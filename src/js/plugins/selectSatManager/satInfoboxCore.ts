@@ -679,39 +679,34 @@ export const intelData = (sat: SatObject, satId?: number): void => {
 export const objectData = (sat: SatObject): void => {
   $('#sat-info-title').html(sat.name);
 
-  let objtype;
-  if (sat.type === SpaceObjectType.UNKNOWN) {
-    objtype = 'TBA';
+  switch (sat.type) {
+    case SpaceObjectType.UNKNOWN:
+      $('#sat-type').html('TBA');
+      break;
+    case SpaceObjectType.PAYLOAD:
+      $('#sat-type').html('Payload');
+      break;
+    case SpaceObjectType.ROCKET_BODY:
+      $('#sat-type').html('Rocket Body');
+      break;
+    case SpaceObjectType.DEBRIS:
+      $('#sat-type').html('Debris');
+      break;
+    case SpaceObjectType.SPECIAL:
+      $('#sat-type').html('Special');
+      break;
+    case SpaceObjectType.RADAR_MEASUREMENT:
+      $('#sat-type').html('Radar Measurement');
+      break;
+    case SpaceObjectType.RADAR_TRACK:
+      $('#sat-type').html('Radar Track');
+      break;
+    case SpaceObjectType.RADAR_OBJECT:
+      $('#sat-type').html('Radar Object');
+      break;
+    default:
+      sat.missile ? $('#sat-type').html('Ballistic Missile') : null;
   }
-  if (sat.type === SpaceObjectType.PAYLOAD) {
-    objtype = 'Payload';
-  }
-  if (sat.type === SpaceObjectType.ROCKET_BODY) {
-    objtype = 'Rocket Body';
-  }
-  if (sat.type === SpaceObjectType.DEBRIS) {
-    objtype = 'Debris';
-  }
-  if (sat.type === SpaceObjectType.SPECIAL) {
-    if (settingsManager.offline) {
-      objtype = 'Special';
-    } else {
-      objtype = 'Amateur Sat';
-    }
-  }
-  if (sat.type === SpaceObjectType.RADAR_MEASUREMENT) {
-    objtype = 'Measurement';
-  }
-  if (sat.type === SpaceObjectType.RADAR_TRACK) {
-    objtype = 'Radar Track';
-  }
-  if (sat.type === SpaceObjectType.RADAR_OBJECT) {
-    objtype = 'Radar Object';
-  }
-  if (sat.missile) {
-    objtype = 'Ballistic Missile';
-  }
-  $('#sat-type').html(objtype);
 
   $('#edit-satinfo-link').html("<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>");
 

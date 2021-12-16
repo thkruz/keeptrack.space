@@ -1,6 +1,7 @@
 import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { KeepTrackPrograms, SatObject } from '../../api/keepTrackTypes';
+import { SpaceObjectType } from '../../api/SpaceObjectType';
 import * as lineManager from './line-factory';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
@@ -52,19 +53,19 @@ describe('removeStars', () => {
   });
 
   test('0', () => {
-    inst.drawLineList = [{ sat: { type: 'Star' } }];
+    inst.drawLineList = [{ sat: { type: SpaceObjectType.STAR } }];
     let result: any = inst.removeStars();
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    inst.drawLineList = [{ sat2: { type: 'Star' } }];
+    inst.drawLineList = [{ sat2: { type: SpaceObjectType.STAR } }];
     let result: any = inst.removeStars();
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    inst.drawLineList = [{ sat2: { type: 'Sat' } }];
+    inst.drawLineList = [{ sat2: { type: SpaceObjectType.PAYLOAD } }];
     let result: any = inst.removeStars();
     expect(result).toMatchSnapshot();
   });

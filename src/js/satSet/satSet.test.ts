@@ -3,6 +3,8 @@ import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms, SatCruncherMessage, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as satSet from '../satSet/satSet';
+import { cruncherDotsManagerInteraction, cruncherExtraUpdate, onCruncherReady, parseGetVariables, satCruncherOnMessage } from './catalogSupport/cruncherInteractions';
+import { getIdFromEci, getIdFromIntlDes, getIdFromObjNum, getIdFromStarName, getSat, getSatExtraOnly, getSatInSun, getSatInView, getSatInViewOnly, getSatPosOnly, getSatVel, getScreenCoords, getSensorFromSensorName } from './catalogSupport/getters';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
@@ -49,15 +51,7 @@ describe('satSet.parseGetVariables', () => {
     satSet.replaceSatSet(keepTrackApi.programs.satSet);
   });
   test('0', () => {
-    let result: any = satSet.parseGetVariables();
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('satSet.initGsData', () => {
-  test('0', () => {
-    let result: any = satSet.initGsData();
+    let result: any = parseGetVariables();
     expect(result).toMatchSnapshot();
   });
 });
@@ -65,32 +59,32 @@ describe('satSet.initGsData', () => {
 // @ponicode
 describe('satSet.getSat', () => {
   test('0', () => {
-    let result: any = satSet.getSat(-5.48);
+    let result: any = getSat(-5.48);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getSat(-100);
+    let result: any = getSat(-100);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satSet.getSat(0);
+    let result: any = getSat(0);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = satSet.getSat(100);
+    let result: any = getSat(100);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satSet.getSat(1);
+    let result: any = getSat(1);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satSet.getSat(-Infinity);
+    let result: any = getSat(-Infinity);
     expect(result).toMatchSnapshot();
   });
 });
@@ -135,32 +129,32 @@ describe('satSet.selectSat', () => {
 // @ponicode
 describe('satSet.getSatInViewOnly', () => {
   test('0', () => {
-    let result: any = satSet.getSatInViewOnly(-5.48);
+    let result: any = getSatInViewOnly(-5.48);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getSatInViewOnly(-100);
+    let result: any = getSatInViewOnly(-100);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satSet.getSatInViewOnly(1);
+    let result: any = getSatInViewOnly(1);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = satSet.getSatInViewOnly(0);
+    let result: any = getSatInViewOnly(0);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satSet.getSatInViewOnly(100);
+    let result: any = getSatInViewOnly(100);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satSet.getSatInViewOnly(-Infinity);
+    let result: any = getSatInViewOnly(-Infinity);
     expect(result).toMatchSnapshot();
   });
 });
@@ -168,32 +162,32 @@ describe('satSet.getSatInViewOnly', () => {
 // @ponicode
 describe('satSet.getSatPosOnly', () => {
   test('0', () => {
-    let result: any = satSet.getSatPosOnly(100);
+    let result: any = getSatPosOnly(100);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getSatPosOnly(-5.48);
+    let result: any = getSatPosOnly(-5.48);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satSet.getSatPosOnly(1);
+    let result: any = getSatPosOnly(1);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = satSet.getSatPosOnly(0);
+    let result: any = getSatPosOnly(0);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satSet.getSatPosOnly(-100);
+    let result: any = getSatPosOnly(-100);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satSet.getSatPosOnly(NaN);
+    let result: any = getSatPosOnly(NaN);
     expect(result).toMatchSnapshot();
   });
 });
@@ -204,32 +198,32 @@ describe('satSet.getIdFromEci', () => {
     satSet.replaceSatSet(keepTrackApi.programs.satSet);
   });
   test('0', () => {
-    let result: any = satSet.getIdFromEci({ x: 1, y: 520, z: 350 });
+    let result: any = getIdFromEci({ x: 1, y: 520, z: 350 });
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getIdFromEci({ x: 350, y: 550, z: 90 });
+    let result: any = getIdFromEci({ x: 350, y: 550, z: 90 });
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satSet.getIdFromEci({ x: 4, y: 30, z: 400 });
+    let result: any = getIdFromEci({ x: 4, y: 30, z: 400 });
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = satSet.getIdFromEci({ x: 90, y: 350, z: 70 });
+    let result: any = getIdFromEci({ x: 90, y: 350, z: 70 });
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satSet.getIdFromEci({ x: 520, y: 550, z: 4 });
+    let result: any = getIdFromEci({ x: 520, y: 550, z: 4 });
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satSet.getIdFromEci({ x: -Infinity, y: -Infinity, z: -Infinity });
+    let result: any = getIdFromEci({ x: -Infinity, y: -Infinity, z: -Infinity });
     expect(result).toMatchSnapshot();
   });
 });
@@ -240,12 +234,12 @@ describe('satSet.getIdFromObjNum', () => {
     satSet.replaceSatSet(keepTrackApi.programs.satSet);
   });
   test('0', () => {
-    let result: any = satSet.getIdFromObjNum(25544);
+    let result: any = getIdFromObjNum(25544);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getIdFromObjNum(-1);
+    let result: any = getIdFromObjNum(-1);
     expect(result).toMatchSnapshot();
   });
 });
@@ -253,7 +247,7 @@ describe('satSet.getIdFromObjNum', () => {
 // @ponicode
 describe('satSet.getSatInView', () => {
   test('0', () => {
-    let result: any = satSet.getSatInView();
+    let result: any = getSatInView();
     expect(result).toMatchSnapshot();
   });
 });
@@ -261,7 +255,7 @@ describe('satSet.getSatInView', () => {
 // @ponicode
 describe('satSet.getSatInSun', () => {
   test('0', () => {
-    let result: any = satSet.getSatInSun();
+    let result: any = getSatInSun();
     expect(result).toMatchSnapshot();
   });
 });
@@ -269,7 +263,7 @@ describe('satSet.getSatInSun', () => {
 // @ponicode
 describe('satSet.getSatVel', () => {
   test('0', () => {
-    let result: any = satSet.getSatVel();
+    let result: any = getSatVel();
     expect(result).toMatchSnapshot();
   });
 });
@@ -293,32 +287,32 @@ describe('satSet.resetSatInSun', () => {
 // @ponicode
 describe('satSet.getSatExtraOnly', () => {
   test('0', () => {
-    let result: any = satSet.getSatExtraOnly(0);
+    let result: any = getSatExtraOnly(0);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getSatExtraOnly(-100);
+    let result: any = getSatExtraOnly(-100);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satSet.getSatExtraOnly(1);
+    let result: any = getSatExtraOnly(1);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = satSet.getSatExtraOnly(-5.48);
+    let result: any = getSatExtraOnly(-5.48);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satSet.getSatExtraOnly(100);
+    let result: any = getSatExtraOnly(100);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satSet.getSatExtraOnly(Infinity);
+    let result: any = getSatExtraOnly(Infinity);
     expect(result).toMatchSnapshot();
   });
 });
@@ -359,7 +353,7 @@ describe('satSet.setSat', () => {
 // @ponicode
 describe('satSet.onCruncherReady', () => {
   test('0', () => {
-    let result: any = satSet.onCruncherReady();
+    let result: any = onCruncherReady();
     expect(result).toMatchSnapshot();
   });
 });
@@ -369,30 +363,30 @@ describe('satSet.getScreenCoords', () => {
   test('0', () => {
     let param2: any = new Float32Array([10.23, 0.5, -1.0, -1.0, 0.0, -1.0, 1.0, -1.0, -29.45, 1.0]);
     let param3: any = new Float32Array([1.0, 1.0, 0.0]);
-    let result: any = satSet.getScreenCoords(-100, param2, param3, { x: 320, y: 4, z: 320 });
+    let result: any = getScreenCoords(-100, param2, param3, { x: 320, y: 4, z: 320 });
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
     let param3: any = new Float32Array([-1.0, -0.5, 10.23]);
-    let result: any = satSet.getScreenCoords(1, [1.0, 0.0, 0.5, 0.5, 10.0, -29.45, 0.5, 10.0, 0.5, -0.5, -29.45, 10.23, 10.23, -1.0, 10.0, -29.45], param3, { x: 70, y: 520, z: 400 });
+    let result: any = getScreenCoords(1, [1.0, 0.0, 0.5, 0.5, 10.0, -29.45, 0.5, 10.0, 0.5, -0.5, -29.45, 10.23, 10.23, -1.0, 10.0, -29.45], param3, { x: 70, y: 520, z: 400 });
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
     let param3: any = new Float32Array([-1.0, 10.23, 0.5]);
-    let result: any = satSet.getScreenCoords(-100, [10.23, 10.0, 1.0, 0.5, 0.5, 1.0, 0.0, 10.0, -0.5, 10.0, 1.0, -29.45, -29.45, -1.0, 10.23, 0.5], param3, { x: 70, y: 350, z: 400 });
+    let result: any = getScreenCoords(-100, [10.23, 10.0, 1.0, 0.5, 0.5, 1.0, 0.0, 10.0, -0.5, 10.0, 1.0, -29.45, -29.45, -1.0, 10.23, 0.5], param3, { x: 70, y: 350, z: 400 });
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
     let param3: any = new Float32Array([10.0, -0.5, 0.0]);
-    let result: any = satSet.getScreenCoords(-5.48, [-0.5, 1.0, 1.0, -1.0, 1.0, -1.0, -29.45, -29.45, -29.45, -0.5, -29.45, -0.5, -0.5, -0.5, 1.0, -1.0], param3, { x: 30, y: 410, z: 400 });
+    let result: any = getScreenCoords(-5.48, [-0.5, 1.0, 1.0, -1.0, 1.0, -1.0, -29.45, -29.45, -29.45, -0.5, -29.45, -0.5, -0.5, -0.5, 1.0, -1.0], param3, { x: 30, y: 410, z: 400 });
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satSet.getScreenCoords(100, [10.23, 0.0, 10.23, 0.5, 1.0, 0.0, -0.5, 0.0, 10.23, 10.0, 0.0, -1.0, 0.5, -29.45, 0.0, -1.0], [-1.0, -1.0, -1.0, -0.5, -0.5, 1.0, -1.0, -1.0, 1.0, -0.5, 10.0, 10.23, -1.0, -1.0, -29.45, -0.5], {
+    let result: any = getScreenCoords(100, [10.23, 0.0, 10.23, 0.5, 1.0, 0.0, -0.5, 0.0, 10.23, 10.0, 0.0, -1.0, 0.5, -29.45, 0.0, -1.0], [-1.0, -1.0, -1.0, -0.5, -0.5, 1.0, -1.0, -1.0, 1.0, -0.5, 10.0, 10.23, -1.0, -1.0, -29.45, -0.5], {
       x: 50,
       y: 4,
       z: 4,
@@ -402,7 +396,7 @@ describe('satSet.getScreenCoords', () => {
 
   test('5', () => {
     let param2: any = new Float32Array([]);
-    let result: any = satSet.getScreenCoords(NaN, param2, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], { x: NaN, y: NaN, z: NaN });
+    let result: any = getScreenCoords(NaN, param2, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], { x: NaN, y: NaN, z: NaN });
     expect(result).toMatchSnapshot();
   });
 });
@@ -483,12 +477,12 @@ describe('satSet.getIdFromIntlDes', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.getIdFromIntlDes('1998-AB');
+    let result: any = getIdFromIntlDes('1998-AB');
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getIdFromIntlDes('2020-A');
+    let result: any = getIdFromIntlDes('2020-A');
     expect(result).toMatchSnapshot();
   });
 });
@@ -500,12 +494,12 @@ describe('satSet.getIdFromStarName', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.getIdFromStarName('test');
+    let result: any = getIdFromStarName('test');
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getIdFromStarName('2020-A');
+    let result: any = getIdFromStarName('2020-A');
     expect(result).toMatchSnapshot();
   });
 });
@@ -517,12 +511,12 @@ describe('satSet.getSensorFromSensorName', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.getSensorFromSensorName('test');
+    let result: any = getSensorFromSensorName('test');
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satSet.getSensorFromSensorName('2020-A');
+    let result: any = getSensorFromSensorName('2020-A');
     expect(result).toMatchSnapshot();
   });
 });
@@ -557,7 +551,7 @@ describe('satSet.satCruncherOnMessage', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.satCruncherOnMessage(defaultSatCruncherMessage);
+    let result: any = satCruncherOnMessage(defaultSatCruncherMessage);
     expect(result).toMatchSnapshot();
   });
 });
@@ -568,7 +562,7 @@ describe('satSet.cruncherExtraUpdate', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.cruncherExtraUpdate(defaultSatCruncherMessage);
+    let result: any = cruncherExtraUpdate(defaultSatCruncherMessage);
     expect(result).toMatchSnapshot();
   });
 });
@@ -579,7 +573,7 @@ describe('satSet.cruncherDotsManagerInteraction', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.cruncherDotsManagerInteraction(defaultSatCruncherMessage);
+    let result: any = cruncherDotsManagerInteraction(defaultSatCruncherMessage);
     expect(result).toMatchSnapshot();
   });
 });
@@ -590,7 +584,7 @@ describe('satSet.satCruncherOnMessage', () => {
   });
 
   test('0', () => {
-    let result: any = satSet.satCruncherOnMessage(defaultSatCruncherMessage);
+    let result: any = satCruncherOnMessage(defaultSatCruncherMessage);
     expect(result).toMatchSnapshot();
   });
 });

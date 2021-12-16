@@ -7,6 +7,7 @@ import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/sele
 import { mat4 } from 'gl-matrix';
 import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
+import { spaceObjType2Str } from '../lib/spaceObjType2Str';
 
 let satHoverBoxNode1: HTMLDivElement;
 let satHoverBoxNode2: HTMLDivElement;
@@ -706,7 +707,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
       if (sat.type === SpaceObjectType.LAUNCH_FACILITY) {
         var launchSite = objectManager.extractLaunchSite(sat.name);
         satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
-        satHoverBoxNode2.innerHTML = sat.type + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+        satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
         satHoverBoxNode3.textContent = '';
       } else if (sat.isRadarData) {
         satHoverBoxNode1.innerHTML = 'Measurement: ' + sat.mId + '</br>Track: ' + sat.trackId + '</br>Object: ' + sat.objectId;
@@ -753,7 +754,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
         }
       } else {
         satHoverBoxNode1.textContent = sat.name;
-        satHoverBoxNode2.innerHTML = sat.type + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+        satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
         satHoverBoxNode3.textContent = '';
       }
     } else if (sat.missile) {

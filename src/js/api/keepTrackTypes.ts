@@ -265,8 +265,8 @@ export interface PickingProgram extends WebGLProgram {
 }
 
 export interface DotsManager {
-  inViewData: any;
-  inSunData: any;
+  inViewData: Int8Array;
+  inSunData: Int8Array;
   colorBuffer: any;
   pickingBuffer: any;
   init(gl: WebGL2RenderingContext): void;
@@ -293,7 +293,7 @@ export interface DotsManager {
   pickingShaderCode: { vert: string; frag: string };
   pickingTexture: WebGLTexture;
   pickingRenderBuffer: WebGLRenderbuffer;
-  velocityData: any;
+  velocityData: Float32Array;
   drawDivisor: number;
   satDataLenInDraw: any;
   satDataLenInDraw3: number;
@@ -510,7 +510,7 @@ export interface ObjectManager {
   starIndex1: number;
   starIndex2: number;
   staticSet: any;
-  analSatSet: any;
+  analSatSet: SatObject[];
   radarDataSet: any;
   missileSet: any;
   isStarManagerLoaded: any;
@@ -1035,15 +1035,14 @@ export interface CatalogManager {
   exportTle2Csv: any;
   exportTle2Txt: any;
   getIdFromEci: (eci: any) => number;
-  getSatInSun: () => number[];
-  getSatInView: () => any;
+  getSatInSun: () => Int8Array;
+  getSatInView: () => Int8Array;
   getSatInViewOnly: (i: number) => any;
-  getSatVel: () => any;
+  getSatVel: () => Float32Array;
   mergeSat: any;
   resetSatInSun: any;
   satExtraData: any;
   selectSat: (i: number) => any;
-  vmagUpdate: any;
   onCruncherReady();
   gsInfo: any;
   queryStr: any;
@@ -1072,7 +1071,6 @@ export interface CatalogManager {
   sccIndex: { [key: string]: number };
   cosparIndex: { [key: string]: number };
   orbitalSats: number;
-  initGsData();
   missileSats: number;
 }
 

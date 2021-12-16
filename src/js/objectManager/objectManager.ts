@@ -2,7 +2,7 @@
 // This loads all of the various modules that provide objects for the screen
 
 import { keepTrackApi } from '../api/keepTrackApi';
-import { ObjectManager } from '../api/keepTrackTypes';
+import { ObjectManager, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { stars } from '../starManager/stars.js';
 import { controlSiteManager, ControlSiteObject } from './controlSiteManager';
@@ -19,24 +19,24 @@ const TEMPLATE_INTLDES = '58001A';
 // TODO: This should be in settings.js
 const controlSiteTypeFilter = (controlSite: ControlSiteObject): boolean => {
   switch (controlSite.type) {
-    case 'Intergovernmental Organization':
-    case 'Launch Agency':
-    case 'Suborbital Payload Operator':
-    case 'Payload Owner':
-    case 'Meteorological Rocket Launch Agency or Manufacturer':
-    case 'Launch Site':
-    case 'Launch Position':
+    case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
+    case SpaceObjectType.LAUNCH_AGENCY:
+    case SpaceObjectType.SUBORBITAL_PAYLOAD_OPERATOR:
+    case SpaceObjectType.PAYLOAD_OWNER:
+    case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
+    case SpaceObjectType.LAUNCH_SITE:
+    case SpaceObjectType.LAUNCH_POSITION:
       return true;
-    case 'Payload Manufacturer':
-    case 'Country':
-    case 'Astronomical Polity':
-    case 'Engine Manufacturer':
-    case 'Launch Vehicle Manufacturer':
-    case 'Parent Organization of Another Entry':
-    case 'Launch Cruise':
-    case 'Launch Zone':
-    case 'Suborbital Target Area':
-    case 'Organization Type Unknown':
+    // case 'Payload Manufacturer':
+    // case 'Country':
+    // case 'Astronomical Polity':
+    // case 'Engine Manufacturer':
+    // case 'Launch Vehicle Manufacturer':
+    // case 'Parent Organization of Another Entry':
+    // case 'Launch Cruise':
+    // case 'Launch Zone':
+    // case 'Suborbital Target Area':
+    // case 'Organization Type Unknown':
     default:
       return false;
   }
@@ -466,7 +466,7 @@ const init = () => {
       static: false,
       missile: true,
       active: false,
-      type: '',
+      type: SpaceObjectType.UNKNOWN,
       name: i,
       latList: [],
       lonList: [],
@@ -482,7 +482,7 @@ const init = () => {
       missile: false,
       active: false,
       isRadarData: true,
-      type: '',
+      type: SpaceObjectType.UNKNOWN,
       name: `Radar Data ${i}`,
     };
     objectManager.radarDataSet.push(radarDataInfo);
@@ -491,19 +491,19 @@ const init = () => {
   // Create a buffer of analyst satellite objects
   for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
     const sccNum = (80000 + i).toString();
-    objectManager.analSatSet.push({
+    objectManager.analSatSet.push(<SatObject>{
       static: false,
       missile: false,
       active: false,
-      ON: 'Analyst Sat ' + i,
-      C: 'ANALSAT',
-      LV: 'Analyst Satellite',
-      LS: 'ANALSAT',
+      name: 'Analyst Sat ' + i,
+      country: 'ANALSAT',
+      launchVehicle: 'Analyst Satellite',
+      launchSite: 'ANALSAT',
       sccNum: sccNum,
       TLE1: `${TEMPLATE_TLE1_BEGINNING}${sccNum}${TEMPLATE_TLE1_ENDING}`,
       TLE2: `${TEMPLATE_TLE2_BEGINNING}${sccNum}${TEMPLATE_TLE2_ENDING}`,
       intlDes: TEMPLATE_INTLDES,
-      type: 'sat',
+      type: SpaceObjectType.PAYLOAD,
       id: i,
     });
   }
@@ -516,7 +516,7 @@ const init = () => {
         name: getStarName(star),
         static: true,
         shortName: 'STAR',
-        type: 'Star',
+        type: SpaceObjectType.STAR,
         dec: star.dec,
         ra: star.ra,
         dist: star.dist,
@@ -562,6 +562,11 @@ const init = () => {
     controlSiteList
       // Remove any control sites that are closed
       .filter((controlSite) => controlSite.TStop === '')
+      // TODO: Control sites all should have an SpaceObjectType Enum
+      // Until all the control sites have enums ignore the legacy ones
+      .filter((controlSite) => typeof controlSite.type !== 'string')
+      // Until all the control sites enums are implemented ignore the odd ones
+      .filter((controlSite) => controlSite.type <= 25)
       .filter(controlSiteTypeFilter)
       // Add the static properties to the control site objects
       .map((controlSite) => ({ ...{ static: true }, ...controlSite }))

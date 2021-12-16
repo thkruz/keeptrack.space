@@ -39,7 +39,6 @@ import { objectManager } from './objectManager/objectManager';
 import { orbitManager } from './orbitManager/orbitManager';
 import { sensorManager } from './plugins/sensor/sensorManager';
 import { satellite } from './satMath/satMath';
-// import { radarDataManager } from'./satSet/radarDataManager.js';
 import { satSet } from './satSet/satSet';
 import { VERSION } from './settingsManager/version.js';
 import { VERSION_DATE } from './settingsManager/versionDate.js';
@@ -50,10 +49,13 @@ import { searchBox } from './uiManager/searchBox';
 import { uiInput, uiManager } from './uiManager/uiManager';
 
 export const forceHttps = (): void => {
+  const isValidUrl = (url: string) => url.startsWith('http://');
   // Allow localhost testing
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
   // Force HTTPS
-  window.location.href.startsWith('http:') ? (window.location.href = window.location.href.replace('http:', 'https:')) : null;
+  if (isValidUrl(window.location.href)) {
+    window.location.href = window.location.href.replace('http:', 'https:');
+  }
 };
 
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {

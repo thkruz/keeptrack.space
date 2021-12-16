@@ -10,6 +10,7 @@ on:
 jobs:
   gh-pages:
     name: Deploy to GitHub Pages
+    environment: Development
     runs-on: ubuntu-latest
     steps:
       # Checkout code
@@ -60,6 +61,7 @@ jobs:
           scan-url: "https://thkruz.github.io/keeptrack.space/"
   live-server:
     needs: gh-pages
+    environment: Production
     name: Deploy to KeepTrack.Space
     runs-on: ubuntu-latest
 

@@ -29,19 +29,6 @@ describe('main.importCss', () => {
   });
 });
 
-describe('main.forceHttps', () => {
-  it('should change an http to https', () => {
-    setUrl('http://dummy.com');
-    main.forceHttps();
-    expect(window.location.href).toBe('https://dummy.com');
-  });
-  it('should not break an https request', () => {
-    setUrl('https://dummy.com');
-    main.forceHttps();
-    expect(window.location.href).toBe('https://dummy.com');
-  });
-});
-
 describe('main.showErrorCode', () => {
   it('should show the error code', () => {
     document.body.innerHTML = '<div id="loader-text"></div>';

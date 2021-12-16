@@ -1,7 +1,7 @@
 import { stringPad } from '@app/js/lib/helpers';
 
 export const formatInclination = (inc: string): string => {
-  parseFloat(inc).toPrecision(7);
+  inc = parseFloat(inc).toPrecision(7);
   const incArr = inc.split('.');
   incArr[0] = incArr[0].substr(-3, 3);
   if (incArr[1]) {
@@ -14,7 +14,7 @@ export const formatInclination = (inc: string): string => {
   return inc;
 };
 export const formatMeanMotion = (meanmo: string): string => {
-  parseFloat(meanmo).toPrecision(10);
+  meanmo = parseFloat(meanmo).toPrecision(10);
   const meanmoArr = meanmo.split('.');
   meanmoArr[0] = meanmoArr[0].substr(-2, 2);
   if (meanmoArr[1]) {
@@ -27,7 +27,7 @@ export const formatMeanMotion = (meanmo: string): string => {
   return meanmo;
 };
 export const formatRightAscension = (rasc: string): string => {
-  parseFloat(rasc).toPrecision(7);
+  rasc = parseFloat(rasc).toPrecision(7);
   const rascArr = rasc.split('.');
   rascArr[0] = rascArr[0].substr(-3, 3);
   if (rascArr[1]) {
@@ -40,7 +40,7 @@ export const formatRightAscension = (rasc: string): string => {
   return rasc;
 };
 export const formatArgumentOfPerigee = (argPe: string): string => {
-  parseFloat(argPe).toPrecision(7);
+  argPe = parseFloat(argPe).toPrecision(7);
   const argPeArr = argPe.split('.');
   argPeArr[0] = argPeArr[0].substr(-3, 3);
   if (argPeArr[1]) {
@@ -53,7 +53,7 @@ export const formatArgumentOfPerigee = (argPe: string): string => {
   return argPe;
 };
 export const formatMeanAnomaly = (meana: string): string => {
-  parseFloat(meana).toPrecision(7);
+  meana = parseFloat(meana).toPrecision(7);
   const meanaArr = meana.split('.');
   meanaArr[0] = meanaArr[0].substr(-3, 3);
   if (meanaArr[1]) {

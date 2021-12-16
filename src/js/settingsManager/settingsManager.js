@@ -549,8 +549,6 @@ settingsManager = {
     // Determines if the Loading is complete
     settingsManager.cruncherReady = false;
 
-    settingsManager.altLoadMsgs = false;
-
     settingsManager.lkVerify = Date.now();
 
     // If No UI Reduce Overhead
@@ -718,7 +716,15 @@ settingsManager = {
     }
 
     // Make sure there is some map loaded!
-    if (!settingsManager.smallImages && !settingsManager.nasaImages && !settingsManager.blueImages && !settingsManager.lowresImages && !settingsManager.hiresImages && !settingsManager.hiresNoCloudsImages && !settingsManager.vectorImages) {
+    if (
+      !settingsManager.smallImages &&
+      !settingsManager.nasaImages &&
+      !settingsManager.blueImages &&
+      !settingsManager.lowresImages &&
+      !settingsManager.hiresImages &&
+      !settingsManager.hiresNoCloudsImages &&
+      !settingsManager.vectorImages
+    ) {
       settingsManager.lowresImages = true;
     }
   },

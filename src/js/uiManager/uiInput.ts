@@ -184,13 +184,13 @@ export const init = (): void => {
 
   if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
     const stopKeyZoom = (event: KeyboardEvent) => {
-      if (event.ctrlKey == true && (event.code == 'Equal' || event.code == 'NumpadAdd' || event.code == 'NumpadSubtract' || event.code == 'NumpadSubtract' || event.code == 'Minus')) {
+      if (event.ctrlKey && (event.code == 'Equal' || event.code == 'NumpadAdd' || event.code == 'NumpadSubtract' || event.code == 'NumpadSubtract' || event.code == 'Minus')) {
         event.preventDefault();
       }
     };
 
     const stopWheelZoom = (event: Event) => {
-      if (mainCamera.isCtrlPressed == true) {
+      if (mainCamera.isCtrlPressed) {
         event.preventDefault();
       }
     };
@@ -271,7 +271,10 @@ export const init = (): void => {
       if (typeof evt.originalEvent == 'undefined') return;
 
       if (isPinching && typeof evt.originalEvent.touches[0] != 'undefined' && typeof evt.originalEvent.touches[1] != 'undefined') {
-        const currentPinchDistance = Math.hypot(evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX, evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
+        const currentPinchDistance = Math.hypot(
+          evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+          evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY
+        );
         if (isNaN(currentPinchDistance)) return;
 
         deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
@@ -289,7 +292,7 @@ export const init = (): void => {
           mainCamera.camZoomSnappedOnSat = false;
         }
         uiInput.isMouseMoving = true;
-        clearTimeout(<number>mouseTimeout);
+        clearTimeout(mouseTimeout);
         mouseTimeout = window.setTimeout(function () {
           uiInput.isMouseMoving = false;
         }, 250);
@@ -310,7 +313,7 @@ export const init = (): void => {
           uiInput.isMouseMoving = true;
 
           // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
-          clearTimeout(<number>mouseTimeout);
+          clearTimeout(mouseTimeout);
           mouseTimeout = window.setTimeout(function () {
             uiInput.isMouseMoving = false;
           }, 150);
@@ -672,7 +675,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         console.debug('latLon undefined!');
         latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
       }
-      (<any>M).toast({
+      M.toast({
         html: 'Lat: ' + latLon.lat.toFixed(3) + '<br/>Lon: ' + latLon.lon.toFixed(3),
       });
       break;
@@ -695,7 +698,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
         latLon = satellite.eci2ll(dragPoint[0], dragPoint[1], dragPoint[2]);
       }
       var gpsDOP = satellite.getDops(latLon.lat, latLon.lon, 0);
-      (<any>M).toast({
+      M.toast({
         html: 'HDOP: ' + gpsDOP.hdop + '<br/>VDOP: ' + gpsDOP.vdop + '<br/>PDOP: ' + gpsDOP.pdop + '<br/>GDOP: ' + gpsDOP.gdop + '<br/>TDOP: ' + gpsDOP.tdop,
       });
       break;
@@ -718,7 +721,6 @@ export const rmbMenuActions = (e: MouseEvent) => {
           const lat: number = parseFloat(<string>$('#dops-lat').val());
           const lon: number = parseFloat(<string>$('#dops-lon').val());
           const alt: number = parseFloat(<string>$('#dops-alt').val());
-          // var el = $('#dops-el').val() * 1;
           satellite.updateDopsTable(lat, lon, alt);
           $('#menu-dops').addClass('bmenu-item-selected');
           $('#loading-screen').fadeOut('slow');
@@ -754,11 +756,6 @@ export const rmbMenuActions = (e: MouseEvent) => {
       });
       break;
     case 'reset-camera-rmb':
-      // if (mainCamera.cameraType.current == mainCamera.cameraType.FixedToSat) {
-      //   // NOTE: Maybe a reset flag to move back to original position over time?
-      //   mainCamera.camPitch = 0;
-      //   mainCamera.camYaw = 0;
-      // }
       mainCamera.isPanReset = true;
       mainCamera.isLocalRotateReset = true;
       mainCamera.ftsRotateReset = true;
@@ -808,11 +805,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
       });
       break;
     case 'colors-default-rmb':
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
-        uiManager.legendMenuChange('default');
-      } else {
-        uiManager.legendMenuChange('default');
-      }
+      uiManager.legendMenuChange('default');
       satSet.setColorScheme(colorSchemeManager.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
@@ -997,7 +990,11 @@ export const rmbMenuActions = (e: MouseEvent) => {
         uiManager.hideSideMenus();
         $('#menu-space-stations').removeClass('bmenu-item-selected');
 
-        if ((!objectManager.isSensorManagerLoaded || sensorManager.currentSensor[0].lat != null) && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && mainCamera.cameraType.current !== mainCamera.cameraType.Astronomy) {
+        if (
+          (!objectManager.isSensorManagerLoaded || sensorManager.currentSensor[0].lat != null) &&
+          mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium &&
+          mainCamera.cameraType.current !== mainCamera.cameraType.Astronomy
+        ) {
           uiManager.legendMenuChange('default');
         }
 
@@ -1038,7 +1035,7 @@ export const getSatIdFromCoordAlt = (x: number, y: number): number => {
     y: eci[1],
     z: eci[2],
   };
-  return <number>keepTrackApi.programs.satSet.getIdFromEci(eciArray);
+  return keepTrackApi.programs.satSet.getIdFromEci(eciArray);
 };
 export const getSatIdFromCoord = (x: number, y: number): number => {
   const { dotsManager } = keepTrackApi.programs;
@@ -1047,12 +1044,12 @@ export const getSatIdFromCoord = (x: number, y: number): number => {
   // NOTE: gl.readPixels is a huge bottleneck
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
   if (typeof process === 'undefined' && uiInput.isAsyncWorking) {
-    uiInput.readPixelsAsync(gl, x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
+    uiInput.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
   }
   if (!uiInput.isAsyncWorking) {
     gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
   }
-  // const id = ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
+  // NOTE: const id = ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
   return ((dotsManager.pickReadPixelBuffer[2] << 16) | (dotsManager.pickReadPixelBuffer[1] << 8) | dotsManager.pickReadPixelBuffer[0]) - 1;
 };
 export const getEarthScreenPoint = (x: number, y: number) => {
@@ -1240,7 +1237,10 @@ export const canvasTouchStart = (evt: any) => {
   if (evt.originalEvent.touches.length > 1) {
     // Two Finger Touch
     isPinching = true;
-    startPinchDistance = Math.hypot(evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX, evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY);
+    startPinchDistance = Math.hypot(
+      evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+      evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY
+    );
     // _pinchStart(evt)
   } else {
     // Single Finger Touch
@@ -1407,13 +1407,13 @@ export const openRmbMenu = () => {
     $('#earth-high-no-clouds-rmb').show();
     $('#earth-vec-rmb').show();
     $('#earth-political-rmb').show();
-    if (settingsManager.nasaImages == true) $('#earth-nasa-rmb').hide();
-    if (settingsManager.trusatImages == true) $('#earth-trusat-rmb').hide();
-    if (settingsManager.blueImages == true) $('#earth-blue-rmb').hide();
-    if (settingsManager.lowresImages == true) $('#earth-low-rmb').hide();
-    if (settingsManager.hiresNoCloudsImages == true) $('#earth-high-no-clouds-rmb').hide();
-    if (settingsManager.vectorImages == true) $('#earth-vec-rmb').hide();
-    if (settingsManager.politicalImages == true) $('#earth-political-rmb').hide();
+    if (settingsManager.nasaImages) $('#earth-nasa-rmb').hide();
+    if (settingsManager.trusatImages) $('#earth-trusat-rmb').hide();
+    if (settingsManager.blueImages) $('#earth-blue-rmb').hide();
+    if (settingsManager.lowresImages) $('#earth-low-rmb').hide();
+    if (settingsManager.hiresNoCloudsImages) $('#earth-high-no-clouds-rmb').hide();
+    if (settingsManager.vectorImages) $('#earth-vec-rmb').hide();
+    if (settingsManager.politicalImages) $('#earth-political-rmb').hide();
 
     rightBtnSaveDOM.hide();
   };
@@ -1439,7 +1439,7 @@ export const openRmbMenu = () => {
   });
 };
 export const hidePopUps = () => {
-  if (settingsManager.isPreventColorboxClose == true) return;
+  if (settingsManager.isPreventColorboxClose) return;
   const { uiManager } = keepTrackApi.programs;
   const rightBtnMenuDOM = $('#right-btn-menu');
   rightBtnMenuDOM.hide();
@@ -1490,8 +1490,9 @@ export const getBufferSubDataAsync = async (gl: any, target: any, buffer: any, s
   return dstBuffer;
 };
 /* istanbul ignore next */
-export const readPixelsAsync = async (gl: any, x: number, y: number, w: number, h: number, format: any, type: any, dstBuffer: any) => {
+export const readPixelsAsync = async (x: number, y: number, w: number, h: number, format: any, type: any, dstBuffer: any) => {
   try {
+    const { gl } = keepTrackApi.programs.drawManager;
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buf);
     gl.bufferData(gl.PIXEL_PACK_BUFFER, dstBuffer.byteLength, gl.STREAM_READ);

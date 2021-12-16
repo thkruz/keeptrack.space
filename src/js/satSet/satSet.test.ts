@@ -4,7 +4,21 @@ import { KeepTrackPrograms, SatCruncherMessage, SatObject } from '../api/keepTra
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as satSet from '../satSet/satSet';
 import { cruncherDotsManagerInteraction, cruncherExtraUpdate, onCruncherReady, parseGetVariables, satCruncherOnMessage } from './catalogSupport/cruncherInteractions';
-import { getIdFromEci, getIdFromIntlDes, getIdFromObjNum, getIdFromStarName, getSat, getSatExtraOnly, getSatInSun, getSatInView, getSatInViewOnly, getSatPosOnly, getSatVel, getScreenCoords, getSensorFromSensorName } from './catalogSupport/getters';
+import {
+  getIdFromEci,
+  getIdFromIntlDes,
+  getIdFromObjNum,
+  getIdFromStarName,
+  getSat,
+  getSatExtraOnly,
+  getSatInSun,
+  getSatInView,
+  getSatInViewOnly,
+  getSatPosOnly,
+  getSatVel,
+  getScreenCoords,
+  getSensorFromSensorName,
+} from './catalogSupport/getters';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
@@ -48,7 +62,7 @@ describe('satSet.init', () => {
 
 describe('satSet.parseGetVariables', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
   test('0', () => {
     let result: any = parseGetVariables();
@@ -58,6 +72,12 @@ describe('satSet.parseGetVariables', () => {
 
 // @ponicode
 describe('satSet.getSat', () => {
+  it('should return extra info if gotExtraData is true', () => {
+    satSet.init(keepTrackApi.programs.satSet.satCruncher);
+    keepTrackApi.programs.satSet.gotExtraData = true;
+    let result: any = getSat(0);
+    expect(result.velocity).not.toBe(false);
+  });
   test('0', () => {
     let result: any = getSat(-5.48);
     expect(result).toMatchSnapshot();
@@ -92,8 +112,9 @@ describe('satSet.getSat', () => {
 // @ponicode
 describe('satSet.selectSat', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
     keepTrackApi.programs.colorSchemeManager.currentColorScheme = keepTrackApi.programs.colorSchemeManager.default;
+    keepTrackApi.programs.colorSchemeManager.colorBufferOneTime = true;
   });
   test('0', () => {
     let result: any = satSet.selectSat(-1);
@@ -195,7 +216,7 @@ describe('satSet.getSatPosOnly', () => {
 // @ponicode
 describe('satSet.getIdFromEci', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
   test('0', () => {
     let result: any = getIdFromEci({ x: 1, y: 520, z: 350 });
@@ -231,7 +252,7 @@ describe('satSet.getIdFromEci', () => {
 // @ponicode
 describe('satSet.getIdFromObjNum', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
   test('0', () => {
     let result: any = getIdFromObjNum(25544);
@@ -286,6 +307,9 @@ describe('satSet.resetSatInSun', () => {
 
 // @ponicode
 describe('satSet.getSatExtraOnly', () => {
+  beforeEach(() => {
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
+  });
   test('0', () => {
     let result: any = getSatExtraOnly(0);
     expect(result).toMatchSnapshot();
@@ -381,16 +405,25 @@ describe('satSet.getScreenCoords', () => {
 
   test('3', () => {
     let param3: any = new Float32Array([10.0, -0.5, 0.0]);
-    let result: any = getScreenCoords(-5.48, [-0.5, 1.0, 1.0, -1.0, 1.0, -1.0, -29.45, -29.45, -29.45, -0.5, -29.45, -0.5, -0.5, -0.5, 1.0, -1.0], param3, { x: 30, y: 410, z: 400 });
+    let result: any = getScreenCoords(-5.48, [-0.5, 1.0, 1.0, -1.0, 1.0, -1.0, -29.45, -29.45, -29.45, -0.5, -29.45, -0.5, -0.5, -0.5, 1.0, -1.0], param3, {
+      x: 30,
+      y: 410,
+      z: 400,
+    });
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = getScreenCoords(100, [10.23, 0.0, 10.23, 0.5, 1.0, 0.0, -0.5, 0.0, 10.23, 10.0, 0.0, -1.0, 0.5, -29.45, 0.0, -1.0], [-1.0, -1.0, -1.0, -0.5, -0.5, 1.0, -1.0, -1.0, 1.0, -0.5, 10.0, 10.23, -1.0, -1.0, -29.45, -0.5], {
-      x: 50,
-      y: 4,
-      z: 4,
-    });
+    let result: any = getScreenCoords(
+      100,
+      [10.23, 0.0, 10.23, 0.5, 1.0, 0.0, -0.5, 0.0, 10.23, 10.0, 0.0, -1.0, 0.5, -29.45, 0.0, -1.0],
+      [-1.0, -1.0, -1.0, -0.5, -0.5, 1.0, -1.0, -1.0, 1.0, -0.5, 10.0, 10.23, -1.0, -1.0, -29.45, -0.5],
+      {
+        x: 50,
+        y: 4,
+        z: 4,
+      }
+    );
     expect(result).toMatchSnapshot();
   });
 
@@ -404,7 +437,7 @@ describe('satSet.getScreenCoords', () => {
 // @ponicode
 describe('satSet.convertIdArrayToSatnumArray', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
   test('0', () => {
     let result: any = satSet.convertIdArrayToSatnumArray([10, 10, 64]);
@@ -473,7 +506,7 @@ describe('satSet.convertSatnumArrayToIdArray', () => {
 // @ponicode
 describe('satSet.getIdFromIntlDes', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -490,7 +523,7 @@ describe('satSet.getIdFromIntlDes', () => {
 // @ponicode
 describe('satSet.getIdFromStarName', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -507,7 +540,7 @@ describe('satSet.getIdFromStarName', () => {
 // @ponicode
 describe('satSet.getSensorFromSensorName', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -524,7 +557,7 @@ describe('satSet.getSensorFromSensorName', () => {
 // @ponicode
 describe('satSet.mergeSat', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -535,19 +568,19 @@ describe('satSet.mergeSat', () => {
 
 // @ponicode
 describe('satSet.addSatExtraFunctions', () => {
-  beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
-  });
-
   test('0', () => {
+    const fakeSatSet = <any>keepTrackApiStubs.programs.satSet;
+    delete fakeSatSet.satData[0].isInSun;
+    satSet.replaceSatSet(fakeSatSet);
     let result: any = satSet.addSatExtraFunctions(0);
     expect(result).toMatchSnapshot();
+    expect(() => satSet.satSet.satData[0].isInSun()).not.toThrow();
   });
 });
 
 describe('satSet.satCruncherOnMessage', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -558,7 +591,7 @@ describe('satSet.satCruncherOnMessage', () => {
 
 describe('satSet.cruncherExtraUpdate', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -569,7 +602,7 @@ describe('satSet.cruncherExtraUpdate', () => {
 
 describe('satSet.cruncherDotsManagerInteraction', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -580,7 +613,7 @@ describe('satSet.cruncherDotsManagerInteraction', () => {
 
 describe('satSet.satCruncherOnMessage', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -591,7 +624,7 @@ describe('satSet.satCruncherOnMessage', () => {
 
 describe('satSet.insertNewAnalystSatellite', () => {
   beforeAll(() => {
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {
@@ -602,7 +635,7 @@ describe('satSet.insertNewAnalystSatellite', () => {
 describe('satSet.setHover', () => {
   beforeAll(() => {
     keepTrackApi.programs.colorSchemeManager.currentColorScheme = keepTrackApi.programs.colorSchemeManager.default;
-    satSet.replaceSatSet(keepTrackApi.programs.satSet);
+    satSet.replaceSatSet(keepTrackApiStubs.programs.satSet);
   });
 
   test('0', () => {

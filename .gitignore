@@ -90,6 +90,7 @@ embed
 
 # Work In Progress
 src/js/wip/
+src/js/satSet/radarDataManager.js
 
 # nyc Output
 .nyc_output

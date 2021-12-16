@@ -7347,12 +7347,12 @@ textarea.materialize-textarea {
     width: 36px;
     height: 14px;
     background-color: rgba(0, 0, 0, 0.38);
-    border-radius: 15px;
-    margin-right: 10px;
+    border-radius: 15px;    
     -webkit-transition: background 0.3s ease;
     transition: background 0.3s ease;
     vertical-align: middle;
     margin: 0 16px;
+    margin-right: 10px;
 }
 
 .switch label .lever:before,

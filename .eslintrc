@@ -7,6 +7,7 @@
   "globals": {
     "M": "readonly",
     "$": "readonly",
+    "process": "readonly",
     "global": "writable",
     "__dirname": "readonly",
     "settingsManager": "writable"

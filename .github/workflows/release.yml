@@ -1,3 +1,4 @@
+---
 name: Release
 on:
   workflow_dispatch:
@@ -20,7 +21,7 @@ jobs:
 
   publish-npm:
     name: Publish on NPM
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -28,16 +29,16 @@ jobs:
       - name: Set up Node.js for NPM
         uses: actions/setup-node@v1
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
-      - run: npm install
+      - run: npm ci
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish-gpr:
     name: Publish on GPR
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -45,10 +46,10 @@ jobs:
       - name: Set up Node.js for GPR
         uses: actions/setup-node@v1
         with:
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: '@thkruz'
+          registry-url: "https://npm.pkg.github.com/"
+          scope: "@thkruz"
 
-      - run: npm install
+      - run: npm ci
       - run: npm run publish:github
       - run: npm publish
         env:

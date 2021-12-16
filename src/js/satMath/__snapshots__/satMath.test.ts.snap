@@ -37,27 +37,6 @@ Array [
 ]
 `;
 
-exports[`satMath.currentEpoch 1 1`] = `
-Array [
-  "30",
-  "000.20833333",
-]
-`;
-
-exports[`satMath.currentEpoch 2 1`] = `
-Array [
-  "20",
-  "000.20833333",
-]
-`;
-
-exports[`satMath.currentEpoch 3 1`] = `
-Array [
-  "20",
-  "000.20833333",
-]
-`;
-
 exports[`satMath.currentEpoch 4 1`] = `
 Array [
   "N",

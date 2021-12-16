@@ -2,7 +2,7 @@ import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms } from '../api/keepTrackTypes';
 import { controlSiteManager } from './controlSiteManager';
-import * as satLinkManager from './satlinkManager';
+import * as satLinkManager from './satLinkManager';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 

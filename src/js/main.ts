@@ -39,7 +39,6 @@ import { objectManager } from './objectManager/objectManager';
 import { orbitManager } from './orbitManager/orbitManager';
 import { sensorManager } from './plugins/sensor/sensorManager';
 import { satellite } from './satMath/satMath';
-// import { radarDataManager } from'./satSet/radarDataManager.js';
 import { satSet } from './satSet/satSet';
 import { VERSION } from './settingsManager/version.js';
 import { VERSION_DATE } from './settingsManager/versionDate.js';
@@ -48,13 +47,6 @@ import { timeManager } from './timeManager/timeManager';
 import { adviceManager } from './uiManager/adviceManager';
 import { searchBox } from './uiManager/searchBox';
 import { uiInput, uiManager } from './uiManager/uiManager';
-
-export const forceHttps = (): void => {
-  // Allow localhost testing
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
-  // Force HTTPS
-  window.location.href.startsWith('http:') ? (window.location.href = window.location.href.replace('http:', 'https:')) : null;
-};
 
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {
   let errorHtml = '';
@@ -168,8 +160,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
   }
 };
 
-// Force HTTPS on main website
-forceHttps();
 // Load the CSS
 importCss();
 // Load the main website

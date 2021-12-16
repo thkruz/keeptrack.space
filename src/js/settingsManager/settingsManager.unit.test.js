@@ -13,8 +13,8 @@ const setUrl = (url) => {
   Object.defineProperty(window, 'location', {
     value: {
       href: url,
-      host: host,
-      search: search,
+      host,
+      search,
     },
     writable: true,
   });
@@ -67,9 +67,7 @@ describe('settingsManager URL Test', () => {
         url = 'http://localhost/index.html?lowperf&nostars';
         setUrl(url);
         // Make this a iPhone
-        navigator.__defineGetter__('userAgent', function () {
-          return 'iPhone'; // customized user agent
-        });
+        navigator.__defineGetter__('userAgent', () => 'iPhone');
         break;
       case 10:
         url = 'http://localhost/index.html?hires&cpo&logo&noPropRate';
@@ -77,6 +75,8 @@ describe('settingsManager URL Test', () => {
         break;
       case 11:
         // This is a test of other random functions
+        break;
+      default:
         break;
     }
     testCaseNum++;
@@ -131,7 +131,6 @@ describe('settingsManager URL Test', () => {
     uiManager.loadStr('');
     uiManager.loadStr('math');
     uiManager.loadStr('science');
-    settingsManager.altLoadMsgs = false;
     uiManager.loadStr('science');
     uiManager.loadStr('dots');
     uiManager.loadStr('satIntel');

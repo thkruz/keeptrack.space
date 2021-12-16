@@ -5,67 +5,65 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - master
+      - master
   pull_request:
     branches:
-    - master
+      - master
 
 jobs:
   lint-yml:
     name: Yaml Lint
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
-    - name: YAML Lint
-      uses: ibiqlik/action-yamllint@v3.1.0
-      with:
-        file_or_dir: ${{ github.workspace }}/.github/workflows/build-pipeline.yml
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: YAML Lint
+        uses: ibiqlik/action-yamllint@v3.1.0
+        with:
+          file_or_dir: ${{ github.workspace }}/
+            .github/workflows/build-pipeline.yml
   compliance:
     needs: lint-yml
     name: NPM Audit Report
     runs-on: ubuntu-latest
     steps:
-    - name: NPM Audit Report
-      uses: wx-jayesh/actions-npm-audit-comment@v1.0.0
+      - name: NPM Audit Report
+        uses: wx-jayesh/actions-npm-audit-comment@v1.0.0
   build:
     needs: compliance
     name: Build
     runs-on: ubuntu-latest
     
     steps:
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '17'
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '17'
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
 
-    - name: Install Dependencies
-      run: npm ci --ignore-scripts
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
 
-    - name: Build
-      run: npm build
-
-
-
-    - run: node ./node_modules/.bin/codecov
+      - name: Build
+        run: npm build
   unit-tests:
     needs: build
     name: Unit Tests
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Test
         run: npm test
@@ -74,25 +72,27 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'javascript' ]        
-
     steps:
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@v1.6
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.6
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: ${{ matrix.language }}
-        
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: javascript
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+  code-coverage:
+    needs: analyze
+    name: Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Coverage
+      - run: node ./node_modules/.bin/codecov
   security:
     needs: analyze
 

@@ -15,7 +15,7 @@ jobs:
     - name: YAML Lint
       uses: ibiqlik/action-yamllint@v3.1.0
       with:
-        file_or_dir: ./.github/workflows/node-ci.yaml
+        file_or_dir: ${{ github.workspace }}/.github/workflows/node-ci.yaml
   compliance:
     needs: lint-yml
     name: NPM Audit Report

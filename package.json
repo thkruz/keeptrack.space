@@ -31,7 +31,6 @@
     "lint": "npx eslint . --ignore-path .gitignore --ext js,ts,tsx",
     "start": "npx five-server --entry-file=dist/index.htm",
     "start:embed": "npx five-server --entry-file=embeded/index.htm",
-    "test:unit": "npm run test",
     "test": "cross-env NODE_ENV=development && jest --coverage",
     "version:major": "npm version major && npm run changelog",
     "version:minor": "npm version minor && npm run changelog",

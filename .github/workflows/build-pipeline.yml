@@ -144,7 +144,7 @@ jobs:
       - name: Test
         run: npm test
   analyze:
-    needs: unit-tests
+    needs: [eslint, unit-tests]
     name: Analyze
     runs-on: ubuntu-latest
 

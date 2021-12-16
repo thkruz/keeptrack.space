@@ -90,9 +90,10 @@ jobs:
     needs: analyze
     name: Analyze
     runs-on: ubuntu-latest
+
     steps:
       - name: Code Coverage
-      - run: node ./node_modules/.bin/codecov
+        run: node ./node_modules/.bin/codecov
   security:
     needs: analyze
 

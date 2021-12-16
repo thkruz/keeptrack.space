@@ -3,13 +3,7 @@ import { saveCsv } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const initMenuController = () => {
-  const { objectManager, timeManager, orbitManager, satSet, satellite, searchBox, uiManager } = keepTrackApi.programs;
-
-  // Reset time if in retro mode
-  if (settingsManager.retro) {
-    timeManager.staticOffset = new Date(2000, 2, 13).getTime() - Date.now();
-    keepTrackApi.methods.updateDateTime(new Date(timeManager.dynamicOffsetEpoch + timeManager.staticOffset));
-  }
+  const { objectManager, orbitManager, satSet, satellite, searchBox, uiManager } = keepTrackApi.programs;
 
   $('#search-icon').on('click', () => {
     uiManager.searchToggle();
@@ -98,11 +92,8 @@ export const initMenuController = () => {
   });
 
   $('#search-results').on('mouseover', '.search-result', function () {
-    const satId = $(this).data('sat-id');
-    orbitManager.setHoverOrbit(satId);
-    satSet.setHover(satId);
-    searchBox.isHovering(true);
-    searchBox.setHoverSat(satId);
+    const satId = <number>$(this).data('sat-id');
+    searchForSat(satId);
   });
   $('#search-results').on('mouseout', () => {
     orbitManager.clearHoverOrbit();
@@ -229,4 +220,12 @@ export const initMenuController = () => {
   $('#export-multiSiteArray').on('click', () => {
     saveCsv(satellite.lastMultiSiteArray, 'multiSiteLooks');
   });
+};
+
+export const searchForSat = (satId: number) => {
+  const { orbitManager, satSet, searchBox } = keepTrackApi.programs;
+  orbitManager.setHoverOrbit(satId);
+  satSet.setHover(satId);
+  searchBox.isHovering(true);
+  searchBox.setHoverSat(satId);
 };

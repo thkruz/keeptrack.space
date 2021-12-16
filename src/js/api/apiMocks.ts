@@ -367,6 +367,8 @@ export const keepTrackApiStubs = {
       },
       setSelectOrbit: jest.fn(),
       draw: jest.fn(),
+      setHoverOrbit: jest.fn(),
+      clearHoverOrbit: jest.fn(),
       clearSelectOrbit: jest.fn(),
       updateOrbitBuffer: jest.fn(),
       clearInViewOrbit: jest.fn(),
@@ -457,6 +459,7 @@ export const keepTrackApiStubs = {
       sunECI: { x: 0, y: 0, z: 0 },
       getSatInViewOnly: () => defaultSat,
       default: '',
+      setHover: jest.fn(),
       insertNewAnalystSatellite: () => ({ sccNum: 25544 }),
       searchYear: () => [25544],
       searchYearOrLess: () => [25544],
@@ -475,6 +478,7 @@ export const keepTrackApiStubs = {
       doSearch: jest.fn(),
       getLastResultGroup: jest.fn(),
       isHovering: jest.fn(),
+      setHoverSat: jest.fn(),
       isResultBoxOpen: jest.fn(),
     },
     sensorFov: {
@@ -525,6 +529,7 @@ export const keepTrackApiStubs = {
     },
     uiManager: {
       hideSideMenus: jest.fn(),
+      footerToggle: jest.fn(),
       toast: jest.fn(),
       colorSchemeChangeAlert: jest.fn(),
       bottomIconPress: jest.fn(),
@@ -538,6 +543,11 @@ export const keepTrackApiStubs = {
       keyHandler: jest.fn(),
       getsensorinfo: jest.fn(),
       hideLoadingScreen: jest.fn(),
+      legendHoverMenuClick: jest.fn(),
+      mobileManager: {
+        fullscreenToggle: jest.fn(),
+        checkMobileMode: jest.fn(),
+      },
     },
     watchlist: {
       updateWatchlist: jest.fn(),

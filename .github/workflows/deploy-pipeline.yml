@@ -8,6 +8,21 @@ on:
       - master
 
 jobs:
+  analyze:
+    needs: build
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # SonarQube
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   gh-pages:
     name: Deploy to GitHub Pages
     environment: Development

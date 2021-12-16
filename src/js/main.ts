@@ -48,16 +48,6 @@ import { adviceManager } from './uiManager/adviceManager';
 import { searchBox } from './uiManager/searchBox';
 import { uiInput, uiManager } from './uiManager/uiManager';
 
-export const forceHttps = (): void => {
-  const isValidUrl = (url: string) => url.startsWith('http://');
-  // Allow localhost testing
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
-  // Force HTTPS
-  if (isValidUrl(window.location.href)) {
-    window.location.href = window.location.href.replace('http:', 'https:');
-  }
-};
-
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {
   let errorHtml = '';
   errorHtml += error?.message ? `${error.message}<br>` : '';
@@ -170,8 +160,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
   }
 };
 
-// Force HTTPS on main website
-forceHttps();
 // Load the CSS
 importCss();
 // Load the main website

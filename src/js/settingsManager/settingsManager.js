@@ -102,7 +102,7 @@ settingsManager = {
           settingsManager.isOfficialWebsite = true;
           break;
         case 'localhost':
-        case '10.0.0.34':
+        case '127.0.0.1':
           // Is node running? This must be some kind of test
           if (typeof process !== 'undefined') {
             settingsManager.installDirectory = 'http://127.0.0.1:8080/';
@@ -110,7 +110,7 @@ settingsManager = {
             // Comment Out the Next Two Lines if you are testing on a local server
             // and have the keeptrack files installed in a subdirectory
             settingsManager.installDirectory = '/';
-            // settingsManager.offline = true;
+            settingsManager.offline = true;
             settingsManager.breakTheLaw = true;
           }
           break;
@@ -608,11 +608,8 @@ settingsManager = {
     // satSet.init
     if (!settingsManager.disableUI) {
       (function initParseFromGETVariables() {
-        let queryStr = window.location.search.substring(1);
-        let params = queryStr.split('&');
-        for (let i = 0; i < params.length; i++) {
-          let key = params[i].split('=')[0];
-          // let val = params[i].split('=')[1];
+        for (const param of params) {
+          const key = param.split('=')[0];
           switch (key) {
             case 'console':
               settingsManager.isEnableConsole = true;
@@ -673,6 +670,7 @@ settingsManager = {
             case 'noPropRate':
               settingsManager.isAlwaysHidePropRate = true;
               break;
+            default:
           }
         }
       })();

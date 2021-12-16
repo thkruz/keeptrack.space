@@ -20,22 +20,6 @@ import { stringPad } from '@app/js/lib/helpers';
  */
 export const catalogLoader = async (): Promise<any> => {
   const settingsManager: any = window.settingsManager;
-  // let extraSats: any;
-
-  // See if we are running jest right now for testing
-  // if (typeof process !== 'undefined') {
-  //   try {
-  //     await import('@app/offline/extra.js').then((resp) => {
-  //       extraSats = resp.satelliteList;
-  //     });
-  //     const satData = await import('@app/offline/tle.js').then((resp) => {
-  //       parseCatalog(resp.jsTLEfile, extraSats);
-  //     });
-  //     return satData;
-  //   } catch (error) {
-  //     console.debug(error);
-  //   }
-  // }
 
   try {
     let extraSats: any = [];
@@ -65,7 +49,7 @@ export const catalogLoader = async (): Promise<any> => {
       await $.get(`${settingsManager.installDirectory}tle/TLE2.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
     }
   } catch (e) {
-    // console.debug(e);
+    // Intentionally left blank
   }
 };
 
@@ -81,7 +65,6 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => 
   if (typeof resp === 'string') resp = JSON.parse(resp);
   satSet.satData = filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog);
   satSet.numSats = satSet.satData.length;
-  resp = null; // Force Garbage Collection
 
   /** Send satDataString to satCruncher to begin propagation loop */
   satSet.satCruncher.postMessage({
@@ -93,55 +76,34 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => 
 };
 
 export const setupGetVariables = () => {
-  const { satSet, timeManager } = keepTrackApi.programs;
-  let obslatitude;
-  let obslongitude;
-  let obsheight;
-  let obsminaz;
-  let obsmaxaz;
-  let obsminel;
-  let obsmaxel;
-  let obsminrange;
-  let obsmaxrange;
+  const { timeManager } = keepTrackApi.programs;
   let limitSatsArray: string[] = [];
   /** Parses GET variables for SatCruncher initialization */
   // This should be somewhere else!!
   const queryStr = window.location.search.substring(1);
   const params = queryStr.split('&');
-  for (let i = 0; i < params.length; i++) {
-    const key = params[i].split('=')[0];
-    const val = params[i].split('=')[1];
+  for (const param of params) {
+    const key = param.split('=')[0];
+    const val = param.split('=')[1];
     switch (key) {
       case 'limitSats':
-        (<any>settingsManager).limitSats = val;
+        settingsManager.limitSats = val;
         $('#limitSats').val(val);
-        // document.getElementById('settings-limitSats-enabled').checked = true;
         $('#limitSats-Label').addClass('active');
         limitSatsArray = val.split(',');
         break;
+      case 'future use':
+      default:
     }
   }
 
   // Make sure everyone agrees on what time it is
   timeManager.synchronize();
 
-  satSet.satCruncher.postMessage({
-    setlatlong: true,
-    lat: obslatitude,
-    lon: obslongitude,
-    alt: obsheight,
-    obsminaz: obsminaz,
-    obsmaxaz: obsmaxaz,
-    obsminel: obsminel,
-    obsmaxel: obsmaxel,
-    obsminrange: obsminrange,
-    obsmaxrange: obsmaxrange,
-  });
-
   return limitSatsArray;
 };
 
-export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | any[], extraSats?: string | any[], asciiCatalog?: string | any[]) => {
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | any[], extraSats?: string[], asciiCatalog?: string[]) => {
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];
@@ -151,17 +113,17 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
 
   if (typeof limitSatsArray === 'undefined' || limitSatsArray.length == 0 || limitSatsArray[0] == null) {
     // If there are no limits then just process like normal
-    (<any>settingsManager).limitSats = '';
+    settingsManager.limitSats = '';
   }
 
-  let year;
-  let prefix;
-  let rest;
+  let year: string;
+  let prefix: string;
+  let rest: string;
 
   let i = 0;
-  for (i = 0; i < resp.length; i++) {
+  for (i; i < resp.length; i++) {
     resp[i].sccNum = stringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
-    if ((<any>settingsManager).limitSats === '') {
+    if (settingsManager.limitSats === '') {
       // If there are no limits then just process like normal
       year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
       if (year === '') {
@@ -177,7 +139,6 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
       satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
       resp[i].active = true;
       tempSatData.push(resp[i]);
-      continue;
     } else {
       // If there are limited satellites
       for (let x = 0; x < limitSatsArray.length; x++) {
@@ -201,7 +162,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
     }
   }
   let extrasSatInfo;
-  if (typeof extraSats !== 'undefined' && (<any>settingsManager).offline) {
+  if (typeof extraSats !== 'undefined' && settingsManager.offline) {
     // If extra catalogue
     for (let s = 0; s < extraSats.length; s++) {
       if (typeof extraSats[s].SCC == 'undefined') continue;
@@ -216,7 +177,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
       } else {
         if (typeof extraSats[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
         if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-        (<any>settingsManager).isExtraSatellitesAdded = true;
+        settingsManager.isExtraSatellitesAdded = true;
 
         if (typeof extraSats[s].ON == 'undefined') {
           extraSats[s].ON = 'Unknown';
@@ -225,7 +186,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
           extraSats[s].OT = 4;
         }
         year = extraSats[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
-        prefix = year > 50 ? '19' : '20';
+        prefix = parseInt(year) > 50 ? '19' : '20';
         year = prefix + year;
         rest = extraSats[s].TLE1.substr(9, 8).trim().substring(2);
         extrasSatInfo = {
@@ -250,10 +211,10 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
         tempSatData.push(extrasSatInfo);
       }
     }
-    extraSats = null;
   }
   let asciiSatInfo;
-  if (typeof asciiCatalog !== 'undefined' && (<any>settingsManager).offline) {
+  if (asciiCatalog?.length > 0 && settingsManager.offline) {
+    console.debug('Processing ASCII Catalog');
     // If asciiCatalog catalogue
     for (let s = 0; s < asciiCatalog.length; s++) {
       if (typeof asciiCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
@@ -265,7 +226,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
       } else {
         if (typeof asciiCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
         if (typeof asciiCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-        (<any>settingsManager).isExtraSatellitesAdded = true;
+        settingsManager.isExtraSatellitesAdded = true;
 
         if (typeof asciiCatalog[s].ON == 'undefined') {
           asciiCatalog[s].ON = 'Unknown';
@@ -274,7 +235,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
           asciiCatalog[s].OT = 4;
         }
         year = asciiCatalog[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
-        prefix = year > 50 ? '19' : '20';
+        prefix = parseInt(year) > 50 ? '19' : '20';
         year = prefix + year;
         rest = asciiCatalog[s].TLE1.substr(9, 8).trim().substring(2);
         asciiSatInfo = {
@@ -298,18 +259,17 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
         tempSatData.push(asciiSatInfo);
       }
     }
-    asciiCatalog = null;
   }
 
-  if ((<any>settingsManager).isExtraSatellitesAdded) {
+  if (settingsManager.isExtraSatellitesAdded) {
     $('.legend-pink-box').show();
     try {
       $('.legend-trusat-box')[1].parentElement.style.display = '';
       $('.legend-trusat-box')[2].parentElement.style.display = '';
       $('.legend-trusat-box')[3].parentElement.style.display = '';
-      $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
-      $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
-      $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${(<any>settingsManager).nameOfSpecialSats}`;
+      $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+      $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+      $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
     } catch (e) {
       // Intentionally Blank
     }
@@ -318,8 +278,6 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
   satSet.orbitalSats = tempSatData.length;
   dotsManager.starIndex1 = objectManager.starIndex1 + satSet.orbitalSats;
   dotsManager.starIndex2 = objectManager.starIndex2 + satSet.orbitalSats;
-
-  // if ((<any>settingsManager).isEnableGsCatalog) satSet.initGsData();
 
   for (i = 0; i < objectManager.staticSet.length; i++) {
     objectManager.staticSet[i].id = tempSatData.length;
@@ -332,7 +290,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
 
   // radarDataManager.satDataStartIndex = tempSatData.length + 1;
 
-  for (let i = 0; i < objectManager.radarDataSet.length; i++) {
+  for (i = 0; i < objectManager.radarDataSet.length; i++) {
     tempSatData.push(objectManager.radarDataSet[i]);
   }
 
@@ -346,7 +304,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | a
     objectManager.fieldOfViewSet[i].id = tempSatData.length;
     tempSatData.push(objectManager.fieldOfViewSet[i]);
   }
-  // console.log(tempSatData.length);
+
   return tempSatData;
 };
 

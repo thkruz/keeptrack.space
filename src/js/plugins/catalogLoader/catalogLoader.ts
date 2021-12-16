@@ -103,7 +103,7 @@ export const setupGetVariables = () => {
   return limitSatsArray;
 };
 
-export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: string | string[], extraSats?: any[], asciiCatalog?: any[]) => {
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[]) => {
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];

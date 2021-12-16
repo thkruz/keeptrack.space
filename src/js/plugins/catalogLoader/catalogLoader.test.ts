@@ -9,6 +9,8 @@ keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs,
 const settingsManager = <SettingsManager>(<any>window).settingsManager;
 settingsManager.installDirectory = '/';
 
+$.get = jest.fn();
+
 const respMock = [
   {
     C: 'US',

@@ -160,11 +160,7 @@ export const searchN2yo = (satNum: any, analsat?: number) => {
   const request = new XMLHttpRequest();
   request.open('GET', `php/get_data.php?type=n&sat=${satNum}`, true);
 
-  request.onload = searchN2yoOnLoad(request, analsat);
-
-  // request.onerror = function () {
-  // console.debug('N2YO request failed!');
-  // };
+  request.onload = () => searchN2yoOnLoad(request, analsat);
 
   request.send();
 };
@@ -241,11 +237,7 @@ export const searchCelestrak = (satNum: any, analsat?: number) => {
   const request = new XMLHttpRequest();
   request.open('GET', `php/get_data.php?type=c&sat=${satNum}`, true);
 
-  request.onload = searchCelestrackOnLoad(request, analsat);
-
-  // request.onerror = function () {
-  // console.debug('Celestrack request failed!');
-  // };
+  request.onload = () => searchCelestrackOnLoad(request, analsat);
 
   request.send();
 };

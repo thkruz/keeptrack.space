@@ -9,7 +9,6 @@ on:
 
 jobs:
   analyze:
-    needs: build
     name: Analyze
     runs-on: ubuntu-latest
 

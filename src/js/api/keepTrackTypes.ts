@@ -6,6 +6,7 @@ import { SatRec } from 'satellite.js';
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
+import { TleParams } from '../satMath/satMath';
 import { SpaceObjectType } from './SpaceObjectType';
 
 export enum CameraType {
@@ -183,7 +184,17 @@ export interface OrbitManager {
   draw(pMatrix: any, camMatrix: any, curBuffer: any): void;
   clearSelectOrbit(): void;
   setSelectOrbit(selectedSat: number): void;
-  updateOrbitBuffer(satId: number, force?: boolean, TLE1?: string, TLE2?: string, missile?: boolean, latList?: number[], lonList?: number[], altList?: number[], startTime?: number): void;
+  updateOrbitBuffer(
+    satId: number,
+    force?: boolean,
+    TLE1?: string,
+    TLE2?: string,
+    missile?: boolean,
+    latList?: number[],
+    lonList?: number[],
+    altList?: number[],
+    startTime?: number
+  ): void;
   addInViewOrbit(i: number): void;
   setHoverOrbit(mouseSat: any): void;
   clearHoverOrbit(): void;
@@ -1130,7 +1141,7 @@ export interface SatMath {
   eci2ll: (x: number, y: number, z: number) => { lat: number; lon: number; alt: number };
   map: (sat: SatObject, i: number) => { time: string; lat: number; lon: number; inView: boolean };
   calculateSensorPos: (sensor?: SensorObject[]) => { x: number; y: number; z: number; lat: number; lon: number; gmst: number };
-  createTle: (sat: SatObject, inc: string, meanmo: string, rasc: string, argPe: string, meana: string, ecen: string, epochyr: string, epochday: string, intl: string, scc: string) => { TLE1: string; TLE2: string };
+  createTle: (tleParams: TleParams) => { TLE1: string; TLE2: string };
 }
 
 export interface Watchlist {

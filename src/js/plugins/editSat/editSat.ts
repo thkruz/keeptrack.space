@@ -362,7 +362,7 @@ export const editSatSubmit = (e: Event) => {
   const epochyr = $('#es-year').val();
   const epochday = $('#es-day').val();
 
-  const { TLE1, TLE2 } = satellite.createTle(sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc);
+  const { TLE1, TLE2 } = satellite.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
 
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.calculateSimulationTime()) > 1) {
     satSet.satCruncher.postMessage({

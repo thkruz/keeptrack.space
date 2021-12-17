@@ -129,12 +129,14 @@ export const getSat = (i: number): SatObject => {
     }
 
     satSet.satData[i].velocity ??= { total: 0, x: 0, y: 0, z: 0 };
-    satSet.satData[i].velocity.total = Math.sqrt(
-      dotsManager.velocityData[i * 3] * dotsManager.velocityData[i * 3] + dotsManager.velocityData[i * 3 + 1] * dotsManager.velocityData[i * 3 + 1] + dotsManager.velocityData[i * 3 + 2] * dotsManager.velocityData[i * 3 + 2]
-    );
-    satSet.satData[i].velocity.x = dotsManager.velocityData[i * 3];
-    satSet.satData[i].velocity.y = dotsManager.velocityData[i * 3 + 1];
-    satSet.satData[i].velocity.z = dotsManager.velocityData[i * 3 + 2];
+
+    // TODO: This is to accomadate the old end of world .json files that used velocity = 0
+    satSet.satData[i].velocity = <any>satSet.satData[i].velocity === 0 ? { total: 0, x: 0, y: 0, z: 0 } : satSet.satData[i].velocity;
+
+    satSet.satData[i].velocity.x = dotsManager.velocityData[i * 3] || 0;
+    satSet.satData[i].velocity.y = dotsManager.velocityData[i * 3 + 1] || 0;
+    satSet.satData[i].velocity.z = dotsManager.velocityData[i * 3 + 2] || 0;
+    satSet.satData[i].velocity.total = Math.sqrt(satSet.satData[i].velocity.x ** 2 + satSet.satData[i].velocity.y ** 2 + satSet.satData[i].velocity.z ** 2);
     satSet.satData[i].position = {
       x: dotsManager.positionData[i * 3],
       y: dotsManager.positionData[i * 3 + 1],

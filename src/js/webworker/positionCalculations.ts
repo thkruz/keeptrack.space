@@ -68,5 +68,7 @@ export const checkSunExclusion = (sensor: SensorObjectCruncher, j: number, gmst:
 
   // RAE to ECI
   const sunECI = satellite.ecfToEci(lookAnglesToEcf(sunAz, sunEl, sunRange, 0, 0, 0), gmst);
-  return sensor.observerGd !== defaultGd && (sensor.type === SpaceObjectType.OPTICAL || sensor.type === SpaceObjectType.OBSERVER) && sunElRel > -6 ? [true, sunECI] : [false, sunECI];
+  return sensor.observerGd !== defaultGd && (sensor.type === SpaceObjectType.OPTICAL || sensor.type === SpaceObjectType.OBSERVER) && sunElRel > -6
+    ? [true, sunECI]
+    : [false, sunECI];
 };

@@ -80,7 +80,7 @@ export const satChng = (row: number): void => {
   if (row === -1 && satChngTable?.length === 0) {
     // Only generate the table if receiving the -1 argument for the first time
     $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
-      ({ resp, satChngTable } = getSatChngJson(resp, satChngTable));
+      ({ resp, satChngTable } = getSatChngJson(resp));
       satChange.satChngTable = satChngTable;
     });
   }
@@ -117,7 +117,7 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 
-export const getSatChngJson = (resp: any, satChngTable: SatChngObject[]) => {
+export const getSatChngJson = (resp: any) => {
   resp = [...new Set(resp)];
 
   const { satSet } = keepTrackApi.programs;
@@ -129,7 +129,7 @@ export const getSatChngJson = (resp: any, satChngTable: SatChngObject[]) => {
     date = new Date(date.getTime() + (resp[i].day % 1) * 1440 * 60000);
     resp[i].date = date;
   }
-  satChngTable = resp;
+  const satChngTable = resp;
   // satChng Menu
   const tbl = <HTMLTableElement>document.getElementById('satChng-table'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data

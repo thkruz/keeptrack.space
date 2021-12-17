@@ -72,7 +72,6 @@ src/tle/mw*
 src/tle/retr*
 src/tle/trus*
 src/tle/TLEAltNemo*
-src/.htaccess
 .notes.js
 classfd.tle
 src/textures/earthmap16ak.jpg

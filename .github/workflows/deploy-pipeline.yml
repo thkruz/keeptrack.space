@@ -16,6 +16,31 @@ jobs:
       # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Unit Tests
+      - name: Test
+        run: npm test
       # SonarQube
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1.6

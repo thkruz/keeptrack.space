@@ -1777,19 +1777,22 @@ export const calculateSensorPos = (sensors?: SensorObject[]): { x: number; y: nu
   return pos;
 };
 
-export const createTle = (
-  sat: SatObject,
-  inc: string,
-  meanmo: string,
-  rasc: string,
-  argPe: string,
-  meana: string,
-  ecen: string,
-  epochyr: string,
-  epochday: string,
-  intl: string,
-  scc: string
-): { TLE1: string; TLE2: string } => {
+export type TleParams = {
+  sat: SatObject;
+  inc: string;
+  meanmo: string;
+  rasc: string;
+  argPe: string;
+  meana: string;
+  ecen: string;
+  epochyr: string;
+  epochday: string;
+  intl: string;
+  scc: string;
+};
+
+export const createTle = (tleParams: TleParams): { TLE1: string; TLE2: string } => {
+  let { sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc } = tleParams;
   inc = formatInclination(inc);
   meanmo = formatMeanMotion(meanmo);
   rasc = formatRightAscension(rasc);

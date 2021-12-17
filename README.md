@@ -3,6 +3,7 @@
 <img src="./src/img/logo192.png" width=128 height=128 alt="KeepTrack.Space" align="right">
 
 # KeepTrack.Space
+
 > Astrodynamics Software for Non-Engineers
 
 KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, we make learning about orbital mechanics and satellite operations accessible to everyone.
@@ -10,6 +11,7 @@ KeepTrack aims to provide orbital analysis tools to the average user. By providi
 The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without @jeyoder's original stuffin.space.
 
 ## Table of Contents
+
 - [Installation](#Installation)
 - [Built With](#Built-With)
 - [Prerequisites](#Prerequisites)
@@ -24,149 +26,132 @@ The code has been rewrote multiple times and now barely resembles the original, 
 
 ## Installation
 
-Starting with Version 3, a github page is automatically deployed with the most-current version of the main branch to https://thkruz.github.io/keeptrack.space/. Periodically the most stable version will be pushed to https://keeptrack.space.
+Starting with Version 3, a github page is automatically deployed with the most-current version of the main branch to https://thkruz.github.io/keeptrack.space/. Periodically the most stable version will be pushed to https://keeptrack.space from the CI/CD pipeline.
 
 ### Built With
-* [babel](https://babeljs.io/)
-* [cypress](https://www.cypress.io/)
-* [eslint 7](https://eslint.org/)
-* [jest 26](https://jestjs.io/)
-* [jsdom](https://github.com/jsdom/jsdom)
-* [webpack 5](https://webpack.js.org/)
+
+- [babel](https://babeljs.io/)
+- [eslint 8](https://eslint.org/)
+- [jest 27](https://jestjs.io/)
+- [jsdom](https://github.com/jsdom/jsdom)
+- [prettier](https://prettier.io/)
+- [ponicode](https://ponicode.com/)
+- [webpack 5](https://webpack.js.org/)
 
 ### Prerequisites
+
 As of version 3.0, KeepTrack.Space is built using ES6+ modules and assembled with Webpack. If you would like to install it you need to install [git](https://git-scm.com/) and [npm](https://www.npmjs.com/).
 
 ### Setting up a Local Copy
 
-Clone the github files. 
-
 ```bash
-git clone https://github.com/thkruz/keeptrack.space
-```
-
-Switch into the directory.
-
-```bash
-cd ./keeptrack.space/
-```
-
-Have npm install all the dependencies (including the development ones). 
-
-```bash
-npm i --save-dev
-```
-
-Copy static files and then have webpack package the source, but not compress it for easier reading.
-
-```bash
-npm run build:dev
-```
-
-Launch a local webserver and then open index.htm in your preferred browser.
-
-```bash
-npm start
+git clone https://github.com/thkruz/keeptrack.space       #Clone the github files.
+cd ./keeptrack.space/                                     #Switch into the directory.
+npm ci                                                    #Install the dependencies.
+npm run build                                             #Build the project.
+npm start                                                 #Start the server.
 ```
 
 ### Launching Offline Mode
 
-KeepTrack was designed to run without the need for a webserver. On Windows, create a shortcut to the following target:
+KeepTrack was designed to run without the need for a server. On Windows, close all open copies of chrome and then launch the included KeepTrack.bat file.
 
-`"C:\Program Files\Google\Chrome\Application\chrome.exe" --allow-file-access-from-files`
-
-Close all open copies of chrome and then launch the shortcut. Now open the downloaded index.htm file in the dist folder.
-
-NOTE: You MUST compile the code first. Opening the index.htm file in the src folder will not work.
+NOTE: You MUST compile the code first. Opening the index.htm file in the src folder will not work. If that feels overwhelming, take a look at https://github.com/thkruz/keeptrack.space/tree/gh-pages for a built version that can be downloaded and launched.
 
 ## Usage
-The main index.htm page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.js and orbitCruncher.js) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
 
-The main draw loop (drawManager.js) has been optimized to reduce memory leaks and to keep FPS high. This is commonly done by having routines modify global variables vs returning a variable - this is definitely intentional.
+The main index.htm page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.ts and orbitCruncher.ts) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
 
-Any modifications to a satellite require that information to be passed to the satCruncher webworker to ensure the UI calculations match the dot on the screen. Most calculations utilize a brute-force method of guess and check (lookangle times, missile trajectories, etc). Optimizing the loop for those calculations is criitcal to keeping the project responsive.
+The main draw loop (drawManager.ts) has been optimized to reduce memory leaks and to keep FPS high. This is commonly done by having functions modify global variables vs returning a variable and using long functions rather than splitting them into pieces - this is definitely intentional.
 
-The project is meant to be run from a webserver but the index.htm file should work if launched directly form the local drive (some minor issues with external website requests and CORS errors). There are php scripts for generating TLE.json that are not included, but http://keeptrack.space/TLE.json can be referenced for an up-to-date catalog using:
+Any modifications to a satellite require that information to be passed to the positionCruncher webworker to ensure the UI calculations match the dot on the screen. Most calculations utilize a brute-force method of guess and check (lookangle times, missile trajectories, etc). Optimizing the loop for those calculations is criitcal to keeping the project responsive. One trick to improve performance is that satSet creates a dictionary of index -> Norad ID number and index -> COSPAR number to allow rapid lookup of satellite data.
 
-```bash
-npm run updateTle
-```
+There are ts scripts for generating TLE.json that are not included, but http://keeptrack.space/tle/TLE2.json can be referenced for an up-to-date catalog.
 
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning.
 
+## Contributing
+
+If you are interested in helping with this project, please reference the [Contributing Guidelines](CONTRIBUTING.md).
+
 ## How the Code Works
+
 ### Main Files
-* index.htm - Controls the structure of the front-end and loads all the CSS and JS files.
-* main.js - Primary JS files that bootstraps all of the other files.
-* camera.js - Camera class is used to create cameraManager that serves as the interface from the UI and the webgl camera.
-* color-scheme-factory.js - Handles the creation of color schemes for the dots.
-  * color-scheme.js - Handles the ruleset for how to color dots when enabled.
-* drawManager.js - Controls the main draw loop.
-  * sceneManager.js - Manages the sun, earth, moon, lines and atmosphere drawing.
-  * meshManager.js - Controls the loading and drawing of .obj models of satellites.
-  * post-processing.js - Loads and draws post processing shaders like gausian blur.
-* group-factory.js - Manages creation and loading of satellite groups
-  * sat-group.js - Manages individual satellite group
-* missileManager.js - ICBM/SLBM simulator.
-* objectManager.js - Used for extracting details from TLE.json and loading additional objects from other files.
-  * controlSiteManager.js - Database of command and control locations.
-  * launchSiteManager.js - Database of launch locations.
-* orbitManager.js - Draws the orbit lines. Called from the main draw loop.
-* photoManager.js - Handles the loading and displaying of satellite photography from external sources.
-* satSet.js - Most of the manipulation of the local satellite catalogue occurs here.
-* sensorManager.js - Database of sensor locations.
-* starManager.js - Database of stars.
-  * constellations.js - Add-on database of star constellations.
-* timeManager.js - Tracks internal time and controls time manipulation.
-* uiManager.js - Controls user keyboard/mouse inputs to the application.
-  * mapManager.js - My modified version of [@juliuste](https://github.com/juliuste/projections)'s library for stereographic map projection.
-  * search-box.js - Functions for searching the catalog and manipulating the search drop-down.
-* orbitCruncher.js - Web Worker that generates future orbits for satellites.
-* positionCruncher.js - Web Worker that provides x, y, z coordinates of the satellites and if it is in a sensor's FOV.
-* TLE.json - The main database on satellites.
+
+- index.htm - Controls the structure of the front-end and loads all the CSS and JS files.
+- main.ts - Primary TS file that bootstraps all of the other files.
+- camera.ts - cameraManager is used to create cameraManager that serves as the interface from the UI and the webgl camera.
+- colorSchemeManager.ts - Handles the creation of color schemes for the dots.
+  - colorManager/ruleSets - These files handle the ruleset for how to color dots when enabled.
+- drawManager.ts - Controls the main draw loop.
+  - sceneManager.ts - Manages the sun, earth, moon, lines and atmosphere drawing.
+  - meshManager.ts - Controls the loading and drawing of .obj models of satellites.
+  - post-processing.js - Loads and draws post processing shaders like gausian blur. Not used at the moment.
+- groupsManager.ts - Manages creation and loading of satellite groups
+  - sat-group.ts - Manages individual satellite group
+- missileManager.ts - ICBM/SLBM simulator.
+- objectManager.ts - Used for extracting details from TLE.json and loading additional objects from other files.
+  - controlSiteManager.ts - Database of command and control locations.
+  - launchSiteManager.ts - Database of launch locations.
+- orbitManager.ts - Draws the orbit lines. Called from the main draw loop.
+- photoManager.ts - Handles the loading and displaying of satellite photography from external sources.
+- satSet.ts - Most of the manipulation of the local satellite catalogue occurs here.
+- sensorManager.ts - Database of sensor locations.
+- starManager.ts - Database of stars.
+  - constellations.ts - Add-on database of star constellations.
+- timeManager.ts - Tracks internal time and controls time manipulation.
+- uiManager.ts - Controls user keyboard/mouse inputs to the application.
+  - mapManager.ts - My modified version of [@juliuste](https://github.com/juliuste/projections)'s library for stereographic map projection.
+  - searchBox.ts - Functions for searching the catalog and manipulating the search drop-down.
+- orbitCruncher.ts - Web Worker that generates future orbits for satellites.
+- positionCruncher.ts - Web Worker that provides x, y, z coordinates of the satellites and if it is in a sensor's FOV.
+- TLE2.json - The main database on satellites. (Second edition)
+
 ### Libraries
-* lookangles.js - My personal modifications to [@shashwata](https://github.com/shashwatak/)'s amazing library [satellite.js](https://github.com/shashwatak/satellite-js).
-* sun-calc.js - [@mourner](https://github.com/mourner/suncalc)'s library used for star position calculations.
+
+- satMath.ts - My personal modifications to [@shashwata](https://github.com/shashwatak/)'s amazing library [satellite.js](https://github.com/shashwatak/satellite-js).
+- suncalc.js - [@mourner](https://github.com/mourner/suncalc)'s library used for star position calculations.
 
 ## Tests
+
 ### Unit/Functional
+
 Currently we are using Jest for unit and functional tests that should cover at least 80% of the functions. All of these tests can be run using:
 
 ```bash
 npm run test
 ```
+
 ### End-To-End
-For end-to-end (E2E) testing we use the cypress framework. When run, this will launch your browser of choice and then run a series of commands with the fully loaded website to make sure it works.
-```bash
-npm run cypress
-```
+
+For end-to-end (E2E) testing we will be using the cypress framework. This is on the to-do list.
+
 ### Fuzz
-For fuzz testing the user interface we use [gremlins.js](https://github.com/marmelab/gremlins.js/). You can unleash the gremlins using db.gremlins() in your web browser's console. By default it runs for 1000 interactions or 10 errors.
+
+For fuzz testing the user interface we use [gremlins.js](https://github.com/marmelab/gremlins.js/). You can unleash the gremlins using db.gremlins() in your web browser's console. By default it runs for 1000 interactions or 10 errors. You will need to ensure the debug plugin is enabled (see settingsManager.js).
+
+### Security
+
+For security testing we are using CodeQL and SonarCloud automatically in the CI/CD pipeline.
 
 ## Style Guide
 
 We use Prettier and ESLint to enforce consistent readable code. Please refer to our [contributing guide](https://github.com/thkruz/keeptrack.space/blob/master/CONTRIBUTING.md#code-style) for more info on styling.
 
 ## Contributors
-* [@cwang-pivotal](https://github.com/cwang-pivotal/)
-* [@hkruczek](https://github.com/hkruczek/)
-* [@Le-Roi777](https://github.com/Le-Roi777/)
+
+- [@cwang-pivotal](https://github.com/cwang-pivotal/)
+- [@hkruczek](https://github.com/hkruczek/)
+- [@Le-Roi777](https://github.com/Le-Roi777/)
 
 ## License
 
-Copyright (C) 2016-2021 Theodore Kruczek<br>
-Copyright (C) 2020-2021 Heather Kruczek
+Copyright (C) 2016-2021 Theodore Kruczek<br> Copyright (C) 2020-2021 Heather Kruczek
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 [Full License](https://github.com/thkruz/keeptrack.space/blob/master/LICENSE)

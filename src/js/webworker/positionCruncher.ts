@@ -34,7 +34,7 @@ import { numeric } from '../lib/external/numeric';
 import { jday } from '../timeManager/transforms';
 import { checkSunExclusion, lookAnglesToEcf, propTime } from './positionCalculations';
 
-interface SatCacheObject extends satellite.SatRec {
+export interface SatCacheObject extends satellite.SatRec {
   id?: number;
   isimp: boolean;
   apogee: number;
@@ -67,7 +67,7 @@ const EMPTY_FLOAT32_ARRAY = new Float32Array(0);
 const EMPTY_INT8_ARRAY = new Int8Array(0);
 
 /** ARRAYS */
-const satCache = <SatCacheObject[]>[]; // Cache of Satellite Data from TLE.json and Static Data from variable.js
+let satCache = <SatCacheObject[]>[]; // Cache of Satellite Data from TLE.json and Static Data from variable.js
 
 let satPos = EMPTY_FLOAT32_ARRAY; // Array of current Satellite and Static Positions
 let satVel = EMPTY_FLOAT32_ARRAY; // Array of current Satellite and Static Velocities
@@ -101,7 +101,7 @@ var isSunlightView = false;
 var isLowPerf = false;
 var isResetMarker = false;
 var isResetInView = false;
-let fieldOfViewSetLength: number;
+let fieldOfViewSetLength = 0;
 let len;
 
 /** OBSERVER VARIABLES */
@@ -139,17 +139,22 @@ const emptySensor: SensorObjectCruncher = {
 let sensor = emptySensor;
 
 // Handles Incomming Messages to sat-cruncher from main thread
-onmessage = function (m) {
+try {
+  onmessage = (m) => onmessageInject(m);
+} catch (e) {
+  if (!process) throw e;
+}
+
+export const onmessageInject = function (m) {
   if (m.data.isSunlightView) {
     isSunlightView = m.data.isSunlightView;
-    // if (isSunlightView == false) isResetSunlight = true;
   }
 
   if (m.data.satelliteSelected) {
     satelliteSelected = m.data.satelliteSelected;
     if (satelliteSelected[0] === -1) {
       isResetSatOverfly = true;
-      if (isResetMarker == false) isResetMarker = true;
+      if (!isResetMarker) isResetMarker = true;
     }
   }
 
@@ -175,7 +180,7 @@ onmessage = function (m) {
   if (m.data.isShowSatOverfly === 'reset') {
     isResetSatOverfly = true;
     isShowSatOverfly = false;
-    if (isResetMarker == false) isResetMarker = true;
+    if (!isResetMarker) isResetMarker = true;
   }
 
   if (m.data.isShowFOVBubble === 'enable') {
@@ -184,16 +189,16 @@ onmessage = function (m) {
   if (m.data.isShowFOVBubble === 'reset') {
     isResetFOVBubble = true;
     isShowFOVBubble = false;
-    if (isResetMarker == false) isResetMarker = true;
+    if (!isResetMarker) isResetMarker = true;
   }
 
   if (m.data.isShowSurvFence === 'enable') {
     isShowSurvFence = true;
-    if (isResetMarker == false) isResetMarker = true;
+    if (!isResetMarker) isResetMarker = true;
   }
   if (m.data.isShowSurvFence === 'disable') {
     isShowSurvFence = false;
-    if (isResetMarker == false) isResetMarker = true;
+    if (!isResetMarker) isResetMarker = true;
   }
 
   // ////////////////////////////////
@@ -203,7 +208,7 @@ onmessage = function (m) {
     mSensor = m.data.sensor;
     sensor = m.data.sensor;
     globalPropagationRateMultiplier = 2;
-    if (isResetInView == false) isResetInView = true;
+    if (!isResetInView) isResetInView = true;
   } else if (m.data.sensor) {
     sensor = m.data.sensor[0];
     if (m.data.setlatlong) {
@@ -211,7 +216,7 @@ onmessage = function (m) {
         globalPropagationRateMultiplier = 1;
         sensor.observerGd = defaultGd;
         mSensor = [];
-        if (isResetInView == false) isResetInView = true;
+        if (!isResetInView) isResetInView = true;
       } else {
         globalPropagationRateMultiplier = 2;
         // satellite.js requires this format - DONT use lat,lon,alt
@@ -221,13 +226,11 @@ onmessage = function (m) {
           latitude: m.data.sensor[0].lat * DEG2RAD,
           height: parseFloat(m.data.sensor[0].alt),
         };
-        if (isResetInView == false) isResetInView = true;
+        if (!isResetInView) isResetInView = true;
       }
     }
     isMultiSensor = false;
   }
-
-  // const oldPropRate = propRate;
 
   switch (m.data.typ) {
     case 'offset':
@@ -266,7 +269,6 @@ onmessage = function (m) {
           extraData.push(extra);
           satCache.push(satrec);
           i++;
-          continue;
         } else {
           satrec = <SatCacheObject>satellite.twoline2satrec(
             // perform and store sat init calcs
@@ -298,10 +300,13 @@ onmessage = function (m) {
       satInView = new Int8Array(len);
       satInSun = new Int8Array(len);
 
-      postMessage({
-        extraData: JSON.stringify(extraData),
-      });
-      satData = null;
+      try {
+        postMessage({
+          extraData: JSON.stringify(extraData),
+        });
+      } catch (e) {
+        if (!process) throw e;
+      }
       break;
     case 'satEdit':
       satrec = <SatCacheObject>satellite.twoline2satrec(
@@ -352,9 +357,6 @@ onmessage = function (m) {
     case 'newMissile':
       satCache[m.data.id] = m.data;
       break;
-    case 'timeSync':
-      // propChangeTime = new Date(m.data.time);
-      break;
     default:
       console.warn('Unknown message typ: ' + m.data.typ);
       break;
@@ -366,27 +368,14 @@ onmessage = function (m) {
     propagateCruncher();
     propagationRunning = true;
   }
-
-  // if (!timeSyncRunning) {
-  //   timeSyncLoop();
-  // }
 };
-
-// const timeSyncLoop = () => {
-//   const postMessageArray = {
-//     typ: 'timeSync',
-//     time: propTime().getTime(),
-//     propRate: propRate,
-//     staticOffset: staticOffset,
-//     dynamicOffsetEpoch: dynamicOffsetEpoch,
-//   };
-//   postMessage(postMessageArray);
-//   setTimeout(timeSyncLoop, 250);
-// };
 
 // Prevent Memory Leak by declaring variables outside of function
 
-var propagateCruncher = () => {
+export const propagateCruncher = (mockSatCache?: SatCacheObject[]) => {
+  if (mockSatCache) {
+    satCache = mockSatCache;
+  }
   const now = propTime(dynamicOffsetEpoch, staticOffset, propRate);
 
   const j =
@@ -482,7 +471,7 @@ var propagateCruncher = () => {
 
           const kmax = 20;
           let k = 0;
-          let lat = Math.atan2(pv.position.z, Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y));
+          lat = Math.atan2(pv.position.z, Math.sqrt(pv.position.x * pv.position.x + pv.position.y * pv.position.y));
           let C;
           while (k < kmax) {
             C = 1 / Math.sqrt(1 - e2 * (Math.sin(lat) * Math.sin(lat)));
@@ -530,7 +519,9 @@ var propagateCruncher = () => {
 
       if (isSunlightView) {
         semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2))) * RAD2DEG;
-        semiDiamSun = Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satPos[i * 3] + sunECI.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunECI.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunECI.z, 2))) * RAD2DEG;
+        semiDiamSun =
+          Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satPos[i * 3] + sunECI.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunECI.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunECI.z, 2))) *
+          RAD2DEG;
 
         // Angle between earth and sun
         theta =
@@ -543,7 +534,6 @@ var propagateCruncher = () => {
           satInSun[i] = 0; // Umbral
         }
 
-        // var isPenumbral = false;
         if (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun) {
           satInSun[i] = 1; // Penumbral
         }
@@ -584,15 +574,33 @@ var propagateCruncher = () => {
 
               if (sensor.obsminaz > sensor.obsmaxaz) {
                 if (
-                  ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
-                  ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)
+                  ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
+                    elevation >= sensor.obsminel &&
+                    elevation <= sensor.obsmaxel &&
+                    rangeSat <= sensor.obsmaxrange &&
+                    rangeSat >= sensor.obsminrange) ||
+                  ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
+                    elevation >= sensor.obsminel2 &&
+                    elevation <= sensor.obsmaxel2 &&
+                    rangeSat <= sensor.obsmaxrange2 &&
+                    rangeSat >= sensor.obsminrange2)
                 ) {
                   satInView[i] = 1; // 1 = TRUE
                 }
               } else {
                 if (
-                  (azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
-                  (azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2 && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)
+                  (azimuth >= sensor.obsminaz &&
+                    azimuth <= sensor.obsmaxaz &&
+                    elevation >= sensor.obsminel &&
+                    elevation <= sensor.obsmaxel &&
+                    rangeSat <= sensor.obsmaxrange &&
+                    rangeSat >= sensor.obsminrange) ||
+                  (azimuth >= sensor.obsminaz2 &&
+                    azimuth <= sensor.obsmaxaz2 &&
+                    elevation >= sensor.obsminel2 &&
+                    elevation <= sensor.obsmaxel2 &&
+                    rangeSat <= sensor.obsmaxrange2 &&
+                    rangeSat >= sensor.obsminrange2)
                 ) {
                   satInView[i] = 1; // 1 = TRUE
                 }
@@ -606,15 +614,33 @@ var propagateCruncher = () => {
 
             if (sensor.obsminaz > sensor.obsmaxaz) {
               if (
-                ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
-                ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)
+                ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
+                  elevation >= sensor.obsminel &&
+                  elevation <= sensor.obsmaxel &&
+                  rangeSat <= sensor.obsmaxrange &&
+                  rangeSat >= sensor.obsminrange) ||
+                ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
+                  elevation >= sensor.obsminel2 &&
+                  elevation <= sensor.obsmaxel2 &&
+                  rangeSat <= sensor.obsmaxrange2 &&
+                  rangeSat >= sensor.obsminrange2)
               ) {
                 satInView[i] = 1; // 1 = TRUE
               }
             } else {
               if (
-                (azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
-                (azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2 && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)
+                (azimuth >= sensor.obsminaz &&
+                  azimuth <= sensor.obsmaxaz &&
+                  elevation >= sensor.obsminel &&
+                  elevation <= sensor.obsmaxel &&
+                  rangeSat <= sensor.obsmaxrange &&
+                  rangeSat >= sensor.obsminrange) ||
+                (azimuth >= sensor.obsminaz2 &&
+                  azimuth <= sensor.obsmaxaz2 &&
+                  elevation >= sensor.obsminel2 &&
+                  elevation <= sensor.obsmaxel2 &&
+                  rangeSat <= sensor.obsmaxrange2 &&
+                  rangeSat >= sensor.obsminrange2)
               ) {
                 satInView[i] = 1; // 1 = TRUE
               }
@@ -723,15 +749,33 @@ var propagateCruncher = () => {
 
       if (sensor.obsminaz > sensor.obsmaxaz) {
         if (
-          ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
-          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)
+          ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
+            elevation >= sensor.obsminel &&
+            elevation <= sensor.obsmaxel &&
+            rangeSat <= sensor.obsmaxrange &&
+            rangeSat >= sensor.obsminrange) ||
+          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
+            elevation >= sensor.obsminel2 &&
+            elevation <= sensor.obsmaxel2 &&
+            rangeSat <= sensor.obsmaxrange2 &&
+            rangeSat >= sensor.obsminrange2)
         ) {
           satInView[i] = 1; // 1 = TRUE
         }
       } else {
         if (
-          (azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && rangeSat <= sensor.obsmaxrange && rangeSat >= sensor.obsminrange) ||
-          (azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2 && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && rangeSat <= sensor.obsmaxrange2 && rangeSat >= sensor.obsminrange2)
+          (azimuth >= sensor.obsminaz &&
+            azimuth <= sensor.obsmaxaz &&
+            elevation >= sensor.obsminel &&
+            elevation <= sensor.obsmaxel &&
+            rangeSat <= sensor.obsmaxrange &&
+            rangeSat >= sensor.obsminrange) ||
+          (azimuth >= sensor.obsminaz2 &&
+            azimuth <= sensor.obsmaxaz2 &&
+            elevation >= sensor.obsminel2 &&
+            elevation <= sensor.obsmaxel2 &&
+            rangeSat <= sensor.obsmaxrange2 &&
+            rangeSat >= sensor.obsminrange2)
         ) {
           satInView[i] = 1; // 1 = TRUE
         }
@@ -1056,7 +1100,7 @@ var propagateCruncher = () => {
           // Floor of FOV
           // //////////////////////////////////
           q = 0.25;
-          for (rng = sensor.obsmaxrange; rng == sensor.obsmaxrange; rng += 1) {
+          for (rng = sensor.obsmaxrange; rng === sensor.obsmaxrange; rng += 1) {
             for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
               if (sensor.obsminaz > sensor.obsmaxaz) {
                 if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
@@ -1088,7 +1132,7 @@ var propagateCruncher = () => {
             }
           }
 
-          for (rng = sensor.obsminrange; rng == sensor.obsminrange; rng += 1) {
+          for (rng = sensor.obsminrange; rng === sensor.obsminrange; rng += 1) {
             for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
               if (sensor.obsminaz > sensor.obsmaxaz) {
                 if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
@@ -1155,7 +1199,7 @@ var propagateCruncher = () => {
           }
 
           if (sensor.obsminaz !== sensor.obsmaxaz && sensor.obsminaz !== sensor.obsmaxaz - 360) {
-            for (az = sensor.obsmaxaz; az == sensor.obsmaxaz; az += 1) {
+            for (az = sensor.obsmaxaz; az === sensor.obsmaxaz; az += 1) {
               for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
                 pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
@@ -1174,7 +1218,7 @@ var propagateCruncher = () => {
               }
             }
 
-            for (az = sensor.obsminaz; az == sensor.obsminaz; az += 1) {
+            for (az = sensor.obsminaz; az === sensor.obsminaz; az += 1) {
               for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
                 pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
                 if (i === len) {
@@ -1265,9 +1309,7 @@ var propagateCruncher = () => {
                 };
                 // Find the Az/El of the position on the earth
                 lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
-                // azimuth = lookangles.azimuth;
                 elevation = lookangles.elevation;
-                // rangeSat = lookangles.rangeSat;
 
                 if (elevation * RAD2DEG > 0 && 90 - elevation * RAD2DEG < selectedSatFOV) {
                   satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
@@ -1299,9 +1341,7 @@ var propagateCruncher = () => {
                 };
                 // Find the Az/El of the position on the earth
                 lookangles = satellite.ecfToLookAngles(satSelPosEarth, satSelPosEcf);
-                // azimuth = lookangles.azimuth;
                 elevation = lookangles.elevation;
-                // rangeSat = lookangles.rangeSat;
 
                 if (elevation * RAD2DEG > 0 && 90 - elevation * RAD2DEG < selectedSatFOV) {
                   satSelPosEarth = satellite.geodeticToEcf(satSelPosEarth);
@@ -1363,7 +1403,7 @@ var propagateCruncher = () => {
   }, (globalPropagationRate * globalPropagationRateMultiplier) / divisor);
 };
 
-const sendDataToSatSet = () => {
+export const sendDataToSatSet = () => {
   let postMessageArray = <PropagationMessage>{
     satPos: satPos,
     satVel: satVel,
@@ -1387,5 +1427,9 @@ const sendDataToSatSet = () => {
     postMessageArray.sensorMarkerArray = [];
   }
 
-  postMessage(postMessageArray);
+  try {
+    postMessage(postMessageArray);
+  } catch (e) {
+    if (!process) throw e;
+  }
 };

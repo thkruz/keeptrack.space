@@ -4,10 +4,10 @@
 </ifmodule>
 
 # custom error pages
- ErrorDocument 401 /res/401.html
- ErrorDocument 403 /res/403.html
- ErrorDocument 404 /res/404.html
- ErrorDocument 500 /res/500.html
+ ErrorDocument 401 /res/error.html?error=401
+ ErrorDocument 403 /res/error.html?error=403
+ ErrorDocument 404 /res/error.html?error=404
+ ErrorDocument 500 /res/error.html?error=500
 
 <ifModule mod_headers.c>
   Header set Connection keep-alive

@@ -83,11 +83,7 @@ export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[])
     if (typeof launchList[i].locationURL == 'undefined' || launchList[i].locationURL == '') {
       locationHTML = `${truncateString(launchList[i].location, 25)}`;
     } else {
-      if (window.location.protocol === 'http:') {
-        locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
-      } else {
-        locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
-      }
+      locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
     }
 
     const tdL = tr.insertCell();
@@ -98,11 +94,7 @@ export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[])
     if (typeof launchList[i].agencyURL == 'undefined') {
       agencyHTML = `${truncateString(launchList[i].agency, 30)}`;
     } else {
-      if (window.location.protocol === 'http:') {
-        agencyHTML = `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
-      } else {
-        agencyHTML = `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
-      }
+      agencyHTML = `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
     }
 
     const tdA = tr.insertCell();

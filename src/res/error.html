@@ -520,7 +520,37 @@
       y2Forward ? y2 += 1 : y2 -= 1;
       y3Forward ? y3 += 1 : y3 -= 1;
     }
+    function populateError() {
+      const errorTitle = document.querySelector('.error__title');
+      const errorSubtitle = document.querySelector('.error__subtitle');
+      const errorDescription = document.querySelector('.error__description');
+      const title = document.querySelector('title');
 
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      switch (urlParams.get('error')) {
+        case '404':
+          title.innerHTML = '404 Error';
+          errorTitle.innerHTML = '404';
+          errorSubtitle.innerHTML = 'Hmmm...';
+          errorDescription.innerHTML = 'It looks like one of the developers fell asleep';
+          break;
+        case '500':
+          title.innerHTML = '500 Error';
+          errorTitle.innerHTML = '500';
+          errorSubtitle.innerHTML = 'Internal Server Error...';
+          errorDescription.innerHTML = 'Space monkeys are loose, please try again later';
+          break;
+        default:
+          title.innerHTML = 'Error';
+          errorTitle.innerHTML = 'Error';
+          errorSubtitle.innerHTML = 'Hmmm...';
+          errorDescription.innerHTML = 'It looks like one of the developers fell asleep';
+          break;
+      }
+    }
+
+    populateError();
     drawVisor();
     animate();
   </script>

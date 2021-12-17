@@ -9,7 +9,7 @@ console.clear();
 console.log('Copying files...'); // NOSONAR
 
 const reqDirs = ['audio', 'css/fonts', 'analysis', 'img', 'meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle'];
-const optDirs = ['admin'];
+const optDirs = [''];
 
 const reqFiles = [
   'README.txt',

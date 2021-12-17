@@ -427,7 +427,10 @@ export const orbitalData = (sat: SatObject): void => {
       }
 
       // If Radar Selected, then Say the Sun Doesn't Matter
-      if (keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OPTICAL && keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OBSERVER) {
+      if (
+        keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OPTICAL &&
+        keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OBSERVER
+      ) {
         $('#sat-sun').html('No Effect');
         // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
       } else if (sunTime.dawn.getTime() - now.getTime() > 0 || sunTime.dusk.getTime() - now.getTime() < 0) {
@@ -705,7 +708,7 @@ export const objectData = (sat: SatObject): void => {
       $('#sat-type').html('Radar Object');
       break;
     default:
-      sat.missile ? $('#sat-type').html('Ballistic Missile') : null;
+      if (sat.missile) $('#sat-type').html('Ballistic Missile');
   }
 
   $('#edit-satinfo-link').html("<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>");

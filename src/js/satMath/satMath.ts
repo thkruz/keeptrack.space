@@ -190,7 +190,8 @@ export const calculateVisMag = (sat: SatObject, sensor: SensorObject, propTime: 
 
   const theta = Math.acos(
     <number>numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.eci.x, -sat.position.y + sun.eci.y, -sat.position.z + sun.eci.z]) /
-      (Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2)) * Math.sqrt(Math.pow(-sat.position.x + sun.eci.x, 2) + Math.pow(-sat.position.y + sun.eci.y, 2) + Math.pow(-sat.position.z + sun.eci.z, 2)))
+      (Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2)) *
+        Math.sqrt(Math.pow(-sat.position.x + sun.eci.x, 2) + Math.pow(-sat.position.y + sun.eci.y, 2) + Math.pow(-sat.position.z + sun.eci.z, 2)))
   );
 
   // Note sometimes -1.3 is used for this calculation.
@@ -1214,7 +1215,6 @@ export const getEci = (sat: SatObject, now: Date) => {
 export const findNearbyObjectsByOrbit = (sat: SatObject) => {
   const { satSet } = keepTrackApi.programs;
 
-  if (typeof sat == 'undefined' || sat == null) [];
   let catalog = satSet.satData;
   let possibleMatches = [];
   let maxPeriod = sat.period * 1.05;
@@ -1529,7 +1529,12 @@ export const calculateDops = (satList: { az: number; el: number }[]): { pdop: st
 
     azlist.push(az);
     ellist.push(el);
-    var B = [Math.cos((el * Math.PI) / 180.0) * Math.sin((az * Math.PI) / 180.0), Math.cos((el * Math.PI) / 180.0) * Math.cos((az * Math.PI) / 180.0), Math.sin((el * Math.PI) / 180.0), 1];
+    var B = [
+      Math.cos((el * Math.PI) / 180.0) * Math.sin((az * Math.PI) / 180.0),
+      Math.cos((el * Math.PI) / 180.0) * Math.cos((az * Math.PI) / 180.0),
+      Math.sin((el * Math.PI) / 180.0),
+      1,
+    ];
     numeric.setBlock(A, [n - 1, 0], [n - 1, 3], [B]);
   }
   var Q = <any>numeric.dot(numeric.transpose(A), A);
@@ -1772,7 +1777,19 @@ export const calculateSensorPos = (sensors?: SensorObject[]): { x: number; y: nu
   return pos;
 };
 
-export const createTle = (sat: SatObject, inc: string, meanmo: string, rasc: string, argPe: string, meana: string, ecen: string, epochyr: string, epochday: string, intl: string, scc: string): { TLE1: string; TLE2: string } => {
+export const createTle = (
+  sat: SatObject,
+  inc: string,
+  meanmo: string,
+  rasc: string,
+  argPe: string,
+  meana: string,
+  ecen: string,
+  epochyr: string,
+  epochday: string,
+  intl: string,
+  scc: string
+): { TLE1: string; TLE2: string } => {
   inc = formatInclination(inc);
   meanmo = formatMeanMotion(meanmo);
   rasc = formatRightAscension(rasc);

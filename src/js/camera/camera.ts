@@ -136,7 +136,8 @@ export const fpsMovement = (): void => {
   camera.fpsLastTime = fpsTimeNow;
 };
 
-export const getCamDist = (): number => Math.pow(camera._zoomLevel, ZOOM_EXP) * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance;
+export const getCamDist = (): number =>
+  Math.pow(camera._zoomLevel, ZOOM_EXP) * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance;
 
 export const alt2zoom = (alt: number): number => {
   const distanceFromCenter = alt + RADIUS_OF_EARTH + 30;
@@ -154,7 +155,7 @@ export const autoRotate = (val?: boolean): void => {
 };
 
 export const autoPan = (val?: boolean): void => {
-  if (settingsManager.autoPanSpeed.x === 0 && settingsManager.autoPanSpeed.x === 0) {
+  if (settingsManager.autoPanSpeed.x === 0) {
     settingsManager.autoPanSpeed.x = 1; // Can't autopan if speed is 0
   }
   if (typeof val == 'undefined') {
@@ -281,9 +282,13 @@ export const snapToSat = (sat: SatObject) => {
       camera.camAngleSnappedOnSat = false;
     }
 
-    camera.camSnapToSat.camDistTarget = camera.camSnapToSat.camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : camera.camSnapToSat.camDistTarget;
+    camera.camSnapToSat.camDistTarget =
+      camera.camSnapToSat.camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : camera.camSnapToSat.camDistTarget;
 
-    camera._zoomTarget = Math.pow((camera.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
+    camera._zoomTarget = Math.pow(
+      (camera.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance),
+      1 / ZOOM_EXP
+    );
     camera.ecLastZoom = camera._zoomTarget + 0.1;
 
     // Only Zoom in Once on Mobile
@@ -403,12 +408,20 @@ export const keyDownHandler = (evt: KeyboardEvent) => {
     }
   }
   if (evt.key.toUpperCase() === 'I') {
-    if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite || camera.cameraType.current === camera.cameraType.Astronomy) {
+    if (
+      camera.cameraType.current === camera.cameraType.Fps ||
+      camera.cameraType.current === camera.cameraType.Satellite ||
+      camera.cameraType.current === camera.cameraType.Astronomy
+    ) {
       camera.fpsPitchRate = settingsManager.fpsPitchRate / camera.speedModifier;
     }
   }
   if (evt.key.toUpperCase() === 'K') {
-    if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite || camera.cameraType.current === camera.cameraType.Astronomy) {
+    if (
+      camera.cameraType.current === camera.cameraType.Fps ||
+      camera.cameraType.current === camera.cameraType.Satellite ||
+      camera.cameraType.current === camera.cameraType.Astronomy
+    ) {
       camera.fpsPitchRate = -settingsManager.fpsPitchRate / camera.speedModifier;
     }
   }
@@ -678,7 +691,11 @@ export const calculate = (dt: number, isSlowDown: boolean) => {
 
   camera.camRotateSpeed -= camera.camRotateSpeed * dt * settingsManager.cameraMovementSpeed;
 
-  if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite || camera.cameraType.current === camera.cameraType.Astronomy) {
+  if (
+    camera.cameraType.current === camera.cameraType.Fps ||
+    camera.cameraType.current === camera.cameraType.Satellite ||
+    camera.cameraType.current === camera.cameraType.Astronomy
+  ) {
     camera.fpsPitch -= 20 * camera.camPitchSpeed * dt;
     camera.fpsYaw -= 20 * camera.camYawSpeed * dt;
     camera.fpsRotate -= 20 * camera.camRotateSpeed * dt;
@@ -758,7 +775,11 @@ export const calculate = (dt: number, isSlowDown: boolean) => {
     camera.ftsYaw = camera.camYaw;
   }
 
-  if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite || camera.cameraType.current === camera.cameraType.Astronomy) {
+  if (
+    camera.cameraType.current === camera.cameraType.Fps ||
+    camera.cameraType.current === camera.cameraType.Satellite ||
+    camera.cameraType.current === camera.cameraType.Astronomy
+  ) {
     fpsMovement();
   }
 };
@@ -778,7 +799,14 @@ export const update = (
      * for traditional view, move the camera and then rotate it
      */
     /* istanbul ignore next */
-    if (Number.isNaN(camera.camPitch) || Number.isNaN(camera.camYaw) || Number.isNaN(camera.camPitchTarget) || Number.isNaN(camera.camYawTarget) || Number.isNaN(camera._zoomLevel) || Number.isNaN(camera._zoomTarget)) {
+    if (
+      Number.isNaN(camera.camPitch) ||
+      Number.isNaN(camera.camYaw) ||
+      Number.isNaN(camera.camPitchTarget) ||
+      Number.isNaN(camera.camYawTarget) ||
+      Number.isNaN(camera._zoomLevel) ||
+      Number.isNaN(camera._zoomTarget)
+    ) {
       try {
         console.group('Camera Math Error');
         console.log(`camPitch: ${camera.camPitch}`);
@@ -917,7 +945,11 @@ export const update = (
     }
 
     // Try to stay out of the earth
-    if (camera.cameraType.current === camera.cameraType.Default || camera.cameraType.current === camera.cameraType.Offset || camera.cameraType.current === camera.cameraType.FixedToSat) {
+    if (
+      camera.cameraType.current === camera.cameraType.Default ||
+      camera.cameraType.current === camera.cameraType.Offset ||
+      camera.cameraType.current === camera.cameraType.FixedToSat
+    ) {
       if (getDistFromEarth() < RADIUS_OF_EARTH + 30) {
         camera._zoomTarget = camera._zoomLevel + 0.01;
       }

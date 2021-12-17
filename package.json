@@ -22,7 +22,6 @@
     "access": "public"
   },
   "scripts": {
-    "catalogManager": "npx ts-node .\\src\\admin\\node\\catalogManager.ts -p .\\src\\admin\\node\\tsconfig.json",
     "build": "node ./scripts/build.mjs development",
     "build:watch": "node ./scripts/build.mjs development --watch",
     "build:embed": "node ./scripts/buildEmbed.mjs embed",
@@ -180,6 +179,7 @@
   },
   "dependencies": {
     "@materializecss/materialize": "^1.1.0-alpha",
+    "axios": "^0.24.0",
     "gl-matrix": "^3.3.0",
     "gremlins.js": "^2.2.0",
     "jquery": "^3.6.0",

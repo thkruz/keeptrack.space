@@ -111,7 +111,7 @@ const getBaseConfig = (dirName) => ({
       {
         test: /\.tsx?$/u,
         loader: 'ts-loader',
-        exclude: [/node_modules/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u],
+        exclude: [/node_modules/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin\//u],
         options: {
           transpileOnly: false,
         },

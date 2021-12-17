@@ -52,7 +52,6 @@ html body {
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: none;
-  overflow: hidden;
   /* Other browsers */
   overscroll-behavior: none;
 }
@@ -764,7 +763,7 @@ fieldset {
   box-sizing: border-box;
   color: var(--colorWhite);
   background: rgba(0, 0, 0, 0);
-  font-family: Open Sans, Verdana;
+  font-family: Open Sans, Verdana, sans-serif;
   -webkit-transition: all 0.1s ease-in-out;
   -moz-transition: all 0.1s ease-in-out;
   -ms-transition: all 0.1s ease-in-out;
@@ -978,7 +977,6 @@ input:focus {
 .bmenu-title {
   position: relative;
   display: inline-block;
-  position: relative;
   font-size: 11px;
   line-height: 20px;
   vertical-align: top;

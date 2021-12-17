@@ -25,7 +25,6 @@ export const register = (params: { method: string; cbName: string; cb: any }) =>
   } else {
     throw new Error(`Invalid callback "${params.method}"!`);
   }
-  return;
 };
 export const unregister = (params: { method: string; cbName: string }) => {
   // If this is a valid callback
@@ -127,10 +126,7 @@ export const keepTrackApi: KeepTrackApi = {
     uiManagerFinal: () => {
       keepTrackApi.callbacks.uiManagerFinal.forEach((cb: any) => cb.cb());
     },
-    loadCatalog: async (): Promise<SatObject[]> => {
-      const satData = await keepTrackApi.callbacks.loadCatalog[0].cb();
-      return satData;
-    },
+    loadCatalog: async (): Promise<SatObject[]> => keepTrackApi.callbacks.loadCatalog[0].cb(),
     resetSensor: () => {
       keepTrackApi.callbacks.resetSensor.forEach((cb: any) => cb.cb());
     },
@@ -142,4 +138,4 @@ export const keepTrackApi: KeepTrackApi = {
 };
 
 // First time we call this module we should make it available to the rest of the application
-!window.keepTrackApi ? (window.keepTrackApi = keepTrackApi) : null;
+if (!window.keepTrackApi) window.keepTrackApi = keepTrackApi;

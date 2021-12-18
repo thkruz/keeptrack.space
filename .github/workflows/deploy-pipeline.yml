@@ -2,7 +2,7 @@
 name: Deploy Pipeline
 
 on:
-  workflow_dispatch: true
+  workflow_dispatch:
   push:
     branches:
       - master

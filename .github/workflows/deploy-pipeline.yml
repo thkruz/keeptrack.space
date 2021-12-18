@@ -137,7 +137,7 @@ jobs:
       - name: FTP Deployer
         uses: sand4rt/ftp-deployer@v1.3
         with:
-          sftp: true # optional
+          sftp: true
           host: ${{ secrets.FTP_HOST }}
           port: 22
           username: ${{ secrets.FTP_USERNAME }}

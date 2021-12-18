@@ -8,28 +8,16 @@ assignees: thkruz
 ---
 
 ### User Story
-<!-- how do you use the software -->
-<!-- ex. user -->
-- **As a**
-<!-- describe what you want -->
-<!-- ex. sounds when I click things -->
-- **I want** 
-<!-- what is your end goal? -->
-<!-- ex. I have feedback that my computer didn't freeze -->
-- **So that**
+- **As a** user
+- **I want**  describe what you want
+- **So that** what is your end goal?
 
-### Acceptance Criteria 1
-<!-- what are the starting conditions -->
-<!-- ex. I'm on the main screen -->
-- **Given**
-<!-- what actions do you take -->
-<!-- ex. I click on a satellite -->
-- **When**
-<!-- what is the end result -->
-<!-- ex. It should make a sound -->
-- **Then**
+### Acceptance Criteria
+- **Given** what are the starting conditions
+- **When** what actions do you take
+- **Then** what is the end result 
 
 <!-- Note: If you have additional criteria copy and paste the above blocks -->
 
 ### Commentary
-<!-- provide as much detail as possible -->
+Add other helpful information here to get exactly what you want

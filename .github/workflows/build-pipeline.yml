@@ -2,7 +2,7 @@
 name: Build Pipeline
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: true
   pull_request:
     branches:
       - master

@@ -7,6 +7,7 @@ import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeMan
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
 import { TleParams } from '../satMath/satMath';
+import { toastMsgType } from '../uiManager/uiManager';
 import { SpaceObjectType } from './SpaceObjectType';
 
 export enum CameraType {
@@ -60,7 +61,7 @@ export interface UiManager {
   lastNextPassCalcSatId: number;
   lastNextPassCalcSensorId: any;
   createClockDOMOnce: boolean;
-  toast: (toastText: string, type: string, isLong?: boolean) => void;
+  toast: (toastText: string, type: toastMsgType, isLong?: boolean) => void;
   uiInput: UiInputInterface;
   searchBox: typeof searchBox;
   mobileManager: typeof mobileManager;

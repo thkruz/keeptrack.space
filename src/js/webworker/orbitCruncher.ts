@@ -26,15 +26,9 @@ onmessage = (m) => {
     // Don't Add Anything Else
   }
 
-  dynamicOffsetEpoch = m.data.dynamicOffsetEpoch ? m.data.dynamicOffsetEpoch : dynamicOffsetEpoch;
-  staticOffset = m.data.staticOffset ? m.data.staticOffset : staticOffset;
-  propRate = m.data.propRate ? m.data.propRate : propRate;
-
-  if (m.data.propRate) {
-    console.log('staticOffset', staticOffset);
-    console.log('dynamicOffsetEpoch', dynamicOffsetEpoch);
-    console.log('propRate', propRate);
-  }
+  dynamicOffsetEpoch = typeof m.data.dynamicOffsetEpoch !== 'undefined' ? m.data.dynamicOffsetEpoch : dynamicOffsetEpoch;
+  staticOffset = typeof m.data.staticOffset !== 'undefined' ? m.data.staticOffset : staticOffset;
+  propRate = typeof m.data.propRate !== 'undefined' ? m.data.propRate : propRate;
 
   if (m.data.isInit) {
     const satData = JSON.parse(m.data.satData);

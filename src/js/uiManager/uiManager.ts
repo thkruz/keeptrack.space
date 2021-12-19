@@ -47,6 +47,8 @@ import { initUiValidation } from './uiValidation';
 // materializecss/materialize goes to window.M, but we want a local reference
 const M = window.M;
 
+export type toastMsgType = 'standby' | 'normal' | 'caution' | 'serious' | 'critical';
+
 $.ajaxSetup({
   cache: false,
 });
@@ -980,7 +982,8 @@ uiManager.startLowPerf = function () {
   // The settings passed as browser variables could be saved as localStorage items
   window.location.replace('index.htm?lowperf');
 };
-uiManager.toast = (toastText: string, type: string, isLong: boolean) => {
+
+uiManager.toast = (toastText: string, type: toastMsgType, isLong: boolean) => {
   let toastMsg = M.toast({
     html: toastText,
   });

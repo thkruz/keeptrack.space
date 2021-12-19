@@ -438,7 +438,25 @@ export const findByLooksSubmit = () => {
   $('#search').val(''); // Reset the search first
   const { uiManager } = keepTrackApi.programs;
   try {
-    const res = searchSats(fblAzimuth, fblElevation, fblRange, fblInc, fblAzimuthM, fblElevationM, fblRangeM, fblIncM, fblPeriod, fblPeriodM, fblRcs, fblRcsM, fblType, fblRaan, fblRaanM, fblArgPe, fblArgPeM);
+    const res = searchSats(
+      fblAzimuth,
+      fblElevation,
+      fblRange,
+      fblInc,
+      fblAzimuthM,
+      fblElevationM,
+      fblRangeM,
+      fblIncM,
+      fblPeriod,
+      fblPeriodM,
+      fblRcs,
+      fblRcsM,
+      fblType,
+      fblRaan,
+      fblRaanM,
+      fblArgPe,
+      fblArgPeM
+    );
     if (res.length === 0) {
       uiManager.toast(`No Satellites Found`, 'critical');
     }
@@ -450,7 +468,7 @@ export const findByLooksSubmit = () => {
 };
 export const limitPossibles = (possibles: any[], limit: number): any[] => {
   const { uiManager } = keepTrackApi.programs;
-  if (possibles.length >= limit) uiManager.toast('Too many results, limited to 200', 'warning');
+  if (possibles.length >= limit) uiManager.toast('Too many results, limited to 200', 'serious');
   possibles = possibles.filter((_possible, i) => i > limit - 1);
   return possibles;
 };

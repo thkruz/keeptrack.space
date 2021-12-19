@@ -2,7 +2,7 @@ import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 
 export const setupDistFolders = () => {
-  rimraf.sync('./dist');
+  rimraf.sync('./dist', { recursive: true });
   mkdirp.sync('./dist');
 
   mkdirp.sync('./dist/plugins');

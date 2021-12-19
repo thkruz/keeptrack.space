@@ -6,12 +6,16 @@ import { getDayOfYear } from './transforms';
 export const changePropRate = (propRate: number) => {
   if (timeManager.propRate === propRate) return; // no change
 
-  timeManager.staticOffset = timeManager.calculateSimulationTime().getTime() - timeManager.realTime;
-
+  timeManager.staticOffset = timeManager.simulationTimeObj.getTime() - timeManager.realTime;
   // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
   timeManager.dynamicOffsetEpoch = Date.now();
   timeManager.propRate = propRate;
-  console.debug('changePropRate', propRate);
+  timeManager.calculateSimulationTime();
+
+  console.log('staticOffset', timeManager.staticOffset);
+  console.log('dynamicOffsetEpoch', timeManager.dynamicOffsetEpoch);
+  console.log('propRate', timeManager.propRate);
+
   synchronize();
 };
 
@@ -64,6 +68,7 @@ export const timeManager: TimeManager = {
   synchronize: synchronize,
   init: () => {
     timeManager.dateObject = new Date();
+    timeManager.dynamicOffsetEpoch = Date.now();
     timeManager.simulationTimeObj = timeManager.dateObject;
     timeManager.datetimeInputDOM = $('#datetime-input-tb');
 
@@ -96,7 +101,7 @@ export const timeManager: TimeManager = {
         const simulationTime = timeManager.dynamicOffsetEpoch + timeManager.staticOffset;
         timeManager.simulationTimeObj.setTime(simulationTime);
       } else {
-        const dynamicOffset = timeManager.realTime - timeManager.dynamicOffsetEpoch;
+        const dynamicOffset = Date.now() - timeManager.dynamicOffsetEpoch;
         const simulationTime = timeManager.realTime + timeManager.staticOffset + dynamicOffset * timeManager.propRate;
         timeManager.simulationTimeObj.setTime(simulationTime);
       }
@@ -159,24 +164,16 @@ export const timeManager: TimeManager = {
     };
 
     timeManager.getPropOffset = (): number => {
-      // timeManager.selectedDate = $('#datetime-text').text().substr(0, 19);
-      if (!timeManager.selectedDate) {
-        // console.debug(timeManager);
-        return 0;
-      }
-      // selectedDate = selectedDate.split(' ');
-      // selectedDate = new Date(selectedDate[0] + 'T' + selectedDate[1] + 'Z');
-      const today = new Date();
+      if (!timeManager.selectedDate) return 0;
       // Not using local scope caused time to drift backwards!
-      const propOffset = timeManager.selectedDate - today.getTime();
-      return propOffset;
+      return timeManager.selectedDate - Date.now();
     };
 
     // Initialize
     timeManager.calculateSimulationTime();
     timeManager.setSelectedDate(timeManager.simulationTimeObj);
   },
-  dynamicOffsetEpoch: Date.now(),
+  dynamicOffsetEpoch: null,
   realTime: 0,
   staticOffset: 0,
   simulationTimeObj: null,

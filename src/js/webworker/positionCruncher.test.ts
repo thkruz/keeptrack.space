@@ -1,6 +1,7 @@
 import { defaultSat, defaultSensor } from '../api/apiMocks';
 import { SpaceObjectType } from '../api/SpaceObjectType';
-import { onmessageInject, propagateCruncher, sendDataToSatSet } from './positionCruncher';
+import { satellite } from '../satMath/satMath';
+import { onmessageProcessing, propagationLoop, sendDataToSatSet } from './positionCruncher';
 
 class MockWorker {
   onmessage: () => void;
@@ -10,7 +11,7 @@ class MockWorker {
 
   postMessage(msg) {
     console.log(this);
-    onmessageInject(msg);
+    onmessageProcessing(msg);
     return sendDataToSatSet();
   }
 }
@@ -127,7 +128,7 @@ describe('positionCruncher.onmessage', () => {
   });
 });
 
-describe('positionCruncher.propagateCruncher', () => {
+describe('positionCruncher.propagationLoop', () => {
   beforeEach(() => {
     message = {
       data: {},
@@ -140,13 +141,33 @@ describe('positionCruncher.propagateCruncher', () => {
     message.data.isShowSatOverfly = 'enable';
     expect(() => worker.postMessage(message)).not.toThrow();
 
-    const fakeCatalog = <any>[defaultSat];
+    const fakeCatalog = <any>[];
 
+    const satrec = satellite.twoline2satrec(
+      // perform and store sat init calcs
+      defaultSat.TLE1,
+      defaultSat.TLE2
+    );
+    fakeCatalog.push({ ...defaultSat, ...satrec, ...{ satnum: true } });
     for (let i = 0; i < 50000; i++) {
       fakeCatalog.push({ ...defaultSat, ...{ marker: true } });
     }
 
-    const result = () => propagateCruncher(fakeCatalog);
+    onmessageProcessing({
+      data: {
+        typ: 'satdata',
+        dat: JSON.stringify([{ ...defaultSat, ...satrec, ...{ satnum: true } }]),
+      },
+    });
+
+    onmessageProcessing({
+      data: {
+        isShowSatOverfly: 'enable',
+        selectedSatFOV: 30,
+      },
+    });
+
+    const result = () => propagationLoop(fakeCatalog);
 
     expect(result).not.toThrow();
   });
@@ -165,11 +186,11 @@ describe('positionCruncher.propagateCruncher', () => {
       { ...defaultSat, ...{ skip: true } },
     ];
 
-    for (let i = 0; i < 50000; i++) {
+    for (let i = 0; i < 100000; i++) {
       fakeCatalog.push({ ...defaultSat, ...{ marker: true } });
     }
 
-    const result = () => propagateCruncher(fakeCatalog);
+    const result = () => propagationLoop(fakeCatalog);
 
     expect(result).not.toThrow();
 
@@ -207,7 +228,7 @@ describe('positionCruncher.propagateCruncher', () => {
       fakeCatalog.push({ ...defaultSat, ...{ marker: true } });
     }
 
-    const result = () => propagateCruncher(fakeCatalog);
+    const result = () => propagationLoop(fakeCatalog);
 
     expect(result).not.toThrow();
   });

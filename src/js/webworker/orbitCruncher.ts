@@ -1,7 +1,7 @@
 import * as satellite from 'satellite.js';
 import { DEG2RAD, RADIUS_OF_EARTH } from '../lib/constants';
 import { jday } from '../timeManager/transforms';
-import { propTime } from './positionCalculations';
+import { propTime } from './positionCruncher/calculations';
 
 let dynamicOffsetEpoch: number;
 let staticOffset = 0;
@@ -29,6 +29,12 @@ onmessage = (m) => {
   dynamicOffsetEpoch = m.data.dynamicOffsetEpoch ? m.data.dynamicOffsetEpoch : dynamicOffsetEpoch;
   staticOffset = m.data.staticOffset ? m.data.staticOffset : staticOffset;
   propRate = m.data.propRate ? m.data.propRate : propRate;
+
+  if (m.data.propRate) {
+    console.log('staticOffset', staticOffset);
+    console.log('dynamicOffsetEpoch', dynamicOffsetEpoch);
+    console.log('propRate', propRate);
+  }
 
   if (m.data.isInit) {
     const satData = JSON.parse(m.data.satData);

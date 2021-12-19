@@ -4,6 +4,7 @@
   // "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.formatOnSave": true,
   "typescript.validate.enable": true,
+  "npm.exclude": ["**/dist/**", "**/src/admin", "**/src/admin/*"],
   "eslint.workingDirectories": ["./"],
   "typescript.tsdk": "./node_modules/typescript/lib",
   "[typescript]": {

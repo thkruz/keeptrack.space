@@ -11,10 +11,6 @@ SatGroup {
       "isIntlDes": true,
       "satId": 0,
     },
-    Object {
-      "isIntlDes": true,
-      "satId": 1,
-    },
   ],
   "updateOrbits": [Function],
 }

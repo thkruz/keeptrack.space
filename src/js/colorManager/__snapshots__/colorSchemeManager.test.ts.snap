@@ -1338,8 +1338,8 @@ exports[`colorSchemeManager.defaultRules should ignore deselected stars 1`] = `
 Object {
   "color": Array [
     1,
-    1,
-    1,
+    0,
+    0,
     0,
   ],
   "pickable": 0,

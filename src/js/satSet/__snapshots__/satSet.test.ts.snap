@@ -117,7 +117,7 @@ exports[`satSet.getIdFromObjNum 0 1`] = `null`;
 
 exports[`satSet.getIdFromObjNum 1 1`] = `null`;
 
-exports[`satSet.getIdFromStarName 0 1`] = `2`;
+exports[`satSet.getIdFromStarName 0 1`] = `null`;
 
 exports[`satSet.getIdFromStarName 1 1`] = `null`;
 

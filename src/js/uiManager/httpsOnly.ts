@@ -90,6 +90,7 @@ export const updateSensorPosition = (position: GeolocationPosition): void => {
   };
 
   satSet.satCruncher.postMessage({
+    typ: 'sensor',
     setlatlong: true,
     sensor: sensorInfo,
   });

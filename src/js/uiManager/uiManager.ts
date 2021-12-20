@@ -969,6 +969,7 @@ uiManager.doSearch = (searchString: string, isPreventDropDown: boolean) => {
 
   if (settingsManager.isSatOverflyModeOn) {
     satSet.satCruncher.postMessage({
+      typ: 'satelliteSelected',
       satelliteSelected: idList,
     });
   }

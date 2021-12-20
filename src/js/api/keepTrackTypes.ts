@@ -1039,6 +1039,7 @@ export interface EarthObject {
 }
 
 export interface CatalogManager {
+  searchBusRegex(satData: SatObject[], text: string): SatObject[];
   resetSatInView();
   convertIdArrayToSatnumArray(aehf: any): any;
   init();
@@ -1062,6 +1063,7 @@ export interface CatalogManager {
   searchYearOrLess(satData: SatObject[], data: any): SatObject[];
   getIdFromIntlDes(arg0: any);
   searchNameRegex(satData: SatObject[], data: any): SatObject[];
+  searchShapeRegex(satData: SatObject[], text: string): SatObject[];
   searchCountryRegex(satData: SatObject[], data: any): SatObject[];
   insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string);
   setSat(x: number, arg1: any);
@@ -1246,6 +1248,7 @@ export interface DrawManager {
   clearFrameBuffers: any;
   selectSatManager: any;
   i: number;
+  updateHoverI: number;
   demoModeSatellite: number;
   demoModeLastTime: number;
   demoModeLast: number;

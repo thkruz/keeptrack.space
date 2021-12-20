@@ -100,7 +100,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
   }
   if (selectedSensor === 'SSN') {
     sensorManager.sensorTitle = 'All Space Surveillance Network Sensors';
-    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
+    const filteredSensors = Object.values(sensorList).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
     sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'CapeCodMulti') {
     let multiSensor = [];
@@ -141,6 +141,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
       volume: false,
     });
     satSet.satCruncher.postMessage({
+      typ: 'sensor',
       setlatlong: true,
       sensor: multiSensor,
       multiSensor: true,
@@ -151,7 +152,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
     sensorManager.sensorTitle = 'Cape Cod Multi Fence Radar';
   } else if (selectedSensor === 'NATO-MW') {
     sensorManager.sensorTitle = 'All North American Aerospace Defense Command Sensors';
-    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+    const filteredSensors = Object.values(sensorList).filter(
       (sensor) =>
         // eslint-disable-next-line implicit-arrow-linebreak
         sensor == sensorManager.sensorList.BLE ||
@@ -165,7 +166,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
     sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'RUS-ALL') {
     sensorManager.sensorTitle = 'All Russian Sensors';
-    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+    const filteredSensors = Object.values(sensorList).filter(
       (sensor) =>
         // eslint-disable-next-line implicit-arrow-linebreak
         sensor == sensorManager.sensorList.ARM ||
@@ -180,7 +181,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
     sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'LEO-LABS') {
     sensorManager.sensorTitle = 'All LEO Labs Sensors';
-    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+    const filteredSensors = Object.values(sensorList).filter(
       (sensor) =>
         // eslint-disable-next-line implicit-arrow-linebreak
         sensor == sensorManager.sensorList.MSR || sensor == sensorManager.sensorList.PFISR || sensor == sensorManager.sensorList.KSR
@@ -188,7 +189,7 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
     sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'MD-ALL') {
     sensorManager.sensorTitle = 'All Missile Defense Agency Sensors';
-    const filteredSensors = <SensorObject[]>Object.values(sensorList).filter(
+    const filteredSensors = Object.values(sensorList).filter(
       (sensor) =>
         // eslint-disable-next-line implicit-arrow-linebreak
         sensor == sensorManager.sensorList.COD ||
@@ -239,8 +240,16 @@ export const drawFov = (sensor: SensorObject) => {
     case 'BLE':
     case 'CLR':
     case 'THL':
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create(
+        'scan2',
+        [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange],
+        'c'
+      );
+      keepTrackApi.programs.lineManager.create(
+        'scan2',
+        [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange],
+        'c'
+      );
       break;
     case 'FYL':
       // TODO: Find actual face directions
@@ -250,7 +259,11 @@ export const drawFov = (sensor: SensorObject) => {
       break;
     case 'CDN':
       // NOTE: This will be a bit more complicated later
-      keepTrackApi.programs.lineManager.create('scan2', [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+      keepTrackApi.programs.lineManager.create(
+        'scan2',
+        [keepTrackApi.programs.satSet.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange],
+        'c'
+      );
       break;
     default:
       console.debug('Sensor not found');
@@ -269,7 +282,19 @@ export const sensorManager: SensorManager = {
   curSensorPositon: [0, 0, 0],
   whichRadar: '',
   selectedSensor: <SensorObject>null,
-  sensorListUS: [sensorList.COD, sensorList.BLE, sensorList.CAV, sensorList.CLR, sensorList.EGL, sensorList.FYL, sensorList.THL, sensorList.MIL, sensorList.ALT, sensorList.ASC, sensorList.CDN],
+  sensorListUS: [
+    sensorList.COD,
+    sensorList.BLE,
+    sensorList.CAV,
+    sensorList.CLR,
+    sensorList.EGL,
+    sensorList.FYL,
+    sensorList.THL,
+    sensorList.MIL,
+    sensorList.ALT,
+    sensorList.ASC,
+    sensorList.CDN,
+  ],
   currentSensor: [
     {
       observerGd: {
@@ -314,6 +339,7 @@ export const sensorManager: SensorManager = {
 export const sendSensorToOtherPrograms = (filteredSensors: SensorObject[]) => {
   const { satSet, satellite, objectManager } = keepTrackApi.programs;
   satSet.satCruncher.postMessage({
+    typ: 'sensor',
     setlatlong: true,
     sensor: filteredSensors,
     multiSensor: filteredSensors.length > 1,

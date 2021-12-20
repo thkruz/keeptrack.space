@@ -373,6 +373,47 @@ export const getSatelliteModel = (sat: SatObject) => {
     return;
   }
 
+  switch (sat.bus) {
+    case 'Cubesat':
+    case 'Cubesat 1U':
+      meshManager.currentModel.model = meshManager.models.s1u;
+      return;
+    case 'Cubesat 2U':
+      meshManager.currentModel.model = meshManager.models.s2u;
+      return;
+    case 'Cubesat 3U':
+    case 'Cubesat 3U+':
+      meshManager.currentModel.model = meshManager.models.s3u;
+      return;
+    case 'DSP':
+    case 'DSP B14':
+    case 'DSP B18':
+    case 'DSP MOS/PIM':
+    case 'DSP P2U':
+    case 'DSP P2':
+      meshManager.currentModel.model = meshManager.models.dsp;
+      return;
+    case 'GPS':
+    case 'GPS II':
+    case 'GPS IIA':
+    case 'GPS IIF':
+    case 'GPS IIR':
+      meshManager.currentModel.model = meshManager.models.gps;
+      return;
+    case 'Iridium':
+      meshManager.currentModel.model = meshManager.models.iridium;
+      return;
+    case 'Cubesat 1.5U':
+    case 'Cubesat 6U':
+    case 'Cubesat 0.5U':
+    case 'Cubesat 0.25U':
+    case 'Cubesat 16U':
+    case 'Cubesat 12U':
+    case 'Cubesat 0.3U':
+    default:
+    // Do Nothing
+  }
+
   const rcs = parseFloat(sat.rcs);
   switch (true) {
     case rcs < 0.1 && rcs > 0.04:

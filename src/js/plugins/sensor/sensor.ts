@@ -471,6 +471,7 @@ export const resetSensorSelected = () => {
     uiManager.legendMenuChange('default');
   }
   satSet.satCruncher.postMessage({
+    typ: 'sensor',
     setlatlong: true,
     resetObserverGd: true,
     sensor: [sensorManager.defaultSensor],
@@ -702,6 +703,15 @@ export const init = (): void => {
     cbName: 'sensor',
     cb: hideSideMenus,
   });
+
+  (<any>$('#sensor-list-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 400,
+    minWidth: 280,
+  });
 };
 
 export const selectSatData = () => {
@@ -779,6 +789,7 @@ export const customSensorSubmit = (): void => {
   sensorManager.whichRadar = customSensors.length > 1 ? 'MULTI CUSTOM' : 'CUSTOM';
 
   satSet.satCruncher.postMessage({
+    typ: 'sensor',
     setlatlong: true,
     sensor: customSensors,
     multiSensor: customSensors.length > 1,

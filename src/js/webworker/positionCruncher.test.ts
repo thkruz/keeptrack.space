@@ -162,6 +162,7 @@ describe('positionCruncher.propagationLoop', () => {
 
     onmessageProcessing({
       data: {
+        typ: 'isShowSatOverfly',
         isShowSatOverfly: 'enable',
         selectedSatFOV: 30,
       },

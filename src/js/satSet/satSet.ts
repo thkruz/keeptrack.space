@@ -52,7 +52,7 @@ import {
   getSensorFromSensorName,
 } from './catalogSupport/getters';
 import { exportTle2Csv, exportTle2Txt } from './exportTle';
-import { searchCountryRegex, searchNameRegex, searchYear, searchYearOrLess } from './search';
+import { searchBusRegex, searchCountryRegex, searchNameRegex, searchShapeRegex, searchYear, searchYearOrLess } from './search';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 
 // ******************** Initialization ********************
@@ -195,6 +195,7 @@ export const selectSat = (i: number): void => {
   }
 
   satSet.satCruncher.postMessage({
+    typ: 'satelliteSelected',
     satelliteSelected: [i],
   });
   if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
@@ -554,6 +555,8 @@ export let satSet: CatalogManager = {
   satSensorMarkerArray: null,
   sccIndex: null,
   searchCountryRegex: searchCountryRegex,
+  searchShapeRegex: searchShapeRegex,
+  searchBusRegex: searchBusRegex,
   searchNameRegex: searchNameRegex,
   searchYear: searchYear,
   searchYearOrLess: searchYearOrLess,

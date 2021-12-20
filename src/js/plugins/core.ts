@@ -92,7 +92,7 @@ export const uiManagerFinal = (plugins: any): void => {
   if (plugins.topMenu) {
     let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--top-menu-height').replace('px', ''));
     if (isNaN(topMenuHeight)) topMenuHeight = 0;
-    document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + 25 + 'px');
+    document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + 22 + 'px');
   }
 
   if (document.getElementById('bottom-icons') && document.getElementById('bottom-icons').innerText == '') {

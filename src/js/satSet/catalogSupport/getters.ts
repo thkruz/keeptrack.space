@@ -21,9 +21,11 @@ export const getIdFromIntlDes = (intlDes: string) => {
   return typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined' ? satSet.cosparIndex[`${intlDes}`] : null;
 };
 export const getIdFromStarName = (starName: string) => {
-  const { satSet } = keepTrackApi.programs;
-  const i = satSet.satData.findIndex((object: SatObject) => object?.type === SpaceObjectType.STAR && object?.name === starName);
-  return i === -1 ? null : i;
+  const { satSet, dotsManager } = keepTrackApi.programs;
+  const i = satSet.satData
+    .slice(dotsManager.starIndex1, dotsManager.starIndex2)
+    .findIndex((object: SatObject) => object?.type === SpaceObjectType.STAR && object?.name === starName);
+  return i === -1 ? null : i + dotsManager.starIndex1;
 };
 export const getSensorFromSensorName = (sensorName: string): number => {
   const { satSet } = keepTrackApi.programs;

@@ -466,6 +466,7 @@ export const keepTrackApiStubs = {
       getIdFromIntlDes: jest.fn(),
       searchNameRegex: () => [25544],
       searchCountryRegex: () => [25544],
+      searchShapeRegex: () => [25544],
       queryStr: 'search=25544&intldes=1998-A&sat=25544&misl=0,0,0&date=1234567&rate=1&hires=true',
       cosparIndex: { '1998-AB': 5 },
       numSats: 1,

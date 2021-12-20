@@ -618,8 +618,9 @@ export const updateHover = () => {
     currentSearchSats = searchBox.getLastResultGroup();
     if (typeof currentSearchSats !== 'undefined') {
       currentSearchSats = currentSearchSats['sats'];
-      for (drawManager.i = 0; drawManager.i < currentSearchSats.length; drawManager.i++) {
-        orbitManager.updateOrbitBuffer(currentSearchSats[drawManager.i].satId);
+      if (drawManager.updateHoverI >= currentSearchSats.length) drawManager.updateHoverI = 0;
+      for (let i = 0; drawManager.updateHoverI < currentSearchSats.length && i < 5; drawManager.updateHoverI++, i++) {
+        orbitManager.updateOrbitBuffer(currentSearchSats[drawManager.updateHoverI].satId);
       }
     }
   }
@@ -1004,6 +1005,7 @@ export const drawManager: DrawManager = {
   drawOptionalScenery: drawOptionalScenery,
   onDrawLoopComplete: onDrawLoopComplete,
   updateHover: updateHover,
+  updateHoverI: 0,
   isDrawOrbitsAbove: false,
   orbitsAbove: orbitsAbove,
   screenShot: screenShot,

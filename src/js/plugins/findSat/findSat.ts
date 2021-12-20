@@ -1,4 +1,5 @@
 import { SatObject } from '@app/js/api/keepTrackTypes';
+import { getUnique } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
@@ -27,43 +28,72 @@ export const checkRcs = (possibles: any[], minRcs: number, maxRcs: number) => {
   possibles = possibles.filter((possible) => parseFloat(possible.R) > minRcs && parseFloat(possible.R) < maxRcs);
   return limitPossibles(possibles, 200);
 };
-export const searchSats = (
-  azimuth: number,
-  elevation: number,
-  range: number,
-  inclination: number,
-  azMarg: number,
-  elMarg: number,
-  rangeMarg: number,
-  incMarg: number,
-  period: number,
-  periodMarg: number,
-  rcs: number,
-  rcsMarg: number,
-  objtype: number,
-  raan: number,
-  raanMarg: number,
-  argPe: number,
-  argPeMarg: number
-) => {
-  const isValidAz = !isNaN(azimuth) && isFinite(azimuth);
-  const isValidEl = !isNaN(elevation) && isFinite(elevation);
-  const isValidRange = !isNaN(range) && isFinite(range);
-  const isValidInc = !isNaN(inclination) && isFinite(inclination);
+
+export interface SearchSatParams {
+  az: number;
+  el: number;
+  rng: number;
+  inc: number;
+  azMarg: number;
+  elMarg: number;
+  rngMarg: number;
+  incMarg: number;
+  period: number;
+  periodMarg: number;
+  rcs: number;
+  rcsMarg: number;
+  objType: number;
+  raan: number;
+  raanMarg: number;
+  argPe: number;
+  argPeMarg: number;
+  shape: string;
+  payload: string;
+  bus: string;
+}
+
+interface SearchResults extends SatObject {
+  rng: number;
+}
+
+export const searchSats = (searchParams: SearchSatParams) => {
+  let { az, el, rng, inc, azMarg, elMarg, rngMarg, incMarg, period, periodMarg, rcs, rcsMarg, objType, raan, raanMarg, argPe, argPeMarg, bus, shape, payload } = searchParams;
+
+  const isValidAz = !isNaN(az) && isFinite(az);
+  const isValidEl = !isNaN(el) && isFinite(el);
+  const isValidRange = !isNaN(rng) && isFinite(rng);
+  const isValidInc = !isNaN(inc) && isFinite(inc);
   const isValidRaan = !isNaN(raan) && isFinite(raan);
   const isValidArgPe = !isNaN(argPe) && isFinite(argPe);
   const isValidPeriod = !isNaN(period) && isFinite(period);
   const isValidRcs = !isNaN(rcs) && isFinite(rcs);
+  const isSpecificBus = bus !== 'All';
+  const isSpecificShape = shape !== 'All';
+  const isSpecificPayload = payload !== 'All';
   azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : 5;
   elMarg = !isNaN(elMarg) && isFinite(elMarg) ? elMarg : 5;
-  rangeMarg = !isNaN(rangeMarg) && isFinite(rangeMarg) ? rangeMarg : 200;
+  rngMarg = !isNaN(rngMarg) && isFinite(rngMarg) ? rngMarg : 200;
   incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : 1;
   periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : 0.5;
   rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
   raanMarg = !isNaN(raanMarg) && isFinite(raanMarg) ? raanMarg : 1;
   argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : 1;
 
-  if (!isValidEl && !isValidRange && !isValidAz && !isValidInc && !isValidPeriod && !isValidRcs && !isValidArgPe && !isValidRaan) throw new Error('No Search Criteria Entered');
+  if (
+    !isValidEl &&
+    !isValidRange &&
+    !isValidAz &&
+    !isValidInc &&
+    !isValidPeriod &&
+    !isValidRcs &&
+    !isValidArgPe &&
+    !isValidRaan &&
+    !isSpecificBus &&
+    !isSpecificShape &&
+    !isSpecificPayload
+  ) {
+    throw new Error('No Search Criteria Entered');
+  }
 
   const { satSet, satellite, uiManager } = keepTrackApi.programs;
 
@@ -73,98 +103,50 @@ export const searchSats = (
     .filter((sat: SatObject) => !sat.static && !sat.missile && sat.active)
     .map((sat: SatObject) => {
       const tearr = satellite.getTEARR(sat);
-      return { ...sat, az: tearr.az, el: tearr.el, rng: tearr.rng, inView: tearr.inView };
+      return <SearchResults>{ ...sat, az: tearr.az, el: tearr.el, rng: tearr.rng, inView: tearr.inView };
     });
 
-  res = !isValidInc && !isValidPeriod ? checkInview(res) : res;
-  res = objtype !== 0 ? checkObjtype(res, objtype) : res;
+  res = !isValidInc && !isValidPeriod && (isValidAz || isValidEl || isValidRange) ? checkInview(res) : res;
 
-  if (isValidAz) {
-    const minaz = azimuth - azMarg;
-    const maxaz = azimuth + azMarg;
-    res = checkAz(res, minaz, maxaz);
-  }
+  res = objType !== 0 ? checkObjtype(res, objType) : res;
+  if (isValidAz) res = checkAz(res, az - azMarg, az + azMarg);
+  if (isValidEl) res = checkEl(res, el - elMarg, el + elMarg);
+  if (isValidRange) res = checkRange(res, rng - rngMarg, rng + rngMarg);
+  if (isValidInc) res = checkInc(res, inc - incMarg, inc + incMarg);
+  if (isValidRaan) res = checkRaan(res, raan - raanMarg, raan + raanMarg);
+  if (isValidArgPe) res = checkArgPe(res, argPe - argPeMarg, argPe + argPeMarg);
+  if (isValidPeriod) res = checkPeriod(res, period - periodMarg, period + periodMarg);
+  if (isValidRcs) res = checkRcs(res, rcs - rcsMarg, rcs + rcsMarg);
+  if (bus !== 'All') res = res.filter((sat: SatObject) => sat.bus === bus);
+  if (shape !== 'All') res = res.filter((sat: SatObject) => sat.shape === shape);
 
-  if (isValidEl) {
-    const minel = elevation - elMarg;
-    const maxel = elevation + elMarg;
-    res = checkEl(res, minel, maxel);
-  }
-
-  if (isValidRange) {
-    const minrange = range - rangeMarg;
-    const maxrange = range + rangeMarg;
-    res = checkRange(res, minrange, maxrange);
-  }
-
-  if (isValidInc) {
-    const minInc = inclination - incMarg;
-    const maxInc = inclination + incMarg;
-    res = checkInc(res, minInc, maxInc);
+  if (payload !== 'All') {
+    res = res.filter(
+      (sat: SatObject) =>
+        sat.payload
+          ?.split(' ')[0]
+          ?.split('-')[0]
+          ?.replace(/[^a-zA-Z]/gu, '') === payload
+    );
   }
 
-  if (isValidRaan) {
-    const minRaan = raan - raanMarg;
-    const maxRaan = raan + raanMarg;
-    res = checkRaan(res, minRaan, maxRaan);
-  }
+  let result = '';
+  res.forEach((sat: SatObject, i: number) => {
+    result += i < res.length - 1 ? `${sat.name},` : `${sat.name}`;
+  });
 
-  if (isValidArgPe) {
-    const minArgPe = argPe - argPeMarg;
-    const maxArgPe = argPe + argPeMarg;
-    res = checkArgPe(res, minArgPe, maxArgPe);
-  }
-
-  if (isValidPeriod) {
-    const minPeriod = period - periodMarg;
-    const maxPeriod = period + periodMarg;
-    res = checkPeriod(res, minPeriod, maxPeriod);
-  }
-
-  if (isValidRcs) {
-    const minRcs = rcs - rcsMarg;
-    const maxRcs = rcs + rcsMarg;
-    res = checkRcs(res, minRcs, maxRcs);
-  }
-  // $('#findByLooks-results').text('');
-  // IDEA: Intentionally doesn't clear previous searches. Could be an option later.
-  const sccList = [];
-  for (let i = 0; i < res.length; i++) {
-    // $('#findByLooks-results').append(res[i].sccNum + '<br />');
-    if (i < res.length - 1) {
-      $('#search').val($('#search').val() + res[i].sccNum + ',');
-    } else {
-      $('#search').val($('#search').val() + res[i].sccNum);
-    }
-    sccList.push(res[i].sccNum);
-  }
+  $('#search').val(result);
   uiManager.doSearch($('#search').val());
-  // console.log(sccList);
   return res;
 };
 
-export const checkInview = (possibles: any[]) => {
-  possibles = possibles.filter((possible) => possible.inView);
-  return possibles;
-};
+export const checkInview = (posAll: SearchResults[]) => posAll.filter((pos) => pos.inView);
+export const checkObjtype = (posAll: SearchResults[], objtype: number) => posAll.filter((pos) => pos.type === objtype);
+export const checkAz = (posAll: SearchResults[], min: number, max: number) => posAll.filter((pos) => pos.az >= min && pos.az <= max);
 
-export const checkObjtype = (possibles: any[], objtype: number) => {
-  possibles = possibles.filter((possible) => possible.OT === objtype);
-  return possibles;
-};
+export const checkEl = (posAll: SearchResults[], min: number, max: number) => posAll.filter((pos) => pos.el >= min && pos.el <= max);
 
-export const checkAz = (possibles: any[], minaz: number, maxaz: number) => {
-  possibles = possibles.filter((possible) => possible.az >= minaz && possible.az <= maxaz);
-  return possibles;
-};
-export const checkEl = (possibles: any[], minel: number, maxel: number) => {
-  possibles = possibles.filter((possible) => possible.el >= minel && possible.el <= maxel);
-  return possibles;
-};
-export const checkRange = (possibles: any[], minrange: number, maxrange: number) => {
-  possibles = possibles.filter((possible) => possible.rng >= minrange && possible.rng <= maxrange);
-  return possibles;
-};
+export const checkRange = (posAll: SearchResults[], min: number, max: number) => posAll.filter((pos) => pos.rng >= min && pos.rng <= max);
 
 export const newLaunchSubmit = (): void => {
   const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
@@ -245,6 +227,30 @@ export const uiManagerInit = (): void => {
                       <option value=3>Debris</option>
                     </select>
                     <label for="disabled">Object Type</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <select value=0 id="fbl-bus" type="text">
+                      <option value='All'>All</option>
+                    </select>
+                    <label for="disabled">Satellite Bus</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <select value=0 id="fbl-payload" type="text">
+                      <option value='All'>All</option>
+                    </select>
+                    <label for="disabled">Payload</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-field col s12">
+                    <select value=0 id="fbl-shape" type="text">
+                      <option value='All'>All</option>
+                    </select>
+                    <label for="disabled">Shape</label>
                   </div>
                 </div>
                 <div class="row">
@@ -373,6 +379,40 @@ export const uiManagerInit = (): void => {
     findByLooksSubmit();
     e.preventDefault();
   });
+
+  const { satSet } = keepTrackApi.programs;
+  getUnique(satSet.satData.filter((obj: SatObject) => obj.bus).map((obj) => obj.bus))
+    // Sort using lower case
+    .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+    .forEach((bus) => {
+      $('#fbl-bus').append(`<option value="${bus}">${bus}</option>`);
+    });
+
+  getUnique(satSet.satData.filter((obj: SatObject) => obj.shape).map((obj) => obj.shape))
+    // Sort using lower case
+    .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+    .forEach((shape) => {
+      $('#fbl-shape').append(`<option value="${shape}">${shape}</option>`);
+    });
+
+  const payloadPartials = satSet.satData
+    .filter((obj: SatObject) => obj.payload)
+    .map((obj) =>
+      obj.payload
+        .split(' ')[0]
+        .split('-')[0]
+        .replace(/[^a-zA-Z]/gu, '')
+    )
+    .filter((obj) => obj.length >= 3);
+
+  getUnique(payloadPartials)
+    .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+    .forEach((payload) => {
+      if (payload === '') return;
+      if (payloadPartials.filter((partial) => partial === payload).length > 3) {
+        $('#fbl-payload').append(`<option value="${payload}">${payload}</option>`);
+      }
+    });
 };
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-find-sat') {
@@ -418,45 +458,52 @@ export const init = (): void => {
   });
 };
 export const findByLooksSubmit = () => {
-  const fblAzimuth = parseFloat($('#fbl-azimuth').val());
-  const fblElevation = parseFloat($('#fbl-elevation').val());
-  const fblRange = parseFloat($('#fbl-range').val());
-  const fblInc = parseFloat($('#fbl-inc').val());
-  const fblPeriod = parseFloat($('#fbl-period').val());
-  const fblRcs = parseFloat($('#fbl-rcs').val());
-  const fblAzimuthM = parseFloat($('#fbl-azimuth-margin').val());
-  const fblElevationM = parseFloat($('#fbl-elevation-margin').val());
-  const fblRangeM = parseFloat($('#fbl-range-margin').val());
-  const fblIncM = parseFloat($('#fbl-inc-margin').val());
-  const fblPeriodM = parseFloat($('#fbl-period-margin').val());
-  const fblRcsM = parseFloat($('#fbl-rcs-margin').val());
-  const fblType = parseInt($('#fbl-type').val());
-  const fblRaan = parseFloat($('#fbl-raan').val());
-  const fblRaanM = parseFloat($('#fbl-raan-margin').val());
-  const fblArgPe = parseFloat($('#fbl-argPe').val());
-  const fblArgPeM = parseFloat($('#fbl-argPe-margin').val());
+  const az = parseFloat($('#fbl-azimuth').val());
+  const el = parseFloat($('#fbl-elevation').val());
+  const rng = parseFloat($('#fbl-range').val());
+  const inc = parseFloat($('#fbl-inc').val());
+  const period = parseFloat($('#fbl-period').val());
+  const rcs = parseFloat($('#fbl-rcs').val());
+  const azMarg = parseFloat($('#fbl-azimuth-margin').val());
+  const elMarg = parseFloat($('#fbl-elevation-margin').val());
+  const rngMarg = parseFloat($('#fbl-range-margin').val());
+  const incMarg = parseFloat($('#fbl-inc-margin').val());
+  const periodMarg = parseFloat($('#fbl-period-margin').val());
+  const rcsMarg = parseFloat($('#fbl-rcs-margin').val());
+  const objType = parseInt($('#fbl-type').val());
+  const raan = parseFloat($('#fbl-raan').val());
+  const raanMarg = parseFloat($('#fbl-raan-margin').val());
+  const argPe = parseFloat($('#fbl-argPe').val());
+  const argPeMarg = parseFloat($('#fbl-argPe-margin').val());
+  const bus = $('#fbl-bus').val();
+  const payload = $('#fbl-payload').val();
+  const shape = $('#fbl-shape').val();
   $('#search').val(''); // Reset the search first
   const { uiManager } = keepTrackApi.programs;
   try {
-    const res = searchSats(
-      fblAzimuth,
-      fblElevation,
-      fblRange,
-      fblInc,
-      fblAzimuthM,
-      fblElevationM,
-      fblRangeM,
-      fblIncM,
-      fblPeriod,
-      fblPeriodM,
-      fblRcs,
-      fblRcsM,
-      fblType,
-      fblRaan,
-      fblRaanM,
-      fblArgPe,
-      fblArgPeM
-    );
+    const searchParams = {
+      az: az,
+      el: el,
+      rng: rng,
+      inc: inc,
+      azMarg,
+      elMarg,
+      rngMarg,
+      incMarg,
+      period,
+      periodMarg,
+      rcs,
+      rcsMarg,
+      objType,
+      raan,
+      raanMarg,
+      argPe,
+      argPeMarg,
+      bus,
+      payload,
+      shape,
+    };
+    const res = searchSats(searchParams);
     if (res.length === 0) {
       uiManager.toast(`No Satellites Found`, 'critical');
     }
@@ -466,6 +513,7 @@ export const findByLooksSubmit = () => {
     }
   }
 };
+
 export const limitPossibles = (possibles: any[], limit: number): any[] => {
   const { uiManager } = keepTrackApi.programs;
   if (possibles.length >= limit) uiManager.toast('Too many results, limited to 200', 'serious');

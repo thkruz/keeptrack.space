@@ -348,14 +348,13 @@ export const orbitalData = (sat: SatObject): void => {
       maxHeight: 900,
       minHeight: 200,
       maxWidth: 600,
-      minWidth: 350,
+      minWidth: 355,
     });
 
     // If right click kill and reinit
     $('#sat-infobox').on('mousedown', (e: any) => {
       if (e.button === 2) {
         $('#sat-infobox').removeClass().removeAttr('style');
-        return;
       }
     });
 

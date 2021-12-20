@@ -141,15 +141,6 @@ export const initMenuController = () => {
   });
 
   // Allow All Side Menu Resizing
-  (<any>$('#sensor-list-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 400,
-    minWidth: 280,
-  });
-
   (<any>$('#sensor-info-menu')).resizable({
     handles: 'e',
     stop: function () {

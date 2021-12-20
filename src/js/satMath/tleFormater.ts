@@ -35,7 +35,7 @@ export const formatRightAscension = (rasc: string): string => {
   } else {
     rascArr[1] = '0000';
   }
-  rasc = (rasc[0] + '.' + rasc[1]).toString();
+  rasc = (rascArr[0] + '.' + rascArr[1]).toString();
   rasc = stringPad.pad0(rasc, 8);
   return rasc;
 };

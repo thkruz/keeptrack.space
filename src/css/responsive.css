@@ -207,7 +207,7 @@
     border-style: solid;
     overflow: hidden auto;
   }
-  #sat-infobox:after {
+  .satinfo-fixed:after {
     content: '';
     height: calc(var(--bottom-menu-height) + 15px);
     display: block;

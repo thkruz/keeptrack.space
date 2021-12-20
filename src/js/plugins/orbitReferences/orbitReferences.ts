@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { stringPad } from '@app/js/lib/helpers';
+import { StringifiedNubmer } from '@app/js/satMath/tleFormater';
 import $ from 'jquery';
 
 let doOnce = false;
@@ -44,10 +45,10 @@ export const orbitReferencesLinkClick = () => {
   // Add the satellites
   const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
   const ecen = satrec.ecco.toPrecision(7).substr(2, 7);
-  const rasc = (satrec.nodeo * RAD2DEG).toString();
-  const argPe = (satrec.argpo * RAD2DEG).toString();
-  const inc = sat.TLE2.substr(8, 8);
-  const meanmo = sat.TLE2.substr(52, 10);
+  const rasc = <StringifiedNubmer>(satrec.nodeo * RAD2DEG).toString();
+  const argPe = <StringifiedNubmer>(satrec.argpo * RAD2DEG).toString();
+  const inc = <StringifiedNubmer>sat.TLE2.substr(8, 8);
+  const meanmo = <StringifiedNubmer>sat.TLE2.substr(52, 10);
   const epochyr = sat.TLE1.substr(18, 2);
   const epochday = sat.TLE1.substr(20, 12);
   const intl = sat.TLE1.substr(9, 8);
@@ -57,7 +58,7 @@ export const orbitReferencesLinkClick = () => {
 
   let j = 0;
   for (let i = 0; i < 360; i++) {
-    const meana = j.toPrecision(10);
+    const meana = <StringifiedNubmer>j.toPrecision(10);
     const { TLE1, TLE2 } = satellite.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: sccNum });
     searchStr += satSet.insertNewAnalystSatellite(TLE1, TLE2, satNum + i, (100000 + i).toString()).sccNum.toString() + ',';
     j += (360 / period) * 4;

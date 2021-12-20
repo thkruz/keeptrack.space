@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { saveAs, stringPad } from '@app/js/lib/helpers';
+import { StringifiedNubmer } from '@app/js/satMath/tleFormater';
 import $ from 'jquery';
 
 let isEditSatMenuOpen = false;
@@ -361,12 +362,12 @@ export const editSatSubmit = (e: Event) => {
   }
   const sat = satSet.getSatExtraOnly(satId);
   const intl = sat.TLE1.substr(9, 8);
-  let inc: string | string[] = <string>$('#es-inc').val();
-  let meanmo: string | string[] = <string>$('#es-meanmo').val();
-  let rasc: string | string[] = <string>$('#es-rasc').val();
+  let inc = <StringifiedNubmer>$('#es-inc').val();
+  let meanmo = <StringifiedNubmer>$('#es-meanmo').val();
+  let rasc = <StringifiedNubmer>$('#es-rasc').val();
   const ecen = $('#es-ecen').val();
-  let argPe: string | string[] = <string>$('#es-argPe').val();
-  let meana: string | string[] = <string>$('#es-meana').val();
+  let argPe = <StringifiedNubmer>$('#es-argPe').val();
+  let meana = <StringifiedNubmer>$('#es-meana').val();
   const epochyr = $('#es-year').val();
   const epochday = $('#es-day').val();
 

@@ -133,11 +133,3 @@ describe('findSat.findByLooksSubmit', () => {
     expect(result).toMatchSnapshot();
   });
 });
-
-// @ponicode
-describe('findSat.newLaunchSubmit', () => {
-  test('0', () => {
-    let result: any = findSat.newLaunchSubmit();
-    expect(result).toMatchSnapshot();
-  });
-});

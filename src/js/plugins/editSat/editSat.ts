@@ -263,7 +263,7 @@ export const editSatNewTleClick = () => {
 };
 
 export const editSatNewTleClickFadeIn = () => {
-  const { satellite, satSet, timeManager, objectManager, orbitManager } = keepTrackApi.programs;
+  const { satellite, satSet, timeManager, objectManager, orbitManager, uiManager } = keepTrackApi.programs;
   try {
     // Update Satellite TLE so that Epoch is Now but ECI position is very very close
     const satId = satSet.getIdFromObjNum($('#es-scc').val());
@@ -292,8 +292,16 @@ export const editSatNewTleClickFadeIn = () => {
     } else {
       TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, simulationTimeObj, alt);
     }
+
     const TLE1 = TLEs[0];
     const TLE2 = TLEs[1];
+
+    if (TLE1 === 'Error') {
+      $('#loading-screen').fadeOut('slow');
+      uiManager.toast(`${TLE2}`, 'critical');
+      return;
+    }
+
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,

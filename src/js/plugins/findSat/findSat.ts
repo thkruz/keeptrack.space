@@ -148,68 +148,6 @@ export const checkEl = (posAll: SearchResults[], min: number, max: number) => po
 
 export const checkRange = (posAll: SearchResults[], min: number, max: number) => posAll.filter((pos) => pos.rng >= min && pos.rng <= max);
 
-export const newLaunchSubmit = (): void => {
-  const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
-
-  const scc = $('#nl-scc').val();
-  const satId = satSet.getIdFromObjNum(scc);
-  let sat = satSet.getSat(satId);
-
-  const upOrDown = $('#nl-updown').val();
-  const launchFac = $('#nl-facility').val();
-  let launchLat, launchLon;
-
-  if (objectManager.isLaunchSiteManagerLoaded) {
-    for (const launchSite in objectManager.launchSiteManager.launchSiteList) {
-      if (objectManager.launchSiteManager.launchSiteList[launchSite].name === launchFac) {
-        launchLat = objectManager.launchSiteManager.launchSiteList[launchSite].lat;
-        launchLon = objectManager.launchSiteManager.launchSiteList[launchSite].lon;
-      }
-    }
-  }
-  if (launchLon > 180) {
-    // if West not East
-    launchLon -= 360; // Convert from 0-360 to -180-180
-  }
-
-  // if (sat.inclination * RAD2DEG < launchLat) {
-  //   uiManager.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
-  //   $('#loading-screen').fadeOut('slow');
-  //   return;
-  // }
-  // Set time to 0000z for relative time.
-  const today = new Date(); // Need to know today for offset calculation
-  const quadZTime = new Date(today.getFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
-
-  // Date object defaults to local time.
-  quadZTime.setUTCHours(0); // Move to UTC Hour
-
-  timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
-  mainCamera.isCamSnapMode = false;
-
-  const simulationTimeObj = timeManager.calculateSimulationTime();
-
-  const TLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj);
-
-  const TLE1 = TLEs[0];
-  const TLE2 = TLEs[1];
-
-  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.calculateSimulationTime()) > 1) {
-    satSet.satCruncher.postMessage({
-      typ: 'satEdit',
-      id: satId,
-      active: true,
-      TLE1: TLE1,
-      TLE2: TLE2,
-    });
-    orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
-
-    sat = satSet.getSat(satId);
-  } else {
-    uiManager.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
-  }
-  $('#loading-screen').fadeOut('slow');
-};
 export const uiManagerInit = (): void => {
   // Side Menu
   $('#left-menus').append(keepTrackApi.html`
@@ -349,21 +287,6 @@ export const uiManagerInit = (): void => {
 
   $('#fbl-error').on('click', function () {
     $('#fbl-error').hide();
-  });
-
-  $('#newLaunch').on('submit', function (e: Event) {
-    $('#loading-screen').fadeIn(1000, newLaunchSubmit);
-    e.preventDefault();
-  });
-
-  // Allow resizing of the side menu
-  $('#newLaunch-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
   });
 
   // Bottom Icon

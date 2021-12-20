@@ -724,7 +724,7 @@ export const selectSatData = () => {
       Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
         const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
         const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
-        const tearr = sat.getTEARR(null, sensor);
+        const tearr = sat.getTEARR(null, [sensor]);
         if (tearr.inView) {
           keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
         }

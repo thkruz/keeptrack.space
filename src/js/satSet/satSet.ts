@@ -371,7 +371,18 @@ export const addSatExtraFunctions = (i: number) => {
     };
   }
   if (objectManager.isSensorManagerLoaded && typeof satSet.satData[i].getTEARR == 'undefined') {
-    satSet.satData[i].getTEARR = (propTime: any, sensors: SensorObject[]) => {
+    satSet.satData[i].getTEARR = (
+      propTime?: Date,
+      sensors?: SensorObject[]
+    ): {
+      lat: number;
+      lon: number;
+      alt: number;
+      rng?: number;
+      az?: number;
+      el?: number;
+      inView: boolean;
+    } => {
       const currentTEARR: Lla & Rae & InView = {
         lat: 0,
         lon: 0,

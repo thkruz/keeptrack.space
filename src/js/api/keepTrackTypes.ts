@@ -845,7 +845,18 @@ export declare interface SatObject {
   FMISSED?: any;
   getAltitude?: any;
   getDirection?: any;
-  getTEARR?: any;
+  getTEARR?: (
+    propTime?: Date,
+    sensors?: SensorObject[]
+  ) => {
+    lat: number;
+    lon: number;
+    alt: number;
+    inView: boolean;
+    rng?: number;
+    az?: number;
+    el?: number;
+  };
   id: number;
   inclination: number;
   inSun?: any;

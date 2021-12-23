@@ -1,4 +1,4 @@
-var stars = [
+export const stars = [
   {
     name: 28,
     hr: 3,
@@ -30980,5 +30980,3 @@ var stars = [
     vmag: 4.99,
   },
 ];
-
-export { stars };

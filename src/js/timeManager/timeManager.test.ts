@@ -1,8 +1,9 @@
-import { timeManager } from '@app/js/timeManager/timeManager.ts';
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { KeepTrackPrograms } from '../api/keepTrackTypes';
+import { timeManager } from './timeManager';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 test(`Basic Functions of Time Manager`, () => {
   // Setup a unit test enviornment that doesn't worry about other modules
@@ -10,7 +11,7 @@ test(`Basic Functions of Time Manager`, () => {
     <div id="datetime-text"><div>
   `;
 
-  settingsManager = { plugins: {} };
+  (<any>window).settingsManager = { plugins: {} };
   timeManager.init();
   expect(timeManager.drawDt).toBe(0);
 

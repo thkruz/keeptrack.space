@@ -4,7 +4,7 @@
 import { keepTrackApi } from '../api/keepTrackApi';
 import { ObjectManager, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
-import { stars } from '../starManager/stars.js';
+import { stars } from '../starManager/stars';
 import { controlSiteManager, ControlSiteObject } from './controlSiteManager';
 import { launchSiteManager } from './launchSiteManager';
 import { satLinkManager } from './satLinkManager';
@@ -62,7 +62,7 @@ const extractLiftVehicle = (LV: string): string => {
   if (LV == 'U') {
     return 'Unknown';
   } else {
-    const rocketUrl = objectManager.rocketUrls.filter((rocketUrl) => rocketUrl.rocket === LV);
+    const rocketUrl = objectManager.rocketUrls.filter((url) => url.rocket === LV);
     if (rocketUrl.length > 0) {
       return `<a class="iframe" href="${rocketUrl[0].url}">${LV}</a>`;
     } else {

@@ -207,6 +207,8 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
       extra.TLE1 = m.data.TLE1;
       extra.TLE2 = m.data.TLE2;
       extraData.push(extra);
+      if (process) return;
+      // istanbul ignore next
       postMessage({
         extraUpdate: true,
         extraData: JSON.stringify(extraData),

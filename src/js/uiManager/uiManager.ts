@@ -40,7 +40,6 @@ import { SensorObject, UiManager } from '../api/keepTrackTypes';
 import { useCurrentGeolocationAsSensor } from './httpsOnly';
 import { keyHandler } from './keyHandler';
 import { initMenuController } from './menuController';
-import { uiLimited } from './ui-limited.js';
 import { uiInput } from './uiInput';
 import { initUiValidation } from './uiValidation';
 import { legendColorsChange, legendMenuChange } from './legendMenu/legendMenu';
@@ -58,11 +57,6 @@ var updateInterval = 1000;
 settingsManager.lastBoxUpdateTime = 0;
 
 export const init = () => {
-  if (settingsManager.disableUI && settingsManager.enableLimitedUI) {
-    // Pass the references through to the limited UI
-    uiLimited.init(keepTrackApi.programs.satSet, keepTrackApi.programs.orbitManager, keepTrackApi.programs.groupsManager, keepTrackApi.programs.colorSchemeManager);
-  }
-
   initUiValidation();
 
   // Register all UI callback functions with drawLoop in main.js
@@ -1041,4 +1035,4 @@ uiManager.searchToggle = (force?: boolean) => {
   }
 };
 
-export { doSearch, uiLimited, uiInput };
+export { doSearch, uiInput };

@@ -189,8 +189,6 @@ settingsManager = {
     settingsManager.disableZoomControls = true;
     // Disable Touch Move Causing Drag Errors on Desktop
     settingsManager.disableWindowTouchMove = true;
-    // Enable limited UI features
-    settingsManager.enableLimitedUI = false;
     // Allows canvas will steal focus on load
     settingsManager.startWithFocus = false;
     // Shows an overlay with object information
@@ -309,7 +307,6 @@ settingsManager = {
 
     if (pageName[0] == 'embed.html') {
       settingsManager.disableUI = true;
-      settingsManager.enableLimitedUI = true;
       settingsManager.startWithOrbitsDisplayed = true;
       settingsManager.isAutoResizeCanvas = true;
       settingsManager.enableHoverOverlay = true;
@@ -557,10 +554,6 @@ settingsManager = {
       settingsManager.maxFieldOfViewMarkers = 1;
       settingsManager.maxMissiles = 1;
       settingsManager.maxAnalystSats = 1;
-    }
-
-    if (settingsManager.enableLimitedUI) {
-      settingsManager.zFar = 150000;
     }
 
     settingsManager.legendMenuOpen = false;

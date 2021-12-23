@@ -2,11 +2,13 @@
   "env": {
     "jest": true,
     "browser": true,
-    "es2021": true
+    "es2021": true,
+    "jquery": true
   },
   "globals": {
     "M": "readonly",
     "$": "readonly",
+    "JQuery": "readonly",
     "process": "readonly",
     "global": "writable",
     "__dirname": "readonly",

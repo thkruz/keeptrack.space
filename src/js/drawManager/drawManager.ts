@@ -328,8 +328,7 @@ export const drawLoop = (preciseDt: number) => {
   // }
   // }
 
-  // callbacks at the end of the draw loop (this should be used more!)
-  drawManager.onDrawLoopComplete(drawManager.drawLoopCallback);
+  keepTrackApi.methods.onDrawLoopComplete(drawManager.drawLoopCallback);
 
   // If Demo Mode do stuff
   if (settingsManager.isDemoModeOn) drawManager.demoMode();

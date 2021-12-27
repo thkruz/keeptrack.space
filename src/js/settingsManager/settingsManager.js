@@ -54,8 +54,8 @@ settingsManager = {
     analysis: true,
     sensorFov: true,
     sensorSurv: true,
-    satelliteView: true,
     satelliteFov: true,
+    satelliteView: true,
     planetarium: true,
     astronomy: true,
     photo: true,
@@ -665,6 +665,13 @@ settingsManager = {
           }
         }
       })();
+    }
+
+    // Disable resource intense plugins if lowPerf is enabled
+    if (settingsManager.lowPerf) {
+      settingsManager.plugins.sensorFov = false;
+      settingsManager.plugins.sensorSurv = false;
+      settingsManager.plugins.satelliteFov = false;
     }
 
     // Load the previously saved map

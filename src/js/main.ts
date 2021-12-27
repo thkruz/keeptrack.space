@@ -46,7 +46,7 @@ import { starManager } from './starManager/starManager';
 import { timeManager } from './timeManager/timeManager';
 import { adviceManager } from './uiManager/adviceManager';
 import { searchBox } from './uiManager/searchBox';
-import { uiInput, uiManager } from './uiManager/uiManager';
+import { uiManager } from './uiManager/uiManager';
 
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {
   let errorHtml = '';
@@ -143,7 +143,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     objectManager?.satLinkManager?.idToSatnum(satSet);
 
-    uiInput.init();
+    uiManager.uiInput.init();
 
     drawManager.init();
 

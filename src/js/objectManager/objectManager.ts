@@ -42,17 +42,6 @@ const controlSiteTypeFilter = (controlSite: ControlSiteObject): boolean => {
   }
 };
 
-interface Star {
-  name: any;
-  hr?: number;
-  bf: any;
-  pname: any;
-  ra?: number;
-  dec?: number;
-  dist?: number;
-  vmag?: number;
-}
-
 const lastSelectedSat = (id?: number): number => {
   objectManager._lastSelectedSat = id ? id : objectManager._lastSelectedSat;
   return objectManager._lastSelectedSat;
@@ -513,13 +502,12 @@ const init = () => {
     objectManager.starIndex1 = objectManager.staticSet.length + 1;
     stars.forEach((star) => {
       objectManager.staticSet.push({
-        name: getStarName(star),
+        name: star.name,
         static: true,
         shortName: 'STAR',
         type: SpaceObjectType.STAR,
         dec: star.dec,
         ra: star.ra,
-        dist: star.dist,
         vmag: star.vmag,
       });
     });
@@ -598,17 +586,6 @@ const init = () => {
     console.log('satLinkManager Failed to Initialize!');
   }
   objectManager.satLinkManager = satLinkManager;
-};
-
-const getStarName = (star: Star) => {
-  if (star.pname != '') {
-    return star.pname;
-  } else if (star.bf != '') {
-    return star.bf;
-  } else {
-    /* istanbul ignore next */
-    return 'HD ' + star.name;
-  }
 };
 
 export const objectManager: ObjectManager = {

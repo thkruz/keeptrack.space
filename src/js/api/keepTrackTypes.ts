@@ -54,6 +54,7 @@ export interface PostProcessingManager {
 }
 
 export interface UiManager {
+  lastBoxUpdateTime: number;
   earthClicked: () => void;
   updateNextPassOverlay(arg0: boolean);
   resize2DMap();
@@ -83,7 +84,6 @@ export interface UiManager {
   reloadLastSensor: () => void;
   getsensorinfo(): void;
   doSearch(searchString: string, isPreventDropDown?: boolean): void;
-  startLowPerf: () => void;
   panToStar: (c: any) => void;
   clearRMBSubMenu: () => void;
   menuController: () => void;
@@ -826,6 +826,8 @@ export interface TimeManager {
   init: any;
 }
 export declare interface SatObject {
+  pname?: string;
+  bf?: string;
   active: boolean;
   apogee: number;
   argPe: number;

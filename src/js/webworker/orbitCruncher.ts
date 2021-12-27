@@ -48,7 +48,8 @@ onmessage = (m) => {
     NUM_SEGS = m.data.numSegs;
   }
 
-  if (m.data.satId) {
+  // NOTE: Without "typeof" vanguard 1 is falsly
+  if (typeof m.data.satId !== 'undefined') {
     // TODO: figure out how to calculate the orbit points on constant
     // position slices, not timeslices (ugly perigees on HEOs)
 

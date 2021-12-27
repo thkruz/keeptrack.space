@@ -84,7 +84,7 @@ export interface UiManager {
   reloadLastSensor: () => void;
   getsensorinfo(): void;
   doSearch(searchString: string, isPreventDropDown?: boolean): void;
-  panToStar: (c: any) => void;
+  panToStar: (c: SatObject) => void;
   clearRMBSubMenu: () => void;
   menuController: () => void;
   legendHoverMenuClick: (legendType: any) => void;
@@ -766,7 +766,8 @@ export interface Camera {
   keyUpHandler: any;
   latToPitch: any;
   lookAtLatLon: (lat: number, long: number, zoom?: ZoomValue | number, date?: Date) => void;
-  longToYaw: any;
+  lookAtObject: (sat: SatObject, isFaceEarth: boolean) => void;
+  longToYaw: (long: number, selectedDate: Date) => number;
   normalizeAngle: any;
   resetFpsPos: any;
   snapToSat: any;

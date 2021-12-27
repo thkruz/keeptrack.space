@@ -18,6 +18,7 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import * as glm from 'gl-matrix';
+import { keepTrackApi } from '../api/keepTrackApi';
 import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager, ZoomValue } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getDayOfYear } from '../timeManager/transforms';
@@ -29,7 +30,7 @@ export const normalizeAngle = (angle: number): number => {
   return angle;
 };
 
-export const longToYaw = (long: number, selectedDate: Date) => {
+export const longToYaw = (long: number, selectedDate: Date): number => {
   const realTime = new Date();
   let propTime = new Date();
   let angle = 0;
@@ -227,6 +228,14 @@ export const lookAtLatLon = (lat: number, long: number, zoom?: ZoomValue | numbe
   // Convert the lat/long to a position on the globe and then set the camera to look at that position
   changeZoom(zoom);
   camSnap(latToPitch(lat), longToYaw(long, date));
+};
+
+export const lookAtObject = (sat: SatObject, isFaceEarth: boolean): void => {
+  const { timeManager, satellite } = keepTrackApi.programs;
+  const lla = satellite.eci2ll(sat.position.x, sat.position.y, sat.position.z);
+  const latModifier = isFaceEarth ? 1 : -1;
+  const lonModifier = isFaceEarth ? 0 : 180;
+  camSnap(latToPitch(lla.lat * latModifier), longToYaw(lla.lon + lonModifier, timeManager.selectedDate));
 };
 
 export const camSnap = (pitch: number, yaw: number): void => {
@@ -1123,6 +1132,7 @@ export const camera: Camera = {
   keyUpHandler: keyUpHandler,
   latToPitch: latToPitch,
   lookAtLatLon: lookAtLatLon,
+  lookAtObject: lookAtObject,
   localRotateCurrent: { pitch: 0, roll: 0, yaw: 0 },
   localRotateDif: { pitch: 0, roll: 0, yaw: 0 },
   localRotateMovementSpeed: 0.00005,

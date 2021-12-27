@@ -499,7 +499,7 @@ const init = () => {
 
   // Create Stars
   if (!settingsManager.lowPerf && !settingsManager.noStars) {
-    objectManager.starIndex1 = objectManager.staticSet.length + 1;
+    objectManager.starIndex1 = objectManager.staticSet.length;
     stars.forEach((star) => {
       objectManager.staticSet.push({
         name: star.name,

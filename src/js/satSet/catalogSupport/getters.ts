@@ -29,11 +29,10 @@ export const getIdFromStarName = (starName: string) => {
 };
 export const getSensorFromSensorName = (sensorName: string): number => {
   const { satSet } = keepTrackApi.programs;
-  const i = satSet.satData.findIndex(
+  return satSet.satData.findIndex(
     // Find the first static object that isn't a missile or a star
     (object: SatObject) => (object?.static && !object?.missile && object?.type !== SpaceObjectType.STAR ? object.name === sensorName : false) // Test
   );
-  return i;
 };
 export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: { x: number; y: number; z: number }) => {
   const screenPos = { x: 0, y: 0, z: 0, error: false };
@@ -90,8 +89,7 @@ export const getSatPosOnly = (i: number): SatObject => {
     };
   }
 
-  const sat = satSet.satData[i];
-  return sat;
+  return satSet.satData[i];
 };
 export const getIdFromEci = (eci: { x: number; y: number; z: number }): number => {
   const { dotsManager, satSet } = keepTrackApi.programs;

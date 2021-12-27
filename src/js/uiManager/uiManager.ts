@@ -31,12 +31,11 @@ import '@materializecss/materialize';
 // eslint-disable-next-line sort-imports
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { drawManager } from '@app/js/drawManager/drawManager';
-import { DEG2RAD } from '@app/js/lib/constants';
 import { rgbCss } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobileManager';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import $ from 'jquery';
-import { SensorObject, UiManager } from '../api/keepTrackTypes';
+import { SatObject, SensorObject, UiManager } from '../api/keepTrackTypes';
 import { useCurrentGeolocationAsSensor } from './httpsOnly';
 import { keyHandler } from './keyHandler';
 import { initMenuController } from './menuController';
@@ -650,11 +649,9 @@ export const onReady = () => {
   };
   (<any>$('#bottom-icons')).sortable({ tolerance: 'pointer' });
 };
-// TODO: uiManager.panToStar needs to be finished
-// Yaw needs fixed. Needs to incorporate a time calculation
-/* istanbul ignore next */
-export const panToStar = (c) => {
-  const { objectManager, satSet, timeManager, lineManager, mainCamera, starManager } = keepTrackApi.programs;
+
+export const panToStar = (c: SatObject): void => {
+  const { objectManager, satSet, lineManager, mainCamera, starManager } = keepTrackApi.programs;
 
   // Try with the pname
   let satId = satSet.getIdFromStarName(c.name);
@@ -669,11 +666,7 @@ export const panToStar = (c) => {
 
   lineManager.create('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
   mainCamera.cameraType.current = mainCamera.cameraType.Offset;
-  console.log(sat);
-  // ======================================================
-  // Need to calculate the time to get the right RA offset
-  // ======================================================
-  mainCamera.camSnap(mainCamera.latToPitch(sat.dec) * -1, mainCamera.longToYaw(sat.ra * DEG2RAD, timeManager.selectedDate));
+  mainCamera.lookAtObject(sat, false);
 };
 export const loadStr = (str) => {
   if (str == '') {

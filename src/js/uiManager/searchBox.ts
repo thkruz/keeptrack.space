@@ -12,12 +12,13 @@ let resultsOpen = false;
 let lastResultGroup: SatGroup;
 
 interface SearchResult {
-  satId: any;
-  isON: any;
+  satId: number;
+  type: SpaceObjectType;
+  isON: boolean;
   strIndex: number;
-  patlen: any;
-  isSccNum: any;
-  isIntlDes: any;
+  patlen: number;
+  isSccNum: boolean;
+  isIntlDes: boolean;
 }
 
 export const isResultBoxOpen = (): boolean => resultsOpen;
@@ -93,7 +94,7 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
     satData.every((sat, i) => {
       if (i > satSet.missileSats) return false;
       const len = searchString.length;
-      if (sat.static) return true; // Skip static dots (Maybe these should be searchable?)
+      if (sat.static && sat.type !== SpaceObjectType.STAR) return true; // Skip static dots (Maybe these should be searchable?)
       if (sat.marker) return false; // Stop searching once you reach the markers
       if (settingsManager.isSatOverflyModeOn && sat.type !== SpaceObjectType.PAYLOAD) return true; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
       if (sat.missile && !sat.active) return true; // Skip inactive missiles.
@@ -103,6 +104,7 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
       if (sat.name.toUpperCase().indexOf(searchString) !== -1) {
         results.push({
           strIndex: sat.name.indexOf(searchString),
+          type: sat.type,
           isON: true,
           patlen: len,
           satId: i,
@@ -177,9 +179,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
 export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) => {
   let satData = satSet.satData;
   var resultBox = $('#search-results');
-  const html = results.reduce((html, result) => {
+  resultBox[0].innerHTML = results.reduce((html, result) => {
     const sat = satData[result.satId];
-    html += '<div class="search-result" data-sat-id="' + sat.id + '">';
+    html += '<div class="search-result" data-obj-id="' + sat.id + '">';
     html += '<div class="truncate-search">';
     if (sat.missile) {
       html += sat.name;
@@ -218,6 +220,8 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
       html += sat.intlDes.substring(result.strIndex, result.strIndex + result.patlen);
       html += '</span>';
       html += sat.intlDes.substring(result.strIndex + result.patlen);
+    } else if (result.type === SpaceObjectType.STAR) {
+      html += 'Star';
     } else {
       // Don't Write the lift vehicle - maybe it should?
       html += sat.sccNum;
@@ -225,7 +229,6 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
     html += '</div></div>';
     return html;
   }, '');
-  resultBox[0].innerHTML = html;
   resultBox.slideDown();
   resultsOpen = true;
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc

@@ -1,10 +1,12 @@
-import 'webgl-mock';
 import '@app/js/settingsManager/settingsManager';
-
-import $ from 'jquery';
 import fs from 'fs';
-import path from 'path';
+import $ from 'jquery';
 import { JSDOM } from 'jsdom';
+import path from 'path';
+import 'webgl-mock';
+
+// This allows consistent testing in the CI environment
+jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
 
 // eslint-disable-next-line no-sync
 const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.htm'), 'utf8').toString();

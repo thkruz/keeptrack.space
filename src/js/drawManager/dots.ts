@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-escape */
-import { SpaceObjectType } from '@app/admin/node/SpaceObjectType';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as glm from 'gl-matrix';
 import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrackTypes';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';

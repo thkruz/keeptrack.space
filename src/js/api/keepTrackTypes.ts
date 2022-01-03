@@ -1132,6 +1132,7 @@ export interface SatMath {
   findBestPass(sat: any, sensors: SensorObject[], arg2: number);
   getEci(sat1: SatObject, now: any);
   currentEpoch(arg0: any);
+  sat2ric: (sat: SatObject, reference: SatObject) => { position: glm.vec3; velocity: glm.vec3 };
   getOrbitByLatLon(at: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number): [string, string];
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   getDops(lat: number, lon: number, alt?: number, now?: any);

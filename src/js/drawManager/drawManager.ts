@@ -697,7 +697,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
     isHoverBoxVisible = false;
   } else if (!mainCamera.isDragging && settingsManager.enableHoverOverlay) {
     // NOTE: The radar mesurement logic breaks if you call it a SatObject
-    const sat = <any>satSet.getSatExtraOnly(satId);
+    const sat = <any>satSet.getSat(satId);
     isHoverBoxVisible = true;
 
     const parentNode = satHoverBoxDOM.parentNode;
@@ -789,24 +789,11 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
           satHoverBoxNode1.textContent = sat.name;
           sat2 = satSet.getSat(objectManager.selectedSat);
           if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
-            satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, sat2)}</br>ΔVel: ${Math.sqrt(
-              (sat.velocity.x - sat2.velocity.x) ** 2 + (sat.velocity.y - sat2.velocity.y) ** 2 + (sat.velocity.z - sat2.velocity.z) ** 2
-            ).toFixed(2)} km/s`;
+            const ric = satellite.sat2ric(sat, sat2);
+            satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
             satHoverBoxNode3.innerHTML =
-              'X: ' +
-              sat.position.x.toFixed(2) +
-              ' Y: ' +
-              sat.position.y.toFixed(2) +
-              ' Z: ' +
-              sat.position.z.toFixed(2) +
-              '</br>' +
-              'ΔX: ' +
-              (sat.velocity.x - sat2.velocity.x).toFixed(2) +
-              'km/s ΔY: ' +
-              (sat.velocity.y - sat2.velocity.y).toFixed(2) +
-              'km/s ΔZ: ' +
-              (sat.velocity.z - sat2.velocity.z).toFixed(2) +
-              'km/s';
+              `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
+              `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
           } else {
             satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, sat2)}`;
             satHoverBoxNode3.innerHTML =

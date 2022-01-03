@@ -20,9 +20,15 @@ const meshList = [
   'gps',
   'aehf',
   'dsp',
+  'flock',
+  'lemur',
   'galileo',
   'o3b',
+  'oneweb',
   'orbcomm',
+  'spacebee1gen',
+  'spacebee2gen',
+  'spacebee3gen',
   'iridium',
   'globalstar',
   'debris0',
@@ -374,9 +380,22 @@ export const getSatelliteModel = (sat: SatObject) => {
   }
 
   switch (sat.bus) {
+    case 'Cubesat 0.25U':
+      if (sat.intlDes.startsWith('2018')) {
+        meshManager.currentModel.model = meshManager.models.spacebee1gen;
+      } else if (sat.name.startsWith('SPACEBEE')) {
+        meshManager.currentModel.model = meshManager.models.spacebee3gen;
+      } else {
+        meshManager.currentModel.model = meshManager.models.spacebee1gen;
+      }
+      return;
     case 'Cubesat':
     case 'Cubesat 1U':
-      meshManager.currentModel.model = meshManager.models.s1u;
+      if (sat.name.startsWith('SPACEBEE')) {
+        meshManager.currentModel.model = meshManager.models.spacebee2gen;
+      } else {
+        meshManager.currentModel.model = meshManager.models.s1u;
+      }
       return;
     case 'Cubesat 2U':
       meshManager.currentModel.model = meshManager.models.s2u;
@@ -403,10 +422,13 @@ export const getSatelliteModel = (sat: SatObject) => {
     case 'Iridium':
       meshManager.currentModel.model = meshManager.models.iridium;
       return;
+    case 'ARROW':
+      meshManager.currentModel.model = meshManager.models.oneweb;
+      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+      return;
     case 'Cubesat 1.5U':
     case 'Cubesat 6U':
     case 'Cubesat 0.5U':
-    case 'Cubesat 0.25U':
     case 'Cubesat 16U':
     case 'Cubesat 12U':
     case 'Cubesat 0.3U':
@@ -436,8 +458,6 @@ export const checkIfNameKnown = (name: string): boolean => {
   // TODO: Currently all named models aim at nadir - that isn't always true
 
   let newModel = null;
-  if (name.startsWith('FLOCK')) newModel = meshManager.models.s3u;
-  if (name.startsWith('LEMUR')) newModel = meshManager.models.s3u;
   if (name.startsWith('STARLINK')) newModel = meshManager.models.starlink;
   if (name.startsWith('GLOBALSTAR')) newModel = meshManager.models.globalstar;
   if (name.startsWith('IRIDIUM')) newModel = meshManager.models.iridium;
@@ -446,6 +466,8 @@ export const checkIfNameKnown = (name: string): boolean => {
   if (name.startsWith('NAVSTAR')) newModel = meshManager.models.gps;
   if (name.startsWith('GALILEO')) newModel = meshManager.models.galileo;
   if (name.startsWith('SBIRS')) newModel = meshManager.models.sbirs;
+  if (name.startsWith('FLOCK')) newModel = meshManager.models.flock;
+  if (name.startsWith('LEMUR')) newModel = meshManager.models.lemur;
 
   if (newModel !== null) {
     meshManager.currentModel.model = newModel;

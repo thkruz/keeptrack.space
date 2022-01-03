@@ -12,6 +12,7 @@ let resultsOpen = false;
 let lastResultGroup: SatGroup;
 
 interface SearchResult {
+  isBus: any;
   satId: number;
   type: SpaceObjectType;
   isON: boolean;
@@ -106,6 +107,17 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
           strIndex: sat.name.indexOf(searchString),
           type: sat.type,
           isON: true,
+          patlen: len,
+          satId: i,
+        });
+        return true; // Prevent's duplicate results
+      }
+
+      if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchString) !== -1) {
+        results.push({
+          strIndex: sat.bus.indexOf(searchString),
+          type: sat.type,
+          isBus: true,
           patlen: len,
           satId: i,
         });
@@ -220,6 +232,16 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
       html += sat.intlDes.substring(result.strIndex, result.strIndex + result.patlen);
       html += '</span>';
       html += sat.intlDes.substring(result.strIndex + result.patlen);
+    } else if (result.isBus) {
+      // If the object number matched
+      result.strIndex = result.strIndex || 0;
+      result.patlen = result.patlen || 5;
+
+      html += sat.bus.substring(0, result.strIndex);
+      html += '<span class="search-hilight">';
+      html += sat.bus.substring(result.strIndex, result.strIndex + result.patlen);
+      html += '</span>';
+      html += sat.bus.substring(result.strIndex + result.patlen);
     } else if (result.type === SpaceObjectType.STAR) {
       html += 'Star';
     } else {

@@ -1,7 +1,7 @@
 import * as satellite from 'satellite.js';
 import { DEG2RAD, RADIUS_OF_EARTH } from '../lib/constants';
 import { jday } from '../timeManager/transforms';
-import { propTime } from './positionCalculations';
+import { propTime } from './positionCruncher/calculations';
 
 let dynamicOffsetEpoch: number;
 let staticOffset = 0;
@@ -26,9 +26,9 @@ onmessage = (m) => {
     // Don't Add Anything Else
   }
 
-  dynamicOffsetEpoch = m.data.dynamicOffsetEpoch ? m.data.dynamicOffsetEpoch : dynamicOffsetEpoch;
-  staticOffset = m.data.staticOffset ? m.data.staticOffset : staticOffset;
-  propRate = m.data.propRate ? m.data.propRate : propRate;
+  dynamicOffsetEpoch = typeof m.data.dynamicOffsetEpoch !== 'undefined' ? m.data.dynamicOffsetEpoch : dynamicOffsetEpoch;
+  staticOffset = typeof m.data.staticOffset !== 'undefined' ? m.data.staticOffset : staticOffset;
+  propRate = typeof m.data.propRate !== 'undefined' ? m.data.propRate : propRate;
 
   if (m.data.isInit) {
     const satData = JSON.parse(m.data.satData);
@@ -48,7 +48,8 @@ onmessage = (m) => {
     NUM_SEGS = m.data.numSegs;
   }
 
-  if (m.data.satId) {
+  // NOTE: Without "typeof" vanguard 1 is falsly
+  if (typeof m.data.satId !== 'undefined') {
     // TODO: figure out how to calculate the orbit points on constant
     // position slices, not timeslices (ugly perigees on HEOs)
 

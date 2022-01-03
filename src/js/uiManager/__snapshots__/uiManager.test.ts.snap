@@ -72,8 +72,6 @@ exports[`uiManager.legendHoverMenuClick 30 1`] = `undefined`;
 
 exports[`uiManager.legendHoverMenuClick 31 1`] = `undefined`;
 
-exports[`uiManager.legendHoverMenuClick-flagsOff 0 1`] = `undefined`;
-
 exports[`uiManager.legendHoverMenuClick-flagsOff 1 1`] = `undefined`;
 
 exports[`uiManager.legendHoverMenuClick-flagsOff 2 1`] = `undefined`;

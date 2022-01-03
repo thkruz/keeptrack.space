@@ -111,16 +111,22 @@ export const orbitManagerInit = (): void => {
   };
 };
 export const timeMachineIconClick = () => {
-  const { searchBox } = keepTrackApi.programs;
+  const { searchBox, uiManager } = keepTrackApi.programs;
   if ($('#time-machine-menu').css('display') === 'block') {
-    $('#time-machine-menu').hide();
+    uiManager.legendMenuChange('clear');
   } else {
-    $('#time-machine-menu').show();
+    uiManager.legendMenuChange('timeMachine');
     searchBox.hideResults();
     $('#search-results').hide();
   }
 };
-export const timeMachineRemoveSatellite = (runCount: number, orbitManager: OrbitManager, groupsManager: GroupsManager, satSet: CatalogManager, colorSchemeManager: ColorSchemeManager): void => {
+export const timeMachineRemoveSatellite = (
+  runCount: number,
+  orbitManager: OrbitManager,
+  groupsManager: GroupsManager,
+  satSet: CatalogManager,
+  colorSchemeManager: ColorSchemeManager
+): void => {
   if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
   if (!orbitManager.isTimeMachineVisible) return;
   settingsManager.colors.transparent = orbitManager.tempTransColor;

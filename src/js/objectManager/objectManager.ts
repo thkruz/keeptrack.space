@@ -4,7 +4,7 @@
 import { keepTrackApi } from '../api/keepTrackApi';
 import { ObjectManager, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
-import { stars } from '../starManager/stars.js';
+import { stars } from '../starManager/stars';
 import { controlSiteManager, ControlSiteObject } from './controlSiteManager';
 import { launchSiteManager } from './launchSiteManager';
 import { satLinkManager } from './satLinkManager';
@@ -42,17 +42,6 @@ const controlSiteTypeFilter = (controlSite: ControlSiteObject): boolean => {
   }
 };
 
-interface Star {
-  name: any;
-  hr?: number;
-  bf: any;
-  pname: any;
-  ra?: number;
-  dec?: number;
-  dist?: number;
-  vmag?: number;
-}
-
 const lastSelectedSat = (id?: number): number => {
   objectManager._lastSelectedSat = id ? id : objectManager._lastSelectedSat;
   return objectManager._lastSelectedSat;
@@ -62,7 +51,7 @@ const extractLiftVehicle = (LV: string): string => {
   if (LV == 'U') {
     return 'Unknown';
   } else {
-    const rocketUrl = objectManager.rocketUrls.filter((rocketUrl) => rocketUrl.rocket === LV);
+    const rocketUrl = objectManager.rocketUrls.filter((url) => url.rocket === LV);
     if (rocketUrl.length > 0) {
       return `<a class="iframe" href="${rocketUrl[0].url}">${LV}</a>`;
     } else {
@@ -510,16 +499,15 @@ const init = () => {
 
   // Create Stars
   if (!settingsManager.lowPerf && !settingsManager.noStars) {
-    objectManager.starIndex1 = objectManager.staticSet.length + 1;
+    objectManager.starIndex1 = objectManager.staticSet.length;
     stars.forEach((star) => {
       objectManager.staticSet.push({
-        name: getStarName(star),
+        name: star.name,
         static: true,
         shortName: 'STAR',
         type: SpaceObjectType.STAR,
         dec: star.dec,
         ra: star.ra,
-        dist: star.dist,
         vmag: star.vmag,
       });
     });
@@ -598,17 +586,6 @@ const init = () => {
     console.log('satLinkManager Failed to Initialize!');
   }
   objectManager.satLinkManager = satLinkManager;
-};
-
-const getStarName = (star: Star) => {
-  if (star.pname != '') {
-    return star.pname;
-  } else if (star.bf != '') {
-    return star.bf;
-  } else {
-    /* istanbul ignore next */
-    return 'HD ' + star.name;
-  }
 };
 
 export const objectManager: ObjectManager = {

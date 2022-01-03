@@ -6,7 +6,7 @@ export class SatGroup {
   updateOrbits: any;
   forEach: any;
 
-  constructor(groupType: string, data: any[], satSet: CatalogManager) {
+  constructor(groupType: string, data: any, satSet: CatalogManager) {
     switch (groupType) {
       case 'all':
         this.sats = [];
@@ -17,7 +17,7 @@ export class SatGroup {
               isIntlDes: true,
             });
           }
-          return !(this.sats.length > settingsManager.maxOribtsDisplayed);
+          return this.sats.length <= settingsManager.maxOribtsDisplayed;
         });
         break;
       case 'year':
@@ -57,6 +57,22 @@ export class SatGroup {
       case 'countryRegex':
         this.sats = satSet
           .searchCountryRegex(satSet.satData, data)
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
+      case 'shapeRegex':
+        this.sats = satSet
+          .searchShapeRegex(satSet.satData, data)
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
+      case 'busRegex':
+        this.sats = satSet
+          .searchBusRegex(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,

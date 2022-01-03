@@ -1,7 +1,7 @@
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms } from '../api/keepTrackTypes';
-import * as uiManager from './uiManager';
+import { uiManager } from './uiManager';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
@@ -201,6 +201,10 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
       ageMed: false,
       ageOld: false,
       ageLost: false,
+      countryUS: false,
+      countryCIS: false,
+      countryPRC: false,
+      countryOther: false,
     };
   });
 
@@ -237,12 +241,11 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
       ageMed: true,
       ageOld: true,
       ageLost: true,
+      countryUS: true,
+      countryCIS: true,
+      countryPRC: true,
+      countryOther: true,
     };
-  });
-
-  test('0', () => {
-    let result = uiManager.legendHoverMenuClick();
-    expect(result).toMatchSnapshot();
   });
 
   test('1', () => {

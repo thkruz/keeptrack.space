@@ -60,6 +60,12 @@
       "node_modules",
       "offline"
     ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/offline/",
+      "<rootDir>/dist/",
+      "<rootDir>/src/admin/"
+    ],
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
       "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
@@ -75,7 +81,8 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/src/js/lib/external/",
-      "/test/"
+      "/test/",
+      "/dist/"
     ]
   },
   "nyc": {

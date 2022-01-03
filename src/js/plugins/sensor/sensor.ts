@@ -471,6 +471,7 @@ export const resetSensorSelected = () => {
     uiManager.legendMenuChange('default');
   }
   satSet.satCruncher.postMessage({
+    typ: 'sensor',
     setlatlong: true,
     resetObserverGd: true,
     sensor: [sensorManager.defaultSensor],
@@ -702,6 +703,15 @@ export const init = (): void => {
     cbName: 'sensor',
     cb: hideSideMenus,
   });
+
+  (<any>$('#sensor-list-menu')).resizable({
+    handles: 'e',
+    stop: function () {
+      $(this).css('height', '');
+    },
+    maxWidth: 400,
+    minWidth: 280,
+  });
 };
 
 export const selectSatData = () => {
@@ -714,7 +724,7 @@ export const selectSatData = () => {
       Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
         const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
         const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
-        const tearr = sat.getTEARR(null, sensor);
+        const tearr = sat.getTEARR(null, [sensor]);
         if (tearr.inView) {
           keepTrackApi.programs.lineManager.create('sat6', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
         }
@@ -779,6 +789,7 @@ export const customSensorSubmit = (): void => {
   sensorManager.whichRadar = customSensors.length > 1 ? 'MULTI CUSTOM' : 'CUSTOM';
 
   satSet.satCruncher.postMessage({
+    typ: 'sensor',
     setlatlong: true,
     sensor: customSensors,
     multiSensor: customSensors.length > 1,
@@ -793,6 +804,6 @@ export const customSensorSubmit = (): void => {
     } else {
       mainCamera.changeZoom('leo');
     }
-    mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
+    mainCamera.camSnap(mainCamera.lat2pitch(lat), mainCamera.lon2yaw(lon, timeManager.selectedDate));
   }
 };

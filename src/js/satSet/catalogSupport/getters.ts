@@ -21,17 +21,18 @@ export const getIdFromIntlDes = (intlDes: string) => {
   return typeof satSet.cosparIndex[`${intlDes}`] !== 'undefined' ? satSet.cosparIndex[`${intlDes}`] : null;
 };
 export const getIdFromStarName = (starName: string) => {
-  const { satSet } = keepTrackApi.programs;
-  const i = satSet.satData.findIndex((object: SatObject) => object?.type === SpaceObjectType.STAR && object?.name === starName);
-  return i === -1 ? null : i;
+  const { satSet, dotsManager } = keepTrackApi.programs;
+  const i = satSet.satData
+    .slice(dotsManager.starIndex1, dotsManager.starIndex2)
+    .findIndex((object: SatObject) => object?.type === SpaceObjectType.STAR && object?.name === starName);
+  return i === -1 ? null : i + dotsManager.starIndex1;
 };
 export const getSensorFromSensorName = (sensorName: string): number => {
   const { satSet } = keepTrackApi.programs;
-  const i = satSet.satData.findIndex(
+  return satSet.satData.findIndex(
     // Find the first static object that isn't a missile or a star
     (object: SatObject) => (object?.static && !object?.missile && object?.type !== SpaceObjectType.STAR ? object.name === sensorName : false) // Test
   );
-  return i;
 };
 export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: { x: number; y: number; z: number }) => {
   const screenPos = { x: 0, y: 0, z: 0, error: false };
@@ -88,8 +89,7 @@ export const getSatPosOnly = (i: number): SatObject => {
     };
   }
 
-  const sat = satSet.satData[i];
-  return sat;
+  return satSet.satData[i];
 };
 export const getIdFromEci = (eci: { x: number; y: number; z: number }): number => {
   const { dotsManager, satSet } = keepTrackApi.programs;

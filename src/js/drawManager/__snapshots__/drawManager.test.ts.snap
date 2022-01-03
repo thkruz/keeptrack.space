@@ -2287,6 +2287,8 @@ Object {
     "screenShot": [Function],
     "selectSatManager": Object {
       "init": [Function],
+      "lastCssStyle": "",
+      "searchResultDom": null,
       "selectSat": [Function],
     },
     "sensorPos": null,
@@ -2294,6 +2296,7 @@ Object {
     "startWithOrbits": [Function],
     "t0": 15,
     "updateHover": [Function],
+    "updateHoverI": 0,
     "updateLoop": [Function],
     "watermarkedDataUrl": [Function],
   },

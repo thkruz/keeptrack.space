@@ -7,6 +7,7 @@ import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeMan
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
 import { TleParams } from '../satMath/satMath';
+import { toastMsgType } from '../uiManager/uiManager';
 import { SpaceObjectType } from './SpaceObjectType';
 
 export enum CameraType {
@@ -53,6 +54,7 @@ export interface PostProcessingManager {
 }
 
 export interface UiManager {
+  lastBoxUpdateTime: number;
   earthClicked: () => void;
   updateNextPassOverlay(arg0: boolean);
   resize2DMap();
@@ -60,7 +62,7 @@ export interface UiManager {
   lastNextPassCalcSatId: number;
   lastNextPassCalcSensorId: any;
   createClockDOMOnce: boolean;
-  toast: (toastText: string, type: string, isLong?: boolean) => void;
+  toast: (toastText: string, type: toastMsgType, isLong?: boolean) => void;
   uiInput: UiInputInterface;
   searchBox: typeof searchBox;
   mobileManager: typeof mobileManager;
@@ -82,8 +84,7 @@ export interface UiManager {
   reloadLastSensor: () => void;
   getsensorinfo(): void;
   doSearch(searchString: string, isPreventDropDown?: boolean): void;
-  startLowPerf: () => void;
-  panToStar: (c: any) => void;
+  panToStar: (c: SatObject) => void;
   clearRMBSubMenu: () => void;
   menuController: () => void;
   legendHoverMenuClick: (legendType: any) => void;
@@ -763,9 +764,10 @@ export interface Camera {
   getForwardVector: any;
   keyDownHandler: any;
   keyUpHandler: any;
-  latToPitch: any;
+  lat2pitch: any;
   lookAtLatLon: (lat: number, long: number, zoom?: ZoomValue | number, date?: Date) => void;
-  longToYaw: any;
+  lookAtObject: (sat: SatObject, isFaceEarth: boolean) => void;
+  lon2yaw: (long: number, selectedDate: Date) => number;
   normalizeAngle: any;
   resetFpsPos: any;
   snapToSat: any;
@@ -825,6 +827,8 @@ export interface TimeManager {
   init: any;
 }
 export declare interface SatObject {
+  pname?: string;
+  bf?: string;
   active: boolean;
   apogee: number;
   argPe: number;
@@ -844,7 +848,18 @@ export declare interface SatObject {
   FMISSED?: any;
   getAltitude?: any;
   getDirection?: any;
-  getTEARR?: any;
+  getTEARR?: (
+    propTime?: Date,
+    sensors?: SensorObject[]
+  ) => {
+    lat: number;
+    lon: number;
+    alt: number;
+    inView: boolean;
+    rng?: number;
+    az?: number;
+    el?: number;
+  };
   id: number;
   inclination: number;
   inSun?: any;
@@ -1038,6 +1053,7 @@ export interface EarthObject {
 }
 
 export interface CatalogManager {
+  searchBusRegex(satData: SatObject[], text: string): SatObject[];
   resetSatInView();
   convertIdArrayToSatnumArray(aehf: any): any;
   init();
@@ -1061,6 +1077,7 @@ export interface CatalogManager {
   searchYearOrLess(satData: SatObject[], data: any): SatObject[];
   getIdFromIntlDes(arg0: any);
   searchNameRegex(satData: SatObject[], data: any): SatObject[];
+  searchShapeRegex(satData: SatObject[], text: string): SatObject[];
   searchCountryRegex(satData: SatObject[], data: any): SatObject[];
   insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string);
   setSat(x: number, arg1: any);
@@ -1245,6 +1262,7 @@ export interface DrawManager {
   clearFrameBuffers: any;
   selectSatManager: any;
   i: number;
+  updateHoverI: number;
   demoModeSatellite: number;
   demoModeLastTime: number;
   demoModeLast: number;

@@ -199,49 +199,49 @@ export const uiManagerInit = (): void => {
       rgbCss([1, 1, 1, 1]), // White
     ];
     (<any>$('#settings-color-payload')).colorPick({
-      initialColor: rgbCss((<any>settingsManager).colors?.payload || [0.2, 1.0, 0.0, 0.5]),
+      initialColor: rgbCss(settingsManager.colors?.payload || [0.2, 1.0, 0.0, 0.5]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'payload');
       },
     });
     (<any>$('#settings-color-rocketBody')).colorPick({
-      initialColor: rgbCss((<any>settingsManager).colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
+      initialColor: rgbCss(settingsManager.colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'rocketBody');
       },
     });
     (<any>$('#settings-color-debris')).colorPick({
-      initialColor: rgbCss((<any>settingsManager).colors?.debris || [0.5, 0.5, 0.5, 1]),
+      initialColor: rgbCss(settingsManager.colors?.debris || [0.5, 0.5, 0.5, 1]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'debris');
       },
     });
     (<any>$('#settings-color-inview')).colorPick({
-      initialColor: rgbCss((<any>settingsManager).colors?.inView || [0.85, 0.5, 0.0, 1.0]),
+      initialColor: rgbCss(settingsManager.colors?.inView || [0.85, 0.5, 0.0, 1.0]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'inview');
       },
     });
     (<any>$('#settings-color-missile')).colorPick({
-      initialColor: rgbCss((<any>settingsManager).colors?.missile || [1.0, 1.0, 0.0, 1.0]),
+      initialColor: rgbCss(settingsManager.colors?.missile || [1.0, 1.0, 0.0, 1.0]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'missile');
       },
     });
     (<any>$('#settings-color-missileInview')).colorPick({
-      initialColor: rgbCss((<any>settingsManager).colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
+      initialColor: rgbCss(settingsManager.colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'missileInview');
       },
     });
     (<any>$('#settings-color-trusat')).colorPick({
-      initialColor: rgbCss((<any>settingsManager).colors?.trusat || [1.0, 0.0, 0.6, 1.0]),
+      initialColor: rgbCss(settingsManager.colors?.trusat || [1.0, 0.0, 0.6, 1.0]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'trusat');
@@ -283,11 +283,11 @@ export const onColorSelected = (context: any, colorStr: string) => {
 
   context.element.css('cssText', `background-color: ${context.color} !important; color: ${context.color};`);
   if (isNotColorPickerInitialSetup) {
-    (<any>settingsManager).colors[colorStr] = parseRgba(context.color);
+    settingsManager.colors[colorStr] = parseRgba(context.color);
     uiManager.legendColorsChange();
-    satSet.setColorScheme((<any>settingsManager).currentColorScheme, true);
+    satSet.setColorScheme(settingsManager.currentColorScheme, true);
     try {
-      localStorage.setItem('settingsManager-colors', JSON.stringify((<any>settingsManager).colors));
+      localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
     } catch {
       console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
     }
@@ -313,40 +313,34 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?: boolean, isSLMChecked?: boolean, isSNPChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { satSet, colorSchemeManager } = keepTrackApi.programs;
+  const { satSet, colorSchemeManager, uiManager } = keepTrackApi.programs;
 
   isHOSChecked ??= (<HTMLInputElement>document.getElementById('settings-hos')).checked;
   isDMChecked ??= (<HTMLInputElement>document.getElementById('settings-demo-mode')).checked;
   isSLMChecked ??= (<HTMLInputElement>document.getElementById('settings-sat-label-mode')).checked;
   isSNPChecked ??= (<HTMLInputElement>document.getElementById('settings-snp')).checked;
 
-  if (isSLMChecked) {
-    (<any>settingsManager).isSatLabelModeOn = true;
-  } else {
-    (<any>settingsManager).isSatLabelModeOn = false;
-  }
+  settingsManager.isSatLabelModeOn = isSLMChecked;
+  settingsManager.isDemoModeOn = isDMChecked;
+  settingsManager.colors.transparent = isHOSChecked ? [1.0, 1.0, 1.0, 0] : [1.0, 1.0, 1.0, 0.1];
 
-  if (isDMChecked) {
-    (<any>settingsManager).isDemoModeOn = true;
-  } else {
-    (<any>settingsManager).isDemoModeOn = false;
-  }
-
-  if (isHOSChecked) {
-    (<any>settingsManager).colors.transparent = [1.0, 1.0, 1.0, 0];
-  } else {
-    (<any>settingsManager).colors.transparent = [1.0, 1.0, 1.0, 0.1];
-  }
   colorSchemeManager.reloadColors();
 
-  if (isSNPChecked) {
-    (<any>settingsManager).isShowNextPass = true;
+  settingsManager.isShowNextPass = isSNPChecked;
+
+  const newFieldOfView = parseInt($('#satFieldOfView').val());
+  if (isNaN(newFieldOfView)) {
+    $('#satFieldOfView').val('30');
+    uiManager.toast('Invalid field of view value!', 'critical');
   } else {
-    (<any>settingsManager).isShowNextPass = false;
+    satSet.satCruncher.postMessage({
+      typ: 'isShowSatOverfly',
+      selectedSatFOV: newFieldOfView,
+    });
   }
 
-  (<any>settingsManager).isForceColorScheme = true;
-  satSet.setColorScheme((<any>settingsManager).currentColorScheme); // force color recalc
+  settingsManager.isForceColorScheme = true;
+  satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
   e.preventDefault();
 };
 

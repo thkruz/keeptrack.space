@@ -175,18 +175,6 @@ export const parseGetVariables = (): void => {
 };
 export const satCruncherOnMessage = (m: SatCruncherMessage) => {
   const { mainCamera, sensorManager, objectManager, uiManager, satSet } = keepTrackApi.programs;
-  if (m.data?.typ === 'timeSync') {
-    // const timeDif = timeManager.calculateSimulationTime().getTime() - m.data.time;
-    // if (timeDif > 100 || timeDif < -100) {
-    //   console.table([
-    //     { time: new Date(m.data.time).toISOString(), unix: m.data.time, staticOffset: m.data.staticOffset, dynamicOffsetEpoch: m.data.dynamicOffsetEpoch, rate: m.data.propRate },
-    //     { time: timeManager.calculateSimulationTime().toISOString(), unix: timeManager.calculateSimulationTime().getTime(), staticOffset: timeManager.propOffset, dynamicOffsetEpoch: timeManager.dynamicOffsetEpoch, rate: timeManager.propRate },
-    //     { unix: timeDif },
-    //   ]);
-    // }
-    return;
-  }
-
   // store extra data that comes from crunching
   // Only do this once
   if (!satSet.gotExtraData && m.data?.extraData) {

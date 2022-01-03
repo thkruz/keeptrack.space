@@ -230,7 +230,7 @@ export const allObjectsLink = (): void => {
 export const orbitalData = (sat: SatObject): void => {
   if (!satInfoboxCore.orbitalData.isLoaded) {
     $('#ui-wrapper').append(keepTrackApi.html`
-          <div id="sat-infobox" class="text-select">
+          <div id="sat-infobox" class="text-select satinfo-fixed">
             <div id="sat-info-top-links">
               <div id="sat-info-title" class="center-text">This is a title</div>
               <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
@@ -335,27 +335,19 @@ export const orbitalData = (sat: SatObject): void => {
         `);
 
     // Create a Sat Info Box Initializing Script
-    (<any>$('#sat-infobox')).draggable({
+    $('#sat-infobox').draggable({
       containment: 'window',
       drag: () => {
         $('#sat-infobox').height(600);
+        $('#sat-infobox').removeClass('satinfo-fixed');
       },
-    });
-    (<any>$('#sat-infobox')).resizable({
-      handles: 'all',
-      // alsoResize: '#bottom-icons-container',
-      // No larger than the stack of icons
-      maxHeight: 900,
-      minHeight: 200,
-      maxWidth: 600,
-      minWidth: 350,
     });
 
     // If right click kill and reinit
     $('#sat-infobox').on('mousedown', (e: any) => {
       if (e.button === 2) {
         $('#sat-infobox').removeClass().removeAttr('style');
-        return;
+        $('#sat-infobox').addClass('satinfo-fixed');
       }
     });
 

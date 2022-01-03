@@ -93,7 +93,7 @@ describe('findSat.checkInview', () => {
 // @ponicode
 describe('findSat.checkObjtype', () => {
   test('0', () => {
-    let param1: any = [{ OT: 0 }, { OT: 1 }];
+    let param1: any = [{ type: 0 }, { type: 1 }];
     let result: any = findSat.checkObjtype(param1, 1);
     expect(result).toMatchSnapshot();
   });
@@ -130,14 +130,6 @@ describe('findSat.checkRange', () => {
 describe('findSat.findByLooksSubmit', () => {
   test('0', () => {
     let result: any = findSat.findByLooksSubmit();
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('findSat.newLaunchSubmit', () => {
-  test('0', () => {
-    let result: any = findSat.newLaunchSubmit();
     expect(result).toMatchSnapshot();
   });
 });

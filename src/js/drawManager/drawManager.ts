@@ -40,7 +40,6 @@ export const init = () => {
 
 // Reinitialize the canvas on mobile rotation
 window.addEventListener('orientationchange', function () {
-  // console.log('rotate');
   drawManager.isRotationEvent = true;
 });
 
@@ -148,7 +147,11 @@ export const resizeCanvas = () => {
         // Changes more than 35% of height but not due to rotation are likely
         // the keyboard! Ignore them
         // But Make sure we have set this at least once to trigger
-        if ((Math.abs((vw - drawManager.canvas.width) / drawManager.canvas.width) < 0.35 && Math.abs((vh - drawManager.canvas.height) / drawManager.canvas.height) > 0.35) || drawManager.isRotationEvent || typeof drawManager.pMatrix == 'undefined') {
+        if (
+          (Math.abs((vw - drawManager.canvas.width) / drawManager.canvas.width) < 0.35 && Math.abs((vh - drawManager.canvas.height) / drawManager.canvas.height) > 0.35) ||
+          drawManager.isRotationEvent ||
+          typeof drawManager.pMatrix == 'undefined'
+        ) {
           drawManager.canvas.width = vw;
           drawManager.canvas.height = vh;
           drawManager.isRotationEvent = false;
@@ -325,8 +328,7 @@ export const drawLoop = (preciseDt: number) => {
   // }
   // }
 
-  // callbacks at the end of the draw loop (this should be used more!)
-  drawManager.onDrawLoopComplete(drawManager.drawLoopCallback);
+  keepTrackApi.methods.onDrawLoopComplete(drawManager.drawLoopCallback);
 
   // If Demo Mode do stuff
   if (settingsManager.isDemoModeOn) drawManager.demoMode();
@@ -431,7 +433,7 @@ export const satCalculate = () => {
     };
   }
   try {
-    meshManager.update(mainCamera, timeManager, drawManager.sat);
+    meshManager.update(timeManager, drawManager.sat);
   } catch {
     // Don't Let meshManager break everything
   }
@@ -615,8 +617,9 @@ export const updateHover = () => {
     currentSearchSats = searchBox.getLastResultGroup();
     if (typeof currentSearchSats !== 'undefined') {
       currentSearchSats = currentSearchSats['sats'];
-      for (drawManager.i = 0; drawManager.i < currentSearchSats.length; drawManager.i++) {
-        orbitManager.updateOrbitBuffer(currentSearchSats[drawManager.i].satId);
+      if (drawManager.updateHoverI >= currentSearchSats.length) drawManager.updateHoverI = 0;
+      for (let i = 0; drawManager.updateHoverI < currentSearchSats.length && i < 5; drawManager.updateHoverI++, i++) {
+        orbitManager.updateOrbitBuffer(currentSearchSats[drawManager.updateHoverI].satId);
       }
     }
   }
@@ -735,7 +738,16 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
           let measurementDate = new Date(sat.t);
           satHoverBoxNode2.innerHTML = `JDAY: ${timeManager.getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}`;
         }
-        satHoverBoxNode3.innerHTML = 'RCS: ' + parseFloat(sat.rcs).toFixed(2) + ' m^2 (' + (10 ** (parseFloat(sat.rcs) / 10)).toFixed(2) + ' dBsm)</br>Az Error: ' + sat.azError.toFixed(2) + '° El Error: ' + sat.elError.toFixed(2) + '°';
+        satHoverBoxNode3.innerHTML =
+          'RCS: ' +
+          parseFloat(sat.rcs).toFixed(2) +
+          ' m^2 (' +
+          (10 ** (parseFloat(sat.rcs) / 10)).toFixed(2) +
+          ' dBsm)</br>Az Error: ' +
+          sat.azError.toFixed(2) +
+          '° El Error: ' +
+          sat.elError.toFixed(2) +
+          '°';
       } else if (sat.type === SpaceObjectType.CONTORL_FACILITY) {
         satHoverBoxNode1.textContent = sat.name;
         satHoverBoxNode2.innerHTML = sat.country + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
@@ -777,9 +789,9 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
           satHoverBoxNode1.textContent = sat.name;
           sat2 = satSet.getSat(objectManager.selectedSat);
           if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
-            satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, sat2)}</br>ΔVel: ${Math.sqrt((sat.velocity.x - sat2.velocity.x) ** 2 + (sat.velocity.y - sat2.velocity.y) ** 2 + (sat.velocity.z - sat2.velocity.z) ** 2).toFixed(
-              2
-            )} km/s`;
+            satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, sat2)}</br>ΔVel: ${Math.sqrt(
+              (sat.velocity.x - sat2.velocity.x) ** 2 + (sat.velocity.y - sat2.velocity.y) ** 2 + (sat.velocity.z - sat2.velocity.z) ** 2
+            ).toFixed(2)} km/s`;
             satHoverBoxNode3.innerHTML =
               'X: ' +
               sat.position.x.toFixed(2) +
@@ -826,7 +838,18 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
           satHoverBoxNode1.textContent = sat.name;
           satHoverBoxNode2.textContent = sat.sccNum;
           satHoverBoxNode3.innerHTML =
-            'X: ' + sat.position.x.toFixed(2) + ' Y: ' + sat.position.y.toFixed(2) + ' Z: ' + sat.position.z.toFixed(2) + '</br>X: ' + sat.velocity.x.toFixed(2) + ' Y: ' + sat.velocity.y.toFixed(2) + ' Z: ' + sat.velocity.z.toFixed(2);
+            'X: ' +
+            sat.position.x.toFixed(2) +
+            ' Y: ' +
+            sat.position.y.toFixed(2) +
+            ' Z: ' +
+            sat.position.z.toFixed(2) +
+            '</br>X: ' +
+            sat.velocity.x.toFixed(2) +
+            ' Y: ' +
+            sat.velocity.y.toFixed(2) +
+            ' Z: ' +
+            sat.velocity.z.toFixed(2);
         }
       }
     }
@@ -981,6 +1004,7 @@ export const drawManager: DrawManager = {
   drawOptionalScenery: drawOptionalScenery,
   onDrawLoopComplete: onDrawLoopComplete,
   updateHover: updateHover,
+  updateHoverI: 0,
   isDrawOrbitsAbove: false,
   orbitsAbove: orbitsAbove,
   screenShot: screenShot,

@@ -73,6 +73,7 @@ export const bottomMenuClick = (iconName: string): void => {
       settingsManager.isSatOverflyModeOn = false;
       $('#menu-sat-fov').removeClass('bmenu-item-selected');
       satSet.satCruncher.postMessage({
+        typ: 'isShowSatOverfly',
         isShowSatOverfly: 'reset',
       });
       return;
@@ -94,6 +95,9 @@ export const bottomMenuClick = (iconName: string): void => {
       satSet.satCruncher.postMessage({
         isShowFOVBubble: 'reset',
         isShowSurvFence: 'disable',
+      });
+      satSet.satCruncher.postMessage({
+        typ: 'isShowSatOverfly',
         isShowSatOverfly: 'enable',
         selectedSatFOV: satFieldOfView,
       });

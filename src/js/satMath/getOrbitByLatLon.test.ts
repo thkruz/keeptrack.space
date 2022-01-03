@@ -3,6 +3,22 @@ import * as getOrbitByLatLon from './getOrbitByLatLon';
 
 // @ponicode
 describe('getOrbitByLatLon.getOrbitByLatLon', () => {
+  it('should provide consistent results going north', () => {
+    const date = new Date('01-01-2021');
+    const sat = { ...defaultSat, ...{ position: { x: 1968.3, y: 3800.45, z: -5285.27 } } };
+    let result = getOrbitByLatLon.getOrbitByLatLon(sat, -51.176, 89.66, 'N', date);
+    const expected = ['1 00005U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991', '2 00005 2958.886 329.9000 0000345 0.000000 65.90000 15.48839820    10'];
+    expect(result).toStrictEqual(expected);
+  });
+
+  it('should provide consistent results going south', () => {
+    const date = new Date('01-01-2021');
+    const sat = { ...defaultSat, ...{ position: { x: -286.42, y: -4679.9, z: 4916.22 } } };
+    let result = getOrbitByLatLon.getOrbitByLatLon(sat, 46.537, 83.951, 'S', date);
+    const expected = ['1 00005U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991', '2 00005 2958.886 142.0300 0000345 0.000000 250.6000 15.48839820    10'];
+    expect(result).toStrictEqual(expected);
+  });
+
   test('0', () => {
     // TODO: Write better test
     let param5: any = new Date('01-01-2020');

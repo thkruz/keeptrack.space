@@ -15,8 +15,8 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { constellations } from './constellations.js';
-import { stars } from './stars.js';
+import { constellations } from './constellations';
+import { stars } from './stars';
 
 export const findStarsConstellation = (starName: string) => {
   for (let i = 0; i < starManager.constellations.length; i++) {

@@ -47,7 +47,7 @@ Array [
 exports[`findSat.checkObjtype 0 1`] = `
 Array [
   Object {
-    "OT": 1,
+    "type": 1,
   },
 ]
 `;
@@ -72,8 +72,6 @@ exports[`findSat.findByLooksSubmit 0 1`] = `undefined`;
 exports[`findSat.hideSideMenus 0 1`] = `undefined`;
 
 exports[`findSat.init 0 1`] = `undefined`;
-
-exports[`findSat.newLaunchSubmit 0 1`] = `undefined`;
 
 exports[`findSat.searchSats 0 1`] = `Array []`;
 

@@ -764,10 +764,10 @@ export interface Camera {
   getForwardVector: any;
   keyDownHandler: any;
   keyUpHandler: any;
-  latToPitch: any;
+  lat2pitch: any;
   lookAtLatLon: (lat: number, long: number, zoom?: ZoomValue | number, date?: Date) => void;
   lookAtObject: (sat: SatObject, isFaceEarth: boolean) => void;
-  longToYaw: (long: number, selectedDate: Date) => number;
+  lon2yaw: (long: number, selectedDate: Date) => number;
   normalizeAngle: any;
   resetFpsPos: any;
   snapToSat: any;

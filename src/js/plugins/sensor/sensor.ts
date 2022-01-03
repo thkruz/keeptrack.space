@@ -804,6 +804,6 @@ export const customSensorSubmit = (): void => {
     } else {
       mainCamera.changeZoom('leo');
     }
-    mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
+    mainCamera.camSnap(mainCamera.lat2pitch(lat), mainCamera.lon2yaw(lon, timeManager.selectedDate));
   }
 };

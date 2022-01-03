@@ -1,11 +1,25 @@
 /* eslint-disable no-undefined */
-import * as camera from '@app/js/camera/camera';
 import { keepTrackApiStubs } from '../api/apiMocks';
+import { DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager } from '../api/keepTrackTypes';
+import * as camera from './camera';
+import { keyDownHandler, keyUpHandler } from './keyHandler';
+import {
+  setCamAngleSnappedOnSat,
+  setCamZoomSnappedOnSat,
+  setFtsRotateReset,
+  setIsLocalRotateOverride,
+  setIsLocalRotateRoll,
+  setIsLocalRotateYaw,
+  setIsPanReset,
+  setIsScreenPan,
+  setIsWorldPan,
+} from './overrides';
+import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from './transforms';
 // @ponicode
 describe('camera.normalizeAngle', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.normalizeAngle(1.0);
+      normalizeAngle(1.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -13,7 +27,7 @@ describe('camera.normalizeAngle', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.normalizeAngle(10.0);
+      normalizeAngle(10.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -21,7 +35,7 @@ describe('camera.normalizeAngle', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.normalizeAngle(0.1);
+      normalizeAngle(0.1);
     };
 
     expect(callFunction).not.toThrow();
@@ -29,7 +43,7 @@ describe('camera.normalizeAngle', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.normalizeAngle(2.0);
+      normalizeAngle(2.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -37,7 +51,7 @@ describe('camera.normalizeAngle', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.normalizeAngle(0.5);
+      normalizeAngle(0.5);
     };
 
     expect(callFunction).not.toThrow();
@@ -45,7 +59,7 @@ describe('camera.normalizeAngle', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.normalizeAngle(-Infinity);
+      normalizeAngle(-Infinity);
     };
 
     expect(callFunction).not.toThrow();
@@ -53,11 +67,11 @@ describe('camera.normalizeAngle', () => {
 });
 
 // @ponicode
-describe('camera.longToYaw', () => {
+describe('lon2yaw', () => {
   test('0', () => {
     let param2: any = new Date('01-01-2030');
     let callFunction: any = () => {
-      camera.longToYaw(1, param2);
+      lon2yaw(1, param2);
     };
 
     expect(callFunction).not.toThrow();
@@ -66,7 +80,7 @@ describe('camera.longToYaw', () => {
   test('1', () => {
     let param2: any = new Date('01-01-2030');
     let callFunction: any = () => {
-      camera.longToYaw(0, param2);
+      lon2yaw(0, param2);
     };
 
     expect(callFunction).not.toThrow();
@@ -75,7 +89,7 @@ describe('camera.longToYaw', () => {
   test('2', () => {
     let param2: any = new Date('01-13-2020');
     let callFunction: any = () => {
-      camera.longToYaw(100, param2);
+      lon2yaw(100, param2);
     };
 
     expect(callFunction).not.toThrow();
@@ -84,7 +98,7 @@ describe('camera.longToYaw', () => {
   test('3', () => {
     let param2: any = new Date('01-13-2020');
     let callFunction: any = () => {
-      camera.longToYaw(1, param2);
+      lon2yaw(1, param2);
     };
 
     expect(callFunction).not.toThrow();
@@ -93,7 +107,7 @@ describe('camera.longToYaw', () => {
   test('4', () => {
     let param2: any = new Date('01-01-2020');
     let callFunction: any = () => {
-      camera.longToYaw(-5.48, param2);
+      lon2yaw(-5.48, param2);
     };
 
     expect(callFunction).not.toThrow();
@@ -102,7 +116,7 @@ describe('camera.longToYaw', () => {
   test('5', () => {
     let param2: any = new Date('');
     let callFunction: any = () => {
-      camera.longToYaw(Infinity, param2);
+      lon2yaw(Infinity, param2);
     };
 
     expect(callFunction).not.toThrow();
@@ -110,10 +124,10 @@ describe('camera.longToYaw', () => {
 });
 
 // @ponicode
-describe('camera.latToPitch', () => {
+describe('lat2pitch', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.latToPitch(320);
+      lat2pitch(320);
     };
 
     expect(callFunction).not.toThrow();
@@ -121,7 +135,7 @@ describe('camera.latToPitch', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.latToPitch(4);
+      lat2pitch(4);
     };
 
     expect(callFunction).not.toThrow();
@@ -129,7 +143,7 @@ describe('camera.latToPitch', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.latToPitch(30);
+      lat2pitch(30);
     };
 
     expect(callFunction).not.toThrow();
@@ -137,7 +151,7 @@ describe('camera.latToPitch', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.latToPitch(100);
+      lat2pitch(100);
     };
 
     expect(callFunction).not.toThrow();
@@ -145,7 +159,7 @@ describe('camera.latToPitch', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.latToPitch(400);
+      lat2pitch(400);
     };
 
     expect(callFunction).not.toThrow();
@@ -153,7 +167,7 @@ describe('camera.latToPitch', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.latToPitch(Infinity);
+      lat2pitch(Infinity);
     };
 
     expect(callFunction).not.toThrow();
@@ -197,7 +211,7 @@ describe('camera.getCamDist', () => {
 describe('camera.alt2zoom', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.alt2zoom(-100);
+      alt2zoom(-100);
     };
 
     expect(callFunction).not.toThrow();
@@ -205,7 +219,7 @@ describe('camera.alt2zoom', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.alt2zoom(-5.48);
+      alt2zoom(-5.48);
     };
 
     expect(callFunction).not.toThrow();
@@ -213,7 +227,7 @@ describe('camera.alt2zoom', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.alt2zoom(1);
+      alt2zoom(1);
     };
 
     expect(callFunction).not.toThrow();
@@ -221,7 +235,7 @@ describe('camera.alt2zoom', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.alt2zoom(0);
+      alt2zoom(0);
     };
 
     expect(callFunction).not.toThrow();
@@ -229,7 +243,7 @@ describe('camera.alt2zoom', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.alt2zoom(100);
+      alt2zoom(100);
     };
 
     expect(callFunction).not.toThrow();
@@ -237,7 +251,7 @@ describe('camera.alt2zoom', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.alt2zoom(-Infinity);
+      alt2zoom(-Infinity);
     };
 
     expect(callFunction).not.toThrow();
@@ -353,7 +367,12 @@ describe('camera.changeZoom', () => {
 describe('camera.changeCameraType', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(keepTrackApiStubs.programs.orbitManager, keepTrackApiStubs.programs.drawManager, { selectedSat: 0.0, isSensorManagerLoaded: true }, keepTrackApiStubs.programs.sensorManager);
+      camera.changeCameraType(
+        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
+        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <ObjectManager>{ selectedSat: 1, isSensorManagerLoaded: false },
+        <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -361,7 +380,12 @@ describe('camera.changeCameraType', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(keepTrackApiStubs.programs.orbitManager, keepTrackApiStubs.programs.drawManager, { selectedSat: 0.0, isSensorManagerLoaded: false }, keepTrackApiStubs.programs.sensorManager);
+      camera.changeCameraType(
+        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
+        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <ObjectManager>{ selectedSat: 0, isSensorManagerLoaded: false },
+        <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -369,7 +393,12 @@ describe('camera.changeCameraType', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(keepTrackApiStubs.programs.orbitManager, keepTrackApiStubs.programs.drawManager, { selectedSat: -29.45, isSensorManagerLoaded: 12345 }, keepTrackApiStubs.programs.sensorManager);
+      camera.changeCameraType(
+        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
+        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <ObjectManager>{ selectedSat: 29, isSensorManagerLoaded: false },
+        <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -377,7 +406,12 @@ describe('camera.changeCameraType', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(keepTrackApiStubs.programs.orbitManager, keepTrackApiStubs.programs.drawManager, { selectedSat: -29.45, isSensorManagerLoaded: true }, keepTrackApiStubs.programs.sensorManager);
+      camera.changeCameraType(
+        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
+        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <ObjectManager>{ selectedSat: 29, isSensorManagerLoaded: true },
+        <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -385,7 +419,12 @@ describe('camera.changeCameraType', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(keepTrackApiStubs.programs.orbitManager, keepTrackApiStubs.programs.drawManager, { selectedSat: -1.0, isSensorManagerLoaded: 0 }, keepTrackApiStubs.programs.sensorManager);
+      camera.changeCameraType(
+        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
+        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <ObjectManager>{ selectedSat: -1, isSensorManagerLoaded: false },
+        <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -393,7 +432,12 @@ describe('camera.changeCameraType', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(keepTrackApiStubs.programs.orbitManager, keepTrackApiStubs.programs.drawManager, { selectedSat: -Infinity, isSensorManagerLoaded: -Infinity }, keepTrackApiStubs.programs.sensorManager);
+      camera.changeCameraType(
+        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
+        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <ObjectManager>{ selectedSat: 0, isSensorManagerLoaded: true },
+        <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -466,19 +510,19 @@ describe('camera.camSnap', () => {
 describe('camera.snapToSat', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.snapToSat({
+      camera.snapToSat(<SatObject>(<unknown>{
         position: { x: 550, y: 410, z: 30 },
-        static: 'Michael',
+        static: false,
         TLE1: 'Foo bar',
         TLE2: 'foo bar',
         sccNum: 'лв',
         active: false,
-        C: '#F00',
-        LS: 'лв',
-        LV: 'Saltwater Crocodile',
-        ON: '2021-07-29T15:31:46.922Z',
-        OT: 987650,
-        R: 'email@Google.com',
+        country: '#F00',
+        launchSite: 'лв',
+        launchVehicle: 'Saltwater Crocodile',
+        name: '2021-07-29T15:31:46.922Z',
+        type: 987650,
+        rcs: 'email@Google.com',
         URL: 'https://api.telegram.org/',
         O: 'bed-free@tutanota.de',
         U: 'something@example.com',
@@ -508,11 +552,11 @@ describe('camera.snapToSat', () => {
         argPe: 56784,
         inView: 100,
         velocity: { total: 300, x: 380, y: 30, z: 380 },
-        getTEARR: -100,
+        getTEARR: <any>-100,
         getAltitude: () => true,
         getDirection: 520,
         vmag: 100,
-      });
+      }));
     };
 
     expect(callFunction).not.toThrow();
@@ -521,20 +565,20 @@ describe('camera.snapToSat', () => {
   test('1', () => {
     let callFunction: any = () => {
       // eslint-disable-next-line no-import-assign
-      camera.setCamAngleSnappedOnSat(true);
-      camera.snapToSat({
+      setCamAngleSnappedOnSat(true);
+      camera.snapToSat(<SatObject>(<unknown>{
         position: { x: 50, y: 30, z: 90 },
-        static: 'Michael',
+        static: true,
         TLE1: 'Foo bar',
         TLE2: 'Hello, world!',
         sccNum: 'B/.',
         active: false,
-        C: '#F00',
-        LS: '₹',
-        LV: 'Dwarf Crocodile',
-        ON: '2021-07-29T15:31:46.922Z',
-        OT: 987650,
-        R: 'user@host:300',
+        country: '#F00',
+        launchSite: '₹',
+        launchVehicle: 'Dwarf Crocodile',
+        name: '2021-07-29T15:31:46.922Z',
+        type: 987650,
+        rcs: 'user@host:300',
         URL: 'http://www.example.com/route/123?foo=bar',
         O: 'bed-free@tutanota.de',
         U: 'TestUpperCase@Example.com',
@@ -564,11 +608,11 @@ describe('camera.snapToSat', () => {
         argPe: 12345,
         inView: 1,
         velocity: { total: 10000, x: 550, y: 520, z: 30 },
-        getTEARR: 1,
+        getTEARR: <any>1,
         getAltitude: () => true,
         getDirection: 400,
         vmag: -5.48,
-      });
+      }));
     };
 
     expect(callFunction).not.toThrow();
@@ -576,19 +620,19 @@ describe('camera.snapToSat', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.snapToSat({
+      camera.snapToSat(<SatObject>(<unknown>{
         position: { x: 550, y: 550, z: 520 },
-        static: 'Michael',
+        static: false,
         TLE1: 'foo bar',
         TLE2: 'Hello, world!',
         sccNum: 'B/.',
         active: false,
-        C: 'rgb(20%,10%,30%)',
-        LS: 'B/.',
-        LV: 'Nile Crocodile',
-        ON: '2021-07-29T15:31:46.922Z',
-        OT: 12,
-        R: 'user@host:300',
+        country: 'rgb(20%,10%,30%)',
+        launchSite: 'B/.',
+        launchVehicle: 'Nile Crocodile',
+        name: '2021-07-29T15:31:46.922Z',
+        type: 12,
+        rcs: 'user@host:300',
         URL: 'https://croplands.org/app/a/confirm?t=',
         O: 'TestUpperCase@Example.com',
         U: 'user@host:300',
@@ -618,11 +662,11 @@ describe('camera.snapToSat', () => {
         argPe: 56784,
         inView: -5.48,
         velocity: { total: 10000, x: 90, y: 520, z: 380 },
-        getTEARR: -5.48,
+        getTEARR: <any>-5.48,
         getAltitude: () => true,
         getDirection: 400,
         vmag: -5.48,
-      });
+      }));
     };
 
     expect(callFunction).not.toThrow();
@@ -631,20 +675,20 @@ describe('camera.snapToSat', () => {
   test('3', () => {
     let callFunction: any = () => {
       // eslint-disable-next-line no-import-assign
-      camera.setCamZoomSnappedOnSat(true);
-      camera.snapToSat({
+      setCamZoomSnappedOnSat(true);
+      camera.snapToSat(<SatObject>(<unknown>{
         position: { x: 50, y: 4, z: 30 },
         static: false,
         TLE1: 'Foo bar',
         TLE2: 'This is a Text',
         sccNum: 'B/.',
         active: true,
-        C: '#FF00FF',
-        LS: 'MT',
-        LV: 'Spectacled Caiman',
-        ON: '2021-07-30T00:05:36.818Z',
-        OT: 12,
-        R: 'user1+user2@mycompany.com',
+        country: '#FF00FF',
+        launchSite: 'MT',
+        launchVehicle: 'Spectacled Caiman',
+        name: '2021-07-30T00:05:36.818Z',
+        type: 12,
+        rcs: 'user1+user2@mycompany.com',
         URL: 'https://api.telegram.org/bot',
         O: 'TestUpperCase@Example.com',
         U: 'bed-free@tutanota.de',
@@ -674,11 +718,11 @@ describe('camera.snapToSat', () => {
         argPe: 56784,
         inView: 1,
         velocity: { total: 300, x: 90, y: 50, z: 70 },
-        getTEARR: 100,
+        getTEARR: <any>100,
         getAltitude: () => true,
         getDirection: 'South',
         vmag: 1,
-      });
+      }));
     };
 
     expect(callFunction).not.toThrow();
@@ -687,19 +731,19 @@ describe('camera.snapToSat', () => {
   test('4', () => {
     let callFunction: any = () => {
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Planetarium);
-      camera.snapToSat({
+      camera.snapToSat(<SatObject>(<unknown>{
         position: { x: 100, y: 70, z: 400 },
-        static: 'Pierre Edouard',
+        static: true,
         TLE1: 'This is a Text',
         TLE2: 'Foo bar',
         sccNum: 'лв',
         active: false,
-        C: '#F00',
-        LS: '£',
-        LV: 'Spectacled Caiman',
-        ON: '2021-07-29T23:03:48.812Z',
-        OT: 12345,
-        R: 'email@Google.com',
+        country: '#F00',
+        launchSite: '£',
+        launchVehicle: 'Spectacled Caiman',
+        name: '2021-07-29T23:03:48.812Z',
+        type: 12345,
+        rcs: 'email@Google.com',
         URL: 'http://example.com/showcalendar.html?token=CKF50YzIHxCTKMAg',
         O: 'email@Google.com',
         U: 'TestUpperCase@Example.com',
@@ -729,11 +773,11 @@ describe('camera.snapToSat', () => {
         argPe: 86,
         inView: -5.48,
         velocity: { total: 0, x: 380, y: 4, z: 70 },
-        getTEARR: 100,
+        getTEARR: <any>100,
         getAltitude: () => true,
         getDirection: 400,
         vmag: 0,
-      });
+      }));
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Default);
     };
 
@@ -742,19 +786,19 @@ describe('camera.snapToSat', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.snapToSat({
+      camera.snapToSat(<SatObject>(<unknown>{
         position: { x: -Infinity, y: -Infinity, z: -Infinity },
-        static: '',
+        static: false,
         TLE1: '',
         TLE2: '',
         sccNum: '',
         active: true,
-        C: '',
-        LS: '',
-        LV: '',
-        ON: '',
-        OT: -Infinity,
-        R: '',
+        country: '',
+        launchSite: '',
+        launchVehicle: '',
+        name: '',
+        type: -Infinity,
+        rcs: '',
         URL: '',
         O: '',
         U: '',
@@ -784,11 +828,11 @@ describe('camera.snapToSat', () => {
         argPe: -Infinity,
         inView: -Infinity,
         velocity: { total: -Infinity, x: -Infinity, y: -Infinity, z: -Infinity },
-        getTEARR: -Infinity,
+        getTEARR: <any>-Infinity,
         getAltitude: () => true,
         getDirection: -Infinity,
         vmag: -Infinity,
-      });
+      }));
     };
 
     expect(callFunction).not.toThrow();
@@ -858,17 +902,17 @@ describe('camera.calculate', () => {
 
   test('6', () => {
     let callFunction: any = () => {
-      camera.setIsScreenPan(true);
+      setIsScreenPan(true);
       camera.calculate(1, false);
-      camera.setIsWorldPan(true);
+      setIsWorldPan(true);
       camera.calculate(1, false);
-      camera.setIsPanReset(true);
+      setIsPanReset(true);
       camera.calculate(1, false);
-      camera.setIsLocalRotateRoll(true);
+      setIsLocalRotateRoll(true);
       camera.calculate(1, false);
-      camera.setIsLocalRotateYaw(true);
+      setIsLocalRotateYaw(true);
       camera.calculate(1, false);
-      camera.setIsLocalRotateOverride(true);
+      setIsLocalRotateOverride(true);
       camera.calculate(1, false);
     };
 
@@ -877,7 +921,7 @@ describe('camera.calculate', () => {
 
   test('7', () => {
     let callFunction: any = () => {
-      camera.setFtsRotateReset(true);
+      setFtsRotateReset(true);
       camera.calculate(1, false);
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
       camera.calculate(1, false);
@@ -891,7 +935,14 @@ describe('camera.calculate', () => {
 describe('camera.update', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -899,7 +950,14 @@ describe('camera.update', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.update({ id: 987650, getAltitude: () => 400, position: { x: 350, y: 4, z: 1 }, velocity: { x: 100, y: 410, z: 50 } }, { lat: 350, lon: 410, gmst: 12, x: 90, y: 4, z: 30 });
+      camera.update(<any>{ id: 987650, getAltitude: () => 400, position: { x: 350, y: 4, z: 1 }, velocity: { x: 100, y: 410, z: 50 } }, {
+        lat: 350,
+        lon: 410,
+        gmst: 12,
+        x: 90,
+        y: 4,
+        z: 30,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -907,7 +965,14 @@ describe('camera.update', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.update({ id: 12345, getAltitude: () => 380, position: { x: 1, y: 30, z: 520 }, velocity: { x: 50, y: 100, z: 100 } }, { lat: 550, lon: 4, gmst: 987650, x: 520, y: 4, z: 400 });
+      camera.update(<any>{ id: 12345, getAltitude: () => 380, position: { x: 1, y: 30, z: 520 }, velocity: { x: 50, y: 100, z: 100 } }, {
+        lat: 550,
+        lon: 4,
+        gmst: 987650,
+        x: 520,
+        y: 4,
+        z: 400,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -915,7 +980,14 @@ describe('camera.update', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.update({ id: 4, getAltitude: () => 1, position: { x: 100, y: 320, z: 4 }, velocity: { x: 1, y: 100, z: 90 } }, { lat: 30, lon: 100, gmst: 12345, x: 320, y: 380, z: 1 });
+      camera.update(<any>{ id: 4, getAltitude: () => 1, position: { x: 100, y: 320, z: 4 }, velocity: { x: 1, y: 100, z: 90 } }, {
+        lat: 30,
+        lon: 100,
+        gmst: 12345,
+        x: 320,
+        y: 380,
+        z: 1,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -923,7 +995,14 @@ describe('camera.update', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.update({ id: 12, getAltitude: () => 70, position: { x: 30, y: 380, z: 550 }, velocity: { x: 70, y: 30, z: 410 } }, { lat: 520, lon: 100, gmst: 12345, x: 1, y: 400, z: 4 });
+      camera.update(<any>{ id: 12, getAltitude: () => 70, position: { x: 30, y: 380, z: 550 }, velocity: { x: 70, y: 30, z: 410 } }, {
+        lat: 520,
+        lon: 100,
+        gmst: 12345,
+        x: 1,
+        y: 400,
+        z: 4,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -931,10 +1010,14 @@ describe('camera.update', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.update(
-        { id: Infinity, getAltitude: () => Infinity, position: { x: Infinity, y: Infinity, z: Infinity }, velocity: { x: Infinity, y: Infinity, z: Infinity } },
-        { lat: Infinity, lon: Infinity, gmst: Infinity, x: Infinity, y: Infinity, z: Infinity }
-      );
+      camera.update(<any>{ id: Infinity, getAltitude: () => Infinity, position: { x: Infinity, y: Infinity, z: Infinity }, velocity: { x: Infinity, y: Infinity, z: Infinity } }, {
+        lat: Infinity,
+        lon: Infinity,
+        gmst: Infinity,
+        x: Infinity,
+        y: Infinity,
+        z: Infinity,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -942,7 +1025,14 @@ describe('camera.update', () => {
 
   test('6', () => {
     let callFunction: any = () => {
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -952,17 +1042,59 @@ describe('camera.update', () => {
     let callFunction: any = () => {
       // eslint-disable-next-line no-import-assign
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Offset);
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.FixedToSat);
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Planetarium);
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Satellite);
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
       camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Astronomy);
-      camera.update({ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, { lat: 100, lon: 100, gmst: 0, x: 50, y: 70, z: 1 });
+      camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
+        lat: 100,
+        lon: 100,
+        gmst: 0,
+        x: 50,
+        y: 70,
+        z: 1,
+      });
     };
 
     expect(callFunction).not.toThrow();
@@ -1006,7 +1138,7 @@ describe('camera.getForwardVector', () => {
 describe('camera.earthHitTest', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, keepTrackApiStubs.programs.dotsManager, 380, 1);
+      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, <DotsManager>(<unknown>keepTrackApiStubs.programs.dotsManager), 380, 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -1014,7 +1146,7 @@ describe('camera.earthHitTest', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, keepTrackApiStubs.programs.dotsManager, 100, 50);
+      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, <DotsManager>(<unknown>keepTrackApiStubs.programs.dotsManager), 100, 50);
     };
 
     expect(callFunction).not.toThrow();
@@ -1022,7 +1154,7 @@ describe('camera.earthHitTest', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, keepTrackApiStubs.programs.dotsManager, 320, 1);
+      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, <DotsManager>(<unknown>keepTrackApiStubs.programs.dotsManager), 320, 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -1030,7 +1162,7 @@ describe('camera.earthHitTest', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, keepTrackApiStubs.programs.dotsManager, 320, 30);
+      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, <DotsManager>(<unknown>keepTrackApiStubs.programs.dotsManager), 320, 30);
     };
 
     expect(callFunction).not.toThrow();
@@ -1038,7 +1170,7 @@ describe('camera.earthHitTest', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, keepTrackApiStubs.programs.dotsManager, 520, 320);
+      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, <DotsManager>(<unknown>keepTrackApiStubs.programs.dotsManager), 520, 320);
     };
 
     expect(callFunction).not.toThrow();
@@ -1046,7 +1178,7 @@ describe('camera.earthHitTest', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, keepTrackApiStubs.programs.dotsManager, -Infinity, -Infinity);
+      camera.earthHitTest(keepTrackApiStubs.programs.drawManager.gl, <DotsManager>(<unknown>keepTrackApiStubs.programs.dotsManager), -Infinity, -Infinity);
     };
 
     expect(callFunction).not.toThrow();
@@ -1098,51 +1230,51 @@ describe('camera.setCameraType', () => {
 });
 
 // @ponicode
-describe('camera.keyUpHandler', () => {
+describe('keyUpHandler', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.keyUpHandler({});
-      camera.keyUpHandler({ key: 'a' });
-      camera.keyUpHandler({ key: 'd' });
-      camera.keyUpHandler({ key: 's' });
-      camera.keyUpHandler({ key: 'w' });
-      camera.keyUpHandler({ key: 'q' });
-      camera.keyUpHandler({ key: 'e' });
-      camera.keyUpHandler({ key: 'j' });
-      camera.keyUpHandler({ key: 'l' });
-      camera.keyUpHandler({ key: 'i' });
-      camera.keyUpHandler({ key: 'k' });
-      camera.keyUpHandler({ key: 'shift' });
-      camera.keyUpHandler({ key: 'ShiftRight' });
+      keyUpHandler(<KeyboardEvent>{});
+      keyUpHandler(<KeyboardEvent>{ key: 'a' });
+      keyUpHandler(<KeyboardEvent>{ key: 'd' });
+      keyUpHandler(<KeyboardEvent>{ key: 's' });
+      keyUpHandler(<KeyboardEvent>{ key: 'w' });
+      keyUpHandler(<KeyboardEvent>{ key: 'q' });
+      keyUpHandler(<KeyboardEvent>{ key: 'e' });
+      keyUpHandler(<KeyboardEvent>{ key: 'j' });
+      keyUpHandler(<KeyboardEvent>{ key: 'l' });
+      keyUpHandler(<KeyboardEvent>{ key: 'i' });
+      keyUpHandler(<KeyboardEvent>{ key: 'k' });
+      keyUpHandler(<KeyboardEvent>{ key: 'shift' });
+      keyUpHandler(<KeyboardEvent>{ key: 'ShiftRight' });
     };
 
     expect(callFunction).not.toThrow();
   });
 
   // @ponicode
-  describe('camera.keyDownHandler', () => {
+  describe('keyDownHandler', () => {
     test('0', () => {
       let callFunction: any = () => {
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
-        camera.keyDownHandler({});
-        camera.keyDownHandler({ key: 'w' });
-        camera.keyDownHandler({ key: 'a' });
-        camera.keyDownHandler({ key: 's' });
-        camera.keyDownHandler({ key: 'd' });
-        camera.keyDownHandler({ key: 'q' });
-        camera.keyDownHandler({ key: 'e' });
-        camera.keyDownHandler({ key: 'j' });
-        camera.keyDownHandler({ key: 'l' });
-        camera.keyDownHandler({ key: 'i' });
-        camera.keyDownHandler({ key: 'k' });
-        camera.keyDownHandler({ key: 'shift' });
-        camera.keyDownHandler({ key: 'ShiftRight' });
+        keyDownHandler(<KeyboardEvent>{});
+        keyDownHandler(<KeyboardEvent>{ key: 'w' });
+        keyDownHandler(<KeyboardEvent>{ key: 'a' });
+        keyDownHandler(<KeyboardEvent>{ key: 's' });
+        keyDownHandler(<KeyboardEvent>{ key: 'd' });
+        keyDownHandler(<KeyboardEvent>{ key: 'q' });
+        keyDownHandler(<KeyboardEvent>{ key: 'e' });
+        keyDownHandler(<KeyboardEvent>{ key: 'j' });
+        keyDownHandler(<KeyboardEvent>{ key: 'l' });
+        keyDownHandler(<KeyboardEvent>{ key: 'i' });
+        keyDownHandler(<KeyboardEvent>{ key: 'k' });
+        keyDownHandler(<KeyboardEvent>{ key: 'shift' });
+        keyDownHandler(<KeyboardEvent>{ key: 'ShiftRight' });
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Satellite);
-        camera.keyDownHandler({ key: 'q' });
-        camera.keyDownHandler({ key: 'e' });
+        keyDownHandler(<KeyboardEvent>{ key: 'q' });
+        keyDownHandler(<KeyboardEvent>{ key: 'e' });
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Astronomy);
-        camera.keyDownHandler({ key: 'j' });
-        camera.keyDownHandler({ key: 'l' });
+        keyDownHandler(<KeyboardEvent>{ key: 'j' });
+        keyDownHandler(<KeyboardEvent>{ key: 'l' });
       };
 
       expect(callFunction).not.toThrow();
@@ -1160,11 +1292,11 @@ describe('camera.keyUpHandler', () => {
 
     test('1', () => {
       let callFunction: any = () => {
-        camera.keyDownHandler({ key: 'w' });
+        keyDownHandler(<KeyboardEvent>{ key: 'w' });
         camera.fpsMovement();
-        camera.keyDownHandler({ key: 'a' });
+        keyDownHandler(<KeyboardEvent>{ key: 'a' });
         camera.fpsMovement();
-        camera.keyDownHandler({ key: 'q' });
+        keyDownHandler(<KeyboardEvent>{ key: 'q' });
         camera.fpsMovement();
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
         camera.fpsMovement();

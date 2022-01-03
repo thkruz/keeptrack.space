@@ -288,7 +288,7 @@ export const draw = (pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) => 
 };
 
 export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: TimeManager) => {
-  meshManager.currentModel.nadirYaw = mainCamera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
+  meshManager.currentModel.nadirYaw = mainCamera.lon2yaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
 };
 
 export const update = (timeManager: TimeManager, sat: SatObject) => {

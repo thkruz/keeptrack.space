@@ -19,7 +19,10 @@ export const dscovrLoaded = (req: any): void => {
     // Hours are in EST? Daylight savings time might make this break
     const dateObj = new Date(Date.UTC(year, month - 1, day, hour - 4, min, sec));
 
-    keepTrackApi.programs.mainCamera.camSnap(keepTrackApi.programs.mainCamera.latToPitch(response[0].centroid_coordinates.lat), keepTrackApi.programs.mainCamera.longToYaw(response[0].centroid_coordinates.lon, dateObj));
+    keepTrackApi.programs.mainCamera.camSnap(
+      keepTrackApi.programs.mainCamera.lat2pitch(response[0].centroid_coordinates.lat),
+      keepTrackApi.programs.mainCamera.lon2yaw(response[0].centroid_coordinates.lon, dateObj)
+    );
     keepTrackApi.programs.mainCamera.changeZoom(0.7);
 
     colorbox(`https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageUrl}.png`);

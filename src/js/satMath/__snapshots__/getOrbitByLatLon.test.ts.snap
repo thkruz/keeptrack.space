@@ -3,14 +3,14 @@
 exports[`getOrbitByLatLon.getOrbitByLatLon 3 1`] = `
 Array [
   "Error",
-  "",
+  "Failed to find a solution for Argument of Perigee",
 ]
 `;
 
 exports[`getOrbitByLatLon.getOrbitByLatLon 4 1`] = `
 Array [
   "Error",
-  "",
+  "Failed to find a solution for Mean Anomaly",
 ]
 `;
 

@@ -1,4 +1,4 @@
-var constellations = [
+export const constellations = [
   {
     name: 'Ursa Minor',
     stars: [
@@ -1184,5 +1184,3 @@ var constellations = [
     ],
   },
 ];
-
-export { constellations };

@@ -18,51 +18,11 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import * as glm from 'gl-matrix';
+import { keepTrackApi } from '../api/keepTrackApi';
 import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager, ZoomValue } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
-import { getDayOfYear } from '../timeManager/transforms';
-
-export const normalizeAngle = (angle: number): number => {
-  angle %= TAU;
-  if (angle > TAU / 2) angle -= TAU;
-  if (angle < -TAU / 2) angle += TAU;
-  return angle;
-};
-
-export const longToYaw = (long: number, selectedDate: Date) => {
-  const realTime = new Date();
-  let propTime = new Date();
-  let angle = 0;
-
-  // NOTE: camera formula sometimes is incorrect, but has been stable for over a year
-  // NOTE: Looks wrong again as of 8/29/2020 - time of year issue?
-  // NOTE: Could camera be related to daylight savings time? Subtracting one hour from selected date works
-  const doy = getDayOfYear(selectedDate);
-  const modifier = 1000 * 60 * 60 * (-11.23 + 0.065666667 * doy);
-
-  propTime.setUTCHours(selectedDate.getUTCHours()); // + (selectedDate.getUTCMonth() * 2 - 11) / 2); // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
-  propTime.setUTCMinutes(selectedDate.getUTCMinutes());
-  propTime.setUTCSeconds(selectedDate.getUTCSeconds());
-  propTime = new Date(propTime.getTime() * 1 + modifier);
-
-  realTime.setUTCHours(0);
-  realTime.setUTCMinutes(0);
-  realTime.setUTCSeconds(0);
-  let longOffset = (propTime.getTime() - realTime.getTime()) / 60 / 60 / 1000; // In Hours
-  if (longOffset > 24) longOffset = longOffset - 24;
-  longOffset = longOffset * 15; // 15 Degress Per Hour longitude Offset
-
-  angle = (long + longOffset) * DEG2RAD;
-  angle = normalizeAngle(angle);
-  return angle;
-};
-
-export const latToPitch = (lat: number): number => {
-  let pitch = lat * DEG2RAD;
-  if (pitch > TAU / 4) pitch = TAU / 4; // Max 90 Degrees
-  if (pitch < -TAU / 4) pitch = -TAU / 4; // Min -90 Degrees
-  return pitch;
-};
+import { keyDownHandler, keyUpHandler } from './keyHandler';
+import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from './transforms';
 
 /* Private Methods */
 export const resetFpsPos = (): void => {
@@ -102,8 +62,6 @@ export const fpsMovement = (): void => {
       camera.fpsVertSpeed = Math.min(camera.fpsVertSpeed + Math.max(camera.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsVertSpeed);
     }
 
-    // console.log('Front: ' + fpsForwardSpeed + ' - ' + 'Side: ' + fpsSideSpeed + ' - ' + 'Vert: ' + fpsVertSpeed)
-
     if (camera.cameraType.Fps) {
       if (camera.fpsForwardSpeed !== 0) {
         camera.fpsPos[0] -= Math.sin(camera.fpsYaw * DEG2RAD) * camera.fpsForwardSpeed * camera.fpsRun * fpsElapsed;
@@ -130,19 +88,12 @@ export const fpsMovement = (): void => {
     camera.fpsPitch += camera.fpsPitchRate * fpsElapsed;
     camera.fpsRotate += camera.fpsRotateRate * fpsElapsed;
     camera.fpsYaw += camera.fpsYawRate * fpsElapsed;
-
-    // console.log('Pitch: ' + fpsPitch + ' - ' + 'Rotate: ' + fpsRotate + ' - ' + 'Yaw: ' + fpsYaw)
   }
   camera.fpsLastTime = fpsTimeNow;
 };
 
 export const getCamDist = (): number =>
   Math.pow(camera._zoomLevel, ZOOM_EXP) * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance;
-
-export const alt2zoom = (alt: number): number => {
-  const distanceFromCenter = alt + RADIUS_OF_EARTH + 30;
-  return Math.pow((distanceFromCenter - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance), 1 / ZOOM_EXP);
-};
 
 export const autoRotate = (val?: boolean): void => {
   if (settingsManager.autoRotateSpeed === 0) settingsManager.autoRotateSpeed = 0.0075;
@@ -226,7 +177,15 @@ export const lookAtLatLon = (lat: number, long: number, zoom?: ZoomValue | numbe
 
   // Convert the lat/long to a position on the globe and then set the camera to look at that position
   changeZoom(zoom);
-  camSnap(latToPitch(lat), longToYaw(long, date));
+  camSnap(lat2pitch(lat), lon2yaw(long, date));
+};
+
+export const lookAtObject = (sat: SatObject, isFaceEarth: boolean): void => {
+  const { timeManager, satellite } = keepTrackApi.programs;
+  const lla = satellite.eci2ll(sat.position.x, sat.position.y, sat.position.z);
+  const latModifier = isFaceEarth ? 1 : -1;
+  const lonModifier = isFaceEarth ? 0 : 180;
+  camSnap(lat2pitch(lla.lat * latModifier), lon2yaw(lla.lon + lonModifier, timeManager.selectedDate));
 };
 
 export const camSnap = (pitch: number, yaw: number): void => {
@@ -306,158 +265,6 @@ export const fts2default = (): void => {
     camera.camPitch = camera.ecPitch;
     camera.camYaw = camera.ecYaw;
     camera._zoomTarget = camera.ecLastZoom; // Reset Zoom
-  }
-};
-
-export const keyUpHandler = (evt: KeyboardEvent) => {
-  // Error Handling
-  if (typeof evt.key == 'undefined') return;
-
-  if (evt.key.toUpperCase() === 'A' && camera.fpsSideSpeed === -settingsManager.fpsSideSpeed) {
-    camera.isFPSSideSpeedLock = false;
-  }
-  if (evt.key.toUpperCase() === 'D' && camera.fpsSideSpeed === settingsManager.fpsSideSpeed) {
-    camera.isFPSSideSpeedLock = false;
-  }
-  if (evt.key.toUpperCase() === 'S' && camera.fpsForwardSpeed === -settingsManager.fpsForwardSpeed) {
-    camera.isFPSForwardSpeedLock = false;
-  }
-  if (evt.key.toUpperCase() === 'W' && camera.fpsForwardSpeed === settingsManager.fpsForwardSpeed) {
-    camera.isFPSForwardSpeedLock = false;
-  }
-  if (evt.key.toUpperCase() === 'Q') {
-    if (camera.fpsVertSpeed === -settingsManager.fpsVertSpeed) camera.isFPSVertSpeedLock = false;
-    camera.fpsRotateRate = 0;
-  }
-  if (evt.key.toUpperCase() === 'E') {
-    if (camera.fpsVertSpeed === settingsManager.fpsVertSpeed) camera.isFPSVertSpeedLock = false;
-    camera.fpsRotateRate = 0;
-  }
-  if (evt.key.toUpperCase() === 'J' || evt.key.toUpperCase() === 'L') {
-    if (camera.cameraType.current === camera.cameraType.Astronomy) {
-      camera.fpsRotateRate = 0;
-    } else {
-      camera.fpsYawRate = 0;
-    }
-  }
-  if (evt.key.toUpperCase() === 'I' || evt.key.toUpperCase() === 'K') {
-    camera.fpsPitchRate = 0;
-  }
-
-  if (evt.key.toUpperCase() === 'SHIFT') {
-    camera.isShiftPressed = false;
-    camera.fpsRun = 1;
-    settingsManager.cameraMovementSpeed = 0.003;
-    settingsManager.cameraMovementSpeedMin = 0.005;
-    camera.speedModifier = 1;
-    if (!camera.isFPSForwardSpeedLock) camera.fpsForwardSpeed = 0;
-    if (!camera.isFPSSideSpeedLock) camera.fpsSideSpeed = 0;
-    if (!camera.isFPSVertSpeedLock) camera.fpsVertSpeed = 0;
-  }
-  // Applies to _keyDownHandler as well
-  if (evt.key === 'ShiftRight') {
-    camera.isShiftPressed = false;
-    camera.fpsRun = 1;
-    settingsManager.cameraMovementSpeed = 0.003;
-    settingsManager.cameraMovementSpeedMin = 0.005;
-    camera.speedModifier = 1;
-  }
-};
-
-export const keyDownHandler = (evt: KeyboardEvent) => {
-  // Error Handling
-  if (typeof evt.key == 'undefined') return;
-
-  if (evt.key.toUpperCase() === 'SHIFT') {
-    camera.isShiftPressed = true;
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsRun = 0.05;
-    }
-    camera.speedModifier = 8;
-    settingsManager.cameraMovementSpeed = 0.003 / 8;
-    settingsManager.cameraMovementSpeedMin = 0.005 / 8;
-  }
-  if (evt.key === 'ShiftRight') {
-    camera.isShiftPressed = true;
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsRun = 3;
-    }
-  }
-  if (evt.key.toUpperCase() === 'W') {
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsForwardSpeed = settingsManager.fpsForwardSpeed;
-      camera.isFPSForwardSpeedLock = true;
-    }
-  }
-  if (evt.key.toUpperCase() === 'A') {
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsSideSpeed = -settingsManager.fpsSideSpeed;
-      camera.isFPSSideSpeedLock = true;
-    }
-  }
-  if (evt.key.toUpperCase() === 'S') {
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
-      camera.isFPSForwardSpeedLock = true;
-    }
-  }
-  if (evt.key.toUpperCase() === 'D') {
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsSideSpeed = settingsManager.fpsSideSpeed;
-      camera.isFPSSideSpeedLock = true;
-    }
-  }
-  if (evt.key.toUpperCase() === 'I') {
-    if (
-      camera.cameraType.current === camera.cameraType.Fps ||
-      camera.cameraType.current === camera.cameraType.Satellite ||
-      camera.cameraType.current === camera.cameraType.Astronomy
-    ) {
-      camera.fpsPitchRate = settingsManager.fpsPitchRate / camera.speedModifier;
-    }
-  }
-  if (evt.key.toUpperCase() === 'K') {
-    if (
-      camera.cameraType.current === camera.cameraType.Fps ||
-      camera.cameraType.current === camera.cameraType.Satellite ||
-      camera.cameraType.current === camera.cameraType.Astronomy
-    ) {
-      camera.fpsPitchRate = -settingsManager.fpsPitchRate / camera.speedModifier;
-    }
-  }
-  if (evt.key.toUpperCase() === 'J') {
-    if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite) {
-      camera.fpsYawRate = -settingsManager.fpsYawRate / camera.speedModifier;
-    }
-    if (camera.cameraType.current === camera.cameraType.Astronomy) {
-      camera.fpsRotateRate = settingsManager.fpsRotateRate / camera.speedModifier;
-    }
-  }
-  if (evt.key.toUpperCase() === 'L') {
-    if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite) {
-      camera.fpsYawRate = settingsManager.fpsYawRate / camera.speedModifier;
-    }
-    if (camera.cameraType.current === camera.cameraType.Astronomy) {
-      camera.fpsRotateRate = -settingsManager.fpsRotateRate / camera.speedModifier;
-    }
-  }
-  if (evt.key.toUpperCase() === 'Q') {
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsVertSpeed = -settingsManager.fpsVertSpeed;
-      camera.isFPSVertSpeedLock = true;
-    }
-    if (camera.cameraType.current === camera.cameraType.Satellite || camera.cameraType.current === camera.cameraType.Astronomy) {
-      camera.fpsRotateRate = settingsManager.fpsRotateRate / camera.speedModifier;
-    }
-  }
-  if (evt.key.toUpperCase() === 'E') {
-    if (camera.cameraType.current === camera.cameraType.Fps) {
-      camera.fpsVertSpeed = settingsManager.fpsVertSpeed;
-      camera.isFPSVertSpeedLock = true;
-    }
-    if (camera.cameraType.current === camera.cameraType.Satellite || camera.cameraType.current === camera.cameraType.Astronomy) {
-      camera.fpsRotateRate = -settingsManager.fpsRotateRate / camera.speedModifier;
-    }
   }
 };
 
@@ -994,42 +801,6 @@ export const setCameraType = (val: CameraType) => {
   resetFpsPos();
 };
 
-export const setCamAngleSnappedOnSat = (val: boolean) => {
-  camera.camAngleSnappedOnSat = val;
-};
-
-export const setCamZoomSnappedOnSat = (val: boolean) => {
-  camera.camZoomSnappedOnSat = val;
-};
-
-export const setIsScreenPan = (val: boolean) => {
-  camera.isScreenPan = val;
-};
-
-export const setIsWorldPan = (val: boolean) => {
-  camera.isWorldPan = val;
-};
-
-export const setIsPanReset = (val: boolean) => {
-  camera.isPanReset = val;
-};
-
-export const setIsLocalRotateRoll = (val: boolean) => {
-  camera.isLocalRotateRoll = val;
-};
-
-export const setIsLocalRotateYaw = (val: boolean) => {
-  camera.isLocalRotateYaw = val;
-};
-
-export const setIsLocalRotateOverride = (val: boolean) => {
-  camera.isLocalRotateOverride = val;
-};
-
-export const setFtsRotateReset = (val: boolean) => {
-  camera.ftsRotateReset = val;
-};
-
 export const camera: Camera = {
   _zoomLevel: 0.6925,
   _zoomTarget: 0.6925,
@@ -1121,15 +892,16 @@ export const camera: Camera = {
   isZoomIn: false,
   keyDownHandler: keyDownHandler,
   keyUpHandler: keyUpHandler,
-  latToPitch: latToPitch,
+  lat2pitch: lat2pitch,
   lookAtLatLon: lookAtLatLon,
+  lookAtObject: lookAtObject,
   localRotateCurrent: { pitch: 0, roll: 0, yaw: 0 },
   localRotateDif: { pitch: 0, roll: 0, yaw: 0 },
   localRotateMovementSpeed: 0.00005,
   localRotateSpeed: { pitch: 0, roll: 0, yaw: 0 },
   localRotateStartPosition: { pitch: 0, roll: 0, yaw: 0 },
   localRotateTarget: { pitch: 0, roll: 0, yaw: 0 },
-  longToYaw: longToYaw,
+  lon2yaw: lon2yaw,
   mouseX: 0,
   mouseY: 0,
   normalizeAngle: normalizeAngle,

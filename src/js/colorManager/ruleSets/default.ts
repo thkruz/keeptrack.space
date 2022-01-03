@@ -29,7 +29,8 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
     } else {
       // Deselected
       return {
-        color: colorSchemeManager.colorTheme.deselected,
+        // color: colorSchemeManager.colorTheme.deselected,
+        color: [1, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
@@ -177,7 +178,11 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
   if (
     (sat.inView === 0 && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false)
+    (objectManager.isSensorManagerLoaded &&
+      sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
+      typeof sat.vmag == 'undefined' &&
+      sat.type === SpaceObjectType.PAYLOAD &&
+      colorSchemeManager.objectTypeFlags.payload === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -187,7 +192,11 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
   if (
     (sat.inView === 0 && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false)
+    (objectManager.isSensorManagerLoaded &&
+      sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
+      typeof sat.vmag == 'undefined' &&
+      sat.type === SpaceObjectType.ROCKET_BODY &&
+      colorSchemeManager.objectTypeFlags.rocketBody === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -197,7 +206,11 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
   if (
     (sat.inView === 0 && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false)
+    (objectManager.isSensorManagerLoaded &&
+      sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
+      typeof sat.vmag == 'undefined' &&
+      sat.type === SpaceObjectType.DEBRIS &&
+      colorSchemeManager.objectTypeFlags.debris === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -207,7 +220,11 @@ export const defaultRules = (sat: SatObject): ColorInformation => {
   if (
     (sat.inView === 0 && sat.type === SpaceObjectType.SPECIAL && colorSchemeManager.objectTypeFlags.trusat === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.SPECIAL && colorSchemeManager.objectTypeFlags.trusat === false) ||
-    (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined' && sat.type === SpaceObjectType.SPECIAL && colorSchemeManager.objectTypeFlags.trusat === false)
+    (objectManager.isSensorManagerLoaded &&
+      sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
+      typeof sat.vmag == 'undefined' &&
+      sat.type === SpaceObjectType.SPECIAL &&
+      colorSchemeManager.objectTypeFlags.trusat === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,

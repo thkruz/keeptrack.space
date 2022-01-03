@@ -17,7 +17,15 @@ enum PropagationResults {
   Far = 3,
 }
 
-export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: number, goalDirection: 'N' | 'S', now: Date, goalAlt?: number, raanOffset?: number): [string, string] => {
+export const getOrbitByLatLon = (
+  sat: SatObject,
+  goalLat: number,
+  goalLon: number,
+  goalDirection: 'N' | 'S',
+  now: Date,
+  goalAlt?: number,
+  raanOffset?: number
+): [string, string] => {
   let newMeana: string = null;
   let newArgPer: string = null;
   goalAlt = goalAlt || null;
@@ -215,8 +223,7 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
   }
 
   if (meanACalcResults !== PropagationResults.Success) {
-    console.log('Failed to find a solution for Mean Anomaly');
-    return ['Error', ''];
+    return ['Error', 'Failed to find a solution for Mean Anomaly'];
   }
 
   // ===== Argument of Perigee Loop =====
@@ -246,7 +253,7 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
         i += 5 * 10; // Change ArgPer faster
       }
       if (argPerCalcResults === PropagationResults.Error) {
-        return ['Error', ''];
+        return ['Error', 'Failed to find a solution for Argument of Perigee'];
       }
 
       // ===== Mean Anomaly Loop =====
@@ -269,8 +276,7 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
     }
 
     if (argPerCalcResults !== PropagationResults.Success) {
-      console.log('Failed to find a solution for Arg Per');
-      return ['Error', ''];
+      return ['Error', 'Failed to find a solution for Argument of Perigee'];
     }
   }
 
@@ -287,8 +293,7 @@ export const getOrbitByLatLon = (sat: SatObject, goalLat: number, goalLon: numbe
   }
 
   if (raanCalcResults !== PropagationResults.Success) {
-    console.log('Failed to find a solution for Right Ascension');
-    return ['Error', ''];
+    return ['Error', 'Failed to find a solution for Right Ascension of Ascending Node'];
   }
 
   return [sat.TLE1, sat.TLE2];

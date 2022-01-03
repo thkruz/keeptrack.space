@@ -70,6 +70,7 @@ export const keepTrackApi: KeepTrackApi = {
     loadCatalog: [],
     resetSensor: [],
     setSensor: [],
+    onDrawLoopComplete: [],
   },
   methods: {
     selectSatData: (sat: any, satId: number) => {
@@ -132,6 +133,9 @@ export const keepTrackApi: KeepTrackApi = {
     },
     setSensor: (sensor: any, id: number) => {
       keepTrackApi.callbacks.setSensor.forEach((cb: any) => cb.cb(sensor, id));
+    },
+    onDrawLoopComplete: () => {
+      keepTrackApi.callbacks.onDrawLoopComplete.forEach((cb: any) => cb.cb());
     },
   },
   programs: <any>{},

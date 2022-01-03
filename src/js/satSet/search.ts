@@ -22,11 +22,21 @@ export const searchYearOrLess = (satData: any, year: number) => {
 
 // eslint-disable-next-line no-unused-vars
 export const searchNameRegex = (satData: any, regex: { test: (arg0: any) => any }): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => !!regex.test(sat.name));
+  const result = satData.filter((sat: SatObject) => !!regex.test(sat.name)); // NOSONAR
   return result;
 };
 // eslint-disable-next-line no-unused-vars
 export const searchCountryRegex = (satData: any, regex: { test: (arg0: any) => any }): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => !!regex.test(sat.country));
+  const result = satData.filter((sat: SatObject) => !!regex.test(sat.country)); // NOSONAR
+  return result;
+};
+
+export const searchShapeRegex = (satData: any, text: string): SatObject[] => {
+  const result = satData.filter((sat: SatObject) => sat.shape === text); // NOSONAR
+  return result;
+};
+
+export const searchBusRegex = (satData: any, text: string): SatObject[] => {
+  const result = satData.filter((sat: SatObject) => sat.bus === text); // NOSONAR
   return result;
 };

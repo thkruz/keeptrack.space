@@ -7,8 +7,41 @@ import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
 import { mat4 } from 'gl-matrix';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { Camera, SatObject, TimeManager } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
+import { aehfSccNums, dspSccNums, issSccNum } from './meshManager/modelConstants';
 
-const meshList = ['sat2', 's1u', 's2u', 's3u', 'starlink', 'iss', 'gps', 'aehf', 'dsp', 'galileo', 'o3b', 'orbcomm', 'iridium', 'globalstar', 'debris0', 'debris1', 'debris2', 'rocketbody', 'sbirs', 'misl', 'misl2', 'misl3', 'misl4', 'rv'];
+const meshList = [
+  'sat2',
+  's1u',
+  's2u',
+  's3u',
+  'starlink',
+  'iss',
+  'gps',
+  'aehf',
+  'dsp',
+  'flock',
+  'lemur',
+  'galileo',
+  'o3b',
+  'oneweb',
+  'orbcomm',
+  'spacebee1gen',
+  'spacebee2gen',
+  'spacebee3gen',
+  'iridium',
+  'globalstar',
+  'debris0',
+  'debris1',
+  'debris2',
+  'rocketbody',
+  'sbirs',
+  'misl',
+  'misl2',
+  'misl3',
+  'misl4',
+  'rv',
+];
 
 let mvMatrix;
 let nMatrix;
@@ -22,7 +55,7 @@ export const init: any = async () => {
     meshManager.fileList = [];
 
     // Don't Continue until you have populated the mesh list
-    await meshManager.populateFileList();
+    meshManager.populateFileList();
 
     let p = OBJ.downloadModels(meshManager.fileList);
 
@@ -261,10 +294,10 @@ export const draw = (pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) => 
 };
 
 export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: TimeManager) => {
-  meshManager.currentModel.nadirYaw = mainCamera.longToYaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
+  meshManager.currentModel.nadirYaw = mainCamera.lon2yaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
 };
 
-export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) => {
+export const update = (timeManager: TimeManager, sat: SatObject) => {
   meshManager.currentModel.id = sat?.id || -1;
   meshManager.currentModel.static = sat?.static || false;
 
@@ -300,150 +333,148 @@ export const update = (mainCamera: Camera, timeManager: TimeManager, sat: any) =
     }
   }
 
-  if (sat.sccNum == '25544') {
+  switch (sat.type) {
+    case SpaceObjectType.PAYLOAD:
+      getSatelliteModel(sat);
+      return;
+    case SpaceObjectType.ROCKET_BODY:
+      // TODO: Add more rocket body models
+      meshManager.currentModel.model = meshManager.models.rocketbody;
+      return;
+    case SpaceObjectType.DEBRIS:
+      // TODO: Add more debris models
+      if (parseInt(sat.sccNum) <= 20000) meshManager.currentModel.model = meshManager.models.debris0;
+      if (parseInt(sat.sccNum) <= 35000) meshManager.currentModel.model = meshManager.models.debris1;
+      if (parseInt(sat.sccNum) > 35000) meshManager.currentModel.model = meshManager.models.debris2;
+      return;
+    default:
+      // Generic Model
+      meshManager.currentModel.model = meshManager.models.sat2;
+  }
+};
+
+export const getSatelliteModel = (sat: SatObject) => {
+  const { mainCamera, timeManager } = keepTrackApi.programs;
+
+  if (checkIfNameKnown(sat.name)) {
+    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    return;
+  }
+
+  if (sat.sccNum === issSccNum) {
     meshManager.updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.iss;
     return;
   }
 
-  if (sat.OT == 1) {
-    // Default Satellite
-    if (sat.ON.slice(0, 5) == 'FLOCK' || sat.ON.slice(0, 5) == 'LEMUR') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.s3u;
-      return;
-    }
-    if (sat.ON.slice(0, 8) == 'STARLINK') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.starlink;
-      return;
-    }
+  if (aehfSccNums.findIndex((num) => sat.sccNum == num) !== -1) {
+    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    meshManager.currentModel.model = meshManager.models.aehf;
+    return;
+  }
 
-    if (sat.ON.slice(0, 10) == 'GLOBALSTAR') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.globalstar;
-      return;
-    }
+  if (dspSccNums.findIndex((num) => sat.sccNum == num) !== -1) {
+    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    meshManager.currentModel.model = meshManager.models.dsp;
+    return;
+  }
 
-    if (sat.ON.slice(0, 7) == 'IRIDIUM') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.iridium;
+  switch (sat.bus) {
+    case 'Cubesat 0.25U':
+      if (sat.intlDes.startsWith('2018')) {
+        meshManager.currentModel.model = meshManager.models.spacebee1gen;
+      } else if (sat.name.startsWith('SPACEBEE')) {
+        meshManager.currentModel.model = meshManager.models.spacebee3gen;
+      } else {
+        meshManager.currentModel.model = meshManager.models.spacebee1gen;
+      }
       return;
-    }
-
-    if (sat.ON.slice(0, 7) == 'ORBCOMM') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.orbcomm;
+    case 'Cubesat':
+    case 'Cubesat 1U':
+      if (sat.name.startsWith('SPACEBEE')) {
+        meshManager.currentModel.model = meshManager.models.spacebee2gen;
+      } else {
+        meshManager.currentModel.model = meshManager.models.s1u;
+      }
       return;
-    }
-
-    if (sat.ON.slice(0, 3) == 'O3B') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.o3b;
-      return;
-    }
-
-    // Is this a GPS Satellite (Called NAVSTAR)
-    if (sat.ON.slice(0, 7) == 'NAVSTAR' || sat.ON.slice(10, 17) == 'NAVSTAR') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.gps;
-      return;
-    }
-
-    // Is this a Galileo Satellite
-    if (sat.ON.slice(0, 7) == 'GALILEO') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.galileo;
-      return;
-    }
-
-    // Is this a SBIRS Satellite
-    if (sat.ON.slice(0, 5) == 'SBIRS') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.sbirs;
-      return;
-    }
-
-    // Is this a DSP Satellite?
-    if (
-      sat.sccNum == '04630' ||
-      sat.sccNum == '05204' ||
-      sat.sccNum == '05851' ||
-      sat.sccNum == '06691' ||
-      sat.sccNum == '08482' ||
-      sat.sccNum == '08916' ||
-      sat.sccNum == '09803' ||
-      sat.sccNum == '11397' ||
-      sat.sccNum == '12339' ||
-      sat.sccNum == '13086' ||
-      sat.sccNum == '14930' ||
-      sat.sccNum == '15453' ||
-      sat.sccNum == '18583' ||
-      sat.sccNum == '20066' ||
-      sat.sccNum == '20929' ||
-      sat.sccNum == '21805' ||
-      sat.sccNum == '23435' ||
-      sat.sccNum == '24737' ||
-      sat.sccNum == '26356' ||
-      sat.sccNum == '26880' ||
-      sat.sccNum == '28158'
-    ) {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.dsp;
-      return;
-    }
-
-    // Is this an AEHF Satellite?
-    if (sat.sccNum == '36868' || sat.sccNum == '38254' || sat.sccNum == '39256' || sat.sccNum == '43651' || sat.sccNum == '44481' || sat.sccNum == '45465') {
-      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
-      meshManager.currentModel.model = meshManager.models.aehf;
-      return;
-    }
-
-    // Is this a 1U Cubesat?
-    if (parseFloat(sat.R) < 0.1 && parseFloat(sat.R) > 0.04) {
-      meshManager.currentModel.model = meshManager.models.s1u;
-      return;
-    }
-    if (parseFloat(sat.R) < 0.22 && parseFloat(sat.R) >= 0.1) {
+    case 'Cubesat 2U':
       meshManager.currentModel.model = meshManager.models.s2u;
       return;
-    }
-    if (parseFloat(sat.R) < 0.33 && parseFloat(sat.R) >= 0.22) {
+    case 'Cubesat 3U':
+    case 'Cubesat 3U+':
       meshManager.currentModel.model = meshManager.models.s3u;
       return;
-    }
+    case 'DSP':
+    case 'DSP B14':
+    case 'DSP B18':
+    case 'DSP MOS/PIM':
+    case 'DSP P2U':
+    case 'DSP P2':
+      meshManager.currentModel.model = meshManager.models.dsp;
+      return;
+    case 'GPS':
+    case 'GPS II':
+    case 'GPS IIA':
+    case 'GPS IIF':
+    case 'GPS IIR':
+      meshManager.currentModel.model = meshManager.models.gps;
+      return;
+    case 'Iridium':
+      meshManager.currentModel.model = meshManager.models.iridium;
+      return;
+    case 'ARROW':
+      meshManager.currentModel.model = meshManager.models.oneweb;
+      meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+      return;
+    case 'Cubesat 1.5U':
+    case 'Cubesat 6U':
+    case 'Cubesat 0.5U':
+    case 'Cubesat 16U':
+    case 'Cubesat 12U':
+    case 'Cubesat 0.3U':
+    default:
+    // Do Nothing
+  }
+
+  const rcs = parseFloat(sat.rcs);
+  switch (true) {
+    case rcs < 0.1 && rcs > 0.04:
+      meshManager.currentModel.model = meshManager.models.s1u;
+      return;
+    case rcs < 0.22 && rcs >= 0.1:
+      meshManager.currentModel.model = meshManager.models.s2u;
+      return;
+    case rcs < 0.33 && rcs >= 0.22:
+      meshManager.currentModel.model = meshManager.models.s3u;
+      return;
+    default:
     // Generic Model
-    meshManager.currentModel.model = meshManager.models.sat2;
-    return;
   }
 
-  if (sat.OT == 2) {
-    // Rocket Body
-    meshManager.currentModel.model = meshManager.models.rocketbody;
-    return;
-  }
-
-  if (sat.OT == 3) {
-    if (parseInt(sat.sccNum) <= 20000) {
-      // Debris
-      meshManager.currentModel.model = meshManager.models.debris0;
-      return;
-    } else if (parseInt(sat.sccNum) <= 35000) {
-      // Debris
-      meshManager.currentModel.model = meshManager.models.debris1;
-      return;
-    } else if (parseInt(sat.sccNum) > 35000) {
-      // Debris
-      meshManager.currentModel.model = meshManager.models.debris2;
-      return;
-    }
-  }
-
-  // Catch All for Special Satellites
-  // Generic Model
   meshManager.currentModel.model = meshManager.models.sat2;
-  return;
+};
+
+export const checkIfNameKnown = (name: string): boolean => {
+  // TODO: Currently all named models aim at nadir - that isn't always true
+
+  let newModel = null;
+  if (name.startsWith('STARLINK')) newModel = meshManager.models.starlink;
+  if (name.startsWith('GLOBALSTAR')) newModel = meshManager.models.globalstar;
+  if (name.startsWith('IRIDIUM')) newModel = meshManager.models.iridium;
+  if (name.startsWith('ORBCOMM')) newModel = meshManager.models.orbcomm;
+  if (name.startsWith('O3B')) newModel = meshManager.models.o3b;
+  if (name.startsWith('NAVSTAR')) newModel = meshManager.models.gps;
+  if (name.startsWith('GALILEO')) newModel = meshManager.models.galileo;
+  if (name.startsWith('SBIRS')) newModel = meshManager.models.sbirs;
+  if (name.startsWith('FLOCK')) newModel = meshManager.models.flock;
+  if (name.startsWith('LEMUR')) newModel = meshManager.models.lemur;
+
+  if (newModel !== null) {
+    meshManager.currentModel.model = newModel;
+    return true;
+  }
+
+  return false;
 };
 
 export const drawOcclusion = (pMatrix: mat4, camMatrix: mat4, occlusionPrgm: any, tgtBuffer: WebGLBuffer) => {

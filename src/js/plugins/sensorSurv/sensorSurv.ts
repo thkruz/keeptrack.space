@@ -86,9 +86,12 @@ export const bottomMenuClick = (iconName: string): void => {
       $('#menu-surveillance').addClass('bmenu-item-selected');
       $('#menu-fov-bubble').removeClass('bmenu-item-selected');
       satSet.satCruncher.postMessage({
-        isShowSatOverfly: 'reset',
         isShowFOVBubble: 'enable',
         isShowSurvFence: 'enable',
+      });
+      satSet.satCruncher.postMessage({
+        typ: 'isShowSatOverfly',
+        isShowSatOverfly: 'reset',
       });
       return;
     }

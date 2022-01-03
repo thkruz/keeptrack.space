@@ -176,8 +176,9 @@ export const findFutureDate = (socratesObjTwo: any[][], row: number) => {
   selectedDate.setUTCDate(sDay); // Move to UTC day.
   selectedDate.setUTCHours(sHour); // Move to UTC Hour
 
-  const today = new Date(); // Need to know today for offset calculation
-  keepTrackApi.programs.timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime()); // Find the offset from today
+  const today = new Date();
+  // Find the offset from today 60 seconds before possible collision
+  keepTrackApi.programs.timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime() - 1000 * 30);
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
   keepTrackApi.programs.timeManager.calculateSimulationTime();
 }; // Allows passing -1 argument to socrates function to skip these steps
@@ -260,7 +261,22 @@ export const processSocratesHtm = (socratesHTM: Document): void => {
     const socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
     const socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
     const socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
-    tdT.appendChild(document.createTextNode(socratesDate[2] + ' ' + socratesDate[1] + ' ' + socratesDate[0] + ' - ' + stringPad.pad0(socratesTime[0], 2) + ':' + stringPad.pad0(socratesTime[1], 2) + ':' + stringPad.pad0(socratesTimeS[0], 2) + 'Z'));
+    tdT.appendChild(
+      document.createTextNode(
+        socratesDate[2] +
+          ' ' +
+          socratesDate[1] +
+          ' ' +
+          socratesDate[0] +
+          ' - ' +
+          stringPad.pad0(socratesTime[0], 2) +
+          ':' +
+          stringPad.pad0(socratesTime[1], 2) +
+          ':' +
+          stringPad.pad0(socratesTimeS[0], 2) +
+          'Z'
+      )
+    );
     tdS1 = tr.insertCell();
     tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
     tdS2 = tr.insertCell();

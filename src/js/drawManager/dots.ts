@@ -1,4 +1,5 @@
 /* eslint-disable no-useless-escape */
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as glm from 'gl-matrix';
 import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrackTypes';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
@@ -391,7 +392,7 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
 
     const { gmst } = calculateTimeVariables(timeManager.calculateSimulationTime());
     objectManager.staticSet
-      .filter((object) => object.static && !object.marker)
+      .filter((object) => object.static && !object.marker && object.type !== SpaceObjectType.STAR)
       .forEach((object) => {
         const cosLat = Math.cos(object.lat * DEG2RAD);
         const sinLat = Math.sin(object.lat * DEG2RAD);

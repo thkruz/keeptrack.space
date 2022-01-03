@@ -190,7 +190,7 @@ export const stfFormOnSubmit = (e: Event) => {
   const maxrange = rng + rngExt;
 
   satSet.satCruncher.postMessage({
-    // Send satSet.satCruncher File information on this radar
+    typ: 'sensor',
     setlatlong: true, // Tell satSet.satCruncher we are changing observer location
     sensor: [
       {

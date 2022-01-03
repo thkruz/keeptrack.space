@@ -170,14 +170,14 @@ Array [
 
 exports[`Test ColorRules 8 1`] = `
 Array [
+  0.2,
   1,
+  0,
+  0.65,
+  0.2,
   1,
-  1,
-  0.1,
-  1,
-  1,
-  1,
-  0.1,
+  0,
+  0.65,
   1,
   1,
   1,
@@ -664,7 +664,7 @@ Object {
 exports[`colorSchemeManager.ageOfElsetRules 8 1`] = `
 Object {
   "color": Array [
-    1,
+    0,
     1,
     0,
     0.9,
@@ -676,8 +676,8 @@ Object {
 exports[`colorSchemeManager.ageOfElsetRules 9 1`] = `
 Object {
   "color": Array [
+    0,
     1,
-    0.6,
     0,
     0.9,
   ],
@@ -689,7 +689,7 @@ exports[`colorSchemeManager.ageOfElsetRules 10 1`] = `
 Object {
   "color": Array [
     1,
-    0,
+    0.6,
     0,
     0.9,
   ],
@@ -701,11 +701,11 @@ exports[`colorSchemeManager.ageOfElsetRules 11 1`] = `
 Object {
   "color": Array [
     1,
-    1,
-    1,
+    0.6,
     0,
+    0.9,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;
 
@@ -1338,8 +1338,8 @@ exports[`colorSchemeManager.defaultRules should ignore deselected stars 1`] = `
 Object {
   "color": Array [
     1,
-    1,
-    1,
+    0,
+    0,
     0,
   ],
   "pickable": 0,

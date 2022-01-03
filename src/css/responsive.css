@@ -154,6 +154,12 @@
     border-color: var(--colorTertiaryDarken3);
     border-style: solid;
   }
+
+  #twitter-menu {
+    overflow: scroll;
+    background: #292f33;
+  }
+
   #membership-menu {
     width: 450px !important;
   }
@@ -172,6 +178,13 @@
   #lookanglesmultisite-menu {
     width: 450px;
   }
+  #findByLooks .row {
+    margin: 0px;
+  }
+  #findByLooks .row div input {
+    height: 2.5rem;
+    margin: 0px;
+  }
   #dops-menu {
     width: 375px;
   }
@@ -188,13 +201,13 @@
     margin-top: 25px;
     padding: 0 10px 0px 10px;
     right: 0px;
-    width: 350px;
+    width: 355px;
     border-width: 5px;
     border-color: var(--colorTertiaryDarken3);
     border-style: solid;
     overflow: hidden auto;
   }
-  #sat-infobox:after {
+  .satinfo-fixed:after {
     content: '';
     height: calc(var(--bottom-menu-height) + 15px);
     display: block;

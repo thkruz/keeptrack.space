@@ -130,7 +130,6 @@ export const SunCalc = {
       altitude: SunCalc.h,
       vmag: c.vmag,
       name: c.name,
-      pname: c.pname,
       dist: c.dist,
     };
   },

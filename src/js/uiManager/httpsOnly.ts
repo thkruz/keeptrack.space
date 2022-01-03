@@ -90,6 +90,7 @@ export const updateSensorPosition = (position: GeolocationPosition): void => {
   };
 
   satSet.satCruncher.postMessage({
+    typ: 'sensor',
     setlatlong: true,
     sensor: sensorInfo,
   });
@@ -98,7 +99,7 @@ export const updateSensorPosition = (position: GeolocationPosition): void => {
 
   objectManager.setSelectedSat(-1);
   maxrange > 6000 ? mainCamera.changeZoom('geo') : mainCamera.changeZoom('leo');
-  mainCamera.camSnap(mainCamera.latToPitch(lat), mainCamera.longToYaw(lon, timeManager.selectedDate));
+  mainCamera.camSnap(mainCamera.lat2pitch(lat), mainCamera.lon2yaw(lon, timeManager.selectedDate));
 };
 
 export const useCurrentGeolocationAsSensor = () => {

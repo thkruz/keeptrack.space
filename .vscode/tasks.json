@@ -1,14 +1,31 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "npm",
-			"script": "lint",
-			"problemMatcher": [
-				"$eslint-stylish"
-			],
-			"label": "npm: lint",
-			"detail": "eslint ./src/**/*"
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // The name that shows up in terminal tab
+      "label": "Build and Watch",
+      // The task will launch a shell
+      "type": "shell",
+      "command": "npm run build:watch",
+      "isBackground": true,
+      "presentation": {
+        "group": "my-group"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "Start Server",
+      "type": "shell",
+      "command": "npm run start",
+      "isBackground": true,
+      "presentation": {
+        "group": "my-group"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
 }

@@ -71,9 +71,12 @@ export const enableFovView = () => {
   $('#menu-fov-bubble').addClass('bmenu-item-selected');
   $('#menu-surveillance').removeClass('bmenu-item-selected');
   satSet.satCruncher.postMessage({
-    isShowSatOverfly: 'reset',
     isShowFOVBubble: 'enable',
     isShowSurvFence: 'disable',
+  });
+  satSet.satCruncher.postMessage({
+    typ: 'isShowSatOverfly',
+    isShowSatOverfly: 'reset',
   });
 };
 

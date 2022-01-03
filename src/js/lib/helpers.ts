@@ -2,6 +2,8 @@ import { saveAs } from './external/file-saver.min.js';
 
 export { saveAs };
 
+export const getUnique = (arr) => [...new Set(arr)];
+
 export const stringPad = {
   pad: (val: string, len: number): string => {
     val = String(val);
@@ -96,3 +98,6 @@ export const truncateString = (str: string, num: number): string => {
   // Return str truncated with '...' concatenated to the end of str.
   return str.slice(0, num) + '...';
 };
+
+(<any>window).getUnique = getUnique;
+(<any>window).saveCsv = saveCsv;

@@ -12,10 +12,6 @@ export const changePropRate = (propRate: number) => {
   timeManager.propRate = propRate;
   timeManager.calculateSimulationTime();
 
-  console.log('staticOffset', timeManager.staticOffset);
-  console.log('dynamicOffsetEpoch', timeManager.dynamicOffsetEpoch);
-  console.log('propRate', timeManager.propRate);
-
   synchronize();
 };
 

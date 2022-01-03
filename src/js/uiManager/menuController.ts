@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { saveCsv } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 
 export const initMenuController = () => {
   const { objectManager, orbitManager, satSet, satellite, searchBox, uiManager } = keepTrackApi.programs;
@@ -36,7 +37,6 @@ export const initMenuController = () => {
       $('#legend-icon').removeClass('bmenu-item-selected');
       settingsManager.legendMenuOpen = false;
     } else {
-      // uiManager.legendColorsChange(); // Disabled colors show up again.
       $('#legend-hover-menu').show();
       $('#legend-icon').addClass('bmenu-item-selected');
       searchBox.hideResults();
@@ -87,12 +87,17 @@ export const initMenuController = () => {
   });
 
   $('#search-results').on('click', '.search-result', function () {
-    var satId = $(this).data('sat-id');
-    objectManager.setSelectedSat(satId);
+    var satId = $(this).data('obj-id');
+    const sat = satSet.getSat(satId);
+    if (sat.type === SpaceObjectType.STAR) {
+      uiManager.panToStar(sat);
+    } else {
+      objectManager.setSelectedSat(satId);
+    }
   });
 
   $('#search-results').on('mouseover', '.search-result', function () {
-    const satId = <number>$(this).data('sat-id');
+    const satId = <number>$(this).data('obj-id');
     searchForSat(satId);
   });
   $('#search-results').on('mouseout', () => {
@@ -141,15 +146,6 @@ export const initMenuController = () => {
   });
 
   // Allow All Side Menu Resizing
-  (<any>$('#sensor-list-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 400,
-    minWidth: 280,
-  });
-
   (<any>$('#sensor-info-menu')).resizable({
     handles: 'e',
     stop: function () {

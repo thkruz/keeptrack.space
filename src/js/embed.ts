@@ -43,7 +43,7 @@ import { VERSION_DATE } from '../js/settingsManager/versionDate.js';
 import { starManager } from '../js/starManager/starManager';
 import { timeManager } from '../js/timeManager/timeManager';
 import { adviceManager } from '../js/uiManager/adviceManager';
-import { uiInput, uiManager } from '../js/uiManager/uiManager';
+import { uiManager } from '../js/uiManager/uiManager';
 import { searchBox } from './uiManager/searchBox';
 
 export const initalizeKeepTrack = async (): Promise<void> => {
@@ -124,7 +124,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     objectManager.satLinkManager.idToSatnum(satSet);
 
-    uiInput.init();
+    uiManager.uiInput.init();
 
     drawManager.init();
 

@@ -40,7 +40,10 @@ export class LineFactory {
   removeStars(): boolean {
     let starFound = false;
     for (let i = 0; i < this.drawLineList.length; i++) {
-      if ((typeof this.drawLineList[i].sat !== 'undefined' && this.drawLineList[i].sat.type === SpaceObjectType.STAR) || (typeof this.drawLineList[i].sat2 !== 'undefined' && this.drawLineList[i].sat2.type === SpaceObjectType.STAR)) {
+      if (
+        (typeof this.drawLineList[i].sat !== 'undefined' && this.drawLineList[i].sat.type === SpaceObjectType.STAR) ||
+        (typeof this.drawLineList[i].sat2 !== 'undefined' && this.drawLineList[i].sat2.type === SpaceObjectType.STAR)
+      ) {
         this.drawLineList.splice(i, 1);
         starFound = true;
       }
@@ -325,7 +328,7 @@ export class LineFactory {
                 Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
                   const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
                   if (sensor.name == this.drawLineList[i].sat2.name) {
-                    let tearr = this.drawLineList[i].sat.getTEARR(null, sensor);
+                    let tearr = this.drawLineList[i].sat.getTEARR(null, [sensor]);
                     if (!tearr.inView) {
                       this.drawLineList.splice(i, 1);
                     }
@@ -365,7 +368,10 @@ export class LineFactory {
                 const el = rae.el * RAD2DEG;
                 if (el > settingsManager.lineScanMinEl) {
                   const pos = keepTrackApi.programs.satellite.geodeticToEcf(lla);
-                  this.drawLineList[i].line.set([pos.x, pos.y, pos.z], [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+                  this.drawLineList[i].line.set(
+                    [pos.x, pos.y, pos.z],
+                    [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]
+                  );
                   break;
                 }
 
@@ -387,7 +393,9 @@ export class LineFactory {
               // Is azimuth outside of FOV?
               if (
                 (this.drawLineList[i].maxAz > this.drawLineList[i].minAz && this.drawLineList[i].az > this.drawLineList[i].maxAz) ||
-                (this.drawLineList[i].maxAz < this.drawLineList[i].minAz && this.drawLineList[i].az > this.drawLineList[i].maxAz && this.drawLineList[i].az < this.drawLineList[i].minAz)
+                (this.drawLineList[i].maxAz < this.drawLineList[i].minAz &&
+                  this.drawLineList[i].az > this.drawLineList[i].maxAz &&
+                  this.drawLineList[i].az < this.drawLineList[i].minAz)
               ) {
                 // Reset it
                 this.drawLineList[i].az = this.drawLineList[i].minAz;
@@ -409,10 +417,19 @@ export class LineFactory {
               this.drawLineList[i].line.set([pos.x, pos.y, pos.z], [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
             } else {
               // Just One Satellite
-              this.drawLineList[i].line.set(this.drawLineList[i].ref, [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+              this.drawLineList[i].line.set(this.drawLineList[i].ref, [
+                this.drawLineList[i].sat.position.x,
+                this.drawLineList[i].sat.position.y,
+                this.drawLineList[i].sat.position.z,
+              ]);
             }
           }
-        } else if (typeof this.drawLineList[i].star1 != 'undefined' && typeof this.drawLineList[i].star2 != 'undefined' && this.drawLineList[i].star1 != null && this.drawLineList[i].star2 != null) {
+        } else if (
+          typeof this.drawLineList[i].star1 != 'undefined' &&
+          typeof this.drawLineList[i].star2 != 'undefined' &&
+          this.drawLineList[i].star1 != null &&
+          this.drawLineList[i].star2 != null
+        ) {
           // Constellation
           if (typeof this.drawLineList[i].star1ID == 'undefined') {
             this.drawLineList[i].star1ID = this.getIdFromStarName(this.drawLineList[i].star1);
@@ -422,7 +439,10 @@ export class LineFactory {
           }
           this.tempStar1 = this.getSatPosOnly(this.drawLineList[i].star1ID);
           this.tempStar2 = this.getSatPosOnly(this.drawLineList[i].star2ID);
-          this.drawLineList[i].line.set([this.tempStar1.position.x, this.tempStar1.position.y, this.tempStar1.position.z], [this.tempStar2.position.x, this.tempStar2.position.y, this.tempStar2.position.z]);
+          this.drawLineList[i].line.set(
+            [this.tempStar1.position.x, this.tempStar1.position.y, this.tempStar1.position.z],
+            [this.tempStar2.position.x, this.tempStar2.position.y, this.tempStar2.position.z]
+          );
         } else {
           // Arbitrary Lines
           this.drawLineList[i].line.set(this.drawLineList[i].ref, this.drawLineList[i].ref2);

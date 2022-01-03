@@ -688,7 +688,7 @@ export const rmbMenuActions = (e: MouseEvent) => {
       break;
     case 'view-related-sats-rmb':
       var intldes = satSet.getSatExtraOnly(clickedSat).intlDes;
-      if (typeof intldes == 'undefined') uiManager.toast(`Time 1 is Invalid!`, 'warn');
+      if (typeof intldes == 'undefined') uiManager.toast(`Time 1 is Invalid!`, 'serious');
       var searchStr = intldes.slice(0, 8);
       uiManager.doSearch(searchStr);
       break;

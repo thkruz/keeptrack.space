@@ -149,8 +149,8 @@ const getNonEmbedConfig = (baseConfig, env) => {
       'windows.jQuery': 'jquery',
     }),
     new HtmlWebpackPlugin({
-      filename: '../index.htm',
-      template: './src/index.htm',
+      filename: '../index.html',
+      template: './src/index.html',
     }),
     new CleanTerminalPlugin({
       beforeCompile: true,
@@ -185,8 +185,8 @@ const getEmbedConfig = (baseConfig) => {
       'windows.jQuery': 'jquery',
     }),
     new HtmlWebpackPlugin({
-      filename: '../../example.htm',
-      template: './src/embed.htm',
+      filename: '../../example.html',
+      template: './src/embed.html',
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
@@ -241,8 +241,8 @@ const getAnalysisConfig = (baseConfig, dirName) => ({
         'windows.jQuery': 'jquery',
       }),
       new HtmlWebpackPlugin({
-        filename: '../index.htm',
-        template: './src/analysis/index.htm',
+        filename: '../index.html',
+        template: './src/analysis/index.html',
       }),
     ],
     output: {

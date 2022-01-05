@@ -3,7 +3,7 @@ module.exports = {
   watch: 'dist',
   port: 8080,
   root: 'dist',
-  open: 'index.htm',
+  open: 'index.html',
   browser: 'chrome',
   https: false,
 };

@@ -39,7 +39,12 @@ jobs:
       # Ensure Node Modules Setup
       - name: Install Dependencies
         run: npm ci --ignore-scripts
-      # Unit Tests
+      # Set Timezone to match snapshots
+      - name: Set Timezone
+        uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "America/New_York"
+      # Unit Tests for Code Coverage
       - name: Test
         run: npm test
       # SonarQube

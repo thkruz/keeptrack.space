@@ -4,8 +4,7 @@ USER root
 
 WORKDIR /app
 
-COPY package.json ./
-COPY tsconfig.json ./
+COPY package.json package-lock.json tsconfig.json ./
 COPY src src
 COPY scripts scripts
 COPY node_modules node_modules

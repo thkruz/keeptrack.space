@@ -1223,3 +1223,11 @@ describe('satMath.calculateSensorPos', () => {
     satMath.calculateSensorPos();
   });
 });
+
+describe('satMath.findClosestApproachTime', () => {
+  test('0', () => {
+    const defaultSat2 = {...defaultSat
+    let result: any = satMath.findClosestApproachTime(defaultSat, );
+    expect(result).toMatchSnapshot();
+  });
+}

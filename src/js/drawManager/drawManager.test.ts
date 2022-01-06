@@ -117,21 +117,6 @@ describe('drawManager.resizePostProcessingTexture', () => {
 });
 
 // @ponicode
-describe('drawManager.demoMode', () => {
-  test('0', () => {
-    let result: any = drawManager.demoMode();
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    settingsManager.demoModeInterval = -1;
-    let result: any = drawManager.demoMode();
-    expect(result).toMatchSnapshot();
-    settingsManager.demoModeInterval = 1000;
-  });
-});
-
-// @ponicode
 describe('drawManager.loadScene', () => {
   test('0', async () => {
     let result: any = await drawManager.loadScene();

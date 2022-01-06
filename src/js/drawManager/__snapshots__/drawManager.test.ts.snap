@@ -2,10 +2,6 @@
 
 exports[`drawManager.createDotsManager 0 1`] = `null`;
 
-exports[`drawManager.demoMode 0 1`] = `undefined`;
-
-exports[`drawManager.demoMode 1 1`] = `undefined`;
-
 exports[`drawManager.drawLoop  0 1`] = `undefined`;
 
 exports[`drawManager.drawOptionalScenery 0 1`] = `undefined`;
@@ -59,14 +55,11 @@ exports[`drawManager.resizePostProcessingTexture 0 1`] = `undefined`;
 
 exports[`drawManager.satCalculate 0 1`] = `undefined`;
 
-exports[`drawManager.screenShot 0 1`] = `undefined`;
-
 exports[`drawManager.startWithOrbits   0 1`] = `
 Object {
   "calculatePMatrix": [Function],
   "clearFrameBuffers": [Function],
   "createDotsManager": [Function],
-  "demoMode": [Function],
   "drawLoop": [Function],
   "drawManager": Object {
     "calculatePMatrix": [Function],
@@ -2317,11 +2310,3 @@ Object {
 `;
 
 exports[`drawManager.updateHover 0 1`] = `undefined`;
-
-exports[`drawManager.watermarkedDataUrl 0 1`] = `null`;
-
-exports[`drawManager.watermarkedDataUrl 1 1`] = `null`;
-
-exports[`drawManager.watermarkedDataUrl 2 1`] = `null`;
-
-exports[`drawManager.watermarkedDataUrl 3 1`] = `null`;

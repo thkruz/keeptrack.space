@@ -19,5 +19,3 @@ exports[`Screenshot Package watermarkedDataUrl should handle all classification 
 exports[`Screenshot Package watermarkedDataUrl should handle all classification options 5`] = `""`;
 
 exports[`Screenshot Package watermarkedDataUrl should handle all classification options 6`] = `""`;
-
-exports[`Screenshot Package watermarkedDataUrl should handle all classification options 7`] = `[Function]`;

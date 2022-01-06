@@ -8,6 +8,7 @@ import { mat4 } from 'gl-matrix';
 import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { spaceObjType2Str } from '../lib/spaceObjType2Str';
+import { demoMode } from './demoMode';
 import { screenShot, watermarkedDataUrl } from './screenShot';
 
 let satHoverBoxNode1: HTMLDivElement;
@@ -16,14 +17,14 @@ let satHoverBoxNode3: HTMLDivElement;
 let satHoverBoxDOM: HTMLDivElement;
 let satMiniBox: HTMLDivElement;
 
-var updateHoverDelay = 0;
-var updateHoverDelayLimit = 3;
-var satLabelModeLastTime = 0;
-var isSatMiniBoxInUse = false;
-var labelCount;
-var hoverBoxOnSatMiniElements = null;
-var satHoverMiniDOM;
-window.settingsManager.isShowNextPass = false;
+let updateHoverDelay = 0;
+let updateHoverDelayLimit = 3;
+let satLabelModeLastTime = 0;
+let isSatMiniBoxInUse = false;
+let labelCount;
+let hoverBoxOnSatMiniElements = null;
+let satHoverMiniDOM;
+settingsManager.isShowNextPass = false;
 let updateHoverSatId;
 let isHoverBoxVisible = false;
 let isShowDistance = true;
@@ -233,30 +234,22 @@ export const drawLoop = (preciseDt: number) => {
   // drawManager.checkIfPostProcessingRequired();
 
   // Do any per frame calculations
-  // var start = window.performance.now();
-  // PERFORMANCE: 0.110 ms
   drawManager.updateLoop();
-  // settingsManager.pTime.push(window.performance.now() - start);
 
   // Actually draw things now that math is done
-  // PERFORMANCE: 0.0337ms
-  // drawManager.resizeCanvas();
   drawManager.clearFrameBuffers(dotsManager.pickingFrameBuffer, sceneManager.sun.godrays.frameBuffer);
 
   // Sun, and Moon
-  // PERFORMANCE: 0.106 ms
   drawManager.drawOptionalScenery();
 
   sceneManager.earth.draw(drawManager.pMatrix, mainCamera, dotsManager, drawManager.postProcessingManager.curBuffer);
 
   // Update Draw Positions
-  // PERFORMANCE: 0.281 ms - minor increase with stars disabled
   dotsManager.updatePositionBuffer(satSet.satData.length, satSet.orbitalSats, timeManager);
 
   dotsManager.updatePMvCamMatrix(drawManager.pMatrix, mainCamera);
 
   // Draw Dots
-  // PERFORMANCE: 0.6813 ms
   dotsManager.draw(mainCamera, colorSchemeManager, drawManager.postProcessingManager.curBuffer);
 
   // Draw GPU Picking Overlay -- This is what lets us pick a satellite
@@ -487,7 +480,7 @@ export const orbitsAbove = () => {
 
     orbitManager.clearInViewOrbit();
 
-    var sat;
+    let sat;
     labelCount = 0;
     isHoverBoxVisible = true;
 
@@ -498,7 +491,7 @@ export const orbitsAbove = () => {
      * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
      */
     hoverBoxOnSatMiniElements.innerHTML = '';
-    for (var i = 0; i < satSet.orbitalSats && labelCount < settingsManager.maxLabels; i++) {
+    for (let i = 0; i < satSet.orbitalSats && labelCount < settingsManager.maxLabels; i++) {
       sat = satSet.getSatPosOnly(i);
 
       if (sat.static) continue;
@@ -548,7 +541,7 @@ export const orbitsAbove = () => {
   }
 };
 
-var currentSearchSats;
+let currentSearchSats;
 export const updateHover = () => {
   const { mainCamera, orbitManager, uiManager, searchBox, satSet, timeManager } = keepTrackApi.programs;
 
@@ -647,7 +640,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
     if (sat.static || sat.isRadarData) {
       // TODO: This is a broken mess but only used offline
       if (sat.type === SpaceObjectType.LAUNCH_FACILITY) {
-        var launchSite = objectManager.extractLaunchSite(sat.name);
+        let launchSite = objectManager.extractLaunchSite(sat.name);
         satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
         satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
         satHoverBoxNode3.textContent = '';
@@ -808,41 +801,6 @@ export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: Sun
 
   // Reset Flag now that textures are reinitialized
   drawManager.isPostProcessingResizeNeeded = false;
-};
-
-var demoModeLastTime = 0;
-export const demoMode = () => {
-  const { mainCamera, objectManager, sensorManager, colorSchemeManager, timeManager, orbitManager, satSet } = keepTrackApi.programs;
-
-  if (objectManager?.isSensorManagerLoaded && sensorManager?.currentSensor[0]?.lat === null) return;
-  if (timeManager.realTime - demoModeLastTime < settingsManager.demoModeInterval) return;
-
-  drawManager.demoModeLast = timeManager.realTime;
-
-  if (drawManager.demoModeSatellite === satSet.satData.length) drawManager.demoModeSatellite = 0;
-  let satData = satSet.satData;
-  for (drawManager.i = drawManager.demoModeSatellite; drawManager.i < satData.length; drawManager.i++) {
-    try {
-      drawManager.sat = satData[drawManager.i];
-      if (drawManager.sat.static) continue;
-      if (drawManager.sat.missile) continue;
-      // if (!drawManager.sat.inView === 1) continue
-      if (drawManager.sat.type === 1 && colorSchemeManager.objectTypeFlags.payload === false) continue;
-      if (drawManager.sat.type === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false) continue;
-      if (drawManager.sat.type === 3 && colorSchemeManager.objectTypeFlags.debris === false) continue;
-      if (drawManager.sat.inView === 1 && colorSchemeManager.objectTypeFlags.inFOV === false) continue;
-      const satScreenPositionArray = satSet.getScreenCoords(drawManager.i, drawManager.pMatrix, mainCamera.camMatrix);
-      if (satScreenPositionArray.error) continue;
-      if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
-      if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
-      drawManager.hoverBoxOnSat(drawManager.i, satScreenPositionArray.x, satScreenPositionArray.y);
-      orbitManager.setSelectOrbit(drawManager.i);
-      drawManager.demoModeSatellite = drawManager.i + 1;
-      return;
-    } catch {
-      continue;
-    }
-  }
 };
 
 // export const checkIfPostProcessingRequired = (postProcessingManagerOverride?) => {

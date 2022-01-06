@@ -16,7 +16,7 @@ module.exports = (api) => {
   return {
     env: {
       test: {
-        plugins: api.env() == 'test' ? testPlugins : normPlugins,
+        plugins: api.env() === 'test' ? testPlugins : normPlugins,
       },
       development: {
         plugins: normPlugins,

@@ -52,9 +52,9 @@ global.console = {
   // log: console.log, // console.log are ignored in tests
 
   // Keep native behaviour for other methods, use those to print out things in your own tests, not `console.log`
-  error: console.debug,
+  error: console.debug, // NOSONAR
   // error: jest.fn(),
-  warn: console.warn,
+  warn: console.warn, // NOSONAR
   // warn: jest.fn(),
   // info: console.info,
   info: jest.fn(),

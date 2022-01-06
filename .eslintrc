@@ -14,7 +14,6 @@
     "__dirname": "readonly",
     "settingsManager": "writable"
   },
-  "ignorePatterns": ["**/**/*.min.js", "**/**/tle.js", "src/js/lib/external/*"],
   "extends": ["eslint:recommended"],
   "parserOptions": {
     "sourceType": "module",

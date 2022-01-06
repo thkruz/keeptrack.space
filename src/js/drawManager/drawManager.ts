@@ -8,6 +8,7 @@ import { mat4 } from 'gl-matrix';
 import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { spaceObjType2Str } from '../lib/spaceObjType2Str';
+import { screenShot, watermarkedDataUrl } from './screenShot';
 
 let satHoverBoxNode1: HTMLDivElement;
 let satHoverBoxNode2: HTMLDivElement;
@@ -334,7 +335,7 @@ export const drawLoop = (preciseDt: number) => {
   if (settingsManager.isDemoModeOn) drawManager.demoMode();
 
   // If in the process of taking a screenshot complete work for that
-  if (settingsManager.screenshotMode) drawManager.screenShot();
+  if (settingsManager.screenshotMode) screenShot();
 };
 
 export const updateLoop = () => {
@@ -457,67 +458,6 @@ export const satCalculate = () => {
     }
     drawManager.lastSelectedSat = objectManager.selectedSat;
     objectManager.lastSelectedSat(objectManager.selectedSat);
-  }
-};
-
-export const screenShot = () => {
-  if (!settingsManager.queuedScreenshot) {
-    drawManager.resizeCanvas();
-    settingsManager.queuedScreenshot = true;
-  } else {
-    let link = document.createElement('a');
-    link.download = 'keeptrack.png';
-
-    let d = new Date();
-    let n = d.getFullYear();
-    let copyrightStr;
-    if (!settingsManager.copyrightOveride) {
-      copyrightStr = `©${n} KEEPTRACK.SPACE`;
-    } else {
-      copyrightStr = '';
-    }
-
-    link.href = drawManager.watermarkedDataUrl(drawManager.canvas, copyrightStr);
-    link.click();
-    settingsManager.screenshotMode = false;
-    settingsManager.queuedScreenshot = false;
-    drawManager.resizeCanvas();
-  }
-};
-
-export const watermarkedDataUrl = (canvas: HTMLCanvasElement, text: string) => {
-  try {
-    let tempCanvas = document.createElement('canvas');
-    let tempCtx = tempCanvas.getContext('2d');
-    let cw, ch;
-    cw = tempCanvas.width = canvas.width;
-    ch = tempCanvas.height = canvas.height;
-    tempCtx.drawImage(canvas, 0, 0);
-    tempCtx.font = '24px nasalization';
-    let textWidth = tempCtx.measureText(text).width;
-    tempCtx.globalAlpha = 1.0;
-    tempCtx.fillStyle = 'white';
-    tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
-    // tempCtx.fillStyle ='black'
-    // tempCtx.fillText(text,cw-textWidth-10+2,ch-20+2)
-    // just testing by adding tempCanvas to document
-
-    if (settingsManager.classificationStr !== '') {
-      tempCtx.font = '24px nasalization';
-      textWidth = tempCtx.measureText('Secret').width;
-      tempCtx.globalAlpha = 1.0;
-      tempCtx.fillStyle = 'red';
-      tempCtx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, ch - 20);
-      tempCtx.fillText(settingsManager.classificationStr, cw / 2 - textWidth, 34);
-    }
-
-    document.body.appendChild(tempCanvas);
-    let image = tempCanvas.toDataURL();
-    tempCanvas.parentNode.removeChild(tempCanvas);
-    return image;
-  } catch (error) {
-    console.log(error);
-    return null;
   }
 };
 
@@ -1019,7 +959,8 @@ export const drawManager: DrawManager = {
     inView: false,
     satId: -1,
   }),
-  canvas: <HTMLCanvasElement>null,
+  // Canvas needs to account for jest
+  canvas: process ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>document.getElementById('keeptrack-canvas'),
   sceneManager: null,
   gl: <WebGL2RenderingContext>null,
   isNeedPostProcessing: false,
@@ -1032,10 +973,3 @@ export const drawManager: DrawManager = {
   lastSelectedSat: -1,
   dotsManager: null,
 };
-
-// See if we are running jest right now for testing
-if (typeof process !== 'undefined') {
-  drawManager.canvas = (<any>document).canvas;
-} else {
-  drawManager.canvas = <HTMLCanvasElement>document.getElementById('keeptrack-canvas');
-}

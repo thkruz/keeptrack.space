@@ -216,8 +216,6 @@ export const selectSat = (i: number): void => {
 
   objectManager.setSelectedSat(i);
 
-  // satSet.setColorScheme(settingsManager.currentColorScheme, true);
-
   if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
     $('#menu-lookangles').removeClass('bmenu-item-disabled');
   }
@@ -453,11 +451,11 @@ export const addSatExtraFunctions = (i: number) => {
         // ECI to ECF
         const positionEcf = satellite.eciToEcf(satSet.satData[i].position, gmst);
         // ECF to RAE
-        const Rae = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+        const rae = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
         const inview = satellite.checkIsInView(sensor, {
-          az: Rae.az * RAD2DEG,
-          el: Rae.el * RAD2DEG,
-          rng: Rae.rng,
+          az: rae.az * RAD2DEG,
+          el: rae.el * RAD2DEG,
+          rng: rae.rng,
         });
         const lla = satellite.eciToGeodetic(satSet.satData[i].position, gmst);
         return {
@@ -517,7 +515,7 @@ export const addSatExtraFunctions = (i: number) => {
       if (nowLat < futLat) return 'N';
       if (nowLat > futLat) return 'S';
       if (nowLat === futLat) {
-        futureTime = timeManager.getOffsetTimeObj(20000, timeManager.calculateSimulationTime());
+        // futureTime = timeManager.getOffsetTimeObj(20000, timeManager.calculateSimulationTime());
         // futureTEARR = satSet.satData[i].getTEARR(futureTime);
         if (nowLat < futLat) return 'N';
         if (nowLat > futLat) return 'S';

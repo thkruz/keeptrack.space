@@ -237,8 +237,6 @@ export const processSocratesHtm = (socratesHTM: Document): void => {
   // SOCRATES Menu
   const tbl = <HTMLTableElement>document.getElementById('socrates-table'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
-
-  // var tblLength = 0;                                   // Iniially no rows to the table
   let tr = tbl.insertRow();
   let tdT = tr.insertCell();
   tdT.appendChild(document.createTextNode('Time'));

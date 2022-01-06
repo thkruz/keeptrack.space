@@ -9,7 +9,7 @@ import 'webgl-mock';
 jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
 
 // eslint-disable-next-line no-sync
-const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.htm'), 'utf8').toString();
+const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.html'), 'utf8').toString();
 const body = '<body>';
 const bodyEnd = '</body>';
 const docBody = documentHTML.substring(documentHTML.indexOf(body) + body.length, documentHTML.indexOf(bodyEnd));

@@ -1053,36 +1053,30 @@ export interface EarthObject {
 }
 
 export interface CatalogManager {
-  searchBusRegex(satData: SatObject[], text: string): SatObject[];
-  resetSatInView();
+  resetSatInView(): void;
   convertIdArrayToSatnumArray(aehf: any): any;
-  init();
+  init(): void;
   gotExtraData: boolean;
   convertSatnumArrayToIdArray: any;
   exportTle2Csv: any;
   exportTle2Txt: any;
   getIdFromEci: (eci: any) => number;
-  getSatInSun: () => Int8Array;
-  getSatInView: () => Int8Array;
+  getSatInSun(): Int8Array;
+  getSatInView(): Int8Array;
   getSatInViewOnly: (i: number) => any;
-  getSatVel: () => Float32Array;
+  getSatVel(): Float32Array;
   mergeSat: any;
   resetSatInSun: any;
   satExtraData: any;
   selectSat: (i: number) => any;
-  onCruncherReady();
+  onCruncherReady(): void;
   gsInfo: any;
   queryStr: any;
-  searchYear(satData: SatObject[], data: any): SatObject[];
-  searchYearOrLess(satData: SatObject[], data: any): SatObject[];
-  getIdFromIntlDes(arg0: any);
-  searchNameRegex(satData: SatObject[], data: any): SatObject[];
-  searchShapeRegex(satData: SatObject[], text: string): SatObject[];
-  searchCountryRegex(satData: SatObject[], data: any): SatObject[];
+  getIdFromIntlDes(intlDes: string): number;
   insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string);
   setSat(x: number, arg1: any);
-  getSatFromObjNum(arg0: number);
-  getIdFromStarName(pname: any);
+  getSatFromObjNum(objNum: number): SatObject;
+  getIdFromStarName(pname: string): number;
   satSensorMarkerArray: any;
   setColorScheme: (currentColorScheme: ColorRuleSet, force?: boolean) => void;
   sunECI: { x: number; y: number; z: number };
@@ -1100,6 +1094,16 @@ export interface CatalogManager {
   cosparIndex: { [key: string]: number };
   orbitalSats: number;
   missileSats: number;
+  search: CatalogSearches;
+}
+
+export interface CatalogSearches {
+  year(satData: SatObject[], yr: number): SatObject[];
+  yearOrLess(satData: SatObject[], yr: number): SatObject[];
+  name(satData: SatObject[], regex: RegExp): SatObject[];
+  shape(satData: SatObject[], text: string): SatObject[];
+  bus(satData: SatObject[], text: string): SatObject[];
+  type(satData: SatObject[], type: SpaceObjectType): SatObject[];
 }
 
 export type Kilometers = number;

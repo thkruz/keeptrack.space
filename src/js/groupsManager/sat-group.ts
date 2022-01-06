@@ -1,4 +1,5 @@
 import { CatalogManager, MissileObject, OrbitManager, SatGroupCollection, SatObject } from '../api/keepTrackTypes';
+import { country } from '../satSet/search';
 
 export class SatGroup {
   sats: SatGroupCollection[];
@@ -21,16 +22,16 @@ export class SatGroup {
         });
         break;
       case 'year':
-        this.sats = satSet
-          .searchYear(satSet.satData, data)
+        this.sats = satSet.search
+          .year(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,
           }));
         break;
       case 'yearOrLess':
-        this.sats = satSet
-          .searchYearOrLess(satSet.satData, data)
+        this.sats = satSet.search
+          .yearOrLess(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,
@@ -47,32 +48,31 @@ export class SatGroup {
           }));
         break;
       case 'nameRegex':
-        this.sats = satSet
-          .searchNameRegex(satSet.satData, data)
+        this.sats = satSet.search
+          .name(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,
           }));
         break;
       case 'countryRegex':
-        this.sats = satSet
-          .searchCountryRegex(satSet.satData, data)
+        this.sats = country(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,
           }));
         break;
       case 'shapeRegex':
-        this.sats = satSet
-          .searchShapeRegex(satSet.satData, data)
+        this.sats = satSet.search
+          .shape(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,
           }));
         break;
       case 'busRegex':
-        this.sats = satSet
-          .searchBusRegex(satSet.satData, data)
+        this.sats = satSet.search
+          .bus(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,

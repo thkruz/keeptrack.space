@@ -52,7 +52,7 @@ import {
   getSensorFromSensorName,
 } from './catalogSupport/getters';
 import { exportTle2Csv, exportTle2Txt } from './exportTle';
-import { searchBusRegex, searchCountryRegex, searchNameRegex, searchShapeRegex, searchYear, searchYearOrLess } from './search';
+import { search } from './search';
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 
 // ******************** Initialization ********************
@@ -565,15 +565,10 @@ export let satSet: CatalogManager = {
   satExtraData: null,
   satSensorMarkerArray: null,
   sccIndex: null,
-  searchCountryRegex: searchCountryRegex,
-  searchShapeRegex: searchShapeRegex,
-  searchBusRegex: searchBusRegex,
-  searchNameRegex: searchNameRegex,
-  searchYear: searchYear,
-  searchYearOrLess: searchYearOrLess,
   selectSat: selectSat,
   setColorScheme: <any>setColorScheme,
   setHover: setHover,
   setSat: setSat,
   sunECI: null,
+  search: search,
 };

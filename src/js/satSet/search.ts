@@ -1,42 +1,32 @@
 import { SatObject } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 
-export const searchYear = (satData: any, year: any) => {
-  const result = satData.filter((sat: SatObject) => {
+export const year = (satData: SatObject[], yr: number) =>
+  satData.filter((sat) => {
     const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
-    return parseInt(tleYear) == year;
+    return parseInt(tleYear) == yr;
   });
-  return result;
-};
-
-export const searchYearOrLess = (satData: any, year: number) => {
-  const result = satData.filter((sat: SatObject) => {
+export const yearOrLess = (satData: SatObject[], yr: number) =>
+  satData.filter((sat) => {
     const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
-    if (year >= 59 && year < 100) {
-      return parseInt(tleYear) <= year && parseInt(tleYear) >= 59;
+    if (yr >= 59 && yr < 100) {
+      return parseInt(tleYear) <= yr && parseInt(tleYear) >= 59;
     } else {
-      return parseInt(tleYear) <= year || parseInt(tleYear) >= 59;
+      return parseInt(tleYear) <= yr || parseInt(tleYear) >= 59;
     }
   });
-  return result;
-};
+export const name = (satData: SatObject[], regex: RegExp): SatObject[] => satData.filter((sat) => !!regex.test(sat.name));
+export const country = (satData: SatObject[], regex: RegExp): SatObject[] => satData.filter((sat) => !!regex.test(sat.country));
+export const shape = (satData: SatObject[], text: string): SatObject[] => satData.filter((sat) => sat.shape === text);
+export const bus = (satData: SatObject[], text: string): SatObject[] => satData.filter((sat) => sat.bus === text);
+export const type = (satData: SatObject[], objType: SpaceObjectType): SatObject[] => satData.filter((sat) => sat.type === objType);
 
-// eslint-disable-next-line no-unused-vars
-export const searchNameRegex = (satData: any, regex: { test: (arg0: any) => any }): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => !!regex.test(sat.name)); // NOSONAR
-  return result;
-};
-// eslint-disable-next-line no-unused-vars
-export const searchCountryRegex = (satData: any, regex: { test: (arg0: any) => any }): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => !!regex.test(sat.country)); // NOSONAR
-  return result;
-};
-
-export const searchShapeRegex = (satData: any, text: string): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => sat.shape === text); // NOSONAR
-  return result;
-};
-
-export const searchBusRegex = (satData: any, text: string): SatObject[] => {
-  const result = satData.filter((sat: SatObject) => sat.bus === text); // NOSONAR
-  return result;
+export const search = {
+  year,
+  yearOrLess,
+  name,
+  country,
+  shape,
+  bus,
+  type,
 };

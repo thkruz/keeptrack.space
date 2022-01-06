@@ -448,7 +448,6 @@ export const satCalculate = () => {
         lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name));
       }
-      // TODO: #281 keepTrackApi.programs.mapManager.updateMap should be a callback
       if (keepTrackApi.programs.mapManager) {
         keepTrackApi.programs.mapManager.updateMap();
       }

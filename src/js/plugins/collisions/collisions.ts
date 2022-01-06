@@ -210,7 +210,7 @@ export const socrates = (row: number) => {
 export const processSocratesHtm = (socratesHTM: Document): void => {
   const { socratesObjOne, socratesObjTwo } = keepTrackApi.programs.socrates;
 
-  // Load SOCRATES.htm so we can use it instead of index.htm
+  // Load SOCRATES.htm so we can use it instead of index.html
   const tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
   const tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
 

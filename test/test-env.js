@@ -62,8 +62,6 @@ global.console = {
   debug: jest.fn(),
 };
 
-// document.body.innerHTML += '<div id="keeptrack-canvas"></div>';
-
 window.HTMLMediaElement.prototype.load = () => {
   /* do nothing */
 };

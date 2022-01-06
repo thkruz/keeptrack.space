@@ -918,7 +918,7 @@ export const drawManager: DrawManager = {
     satId: -1,
   }),
   // Canvas needs to account for jest
-  canvas: process ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>document.getElementById('keeptrack-canvas'),
+  canvas: typeof process !== 'undefined' ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>document.getElementById('keeptrack-canvas'),
   sceneManager: null,
   gl: <WebGL2RenderingContext>null,
   isNeedPostProcessing: false,

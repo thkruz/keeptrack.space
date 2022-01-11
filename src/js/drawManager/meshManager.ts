@@ -298,58 +298,62 @@ export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: 
 };
 
 export const update = (timeManager: TimeManager, sat: SatObject) => {
-  meshManager.currentModel.id = sat?.id || -1;
-  meshManager.currentModel.static = sat?.static || false;
+  try {
+    meshManager.currentModel.id = sat?.id || -1;
+    meshManager.currentModel.static = sat?.static || false;
 
-  if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;
-  if (settingsManager.modelsOnSatelliteViewOverride) return;
+    if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;
+    if (settingsManager.modelsOnSatelliteViewOverride) return;
 
-  // Try to reduce some jitter
-  if (
-    typeof meshManager.currentModel.position !== 'undefined' &&
-    meshManager.currentModel.position.x > sat.position.x - 1.0 &&
-    meshManager.currentModel.position.x < sat.position.x + 1.0 &&
-    meshManager.currentModel.position.y > sat.position.y - 1.0 &&
-    meshManager.currentModel.position.y < sat.position.y + 1.0 &&
-    meshManager.currentModel.position.z > sat.position.z - 1.0 &&
-    meshManager.currentModel.position.z < sat.position.z + 1.0
-  ) {
-    // Lerp to smooth difference between SGP4 and position+velocity
-    meshManager.lerpPosition(sat.position, timeManager.drawDt);
-  } else {
-    meshManager.updatePosition(sat.position);
-  }
-
-  meshManager.currentModel.inSun = sat.isInSun();
-  meshManager.currentModel.nadirYaw = null;
-
-  if (settingsManager.meshOverride) {
-    if (typeof meshManager.models[settingsManager.meshOverride] === 'undefined') {
-      console.debug(`Mesh override not found: ${settingsManager.meshOverride}`);
-      settingsManager.meshOverride = null;
+    // Try to reduce some jitter
+    if (
+      typeof meshManager.currentModel.position !== 'undefined' &&
+      meshManager.currentModel.position.x > sat.position.x - 1.0 &&
+      meshManager.currentModel.position.x < sat.position.x + 1.0 &&
+      meshManager.currentModel.position.y > sat.position.y - 1.0 &&
+      meshManager.currentModel.position.y < sat.position.y + 1.0 &&
+      meshManager.currentModel.position.z > sat.position.z - 1.0 &&
+      meshManager.currentModel.position.z < sat.position.z + 1.0
+    ) {
+      // Lerp to smooth difference between SGP4 and position+velocity
+      meshManager.lerpPosition(sat.position, timeManager.drawDt);
     } else {
-      meshManager.currentModel.model = meshManager.models[settingsManager.meshOverride];
-      return;
+      meshManager.updatePosition(sat.position);
     }
-  }
 
-  switch (sat.type) {
-    case SpaceObjectType.PAYLOAD:
-      getSatelliteModel(sat);
-      return;
-    case SpaceObjectType.ROCKET_BODY:
-      // TODO: Add more rocket body models
-      meshManager.currentModel.model = meshManager.models.rocketbody;
-      return;
-    case SpaceObjectType.DEBRIS:
-      // TODO: Add more debris models
-      if (parseInt(sat.sccNum) <= 20000) meshManager.currentModel.model = meshManager.models.debris0;
-      if (parseInt(sat.sccNum) <= 35000) meshManager.currentModel.model = meshManager.models.debris1;
-      if (parseInt(sat.sccNum) > 35000) meshManager.currentModel.model = meshManager.models.debris2;
-      return;
-    default:
-      // Generic Model
-      meshManager.currentModel.model = meshManager.models.sat2;
+    meshManager.currentModel.inSun = sat.isInSun();
+    meshManager.currentModel.nadirYaw = null;
+
+    if (settingsManager.meshOverride) {
+      if (typeof meshManager.models[settingsManager.meshOverride] === 'undefined') {
+        console.debug(`Mesh override not found: ${settingsManager.meshOverride}`);
+        settingsManager.meshOverride = null;
+      } else {
+        meshManager.currentModel.model = meshManager.models[settingsManager.meshOverride];
+        return;
+      }
+    }
+
+    switch (sat.type) {
+      case SpaceObjectType.PAYLOAD:
+        getSatelliteModel(sat);
+        return;
+      case SpaceObjectType.ROCKET_BODY:
+        // TODO: Add more rocket body models
+        meshManager.currentModel.model = meshManager.models.rocketbody;
+        return;
+      case SpaceObjectType.DEBRIS:
+        // TODO: Add more debris models
+        if (parseInt(sat.sccNum) <= 20000) meshManager.currentModel.model = meshManager.models.debris0;
+        if (parseInt(sat.sccNum) <= 35000) meshManager.currentModel.model = meshManager.models.debris1;
+        if (parseInt(sat.sccNum) > 35000) meshManager.currentModel.model = meshManager.models.debris2;
+        return;
+      default:
+        // Generic Model
+        meshManager.currentModel.model = meshManager.models.sat2;
+    }
+  } catch {
+    // Don't Let meshManager break everything
   }
 };
 

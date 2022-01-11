@@ -40,7 +40,7 @@ export const spaceObjType2Str = (satType: SpaceObjectType): string => {
       return 'Launch Position';
     case SpaceObjectType.LAUNCH_FACILITY:
       return 'Launch Facility';
-    case SpaceObjectType.CONTORL_FACILITY:
+    case SpaceObjectType.CONTROL_FACILITY:
       return 'Control Facility';
     case SpaceObjectType.GROUND_SENSOR_STATION:
       return 'Ground Sensor Station';

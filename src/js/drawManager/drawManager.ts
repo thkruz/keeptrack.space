@@ -7,44 +7,28 @@ import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/sele
 import { mat4 } from 'gl-matrix';
 import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
-import { spaceObjType2Str } from '../lib/spaceObjType2Str';
 import { demoMode } from './demoMode';
+import { hoverBoxOnSat, hoverManager, updateHover } from './hoverManager/hoverManager';
 import { screenShot, watermarkedDataUrl } from './screenShot';
 
-let satHoverBoxNode1: HTMLDivElement;
-let satHoverBoxNode2: HTMLDivElement;
-let satHoverBoxNode3: HTMLDivElement;
-let satHoverBoxDOM: HTMLDivElement;
 let satMiniBox: HTMLDivElement;
-
-let updateHoverDelay = 0;
-let updateHoverDelayLimit = 3;
 let satLabelModeLastTime = 0;
 let isSatMiniBoxInUse = false;
 let labelCount;
 let hoverBoxOnSatMiniElements = null;
 let satHoverMiniDOM;
 settingsManager.isShowNextPass = false;
-let updateHoverSatId;
-let isHoverBoxVisible = false;
-let isShowDistance = true;
-let gl: WebGL2RenderingContext;
 
 export const init = () => {
-  satHoverBoxNode1 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox1'));
-  satHoverBoxNode2 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox2'));
-  satHoverBoxNode3 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox3'));
-  satHoverBoxDOM = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox'));
   satMiniBox = <HTMLDivElement>(<unknown>document.getElementById('sat-minibox'));
-
+  hoverManager.init();
   drawManager.startWithOrbits();
+
+  // Reinitialize the canvas on mobile rotation
+  window.addEventListener('orientationchange', function () {
+    drawManager.isRotationEvent = true;
+  });
 };
-
-// Reinitialize the canvas on mobile rotation
-window.addEventListener('orientationchange', function () {
-  drawManager.isRotationEvent = true;
-});
-
 export const glInit = async () => {
   // Ensure the canvas is available
   if (drawManager.canvas === null) {
@@ -60,7 +44,8 @@ export const glInit = async () => {
     console.debug(e);
     drawManager.glInit();
   });
-  // drawManager Scope
+
+  let gl: WebGL2RenderingContext;
   if (typeof process !== 'undefined') {
     gl = <WebGL2RenderingContext>drawManager.canvas.getContext('webgl', {
       alpha: false,
@@ -101,7 +86,6 @@ export const glInit = async () => {
   drawManager.postProcessingManager = postProcessingManager;
   return gl;
 };
-
 export const createDotsManager = (gl: WebGL2RenderingContext) => {
   gl ??= drawManager.gl; // use the global gl if not passed in
   if (typeof gl === 'undefined') throw new Error('gl is undefined');
@@ -112,7 +96,6 @@ export const createDotsManager = (gl: WebGL2RenderingContext) => {
   dotsManager.init(gl);
   return drawManager.dotsManager;
 };
-
 export const loadScene = async () => {
   const { gl } = keepTrackApi.programs.drawManager;
   // Make this public
@@ -129,15 +112,22 @@ export const loadScene = async () => {
     console.debug(error);
   }
 };
-
-export const resizeCanvas = () => {
-  const { gl } = keepTrackApi.programs.drawManager;
-
+export const getCanvasInfo = () => {
   // Using minimum allows the canvas to be full screen without fighting with scrollbars
   const cw = document.documentElement.clientWidth || 0;
   const iw = window.innerWidth || 0;
   const vw = Math.min.apply(null, [cw, iw].filter(Boolean));
   const vh = Math.min(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+  return { vw, vh };
+};
+export const setCanvasSize = (height: number, width: number) => {
+  drawManager.canvas.width = width;
+  drawManager.canvas.height = height;
+};
+export const resizeCanvas = () => {
+  const { gl } = keepTrackApi.programs.drawManager;
+  const { vw, vh } = getCanvasInfo();
 
   // If taking a screenshot then resize no matter what to get high resolution
   if (gl.canvas.width != vw || gl.canvas.height != vh) {
@@ -145,35 +135,23 @@ export const resizeCanvas = () => {
     if (settingsManager.isAutoResizeCanvas) {
       // If this is a cellphone avoid the keyboard forcing resizes but
       // always resize on rotation
-      if (settingsManager.isMobileModeEnabled) {
-        // Changes more than 35% of height but not due to rotation are likely
-        // the keyboard! Ignore them
-        // But Make sure we have set this at least once to trigger
-        if (
-          (Math.abs((vw - drawManager.canvas.width) / drawManager.canvas.width) < 0.35 && Math.abs((vh - drawManager.canvas.height) / drawManager.canvas.height) > 0.35) ||
-          drawManager.isRotationEvent ||
-          typeof drawManager.pMatrix == 'undefined'
-        ) {
-          drawManager.canvas.width = vw;
-          drawManager.canvas.height = vh;
-          drawManager.isRotationEvent = false;
-        } else {
-          // No Canvas Change
-          return;
-        }
+      const oldWidth = drawManager.canvas.width;
+      const oldHeight = drawManager.canvas.height;
+      // Changes more than 35% of height but not due to rotation are likely the keyboard! Ignore them
+      // but make sure we have set this at least once to trigger
+      const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
+
+      if (!settingsManager.isMobileModeEnabled || isKeyboardOut || drawManager.isRotationEvent || typeof drawManager.pMatrix == 'undefined') {
+        setCanvasSize(vh, vw);
+        drawManager.isRotationEvent = false;
       } else {
-        drawManager.canvas.width = vw;
-        drawManager.canvas.height = vh;
+        // No Canvas Change
+        return;
       }
     }
   } else {
-    if (settingsManager.screenshotMode) {
-      drawManager.canvas.width = settingsManager.hiResWidth;
-      drawManager.canvas.height = settingsManager.hiResHeight;
-    } else {
-      // No screen size change and not taking a photo
-      return;
-    }
+    if (!settingsManager.screenshotMode) return;
+    setCanvasSize(settingsManager.hiResWidth, settingsManager.hiResHeight);
   }
 
   gl.viewport(0, 0, drawManager.canvas.width, drawManager.canvas.height);
@@ -185,7 +163,6 @@ export const resizeCanvas = () => {
   // Fix the gpu picker texture size if it has already been created
   if (typeof dotsManager?.pickingProgram !== 'undefined') dotsManager.createPickingProgram(drawManager.gl);
 };
-
 export const calculatePMatrix = () => {
   const { gl } = keepTrackApi.programs.drawManager;
   drawManager.pMatrix = <mat4>(<unknown>glm.mat4.create());
@@ -195,7 +172,6 @@ export const calculatePMatrix = () => {
   const eciToOpenGlMat = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
   glm.mat4.mul(<any>drawManager.pMatrix, drawManager.pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
 };
-
 export const startWithOrbits = async () => {
   if (settingsManager.startWithOrbitsDisplayed) {
     const { groupsManager, orbitManager, satSet } = keepTrackApi.programs;
@@ -207,12 +183,9 @@ export const startWithOrbits = async () => {
     settingsManager.isOrbitOverlayVisible = true;
   }
 };
-
 export const drawLoop = (preciseDt: number) => {
   // Restart the draw loop when ready to draw again
   requestAnimationFrame(drawLoop);
-  // if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) return;
-
   const { satSet, dotsManager, colorSchemeManager, mainCamera, orbitManager, lineManager, objectManager, timeManager } = keepTrackApi.programs;
 
   // Record milliseconds since last drawLoop - default is 0
@@ -274,7 +247,7 @@ export const drawLoop = (preciseDt: number) => {
   // Only if last frame was 30 FPS or more. readpixels used to determine which satellite is hovered
   // is the biggest performance hit and we should throttle that.
   if (1000 / timeManager.dt > 5 && !settingsManager.lowPerf) {
-    drawManager.updateHover();
+    updateHover();
   }
 
   // Do Post Processing
@@ -330,7 +303,6 @@ export const drawLoop = (preciseDt: number) => {
   // If in the process of taking a screenshot complete work for that
   if (settingsManager.screenshotMode) screenShot();
 };
-
 export const updateLoop = () => {
   // Calculate changes related to satellites objects
   satCalculate();
@@ -355,28 +327,25 @@ export const updateLoop = () => {
   mainCamera.update(drawManager.sat, drawManager.sensorPos);
   keepTrackApi.methods.updateLoop();
 };
+export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
+  drawManager = drawManagerOverride || drawManager;
+  const { gl } = keepTrackApi.programs.drawManager;
 
-export const drawOptionalScenery = () => {
-  // const { timeManager } = keepTrackApi.programs;
-  // if (1000 / timeManager.dt > settingsManager.fpsThrottle1) {
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
     if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
-
     const { mainCamera, objectManager } = keepTrackApi.programs;
-
     // Draw the Sun to the Godrays Frame Buffer
     sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godrays.frameBuffer);
 
     // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
-    sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.programs.occlusion, sceneManager.sun.godrays.frameBuffer);
-    // if (!settingsManager.modelsOnSatelliteViewOverride && mainCamera.cameraType.current !== mainCamera.cameraType.Satellite) {
+    sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager?.postProcessingManager?.programs?.occlusion, sceneManager?.sun?.godrays?.frameBuffer);
     if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
       meshManager.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.programs.occlusion, sceneManager.sun.godrays.frameBuffer);
     }
     // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
     // todo: this should be a dynamic buffer not hardcoded to bufffer two
     drawManager.postProcessingManager.curBuffer = null;
-    sceneManager.sun.drawGodrays(gl, drawManager.postProcessingManager.curBuffer);
+    drawManager.sceneManager.sun.drawGodrays(gl, drawManager.postProcessingManager.curBuffer);
 
     // Apply two pass gaussian blur to the godrays to smooth them out
     // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
@@ -388,33 +357,18 @@ export const drawOptionalScenery = () => {
     // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
 
     // Draw the moon
-    sceneManager.moon.draw(drawManager.pMatrix, mainCamera.camMatrix);
+    drawManager.sceneManager.moon.draw(drawManager.pMatrix, mainCamera.camMatrix);
 
     keepTrackApi.methods.drawOptionalScenery();
   }
-  // }
   keepTrackApi.programs.drawManager.postProcessingManager.curBuffer = null;
 };
-
 export const satCalculate = () => {
   const { mainCamera, orbitManager, lineManager, objectManager, sensorManager, satSet, timeManager } = keepTrackApi.programs;
 
   if (objectManager.selectedSat !== -1) {
     drawManager.sat = satSet.getSat(objectManager.selectedSat);
-    // Can't Draw a Star
-    if (typeof drawManager.sat === 'undefined') return;
-
-    if (!drawManager.sat.static) {
-      mainCamera.snapToSat(drawManager.sat);
-
-      // if (drawManager.sat.missile || typeof meshManager == 'undefined') {
-      //   settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0];
-      // } else {
-      //   settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
-      // }
-
-      // if (!settingsManager.modelsOnSatelliteViewOverride && mainCamera.cameraType.current !== mainCamera.cameraType.Satellite) {
-    }
+    mainCamera.snapToSat(drawManager.sat);
     if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.id);
   } else {
     // Reset the selected satellite if no satellite is selected
@@ -426,15 +380,11 @@ export const satCalculate = () => {
       inView: 0,
     };
   }
-  try {
-    meshManager.update(timeManager, drawManager.sat);
-  } catch {
-    // Don't Let meshManager break everything
-  }
+
+  meshManager.update(timeManager, drawManager.sat);
+
   if (objectManager.selectedSat !== drawManager.lastSelectedSat) {
-    if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) {
-      orbitManager.clearSelectOrbit();
-    }
+    if (objectManager.selectedSat === -1 && !isselectedSatNegativeOne) orbitManager.clearSelectOrbit();
     selectSatManager.selectSat(objectManager.selectedSat, mainCamera);
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
@@ -442,18 +392,14 @@ export const satCalculate = () => {
         lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name));
       }
-      if (keepTrackApi.programs.mapManager) {
-        keepTrackApi.programs.mapManager.updateMap();
-      }
-    }
-    if (objectManager.selectedSat == -1) {
+      keepTrackApi.programs.mapManager?.updateMap();
+    } else {
       lineManager.drawWhenSelected();
     }
     drawManager.lastSelectedSat = objectManager.selectedSat;
     objectManager.lastSelectedSat(objectManager.selectedSat);
   }
 };
-
 export const orbitsAbove = () => {
   const { mainCamera, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
 
@@ -482,7 +428,7 @@ export const orbitsAbove = () => {
 
     let sat;
     labelCount = 0;
-    isHoverBoxVisible = true;
+    drawManager.isHoverBoxVisible = true;
 
     hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
 
@@ -540,248 +486,6 @@ export const orbitsAbove = () => {
     isSatMiniBoxInUse = false;
   }
 };
-
-let currentSearchSats;
-export const updateHover = () => {
-  const { mainCamera, orbitManager, uiManager, searchBox, satSet, timeManager } = keepTrackApi.programs;
-
-  if (searchBox.isResultBoxOpen() && !settingsManager.disableUI && !settingsManager.lowPerf) {
-    currentSearchSats = searchBox.getLastResultGroup();
-    if (typeof currentSearchSats !== 'undefined') {
-      currentSearchSats = currentSearchSats['sats'];
-      if (drawManager.updateHoverI >= currentSearchSats.length) drawManager.updateHoverI = 0;
-      for (let i = 0; drawManager.updateHoverI < currentSearchSats.length && i < 5; drawManager.updateHoverI++, i++) {
-        orbitManager.updateOrbitBuffer(currentSearchSats[drawManager.updateHoverI].satId);
-      }
-    }
-  }
-  if (!settingsManager.disableUI && searchBox.isHovering()) {
-    updateHoverSatId = uiManager.searchBox.getHoverSat();
-    const satScreenPositionArray = satSet.getScreenCoords(updateHoverSatId, drawManager.pMatrix, mainCamera.camMatrix);
-    // if (!mainCamera.earthHitTest(gl, pickColorBuf, satScreenPositionArray.x, satScreenPositionArray.y)) {
-    try {
-      drawManager.hoverBoxOnSat(updateHoverSatId, satScreenPositionArray.x, satScreenPositionArray.y);
-    } catch (e) {
-      // Intentionally Empty
-    }
-    // } else {
-    //   drawManager.hoverBoxOnSat(-1, 0, 0)
-    // }
-  } else {
-    // gl.readPixels in uiInput.getSatIdFromCoord creates a lot of jank
-    // Earlier in the loop we decided how much to throttle updateHover
-    // if we skip it this loop, we want to still draw the last thing
-    // it was looking at
-
-    if (1000 / timeManager.dt < 15) {
-      updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
-    } else if (1000 / timeManager.dt < 30) {
-      updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
-    } else {
-      if (updateHoverDelayLimit > 0) --updateHoverDelayLimit;
-    }
-
-    if (mainCamera.isDragging || settingsManager.isMobileModeEnabled) {
-      return;
-    }
-
-    if (++updateHoverDelay >= updateHoverDelayLimit) {
-      updateHoverDelay = 0;
-      uiManager.uiInput.mouseSat = uiManager.uiInput.getSatIdFromCoord(mainCamera.mouseX, mainCamera.mouseY);
-    }
-
-    if (settingsManager.enableHoverOrbits) {
-      if (uiManager.uiInput.mouseSat !== -1 && keepTrackApi.programs.satSet.satData[uiManager.uiInput.mouseSat].type !== SpaceObjectType.STAR) {
-        orbitManager.setHoverOrbit(uiManager.uiInput.mouseSat);
-      } else {
-        orbitManager.clearHoverOrbit();
-      }
-      satSet.setHover(uiManager.uiInput.mouseSat);
-    }
-    if (settingsManager.enableHoverOverlay) {
-      drawManager.hoverBoxOnSat(uiManager.uiInput.mouseSat, mainCamera.mouseX, mainCamera.mouseY);
-    }
-  }
-};
-let sat2;
-export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
-  if (typeof satHoverBoxDOM === 'undefined' || satHoverBoxDOM === null) return;
-
-  const { starManager, mainCamera, objectManager, satellite, sensorManager, satSet, timeManager } = keepTrackApi.programs;
-
-  if (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && !settingsManager.isDemoModeOn) {
-    satHoverBoxDOM.style.display = 'none';
-    if (satId === -1) {
-      drawManager.canvas.style.cursor = 'default';
-    } else {
-      drawManager.canvas.style.cursor = 'pointer';
-    }
-    return;
-  }
-  if (satId === -1) {
-    if (!isHoverBoxVisible || !settingsManager.enableHoverOverlay) return;
-    if (objectManager.isStarManagerLoaded) {
-      if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
-    }
-    // satHoverBoxDOM.html('(none)')
-    satHoverBoxDOM.style.display = 'none';
-    drawManager.canvas.style.cursor = 'default';
-    isHoverBoxVisible = false;
-  } else if (!mainCamera.isDragging && settingsManager.enableHoverOverlay) {
-    // NOTE: The radar mesurement logic breaks if you call it a SatObject
-    const sat = <any>satSet.getSat(satId);
-    isHoverBoxVisible = true;
-
-    const parentNode = satHoverBoxDOM.parentNode;
-    if (parentNode == null) return;
-    const nextSibling = satHoverBoxDOM.nextSibling;
-    parentNode.removeChild(satHoverBoxDOM); // reflow
-
-    if (sat.static || sat.isRadarData) {
-      // TODO: This is a broken mess but only used offline
-      if (sat.type === SpaceObjectType.LAUNCH_FACILITY) {
-        let launchSite = objectManager.extractLaunchSite(sat.name);
-        satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
-        satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
-        satHoverBoxNode3.textContent = '';
-      } else if (sat.isRadarData) {
-        satHoverBoxNode1.innerHTML = 'Measurement: ' + sat.mId + '</br>Track: ' + sat.trackId + '</br>Object: ' + sat.objectId;
-        if (sat.missileComplex !== -1) {
-          satHoverBoxNode1.innerHTML += '</br>Missile Complex: ' + sat.missileComplex;
-          satHoverBoxNode1.innerHTML += '</br>Missile Object: ' + sat.missileObject;
-        }
-        if (parseInt(sat.sccNum) !== -1) satHoverBoxNode1.innerHTML += '</br>Satellite: ' + sat.sccNum;
-        if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
-          sat.rae = satellite.eci2Rae(sat.t, sat.position, sensorManager.currentSensor[0]);
-          sat.setRAE(sat.rae);
-        }
-        if (sensorManager.currentSensor !== sensorManager.defaultSensor) {
-          let measurementDate = new Date(sat.t);
-          satHoverBoxNode2.innerHTML =
-            `JDAY: ${timeManager.getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}` +
-            '</br>' +
-            'R: ' +
-            sat.rae.range.toFixed(2) +
-            ' A: ' +
-            sat.rae.az.toFixed(2) +
-            ' E: ' +
-            sat.rae.el.toFixed(2);
-        } else {
-          let measurementDate = new Date(sat.t);
-          satHoverBoxNode2.innerHTML = `JDAY: ${timeManager.getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}`;
-        }
-        satHoverBoxNode3.innerHTML =
-          'RCS: ' +
-          parseFloat(sat.rcs).toFixed(2) +
-          ' m^2 (' +
-          (10 ** (parseFloat(sat.rcs) / 10)).toFixed(2) +
-          ' dBsm)</br>Az Error: ' +
-          sat.azError.toFixed(2) +
-          '° El Error: ' +
-          sat.elError.toFixed(2) +
-          '°';
-      } else if (sat.type === SpaceObjectType.CONTORL_FACILITY) {
-        satHoverBoxNode1.textContent = sat.name;
-        satHoverBoxNode2.innerHTML = sat.country + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
-        satHoverBoxNode3.textContent = '';
-      } else if (sat.type === SpaceObjectType.STAR) {
-        const constellationName = starManager.findStarsConstellation(sat.name);
-        if (constellationName !== null) {
-          satHoverBoxNode1.innerHTML = sat.name + '</br>' + constellationName;
-        } else {
-          satHoverBoxNode1.textContent = sat.name;
-        }
-        satHoverBoxNode2.innerHTML = 'Star';
-        satHoverBoxNode3.innerHTML = 'RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg';
-        if (objectManager.lasthoveringSat !== satId && typeof sat !== 'undefined' && constellationName !== null) {
-          starManager.drawConstellations(constellationName);
-        }
-      } else {
-        satHoverBoxNode1.textContent = sat.name;
-        satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
-        satHoverBoxNode3.textContent = '';
-      }
-    } else if (sat.missile) {
-      satHoverBoxNode1.innerHTML = sat.name + '<br >' + sat.desc + '';
-      satHoverBoxNode2.textContent = '';
-      satHoverBoxNode3.textContent = '';
-    } else {
-      if (!settingsManager.enableHoverOverlay) return;
-      // Use this as a default if no UI
-      if (settingsManager.disableUI) {
-        satHoverBoxNode1.textContent = sat.name;
-        satHoverBoxNode2.textContent = sat.sccNum;
-        satHoverBoxNode3.textContent = objectManager.extractCountry(sat.country);
-      } else {
-        if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass && isShowDistance) {
-          satHoverBoxNode1.textContent = sat.name;
-          satHoverBoxNode2.textContent = sat.sccNum;
-          satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
-        } else if (isShowDistance) {
-          satHoverBoxNode1.textContent = sat.name;
-          sat2 = satSet.getSat(objectManager.selectedSat);
-          if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
-            const ric = satellite.sat2ric(sat, sat2);
-            satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
-            satHoverBoxNode3.innerHTML =
-              `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
-              `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
-          } else {
-            satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, sat2)}`;
-            satHoverBoxNode3.innerHTML =
-              'X: ' +
-              sat.position.x.toFixed(2) +
-              ' km' +
-              ' Y: ' +
-              sat.position.y.toFixed(2) +
-              ' km' +
-              ' Z: ' +
-              sat.position.z.toFixed(2) +
-              ' km' +
-              '</br>' +
-              'XDot: ' +
-              sat.velocity.x.toFixed(2) +
-              ' km/s' +
-              ' YDot: ' +
-              sat.velocity.y.toFixed(2) +
-              ' km/s' +
-              ' ZDot: ' +
-              sat.velocity.z.toFixed(2) +
-              ' km/s';
-          }
-        } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass) {
-          satHoverBoxNode1.textContent = sat.name;
-          satHoverBoxNode2.textContent = sat.sccNum;
-          satHoverBoxNode3.textContent = satellite.nextpass(sat);
-        } else {
-          satHoverBoxNode1.textContent = sat.name;
-          satHoverBoxNode2.textContent = sat.sccNum;
-          satHoverBoxNode3.innerHTML =
-            'X: ' +
-            sat.position.x.toFixed(2) +
-            ' Y: ' +
-            sat.position.y.toFixed(2) +
-            ' Z: ' +
-            sat.position.z.toFixed(2) +
-            '</br>X: ' +
-            sat.velocity.x.toFixed(2) +
-            ' Y: ' +
-            sat.velocity.y.toFixed(2) +
-            ' Z: ' +
-            sat.velocity.z.toFixed(2);
-        }
-      }
-    }
-
-    satHoverBoxDOM.style.display = 'block';
-    satHoverBoxDOM.style.textAlign = 'center';
-    satHoverBoxDOM.style.position = 'fixed';
-    satHoverBoxDOM.style.left = `${satX + 20}px`;
-    satHoverBoxDOM.style.top = `${satY - 10}px`;
-    drawManager.canvas.style.cursor = 'pointer';
-    parentNode.insertBefore(satHoverBoxDOM, nextSibling); // reflow
-  }
-};
 export const onDrawLoopComplete = (cb: () => void) => {
   if (typeof cb === 'undefined' || cb === null) {
     console.debug('onDrawLoopComplete: callback is undefined or null');
@@ -789,7 +493,6 @@ export const onDrawLoopComplete = (cb: () => void) => {
   }
   cb();
 };
-
 export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: SunObject, postProcessingManager: PostProcessingManager) => {
   if (typeof gl === 'undefined' || gl === null) throw new Error('gl is undefined or null');
   if (typeof sun === 'undefined' || sun === null) throw new Error('sun is undefined or null');
@@ -802,7 +505,6 @@ export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: Sun
   // Reset Flag now that textures are reinitialized
   drawManager.isPostProcessingResizeNeeded = false;
 };
-
 // export const checkIfPostProcessingRequired = (postProcessingManagerOverride?) => {
 //   if (postProcessingManagerOverride) drawManager.postProcessingManager = postProcessingManagerOverride;
 
@@ -846,7 +548,6 @@ export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: Sun
 //   // drawManager.postProcessingManager.switchFrameBuffer();
 //   drawManager.isNeedPostProcessing = false;
 // };
-
 export const clearFrameBuffers = (pickFb: WebGLFramebuffer, godFb: WebGLFramebuffer) => {
   const { gl } = keepTrackApi.programs.drawManager;
   // NOTE: clearColor is set here because two different colors are used. If you set it during
@@ -873,7 +574,7 @@ export const clearFrameBuffers = (pickFb: WebGLFramebuffer, godFb: WebGLFramebuf
   // gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
 };
 
-export const drawManager: DrawManager = {
+export let drawManager: DrawManager = {
   init: init,
   glInit: glInit,
   createDotsManager: createDotsManager,
@@ -930,4 +631,7 @@ export const drawManager: DrawManager = {
   sensorPos: null,
   lastSelectedSat: -1,
   dotsManager: null,
+  isHoverBoxVisible: false,
+  isShowDistance: true,
+  sat2: null,
 };

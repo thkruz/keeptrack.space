@@ -60,7 +60,7 @@ describe('spaceObjType2Str', () => {
     expect(spaceObjType2Str(SpaceObjectType.LAUNCH_FACILITY)).toBe('Launch Facility');
   });
   it('should return "Control Facility" for SpaceObjectType.CONTORL_FACILITY', () => {
-    expect(spaceObjType2Str(SpaceObjectType.CONTORL_FACILITY)).toBe('Control Facility');
+    expect(spaceObjType2Str(SpaceObjectType.CONTROL_FACILITY)).toBe('Control Facility');
   });
   it('should return "Ground Sensor Station" for SpaceObjectType.GROUND_SENSOR_STATION', () => {
     expect(spaceObjType2Str(SpaceObjectType.GROUND_SENSOR_STATION)).toBe('Ground Sensor Station');

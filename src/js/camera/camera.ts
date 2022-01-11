@@ -203,6 +203,8 @@ export const snapToSat = (sat: SatObject) => {
   However, the user might have broken out of the zoom snap or angle snap.
   If so, don't change those targets. */
 
+  if (typeof sat === 'undefined' || sat.static) return;
+
   if (camera.camAngleSnappedOnSat) {
     camera.camSnapToSat.pos = sat.position;
     camera.camSnapToSat.radius = Math.sqrt(camera.camSnapToSat.pos.x ** 2 + camera.camSnapToSat.pos.y ** 2);

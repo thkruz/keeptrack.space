@@ -65597,7 +65597,7 @@ export const controlSiteManager: ControlSiteManager = {
       Location: 'Fucino Italy',
       Parent: '',
       name: 'Galileo Ground Station', // https://www.esa.int/Applications/Navigation/Galileo/Galileo_IOV_ground_stations_Fucino
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
       lat: 41.978,
       lon: 13.604,
       alt: 0,
@@ -65611,7 +65611,7 @@ export const controlSiteManager: ControlSiteManager = {
 
     {
       name: 'Ramstein Air Base, Germany',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
       Code: 'RAM',
       StateC: '',
       C: '',
@@ -65631,7 +65631,7 @@ export const controlSiteManager: ControlSiteManager = {
     },
     {
       name: 'Osan Air Base, South Korea',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
       Code: '',
       StateC: '',
       C: '',
@@ -65651,7 +65651,7 @@ export const controlSiteManager: ControlSiteManager = {
     },
     {
       name: 'Al Udeid Air Base, Qatar',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
       Code: '',
       StateC: '',
       C: '',
@@ -65675,7 +65675,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Conrad Gateway, Montana', // https://www.esa.int/Applications/Navigation/Galileo/Galileo_IOV_ground_stations_Fucino
       Code: 'CMTG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65692,7 +65692,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Loring Gateway, Maine',
       Code: 'LMEG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65709,7 +65709,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Redmon Gateway, Washington',
       Code: 'RWAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65726,7 +65726,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Greenville Gateway, Pennsylvania',
       Code: 'GPAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65743,7 +65743,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Merrillan Gateway, Wisconsin', //https://fcc.report/IBFS/SES-LIC-20190906-01171
       Code: 'GPAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65760,7 +65760,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Kalama Gateway, Washington',
       Code: 'KWAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65777,7 +65777,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Hawthorne Gateway, California',
       Code: 'HCAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65794,7 +65794,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Arbuckle Gateway, California',
       Code: 'ACAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65811,7 +65811,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Beekmantown Gateway, New York',
       Code: 'BNYG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65828,7 +65828,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Charleston Gateway, Oregon',
       Code: 'CORG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65845,7 +65845,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Coalville Gateway, Utah',
       Code: 'CUTG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65862,7 +65862,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Panaca Gateway, Nevada',
       Code: 'PNVG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65879,7 +65879,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Boca Chica Gateway, Texas',
       Code: 'BTXG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65896,7 +65896,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'McGregor Gateway, Texas',
       Code: 'MTXG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65913,7 +65913,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Litchfield Gateway, Connecticut',
       Code: 'LCTG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65930,7 +65930,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Warren Gateway, Missouri',
       Code: 'WMOG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65947,7 +65947,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Nemaha Gateway, Nebraska',
       Code: 'NNEG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65964,7 +65964,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Manistique Gateway, Michigan',
       Code: 'MMIG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65981,7 +65981,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Slope County Gateway, North Dakota',
       Code: 'SNDG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -65998,7 +65998,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Los Angeles Gateway, California',
       Code: 'LCAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66015,7 +66015,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Cass County Gateway, North Dakota',
       Code: 'CNDG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66032,7 +66032,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Prudhoe Bay Gateway, Alaska',
       Code: 'PAKG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66049,7 +66049,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Sanderson Gateway, Texas',
       Code: 'STXG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66066,7 +66066,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Springer Gateway, Oklahoma',
       Code: 'SOKG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66083,7 +66083,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Hitterdal Gateway, Montana',
       Code: 'HMNG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66100,7 +66100,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Tionesta Gateway, California',
       Code: 'TCAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66117,7 +66117,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Butte Gateway, Montana',
       Code: 'BMTG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66134,7 +66134,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Colburn Gateway, Idaho',
       Code: 'CIDG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66151,7 +66151,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Baxley Gateway, Georgia',
       Code: 'BGAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66168,7 +66168,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Robertsdale Gateway, Alabama',
       Code: 'RALG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66185,7 +66185,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Roll Gateway, Arizona',
       Code: 'RAZG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66202,7 +66202,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Prosser Gateway, Washington',
       Code: 'PWAG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66219,7 +66219,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Vernon Gateway, Utah',
       Code: 'VUTG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66236,7 +66236,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Inman Gateway, Kansas',
       Code: 'IKSG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66253,7 +66253,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Evanston Gateway, Wyoming',
       Code: 'EWYG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66270,7 +66270,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Punta Gorda Gateway, Florida',
       Code: 'PFLG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66287,7 +66287,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Tracy City Gateway, Tennessee',
       Code: 'TTNG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66304,7 +66304,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Kuparuk Gateway, Alaska',
       Code: 'KAKG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 
@@ -66321,7 +66321,7 @@ export const controlSiteManager: ControlSiteManager = {
     {
       name: 'Gaffney Gateway, South Carolina',
       Code: 'GSCG',
-      type: SpaceObjectType.CONTORL_FACILITY,
+      type: SpaceObjectType.CONTROL_FACILITY,
 
       StateC: '',
 

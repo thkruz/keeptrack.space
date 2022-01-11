@@ -1,4 +1,4 @@
-import { keepTrackApiStubs } from '../api/apiMocks';
+import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms } from '../api/keepTrackTypes';
 import { demoMode } from './demoMode';
@@ -16,6 +16,10 @@ describe('drawManager.demoMode', () => {
 
   test('1', () => {
     settingsManager.demoModeInterval = -1;
+    keepTrackApi.programs.drawManager.demoModeSatellite = 0;
+    keepTrackApi.programs.satSet.getScreenCoords = () => ({ x: 0, y: 0 });
+    keepTrackApi.programs.drawManager.hoverBoxOnSat = () => {};
+    keepTrackApi.programs.satSet.satData = [defaultSat];
     let result: any = demoMode();
     expect(result).toMatchSnapshot();
     settingsManager.demoModeInterval = 1000;

@@ -1298,6 +1298,9 @@ export interface DrawManager {
   isUpdateTimeThrottle: boolean;
   sensorPos: any;
   lastSelectedSat: number;
+  isHoverBoxVisible: boolean;
+  isShowDistance: boolean;
+  sat2: SatObject;
 }
 
 export interface SocratesPlugin {

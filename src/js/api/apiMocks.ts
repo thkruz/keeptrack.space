@@ -202,6 +202,13 @@ export const keepTrackApiStubs = {
       resizeCanvas: jest.fn(),
       glInit: jest.fn(),
       gl: global.mocks.glMock,
+      canvas: {
+        style: {
+          cursor: '',
+        },
+        width: 0,
+        height: 0,
+      },
       selectSatManager: {
         selectSat: jest.fn(),
       },
@@ -223,6 +230,8 @@ export const keepTrackApiStubs = {
           sunvar: {
             gmst: 0,
           },
+          draw: jest.fn(),
+          drawGodrays: jest.fn(),
           godrays: {
             frameBuffer: {},
           },
@@ -232,8 +241,13 @@ export const keepTrackApiStubs = {
           loadHiRes: jest.fn(),
           loadHiResNight: jest.fn(),
           lightDirection: [0, 0, 0],
+          drawOcclusion: () => {},
+        },
+        moon: {
+          draw: jest.fn(),
         },
       },
+      startWithOrbits: jest.fn(),
     },
     dotsManager: {
       inSunData: new Float32Array([0, 0, 0]),
@@ -416,6 +430,7 @@ export const keepTrackApiStubs = {
       }),
       updateDopsTable: jest.fn(),
       map: () => ({ lat: 0, lon: 0 }),
+      sat2ric: () => ({ position: [0, 0, 0], velocity: [0, 0, 0] }),
       getTEARR: () => ({
         az: 0,
         el: 0,
@@ -553,12 +568,18 @@ export const keepTrackApiStubs = {
         fullscreenToggle: jest.fn(),
         checkMobileMode: jest.fn(),
       },
+      uiInput: {
+        getSatIdFromCoord: () => 0,
+        mouseSat: 0,
+      },
     },
     watchlist: {
       updateWatchlist: jest.fn(),
     },
   },
 };
+
+keepTrackApiStubs.programs.uiManager.searchBox = keepTrackApiStubs.programs.searchBox;
 
 keepTrackApiStubs.programs.groupsManager.Canada = keepTrackApiStubs.programs.groupsManager.SpaceStations;
 keepTrackApiStubs.programs.groupsManager.Japan = keepTrackApiStubs.programs.groupsManager.SpaceStations;

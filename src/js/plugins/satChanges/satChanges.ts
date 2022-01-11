@@ -79,7 +79,7 @@ export const satChng = (row: number): void => {
 
   if (row === -1 && satChngTable?.length === 0) {
     // Only generate the table if receiving the -1 argument for the first time
-    $.get('/analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
+    $.get('./analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
       ({ resp, satChngTable } = getSatChngJson(resp));
       satChange.satChngTable = satChngTable;
     });

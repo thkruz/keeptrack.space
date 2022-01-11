@@ -1,4 +1,4 @@
-import { saveAs } from './external/file-saver.min.js';
+import { saveAs } from 'file-saver';
 
 export { saveAs };
 

@@ -15,8 +15,8 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
+import Chart from 'chart.js/auto';
 import * as $ from 'jquery';
-import '../../js/lib/external/Chart.js';
 import { dateFormat } from '../../js/lib/external/dateFormat.js';
 import { sensorList } from '../../js/plugins/sensor/sensorList';
 import { satellite } from '../../js/satMath/satMath';
@@ -130,8 +130,20 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
 
     if (sensor.obsminaz < sensor.obsmaxaz) {
       if (
-        !(azimuth >= sensor.obsminaz && azimuth <= sensor.obsmaxaz && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && range <= sensor.obsmaxrange && range >= sensor.obsminrange) ||
-        (azimuth >= sensor.obsminaz2 && azimuth <= sensor.obsmaxaz2 && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2)
+        !(
+          azimuth >= sensor.obsminaz &&
+          azimuth <= sensor.obsmaxaz &&
+          elevation >= sensor.obsminel &&
+          elevation <= sensor.obsmaxel &&
+          range <= sensor.obsmaxrange &&
+          range >= sensor.obsminrange
+        ) ||
+        (azimuth >= sensor.obsminaz2 &&
+          azimuth <= sensor.obsmaxaz2 &&
+          elevation >= sensor.obsminel2 &&
+          elevation <= sensor.obsmaxel2 &&
+          range <= sensor.obsmaxrange2 &&
+          range >= sensor.obsminrange2)
       ) {
         if (tableType == 1) {
           return {
@@ -153,8 +165,16 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
       }
     }
     if (
-      ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && range <= sensor.obsmaxrange && range >= sensor.obsminrange) ||
-      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2)
+      ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
+        elevation >= sensor.obsminel &&
+        elevation <= sensor.obsmaxel &&
+        range <= sensor.obsmaxrange &&
+        range >= sensor.obsminrange) ||
+      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
+        elevation >= sensor.obsminel2 &&
+        elevation <= sensor.obsmaxel2 &&
+        range <= sensor.obsmaxrange2 &&
+        range >= sensor.obsminrange2)
     ) {
       if (satellite.isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
@@ -186,8 +206,18 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
         elevation1 = lookAngles1.el * RAD2DEG;
         range1 = lookAngles1.rng;
         if (
-          !((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) && elevation >= sensor.obsminel && elevation <= sensor.obsmaxel && range <= sensor.obsmaxrange && range >= sensor.obsminrange) ||
-          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) && elevation >= sensor.obsminel2 && elevation <= sensor.obsmaxel2 && range <= sensor.obsmaxrange2 && range >= sensor.obsminrange2)
+          !(
+            (azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
+            elevation >= sensor.obsminel &&
+            elevation <= sensor.obsmaxel &&
+            range <= sensor.obsmaxrange &&
+            range >= sensor.obsminrange
+          ) ||
+          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
+            elevation >= sensor.obsminel2 &&
+            elevation <= sensor.obsmaxel2 &&
+            range <= sensor.obsmaxrange2 &&
+            range >= sensor.obsminrange2)
         ) {
           return {
             time: dateFormat(now, 'isoDateTime', true),
@@ -223,8 +253,18 @@ satellite.calculateLookAngles = function (sat, sensor, tableType) {
           elevation1 = lookAngles1.el * RAD2DEG;
           range1 = lookAngles1.rng;
           if (
-            !((azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) && elevation1 >= sensor.obsminel && elevation1 <= sensor.obsmaxel && range1 <= sensor.obsmaxrange && range1 >= sensor.obsminrange) ||
-            ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) && elevation1 >= sensor.obsminel2 && elevation1 <= sensor.obsmaxel2 && range1 <= sensor.obsmaxrange2 && range1 >= sensor.obsminrange2)
+            !(
+              (azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) &&
+              elevation1 >= sensor.obsminel &&
+              elevation1 <= sensor.obsmaxel &&
+              range1 <= sensor.obsmaxrange &&
+              range1 >= sensor.obsminrange
+            ) ||
+            ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) &&
+              elevation1 >= sensor.obsminel2 &&
+              elevation1 <= sensor.obsmaxel2 &&
+              range1 <= sensor.obsmaxrange2 &&
+              range1 >= sensor.obsminrange2)
           ) {
             return {
               time: dateFormat(now, 'isoDateTime', true),
@@ -519,13 +559,13 @@ var drawChart = (data) => {
     },
     options: {
       scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: true,
-            },
-          },
-        ],
+        // yAxes: [
+        //   {
+        //     ticks: {
+        //       beginAtZero: true,
+        //     },
+        //   },
+        // ],
       },
     },
   });

@@ -28,10 +28,10 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
 import $ from 'jquery';
+import numeric from 'numeric';
 import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
-import { numeric } from '../lib/external/numeric';
 import { stringPad } from '../lib/helpers';
 import { jday } from '../timeManager/transforms';
 import { onCruncherReady, satCruncherOnMessage } from './catalogSupport/cruncherInteractions';

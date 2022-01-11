@@ -32,7 +32,7 @@ jobs:
       # Audit Package.json
       - name: NPM Audit Action
         uses: oke-py/npm-audit-action@v1.8.2
-        env:
+        with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
   eslint:
     needs: compliance

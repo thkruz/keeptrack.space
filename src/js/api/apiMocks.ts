@@ -241,7 +241,7 @@ export const keepTrackApiStubs = {
           loadHiRes: jest.fn(),
           loadHiResNight: jest.fn(),
           lightDirection: [0, 0, 0],
-          drawOcclusion: () => {},
+          drawOcclusion: () => {}, // NOSONAR
         },
         moon: {
           draw: jest.fn(),

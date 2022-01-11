@@ -22,7 +22,7 @@ SatGroup {
   "hasSat": [Function],
   "sats": Array [
     Object {
-      "satId": undefined,
+      "satId": 1,
     },
   ],
   "updateOrbits": [Function],
@@ -35,7 +35,7 @@ SatGroup {
   "hasSat": [Function],
   "sats": Array [
     Object {
-      "satId": undefined,
+      "satId": 1,
     },
   ],
   "updateOrbits": [Function],
@@ -62,7 +62,7 @@ SatGroup {
   "hasSat": [Function],
   "sats": Array [
     Object {
-      "satId": undefined,
+      "satId": 1,
     },
   ],
   "updateOrbits": [Function],
@@ -73,11 +73,7 @@ exports[`createGroup 6 1`] = `
 SatGroup {
   "forEach": [Function],
   "hasSat": [Function],
-  "sats": Array [
-    Object {
-      "satId": undefined,
-    },
-  ],
+  "sats": Array [],
   "updateOrbits": [Function],
 }
 `;

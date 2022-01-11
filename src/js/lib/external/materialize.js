@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /*!
  * Materialize v1.0.0-rc.2 (http://materializecss.com)
  * Copyright 2014-2017 Materialize
@@ -89,7 +91,11 @@ function _classCallCheck(instance, Constructor) {
 
   function find(selector, context) {
     context = context || doc;
-    var elems = classMatch.test(selector) ? context.getElementsByClassName(selector.slice(1)) : singlet.test(selector) ? context.getElementsByTagName(selector) : context.querySelectorAll(selector);
+    var elems = classMatch.test(selector)
+      ? context.getElementsByClassName(selector.slice(1))
+      : singlet.test(selector)
+      ? context.getElementsByTagName(selector)
+      : context.querySelectorAll(selector);
     return elems;
   }
 
@@ -1415,7 +1421,9 @@ M.checkPossibleAlignments = function (el, container, bounding, offset) {
   }
 
   // Check for container and viewport for Top
-  canAlign.spaceOnBottom = !containerAllowsOverflow ? containerHeight - (scrolledYTopEdge + bounding.height + offset) : window.innerHeight - (elOffsetRect.top + bounding.height + offset);
+  canAlign.spaceOnBottom = !containerAllowsOverflow
+    ? containerHeight - (scrolledYTopEdge + bounding.height + offset)
+    : window.innerHeight - (elOffsetRect.top + bounding.height + offset);
   if (canAlign.spaceOnBottom < 0) {
     canAlign.top = false;
   }
@@ -1994,7 +2002,18 @@ var $jscomp$this = this;
             r(h, function (b) {
               return a < b.end;
             })[0] || l);
-        for (var h = Math.min(Math.max(a - l.start - l.delay, 0), l.duration) / l.duration, w = isNaN(h) ? 1 : l.easing(h, l.elasticity), h = l.to.strings, p = l.round, n = [], m = void 0, m = l.to.numbers.length, t = 0; t < m; t++) {
+        for (
+          var h = Math.min(Math.max(a - l.start - l.delay, 0), l.duration) / l.duration,
+            w = isNaN(h) ? 1 : l.easing(h, l.elasticity),
+            h = l.to.strings,
+            p = l.round,
+            n = [],
+            m = void 0,
+            m = l.to.numbers.length,
+            t = 0;
+          t < m;
+          t++
+        ) {
           var x = void 0,
             x = l.to.numbers[t],
             q = l.from.numbers[t],
@@ -2047,7 +2066,11 @@ var $jscomp$this = this;
       if (q > n && q < k) b(q);
       else if ((q <= n && 0 !== r && (b(0), x && e()), (q >= k && r !== k) || !k)) b(k), x || e();
       f('update');
-      a >= k && (g.remaining ? ((t = h), 'alternate' === g.direction && (g.reversed = !g.reversed)) : (g.pause(), g.completed || ((g.completed = !0), f('complete'), 'Promise' in window && (p(), (m = c())))), (l = 0));
+      a >= k &&
+        (g.remaining
+          ? ((t = h), 'alternate' === g.direction && (g.reversed = !g.reversed))
+          : (g.pause(), g.completed || ((g.completed = !0), f('complete'), 'Promise' in window && (p(), (m = c())))),
+        (l = 0));
     }
     a = void 0 === a ? {} : a;
     var h,
@@ -2194,7 +2217,17 @@ var $jscomp$this = this;
       }
       var c = 'Quad Cubic Quart Quint Sine Expo Circ Back Elastic'.split(' '),
         d = {
-          In: [[0.55, 0.085, 0.68, 0.53], [0.55, 0.055, 0.675, 0.19], [0.895, 0.03, 0.685, 0.22], [0.755, 0.05, 0.855, 0.06], [0.47, 0, 0.745, 0.715], [0.95, 0.05, 0.795, 0.035], [0.6, 0.04, 0.98, 0.335], [0.6, -0.28, 0.735, 0.045], a],
+          In: [
+            [0.55, 0.085, 0.68, 0.53],
+            [0.55, 0.055, 0.675, 0.19],
+            [0.895, 0.03, 0.685, 0.22],
+            [0.755, 0.05, 0.855, 0.06],
+            [0.47, 0, 0.745, 0.715],
+            [0.95, 0.05, 0.795, 0.035],
+            [0.6, 0.04, 0.98, 0.335],
+            [0.6, -0.28, 0.735, 0.045],
+            a,
+          ],
           Out: [
             [0.25, 0.46, 0.45, 0.94],
             [0.215, 0.61, 0.355, 1],
@@ -5711,7 +5744,11 @@ var $jscomp$this = this;
             }
 
             // Set content
-            if (typeof HTMLElement === 'object' ? this.message instanceof HTMLElement : this.message && typeof this.message === 'object' && this.message !== null && this.message.nodeType === 1 && typeof this.message.nodeName === 'string') {
+            if (
+              typeof HTMLElement === 'object'
+                ? this.message instanceof HTMLElement
+                : this.message && typeof this.message === 'object' && this.message !== null && this.message.nodeType === 1 && typeof this.message.nodeName === 'string'
+            ) {
               toast.appendChild(this.message);
 
               // Check if it is jQuery object
@@ -7504,7 +7541,8 @@ var $jscomp$this = this;
 (function ($) {
   // Function to update labels of text fields
   M.updateTextFields = function () {
-    var input_selector = 'input[type=text], input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea';
+    var input_selector =
+      'input[type=text], input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea';
     $(input_selector).each(function (element, index) {
       var $this = $(this);
       if (element.value.length > 0 || $(element).is(':focus') || element.autofocus || $this.attr('placeholder') !== null) {
@@ -7633,7 +7671,8 @@ var $jscomp$this = this;
 
   $(document).ready(function () {
     // Text based inputs
-    var input_selector = 'input[type=text], input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea';
+    var input_selector =
+      'input[type=text], input[type=password], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=search], input[type=date], input[type=time], textarea';
 
     // Add active if form auto complete
     $(document).on('change', input_selector, function () {
@@ -9755,7 +9794,11 @@ var $jscomp$this = this;
                 isStartRange = opts.startRange && Datepicker._compareDates(opts.startRange, day),
                 isEndRange = opts.endRange && Datepicker._compareDates(opts.endRange, day),
                 isInRange = opts.startRange && opts.endRange && opts.startRange < day && day < opts.endRange,
-                isDisabled = (opts.minDate && day < opts.minDate) || (opts.maxDate && day > opts.maxDate) || (opts.disableWeekends && Datepicker._isWeekend(day)) || (opts.disableDayFn && opts.disableDayFn(day));
+                isDisabled =
+                  (opts.minDate && day < opts.minDate) ||
+                  (opts.maxDate && day > opts.maxDate) ||
+                  (opts.disableWeekends && Datepicker._isWeekend(day)) ||
+                  (opts.disableDayFn && opts.disableDayFn(day));
 
               if (isEmpty) {
                 if (i < before) {
@@ -9840,7 +9883,15 @@ var $jscomp$this = this;
               '" aria-selected="' +
               ariaSelected +
               '">' +
-              ('<button class="datepicker-day-button" type="button" data-year="' + opts.year + '" data-month="' + opts.month + '" data-day="' + opts.day + '">' + opts.day + '</button>') +
+              ('<button class="datepicker-day-button" type="button" data-year="' +
+                opts.year +
+                '" data-month="' +
+                opts.month +
+                '" data-day="' +
+                opts.day +
+                '">' +
+                opts.day +
+                '</button>') +
               '</td>'
             );
           },
@@ -9854,7 +9905,14 @@ var $jscomp$this = this;
         {
           key: 'renderTable',
           value: function renderTable(opts, data, randId) {
-            return '<div class="datepicker-table-wrapper"><table cellpadding="0" cellspacing="0" class="datepicker-table" role="grid" aria-labelledby="' + randId + '">' + this.renderHead(opts) + this.renderBody(data) + '</table></div>';
+            return (
+              '<div class="datepicker-table-wrapper"><table cellpadding="0" cellspacing="0" class="datepicker-table" role="grid" aria-labelledby="' +
+              randId +
+              '">' +
+              this.renderHead(opts) +
+              this.renderBody(data) +
+              '</table></div>'
+            );
           },
         },
         {
@@ -9920,7 +9978,8 @@ var $jscomp$this = this;
 
             yearHtml = '<select class="datepicker-select orig-select-year" tabindex="-1">' + arr.join('') + '</select>';
 
-            var leftArrow = '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/><path d="M0-.5h24v24H0z" fill="none"/></svg>';
+            var leftArrow =
+              '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z"/><path d="M0-.5h24v24H0z" fill="none"/></svg>';
             html += '<button class="month-prev' + (prev ? '' : ' is-disabled') + '" type="button">' + leftArrow + '</button>';
 
             html += '<div class="selects-container">';
@@ -9939,7 +9998,8 @@ var $jscomp$this = this;
               next = false;
             }
 
-            var rightArrow = '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/><path d="M0-.25h24v24H0z" fill="none"/></svg>';
+            var rightArrow =
+              '<svg fill="#000000" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/><path d="M0-.25h24v24H0z" fill="none"/></svg>';
             html += '<button class="month-next' + (next ? '' : ' is-disabled') + '" type="button">' + rightArrow + '</button>';
 
             return (html += '</div>');
@@ -9985,7 +10045,9 @@ var $jscomp$this = this;
 
             for (var c = 0; c < 1; c++) {
               this._renderDateDisplay();
-              html += this.renderTitle(this, c, this.calendars[c].year, this.calendars[c].month, this.calendars[0].year, randId) + this.render(this.calendars[c].year, this.calendars[c].month, randId);
+              html +=
+                this.renderTitle(this, c, this.calendars[c].year, this.calendars[c].month, this.calendars[0].year, randId) +
+                this.render(this.calendars[c].year, this.calendars[c].month, randId);
             }
 
             this.destroySelects();
@@ -10620,7 +10682,13 @@ var $jscomp$this = this;
         {
           key: '_pickerSetup',
           value: function _pickerSetup() {
-            var $clearBtn = $('<button class="btn-flat timepicker-clear waves-effect" style="visibility: hidden;" type="button" tabindex="' + (this.options.twelveHour ? '3' : '1') + '">' + this.options.i18n.clear + '</button>')
+            var $clearBtn = $(
+              '<button class="btn-flat timepicker-clear waves-effect" style="visibility: hidden;" type="button" tabindex="' +
+                (this.options.twelveHour ? '3' : '1') +
+                '">' +
+                this.options.i18n.clear +
+                '</button>'
+            )
               .appendTo(this.footer)
               .on('click', this.clear.bind(this));
             if (this.options.showClearBtn) {
@@ -10628,10 +10696,22 @@ var $jscomp$this = this;
             }
 
             var confirmationBtnsContainer = $('<div class="confirmation-btns"></div>');
-            $('<button class="btn-flat timepicker-close waves-effect" type="button" tabindex="' + (this.options.twelveHour ? '3' : '1') + '">' + this.options.i18n.cancel + '</button>')
+            $(
+              '<button class="btn-flat timepicker-close waves-effect" type="button" tabindex="' +
+                (this.options.twelveHour ? '3' : '1') +
+                '">' +
+                this.options.i18n.cancel +
+                '</button>'
+            )
               .appendTo(confirmationBtnsContainer)
               .on('click', this.close.bind(this));
-            $('<button class="btn-flat timepicker-close waves-effect" type="button" tabindex="' + (this.options.twelveHour ? '3' : '1') + '">' + this.options.i18n.done + '</button>')
+            $(
+              '<button class="btn-flat timepicker-close waves-effect" type="button" tabindex="' +
+                (this.options.twelveHour ? '3' : '1') +
+                '">' +
+                this.options.i18n.done +
+                '</button>'
+            )
               .appendTo(confirmationBtnsContainer)
               .on('click', this.done.bind(this));
             confirmationBtnsContainer.appendTo(this.footer);
@@ -11819,7 +11899,8 @@ var $jscomp$this = this;
                 this.$el.find('.carousel-item').removeClass('active');
                 el.classList.add('active');
               }
-              var transformString = alignment + ' translateX(' + -delta / 2 + 'px) translateX(' + dir * this.options.shift * tween * i + 'px) translateZ(' + this.options.dist * tween + 'px)';
+              var transformString =
+                alignment + ' translateX(' + -delta / 2 + 'px) translateX(' + dir * this.options.shift * tween * i + 'px) translateZ(' + this.options.dist * tween + 'px)';
               this._updateItemStyle(el, centerTweenedOpacity, 0, transformString);
             }
 
@@ -11859,7 +11940,8 @@ var $jscomp$this = this;
             // Don't show wrapped items.
             if (!this.noWrap || (this.center >= 0 && this.center < this.count)) {
               el = this.images[this._wrap(this.center)];
-              var _transformString3 = alignment + ' translateX(' + -delta / 2 + 'px) translateX(' + dir * this.options.shift * tween + 'px) translateZ(' + this.options.dist * tween + 'px)';
+              var _transformString3 =
+                alignment + ' translateX(' + -delta / 2 + 'px) translateX(' + dir * this.options.shift * tween + 'px) translateZ(' + this.options.dist * tween + 'px)';
               this._updateItemStyle(el, centerTweenedOpacity, 0, _transformString3);
             }
 
@@ -12647,7 +12729,9 @@ var $jscomp$this = this;
             this._setValueToInput();
 
             // Add caret
-            var dropdownIcon = $('<svg class="caret" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            var dropdownIcon = $(
+              '<svg class="caret" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'
+            );
             this.$el.before(dropdownIcon[0]);
 
             // Initialize dropdown

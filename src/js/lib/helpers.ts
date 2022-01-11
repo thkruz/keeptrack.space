@@ -1,8 +1,8 @@
-import { saveAs } from './external/file-saver.min.js';
+import { saveAs } from 'file-saver';
 
 export { saveAs };
 
-export const getUnique = (arr) => [...new Set(arr)];
+export const getUnique = (arr: Array<any>): Array<any> => [...new Set(arr)];
 
 export const stringPad = {
   pad: (val: string, len: number): string => {
@@ -26,7 +26,7 @@ export const saveVariable = (variable: any, filename: string): void => {
     if (!saveAs) throw new Error('saveAs is unavailable!');
     saveAs(blob, filename);
   } catch (e) {
-    // console.debug('Unable to Save File!');
+    // Intentionally Left Blank
   }
 };
 
@@ -42,7 +42,7 @@ export const saveCsv = (items: Array<any>, name: string): void => {
     if (!saveAs) throw new Error('saveAs is unavailable!');
     saveAs(blob, `${name}.csv`);
   } catch (error) {
-    // console.debug('Unable to Save File!');
+    // Intentionally Left Blank
   }
 };
 
@@ -50,12 +50,11 @@ type rgbaType = [string | number, string | number, string | number, string | num
 export const parseRgba = (str: string): [number, number, number, number] => {
   // eslint-disable-next-line no-useless-escape
   let [r, g, b, a]: rgbaType = <rgbaType>str.match(/[\d\.]+/gu);
-  r = <number>(parseInt(<string>r) / 255);
-  g = <number>parseInt(<string>g) / 255;
-  b = <number>parseInt(<string>b) / 255;
-  a = <number>parseFloat(<string>a);
+  r = parseInt(<string>r) / 255;
+  g = parseInt(<string>g) / 255;
+  b = parseInt(<string>b) / 255;
+  a = parseFloat(<string>a);
   if (isNaN(r) || isNaN(g) || isNaN(b) || isNaN(a)) {
-    // console.warn('Bad RGBA! Using White Instead.');
     return [1, 1, 1, 1];
   } else {
     return [r, g, b, a];
@@ -74,9 +73,9 @@ export const hex2RgbA = (hex: string): rgbaType => {
     const g = ((parseInt(c) >> 8) & 255) / 255;
     const b = (parseInt(c) & 255) / 255;
     return [r, g, b, 1];
+  } else {
+    return [1, 1, 1, 1];
   }
-  // console.warn('Bad Hex! Using White Instead.');
-  return [1, 1, 1, 1];
 };
 
 export const rgbCss = (values: [number, number, number, number]): string => `rgba(${values[0] * 255},${values[1] * 255},${values[2] * 255},${values[3]})`;

@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 (function webpackUniversalModuleDefinition(root, factory) {
   if (typeof exports === 'object' && typeof module === 'object') module.exports = factory();
   else if (typeof define === 'function' && define.amd) define([], factory);
@@ -1452,7 +1454,10 @@
              * Adds the tangents and bitangents as members of the class instance.
              */
             calculateTangentsAndBitangents() {
-              console.assert(!!(this.vertices && this.vertices.length && this.vertexNormals && this.vertexNormals.length && this.textures && this.textures.length), 'Missing attributes for calculating tangents and bitangents');
+              console.assert(
+                !!(this.vertices && this.vertices.length && this.vertexNormals && this.vertexNormals.length && this.textures && this.textures.length),
+                'Missing attributes for calculating tangents and bitangents'
+              );
               const unpacked = {
                 tangents: [...new Array(this.vertices.length)].map((_) => 0),
                 bitangents: [...new Array(this.vertices.length)].map((_) => 0),

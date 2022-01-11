@@ -26,11 +26,11 @@
  */
 
 import { SunCalc } from '@app/js/lib/suncalc.js';
+import numeric from 'numeric';
 import * as satellite from 'satellite.js';
 import { SensorObjectCruncher } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, PI, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN, STAR_DISTANCE, TAU } from '../lib/constants';
-import { numeric } from '../lib/external/numeric';
 import { defaultGd, emptySensor, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg, SatCacheObject } from './constants';
 import { createLatLonHei, isInFov, isInValidElevation, isSensorDeepSpace, lookAnglesToEcf, setupTimeVariables } from './positionCruncher/calculations';
 import { resetPosition, resetVelocity, setPosition } from './positionCruncher/satCache';
@@ -650,7 +650,7 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
     // Angle between earth and sun
     theta =
       Math.acos(
-        numeric.dot([-satPos[i * 3], -satPos[i * 3 + 1], -satPos[i * 3 + 2]], [-satPos[i * 3] + sunEci.x, -satPos[i * 3 + 1] + sunEci.y, -satPos[i * 3 + 2] + sunEci.z]) /
+        <number>numeric.dot([-satPos[i * 3], -satPos[i * 3 + 1], -satPos[i * 3 + 2]], [-satPos[i * 3] + sunEci.x, -satPos[i * 3 + 1] + sunEci.y, -satPos[i * 3 + 2] + sunEci.z]) /
           (Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2)) *
             Math.sqrt(Math.pow(-satPos[i * 3] + sunEci.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunEci.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunEci.z, 2)))
       ) * RAD2DEG;

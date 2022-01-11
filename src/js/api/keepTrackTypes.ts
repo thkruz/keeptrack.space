@@ -1053,36 +1053,30 @@ export interface EarthObject {
 }
 
 export interface CatalogManager {
-  searchBusRegex(satData: SatObject[], text: string): SatObject[];
-  resetSatInView();
+  resetSatInView(): void;
   convertIdArrayToSatnumArray(aehf: any): any;
-  init();
+  init(): void;
   gotExtraData: boolean;
   convertSatnumArrayToIdArray: any;
   exportTle2Csv: any;
   exportTle2Txt: any;
   getIdFromEci: (eci: any) => number;
-  getSatInSun: () => Int8Array;
-  getSatInView: () => Int8Array;
+  getSatInSun(): Int8Array;
+  getSatInView(): Int8Array;
   getSatInViewOnly: (i: number) => any;
-  getSatVel: () => Float32Array;
+  getSatVel(): Float32Array;
   mergeSat: any;
   resetSatInSun: any;
   satExtraData: any;
   selectSat: (i: number) => any;
-  onCruncherReady();
+  onCruncherReady(): void;
   gsInfo: any;
   queryStr: any;
-  searchYear(satData: SatObject[], data: any): SatObject[];
-  searchYearOrLess(satData: SatObject[], data: any): SatObject[];
-  getIdFromIntlDes(arg0: any);
-  searchNameRegex(satData: SatObject[], data: any): SatObject[];
-  searchShapeRegex(satData: SatObject[], text: string): SatObject[];
-  searchCountryRegex(satData: SatObject[], data: any): SatObject[];
+  getIdFromIntlDes(intlDes: string): number;
   insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string);
   setSat(x: number, arg1: any);
-  getSatFromObjNum(arg0: number);
-  getIdFromStarName(pname: any);
+  getSatFromObjNum(objNum: number): SatObject;
+  getIdFromStarName(pname: string): number;
   satSensorMarkerArray: any;
   setColorScheme: (currentColorScheme: ColorRuleSet, force?: boolean) => void;
   sunECI: { x: number; y: number; z: number };
@@ -1100,6 +1094,16 @@ export interface CatalogManager {
   cosparIndex: { [key: string]: number };
   orbitalSats: number;
   missileSats: number;
+  search: CatalogSearches;
+}
+
+export interface CatalogSearches {
+  year(satData: SatObject[], yr: number): SatObject[];
+  yearOrLess(satData: SatObject[], yr: number): SatObject[];
+  name(satData: SatObject[], regex: RegExp): SatObject[];
+  shape(satData: SatObject[], text: string): SatObject[];
+  bus(satData: SatObject[], text: string): SatObject[];
+  type(satData: SatObject[], type: SpaceObjectType): SatObject[];
 }
 
 export type Kilometers = number;
@@ -1110,56 +1114,65 @@ export type EciVel = { x: Kilometers; y: Kilometers; z: Kilometers };
 export type Eci = { position: EciPos; velocity: EciVel };
 
 export interface SatMath {
-  obsmaxrange: number;
-  obsminrange: number;
-  getRae(now: Date, satrec: SatRec, sensor: SensorObject);
+  altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
+  calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };
+  calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => boolean[];
+  calculateSensorPos: (sensor?: SensorObject[]) => { x: number; y: number; z: number; lat: number; lon: number; gmst: number };
+  calculateVisMag: (sat: SatObject, sensor: SensorObject, propTime: Date, sun: SunObject) => number;
   checkIsInView(sensor: SensorObject, aer: any): boolean;
-  isRiseSetLookangles: any;
+  createTle: (tleParams: TleParams) => { TLE1: string; TLE2: string };
+  currentEpoch(arg0: any);
   currentTEARR: TearrData;
-  twoline2satrec(TLE1: string, TLE2: string);
-  gstime(j: number);
-  sgp4(satrec: SatRec, m: number): Eci;
-  eciToGeodetic(position: EciPos, gmst: number): { lat: Radians; lon: Radians; alt: Kilometers };
-  eciToEcf(position: any, gmst: any);
-  ecfToLookAngles(observerGd: { lat: number; lon: number; alt: number }, positionEcf: any);
-  lookanglesInterval: number;
-  lookanglesLength: number;
-  lastlooksArray: TearrData[];
-  setobs(sensors: SensorObject[]);
-  lastMultiSiteArray: TearrData[];
   degreesLat(lat: Radians): Degrees;
   degreesLong(lon: Radians): Degrees;
-  findBestPass(sat: any, sensors: SensorObject[], arg2: number);
-  getEci(sat1: SatObject, now: any);
-  currentEpoch(arg0: any);
-  sat2ric: (sat: SatObject, reference: SatObject) => { position: glm.vec3; velocity: glm.vec3 };
-  getOrbitByLatLon(at: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number): [string, string];
-  altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
-  getDops(lat: number, lon: number, alt?: number, now?: any);
-  calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };
-  geodeticToEcf(geodeticCoords: any);
-  ecfToEci: (ecf: { x: number; y: number; z: number }, gmst: number) => { x: number; y: number; z: number };
   distance: (hoverSat: SatObject, selectedSat: SatObject) => string;
-  calculateVisMag: (sat: SatObject, sensor: SensorObject, propTime: Date, sun: SunObject) => number;
-  setTEARR: (currentTEARR: any) => void;
-  getTEARR: (sat?: SatObject, sensors?: SensorObject[], propTime?: Date) => any;
-  nextpassList: (satArray: SatObject[]) => { sccNum: string; time: any }[];
-  nextNpasses: (sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) => any[];
-  nextpass: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => any;
+  ecfToEci: (ecf: { x: number; y: number; z: number }, gmst: number) => { x: number; y: number; z: number };
+  ecfToLookAngles(observerGd: { lat: number; lon: number; alt: number }, positionEcf: any);
+  eci2ll: (x: number, y: number, z: number) => { lat: number; lon: number; alt: number };
+  eci2Rae: (now: Date, eci: EciArr3, sensor: SensorObject) => { az: number; el: number; rng: any };
+  eciToEcf(position: any, gmst: any);
+  eciToGeodetic(position: EciPos, gmst: number): { lat: Radians; lon: Radians; alt: Kilometers };
+  findBestPass(sat: any, sensors: SensorObject[], arg2: number);
+  findBestPasses: (sats: string, sensor: SensorObject) => void;
+  findCloseObjects: () => string;
+  findClosestApproachTime: (
+    sat1: SatObject,
+    sat2: SatObject,
+    propLength: number
+  ) => {
+    offset: number;
+    dist: number;
+    ric: { position: [number, number, number]; velocity: [number, number, number] };
+  };
+  findNearbyObjectsByOrbit: (sat: SatObject) => any[];
+  geodeticToEcf(geodeticCoords: any);
+  getDops(lat: number, lon: number, alt?: number, now?: any);
+  getEci(sat1: SatObject, now: any);
   getlookangles: (sat: SatObject) => TearrData[];
   getlookanglesMultiSite: (sat: SatObject) => void;
-  findCloseObjects: () => string;
-  calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => boolean[];
-  findBestPasses: (sats: string, sensor: SensorObject) => void;
-  eci2Rae: (now: Date, eci: EciArr3, sensor: SensorObject) => { az: number; el: number; rng: any };
-  findNearbyObjectsByOrbit: (sat: SatObject) => any[];
-  updateDopsTable: (lat: number, lon: number, alt: number) => void;
+  getOrbitByLatLon(at: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number): [string, string];
+  getRae(now: Date, satrec: SatRec, sensor: SensorObject);
   getSunTimes: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => void;
+  getTEARR: (sat?: SatObject, sensors?: SensorObject[], propTime?: Date) => any;
+  gstime(j: number);
+  isRiseSetLookangles: any;
+  lastlooksArray: TearrData[];
+  lastMultiSiteArray: TearrData[];
   lookAngles2Ecf: (az: number, el: number, rng: number, lat: number, lon: number, alt: number) => { x: number; y: number; z: number };
-  eci2ll: (x: number, y: number, z: number) => { lat: number; lon: number; alt: number };
+  lookanglesInterval: number;
+  lookanglesLength: number;
   map: (sat: SatObject, i: number) => { time: string; lat: number; lon: number; inView: boolean };
-  calculateSensorPos: (sensor?: SensorObject[]) => { x: number; y: number; z: number; lat: number; lon: number; gmst: number };
-  createTle: (tleParams: TleParams) => { TLE1: string; TLE2: string };
+  nextNpasses: (sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) => any[];
+  nextpass: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => any;
+  nextpassList: (satArray: SatObject[]) => { sccNum: string; time: any }[];
+  obsmaxrange: number;
+  obsminrange: number;
+  sat2ric: (sat: SatObject, reference: SatObject) => { position: glm.vec3; velocity: glm.vec3 };
+  setobs(sensors: SensorObject[]);
+  setTEARR: (currentTEARR: any) => void;
+  sgp4(satrec: SatRec, m: number): Eci;
+  twoline2satrec(TLE1: string, TLE2: string);
+  updateDopsTable: (lat: number, lon: number, alt: number) => void;
 }
 
 export interface Watchlist {
@@ -1285,6 +1298,9 @@ export interface DrawManager {
   isUpdateTimeThrottle: boolean;
   sensorPos: any;
   lastSelectedSat: number;
+  isHoverBoxVisible: boolean;
+  isShowDistance: boolean;
+  sat2: SatObject;
 }
 
 export interface SocratesPlugin {

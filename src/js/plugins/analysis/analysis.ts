@@ -241,7 +241,7 @@ export const analysisFormSubmit = () => {
   const sensor = sensorManager.currentSensor[0].shortName;
   if (typeof sensor == 'undefined') {
     $.colorbox({
-      href: `analysis/index.htm?sat=${sat}&type=${chartType}`,
+      href: `analysis/index.html?sat=${sat}&type=${chartType}`,
       iframe: true,
       width: '60%',
       height: '60%',
@@ -250,7 +250,7 @@ export const analysisFormSubmit = () => {
     });
   } else {
     $.colorbox({
-      href: `analysis/index.htm?sat=${sat}&type=${chartType}&sensor=${sensor}`,
+      href: `analysis/index.html?sat=${sat}&type=${chartType}&sensor=${sensor}`,
       iframe: true,
       width: '60%',
       height: '60%',

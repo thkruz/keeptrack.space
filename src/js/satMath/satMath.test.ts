@@ -3,7 +3,7 @@
 
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { KeepTrackPrograms, SunObject, ZoomValue } from '../api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject, SunObject, ZoomValue } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
 import * as satMath from './satMath';
@@ -52,7 +52,7 @@ describe('satMath.distance', () => {
     let result: any = satMath.distance(
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 1, y: 550, z: 350 },
           static: true,
           TLE1: 'Foo bar',
@@ -99,11 +99,11 @@ describe('satMath.distance', () => {
           getDirection: false,
           vmag: 1,
           id: 0,
-        },
+        })),
       },
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 4, y: 4, z: 30 },
           static: false,
           TLE1: 'This is a Text',
@@ -150,7 +150,7 @@ describe('satMath.distance', () => {
           getDirection: 'Southwest',
           vmag: 0,
           id: 0,
-        },
+        })),
       }
     );
     expect(result).toMatchSnapshot();
@@ -160,7 +160,7 @@ describe('satMath.distance', () => {
     let result: any = satMath.distance(
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 350, y: 550, z: 1 },
           static: true,
           TLE1: 'Hello, world!',
@@ -207,11 +207,11 @@ describe('satMath.distance', () => {
           getDirection: false,
           vmag: 100,
           id: 0,
-        },
+        })),
       },
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 50, y: 70, z: 320 },
           static: true,
           TLE1: 'Foo bar',
@@ -258,7 +258,7 @@ describe('satMath.distance', () => {
           getDirection: 'Southeast',
           vmag: -100,
           id: 0,
-        },
+        })),
       }
     );
     expect(result).toMatchSnapshot();
@@ -517,7 +517,7 @@ describe('satMath.calculateVisMag', () => {
     let result: any = satMath.calculateVisMag(
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 350, y: 90, z: 550 },
           static: true,
           TLE1: 'Foo bar',
@@ -564,7 +564,7 @@ describe('satMath.calculateVisMag', () => {
           getDirection: 'South',
           vmag: -100,
           id: 0,
-        },
+        })),
       },
       {
         ...defaultSat,
@@ -605,7 +605,7 @@ describe('satMath.calculateVisMag', () => {
     let result: any = satMath.calculateVisMag(
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 410, y: 400, z: 350 },
           static: false,
           TLE1: 'foo bar',
@@ -652,7 +652,7 @@ describe('satMath.calculateVisMag', () => {
           getDirection: 'South',
           vmag: 100,
           id: 0,
-        },
+        })),
       },
       {
         ...defaultSat,
@@ -693,7 +693,7 @@ describe('satMath.calculateVisMag', () => {
     let result: any = satMath.calculateVisMag(
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 90, y: 1, z: 550 },
           static: true,
           TLE1: 'Hello, world!',
@@ -740,7 +740,7 @@ describe('satMath.calculateVisMag', () => {
           getDirection: 'Southwest',
           vmag: -5.48,
           id: 0,
-        },
+        })),
       },
       {
         ...defaultSat,
@@ -781,7 +781,7 @@ describe('satMath.calculateVisMag', () => {
     let result: any = satMath.calculateVisMag(
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 90, y: 30, z: 520 },
           static: false,
           TLE1: 'This is a Text',
@@ -828,7 +828,7 @@ describe('satMath.calculateVisMag', () => {
           getDirection: 'Southeast',
           vmag: -5.48,
           id: 0,
-        },
+        })),
       },
       {
         ...defaultSat,
@@ -869,7 +869,7 @@ describe('satMath.calculateVisMag', () => {
     let result: any = satMath.calculateVisMag(
       {
         ...defaultSat,
-        ...{
+        ...(<SatObject>(<unknown>{
           position: { x: 70, y: 100, z: 550 },
           static: false,
           TLE1: 'Hello, world!',
@@ -916,7 +916,7 @@ describe('satMath.calculateVisMag', () => {
           getDirection: 'Southwest',
           vmag: -5.48,
           id: 0,
-        },
+        })),
       },
       {
         ...defaultSat,

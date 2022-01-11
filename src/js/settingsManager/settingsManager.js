@@ -114,6 +114,9 @@ settingsManager = {
             settingsManager.breakTheLaw = true;
           }
           break;
+        case 'darts.staging.dso.mil':
+          settingsManager.installDirectory = '/keeptrack/';
+          break;
         case 'thkruz.github.io':
         case 'www.thkruz.github.io':
           settingsManager.installDirectory = '/keeptrack.space/';

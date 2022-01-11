@@ -21,7 +21,7 @@ setup.init = () => {
 
 const eventFire = (elObj, etype) => {
   try {
-    let el = typeof elObj == 'string' ? document.getElementById(elObj) : elObj;
+    const el = typeof elObj == 'string' ? document.getElementById(elObj) : elObj;
     if (el.fireEvent) {
       el.fireEvent('on' + etype);
     } else {
@@ -29,7 +29,7 @@ const eventFire = (elObj, etype) => {
       el.dispatchEvent(evObj);
     }
   } catch (error) {
-    console.debug(elObj);
+    // Intentionally left blank
   }
 };
 

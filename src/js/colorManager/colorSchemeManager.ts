@@ -312,7 +312,7 @@ export const colorSchemeManager: ColorSchemeManager = {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, colorSchemeManager.pickableData);
       }
     } catch (e) {
-      // console.debug(e);
+      // Intentionally left blank
     }
   },
   resetObjectTypeFlags: () => {
@@ -373,3 +373,8 @@ export const colorSchemeManager: ColorSchemeManager = {
   colorBufferOneTime: false,
   pickableBufferOneTime: false,
 };
+
+export const isPayloadOff = (sat: SatObject) => sat.type === 1 && colorSchemeManager.objectTypeFlags.payload === false;
+export const isRocketBodyOff = (sat: SatObject) => sat.type === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false;
+export const isDebrisOff = (sat: SatObject) => sat.type === 3 && colorSchemeManager.objectTypeFlags.debris === false;
+export const isInViewOff = (sat: SatObject) => sat.inView === 1 && colorSchemeManager.objectTypeFlags.inFOV === false;

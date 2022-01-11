@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Screenshot Package screenShot if queued screenshot off prevents a screenshot 1`] = `undefined`;
+
+exports[`Screenshot Package screenShot if queued screenshot triggers a screenshot 1`] = `undefined`;
+
+exports[`Screenshot Package watermarkedDataUrl should account for classification banner 1`] = `""`;
+
+exports[`Screenshot Package watermarkedDataUrl should create a watermark on the canvas 1`] = `""`;
+
+exports[`Screenshot Package watermarkedDataUrl should handle all classification options 1`] = `""`;
+
+exports[`Screenshot Package watermarkedDataUrl should handle all classification options 2`] = `""`;
+
+exports[`Screenshot Package watermarkedDataUrl should handle all classification options 3`] = `""`;
+
+exports[`Screenshot Package watermarkedDataUrl should handle all classification options 4`] = `""`;
+
+exports[`Screenshot Package watermarkedDataUrl should handle all classification options 5`] = `""`;
+
+exports[`Screenshot Package watermarkedDataUrl should handle all classification options 6`] = `""`;

@@ -132,7 +132,7 @@ export const searchSats = (searchParams: SearchSatParams) => {
 
   let result = '';
   res.forEach((sat: SatObject, i: number) => {
-    result += i < res.length - 1 ? `${sat.name},` : `${sat.name}`;
+    result += i < res.length - 1 ? `${sat.sccNum},` : `${sat.sccNum}`;
   });
 
   $('#search').val(result);
@@ -302,7 +302,9 @@ export const uiManagerInit = (): void => {
     findByLooksSubmit();
     e.preventDefault();
   });
+};
 
+const uiManagerFinal = () => {
   const { satSet } = keepTrackApi.programs;
   getUnique(satSet.satData.filter((obj: SatObject) => obj.bus).map((obj) => obj.bus))
     // Sort using lower case
@@ -332,11 +334,15 @@ export const uiManagerInit = (): void => {
     .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
     .forEach((payload) => {
       if (payload === '') return;
-      if (payloadPartials.filter((partial) => partial === payload).length > 3) {
+      if (payload.length > 3) {
         $('#fbl-payload').append(`<option value="${payload}">${payload}</option>`);
       }
     });
+
+  // Update MaterialUI with new menu options
+  window.M.AutoInit();
 };
+
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-find-sat') {
     const { uiManager } = keepTrackApi.programs;
@@ -365,6 +371,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'findSat',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'findSat',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript

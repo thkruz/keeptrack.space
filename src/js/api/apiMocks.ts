@@ -235,6 +235,7 @@ export const keepTrackApiStubs = {
           godrays: {
             frameBuffer: {},
           },
+          now: new Date(2022, 1, 1),
         },
         earth: {
           init: jest.fn(),

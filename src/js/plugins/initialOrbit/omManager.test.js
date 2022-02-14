@@ -1,5 +1,5 @@
 /* eslint-disable no-undefined */
-import { _jday, _arctan2, _dayOfYear, _pad0, _sv2kp, _propagate } from './omManager';
+import { _arctan2, _dayOfYear, _jday, _pad0, _propagate, _sv2kp } from './omManager';
 // @ponicode
 describe('omManager._jday', () => {
   test('0', () => {
@@ -207,7 +207,28 @@ describe('omManager._pad0', () => {
 // @ponicode
 describe('omManager._sv2kp', () => {
   test('0', () => {
-    let param3 = [-1, ['41.1994', '-115.9206'], 1, 10, 0, 1, ['-19.3366', '-46.1477'], 1, -1, 1, -10, -10, 0, 1, 0, ['41.1994', '-115.9206'], -1, 0.0, 0.0, ['-19.3366', '-46.1477']];
+    let param3 = [
+      -1,
+      ['41.1994', '-115.9206'],
+      1,
+      10,
+      0,
+      1,
+      ['-19.3366', '-46.1477'],
+      1,
+      -1,
+      1,
+      -10,
+      -10,
+      0,
+      1,
+      0,
+      ['41.1994', '-115.9206'],
+      -1,
+      0.0,
+      0.0,
+      ['-19.3366', '-46.1477'],
+    ];
     let callFunction = () => {
       _sv2kp(
         1,
@@ -416,7 +437,15 @@ describe('omManager._propagate', () => {
     await _propagate(
       410,
       100,
-      { getUTCMonth: () => 1, getUTCMilliseconds: () => 520, getUTCFullYear: () => true, getUTCDate: () => '01-13-2020', getUTCHours: () => 56784, getUTCMinutes: () => 75, getUTCSeconds: () => 243 },
+      {
+        getUTCMonth: () => 1,
+        getUTCMilliseconds: () => 520,
+        getUTCFullYear: () => true,
+        getUTCDate: () => '01-13-2020',
+        getUTCHours: () => 56784,
+        getUTCMinutes: () => 75,
+        getUTCSeconds: () => 243,
+      },
       { twoline2satrec: () => 'Nile Crocodile', sgp4: () => 100 }
     );
   });
@@ -425,7 +454,15 @@ describe('omManager._propagate', () => {
     await _propagate(
       380,
       1,
-      { getUTCMonth: () => 28, getUTCMilliseconds: () => 380, getUTCFullYear: () => false, getUTCDate: () => '32-01-2020', getUTCHours: () => 'bc23a9d531064583ace8f67dad60f6bb', getUTCMinutes: () => 75, getUTCSeconds: () => 161 },
+      {
+        getUTCMonth: () => 28,
+        getUTCMilliseconds: () => 380,
+        getUTCFullYear: () => false,
+        getUTCDate: () => '32-01-2020',
+        getUTCHours: () => 'fakeData',
+        getUTCMinutes: () => 75,
+        getUTCSeconds: () => 161,
+      },
       { twoline2satrec: () => 'Spectacled Caiman', sgp4: () => -100 }
     );
   });
@@ -434,7 +471,15 @@ describe('omManager._propagate', () => {
     await _propagate(
       100,
       -5.48,
-      { getUTCMonth: () => 0, getUTCMilliseconds: () => 410, getUTCFullYear: () => false, getUTCDate: () => '01-13-2020', getUTCHours: () => 987650, getUTCMinutes: () => 5, getUTCSeconds: () => 161 },
+      {
+        getUTCMonth: () => 0,
+        getUTCMilliseconds: () => 410,
+        getUTCFullYear: () => false,
+        getUTCDate: () => '01-13-2020',
+        getUTCHours: () => 987650,
+        getUTCMinutes: () => 5,
+        getUTCSeconds: () => 161,
+      },
       { twoline2satrec: () => 'Saltwater Crocodile', sgp4: () => 0 }
     );
   });
@@ -443,7 +488,15 @@ describe('omManager._propagate', () => {
     await _propagate(
       320,
       -5.48,
-      { getUTCMonth: () => 3, getUTCMilliseconds: () => 30, getUTCFullYear: () => true, getUTCDate: () => '01-01-2030', getUTCHours: () => 'bc23a9d531064583ace8f67dad60f6bb', getUTCMinutes: () => 25, getUTCSeconds: () => 241 },
+      {
+        getUTCMonth: () => 3,
+        getUTCMilliseconds: () => 30,
+        getUTCFullYear: () => true,
+        getUTCDate: () => '01-01-2030',
+        getUTCHours: () => 'fakeData',
+        getUTCMinutes: () => 25,
+        getUTCSeconds: () => 241,
+      },
       { twoline2satrec: () => 'Nile Crocodile', sgp4: () => -5.48 }
     );
   });
@@ -452,7 +505,15 @@ describe('omManager._propagate', () => {
     await _propagate(
       100,
       -100,
-      { getUTCMonth: () => 0, getUTCMilliseconds: () => 320, getUTCFullYear: () => false, getUTCDate: () => '32-01-2020', getUTCHours: () => 'bc23a9d531064583ace8f67dad60f6bb', getUTCMinutes: () => 75, getUTCSeconds: () => 127 },
+      {
+        getUTCMonth: () => 0,
+        getUTCMilliseconds: () => 320,
+        getUTCFullYear: () => false,
+        getUTCDate: () => '32-01-2020',
+        getUTCHours: () => 'fakeData',
+        getUTCMinutes: () => 75,
+        getUTCSeconds: () => 127,
+      },
       { twoline2satrec: () => 'Saltwater Crocodile', sgp4: () => -100 }
     );
   });

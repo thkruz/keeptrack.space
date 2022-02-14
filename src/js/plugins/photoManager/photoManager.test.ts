@@ -72,7 +72,7 @@ describe('photoManager.dscovrLoaded', () => {
 
   test('6', () => {
     const callFunction: any = () => {
-      photoManager.dscovrLoaded('bc23a9d531064583ace8f67dad60f6bb');
+      photoManager.dscovrLoaded('fakeData');
     };
 
     expect(callFunction).not.toThrow();

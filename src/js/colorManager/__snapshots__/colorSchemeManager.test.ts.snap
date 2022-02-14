@@ -661,54 +661,6 @@ Object {
 }
 `;
 
-exports[`colorSchemeManager.ageOfElsetRules 8 1`] = `
-Object {
-  "color": Array [
-    0,
-    1,
-    0,
-    0.9,
-  ],
-  "pickable": 1,
-}
-`;
-
-exports[`colorSchemeManager.ageOfElsetRules 9 1`] = `
-Object {
-  "color": Array [
-    0,
-    1,
-    0,
-    0.9,
-  ],
-  "pickable": 1,
-}
-`;
-
-exports[`colorSchemeManager.ageOfElsetRules 10 1`] = `
-Object {
-  "color": Array [
-    1,
-    0.6,
-    0,
-    0.9,
-  ],
-  "pickable": 1,
-}
-`;
-
-exports[`colorSchemeManager.ageOfElsetRules 11 1`] = `
-Object {
-  "color": Array [
-    1,
-    0.6,
-    0,
-    0.9,
-  ],
-  "pickable": 1,
-}
-`;
-
 exports[`colorSchemeManager.countriesRules 0 1`] = `
 Object {
   "color": Array [

@@ -61,7 +61,7 @@ describe('starManager.drawAllConstellations', () => {
 describe('starManager.findStarsConstellation', () => {
   test('0', () => {
     let callFunction = () => {
-      starManager.findStarsConstellation('bc23a9d531064583ace8f67dad60f6bb');
+      starManager.findStarsConstellation('fakeData');
     };
 
     expect(callFunction).not.toThrow();
@@ -69,7 +69,7 @@ describe('starManager.findStarsConstellation', () => {
 
   test('1', () => {
     let callFunction = () => {
-      starManager.findStarsConstellation(12345);
+      starManager.findStarsConstellation('12345');
     };
 
     expect(callFunction).not.toThrow();
@@ -77,7 +77,7 @@ describe('starManager.findStarsConstellation', () => {
 
   test('2', () => {
     let callFunction = () => {
-      starManager.findStarsConstellation(12);
+      starManager.findStarsConstellation('12');
     };
 
     expect(callFunction).not.toThrow();
@@ -85,7 +85,7 @@ describe('starManager.findStarsConstellation', () => {
 
   test('3', () => {
     let callFunction = () => {
-      starManager.findStarsConstellation(56784);
+      starManager.findStarsConstellation('56784');
     };
 
     expect(callFunction).not.toThrow();
@@ -93,7 +93,7 @@ describe('starManager.findStarsConstellation', () => {
 
   test('4', () => {
     let callFunction = () => {
-      starManager.findStarsConstellation('a1969970175');
+      starManager.findStarsConstellation('fakeData');
     };
 
     expect(callFunction).not.toThrow();

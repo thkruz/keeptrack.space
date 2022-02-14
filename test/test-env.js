@@ -6,6 +6,8 @@ import path from 'path';
 import 'webgl-mock';
 
 // This allows consistent testing in the CI environment
+// eslint-disable-next-line no-process-env
+process.env.TZ = 'GMT';
 jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
 
 // eslint-disable-next-line no-sync

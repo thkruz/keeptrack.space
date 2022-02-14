@@ -162,7 +162,7 @@ describe('countries.groupSelected', () => {
 
   test('5', () => {
     const callFunction: any = () => {
-      countries.groupSelected('bc23a9d531064583ace8f67dad60f6bb');
+      countries.groupSelected('fakeData');
     };
 
     expect(callFunction).not.toThrow();

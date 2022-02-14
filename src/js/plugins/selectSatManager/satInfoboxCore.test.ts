@@ -43,7 +43,7 @@ describe('satInfoboxCore.orbitalData', () => {
     window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
     let sat = defaultSat;
-    sat.TLE1 = '01234567890123456abcd';
+    sat.TLE1 = 'fakeData';
     let result: any = satInfoboxCore.orbitalData(sat);
     expect(result).toMatchSnapshot();
   });

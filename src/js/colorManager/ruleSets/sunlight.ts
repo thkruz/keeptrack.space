@@ -6,7 +6,7 @@ import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeMa
 export const sunlightRules = (sat: SatObject): ColorInformation => {
   const { satSet } = keepTrackApi.programs;
 
-  if (sat.static && (sat.type === SpaceObjectType.LAUNCH_FACILITY || sat.type === SpaceObjectType.CONTORL_FACILITY) && colorSchemeManager.objectTypeFlags.facility === false) {
+  if (sat.static && (sat.type === SpaceObjectType.LAUNCH_FACILITY || sat.type === SpaceObjectType.CONTROL_FACILITY) && colorSchemeManager.objectTypeFlags.facility === false) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
       pickable: Pickable.No,

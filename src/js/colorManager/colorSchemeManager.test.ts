@@ -4,7 +4,7 @@ import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getDayOfYear } from '../timeManager/transforms';
-import { colorSchemeManager } from './colorSchemeManager';
+import { colorSchemeManager, isDebrisOff, isInViewOff, isPayloadOff, isRocketBodyOff } from './colorSchemeManager';
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
 // @ponicode
@@ -1358,6 +1358,42 @@ describe('colorSchemeManager.geoRules', () => {
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.inFOV = true;
+  });
+});
+
+describe('colorSchemeManager objectTypeFlags checks', () => {
+  it('should handle payload on', () => {
+    colorSchemeManager.objectTypeFlags.payload = true;
+    expect(isPayloadOff({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD } })).toBe(false);
+  });
+  it('should handle payload off', () => {
+    colorSchemeManager.objectTypeFlags.payload = false;
+    expect(isPayloadOff({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD } })).toBe(true);
+  });
+  it('should handle rocket body on', () => {
+    colorSchemeManager.objectTypeFlags.rocketBody = true;
+    expect(isRocketBodyOff({ ...defaultSat, ...{ type: SpaceObjectType.ROCKET_BODY } })).toBe(false);
+  });
+  it('should handle rocket body off', () => {
+    colorSchemeManager.objectTypeFlags.rocketBody = false;
+    expect(isRocketBodyOff({ ...defaultSat, ...{ type: SpaceObjectType.ROCKET_BODY } })).toBe(true);
+  });
+  it('should handle debris on', () => {
+    colorSchemeManager.objectTypeFlags.debris = true;
+    expect(isDebrisOff({ ...defaultSat, ...{ type: SpaceObjectType.DEBRIS } })).toBe(false);
+  });
+  it('should handle debris off', () => {
+    colorSchemeManager.objectTypeFlags.debris = false;
+    expect(isDebrisOff({ ...defaultSat, ...{ type: SpaceObjectType.DEBRIS } })).toBe(true);
+  });
+
+  it('should handle inview on', () => {
+    colorSchemeManager.objectTypeFlags.inFOV = true;
+    expect(isInViewOff({ ...defaultSat, ...{ inView: 0 } })).toBe(false);
+  });
+  it('should handle inview off', () => {
+    colorSchemeManager.objectTypeFlags.inFOV = false;
+    expect(isInViewOff({ ...defaultSat, ...{ inView: 1 } })).toBe(true);
   });
 });
 

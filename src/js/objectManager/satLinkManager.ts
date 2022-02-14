@@ -1,7 +1,7 @@
+import numeric from 'numeric';
 import { CatalogManager, SatObject, SensorManager, SensorObject } from '../api/keepTrackTypes';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { RAD2DEG } from '../lib/constants';
-import { numeric } from '../lib/external/numeric';
 import { ControlSiteManager } from './controlSiteManager';
 
 export enum SatConstellationString {
@@ -143,9 +143,11 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
             // var semiDiamSat2 = Math.asin(0.1/Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2))) * RAD2DEG;
             var theta =
               Math.acos(
-                numeric.dot(
-                  [-sat1.position.x, -sat1.position.y, -sat1.position.z],
-                  [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]
+                <number>(
+                  numeric.dot(
+                    [-sat1.position.x, -sat1.position.y, -sat1.position.z],
+                    [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]
+                  )
                 ) /
                   (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
                     Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)))

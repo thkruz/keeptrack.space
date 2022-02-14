@@ -1,8 +1,20 @@
+/* eslint-disable */
+
 /*!
  Copyright (c) 2016 Fabio Soldati, www.peakfinder.org
  License MIT: http://www.opensource.org/licenses/MIT
 */
-var A = { JMod: 2400000.5, J2000: 2451545, J1900: 2415020, B1900: 2415020.3135, B1950: 2433282.4235, JulianYear: 365.25, JulianCentury: 36525, BesselianYear: 365.2421988, AU: 149597870 };
+var A = {
+  JMod: 2400000.5,
+  J2000: 2451545,
+  J1900: 2415020,
+  B1900: 2415020.3135,
+  B1950: 2433282.4235,
+  JulianYear: 365.25,
+  JulianCentury: 36525,
+  BesselianYear: 365.2421988,
+  AU: 149597870,
+};
 A.EclCoord = function (a, b, c) {
   if (isNaN(a) || isNaN(b)) throw Error('Invalid EclCoord object: (' + a + ', ' + b + ')');
   this.lat = a;
@@ -200,7 +212,9 @@ A.JulianDay.jdFromJDE = function (a) {
 };
 A.JulianDay.dateToJD = function (a) {
   var b = a.getUTCDate() + A.JulianDay.secondsFromHMS(a.getUTCHours(), a.getUTCMinutes(), a.getUTCSeconds()) / 86400;
-  return a.getTime() < A.JulianDay.gregorianTimeStart ? A.JulianDay.calendarJulianToJD(a.getUTCFullYear(), a.getUTCMonth() + 1, b) : A.JulianDay.calendarGregorianToJD(a.getUTCFullYear(), a.getUTCMonth() + 1, b);
+  return a.getTime() < A.JulianDay.gregorianTimeStart
+    ? A.JulianDay.calendarJulianToJD(a.getUTCFullYear(), a.getUTCMonth() + 1, b)
+    : A.JulianDay.calendarGregorianToJD(a.getUTCFullYear(), a.getUTCMonth() + 1, b);
 };
 A.JulianDay.calendarGregorianToJD = function (a, b, c) {
   if (1 == b || 2 == b) a--, (b += 12);
@@ -550,7 +564,12 @@ A.Nutation = {
     return b + a.deltaobliquity;
   },
   meanObliquity: function (a) {
-    return A.Math.horner(a.jdeJ2000Century(), [(84381.448 / 3600) * (Math.PI / 180), (-46.815 / 3600) * (Math.PI / 180), (-5.9e-4 / 3600) * (Math.PI / 180), (0.001813 / 3600) * (Math.PI / 180)]);
+    return A.Math.horner(a.jdeJ2000Century(), [
+      (84381.448 / 3600) * (Math.PI / 180),
+      (-46.815 / 3600) * (Math.PI / 180),
+      (-5.9e-4 / 3600) * (Math.PI / 180),
+      (0.001813 / 3600) * (Math.PI / 180),
+    ]);
   },
   meanObliquityLaskar: function (a) {
     return A.Math.horner(0.01 * a.jdeJ2000Century(), [
@@ -692,7 +711,14 @@ A.Rise = {
     if (!b) return null;
     b = (43200 * Math.acos(b)) / Math.PI;
     a = (43200 * (d.ra + a.lng)) / Math.PI - c;
-    return { transit: A.Math.pMod(a, 86400), transitd: Math.floor(a / 86400), rise: A.Math.pMod(a - b, 86400), rised: Math.floor((a - b) / 86400), set: A.Math.pMod(a + b, 86400), setd: Math.floor((a + b) / 86400) };
+    return {
+      transit: A.Math.pMod(a, 86400),
+      transitd: Math.floor(a / 86400),
+      rise: A.Math.pMod(a - b, 86400),
+      rised: Math.floor((a - b) / 86400),
+      set: A.Math.pMod(a + b, 86400),
+      setd: Math.floor((a + b) / 86400),
+    };
   },
   times: function (a, b, c, d, e) {
     function f(e) {

@@ -159,7 +159,7 @@ export const initVao = (gl: WebGL2RenderingContext) => {
 export const update = () => {
   const { sun } = keepTrackApi.programs.drawManager.sceneManager;
   // Calculate RAE
-  moon.rae = SunCalc.getMoonPosition(moon.now, 0, 0);
+  moon.rae = SunCalc.getMoonPosition(sun.now, 0, 0);
 
   // RAE2ECF and then ECF2ECI
   moon.eci = satellite.ecfToEci(satellite.lookAngles2Ecf(180 + moon.rae.azimuth * RAD2DEG, moon.rae.altitude * RAD2DEG, moon.rae.distance, 0, 0, 0), sun.sunvar.gmst);
@@ -341,7 +341,6 @@ export const moon = {
   positionModifier: { x: 0, y: 0, z: 0 },
   drawPosition: [0, 0, 0],
   pos: [0, 0, 0],
-  now: new Date(),
   isLoaded: false,
 };
 export const onTextureLoaded = (gl: WebGL2RenderingContext): any => {

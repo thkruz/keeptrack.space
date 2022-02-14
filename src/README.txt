@@ -15,10 +15,10 @@ Date: 8/18/2021
 To run KeepTrack without a webserver you need to use Chrome and enable 
 loading local files (--allow-file-access-from-files). There is a "Chrome 
 With Local Files" shortcut included that should work without modification.
-This will not open the index.htm file automatically. You either need to add
-the full path to the index file (ex. C:\KeepTrack\index.htm) to the end of
+This will not open the index.html file automatically. You either need to add
+the full path to the index file (ex. C:\KeepTrack\index.html) to the end of
 the shortcut target or Try using the included KeepTrack.bat file. That file
-will attempt to launch Chrome with the flag and open the index.htm file
+will attempt to launch Chrome with the flag and open the index.html file
 automatically.
 
 The KeepTrack.lnk file is just an example of launching the .bat file with
@@ -53,7 +53,7 @@ unclassified website.
 
 2) extra.json - this loads a secondary database that can contain additional
 information to augment and/or replace the TLE.json data. This will only
-load if you are launching KeepTrack in the offline mode (with index.htm)
+load if you are launching KeepTrack in the offline mode (with index.html)
 
 3) TLE.txt - this loads the most up-to-date ELSETs when running offline.
 Download TLEs in standard format:

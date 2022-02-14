@@ -78,5 +78,6 @@
     "suppressImplicitAnyIndexErrors": false /* suppresses the errors about accessing any as a type */,
     "resolveJsonModule": true /* Allows a module id to be a json file. */
   },
-  "exclude": ["node_modules/", "dist", "embed", "coverage", "tsconfig.json", "**/*.test.ts", "**/*.test.js"]
+  "exclude": ["node_modules/**/*", "dist/**/*", "embed/**/*", "coverage/**/*", "tsconfig.json", "**/*.test.ts", "**/*.test.js"],
+  "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "!node_modules/**"]
 }

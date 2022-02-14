@@ -9,7 +9,7 @@ import 'webgl-mock';
 jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
 
 // eslint-disable-next-line no-sync
-const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.htm'), 'utf8').toString();
+const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.html'), 'utf8').toString();
 const body = '<body>';
 const bodyEnd = '</body>';
 const docBody = documentHTML.substring(documentHTML.indexOf(body) + body.length, documentHTML.indexOf(bodyEnd));
@@ -52,17 +52,15 @@ global.console = {
   // log: console.log, // console.log are ignored in tests
 
   // Keep native behaviour for other methods, use those to print out things in your own tests, not `console.log`
-  error: console.debug,
+  error: console.debug, // NOSONAR
   // error: jest.fn(),
-  warn: console.warn,
+  warn: console.warn, // NOSONAR
   // warn: jest.fn(),
   // info: console.info,
   info: jest.fn(),
   // debug: console.debug,
   debug: jest.fn(),
 };
-
-// document.body.innerHTML += '<div id="keeptrack-canvas"></div>';
 
 window.HTMLMediaElement.prototype.load = () => {
   /* do nothing */

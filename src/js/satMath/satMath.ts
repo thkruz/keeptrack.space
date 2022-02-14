@@ -25,6 +25,7 @@ import { DEG2RAD, DISTANCE_TO_SUN, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, PLANET
 import { getUnique, saveCsv, stringPad } from '@app/js/lib/helpers';
 import { ReadonlyMat3, vec3 } from 'gl-matrix';
 import $ from 'jquery';
+import numeric from 'numeric';
 import * as Ootk from 'ootk';
 import { SatRec } from 'satellite.js';
 import { keepTrackApi } from '../api/keepTrackApi';
@@ -32,7 +33,6 @@ import { Eci, EciArr3, SatGroupCollection, SatMath, SatObject, SensorManager, Se
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { dateFormat } from '../lib/external/dateFormat.js';
 import { mat3 } from '../lib/external/gl-matrix';
-import { numeric } from '../lib/external/numeric';
 import { jday } from '../timeManager/transforms';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
 import { formatArgumentOfPerigee, formatInclination, formatMeanAnomaly, formatMeanMotion, formatRightAscension, StringifiedNubmer } from './tleFormater';
@@ -1273,7 +1273,7 @@ export const calculateDops = (satList: { az: number; el: number }[]): { pdop: st
     ];
     numeric.setBlock(A, [n - 1, 0], [n - 1, 3], [B]);
   }
-  var Q = numeric.dot(numeric.transpose(A), A);
+  var Q = <number[][]>numeric.dot(numeric.transpose(A), A);
   var Qinv = numeric.inv(Q);
   var pdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2]);
   var hdop = Math.sqrt(Qinv[0][0] + Qinv[1][1]);

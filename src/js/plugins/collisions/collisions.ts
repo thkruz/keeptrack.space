@@ -210,7 +210,7 @@ export const socrates = (row: number) => {
 export const processSocratesHtm = (socratesHTM: Document): void => {
   const { socratesObjOne, socratesObjTwo } = keepTrackApi.programs.socrates;
 
-  // Load SOCRATES.htm so we can use it instead of index.htm
+  // Load SOCRATES.htm so we can use it instead of index.html
   const tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
   const tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
 
@@ -237,8 +237,6 @@ export const processSocratesHtm = (socratesHTM: Document): void => {
   // SOCRATES Menu
   const tbl = <HTMLTableElement>document.getElementById('socrates-table'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
-
-  // var tblLength = 0;                                   // Iniially no rows to the table
   let tr = tbl.insertRow();
   let tdT = tr.insertCell();
   tdT.appendChild(document.createTextNode('Time'));

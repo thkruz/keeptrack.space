@@ -78,7 +78,6 @@ export const rmbMenuActions = (iconName: string): void => {
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-photo') {
     saveHiResPhoto('4k');
-    return;
   }
 };
 export const init = (): void => {

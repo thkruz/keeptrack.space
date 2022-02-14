@@ -5,6 +5,9 @@ src/js/wip
 src/js/lib/external
 **/*.min.*
 **/*.css
+dist/**/*
+dist/*
 dist
 src/offline/tle.js
 src/tle
+**/**/tle.js

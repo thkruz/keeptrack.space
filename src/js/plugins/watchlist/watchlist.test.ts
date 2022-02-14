@@ -158,7 +158,7 @@ describe('watchlist.pushOverlayElement', () => {
   const nextPassArray = [defaultSat, defaultSat];
   test('0', () => {
     const callFunction: any = () => {
-      watchlist.pushOverlayElement(keepTrackApi.programs.satSet, nextPassArray, 0, 'Lights', [false, '^5.0.0', 'bc23a9d531064583ace8f67dad60f6bb', '^5.0.0', 987650]);
+      watchlist.pushOverlayElement(keepTrackApi.programs.satSet, nextPassArray, 0, 'Lights', [false, '^5.0.0', 'fakeData', '^5.0.0', 987650]);
     };
 
     expect(callFunction).not.toThrow();

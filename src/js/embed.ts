@@ -101,7 +101,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     await drawManager.createDotsManager(drawManager.gl);
 
-    await satSet.init();
+    satSet.init();
     objectManager.init();
     colorSchemeManager.init();
     drawManager.selectSatManager.init();

@@ -117,7 +117,7 @@ describe('shortTermFences.setSensor', () => {
 
   test('4', () => {
     const callFunction: any = () => {
-      shortTermFences.setSensor('c466a48309794261b64a4f02cfcc3d64', 987650);
+      shortTermFences.setSensor('fakeData', 987650);
     };
 
     expect(callFunction).not.toThrow();
@@ -133,7 +133,7 @@ describe('shortTermFences.setSensor', () => {
 
   test('4', () => {
     const callFunction: any = () => {
-      shortTermFences.setSensor('c466a48309794261b64a4f02cf$cc3d64', 987650);
+      shortTermFences.setSensor('fakeDat', 987650);
     };
 
     expect(callFunction).not.toThrow();
@@ -157,7 +157,7 @@ describe('shortTermFences.setSensor', () => {
 
   test('7', () => {
     const callFunction: any = () => {
-      shortTermFences.setSensor('c466a48309794261b64a4f02cfcc3d64', 987650);
+      shortTermFences.setSensor('fakeData', 987650);
     };
 
     expect(callFunction).not.toThrow();
@@ -190,7 +190,7 @@ describe('shortTermFences.stfFormOnSubmit', () => {
         composed: false,
         currentTarget: {},
         defaultPrevented: false,
-        eventPhase: 'c466a48309794261b64a4f02cfcc3d64',
+        eventPhase: 'fakeData',
         isTrusted: false,
         returnValue: false,
         srcElement: {},
@@ -224,7 +224,7 @@ describe('shortTermFences.stfFormOnSubmit', () => {
         returnValue: false,
         srcElement: {},
         target: {},
-        timeStamp: 'bc23a9d531064583ace8f67dad60f6bb',
+        timeStamp: '1234',
         type: 'object',
         AT_TARGET: 987650,
         BUBBLING_PHASE: -1.0,
@@ -253,7 +253,7 @@ describe('shortTermFences.stfFormOnSubmit', () => {
         returnValue: false,
         srcElement: {},
         target: {},
-        timeStamp: 'bc23a9d531064583ace8f67dad60f6bb',
+        timeStamp: '1234',
         type: 'object',
         AT_TARGET: 987650,
         BUBBLING_PHASE: -1.0,

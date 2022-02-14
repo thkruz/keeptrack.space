@@ -1,191 +1,195 @@
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>KeepTrack Configuration</title>
-    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
-    <script>
-      const launchKeepTrack = () => {
-        // Settings Manager Overrides
-        const settingsManagerOverride = {
-          // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
-          classificationStr: `${document.getElementById('classification').value}`,
-          // This controls which of the built-in plugins are loaded
-          plugins: {
-            atmosphere: true,
-            satInfoboxCore: true,
-            updateSelectBoxCore: true,
-            aboutManager: document.getElementById('aboutManager').nodeValue,
-            dops: document.getElementById('dops').nodeValue,
-            findSat: true,
-            launchCalendar: document.getElementById('launchCalendar').nodeValue,
-            newLaunch: true,
-            nextLaunch: document.getElementById('nextLaunch').nodeValue,
-            nightToggle: document.getElementById('nightToggle').nodeValue,
-            photoManager: true,
-            recorderManager: true,
-            satChanges: document.getElementById('satChanges').nodeValue,
-            stereoMap: true,
-            timeMachine: document.getElementById('timeMachine').nodeValue,
-            twitter: document.getElementById('twitter').nodeValue,
-            initialOrbit: document.getElementById('initialOrbit').nodeValue,
-            missile: true,
-            breakup: true,
-            editSat: true,
-            constellations: true,
-            countries: true,
-            colorsMenu: true,
-            shortTermFences: true,
-            externalSources: document.getElementById('externalSources').nodeValue,
-            analysis: true,
-            sensorFov: true,
-            sensorSurv: true,
-            satelliteView: document.getElementById('satelliteView').nodeValue,
-            satelliteFov: document.getElementById('satelliteFov').nodeValue,
-            planetarium: document.getElementById('planetarium').nodeValue,
-            astronomy: document.getElementById('astronomy').nodeValue,
-            photo: document.getElementById('photo').nodeValue,
-            watchlist: document.getElementById('watchlist').nodeValue,
-            sensor: document.getElementById('sensor').nodeValue,
-            settingsMenu: true,
-            datetime: true,
-            social: document.getElementById('social').nodeValue,
-            topMenu: true,
-            classification: true,
-            soundManager: true,
-          },
-        };
-        window.open(`index.html?settingsManagerOverride=${encodeURIComponent(JSON.stringify(settingsManagerOverride))}`);
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>KeepTrack Configuration</title>
+  <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+  <script>
+    const launchKeepTrack = () => {
+      // Settings Manager Overrides
+      const settingsManagerOverride = {
+        // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
+        classificationStr: `${document.getElementById('classification').value}`,
+        // This controls which of the built-in plugins are loaded
+        plugins: {
+          atmosphere: true,
+          satInfoboxCore: true,
+          updateSelectBoxCore: true,
+          aboutManager: document.getElementById('aboutManager').nodeValue,
+          dops: document.getElementById('dops').nodeValue,
+          findSat: true,
+          launchCalendar: document.getElementById('launchCalendar').nodeValue,
+          newLaunch: true,
+          nextLaunch: document.getElementById('nextLaunch').nodeValue,
+          nightToggle: document.getElementById('nightToggle').nodeValue,
+          photoManager: true,
+          recorderManager: true,
+          satChanges: document.getElementById('satChanges').nodeValue,
+          stereoMap: true,
+          timeMachine: document.getElementById('timeMachine').nodeValue,
+          twitter: document.getElementById('twitter').nodeValue,
+          initialOrbit: document.getElementById('initialOrbit').nodeValue,
+          missile: true,
+          breakup: true,
+          editSat: true,
+          constellations: true,
+          countries: true,
+          colorsMenu: true,
+          shortTermFences: true,
+          externalSources: document.getElementById('externalSources').nodeValue,
+          analysis: true,
+          sensorFov: true,
+          sensorSurv: true,
+          satelliteView: document.getElementById('satelliteView').nodeValue,
+          satelliteFov: document.getElementById('satelliteFov').nodeValue,
+          planetarium: document.getElementById('planetarium').nodeValue,
+          astronomy: document.getElementById('astronomy').nodeValue,
+          photo: document.getElementById('photo').nodeValue,
+          watchlist: document.getElementById('watchlist').nodeValue,
+          sensor: document.getElementById('sensor').nodeValue,
+          settingsMenu: true,
+          datetime: true,
+          social: document.getElementById('social').nodeValue,
+          topMenu: true,
+          classification: true,
+          soundManager: true,
+        },
       };
-    </script>
-  </head>
-  <body>
-    </p><span>Classification: </span><input type="text" id="classification" placeholder="" /></p>
-    <p>
-      <span>About Manager: </span>
-      <select id="aboutManager">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>DOPS: </span>
-      <select id="dops">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Launch Calendar: </span>
-      <select id="launchCalendar">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Next Launch: </span>
-      <select id="nextLaunch">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Night Toggle: </span>
-      <select id="nightToggle">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Sat Changes: </span>
-      <select id="satChanges">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Time Machine: </span>
-      <select id="timeMachine">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Twitter: </span>
-      <select id="twitter">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Initial Orbit: </span>
-      <select id="initialOrbit">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>External Sources: </span>
-      <select id="externalSources">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Satellite View: </span>
-      <select id="satelliteView">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Satellite FOV: </span>
-      <select id="satelliteFov">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Planetarium: </span>
-      <select id="planetarium">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Astronomy: </span>
-      <select id="astronomy">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Photo: </span>
-      <select id="photo">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Watchlist: </span>
-      <select id="watchlist">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Sensor: </span>
-      <select id="sensor">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <p>
-      <span>Social: </span>
-      <select id="social">
-        <option value="true" selected="selected">True</option>
-        <option value="false">False</option>
-      </select>
-    </p>
-    <button onclick="launchKeepTrack()">Launch</button>
-  </body>
+      window.open(`index.html?settingsManagerOverride=${encodeURIComponent(JSON.stringify(settingsManagerOverride))}`);
+    };
+  </script>
+</head>
+
+<body>
+  </p><span>Classification: </span><input type="text" id="classification" placeholder="" /></p>
+  <p>
+    <span>About Manager: </span>
+    <select id="aboutManager">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>DOPS: </span>
+    <select id="dops">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Launch Calendar: </span>
+    <select id="launchCalendar">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Next Launch: </span>
+    <select id="nextLaunch">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Night Toggle: </span>
+    <select id="nightToggle">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Sat Changes: </span>
+    <select id="satChanges">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Time Machine: </span>
+    <select id="timeMachine">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Twitter: </span>
+    <select id="twitter">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Initial Orbit: </span>
+    <select id="initialOrbit">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>External Sources: </span>
+    <select id="externalSources">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Satellite View: </span>
+    <select id="satelliteView">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Satellite FOV: </span>
+    <select id="satelliteFov">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Planetarium: </span>
+    <select id="planetarium">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Astronomy: </span>
+    <select id="astronomy">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Photo: </span>
+    <select id="photo">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Watchlist: </span>
+    <select id="watchlist">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Sensor: </span>
+    <select id="sensor">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <p>
+    <span>Social: </span>
+    <select id="social">
+      <option value="true" selected="selected">True</option>
+      <option value="false">False</option>
+    </select>
+  </p>
+  <button onclick="launchKeepTrack()">Launch</button>
+</body>
+
 </html>

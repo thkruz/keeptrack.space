@@ -515,6 +515,7 @@ export const addSatExtraFunctions = (i: number) => {
       if (nowLat < futLat) return 'N';
       if (nowLat > futLat) return 'S';
       if (nowLat === futLat) {
+        // TODO: decide what to do with this
         // futureTime = timeManager.getOffsetTimeObj(20000, timeManager.calculateSimulationTime());
         // futureTEARR = satSet.satData[i].getTEARR(futureTime);
         if (nowLat < futLat) return 'N';

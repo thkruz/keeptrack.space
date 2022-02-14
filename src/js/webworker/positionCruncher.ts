@@ -268,7 +268,8 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
       }
       break;
     default:
-      console.warn('Unknown message typ: ' + m.data.typ);
+      // NOTE: For debugging turn this on
+      // console.warn('Unknown message typ: ' + m.data.typ);
       if (m.data.isSunlightView) {
         isSunlightView = m.data.isSunlightView;
       }

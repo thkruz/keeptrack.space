@@ -279,7 +279,7 @@ export const uiManagerInit = (): void => {
   });
 };
 
-export const updateLoop = () => {
+export const updateLoop = () => { // NOSONAR
   const {
     satellite,
     satSet,
@@ -327,7 +327,7 @@ export const updateLoop = () => {
   }
 };
 
-export const bottomMenuClick = (iconName: string) => {
+export const bottomMenuClick = (iconName: string) => { // NOSONAR
   const { satellite, satSet, uiManager, sensorManager, timeManager }: { satellite: any; satSet: any; uiManager: any; sensorManager: any; timeManager: any } = keepTrackApi.programs;
 
   if (iconName === 'menu-info-overlay') {

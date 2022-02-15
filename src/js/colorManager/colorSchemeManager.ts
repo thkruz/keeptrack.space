@@ -212,7 +212,10 @@ export const colorSchemeManager: ColorSchemeManager = {
   currentColorScheme: null,
   iSensor: 0,
   lastCalculation: 0,
-  calculateColorBuffers: async (isForceRecolor?: boolean): Promise<void> => {
+
+  // This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+  calculateColorBuffers: async (isForceRecolor?: boolean): Promise<void> => { // NOSONAR
     try {
       // These two variables only need to be set once, but we want to make sure they aren't called before the satellites
       // are loaded into satSet. Don't move the buffer data creation into the constructor!

@@ -117,7 +117,7 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 
-export const getSatChngJson = (resp: any) => {
+export const getSatChngJson = (resp: any) => { // NOSONAR
   resp = [...new Set(resp)];
 
   const { satSet } = keepTrackApi.programs;

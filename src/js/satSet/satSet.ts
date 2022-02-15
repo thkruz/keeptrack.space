@@ -57,7 +57,7 @@ import { search } from './search';
 
 // ******************** Initialization ********************
 
-export const init = async (satCruncherOveride?: any): Promise<void> => {
+export const init = async (satCruncherOveride?: any): Promise<void> => { // NOSONAR
   try {
     const { uiManager } = keepTrackApi.programs;
     let satCruncher: Worker;
@@ -270,7 +270,7 @@ export const mergeSat = (sat: SatObject): void => {
 export const replaceSatSet = (newSatSet: any) => {
   satSet = newSatSet;
 };
-export const addSatExtraFunctions = (i: number) => {
+export const addSatExtraFunctions = (i: number) => { // NOSONAR
   const { sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
   if (typeof satSet.satData[i].isInSun == 'undefined') {
     satSet.satData[i].isInSun = () => {

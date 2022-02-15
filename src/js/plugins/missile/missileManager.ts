@@ -96,7 +96,7 @@ export const Missile = (
   MaxMissileRange: number,
   country: any,
   minAltitude: number
-) => {
+) => { // NOSONAR
   // This is the main function for this program. It calculates and designs the flight path of an intercontinental
   // ballistic missile (ICBM). This function calls upon many sub-functions to help it iteratively calculate many of the
   // changing variables as the rocket makes its path around the world. Changing variables that had to be taken into
@@ -738,7 +738,7 @@ export const Missile = (
   missileManager.lastMissileError = 'Missile Named RV_' + missileObj.id + '<br>has been created.';
   return 1; // Successful Launch
 };
-export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[]) => {
+export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[]) => { // NOSONAR
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
   const now = timeManager.calculateSimulationTime();
   let j = jday(
@@ -2437,7 +2437,7 @@ export const _CoordinateCalculator = (
   CurrentLongitude: number,
   TargetLatitude: number,
   TargetLongitude: number
-): [number[], number[], number, number, number[], number] => {
+): [number[], number[], number, number, number[], number] => { // NOSONAR
   // This function calculates the path of the rocket across the earth in terms of coordinates by using
   // great-circle equations. It will also calculate which direction will be the shortest distance to the
   // target and then calculate the distance across the surface of the earth to the target. There is only

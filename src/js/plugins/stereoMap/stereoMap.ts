@@ -194,7 +194,7 @@ export const resize2DMap = function (isForceWidescreen?: boolean): void {
     mapMenuDOM.width($(window).width());
   }
 };
-export const bottomMenuClick = (iconName: string): void => {
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-map') {
     const { mapManager, uiManager, objectManager, satSet } = keepTrackApi.programs;
     if (mapManager.isMapMenuOpen) {

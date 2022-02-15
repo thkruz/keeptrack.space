@@ -2,7 +2,9 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
-export const countriesRules = (sat: SatObject): ColorInformation => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const countriesRules = (sat: SatObject): ColorInformation => { // NOSONAR
   const { mainCamera } = keepTrackApi.programs;
   if (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
     return {

@@ -3,7 +3,9 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
-export const defaultRules = (sat: SatObject): ColorInformation => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
   // NOTE: The order of these checks is important
   // Grab reference to outside managers for their functions
   const { mainCamera, sensorManager, objectManager, satSet } = keepTrackApi.programs;

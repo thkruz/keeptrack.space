@@ -90,7 +90,7 @@ settingsManager = {
   isEditTime: null,
   fieldOfView: null,
   db: null,
-  init: () => {
+  init: () => { // NOSONAR
     settingsManager.pTime = [];
 
     // Install Folder Settings

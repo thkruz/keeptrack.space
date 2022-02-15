@@ -49,7 +49,7 @@ export const uiManagerInit = () => {
   });
 };
 
-export const constellationMenuClick = (groupName: any) => {
+export const constellationMenuClick = (groupName: any) => { // NOSONAR
   const { satSet, objectManager, groupsManager, lineManager, uiManager } = keepTrackApi.programs;
 
   if (typeof groupsManager == 'undefined') return;

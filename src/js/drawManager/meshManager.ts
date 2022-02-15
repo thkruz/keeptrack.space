@@ -297,7 +297,9 @@ export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: 
   meshManager.currentModel.nadirYaw = mainCamera.lon2yaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
 };
 
-export const update = (timeManager: TimeManager, sat: SatObject) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
   try {
     meshManager.currentModel.id = sat?.id || -1;
     meshManager.currentModel.static = sat?.static || false;
@@ -357,7 +359,9 @@ export const update = (timeManager: TimeManager, sat: SatObject) => {
   }
 };
 
-export const getSatelliteModel = (sat: SatObject) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const getSatelliteModel = (sat: SatObject) => { // NOSONAR
   const { mainCamera, timeManager } = keepTrackApi.programs;
 
   if (checkIfNameKnown(sat.name)) {

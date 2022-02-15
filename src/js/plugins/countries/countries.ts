@@ -95,7 +95,7 @@ export const uiManagerInit = () => {
   });
 };
 
-export const countryMenuClick = (groupName: string): void => {
+export const countryMenuClick = (groupName: string): void => { // NOSONAR
   const { groupsManager } = keepTrackApi.programs;
   switch (groupName) {
     case 'Canada':

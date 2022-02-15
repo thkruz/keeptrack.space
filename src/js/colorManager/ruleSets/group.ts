@@ -2,7 +2,9 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
-export const groupRules = (sat: SatObject): ColorInformation => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const groupRules = (sat: SatObject): ColorInformation => { // NOSONAR
   // Glitch in the Matrix
   // if (groupsManager.selectedGroup === null) return;
   // Show Things in the Group

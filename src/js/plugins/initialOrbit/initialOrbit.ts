@@ -218,7 +218,7 @@ export const bottomMenuClick = (iconName: string): void => {
     }
   }
 };
-export const obfitFormSubmit = (e: any) => {
+export const obfitFormSubmit = (e: any) => { // NOSONAR
   const { uiManager, satSet, timeManager, satellite } = keepTrackApi.programs;
   let t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v;
   let t2v, x2v, y2v, z2v, xd2v, yd2v, zd2v;

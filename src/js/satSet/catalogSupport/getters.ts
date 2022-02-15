@@ -107,7 +107,7 @@ export const getIdFromEci = (eci: { x: number; y: number; z: number }): number =
   }
   return -1;
 };
-export const getSat = (i: number): SatObject => {
+export const getSat = (i: number): SatObject => { // NOSONAR
   const { satSet } = keepTrackApi.programs;
   if (!satSet.satData || !satSet.satData[i]) return null;
   const { dotsManager } = keepTrackApi.programs;

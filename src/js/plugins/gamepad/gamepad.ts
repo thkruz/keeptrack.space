@@ -10,8 +10,7 @@ export const init = (): void => {
     currentState: null,
   };
   // NOTE: This is note a message event and sonarqube should ignore it
-  window.addEventListener('gamepadconnected', (evt: any) => {
-    // NOSONAR
+  window.addEventListener('gamepadconnected', (evt: any) => { // NOSONAR    
     if (settingsManager.cruncherReady) {
       gamepadConnected(<GamepadEvent>event);
     } else {

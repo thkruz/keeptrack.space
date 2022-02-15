@@ -81,7 +81,7 @@ export const defaultSensor: SensorObject = {
   staticNum: 0,
   sun: 'No Impact',
   type: SpaceObjectType.PHASED_ARRAY_RADAR,
-  url: 'http://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
+  url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
   volume: false,
   zoom: 'leo',
 };

@@ -227,7 +227,7 @@ export const allObjectsLink = (): void => {
   uiManager.doSearch(searchStr);
   $('#search').val(searchStr);
 };
-export const orbitalData = (sat: SatObject): void => {
+export const orbitalData = (sat: SatObject): void => { // NOSONAR
   if (!satInfoboxCore.orbitalData.isLoaded) {
     $('#ui-wrapper').append(keepTrackApi.html`
           <div id="sat-infobox" class="text-select satinfo-fixed">
@@ -449,7 +449,7 @@ export const orbitalData = (sat: SatObject): void => {
   $('#near-orbits-link').on('click', nearOrbitsLink);
   $('#near-objects-link').on('click', nearObjectsLinkClick);
 };
-export const satMissionData = (sat: SatObject): void => {
+export const satMissionData = (sat: SatObject): void => { // NOSONAR
   if (!satInfoboxCore.satMissionData.isLoaded) {
     $('#sat-infobox').append(`
         <li class="divider"></li>
@@ -625,7 +625,7 @@ export const satMissionData = (sat: SatObject): void => {
     });
   }
 };
-export const intelData = (sat: SatObject, satId?: number): void => {
+export const intelData = (sat: SatObject, satId?: number): void => { // NOSONAR
   if (satId !== -1) {
     if (typeof sat.TTP != 'undefined') {
       $('#sat-ttp-wrapper').show();

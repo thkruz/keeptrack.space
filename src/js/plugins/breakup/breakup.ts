@@ -115,7 +115,9 @@ export const uiManagerInit = (): void => {
   });
 };
 
-export const breakupOnSubmit = (): void => {
+  // This is intentionally complex to reduce object creation and GC
+  // Splitting it into subfunctions would not be optimal
+export const breakupOnSubmit = (): void => { // NOSONAR
   const { orbitManager, satellite, timeManager, uiManager, satSet } = keepTrackApi.programs;
   let satId = satSet.getIdFromObjNum($('#hc-scc').val());
   const mainsat: SatObject = satSet.getSat(satId);
@@ -221,7 +223,7 @@ export const hideSideMenus = (): void => {
   $('#menu-breakup').removeClass('bmenu-item-selected');
   isBreakupMenuOpen = false;
 };
-export const bottomMenuClick = (iconName: string): void => {
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-breakup') {
     const { uiManager, satSet, objectManager } = keepTrackApi.programs;
     if (isBreakupMenuOpen) {

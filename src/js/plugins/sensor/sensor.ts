@@ -543,7 +543,7 @@ export const sensorListContentClick = (sensorClick: string) => {
   }
 };
 
-export const bottomMenuClick = (iconName: string): void => {
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   const { uiManager, sensorManager, satSet, objectManager, satellite } = keepTrackApi.programs;
   switch (iconName) {
     case 'menu-sensor-list': // No Keyboard Commands

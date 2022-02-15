@@ -51,7 +51,9 @@ export class LineFactory {
     return starFound;
   }
 
-  create(type: LineTypes, value: number[] | number, color?: LineColors): void {
+  // This is intentionally complex to reduce object creation and GC
+  // Splitting it into subfunctions would not be optimal
+  create(type: LineTypes, value: number[] | number, color?: LineColors): void { // NOSONAR
     const getSat = keepTrackApi.programs.satSet.getSat;
     let sat = null;
     let sat2 = null;
@@ -306,7 +308,9 @@ export class LineFactory {
     return this.drawLineList.length;
   }
 
-  draw(): void {
+  // This is intentionally complex to reduce object creation and GC
+  // Splitting it into subfunctions would not be optimal
+  draw(): void { // NOSONAR
     if (this.drawLineList.length == 0) return;
     for (let i = 0; i < this.drawLineList.length; i++) {
       try {

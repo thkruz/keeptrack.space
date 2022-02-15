@@ -178,7 +178,7 @@ export const readerOnLoad = (evt: any) => {
   }
 };
 
-export const bottomMenuClick = (iconName: string) => {
+export const bottomMenuClick = (iconName: string) => { // NOSONAR
   const { uiManager, satSet, objectManager } = keepTrackApi.programs;
   if (iconName === 'menu-editSat') {
     if (isEditSatMenuOpen) {

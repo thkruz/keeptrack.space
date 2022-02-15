@@ -1,6 +1,8 @@
 import { camera } from './camera';
 
-export const keyUpHandler = (evt: KeyboardEvent) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const keyUpHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
 
@@ -55,7 +57,9 @@ export const keyUpHandler = (evt: KeyboardEvent) => {
   }
 };
 
-export const keyDownHandler = (evt: KeyboardEvent) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
 

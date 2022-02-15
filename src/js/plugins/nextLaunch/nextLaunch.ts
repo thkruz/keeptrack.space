@@ -38,7 +38,7 @@ export const makeTableHeaders = (tbl: HTMLTableElement): void => {
   tdC.setAttribute('style', 'text-decoration: underline');
 };
 
-export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
+export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => { // NOSONAR
   makeTableHeaders(tbl);
 
   for (let i = 0; i < launchList.length; i++) {
@@ -207,7 +207,7 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
   init: () => {
     if (settingsManager.offline) $('#menu-nextLaunch').hide();
   },
-  showTable: () => {
+  showTable: () => { // NOSONAR
     if (nextLaunchManager.launchList.length === 0) {
       if (window.location.hostname !== 'localhost') {
         fetch('https://ll.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed')
@@ -237,7 +237,7 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
       }
     }
   },
-  processData: (resp: { results: Array<any> }) => {
+  processData: (resp: { results: Array<any> }) => { // NOSONAR
     for (let i = 0; i < resp.results.length; i++) {
       /**
        * Info from launchlibrary.net

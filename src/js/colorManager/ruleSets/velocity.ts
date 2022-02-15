@@ -2,7 +2,9 @@ import { SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
-export const velocityRules = (sat: SatObject): ColorInformation => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const velocityRules = (sat: SatObject): ColorInformation => { // NOSONAR
   // Stars
   if (sat.static && sat.type === SpaceObjectType.STAR) {
     if (sat.vmag >= 4.7 && colorSchemeManager.objectTypeFlags.starLow) {

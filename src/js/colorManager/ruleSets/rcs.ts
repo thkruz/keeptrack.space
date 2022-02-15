@@ -1,7 +1,9 @@
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
-export const rcsRules = (sat: SatObject): ColorInformation => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const rcsRules = (sat: SatObject): ColorInformation => { // NOSONAR
   const rcs: number = parseFloat(sat.rcs);
   if (rcs < 0.1 && colorSchemeManager.objectTypeFlags.rcsSmall === false) {
     return {

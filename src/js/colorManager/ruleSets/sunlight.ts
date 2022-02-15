@@ -3,7 +3,9 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
-export const sunlightRules = (sat: SatObject): ColorInformation => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
   const { satSet } = keepTrackApi.programs;
 
   if (sat.static && (sat.type === SpaceObjectType.LAUNCH_FACILITY || sat.type === SpaceObjectType.CONTROL_FACILITY) && colorSchemeManager.objectTypeFlags.facility === false) {

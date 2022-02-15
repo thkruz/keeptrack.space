@@ -53,7 +53,7 @@ export const cruncherExtraUpdate = (m: SatCruncherMessage) => {
   satSet.satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
   satSet.satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
 };
-export const cruncherDotsManagerInteraction = (m: SatCruncherMessage) => {
+export const cruncherDotsManagerInteraction = (m: SatCruncherMessage) => { // NOSONAR
   const { dotsManager, satSet } = keepTrackApi.programs;
   if (typeof dotsManager.positionData == 'undefined') {
     dotsManager.positionData = new Float32Array(m.data.satPos);
@@ -106,7 +106,7 @@ export const getVariableSearch = (params: string[]) => {
     }
   }
 };
-export const getVariableActions = (params: string[]) => {
+export const getVariableActions = (params: string[]) => { // NOSONAR
   const { timeManager, objectManager, uiManager, satSet } = keepTrackApi.programs;
   for (let i = 0; i < params.length; i++) {
     const key = params[i].split('=')[0];

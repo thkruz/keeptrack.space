@@ -60,6 +60,7 @@ export const init: any = async () => {
     let p = OBJ.downloadModels(meshManager.fileList);
 
     p.then((models: any[]) => {
+      // DEBUG:
       // for (var [name, mesh] of Object.entries(models)) {
       //   console.debug('Name:', name);
       //   console.debug('Mesh:', mesh);
@@ -70,9 +71,11 @@ export const init: any = async () => {
       meshManager.isReady = true;
       // eslint-disable-next-line no-unused-vars
     }).catch(() => {
+      // DEBUG:
       // console.warn(error);
     });
   } catch {
+    // DEBUG:
     // console.debug(error);
   }
 };
@@ -87,6 +90,7 @@ export const populateFileList = () => {
       meshManager.fileList.push(meshFiles);
     }
   } catch (error) {
+    // DEBUG:
     // console.debug(error);
   }
 };
@@ -213,8 +217,10 @@ export const initBuffers = (meshes?: any) => {
       // model objects and setting their mesh to the current mesh
       meshManager.models[mesh] = {};
       meshManager.models[mesh].mesh = meshManager.meshes[mesh];
+      // DEBUG:
       // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
     } catch (error) {
+      // DEBUG:
       // console.warn(error);
     }
   }
@@ -297,7 +303,9 @@ export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: 
   meshManager.currentModel.nadirYaw = mainCamera.lon2yaw(sat.getTEARR().lon * RAD2DEG, timeManager.selectedDate) + 180 * DEG2RAD;
 };
 
-export const update = (timeManager: TimeManager, sat: SatObject) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
   try {
     meshManager.currentModel.id = sat?.id || -1;
     meshManager.currentModel.static = sat?.static || false;
@@ -357,7 +365,9 @@ export const update = (timeManager: TimeManager, sat: SatObject) => {
   }
 };
 
-export const getSatelliteModel = (sat: SatObject) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const getSatelliteModel = (sat: SatObject) => { // NOSONAR
   const { mainCamera, timeManager } = keepTrackApi.programs;
 
   if (checkIfNameKnown(sat.name)) {

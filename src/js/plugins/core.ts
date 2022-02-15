@@ -1,7 +1,7 @@
 import { isThisJest } from '../api/keepTrackApi';
 
 // Register all core modules
-export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => {
+export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => { // NOSONAR
   plugins ??= {};
   try {
     // Register Catalog Loader

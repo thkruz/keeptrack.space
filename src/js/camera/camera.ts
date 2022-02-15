@@ -39,7 +39,9 @@ export const resetFpsPos = (): void => {
   camera.fpsPos[2] = 0;
 };
 
-export const fpsMovement = (): void => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const fpsMovement = (): void => { // NOSONAR
   const fpsTimeNow = Date.now();
   if (camera.fpsLastTime !== 0) {
     const fpsElapsed = fpsTimeNow - camera.fpsLastTime;
@@ -198,7 +200,9 @@ export const camSnap = (pitch: number, yaw: number): void => {
   camera.isCamSnapMode = true;
 };
 
-export const snapToSat = (sat: SatObject) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const snapToSat = (sat: SatObject) => { // NOSONAR
   /* camera function runs every frame that a satellite is selected.
   However, the user might have broken out of the zoom snap or angle snap.
   If so, don't change those targets. */
@@ -270,7 +274,9 @@ export const fts2default = (): void => {
   }
 };
 
-export const calculate = (dt: number, isSlowDown: boolean) => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const calculate = (dt: number, isSlowDown: boolean) => { // NOSONAR
   if (camera.isScreenPan || camera.isWorldPan || camera.isPanReset) {
     // If user is actively moving
     if (camera.isScreenPan || camera.isWorldPan) {
@@ -593,10 +599,12 @@ export const calculate = (dt: number, isSlowDown: boolean) => {
   }
 };
 
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
 export const update = (
   target: { id: number; getAltitude: () => number; position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number }; type: SpaceObjectType },
   sensorPos: { lat: number; lon: number; gmst: number; x: number; y: number; z: number }
-) => {
+) => { // NOSONAR
   camera.camMatrix = camera.camMatrixEmpty;
   const normUp = glm.vec3.create();
   const normForward = glm.vec3.create();
@@ -717,20 +725,20 @@ export const update = (
         break;
       }
       case camera.cameraType.Satellite: {
-        const targetPosition = glm.vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
-        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPosition);
-        glm.vec3.normalize(normUp, targetPosition);
+        const targetPositionTemp = glm.vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
+        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPositionTemp);
+        glm.vec3.normalize(normUp, targetPositionTemp);
         glm.vec3.normalize(normForward, [target.velocity.x, target.velocity.y, target.velocity.z]);
         glm.vec3.transformQuat(normLeft, normUp, glm.quat.fromValues(normForward[0], normForward[1], normForward[2], 90 * DEG2RAD));
         const targetNextPosition = glm.vec3.fromValues(target.position.x + target.velocity.x, target.position.y + target.velocity.y, target.position.z + target.velocity.z);
-        glm.mat4.lookAt(camera.camMatrix, targetNextPosition, targetPosition, normUp);
+        glm.mat4.lookAt(camera.camMatrix, targetNextPosition, targetPositionTemp, normUp);
 
         glm.mat4.translate(camera.camMatrix, camera.camMatrix, [target.position.x, target.position.y, target.position.z]);
 
         glm.mat4.rotate(camera.camMatrix, camera.camMatrix, camera.fpsPitch * DEG2RAD, normLeft);
         glm.mat4.rotate(camera.camMatrix, camera.camMatrix, -camera.fpsYaw * DEG2RAD, normUp);
 
-        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPosition);
+        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPositionTemp);
         break;
       }
       case camera.cameraType.Astronomy: {

@@ -25,7 +25,7 @@ export const getOrbitByLatLon = (
   now: Date,
   goalAlt?: number,
   raanOffset?: number
-): [string, string] => {
+): [string, string] => { // NOSONAR
   let newMeana: string = null;
   let newArgPer: string = null;
   goalAlt = goalAlt || null;

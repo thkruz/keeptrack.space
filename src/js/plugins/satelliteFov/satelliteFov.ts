@@ -54,7 +54,7 @@ export const init = (): void => {
     cb: bottomMenuClick,
   });
 };
-export const bottomMenuClick = (iconName: string): void => {
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   const { satSet, objectManager, uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-sat-fov') {
     if (objectManager.selectedSat === -1 && $('#search').val() === '') {

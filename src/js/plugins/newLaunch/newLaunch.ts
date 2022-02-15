@@ -172,7 +172,7 @@ export const uiManagerInit = () => {
       `);
 };
 
-export const bottomMenuClick = (iconName: string): void => {
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   const aM = keepTrackApi.programs.adviceManager;
   if (iconName === 'menu-newLaunch') {
     if (isNewLaunchMenuOpen) {

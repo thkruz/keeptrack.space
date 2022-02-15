@@ -239,7 +239,9 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
     hoverOverSomething(satId, satX, satY);
   }
 };
-export const updateHover = () => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const updateHover = () => { // NOSONAR
   const { drawManager, mainCamera, orbitManager, uiManager, searchBox, satSet, timeManager } = keepTrackApi.programs;
 
   if (searchBox.isResultBoxOpen() && !settingsManager.disableUI && !settingsManager.lowPerf) {

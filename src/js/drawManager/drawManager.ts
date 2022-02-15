@@ -498,14 +498,14 @@ export const onDrawLoopComplete = (cb: () => void) => {
   }
   cb();
 };
-export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: SunObject, postProcessingManager: PostProcessingManager) => {
+export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: SunObject, postProcessingManagerRef: PostProcessingManager) => {
   if (typeof gl === 'undefined' || gl === null) throw new Error('gl is undefined or null');
   if (typeof sun === 'undefined' || sun === null) throw new Error('sun is undefined or null');
-  if (typeof postProcessingManager === 'undefined' || postProcessingManager === null) throw new Error('postProcessingManager is undefined or null');
+  if (typeof postProcessingManagerRef === 'undefined' || postProcessingManagerRef === null) throw new Error('postProcessingManager is undefined or null');
 
   // Post Processing Texture Needs Scaled
   sun.initGodrays(gl);
-  postProcessingManager.init(gl);
+  postProcessingManagerRef.init(gl);
 
   // Reset Flag now that textures are reinitialized
   drawManager.isPostProcessingResizeNeeded = false;

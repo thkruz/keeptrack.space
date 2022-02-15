@@ -56,7 +56,7 @@ export const drawAllConstellations = () => {
     }
   }
 };
-export const drawConstellations = (C: string) => {
+export const drawConstellations = (C: string) => { // NOSONAR
   if (typeof C === 'undefined') return;
 
   const getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;

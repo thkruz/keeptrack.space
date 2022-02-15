@@ -5,7 +5,7 @@ useMockWorkers();
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
 
-settingsManager = {
+const settingsManager = {
   plugins: {
     datetime: {},
   },

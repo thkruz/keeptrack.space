@@ -2,7 +2,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { cKmPerMs, DEG2RAD } from '@app/js/lib/constants';
 
-export const updateSelectBoxCoreCallback = (sat: SatObject) => {
+export const updateSelectBoxCoreCallback = (sat: SatObject) => { // NOSONAR
   const { satellite, missileManager, timeManager, objectManager, sensorManager, uiManager } = keepTrackApi.programs;
 
   if (typeof sat === 'undefined' || sat == null) throw new Error('updateSelectBoxCoreCallback: sat is undefined');

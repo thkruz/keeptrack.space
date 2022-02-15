@@ -1,7 +1,9 @@
-class Worker {
+export class Worker {
   constructor(stringUrl) {
     this.url = stringUrl;
-    this.onmessage = () => {};
+    this.onmessage = () => {
+      // This is intentional
+    };
   }
 
   postMessage(msg) {

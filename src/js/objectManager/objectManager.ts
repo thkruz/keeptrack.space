@@ -447,7 +447,9 @@ const setLasthoveringSat = (id: number): void => {
   objectManager.lasthoveringSat = id;
 };
 
-const init = () => {
+  // This is intentionally complex to reduce object creation and GC
+  // Splitting it into subfunctions would not be optimal
+const init = () => { // NOSONAR
   const sensorManager = keepTrackApi.programs.sensorManager;
   // Create a buffer of missile objects
   for (let i = 0; i < settingsManager.maxMissiles; i++) {

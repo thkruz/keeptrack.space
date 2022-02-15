@@ -340,7 +340,7 @@ export const nextNpasses = (sat: SatObject, sensors: SensorObject[], searchLengt
   }
   return passTimesArray;
 };
-export const getlookangles = (sat: SatObject): TearrData[] => {
+export const getlookangles = (sat: SatObject): TearrData[] => { // NOSONAR
   const { timeManager, sensorManager } = keepTrackApi.programs;
 
   // Error Checking
@@ -514,7 +514,7 @@ const getSatPos = (offset: number, satrec: SatRec): Eci => {
 };
 
 /* istanbul ignore next */
-export const findCloseObjects = () => {
+export const findCloseObjects = () => { // NOSONAR
   const { satSet } = keepTrackApi.programs;
   const searchRadius = 50; // km
 
@@ -629,7 +629,7 @@ export const findCloseObjects = () => {
 
   return searchStr; // csoListUnique;
 };
-export const calculateLookAngles = (sat: SatObject, sensors: SensorObject[]) => {
+export const calculateLookAngles = (sat: SatObject, sensors: SensorObject[]) => { // NOSONAR
   const { sensorManager, timeManager } = keepTrackApi.programs;
 
   (function _inputValidation() {
@@ -738,7 +738,7 @@ export const findBestPasses = (sats: string, sensor: SensorObject) => {
   saveCsv(tableSatTimes, 'bestSatTimes');
 };
 /* istanbul ignore next */
-export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => {
+export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NOSONAR
   const { sensorManager, timeManager } = keepTrackApi.programs;
 
   (function _inputValidation() {
@@ -1348,7 +1348,7 @@ export const getSunDirection = (jd: number): EciArr3 => {
 
   return [x, y, z];
 };
-export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => {
+export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => { // NOSONAR
   const { timeManager, sensorManager } = keepTrackApi.programs;
 
   sensors = verifySensors(sensors, sensorManager);

@@ -276,15 +276,18 @@ export const drawLoop = (preciseDt: number) => {
   //   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   //   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  // DEBUG: Kept for future use
   //   // postProcessingManager.switchFrameBuffer();
   //   postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.hdr, postProcessingManager.curBuffer, sceneManager.sun.godrays.frameBuffer);
 
+  // DEBUG: Kept for future use
   //   // Load input into edges
   //   postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaEdges, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
   //   postProcessingManager.switchFrameBuffer();
   //   // Load edges into weights
   //   postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaWeights, postProcessingManager.curBuffer, postProcessingManager.curBuffer);
 
+  // DEBUG: Kept for future use
   //   // Load weights into blend along with original
   //   postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.smaaBlend, postProcessingManager.curBuffer, null, sceneManager.sun);
   // }
@@ -400,7 +403,9 @@ export const satCalculate = () => {
     objectManager.lastSelectedSat(objectManager.selectedSat);
   }
 };
-export const orbitsAbove = () => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const orbitsAbove = () => { // NOSONAR
   const { mainCamera, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
 
   if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
@@ -505,6 +510,7 @@ export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: Sun
   // Reset Flag now that textures are reinitialized
   drawManager.isPostProcessingResizeNeeded = false;
 };
+// DEBUG: Kept for future use
 // export const checkIfPostProcessingRequired = (postProcessingManagerOverride?) => {
 //   if (postProcessingManagerOverride) drawManager.postProcessingManager = postProcessingManagerOverride;
 
@@ -514,6 +520,7 @@ export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: Sun
 //   //   drawManager.gaussianAmt = 500;
 //   // }
 
+// DEBUG: Kept for future use
 //   // if (drawManager.gaussianAmt > 0) {
 //   //   drawManager.gaussianAmt -= drawManager.dt * 2;
 //   //   drawManager.isNeedPostProcessing = true;
@@ -522,29 +529,34 @@ export const resizePostProcessingTexture = (gl: WebGL2RenderingContext, sun: Sun
 //   //   drawManager.postProcessingManager.isGaussianNeeded = false;
 //   // }
 
+// DEBUG: Kept for future use
 //   // Slight Blur
 //   drawManager.postProcessingManager.isFxaaNeeded = false;
 //   // Horrible Results
 //   drawManager.postProcessingManager.isSmaaNeeded = false;
 
+// DEBUG: Kept for future use
 //   if (drawManager.postProcessingManager.isGaussianNeeded) {
 //     drawManager.isNeedPostProcessing = true;
 //     drawManager.postProcessingManager.switchFrameBuffer();
 //     return;
 //   }
 
+// DEBUG: Kept for future use
 //   if (drawManager.postProcessingManager.isFxaaNeeded) {
 //     drawManager.isNeedPostProcessing = true;
 //     drawManager.postProcessingManager.switchFrameBuffer();
 //     return;
 //   }
 
+// DEBUG: Kept for future use
 //   if (drawManager.postProcessingManager.isSmaaNeeded) {
 //     drawManager.isNeedPostProcessing = true;
 //     drawManager.postProcessingManager.switchFrameBuffer();
 //     return;
 //   }
 
+// DEBUG: Kept for future use
 //   // drawManager.postProcessingManager.switchFrameBuffer();
 //   drawManager.isNeedPostProcessing = false;
 // };

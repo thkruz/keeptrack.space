@@ -104,6 +104,8 @@ export const updateSensorPosition = (position: GeolocationPosition): void => {
 
 export const useCurrentGeolocationAsSensor = () => {
   if (location.protocol === 'https:' && !settingsManager.geolocationUsed && settingsManager.isMobileModeEnabled) {
-    navigator.geolocation.getCurrentPosition(updateSensorPosition);
+    // Access to the users geolocation is explicitly for allowing them to use the
+    // lat lon information when creating a custom sensor.
+    navigator.geolocation.getCurrentPosition(updateSensorPosition); // NOSONAR
   }
 };

@@ -1,38 +1,23 @@
 @font-face {
-    font-family: 'Varela Round';
-    font-weight: 400;
-    font-style: normal;
-    src: url('fonts/Varela-Round-regular/Varela-Round-regular.eot');
-    src: url('fonts/Varela-Round-regular/Varela-Round-regular.eot?#iefix')
-            format('embedded-opentype'),
-        local('Varela Round Regular'), local('Varela-Round-regular'),
-        url('fonts/Varela-Round-regular/Varela-Round-regular.woff2')
-            format('woff2'),
-        url('fonts/Varela-Round-regular/Varela-Round-regular.woff')
-            format('woff'),
-        url('fonts/Varela-Round-regular/Varela-Round-regular.ttf')
-            format('truetype'),
-        url('fonts/Varela-Round-regular/Varela-Round-regular.svg#VarelaRound')
-            format('svg');
+  font-family: 'Varela Round';
+  font-weight: 400;
+  font-style: normal;
+  src: url('fonts/Varela-Round-regular/Varela-Round-regular.eot');
+  src: url('fonts/Varela-Round-regular/Varela-Round-regular.eot?#iefix') format('embedded-opentype'), local('Varela Round Regular'), local('Varela-Round-regular'),
+    url('fonts/Varela-Round-regular/Varela-Round-regular.woff2') format('woff2'), url('fonts/Varela-Round-regular/Varela-Round-regular.woff') format('woff'),
+    url('fonts/Varela-Round-regular/Varela-Round-regular.ttf') format('truetype'), url('fonts/Varela-Round-regular/Varela-Round-regular.svg#VarelaRound') format('svg');
 }
 
 @font-face {
-    font-family: 'Open Sans';
-    font-style: normal;
-    font-weight: 400;
-    src: url('fonts/droid/droid-sans-v6-latin-regular.eot'); /* IE9 Compat Modes */
-    src: local('Open Sans'), local('DroidSans'),
-        url('fonts/droid/droid-sans-v6-latin-regular.eot?#iefix')
-            format('embedded-opentype'),
-        /* IE6-IE8 */ url('fonts/droid/droid-sans-v6-latin-regular.woff2')
-            format('woff2'),
-        /* Super Modern Browsers */
-            url('fonts/droid/droid-sans-v6-latin-regular.woff') format('woff'),
-        /* Modern Browsers */ url('fonts/droid/droid-sans-v6-latin-regular.ttf')
-            format('truetype'),
-        /* Safari, Android, iOS */
-            url('fonts/droid/droid-sans-v6-latin-regular.svg#DroidSans')
-            format('svg'); /* Legacy iOS */
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/droid/droid-sans-v6-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Open Sans'), local('DroidSans'), url('fonts/droid/droid-sans-v6-latin-regular.eot?#iefix') format('embedded-opentype'),
+    /* IE6-IE8 */ url('fonts/droid/droid-sans-v6-latin-regular.woff2') format('woff2'),
+    /* Super Modern Browsers */ url('fonts/droid/droid-sans-v6-latin-regular.woff') format('woff'),
+    /* Modern Browsers */ url('fonts/droid/droid-sans-v6-latin-regular.ttf') format('truetype'),
+    /* Safari, Android, iOS */ url('fonts/droid/droid-sans-v6-latin-regular.svg#DroidSans') format('svg'); /* Legacy iOS */
 }
 
 /**/
@@ -40,39 +25,37 @@
 
 /* fallback */
 @font-face {
-    font-family: 'Material Icons';
-    font-style: normal;
-    font-weight: 400;
-    src: url('fonts/material-icons/material-icons.eot'); /* For IE6-8 */
-    src: local('Material Icons'), local('MaterialIcons-Regular'),
-        url('fonts/material-icons/material-icons.woff2') format('woff2'),
-        url('fonts/material-icons/material-icons.woff') format('woff'),
-        url('fonts/material-icons/material-icons.ttf') format('truetype');
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/material-icons/material-icons.eot'); /* For IE6-8 */
+  src: local('Material Icons'), local('MaterialIcons-Regular'), url('fonts/material-icons/material-icons.woff2') format('woff2'),
+    url('fonts/material-icons/material-icons.woff') format('woff'), url('fonts/material-icons/material-icons.ttf') format('truetype');
 }
 
 .material-icons {
-    font-family: 'Material Icons';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 24px; /* Preferred icon size */
-    display: inline-block;
-    line-height: 1;
-    text-transform: none;
-    letter-spacing: normal;
-    word-wrap: normal;
-    white-space: nowrap;
-    direction: ltr;
+  font-family: 'Material Icons', sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
 
-    /* Support for all WebKit browsers. */
-    -webkit-font-smoothing: antialiased;
-    /* Support for Safari and Chrome. */
-    text-rendering: optimizeLegibility;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
 
-    /* Support for Firefox. */
-    -moz-osx-font-smoothing: grayscale;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
 
-    /* Support for IE. */
-    font-feature-settings: 'liga';
+  /* Support for IE. */
+  font-feature-settings: 'liga';
 }
 
 /*Material Icons*/
@@ -82,121 +65,118 @@
 /*Icomoon Font*/
 
 @font-face {
-    font-family: 'icomoon';
-    src: url('fonts/icomoon/icomoon.eot');
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'icomoon';
+  src: url('fonts/icomoon/icomoon.eot');
+  font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
-    font-family: 'nasalization';
-    font-style: normal;
-    font-weight: 400;
-    src: url('fonts/nasalization-rg.woff2') format('woff2'),
-        url('fonts/nasalization-rg.woff') format('woff'),
-        url('fonts/nasalization-rg.ttf') format('truetype');
+  font-family: 'nasalization';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/nasalization-rg.woff2') format('woff2'), url('fonts/nasalization-rg.woff') format('woff'), url('fonts/nasalization-rg.ttf') format('truetype');
 }
 
 .ui-icon {
-    font-family: 'icomoon';
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
+  font-family: 'icomoon', sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
 
-    /* Better Font Rendering =========== */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-location2:before {
-    content: '\e948';
+  content: '\e948';
 }
 
 .icon-undo:before {
-    content: '\e965';
+  content: '\e965';
 }
 
 .icon-redo:before {
-    content: '\e966';
+  content: '\e966';
 }
 
 .icon-undo2:before {
-    content: '\e967';
+  content: '\e967';
 }
 
 .icon-redo2:before {
-    content: '\e968';
+  content: '\e968';
 }
 
 .icon-forward:before {
-    content: '\e969';
+  content: '\e969';
 }
 
 .icon-reply:before {
-    content: '\e96a';
+  content: '\e96a';
 }
 
 .icon-search:before {
-    content: '\e986';
+  content: '\e986';
 }
 
 .icon-enlarge:before {
-    content: '\e989';
+  content: '\e989';
 }
 
 .icon-shrink:before {
-    content: '\e98a';
+  content: '\e98a';
 }
 
 .icon-list-numbered:before {
-    content: '\e9b9';
+  content: '\e9b9';
 }
 
 .icon-list:before {
-    content: '\e9ba';
+  content: '\e9ba';
 }
 
 .icon-list2:before {
-    content: '\e9bb';
+  content: '\e9bb';
 }
 
 .icon-menu:before {
-    content: '\e9bd';
+  content: '\e9bd';
 }
 
 .icon-menu2:before {
-    content: '\e9be';
+  content: '\e9be';
 }
 
 .icon-menu3:before {
-    content: '\e9bf';
+  content: '\e9bf';
 }
 
 .icon-menu4:before {
-    content: '\e9c0';
+  content: '\e9c0';
 }
 
 .icon-download3:before {
-    content: '\e9c7';
+  content: '\e9c7';
 }
 
 .icon-upload3:before {
-    content: '\e9c8';
+  content: '\e9c8';
 }
 
 .icon-blocked:before {
-    content: '\ea0e';
+  content: '\ea0e';
 }
 
 .icon-cross:before {
-    content: '\ea0f';
+  content: '\ea0f';
 }
 
 .icon-checkmark:before {
-    content: '\ea10';
+  content: '\ea10';
 }
 
 /*Icomoon Font*/

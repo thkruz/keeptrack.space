@@ -25,7 +25,7 @@ export const getOrbitByLatLon = (
   now: Date,
   goalAlt?: number,
   raanOffset?: number
-): [string, string] => {
+): [string, string] => { // NOSONAR
   let newMeana: string = null;
   let newArgPer: string = null;
   goalAlt = goalAlt || null;
@@ -212,13 +212,13 @@ export const getOrbitByLatLon = (
       if (currentDirection !== goalDirection) {
         // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
         // This happens when the goal latitude is near the poles
-        i += 20;
+        i += 20; // NOSONAR
       } else {
         break; // Stop changing the Mean Anomaly
       }
     }
     if (meanACalcResults === PropagationResults.Far) {
-      i += 100;
+      i += 100; // NOSONAR
     }
   }
 
@@ -250,7 +250,8 @@ export const getOrbitByLatLon = (
         // console.log('Failed Arg of Per Calc');
       }
       if (argPerCalcResults === PropagationResults.Far) {
-        i += 5 * 10; // Change ArgPer faster
+        // Change ArgPer faster
+        i += 5 * 10; // NOSONAR
       }
       if (argPerCalcResults === PropagationResults.Error) {
         return ['Error', 'Failed to find a solution for Argument of Perigee'];
@@ -263,12 +264,13 @@ export const getOrbitByLatLon = (
         if (meanACalcResults === PropagationResults.Success) {
           if (currentDirection !== goalDirection) {
             // If Object is moving opposite of the goal direction (upOrDown)
-            j = j + 20; // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
+            // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
+            j = j + 20; // NOSONAR
           } else {
             break; // Stop changing the Mean Anomaly
           }
         }
-        j = meanACalcResults === PropagationResults.Far ? j + 100 : j;
+        j = meanACalcResults === PropagationResults.Far ? j + 100 : j; // NOSONAR
         if (meanACalcResults === PropagationResults.Error) {
           return ['Error', ''];
         }
@@ -288,7 +290,7 @@ export const getOrbitByLatLon = (
       break;
     }
     if (raanCalcResults === PropagationResults.Far) {
-      i += 10 * 100;
+      i += 10 * 100; // NOSONAR
     }
   }
 

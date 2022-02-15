@@ -12,7 +12,9 @@ import $ from 'jquery';
 export const getRandomInt = (min: number, max: number): any => {
   min = Number.isNaN(min) ? 0 : Math.ceil(min);
   max = Number.isNaN(max) ? 100 : Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  // The use of Math.random here is for debugging purposes only.
+  // It is not used in any cryptographic way.
+  return Math.floor(Math.random() * (max - min + 1)) + min; // NOSONAR
 };
 
 export const defaultPositionSelector = () => {

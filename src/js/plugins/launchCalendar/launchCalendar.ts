@@ -42,26 +42,16 @@ export const bottomMenuClick = (iconName: string): void => {
       }, 2000);
       keepTrackApi.programs.uiManager.hideSideMenus();
       try {
-        if (location.protocol === 'https:') {
-          $.colorbox({
-            href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
-            iframe: true,
-            width: '80%',
-            height: '80%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        } else {
-          $.colorbox({
-            href: 'http://space.skyrocket.de/doc_chr/lau2020.htm',
-            iframe: true,
-            width: '80%',
-            height: '80%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        }
+        $.colorbox({
+          href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
+          iframe: true,
+          width: '80%',
+          height: '80%',
+          fastIframe: false,
+          closeButton: false,
+        });
       } catch (error) {
+        // DEBUG:
         // console.debug(error);
       }
       isLaunchMenuOpen = true;
@@ -85,7 +75,7 @@ export const uiManagerInit = (): any => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
     <div id="menu-launches" class="bmenu-item">
-      <img alt="calendar2" src="" delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAABRUlEQVR4nO3cQWoCQRBAUQ25Tna5/wmy80BmFXDhgIPp/u343jIEHfhU05YkpxMAAAAA7+I8882+fq7Xez+/fJ+nPsefFZ7nY9YbcZ8AsadGbWuE380zR5YJiAkQEyAmQEyA2OeIF926FazwwefW3ucZceszATEBYkOOoC3VUbNlhecxATEBYkOOIDuix5mAmAAxAWICxASITd0FvTq7oAMSICZATICYALGp6+i9/usbq5W/oTMBMQFiAsQEiAkQW/oWtPc2Mvr3RzABMQFiSx9Bj9i7Il7h2LllAmICxKYeQavtauyCEKAmQEyAmACxpf9AY/RtZIUPZSYgJkDs5XdBKxwjzzABMQFih9oFrbDb2csExASICRATICZA7FC7oJVvO1tMQEyAmAAxAWICxPy/oJgJiAkQEyAmQEwAAAAAAAA4vl/1Vlb9QHsXDQAAAABJRU5ErkJggg=="> // NO-PIG
+      <img alt="calendar2" src="" delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAABRUlEQVR4nO3cQWoCQRBAUQ25Tna5/wmy80BmFXDhgIPp/u343jIEHfhU05YkpxMAAAAA7+I8882+fq7Xez+/fJ+nPsefFZ7nY9YbcZ8AsadGbWuE380zR5YJiAkQEyAmQEyA2OeIF926FazwwefW3ucZceszATEBYkOOoC3VUbNlhecxATEBYkOOIDuix5mAmAAxAWICxASITd0FvTq7oAMSICZATICYALGp6+i9/usbq5W/oTMBMQFiAsQEiAkQW/oWtPc2Mvr3RzABMQFiSx9Bj9i7Il7h2LllAmICxKYeQavtauyCEKAmQEyAmACxpf9AY/RtZIUPZSYgJkDs5XdBKxwjzzABMQFih9oFrbDb2csExASICRATICZA7FC7oJVvO1tMQEyAmAAxAWICxPy/oJgJiAkQEyAmQEwAAAAAAAA4vl/1Vlb9QHsXDQAAAABJRU5ErkJggg=="> <!-- // NO-PIG -->
       <span class="bmenu-title">Launch Calendar</span>
       <div class="status-icon"></div>
     </div> 

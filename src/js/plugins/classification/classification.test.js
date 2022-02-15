@@ -4,7 +4,7 @@ import '@app/js/settingsManager/settingsManager';
 import { init } from './classification';
 
 keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
-settingsManager = {};
+const settingsManager = {};
 
 describe('classification', () => {
   it('should be initialized', () => {

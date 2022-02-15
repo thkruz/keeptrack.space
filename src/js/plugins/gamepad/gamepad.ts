@@ -9,7 +9,8 @@ export const init = (): void => {
   keepTrackApi.programs.gamepad = <GamepadPlugin>{
     currentState: null,
   };
-  window.addEventListener('gamepadconnected', (evt: any) => {
+  // NOTE: This is note a message event and sonarqube should ignore it
+  window.addEventListener('gamepadconnected', (evt: any) => { // NOSONAR    
     if (settingsManager.cruncherReady) {
       gamepadConnected(<GamepadEvent>event);
     } else {

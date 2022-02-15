@@ -200,32 +200,31 @@ pPM.createProgram = (vertCode, fragCode) => {
 //   return program;
 // };
 
-// DEBUG: Future Use
-// pPM.setupOcclusion = (gl, program) => {
-//   program.attr = {
-//     position: gl.getAttribLocation(program, 'a_position'),
-//   };
-//   program.uniform = {
-//     uPMatrix: gl.getUniformLocation(program, 'uPMatrix'),
-//     uCamMatrix: gl.getUniformLocation(program, 'uCamMatrix'),
-//     uMvMatrix: gl.getUniformLocation(program, 'uMvMatrix'),
-//   };
-//   program.attrSetup = (program, vertPosBuf, stride) => {
-//     stride = stride || 0;
-//     gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-//     gl.enableVertexAttribArray(program.attr.position);
-//     gl.vertexAttribPointer(program.attr.position, 3, gl.FLOAT, false, stride, 0);
-//   };
-//   program.attrOff = (program) => {
-//     gl.disableVertexAttribArray(program.attr.position);
-//   };
-//   program.uniformSetup = (program, mvMatrix, pMatrix, camMatrix) => {
-//     gl.uniformMatrix4fv(program.uniform.uMvMatrix, false, mvMatrix);
-//     gl.uniformMatrix4fv(program.uniform.uPMatrix, false, pMatrix);
-//     gl.uniformMatrix4fv(program.uniform.uCamMatrix, false, camMatrix);
-//   };
-//   return program;
-// };
+pPM.setupOcclusion = (gl, program) => {
+  program.attr = {
+    position: gl.getAttribLocation(program, 'a_position'),
+  };
+  program.uniform = {
+    uPMatrix: gl.getUniformLocation(program, 'uPMatrix'),
+    uCamMatrix: gl.getUniformLocation(program, 'uCamMatrix'),
+    uMvMatrix: gl.getUniformLocation(program, 'uMvMatrix'),
+  };
+  program.attrSetup = (program, vertPosBuf, stride) => {
+    stride = stride || 0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
+    gl.enableVertexAttribArray(program.attr.position);
+    gl.vertexAttribPointer(program.attr.position, 3, gl.FLOAT, false, stride, 0);
+  };
+  program.attrOff = (program) => {
+    gl.disableVertexAttribArray(program.attr.position);
+  };
+  program.uniformSetup = (program, mvMatrix, pMatrix, camMatrix) => {
+    gl.uniformMatrix4fv(program.uniform.uMvMatrix, false, mvMatrix);
+    gl.uniformMatrix4fv(program.uniform.uPMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(program.uniform.uCamMatrix, false, camMatrix);
+  };
+  return program;
+};
 
 // DEBUG: Future Use
 // pPM.setupAdditionalUniforms = (program) => {

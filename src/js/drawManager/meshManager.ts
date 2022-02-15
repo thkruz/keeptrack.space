@@ -60,6 +60,7 @@ export const init: any = async () => {
     let p = OBJ.downloadModels(meshManager.fileList);
 
     p.then((models: any[]) => {
+      // DEBUG:
       // for (var [name, mesh] of Object.entries(models)) {
       //   console.debug('Name:', name);
       //   console.debug('Mesh:', mesh);
@@ -70,9 +71,11 @@ export const init: any = async () => {
       meshManager.isReady = true;
       // eslint-disable-next-line no-unused-vars
     }).catch(() => {
+      // DEBUG:
       // console.warn(error);
     });
   } catch {
+    // DEBUG:
     // console.debug(error);
   }
 };
@@ -87,6 +90,7 @@ export const populateFileList = () => {
       meshManager.fileList.push(meshFiles);
     }
   } catch (error) {
+    // DEBUG:
     // console.debug(error);
   }
 };
@@ -213,8 +217,10 @@ export const initBuffers = (meshes?: any) => {
       // model objects and setting their mesh to the current mesh
       meshManager.models[mesh] = {};
       meshManager.models[mesh].mesh = meshManager.meshes[mesh];
+      // DEBUG:
       // meshManager.models[mesh].size = meshManager.sizeInfo[mesh];
     } catch (error) {
+      // DEBUG:
       // console.warn(error);
     }
   }

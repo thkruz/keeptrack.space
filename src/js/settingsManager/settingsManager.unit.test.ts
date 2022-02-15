@@ -1,8 +1,9 @@
 /* eslint-disable no-undefined */
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
+import { KeepTrackPrograms } from '../api/keepTrackTypes';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';
@@ -67,7 +68,7 @@ describe('settingsManager URL Test', () => {
         url = 'http://localhost/index.html?lowperf&nostars'; // NOSONAR
         setUrl(url);
         // Make this a iPhone
-        navigator.__defineGetter__('userAgent', () => 'iPhone');
+        (<any>navigator).__defineGetter__('userAgent', () => 'iPhone');
         break;
       case 10:
         url = 'http://localhost/index.html?hires&cpo&logo&noPropRate'; // NOSONAR
@@ -81,27 +82,32 @@ describe('settingsManager URL Test', () => {
     }
     testCaseNum++;
     setUrl(url);
-    import('@app/js/settingsManager/settingsManager.js');
+    // @ts-ignore
+    import('./settingsManager.js');
     settingsManager.init();
   });
 
-  test('http://keeptrack.space', () => { // NOSONAR
+  test('http://keeptrack.space', () => {
+    // NOSONAR
     expect(settingsManager.installDirectory).toBe('/');
     expect(settingsManager.isOfficialWebsite).toBe(true);
     expect(settingsManager.breakTheLaw).toBe(undefined);
   });
 
-  test('http://www.keeptrack.space', () => { // NOSONAR
+  test('http://www.keeptrack.space', () => {
+    // NOSONAR
     expect(settingsManager.installDirectory).toBe('/');
     expect(settingsManager.breakTheLaw).toBe(undefined);
   });
 
-  test('http://localhost', () => { // NOSONAR
+  test('http://localhost', () => {
+    // NOSONAR
     // Caused by Node being active
     expect(settingsManager.installDirectory).toBe('http://127.0.0.1:8080/');
   });
 
-  test('http://thkruz.github.io', () => { // NOSONAR
+  test('http://thkruz.github.io', () => {
+    // NOSONAR
     expect(settingsManager.installDirectory).toBe('/keeptrack.space/');
   });
 

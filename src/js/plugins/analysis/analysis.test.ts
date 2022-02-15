@@ -1,12 +1,52 @@
-import { keepTrackApiStubs } from '@app/js/api/apiMocks';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import * as analysis from '@app/js/plugins/analysis/analysis';
 import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
+import { keepTrackApiStubs } from '../../api/apiMocks';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
+import * as analysis from './analysis';
+import { init } from './analysis';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 settingsManager = window.settingsManager;
+
+test('Load Analysis Plugin', () => {
+  window.M = {
+    FormSelect: {
+      init: () => true,
+    },
+  };
+
+  init();
+  keepTrackApi.methods.uiManagerInit();
+  keepTrackApi.methods.bottomMenuClick('menu-analysis');
+  keepTrackApi.methods.selectSatData();
+  keepTrackApi.methods.bottomMenuClick('menu-analysis');
+  window.keepTrackApi.programs.sensorManager.checkSensorSelected = () => false;
+  keepTrackApi.methods.bottomMenuClick('menu-analysis');
+  keepTrackApi.methods.bottomMenuClick('NOTmenu-analysis');
+  keepTrackApi.methods.hideSideMenus();
+  keepTrackApi.methods.selectSatData();
+});
+
+test('Load Analysis Plugin', () => {
+  window.M = {
+    FormSelect: {
+      init: () => true,
+    },
+  };
+
+  init();
+  keepTrackApi.methods.uiManagerInit();
+  keepTrackApi.methods.bottomMenuClick('menu-analysis');
+  keepTrackApi.methods.selectSatData();
+  keepTrackApi.methods.bottomMenuClick('menu-analysis');
+  window.keepTrackApi.programs.sensorManager.checkSensorSelected = () => false;
+  keepTrackApi.methods.bottomMenuClick('menu-analysis');
+  keepTrackApi.methods.bottomMenuClick('NOTmenu-analysis');
+  keepTrackApi.methods.hideSideMenus();
+  keepTrackApi.methods.selectSatData();
+});
 
 // @ponicode
 describe('analysis.analysisBptSumbit', () => {

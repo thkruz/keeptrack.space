@@ -55,7 +55,7 @@
       "<rootDir>/test/test-env.js",
       "<rootDir>/test/test-env-mocks.js"
     ],
-    "coverageDirectory": "<rootDir>/coverage/unit",
+    "coverageDirectory": "<rootDir>/coverage",
     "moduleDirectories": [
       "node_modules",
       "offline"

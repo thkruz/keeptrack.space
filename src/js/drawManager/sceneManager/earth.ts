@@ -469,6 +469,7 @@ export const drawOcclusion = (pMatrix: glm.mat4, camMatrix: glm.mat4, occlusionP
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vertIndexBuf);
   gl.drawElements(gl.TRIANGLES, vertCount, gl.UNSIGNED_SHORT, 0);
 
+  // DEBUG:
   // occlusionPrgm.attrOff(occlusionPrgm);
 };
 export const update = (): void => {

@@ -61,7 +61,7 @@ const extractLiftVehicle = (LV: string): string => {
 };
 
 const extractCountry = (C: string): string => {
-  switch (C) {
+  switch (C) { // NOSONAR
     case 'ANALSAT':
       return 'Analyst Satellite';
     case 'AB':
@@ -256,7 +256,7 @@ const extractCountry = (C: string): string => {
 };
 
 const extractLaunchSite = (LS: string): { site: string; sitec: string } => {
-  switch (LS) {
+  switch (LS) { // NOSONAR
     case 'ANALSAT':
       return {
         site: 'Analyst Satellite',

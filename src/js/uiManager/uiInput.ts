@@ -112,10 +112,12 @@ export const init = (): void => {
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
-  window.addEventListener('keydown', (e: KeyboardEvent) => {
+  // NOTE: This is note a message event and sonarqube should ignore it
+  window.addEventListener('keydown', (e: KeyboardEvent) => { // NOSONAR
     if (e.ctrlKey === true || e.metaKey === true) mainCamera.isCtrlPressed = true;
   });
-  window.addEventListener('keyup', (e: KeyboardEvent) => {
+  // NOTE: This is note a message event and sonarqube should ignore it
+  window.addEventListener('keyup', (e: KeyboardEvent) => { // NOSONAR
     if (e.ctrlKey === false || e.metaKey === false) mainCamera.isCtrlPressed = false;
   });
 
@@ -202,7 +204,8 @@ export const init = (): void => {
 
   // Needed?
   if (settingsManager.disableWindowTouchMove) {
-    window.addEventListener(
+    // NOTE: This is note a message event and sonarqube should ignore it
+    window.addEventListener( // NOSONAR
       'touchmove',
       function (event) {
         event.preventDefault();
@@ -220,7 +223,8 @@ export const init = (): void => {
   }
 
   if (!settingsManager.disableCameraControls) {
-    window.addEventListener('mousedown', (evt) => {
+    // NOTE: This is note a message event and sonarqube should ignore it
+    window.addEventListener('mousedown', (evt) => { // NOSONAR
       // Camera Manager Events
       // Middle Mouse Button MMB
       if (evt.button === 1) {
@@ -250,7 +254,8 @@ export const init = (): void => {
   }
 
   if (!settingsManager.disableCameraControls) {
-    window.addEventListener('mouseup', function (evt: any) {
+    // NOTE: This is note a message event and sonarqube should ignore it
+    window.addEventListener('mouseup', function (evt: any) { // NOSONAR
       // Camera Manager Events
       if (evt.button === 1) {
         mainCamera.isLocalRotateRoll = false;

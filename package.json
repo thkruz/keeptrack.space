@@ -170,7 +170,7 @@
     "mkdirp": "^1.0.4",
     "opener": "^1.5.2",
     "ponicode": "^0.61.3",
-    "prettier": "^2.2.1",
+    "prettier": "^2.5.1",
     "prettier-plugin-organize-imports": "^2.3.4",
     "retire": "^3.0.3",
     "source-map-loader": "^3.0.0",

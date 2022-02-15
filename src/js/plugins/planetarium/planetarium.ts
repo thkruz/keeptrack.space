@@ -58,7 +58,7 @@ export const init = (): void => {
     cb: bottomMenuClick,
   });
 };
-export const bottomMenuClick = (iconName: string): void => {
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   const { drawManager, starManager, objectManager, uiManager, orbitManager, sensorManager } = keepTrackApi.programs;
   if (iconName === 'menu-planetarium') {
     const mainCamera = keepTrackApi.programs.mainCamera;

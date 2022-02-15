@@ -67,7 +67,7 @@ om.kp2tle = (kp, epoch, timeManager) => {
   return { tle1: tle1, tle2: tle2 };
 };
 // State Vectors to Keplerian Min/Max/Avg
-om.svs2kps = (svs) => {
+om.svs2kps = (svs) => { // NOSONAR
   let kpList = [];
   for (let i = 0; i < svs.length; i++) {
     kpList.push(om.sv2kp(svs[i]));
@@ -183,7 +183,7 @@ om.iod = async (svs, timeManager, satellite) => {
   }
 };
 
-om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
+om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
   try {
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
@@ -307,7 +307,7 @@ export const _jday = (year, mon, day, hr, minute, sec) => {
   );
 };
 // Converts State Vectors to Keplerian Elements
-export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => {
+export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => { // NOSONAR
   let rx = vector[1] * 1000;
   let ry = vector[2] * 1000;
   let rz = vector[3] * 1000;

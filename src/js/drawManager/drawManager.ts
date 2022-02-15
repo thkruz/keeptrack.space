@@ -400,7 +400,9 @@ export const satCalculate = () => {
     objectManager.lastSelectedSat(objectManager.selectedSat);
   }
 };
-export const orbitsAbove = () => {
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+export const orbitsAbove = () => { // NOSONAR
   const { mainCamera, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
 
   if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {

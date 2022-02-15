@@ -13,7 +13,7 @@ const satCache = [];
 let NUM_SEGS: number;
 let orbitFadeFactor = 1.0;
 
-onmessage = (m) => {
+onmessage = (m) => { // NOSONAR
   if (m.data.isUpdate) {
     // Add Satellites
     if (!m.data.missile && m.data.satId < 99999) {

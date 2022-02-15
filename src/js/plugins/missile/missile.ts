@@ -57,7 +57,7 @@ export const msTargetChange = () => {
   }
 };
 export const missileSubmit = (): void => {
-  $('#loading-screen').fadeIn(1000, () => {
+  $('#loading-screen').fadeIn(1000, () => { // NOSONAR
     const { uiManager, satSet, timeManager } = keepTrackApi.programs;
     $('#ms-error').hide();
     const type = parseFloat(<string>$('#ms-type').val());

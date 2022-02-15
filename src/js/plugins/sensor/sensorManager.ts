@@ -82,7 +82,7 @@ export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
 
 export const sensorListLength = () => Object.values(sensorList).reduce((acc) => acc++, 0);
 
-export const setSensor = (selectedSensor: SensorObject | string, staticNum: number) => {
+export const setSensor = (selectedSensor: SensorObject | string, staticNum: number) => { // NOSONAR
   try {
     localStorage.setItem('currentSensor', JSON.stringify([selectedSensor, staticNum]));
   } catch {

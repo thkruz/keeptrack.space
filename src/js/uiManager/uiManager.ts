@@ -175,7 +175,7 @@ export const getsensorinfo = () => {
   $('#sensor-minrange').html(firstSensor.obsminrange.toString());
   $('#sensor-maxrange').html(firstSensor.obsmaxrange.toString());
 };
-export const legendHoverMenuClick = (legendType?: string) => {
+export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
   const { satSet, colorSchemeManager } = keepTrackApi.programs;
 
   switch (legendType) {

@@ -52,7 +52,7 @@ export const init = (): void => {
   keepTrackApi.register({
     method: 'bottomMenuClick',
     cbName: 'satelliteView',
-    cb: (iconName: string): void => {
+    cb: (iconName: string): void => { // NOSONAR
       if (iconName === 'menu-satview') {
         const mainCamera = keepTrackApi.programs.mainCamera;
         if (mainCamera.cameraType.current === mainCamera.cameraType.Satellite) {

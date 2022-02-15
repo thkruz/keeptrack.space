@@ -725,20 +725,20 @@ export const update = (
         break;
       }
       case camera.cameraType.Satellite: {
-        const targetPosition = glm.vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
-        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPosition);
-        glm.vec3.normalize(normUp, targetPosition);
+        const targetPositionTemp = glm.vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
+        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPositionTemp);
+        glm.vec3.normalize(normUp, targetPositionTemp);
         glm.vec3.normalize(normForward, [target.velocity.x, target.velocity.y, target.velocity.z]);
         glm.vec3.transformQuat(normLeft, normUp, glm.quat.fromValues(normForward[0], normForward[1], normForward[2], 90 * DEG2RAD));
         const targetNextPosition = glm.vec3.fromValues(target.position.x + target.velocity.x, target.position.y + target.velocity.y, target.position.z + target.velocity.z);
-        glm.mat4.lookAt(camera.camMatrix, targetNextPosition, targetPosition, normUp);
+        glm.mat4.lookAt(camera.camMatrix, targetNextPosition, targetPositionTemp, normUp);
 
         glm.mat4.translate(camera.camMatrix, camera.camMatrix, [target.position.x, target.position.y, target.position.z]);
 
         glm.mat4.rotate(camera.camMatrix, camera.camMatrix, camera.fpsPitch * DEG2RAD, normLeft);
         glm.mat4.rotate(camera.camMatrix, camera.camMatrix, -camera.fpsYaw * DEG2RAD, normUp);
 
-        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPosition);
+        glm.mat4.translate(camera.camMatrix, camera.camMatrix, targetPositionTemp);
         break;
       }
       case camera.cameraType.Astronomy: {

@@ -91,17 +91,17 @@ export class LineFactory {
     }
     // Center of the Earth to the Satellite
     if (type == 'sat') {
-      let sat = getSat(<number>value);
-      if (typeof sat.position == 'undefined') {
+      let satForLine = getSat(<number>value);
+      if (typeof satForLine.position == 'undefined') {
         console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
+        console.debug(satForLine);
         return;
       }
       this.drawLineList.push({
         line: new Line(this.gl, this.shader),
-        sat: sat,
+        sat: satForLine,
         ref: [0, 0, 0],
-        ref2: [sat.position.x, sat.position.y, sat.position.z],
+        ref2: [satForLine.position.x, satForLine.position.y, satForLine.position.z],
         color: color,
       });
     }
@@ -170,9 +170,6 @@ export class LineFactory {
       sat = getSat(value[0]);
       sat2 = getSat(value[1]);
       if (typeof sat == 'undefined' || typeof sat2 == 'undefined' || typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
-        // console.debug(`No Satellite Position Available for Line`);
-        // console.debug(sat);
-        // console.debug(sat2);
         return;
       }
       this.drawLineList.push({
@@ -191,9 +188,6 @@ export class LineFactory {
       sat = getSat(value[0]);
       sat2 = getSat(value[1]);
       if (typeof sat == 'undefined' || typeof sat2 == 'undefined' || typeof sat.position == 'undefined' || typeof sat2.position == 'undefined') {
-        // console.debug(`No Satellite Position Available for Line`);
-        // console.debug(sat);
-        // console.debug(sat2);
         return;
       }
       this.drawLineList.push({
@@ -452,6 +446,7 @@ export class LineFactory {
           this.drawLineList[i].line.set(this.drawLineList[i].ref, this.drawLineList[i].ref2);
         }
       } catch (error) {
+        // DEBUG:
         // console.warn(error);
       }
 

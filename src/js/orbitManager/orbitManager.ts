@@ -31,7 +31,11 @@ export const init = (orbitWorker?: Worker): void => {
     if (typeof orbitWorker !== 'undefined') {
       orbitManager.orbitWorker = orbitWorker;
     } else {
-      orbitManager.orbitWorker = { postMessage: () => {} } as any;
+      orbitManager.orbitWorker = {
+        postMessage: () => {
+          // This is intentional
+        },
+      } as any;
     }
   } else {
     if (typeof Worker === 'undefined') {

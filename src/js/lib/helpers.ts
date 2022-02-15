@@ -5,9 +5,9 @@ export { saveAs };
 export const getUnique = (arr: Array<any>): Array<any> => [...new Set(arr)];
 
 export const stringPad = {
-  pad: (val: string, len: number): string => {
+  pad: (val: string, len?: number): string => {
     val = String(val);
-    len = len || 2;
+    len ??= 2;
     while (val.length < len) val = '0' + val;
     return val;
   },
@@ -18,9 +18,9 @@ export const stringPad = {
   pad0: (str: string, max: number): string => (str.length < max ? stringPad.pad0('0' + str, max) : str),
 };
 
-export const saveVariable = (variable: any, filename: string): void => {
+export const saveVariable = (variable: any, filename?: string): void => {
   try {
-    filename = typeof filename == 'undefined' ? 'variable.txt' : filename;
+    filename ??= 'variable.txt';
     variable = JSON.stringify(variable);
     const blob = new Blob([variable], { type: 'text/plain;charset=utf-8' });
     if (!saveAs) throw new Error('saveAs is unavailable!');
@@ -30,7 +30,7 @@ export const saveVariable = (variable: any, filename: string): void => {
   }
 };
 
-export const saveCsv = (items: Array<any>, name: string): void => {
+export const saveCsv = (items: Array<any>, name?: string): void => {
   try {
     const replacer: any = (value: never) => (value === null ? '' : value); // specify how you want to handle null values here
     const header = Object.keys(items[0]);
@@ -40,6 +40,7 @@ export const saveCsv = (items: Array<any>, name: string): void => {
 
     const blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
     if (!saveAs) throw new Error('saveAs is unavailable!');
+    name ??= 'data';
     saveAs(blob, `${name}.csv`);
   } catch (error) {
     // Intentionally Left Blank

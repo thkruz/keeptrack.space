@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 
-export const keyHandler = (evt: KeyboardEvent) => {
+export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
   const { mainCamera, timeManager, uiManager, drawManager, objectManager, orbitManager, sensorManager } = keepTrackApi.programs;

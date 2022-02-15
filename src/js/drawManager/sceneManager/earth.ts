@@ -93,6 +93,7 @@ export const initBumpTexture = (gl: WebGL2RenderingContext): void => {
   if (settingsManager.smallImages) earth.bumpMap.img.src = `${settingsManager.installDirectory}textures/earthbump256.jpg`;
   if (settingsManager.isMobileModeEnabled) earth.bumpMap.img.src = `${settingsManager.installDirectory}textures/earthbump4k.jpg`;
 
+  // DEBUG:
   // `${settingsManager.installDirectory}textures/earthbump1k.jpg`;
 };
 export const initNightTexture = (gl: WebGL2RenderingContext): void => {
@@ -159,6 +160,7 @@ export const initSpecularTexture = (gl: WebGL2RenderingContext): void => {
   if (settingsManager.smallImages) earth.specularMap.img.src = `${settingsManager.installDirectory}textures/earthspec256.jpg`;
   if (settingsManager.isMobileModeEnabled) earth.specularMap.img.src = `${settingsManager.installDirectory}textures/earthspec4k.jpg`;
 
+  // DEBUG:
   // `${settingsManager.installDirectory}textures/earthspec1k.jpg`;
 };
 export const initBuffers = (gl: WebGL2RenderingContext): void => {
@@ -170,8 +172,6 @@ export const initBuffers = (gl: WebGL2RenderingContext): void => {
     let latAngle = (Math.PI / settingsManager.earthNumLatSegs) * lat - Math.PI / 2;
     let diskRadius = Math.cos(Math.abs(latAngle));
     let z = Math.sin(latAngle);
-    // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
-    // let i = 0;
     for (let lon = 0; lon <= settingsManager.earthNumLonSegs; lon++) {
       // add an extra vertex for texture funness
       let lonAngle = ((Math.PI * 2) / settingsManager.earthNumLonSegs) * lon;
@@ -192,8 +192,6 @@ export const initBuffers = (gl: WebGL2RenderingContext): void => {
       vertNorm.push(x);
       vertNorm.push(y);
       vertNorm.push(z);
-
-      // i++;
     }
   }
 
@@ -206,6 +204,7 @@ export const initBuffers = (gl: WebGL2RenderingContext): void => {
       let brVert = blVert + 1;
       let tlVert = (lat + 1) * (settingsManager.earthNumLonSegs + 1) + lon;
       let trVert = tlVert + 1;
+      // DEBUG:
       // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
       vertIndex.push(blVert);
       vertIndex.push(brVert);
@@ -313,6 +312,7 @@ export const nightImgOnLoad = (gl: WebGL2RenderingContext): void => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
   }
 
+  // DEBUG:
   // console.log('earth.ts loaded nightearth');
   nightLoaded = true;
   onImageLoaded();
@@ -349,7 +349,10 @@ export const draw = (pMatrix: glm.mat4, mainCamera: Camera, dotsManager: DotsMan
   gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
   // Set the uniforms
-  const uZoomModifier = mainCamera.cameraType.current === mainCamera.cameraType.FixedToSat || mainCamera.panCurrent.x !== 0 || mainCamera.panCurrent.y !== 0 || mainCamera.panCurrent.z ? mainCamera.zoomLevel() : 1.0;
+  const uZoomModifier =
+    mainCamera.cameraType.current === mainCamera.cameraType.FixedToSat || mainCamera.panCurrent.x !== 0 || mainCamera.panCurrent.y !== 0 || mainCamera.panCurrent.z
+      ? mainCamera.zoomLevel()
+      : 1.0;
 
   gl.uniform1f(earth.program.uZoomModifier, uZoomModifier);
   gl.uniform3fv(earth.program.uCamPos, mainCamera.getForwardVector());
@@ -491,6 +494,7 @@ export const update = (): void => {
   glm.mat4.identity(mvMatrix);
   glm.mat4.rotateZ(mvMatrix, mvMatrix, earth.earthEra);
   glm.mat4.translate(mvMatrix, mvMatrix, earth.pos);
+  // DEBUG:
   // glm.mat4.scale(mvMatrix, mvMatrix, [2,2,2]);
   nMatrix = glm.mat3.create();
   glm.mat3.normalFromMat4(nMatrix, mvMatrix);

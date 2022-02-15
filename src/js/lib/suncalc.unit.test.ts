@@ -1,4 +1,4 @@
-import { SunCalc } from '@app/js/lib/suncalc.js';
+import { SunCalc } from './suncalc.js';
 
 test('sunCalc Unit Tests', () => {
   let dateObj = new Date();

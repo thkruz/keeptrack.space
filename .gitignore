@@ -104,3 +104,4 @@ key.pem
 
 # Gitlab Specific
 src/SOCRATES.html
+src/serviceWorker.js

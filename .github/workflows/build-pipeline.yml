@@ -144,6 +144,17 @@ jobs:
       # Build
       - name: Build
         run: npm run build
+  trufflehog:
+    needs: build
+    name: TruffleHog
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: trufflehog-actions-scan
+        uses: edplato/trufflehog-actions-scan@master
   codeQl:
     needs: build
     name: CodeQL
@@ -165,7 +176,7 @@ jobs:
         uses: github/codeql-action/analyze@v1
   analyze:
     needs: build
-    name: Analyze
+    name: SonarQube
     runs-on: ubuntu-latest
 
     steps:

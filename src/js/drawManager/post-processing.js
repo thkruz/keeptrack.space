@@ -209,19 +209,19 @@ pPM.setupOcclusion = (gl, program) => {
     uCamMatrix: gl.getUniformLocation(program, 'uCamMatrix'),
     uMvMatrix: gl.getUniformLocation(program, 'uMvMatrix'),
   };
-  program.attrSetup = (program, vertPosBuf, stride) => {
+  program.attrSetup = (glProgram, vertPosBuf, stride) => {
     stride = stride || 0;
     gl.bindBuffer(gl.ARRAY_BUFFER, vertPosBuf);
-    gl.enableVertexAttribArray(program.attr.position);
-    gl.vertexAttribPointer(program.attr.position, 3, gl.FLOAT, false, stride, 0);
+    gl.enableVertexAttribArray(glProgram.attr.position);
+    gl.vertexAttribPointer(glProgram.attr.position, 3, gl.FLOAT, false, stride, 0);
   };
-  program.attrOff = (program) => {
-    gl.disableVertexAttribArray(program.attr.position);
+  program.attrOff = (glProgram) => {
+    gl.disableVertexAttribArray(glProgram.attr.position);
   };
-  program.uniformSetup = (program, mvMatrix, pMatrix, camMatrix) => {
-    gl.uniformMatrix4fv(program.uniform.uMvMatrix, false, mvMatrix);
-    gl.uniformMatrix4fv(program.uniform.uPMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(program.uniform.uCamMatrix, false, camMatrix);
+  program.uniformSetup = (glProgram, mvMatrix, pMatrix, camMatrix) => {
+    gl.uniformMatrix4fv(glProgram.uniform.uMvMatrix, false, mvMatrix);
+    gl.uniformMatrix4fv(glProgram.uniform.uPMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(glProgram.uniform.uCamMatrix, false, camMatrix);
   };
   return program;
 };

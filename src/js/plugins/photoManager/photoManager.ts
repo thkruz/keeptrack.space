@@ -191,7 +191,7 @@ export const discovr = (): void => {
   };
 
   request.onerror = function () {
-    console.debug('http://epic.gsfc.nasa.gov/ request failed!');
+    console.debug('https://epic.gsfc.nasa.gov/ request failed!');
   };
 
   keepTrackApi.programs.drawManager.selectSatManager.selectSat(-1, keepTrackApi.programs.mainCamera);

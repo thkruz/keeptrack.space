@@ -1,7 +1,6 @@
 import { mobileManager } from '@app/js/uiManager/mobileManager';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import * as glm from 'gl-matrix';
-import { mat4 } from 'gl-matrix';
 import { SatRec } from 'satellite.js';
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
@@ -1292,7 +1291,7 @@ export interface DrawManager {
   gl: WebGL2RenderingContext;
   isNeedPostProcessing: boolean;
   isRotationEvent: boolean;
-  pMatrix: mat4;
+  pMatrix: glm.mat4;
   postProcessingManager: any;
   isPostProcessingResizeNeeded: boolean;
   isUpdateTimeThrottle: boolean;

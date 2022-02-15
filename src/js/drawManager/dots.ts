@@ -426,8 +426,8 @@ export const updateSizeBuffer = (bufferLen: number = 3) => {
   // because the distance from the center of the earth is too close to
   // be a star. dotsManager method is so there are less buffers needed but as
   // computers get faster it should be replaced
-  for (let i = 0; i < settingsManager.lastSearchResults.length; i++) {
-    dotsManager.sizeData[settingsManager.lastSearchResults[i]] = 1.0;
+  for (const lastSearchResult of settingsManager.lastSearchResults) {
+    dotsManager.sizeData[lastSearchResult] = 1.0;
   }
 
   gl.bindBuffer(gl.ARRAY_BUFFER, dotsManager.sizeBuffer);

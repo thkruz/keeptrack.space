@@ -20,7 +20,7 @@ export enum LinkType {
   Both = 3, // Show the users connected to the satellites and the satellites connected to each other
 }
 
-export const init = (sensorManager: SensorManager, controlSiteManager: ControlSiteManager) => {
+export const init = (sensorManager: SensorManager, controlSiteManager: ControlSiteManager) => { // NOSONAR
   try {
     for (let controlSite in controlSiteManager.controlSiteList) {
       if (controlSiteManager.controlSiteList[controlSite].linkAehf) {
@@ -62,7 +62,7 @@ export const init = (sensorManager: SensorManager, controlSiteManager: ControlSi
   }
 };
 
-export const showLinks = async function (lineManager: LineFactory, satSet: CatalogManager, group: SatConstellationString) {
+export const showLinks = async function (lineManager: LineFactory, satSet: CatalogManager, group: SatConstellationString) { // NOSONAR
   let satlist: number[];
   let userlist: number[];
   let minTheta: number;

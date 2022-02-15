@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
-import { SpaceObjectType } from '../api/SpaceObjectType';
 import * as glm from 'gl-matrix';
 import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrackTypes';
+import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH } from '../lib/constants';
 import { objectManager } from '../objectManager/objectManager';
@@ -79,6 +79,7 @@ export const draw = (mainCamera: Camera, colorSchemeManager: ColorSchemeManager,
   gl.enableVertexAttribArray(dotsManager.drawProgram.aStar);
   gl.vertexAttribPointer(dotsManager.drawProgram.aStar, 1, gl.FLOAT, false, 0, 0);
 
+  // DEBUG:
   // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.BLEND);
   gl.depthMask(false);
@@ -332,6 +333,7 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
   //   }
   //   drawPropTime = timeManager.simulationTimeObj * 1;
 
+  // DEBUG:
   //   // Find the First Radar Return Time
   //   if (satSet.radarDataManager.drawT1 == 0) {
   //     for (rrI = 0; rrI < radarDataLen; rrI++) {
@@ -477,41 +479,3 @@ export const dotsManager = <DotsManager>(<unknown>{
   updateSizeBuffer: updateSizeBuffer,
   setupPickingBuffer: setupPickingBuffer,
 });
-
-/*
-  // Note: dotsManager won't work as is but is kept as a reference
-  satSet.changeShaders = (newShaders) => {
-    gl.detachShader(dotsManager.drawProgram, vertShader);
-    gl.detachShader(dotsManager.drawProgram, fragShader);
-    switch (newShaders) {
-      case 'var':
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-var.glsl'));
-        break;
-      case 12:
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-12.glsl'));
-        break;
-      case 6:
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-6.glsl'));
-        break;
-      case 2:
-        gl.shaderSource(vertShader, shaderLoader.getShaderCode('dot-vertex-2.glsl'));
-        break;
-    }
-    gl.compileShader(vertShader);
-
-    gl.shaderSource(fragShader, shaderLoader.getShaderCode('dot-fragment.glsl'));
-    gl.compileShader(fragShader);
-
-    gl.attachShader(dotsManager.drawProgram, vertShader);
-    gl.attachShader(dotsManager.drawProgram, fragShader);
-    gl.linkProgram(dotsManager.drawProgram);
-    dotsManager.drawProgram.aPos = gl.getAttribLocation(dotsManager.drawProgram, 'aPos');
-    dotsManager.drawProgram.aColor = gl.getAttribLocation(dotsManager.drawProgram, 'aColor');
-    dotsManager.drawProgram.aStar = gl.getAttribLocation(dotsManager.drawProgram, 'aStar');
-    dotsManager.drawProgram.minSize = gl.getUniformLocation(dotsManager.drawProgram, 'minSize');
-    dotsManager.drawProgram.maxSize = gl.getUniformLocation(dotsManager.drawProgram, 'maxSize');
-    dotsManager.drawProgram.uMvMatrix = gl.getUniformLocation(dotsManager.drawProgram, 'uMvMatrix');
-    dotsManager.drawProgram.uCamMatrix = gl.getUniformLocation(dotsManager.drawProgram, 'uCamMatrix');
-    dotsManager.drawProgram.pMvCamMatrix = gl.getUniformLocation(dotsManager.drawProgram, 'pMvCamMatrix');
-  };
-*/

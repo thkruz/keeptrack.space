@@ -13,31 +13,39 @@ pPM.init = (gl) => {
 
   pPM.programs = {};
 
+  // DEBUG: Future Use
   // pPM.programs.hdr = pPM.createProgram(pPM.shaderCode.hdr.vert, pPM.shaderCode.hdr.frag);
   // pPM.programs.hdr = pPM.setupHdr(gl, pPM.programs.hdr);
 
+  // DEBUG: Future Use
   // pPM.programs.fxaa = pPM.createProgram(pPM.shaderCode.fxaa.vert, pPM.shaderCode.fxaa.frag);
   // pPM.programs.fxaa = pPM.setupFxaa(gl, pPM.programs.fxaa);
 
+  // DEBUG: Future Use
   // pPM.programs.smaaEdges = pPM.createProgram(pPM.shaderCode.smaaEdges.vert, pPM.shaderCode.smaaEdges.frag);
   // pPM.programs.smaaEdges = pPM.setupSmaaEdges(gl, pPM.programs.smaaEdges);
 
+  // DEBUG: Future Use
   // pPM.programs.smaaWeights = pPM.createProgram(pPM.shaderCode.smaaWeights.vert, pPM.shaderCode.smaaWeights.frag);
   // pPM.programs.smaaWeights = pPM.setupSmaaWeights(gl, pPM.programs.smaaWeights);
 
+  // DEBUG: Future Use
   // pPM.programs.smaaBlend = pPM.createProgram(pPM.shaderCode.smaaBlend.vert, pPM.shaderCode.smaaBlend.frag);
   // pPM.programs.smaaBlend = pPM.setupSmaaBlend(gl, pPM.programs.smaaBlend);
 
   pPM.programs.occlusion = pPM.createProgram(pPM.shaderCode.occlusion.vert, pPM.shaderCode.occlusion.frag);
   pPM.programs.occlusion = pPM.setupOcclusion(gl, pPM.programs.occlusion);
 
+  // DEBUG: Future Use
   // pPM.programs.gaussian = pPM.createProgram(pPM.shaderCode.gaussian.vert, pPM.shaderCode.gaussian.frag);
   // pPM.programs.gaussian = pPM.setupGaussian(gl, pPM.programs.gaussian);
 
   pPM.frameBufferInfos = {};
+  // DEBUG: Future Use
   // pPM.frameBufferInfos.one = pPM.createFrameBufferInfo(gl.drawingBufferWidth, gl.drawingBufferHeight);
   // pPM.frameBufferInfos.two = pPM.createFrameBufferInfo(gl.drawingBufferWidth, gl.drawingBufferHeight);
 
+  // DEBUG: Future Use
   // pPM.curBuffer = pPM.frameBufferInfos.one.frameBuffer;
   pPM.curBuffer = null;
 };
@@ -59,7 +67,7 @@ pPM.createProgram = (vertCode, fragCode) => {
   gl.linkProgram(program);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    var info = gl.getProgramInfoLog(program);
+    const info = gl.getProgramInfoLog(program);
     throw new Error('Could not compile WebGL program. \n\n' + info);
   }
   return program;
@@ -300,6 +308,7 @@ pPM.clearAll = () => {
   gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.bindFramebuffer(gl.FRAMEBUFFER, pPM.frameBufferInfos.two.frameBuffer);
+  // DEBUG:
   // gl.clearColor(0.0, 0.0, 0.0, 0.0);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 };

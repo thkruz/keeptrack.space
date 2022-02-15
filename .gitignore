@@ -101,3 +101,6 @@ key.pem
 .dccache
 .dcignore
 .cache/server.pem
+
+# Gitlab Specific
+src/SOCRATES.html

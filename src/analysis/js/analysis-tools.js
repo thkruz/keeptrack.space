@@ -41,7 +41,7 @@ var millisecondsPerDay = 1.15741e-8;
 var raeType = 1;
 
 satellite.lookanglesInterval = 60;
-satellite.calculateLookAngles = function (sat, sensor, tableType) {
+satellite.calculateLookAngles = function (sat, sensor, tableType) { // NOSONAR
   var propOffset;
   (function _inputValidation() {
     // Check if there is a sensor
@@ -390,7 +390,7 @@ var drawChart = (data) => {
       satData[i] = extra;
     }
   })();
-  (function setupDataInfo() {
+  (function setupDataInfo() { // NOSONAR
     if (typeof sensor == 'undefined' || isDrawInc || isDrawApogee || isDrawEcc || isDrawInc || isDrawPerigee || isDrawPeriod || isDrawRAAN) {
       for (let i = 0; i < satData.length; i++) {
         labelInfo.push(`${satData[i].year} ${satData[i].jday}`);
@@ -605,7 +605,7 @@ var loadJSON = () => {
     });
 };
 
-(function initParseFromGETVariables() {
+(function initParseFromGETVariables() { // NOSONAR
   // This is an initial parse of the GET variables
   // A satSet focused one happens later.
 

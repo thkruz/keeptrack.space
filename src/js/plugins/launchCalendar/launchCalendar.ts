@@ -42,26 +42,16 @@ export const bottomMenuClick = (iconName: string): void => {
       }, 2000);
       keepTrackApi.programs.uiManager.hideSideMenus();
       try {
-        if (location.protocol === 'https:') {
-          $.colorbox({
-            href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
-            iframe: true,
-            width: '80%',
-            height: '80%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        } else {
-          $.colorbox({
-            href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
-            iframe: true,
-            width: '80%',
-            height: '80%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        }
+        $.colorbox({
+          href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
+          iframe: true,
+          width: '80%',
+          height: '80%',
+          fastIframe: false,
+          closeButton: false,
+        });
       } catch (error) {
+        // DEBUG:
         // console.debug(error);
       }
       isLaunchMenuOpen = true;

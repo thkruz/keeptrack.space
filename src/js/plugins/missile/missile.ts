@@ -146,7 +146,6 @@ export const missileSubmit = (): void => {
           lauLon = <number>missileManager.UsaICBM[a * 4 + 1];
           missileMinAlt = 1100; //https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
         }
-        // attackerName = missileManager.UsaICBM[a * 4 + 2];
         missileManager.Missile(
           lauLat,
           lauLon,

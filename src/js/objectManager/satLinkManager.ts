@@ -135,9 +135,7 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
             if ((sat1.position.x === 0) || (sat1.position.y === 0) || (sat1.position.z === 0) || (sat2.position.x === 0) || (sat2.position.y === 0) || (sat2.position.z === 0)) {
               continue;
             }
-            // DEBUG:
-            // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2))) * RAD2DEG
-            // var semiDiamSat2 = Math.asin(0.1/Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2))) * RAD2DEG
+            // NOTE: Reference old version for debug code
             const theta =
               Math.acos(
                 <number>(

@@ -56,7 +56,6 @@ export const init = (): void => {
       if (iconName === 'menu-satview') {
         const mainCamera = keepTrackApi.programs.mainCamera;
         if (mainCamera.cameraType.current === mainCamera.cameraType.Satellite) {
-          // isSatView = false;
           uiManager.hideSideMenus();
           mainCamera.cameraType.current = mainCamera.cameraType.FixedToSat; // Back to normal Camera Mode
           $('#menu-satview').removeClass('bmenu-item-selected');
@@ -65,7 +64,6 @@ export const init = (): void => {
           if (objectManager.selectedSat !== -1) {
             mainCamera.cameraType.current = mainCamera.cameraType.Satellite; // Activate Satellite Camera Mode
             $('#menu-satview').addClass('bmenu-item-selected');
-            // isSatView = true;
           } else {
             uiManager.toast(`Select a Satellite First!`, 'caution');
             if (settingsManager.plugins.topMenu) adviceManager.adviceList.satViewDisabled();

@@ -93,7 +93,6 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
       const brVert = blVert + 1;
       const tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
       const trVert = tlVert + 1;
-      // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
       vertIndex.push(blVert);
       vertIndex.push(brVert);
       vertIndex.push(tlVert);

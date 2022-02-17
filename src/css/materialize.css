@@ -2152,6 +2152,11 @@
  */
 
 html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-weight: normal;
+  color: rgba(0, 0, 0, 0.87);
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
   line-height: 1.15;
   /* 1 */
   -ms-text-size-adjust: 100%;
@@ -2190,6 +2195,8 @@ section {
  */
 
 h1 {
+  line-height: 110%;
+  margin: 2.8rem 0 1.68rem 0;
   font-size: 2em;
   margin: 0.67em 0;
 }
@@ -2253,6 +2260,9 @@ pre {
  */
 
 a {
+  color: #039be5;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
   background-color: transparent;
   /* 1 */
   -webkit-text-decoration-skip: objects;
@@ -2392,7 +2402,7 @@ input,
 optgroup,
 select,
 textarea {
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   /* 1 */
   font-size: 100%;
   /* 1 */
@@ -2619,24 +2629,11 @@ template {
   display: none;
 }
 
-html {
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
 *,
 *:before,
 *:after {
   -webkit-box-sizing: inherit;
   box-sizing: inherit;
-}
-
-button,
-input,
-optgroup,
-select,
-textarea {
-  font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
 }
 
 ul:not(.browser-default) {
@@ -2646,12 +2643,6 @@ ul:not(.browser-default) {
 
 ul:not(.browser-default) > li {
   list-style-type: none;
-}
-
-a {
-  color: #039be5;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .valign-wrapper {
@@ -3105,12 +3096,12 @@ th {
     margin: 0;
     vertical-align: top;
   }
-  table.responsive-table th {
-    text-align: left;
-  }
+
   table.responsive-table thead {
     display: block;
     float: left;
+    border: 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
   }
   table.responsive-table thead tr {
     display: block;
@@ -3142,10 +3133,6 @@ th {
   table.responsive-table tr {
     border-bottom: none;
     padding: 0 10px;
-  }
-  table.responsive-table thead {
-    border: 0;
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
   }
 }
 
@@ -4487,7 +4474,6 @@ nav ul a {
 }
 
 nav ul a.btn,
-nav ul a.btn-large,
 nav ul a.btn-small,
 nav ul a.btn-large,
 nav ul a.btn-flat,
@@ -4498,7 +4484,6 @@ nav ul a.btn-floating {
 }
 
 nav ul a.btn > .material-icons,
-nav ul a.btn-large > .material-icons,
 nav ul a.btn-small > .material-icons,
 nav ul a.btn-large > .material-icons,
 nav ul a.btn-flat > .material-icons,
@@ -4583,17 +4568,6 @@ nav .input-field label.active i {
   }
 }
 
-a {
-  text-decoration: none;
-}
-
-html {
-  line-height: 1.5;
-  font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-  font-weight: normal;
-  color: rgba(0, 0, 0, 0.87);
-}
-
 @media only screen and (min-width: 0) {
   html {
     font-size: 14px;
@@ -4629,12 +4603,6 @@ h4 a,
 h5 a,
 h6 a {
   font-weight: inherit;
-}
-
-h1 {
-  font-size: 4.2rem;
-  line-height: 110%;
-  margin: 2.8rem 0 1.68rem 0;
 }
 
 h2 {

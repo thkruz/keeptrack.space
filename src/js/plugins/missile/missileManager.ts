@@ -17,14 +17,14 @@ const missileArray: any[] = [];
 export const MassRaidPre = (time: number, simFile: string) => {
   const { satSet, orbitManager } = keepTrackApi.programs;
   missileManager.clearMissiles();
-  $.get(simFile, function (missileArray) {
+  $.get(simFile, function (newMissileArray) {
     const satSetLen = satSet.missileSats;
-    for (let i = 0; i < missileArray.length; i++) {
+    for (let i = 0; i < newMissileArray.length; i++) {
       const x = satSetLen - 500 + i;
-      missileArray[i].startTime = time;
-      missileArray[i].name = missileArray[i].ON;
-      missileArray[i].country = missileArray[i].C;
-      satSet.setSat(x, missileArray[i]);
+      newMissileArray[i].startTime = time;
+      newMissileArray[i].name = newMissileArray[i].ON;
+      newMissileArray[i].country = newMissileArray[i].C;
+      satSet.setSat(x, newMissileArray[i]);
       const missileObj = <MissileObject>satSet.getSat(x);
       if (missileObj) {
         missileObj.id = satSetLen - 500 + i;
@@ -42,10 +42,15 @@ export const MassRaidPre = (time: number, simFile: string) => {
           altList: missileObj.altList,
           startTime: missileObj.startTime,
         });
-        orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, true, missileObj.latList, missileObj.lonList, missileObj.altList); // , missileObj.startTime -- Used to send this too??
+        orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, {
+          missile: true,
+          latList: missileObj.latList,
+          lonList: missileObj.lonList,
+          altList: missileObj.altList,
+        });
       }
     }
-    missileManager.missileArray = missileArray;
+    missileManager.missileArray = newMissileArray;
   }).done(() => {
     keepTrackApi.programs.uiManager.doSearch('RV_');
   });
@@ -140,31 +145,25 @@ export const Missile = (
   Diameter = Diameter || 3.1; // (m)
 
   if (CurrentLatitude > 90 || CurrentLatitude < -90) {
-    // console.debug('Error: Current Latitude must be between 90 and -90 degrees');
     return 0;
   }
   if (CurrentLongitude > 180 || CurrentLongitude < -180) {
-    // console.debug('Error: Current Longitude must be between 180 and -180 degrees');
     return 0;
   }
   if (TargetLatitude > 90 || TargetLatitude < -90) {
-    // console.debug('Error: Target Latitude must be between 90 and -90 degrees');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
     return 0;
   }
   if (TargetLongitude > 180 || TargetLongitude < -180) {
-    // console.debug('Error: Target Longitude must be between 180 and -180 degrees');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 90 and -90 degrees';
     return 0;
   }
   if (NumberWarheads > 12) {
-    // console.debug('Error: Rocket can hold up to 12 warheads');
     return 0;
   }
   if (NumberWarheads % 1 > 0) {
-    // console.debug('Error: The number of warheads must be a whole number');
     return 0;
   }
 
@@ -182,16 +181,12 @@ export const Missile = (
   const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = _CoordinateCalculator(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
   if (ArcLength < 320000) {
-    // console.debug('Error: This missile has a minimum distance of 320 km.');
-    // console.debug('Please choose different target coordinates.');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: This missile has a minimum distance of 320 km.';
     return 0;
   }
 
   if (ArcLength > MaxMissileRange * 1000) {
-    // console.debug('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
-    // console.debug('Please choose different target coordinates.');
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = `Error: This missile has a maximum distance of ${MaxMissileRange} km.`;
     return 0;
@@ -724,7 +719,12 @@ export const Missile = (
       altList: missileObj.altList,
       startTime: missileObj.startTime,
     });
-    orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, true, missileObj.latList, missileObj.lonList, missileObj.altList); // missileObj.startTime - used to send this??
+    orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, {
+      missile: true,
+      latList: missileObj.latList,
+      lonList: missileObj.lonList,
+      altList: missileObj.altList,
+    });
 
     missileManager.missileArray = missileArray;
 
@@ -857,7 +857,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[])
   return currentTEARR;
 };
 
-// Future Use:
+// TODO: Future Use
 /*
 missileManager.MassRaid = function (time, BurnRate, RaidType) {
   var a = 0;

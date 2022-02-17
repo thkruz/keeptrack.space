@@ -76,7 +76,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         starManager.clearConstellations();
       }
       $('#fov-text').html('');
-      // $('#el-text').html('');
       $('#menu-astronomy').removeClass('bmenu-item-selected');
       return;
     } else {

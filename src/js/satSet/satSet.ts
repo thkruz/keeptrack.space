@@ -276,7 +276,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
   const { sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
   if (typeof satSet.satData[i].isInSun == 'undefined') {
     satSet.satData[i].isInSun = () => {
-      //
+      // TODO: Implement enums for the return values
       if (typeof satSet.satData[i].position == 'undefined') return -1;
 
       // Distances all in km
@@ -327,8 +327,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
         ) * RAD2DEG;
 
       // NOTE:
-      // !isSun
-      // !isUmbral
+      // !isSun && !isUmbral
       if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
         // isUmbral
         return 0;
@@ -354,8 +353,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
       }
 
       // NOTE:
-      // !isUmbral && !isPenumbral
-      // isSun
+      // !isUmbral && !isPenumbral && isSun
       return 2;
     };
   }

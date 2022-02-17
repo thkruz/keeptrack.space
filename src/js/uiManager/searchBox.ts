@@ -91,10 +91,10 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
   // Initialize search results
   const satData = satSet.satData;
   let results = [];
-  searchList.forEach((searchString) => {
+  searchList.forEach((searchStringIn) => {
     satData.every((sat, i) => {
       if (i > satSet.missileSats) return false;
-      const len = searchString.length;
+      const len = searchStringIn.length;
       if (sat.static && sat.type !== SpaceObjectType.STAR) return true; // Skip static dots (Maybe these should be searchable?)
       if (sat.marker) return false; // Stop searching once you reach the markers
       if (settingsManager.isSatOverflyModeOn && sat.type !== SpaceObjectType.PAYLOAD) return true; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
@@ -102,9 +102,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
       if (sat.country == 'ANALSAT' && !sat.active) return true; // Skip Fake Analyst satellites
       if (!sat.name) return true; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
-      if (sat.name.toUpperCase().indexOf(searchString) !== -1) {
+      if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1) {
         results.push({
-          strIndex: sat.name.indexOf(searchString),
+          strIndex: sat.name.indexOf(searchStringIn),
           type: sat.type,
           isON: true,
           patlen: len,
@@ -113,9 +113,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
         return true; // Prevent's duplicate results
       }
 
-      if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchString) !== -1) {
+      if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
         results.push({
-          strIndex: sat.bus.indexOf(searchString),
+          strIndex: sat.bus.indexOf(searchStringIn),
           type: sat.type,
           isBus: true,
           patlen: len,
@@ -126,9 +126,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
 
       if (!sat.desc) {
         // Do nothing there is no description property
-      } else if (sat.desc.toUpperCase().indexOf(searchString) !== -1) {
+      } else if (sat.desc.toUpperCase().indexOf(searchStringIn) !== -1) {
         results.push({
-          strIndex: sat.desc.indexOf(searchString),
+          strIndex: sat.desc.indexOf(searchStringIn),
           isMissile: true,
           patlen: len,
           satId: i,
@@ -138,9 +138,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
         return true; // Last check for missiles
       }
 
-      if (sat.sccNum && sat.sccNum.indexOf(searchString) !== -1) {
+      if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
         results.push({
-          strIndex: sat.sccNum.indexOf(searchString),
+          strIndex: sat.sccNum.indexOf(searchStringIn),
           isSccNum: true,
           patlen: len,
           satId: i,
@@ -148,9 +148,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
         return true; // Prevent's duplicate results
       }
 
-      if (sat.intlDes && sat.intlDes.indexOf(searchString) !== -1) {
+      if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
         results.push({
-          strIndex: sat.intlDes.indexOf(searchString),
+          strIndex: sat.intlDes.indexOf(searchStringIn),
           isIntlDes: true,
           patlen: len,
           satId: i,
@@ -158,9 +158,9 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
         return true; // Prevent's duplicate results
       }
 
-      if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchString) !== -1) {
+      if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
         results.push({
-          strIndex: sat.launchVehicle.indexOf(searchString),
+          strIndex: sat.launchVehicle.indexOf(searchStringIn),
           isLV: true,
           patlen: len,
           satId: i,

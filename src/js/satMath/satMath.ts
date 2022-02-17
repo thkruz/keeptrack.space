@@ -1169,7 +1169,6 @@ export const updateDopsTable = (lat: number, lon: number, alt: number) => {
     let tbl = <HTMLTableElement>document.getElementById('dops'); // Identify the table to update
     tbl.innerHTML = ''; // Clear the table from old object data
 
-    // let tblLength = 0;
     const simulationTime = timeManager.calculateSimulationTime();
     let offset = 0;
 
@@ -1240,7 +1239,6 @@ export const calculateDops = (satList: { az: number; el: number }[]): { pdop: st
     dops.gdop = 50;
     dops.vdop = 50;
     dops.tdop = 50;
-    // console.debug("Need More Satellites");
     return dops;
   }
 
@@ -1374,7 +1372,6 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
       ) {
         if (dist < minDistanceApart) {
           minDistanceApart = dist;
-          // minDistTime = now;
         }
       }
     } else {
@@ -1384,7 +1381,6 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
       ) {
         if (dist < minDistanceApart) {
           minDistanceApart = dist;
-          // minDistTime = now;
         }
       }
     }

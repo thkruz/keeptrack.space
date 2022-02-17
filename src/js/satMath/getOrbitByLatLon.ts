@@ -240,6 +240,8 @@ export const getOrbitByLatLon = (
         if (meanACalcResults === PropagationResults.Success) {
           // DEBUG:
           // console.log('Found Correct Lat');
+
+          // DEBUG:
           // console.log('Up Or Down: ' + upOrDown);
           if (currentDirection === goalDirection) {
             // If Object is moving in the goal direction (upOrDown)

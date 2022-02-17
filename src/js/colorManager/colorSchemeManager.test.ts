@@ -11,7 +11,7 @@ const RealNow = Date.now;
 
 beforeAll(() => {
   global.Date.now = jest.fn(() => {
-    const dateNow = new Date(2020, 0, 1);
+    const dateNow = new Date(2022, 0, 1);
     dateNow.setUTCHours(0, 0, 0, 0);
     return dateNow.getTime();
   });

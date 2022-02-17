@@ -9,6 +9,9 @@ import { nextLaunchManager } from './nextLaunch';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
+const fakeTimeObj = new Date(2022, 0, 1);
+fakeTimeObj.setUTCHours(0, 0, 0, 0);
+
 const setUrl = (url) => {
   const host = url.split('/')[2] || '';
   let search = url.split('?')[1] || '';
@@ -47,13 +50,30 @@ const resp = {
       holdreason: '',
       failreason: '',
       hashtag: null,
-      launch_service_provider: { id: 88, url: 'https://ll.thespacedevs.com/2.2.0/agencies/88/?format=json', name: 'China Aerospace Science and Technology Corporation', type: 'Government' },
-      rocket: { id: 2970, configuration: { id: 61, launch_library_id: 75, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/61/?format=json', name: 'Long March 2', family: 'Long March 2', full_name: 'Long March 2C', variant: 'C' } },
+      launch_service_provider: {
+        id: 88,
+        url: 'https://ll.thespacedevs.com/2.2.0/agencies/88/?format=json',
+        name: 'China Aerospace Science and Technology Corporation',
+        type: 'Government',
+      },
+      rocket: {
+        id: 2970,
+        configuration: {
+          id: 61,
+          launch_library_id: 75,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/61/?format=json',
+          name: 'Long March 2',
+          family: 'Long March 2',
+          full_name: 'Long March 2C',
+          variant: 'C',
+        },
+      },
       mission: {
         id: 1396,
         launch_library_id: null,
         name: 'Yaogan-30-10',
-        description: 'NOTE: Payload identity not confirmed.\r\n\r\nThe Yaogan-30 is a series of military remote sensing satellites which are launched in triplets. The satellites are spaced by 120° in their orbit.',
+        description:
+          'NOTE: Payload identity not confirmed.\r\n\r\nThe Yaogan-30 is a series of military remote sensing satellites which are launched in triplets. The satellites are spaced by 120° in their orbit.',
         launch_designator: null,
         type: 'Government/Top Secret',
         orbit: { id: 8, name: 'Low Earth Orbit', abbrev: 'LEO' },
@@ -103,8 +123,27 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 141, url: 'https://ll.thespacedevs.com/2.2.0/agencies/141/?format=json', name: 'Blue Origin', type: 'Commercial' },
-      rocket: { id: 2878, configuration: { id: 137, launch_library_id: 9999, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/137/?format=json', name: 'New Shepard', family: 'Blue Origin', full_name: 'New Shepard', variant: '' } },
-      mission: { id: 1292, launch_library_id: null, name: 'NS-16', description: "First crewed flight of Blue Origin's New Shepard rocket.", launch_designator: null, type: 'Tourism', orbit: { id: 15, name: 'Suborbital', abbrev: 'Sub' } },
+      rocket: {
+        id: 2878,
+        configuration: {
+          id: 137,
+          launch_library_id: 9999,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/137/?format=json',
+          name: 'New Shepard',
+          family: 'Blue Origin',
+          full_name: 'New Shepard',
+          variant: '',
+        },
+      },
+      mission: {
+        id: 1292,
+        launch_library_id: null,
+        name: 'NS-16',
+        description: "First crewed flight of Blue Origin's New Shepard rocket.",
+        launch_designator: null,
+        type: 'Tourism',
+        orbit: { id: 15, name: 'Suborbital', abbrev: 'Sub' },
+      },
       pad: {
         id: 90,
         url: 'https://ll.thespacedevs.com/2.2.0/pad/90/?format=json',
@@ -149,8 +188,24 @@ const resp = {
       holdreason: '',
       failreason: '',
       hashtag: null,
-      launch_service_provider: { id: 96, url: 'https://ll.thespacedevs.com/2.2.0/agencies/96/?format=json', name: 'Khrunichev State Research and Production Space Center', type: 'Government' },
-      rocket: { id: 124, configuration: { id: 152, launch_library_id: 186, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/152/?format=json', name: 'Proton-M', family: 'Proton / UR-500', full_name: 'Proton-M', variant: '' } },
+      launch_service_provider: {
+        id: 96,
+        url: 'https://ll.thespacedevs.com/2.2.0/agencies/96/?format=json',
+        name: 'Khrunichev State Research and Production Space Center',
+        type: 'Government',
+      },
+      rocket: {
+        id: 124,
+        configuration: {
+          id: 152,
+          launch_library_id: 186,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/152/?format=json',
+          name: 'Proton-M',
+          family: 'Proton / UR-500',
+          full_name: 'Proton-M',
+          variant: '',
+        },
+      },
       mission: {
         id: 656,
         launch_library_id: 843,
@@ -206,7 +261,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 115, url: 'https://ll.thespacedevs.com/2.2.0/agencies/115/?format=json', name: 'Arianespace', type: 'Commercial' },
-      rocket: { id: 2684, configuration: { id: 20, launch_library_id: 27, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/20/?format=json', name: 'Ariane 5 ECA', family: 'Ariane 5', full_name: 'Ariane 5 ECA', variant: 'ECA' } },
+      rocket: {
+        id: 2684,
+        configuration: {
+          id: 20,
+          launch_library_id: 27,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/20/?format=json',
+          name: 'Ariane 5 ECA',
+          family: 'Ariane 5',
+          full_name: 'Ariane 5 ECA',
+          variant: 'ECA',
+        },
+      },
       mission: {
         id: 1245,
         launch_library_id: null,
@@ -262,7 +328,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 121, url: 'https://ll.thespacedevs.com/2.2.0/agencies/121/?format=json', name: 'SpaceX', type: 'Commercial' },
-      rocket: { id: 2958, configuration: { id: 164, launch_library_id: 188, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/164/?format=json', name: 'Falcon 9 Block 5', family: 'Falcon', full_name: 'Falcon 9 Block 5', variant: 'Block 5' } },
+      rocket: {
+        id: 2958,
+        configuration: {
+          id: 164,
+          launch_library_id: 188,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/164/?format=json',
+          name: 'Falcon 9 Block 5',
+          family: 'Falcon',
+          full_name: 'Falcon 9 Block 5',
+          variant: 'Block 5',
+        },
+      },
       mission: {
         id: 1380,
         launch_library_id: null,
@@ -317,7 +394,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 124, url: 'https://ll.thespacedevs.com/2.2.0/agencies/124/?format=json', name: 'United Launch Alliance', type: 'Commercial' },
-      rocket: { id: 2702, configuration: { id: 166, launch_library_id: 118, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/166/?format=json', name: 'Atlas V N22', family: 'Atlas', full_name: 'Atlas V N22', variant: 'V N22' } },
+      rocket: {
+        id: 2702,
+        configuration: {
+          id: 166,
+          launch_library_id: 118,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/166/?format=json',
+          name: 'Atlas V N22',
+          family: 'Atlas',
+          full_name: 'Atlas V N22',
+          variant: 'V N22',
+        },
+      },
       mission: {
         id: 1109,
         launch_library_id: 1305,
@@ -410,7 +498,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 121, url: 'https://ll.thespacedevs.com/2.2.0/agencies/121/?format=json', name: 'SpaceX', type: 'Commercial' },
-      rocket: { id: 2959, configuration: { id: 164, launch_library_id: 188, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/164/?format=json', name: 'Falcon 9 Block 5', family: 'Falcon', full_name: 'Falcon 9 Block 5', variant: 'Block 5' } },
+      rocket: {
+        id: 2959,
+        configuration: {
+          id: 164,
+          launch_library_id: 188,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/164/?format=json',
+          name: 'Falcon 9 Block 5',
+          family: 'Falcon',
+          full_name: 'Falcon 9 Block 5',
+          variant: 'Block 5',
+        },
+      },
       mission: {
         id: 1381,
         launch_library_id: null,
@@ -467,7 +566,15 @@ const resp = {
       launch_service_provider: { id: 63, url: 'https://ll.thespacedevs.com/2.2.0/agencies/63/?format=json', name: 'Russian Federal Space Agency (ROSCOSMOS)', type: 'Government' },
       rocket: {
         id: 2510,
-        configuration: { id: 45, launch_library_id: 83, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/45/?format=json', name: 'Soyuz 2.1a/Fregat-M', family: 'Soyuz', full_name: 'Soyuz 2.1a Fregat-M', variant: 'Fregat-M' },
+        configuration: {
+          id: 45,
+          launch_library_id: 83,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/45/?format=json',
+          name: 'Soyuz 2.1a/Fregat-M',
+          family: 'Soyuz',
+          full_name: 'Soyuz 2.1a Fregat-M',
+          variant: 'Fregat-M',
+        },
       },
       mission: null,
       pad: {
@@ -515,7 +622,18 @@ const resp = {
       failreason: null,
       hashtag: null,
       launch_service_provider: { id: 124, url: 'https://ll.thespacedevs.com/2.2.0/agencies/124/?format=json', name: 'United Launch Alliance', type: 'Commercial' },
-      rocket: { id: 147, configuration: { id: 27, launch_library_id: 37, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/27/?format=json', name: 'Atlas V 551', family: 'Atlas', full_name: 'Atlas V 551', variant: '551' } },
+      rocket: {
+        id: 147,
+        configuration: {
+          id: 27,
+          launch_library_id: 37,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/27/?format=json',
+          name: 'Atlas V 551',
+          family: 'Atlas',
+          full_name: 'Atlas V 551',
+          variant: '551',
+        },
+      },
       mission: null,
       pad: {
         id: 29,
@@ -562,7 +680,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 115, url: 'https://ll.thespacedevs.com/2.2.0/agencies/115/?format=json', name: 'Arianespace', type: 'Commercial' },
-      rocket: { id: 179, configuration: { id: 167, launch_library_id: 18, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/167/?format=json', name: 'Vega', family: 'Vega', full_name: 'Vega', variant: '' } },
+      rocket: {
+        id: 179,
+        configuration: {
+          id: 167,
+          launch_library_id: 18,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/167/?format=json',
+          name: 'Vega',
+          family: 'Vega',
+          full_name: 'Vega',
+          variant: '',
+        },
+      },
       mission: {
         id: 1377,
         launch_library_id: null,
@@ -618,7 +747,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 257, url: 'https://ll.thespacedevs.com/2.2.0/agencies/257/?format=json', name: 'Northrop Grumman Innovation Systems', type: 'Commercial' },
-      rocket: { id: 2886, configuration: { id: 210, launch_library_id: 241, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/210/?format=json', name: 'Antares 230+', family: 'Antares', full_name: 'Antares 230+', variant: '230+' } },
+      rocket: {
+        id: 2886,
+        configuration: {
+          id: 210,
+          launch_library_id: 241,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/210/?format=json',
+          name: 'Antares 230+',
+          family: 'Antares',
+          full_name: 'Antares 230+',
+          variant: '230+',
+        },
+      },
       mission: {
         id: 1302,
         launch_library_id: null,
@@ -693,7 +833,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 31, url: 'https://ll.thespacedevs.com/2.2.0/agencies/31/?format=json', name: 'Indian Space Research Organization', type: 'Government' },
-      rocket: { id: 56, configuration: { id: 168, launch_library_id: 60, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/168/?format=json', name: 'GSLV Mk II', family: 'PSLV', full_name: 'GSLV Mk. II', variant: '' } },
+      rocket: {
+        id: 56,
+        configuration: {
+          id: 168,
+          launch_library_id: 60,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/168/?format=json',
+          name: 'GSLV Mk II',
+          family: 'PSLV',
+          full_name: 'GSLV Mk. II',
+          variant: '',
+        },
+      },
       mission: {
         id: 750,
         launch_library_id: 458,
@@ -749,7 +900,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 124, url: 'https://ll.thespacedevs.com/2.2.0/agencies/124/?format=json', name: 'United Launch Alliance', type: 'Commercial' },
-      rocket: { id: 111, configuration: { id: 27, launch_library_id: 37, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/27/?format=json', name: 'Atlas V 551', family: 'Atlas', full_name: 'Atlas V 551', variant: '551' } },
+      rocket: {
+        id: 111,
+        configuration: {
+          id: 27,
+          launch_library_id: 37,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/27/?format=json',
+          name: 'Atlas V 551',
+          family: 'Atlas',
+          full_name: 'Atlas V 551',
+          variant: '551',
+        },
+      },
       mission: {
         id: 1371,
         launch_library_id: null,
@@ -805,7 +967,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 121, url: 'https://ll.thespacedevs.com/2.2.0/agencies/121/?format=json', name: 'SpaceX', type: 'Commercial' },
-      rocket: { id: 2887, configuration: { id: 164, launch_library_id: 188, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/164/?format=json', name: 'Falcon 9 Block 5', family: 'Falcon', full_name: 'Falcon 9 Block 5', variant: 'Block 5' } },
+      rocket: {
+        id: 2887,
+        configuration: {
+          id: 164,
+          launch_library_id: 188,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/164/?format=json',
+          name: 'Falcon 9 Block 5',
+          family: 'Falcon',
+          full_name: 'Falcon 9 Block 5',
+          variant: 'Block 5',
+        },
+      },
       mission: {
         id: 1303,
         launch_library_id: null,
@@ -882,7 +1055,15 @@ const resp = {
       launch_service_provider: { id: 115, url: 'https://ll.thespacedevs.com/2.2.0/agencies/115/?format=json', name: 'Arianespace', type: 'Commercial' },
       rocket: {
         id: 2855,
-        configuration: { id: 134, launch_library_id: 153, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/134/?format=json', name: 'Soyuz 2.1b/Fregat-M', family: 'Soyuz', full_name: 'Soyuz 2.1b Fregat-M', variant: 'Fregat-M' },
+        configuration: {
+          id: 134,
+          launch_library_id: 153,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/134/?format=json',
+          name: 'Soyuz 2.1b/Fregat-M',
+          family: 'Soyuz',
+          full_name: 'Soyuz 2.1b Fregat-M',
+          variant: 'Fregat-M',
+        },
       },
       mission: {
         id: 1269,
@@ -938,9 +1119,33 @@ const resp = {
       holdreason: '',
       failreason: '',
       hashtag: null,
-      launch_service_provider: { id: 184, url: 'https://ll.thespacedevs.com/2.2.0/agencies/184/?format=json', name: 'China Aerospace Science and Industry Corporation', type: 'Government' },
-      rocket: { id: 2758, configuration: { id: 135, launch_library_id: 155, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/135/?format=json', name: 'Kuaizhou', family: 'Kuaizhou', full_name: 'Kuaizhou-1A', variant: '1A' } },
-      mission: { id: 1156, launch_library_id: 1346, name: 'Jilin-1-02D', description: 'Jilin-1 is a series of Chinese commercial remote sensing satellites.', launch_designator: null, type: 'Earth Science', orbit: null },
+      launch_service_provider: {
+        id: 184,
+        url: 'https://ll.thespacedevs.com/2.2.0/agencies/184/?format=json',
+        name: 'China Aerospace Science and Industry Corporation',
+        type: 'Government',
+      },
+      rocket: {
+        id: 2758,
+        configuration: {
+          id: 135,
+          launch_library_id: 155,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/135/?format=json',
+          name: 'Kuaizhou',
+          family: 'Kuaizhou',
+          full_name: 'Kuaizhou-1A',
+          variant: '1A',
+        },
+      },
+      mission: {
+        id: 1156,
+        launch_library_id: 1346,
+        name: 'Jilin-1-02D',
+        description: 'Jilin-1 is a series of Chinese commercial remote sensing satellites.',
+        launch_designator: null,
+        type: 'Earth Science',
+        orbit: null,
+      },
       pad: {
         id: 71,
         url: 'https://ll.thespacedevs.com/2.2.0/pad/71/?format=json',
@@ -985,8 +1190,24 @@ const resp = {
       holdreason: '',
       failreason: '',
       hashtag: null,
-      launch_service_provider: { id: 88, url: 'https://ll.thespacedevs.com/2.2.0/agencies/88/?format=json', name: 'China Aerospace Science and Technology Corporation', type: 'Government' },
-      rocket: { id: 2964, configuration: { id: 64, launch_library_id: 70, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/64/?format=json', name: 'Long March 4C', family: 'Long March 4', full_name: 'Long March 4C', variant: 'C' } },
+      launch_service_provider: {
+        id: 88,
+        url: 'https://ll.thespacedevs.com/2.2.0/agencies/88/?format=json',
+        name: 'China Aerospace Science and Technology Corporation',
+        type: 'Government',
+      },
+      rocket: {
+        id: 2964,
+        configuration: {
+          id: 64,
+          launch_library_id: 70,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/64/?format=json',
+          name: 'Long March 4C',
+          family: 'Long March 4',
+          full_name: 'Long March 4C',
+          variant: 'C',
+        },
+      },
       mission: {
         id: 1386,
         launch_library_id: null,
@@ -1041,9 +1262,33 @@ const resp = {
       holdreason: '',
       failreason: '',
       hashtag: null,
-      launch_service_provider: { id: 184, url: 'https://ll.thespacedevs.com/2.2.0/agencies/184/?format=json', name: 'China Aerospace Science and Industry Corporation', type: 'Government' },
-      rocket: { id: 2759, configuration: { id: 135, launch_library_id: 155, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/135/?format=json', name: 'Kuaizhou', family: 'Kuaizhou', full_name: 'Kuaizhou-1A', variant: '1A' } },
-      mission: { id: 1157, launch_library_id: 1347, name: 'Jilin-1-02F', description: 'Jilin-1 is a series of Chinese commercial remote sensing satellites.', launch_designator: null, type: 'Earth Science', orbit: null },
+      launch_service_provider: {
+        id: 184,
+        url: 'https://ll.thespacedevs.com/2.2.0/agencies/184/?format=json',
+        name: 'China Aerospace Science and Industry Corporation',
+        type: 'Government',
+      },
+      rocket: {
+        id: 2759,
+        configuration: {
+          id: 135,
+          launch_library_id: 155,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/135/?format=json',
+          name: 'Kuaizhou',
+          family: 'Kuaizhou',
+          full_name: 'Kuaizhou-1A',
+          variant: '1A',
+        },
+      },
+      mission: {
+        id: 1157,
+        launch_library_id: 1347,
+        name: 'Jilin-1-02F',
+        description: 'Jilin-1 is a series of Chinese commercial remote sensing satellites.',
+        launch_designator: null,
+        type: 'Earth Science',
+        orbit: null,
+      },
       pad: {
         id: 71,
         url: 'https://ll.thespacedevs.com/2.2.0/pad/71/?format=json',
@@ -1089,7 +1334,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 124, url: 'https://ll.thespacedevs.com/2.2.0/agencies/124/?format=json', name: 'United Launch Alliance', type: 'Commercial' },
-      rocket: { id: 2664, configuration: { id: 214, launch_library_id: 244, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/214/?format=json', name: 'Atlas V 511', family: '', full_name: 'Atlas V 511', variant: '' } },
+      rocket: {
+        id: 2664,
+        configuration: {
+          id: 214,
+          launch_library_id: 244,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/214/?format=json',
+          name: 'Atlas V 511',
+          family: '',
+          full_name: 'Atlas V 511',
+          variant: '',
+        },
+      },
       mission: null,
       pad: {
         id: 29,
@@ -1136,7 +1392,18 @@ const resp = {
       failreason: '',
       hashtag: null,
       launch_service_provider: { id: 265, url: 'https://ll.thespacedevs.com/2.2.0/agencies/265/?format=json', name: 'Firefly Aerospace', type: 'Commercial' },
-      rocket: { id: 2210, configuration: { id: 179, launch_library_id: 216, url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/179/?format=json', name: 'Firefly Alpha', family: 'Firefly Alpha', full_name: 'Firefly Alpha', variant: '' } },
+      rocket: {
+        id: 2210,
+        configuration: {
+          id: 179,
+          launch_library_id: 216,
+          url: 'https://ll.thespacedevs.com/2.2.0/config/launcher/179/?format=json',
+          name: 'Firefly Alpha',
+          family: 'Firefly Alpha',
+          full_name: 'Firefly Alpha',
+          variant: '',
+        },
+      },
       mission: {
         id: 966,
         launch_library_id: 1180,
@@ -1203,9 +1470,9 @@ describe('nextLaunch.initTable', () => {
     let result: any = nextLaunch.initTable(document.createElement('table'), [
       {
         name: 'test',
-        updated: new Date(2020, 0, 1),
-        windowStart: new Date(2020, 0, 1),
-        windowEnd: new Date(2020, 0, 1),
+        updated: fakeTimeObj,
+        windowStart: fakeTimeObj,
+        windowEnd: fakeTimeObj,
         location: 'test',
         locationURL: 'test',
         agency: 'test',
@@ -1229,9 +1496,9 @@ describe('nextLaunch.initTable', () => {
     let result: any = nextLaunch.initTable(document.createElement('table'), [
       {
         name: 'test',
-        updated: new Date(2020, 0, 1),
-        windowStart: new Date(),
-        windowEnd: new Date(2020, 0, 1),
+        updated: fakeTimeObj,
+        windowStart: fakeTimeObj,
+        windowEnd: fakeTimeObj,
         location: 'test',
         locationURL: '',
         agency: 'test',
@@ -1255,9 +1522,9 @@ describe('nextLaunch.initTable', () => {
     let result: any = nextLaunch.initTable(document.createElement('table'), [
       {
         name: 'test',
-        updated: new Date(2020, 0, 1),
-        windowStart: new Date(2020, 0, 1),
-        windowEnd: new Date(2020, 0, 1),
+        updated: fakeTimeObj,
+        windowStart: fakeTimeObj,
+        windowEnd: fakeTimeObj,
         location: 'test',
         locationURL: 'test',
         agency: 'test',

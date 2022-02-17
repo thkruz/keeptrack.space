@@ -383,7 +383,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     // TODO: Error checking on Iframe
     let now: Date | number | string = new Date();
     const jday = keepTrackApi.programs.timeManager.getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let daysold;
     if (sat.TLE1.substr(18, 2) === now) {

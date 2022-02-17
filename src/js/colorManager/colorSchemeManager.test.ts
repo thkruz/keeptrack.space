@@ -87,6 +87,9 @@ describe('Test ColorRules', () => {
     settingsManager.dotsOnScreen = 4;
     colorSchemeManager.pickableData = [0, 0, 0, 1];
     colorSchemeManager.colorData = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+    const fakeDate = new Date(2022, 0, 1);
+    fakeDate.setUTCHours(0, 0, 0, 0);
+    jest.spyOn(Date, 'now').mockReturnValue(fakeDate.getTime());
   });
   test('0', async () => {
     colorSchemeManager.currentColorScheme = colorSchemeManager.default;
@@ -1018,7 +1021,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
     let now = new Date();
     now.setDate(now.getDate());
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let result: any = colorSchemeManager.ageOfElset({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
@@ -1031,7 +1034,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
     let now = new Date();
     now.setDate(now.getDate() - 3);
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let result: any = colorSchemeManager.ageOfElset({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
@@ -1045,7 +1048,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
     let now = new Date();
     now.setDate(now.getDate() - 15);
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let result: any = colorSchemeManager.ageOfElset({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
@@ -1058,7 +1061,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
     let now = new Date();
     now.setDate(now.getDate() - 80);
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let result: any = colorSchemeManager.ageOfElset({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
@@ -1072,7 +1075,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
     let now = new Date();
     now.setDate(now.getDate() - 80);
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let result: any = colorSchemeManager.ageOfElset({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
@@ -1086,7 +1089,7 @@ describe('colorSchemeManager.ageOfElsetRules', () => {
     let now = new Date();
     now.setDate(now.getDate() - 600);
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     colorSchemeManager.ageOfElset({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
@@ -1168,7 +1171,7 @@ describe('colorSchemeManager.lostobjectsRules', () => {
     let now = new Date();
     now.setDate(now.getDate());
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let result: any = colorSchemeManager.lostobjects({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,
@@ -1180,7 +1183,7 @@ describe('colorSchemeManager.lostobjectsRules', () => {
     let now = new Date();
     now.setDate(now.getDate() - 600);
     const jday = getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let result: any = colorSchemeManager.lostobjects({
       TLE1: `012345678901234567${now}${parseInt(jday)}34567890`,

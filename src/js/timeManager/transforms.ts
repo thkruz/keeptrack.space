@@ -4,7 +4,7 @@ import { dateFormat } from '../lib/external/dateFormat';
 export const getDayOfYear = (date: Date): number => {
   date = date || new Date();
   const _isLeapYear = (dateIn: Date) => {
-    const year = dateIn.getFullYear();
+    const year = dateIn.getUTCFullYear();
     if ((year & 3) !== 0) return false;
     return year % 100 !== 0 || year % 400 === 0;
   };
@@ -20,7 +20,7 @@ export const getDayOfYear = (date: Date): number => {
 export const jday = (year?: number, mon?: number, day?: number, hr?: number, minute?: number, sec?: number) => {
   if (!year) {
     const now = new Date();
-    const jDayStart = new Date(now.getFullYear(), 0, 0);
+    const jDayStart = new Date(now.getUTCFullYear(), 0, 0);
     const jDayDiff = now.getDate() - jDayStart.getDate();
     return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
   } else {

@@ -3,37 +3,37 @@ import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { KeepTrackPrograms } from '../../api/keepTrackTypes';
-import * as classification from './classification';
-import { init } from './classification';
+import { init, setClassificationBanner } from './classification';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
-const settingsManager = {
+(<any>window).settingsManager = {
   classificationStr: '',
 };
 
 describe('classification', () => {
   it('should be initialized', () => {
     init();
+    keepTrackApi.methods.uiManagerInit();
   });
   it('should ignore no classification', () => {
-    settingsManager.classificationStr = '';
-    keepTrackApi.methods.uiManagerInit();
+    (<any>window).settingsManager.classificationStr = '';
+    setClassificationBanner();
   });
   it('should add unclassified classification to the top', () => {
-    settingsManager.classificationStr = 'Unclassified';
-    keepTrackApi.methods.uiManagerInit();
+    (<any>window).settingsManager.classificationStr = 'Unclassified';
+    setClassificationBanner();
   });
   it('should add secret classification to the top', () => {
-    settingsManager.classificationStr = 'Secret';
-    keepTrackApi.methods.uiManagerInit();
+    (<any>window).settingsManager.classificationStr = 'Secret';
+    setClassificationBanner();
   });
   it('should add top secret classification to the top', () => {
-    settingsManager.classificationStr = 'Top Secret';
-    keepTrackApi.methods.uiManagerInit();
+    (<any>window).settingsManager.classificationStr = 'Top Secret';
+    setClassificationBanner();
   });
   it('should add sci classification to the top', () => {
-    settingsManager.classificationStr = 'Top Secret//SCI LA';
-    keepTrackApi.methods.uiManagerInit();
+    (<any>window).settingsManager.classificationStr = 'Top Secret//SCI LA';
+    setClassificationBanner();
   });
 });
 
@@ -41,7 +41,7 @@ describe('classification', () => {
 describe('classification.init', () => {
   test('0', () => {
     const callFunction: any = () => {
-      classification.init();
+      init();
     };
 
     expect(callFunction).not.toThrow();

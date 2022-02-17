@@ -5,7 +5,7 @@ omManager.js Orbit Math Manager handles the conversion of state vector data,
 keplerian elements, and two line element sets as well as initial orbit fitting
 http://keeptrack.space
 
-Copyright (C) 2016-2021 Theodore Kruczek
+Copyright (C) 2016-2022 Theodore Kruczek
 Copyright (C) 2020 Heather Kruczek
 
 This program is free software: you can redistribute it and/or modify it under

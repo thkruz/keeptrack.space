@@ -13,7 +13,14 @@ const satCache = [];
 let NUM_SEGS: number;
 let orbitFadeFactor = 1.0;
 
-onmessage = (m) => { // NOSONAR
+// Handles Incomming Messages to sat-cruncher from main thread
+try {
+  onmessage = (m) => onmessageProcessing(m);
+} catch (e) {
+  // If Jest isn't running then throw the error
+  if (!process) throw e;
+}
+export const onmessageProcessing = (m) => { // NOSONAR
   if (m.data.isUpdate) {
     // Add Satellites
     if (!m.data.missile && m.data.satId < 99999) {
@@ -95,12 +102,12 @@ onmessage = (m) => { // NOSONAR
       }
     } else {
       const period = (2 * Math.PI) / satCache[satId].no; // convert rads/min to min
-      let timeslice = period / NUM_SEGS;
+      const timeslice = period / NUM_SEGS;
 
       while (i < len) {
         const t = now + i * timeslice;
         const p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
-        if (p) {
+        if (p.x && p.y && p.z) {
           pointsOut[i * 4] = p.x;
           pointsOut[i * 4 + 1] = p.y;
           pointsOut[i * 4 + 2] = p.z;
@@ -116,12 +123,22 @@ onmessage = (m) => { // NOSONAR
     }
 
     // TODO: figure out how this transferable buffer works
+    postMessageProcessing({pointsOut, satId});
+  }
+};
+
+export const postMessageProcessing = (data: {pointsOut: any, satId: any}) => {
+  const { pointsOut, satId } = data;
+  try {
     postMessage(
       {
         pointsOut: pointsOut.buffer,
-        satId: satId,
+        satId,
       },
       <any>[pointsOut.buffer]
     );
+  } catch (e) {
+    // If Jest isn't running then throw the error
+    if (!process) throw e;
   }
-};
+}

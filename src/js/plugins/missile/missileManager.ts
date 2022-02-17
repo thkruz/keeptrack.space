@@ -291,8 +291,6 @@ export const Missile = (
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
-        // if (!CurrentTime) console.log(t + 's - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Dist: ' + EstDistanceList[i].toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
-        // if (CurrentTime) console.log(new Date(t) + ' - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
         break;
       }
     }
@@ -337,8 +335,6 @@ export const Missile = (
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
-        // if (!CurrentTime) console.log(t + 's - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Dist: ' + EstDistanceList[i].toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
-        // if (CurrentTime) console.log(new Date(t) + ' - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
         break;
       }
     }
@@ -380,8 +376,6 @@ export const Missile = (
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
-        // if (!CurrentTime) console.log(t + 's - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Dist: ' + EstDistanceList[i].toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
-        // if (CurrentTime) console.log(new Date(t) + ' - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
         break;
       }
     }
@@ -423,8 +417,6 @@ export const Missile = (
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
-        // if (!CurrentTime) console.log(t + 's - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Dist: ' + EstDistanceList[i].toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
-        // if (CurrentTime) console.log(new Date(t) + ' - Altitude: ' + (Altitude/1000).toFixed(1) + ' - Lat: ' + EstLatList[i].toFixed(1) + ' - Lon: ' + EstLongList[i].toFixed(1));
         break;
       }
     }
@@ -538,7 +530,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[])
   // If no sensor passed to function then try to use the 'currentSensor'
   if (typeof sensors == 'undefined') {
     if (typeof sensorManager.currentSensor == 'undefined') {
-      throw 'getTEARR requires a sensor or for a sensor to be currently selected.';
+      throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
     } else {
       sensors = sensorManager.currentSensor;
     }
@@ -552,7 +544,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[])
         lon: sensors[0].lon,
       };
     } catch (e) {
-      throw 'observerGd is not set and could not be guessed.';
+      throw new Error('observerGd is not set and could not be guessed.');
     }
   }
 
@@ -2326,7 +2318,7 @@ export const _IterationFun = (
   ArcDistance: number,
   MassIn: number,
   AngleCoefficient: number
-) => {
+) => { // NOSONAR
   // This function is the heart of the program. It calculates the simulated flight
   // of the missile. This is only one step of the flight, to get the whole flight
   // simulated it must be iterated in a loop. The iMathuts for the function are:
@@ -2449,7 +2441,7 @@ export const _Bisection = (
   MassIn: number,
   _ArcLength: number,
   GoalDistance: number
-) => {
+) => { // NOSONAR
   // This function is designed to calculate the needed angle coefficient to for the trust
   // to govern the missiles path into its designated target. Because this missile has the
   // capability of entering into orbit, more complicated calculations needed to be used to
@@ -2617,7 +2609,7 @@ export const _QuickRun = (
   ArcDistance: any,
   MassIn: any,
   AngleCoefficient: number
-) => {
+) => { // NOSONAR
   // This function calculates the entire simularion of the missiles tragectory without
   // collecting any information along the way. It's purpose is for the angle cooefficeint
   // optimizer to have a quick way to run the simulation and retreive the final distance
@@ -3060,163 +3052,155 @@ missileManager.globalBMTargets = [
   'Pyongyang',
 ];
 
-// DEBUG: FOR FUTURE USE
-/*
-// Settings
-// var maxChineseMissiles = 252;
-// var maxUSAMissiles = 350;
-// var maxRussianMissiles = 400;
-// var maxNorthKoreanMissiles = 30;
-// Internal Variables
-  var USATargets = [
-    40.679,
-    -73.947, // NYC NY
-    42.361,
-    -71.058, // Boston MA
-    41.755,
-    -70.539, // Cape Cod MA
-    41.763,
-    -72.684, // Hartford CT
-    42.101,
-    -72.59, // Springfield MA
-    39.408,
-    -74.441, // Atlantic City NJ
-    39.191,
-    -75.534, // Dover DE
-    39.331,
-    -76.671, // Baltimore MD
-    38.951,
-    -77.013, // Washington DC
-    37.608,
-    -77.378, // Richmond VA (10)
-    42.36,
-    -83.048, // Detriot MI
-    39.844,
-    -86.172, // Indianapolis IN
-    40.008,
-    -83.0, // Columbus OH
-    40.538,
-    -79.934, // Pittsburgh PA
-    40.034,
-    -75.131, // Philadelphia PA
-    47.749,
-    -122.317, // Seattle WA
-    45.7,
-    -122.581, // Portland OR
-    47.732,
-    -117.389, // Spokane WA
-    37.889,
-    -122.562, // San Francisco CA
-    36.257,
-    -115.159, // Las Vegas NV (20)
-    48.034,
-    -101.295, // Minot ND
-    49.134,
-    -101.495, // Minot ND
-    48.234,
-    -100.295, // Minot ND
-    48.334,
-    -101.095, // Minot ND
-    48.434,
-    -101.295, // Minot ND
-    47.948,
-    -97.027, // Grand Forks ND
-    45.107,
-    -93.306, // Minneapolis MN
-    47.092,
-    -110.334, // Grand Falls MO
-    47.292,
-    -111.834, // Grand Falls MO
-    47.592,
-    -111.934, // Grand Falls MO (30)
-    46.792,
-    -111.334, // Grand Falls MO
-    47.992,
-    -111.534, // Grand Falls MO
-    47.792,
-    -110.734, // Grand Falls MO
-    48.592,
-    -111.534, // Grand Falls MO
-    47.292,
-    -111.334, // Grand Falls MO
-    46.092,
-    -111.134, // Grand Falls MO
-    47.592,
-    -110.034, // Grand Falls MO
-    40.21,
-    -104.811, // Cheyene WY
-    41.51,
-    -105.811, // Cheyene WY
-    41.21,
-    -104.211, // Cheyene WY (40)
-    40.51,
-    -104.211, // Cheyene WY
-    41.21,
-    -105.611, // Cheyene WY
-    41.51,
-    -104.611, // Cheyene WY
-    41.21,
-    -103.011, // Cheyene WY
-    42.21,
-    -104.011, // Cheyene WY
-    41.91,
-    -104.811, // Cheyene WY
-    41.91,
-    -104.811, // Cheyene WY
-    34.048,
-    -118.28, // Las Angeles CA
-    19.832,
-    -155.491, // Hawaii
-    13.588,
-    144.922, // Guam (50)
-    36.318,
-    -86.718, // Nashville TN
-    32.782,
-    -97.343, // Forth Worth TX
-    32.584,
-    -99.707, // Abilene TX
-    35.208,
-    -101.837, // Amarillo TX
-    35.188,
-    -106.595, // Albuquerque NM
-    33.603,
-    -111.965, // Phoenix AZ
-    38.765,
-    -104.837, // Colorado Springs CO
-    38.737,
-    -104.883, // Cheyenne Moutain CO
-    39.847,
-    -104.902, // Denver CO
-    40.684,
-    -105.059, // Fort Collins CO (60)
-    40.852,
-    -111.827, // Salt Lake City UT
-    61.343,
-    -150.187, // Anchorage AK
-    64.94,
-    -147.881, // Fairbanks AK
-    58.488,
-    -134.238, // Juneau AK
-    30.46,
-    -86.549, // Eglin AFB FL
-    41.33,
-    -96.054, // Omaha NE
-    39.113276,
-    -121.356137, // Beale AFB
-    64.303735,
-    -149.148768, // Clear AFS
-    76.534322,
-    -68.718288, // Thule AFB
-    41.875523,
-    -87.634038, // Chicago IL
-    35.145865,
-    -89.979153, // Memphis TN
-    43.663448,
-    -70.278127, // Portland MA
-    43.612156,
-    -116.231845, // Boise ID
-  ];
-*/
+missileManager.USATargets = [
+  40.679,
+  -73.947, // NYC NY
+  42.361,
+  -71.058, // Boston MA
+  41.755,
+  -70.539, // Cape Cod MA
+  41.763,
+  -72.684, // Hartford CT
+  42.101,
+  -72.59, // Springfield MA
+  39.408,
+  -74.441, // Atlantic City NJ
+  39.191,
+  -75.534, // Dover DE
+  39.331,
+  -76.671, // Baltimore MD
+  38.951,
+  -77.013, // Washington DC
+  37.608,
+  -77.378, // Richmond VA (10)
+  42.36,
+  -83.048, // Detriot MI
+  39.844,
+  -86.172, // Indianapolis IN
+  40.008,
+  -83.0, // Columbus OH
+  40.538,
+  -79.934, // Pittsburgh PA
+  40.034,
+  -75.131, // Philadelphia PA
+  47.749,
+  -122.317, // Seattle WA
+  45.7,
+  -122.581, // Portland OR
+  47.732,
+  -117.389, // Spokane WA
+  37.889,
+  -122.562, // San Francisco CA
+  36.257,
+  -115.159, // Las Vegas NV (20)
+  48.034,
+  -101.295, // Minot ND
+  49.134,
+  -101.495, // Minot ND
+  48.234,
+  -100.295, // Minot ND
+  48.334,
+  -101.095, // Minot ND
+  48.434,
+  -101.295, // Minot ND
+  47.948,
+  -97.027, // Grand Forks ND
+  45.107,
+  -93.306, // Minneapolis MN
+  47.092,
+  -110.334, // Grand Falls MO
+  47.292,
+  -111.834, // Grand Falls MO
+  47.592,
+  -111.934, // Grand Falls MO (30)
+  46.792,
+  -111.334, // Grand Falls MO
+  47.992,
+  -111.534, // Grand Falls MO
+  47.792,
+  -110.734, // Grand Falls MO
+  48.592,
+  -111.534, // Grand Falls MO
+  47.292,
+  -111.334, // Grand Falls MO
+  46.092,
+  -111.134, // Grand Falls MO
+  47.592,
+  -110.034, // Grand Falls MO
+  40.21,
+  -104.811, // Cheyene WY
+  41.51,
+  -105.811, // Cheyene WY
+  41.21,
+  -104.211, // Cheyene WY (40)
+  40.51,
+  -104.211, // Cheyene WY
+  41.21,
+  -105.611, // Cheyene WY
+  41.51,
+  -104.611, // Cheyene WY
+  41.21,
+  -103.011, // Cheyene WY
+  42.21,
+  -104.011, // Cheyene WY
+  41.91,
+  -104.811, // Cheyene WY
+  41.91,
+  -104.811, // Cheyene WY
+  34.048,
+  -118.28, // Las Angeles CA
+  19.832,
+  -155.491, // Hawaii
+  13.588,
+  144.922, // Guam (50)
+  36.318,
+  -86.718, // Nashville TN
+  32.782,
+  -97.343, // Forth Worth TX
+  32.584,
+  -99.707, // Abilene TX
+  35.208,
+  -101.837, // Amarillo TX
+  35.188,
+  -106.595, // Albuquerque NM
+  33.603,
+  -111.965, // Phoenix AZ
+  38.765,
+  -104.837, // Colorado Springs CO
+  38.737,
+  -104.883, // Cheyenne Moutain CO
+  39.847,
+  -104.902, // Denver CO
+  40.684,
+  -105.059, // Fort Collins CO (60)
+  40.852,
+  -111.827, // Salt Lake City UT
+  61.343,
+  -150.187, // Anchorage AK
+  64.94,
+  -147.881, // Fairbanks AK
+  58.488,
+  -134.238, // Juneau AK
+  30.46,
+  -86.549, // Eglin AFB FL
+  41.33,
+  -96.054, // Omaha NE
+  39.113276,
+  -121.356137, // Beale AFB
+  64.303735,
+  -149.148768, // Clear AFS
+  76.534322,
+  -68.718288, // Thule AFB
+  41.875523,
+  -87.634038, // Chicago IL
+  35.145865,
+  -89.979153, // Memphis TN
+  43.663448,
+  -70.278127, // Portland MA
+  43.612156,
+  -116.231845, // Boise ID
+];
+
 missileManager.missileArray = missileArray;
 missileManager.clearMissiles = clearMissiles;
 missileManager.Missile = Missile;

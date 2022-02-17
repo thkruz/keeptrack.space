@@ -340,37 +340,13 @@ export const satFovDisabled = (): void => {
 export const sensor = (): void => {
   // Only Do this Twice
   if (adviceCount.sensorFOV < 1) {
-    adviceCount.sensorFOV += 1;
-    adviceManager.showAdvice(
-      'Field Of View Bubbles',
-      'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
-      $('#menu-fov-bubble'),
-      'bottom-left'
-    );
+    shoFieldOfViewAdvice();
   } else if (adviceCount.sensorSurv < 1) {
-    adviceCount.sensorSurv += 1;
-    adviceManager.showAdvice(
-      'Surveillance Fence',
-      "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
-      $('#menu-surveillance'),
-      'bottom-left'
-    );
+    showSurvFenceAdvice();
   } else if (adviceCount.sensorFOV < 3) {
-    adviceCount.sensorFOV += 1;
-    adviceManager.showAdvice(
-      'Field Of View Bubbles',
-      'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
-      $('#menu-fov-bubble'),
-      'bottom-left'
-    );
+    shoFieldOfViewAdvice();
   } else if (adviceCount.sensorSurv < 3) {
-    adviceCount.sensorSurv += 1;
-    adviceManager.showAdvice(
-      'Surveillance Fence',
-      "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
-      $('#menu-surveillance'),
-      'bottom-left'
-    );
+    showSurvFenceAdvice();
   }
 };
 export const isEnabled = (): boolean => isAdviceEnabled;
@@ -641,5 +617,25 @@ const showSatelliteCameraAdvice = () => {
     'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
     $('#menu-satview'),
     'bottom'
+  );
+};
+
+const showSurvFenceAdvice = () => {
+  adviceCount.sensorSurv += 1;
+  adviceManager.showAdvice(
+    'Surveillance Fence',
+    "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
+    $('#menu-surveillance'),
+    'bottom-left'
+  );
+};
+
+const shoFieldOfViewAdvice = () => {
+  adviceCount.sensorFOV += 1;
+  adviceManager.showAdvice(
+    'Field Of View Bubbles',
+    'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
+    $('#menu-fov-bubble'),
+    'bottom-left'
   );
 };

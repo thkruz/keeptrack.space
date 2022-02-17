@@ -170,6 +170,13 @@ export interface SatShader {
   maxSize: number;
 }
 
+export interface MissileParams {
+  missile?: boolean;
+  latList?: number[];
+  lonList?: number[];
+  altList?: number[];
+}
+
 export interface OrbitManager {
   shader: any;
   init();
@@ -184,17 +191,7 @@ export interface OrbitManager {
   draw(pMatrix: any, camMatrix: any, curBuffer: any): void;
   clearSelectOrbit(): void;
   setSelectOrbit(selectedSat: number): void;
-  updateOrbitBuffer(
-    satId: number,
-    force?: boolean,
-    TLE1?: string,
-    TLE2?: string,
-    missile?: boolean,
-    latList?: number[],
-    lonList?: number[],
-    altList?: number[],
-    startTime?: number
-  ): void;
+  updateOrbitBuffer(satId: number, force?: boolean, TLE1?: string, TLE2?: string, missileParams?: MissileParams): void;
   addInViewOrbit(i: number): void;
   setHoverOrbit(mouseSat: any): void;
   clearHoverOrbit(): void;

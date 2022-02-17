@@ -3259,13 +3259,6 @@ input[type='range']:focus {
   border-color: var(--sliderHoverThumbBorderColor);
 }
 
-.rux-range:disabled::-webkit-slider-runnable-track {
-  opacity: 0.4;
-  opacity: var(--disabledOpacity);
-  cursor: not-allowed;
-  cursor: var(--disabledCursor);
-}
-
 .rux-range:disabled::-webkit-slider-thumb {
   cursor: not-allowed;
   cursor: var(--disabledCursor);
@@ -3276,18 +3269,6 @@ input[type='range']:focus {
   background: radial-gradient(circle, white 40%, var(--primaryDark) 40%);
   background-color: var(--inputBackground);
   -webkit-radial-gradient: radial-gradient(circle, white 40%, var(--primaryDark) 40%);
-  box-shadow: inset 0 0 0 4px var(--primary), 0 1px 3px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.2);
-  box-shadow: var(--thumbShadowActive);
-}
-
-.rux-range:not(:disabled)::-webkit-slider-thumb:focus,
-.rux-range:not(:disabled)::-webkit-slider-thumb:hover:not(:active) {
-  background-color: var(--sliderHoverThumbBackgroundColor);
-}
-
-.rux-range:not(:disabled)::-webkit-slider-thumb:active {
-  border-color: var(--sliderSelectedThumbBorderColor);
-  background-color: var(--inputBackground);
   box-shadow: inset 0 0 0 4px var(--primary), 0 1px 3px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.2);
   box-shadow: var(--thumbShadowActive);
 }
@@ -3648,10 +3629,6 @@ input[type='range']::-moz-focus-outer {
 
 .rux-tabs a:hover:not([disabled]) {
   color: var(--tabHoverTextColor);
-}
-
-.rux-tabs .rux-tab {
-  border-bottom: 5px solid var(--tabBorderColor);
 }
 
 .rux-tabs .rux-tab {

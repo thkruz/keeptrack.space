@@ -288,6 +288,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
     tempSatData.push(objectManager.analSatSet[i]);
   }
 
+  // TODO: Planned feature
   // radarDataManager.satDataStartIndex = tempSatData.length + 1;
 
   for (i = 0; i < objectManager.radarDataSet.length; i++) {

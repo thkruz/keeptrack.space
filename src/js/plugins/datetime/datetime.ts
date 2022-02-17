@@ -27,7 +27,6 @@ export const datetimeTextClick = (): void => {
   keepTrackApi.methods.updateDateTime(new Date(timeManager.calculateSimulationTime()));
 
   if (!settingsManager.isEditTime) {
-    // $('#datetime-text').fadeOut();
     $('#datetime-input').fadeIn();
     $('#datetime-input-tb').trigger('focus');
     settingsManager.isEditTime = true;
@@ -102,5 +101,6 @@ export const datetimeInputFormChange = (jestOverride?: Date) => {
     // Ignore
   }
 
+  // TODO: Planned feature
   // radarDataManager.findFirstDataTime();
 };

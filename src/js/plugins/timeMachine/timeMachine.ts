@@ -70,7 +70,6 @@ export const orbitManagerInit = (): void => {
     // Kill all old async calls if run count updates
     if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
     const yearGroup = groupsManager.createGroup('yearOrLess', year);
-    // groupsManager.selectGroupNoOverlay(yearGroup);
     groupsManager.selectGroup(yearGroup);
     yearGroup.updateOrbits(orbitManager, orbitManager);
     satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc

@@ -80,7 +80,7 @@ export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   }
 };
 
-export const sensorListLength = () => Object.values(sensorList).reduce((acc) => acc++, 0);
+export const sensorListLength = () => Object.values(sensorList).length;
 
 export const setSensor = (selectedSensor: SensorObject | string, staticNum: number) => { // NOSONAR
   try {

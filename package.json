@@ -34,7 +34,8 @@
     "test:unit": "jest --coverage",
     "version:major": "npm version major && npm run changelog",
     "version:minor": "npm version minor && npm run changelog",
-    "version:patch": "npm version patch && npm run changelog"
+    "version:patch": "npm version patch && npm run changelog",
+    "prepare": "husky install"
   },
   "jest": {
     "testEnvironment": "jsdom",
@@ -145,6 +146,7 @@
     "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
     "http-server": "^14.0.0",
+    "husky": "^7.0.4",
     "ignore-loader": "^0.1.2",
     "imports-loader": "^3.0.0",
     "jest": "^27.3.1",

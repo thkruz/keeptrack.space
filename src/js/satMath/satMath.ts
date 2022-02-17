@@ -5,7 +5,7 @@
  * providing tailored functions for calculating orbital data.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  * @Copyright (C) 2020 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under

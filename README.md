@@ -148,7 +148,7 @@ We use Prettier and ESLint to enforce consistent readable code. Please refer to 
 
 ## License
 
-Copyright (C) 2016-2021 Theodore Kruczek<br> Copyright (C) 2020-2021 Heather Kruczek
+Copyright (C) 2016-2022 Theodore Kruczek<br> Copyright (C) 2020-2021 Heather Kruczek
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

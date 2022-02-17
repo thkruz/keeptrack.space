@@ -6,7 +6,7 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
  * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt

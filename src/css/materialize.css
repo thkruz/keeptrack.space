@@ -2198,7 +2198,6 @@ h1 {
   line-height: 110%;
   margin: 2.8rem 0 1.68rem 0;
   font-size: 2em;
-  margin: 0.67em 0;
 }
 
 /* Grouping content
@@ -2520,6 +2519,9 @@ progress {
 
 textarea {
   overflow: auto;
+  width: 100%;
+  height: 3rem;
+  background-color: transparent;
 }
 
 /**
@@ -4643,10 +4645,6 @@ strong {
   font-weight: 500;
 }
 
-small {
-  font-size: 75%;
-}
-
 .light {
   font-weight: 300;
 }
@@ -5279,15 +5277,11 @@ small {
 .btn-small.disabled,
 .btn-flat.disabled,
 .btn:disabled,
-.btn-large:disabled,
-.btn-small:disabled,
 .btn-floating:disabled,
 .btn-large:disabled,
 .btn-small:disabled,
 .btn-flat:disabled,
 .btn[disabled],
-.btn-large[disabled],
-.btn-small[disabled],
 .btn-floating[disabled],
 .btn-large[disabled],
 .btn-small[disabled],
@@ -5311,12 +5305,8 @@ small {
 .btn-large:disabled:hover,
 .btn-small:disabled:hover,
 .btn-floating:disabled:hover,
-.btn-large:disabled:hover,
-.btn-small:disabled:hover,
 .btn-flat:disabled:hover,
 .btn[disabled]:hover,
-.btn-large[disabled]:hover,
-.btn-small[disabled]:hover,
 .btn-floating[disabled]:hover,
 .btn-large[disabled]:hover,
 .btn-small[disabled]:hover,
@@ -5326,8 +5316,6 @@ small {
 }
 
 .btn,
-.btn-large,
-.btn-small,
 .btn-floating,
 .btn-large,
 .btn-small,
@@ -5337,8 +5325,6 @@ small {
 }
 
 .btn i,
-.btn-large i,
-.btn-small i,
 .btn-floating i,
 .btn-large i,
 .btn-small i,
@@ -5764,6 +5750,7 @@ body.keyboard-focused .dropdown-content li:focus {
 }
 
 .waves-effect .waves-ripple {
+  z-index: -1;
   position: absolute;
   border-radius: 50%;
   width: 20px;
@@ -5832,6 +5819,11 @@ body.keyboard-focused .dropdown-content li:focus {
 }
 
 .waves-circle {
+  text-align: center;
+  width: 2.5em;
+  height: 2.5em;
+  line-height: 2.5em;
+  border-radius: 50%;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
@@ -5849,24 +5841,11 @@ body.keyboard-focused .dropdown-content li:focus {
   z-index: 1;
 }
 
-.waves-circle {
-  text-align: center;
-  width: 2.5em;
-  height: 2.5em;
-  line-height: 2.5em;
-  border-radius: 50%;
-  mask-image: none;
-}
-
 .waves-block {
   display: block;
 }
 
 /* Firefox Bug: link not triggered */
-
-.waves-effect .waves-ripple {
-  z-index: -1;
-}
 
 .modal {
   display: none;
@@ -6812,12 +6791,6 @@ textarea.materialize-textarea + label:after,
 
 /* Textarea */
 
-textarea {
-  width: 100%;
-  height: 3rem;
-  background-color: transparent;
-}
-
 textarea.materialize-textarea {
   line-height: normal;
   overflow-y: hidden;
@@ -7300,19 +7273,16 @@ input[type='checkbox']:not(:disabled).tabbed:focus ~ .lever::before {
 
 select {
   display: none;
-}
-
-select.browser-default {
-  display: block;
-}
-
-select {
   background-color: rgba(255, 255, 255, 0.9);
   width: 100%;
   padding: 5px;
   border: 1px solid #f2f2f2;
   border-radius: 2px;
   height: 3rem;
+}
+
+select.browser-default {
+  display: block;
 }
 
 .select-label {
@@ -7506,16 +7476,6 @@ input[type='range'] + .thumb {
   cursor: pointer;
 }
 
-input[type='range'] {
-  position: relative;
-  background-color: transparent;
-  border: none;
-  outline: none;
-  width: 100%;
-  margin: 15px 0;
-  padding: 0;
-}
-
 input[type='range']:focus {
   outline: none;
 }
@@ -7559,6 +7519,15 @@ input[type='range'] + .thumb.active .value {
 
 input[type='range'] {
   -webkit-appearance: none;
+  /* fix for FF unable to apply focus style bug  */
+  border: 1px solid white;
+  /*required for proper track sizing in FF*/
+  position: relative;
+  background-color: transparent;
+  outline: none;
+  width: 100%;
+  margin: 15px 0;
+  padding: 0;
 }
 
 input[type='range']::-webkit-slider-runnable-track {
@@ -7587,12 +7556,6 @@ input[type='range']::-webkit-slider-thumb {
 .keyboard-focused input[type='range']:focus:not(.active)::-webkit-slider-thumb {
   -webkit-box-shadow: 0 0 0 10px rgba(38, 166, 154, 0.26);
   box-shadow: 0 0 0 10px rgba(38, 166, 154, 0.26);
-}
-
-input[type='range'] {
-  /* fix for FF unable to apply focus style bug  */
-  border: 1px solid white;
-  /*required for proper track sizing in FF*/
 }
 
 input[type='range']::-moz-range-track {
@@ -7749,7 +7712,6 @@ input[type='range']::-ms-thumb {
 }
 
 .sidenav li > a.btn,
-.sidenav li > a.btn-large,
 .sidenav li > a.btn-small,
 .sidenav li > a.btn-large,
 .sidenav li > a.btn-flat,
@@ -7758,7 +7720,6 @@ input[type='range']::-ms-thumb {
 }
 
 .sidenav li > a.btn,
-.sidenav li > a.btn-large,
 .sidenav li > a.btn-small,
 .sidenav li > a.btn-large,
 .sidenav li > a.btn-floating {
@@ -7770,7 +7731,6 @@ input[type='range']::-ms-thumb {
 }
 
 .sidenav li > a.btn:hover,
-.sidenav li > a.btn-large:hover,
 .sidenav li > a.btn-small:hover,
 .sidenav li > a.btn-large:hover {
   background-color: #2bbbad;

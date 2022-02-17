@@ -213,7 +213,6 @@ export const nearObjectsLinkClick = (): void => {
 };
 export const nearOrbitsLink = () => {
   const { satSet, searchBox, satellite } = keepTrackApi.programs;
-  // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
   const searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(keepTrackApi.programs.objectManager.selectedSat)));
   searchBox.doSearch(searchStr, false);
 };
@@ -364,7 +363,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
         closeButton: false,
       });
     } catch (error) {
-      // console.warn(error);
+      // Intentionally left blank
     }
 
     $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');

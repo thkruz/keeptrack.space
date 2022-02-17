@@ -393,28 +393,9 @@ export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSec
   }
 
   const PlusMinus = a * e;
-  let periapsis = a - PlusMinus - RADIUS_OF_EARTH;
-  let apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
-  let period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
-
-  if (typeof outputU === 'undefined') {
-    outputU = 'm';
-  } else {
-    if (outputU === 'km') {
-      a = a / 1000;
-    }
-    if (outputU === 'km') {
-      apoapsis = apoapsis / 1000;
-    }
-  }
-
-  if (typeof outputU2 === 'undefined') {
-    outputU2 = 's';
-  } else {
-    if (outputU2 === 'm') {
-      period = period / 60;
-    }
-  }
+  const periapsis = a - PlusMinus - RADIUS_OF_EARTH;
+  const apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
+  const period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
 
   // toDegrees
   i = RAD2DEG * i;
@@ -431,11 +412,11 @@ export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSec
     raan: lan,
     argPe: w,
     mo: m,
-    ta: ta,
-    tl: tl,
+    ta,
+    tl,
     perigee: periapsis,
     apogee: apoapsis,
-    period: period,
+    period,
   };
 };
 

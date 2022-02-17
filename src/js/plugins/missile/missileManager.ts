@@ -217,6 +217,7 @@ export const Missile = (
   const FuelArea2 = 0.25 * Math.PI * Math.pow(Diameter * 0.75 - Thickness, 2); // (m^2)
   const FuelVolume = FuelArea1 * (Length * 0.651) + FuelArea2 * (Length * 0.178); // (m^3)
   let FuelMass = FuelDensity * FuelVolume; // http://www.lr.tudelft.nl/en/organisation/departments/space-engineering/space-systems-engineering/expertise-areas/space-propulsion/design-of-elements/rocket-propellants/solids/
+  let RocketMass = FuelMass + RocketCasingMass1 + WarheadMass; // (kg)
 
   // Here are the initial conditions
   let dthetadt = 0.001; // (m/s)
@@ -228,6 +229,9 @@ export const Missile = (
   const MassIn = 0; // (kg/s)
 
   // Here are the time steps and counters
+  // var y = 0;
+  // var z = 0;
+  let t = 0;
   h = 1;
 
   // Here are the definitions for all the lists
@@ -235,9 +239,16 @@ export const Missile = (
 
   const AltitudeList = [];
 
+
   const hList = [];
 
-  let NozzleAltitude2, NozzleAltitude3;
+
+  for (let i = 0; i < 100000; i++) {
+    NozzleAltitude.push(i);
+  }
+  
+  
+  let dtheta2dt, dr2dt, WeightForce, DragForce, Thrust, cD, M, c, AirDensity, Patm, Tatm, NozzleAltitude2, NozzleAltitude3;
 
   const AngleCoefficient = _Bisection(
     FuelArea1,
@@ -275,11 +286,23 @@ export const Missile = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    RocketMass = iterationFunOutput[1];
+    Tatm = iterationFunOutput[2];
+    Patm = iterationFunOutput[3];
+    AirDensity = iterationFunOutput[4];
+    c = iterationFunOutput[5];
+    M = iterationFunOutput[6];
+    cD = iterationFunOutput[7];
+    Thrust = iterationFunOutput[8];
+    DragForce = iterationFunOutput[9];
+    WeightForce = iterationFunOutput[10];
+    dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     Distance = iterationFunOutput[14];
 
     ArcDistance = iterationFunOutput[16];
+    dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
     NozzleAltitude2 = Altitude;
 
@@ -303,6 +326,9 @@ export const Missile = (
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
+
+    
+    t += 1;
   }
   
 
@@ -322,14 +348,27 @@ export const Missile = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    RocketMass = iterationFunOutput[1];
+    Tatm = iterationFunOutput[2];
+    Patm = iterationFunOutput[3];
+    AirDensity = iterationFunOutput[4];
+    c = iterationFunOutput[5];
+    M = iterationFunOutput[6];
+    cD = iterationFunOutput[7];
+    Thrust = iterationFunOutput[8];
+    DragForce = iterationFunOutput[9];
+    WeightForce = iterationFunOutput[10];
+    dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     Distance = iterationFunOutput[14];
-
+    
     ArcDistance = iterationFunOutput[16];
+    dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
     NozzleAltitude3 = Altitude;
-
+    
+    
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
     
     
@@ -349,6 +388,9 @@ export const Missile = (
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
+    
+    
+    t += 1;
   }
   
 
@@ -368,13 +410,28 @@ export const Missile = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    RocketMass = iterationFunOutput[1];
+    Tatm = iterationFunOutput[2];
+    Patm = iterationFunOutput[3];
+    AirDensity = iterationFunOutput[4];
+    c = iterationFunOutput[5];
+    M = iterationFunOutput[6];
+    cD = iterationFunOutput[7];
+    Thrust = iterationFunOutput[8];
+    DragForce = iterationFunOutput[9];
+    WeightForce = iterationFunOutput[10];
+    dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     Distance = iterationFunOutput[14];
+    
     ArcDistance = iterationFunOutput[16];
+    dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
-
+    
+    
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
+    
     
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
@@ -386,11 +443,15 @@ export const Missile = (
       }
     }
     
+    
     let hListSum = 0;
     for (let i = 0; i < hList.length; i++) {
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
+    
+    
+    t += 1;
   }
   
 
@@ -411,14 +472,29 @@ export const Missile = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    RocketMass = iterationFunOutput[1];
+    Tatm = iterationFunOutput[2];
+    Patm = iterationFunOutput[3];
+    AirDensity = iterationFunOutput[4];
+    c = iterationFunOutput[5];
+    M = iterationFunOutput[6];
+    cD = iterationFunOutput[7];
+    
+    DragForce = iterationFunOutput[9];
+    WeightForce = iterationFunOutput[10];
+    dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     Distance = iterationFunOutput[14];
+    
     ArcDistance = iterationFunOutput[16];
+    dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
-
+    
+    
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
-
+    
+    
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
@@ -428,7 +504,11 @@ export const Missile = (
         break;
       }
     }
+    
+    
+    t += 1;
   }
+  
 
   const MaxAltitude = AltitudeList.reduce(function (a, b) {
     return Math.max(a, b);
@@ -458,7 +538,7 @@ export const Missile = (
     return 0;
   }
 
-  if (minAltitudeTrue === (minAltitude * 3) / 2) {
+  if (minAltitudeTrue == (minAltitude * 3) / 2) {
     missileManager.lastMissileErrorType = 'critical';
     missileManager.lastMissileError = 'Error: This distance is too close for the selected missile.';
     return 0;
@@ -483,6 +563,7 @@ export const Missile = (
     if (missileObj.eccentricity) delete missileObj.eccentricity;
     if (missileObj.inclination) delete missileObj.inclination;
     // maxAlt is used for zoom controls
+    // if (missileObj.maxAlt) delete missileObj.maxAlt;
     if (missileObj.meanMotion) delete missileObj.meanMotion;
     if (missileObj.perigee) delete missileObj.perigee;
     if (missileObj.period) delete missileObj.period;
@@ -491,6 +572,7 @@ export const Missile = (
     if (missileObj.semiMinorAxis) delete missileObj.semiMinorAxis;
 
     if (MissileDesc) missileObj.desc = MissileDesc;
+    // console.log(missileObj);
     missileArray.push(missileObj);
     keepTrackApi.programs.satSet.satCruncher.postMessage({
       id: missileObj.id,
@@ -578,11 +660,11 @@ export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[])
 
   let positionEcf, lookAngles;
   try {
-    const gpos = satellite.eciToGeodetic({ x, y, z }, gmst);
+    const gpos = satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst);
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
-    positionEcf = satellite.eciToEcf({ x, y, z }, gmst);
+    positionEcf = satellite.eciToEcf({ x: x, y: y, z: z }, gmst);
     lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG;
     currentTEARR.el = lookAngles.el * RAD2DEG;
@@ -591,6 +673,8 @@ export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[])
     currentTEARR.alt = 0;
     currentTEARR.lon = 0;
     currentTEARR.lat = 0;
+    positionEcf = 0;
+    lookAngles = 0;
     currentTEARR.az = 0;
     currentTEARR.el = 0;
     currentTEARR.rng = 0;
@@ -2121,9 +2205,9 @@ export const _Pressure = (Altitude: number) => {
   const Po = 101325; // (Pa)
   const mol = 0.02897; // (mol)
   const Tsea = 288; // (K)
-  const _R = 8.31451; // (J / K mol)
+  const R = 8.31451; // (J / K mol)
   const g = 9.81; // (m/s^2)
-  return Po * Math.exp((-mol * g * Altitude) / (_R * Tsea)); // (Pa)
+  return Po * Math.exp((-mol * g * Altitude) / (R * Tsea)); // (Pa)
 };
 export const _Temperature = (Altitude: number) => {
   // This function calculates the atmospheric temperature at any given altitude.
@@ -2267,6 +2351,7 @@ export const _CoordinateCalculator = (
   if (Lambda2 - Lambda1 < -180) Lambda12 = Lambda2 - Lambda1 + 2 * Math.PI; // (Rad)
 
   const Alpha1 = Math.atan2(Math.sin(Lambda12), Math.cos(Phi1) * Math.tan(Phi2) - Math.sin(Phi1) * Math.cos(Lambda12)); // (Rad)
+  // var Alpha2 = Math.atan2((Math.sin(Lambda12)), (-Math.cos(Phi2) * Math.tan(Phi1) + Math.sin(Phi2) * Math.cos(Lambda12)));    // (Rad)
   const DeltaTheta12 = Math.acos(Math.sin(Phi1) * Math.sin(Phi2) + Math.cos(Phi1) * Math.cos(Phi2) * Math.cos(Lambda12)); // (Rad)
   const ArcLength = DeltaTheta12 * r; // (m)
   const Alphao = Math.asin(Math.sin(Alpha1) * Math.cos(Phi1)); // (Rad)
@@ -2299,8 +2384,6 @@ export const _CoordinateCalculator = (
     } else if (Lambda > 180) {
       LongList2.push(Lambda - 360); // (Degrees)
       LatList2.push(Phi); // (Degrees)
-    } else {
-      // Do nothing
     }
   }
 
@@ -2661,11 +2744,24 @@ export const _QuickRun = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    // RocketMass = iterationFunOutput[1];
+    // Tatm = iterationFunOutput[2];
+    // Patm = iterationFunOutput[3];
+    // AirDensity = iterationFunOutput[4];
+    // c = iterationFunOutput[5];
+    // M = iterationFunOutput[6];
+    // cD = iterationFunOutput[7];
+    // Thrust = iterationFunOutput[8];
+    // DragForce = iterationFunOutput[9];
+    // WeightForce = iterationFunOutput[10];
+    // dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     MaxAltitude.push(Altitude);
     Distance = iterationFunOutput[14];
+    // ArcVelocity = iterationFunOutput[15];
     ArcDistance = iterationFunOutput[16];
+    // dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
     NozzleAltitude2 = Altitude;
   }
@@ -2685,11 +2781,24 @@ export const _QuickRun = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    // RocketMass = iterationFunOutput[1];
+    // Tatm = iterationFunOutput[2];
+    // Patm = iterationFunOutput[3];
+    // AirDensity = iterationFunOutput[4];
+    // c = iterationFunOutput[5];
+    // M = iterationFunOutput[6];
+    // cD = iterationFunOutput[7];
+    // Thrust = iterationFunOutput[8];
+    // DragForce = iterationFunOutput[9];
+    // WeightForce = iterationFunOutput[10];
+    // dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     MaxAltitude.push(Altitude);
     Distance = iterationFunOutput[14];
+    // ArcVelocity = iterationFunOutput[15];
     ArcDistance = iterationFunOutput[16];
+    // dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
     NozzleAltitude3 = Altitude;
   }
@@ -2709,11 +2818,24 @@ export const _QuickRun = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    // RocketMass = iterationFunOutput[1];
+    // Tatm = iterationFunOutput[2];
+    // Patm = iterationFunOutput[3];
+    // AirDensity = iterationFunOutput[4];
+    // c = iterationFunOutput[5];
+    // M = iterationFunOutput[6];
+    // cD = iterationFunOutput[7];
+    // Thrust = iterationFunOutput[8];
+    // DragForce = iterationFunOutput[9];
+    // WeightForce = iterationFunOutput[10];
+    // dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     MaxAltitude.push(Altitude);
     Distance = iterationFunOutput[14];
+    // ArcVelocity = iterationFunOutput[15];
     ArcDistance = iterationFunOutput[16];
+    // dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
   }
   while (Altitude > 0) {
@@ -2733,11 +2855,24 @@ export const _QuickRun = (
       AngleCoefficient
     );
     FuelMass = iterationFunOutput[0];
+    // RocketMass = iterationFunOutput[1];
+    // Tatm = iterationFunOutput[2];
+    // Patm = iterationFunOutput[3];
+    // AirDensity = iterationFunOutput[4];
+    // c = iterationFunOutput[5];
+    // M = iterationFunOutput[6];
+    // cD = iterationFunOutput[7];
+    // Thrust = iterationFunOutput[8];
+    // DragForce = iterationFunOutput[9];
+    // WeightForce = iterationFunOutput[10];
+    // dr2dt = iterationFunOutput[11];
     drdt = iterationFunOutput[12];
     Altitude = iterationFunOutput[13];
     MaxAltitude.push(Altitude);
     Distance = iterationFunOutput[14];
+    // ArcVelocity = iterationFunOutput[15];
     ArcDistance = iterationFunOutput[16];
+    // dtheta2dt = iterationFunOutput[17];
     dthetadt = iterationFunOutput[18];
   }
 
@@ -2745,6 +2880,8 @@ export const _QuickRun = (
   for (let i = 0; i < MaxAltitude.length; i++) {
     if (MaxAltitude[i] > MaxAltitudeMax) MaxAltitudeMax = MaxAltitude[i];
   }
+
+  // console.log('Ac: ' + (1 - AngleCoefficient).toFixed(3) + ' - Max Alt: ' + (MaxAltitudeMax / 1000).toFixed(0) + ' - Dist: ' + ArcDistance / 1000);
 
   return Distance;
 };
@@ -3060,14 +3197,14 @@ missileManager.globalBMTargets = [
   'Pyongyang',
 ];
 
-// DEBUG: FOR FUTURE USE
-/*
 // Settings
 // var maxChineseMissiles = 252;
 // var maxUSAMissiles = 350;
 // var maxRussianMissiles = 400;
 // var maxNorthKoreanMissiles = 30;
+
 // Internal Variables
+/*
   var USATargets = [
     40.679,
     -73.947, // NYC NY

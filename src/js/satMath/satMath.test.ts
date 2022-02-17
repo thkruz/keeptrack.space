@@ -1004,7 +1004,7 @@ describe('satMath.calculateVisMag', () => {
 
 describe('satMath.altitudeCheck', () => {
   test('0', () => {
-    satMath.altitudeCheck(defaultSat.TLE1, defaultSat.TLE2, new Date(2020, 0, 1));
+    satMath.altitudeCheck(defaultSat.TLE1, defaultSat.TLE2, dateNow);
   });
 });
 
@@ -1138,11 +1138,11 @@ describe('satMath.populateMultiSiteTable', () => {
 // @ponicode
 describe('satMath.propagate', () => {
   test('0', () => {
-    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor]);
+    satMath.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor]);
   });
 
   test('1', () => {
-    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], true);
+    satMath.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], true);
   });
 });
 
@@ -1196,14 +1196,14 @@ describe('satMath.findBestPass', () => {
 // @ponicode
 describe('satMath.eci2Rae', () => {
   test('0', () => {
-    satMath.eci2Rae(new Date(2020, 0, 1), [10000, 10000, 10000], defaultSensor);
+    satMath.eci2Rae(dateNow, [10000, 10000, 10000], defaultSensor);
   });
 });
 
 // @ponicode
 describe('satMath.getEci', () => {
   test('0', () => {
-    satMath.getEci(defaultSat, new Date(2020, 0, 1));
+    satMath.getEci(defaultSat, dateNow);
   });
 });
 
@@ -1227,7 +1227,7 @@ describe('satMath.updateDopsTable', () => {
 // @ponicode
 describe('satMath.getDops', () => {
   test('0', () => {
-    let result: any = satMath.getDops(0, 0, 10, new Date(2020, 0, 1));
+    let result: any = satMath.getDops(0, 0, 10, dateNow);
     expect(result).toMatchSnapshot();
   });
 });
@@ -1307,11 +1307,11 @@ describe('satMath.eci2ll', () => {
 // @ponicode
 describe('satMath.getLlaTimeView', () => {
   test('0', () => {
-    satMath.getLlaTimeView(new Date(2020, 0, 1), defaultSat);
+    satMath.getLlaTimeView(dateNow, defaultSat);
   });
 
   test('1', () => {
-    satMath.getLlaTimeView(new Date(2020, 0, 2), defaultSat);
+    satMath.getLlaTimeView(new Date(2022, 0, 2), defaultSat);
   });
 });
 

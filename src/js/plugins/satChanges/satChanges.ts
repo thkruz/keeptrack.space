@@ -1,7 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatChngObject } from '@app/js/api/keepTrackTypes';
 import { dateFromJday } from '@app/js/timeManager/transforms';
-import { uiManager } from '@app/js/uiManager/uiManager';
 import $ from 'jquery';
 
 let issatChngMenuOpen = false;
@@ -72,7 +71,7 @@ export const uiManagerInit = () => {
 };
 
 export const satChng = (row: number): void => {
-  const { satChange } = keepTrackApi.programs;
+  const { satChange, uiManager } = keepTrackApi.programs;
   let satChngTable: SatChngObject[] = satChange.satChngTable;
   if (typeof row !== 'number') throw new Error('Row must be a number');
   if (row !== -1 && typeof satChngTable[row] === 'undefined') throw new Error('Row does not exist');
@@ -80,7 +79,7 @@ export const satChng = (row: number): void => {
   if (row === -1 && satChngTable?.length === 0) {
     // Only generate the table if receiving the -1 argument for the first time
     $.get('./analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
-      ({ resp, satChngTable } = getSatChngJson(resp));
+      ({ satChngTable } = getSatChngJson(resp));
       satChange.satChngTable = satChngTable;
     });
   }
@@ -134,7 +133,6 @@ export const getSatChngJson = (resp: any) => { // NOSONAR
   const tbl = <HTMLTableElement>document.getElementById('satChng-table'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
 
-  // var tblLength = 0;                                   // Iniially no rows to the table
   let tr = tbl.insertRow();
   let tdT = tr.insertCell();
   tdT.appendChild(document.createTextNode('Time'));

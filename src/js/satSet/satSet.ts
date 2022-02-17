@@ -5,7 +5,7 @@
  * It manages all interaction with the satellite catalogue.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  * @Copyright (C) 2020 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
@@ -53,6 +53,7 @@ import {
 } from './catalogSupport/getters';
 import { exportTle2Csv, exportTle2Txt } from './exportTle';
 import { search } from './search';
+// TODO: FUTURE FEATURE
 // import { radarDataManager } from '@app/js/satSet/radarDataManager.js';
 
 // ******************** Initialization ********************
@@ -101,6 +102,7 @@ export const init = async (satCruncherOveride?: any): Promise<void> => { // NOSO
 
     satSet.satCruncher.onmessage = satCruncherOnMessage;
     satSet.gotExtraData = false;
+    // TODO: FUTURE FEATURE
     // satSet.radarDataManager = radarDataManager;
   } catch (error) {
     console.debug(error);
@@ -274,7 +276,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
   const { sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
   if (typeof satSet.satData[i].isInSun == 'undefined') {
     satSet.satData[i].isInSun = () => {
-      //
+      // TODO: Implement enums for the return values
       if (typeof satSet.satData[i].position == 'undefined') return -1;
 
       // Distances all in km
@@ -324,30 +326,34 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
               ))
         ) * RAD2DEG;
 
-      // var isSun = false;
-      // var isUmbral = false;
+      // NOTE:
+      // !isSun && !isUmbral
       if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
-        // isUmbral = true;
+        // isUmbral
         return 0;
       }
 
-      // var isPenumbral = false;
+      // !isPenumbral
       if (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun) {
-        // isPenumbral = true;
+        // NOTE:
+        // isPenumbral
         return 1;
       }
 
       if (semiDiamSun > semiDiamEarth) {
-        // isPenumbral = true;
+        // NOTE:
+        // isPenumbral
         return 1;
       }
 
       if (theta < semiDiamSun - semiDiamEarth) {
-        // isPenumbral = true;
+        // NOTE:
+        // isPenumbral
         return 1;
       }
 
-      // if (!isUmbral && !isPenumbral) isSun = true;
+      // NOTE:
+      // !isUmbral && !isPenumbral && isSun
       return 2;
     };
   }
@@ -403,7 +409,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
             lon: sensors[0].lon * DEG2RAD,
           };
         } catch (e) {
-          throw 'observerGd is not set and could not be guessed.';
+          throw new Error('observerGd is not set and could not be guessed.');
         }
         // If it didn't work, try again
         if (typeof sensors[0].observerGd.lon == 'undefined') {
@@ -414,7 +420,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
               lon: sensors[0].lon * DEG2RAD,
             };
           } catch (e) {
-            throw 'observerGd is not set and could not be guessed.';
+            throw new Error('observerGd is not set and could not be guessed.');
           }
         }
       } else {

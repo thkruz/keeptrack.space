@@ -224,7 +224,6 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
 
         $('#es-argPe').val(stringPad.pad0(argPe, 8));
         $('#es-meana').val(sat.TLE2.substr(44 - 1, 7 + 1));
-        // $('#es-rasc').val(sat.TLE2.substr(18 - 1, 7 + 1).toString());
       } else {
         if (settingsManager.plugins?.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
@@ -406,7 +405,7 @@ export const editSatSaveClick = (e: Event) => {
     });
     saveAs(blob, scc + '.tle');
   } catch (error) {
-    // console.warn(error);
+    // intentionally left blank
   }
   e.preventDefault();
 };

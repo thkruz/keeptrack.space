@@ -7,7 +7,6 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
   const { mainCamera, timeManager, uiManager, drawManager, objectManager, orbitManager, sensorManager } = keepTrackApi.programs;
 
   if (uiManager.isCurrentlyTyping) return;
-  // console.log(Number(evt.charCode));
   switch (evt.key.toUpperCase()) {
     case 'R':
       mainCamera.autoRotate();

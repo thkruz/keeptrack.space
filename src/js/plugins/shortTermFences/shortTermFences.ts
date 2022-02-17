@@ -143,8 +143,8 @@ export const hideSideMenus = () => {
   isStfMenuOpen = false;
 };
 
-export const selectSatData = (stfInfoLinks: boolean) => {
-  if (!stfInfoLinks) {
+export const selectSatData = (isShowStfLink: boolean) => {
+  if (!isShowStfLink) {
     $('#sat-info-top-links').append(keepTrackApi.html`
         <div id="stf-on-object-link" class="link sat-infobox-links">Build Short Term Fence on this object...</div>
       `);

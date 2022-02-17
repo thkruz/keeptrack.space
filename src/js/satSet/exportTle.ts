@@ -47,6 +47,7 @@ export const exportTle2Csv = (satData: any[]) => {
     }
     saveCsv(catalogTLE2, 'catalogInfo');
   } catch {
+    // DEBUG:
     // console.warn('Failed to Export TLEs!');
   }
 };
@@ -69,6 +70,7 @@ export const exportTle2Txt = (satData: any[]) => {
     });
     saveAs(blob, 'TLE.txt');
   } catch {
+    // DEBUG:
     // console.warn('Failed to Export TLEs!');
   }
 };

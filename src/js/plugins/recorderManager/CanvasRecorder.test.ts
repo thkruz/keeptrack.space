@@ -1,11 +1,15 @@
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as canvasRecorder from './CanvasRecorder';
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('CanvasRecorder.instance', () => {
   let inst: any;
+  window.M = {
+    toast: jest.fn(),
+  };
 
   beforeEach(() => {
     inst = new canvasRecorder.CanvasRecorder(1024);

@@ -114,6 +114,7 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
           console.log('Xbox Button');
           break;
         default:
+          // DEBUG:
           // console.debug(`Button ${index}`);
           break;
       }

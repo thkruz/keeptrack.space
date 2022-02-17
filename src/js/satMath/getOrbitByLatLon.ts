@@ -64,8 +64,8 @@ export const getOrbitByLatLon = (
 
     const argPe = newArgPer ? stringPad.pad0((parseFloat(newArgPer) / 10).toPrecision(7), 8) : stringPad.pad0((sat.argPe * RAD2DEG).toPrecision(7), 8);
 
-    const TLE1Ending = sat.TLE1.substr(32, 39);
-    const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const _TLE1Ending = sat.TLE1.substr(32, 39);
+    const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + _TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raan + ' ' + ecen + ' ' + argPe + ' ' + meanaStr + ' ' + meanmo + '    10';
 
     satrec = satellite.twoline2satrec(TLE1, TLE2);
@@ -108,10 +108,10 @@ export const getOrbitByLatLon = (
   /**
    * Rotating the mean anomaly adjusts the latitude (and longitude) of the satellite.
    * @param {number} raan - This is the right ascension of the ascending node (where it rises above the equator relative to a specific star)
-   * @param {number} raanOffset - This allows the main thread to send a guess of the raan
+   * @param {number} raanOffsetIn - This allows the main thread to send a guess of the raan
    * @returns {PropagationResults} This number tells the main loop what to do next
    */
-  const raanCalc = (raan: number, raanOffset: number): PropagationResults => {
+  const raanCalc = (raan: number, raanOffsetIn: number): PropagationResults => {
     const origRaan = raan;
     raan = raan / 100;
     raan = raan > 360 ? raan - 360 : raan;
@@ -129,22 +129,22 @@ export const getOrbitByLatLon = (
 
     // If we have a good guess of the raan, we can use it, but need to apply the offset to the original raan
     if (results === PropagationResults.Success) {
-      raan = origRaan / 100 + raanOffset;
+      raan = origRaan / 100 + raanOffsetIn;
       raan = raan > 360 ? raan - 360 : raan;
       raan = raan < 0 ? raan + 360 : raan;
 
-      const raanStr = stringPad.pad0(raan.toPrecision(7), 8);
+      const _raanStr = stringPad.pad0(raan.toPrecision(7), 8);
 
-      const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
+      const _TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + _raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
 
       sat.TLE1 = TLE1;
-      sat.TLE2 = TLE2;
+      sat.TLE2 = _TLE2;
     }
     return results;
   };
 
-  const getOrbitByLatLonPropagate = (now: Date, satrec: SatRec, type: PropagationOptions): PropagationResults => {
-    const { m, gmst } = calculateTimeVariables(now, satrec);
+  const getOrbitByLatLonPropagate = (nowIn: Date, satrec: SatRec, type: PropagationOptions): PropagationResults => {
+    const { m, gmst } = calculateTimeVariables(nowIn, satrec);
     const positionEci = satellite.sgp4(satrec, m);
     const gpos = satellite.eciToGeodetic(positionEci.position, gmst);
 
@@ -235,18 +235,24 @@ export const getOrbitByLatLon = (
       /** Rotate ArgPer 0.1 Degree at a Time for Up To 400 Degrees */
       argPerCalcResults = argPerCalc(i.toString());
       if (argPerCalcResults === PropagationResults.Success) {
+        // DEBUG:
         // console.log('Found Correct Alt');
         if (meanACalcResults === PropagationResults.Success) {
+          // DEBUG:
           // console.log('Found Correct Lat');
+
+          // DEBUG:
           // console.log('Up Or Down: ' + upOrDown);
           if (currentDirection === goalDirection) {
             // If Object is moving in the goal direction (upOrDown)
             break; // Stop changing ArgPer
           }
         } else {
+          // DEBUG:
           // console.log('Found Wrong Lat');
         }
       } else {
+        // DEBUG:
         // console.log('Failed Arg of Per Calc');
       }
       if (argPerCalcResults === PropagationResults.Far) {

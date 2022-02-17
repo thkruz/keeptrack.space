@@ -132,7 +132,6 @@ export const breakupOnSubmit = (): void => { // NOSONAR
   const simulationTimeObj = timeManager.calculateSimulationTime();
 
   const upOrDown = mainsat.getDirection();
-  // console.log(upOrDown);
   const currentEpoch = satellite.currentEpoch(simulationTimeObj);
   mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 
@@ -165,8 +164,8 @@ export const breakupOnSubmit = (): void => { // NOSONAR
         for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
           if (i >= breakupCount) break;
           satId = satSet.getIdFromObjNum(80000 + i);
-          let sat = satSet.getSat(satId);
-          sat = origsat;
+          satSet.getSat(satId); // TODO: This may be unnecessary needs tested
+          let sat = origsat;
           let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
 
           const rascOffset = -rascVariation / 2 + rascVariation * (rascIterat / 4);
@@ -174,8 +173,8 @@ export const breakupOnSubmit = (): void => { // NOSONAR
           // sat.eccentricity = origEcc;
           // sat.eccentricity += -eVariation / 2 + eVariation * (eVariation / 4);
 
-          const alt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
-          let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, alt, rascOffset);
+          const newAlt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
+          let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, newAlt, rascOffset);
 
           iTLE1 = iTLEs[0];
           let iTLE2 = iTLEs[1];

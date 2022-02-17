@@ -1,7 +1,7 @@
 /**
 // /////////////////////////////////////////////////////////////////////////////
 
-Copyright (C) 2016-2021 Theodore Kruczek
+Copyright (C) 2016-2022 Theodore Kruczek
 Copyright (C) 2020 Heather Kruczek
 
 This program is free software: you can redistribute it and/or modify it under
@@ -266,7 +266,6 @@ settingsManager = {
       settingsManager.disableWindowTouchMove = false;
       settingsManager.isMobileModeEnabled = true;
       settingsManager.maxFieldOfViewMarkers = 20000;
-      // settingsManager.smallImages = true;
       settingsManager.isDrawLess = true;
       settingsManager.noMeshManager = true;
       settingsManager.camDistBuffer = 100;
@@ -325,14 +324,11 @@ settingsManager = {
     // GPU Powered Math from gpu.js
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.gpujsMode = 'webgl';
-    // settingsManager.gpujsMode = 'dev';
-    // settingsManager.gpujsMode = 'cpu';
 
     // //////////////////////////////////////////////////////////////////////////
     // Map settings
     // //////////////////////////////////////////////////////////////////////////
 
-    // settingsManager.smallImages = false;
     settingsManager.nasaImages = false;
     settingsManager.blueImages = false;
     settingsManager.lowresImages = false;
@@ -528,11 +524,11 @@ settingsManager = {
       if (key === 'settingsManagerOverride') {
         const overrides = JSON.parse(decodeURIComponent(val));
         Object.keys(overrides.plugins)
-          .filter((key) => key in plugins)
+          .filter((_key) => _key in plugins)
           // eslint-disable-next-line no-loop-func
-          .forEach((key) => {
-            if (typeof overrides.plugins[key] == 'undefined') return;
-            settingsManager.plugins[key] = overrides.plugins[key];
+          .forEach((_key) => {
+            if (typeof overrides.plugins[_key] == 'undefined') return;
+            settingsManager.plugins[_key] = overrides.plugins[_key];
           });
       }
     }
@@ -624,10 +620,8 @@ settingsManager = {
               settingsManager.smallImages = true;
               break;
             case 'hires':
-              // settingsManager.hiresImages = true;
               settingsManager.earthNumLatSegs = 128;
               settingsManager.earthNumLonSegs = 128;
-              // settingsManager.minimumDrawDt = 0.01667;
               break;
             case 'nostars':
               settingsManager.noStars = true;

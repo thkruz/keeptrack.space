@@ -5,7 +5,7 @@ omManager.js Orbit Math Manager handles the conversion of state vector data,
 keplerian elements, and two line element sets as well as initial orbit fitting
 http://keeptrack.space
 
-Copyright (C) 2016-2021 Theodore Kruczek
+Copyright (C) 2016-2022 Theodore Kruczek
 Copyright (C) 2020 Heather Kruczek
 
 This program is free software: you can redistribute it and/or modify it under
@@ -20,6 +20,9 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
 // sv - State Vectors
 // [unixTime, x, y, z, xDot, yDot, zDot]
+
+// TODO: This library needs rewrote in TypeScript
+// TODO: Reference older version of this file for possible additional features
 
 'use strict';
 
@@ -187,25 +190,26 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
   try {
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
-    // const incI = (kps.max.inclination - kps.min.inclination) / STEPS;
     const raanI = (kps.max.raan - kps.min.raan) / STEPS;
-    // const eccI = (kps.max.eccentricity - kps.min.eccentricity) / STEPS;
     const argpeI = (kps.max.argPe - kps.min.argPe) / STEPS;
     const meanaI = (kps.max.mo - kps.min.mo) / STEPS;
+    // DEBUG:
+    // const incI = (kps.max.inclination - kps.min.inclination) / STEPS;
+    // const eccI = (kps.max.eccentricity - kps.min.eccentricity) / STEPS;
     // const periodI = (kps.max.period - kps.min.period) / STEPS;
     let bestIndicies = [10000000]; // Starts Really Large To Ensure First One is Better
 
     for (let r = -STEPS / 2; r < STEPS / 2; r++) {
       for (let a = -STEPS; a < STEPS; a++) {
         for (let m = -STEPS * 2; m < STEPS * 2; m++) {
-          let kp = {};
-          kp.inclination = kps.avg.inclination;
-          kp.raan = kps.avg.raan + raanI * r;
-          kp.eccentricity = kps.avg.eccentricity;
-          kp.argPe = kps.avg.argPe + argpeI * a;
-          kp.mo = kps.avg.mo + (meanaI * m) / 2;
-          kp.period = kps.avg.period;
-          const tles = om.kp2tle(kp, epoch, timeManager);
+          const possibleKp = {};
+          possibleKp.inclination = kps.avg.inclination;
+          possibleKp.raan = kps.avg.raan + raanI * r;
+          possibleKp.eccentricity = kps.avg.eccentricity;
+          possibleKp.argPe = kps.avg.argPe + argpeI * a;
+          possibleKp.mo = kps.avg.mo + (meanaI * m) / 2;
+          possibleKp.period = kps.avg.period;
+          const tles = om.kp2tle(possibleKp, epoch, timeManager);
           let xError = 0;
           let yError = 0;
           let zError = 0;
@@ -219,11 +223,11 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
               zError += Math.abs(eci.position.z - svs[svI][3]);
               posErrorAvg += Math.sqrt(xError ** 2 + yError ** 2 + zError ** 2);
             } catch (error) {
+              // DEBUG:
               // console.warn(eci);
             }
           }
           posErrorAvg /= svs.length;
-          // console.log(posErrorAvg);
 
           // TODO: Better Decision on Best Indicies
           if (posErrorAvg < bestIndicies[0]) {
@@ -291,13 +295,12 @@ export const _propagate = async (tle1, tle2, epoch, satellite) => {
       epoch.getUTCSeconds()
     ); // Converts time to jday (TLEs use epoch year/day)
     j += epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    // let gmst = satellite.gstime(j);
 
     let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     let eci = satellite.sgp4(satrec, m);
     return eci;
-  } catch (error) {
-    // console.debug(error);
+ } catch (error) {
+    // intentionally left blank
   }
 };
 export const _jday = (year, mon, day, hr, minute, sec) => {
@@ -314,440 +317,28 @@ export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSec
   let vx = vector[4] * 1000;
   let vy = vector[5] * 1000;
   let vz = vector[6] * 1000;
-  // let rxu,
-  //   ryu,
-  //   rzu = 'm';
-  // let vxu,
-  //   vyu,
-  //   vzu = 'm/s';
-
-  if (!(massPrimaryU == 'kg' || typeof massPrimaryU == 'undefined')) {
-    // if (massPrimaryU == 'g') {
-    //   massPrimary = massPrimary / 1000;
-    // }
-    // if (massPrimaryU == 'M_Sun') {
-    //   massPrimary = massPrimary * 1.98894729428839e30;
-    // }
-    // if (massPrimaryU == 'M_Mercury') {
-    //   massPrimary = massPrimary * 3.30192458710471e23;
-    // }
-    // if (massPrimaryU == 'M_Venus') {
-    //   massPrimary = massPrimary * 4.86862144253118e24;
-    // }
-    // if (massPrimaryU == 'M_Earth') {
-    //   massPrimary = massPrimary * 5.97378250603408e24;
-    // }
-    // if (massPrimaryU == 'M_Mars') {
-    //   massPrimary = massPrimary * 6.41863349674674e23;
-    // }
-    // if (massPrimaryU == 'M_Jupiter') {
-    //   massPrimary = massPrimary * 1.89863768365072e27;
-    // }
-    // if (massPrimaryU == 'M_Saturn') {
-    //   massPrimary = massPrimary * 5.68470940139966e26;
-    // }
-    // if (massPrimaryU == 'M_Uranus') {
-    //   massPrimary = massPrimary * 8.68333186484441e25;
-    // }
-    // if (massPrimaryU == 'M_Neptune') {
-    //   massPrimary = massPrimary * 1.02431564713932e26;
-    // }
-    // if (massPrimaryU == 'M_Pluto') {
-    //   massPrimary = massPrimary * 1.30861680530754e22;
-    // }
-    // if (massPrimaryU == 'M_Moon') {
-    //   massPrimary = massPrimary * 7.34777534869879e22;
-    // }
-    // if (massPrimaryU == 'M_Phobos') {
-    //   massPrimary = massPrimary * 1.03409569809204e16;
-    // }
-    // if (massPrimaryU == 'M_Deimos') {
-    //   massPrimary = massPrimary * 1.79842730102965e15;
-    // }
-    // if (massPrimaryU == 'M_Io') {
-    //   massPrimary = massPrimary * 8.9320629865446e22;
-    // }
-    // if (massPrimaryU == 'M_Europa') {
-    //   massPrimary = massPrimary * 4.79990319196655e22;
-    // }
-    // if (massPrimaryU == 'M_Ganymede') {
-    //   massPrimary = massPrimary * 1.48187846087315e23;
-    // }
-    // if (massPrimaryU == 'M_Callisto') {
-    //   massPrimary = massPrimary * 1.07595283170753e23;
-    // }
-    // if (massPrimaryU == 'M_Amalthea') {
-    //   massPrimary = massPrimary * 7.49344708762353e18;
-    // }
-    // if (massPrimaryU == 'M_Himalia') {
-    //   massPrimary = massPrimary * 9.55630662185067e18;
-    // }
-    // if (massPrimaryU == 'M_Elara') {
-    //   massPrimary = massPrimary * 7.76699816441212e17;
-    // }
-    // if (massPrimaryU == 'M_Pasiphae') {
-    //   massPrimary = massPrimary * 1.90926209704339e17;
-    // }
-    // if (massPrimaryU == 'M_Sinope') {
-    //   massPrimary = massPrimary * 7.76699816441212e16;
-    // }
-    // if (massPrimaryU == 'M_Lysithea') {
-    //   massPrimary = massPrimary * 7.76699816441212e16;
-    // }
-    // if (massPrimaryU == 'M_Carme') {
-    //   massPrimary = massPrimary * 9.55630662185067e16;
-    // }
-    // if (massPrimaryU == 'M_Ananke') {
-    //   massPrimary = massPrimary * 3.81852419408679e16;
-    // }
-    // if (massPrimaryU == 'M_Leda') {
-    //   massPrimary = massPrimary * 5.6778056079615e15;
-    // }
-    // if (massPrimaryU == 'M_Thebe') {
-    //   massPrimary = massPrimary * 7.76699816441212e17;
-    // }
-    // if (massPrimaryU == 'M_Adrastea') {
-    //   massPrimary = massPrimary * 1.90926209704339e16;
-    // }
-    // if (massPrimaryU == 'M_Metis') {
-    //   massPrimary = massPrimary * 9.55630662185067e16;
-    // }
-    // if (massPrimaryU == 'M_Mimas') {
-    //   massPrimary = massPrimary * 3.81429321227243e19;
-    // }
-    // if (massPrimaryU == 'M_Enceladus') {
-    //   massPrimary = massPrimary * 1.17050220435577e20;
-    // }
-    // if (massPrimaryU == 'M_Tethys') {
-    //   massPrimary = massPrimary * 6.17639232970985e20;
-    // }
-    // if (massPrimaryU == 'M_Dione') {
-    //   massPrimary = massPrimary * 1.09569832670221e21;
-    // }
-    // if (massPrimaryU == 'M_Rhea') {
-    //   massPrimary = massPrimary * 2.31572188769539e21;
-    // }
-    // if (massPrimaryU == 'M_Titan') {
-    //   massPrimary = massPrimary * 1.34555202850711e23;
-    // }
-    // if (massPrimaryU == 'M_Hyperion') {
-    //   massPrimary = massPrimary * 5.54593618108186e18;
-    // }
-    // if (massPrimaryU == 'M_Iapetus') {
-    //   massPrimary = massPrimary * 1.80652899243564e21;
-    // }
-    // if (massPrimaryU == 'M_Phoebe') {
-    //   massPrimary = massPrimary * 8.28855423929348e18;
-    // }
-    // if (massPrimaryU == 'M_Janus') {
-    //   massPrimary = massPrimary * 1.8972946850153e18;
-    // }
-    // if (massPrimaryU == 'M_Epimetheus') {
-    //   massPrimary = massPrimary * 5.26205381601159e17;
-    // }
-    // if (massPrimaryU == 'M_Atlas') {
-    //   massPrimary = massPrimary * 1.13924780048507e15;
-    // }
-    // if (massPrimaryU == 'M_Prometheus') {
-    //   massPrimary = massPrimary * 1.87289854971031e17;
-    // }
-    // if (massPrimaryU == 'M_Pandora') {
-    //   massPrimary = massPrimary * 1.48445610732647e17;
-    // }
-    // if (massPrimaryU == 'M_Ariel') {
-    //   massPrimary = massPrimary * 1.29013922898875e21;
-    // }
-    // if (massPrimaryU == 'M_Umbriel') {
-    //   massPrimary = massPrimary * 1.25880780428295e21;
-    // }
-    // if (massPrimaryU == 'M_Titania') {
-    //   massPrimary = massPrimary * 3.4460391356142e21;
-    // }
-    // if (massPrimaryU == 'M_Oberon') {
-    //   massPrimary = massPrimary * 2.99680258484984e21;
-    // }
-    // if (massPrimaryU == 'M_Miranda') {
-    //   massPrimary = massPrimary * 6.51349484606072e19;
-    // }
-    // if (massPrimaryU == 'M_Triton') {
-    //   massPrimary = massPrimary * 2.13993058500051e22;
-    // }
-    // if (massPrimaryU == 'M_Charon') {
-    //   massPrimary = massPrimary * 1.62268483858135e21;
-    // }
-    // if (massPrimaryU == 'M_Ceres') {
-    //   massPrimary = massPrimary * 8.70013290062687e20;
-    // }
-    // if (massPrimaryU == 'M_Pallas') {
-    //   massPrimary = massPrimary * 3.1800485774705e20;
-    // }
-    // if (massPrimaryU == 'M_Vesta') {
-    //   massPrimary = massPrimary * 3.00004582780236e20;
-    // }
-  }
-  if (!(massSecondaryU == 'kg' || typeof massSecondaryU == 'undefined')) {
-    // if (massSecondaryU == 'g') {
-    //   massSecondary = massSecondary / 1000;
-    // }
-    // if (massSecondaryU == 'M_Sun') {
-    //   massSecondary = massSecondary * 1.98894729428839e30;
-    // }
-    // if (massSecondaryU == 'M_Mercury') {
-    //   massSecondary = massSecondary * 3.30192458710471e23;
-    // }
-    // if (massSecondaryU == 'M_Venus') {
-    //   massSecondary = massSecondary * 4.86862144253118e24;
-    // }
-    if (massSecondaryU == 'M_Earth') {
-      massSecondary = massSecondary * 5.97378250603408e24;
-    }
-    // if (massSecondaryU == 'M_Mars') {
-    //   massSecondary = massSecondary * 6.41863349674674e23;
-    // }
-    // if (massSecondaryU == 'M_Jupiter') {
-    //   massSecondary = massSecondary * 1.89863768365072e27;
-    // }
-    // if (massSecondaryU == 'M_Saturn') {
-    //   massSecondary = massSecondary * 5.68470940139966e26;
-    // }
-    // if (massSecondaryU == 'M_Uranus') {
-    //   massSecondary = massSecondary * 8.68333186484441e25;
-    // }
-    // if (massSecondaryU == 'M_Neptune') {
-    //   massSecondary = massSecondary * 1.02431564713932e26;
-    // }
-    // if (massSecondaryU == 'M_Pluto') {
-    //   massSecondary = massSecondary * 1.30861680530754e22;
-    // }
-    // if (massSecondaryU == 'M_Moon') {
-    //   massSecondary = massSecondary * 7.34777534869879e22;
-    // }
-    // if (massSecondaryU == 'M_Phobos') {
-    //   massSecondary = massSecondary * 1.03409569809204e16;
-    // }
-    // if (massSecondaryU == 'M_Deimos') {
-    //   massSecondary = massSecondary * 1.79842730102965e15;
-    // }
-    // if (massSecondaryU == 'M_Io') {
-    //   massSecondary = massSecondary * 8.9320629865446e22;
-    // }
-    // if (massSecondaryU == 'M_Europa') {
-    //   massSecondary = massSecondary * 4.79990319196655e22;
-    // }
-    // if (massSecondaryU == 'M_Ganymede') {
-    //   massSecondary = massSecondary * 1.48187846087315e23;
-    // }
-    // if (massSecondaryU == 'M_Callisto') {
-    //   massSecondary = massSecondary * 1.07595283170753e23;
-    // }
-    // if (massSecondaryU == 'M_Amalthea') {
-    //   massSecondary = massSecondary * 7.49344708762353e18;
-    // }
-    // if (massSecondaryU == 'M_Himalia') {
-    //   massSecondary = massSecondary * 9.55630662185067e18;
-    // }
-    // if (massSecondaryU == 'M_Elara') {
-    //   massSecondary = massSecondary * 7.76699816441212e17;
-    // }
-    // if (massSecondaryU == 'M_Pasiphae') {
-    //   massSecondary = massSecondary * 1.90926209704339e17;
-    // }
-    // if (massSecondaryU == 'M_Sinope') {
-    //   massSecondary = massSecondary * 7.76699816441212e16;
-    // }
-    // if (massSecondaryU == 'M_Lysithea') {
-    //   massSecondary = massSecondary * 7.76699816441212e16;
-    // }
-    // if (massSecondaryU == 'M_Carme') {
-    //   massSecondary = massSecondary * 9.55630662185067e16;
-    // }
-    // if (massSecondaryU == 'M_Ananke') {
-    //   massSecondary = massSecondary * 3.81852419408679e16;
-    // }
-    // if (massSecondaryU == 'M_Leda') {
-    //   massSecondary = massSecondary * 5.6778056079615e15;
-    // }
-    // if (massSecondaryU == 'M_Thebe') {
-    //   massSecondary = massSecondary * 7.76699816441212e17;
-    // }
-    // if (massSecondaryU == 'M_Adrastea') {
-    //   massSecondary = massSecondary * 1.90926209704339e16;
-    // }
-    // if (massSecondaryU == 'M_Metis') {
-    //   massSecondary = massSecondary * 9.55630662185067e16;
-    // }
-    // if (massSecondaryU == 'M_Mimas') {
-    //   massSecondary = massSecondary * 3.81429321227243e19;
-    // }
-    // if (massSecondaryU == 'M_Enceladus') {
-    //   massSecondary = massSecondary * 1.17050220435577e20;
-    // }
-    // if (massSecondaryU == 'M_Tethys') {
-    //   massSecondary = massSecondary * 6.17639232970985e20;
-    // }
-    // if (massSecondaryU == 'M_Dione') {
-    //   massSecondary = massSecondary * 1.09569832670221e21;
-    // }
-    // if (massSecondaryU == 'M_Rhea') {
-    //   massSecondary = massSecondary * 2.31572188769539e21;
-    // }
-    // if (massSecondaryU == 'M_Titan') {
-    //   massSecondary = massSecondary * 1.34555202850711e23;
-    // }
-    // if (massSecondaryU == 'M_Hyperion') {
-    //   massSecondary = massSecondary * 5.54593618108186e18;
-    // }
-    // if (massSecondaryU == 'M_Iapetus') {
-    //   massSecondary = massSecondary * 1.80652899243564e21;
-    // }
-    // if (massSecondaryU == 'M_Phoebe') {
-    //   massSecondary = massSecondary * 8.28855423929348e18;
-    // }
-    // if (massSecondaryU == 'M_Janus') {
-    //   massSecondary = massSecondary * 1.8972946850153e18;
-    // }
-    // if (massSecondaryU == 'M_Epimetheus') {
-    //   massSecondary = massSecondary * 5.26205381601159e17;
-    // }
-    // if (massSecondaryU == 'M_Atlas') {
-    //   massSecondary = massSecondary * 1.13924780048507e15;
-    // }
-    // if (massSecondaryU == 'M_Prometheus') {
-    //   massSecondary = massSecondary * 1.87289854971031e17;
-    // }
-    // if (massSecondaryU == 'M_Pandora') {
-    //   massSecondary = massSecondary * 1.48445610732647e17;
-    // }
-    // if (massSecondaryU == 'M_Ariel') {
-    //   massSecondary = massSecondary * 1.29013922898875e21;
-    // }
-    // if (massSecondaryU == 'M_Umbriel') {
-    //   massSecondary = massSecondary * 1.25880780428295e21;
-    // }
-    // if (massSecondaryU == 'M_Titania') {
-    //   massSecondary = massSecondary * 3.4460391356142e21;
-    // }
-    // if (massSecondaryU == 'M_Oberon') {
-    //   massSecondary = massSecondary * 2.99680258484984e21;
-    // }
-    // if (massSecondaryU == 'M_Miranda') {
-    //   massSecondary = massSecondary * 6.51349484606072e19;
-    // }
-    // if (massSecondaryU == 'M_Triton') {
-    //   massSecondary = massSecondary * 2.13993058500051e22;
-    // }
-    // if (massSecondaryU == 'M_Charon') {
-    //   massSecondary = massSecondary * 1.62268483858135e21;
-    // }
-    // if (massSecondaryU == 'M_Ceres') {
-    //   massSecondary = massSecondary * 8.70013290062687e20;
-    // }
-    // if (massSecondaryU == 'M_Pallas') {
-    //   massSecondary = massSecondary * 3.1800485774705e20;
-    // }
-    // if (massSecondaryU == 'M_Vesta') {
-    //   massSecondary = massSecondary * 3.00004582780236e20;
-    // }
-  }
-
-  if (typeof vectorU != 'undefined') {
-    // rxu = vectorU[0];
-    // ryu = vectorU[1];
-    // rzu = vectorU[2];
-    // vxu = vectorU[3];
-    // vyu = vectorU[4];
-    // vzu = vectorU[5];
-    // if (rxu == 'cm') {
-    //   rx = rx / 100;
-    // }
-    // if (rxu == 'km') {
-    //   rx = rx * 1000;
-    // }
-    // if (rxu == 'AU') {
-    //   rx = rx * 149597870691;
-    // }
-    // if (rxu == 'LY') {
-    //   rx = rx * 9.4605e15;
-    // }
-    // if (rxu == 'PC') {
-    //   rx = rx * 3.0857e16;
-    // }
-    // if (rxu == 'mi') {
-    //   rx = rx * 1609.344;
-    // }
-    // if (rxu == 'ft') {
-    //   rx = rx * 0.3048;
-    // }
-    // if (ryu == 'cm') {
-    //   ry = ry / 100;
-    // }
-    // if (ryu == 'km') {
-    //   ry = ry * 1000;
-    // }
-    // if (ryu == 'AU') {
-    //   ry = ry * 149597870691;
-    // }
-    // if (ryu == 'LY') {
-    //   ry = ry * 9.4605e15;
-    // }
-    // if (ryu == 'PC') {
-    //   ry = ry * 3.0857e16;
-    // }
-    // if (ryu == 'mi') {
-    //   ry = ry * 1609.344;
-    // }
-    // if (ryu == 'ft') {
-    //   ry = ry * 0.3048;
-    // }
-    // if (rzu == 'cm') {
-    //   rz = rz / 100;
-    // }
-    // if (rzu == 'km') {
-    //   rz = rz * 1000;
-    // }
-    // if (rzu == 'AU') {
-    //   rz = rz * 149597870691;
-    // }
-    // if (rzu == 'LY') {
-    //   rz = rz * 9.4605e15;
-    // }
-    // if (rzu == 'PC') {
-    //   rz = rz * 3.0857e16;
-    // }
-    // if (rzu == 'mi') {
-    //   rz = rz * 1609.344;
-    // }
-    // if (rzu == 'ft') {
-    //   rz = rz * 0.3048;
-    // }
-    // if (vxu == 'km/s') {
-    //   vx = vx * 1000;
-    // }
-    // if (vyu == 'km/s') {
-    //   vy = vy * 1000;
-    // }
-    // if (vzu == 'km/s') {
-    //   vz = vz * 1000;
-    // }
+  
+  if (massSecondaryU === 'M_Earth') {
+    massSecondary = massSecondary * 5.97378250603408e24;
   }
 
   // Prevent divide by 0 errors
-  if (rx == 0) {
+  if (rx === 0) {
     rx = 0.000000000000001;
   }
-  if (ry == 0) {
+  if (ry === 0) {
     ry = 0.000000000000001;
   }
-  if (rz == 0) {
+  if (rz === 0) {
     rz = 0.000000000000001;
   }
-  if (vx == 0) {
+  if (vx === 0) {
     vx = 0.000000000000001;
   }
-  if (vy == 0) {
+  if (vy === 0) {
     vy = 0.000000000000001;
   }
-  if (vz == 0) {
+  if (vz === 0) {
     vz = 0.000000000000001;
   }
 
@@ -782,7 +373,7 @@ export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSec
   let cw = (rx * Math.cos(lan) + ry * Math.sin(lan)) / r;
 
   let sw = 0;
-  if (i == 0 || i == PI) {
+  if (i === 0 || i === PI) {
     sw = (ry * Math.cos(lan) - rx * Math.sin(lan)) / r;
   } else {
     sw = rz / (r * Math.sin(i));
@@ -802,105 +393,9 @@ export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSec
   }
 
   const PlusMinus = a * e;
-  let periapsis = a - PlusMinus - RADIUS_OF_EARTH;
-  let apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
-  let period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
-
-  if (typeof outputU == 'undefined') {
-    outputU = 'm';
-  } else {
-    // if (outputU == 'cm') {
-    //   a = a * 100;
-    // }
-    if (outputU == 'km') {
-      a = a / 1000;
-    }
-    // if (outputU == 'AU') {
-    //   a = a / 149597870691;
-    // }
-    // if (outputU == 'LY') {
-    //   a = a / 9.4605e15;
-    // }
-    // if (outputU == 'PC') {
-    //   a = a / 3.0857e16;
-    // }
-    // if (outputU == 'mi') {
-    //   a = a / 1609.344;
-    // }
-    // if (outputU == 'ft') {
-    //   a = a / 0.3048;
-    // }
-
-    // if (outputU == 'cm') {
-    //   periapsis = periapsis * 100;
-    // }
-    // if (outputU == 'km') {
-    //   periapsis = periapsis / 1000;
-    // }
-    // if (outputU == 'AU') {
-    //   periapsis = periapsis / 149597870691;
-    // }
-    // if (outputU == 'LY') {
-    //   periapsis = periapsis / 9.4605e15;
-    // }
-    // if (outputU == 'PC') {
-    //   periapsis = periapsis / 3.0857e16;
-    // }
-    // if (outputU == 'mi') {
-    //   periapsis = periapsis / 1609.344;
-    // }
-    // if (outputU == 'ft') {
-    //   periapsis = periapsis / 0.3048;
-    // }
-
-    // if (outputU == 'cm') {
-    //   apoapsis = apoapsis * 100;
-    // }
-    if (outputU == 'km') {
-      apoapsis = apoapsis / 1000;
-    }
-    // if (outputU == 'AU') {
-    //   apoapsis = apoapsis / 149597870691;
-    // }
-    // if (outputU == 'LY') {
-    //   apoapsis = apoapsis / 9.4605e15;
-    // }
-    // if (outputU == 'PC') {
-    //   apoapsis = apoapsis / 3.0857e16;
-    // }
-    // if (outputU == 'mi') {
-    //   apoapsis = apoapsis / 1609.344;
-    // }
-    // if (outputU == 'ft') {
-    //   apoapsis = apoapsis / 0.3048;
-    // }
-  }
-
-  if (typeof outputU2 == 'undefined') {
-    outputU2 = 's';
-  } else {
-    if (outputU2 == 'm') {
-      period = period / 60;
-    }
-    // if (outputU2 == 'h') {
-    //   period = period / 3600;
-    // }
-    // if (outputU2 == 'd') {
-    //   period = period / 86400;
-    // }
-    // if (outputU2 == 'yr') {
-    //   period = period / 3.15581e7;
-    // }
-    // if (outputU2 == 'Ky') {
-    //   period = period / 3.15581e10;
-    // }
-    // if (outputU2 == 'My') {
-    //   period = period / 3.15581e13;
-    // }
-    // if (outputU2 == 'By') {
-    //   period = period / 3.15581e16;
-    // }
-  }
+  const periapsis = a - PlusMinus - RADIUS_OF_EARTH;
+  const apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
+  const period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
 
   // toDegrees
   i = RAD2DEG * i;
@@ -917,523 +412,13 @@ export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSec
     raan: lan,
     argPe: w,
     mo: m,
-    ta: ta,
-    tl: tl,
+    ta,
+    tl,
     perigee: periapsis,
     apogee: apoapsis,
-    period: period,
+    period,
   };
 };
-// Converts Keplerian Elements to State Vectors
-/*
-  const _kp2sv = (a, ec, i, w0, o0, m0, massPrimary, massSecondary, massPrimaryU, massSecondaryU, aU, vectorU) => {
-    let rxu,
-      ryu,
-      rzu = 'm';
-    let vxu,
-      vyu,
-      vzu = 'm/s';
-
-    i = DEG2RAD * i;
-    w0 = DEG2RAD * w0;
-    o0 = DEG2RAD * o0;
-    m0 = DEG2RAD * m0;
-
-    if (typeof aU == 'undefined') {
-      aU = 'm';
-    } else {
-      if (aU == 'cm') {
-        a = a / 100;
-      }
-      if (aU == 'km') {
-        a = a * 1000;
-      }
-      if (aU == 'AU') {
-        a = a * 149597870691;
-      }
-      if (aU == 'LY') {
-        a = a * 9.4605e15;
-      }
-      if (aU == 'PC') {
-        a = a * 3.0857e16;
-      }
-      if (aU == 'mi') {
-        a = a * 1609.344;
-      }
-      if (aU == 'ft') {
-        a = a * 0.3048;
-      }
-    }
-
-    if (!(massPrimaryU == 'kg' || typeof massPrimaryU == 'undefined')) {
-      if (massPrimaryU == 'g') {
-        massPrimary = massPrimary / 1000;
-      }
-      if (massPrimaryU == 'M_Sun') {
-        massPrimary = massPrimary * 1.98894729428839e30;
-      }
-      if (massPrimaryU == 'M_Mercury') {
-        massPrimary = massPrimary * 3.30192458710471e23;
-      }
-      if (massPrimaryU == 'M_Venus') {
-        massPrimary = massPrimary * 4.86862144253118e24;
-      }
-      if (massPrimaryU == 'M_Earth') {
-        massPrimary = massPrimary * 5.97378250603408e24;
-      }
-      if (massPrimaryU == 'M_Mars') {
-        massPrimary = massPrimary * 6.41863349674674e23;
-      }
-      if (massPrimaryU == 'M_Jupiter') {
-        massPrimary = massPrimary * 1.89863768365072e27;
-      }
-      if (massPrimaryU == 'M_Saturn') {
-        massPrimary = massPrimary * 5.68470940139966e26;
-      }
-      if (massPrimaryU == 'M_Uranus') {
-        massPrimary = massPrimary * 8.68333186484441e25;
-      }
-      if (massPrimaryU == 'M_Neptune') {
-        massPrimary = massPrimary * 1.02431564713932e26;
-      }
-      if (massPrimaryU == 'M_Pluto') {
-        massPrimary = massPrimary * 1.30861680530754e22;
-      }
-      if (massPrimaryU == 'M_Moon') {
-        massPrimary = massPrimary * 7.34777534869879e22;
-      }
-      if (massPrimaryU == 'M_Phobos') {
-        massPrimary = massPrimary * 1.03409569809204e16;
-      }
-      if (massPrimaryU == 'M_Deimos') {
-        massPrimary = massPrimary * 1.79842730102965e15;
-      }
-      if (massPrimaryU == 'M_Io') {
-        massPrimary = massPrimary * 8.9320629865446e22;
-      }
-      if (massPrimaryU == 'M_Europa') {
-        massPrimary = massPrimary * 4.79990319196655e22;
-      }
-      if (massPrimaryU == 'M_Ganymede') {
-        massPrimary = massPrimary * 1.48187846087315e23;
-      }
-      if (massPrimaryU == 'M_Callisto') {
-        massPrimary = massPrimary * 1.07595283170753e23;
-      }
-      if (massPrimaryU == 'M_Amalthea') {
-        massPrimary = massPrimary * 7.49344708762353e18;
-      }
-      if (massPrimaryU == 'M_Himalia') {
-        massPrimary = massPrimary * 9.55630662185067e18;
-      }
-      if (massPrimaryU == 'M_Elara') {
-        massPrimary = massPrimary * 7.76699816441212e17;
-      }
-      if (massPrimaryU == 'M_Pasiphae') {
-        massPrimary = massPrimary * 1.90926209704339e17;
-      }
-      if (massPrimaryU == 'M_Sinope') {
-        massPrimary = massPrimary * 7.76699816441212e16;
-      }
-      if (massPrimaryU == 'M_Lysithea') {
-        massPrimary = massPrimary * 7.76699816441212e16;
-      }
-      if (massPrimaryU == 'M_Carme') {
-        massPrimary = massPrimary * 9.55630662185067e16;
-      }
-      if (massPrimaryU == 'M_Ananke') {
-        massPrimary = massPrimary * 3.81852419408679e16;
-      }
-      if (massPrimaryU == 'M_Leda') {
-        massPrimary = massPrimary * 5.6778056079615e15;
-      }
-      if (massPrimaryU == 'M_Thebe') {
-        massPrimary = massPrimary * 7.76699816441212e17;
-      }
-      if (massPrimaryU == 'M_Adrastea') {
-        massPrimary = massPrimary * 1.90926209704339e16;
-      }
-      if (massPrimaryU == 'M_Metis') {
-        massPrimary = massPrimary * 9.55630662185067e16;
-      }
-      if (massPrimaryU == 'M_Mimas') {
-        massPrimary = massPrimary * 3.81429321227243e19;
-      }
-      if (massPrimaryU == 'M_Enceladus') {
-        massPrimary = massPrimary * 1.17050220435577e20;
-      }
-      if (massPrimaryU == 'M_Tethys') {
-        massPrimary = massPrimary * 6.17639232970985e20;
-      }
-      if (massPrimaryU == 'M_Dione') {
-        massPrimary = massPrimary * 1.09569832670221e21;
-      }
-      if (massPrimaryU == 'M_Rhea') {
-        massPrimary = massPrimary * 2.31572188769539e21;
-      }
-      if (massPrimaryU == 'M_Titan') {
-        massPrimary = massPrimary * 1.34555202850711e23;
-      }
-      if (massPrimaryU == 'M_Hyperion') {
-        massPrimary = massPrimary * 5.54593618108186e18;
-      }
-      if (massPrimaryU == 'M_Iapetus') {
-        massPrimary = massPrimary * 1.80652899243564e21;
-      }
-      if (massPrimaryU == 'M_Phoebe') {
-        massPrimary = massPrimary * 8.28855423929348e18;
-      }
-      if (massPrimaryU == 'M_Janus') {
-        massPrimary = massPrimary * 1.8972946850153e18;
-      }
-      if (massPrimaryU == 'M_Epimetheus') {
-        massPrimary = massPrimary * 5.26205381601159e17;
-      }
-      if (massPrimaryU == 'M_Atlas') {
-        massPrimary = massPrimary * 1.13924780048507e15;
-      }
-      if (massPrimaryU == 'M_Prometheus') {
-        massPrimary = massPrimary * 1.87289854971031e17;
-      }
-      if (massPrimaryU == 'M_Pandora') {
-        massPrimary = massPrimary * 1.48445610732647e17;
-      }
-      if (massPrimaryU == 'M_Ariel') {
-        massPrimary = massPrimary * 1.29013922898875e21;
-      }
-      if (massPrimaryU == 'M_Umbriel') {
-        massPrimary = massPrimary * 1.25880780428295e21;
-      }
-      if (massPrimaryU == 'M_Titania') {
-        massPrimary = massPrimary * 3.4460391356142e21;
-      }
-      if (massPrimaryU == 'M_Oberon') {
-        massPrimary = massPrimary * 2.99680258484984e21;
-      }
-      if (massPrimaryU == 'M_Miranda') {
-        massPrimary = massPrimary * 6.51349484606072e19;
-      }
-      if (massPrimaryU == 'M_Triton') {
-        massPrimary = massPrimary * 2.13993058500051e22;
-      }
-      if (massPrimaryU == 'M_Charon') {
-        massPrimary = massPrimary * 1.62268483858135e21;
-      }
-      if (massPrimaryU == 'M_Ceres') {
-        massPrimary = massPrimary * 8.70013290062687e20;
-      }
-      if (massPrimaryU == 'M_Pallas') {
-        massPrimary = massPrimary * 3.1800485774705e20;
-      }
-      if (massPrimaryU == 'M_Vesta') {
-        massPrimary = massPrimary * 3.00004582780236e20;
-      }
-    }
-    if (!(massSecondaryU == 'kg' || typeof massSecondaryU == 'undefined')) {
-      if (massSecondaryU == 'g') {
-        massSecondary = massSecondary / 1000;
-      }
-      if (massSecondaryU == 'M_Sun') {
-        massSecondary = massSecondary * 1.98894729428839e30;
-      }
-      if (massSecondaryU == 'M_Mercury') {
-        massSecondary = massSecondary * 3.30192458710471e23;
-      }
-      if (massSecondaryU == 'M_Venus') {
-        massSecondary = massSecondary * 4.86862144253118e24;
-      }
-      if (massSecondaryU == 'M_Earth') {
-        massSecondary = massSecondary * 5.97378250603408e24;
-      }
-      if (massSecondaryU == 'M_Mars') {
-        massSecondary = massSecondary * 6.41863349674674e23;
-      }
-      if (massSecondaryU == 'M_Jupiter') {
-        massSecondary = massSecondary * 1.89863768365072e27;
-      }
-      if (massSecondaryU == 'M_Saturn') {
-        massSecondary = massSecondary * 5.68470940139966e26;
-      }
-      if (massSecondaryU == 'M_Uranus') {
-        massSecondary = massSecondary * 8.68333186484441e25;
-      }
-      if (massSecondaryU == 'M_Neptune') {
-        massSecondary = massSecondary * 1.02431564713932e26;
-      }
-      if (massSecondaryU == 'M_Pluto') {
-        massSecondary = massSecondary * 1.30861680530754e22;
-      }
-      if (massSecondaryU == 'M_Moon') {
-        massSecondary = massSecondary * 7.34777534869879e22;
-      }
-      if (massSecondaryU == 'M_Phobos') {
-        massSecondary = massSecondary * 1.03409569809204e16;
-      }
-      if (massSecondaryU == 'M_Deimos') {
-        massSecondary = massSecondary * 1.79842730102965e15;
-      }
-      if (massSecondaryU == 'M_Io') {
-        massSecondary = massSecondary * 8.9320629865446e22;
-      }
-      if (massSecondaryU == 'M_Europa') {
-        massSecondary = massSecondary * 4.79990319196655e22;
-      }
-      if (massSecondaryU == 'M_Ganymede') {
-        massSecondary = massSecondary * 1.48187846087315e23;
-      }
-      if (massSecondaryU == 'M_Callisto') {
-        massSecondary = massSecondary * 1.07595283170753e23;
-      }
-      if (massSecondaryU == 'M_Amalthea') {
-        massSecondary = massSecondary * 7.49344708762353e18;
-      }
-      if (massSecondaryU == 'M_Himalia') {
-        massSecondary = massSecondary * 9.55630662185067e18;
-      }
-      if (massSecondaryU == 'M_Elara') {
-        massSecondary = massSecondary * 7.76699816441212e17;
-      }
-      if (massSecondaryU == 'M_Pasiphae') {
-        massSecondary = massSecondary * 1.90926209704339e17;
-      }
-      if (massSecondaryU == 'M_Sinope') {
-        massSecondary = massSecondary * 7.76699816441212e16;
-      }
-      if (massSecondaryU == 'M_Lysithea') {
-        massSecondary = massSecondary * 7.76699816441212e16;
-      }
-      if (massSecondaryU == 'M_Carme') {
-        massSecondary = massSecondary * 9.55630662185067e16;
-      }
-      if (massSecondaryU == 'M_Ananke') {
-        massSecondary = massSecondary * 3.81852419408679e16;
-      }
-      if (massSecondaryU == 'M_Leda') {
-        massSecondary = massSecondary * 5.6778056079615e15;
-      }
-      if (massSecondaryU == 'M_Thebe') {
-        massSecondary = massSecondary * 7.76699816441212e17;
-      }
-      if (massSecondaryU == 'M_Adrastea') {
-        massSecondary = massSecondary * 1.90926209704339e16;
-      }
-      if (massSecondaryU == 'M_Metis') {
-        massSecondary = massSecondary * 9.55630662185067e16;
-      }
-      if (massSecondaryU == 'M_Mimas') {
-        massSecondary = massSecondary * 3.81429321227243e19;
-      }
-      if (massSecondaryU == 'M_Enceladus') {
-        massSecondary = massSecondary * 1.17050220435577e20;
-      }
-      if (massSecondaryU == 'M_Tethys') {
-        massSecondary = massSecondary * 6.17639232970985e20;
-      }
-      if (massSecondaryU == 'M_Dione') {
-        massSecondary = massSecondary * 1.09569832670221e21;
-      }
-      if (massSecondaryU == 'M_Rhea') {
-        massSecondary = massSecondary * 2.31572188769539e21;
-      }
-      if (massSecondaryU == 'M_Titan') {
-        massSecondary = massSecondary * 1.34555202850711e23;
-      }
-      if (massSecondaryU == 'M_Hyperion') {
-        massSecondary = massSecondary * 5.54593618108186e18;
-      }
-      if (massSecondaryU == 'M_Iapetus') {
-        massSecondary = massSecondary * 1.80652899243564e21;
-      }
-      if (massSecondaryU == 'M_Phoebe') {
-        massSecondary = massSecondary * 8.28855423929348e18;
-      }
-      if (massSecondaryU == 'M_Janus') {
-        massSecondary = massSecondary * 1.8972946850153e18;
-      }
-      if (massSecondaryU == 'M_Epimetheus') {
-        massSecondary = massSecondary * 5.26205381601159e17;
-      }
-      if (massSecondaryU == 'M_Atlas') {
-        massSecondary = massSecondary * 1.13924780048507e15;
-      }
-      if (massSecondaryU == 'M_Prometheus') {
-        massSecondary = massSecondary * 1.87289854971031e17;
-      }
-      if (massSecondaryU == 'M_Pandora') {
-        massSecondary = massSecondary * 1.48445610732647e17;
-      }
-      if (massSecondaryU == 'M_Ariel') {
-        massSecondary = massSecondary * 1.29013922898875e21;
-      }
-      if (massSecondaryU == 'M_Umbriel') {
-        massSecondary = massSecondary * 1.25880780428295e21;
-      }
-      if (massSecondaryU == 'M_Titania') {
-        massSecondary = massSecondary * 3.4460391356142e21;
-      }
-      if (massSecondaryU == 'M_Oberon') {
-        massSecondary = massSecondary * 2.99680258484984e21;
-      }
-      if (massSecondaryU == 'M_Miranda') {
-        massSecondary = massSecondary * 6.51349484606072e19;
-      }
-      if (massSecondaryU == 'M_Triton') {
-        massSecondary = massSecondary * 2.13993058500051e22;
-      }
-      if (massSecondaryU == 'M_Charon') {
-        massSecondary = massSecondary * 1.62268483858135e21;
-      }
-      if (massSecondaryU == 'M_Ceres') {
-        massSecondary = massSecondary * 8.70013290062687e20;
-      }
-      if (massSecondaryU == 'M_Pallas') {
-        massSecondary = massSecondary * 3.1800485774705e20;
-      }
-      if (massSecondaryU == 'M_Vesta') {
-        massSecondary = massSecondary * 3.00004582780236e20;
-      }
-    }
-
-    let mass = massPrimary + massSecondary;
-
-    let eca = m0 + ec / 2;
-    let diff = 10000;
-    let eps = 0.000001;
-    let e1 = 0;
-
-    while (diff > eps) {
-      e1 = eca - (eca - ec * Math.sin(eca) - m0) / (1 - ec * Math.cos(eca));
-      diff = Math.abs(e1 - eca);
-      eca = e1;
-    }
-
-    let ceca = Math.cos(eca);
-    let seca = Math.sin(eca);
-    e1 = a * Math.sqrt(Math.abs(1 - ec * ec));
-    let xw = a * (ceca - ec);
-    let yw = e1 * seca;
-
-    let edot = Math.sqrt((G * mass) / a) / (a * (1 - ec * ceca));
-    let xdw = -a * edot * seca;
-    let ydw = e1 * edot * ceca;
-
-    let cw = Math.cos(w0);
-    let sw = Math.sin(w0);
-    let co = Math.cos(o0);
-    let so = Math.sin(o0);
-    let ci = Math.cos(i);
-    let si = Math.sin(i);
-    let swci = sw * ci;
-    let cwci = cw * ci;
-    let pX = cw * co - so * swci;
-    let pY = cw * so + co * swci;
-    let pZ = sw * si;
-    let qx = -sw * co - so * cwci;
-    let qy = -sw * so + co * cwci;
-    let qz = cw * si;
-    rx = xw * pX + yw * qx;
-    ry = xw * pY + yw * qy;
-    rz = xw * pZ + yw * qz;
-    vx = xdw * pX + ydw * qx;
-    vy = xdw * pY + ydw * qy;
-    vz = xdw * pZ + ydw * qz;
-
-    if (typeof vectorU != 'undefined') {
-      rxu = vectorU[0];
-      ryu = vectorU[1];
-      rzu = vectorU[2];
-      vxu = vectorU[3];
-      vyu = vectorU[4];
-      vzu = vectorU[5];
-      if (rxu == 'cm') {
-        rx = rx * 100;
-      }
-      if (rxu == 'km') {
-        rx = rx / 1000;
-      }
-      if (rxu == 'AU') {
-        rx = rx / 149597870691;
-      }
-      if (rxu == 'LY') {
-        rx = rx / 9.4605e15;
-      }
-      if (rxu == 'PC') {
-        rx = rx / 3.0857e16;
-      }
-      if (rxu == 'mi') {
-        rx = rx / 1609.344;
-      }
-      if (rxu == 'ft') {
-        rx = rx / 0.3048;
-      }
-
-      if (ryu == 'cm') {
-        ry = ry * 100;
-      }
-      if (ryu == 'km') {
-        ry = ry / 1000;
-      }
-      if (ryu == 'AU') {
-        ry = ry / 149597870691;
-      }
-      if (ryu == 'LY') {
-        ry = ry / 9.4605e15;
-      }
-      if (ryu == 'PC') {
-        ry = ry / 3.0857e16;
-      }
-      if (ryu == 'mi') {
-        ry = ry / 1609.344;
-      }
-      if (ryu == 'ft') {
-        ry = ry / 0.3048;
-      }
-
-      if (rzu == 'cm') {
-        rz = rz * 100;
-      }
-      if (rzu == 'km') {
-        rz = rz / 1000;
-      }
-      if (rzu == 'AU') {
-        rz = rz / 149597870691;
-      }
-      if (rzu == 'LY') {
-        rz = rz / 9.4605e15;
-      }
-      if (rzu == 'PC') {
-        rz = rz / 3.0857e16;
-      }
-      if (rzu == 'mi') {
-        rz = rz / 1609.344;
-      }
-      if (rzu == 'ft') {
-        rz = rz / 0.3048;
-      }
-
-      if (vxu == 'km/s') {
-        vx = vx / 1000;
-      }
-      if (vyu == 'km/s') {
-        vy = vy / 1000;
-      }
-      if (vzu == 'km/s') {
-        vz = vz / 1000;
-      }
-    }
-
-    return {
-      position: {
-        x: rx,
-        y: ry,
-        z: rz,
-      },
-      velocityX: vx,
-      velocityY: vy,
-      velocityZ: vz,
-    };
-  };
-  */
 
 // Internal Functions
 export const _arctan2 = (y, x) => {
@@ -1444,7 +429,7 @@ export const _arctan2 = (y, x) => {
     if (x > 0 && y < 0) u = u + TAU;
   } else {
     if (y < 0) u = -PI / 2;
-    if (y == 0) u = 0;
+    if (y === 0) u = 0;
     if (y > 0) u = PI / 2;
   }
   return u;

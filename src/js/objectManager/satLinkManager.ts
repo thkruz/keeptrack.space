@@ -132,16 +132,11 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
             //
             // Debug for finding decayed satellites
             //
-            if (sat1.position.x === 0) continue;
-            if (sat1.position.y === 0) continue;
-            if (sat1.position.z === 0) continue;
-            if (sat2.position.x === 0) continue;
-            if (sat2.position.y === 0) continue;
-            if (sat2.position.z === 0) continue;
-            //
-            // var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2))) * RAD2DEG;
-            // var semiDiamSat2 = Math.asin(0.1/Math.sqrt(Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2))) * RAD2DEG;
-            var theta =
+            if ((sat1.position.x === 0) || (sat1.position.y === 0) || (sat1.position.z === 0) || (sat2.position.x === 0) || (sat2.position.y === 0) || (sat2.position.z === 0)) {
+              continue;
+            }
+            // NOTE: Reference old version for debug code
+            const theta =
               Math.acos(
                 <number>(
                   numeric.dot(
@@ -178,7 +173,7 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
         if (bestSat) lineManager.create('sat5', [bestSat.id, id], [0, 1.0, 0.6, 1.0]);
       }
     } catch (e) {
-      // console.debug(e);
+      // Intentionally empty
     }
   }
 
@@ -220,6 +215,7 @@ export const idToSatnum = (satSet: CatalogManager): void => {
   satLinkManager.wgs = satSet.convertSatnumArrayToIdArray(satLinkManager.wgs);
   satLinkManager.iridium = satSet.convertSatnumArrayToIdArray(satLinkManager.iridium);
   satLinkManager.galileo = satSet.convertSatnumArrayToIdArray(satLinkManager.galileo);
+  // DEBUG: Planned future update
   // satLinkManager.sbirs = satSet.convertSatnumArrayToIdArray(satLinkManager.sbirs);
   // satLinkManager.dsp = satSet.convertSatnumArrayToIdArray(satLinkManager.dsp);
   satLinkManager.starlink = satSet.convertSatnumArrayToIdArray(satLinkManager.starlink);

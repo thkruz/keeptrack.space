@@ -67,7 +67,6 @@ export const missileSubmit = (): void => {
     const target = parseFloat(<string>$('#ms-target').val());
     let tgtLat = parseFloat(<string>$('#ms-lat').val());
     let tgtLon = parseFloat(<string>$('#ms-lon').val());
-    // var result = false;
     const launchTime = timeManager.selectedDate * 1;
 
     let sim = '';
@@ -107,13 +106,11 @@ export const missileSubmit = (): void => {
         // Custom Target
         if (isNaN(tgtLat)) {
           uiManager.toast(`Invalid Target Latitude!`, 'critical');
-          // evt.preventDefault();
           $('#loading-screen').hide();
           return;
         }
         if (isNaN(tgtLon)) {
           uiManager.toast(`Invalid Target Longitude!`, 'critical');
-          // evt.preventDefault();
           $('#loading-screen').hide();
           return;
         }
@@ -126,13 +123,11 @@ export const missileSubmit = (): void => {
       if (isSub) {
         if (isNaN(lauLat)) {
           uiManager.toast(`Invalid Launch Latitude!`, 'critical');
-          // evt.preventDefault();
           $('#loading-screen').hide();
           return;
         }
         if (isNaN(lauLon)) {
           uiManager.toast(`Invalid Launch Longitude!`, 'critical');
-          // evt.preventDefault();
           $('#loading-screen').hide();
           return;
         }
@@ -151,7 +146,6 @@ export const missileSubmit = (): void => {
           lauLon = <number>missileManager.UsaICBM[a * 4 + 1];
           missileMinAlt = 1100; //https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
         }
-        // attackerName = missileManager.UsaICBM[a * 4 + 2];
         missileManager.Missile(
           lauLat,
           lauLon,
@@ -178,7 +172,6 @@ export const missileSubmit = (): void => {
           lauLat = <number>missileManager.RussianICBM[a * 4];
           lauLon = <number>missileManager.RussianICBM[a * 4 + 1];
         }
-        // attackerName = missileManager.RussianICBM[a * 4 + 2];
         missileManager.Missile(
           lauLat,
           lauLon,
@@ -205,7 +198,6 @@ export const missileSubmit = (): void => {
           lauLat = <number>missileManager.ChinaICBM[a * 4];
           lauLon = <number>missileManager.ChinaICBM[a * 4 + 1];
         }
-        // attackerName = missileManager.ChinaICBM[a * 4 + 2];
         missileManager.Missile(
           lauLat,
           lauLon,
@@ -232,7 +224,6 @@ export const missileSubmit = (): void => {
           lauLat = <number>missileManager.NorthKoreanBM[a * 4];
           lauLon = <number>missileManager.NorthKoreanBM[a * 4 + 1];
         }
-        // attackerName = missileManager.NorthKoreanBM[a * 4 + 2];
         missileManager.Missile(
           lauLat,
           lauLon,
@@ -253,7 +244,6 @@ export const missileSubmit = (): void => {
         // French SLBM
         a = attacker - 500;
         b = 500 - missileManager.missilesInUse;
-        // attackerName = missileManager.FraSLBM[a * 4 + 2];
         const missileMinAlt = 1000;
         if (attacker != 500) {
           // Use Custom Launch Site
@@ -281,7 +271,6 @@ export const missileSubmit = (): void => {
         // United Kingdom SLBM
         a = attacker - 600;
         b = 500 - missileManager.missilesInUse;
-        // attackerName = missileManager.ukSLBM[a * 4 + 2];
         const missileMinAlt = 1200;
         if (attacker != 600) {
           // Use Custom Launch Site
@@ -305,22 +294,6 @@ export const missileSubmit = (): void => {
           missileMinAlt
         );
       }
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'New Missile',
-      //         attackerName,
-      //         'Attacker'
-      //     );
-      // if (settingsManager.isOfficialWebsite)
-      //     ga(
-      //         'send',
-      //         'event',
-      //         'New Missile',
-      //         tgtLat + ', ' + tgtLon,
-      //         'Target'
-      //     );
       uiManager.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
       uiManager.doSearch('RV_');
     }

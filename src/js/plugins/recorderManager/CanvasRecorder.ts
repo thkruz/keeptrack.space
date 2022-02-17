@@ -68,12 +68,10 @@ export class CanvasRecorder {
     };
 
     const startRecording = (): void => {
-      let selectCapture = new Promise(function (resolve) {
-        resolve(startCapture());
-      });
+      let selectCapture = Promise.resolve(startCapture());
       /* istanbul ignore next */
       selectCapture
-        .then(function startRecording(srcObject) {
+        .then(function beginRecording(srcObject) {
           if (srcObject == false) return;
           CanvasRecorder.isVideoRecording = true;
           $('#menu-record').addClass('bmenu-item-selected');
@@ -102,7 +100,6 @@ export class CanvasRecorder {
           try {
             mediaRecorder = new window.MediaRecorder(stream, options);
           } catch (e) {
-            // alert('MediaRecorder is not supported by this browser.');
             CanvasRecorder.isVideoRecording = false;
             $('#menu-record').removeClass('bmenu-item-selected');
             console.warn('Exception while creating MediaRecorder:', e);
@@ -137,7 +134,6 @@ export class CanvasRecorder {
     const stopRecording = (): void => {
       if (!mediaRecorder) throw new Error('MediaRecorder is not initialized');
       mediaRecorder.stop();
-      // console.log('Recorded Blobs: ', recordedBlobs);
       video.controls = true;
     };
 

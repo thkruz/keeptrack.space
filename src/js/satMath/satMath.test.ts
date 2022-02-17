@@ -10,6 +10,8 @@ import * as satMath from './satMath';
 import { satellite } from './satMath';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
+const dateNow = new Date(2022, 0, 1);
+dateNow.setUTCHours(0, 0, 0, 0);
 
 // @ponicode
 describe('satMath.currentEpoch', () => {
@@ -61,12 +63,12 @@ describe('satMath.getTearData', () => {
   });
   it('should handle isInFOV', () => {
     satellite.isRiseSetLookangles = false;
-    let result: any = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    let result: any = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
     expect(result).toMatchSnapshot();
   });
   it('should handle isInFOV and isRiseSetLookangles', () => {
     satellite.isRiseSetLookangles = true;
-    let result: any = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    let result: any = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
     expect(result).toMatchSnapshot();
   });
   afterAll(() => {
@@ -79,13 +81,13 @@ describe('satMath.getTearData', () => {
       .fn()
       .mockImplementationOnce(() => true)
       .mockImplementationOnce(() => false);
-    let result: any = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    let result: any = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
     expect(result).toMatchSnapshot();
     satellite.checkIsInView = jest
       .fn()
       .mockImplementationOnce(() => true)
       .mockImplementationOnce(() => true);
-    result = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    result = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
     expect(result).toMatchSnapshot();
   });
   afterAll(() => {
@@ -1072,7 +1074,7 @@ describe('satMath.getlookangles', () => {
     document.body.innerHTML = `<table id="looks"></table>`;
     keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
     jest.spyOn(satellite, 'getTearData').mockImplementationOnce(() => ({
-      time: new Date(2022, 0, 1).toISOString(),
+      time: dateNow.toISOString(),
       rng: 1000,
       az: 50,
       el: 30,
@@ -1114,14 +1116,14 @@ describe('satMath.populateMultiSiteTable', () => {
     document.body.innerHTML = `<table id="looksmultisite"></table>`;
     const mSiteArray = [
       {
-        time: new Date(2022, 0, 1).toISOString(),
+        time: dateNow.toISOString(),
         rng: 1000,
         az: 50,
         el: 30,
         name: 'COD',
       },
       {
-        time: new Date(2022, 0, 1).toISOString(),
+        time: dateNow.toISOString(),
         rng: 1000,
         az: 50,
         el: 30,
@@ -1162,9 +1164,9 @@ describe.skip('satMath.findCloseObjects', () => {
 });
 
 // @ponicode
-describe.skip('satMath.getOrbitByLatLon', () => {
+describe('satMath.getOrbitByLatLon', () => {
   test('0', () => {
-    let result: any = getOrbitByLatLon(defaultSat, 0, 0, 'N', new Date(), 1000, 0);
+    let result: any = getOrbitByLatLon(defaultSat, 0, 0, 'N', dateNow, 1000, 0);
     expect(result).toMatchSnapshot();
   });
 });

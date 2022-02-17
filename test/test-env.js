@@ -8,7 +8,9 @@ import 'webgl-mock';
 // This allows consistent testing in the CI environment
 // eslint-disable-next-line no-process-env
 process.env.TZ = 'GMT';
-jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
+const fakeTime = new Date('2022-01-01');
+fakeTime.setUTCHours(0, 0, 0, 0);
+jest.useFakeTimers().setSystemTime(fakeTime.getTime());
 
 // eslint-disable-next-line no-sync
 const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.html'), 'utf8').toString();

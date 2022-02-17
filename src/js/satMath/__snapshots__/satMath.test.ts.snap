@@ -59,18 +59,18 @@ exports[`satMath.findBestPasses 0 1`] = `undefined`;
 
 exports[`satMath.findClosestApproachTime 0 1`] = `
 Object {
-  "dist": 0.00006405160951446281,
-  "offset": 7000,
+  "dist": 0.00005183267531286211,
+  "offset": 0,
   "ric": Object {
     "position": Float32Array [
-      0.000020932715415256098,
-      0.00005990445424686186,
-      0.000008711283953743987,
+      0.000019180868548573926,
+      -0.00004520854781731032,
+      -0.000016580341252847575,
     ],
     "velocity": Float32Array [
-      4.3841961172574884e-8,
-      -8.520190775129777e-9,
-      -1.466953847284458e-7,
+      -1.6616925790913228e-7,
+      1.0133948791235525e-7,
+      6.558308029980253e-8,
     ],
   },
 }
@@ -84,6 +84,13 @@ Object {
   "tdop": 50,
   "vdop": 50,
 }
+`;
+
+exports[`satMath.getOrbitByLatLon 0 1`] = `
+Array [
+  "Error",
+  "Failed to find a solution for Argument of Perigee",
+]
 `;
 
 exports[`satMath.getSunDirection 0 1`] = `
@@ -108,31 +115,31 @@ exports[`satMath.getSunTimes 1 1`] = `undefined`;
 
 exports[`satMath.getTearData should handle isInFOV 1`] = `
 Object {
-  "az": 282.96799048721954,
-  "el": 5.76498114579519,
+  "az": 113.80780075611027,
+  "el": 57.48814771937549,
   "name": "COD",
-  "rng": 7601.648974277152,
-  "time": "2022-01-01 05:00:00",
+  "rng": 4439.658324055251,
+  "time": "2022-01-01 00:00:00",
 }
 `;
 
 exports[`satMath.getTearData should handle isInFOV and isRiseSetLookangles 1`] = `
 Object {
-  "az": 282.96799048721954,
-  "el": 5.76498114579519,
+  "az": -1,
+  "el": -1,
   "name": "COD",
-  "rng": 7601.648974277152,
-  "time": "2022-01-01 05:00:00",
+  "rng": -1,
+  "time": "",
 }
 `;
 
 exports[`satMath.getTearData should handle isInFOV and isRiseSetLookangles not previously in FOV but will be 1`] = `
 Object {
-  "az": 282.96799048721954,
-  "el": 5.76498114579519,
+  "az": 113.80780075611027,
+  "el": 57.48814771937549,
   "name": "COD",
-  "rng": 7601.648974277152,
-  "time": "2022-01-01 05:00:00",
+  "rng": 4439.658324055251,
+  "time": "2022-01-01 00:00:00",
 }
 `;
 
@@ -157,7 +164,7 @@ Array [
     "el": 30,
     "name": "COD",
     "rng": 1000,
-    "time": "2022-01-01T05:00:00.000Z",
+    "time": "2022-01-01T00:00:00.000Z",
   },
 ]
 `;

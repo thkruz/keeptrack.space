@@ -7,6 +7,7 @@ import { KeepTrackPrograms, SatObject, SunObject, ZoomValue } from '../api/keepT
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
 import * as satMath from './satMath';
+import { satellite } from './satMath';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
@@ -43,6 +44,52 @@ describe('satMath.currentEpoch', () => {
     let inst: any = new Date('');
     let result: any = satMath.currentEpoch(inst);
     expect(result).toMatchSnapshot();
+  });
+});
+
+describe('satMath.getTearData', () => {
+  const realSgp4 = satellite.sgp4;
+  beforeAll(() => {
+    satellite.sgp4 = () =>
+      <any>{
+        position: {
+          x: 6000,
+          y: 6000,
+          z: 6000,
+        },
+      };
+  });
+  it('should handle isInFOV', () => {
+    satellite.isRiseSetLookangles = false;
+    let result: any = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+  });
+  it('should handle isInFOV and isRiseSetLookangles', () => {
+    satellite.isRiseSetLookangles = true;
+    let result: any = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+  });
+  afterAll(() => {
+    satellite.sgp4 = realSgp4;
+  });
+
+  it('should handle isInFOV and isRiseSetLookangles not previously in FOV but will be', () => {
+    satellite.isRiseSetLookangles = true;
+    satellite.checkIsInView = jest
+      .fn()
+      .mockImplementationOnce(() => true)
+      .mockImplementationOnce(() => false);
+    let result: any = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+    satellite.checkIsInView = jest
+      .fn()
+      .mockImplementationOnce(() => true)
+      .mockImplementationOnce(() => true);
+    result = satMath.getTearData(new Date(2022, 0, 1), defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+  });
+  afterAll(() => {
+    satellite.sgp4 = realSgp4;
   });
 });
 
@@ -1018,6 +1065,70 @@ describe('satMath.getlookangles', () => {
     document.body.innerHTML = `<table id="looks"></table>`;
     keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
     let result: any = satMath.getlookangles(defaultSat);
+    expect(result).toMatchSnapshot();
+  });
+
+  test('2', () => {
+    document.body.innerHTML = `<table id="looks"></table>`;
+    keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
+    jest.spyOn(satellite, 'getTearData').mockImplementationOnce(() => ({
+      time: new Date(2022, 0, 1).toISOString(),
+      rng: 1000,
+      az: 50,
+      el: 30,
+      name: 'COD',
+    }));
+    let result: any = satMath.getlookangles(defaultSat);
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('satMath.findClosestApproachTime', () => {
+  test('0', () => {
+    let result: any = satMath.findClosestApproachTime(defaultSat, defaultSat, 10);
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('satMath.createTle', () => {
+  test('0', () => {
+    let result: any = satMath.createTle({
+      sat: defaultSat,
+      inc: '10.01',
+      meanmo: '15.15',
+      rasc: '10.5',
+      argPe: '1.0',
+      meana: '10.5',
+      ecen: '0.001',
+      epochyr: '20',
+      epochday: '123',
+      intl: '1998-01A',
+      scc: '25544',
+    });
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('satMath.populateMultiSiteTable', () => {
+  test('0', () => {
+    document.body.innerHTML = `<table id="looksmultisite"></table>`;
+    const mSiteArray = [
+      {
+        time: new Date(2022, 0, 1).toISOString(),
+        rng: 1000,
+        az: 50,
+        el: 30,
+        name: 'COD',
+      },
+      {
+        time: new Date(2022, 0, 1).toISOString(),
+        rng: 1000,
+        az: 50,
+        el: 30,
+        name: 'COD',
+      },
+    ];
+    let result: any = satMath.populateMultiSiteTable(mSiteArray);
     expect(result).toMatchSnapshot();
   });
 });

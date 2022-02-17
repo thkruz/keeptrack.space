@@ -54,7 +54,7 @@ export const getTearData = (now: Date, satrec: SatRec, sensors: SensorObject[], 
   if (isInFOV) {
     if (satellite.isRiseSetLookangles) {
       // Previous Pass to Calculate first line of coverage
-      var now1 = new Date();
+      const now1 = new Date();
       now1.setTime(Number(now) - 1000);
       let aer1 = satellite.getRae(now1, satrec, sensor);
       let isInFOV1 = satellite.checkIsInView(sensor, aer1);
@@ -365,7 +365,7 @@ export const getlookangles = (sat: SatObject): TearrData[] => { // NOSONAR
   for (let i = 0; i < satellite.lookanglesLength * 24 * 60 * 60; i += lookanglesInterval) {
     offset = i * 1000; // Offset in seconds (msec * 1000)
     let now = timeManager.getOffsetTimeObj(offset, simulationTime);
-    let looksPass = getTearData(now, satrec, sensor);
+    let looksPass = satellite.getTearData(now, satrec, sensor);
     if (looksPass.time !== '') {
       looksArray.push(looksPass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
     }
@@ -1568,71 +1568,7 @@ const verifySensors = (sensors: SensorObject[], sensorManager: SensorManager): S
   return sensors;
 };
 
-export const satellite: SatMath = {
-  // Legacy API
-  sgp4: Ootk.Sgp4.propagate,
-  gstime: Ootk.Sgp4.gstime,
-  twoline2satrec: Ootk.Sgp4.createSatrec,
-  geodeticToEcf: Ootk.Transforms.lla2ecf,
-  ecfToEci: Ootk.Transforms.ecf2eci,
-  eciToEcf: Ootk.Transforms.eci2ecf,
-  eciToGeodetic: Ootk.Transforms.eci2lla,
-  degreesLat: Ootk.Transforms.getDegLat,
-  degreesLong: Ootk.Transforms.getDegLon,
-  ecfToLookAngles: Ootk.Transforms.ecf2rae,
-  // New API
-  altitudeCheck,
-  calculateDops,
-  calculateLookAngles,
-  calculateSensorPos,
-  calculateVisMag,
-  checkIsInView,
-  createTle,
-  currentEpoch,
-  distance,
-  eci2ll,
-  eci2Rae,
-  findBestPass,
-  findBestPasses,
-  findCloseObjects,
-  findClosestApproachTime,
-  findNearbyObjectsByOrbit,
-  getDops,
-  getEci,
-  getlookangles,
-  getlookanglesMultiSite,
-  getOrbitByLatLon,
-  getRae,
-  getSunTimes,
-  getTEARR,
-  isRiseSetLookangles: false,
-  lastlooksArray: [],
-  lastMultiSiteArray: [],
-  lookAngles2Ecf,
-  lookanglesInterval: 30,
-  lookanglesLength: 1,
-  map,
-  nextNpasses,
-  nextpass,
-  nextpassList,
-  obsmaxrange: 0,
-  obsminrange: 0,
-  sat2ric,
-  setobs,
-  setTEARR,
-  updateDopsTable,
-  currentTEARR: {
-    time: '',
-    az: 0,
-    el: 0,
-    rng: 0,
-    name: '',
-  },
-};
-
-window.satellite = satellite;
-
-const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
+export const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
   const tbl = <HTMLTableElement>document.getElementById('looksmultisite'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
   let tr = tbl.insertRow();
@@ -1699,3 +1635,69 @@ const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
     // };
   }
 };
+
+export const satellite: SatMath = {
+  // Legacy API
+  sgp4: Ootk.Sgp4.propagate,
+  gstime: Ootk.Sgp4.gstime,
+  twoline2satrec: Ootk.Sgp4.createSatrec,
+  geodeticToEcf: Ootk.Transforms.lla2ecf,
+  ecfToEci: Ootk.Transforms.ecf2eci,
+  eciToEcf: Ootk.Transforms.eci2ecf,
+  eciToGeodetic: Ootk.Transforms.eci2lla,
+  degreesLat: Ootk.Transforms.getDegLat,
+  degreesLong: Ootk.Transforms.getDegLon,
+  ecfToLookAngles: Ootk.Transforms.ecf2rae,
+  // New API
+  altitudeCheck,
+  calculateDops,
+  calculateLookAngles,
+  calculateSensorPos,
+  calculateVisMag,
+  checkIsInView,
+  createTle,
+  currentEpoch,
+  distance,
+  eci2ll,
+  eci2Rae,
+  findBestPass,
+  findBestPasses,
+  findCloseObjects,
+  findClosestApproachTime,
+  findNearbyObjectsByOrbit,
+  getDops,
+  getEci,
+  getlookangles,
+  getlookanglesMultiSite,
+  getOrbitByLatLon,
+  getRae,
+  getSunTimes,
+  getTEARR,
+  getTearData,
+  isRiseSetLookangles: false,
+  lastlooksArray: [],
+  lastMultiSiteArray: [],
+  lookAngles2Ecf,
+  lookanglesInterval: 30,
+  lookanglesLength: 1,
+  map,
+  nextNpasses,
+  nextpass,
+  nextpassList,
+  obsmaxrange: 0,
+  obsminrange: 0,
+  sat2ric,
+  setobs,
+  setTEARR,
+  updateDopsTable,
+  populateMultiSiteTable,
+  currentTEARR: {
+    time: '',
+    az: 0,
+    el: 0,
+    rng: 0,
+    name: '',
+  },
+};
+
+window.satellite = satellite;

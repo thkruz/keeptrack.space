@@ -799,14 +799,14 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
 
   let orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
-  let _propagateBestPass = (now: Date, satrec: SatRec) => {
-    let aer = satellite.getRae(now, satrec, sensor);
+  let _propagateBestPass = (now: Date, satrecIn: SatRec) => {
+    let aer = satellite.getRae(now, satrecIn, sensor);
     let isInFOV = satellite.checkIsInView(sensor, aer);
 
     if (isInFOV) {
       // Previous Pass to Calculate first line of coverage
       let now1 = timeManager.getOffsetTimeObj(offset - looksInterval * 1000, simulationTime);
-      let aer1 = satellite.getRae(now1, satrec, sensor);
+      let aer1 = satellite.getRae(now1, satrecIn, sensor);
 
       let isInFOV1 = satellite.checkIsInView(sensor, aer1);
       if (!isInFOV1) {
@@ -822,8 +822,8 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
         srng = aer.rng.toFixed(0);
       } else {
         // Next Pass to Calculate Last line of coverage
-        let now1 = timeManager.getOffsetTimeObj(offset + looksInterval * 1000, simulationTime);
-        aer1 = satellite.getRae(now1, satrec, sensor);
+        let _now1 = timeManager.getOffsetTimeObj(offset + looksInterval * 1000, simulationTime);
+        aer1 = satellite.getRae(_now1, satrecIn, sensor);
 
         isInFOV1 = satellite.checkIsInView(sensor, aer1);
         if (!isInFOV1) {
@@ -851,7 +851,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
           // Last Line of Coverage
           return {
             sortTime: sTime,
-            scc: satrec.satnum,
+            scc: satrecIn.satnum,
             score: score,
             startDate: sTime,
             startTime: sTime,
@@ -1018,25 +1018,23 @@ export const findClosestApproachTime = (
 
   return result;
 };
+
+// TODO: Future Idea
+/*
 // satellite.createManeuverAnalyst = (satId, incVariation, meanmoVariation, rascVariation) => {
 //   const { timeManager, satSet } = keepTrackApi.programs;
 //   // TODO This needs rewrote from scratch to bypass the satcruncher
-
 //   var mainsat = satSet.getSat(satId);
 //   var origsat = mainsat;
-
 //   // Launch Points are the Satellites Current Location
 //   var TEARR = mainsat.getTEARR();
 //   var launchLat, launchLon, alt;
 //   launchLat = satellite.degreesLat(TEARR.lat);
 //   launchLon = satellite.degreesLong(TEARR.lon);
 //   alt = TEARR.alt;
-
 //   var upOrDown = mainsat.getDirection();
-
 //   var currentEpoch = satellite.currentEpoch(timeManager.calculateSimulationTime());
 //   mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
-
 //   var TLEs;
 //   // Ignore argument of perigee for round orbits OPTIMIZE
 //   if (mainsat.apogee - mainsat.perigee < 300) {
@@ -1046,14 +1044,11 @@ export const findClosestApproachTime = (
 //   }
 //   var TLE1 = TLEs[0];
 //   var TLE2 = TLEs[1];
-
 //   //   var breakupSearchString = '';
-
 //   satId = satSet.getIdFromObjNum(80000);
 //   var sat = satSet.getSat(satId);
 //   sat = origsat;
 //   let iTLE1 = '1 ' + 80000 + TLE1.substr(7);
-
 //   let iTLEs;
 //   // Ignore argument of perigee for round orbits OPTIMIZE
 //   if (sat.apogee - sat.perigee < 300) {
@@ -1063,7 +1058,6 @@ export const findClosestApproachTime = (
 //   }
 //   iTLE1 = iTLEs[0];
 //   let iTLE2 = iTLEs[1];
-
 //   // For the first 30
 //   var inc = TLE2.substr(8, 8);
 //   inc = (parseFloat(inc) + incVariation).toPrecision(7);
@@ -1076,7 +1070,6 @@ export const findClosestApproachTime = (
 //   }
 //   inc = (inc[0] + '.' + inc[1]).toString();
 //   inc = stringPad.padEmpty(inc, 8);
-
 //   // For the second 30
 //   var meanmo: any = iTLE2.substr(52, 10);
 //   meanmo = (parseFloat(meanmo) * meanmoVariation).toPrecision(10);
@@ -1089,7 +1082,6 @@ export const findClosestApproachTime = (
 //     meanmo[1] = '00000000';
 //   }
 //   meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
-
 //   iTLE2 = '2 ' + 80000 + ' ' + inc + ' ' + iTLE2.substr(17, 35) + meanmo + iTLE2.substr(63);
 //   sat = satSet.getSat(satId);
 //   sat.TLE1 = iTLE1;
@@ -1108,22 +1100,18 @@ export const findClosestApproachTime = (
 //     console.debug('Breakup Generator Failed');
 //     return false;
 //   }
-
 //   // breakupSearchString += mainsat.sccNum + ',Analyst Sat';
 //   // uiManager.doSearch(breakupSearchString);
 //   return true;
 // };
 // satellite.findChangeOrbitToDock = (sat, sat2, propOffset, propLength) => {
 //   const { satSet } = keepTrackApi.programs;
-
 //   let closestInc = 0;
 //   let closestRaan = 0;
 //   let closestMeanMo = 1;
-
 //   let minDistArray = {
 //     dist: 1000000,
 //   };
-
 //   for (let incTemp = -1; incTemp <= 1; incTemp++) {
 //     for (let raanTemp = -1; raanTemp <= 1; raanTemp++) {
 //       for (let meanMoTemp = 0.95; meanMoTemp <= 1.05; meanMoTemp += 0.05) {
@@ -1148,6 +1136,8 @@ export const findClosestApproachTime = (
 //   console.log(`${sat.meanMotion * closestMeanMo}`);
 //   satellite.createManeuverAnalyst(sat.id, closestInc, closestMeanMo, closestRaan);
 // };
+*/
+
 const checkIsInView = (sensor: SensorObject, rae: { rng: number; az: number; el: number }): boolean => {
   const { az, el, rng } = rae;
 
@@ -1255,17 +1245,13 @@ export const calculateDops = (satList: { az: number; el: number }[]): { pdop: st
   }
 
   var A = <any>numeric.rep([nsat, 4], 0);
-  var azlist = [];
-  var ellist = [];
   for (var n = 1; n <= nsat; n++) {
     var cursat = satList[n - 1];
 
     var az = cursat.az;
     var el = cursat.el;
 
-    azlist.push(az);
-    ellist.push(el);
-    var B = [
+    const B = [
       Math.cos((el * Math.PI) / 180.0) * Math.sin((az * Math.PI) / 180.0),
       Math.cos((el * Math.PI) / 180.0) * Math.cos((az * Math.PI) / 180.0),
       Math.sin((el * Math.PI) / 180.0),
@@ -1287,6 +1273,7 @@ export const calculateDops = (satList: { az: number; el: number }[]): { pdop: st
   dops.tdop = (Math.round(tdop * 100) / 100).toFixed(2);
   return dops;
 };
+// TODO: Future features
 // satellite.radarMaxrng = (pW: number, aG: number, rcs: number, minSdB: number, fMhz: number): number => {
 //   // let powerInWatts = 325 * 1792;
 //   // let antennaGain = 2613000000;
@@ -1294,24 +1281,19 @@ export const calculateDops = (satList: { az: number; el: number }[]): { pdop: st
 //   let minSW = Math.pow(10, (minSdB - 30) / 10);
 //   // let frequencyMhz = 435;
 //   let fHz = (fMhz *= Math.pow(10, 6));
-
 //   let numer = pW * Math.pow(aG, 2) * rcs * Math.pow(3 * Math.pow(10, 8), 2);
 //   let denom = minSW * Math.pow(4 * Math.PI, 3) * Math.pow(fHz, 2);
-
 //   let rng = Math.sqrt(Math.sqrt(numer / denom));
 //   return rng;
 // };
-
 // satellite.radarMinSignal = (pW: number, aG: number, rcs: number, rng: number, fMhz: number): number => {
 //   // let powerInWatts = 325 * 1792;
 //   // let antennaGain = 2613000000;
 //   // let minimumDetectableSignaldB;
 //   // let frequencyMhz = 435;
 //   let fHz = (fMhz *= Math.pow(10, 6));
-
 //   let numer = pW * Math.pow(aG, 2) * rcs * Math.pow(3 * Math.pow(10, 8), 2);
 //   let denom = rng ** 4 * Math.pow(4 * Math.PI, 3) * Math.pow(fHz, 2);
-
 //   let minSW = numer / denom;
 //   let minSdB = Math.log10(minSW);
 //   return minSdB;
@@ -1655,8 +1637,6 @@ export const satellite: SatMath = {
 window.satellite = satellite;
 
 const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
-  // const { timeManager, sensorManager, objectManager, mainCamera, satSet } = keepTrackApi.programs;
-
   const tbl = <HTMLTableElement>document.getElementById('looksmultisite'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
   let tr = tbl.insertRow();
@@ -1715,6 +1695,7 @@ const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
     tdR.appendChild(document.createTextNode(multiSiteArray[i].rng.toFixed(0)));
     tdS = tr.insertCell();
     tdS.appendChild(document.createTextNode(multiSiteArray[i].name));
+    // TODO: Future feature
     // tdS.onclick = () => {
     //   timeManager.changeStaticOffset(new Date(multiSiteArray[i].time).getTime() - new Date().getTime());
     //   sensorManager.setSensor(sensorManager.sensorList[multiSiteArray[i].name]);

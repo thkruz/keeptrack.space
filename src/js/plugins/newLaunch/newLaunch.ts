@@ -35,7 +35,7 @@ export const newLaunchSubmit = () => {
   // }
   // Set time to 0000z for relative time.
   const today = new Date(); // Need to know today for offset calculation
-  const quadZTime = new Date(today.getFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
+  const quadZTime = new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
 
   // Date object defaults to local time.
   quadZTime.setUTCHours(0); // Move to UTC Hour

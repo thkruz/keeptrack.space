@@ -10,7 +10,7 @@ export const screenShot = () => {
     link.download = 'keeptrack.png';
 
     let d = new Date();
-    let n = d.getFullYear();
+    let n = d.getUTCFullYear();
     let copyrightStr = !settingsManager.copyrightOveride ? `©${n} KEEPTRACK.SPACE` : '';
 
     link.href = watermarkedDataUrl(drawManager.canvas, copyrightStr);

@@ -596,7 +596,8 @@ adviceList = adviceManager.adviceList;
 adviceCount = adviceManager.adviceCount;
 
 export { adviceList };
-function showEditSatAdvice() {
+
+const showEditSatAdvice = () => {
   adviceCount.editSat += 1;
 
   adviceManager.showAdvice(
@@ -605,9 +606,9 @@ function showEditSatAdvice() {
     $('#menu-editSat'),
     'bottom-right'
   );
-}
+};
 
-function showBreakupAdvice() {
+const showBreakupAdvice = () => {
   adviceCount.breakup += 1;
 
   adviceManager.showAdvice(
@@ -616,9 +617,9 @@ function showBreakupAdvice() {
     $('#menu-breakup'),
     'right'
   );
-}
+};
 
-function showLaunchNominalAdvice() {
+const showLaunchNominalAdvice = () => {
   adviceCount.newLaunch += 1;
 
   adviceManager.showAdvice(
@@ -630,9 +631,9 @@ function showLaunchNominalAdvice() {
     $('#menu-newLaunch'),
     'top-right'
   );
-}
+};
 
-function showSatelliteCameraAdvice() {
+const showSatelliteCameraAdvice = () => {
   adviceCount.satelliteView += 1;
 
   adviceManager.showAdvice(
@@ -641,4 +642,4 @@ function showSatelliteCameraAdvice() {
     $('#menu-satview'),
     'bottom'
   );
-}
+};

@@ -107,7 +107,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
       while (i < len) {
         const t = now + i * timeslice;
         const p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
-        if (p) {
+        if (p.x && p.y && p.z) {
           pointsOut[i * 4] = p.x;
           pointsOut[i * 4 + 1] = p.y;
           pointsOut[i * 4 + 2] = p.z;

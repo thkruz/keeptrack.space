@@ -1,5 +1,5 @@
-import { Worker as OrbitCruncher } from './orbitCruncher';
-import { Worker as PositionCruncher } from './positionCruncher';
+import { Worker as OrbitCruncher } from '../src/js/__mocks__/orbitCruncher';
+import { Worker as PositionCruncher } from '../src/js/__mocks__/positionCruncher';
 
 describe('Mocks', () => {
   test('OrbitCruncher', () => {

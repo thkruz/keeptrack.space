@@ -178,7 +178,7 @@ export const getsensorinfo = () => {
 export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
   const { satSet, colorSchemeManager } = keepTrackApi.programs;
 
-  switch (legendType) {
+  switch (legendType) { // NOSONAR
     case 'legend-payload-box':
       if (colorSchemeManager.objectTypeFlags.payload) {
         colorSchemeManager.objectTypeFlags.payload = false;

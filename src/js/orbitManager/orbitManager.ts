@@ -2,11 +2,11 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { Camera, GroupsManager, OrbitManager } from '../api/keepTrackTypes';
+import { Camera, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
 
 const NUM_SEGS = 255;
-let glBuffers = <WebGLBuffer[]>[];
-let inProgress = <boolean[]>[];
+const glBuffers = <WebGLBuffer[]>[];
+const inProgress = <boolean[]>[];
 let pathShader: any;
 let selectOrbitBuf: WebGLBuffer;
 let hoverOrbitBuf: WebGLBuffer;
@@ -187,7 +187,6 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
   gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
   gl.useProgram(pathShader);
 
-  // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.BLEND);
   if (settingsManager.showOrbitThroughEarth) {
     gl.disable(gl.DEPTH_TEST);
@@ -223,15 +222,13 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
     } else {
       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
     }
-    currentInView.forEach(function (id) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(pathShader.aPos);
-      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    currentInView.forEach((id) => {
+      writePathToGpu(id);
     });
   }
 
   if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+    // DEBUG: Planned future feature
     // if (sensorManager.currentSensor?.lat) {
     //   groupsManager.selectedGroup.forEach(function (id) {
     //     let isInViewSoon = false;
@@ -254,16 +251,11 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
     //   });
     // }
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    groupsManager.selectedGroup.forEach(function (id: number) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(pathShader.aPos);
-      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    groupsManager.selectedGroup.forEach((id: number) => {
+      writePathToGpu(id);
     });
   }
 
-  // gl.disableVertexAttribArray(pathShader.aPos);
-  // gl.disableVertexAttribArray(pathShader.aColor);
   gl.disable(gl.BLEND);
   gl.enable(gl.DEPTH_TEST);
 
@@ -278,11 +270,13 @@ export const allocateBuffer = () => {
   return buf;
 };
 
-export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string, TLE2?: string, missile?: boolean, latList?: number[], lonList?: number[], altList?: number[]) => {
+export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string, TLE2?: string, missileParams: MissileParams = {}) => {
   const { satSet, timeManager } = keepTrackApi.programs;
+  const { missile, latList, lonList, altList } = missileParams;
   const sat = satSet.getSat(satId);
   if (typeof sat === 'undefined') return;
 
+  force ??= false;
   if (force) {
     orbitManager.orbitWorker.postMessage({
       isInit: false,
@@ -368,4 +362,10 @@ export const orbitManager: OrbitManager = {
   historyOfSatellitesPlay: null,
   playNextSatellite: null,
   historyOfSatellitesRunCount: 0,
+};
+const writePathToGpu = (id: number) => {
+  gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
+  gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(pathShader.aPos);
+  gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
 };

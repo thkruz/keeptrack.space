@@ -6,15 +6,7 @@ export const dopsFormSubmit = (): void => {
   keepTrackApi.programs.uiManager.hideSideMenus();
   isDOPMenuOpen = true;
   $('#loading-screen').fadeIn(1000, function () {
-    const lat = parseFloat(<string>$('#dops-lat').val());
-    const lon = parseFloat(<string>$('#dops-lon').val());
-    const alt = parseFloat(<string>$('#dops-alt').val());
-    const el = parseFloat(<string>$('#dops-el').val());
-    settingsManager.gpsElevationMask = el;
-    keepTrackApi.programs.satellite.updateDopsTable(lat, lon, alt);
-    $('#menu-dops').addClass('bmenu-item-selected');
-    $('#loading-screen').fadeOut('slow');
-    $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    loadingScreenFadeIn();
   });
 };
 export const uiManagerInit = () => {

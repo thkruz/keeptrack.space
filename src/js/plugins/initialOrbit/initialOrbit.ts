@@ -223,7 +223,6 @@ export const obfitFormSubmit = (e: any) => { // NOSONAR
   let t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v;
   let t2v, x2v, y2v, z2v, xd2v, yd2v, zd2v;
   let t3v, x3v, y3v, z3v, xd3v, yd3v, zd3v;
-  let isOb1 = true;
   let isOb2 = true;
   let isOb3 = true;
   const t1 = (<HTMLInputElement>document.getElementById('obfit-t1')).value;
@@ -356,45 +355,43 @@ export const obfitFormSubmit = (e: any) => { // NOSONAR
   const svs = [];
   let sv1 = [];
   {
-    if (isOb1 && isNaN(parseFloat(t1))) {
-      isOb1 = false;
+    if (isNaN(parseFloat(t1))) {
+      
       uiManager.toast(`Time 1 is Invalid!`, 'critical');
       return false;
     }
-    if (isOb1 && isNaN(parseFloat(x1))) {
-      isOb1 = false;
+    if (isNaN(parseFloat(x1))) {
+      
       uiManager.toast(`X 1 is Invalid!`, 'critical');
       return false;
     }
-    if (isOb1 && isNaN(parseFloat(y1))) {
-      isOb1 = false;
+    if (isNaN(parseFloat(y1))) {
+      
       uiManager.toast(`Y 1 is Invalid!`, 'critical');
       return false;
     }
-    if (isOb1 && isNaN(parseFloat(z1))) {
-      isOb1 = false;
+    if (isNaN(parseFloat(z1))) {
+      
       uiManager.toast(`Z 1 is Invalid!`, 'critical');
       return false;
     }
-    if (isOb1 && isNaN(parseFloat(xd1))) {
-      isOb1 = false;
+    if (isNaN(parseFloat(xd1))) {
+      
       uiManager.toast(`X Dot 1 is Invalid!`, 'critical');
       return false;
     }
-    if (isOb1 && isNaN(parseFloat(yd1))) {
-      isOb1 = false;
+    if (isNaN(parseFloat(yd1))) {
+      
       uiManager.toast(`Y Dot 1 is Invalid!`, 'critical');
       return false;
     }
-    if (isOb1 && isNaN(parseFloat(zd1))) {
-      isOb1 = false;
+    if (isNaN(parseFloat(zd1))) {
+      
       uiManager.toast(`Z Dot 1 is Invalid!`, 'critical');
       return false;
     }
-    if (isOb1) {
       sv1 = [t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v];
       svs.push(sv1);
-    }
   }
 
   let sv2 = [];

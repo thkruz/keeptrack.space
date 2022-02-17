@@ -1,6 +1,8 @@
 describe('Timezones', () => {
   it('should always be the same time', () => {
     const now = new Date();
-    expect(now.getTime()).toBe(new Date('2020-01-01').getTime());
+    const fakeTime = new Date('2022-01-01');
+    fakeTime.setUTCHours(0, 0, 0, 0);
+    expect(now.getTime()).toBe(fakeTime.getTime());
   });
 });

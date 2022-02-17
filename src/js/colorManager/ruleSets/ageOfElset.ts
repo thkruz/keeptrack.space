@@ -66,7 +66,7 @@ export const ageOfElsetRules = (sat: SatObject): ColorInformation => { // NOSONA
 
   let now = new Date();
   const jday = timeManager.getDayOfYear(now);
-  const year = now.getFullYear().toString().substr(2, 2);
+  const year = now.getUTCFullYear().toString().substr(2, 2);
   let daysold;
   if (sat.TLE1.substr(18, 2) === year) {
     daysold = jday - parseInt(sat.TLE1.substr(20, 3));

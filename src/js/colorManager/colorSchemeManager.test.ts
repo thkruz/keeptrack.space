@@ -10,7 +10,11 @@ keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.program
 const RealNow = Date.now;
 
 beforeAll(() => {
-  global.Date.now = jest.fn(() => new Date('2019-04-07T10:20:30Z').getTime());
+  global.Date.now = jest.fn(() => {
+    const dateNow = new Date(2020, 0, 1);
+    dateNow.setUTCHours(0, 0, 0, 0);
+    return dateNow.getTime();
+  });
 });
 
 afterAll(() => {

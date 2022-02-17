@@ -27,7 +27,7 @@ export const cruncherExtraData = (m: SatCruncherMessage) => {
       satSet.satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
       satSet.satData[satCrunchIndex].velocity = { total: 0, x: 0, y: 0, z: 0 };
     } catch (error) {
-      console.debug(satCrunchIndex);
+      // Intentionally left blank
     }
   }
 

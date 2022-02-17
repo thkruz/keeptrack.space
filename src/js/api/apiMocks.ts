@@ -484,6 +484,7 @@ export const keepTrackApiStubs = {
       queryStr: 'search=25544&intldes=1998-A&sat=25544&misl=0,0,0&date=1234567&rate=1&hires=true',
       cosparIndex: { '1998-AB': 5 },
       numSats: 1,
+      onCruncherReady: jest.fn(),
       missileSats: 10000,
       search: {
         year: () => [defaultSat],
@@ -565,6 +566,7 @@ export const keepTrackApiStubs = {
       clearRMBSubMenu: jest.fn(),
       updateURL: jest.fn(),
       keyHandler: jest.fn(),
+      reloadLastSensor: jest.fn(),
       getsensorinfo: jest.fn(),
       hideLoadingScreen: jest.fn(),
       legendHoverMenuClick: jest.fn(),

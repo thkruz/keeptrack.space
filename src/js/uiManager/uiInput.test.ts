@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
@@ -250,6 +251,8 @@ describe('Legacy Tests', () => {
     test('5', () => {
       let result: any = uiInput.rmbMenuActions(<any>{ target: { id: 'view-24dops-rmb' } });
       expect(result).toMatchSnapshot();
+      result = uiInput.rmbMenuActions(<any>{ target: { id: 'view-24dops-rmb' } });
+      expect(result).toMatchSnapshot();
     });
 
     test('6', () => {
@@ -414,6 +417,103 @@ describe('Legacy Tests', () => {
       expect(result).toMatchSnapshot();
     });
   });
+
+  describe('uiManager.earthClicked', () => {
+    test('0', () => {
+      const fakeHtmlElement = { show: () => {}, hide: () => {} };
+      const clickEarth = () => {
+        uiInput.earthClicked({
+          isViewDOM: true,
+          rightBtnViewDOM: fakeHtmlElement,
+          numMenuItems: 3,
+          isCreateDOM: true,
+          rightBtnCreateDOM: fakeHtmlElement,
+          isDrawDOM: true,
+          rightBtnDrawDOM: fakeHtmlElement,
+          isEarthDOM: true,
+          rightBtnEarthDOM: fakeHtmlElement,
+          rightBtnSaveDOM: fakeHtmlElement,
+        });
+      };
+
+      clickEarth();
+      settingsManager.nasaImages = true;
+      clickEarth();
+      settingsManager.nasaImages = false;
+      settingsManager.trusatImages = true;
+      clickEarth();
+      settingsManager.trusatImages = false;
+      settingsManager.lowresImages = true;
+      clickEarth();
+      settingsManager.lowresImages = false;
+      settingsManager.politicalImages = true;
+      clickEarth();
+      settingsManager.politicalImages = false;
+      settingsManager.hiresNoCloudsImages = true;
+      clickEarth();
+      settingsManager.hiresNoCloudsImages = false;
+      settingsManager.vectorImages = true;
+      clickEarth();
+      settingsManager.vectorImages = false;
+      settingsManager.blueImages = true;
+      clickEarth();
+      settingsManager.blueImages = false;
+      settingsManager.hiresImages = true;
+    });
+    test('1', () => {
+      const fakeHtmlElement = { show: () => {}, hide: () => {} };
+      const clickEarth = () => {
+        uiInput.earthClicked({
+          isViewDOM: false,
+          rightBtnViewDOM: fakeHtmlElement,
+          numMenuItems: 3,
+          isCreateDOM: false,
+          rightBtnCreateDOM: fakeHtmlElement,
+          isDrawDOM: false,
+          rightBtnDrawDOM: fakeHtmlElement,
+          isEarthDOM: false,
+          rightBtnEarthDOM: fakeHtmlElement,
+          rightBtnSaveDOM: fakeHtmlElement,
+        });
+      };
+
+      clickEarth();
+      settingsManager.nasaImages = true;
+      clickEarth();
+      settingsManager.nasaImages = false;
+      settingsManager.trusatImages = true;
+      clickEarth();
+      settingsManager.trusatImages = false;
+      settingsManager.lowresImages = true;
+      clickEarth();
+      settingsManager.lowresImages = false;
+      settingsManager.politicalImages = true;
+      clickEarth();
+      settingsManager.politicalImages = false;
+      settingsManager.hiresNoCloudsImages = true;
+      clickEarth();
+      settingsManager.hiresNoCloudsImages = false;
+      settingsManager.vectorImages = true;
+      clickEarth();
+      settingsManager.vectorImages = false;
+      settingsManager.blueImages = true;
+      clickEarth();
+      settingsManager.blueImages = false;
+      settingsManager.hiresImages = true;
+    });
+  });
+});
+
+describe('Broken UI Tests', () => {
+  it('should log issues', () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    document.body.innerHTML = `
+      <div id="draw-rmb"></div>
+    `;
+    uiInput.init();
+    userEvent.click(document.getElementById('draw-rmb'));
+    expect(console.warn).toHaveBeenCalled();
+  });
 });
 
 describe('Testing Library', () => {
@@ -440,6 +540,15 @@ describe('Testing Library', () => {
     <div id="clear-screen-rmb">
     <div id="clear-lines-rmb">
     <div id="reset-camera-rmb">
+    <div id="nav-wrapper">
+      <div id="nav-wrapper-inner"></div>
+    </div>
+    <div id="nav-footer">
+      <div id="nav-footer-inner"></div>
+    </div>
+    <div id="ui-wrapper">
+      <div id="ui-wrapper-inner"></div>
+    </div>
     </div>
   `;
     uiInput.init();
@@ -481,28 +590,70 @@ describe('Testing Library', () => {
     test('11', () => {
       userEvent.click(document.getElementById('clear-lines-rmb'));
     });
+    test('12', () => {
+      userEvent.click(document.getElementById('keeptrack-canvas'));
+    });
+    test('13', () => {
+      userEvent.click(document.getElementById('nav-wrapper'));
+    });
+    test('14', () => {
+      userEvent.click(document.getElementById('nav-footer'));
+    });
+    test('15', () => {
+      userEvent.click(document.getElementById('ui-wrapper'));
+    });
+    test('16', () => {
+      userEvent.click(document.getElementById('nav-wrapper-inner'));
+    });
+    test('17', () => {
+      userEvent.click(document.getElementById('nav-footer-inner'));
+    });
+    test('18', () => {
+      userEvent.click(document.getElementById('ui-wrapper-inner'));
+    });
   });
   describe('Mouse Events', () => {
     test('0', () => {
+      userEvent.hover(document.getElementById('save-rmb-menu'));
       userEvent.unhover(document.getElementById('save-rmb-menu'));
     });
     test('1', () => {
+      userEvent.hover(document.getElementById('view-rmb-menu'));
       userEvent.unhover(document.getElementById('view-rmb-menu'));
     });
     test('2', () => {
+      userEvent.hover(document.getElementById('edit-rmb-menu'));
       userEvent.unhover(document.getElementById('edit-rmb-menu'));
     });
     test('3', () => {
+      userEvent.hover(document.getElementById('create-rmb-menu'));
       userEvent.unhover(document.getElementById('create-rmb-menu'));
     });
     test('4', () => {
+      userEvent.hover(document.getElementById('draw-rmb-menu'));
       userEvent.unhover(document.getElementById('draw-rmb-menu'));
     });
     test('5', () => {
+      userEvent.hover(document.getElementById('colors-rmb-menu'));
       userEvent.unhover(document.getElementById('colors-rmb-menu'));
     });
     test('6', () => {
+      userEvent.hover(document.getElementById('earth-rmb-menu'));
       userEvent.unhover(document.getElementById('earth-rmb-menu'));
+    });
+    test('7', () => {
+      userEvent.hover(document.getElementById('keeptrack-canvas'));
+      userEvent.unhover(document.getElementById('keeptrack-canvas'));
+      fireEvent.wheel(document.getElementById('keeptrack-canvas'), { deltaY: -100 });
+      fireEvent.wheel(document.getElementById('keeptrack-canvas'), { deltaY: 100 });
+    });
+  });
+
+  describe('Touch Events', () => {
+    test('0', () => {
+      fireEvent.touchStart(document.getElementById('keeptrack-canvas'), { touches: [{ clientX: 100, clientY: 100 }] });
+      fireEvent.touchEnd(document.getElementById('keeptrack-canvas'), { touches: [{ clientX: 100, clientY: 100 }] });
+      fireEvent.touchMove(document.getElementById('keeptrack-canvas'), { touches: [{ clientX: 100, clientY: 100 }] });
     });
   });
 });

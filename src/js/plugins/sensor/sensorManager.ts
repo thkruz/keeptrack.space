@@ -6,7 +6,7 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
  * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
@@ -80,7 +80,7 @@ export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   }
 };
 
-export const sensorListLength = () => Object.values(sensorList).reduce((acc) => acc++, 0);
+export const sensorListLength = () => Object.values(sensorList).length;
 
 export const setSensor = (selectedSensor: SensorObject | string, staticNum: number) => { // NOSONAR
   try {

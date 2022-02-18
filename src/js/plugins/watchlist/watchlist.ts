@@ -5,7 +5,7 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,11 +61,11 @@ export const init = (): void => {
   keepTrackApi.programs.watchlist.updateWatchlist = updateWatchlist;
 
   let infoOverlayDOM = [];
-  uiManager.updateNextPassOverlay = (nextPassArray: any, isForceUpdate: any) => {
-    if (nextPassArray.length <= 0 && !isInfoOverlayMenuOpen) return;
+  uiManager.updateNextPassOverlay = (nextPassArrayIn: any, isForceUpdate: any) => {
+    if (nextPassArrayIn.length <= 0 && !isInfoOverlayMenuOpen) return;
     const { mainCamera } = keepTrackApi.programs;
 
-    // FIXME This should auto update the overlay when the time changes outside the original search window
+    // TODO: This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
     if (
       (timeManager.realTime > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 &&
@@ -77,8 +77,8 @@ export const init = (): void => {
       const propTime = timeManager.calculateSimulationTime();
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
-      for (let s = 0; s < nextPassArray.length; s++) {
-        pushOverlayElement(satSet, nextPassArray, s, propTime, infoOverlayDOM);
+      for (let s = 0; s < nextPassArrayIn.length; s++) {
+        pushOverlayElement(satSet, nextPassArrayIn, s, propTime, infoOverlayDOM);
       }
       infoOverlayDOM.push('</div>');
       document.getElementById('info-overlay-content').innerHTML = infoOverlayDOM.join('');
@@ -169,6 +169,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
   try {
     localStorage.setItem('watchlistList', variable);
   } catch {
+    // DEBUG:
     // console.warn('Watchlist Plugin: Unable to save watchlist - localStorage issue!');
   }
 };
@@ -392,14 +393,12 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
     if (isWatchlistMenuOpen) {
       isWatchlistMenuOpen = false;
       $('#menu-watchlist').removeClass('bmenu-item-selected');
-      // $('#search-holder').hide();
       uiManager.hideSideMenus();
       return;
     } else {
       if ((<any>settingsManager).isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
       (<any>$('#watchlist-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      // uiManager.searchToggle(true);
       updateWatchlist();
       isWatchlistMenuOpen = true;
       $('#menu-watchlist').addClass('bmenu-item-selected');
@@ -418,13 +417,14 @@ export const onCruncherReady = (): any => {
   }
   if (watchlistJSON !== null) {
     const newWatchlist = JSON.parse(watchlistJSON);
-    const watchlistInViewList = [];
+    const _watchlistInViewList = [];
     for (let i = 0; i < newWatchlist.length; i++) {
       const sat = satSet.getSatExtraOnly(satSet.getIdFromObjNum(newWatchlist[i]));
       if (sat !== null) {
         newWatchlist[i] = sat.id;
-        watchlistInViewList.push(false);
+        _watchlistInViewList.push(false);
       } else {
+        // DEBUG:
         // console.debug('Watchlist File Format Incorret');
         return;
       }
@@ -432,34 +432,34 @@ export const onCruncherReady = (): any => {
     if (sensorManager.checkSensorSelected() && newWatchlist.length > 0) {
       $('#menu-info-overlay').removeClass('bmenu-item-disabled');
     }
-    updateWatchlist(newWatchlist, watchlistInViewList);
+    updateWatchlist(newWatchlist, _watchlistInViewList);
   }
 };
 
-export const pushOverlayElement = (satSet: any, nextPassArray: any, s: number, propTime: any, infoOverlayDOM: any[]) => {
+export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number, propTime: any, infoOverlayDOM: any[]) => {
   if (typeof satSet?.getSatInViewOnly !== 'function') throw new Error('satSet is not proper satSet Object');
 
-  const satInView = satSet.getSatInViewOnly(satSet.getIdFromObjNum(nextPassArray[s].sccNum)).inView;
+  const satInView = satSet.getSatInViewOnly(satSet.getIdFromObjNum(nextPassArrayIn[s].sccNum)).inView;
   // If old time and not in view, skip it
-  if (nextPassArray[s].time - propTime < -1000 * 60 * 5 && !satInView) return;
+  if (nextPassArrayIn[s].time - propTime < -1000 * 60 * 5 && !satInView) return;
 
   // Get the pass Time
-  const time = dateFormat(nextPassArray[s].time, 'isoTime', true);
+  const time = dateFormat(nextPassArrayIn[s].time, 'isoTime', true);
 
   // Yellow - In View and Time to Next Pass is +/- 30 minutes
-  if (satInView && nextPassArray[s].time - propTime < 1000 * 60 * 30 && propTime - nextPassArray[s].time < 1000 * 60 * 30) {
-    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: yellow">' + nextPassArray[s].sccNum + ': ' + time + '</h5></div>');
+  if (satInView && nextPassArrayIn[s].time - propTime < 1000 * 60 * 30 && propTime - nextPassArrayIn[s].time < 1000 * 60 * 30) {
+    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: yellow">' + nextPassArrayIn[s].sccNum + ': ' + time + '</h5></div>');
     return;
   }
   // Blue - Time to Next Pass is between 10 minutes before and 20 minutes after the current time
   // This makes recent objects stay at the top of the list in blue
-  if (nextPassArray[s].time - propTime < 1000 * 60 * 10 && propTime - nextPassArray[s].time < 1000 * 60 * 20) {
-    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArray[s].sccNum + ': ' + time + '</h5></div>');
+  if (nextPassArrayIn[s].time - propTime < 1000 * 60 * 10 && propTime - nextPassArrayIn[s].time < 1000 * 60 * 20) {
+    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArrayIn[s].sccNum + ': ' + time + '</h5></div>');
     return;
   }
   // White - Any future pass not fitting the above requirements
-  if (nextPassArray[s].time - propTime > 0) {
-    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: white">' + nextPassArray[s].sccNum + ': ' + time + '</h5></div>');
+  if (nextPassArrayIn[s].time - propTime > 0) {
+    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: white">' + nextPassArrayIn[s].sccNum + ': ' + time + '</h5></div>');
   }
 };
 
@@ -539,8 +539,8 @@ export const watchlistFileChange = (evt: any) => {
 
   const reader = new FileReader();
 
-  reader.onload = function (evt) {
-    watchListReaderOnLoad(evt);
+  reader.onload = function (e) {
+    watchListReaderOnLoad(e);
   };
   reader.readAsText((<HTMLInputElement>evt.target).files[0]);
   evt.preventDefault();

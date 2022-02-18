@@ -122,89 +122,27 @@ export const missileMenu = (): void => {
 export const satelliteSelected = (): void => {
   // Only Do this Twice
   if (adviceCount.satelliteView < 1) {
-    adviceCount.satelliteView += 1;
-
-    adviceManager.showAdvice(
-      'Satellite Camera View',
-      'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
-      $('#menu-satview'),
-      'bottom'
-    );
+    showSatelliteCameraAdvice();
   } else if (adviceCount.newLaunch < 1) {
     // Only Do this Twice
-    adviceCount.newLaunch += 1;
-
-    adviceManager.showAdvice(
-      'Create Launch Nominal',
-      'Trying to figure out when a new launch will be in your view? After selecting an ' +
-        'object with a similar orbit, use the launch nominal creator menu to position the ' +
-        'satellite over the launch site at a time of 0000z. Now you can see details using ' +
-        'relative time.',
-      $('#menu-newLaunch'),
-      'top-right'
-    );
+    showLaunchNominalAdvice();
   } else if (adviceCount.breakup < 1) {
     // Only Do this Twice
-    adviceCount.breakup += 1;
-
-    adviceManager.showAdvice(
-      'Create a Breakup',
-      'Curious what this satellite would look like in a 100 pieces? Create a breakup using the breakup menu below! This is also helpful for understanding what a large cubesat launch looks like over time.',
-      $('#menu-breakup'),
-      'right'
-    );
+    showBreakupAdvice();
   } else if (adviceCount.editSat < 1) {
     // Only Do this Twice
-    adviceCount.editSat += 1;
-
-    adviceManager.showAdvice(
-      'Edit Satellite',
-      'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?',
-      $('#menu-editSat'),
-      'bottom-right'
-    );
+    showEditSatAdvice();
   } else if (adviceCount.satelliteView < 3) {
-    adviceCount.satelliteView += 1;
-
-    adviceManager.showAdvice(
-      'Satellite Camera View',
-      'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
-      $('#menu-satview'),
-      'bottom'
-    );
+    showSatelliteCameraAdvice();
   } else if (adviceCount.newLaunch < 3) {
-    // Only Do this Twice
-    adviceCount.newLaunch += 1;
-
-    adviceManager.showAdvice(
-      'Create Launch Nominal',
-      'Trying to figure out when a new launch will be in your view? After selecting an ' +
-        'object with a similar orbit, use the launch nominal creator menu to position the ' +
-        'satellite over the launch site at a time of 0000z. Now you can see details using ' +
-        'relative time.',
-      $('#menu-newLaunch'),
-      'top-right'
-    );
+    showLaunchNominalAdvice();
   } else if (adviceCount.breakup < 3) {
-    // Only Do this Twice
-    adviceCount.breakup += 1;
-
-    adviceManager.showAdvice(
-      'Create a Breakup',
-      'Curious what this satellite would look like in a 100 pieces? Create a breakup using the breakup menu below! This is also helpful for understanding what a large cubesat launch looks like over time.',
-      $('#menu-breakup'),
-      'right'
-    );
+    showBreakupAdvice();
   } else if (adviceCount.editSat < 3) {
     // Only Do this Twice
-    adviceCount.editSat += 1;
-
-    adviceManager.showAdvice(
-      'Edit Satellite',
-      'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?',
-      $('#menu-editSat'),
-      'bottom-right'
-    );
+    showEditSatAdvice();
+  } else {
+    // Intentionally left blank
   }
 };
 export const colorScheme = (): void => {
@@ -402,37 +340,13 @@ export const satFovDisabled = (): void => {
 export const sensor = (): void => {
   // Only Do this Twice
   if (adviceCount.sensorFOV < 1) {
-    adviceCount.sensorFOV += 1;
-    adviceManager.showAdvice(
-      'Field Of View Bubbles',
-      'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
-      $('#menu-fov-bubble'),
-      'bottom-left'
-    );
+    shoFieldOfViewAdvice();
   } else if (adviceCount.sensorSurv < 1) {
-    adviceCount.sensorSurv += 1;
-    adviceManager.showAdvice(
-      'Surveillance Fence',
-      "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
-      $('#menu-surveillance'),
-      'bottom-left'
-    );
+    showSurvFenceAdvice();
   } else if (adviceCount.sensorFOV < 3) {
-    adviceCount.sensorFOV += 1;
-    adviceManager.showAdvice(
-      'Field Of View Bubbles',
-      'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
-      $('#menu-fov-bubble'),
-      'bottom-left'
-    );
+    shoFieldOfViewAdvice();
   } else if (adviceCount.sensorSurv < 3) {
-    adviceCount.sensorSurv += 1;
-    adviceManager.showAdvice(
-      'Surveillance Fence',
-      "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
-      $('#menu-surveillance'),
-      'bottom-left'
-    );
+    showSurvFenceAdvice();
   }
 };
 export const isEnabled = (): boolean => isAdviceEnabled;
@@ -658,3 +572,70 @@ adviceList = adviceManager.adviceList;
 adviceCount = adviceManager.adviceCount;
 
 export { adviceList };
+
+const showEditSatAdvice = () => {
+  adviceCount.editSat += 1;
+
+  adviceManager.showAdvice(
+    'Edit Satellite',
+    'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?',
+    $('#menu-editSat'),
+    'bottom-right'
+  );
+};
+
+const showBreakupAdvice = () => {
+  adviceCount.breakup += 1;
+
+  adviceManager.showAdvice(
+    'Create a Breakup',
+    'Curious what this satellite would look like in a 100 pieces? Create a breakup using the breakup menu below! This is also helpful for understanding what a large cubesat launch looks like over time.',
+    $('#menu-breakup'),
+    'right'
+  );
+};
+
+const showLaunchNominalAdvice = () => {
+  adviceCount.newLaunch += 1;
+
+  adviceManager.showAdvice(
+    'Create Launch Nominal',
+    'Trying to figure out when a new launch will be in your view? After selecting an ' +
+      'object with a similar orbit, use the launch nominal creator menu to position the ' +
+      'satellite over the launch site at a time of 0000z. Now you can see details using ' +
+      'relative time.',
+    $('#menu-newLaunch'),
+    'top-right'
+  );
+};
+
+const showSatelliteCameraAdvice = () => {
+  adviceCount.satelliteView += 1;
+
+  adviceManager.showAdvice(
+    'Satellite Camera View',
+    'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
+    $('#menu-satview'),
+    'bottom'
+  );
+};
+
+const showSurvFenceAdvice = () => {
+  adviceCount.sensorSurv += 1;
+  adviceManager.showAdvice(
+    'Surveillance Fence',
+    "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
+    $('#menu-surveillance'),
+    'bottom-left'
+  );
+};
+
+const shoFieldOfViewAdvice = () => {
+  adviceCount.sensorFOV += 1;
+  adviceManager.showAdvice(
+    'Field Of View Bubbles',
+    'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
+    $('#menu-fov-bubble'),
+    'bottom-left'
+  );
+};

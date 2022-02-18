@@ -1511,9 +1511,6 @@ label {
   top: 5px;
   display: flex;
   content: '';
-}
-
-.rux-checkbox input[type='checkbox']:checked + label::after {
   height: 6px;
   width: 12px;
   left: 3px;
@@ -1912,9 +1909,6 @@ label {
   width: var(--controlOptionSize);
   margin: 0 0.625rem 0 0;
   border: 1px solid var(--controlBorderColor);
-}
-
-.rux-radio-button input[type='radio'] + label::before {
   border-radius: 100%;
   background-color: transparent;
 }
@@ -1938,9 +1932,6 @@ label {
   top: 5px;
   display: flex;
   content: '';
-}
-
-.rux-radio-button input[type='radio']:checked + label::after {
   left: 5px;
   height: 8px;
   width: 8px;

@@ -269,65 +269,13 @@ export const init = (): void => { // NOSONAR
   }
 
   (function _canvasController() {
-    canvasDOM.on('touchmove', function (evt: any) {
-      if (settingsManager.disableNormalEvents) {
-        evt.preventDefault();
-      }
-      if (typeof evt.originalEvent == 'undefined') return;
-
-      if (isPinching && typeof evt.originalEvent.touches[0] != 'undefined' && typeof evt.originalEvent.touches[1] != 'undefined') {
-        const currentPinchDistance = Math.hypot(
-          evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
-          evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY
-        );
-        if (isNaN(currentPinchDistance)) return;
-
-        deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
-        let zoomTarget = mainCamera.zoomTarget();
-        zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
-        zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
-        mainCamera.zoomTarget(zoomTarget);
-      } else {
-        // Dont Move While Zooming
-        mainCamera.mouseX = evt.originalEvent.touches[0].clientX;
-        mainCamera.mouseY = evt.originalEvent.touches[0].clientY;
-        if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
-          dragHasMoved = true;
-          mainCamera.camAngleSnappedOnSat = false;
-          mainCamera.camZoomSnappedOnSat = false;
-        }
-        uiInput.isMouseMoving = true;
-        clearTimeout(mouseTimeout);
-        mouseTimeout = window.setTimeout(function () {
-          uiInput.isMouseMoving = false;
-        }, 250);
-      }
+    canvasDOM.on('touchmove', function (e) {
+      canvasTouchMove(e, mainCamera);
     });
 
     uiInput.mouseMoveTimeout = -1;
-    canvasDOM.on('mousemove', function (evt: any) {
-      if (uiInput.mouseMoveTimeout == -1) {
-        uiInput.mouseMoveTimeout = window.setTimeout(() => {
-          mainCamera.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
-          mainCamera.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
-          if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
-            dragHasMoved = true;
-            mainCamera.camAngleSnappedOnSat = false;
-            mainCamera.camZoomSnappedOnSat = false;
-          }
-          uiInput.isMouseMoving = true;
-
-          // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
-          clearTimeout(mouseTimeout);
-          mouseTimeout = window.setTimeout(function () {
-            uiInput.isMouseMoving = false;
-          }, 150);
-
-          // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
-          window.clearTimeout(uiInput.mouseMoveTimeout);
-          uiInput.mouseMoveTimeout = -1;
-        }, 16);
-      }
+    canvasDOM.on('mousemove', function(e) {
+      canvasMouseMove(e, mainCamera, canvasDOM);
     });
 
     if (settingsManager.disableUI) {
@@ -367,24 +315,7 @@ export const init = (): void => { // NOSONAR
     }
 
     canvasDOM.on('touchend', function () {
-      const touchTime = Date.now() - touchStartTime;
-
-      if (touchTime > 150 && !isPinching && Math.abs(mainCamera.startMouseX - mainCamera.mouseX) < 50 && Math.abs(mainCamera.startMouseY - mainCamera.mouseY) < 50) {
-        uiInput.openRmbMenu();
-        uiInput.mouseSat = -1;
-      }
-
-      if (isPinching) {
-        // pinchEnd(e)
-        isPinching = false;
-      }
-      mainCamera.mouseX = 0;
-      mainCamera.mouseY = 0;
-      dragHasMoved = false;
-      mainCamera.isDragging = false;
-      if (!settingsManager.disableUI) {
-        mainCamera.autoRotate(false);
-      }
+      canvasTouchEnd(mainCamera);
     });
 
     $('#nav-wrapper *').on('click', function () {
@@ -529,7 +460,7 @@ export const init = (): void => { // NOSONAR
         rightBtnEarthMenuDOM.hide();
       });
     }
-    var rightBtnSaveDOMDropdown = () => {
+    const rightBtnSaveDOMDropdown = () => {
       uiManager.clearRMBSubMenu();
       const offsetX = rightBtnSaveDOM.offset().left < canvasDOM.innerWidth() / 2 ? 165 : -165;
       rightBtnSaveMenuDOM.css({
@@ -545,7 +476,7 @@ export const init = (): void => { // NOSONAR
         rightBtnSaveMenuDOM.hide();
       }
     };
-    var rightBtnViewDOMDropdown = () => {
+    const rightBtnViewDOMDropdown = () => {
       uiManager.clearRMBSubMenu();
       const offsetX = rightBtnViewDOM.offset().left < canvasDOM.innerWidth() / 2 ? 165 : -165;
       rightBtnViewMenuDOM.css({
@@ -561,7 +492,7 @@ export const init = (): void => { // NOSONAR
         rightBtnViewMenuDOM.hide();
       }
     };
-    var rightBtnEditDOMDropdown = () => {
+    const rightBtnEditDOMDropdown = () => {
       uiManager.clearRMBSubMenu();
 
       const offsetX = rightBtnEditDOM.offset().left < canvasDOM.innerWidth() / 2 ? 165 : -165;
@@ -578,7 +509,7 @@ export const init = (): void => { // NOSONAR
         rightBtnEditMenuDOM.hide();
       }
     };
-    var rightBtnCreateDOMDropdown = () => {
+    const rightBtnCreateDOMDropdown = () => {
       uiManager.clearRMBSubMenu();
 
       const offsetX = rightBtnCreateDOM.offset().left < canvasDOM.innerWidth() / 2 ? 165 : -165;
@@ -595,7 +526,7 @@ export const init = (): void => { // NOSONAR
         rightBtnCreateMenuDOM.hide();
       }
     };
-    var rightBtnDrawDOMDropdown = () => {
+    const rightBtnDrawDOMDropdown = () => {
       const canvasWidth = canvasDOM.innerWidth();
       if (!canvasWidth) {
         console.warn('canvasDOM undefined!');
@@ -622,7 +553,7 @@ export const init = (): void => { // NOSONAR
         rightBtnDrawMenuDOM.hide();
       }
     };
-    var rightBtnColorsDOMDropdown = () => {
+    const rightBtnColorsDOMDropdown = () => {
       uiManager.clearRMBSubMenu();
       const offsetX = rightBtnColorsDOM.offset().left < canvasDOM.innerWidth() / 2 ? 165 : -165;
       rightBtnColorsMenuDOM.css({
@@ -638,7 +569,7 @@ export const init = (): void => { // NOSONAR
         rightBtnColorsMenuDOM.hide();
       }
     };
-    var rightBtnEarthDOMDropdown = () => {
+    const rightBtnEarthDOMDropdown = () => {
       uiManager.clearRMBSubMenu();
       const offsetX = rightBtnEarthDOM.offset().left < canvasDOM.innerWidth() / 2 ? 165 : -165;
       rightBtnEarthMenuDOM.css({
@@ -1273,7 +1204,7 @@ export const canvasTouchStart = (evt: any) => {
     uiManager.updateURL();
   }
 };
-export const openRmbMenu = () => { // NOSONAR
+export const openRmbMenu = (testmouseSat?: number) => { // NOSONAR
   const { uiManager, sensorManager, lineManager, satSet, mainCamera, objectManager } = keepTrackApi.programs;
   const canvasDOM = $('#keeptrack-canvas');
   const rightBtnMenuDOM = $('#right-btn-menu');
@@ -1335,7 +1266,7 @@ export const openRmbMenu = () => { // NOSONAR
     $('#clear-lines-rmb').show();
   }
 
-  if (uiInput.mouseSat !== -1) {
+  if (uiInput.mouseSat !== -1 || testmouseSat !== -1) {
     if (typeof clickedSat == 'undefined') return;
     const sat = satSet.getSat(clickedSat);
     if (typeof sat == 'undefined' || sat == null) return;
@@ -1515,6 +1446,92 @@ export const readPixelsAsync = async (x: number, y: number, w: number, h: number
   }
 };
 
+export const canvasMouseMove = (evt: any, mainCamera: Camera, canvasDOM: any): any => {
+    if (uiInput.mouseMoveTimeout === -1) {
+      uiInput.mouseMoveTimeout = window.setTimeout(() => {
+        canvasMouseMoveFire(mainCamera, evt, canvasDOM);
+      }, 16);
+    }
+  };
+  export const canvasMouseMoveFire = (mainCamera: Camera, evt: any, canvasDOM: any) => {
+    mainCamera.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
+    mainCamera.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
+    if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
+      dragHasMoved = true;
+      mainCamera.camAngleSnappedOnSat = false;
+      mainCamera.camZoomSnappedOnSat = false;
+    }
+    uiInput.isMouseMoving = true;
+  
+    // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
+    clearTimeout(mouseTimeout);
+    mouseTimeout = window.setTimeout(function () {
+      uiInput.isMouseMoving = false;
+    }, 150);
+  
+    // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
+    window.clearTimeout(uiInput.mouseMoveTimeout);
+    uiInput.mouseMoveTimeout = -1;
+  }
+
+  export const canvasTouchMove = (evt: any, mainCamera: Camera): any => {
+    if (settingsManager.disableNormalEvents) {
+      evt.preventDefault();
+    }
+    if (typeof evt.originalEvent == 'undefined')
+      return;
+
+    if (isPinching && typeof evt.originalEvent.touches[0] != 'undefined' && typeof evt.originalEvent.touches[1] != 'undefined') {
+      const currentPinchDistance = Math.hypot(
+        evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+        evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY
+      );
+      if (isNaN(currentPinchDistance))
+        return;
+
+      deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
+      let zoomTarget = mainCamera.zoomTarget();
+      zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
+      zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
+      mainCamera.zoomTarget(zoomTarget);
+    } else {
+      // Dont Move While Zooming
+      mainCamera.mouseX = evt.originalEvent.touches[0].clientX;
+      mainCamera.mouseY = evt.originalEvent.touches[0].clientY;
+      if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
+        dragHasMoved = true;
+        mainCamera.camAngleSnappedOnSat = false;
+        mainCamera.camZoomSnappedOnSat = false;
+      }
+      uiInput.isMouseMoving = true;
+      clearTimeout(mouseTimeout);
+      mouseTimeout = window.setTimeout(function () {
+        uiInput.isMouseMoving = false;
+      }, 250);
+    }
+}
+
+export const canvasTouchEnd = (mainCamera: Camera) => {
+  const touchTime = Date.now() - touchStartTime;
+
+  if (touchTime > 150 && !isPinching && Math.abs(mainCamera.startMouseX - mainCamera.mouseX) < 50 && Math.abs(mainCamera.startMouseY - mainCamera.mouseY) < 50) {
+    uiInput.openRmbMenu();
+    uiInput.mouseSat = -1;
+  }
+
+  if (isPinching) {
+    // pinchEnd(e)
+    isPinching = false;
+  }
+  mainCamera.mouseX = 0;
+  mainCamera.mouseY = 0;
+  dragHasMoved = false;
+  mainCamera.isDragging = false;
+  if (!settingsManager.disableUI) {
+    mainCamera.autoRotate(false);
+  }
+}
+
 // *********************************************************************************************************************
 // Main Declration
 // *********************************************************************************************************************
@@ -1527,6 +1544,9 @@ export const uiInput: UiInputInterface = {
   canvasClick: null,
   canvasTouchStart: canvasTouchStart,
   canvasMouseUp: canvasMouseUp,
+  canvasMouseMove,
+  canvasTouchMove,
+  canvasTouchEnd,
   openRmbMenu: openRmbMenu,
   rmbMenuActions: null,
   canvasWheel: canvasWheel,
@@ -1541,3 +1561,4 @@ export const uiInput: UiInputInterface = {
   getEarthScreenPoint: getEarthScreenPoint, // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
   getRayOrigin: getRayOrigin,
 };
+

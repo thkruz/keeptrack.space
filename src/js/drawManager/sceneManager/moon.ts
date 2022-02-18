@@ -66,20 +66,13 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
     const latAngle = (Math.PI / NUM_LAT_SEGS) * lat - Math.PI / 2;
     const diskRadius = Math.cos(Math.abs(latAngle));
     const z = Math.sin(latAngle);
-    // console.log('LAT: ' + latAngle * RAD2DEG + ' , Z: ' + z);
-    // var i = 0;
     for (let lon = 0; lon <= NUM_LON_SEGS; lon++) {
       // add an extra vertex for texture funness
       const lonAngle = ((Math.PI * 2) / NUM_LON_SEGS) * lon;
       const x = Math.cos(lonAngle) * diskRadius;
       const y = Math.sin(lonAngle) * diskRadius;
-      // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
-      // mercator cylindrical projection (simple angle interpolation)
       const v = 1 - lat / NUM_LAT_SEGS;
       const u = 0.5 + lon / NUM_LON_SEGS; // may need to change to move map
-
-      // console.log('u: ' + u + ' v: ' + v);
-      // normals: should just be a vector from center to point (aka the point itself!
       vertPos.push(x * DRAW_RADIUS);
       vertPos.push(y * DRAW_RADIUS);
       vertPos.push(z * DRAW_RADIUS);
@@ -88,8 +81,6 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
       vertNorm.push(x);
       vertNorm.push(y);
       vertNorm.push(z);
-
-      // i++;
     }
   }
 
@@ -102,7 +93,6 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
       const brVert = blVert + 1;
       const tlVert = (lat + 1) * (NUM_LON_SEGS + 1) + lon;
       const trVert = tlVert + 1;
-      // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
       vertIndex.push(blVert);
       vertIndex.push(brVert);
       vertIndex.push(tlVert);

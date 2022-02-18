@@ -149,12 +149,12 @@ Array [
 
 exports[`Test ColorRules 7 1`] = `
 Array [
-  0,
   1,
+  0,
   0,
   0.9,
-  0,
   1,
+  0,
   0,
   0.9,
   1,

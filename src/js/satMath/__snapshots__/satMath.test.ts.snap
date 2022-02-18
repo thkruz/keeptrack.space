@@ -30,6 +30,13 @@ exports[`satMath.calculateVisMag 3 1`] = `NaN`;
 
 exports[`satMath.calculateVisMag 4 1`] = `NaN`;
 
+exports[`satMath.createTle 0 1`] = `
+Object {
+  "TLE1": "1 25544U 1998-01A 20123  .00003453  00000-0  71172-4 0  9991",
+  "TLE2": "2 25544 010.0100 010.5000 0.001 001.0000 010.5000 15.15000000    10",
+}
+`;
+
 exports[`satMath.currentEpoch 0 1`] = `
 Array [
   "N",
@@ -60,6 +67,13 @@ Object {
 }
 `;
 
+exports[`satMath.getOrbitByLatLon 0 1`] = `
+Array [
+  "Error",
+  "Failed to find a solution for Argument of Perigee",
+]
+`;
+
 exports[`satMath.getSunDirection 0 1`] = `
 Array [
   148724320.43455538,
@@ -80,9 +94,61 @@ exports[`satMath.getSunTimes 0 1`] = `undefined`;
 
 exports[`satMath.getSunTimes 1 1`] = `undefined`;
 
+exports[`satMath.getTearData should handle isInFOV 1`] = `
+Object {
+  "az": 113.80780075611027,
+  "el": 57.48814771937549,
+  "name": "COD",
+  "rng": 4439.658324055251,
+  "time": "2022-01-01 00:00:00",
+}
+`;
+
+exports[`satMath.getTearData should handle isInFOV and isRiseSetLookangles 1`] = `
+Object {
+  "az": -1,
+  "el": -1,
+  "name": "COD",
+  "rng": -1,
+  "time": "",
+}
+`;
+
+exports[`satMath.getTearData should handle isInFOV and isRiseSetLookangles not previously in FOV but will be 1`] = `
+Object {
+  "az": 113.80780075611027,
+  "el": 57.48814771937549,
+  "name": "COD",
+  "rng": 4439.658324055251,
+  "time": "2022-01-01 00:00:00",
+}
+`;
+
+exports[`satMath.getTearData should handle isInFOV and isRiseSetLookangles not previously in FOV but will be 2`] = `
+Object {
+  "az": -1,
+  "el": -1,
+  "name": "COD",
+  "rng": -1,
+  "time": "",
+}
+`;
+
 exports[`satMath.getlookangles 0 1`] = `Array []`;
 
 exports[`satMath.getlookangles 1 1`] = `Array []`;
+
+exports[`satMath.getlookangles 2 1`] = `
+Array [
+  Object {
+    "az": 50,
+    "el": 30,
+    "name": "COD",
+    "rng": 1000,
+    "time": "2022-01-01T00:00:00.000Z",
+  },
+]
+`;
 
 exports[`satMath.getlookanglesMultiSite 0 1`] = `undefined`;
 
@@ -101,6 +167,8 @@ Object {
   "z": 3243.7908022872425,
 }
 `;
+
+exports[`satMath.populateMultiSiteTable 0 1`] = `undefined`;
 
 exports[`satMath.setTEARR 0 1`] = `undefined`;
 

@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`uiInput.canvasMouseMove canvasMouseMove 1`] = `undefined`;
+
+exports[`uiInput.canvasMouseMove canvasMouseMoveFire 1`] = `undefined`;
+
+exports[`uiInput.canvasTouchEnd 0 1`] = `undefined`;
+
+exports[`uiInput.canvasTouchMove 0 1`] = `undefined`;
+
 exports[`uiInput.getEarthScreenPoint 0 1`] = `
 Float32Array [
   NaN,

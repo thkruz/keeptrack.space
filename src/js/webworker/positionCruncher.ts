@@ -5,7 +5,7 @@
  * interaction with the application.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  * @Copyright (C) 2020 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
@@ -47,7 +47,7 @@ let satInView = EMPTY_INT8_ARRAY; // Array of booleans showing if current Satell
 let satInSun = EMPTY_INT8_ARRAY; // Array of booleans showing if current Satellite is in sunlight
 let sensorMarkerArray = [0]; // Array of Markers used to show sensor fence and FOV
 
-var satelliteSelected = [-1]; // Array used to determine which satellites are selected
+let satelliteSelected = [-1]; // Array used to determine which satellites are selected
 
 let isInterupted = false; // Boolean used to determine if the worker is interupted
 
@@ -56,30 +56,30 @@ let globalPropagationRate = 1000; // Limits how often the propagation loop runs
 let globalPropagationRateMultiplier = 1; // Used to slow down propagation rate on slow computers
 let propagationRunning = false; // Prevent Propagation From Running Twice
 // let timeSyncRunning = false; // Prevent Time Sync Loop From Running Twice
-var divisor = 1; // When running at high speeds, allow faster propagation
+let divisor = 1; // When running at high speeds, allow faster propagation
 let dynamicOffsetEpoch = Date.now();
 let staticOffset = 0;
-var propRate = 1; // vars us run time faster (or slower) than normal
-// var propChangeTime = Date.now(); // vars us run time faster (or slower) than normal
+let propRate = 1; // vars us run time faster (or slower) than normal
+// let propChangeTime = Date.now(); // vars us run time faster (or slower) than normal
 
 /** Settings */
-var selectedSatFOV = 90; // FOV in Degrees
-var isShowFOVBubble = false; // Flag for if FOV bubble is shown
-var isShowSurvFence = false; // Flag for if fence markers are shown
-var isResetFOVBubble = false;
-var isShowSatOverfly = false;
-var isResetSatOverfly = false;
-var isMultiSensor = false;
-var isIgnoreNonRadar = true;
-var isSunlightView = false;
-var isLowPerf = false;
-var isResetMarker = false;
-var isResetInView = false;
+let selectedSatFOV = 90; // FOV in Degrees
+let isShowFOVBubble = false; // Flag for if FOV bubble is shown
+let isShowSurvFence = false; // Flag for if fence markers are shown
+let isResetFOVBubble = false;
+let isShowSatOverfly = false;
+let isResetSatOverfly = false;
+let isMultiSensor = false;
+const isIgnoreNonRadar = true;
+let isSunlightView = false;
+let isLowPerf = false;
+let isResetMarker = false;
+let isResetInView = false;
 let fieldOfViewSetLength = 0;
 let len: number;
 
 /** OBSERVER VARIABLES */
-var mSensor = <SensorObjectCruncher[]>[];
+let mSensor = <SensorObjectCruncher[]>[];
 let sensor = emptySensor;
 
 // Handles Incomming Messages to sat-cruncher from main thread
@@ -90,6 +90,11 @@ try {
   if (!process) throw e;
 }
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSONAR
+  let satData;
+  let i;
+  let extraData = [];
+  let satrec: SatCacheObject;
+
   switch (m.data.typ) {
     case 'offset':
       staticOffset = m.data.staticOffset;
@@ -101,12 +106,10 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       divisor = 1;
       return;
     case 'satdata':
-      var satData = JSON.parse(m.data.dat);
+      satData = JSON.parse(m.data.dat);
       len = satData.length;
-      var i = 0;
+      i = 0;
 
-      var extraData = [];
-      var satrec: SatCacheObject;
       while (i < len) {
         const extraRec = {
           lowAlt: <boolean>null,
@@ -253,6 +256,8 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
           }
         }
         isMultiSensor = false;
+      } else {
+        // Intentionally left blank
       }
       break;
     case 'isShowSatOverfly':
@@ -363,21 +368,24 @@ export const updateSatCache = (now: Date, j: number, gmst: number, gmstNext: num
       i = updateMarkerFov(i, gmst);
     } else if (satCache[i].marker && (isShowSatOverfly || isResetSatOverfly)) {
       i = updateSatOverfly(i, gmst);
+    } else {
+      // Intentionally left blank
     }
 
-    if (isContinue) continue;
+    if (!isContinue) {
+      isResetSatOverfly = false;
 
-    isResetSatOverfly = false;
-
-    // Markers always come last, if we are at this part of the code
-    // then it is time to reset every non-active marker back to 0,0,0
-    // if this isnt a marker then they must be turned off
-    if (satCache[i].marker) {
-      resetInactiveMarkers(i);
-      break;
+      // Markers always come last, if we are at this part of the code
+      // then it is time to reset every non-active marker back to 0,0,0
+      // if this isnt a marker then they must be turned off
+      if (satCache[i].marker) {
+        resetInactiveMarkers(i);
+        break;
+      }
     }
   }
 };
+/* istanbul ignore next */
 export const updateRadarData = (i: number): boolean => {
   if (satCache[i].skip) return false;
 
@@ -447,7 +455,6 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
             pos = satellite.geodeticToEcf(satSelPosEarth);
 
             if (i === len) {
-              console.debug('Ran out of Markers');
               continue; // Only get so many markers.
             }
             satCache[i].active = true;
@@ -469,7 +476,6 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
             pos = satellite.geodeticToEcf(satSelPosEarth);
 
             if (i === len) {
-              console.debug('Ran out of Markers');
               continue; // Only get so many markers.
             }
             satCache[i].active = true;
@@ -491,24 +497,22 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
 export const updateStar = (i: number, now: Date): void => {
   // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
   // WARNING: 180 and 0 really matter...unclear why
-  let starPosition = SunCalc.getStarPosition(now, 180, 0, satCache[i]);
-  let pos = lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, STAR_DISTANCE, 0, 0, 0);
+  const starPosition = SunCalc.getStarPosition(now, 180, 0, satCache[i]);
+  const pos = lookAnglesToEcf(starPosition.azimuth * RAD2DEG, starPosition.altitude * RAD2DEG, STAR_DISTANCE, 0, 0, 0);
 
   // Reduce Random Jitter by Requiring New Positions to be Similar to Old
   // THIS MIGHT BE A HORRIBLE
-  if (satPos[i * 3] == 0 || (satPos[i * 3] - pos.x < 0.1 && satPos[i * 3] - pos.x > -0.1)) satPos[i * 3] = pos.x;
-  if (satPos[i * 3 + 1] == 0 || (satPos[i * 3 + 1] - pos.y < 0.1 && satPos[i * 3 + 1] - pos.y > -0.1)) satPos[i * 3 + 1] = pos.y;
-  if (satPos[i * 3 + 2] == 0 || (satPos[i * 3 + 2] - pos.z < 0.1 && satPos[i * 3 + 2] - pos.z > -0.1)) satPos[i * 3 + 2] = pos.z;
+  if (satPos[i * 3] === 0 || (satPos[i * 3] - pos.x < 0.1 && satPos[i * 3] - pos.x > -0.1)) satPos[i * 3] = pos.x;
+  if (satPos[i * 3 + 1] === 0 || (satPos[i * 3 + 1] - pos.y < 0.1 && satPos[i * 3 + 1] - pos.y > -0.1)) satPos[i * 3 + 1] = pos.y;
+  if (satPos[i * 3 + 2] === 0 || (satPos[i * 3 + 2] - pos.z < 0.1 && satPos[i * 3 + 2] - pos.z > -0.1)) satPos[i * 3 + 2] = pos.z;
 };
 export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: number): boolean => {
   if (!satCache[i].active) return false; // Skip inactive missiles
-  let x: number, y: number, z: number;
   let cosLat: number, sinLat: number, cosLon: number, sinLon: number;
-  let curMissivarTime, positionEcf;
-  let tLen, t;
 
-  tLen = satCache[i].altList.length;
-  for (t = 0; t < tLen; t++) {
+  const tLen = satCache[i].altList.length;
+  let curMissivarTime: number;
+  for (let t = 0; t < tLen; t++) {
     if (satCache[i].startTime * 1 + t * 1000 >= now.getTime()) {
       curMissivarTime = t;
       break;
@@ -522,9 +526,9 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: numb
   cosLon = Math.cos(satCache[i].lonList[satCache[i].lastTime + 1] * DEG2RAD + gmstNext);
   sinLon = Math.sin(satCache[i].lonList[satCache[i].lastTime + 1] * DEG2RAD + gmstNext);
 
-  if (satCache[i].lastTime == 0) {
+  if (satCache[i].lastTime === 0) {
     resetVelocity(satVel, i);
-  } else if (satVel[i * 3] == 0 && satVel[i * 3 + 1] == 0 && satVel[i * 3 + 2] == 0) {
+  } else if (satVel[i * 3] === 0 && satVel[i * 3 + 1] === 0 && satVel[i * 3 + 2] === 0) {
     satVel[i * 3] = (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * cosLat * cosLon - satPos[i * 3];
     satVel[i * 3 + 1] = (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * cosLat * sinLon - satPos[i * 3 + 1];
     satVel[i * 3 + 2] = (6371 + satCache[i].altList[satCache[i].lastTime + 1]) * sinLat - satPos[i * 3 + 2];
@@ -548,13 +552,14 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: numb
 
   satCache[i].lastTime = curMissivarTime;
 
-  x = satPos[i * 3];
-  y = satPos[i * 3 + 1];
-  z = satPos[i * 3 + 2];
+  const x = satPos[i * 3];
+  const y = satPos[i * 3 + 1];
+  const z = satPos[i * 3 + 2];
 
-  positionEcf = satellite.eciToEcf({ x: x, y: y, z: z }, gmst);
-  if (satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst).height <= 150 && satCache[i].missile === false) {
-    console.error(i);
+  const positionEcf = satellite.eciToEcf({ x, y, z }, gmst);
+  if (satellite.eciToGeodetic({ x, y, z }, gmst).height <= 150 && satCache[i].missile === false) {
+    // DEBUG:
+    // console.error(i);
     satCache[i].skip = true;
   }
   satInView[i] = isInFov(satellite.ecfToLookAngles(sensor.observerGd, positionEcf), sensor);
@@ -570,14 +575,13 @@ export const updateLandObject = (i: number, gmst: number): void => {
   satPos[i * 3 + 2] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + satCache[i].alt) * sinLat;
 };
 export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number, isSunExclusion: boolean): boolean => { // NOSONAR
-  let pv: { position: satellite.EciVec3<number>; velocity: satellite.EciVec3<number> };
   let semiDiamEarth, semiDiamSun, theta;
   let positionEcf, lookangles;
 
   // Skip reentries
   if (satCache[i].skip) return false;
   const m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-  pv = satellite.sgp4(satCache[i], m) as { position: satellite.EciVec3<number>; velocity: satellite.EciVec3<number> };
+  const pv = satellite.sgp4(satCache[i], m) as { position: satellite.EciVec3<number>; velocity: satellite.EciVec3<number> };
 
   try {
     satPos[i * 3] = pv.position.x;
@@ -676,7 +680,7 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
     if (isMultiSensor) {
       for (let s = 0; s < mSensor.length; s++) {
         // Skip satellites in the sun if you are an optical sensor
-        if (!(sensor.type == SpaceObjectType.OPTICAL && satInSun[i] == 0)) {
+        if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === 0)) {
           if (satInView[i]) break;
           sensor = mSensor[s];
           // satellite.js requires this format - DONT use lon,lat,alt
@@ -695,7 +699,7 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
         }
       }
     } else {
-      if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] == 0)) {
+      if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === 0)) {
         satInView[i] = isInFov(lookangles, sensor);
       }
     }
@@ -727,7 +731,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
   for (let s = 0; s < mSensor.length + 1; s++) {
     sensorMarkerArray.push(i);
     // We intentionally go past the last sensor so we can record the last marker's id
-    if (s == mSensor.length) break;
+    if (s === mSensor.length) break;
     sensor = mSensor[s];
     // satellite.js requires this format - DONT use lon,lat,alt
     sensor.observerGd = createLatLonHei(sensor.lat * DEG2RAD, sensor.lon * DEG2RAD, sensor.alt);
@@ -762,7 +766,8 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
               resetVelocity(satVel, i);
               i++;
             } catch (e) {
-              console.log(e);
+              // DEBUG:
+              // console.log(e);
             }
           }
         }
@@ -777,7 +782,8 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
             try {
               satCache[i].active = true;
             } catch (e) {
-              console.log(e);
+              // DEBUG:
+              // console.log(e);
             }
             satPos = setPosition(satPos, i, pos);
             resetVelocity(satVel, i);
@@ -854,7 +860,6 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           }
           pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsmaxel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
           if (i === len) {
-            console.debug('No More Markers');
             break;
           }
           satCache[i].active = true;
@@ -891,7 +896,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           }
           pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel2, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
           if (i === len) {
-            console.debug('No More Markers');
+            
             break;
           }
           satCache[i].active = true;
@@ -926,7 +931,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
           pos = satellite.ecfToEci(lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
           if (i === len) {
-            console.debug('No More Markers');
+            
             break;
           }
           satCache[i].active = true;
@@ -961,7 +966,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
             pos = satellite.ecfToEci(lookAnglesToEcf(az, el, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
             if (i === len) {
-              console.debug('No More Markers');
+              
               break;
             }
             satCache[i].active = true;
@@ -994,7 +999,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         }
         pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
         if (i === len) {
-          console.debug('No More Markers');
+          
           break;
         }
         satCache[i].active = true;
@@ -1021,7 +1026,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         }
         pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
         if (i === len) {
-          console.debug('No More Markers');
+          
           break;
         }
         satCache[i].active = true;
@@ -1049,7 +1054,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           }
           pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
           if (i === len) {
-            console.debug('No More Markers');
+            
             break;
           }
           satCache[i].active = true;
@@ -1065,7 +1070,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
           pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
           if (i === len) {
-            console.debug('No More Markers');
+            
             break;
           }
           satCache[i].active = true;
@@ -1079,7 +1084,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
           pos = satellite.ecfToEci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.latitude, sensor.observerGd.longitude, sensor.observerGd.height), gmst);
           if (i === len) {
-            console.debug('No More Markers');
+            
             break;
           }
           satCache[i].active = true;
@@ -1095,7 +1100,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
   return i;
 };
 export const sendDataToSatSet = () => {
-  let postMessageArray = <PositionCruncherOutgoingMsg>{
+  const postMessageArray = <PositionCruncherOutgoingMsg>{
     satPos: satPos,
     satVel: satVel,
   };

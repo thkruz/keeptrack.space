@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -32,9 +32,11 @@
     "start:embed": "five-server --entry-file=embeded/index.html",
     "test": "jest --coverage",
     "test:unit": "jest --coverage",
+    "test:watch": "jest --coverage --watchAll",
     "version:major": "npm version major && npm run changelog",
     "version:minor": "npm version minor && npm run changelog",
-    "version:patch": "npm version patch && npm run changelog"
+    "version:patch": "npm version patch && npm run changelog",
+    "prepare": "husky install"
   },
   "jest": {
     "testEnvironment": "jsdom",
@@ -107,23 +109,6 @@
   "directories": {
     "app": "src"
   },
-  "prettier": {
-    "printWidth": 180,
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "quoteProps": "consistent",
-    "trailingComma": "es5",
-    "bracketSpacing": true,
-    "arrowParens": "always",
-    "requirePragma": false,
-    "insertPragma": false,
-    "proseWrap": "never",
-    "htmlWhitespaceSensitivity": "ignore",
-    "endOfLine": "lf",
-    "embeddedLanguageFormatting": "off"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thkruz/keeptrack.space"
@@ -158,9 +143,11 @@
     "download-file": "^0.1.5",
     "eslint": "^8.5.0",
     "eslint-plugin-jest": "^25.3.0",
+    "five-server": "^0.1.3",
     "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
     "http-server": "^14.0.0",
+    "husky": "^7.0.4",
     "ignore-loader": "^0.1.2",
     "imports-loader": "^3.0.0",
     "jest": "^27.3.1",

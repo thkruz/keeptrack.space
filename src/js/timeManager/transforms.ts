@@ -3,8 +3,8 @@ import { dateFormat } from '../lib/external/dateFormat';
 
 export const getDayOfYear = (date: Date): number => {
   date = date || new Date();
-  const _isLeapYear = (date: Date) => {
-    const year = date.getFullYear();
+  const _isLeapYear = (dateIn: Date) => {
+    const year = dateIn.getUTCFullYear();
     if ((year & 3) !== 0) return false;
     return year % 100 !== 0 || year % 400 === 0;
   };
@@ -20,11 +20,13 @@ export const getDayOfYear = (date: Date): number => {
 export const jday = (year?: number, mon?: number, day?: number, hr?: number, minute?: number, sec?: number) => {
   if (!year) {
     const now = new Date();
-    const jDayStart = new Date(now.getFullYear(), 0, 0);
+    const jDayStart = new Date(now.getUTCFullYear(), 0, 0);
     const jDayDiff = now.getDate() - jDayStart.getDate();
     return Math.floor(jDayDiff / MILLISECONDS_PER_DAY);
   } else {
-    return 367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0;
+    return (
+      367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0
+    );
   }
 };
 

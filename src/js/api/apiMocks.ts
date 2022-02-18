@@ -4,6 +4,9 @@ import { SatObject, SensorObject } from './keepTrackTypes';
 import { SpaceObjectType } from './SpaceObjectType';
 declare const jest: any;
 
+const fakeTimeObj = new Date(2022, 0, 1);
+fakeTimeObj.setUTCHours(0, 0, 0, 0);
+
 export const defaultSat: SatObject = {
   id: 1,
   active: true,
@@ -235,7 +238,7 @@ export const keepTrackApiStubs = {
           godrays: {
             frameBuffer: {},
           },
-          now: new Date(2022, 1, 1),
+          now: fakeTimeObj,
         },
         earth: {
           init: jest.fn(),
@@ -481,6 +484,7 @@ export const keepTrackApiStubs = {
       queryStr: 'search=25544&intldes=1998-A&sat=25544&misl=0,0,0&date=1234567&rate=1&hires=true',
       cosparIndex: { '1998-AB': 5 },
       numSats: 1,
+      onCruncherReady: jest.fn(),
       missileSats: 10000,
       search: {
         year: () => [defaultSat],
@@ -534,18 +538,18 @@ export const keepTrackApiStubs = {
     timeManager: {
       propOffset: 0,
       getPropOffset: () => 0,
-      propTimeVar: new Date(2020, 0, 1),
+      propTimeVar: fakeTimeObj,
       propRate: 0,
       selectedDate: 0,
       getDayOfYear: () => 0,
       updatePropTime: jest.fn(),
       jday: () => 0,
-      dateFromDay: () => new Date(2020, 0, 1),
+      dateFromDay: () => fakeTimeObj,
       setNow: jest.fn(),
       changePropRate: jest.fn(),
       changeStaticOffset: jest.fn(),
-      calculateSimulationTime: () => new Date(2020, 0, 1),
-      getOffsetTimeObj: () => new Date(2020, 0, 1),
+      calculateSimulationTime: () => fakeTimeObj,
+      getOffsetTimeObj: () => fakeTimeObj,
       synchronize: jest.fn(),
     },
     uiManager: {
@@ -562,6 +566,7 @@ export const keepTrackApiStubs = {
       clearRMBSubMenu: jest.fn(),
       updateURL: jest.fn(),
       keyHandler: jest.fn(),
+      reloadLastSensor: jest.fn(),
       getsensorinfo: jest.fn(),
       hideLoadingScreen: jest.fn(),
       legendHoverMenuClick: jest.fn(),

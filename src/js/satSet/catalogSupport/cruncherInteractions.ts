@@ -27,7 +27,7 @@ export const cruncherExtraData = (m: SatCruncherMessage) => {
       satSet.satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
       satSet.satData[satCrunchIndex].velocity = { total: 0, x: 0, y: 0, z: 0 };
     } catch (error) {
-      console.debug(satCrunchIndex);
+      // Intentionally left blank
     }
   }
 
@@ -133,11 +133,7 @@ export const getVariableActions = (params: string[]) => { // NOSONAR
         var subVal = val.split(',');
         $('#ms-type').val(subVal[0].toString());
         $('#ms-attacker').val(subVal[1].toString());
-        // $('#ms-lat-lau').val() * 1;
-        // ('#ms-lon-lau').val() * 1;
         $('#ms-target').val(subVal[2].toString());
-        // $('#ms-lat').val() * 1;
-        // $('#ms-lon').val() * 1;
         $('#missile').trigger('submit');
         break;
       case 'date':

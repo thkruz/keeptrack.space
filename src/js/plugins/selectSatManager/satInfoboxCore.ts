@@ -213,7 +213,6 @@ export const nearObjectsLinkClick = (): void => {
 };
 export const nearOrbitsLink = () => {
   const { satSet, searchBox, satellite } = keepTrackApi.programs;
-  // searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(objectManager.selectedSat)));
   const searchStr = searchBox.doArraySearch(satellite.findNearbyObjectsByOrbit(satSet.getSat(keepTrackApi.programs.objectManager.selectedSat)));
   searchBox.doSearch(searchStr, false);
 };
@@ -364,7 +363,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
         closeButton: false,
       });
     } catch (error) {
-      // console.warn(error);
+      // Intentionally left blank
     }
 
     $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
@@ -384,7 +383,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     // TODO: Error checking on Iframe
     let now: Date | number | string = new Date();
     const jday = keepTrackApi.programs.timeManager.getDayOfYear(now);
-    now = now.getFullYear();
+    now = now.getUTCFullYear();
     now = now.toString().substr(2, 2);
     let daysold;
     if (sat.TLE1.substr(18, 2) === now) {

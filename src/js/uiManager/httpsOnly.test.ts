@@ -55,3 +55,38 @@ describe('httpsOnly.updateSettingsManager', () => {
     expect(settingsManager.geolocation).toMatchSnapshot();
   });
 });
+
+describe('httpsOnly.updateSensorPosition', () => {
+  it('should not throw an error', () => {
+    const result = httpsOnly.updateSensorPosition({
+      coords: {
+        latitude: 41,
+        longitude: -71,
+        altitude: 1,
+      },
+    });
+    expect(() => result).not.toThrow();
+  });
+});
+
+describe('httpsOnly.useCurrentGeolocationAsSensor', () => {
+  it('should not throw an error', () => {
+    expect(() => httpsOnly.useCurrentGeolocationAsSensor()).not.toThrow();
+  });
+  it('should try to get geolocation if configured', () => {
+    settingsManager.geolocationUsed = false;
+    settingsManager.isMobileModeEnabled = true;
+    delete window.location;
+    window.location = <any>{
+      protocol: 'https:',
+    };
+    delete window.navigator;
+    window.navigator = <any>{
+      geolocation: {
+        getCurrentPosition: jest.fn(),
+      },
+    };
+    httpsOnly.useCurrentGeolocationAsSensor();
+    expect(window.navigator.geolocation.getCurrentPosition).toHaveBeenCalled();
+  });
+});

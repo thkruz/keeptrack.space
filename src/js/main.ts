@@ -6,7 +6,7 @@
  * interaction with the application.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  * @Copyright (C) 2020 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *

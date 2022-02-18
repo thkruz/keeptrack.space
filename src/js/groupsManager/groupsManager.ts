@@ -1,6 +1,6 @@
 /*! /////////////////////////////////////////////////////////////////////////////
 
-Copyright (C) 2016-2021 Theodore Kruczek
+Copyright (C) 2016-2022 Theodore Kruczek
 Copyright (C) 2020 Heather Kruczek
 
 This program is free software: you can redistribute it and/or modify it under

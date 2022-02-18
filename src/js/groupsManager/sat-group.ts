@@ -104,7 +104,12 @@ export class SatGroup {
       this.sats.forEach((sat) => {
         if (sat.missile) {
           const missile = <MissileObject>(<unknown>sat);
-          orbitManager.updateOrbitBuffer(missile.id, null, null, null, true, missile.latList, missile.lonList, missile.altList, missile.startTime);
+          orbitManager.updateOrbitBuffer(missile.id, null, null, null, {
+            missile: true,
+            latList: missile.latList,
+            lonList: missile.lonList,
+            altList: missile.altList,
+          });
         } else {
           orbitManager.updateOrbitBuffer(sat.satId);
         }

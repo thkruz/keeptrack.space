@@ -304,7 +304,7 @@ export const uiManagerInit = (): void => {
   });
 };
 
-const uiManagerFinal = () => {
+export const uiManagerFinal = () => {
   const { satSet } = keepTrackApi.programs;
   getUnique(satSet.satData.filter((obj: SatObject) => obj.bus).map((obj) => obj.bus))
     // Sort using lower case

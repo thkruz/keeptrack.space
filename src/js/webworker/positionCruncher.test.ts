@@ -104,6 +104,17 @@ describe('positionCruncher.onmessage', () => {
     const worker = new MockWorker();
     message.data.multiSensor = true;
     message.data.sensor = [defaultSensor];
+    message.data.typ = 'sensor';
+    expect(() => worker.postMessage(message)).not.toThrow();
+  });
+
+  it('should handle m.data.resetObserverGd', () => {
+    const worker = new MockWorker();
+    message.data.multiSensor = false;
+    message.data.sensor = [defaultSensor];
+    message.data.setlatlong = true;
+    message.data.resetObserverGd = true;
+    message.data.typ = 'sensor';
     expect(() => worker.postMessage(message)).not.toThrow();
   });
 
@@ -115,6 +126,13 @@ describe('positionCruncher.onmessage', () => {
 
     message.data.sensor = [defaultSensor];
     message.data.typ = 'sensor';
+    expect(() => worker.postMessage(message)).not.toThrow();
+  });
+
+  it('should handle m.data.newMissile', () => {
+    const worker = new MockWorker();
+    message.data.id = 0;
+    message.data.typ = 'newMissile';
     expect(() => worker.postMessage(message)).not.toThrow();
   });
 

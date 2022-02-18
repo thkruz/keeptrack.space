@@ -9,7 +9,7 @@ import $ from 'jquery';
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2021 Theodore Kruczek
+ * @Copyright (C) 2016-2022 Theodore Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software

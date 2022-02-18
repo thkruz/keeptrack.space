@@ -7,8 +7,11 @@ import { KeepTrackPrograms, SatObject, SunObject, ZoomValue } from '../api/keepT
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
 import * as satMath from './satMath';
+import { satellite } from './satMath';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
+const dateNow = new Date(2022, 0, 1);
+dateNow.setUTCHours(0, 0, 0, 0);
 
 // @ponicode
 describe('satMath.currentEpoch', () => {
@@ -43,6 +46,52 @@ describe('satMath.currentEpoch', () => {
     let inst: any = new Date('');
     let result: any = satMath.currentEpoch(inst);
     expect(result).toMatchSnapshot();
+  });
+});
+
+describe('satMath.getTearData', () => {
+  const realSgp4 = satellite.sgp4;
+  beforeAll(() => {
+    satellite.sgp4 = () =>
+      <any>{
+        position: {
+          x: 6000,
+          y: 6000,
+          z: 6000,
+        },
+      };
+  });
+  it('should handle isInFOV', () => {
+    satellite.isRiseSetLookangles = false;
+    let result: any = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+  });
+  it('should handle isInFOV and isRiseSetLookangles', () => {
+    satellite.isRiseSetLookangles = true;
+    let result: any = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+  });
+  afterAll(() => {
+    satellite.sgp4 = realSgp4;
+  });
+
+  it('should handle isInFOV and isRiseSetLookangles not previously in FOV but will be', () => {
+    satellite.isRiseSetLookangles = true;
+    satellite.checkIsInView = jest
+      .fn()
+      .mockImplementationOnce(() => true)
+      .mockImplementationOnce(() => false);
+    let result: any = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+    satellite.checkIsInView = jest
+      .fn()
+      .mockImplementationOnce(() => true)
+      .mockImplementationOnce(() => true);
+    result = satMath.getTearData(dateNow, defaultSat.satrec, [defaultSensor], true);
+    expect(result).toMatchSnapshot();
+  });
+  afterAll(() => {
+    satellite.sgp4 = realSgp4;
   });
 });
 
@@ -955,7 +1004,7 @@ describe('satMath.calculateVisMag', () => {
 
 describe('satMath.altitudeCheck', () => {
   test('0', () => {
-    satMath.altitudeCheck(defaultSat.TLE1, defaultSat.TLE2, new Date(2020, 0, 1));
+    satMath.altitudeCheck(defaultSat.TLE1, defaultSat.TLE2, dateNow);
   });
 });
 
@@ -1020,16 +1069,80 @@ describe('satMath.getlookangles', () => {
     let result: any = satMath.getlookangles(defaultSat);
     expect(result).toMatchSnapshot();
   });
+
+  test('2', () => {
+    document.body.innerHTML = `<table id="looks"></table>`;
+    keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
+    jest.spyOn(satellite, 'getTearData').mockImplementationOnce(() => ({
+      time: dateNow.toISOString(),
+      rng: 1000,
+      az: 50,
+      el: 30,
+      name: 'COD',
+    }));
+    let result: any = satMath.getlookangles(defaultSat);
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('satMath.findClosestApproachTime', () => {
+  test('0', () => {
+    let result: any = () => satMath.findClosestApproachTime(defaultSat, defaultSat, 5);
+    expect(() => result()).not.toThrow;
+  });
+});
+
+describe('satMath.createTle', () => {
+  test('0', () => {
+    let result: any = satMath.createTle({
+      sat: defaultSat,
+      inc: '10.01',
+      meanmo: '15.15',
+      rasc: '10.5',
+      argPe: '1.0',
+      meana: '10.5',
+      ecen: '0.001',
+      epochyr: '20',
+      epochday: '123',
+      intl: '1998-01A',
+      scc: '25544',
+    });
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('satMath.populateMultiSiteTable', () => {
+  test('0', () => {
+    document.body.innerHTML = `<table id="looksmultisite"></table>`;
+    const mSiteArray = [
+      {
+        time: dateNow.toISOString(),
+        rng: 1000,
+        az: 50,
+        el: 30,
+        name: 'COD',
+      },
+      {
+        time: dateNow.toISOString(),
+        rng: 1000,
+        az: 50,
+        el: 30,
+        name: 'COD',
+      },
+    ];
+    let result: any = satMath.populateMultiSiteTable(mSiteArray);
+    expect(result).toMatchSnapshot();
+  });
 });
 
 // @ponicode
 describe('satMath.propagate', () => {
   test('0', () => {
-    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor]);
+    satMath.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor]);
   });
 
   test('1', () => {
-    satMath.getTearData(new Date(2020, 0, 1), satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], true);
+    satMath.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], true);
   });
 });
 
@@ -1051,9 +1164,9 @@ describe.skip('satMath.findCloseObjects', () => {
 });
 
 // @ponicode
-describe.skip('satMath.getOrbitByLatLon', () => {
+describe('satMath.getOrbitByLatLon', () => {
   test('0', () => {
-    let result: any = getOrbitByLatLon(defaultSat, 0, 0, 'N', new Date(), 1000, 0);
+    let result: any = getOrbitByLatLon(defaultSat, 0, 0, 'N', dateNow, 1000, 0);
     expect(result).toMatchSnapshot();
   });
 });
@@ -1083,14 +1196,14 @@ describe('satMath.findBestPass', () => {
 // @ponicode
 describe('satMath.eci2Rae', () => {
   test('0', () => {
-    satMath.eci2Rae(new Date(2020, 0, 1), [10000, 10000, 10000], defaultSensor);
+    satMath.eci2Rae(dateNow, [10000, 10000, 10000], defaultSensor);
   });
 });
 
 // @ponicode
 describe('satMath.getEci', () => {
   test('0', () => {
-    satMath.getEci(defaultSat, new Date(2020, 0, 1));
+    satMath.getEci(defaultSat, dateNow);
   });
 });
 
@@ -1114,7 +1227,7 @@ describe('satMath.updateDopsTable', () => {
 // @ponicode
 describe('satMath.getDops', () => {
   test('0', () => {
-    let result: any = satMath.getDops(0, 0, 10, new Date(2020, 0, 1));
+    let result: any = satMath.getDops(0, 0, 10, dateNow);
     expect(result).toMatchSnapshot();
   });
 });
@@ -1194,11 +1307,11 @@ describe('satMath.eci2ll', () => {
 // @ponicode
 describe('satMath.getLlaTimeView', () => {
   test('0', () => {
-    satMath.getLlaTimeView(new Date(2020, 0, 1), defaultSat);
+    satMath.getLlaTimeView(dateNow, defaultSat);
   });
 
   test('1', () => {
-    satMath.getLlaTimeView(new Date(2020, 0, 2), defaultSat);
+    satMath.getLlaTimeView(new Date(2022, 0, 2), defaultSat);
   });
 });
 

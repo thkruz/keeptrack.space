@@ -1,5 +1,29 @@
 @charset "UTF-8";
 :root {
+  --thumbSize: var(--controlOptionSize);
+  --thumbShadow: 0 3px 5px rgba(0, 0, 0, 0.14), 0 1px 9px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --thumbShadowHover: 0 6px 10px rgba(0, 0, 0, 0.14), 0 1px 18px rgba(0, 0, 0, 0.12), 0 3px 5px rgba(0, 0, 0, 0.2);
+  --thumbShadowActive: inset 0 0 0 4px var(--primary), 0 1px 3px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.2);
+  --trackHeight: 3px;
+  --trackCursor: pointer;
+  --step: 1;
+  --min: 0;
+  --max: 100;
+  --ticksThickness: 1px;
+  --ticksHeight: 3px;
+  --ticksColor: var(--primaryDark);
+
+  --progressPadding: 2px 0 0 2px;
+  --progressRadius: 10px 10px 10px 10px;
+  --progressHeight: 14px;
+  --progressWidth: calc(100% - 4px);
+
+  --padding: 0.5rem;
+  --paddingLeft: 0.5rem;
+  --paddingRight: 0.5rem;
+  --paddingTop: 0.25rem;
+  --paddingBottom: 0.25rem;
+
   --disabledControlOpacity: 0.4;
   --disabledControlCursor: not-allowed;
   --disabledOpacity: 0.4;
@@ -1243,6 +1267,8 @@ label {
 */
 .rux-button-group {
   display: flex;
+  margin-left: auto;
+  align-self: flex-end;
 }
 
 .rux-button-group .rux-button:not(:last-child) {
@@ -1485,10 +1511,6 @@ label {
   border-radius: 2px;
 }
 
-.rux-checkbox input[type='checkbox'] + label::before {
-  border-radius: 2px;
-}
-
 .rux-checkbox input[type='checkbox']:checked + label::before {
   background-color: var(--primary);
   border-color: var(--controlSelectedOutlineBorderColor);
@@ -1509,9 +1531,6 @@ label {
   top: 5px;
   display: flex;
   content: '';
-}
-
-.rux-checkbox input[type='checkbox']:checked + label::after {
   height: 6px;
   width: 12px;
   left: 3px;
@@ -1627,14 +1646,6 @@ label {
 ** 	==========================================================================
 */
 /* 	REQUIRED CLASSES */
-:root {
-  --padding: 0.5rem;
-  --paddingLeft: 0.5rem;
-  --paddingRight: 0.5rem;
-  --paddingTop: 0.25rem;
-  --paddingBottom: 0.25rem;
-}
-
 .rux-form-field {
   display: flex;
   flex-direction: row;
@@ -1918,9 +1929,6 @@ label {
   width: var(--controlOptionSize);
   margin: 0 0.625rem 0 0;
   border: 1px solid var(--controlBorderColor);
-}
-
-.rux-radio-button input[type='radio'] + label::before {
   border-radius: 100%;
   background-color: transparent;
 }
@@ -1944,9 +1952,6 @@ label {
   top: 5px;
   display: flex;
   content: '';
-}
-
-.rux-radio-button input[type='radio']:checked + label::after {
   left: 5px;
   height: 8px;
   width: 8px;
@@ -2470,11 +2475,6 @@ i.rux-icon {
   color: var(--defaultText);
 }
 
-.rux-button-group {
-  margin-left: auto;
-  align-self: flex-end;
-}
-
 .rux-modal__message {
   margin: 0.5rem 1.875rem 2.5rem 1.875rem;
 }
@@ -2817,13 +2817,6 @@ i.rux-icon {
 **  - The whole progress bar needs a rewrite. Better native elements and CSS properties should be used
 **  -
 */
-:root {
-  --progressPadding: 2px 0 0 2px;
-  --progressRadius: 10px 10px 10px 10px;
-  --progressHeight: 14px;
-  --progressWidth: calc(100% - 4px);
-}
-
 .rux-progress {
   display: flex;
   position: relative;
@@ -3113,21 +3106,6 @@ i.rux-icon {
     the slider/range component these minimize the need to add repeat values
     between the three
   */
-:root {
-  --thumbSize: var(--controlOptionSize);
-  --thumbShadow: 0 3px 5px rgba(0, 0, 0, 0.14), 0 1px 9px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.2);
-  --thumbShadowHover: 0 6px 10px rgba(0, 0, 0, 0.14), 0 1px 18px rgba(0, 0, 0, 0.12), 0 3px 5px rgba(0, 0, 0, 0.2);
-  --thumbShadowActive: inset 0 0 0 4px var(--primary), 0 1px 3px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.2);
-  --trackHeight: 3px;
-  --trackCursor: pointer;
-  --step: 1;
-  --min: 0;
-  --max: 100;
-  --ticksThickness: 1px;
-  --ticksHeight: 3px;
-  --ticksColor: var(--primaryDark);
-}
-
 .rux-slider {
   display: flex;
   flex-direction: column;
@@ -3281,13 +3259,6 @@ input[type='range']:focus {
   border-color: var(--sliderHoverThumbBorderColor);
 }
 
-.rux-range:disabled::-webkit-slider-runnable-track {
-  opacity: 0.4;
-  opacity: var(--disabledOpacity);
-  cursor: not-allowed;
-  cursor: var(--disabledCursor);
-}
-
 .rux-range:disabled::-webkit-slider-thumb {
   cursor: not-allowed;
   cursor: var(--disabledCursor);
@@ -3298,18 +3269,6 @@ input[type='range']:focus {
   background: radial-gradient(circle, white 40%, var(--primaryDark) 40%);
   background-color: var(--inputBackground);
   -webkit-radial-gradient: radial-gradient(circle, white 40%, var(--primaryDark) 40%);
-  box-shadow: inset 0 0 0 4px var(--primary), 0 1px 3px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.2);
-  box-shadow: var(--thumbShadowActive);
-}
-
-.rux-range:not(:disabled)::-webkit-slider-thumb:focus,
-.rux-range:not(:disabled)::-webkit-slider-thumb:hover:not(:active) {
-  background-color: var(--sliderHoverThumbBackgroundColor);
-}
-
-.rux-range:not(:disabled)::-webkit-slider-thumb:active {
-  border-color: var(--sliderSelectedThumbBorderColor);
-  background-color: var(--inputBackground);
   box-shadow: inset 0 0 0 4px var(--primary), 0 1px 3px rgba(0, 0, 0, 0.14), 0 1px 4px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.2);
   box-shadow: var(--thumbShadowActive);
 }
@@ -3670,10 +3629,6 @@ input[type='range']::-moz-focus-outer {
 
 .rux-tabs a:hover:not([disabled]) {
   color: var(--tabHoverTextColor);
-}
-
-.rux-tabs .rux-tab {
-  border-bottom: 5px solid var(--tabBorderColor);
 }
 
 .rux-tabs .rux-tab {

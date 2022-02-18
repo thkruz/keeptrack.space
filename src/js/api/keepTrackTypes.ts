@@ -1,7 +1,6 @@
 import { mobileManager } from '@app/js/uiManager/mobileManager';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import * as glm from 'gl-matrix';
-import { mat4 } from 'gl-matrix';
 import { SatRec } from 'satellite.js';
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
@@ -171,6 +170,13 @@ export interface SatShader {
   maxSize: number;
 }
 
+export interface MissileParams {
+  missile?: boolean;
+  latList?: number[];
+  lonList?: number[];
+  altList?: number[];
+}
+
 export interface OrbitManager {
   shader: any;
   init();
@@ -185,17 +191,7 @@ export interface OrbitManager {
   draw(pMatrix: any, camMatrix: any, curBuffer: any): void;
   clearSelectOrbit(): void;
   setSelectOrbit(selectedSat: number): void;
-  updateOrbitBuffer(
-    satId: number,
-    force?: boolean,
-    TLE1?: string,
-    TLE2?: string,
-    missile?: boolean,
-    latList?: number[],
-    lonList?: number[],
-    altList?: number[],
-    startTime?: number
-  ): void;
+  updateOrbitBuffer(satId: number, force?: boolean, TLE1?: string, TLE2?: string, missileParams?: MissileParams): void;
   addInViewOrbit(i: number): void;
   setHoverOrbit(mouseSat: any): void;
   clearHoverOrbit(): void;
@@ -662,6 +658,9 @@ export interface UiInputInterface {
   openRmbMenu: any;
   rmbMenuActions: any;
   getRayOrigin: any;
+  canvasMouseMove: any;
+  canvasTouchMove: any;
+  canvasTouchEnd: any;
 }
 
 export interface Camera {
@@ -1153,6 +1152,8 @@ export interface SatMath {
   getOrbitByLatLon(at: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number): [string, string];
   getRae(now: Date, satrec: SatRec, sensor: SensorObject);
   getSunTimes: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => void;
+  getTearData: any;
+  populateMultiSiteTable: (multiSiteArray: TearrData[]) => void;
   getTEARR: (sat?: SatObject, sensors?: SensorObject[], propTime?: Date) => any;
   gstime(j: number);
   isRiseSetLookangles: any;
@@ -1292,7 +1293,7 @@ export interface DrawManager {
   gl: WebGL2RenderingContext;
   isNeedPostProcessing: boolean;
   isRotationEvent: boolean;
-  pMatrix: mat4;
+  pMatrix: glm.mat4;
   postProcessingManager: any;
   isPostProcessingResizeNeeded: boolean;
   isUpdateTimeThrottle: boolean;

@@ -34,9 +34,9 @@ const defaults = {
   latLimit: 90,
 };
 
-export const rad = (deg: number) => (deg * Math.PI) / 180;
-export const tan = (deg: number) => Math.tan(rad(deg));
-export const deg = (rad: number) => (rad * 180) / Math.PI;
+export const rad = (degIn: number) => (degIn * Math.PI) / 180;
+export const tan = (degIn: number) => Math.tan(rad(degIn));
+export const deg = (radIn: number) => (radIn * 180) / Math.PI;
 export const init = (): void => {
   const mapManager: MapManager = <MapManager>(<unknown>{
     options,
@@ -79,7 +79,6 @@ export const init = (): void => {
 export const options = (opt: any) => ({ ...defaults, ...(opt || {}) });
 export const braun = (point: any, opt: { meridian: number; latLimit: number }) => {
   point = check(point);
-  // opt = options(opt);
   if (point.wgs) {
     point = addMeridian(point, opt.meridian);
     return {

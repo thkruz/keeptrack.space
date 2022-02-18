@@ -75,4 +75,8 @@ exports[`findSat.init 0 1`] = `undefined`;
 
 exports[`findSat.searchSats 0 1`] = `Array []`;
 
+exports[`findSat.searchSats 1 1`] = `Array []`;
+
+exports[`findSat.uiManagerFinal 0 1`] = `undefined`;
+
 exports[`findSat.uiManagerInit 0 1`] = `undefined`;

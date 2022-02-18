@@ -444,9 +444,9 @@ export const init = (): void => { // NOSONAR
       rightBtnColorsDOM.on('click', () => {
         rightBtnColorsDOMDropdown();
       });
-      rightBtnEarthMenuDOM.on('mouseleave', () => {
+      rightBtnColorsMenuDOM.on('mouseleave', () => {
         // Lost Focus
-        rightBtnEarthMenuDOM.hide();
+        rightBtnColorsMenuDOM.hide();
       });
 
       rightBtnEarthDOM.on('mouseenter', () => {
@@ -528,7 +528,7 @@ export const init = (): void => { // NOSONAR
     };
     const rightBtnDrawDOMDropdown = () => {
       const canvasWidth = canvasDOM.innerWidth();
-      if (!canvasWidth) {
+      if (!canvasDOM || canvasDOM.length === 0) {
         console.warn('canvasDOM undefined!');
         return;
       }
@@ -1311,47 +1311,7 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
   //
   // This not the Earth
   uiManager.earthClicked = () => {
-    if (!isViewDOM) {
-      rightBtnViewDOM.show();
-      ++numMenuItems;
-    }
-    $('#view-info-rmb').show();
-    $('#view-curdops-rmb').show();
-    $('#view-24dops-rmb').show();
-
-    if (!isCreateDOM) {
-      rightBtnCreateDOM.show();
-      ++numMenuItems;
-    }
-    $('#create-observer-rmb ').show();
-    $('#create-sensor-rmb').show();
-
-    if (!isDrawDOM) {
-      rightBtnDrawDOM.show();
-      ++numMenuItems;
-    }
-    $('#line-eci-axis-rmb').show();
-
-    if (!isEarthDOM) {
-      rightBtnEarthDOM.show();
-      ++numMenuItems;
-    }
-
-    $('#earth-nasa-rmb').show();
-    $('#earth-blue-rmb').show();
-    $('#earth-low-rmb').show();
-    $('#earth-high-no-clouds-rmb').show();
-    $('#earth-vec-rmb').show();
-    $('#earth-political-rmb').show();
-    if (settingsManager.nasaImages) $('#earth-nasa-rmb').hide();
-    if (settingsManager.trusatImages) $('#earth-trusat-rmb').hide();
-    if (settingsManager.blueImages) $('#earth-blue-rmb').hide();
-    if (settingsManager.lowresImages) $('#earth-low-rmb').hide();
-    if (settingsManager.hiresNoCloudsImages) $('#earth-high-no-clouds-rmb').hide();
-    if (settingsManager.vectorImages) $('#earth-vec-rmb').hide();
-    if (settingsManager.politicalImages) $('#earth-political-rmb').hide();
-
-    rightBtnSaveDOM.hide();
+    numMenuItems = earthClicked({ isViewDOM, rightBtnViewDOM, numMenuItems, isCreateDOM, rightBtnCreateDOM, isDrawDOM, rightBtnDrawDOM, isEarthDOM, rightBtnEarthDOM, rightBtnSaveDOM });
   };
 
   if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
@@ -1561,4 +1521,56 @@ export const uiInput: UiInputInterface = {
   getEarthScreenPoint: getEarthScreenPoint, // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
   getRayOrigin: getRayOrigin,
 };
+
+export const earthClicked = ({ isViewDOM, rightBtnViewDOM, numMenuItems, isCreateDOM, rightBtnCreateDOM, isDrawDOM, rightBtnDrawDOM, isEarthDOM, rightBtnEarthDOM, rightBtnSaveDOM }: { isViewDOM: boolean; rightBtnViewDOM: any; numMenuItems: number; isCreateDOM: boolean; rightBtnCreateDOM: any; isDrawDOM: boolean; rightBtnDrawDOM: any; isEarthDOM: boolean; rightBtnEarthDOM: any; rightBtnSaveDOM: any; }) => {
+  if (!isViewDOM) {
+    rightBtnViewDOM.show();
+    ++numMenuItems;
+  }
+  $('#view-info-rmb').show();
+  $('#view-curdops-rmb').show();
+  $('#view-24dops-rmb').show();
+
+  if (!isCreateDOM) {
+    rightBtnCreateDOM.show();
+    ++numMenuItems;
+  }
+  $('#create-observer-rmb ').show();
+  $('#create-sensor-rmb').show();
+
+  if (!isDrawDOM) {
+    rightBtnDrawDOM.show();
+    ++numMenuItems;
+  }
+  $('#line-eci-axis-rmb').show();
+
+  if (!isEarthDOM) {
+    rightBtnEarthDOM.show();
+    ++numMenuItems;
+  }
+
+  $('#earth-nasa-rmb').show();
+  $('#earth-blue-rmb').show();
+  $('#earth-low-rmb').show();
+  $('#earth-high-no-clouds-rmb').show();
+  $('#earth-vec-rmb').show();
+  $('#earth-political-rmb').show();
+  if (settingsManager.nasaImages)
+    $('#earth-nasa-rmb').hide();
+  if (settingsManager.trusatImages)
+    $('#earth-trusat-rmb').hide();
+  if (settingsManager.blueImages)
+    $('#earth-blue-rmb').hide();
+  if (settingsManager.lowresImages)
+    $('#earth-low-rmb').hide();
+  if (settingsManager.hiresNoCloudsImages)
+    $('#earth-high-no-clouds-rmb').hide();
+  if (settingsManager.vectorImages)
+    $('#earth-vec-rmb').hide();
+  if (settingsManager.politicalImages)
+    $('#earth-political-rmb').hide();
+
+  rightBtnSaveDOM.hide();
+  return numMenuItems;
+}
 

@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`calculations checkSunExclusion 1`] = `
+Array [
+  false,
+  Object {
+    "x": 137362374.578857,
+    "y": -777123.1883858797,
+    "z": -54884465.865863204,
+  },
+]
+`;
+
+exports[`calculations lookAnglesToEcf 1`] = `
+Object {
+  "x": 6378.137,
+  "y": 0,
+  "z": 0,
+}
+`;
+
+exports[`calculations propTime 1`] = `1970-01-01T00:00:00.000Z`;
+
+exports[`calculations setupTimeVariables should return the correct time variables 1`] = `
+Object {
+  "gmst": 1.7563256805284624,
+  "gmstNext": 1.7563986012888932,
+  "isSunExclusion": false,
+  "j": 2459580.5,
+  "now": 2022-01-01T00:00:00.000Z,
+  "sunEci": Object {
+    "x": 27051215.157581575,
+    "y": -133418686.76125598,
+    "z": -57840536.30867104,
+  },
+}
+`;
+
+exports[`calculations setupTimeVariables should return the correct time variables 2`] = `
+Object {
+  "gmst": 1.7563256805284624,
+  "gmstNext": 1.7563986012888932,
+  "isSunExclusion": false,
+  "j": 2459580.5,
+  "now": 2022-01-01T00:00:00.000Z,
+  "sunEci": Object {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+  },
+}
+`;

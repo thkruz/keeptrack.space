@@ -86,7 +86,6 @@
   /* TODO: Account for the bottom bar being minimized */
   #search-results {
     min-height: fit-content;
-    max-height: -webkit-fill-available;
     overflow-x: hidden;
     overflow-y: auto;
     display: none;
@@ -470,7 +469,6 @@
   #search-results {
     display: none;
     min-height: fit-content;
-    max-height: -webkit-fill-available;
     overflow-x: hidden;
     overflow-y: auto;
     position: absolute;

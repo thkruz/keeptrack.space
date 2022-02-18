@@ -1,7 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`uiInput.canvasMouseMove 0 1`] = `undefined`;
-
 exports[`uiInput.canvasMouseMove canvasMouseMove 1`] = `undefined`;
 
 exports[`uiInput.canvasMouseMove canvasMouseMoveFire 1`] = `undefined`;

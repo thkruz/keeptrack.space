@@ -385,6 +385,7 @@ export const updateSatCache = (now: Date, j: number, gmst: number, gmstNext: num
     }
   }
 };
+/* istanbul ignore next */
 export const updateRadarData = (i: number): boolean => {
   if (satCache[i].skip) return false;
 

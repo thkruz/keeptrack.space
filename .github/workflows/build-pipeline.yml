@@ -144,6 +144,13 @@ jobs:
       # Build
       - name: Build
         run: npm run build
+
+      - name: Save build folder
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          if-no-files-found: error
+          path: dist
   trufflehog:
     needs: build
     name: TruffleHog
@@ -189,3 +196,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  cypress:
+    needs: [codeQl, analyze, trufflehog]
+    name: Cypress
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download the build folders
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
+
+      - name: Run Cypress
+        run: npm run test:e2e-ci

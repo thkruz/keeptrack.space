@@ -24,7 +24,6 @@ import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
 import '@app/js/lib/external/jquery.colorbox.min.js';
-import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
 import '@materializecss/materialize';
 // eslint-disable-next-line sort-imports
@@ -46,10 +45,6 @@ import { legendColorsChange, legendMenuChange } from './legendMenu/legendMenu';
 const M = window.M;
 
 export type toastMsgType = 'standby' | 'normal' | 'caution' | 'serious' | 'critical';
-
-$.ajaxSetup({
-  cache: false,
-});
 
 let isSearchOpen = false;
 let forceClose = false;

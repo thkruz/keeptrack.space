@@ -11,10 +11,6 @@ Array [
 ]
 `;
 
-exports[`calculations isInFov 1`] = `1`;
-
-exports[`calculations isInFov should return 1 if in fov 1`] = `1`;
-
 exports[`calculations lookAnglesToEcf 1`] = `
 Object {
   "x": 6378.137,

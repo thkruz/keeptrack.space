@@ -5,6 +5,9 @@ import * as camera from './camera';
 import { keyDownHandler, keyUpHandler } from './keyHandler';
 import { setFtsRotateReset, setIsLocalRotateOverride, setIsLocalRotateRoll, setIsLocalRotateYaw, setIsPanReset, setIsScreenPan, setIsWorldPan } from './overrides';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from './transforms';
+
+const generateKeyboardEvent = (key: string) => <KeyboardEvent>{ key: key };
+
 // @ponicode
 describe('camera.normalizeAngle', () => {
   test('0', () => {
@@ -910,18 +913,18 @@ describe('keyUpHandler', () => {
   test('0', () => {
     let callFunction: any = () => {
       keyUpHandler(<KeyboardEvent>{});
-      keyUpHandler(<KeyboardEvent>{ key: 'a' });
-      keyUpHandler(<KeyboardEvent>{ key: 'd' });
-      keyUpHandler(<KeyboardEvent>{ key: 's' });
-      keyUpHandler(<KeyboardEvent>{ key: 'w' });
-      keyUpHandler(<KeyboardEvent>{ key: 'q' });
-      keyUpHandler(<KeyboardEvent>{ key: 'e' });
-      keyUpHandler(<KeyboardEvent>{ key: 'j' });
-      keyUpHandler(<KeyboardEvent>{ key: 'l' });
-      keyUpHandler(<KeyboardEvent>{ key: 'i' });
-      keyUpHandler(<KeyboardEvent>{ key: 'k' });
-      keyUpHandler(<KeyboardEvent>{ key: 'shift' });
-      keyUpHandler(<KeyboardEvent>{ key: 'ShiftRight' });
+      keyUpHandler(generateKeyboardEvent('a'));
+      keyUpHandler(generateKeyboardEvent('d'));
+      keyUpHandler(generateKeyboardEvent('s'));
+      keyUpHandler(generateKeyboardEvent('w'));
+      keyUpHandler(generateKeyboardEvent('q'));
+      keyUpHandler(generateKeyboardEvent('e'));
+      keyUpHandler(generateKeyboardEvent('j'));
+      keyUpHandler(generateKeyboardEvent('l'));
+      keyUpHandler(generateKeyboardEvent('i'));
+      keyUpHandler(generateKeyboardEvent('k'));
+      keyUpHandler(generateKeyboardEvent('shift'));
+      keyUpHandler(generateKeyboardEvent('ShiftRight'));
     };
 
     expect(callFunction).not.toThrow();
@@ -933,24 +936,24 @@ describe('keyUpHandler', () => {
       let callFunction: any = () => {
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
         keyDownHandler(<KeyboardEvent>{});
-        keyDownHandler(<KeyboardEvent>{ key: 'w' });
-        keyDownHandler(<KeyboardEvent>{ key: 'a' });
-        keyDownHandler(<KeyboardEvent>{ key: 's' });
-        keyDownHandler(<KeyboardEvent>{ key: 'd' });
-        keyDownHandler(<KeyboardEvent>{ key: 'q' });
-        keyDownHandler(<KeyboardEvent>{ key: 'e' });
-        keyDownHandler(<KeyboardEvent>{ key: 'j' });
-        keyDownHandler(<KeyboardEvent>{ key: 'l' });
-        keyDownHandler(<KeyboardEvent>{ key: 'i' });
-        keyDownHandler(<KeyboardEvent>{ key: 'k' });
-        keyDownHandler(<KeyboardEvent>{ key: 'shift' });
-        keyDownHandler(<KeyboardEvent>{ key: 'ShiftRight' });
+        keyDownHandler(generateKeyboardEvent('w'));
+        keyDownHandler(generateKeyboardEvent('a'));
+        keyDownHandler(generateKeyboardEvent('s'));
+        keyDownHandler(generateKeyboardEvent('d'));
+        keyDownHandler(generateKeyboardEvent('q'));
+        keyDownHandler(generateKeyboardEvent('e'));
+        keyDownHandler(generateKeyboardEvent('j'));
+        keyDownHandler(generateKeyboardEvent('l'));
+        keyDownHandler(generateKeyboardEvent('i'));
+        keyDownHandler(generateKeyboardEvent('k'));
+        keyDownHandler(generateKeyboardEvent('shift'));
+        keyDownHandler(generateKeyboardEvent('ShiftRight'));
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Satellite);
-        keyDownHandler(<KeyboardEvent>{ key: 'q' });
-        keyDownHandler(<KeyboardEvent>{ key: 'e' });
+        keyDownHandler(generateKeyboardEvent('q'));
+        keyDownHandler(generateKeyboardEvent('e'));
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Astronomy);
-        keyDownHandler(<KeyboardEvent>{ key: 'j' });
-        keyDownHandler(<KeyboardEvent>{ key: 'l' });
+        keyDownHandler(generateKeyboardEvent('j'));
+        keyDownHandler(generateKeyboardEvent('l'));
       };
 
       expect(callFunction).not.toThrow();
@@ -968,11 +971,11 @@ describe('keyUpHandler', () => {
 
     test('1', () => {
       let callFunction: any = () => {
-        keyDownHandler(<KeyboardEvent>{ key: 'w' });
+        keyDownHandler(generateKeyboardEvent('w'));
         camera.fpsMovement();
-        keyDownHandler(<KeyboardEvent>{ key: 'a' });
+        keyDownHandler(generateKeyboardEvent('a'));
         camera.fpsMovement();
-        keyDownHandler(<KeyboardEvent>{ key: 'q' });
+        keyDownHandler(generateKeyboardEvent('q'));
         camera.fpsMovement();
         camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
         camera.fpsMovement();

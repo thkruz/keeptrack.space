@@ -1204,7 +1204,7 @@ export const canvasTouchStart = (evt: any) => {
     uiManager.updateURL();
   }
 };
-export const openRmbMenu = (testmouseSat?: number) => { // NOSONAR
+export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
   const { uiManager, sensorManager, lineManager, satSet, mainCamera, objectManager } = keepTrackApi.programs;
   const canvasDOM = $('#keeptrack-canvas');
   const rightBtnMenuDOM = $('#right-btn-menu');

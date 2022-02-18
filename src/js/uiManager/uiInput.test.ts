@@ -75,6 +75,12 @@ describe('uiInput Base Tests', () => {
     uiInput.canvasTouchStart(evObj);
     uiInput.canvasMouseUp(evObj);
     uiInput.openRmbMenu();
+    uiInput.openRmbMenu(1);
+
+    (<any>evObj).originalEvent = {
+      touches: [{ pageX: 100, pageY: 100 }],
+    };
+    uiInput.canvasTouchStart(evObj);
   });
 });
 
@@ -385,6 +391,40 @@ describe('uiInput.rmbMenuActions', () => {
 describe('uiInput.hidePopUps', () => {
   test('0', () => {
     let result: any = uiInput.hidePopUps();
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('uiInput.canvasMouseMove', () => {
+  test('canvasMouseMove', () => {
+    const canvasDom = document.createElement('canvas');
+    keepTrackApi.programs.uiManager.uiInput.mouseMoveTimeout = -1;
+    let result: any = uiInput.canvasMouseMove(<any>{ clientX: 100, clientY: 100 }, keepTrackApi.programs.mainCamera, canvasDom);
+    expect(result).toMatchSnapshot();
+  });
+  test('canvasMouseMoveFire', () => {
+    const canvasDom = {
+      position: () => ({
+        left: 100,
+        top: 100,
+      }),
+    };
+    keepTrackApi.programs.uiManager.uiInput.mouseMoveTimeout = -1;
+    let result: any = uiInput.canvasMouseMoveFire(<any>{ clientX: 100, clientY: 100 }, keepTrackApi.programs.mainCamera, canvasDom);
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('uiInput.canvasTouchMove', () => {
+  test('0', () => {
+    let result: any = uiInput.canvasTouchMove(<any>{ clientX: 100, clientY: 100 }, keepTrackApi.programs.mainCamera);
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('uiInput.canvasTouchEnd', () => {
+  test('0', () => {
+    let result: any = uiInput.canvasTouchEnd(keepTrackApi.programs.mainCamera);
     expect(result).toMatchSnapshot();
   });
 });

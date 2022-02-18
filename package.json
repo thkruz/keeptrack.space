@@ -72,9 +72,7 @@
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
       "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
-      "@app(.*)$": "<rootDir>/src/$1",
-      "@lib(.*)$": "<rootDir>/src/js/lib/external/ootk/lib/$1",
-      "@test(.*)$": "<rootDir>/src/js/lib/external/ootk/test/$1"
+      "@app(.*)$": "<rootDir>/src/$1"
     },
     "coverageReporters": [
       "lcov",
@@ -120,6 +118,9 @@
     "@babel/plugin-transform-modules-commonjs": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
+    "@testing-library/dom": "^8.11.3",
+    "@testing-library/jest-dom": "^5.16.2",
+    "@testing-library/user-event": "^13.5.0",
     "@types/agent-base": "^4.2.2",
     "@types/jest": "^27.0.3",
     "@types/jquery": "^3.5.10",

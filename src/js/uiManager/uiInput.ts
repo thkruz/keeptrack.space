@@ -444,9 +444,9 @@ export const init = (): void => { // NOSONAR
       rightBtnColorsDOM.on('click', () => {
         rightBtnColorsDOMDropdown();
       });
-      rightBtnEarthMenuDOM.on('mouseleave', () => {
+      rightBtnColorsMenuDOM.on('mouseleave', () => {
         // Lost Focus
-        rightBtnEarthMenuDOM.hide();
+        rightBtnColorsMenuDOM.hide();
       });
 
       rightBtnEarthDOM.on('mouseenter', () => {

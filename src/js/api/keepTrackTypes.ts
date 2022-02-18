@@ -658,6 +658,9 @@ export interface UiInputInterface {
   openRmbMenu: any;
   rmbMenuActions: any;
   getRayOrigin: any;
+  canvasMouseMove: any;
+  canvasTouchMove: any;
+  canvasTouchEnd: any;
 }
 
 export interface Camera {

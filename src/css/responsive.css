@@ -82,7 +82,13 @@
   #share-icon {
     display: none;
   }
+
+  /* TODO: Account for the bottom bar being minimized */
   #search-results {
+    min-height: fit-content;
+    max-height: -webkit-fill-available;
+    overflow-x: hidden;
+    overflow-y: auto;
     display: none;
     position: absolute;
     right: 0px;
@@ -91,7 +97,7 @@
     z-index: 1;
     top: var(--top-menu-height);
     bottom: var(--bottom-menu-top);
-    max-height: 100%;
+    max-height: calc(100% - var(--bottom-menu-height));
     border-width: 0px 0px 5px 5px;
     border-style: solid;
     border-color: var(--colorTertiaryDarken3);
@@ -463,6 +469,10 @@
   }
   #search-results {
     display: none;
+    min-height: fit-content;
+    max-height: -webkit-fill-available;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: absolute;
     right: 0px;
     width: 100%;

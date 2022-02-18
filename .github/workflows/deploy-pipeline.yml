@@ -1,0 +1,152 @@
+---
+name: Deploy Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Set Timezone to match snapshots
+      - name: Set Timezone
+        uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "America/New_York"
+      # Unit Tests for Code Coverage
+      - name: Test
+        run: npm test
+      # SonarQube
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  gh-pages:
+    name: Deploy to GitHub Pages
+    environment: Development
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Build
+      - name: Build
+        run: npm run build
+
+      # Deploy to GitHub Pages
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+          # The branch the action should deploy to.
+          BRANCH: gh-pages
+          # The folder the action should deploy.
+          FOLDER: dist
+          # Automatically remove deleted files from the deploy branch
+          CLEAN: true
+
+      # Test for Vulnerabilities that snuck in
+      - name: Test for public javascript library vulnerabilities
+        uses: lirantal/is-website-vulnerable@master
+        with:
+          scan-url: "https://thkruz.github.io/keeptrack.space/"
+  live-server:
+    needs: gh-pages
+    environment: Production
+    name: Deploy to KeepTrack.Space
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "17"
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-
+            ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Build
+      - name: Build
+        run: npm run build
+      # Deploy
+      - name: FTP Deployer
+        uses: sand4rt/ftp-deployer@v1.3
+        with:
+          sftp: true
+          host: ${{ secrets.FTP_HOST }}
+          port: 22
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          remote_folder: ${{ secrets.FTP_REMOTE_FOLDER }}
+          local_folder: dist
+          cleanup: false

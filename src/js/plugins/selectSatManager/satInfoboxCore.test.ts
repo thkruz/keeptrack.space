@@ -29,6 +29,21 @@ describe('satInfoboxCore.launchData', () => {
     let result: any = satInfoboxCore.launchData(defaultSat);
     expect(result).toMatchSnapshot();
   });
+
+  test('1', () => {
+    let result: any = satInfoboxCore.launchData({
+      ...defaultSat,
+      ...{ missile: true, desc: 'mis(s)ile' },
+    });
+    expect(result).toMatchSnapshot();
+  });
+  test('2', () => {
+    let result: any = satInfoboxCore.launchData({
+      ...defaultSat,
+      ...{ launchVehcile: 'U' },
+    });
+    expect(result).toMatchSnapshot();
+  });
 });
 
 // @ponicode
@@ -199,6 +214,25 @@ describe('satInfoboxCore.objectData', () => {
     let result: any = satInfoboxCore.objectData({ OT: 'unknown', TLE2: '1234556767' });
     expect(result).toMatchSnapshot();
   });
+
+  it('should handle all sat-types', () => {
+    let result: any = satInfoboxCore.objectData({ type: SpaceObjectType.UNKNOWN });
+    expect(result).toMatchSnapshot();
+    result = satInfoboxCore.objectData({ type: SpaceObjectType.PAYLOAD });
+    expect(result).toMatchSnapshot();
+    result = satInfoboxCore.objectData({ type: SpaceObjectType.ROCKET_BODY });
+    expect(result).toMatchSnapshot();
+    result = satInfoboxCore.objectData({ type: SpaceObjectType.DEBRIS });
+    expect(result).toMatchSnapshot();
+    result = satInfoboxCore.objectData({ type: SpaceObjectType.SPECIAL });
+    expect(result).toMatchSnapshot();
+    result = satInfoboxCore.objectData({ type: SpaceObjectType.RADAR_MEASUREMENT, TLE2: '1234556767' });
+    expect(result).toMatchSnapshot();
+    result = satInfoboxCore.objectData({ type: SpaceObjectType.RADAR_TRACK, TLE2: '1234556767' });
+    expect(result).toMatchSnapshot();
+    result = satInfoboxCore.objectData({ type: SpaceObjectType.RADAR_OBJECT, TLE2: '1234556767' });
+    expect(result).toMatchSnapshot();
+  });
 });
 
 // @ponicode
@@ -251,6 +285,7 @@ describe('satInfoboxCore.nearObjectsLinkClick', () => {
   test('1', () => {
     document.body.innerHTML = '<input id="search" value="39208" />';
     keepTrackApi.programs.objectManager.selectedSat = 1;
+    keepTrackApi.programs.satSet.numSats = 3;
     let result: any = satInfoboxCore.nearObjectsLinkClick();
     expect(result).toMatchSnapshot();
   });

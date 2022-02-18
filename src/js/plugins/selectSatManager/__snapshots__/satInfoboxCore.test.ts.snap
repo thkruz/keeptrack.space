@@ -28,6 +28,10 @@ exports[`satInfoboxCore.intelData 9 1`] = `undefined`;
 
 exports[`satInfoboxCore.launchData 0 1`] = `undefined`;
 
+exports[`satInfoboxCore.launchData 1 1`] = `undefined`;
+
+exports[`satInfoboxCore.launchData 2 1`] = `undefined`;
+
 exports[`satInfoboxCore.nearObjectsLinkClick 0 1`] = `undefined`;
 
 exports[`satInfoboxCore.nearObjectsLinkClick 1 1`] = `undefined`;
@@ -55,6 +59,22 @@ exports[`satInfoboxCore.objectData 7 1`] = `undefined`;
 exports[`satInfoboxCore.objectData 8 1`] = `undefined`;
 
 exports[`satInfoboxCore.objectData 9 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 1`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 2`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 3`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 4`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 5`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 6`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 7`] = `undefined`;
+
+exports[`satInfoboxCore.objectData should handle all sat-types 8`] = `undefined`;
 
 exports[`satInfoboxCore.orbitalData 0 1`] = `undefined`;
 

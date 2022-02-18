@@ -156,7 +156,7 @@
     "jsdom-worker": "^0.2.1",
     "mkdirp": "^1.0.4",
     "opener": "^1.5.2",
-    "ponicode": "^0.61.3",
+    "ponicode": "^0.63.2",
     "prettier": "^2.5.1",
     "prettier-plugin-organize-imports": "^2.3.4",
     "retire": "^3.0.3",

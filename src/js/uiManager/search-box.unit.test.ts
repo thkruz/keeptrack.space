@@ -62,7 +62,7 @@ test(`Basic Functions of Search Box`, () => {
   // Run Tests
   expect(searchBox.isResultBoxOpen()).toBe(false);
   expect(searchBox.getLastResultGroup()).toBe(undefined);
-  expect(searchBox.getCurrentSearch()).toBe(null);
+  expect(searchBox.getCurrentSearch()).toBe('');
   expect(searchBox.isHovering(false)).toBe(false);
   expect(searchBox.isHovering()).toBe(false);
   expect(searchBox.isHovering(true)).toBe(true);

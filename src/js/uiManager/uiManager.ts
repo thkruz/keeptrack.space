@@ -23,7 +23,6 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
-import '@app/js/lib/external/perfect-scrollbar.min.js';
 import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/jquery-ajax.js';
 import '@app/js/lib/external/colorPick.js';
@@ -612,9 +611,6 @@ export const onReady = () => {
   (function _menuInit() {
     $('.tooltipped').tooltip(<any>{ delay: 50 });
 
-    // Initialize Perfect Scrollbar
-    (<any>$('#search-results')).perfectScrollbar();
-
     // Setup Legend Colors
     uiManager.legendColorsChange();
   })();
@@ -767,7 +763,7 @@ export const updateURL = () => {
     paramSlices.push('sat=' + satSet.getSatExtraOnly(objectManager.selectedSat).sccNum);
   }
   var currentSearch = searchBox.getCurrentSearch();
-  if (currentSearch != null) {
+  if (currentSearch !== '') {
     paramSlices.push('search=' + currentSearch);
   }
   if (timeManager.propRate < 0.99 || timeManager.propRate > 1.01) {

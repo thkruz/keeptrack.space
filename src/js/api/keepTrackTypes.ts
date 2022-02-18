@@ -1184,7 +1184,7 @@ export interface Watchlist {
 export interface SearchBox {
   isResultBoxOpen;
   getLastResultGroup;
-  getCurrentSearch;
+  getCurrentSearch: () => string | null;
   isHovering;
   setHoverSat;
   getHoverSat;

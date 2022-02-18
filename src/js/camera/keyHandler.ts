@@ -5,39 +5,40 @@ import { camera } from './camera';
 export const keyUpHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
+  const KEY_PRESSED = evt.key.toUpperCase();
 
-  if (evt.key.toUpperCase() === 'A' && camera.fpsSideSpeed === -settingsManager.fpsSideSpeed) {
+  if (KEY_PRESSED === 'A' && camera.fpsSideSpeed === -settingsManager.fpsSideSpeed) {
     camera.isFPSSideSpeedLock = false;
   }
-  if (evt.key.toUpperCase() === 'D' && camera.fpsSideSpeed === settingsManager.fpsSideSpeed) {
+  if (KEY_PRESSED === 'D' && camera.fpsSideSpeed === settingsManager.fpsSideSpeed) {
     camera.isFPSSideSpeedLock = false;
   }
-  if (evt.key.toUpperCase() === 'S' && camera.fpsForwardSpeed === -settingsManager.fpsForwardSpeed) {
+  if (KEY_PRESSED === 'S' && camera.fpsForwardSpeed === -settingsManager.fpsForwardSpeed) {
     camera.isFPSForwardSpeedLock = false;
   }
-  if (evt.key.toUpperCase() === 'W' && camera.fpsForwardSpeed === settingsManager.fpsForwardSpeed) {
+  if (KEY_PRESSED === 'W' && camera.fpsForwardSpeed === settingsManager.fpsForwardSpeed) {
     camera.isFPSForwardSpeedLock = false;
   }
-  if (evt.key.toUpperCase() === 'Q') {
+  if (KEY_PRESSED === 'Q') {
     if (camera.fpsVertSpeed === -settingsManager.fpsVertSpeed) camera.isFPSVertSpeedLock = false;
     camera.fpsRotateRate = 0;
   }
-  if (evt.key.toUpperCase() === 'E') {
+  if (KEY_PRESSED === 'E') {
     if (camera.fpsVertSpeed === settingsManager.fpsVertSpeed) camera.isFPSVertSpeedLock = false;
     camera.fpsRotateRate = 0;
   }
-  if (evt.key.toUpperCase() === 'J' || evt.key.toUpperCase() === 'L') {
+  if (KEY_PRESSED === 'J' || KEY_PRESSED === 'L') {
     if (camera.cameraType.current === camera.cameraType.Astronomy) {
       camera.fpsRotateRate = 0;
     } else {
       camera.fpsYawRate = 0;
     }
   }
-  if (evt.key.toUpperCase() === 'I' || evt.key.toUpperCase() === 'K') {
+  if (KEY_PRESSED === 'I' || KEY_PRESSED === 'K') {
     camera.fpsPitchRate = 0;
   }
 
-  if (evt.key.toUpperCase() === 'SHIFT') {
+  if (KEY_PRESSED === 'SHIFT') {
     camera.isShiftPressed = false;
     camera.fpsRun = 1;
     settingsManager.cameraMovementSpeed = 0.003;
@@ -48,7 +49,7 @@ export const keyUpHandler = (evt: KeyboardEvent) => { // NOSONAR
     if (!camera.isFPSVertSpeedLock) camera.fpsVertSpeed = 0;
   }
   // Applies to _keyDownHandler as well
-  if (evt.key === 'ShiftRight') {
+  if (KEY_PRESSED === 'SHIFTRIGHT') {
     camera.isShiftPressed = false;
     camera.fpsRun = 1;
     settingsManager.cameraMovementSpeed = 0.003;
@@ -62,8 +63,9 @@ export const keyUpHandler = (evt: KeyboardEvent) => { // NOSONAR
 export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
+  const KEY_PRESSED = evt.key.toUpperCase();
 
-  if (evt.key.toUpperCase() === 'SHIFT') {
+  if (KEY_PRESSED === 'SHIFT') {
     camera.isShiftPressed = true;
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsRun = 0.05;
@@ -72,37 +74,37 @@ export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
     settingsManager.cameraMovementSpeed = 0.003 / 8;
     settingsManager.cameraMovementSpeedMin = 0.005 / 8;
   }
-  if (evt.key === 'ShiftRight') {
+  if (KEY_PRESSED === 'SHIFTRIGHT') {
     camera.isShiftPressed = true;
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsRun = 3;
     }
   }
-  if (evt.key.toUpperCase() === 'W') {
+  if (KEY_PRESSED === 'W') {
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsForwardSpeed = settingsManager.fpsForwardSpeed;
       camera.isFPSForwardSpeedLock = true;
     }
   }
-  if (evt.key.toUpperCase() === 'A') {
+  if (KEY_PRESSED === 'A') {
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsSideSpeed = -settingsManager.fpsSideSpeed;
       camera.isFPSSideSpeedLock = true;
     }
   }
-  if (evt.key.toUpperCase() === 'S') {
+  if (KEY_PRESSED === 'S') {
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
       camera.isFPSForwardSpeedLock = true;
     }
   }
-  if (evt.key.toUpperCase() === 'D') {
+  if (KEY_PRESSED === 'D') {
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsSideSpeed = settingsManager.fpsSideSpeed;
       camera.isFPSSideSpeedLock = true;
     }
   }
-  if (evt.key.toUpperCase() === 'I') {
+  if (KEY_PRESSED === 'I') {
     if (
       camera.cameraType.current === camera.cameraType.Fps ||
       camera.cameraType.current === camera.cameraType.Satellite ||
@@ -111,7 +113,7 @@ export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
       camera.fpsPitchRate = settingsManager.fpsPitchRate / camera.speedModifier;
     }
   }
-  if (evt.key.toUpperCase() === 'K') {
+  if (KEY_PRESSED === 'K') {
     if (
       camera.cameraType.current === camera.cameraType.Fps ||
       camera.cameraType.current === camera.cameraType.Satellite ||
@@ -120,7 +122,7 @@ export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
       camera.fpsPitchRate = -settingsManager.fpsPitchRate / camera.speedModifier;
     }
   }
-  if (evt.key.toUpperCase() === 'J') {
+  if (KEY_PRESSED === 'J') {
     if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite) {
       camera.fpsYawRate = -settingsManager.fpsYawRate / camera.speedModifier;
     }
@@ -128,7 +130,7 @@ export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
       camera.fpsRotateRate = settingsManager.fpsRotateRate / camera.speedModifier;
     }
   }
-  if (evt.key.toUpperCase() === 'L') {
+  if (KEY_PRESSED === 'L') {
     if (camera.cameraType.current === camera.cameraType.Fps || camera.cameraType.current === camera.cameraType.Satellite) {
       camera.fpsYawRate = settingsManager.fpsYawRate / camera.speedModifier;
     }
@@ -136,7 +138,7 @@ export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
       camera.fpsRotateRate = -settingsManager.fpsRotateRate / camera.speedModifier;
     }
   }
-  if (evt.key.toUpperCase() === 'Q') {
+  if (KEY_PRESSED === 'Q') {
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsVertSpeed = -settingsManager.fpsVertSpeed;
       camera.isFPSVertSpeedLock = true;
@@ -145,7 +147,7 @@ export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
       camera.fpsRotateRate = settingsManager.fpsRotateRate / camera.speedModifier;
     }
   }
-  if (evt.key.toUpperCase() === 'E') {
+  if (KEY_PRESSED === 'E') {
     if (camera.cameraType.current === camera.cameraType.Fps) {
       camera.fpsVertSpeed = settingsManager.fpsVertSpeed;
       camera.isFPSVertSpeedLock = true;

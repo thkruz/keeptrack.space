@@ -18,9 +18,6 @@ export const importCss = async (): Promise<void> => {
       import('../js/lib/external/colorPick.css').catch(() => {
         // This is intentional
       });
-      import('../css/perfect-scrollbar.min.css').catch(() => {
-        // This is intentional
-      });
       import('../css/jquery-ui.min.css').catch(() => {
         // This is intentional
       });

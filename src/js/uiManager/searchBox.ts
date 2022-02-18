@@ -27,7 +27,7 @@ export const getLastResultGroup = () => lastResultGroup;
 export const getHoverSat = () => hoverSatId;
 export const isHovering = (val?: boolean): boolean => (hovering = typeof val !== 'undefined' ? val : hovering);
 export const setHoverSat = (satId: number): number => (hoverSatId = satId);
-export const getCurrentSearch = () => (resultsOpen ? $('#search').val() : null);
+export const getCurrentSearch = () => (resultsOpen ? $('#search').val() : '');
 
 export const hideResults = () => {
   try {

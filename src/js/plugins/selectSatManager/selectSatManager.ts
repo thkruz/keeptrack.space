@@ -154,12 +154,18 @@ export const checkIfSelectSatVisible = () => {
     const { objectManager, searchBox } = keepTrackApi.programs;
     const searchVal = searchBox.getCurrentSearch();
 
-    let cssStyle = searchVal?.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
+    // Base CSS Style based on if the search box is open or not
+    let cssStyle = searchVal.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
+
+    // If a satellite is selected on a desktop computer then shrink the search box
     if (window.innerWidth > 1000 && objectManager.selectedSat !== -1)
       cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
 
     // Avoid unnecessary dom updates
-    if (cssStyle !== selectSatManager.lastCssStyle) selectSatManager.searchResultDom.attr('style', cssStyle);
+    if (cssStyle !== selectSatManager.lastCssStyle && selectSatManager.searchResultDom) {
+      selectSatManager.searchResultDom.attr('style', cssStyle);
+      selectSatManager.lastCssStyle = cssStyle;
+    }
   }
 };
 

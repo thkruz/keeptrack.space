@@ -9,7 +9,7 @@ coverage:
     project:
       default:
         # basic
-        target: 80%
+        target: auto
         threshold: 3%
         flags:
           - unit
@@ -21,6 +21,9 @@ coverage:
         if_ci_failed: error #success, failure, error, ignore
         informational: true
         only_pulls: false
+    patch:
+      default:
+        informational: true
 
 parsers:
   gcov:

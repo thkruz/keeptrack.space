@@ -1,8 +1,12 @@
 import * as apiMocks from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as findSat from '../../plugins/findSat/findSat';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...apiMocks.keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...apiMocks.keepTrackApiStubs.programs });
+window.M = {
+  AutoInit: jest.fn(),
+};
 
 // @ponicode
 describe('findSat.init', () => {
@@ -24,6 +28,13 @@ describe('findSat.hideSideMenus', () => {
 describe('findSat.uiManagerInit', () => {
   test('0', () => {
     let result: any = findSat.uiManagerInit();
+    expect(result).toMatchSnapshot();
+  });
+});
+
+describe('findSat.uiManagerFinal', () => {
+  test('0', () => {
+    let result: any = findSat.uiManagerFinal();
     expect(result).toMatchSnapshot();
   });
 });
@@ -76,8 +87,59 @@ describe('findSat.checkRcs', () => {
 // @ponicode
 describe('findSat.searchSats', () => {
   test('0', () => {
-    let result: any = findSat.searchSats(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, '1');
+    let result: any = findSat.searchSats(<any>{ test: 1 });
     expect(result).toMatchSnapshot();
+  });
+  test('1', () => {
+    let result: any = findSat.searchSats(<any>{
+      az: 50,
+      el: 50,
+      rng: 50,
+      inc: 50,
+      azMarg: 50,
+      elMarg: 50,
+      rngMarg: 50,
+      incMarg: 50,
+      period: 50,
+      periodMarg: 50,
+      rcs: 50,
+      rcsMarg: 50,
+      objType: 'sat',
+      raan: 50,
+      raanMarg: 50,
+      argPe: 50,
+      argPeMarg: 50,
+      bus: 'test',
+      shape: 'test',
+      payload: 'test',
+    });
+    expect(result).toMatchSnapshot();
+  });
+  test('2', () => {
+    let result: any = () =>
+      findSat.searchSats(<any>{
+        az: 'chipmunk',
+        el: 'chipmunk',
+        rng: 'chipmunk',
+        inc: 'chipmunk',
+        azMarg: 'chipmunk',
+        elMarg: 'chipmunk',
+        rngMarg: 'chipmunk',
+        incMarg: 'chipmunk',
+        period: 'chipmunk',
+        periodMarg: 'chipmunk',
+        rcs: 'chipmunk',
+        rcsMarg: 'chipmunk',
+        objType: 'chipmunk',
+        raan: 'chipmunk',
+        raanMarg: 'chipmunk',
+        argPe: 'chipmunk',
+        argPeMarg: 'chipmunk',
+        bus: 'All',
+        shape: 'All',
+        payload: 'All',
+      });
+    expect(result).toThrow();
   });
 });
 

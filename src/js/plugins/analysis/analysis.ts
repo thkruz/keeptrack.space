@@ -85,7 +85,7 @@ export const init = (): void => {
           }
           // Reinitialize the Material CSS Code
           const elems = document.querySelectorAll('select');
-          (<any>M).FormSelect.init(elems);
+          (<any>window.M).FormSelect.init(elems);
 
           $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
           $('#menu-analysis').addClass('bmenu-item-selected');

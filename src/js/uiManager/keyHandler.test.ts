@@ -5,6 +5,8 @@ import * as keyHandler from './keyHandler';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
+const generateKeyboardEvent = (key: string) => <KeyboardEvent>{ key: key };
+
 // @ponicode
 describe('keyHandler.keyHandler', () => {
   test('0', () => {
@@ -14,41 +16,41 @@ describe('keyHandler.keyHandler', () => {
       </div>
     `;
     let result = () => {
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'R' });
+      keyHandler.keyHandler(generateKeyboardEvent('R'));
       keepTrackApi.programs.mainCamera.cameraType.current = 0;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
       keepTrackApi.programs.mainCamera.cameraType.current = 1;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
       keepTrackApi.programs.mainCamera.cameraType.current = 2;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
       keepTrackApi.programs.mainCamera.cameraType.current = 3;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
       keepTrackApi.programs.mainCamera.cameraType.current = 4;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
       keepTrackApi.programs.mainCamera.cameraType.current = 5;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
       keepTrackApi.programs.mainCamera.cameraType.current = 6;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
       keepTrackApi.programs.mainCamera.cameraType.current = 7;
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'C' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'F' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: 'H' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '!' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: ',' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: ',' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '.' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '.' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '<' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '<' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '>' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '>' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '0' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '+' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '=' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '-' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '_' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '1' });
-      keyHandler.keyHandler(<KeyboardEvent>{ key: '1' });
+      keyHandler.keyHandler(generateKeyboardEvent('C'));
+      keyHandler.keyHandler(generateKeyboardEvent('F'));
+      keyHandler.keyHandler(generateKeyboardEvent('H'));
+      keyHandler.keyHandler(generateKeyboardEvent('!'));
+      keyHandler.keyHandler(generateKeyboardEvent(','));
+      keyHandler.keyHandler(generateKeyboardEvent(','));
+      keyHandler.keyHandler(generateKeyboardEvent('.'));
+      keyHandler.keyHandler(generateKeyboardEvent('.'));
+      keyHandler.keyHandler(generateKeyboardEvent('<'));
+      keyHandler.keyHandler(generateKeyboardEvent('<'));
+      keyHandler.keyHandler(generateKeyboardEvent('>'));
+      keyHandler.keyHandler(generateKeyboardEvent('>'));
+      keyHandler.keyHandler(generateKeyboardEvent('0'));
+      keyHandler.keyHandler(generateKeyboardEvent('+'));
+      keyHandler.keyHandler(generateKeyboardEvent('='));
+      keyHandler.keyHandler(generateKeyboardEvent('-'));
+      keyHandler.keyHandler(generateKeyboardEvent('_'));
+      keyHandler.keyHandler(generateKeyboardEvent('1'));
+      keyHandler.keyHandler(generateKeyboardEvent('1'));
     };
     expect(result).not.toThrow();
   });

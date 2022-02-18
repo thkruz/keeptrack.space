@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v5.2.1](https://code.il4.dso.mil/spacecamp/delta4/compare/v5.2.0...v5.2.1)
+
+>  
+
+- refactor: :heavy_minus_sign: remove materialize.js in favor of npm package [`73626bc`](https://code.il4.dso.mil/spacecamp/delta4/commit/73626bcc5593154ed1bc48f744a5bf9d23bb5133)
+- docs: :memo: new changelog for 5.2 [`7ae49a9`](https://code.il4.dso.mil/spacecamp/delta4/commit/7ae49a9805cae2c8fa1f9fcf1d71ea9794df4659)
+- test: :camera_flash: snapshots updated to UTC timezone [`66ff944`](https://code.il4.dso.mil/spacecamp/delta4/commit/66ff944bba96bca614b0a656311a75f5933ab95f)
+- style: :art: fixed sonarqube findings [`2cb8a3d`](https://code.il4.dso.mil/spacecamp/delta4/commit/2cb8a3d564a7af79da2669251d30e607791b4ee6)
+- test: :white_check_mark: increase test coverage in satMath [`1fb1a97`](https://code.il4.dso.mil/spacecamp/delta4/commit/1fb1a972b7a951710d57237981b2b6e177e6ca11)
+- test: :white_check_mark: expand testing of uiInput.ts [`9e4220d`](https://code.il4.dso.mil/spacecamp/delta4/commit/9e4220d256c158e2787a66f2cc4958a065181c20)
+- test: :white_check_mark: increase test coverage of positionCruncher [`0bfa401`](https://code.il4.dso.mil/spacecamp/delta4/commit/0bfa401bf7d74ed2fb4f57be9ada79024250fd0b)
+- test: :white_check_mark: increase test coverage [`e220d8d`](https://code.il4.dso.mil/spacecamp/delta4/commit/e220d8de6fb4b123aeb1d0c3a931b126f84859b1)
+- test: :white_check_mark: add tests for cruncherInteractions.ts [`4214472`](https://code.il4.dso.mil/spacecamp/delta4/commit/42144721570b9e7957a5aac976592e979e506d12)
+- test: :white_check_mark: set time using UTC to ensure standardized timezone settings [`a6228b4`](https://code.il4.dso.mil/spacecamp/delta4/commit/a6228b4cf47f42dca4cb1fc99a76de8df2251e1d)
+- test: :white_check_mark: increase test coverage of orbitCruncher [`649873c`](https://code.il4.dso.mil/spacecamp/delta4/commit/649873c454c3ab76d9c291a31da0941b8f5cc40e)
+- test: :white_check_mark: increase test coverage of classification.ts [`c5b60f4`](https://code.il4.dso.mil/spacecamp/delta4/commit/c5b60f4505e5072c2968d3c7473a05b7841b27fd)
+- test: :white_check_mark: increase test coverage of findSat and positionCruncher [`6b4476f`](https://code.il4.dso.mil/spacecamp/delta4/commit/6b4476fd7cd1c04ffca7d4d82f3264a13db6f106)
+- docs: :page_facing_up: update copyright dates [`6365848`](https://code.il4.dso.mil/spacecamp/delta4/commit/63658486cbf6c4e9ad6124cb74d1ade3889e3c0d)
+- test: :white_check_mark: add more test coverage to satInfoboxCore [`d948bd1`](https://code.il4.dso.mil/spacecamp/delta4/commit/d948bd1a8de26b5cf78873b75b9ef791dd58fdcb)
+- fix: :bug: replace getFullYear with getUTCFullYear [`a4f4868`](https://code.il4.dso.mil/spacecamp/delta4/commit/a4f4868c092c298d0fd25d380d1ba761a3b15f98)
+- ci: :camera_flash: remove snapshot tripping trufflehog [`715ede3`](https://code.il4.dso.mil/spacecamp/delta4/commit/715ede3180d0f93a9511df8e782940b5e74ee806)
+- test: :white_check_mark: standardize time in colorschememanager [`4475d4f`](https://code.il4.dso.mil/spacecamp/delta4/commit/4475d4fc07833351e96cfa17c5e6d572a81368bb)
+- test: :camera_flash: remove obsolute snapshots [`29b4c6a`](https://code.il4.dso.mil/spacecamp/delta4/commit/29b4c6a3f6585aefc4bed0b55f18f5177cdce5ef)
+- ci: :heavy_plus_sign: add husky to package [`a803eb6`](https://code.il4.dso.mil/spacecamp/delta4/commit/a803eb62bd8c92557a3f361955e0de15b0a6c3bb)
+- ci: :white_check_mark: added run lint on commit [`027b6a4`](https://code.il4.dso.mil/spacecamp/delta4/commit/027b6a4526790310876f1f732b319324eb3c884d)
+- test: :camera_flash: remove obsolete snapshots [`4c35c15`](https://code.il4.dso.mil/spacecamp/delta4/commit/4c35c153d79793ae36e18f6b7d90f254bad66386)
+
 #### [v5.2.0](https://code.il4.dso.mil/spacecamp/delta4/compare/v5.1.0...v5.2.0)
 
 >  

@@ -32,6 +32,7 @@
     "start:embed": "five-server --entry-file=embeded/index.html",
     "test": "jest --coverage",
     "test:unit": "jest --coverage",
+    "test:e2e-ci": "echo 'E2E are not setup yet...'",
     "test:watch": "jest --coverage --watchAll",
     "version:major": "npm version major && npm run changelog",
     "version:minor": "npm version minor && npm run changelog",

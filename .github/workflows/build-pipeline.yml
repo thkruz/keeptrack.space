@@ -214,7 +214,7 @@ jobs:
       - name: Cypress install
         uses: cypress-io/github-action@v2
         with:
-          start: start:ci
+          start: npm run start:ci
           wait-on: "http://localhost:8080"
           wait-on-timeout: "120"
           record: false

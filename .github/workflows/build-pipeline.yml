@@ -211,5 +211,13 @@ jobs:
           name: build
           path: build
 
-      - name: Run Cypress
-        run: npm run test:e2e-ci
+      - name: Cypress install
+        uses: cypress-io/github-action@v2
+        with:
+          start: start:ci
+          wait-on: "http://localhost:8080"
+          wait-on-timeout: "120"
+          record: false
+          spec: cypress/integration/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

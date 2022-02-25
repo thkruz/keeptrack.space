@@ -29,7 +29,7 @@ import numeric from 'numeric';
 import * as Ootk from 'ootk';
 import { SatRec } from 'satellite.js';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { Eci, EciArr3, SatGroupCollection, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrackTypes';
+import { Eci, EciArr3, lookanglesRow, SatGroupCollection, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { dateFormat } from '../lib/external/dateFormat.js';
 import { mat3 } from '../lib/external/gl-matrix';
@@ -710,10 +710,10 @@ export const findBestPasses = (sats: string, sensor: SensorObject) => {
   let tableSatTimes = [];
   for (let i = 0; i < satArray.length; i++) {
     try {
-      let satId = satArray[i];
-      if (typeof satId == 'undefined' || satId == null || satId == '' || satId == ' ') continue;
-      let sat = satSet.getSatFromObjNum(parseInt(satId));
-      let satPasses = satellite.findBestPass(sat, [sensor], 0);
+      const satId = satArray[i];
+      if (typeof satId == 'undefined' || satId == null || satId === '' || satId === ' ') continue;
+      const sat = satSet.getSatFromObjNum(parseInt(satId));
+      const satPasses = findBestPass(sat, [sensor]);
       for (let s = 0; s < satPasses.length; s++) {
         tableSatTimes.push(satPasses[s]);
         // }
@@ -738,8 +738,8 @@ export const findBestPasses = (sats: string, sensor: SensorObject) => {
   saveCsv(tableSatTimes, 'bestSatTimes');
 };
 /* istanbul ignore next */
-export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NOSONAR
-  const { sensorManager, timeManager } = keepTrackApi.programs;
+export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookanglesRow[] => { // NOSONAR
+  const { sensorManager, timeManager,uiManager } = keepTrackApi.programs;
 
   (function _inputValidation() {
     // Check if there is a sensor
@@ -748,13 +748,13 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
       if (sensorManager.checkSensorSelected()) {
         sensors = sensorManager.currentSensor;
       } else {
-        console.debug('findBestPass requires a sensor!');
+        uiManager.toast(`No sensor selected. Did you select a sensor first?`, 'critical');
         return;
       }
       // Simple Error Checking
     } else {
-      if (typeof sensors[0].obsminaz == 'undefined') {
-        console.debug('sensor format incorrect');
+      if (sensors.length <= 0 || !sensors[0] || typeof sensors[0].obsminaz == 'undefined') {
+        uiManager.toast(`Sensor's format incorrect. Did you select a sensor first?`, 'critical');
         return;
       }
       sensors[0].observerGd = {
@@ -791,7 +791,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
   let sAz = <string | null>null;
   let sEl = <string | null>null;
   let srng = <string | null>null;
-  let sTime = <number | null>null;
+  let sTime = <Date | null>null;
   let passMinrng = sensor.obsmaxrange; // This is set each look to find minimum rng (start at max rng)
   let passMaxEl = 0;
   let start3 = false;
@@ -799,13 +799,13 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
 
   let orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
-  let _propagateBestPass = (now: Date, satrecIn: SatRec) => {
+  const _propagateBestPass = (now: Date, satrecIn: SatRec): lookanglesRow => {
     let aer = satellite.getRae(now, satrecIn, sensor);
     let isInFOV = satellite.checkIsInView(sensor, aer);
 
     if (isInFOV) {
       // Previous Pass to Calculate first line of coverage
-      let now1 = timeManager.getOffsetTimeObj(offset - looksInterval * 1000, simulationTime);
+      const now1 = timeManager.getOffsetTimeObj(offset - looksInterval * 1000, simulationTime);
       let aer1 = satellite.getRae(now1, satrecIn, sensor);
 
       let isInFOV1 = satellite.checkIsInView(sensor, aer1);
@@ -816,7 +816,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
         }
 
         // First Line of Coverage
-        sTime = now.getTime();
+        sTime = now;
         sAz = aer.az.toFixed(0);
         sEl = aer.el.toFixed(1);
         srng = aer.rng.toFixed(0);
@@ -830,7 +830,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
           // if it stops around 3
           stop3 = aer.el <= 3.5;
 
-          score = Math.min((((now.getTime() - sTime) / 1000 / 60) * 10) / 8, 10); // 8 minute pass is max score
+          score = Math.min((((now.getTime() - sTime.getTime()) / 1000 / 60) * 10) / 8, 10); // 8 minute pass is max score
           let elScore = Math.min((passMaxEl / 50) * 10, 10); // 50 el or above is max score
           // elScore -= Math.max((passMaxEl - 50) / 5, 0); // subtract points for being over 50 el
           elScore *= start3 && stop3 ? 2 : 1; // Double points for start and stop at 3
@@ -839,18 +839,31 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
           // score -= Math.max((750 - passMinrng) / 10, 0); // subtract points for being closer than 750
 
           let tic = 0;
-          try {
-            tic = (now.getTime() - sTime) / 1000;
-          } catch (e) {
-            tic = 0;
-          }
+          tic = (now.getTime() - sTime.getTime()) / 1000 || 0;
 
           // Skip pass if satellite is in track right now
-          if (sTime == null) return {};
+          if (sTime == null) return {
+            sortTime: null,
+            scc: null,
+            score: null,
+            startDate: null,
+            startTime: null,
+            startAz: null,
+            startEl: null,
+            startrng: null,
+            stopDate: null,
+            stopTime: null,
+            stopAz: null,
+            stopEl: null,
+            stoprng: null,
+            tic: null,
+            minrng: null,
+            passMaxEl: null,
+          };
 
           // Last Line of Coverage
           return {
-            sortTime: sTime,
+            sortTime: sTime.getTime(),
             scc: satrecIn.satnum,
             score: score,
             startDate: sTime,
@@ -873,7 +886,24 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
       if (passMaxEl < aer.el) passMaxEl = aer.el;
       if (passMinrng > aer.rng) passMinrng = aer.rng;
     }
-    return {};
+    return {
+      sortTime: null,
+      scc: null,
+      score: null,
+      startDate: null,
+      startTime: null,
+      startAz: null,
+      startEl: null,
+      startrng: null,
+      stopDate: null,
+      stopTime: null,
+      stopAz: null,
+      stopEl: null,
+      stoprng: null,
+      tic: null,
+      minrng: null,
+      passMaxEl: null,
+    };
   };
 
   for (var i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
@@ -882,9 +912,9 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]) => { // NO
     let now = timeManager.getOffsetTimeObj(offset, simulationTime);
     if (lookanglesTable.length <= 5000) {
       // Maximum of 1500 lines in the look angles table
-      let lookanglesRow = _propagateBestPass(now, satrec);
+      const lookanglesRow = _propagateBestPass(now, satrec);
       // If data came back...
-      if (typeof lookanglesRow.score !== 'undefined') {
+      if (lookanglesRow.score !== null) {
         lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
         // Reset flags for next pass
         score = 0;

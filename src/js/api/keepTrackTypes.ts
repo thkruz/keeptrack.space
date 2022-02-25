@@ -1112,6 +1112,25 @@ export type EciPos = { x: Kilometers; y: Kilometers; z: Kilometers };
 export type EciVel = { x: Kilometers; y: Kilometers; z: Kilometers };
 export type Eci = { position: EciPos; velocity: EciVel };
 
+export type lookanglesRow = {
+  sortTime: number;
+  scc: string;
+  score: number;
+  startDate: Date;
+  startTime: Date;
+  startAz: string;
+  startEl: string;
+  startrng: string;
+  stopDate: Date;
+  stopTime: Date;
+  stopAz: string;
+  stopEl: string;
+  stoprng: string;
+  tic: number;
+  minrng: string;
+  passMaxEl: string;
+};
+
 export interface SatMath {
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };
@@ -1131,7 +1150,7 @@ export interface SatMath {
   eci2Rae: (now: Date, eci: EciArr3, sensor: SensorObject) => { az: number; el: number; rng: any };
   eciToEcf(position: any, gmst: any);
   eciToGeodetic(position: EciPos, gmst: number): { lat: Radians; lon: Radians; alt: Kilometers };
-  findBestPass(sat: any, sensors: SensorObject[], arg2: number);
+  findBestPass(sat: SatObject, sensors: SensorObject[]): lookanglesRow[];
   findBestPasses: (sats: string, sensor: SensorObject) => void;
   findCloseObjects: () => string;
   findClosestApproachTime: (

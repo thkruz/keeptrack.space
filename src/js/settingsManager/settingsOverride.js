@@ -65,6 +65,7 @@ const settingsManagerOverride = {
     soundManager: true,
     gamepad: true,
   },
+  searchLimit: 150,
 };
 
 // Expose these to the console

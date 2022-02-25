@@ -432,7 +432,7 @@ export const onCruncherReady = (): any => {
     if (sensorManager.checkSensorSelected() && newWatchlist.length > 0) {
       $('#menu-info-overlay').removeClass('bmenu-item-disabled');
     }
-    updateWatchlist(newWatchlist, _watchlistInViewList);
+    // updateWatchlist(newWatchlist, _watchlistInViewList);
   }
 };
 

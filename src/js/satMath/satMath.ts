@@ -497,7 +497,7 @@ export const getlookanglesMultiSite = (sat: SatObject) => {
   satellite.lastMultiSiteArray = multiSiteArray;
 
   // Populate the Side Menu
-  populateMultiSiteTable(multiSiteArray);
+  populateMultiSiteTable(multiSiteArray, sat);
 
   isResetToDefault ? sensorManager.setCurrentSensor(sensorManager.defaultSensor) : sensorManager.setCurrentSensor(sensorManager.tempSensor);
 };
@@ -1598,7 +1598,9 @@ const verifySensors = (sensors: SensorObject[], sensorManager: SensorManager): S
   return sensors;
 };
 
-export const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
+export const populateMultiSiteTable = (multiSiteArray: TearrData[], sat: SatObject) => {
+  const { sensorManager } = keepTrackApi.programs;
+
   const tbl = <HTMLTableElement>document.getElementById('looksmultisite'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
   let tr = tbl.insertRow();
@@ -1619,50 +1621,29 @@ export const populateMultiSiteTable = (multiSiteArray: TearrData[]) => {
   tdS.setAttribute('style', 'text-decoration: underline');
 
   for (let i = 0; i < multiSiteArray.length; i++) {
-    if (tbl.rows.length > 0) {
-      for (let r = 0; r < tbl.rows.length; r++) {
-        const dateString = tbl.rows[r].cells[0].textContent;
-
-        const sYear = parseInt(dateString.substr(0, 4)); // UTC Year
-        const sMon = parseInt(dateString.substr(5, 2)) - 1; // UTC Month in MMM prior to converting
-        const sDay = parseInt(dateString.substr(8, 2)); // UTC Day
-        const sHour = parseInt(dateString.substr(11, 2)); // UTC Hour
-        const sMin = parseInt(dateString.substr(14, 2)); // UTC Min
-        const sSec = parseInt(dateString.substr(17, 2)); // UTC Sec
-
-        const topTime = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
-
-        // Date object defaults to local time.
-        topTime.setUTCDate(sDay); // Move to UTC day.
-        topTime.setUTCHours(sHour); // Move to UTC Hour
-
-        if (new Date(multiSiteArray[i].time) < topTime) {
-          tr = tbl.insertRow(i);
-          break;
-        }
-      }
-    }
-
-    if (tr == null) {
+    if (sensorManager.sensorListUS.includes(sensorManager.sensorList[multiSiteArray[i].name])) {
       tr = tbl.insertRow();
+      tdT = tr.insertCell();
+      tdT.appendChild(document.createTextNode(dateFormat(multiSiteArray[i].time, 'isoDateTime', true)));
+      tdE = tr.insertCell();
+      tdE.appendChild(document.createTextNode(multiSiteArray[i].el.toFixed(1)));
+      tdA = tr.insertCell();
+      tdA.appendChild(document.createTextNode(multiSiteArray[i].az.toFixed(0)));
+      tdR = tr.insertCell();
+      tdR.appendChild(document.createTextNode(multiSiteArray[i].rng.toFixed(0)));
+      tdS = tr.insertCell();
+      tdS.appendChild(document.createTextNode(multiSiteArray[i].name));
+      // TODO: Future feature
+      tr.addEventListener('click', () => {
+        const { sensorManager, timeManager, satSet } = keepTrackApi.programs;
+        timeManager.changeStaticOffset(new Date(multiSiteArray[i].time).getTime() - new Date().getTime());
+        sensorManager.setSensor(sensorManager.sensorList[multiSiteArray[i].name]);
+        // TODO: This is an ugly workaround
+        setTimeout(() => {
+          satSet.selectSat(sat.id);
+        }, 500);
+      });
     }
-
-    tdT = tr.insertCell();
-    tdT.appendChild(document.createTextNode(dateFormat(multiSiteArray[i].time, 'isoDateTime', true)));
-    tdE = tr.insertCell();
-    tdE.appendChild(document.createTextNode(multiSiteArray[i].el.toFixed(1)));
-    tdA = tr.insertCell();
-    tdA.appendChild(document.createTextNode(multiSiteArray[i].az.toFixed(0)));
-    tdR = tr.insertCell();
-    tdR.appendChild(document.createTextNode(multiSiteArray[i].rng.toFixed(0)));
-    tdS = tr.insertCell();
-    tdS.appendChild(document.createTextNode(multiSiteArray[i].name));
-    // TODO: Future feature
-    // tdS.onclick = () => {
-    //   timeManager.changeStaticOffset(new Date(multiSiteArray[i].time).getTime() - new Date().getTime());
-    //   sensorManager.setSensor(sensorManager.sensorList[multiSiteArray[i].name]);
-    //   mainCamera.snapToSat(satSet.getSat(objectManager.lastSelectedSat()));
-    // };
   }
 };
 

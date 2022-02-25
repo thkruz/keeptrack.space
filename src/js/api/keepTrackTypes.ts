@@ -1172,7 +1172,7 @@ export interface SatMath {
   getRae(now: Date, satrec: SatRec, sensor: SensorObject);
   getSunTimes: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => void;
   getTearData: any;
-  populateMultiSiteTable: (multiSiteArray: TearrData[]) => void;
+  populateMultiSiteTable: (multiSiteArray: TearrData[], sat: SatObject) => void;
   getTEARR: (sat?: SatObject, sensors?: SensorObject[], propTime?: Date) => any;
   gstime(j: number);
   isRiseSetLookangles: any;

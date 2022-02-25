@@ -686,12 +686,12 @@ export const calculateLookAngles = (sat: SatObject, sensors: SensorObject[]) => 
   for (var i = 0; i < satellite.lookanglesLength * 24 * 60 * 60; i += satellite.lookanglesInterval) {
     // satellite.lookanglesInterval in seconds
     offset = i * 1000; // Offset in seconds (msec * 1000)
-    let now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
     if (lookanglesTable.length <= 5000) {
       // Maximum of 1500 lines in the look angles table
-      let lookanglesRow = getTearData(now, satrec, [sensor]);
-      if (lookanglesRow.time !== '') {
-        lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
+      const _lookanglesRow = getTearData(now, satrec, [sensor]);
+      if (_lookanglesRow.time !== '') {
+        lookanglesTable.push(_lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
       }
     }
   }

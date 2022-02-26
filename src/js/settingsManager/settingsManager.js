@@ -462,7 +462,7 @@ settingsManager = {
     settingsManager.nextNPassesCount = 5;
 
     settingsManager.minimumSearchCharacters = 2; // Searches after 3 characters typed
-    settingsManager.searchLimit = 400;
+    settingsManager.searchLimit = 150;
 
     settingsManager.nameOfSpecialSats = 'Special Sats';
 

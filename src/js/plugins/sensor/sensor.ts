@@ -285,14 +285,12 @@ export const uiManagerInit = () => {
                   <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Add Custom Sensor &#9658;</button>
                   <br />
                   <br />
+                  <button id="cs-clear" class="btn btn-ui waves-effect waves-light" name="action">Clear Custom Sensors &#9658;</button>
+                  <br />
+                  <br />
+                  <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" name="search">Use Geolocation &#9658;</button>
                 </div>
               </form>
-              <div>
-                <button id="cs-clear" class="btn btn-ui waves-effect waves-light" name="action">Clear Custom Sensors &#9658;</button>
-                <br />
-                <br />
-                <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" name="search">Use Geolocation &#9658;</button>
-              </div>
             </div>
           </div>
         </div>

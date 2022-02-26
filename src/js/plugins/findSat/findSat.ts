@@ -7,26 +7,26 @@ import { RAD2DEG } from '../../lib/constants';
 let isFindByLooksMenuOpen = false;
 export const checkInc = (possibles: any[], min: number, max: number) => {
   possibles = possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
-  return possibles;
+  return limitPossibles(possibles, settingsManager.searchLimit);
 };
 
 export const checkRaan = (possibles: any[], min: number, max: number) => {
   possibles = possibles.filter((possible) => possible.raan * RAD2DEG < max && possible.raan * RAD2DEG > min);
-  return possibles;
+  return limitPossibles(possibles, settingsManager.searchLimit);
 };
 
 export const checkArgPe = (possibles: any[], min: number, max: number) => {
   possibles = possibles.filter((possible) => possible.argPe * RAD2DEG < max && possible.argPe * RAD2DEG > min);
-  return possibles;
+  return limitPossibles(possibles, settingsManager.searchLimit);
 };
 
 export const checkPeriod = (possibles: any[], minPeriod: number, maxPeriod: number) => {
   possibles = possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
-  return limitPossibles(possibles, 200);
+  return limitPossibles(possibles, settingsManager.searchLimit);
 };
 export const checkRcs = (possibles: any[], minRcs: number, maxRcs: number) => {
   possibles = possibles.filter((possible) => parseFloat(possible.R) > minRcs && parseFloat(possible.R) < maxRcs);
-  return limitPossibles(possibles, 200);
+  return limitPossibles(possibles, settingsManager.searchLimit);
 };
 
 export interface SearchSatParams {
@@ -451,7 +451,7 @@ export const findByLooksSubmit = () => {
 
 export const limitPossibles = (possibles: any[], limit: number): any[] => {
   const { uiManager } = keepTrackApi.programs;
-  if (possibles.length >= limit) uiManager.toast('Too many results, limited to 200', 'serious');
-  possibles = possibles.filter((_possible, i) => i > limit - 1);
+  if (possibles.length >= limit) uiManager.toast(`Too many results, limited to ${limit}`, 'serious');
+  possibles = possibles.slice(0, limit);
   return possibles;
 };

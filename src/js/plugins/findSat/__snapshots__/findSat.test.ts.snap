@@ -52,7 +52,16 @@ Array [
 ]
 `;
 
-exports[`findSat.checkPeriod 0 1`] = `Array []`;
+exports[`findSat.checkPeriod 0 1`] = `
+Array [
+  Object {
+    "period": 0,
+  },
+  Object {
+    "period": 50,
+  },
+]
+`;
 
 exports[`findSat.checkRange 0 1`] = `
 Array [
@@ -65,7 +74,16 @@ Array [
 ]
 `;
 
-exports[`findSat.checkRcs 0 1`] = `Array []`;
+exports[`findSat.checkRcs 0 1`] = `
+Array [
+  Object {
+    "R": 0,
+  },
+  Object {
+    "R": 50,
+  },
+]
+`;
 
 exports[`findSat.findByLooksSubmit 0 1`] = `undefined`;
 

@@ -906,16 +906,16 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookangle
     };
   };
 
-  for (var i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
+  for (let i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
     // satellite.lookanglesInterval in seconds
     offset = i * 1000; // Offset in seconds (msec * 1000)
-    let now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
     if (lookanglesTable.length <= 5000) {
       // Maximum of 1500 lines in the look angles table
-      const lookanglesRow = _propagateBestPass(now, satrec);
+      const _lookanglesRow = _propagateBestPass(now, satrec);
       // If data came back...
-      if (lookanglesRow.score !== null) {
-        lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
+      if (_lookanglesRow.score !== null) {
+        lookanglesTable.push(_lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
         // Reset flags for next pass
         score = 0;
         sAz = null;
@@ -1635,7 +1635,7 @@ export const populateMultiSiteTable = (multiSiteArray: TearrData[], sat: SatObje
       tdS.appendChild(document.createTextNode(multiSiteArray[i].name));
       // TODO: Future feature
       tr.addEventListener('click', () => {
-        const { sensorManager, timeManager, satSet } = keepTrackApi.programs;
+        const { timeManager, satSet } = keepTrackApi.programs;
         timeManager.changeStaticOffset(new Date(multiSiteArray[i].time).getTime() - new Date().getTime());
         sensorManager.setSensor(sensorManager.sensorList[multiSiteArray[i].name]);
         // TODO: This is an ugly workaround

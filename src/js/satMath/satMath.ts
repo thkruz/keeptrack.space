@@ -985,26 +985,26 @@ export const getEci = (sat: SatObject, now: Date) => {
 };
 /* istanbul ignore next */
 export const findNearbyObjectsByOrbit = (sat: SatObject) => {
-  const { satSet } = keepTrackApi.programs;
+  const { satData: catalog } = keepTrackApi.programs.satSet;
 
-  let catalog = satSet.satData;
-  let possibleMatches = [];
-  let maxPeriod = sat.period * 1.05;
-  let minPeriod = sat.period * 0.95;
-  let maxInclination = sat.inclination * 1.025;
-  let minInclination = sat.inclination * 0.975;
-  let maxRaan = sat.raan * 1.025;
-  let minRaan = sat.raan * 0.975;
-  for (let ss = 0; ss < catalog.length; ss++) {
-    let sat2 = catalog[ss];
-    if (sat2.static) break;
-    if (sat2.period > maxPeriod || sat2.period < minPeriod) continue;
-    if (sat2.inclination > maxInclination || sat2.inclination < minInclination) continue;
-    if (sat2.raan > maxRaan || sat2.raan < minRaan) continue;
-    possibleMatches.push(sat2.id);
-  }
+  const maxPeriod = sat.period * 1.1;
+  const minPeriod = sat.period * 0.9;
+  const maxInclination = sat.inclination + 10 * DEG2RAD;
+  const minInclination = sat.inclination - 10 * DEG2RAD;
+  const maxRaan = sat.raan > 350 * DEG2RAD ? sat.raan - 350 * DEG2RAD : sat.raan + 10 * DEG2RAD;
+  const minRaan = sat.raan - 10 * DEG2RAD;
 
-  return possibleMatches;
+  return catalog.filter((s) => {
+    if (s.static) return false;
+    if (s.inclination < minInclination || s.inclination > maxInclination) return false;
+    if (sat.raan > 350 * DEG2RAD) {
+      if (s.raan > maxRaan && s.raan < minRaan) return false;
+    } else {
+      if (s.raan < minRaan || s.raan > maxRaan) return false;
+    }
+    if (s.period < minPeriod || s.period > maxPeriod) return false;
+    return true;
+  }).map((s) => s.id);
 };
 export const findClosestApproachTime = (
   sat1: SatObject,

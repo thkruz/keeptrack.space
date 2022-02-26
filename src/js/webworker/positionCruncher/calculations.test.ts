@@ -58,6 +58,7 @@ describe('calculations', () => {
 
   describe('isInFov', () => {
     let isInFovSensor = { ...defaultSensor };
+    let isInFovSensor2 = { ...defaultSensor };
     beforeEach(() => {
       isInFovSensor.obsminaz = -90;
       isInFovSensor.obsmaxaz = 90;
@@ -65,6 +66,19 @@ describe('calculations', () => {
       isInFovSensor.obsmaxel = 90;
       isInFovSensor.obsminrange = 0;
       isInFovSensor.obsmaxrange = 100;
+
+      isInFovSensor2.obsminaz = 0;
+      isInFovSensor2.obsmaxaz = 0;
+      isInFovSensor2.obsminel = 0;
+      isInFovSensor2.obsmaxel = 0;
+      isInFovSensor2.obsminrange = 0;
+      isInFovSensor2.obsmaxrange = 0;
+      isInFovSensor2.obsminaz2 = -90;
+      isInFovSensor2.obsmaxaz2 = 90;
+      isInFovSensor2.obsminel2 = -90;
+      isInFovSensor2.obsmaxel2 = 90;
+      isInFovSensor2.obsminrange2 = 0;
+      isInFovSensor2.obsmaxrange2 = 100;
     });
 
     it('should return 1 if in fov', () => {
@@ -84,6 +98,28 @@ describe('calculations', () => {
       };
       const result = calculations.isInFov(lookangles, isInFovSensor);
       expect(result).toBe(0);
+    });
+    it('should handle second sensor and in fov', () => {
+      const lookangles = {
+        azimuth: 0 * DEG2RAD,
+        elevation: 0 * DEG2RAD,
+        rangeSat: 50,
+      };
+      const result = calculations.isInFov(lookangles, isInFovSensor2);
+      expect(result).toBe(1);
+    });
+    it('should handle second sensor, az crosses 0, and in fov', () => {
+      const lookangles = {
+        azimuth: 0 * DEG2RAD,
+        elevation: 0 * DEG2RAD,
+        rangeSat: 50,
+      };
+      isInFovSensor2.obsminaz = 350;
+      isInFovSensor2.obsmaxaz = 10;
+      isInFovSensor2.obsminaz2 = 350;
+      isInFovSensor2.obsmaxaz2 = 10;
+      const result = calculations.isInFov(lookangles, isInFovSensor2);
+      expect(result).toBe(1);
     });
     it('should return 1 if in fov and az crosses 0', () => {
       const northSensor = { ...isInFovSensor };

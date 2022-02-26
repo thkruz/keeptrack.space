@@ -1,4 +1,4 @@
-import * as satellite from 'satellite.js';
+import * as satellite from 'satellite.js'; // NOSONAR
 import { SensorObjectCruncher } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { DEG2RAD, MILLISECONDS_PER_DAY, PI, RAD2DEG } from '../../lib/constants';
@@ -49,19 +49,19 @@ export const propTime = (dynamicOffsetEpoch: number, staticOffset: number, propR
 };
 
 export const checkSunExclusion = (sensor: SensorObjectCruncher, j: number, gmst: number, now: Date): [isSunExclusion: boolean, sunECI: { x: number; y: number; z: number }] => {
-  var jdo = new A.JulianDay(j); // now
-  var coord = A.EclCoordfromWgs84(0, 0, 0);
-  var coord2 = A.EclCoordfromWgs84(sensor.observerGd.latitude * RAD2DEG, sensor.observerGd.longitude * RAD2DEG, sensor.observerGd.height);
+  const jdo = new A.JulianDay(j); // now
+  const coord = A.EclCoordfromWgs84(0, 0, 0);
+  const coord2 = A.EclCoordfromWgs84(sensor.observerGd.latitude * RAD2DEG, sensor.observerGd.longitude * RAD2DEG, sensor.observerGd.height);
 
   // AZ / EL Calculation
-  var tp = <{ hz: { az: number; alt: number } }>(<unknown>A.Solar.topocentricPosition(jdo, coord, false));
-  var tpRel = A.Solar.topocentricPosition(jdo, coord2, false);
+  const tp = <{ hz: { az: number; alt: number } }>(<unknown>A.Solar.topocentricPosition(jdo, coord, false));
+  const tpRel = A.Solar.topocentricPosition(jdo, coord2, false);
   const sunAz = tp.hz.az * RAD2DEG + (180 % 360);
   const sunEl = (tp.hz.alt * RAD2DEG) % 360;
   const sunElRel = (tpRel.hz.alt * RAD2DEG) % 360;
 
   // Range Calculation
-  var T = new A.JulianDay(A.JulianDay.dateToJD(now)).jdJ2000Century();
+  const T = new A.JulianDay(A.JulianDay.dateToJD(now)).jdJ2000Century();
   let sunG = (A.Solar.meanAnomaly(T) * 180) / PI;
   sunG = sunG % 360.0;
   const sunR = 1.00014 - 0.01671 * Math.cos(sunG) - 0.00014 * Math.cos(2 * sunG);

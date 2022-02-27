@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SensorObject } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
+import { addCustomSensor } from '../sensor/sensor';
 
 let isStfMenuOpen = false;
 let stfInfoLinks = false;
@@ -169,9 +170,7 @@ export const stfFormOnSubmit = (e: Event) => {
     return;
   }
 
-  const lat = sensorManager.currentSensor[0].lat;
-  const lon = sensorManager.currentSensor[0].lon;
-  const alt = sensorManager.currentSensor[0].alt;
+  const { lat, lon, alt } = sensorManager.currentSensor[0];
   const sensorType = 'Short Range Fence';
 
   // Multiply everything by 1 to convert string to number
@@ -189,40 +188,30 @@ export const stfFormOnSubmit = (e: Event) => {
   const minrange = rng - rngExt;
   const maxrange = rng + rngExt;
 
+  const stfSensor = <SensorObject>(<unknown>{
+    lat,
+    lon,
+    alt,
+    obsminaz: minaz,
+    obsmaxaz: maxaz,
+    obsminel: minel,
+    obsmaxel: maxel,
+    obsminrange: minrange,
+    obsmaxrange: maxrange,
+    type: sensorType,
+  });
+
+  const customSensors = addCustomSensor(stfSensor);
+
+  sensorManager.whichRadar = customSensors.length > 1 ? 'MULTI CUSTOM' : 'CUSTOM';
+
   satSet.satCruncher.postMessage({
     typ: 'sensor',
     setlatlong: true, // Tell satSet.satCruncher we are changing observer location
-    sensor: [
-      {
-        lat: lat,
-        lon: lon,
-        alt: alt,
-        obsminaz: minaz,
-        obsmaxaz: maxaz,
-        obsminel: minel,
-        obsmaxel: maxel,
-        obsminrange: minrange,
-        obsmaxrange: maxrange,
-        type: sensorType,
-      },
-    ],
+    sensor: customSensors,
+    multiSensor: customSensors.length > 1,
   });
-
-  satellite.setobs(<SensorObject[]>(<unknown>[
-    {
-      lat: lat,
-      lon: lon,
-      alt: alt,
-      obsminaz: minaz,
-      obsmaxaz: maxaz,
-      obsminel: minel,
-      obsmaxel: maxel,
-      obsminrange: minrange,
-      obsmaxrange: maxrange,
-      type: sensorType,
-    },
-  ]));
-
+  satellite.setobs(customSensors);
   $('#sensor-selected').text('Short Term Fence');
 
   keepTrackApi.programs.sensorFov.enableFovView();

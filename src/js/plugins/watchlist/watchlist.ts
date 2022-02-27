@@ -112,7 +112,7 @@ export const init = (): void => {
   });
 };
 
-export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any, isSkipSearch = false) => {
+export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any, isSkipSearch = false) => { // NOSONAR
   const settingsManager: any = window.settingsManager;
   const { satSet, uiManager }: { satSet: any; uiManager: any } = keepTrackApi.programs;
   if (typeof updateWatchlistList !== 'undefined') {
@@ -132,8 +132,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
     sat = satSet.getSatExtraOnly(watchlistList[i]);
     if (sat == null) {
       watchlistList.splice(i, 1);
-      continue;
-    }
+    } else {
     watchlistListHTML +=`
       <div class="row">
         <div class="col s3 m3 l3">
@@ -146,6 +145,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
           <img class="watchlist-remove" data-sat-id="${sat.id}" src="img/remove.png"></img>
         </div>
       </div>`;
+    }
   }
   $('#watchlist-list').html(watchlistListHTML);
   for (let i = 0; i < watchlistList.length; i++) {

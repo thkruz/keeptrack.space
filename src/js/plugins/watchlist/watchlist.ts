@@ -112,7 +112,7 @@ export const init = (): void => {
   });
 };
 
-export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any) => {
+export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any, isSkipSearch = false) => {
   const settingsManager: any = window.settingsManager;
   const { satSet, uiManager }: { satSet: any; uiManager: any } = keepTrackApi.programs;
   if (typeof updateWatchlistList !== 'undefined') {
@@ -124,11 +124,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
 
   if (!watchlistList) return;
   settingsManager.isThemesNeeded = true;
-  if (isWatchlistChanged == null) {
-    isWatchlistChanged = false;
-  } else {
-    isWatchlistChanged = true;
-  }
+  isWatchlistChanged = isWatchlistChanged != null;
   let watchlistString = '';
   let watchlistListHTML = '';
   let sat;
@@ -157,7 +153,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
     watchlistString += satSet.getSatExtraOnly(watchlistList[i]).sccNum;
     if (i !== watchlistList.length - 1) watchlistString += ',';
   }
-  uiManager.doSearch(watchlistString, true);
+  if (!isSkipSearch) uiManager.doSearch(watchlistString, true);
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 
   const saveWatchlist = [];
@@ -432,7 +428,7 @@ export const onCruncherReady = (): any => {
     if (sensorManager.checkSensorSelected() && newWatchlist.length > 0) {
       $('#menu-info-overlay').removeClass('bmenu-item-disabled');
     }
-    updateWatchlist(newWatchlist, _watchlistInViewList);
+    updateWatchlist(newWatchlist, _watchlistInViewList, true);
   }
 };
 

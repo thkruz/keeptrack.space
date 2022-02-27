@@ -1130,7 +1130,7 @@ describe('satMath.populateMultiSiteTable', () => {
         name: 'COD',
       },
     ];
-    let result: any = satMath.populateMultiSiteTable(mSiteArray);
+    let result: any = satMath.populateMultiSiteTable(mSiteArray, defaultSat);
     expect(result).toMatchSnapshot();
   });
 });

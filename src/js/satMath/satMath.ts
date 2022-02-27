@@ -991,13 +991,19 @@ export const findNearbyObjectsByOrbit = (sat: SatObject) => {
   const minPeriod = sat.period * 0.9;
   const maxInclination = sat.inclination + 10 * DEG2RAD;
   const minInclination = sat.inclination - 10 * DEG2RAD;
-  const maxRaan = sat.raan > 350 * DEG2RAD ? sat.raan - 350 * DEG2RAD : sat.raan + 10 * DEG2RAD;
-  const minRaan = sat.raan - 10 * DEG2RAD;
+  let maxRaan = sat.raan + 10 * DEG2RAD;
+  let minRaan = sat.raan - 10 * DEG2RAD;
+  if (sat.raan >= 350 * DEG2RAD) {
+    maxRaan -= 360 * DEG2RAD;
+  }
+  if (sat.raan <= 10 * DEG2RAD) {
+    minRaan += 360 * DEG2RAD;
+  }
 
   return catalog.filter((s) => {
     if (s.static) return false;
     if (s.inclination < minInclination || s.inclination > maxInclination) return false;
-    if (sat.raan > 350 * DEG2RAD) {
+    if (sat.raan > 350 * DEG2RAD || sat.raan < 10 * DEG2RAD) {
       if (s.raan > maxRaan && s.raan < minRaan) return false;
     } else {
       if (s.raan < minRaan || s.raan > maxRaan) return false;

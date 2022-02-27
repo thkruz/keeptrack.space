@@ -440,18 +440,16 @@ export const uiManagerInit = () => {
     sensorListContentClick(sensorClick);
   });
 
-  $('#cs-geolocation').on('click', uiManager.useCurrentGeolocationAsSensor);
-
-  $('#cs-clear').on('click', clearCustomSensors);
-
-  $('#reset-sensor-button').on('click', resetSensorButtonClick);
-
-  $('#cs-telescope').on('click', csTelescopeClick);
 
   $('#customSensor').on('submit', (e: Event) => {
-    customSensorSubmit();
     e.preventDefault();
   });
+
+  $('#reset-sensor-button').on('click', resetSensorButtonClick);
+  $('#cs-telescope').on('click', csTelescopeClick);
+  $('#cs-submit').on('click', customSensorSubmit);
+  $('#cs-clear').on('click', clearCustomSensors);
+  $('#cs-geolocation').on('click', uiManager.useCurrentGeolocationAsSensor);
 };
 
 export const resetSensorSelected = () => {
@@ -744,6 +742,13 @@ export const hideSideMenus = (): void => {
   keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = false;
   isLookanglesMultiSiteMenuOpen = false;
 };
+
+export const addCustomSensor = (sensor: SensorObject): SensorObject[] => {
+  customSensors.push(sensor);
+  return customSensors;
+};
+
+
 export const customSensorSubmit = (): void => {
   const { sensorManager, satSet, satellite, mainCamera, timeManager, objectManager } = keepTrackApi.programs;
   $('#menu-sensor-info').removeClass('bmenu-item-disabled');
@@ -766,9 +771,9 @@ export const customSensorSubmit = (): void => {
   const minrange = $('#cs-minrange').val();
   const maxrange = $('#cs-maxrange').val();
 
-  customSensors.push(<SensorObject>{
-    lat: lat,
-    lon: lon,
+  addCustomSensor(<SensorObject>{
+    lat,
+    lon,
     alt: parseFloat(<string>alt),
     obsminaz: parseFloat(<string>minaz),
     obsmaxaz: parseFloat(<string>maxaz),

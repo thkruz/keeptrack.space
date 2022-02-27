@@ -70,6 +70,7 @@ export const updateSelectBoxCoreCallback = (sat: SatObject) => { // NOSONAR
   if (objectManager.isSensorManagerLoaded) {
     if (sensorManager.checkSensorSelected()) {
       // If we didn't just calculate next pass time for this satellite and sensor combination do it
+      // TODO: Make new logic for this to allow it to be updated while selected
       if (objectManager.selectedSat !== uiManager.lastNextPassCalcSatId && sensorManager.currentSensor[0].shortName !== uiManager.lastNextPassCalcSensorId && !sat.missile) {
         $('#sat-nextpass').html(satellite.nextpass(sat));
 

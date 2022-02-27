@@ -120,6 +120,8 @@ export const initNightTexture = (gl: WebGL2RenderingContext): void => {
   };
 };
 export const initDayTexture = (gl: WebGL2RenderingContext): void => {
+  const uiManager = keepTrackApi.programs.uiManager;
+  uiManager.loadStr('painting');
   texture = gl.createTexture();
   let img = new Image();
   img.onload = () => {
@@ -267,8 +269,6 @@ export const dayImgHiOnLoad = (gl: WebGL2RenderingContext): void => {
 };
 
 export const dayImgOnLoad = (gl: WebGL2RenderingContext, img: HTMLImageElement): void => {
-  const uiManager = keepTrackApi.programs.uiManager;
-  uiManager.loadStr('painting');
   if (!settingsManager.isBlackEarth) {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);

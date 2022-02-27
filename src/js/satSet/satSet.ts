@@ -58,7 +58,7 @@ import { search } from './search';
 
 // ******************** Initialization ********************
 
-export const init = async (satCruncherOveride?: any): Promise<void> => { // NOSONAR
+export const init = async (satCruncherOveride?: any): Promise<number> => { // NOSONAR
   try {
     const { uiManager } = keepTrackApi.programs;
     let satCruncher: Worker;
@@ -81,8 +81,10 @@ export const init = async (satCruncherOveride?: any): Promise<void> => { // NOSO
       }
     } else {
       if (typeof Worker === 'undefined') {
-        console.debug('Your browser does not support web workers.');
-        return;
+        $('#loader-text').text(
+          'Your browser does not support web workers.'
+        );
+        return 1;
       }
       /* istanbul ignore next */
       try {
@@ -92,10 +94,15 @@ export const init = async (satCruncherOveride?: any): Promise<void> => { // NOSO
         // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
         if (window.location.href.indexOf('file://') === 0) {
           $('#loader-text').text(
-            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
+            'Critical Error: You need to allow access to files from your computer! ' + 
+            'Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
           );
+          return 1;
         } else {
-          console.debug(error);
+          $('#loader-text').text(
+            error
+          );
+          return 1;
         }
       }
     }
@@ -104,8 +111,12 @@ export const init = async (satCruncherOveride?: any): Promise<void> => { // NOSO
     satSet.gotExtraData = false;
     // TODO: FUTURE FEATURE
     // satSet.radarDataManager = radarDataManager;
+    return 0;
   } catch (error) {
-    console.debug(error);
+    $('#loader-text').text(
+      error
+    );
+    return 1;
   }
 };
 export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, sccNum?: string): any => {
@@ -366,6 +377,8 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
     satSet.satData[i].getAltitude = () => {
       // Stars don't have an altitude
       if (satSet.satData[i].type === SpaceObjectType.STAR) return;
+      // Sensors don't have TLEs
+      if ([SpaceObjectType.PHASED_ARRAY_RADAR, SpaceObjectType.MECHANICAL, SpaceObjectType.OPTICAL].includes(satSet.satData[i].type)) return;
 
       if (satSet.satData[i].missile) {
         return satellite.eci2ll(satSet.satData[i].position.x, satSet.satData[i].position.y, satSet.satData[i].position.z).alt;
@@ -510,7 +523,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
   if (typeof satSet.satData[i].getDirection == 'undefined') {
     satSet.satData[i].getDirection = () => {
       const nowLat = satSet.satData[i].getTEARR().lat * RAD2DEG;
-      let futureTime = timeManager.getOffsetTimeObj(5000, timeManager.calculateSimulationTime());
+      const futureTime = timeManager.getOffsetTimeObj(5000, timeManager.calculateSimulationTime());
       const futLat = satSet.satData[i].getTEARR(futureTime).lat * RAD2DEG;
 
       // TODO: Remove getTEARR References
@@ -534,46 +547,46 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
 };
 
 export let satSet: CatalogManager = {
-  convertIdArrayToSatnumArray: convertIdArrayToSatnumArray,
-  convertSatnumArrayToIdArray: convertSatnumArrayToIdArray,
+  convertIdArrayToSatnumArray,
+  convertSatnumArrayToIdArray,
   cosparIndex: null,
-  exportTle2Csv: exportTle2Csv,
-  exportTle2Txt: exportTle2Txt,
-  getIdFromEci: getIdFromEci,
-  getIdFromIntlDes: getIdFromIntlDes,
-  getIdFromObjNum: getIdFromObjNum,
-  getSensorFromSensorName: getSensorFromSensorName,
-  getIdFromStarName: getIdFromStarName,
-  getSat: getSat,
-  getSatExtraOnly: getSatExtraOnly,
-  getSatFromObjNum: getSatFromObjNum,
-  getSatInSun: getSatInSun,
-  getSatInView: getSatInView,
-  getSatInViewOnly: getSatInViewOnly,
-  getSatPosOnly: getSatPosOnly,
-  getSatVel: getSatVel,
-  getScreenCoords: getScreenCoords,
+  exportTle2Csv,
+  exportTle2Txt,
+  getIdFromEci,
+  getIdFromIntlDes,
+  getIdFromObjNum,
+  getSensorFromSensorName,
+  getIdFromStarName,
+  getSat,
+  getSatExtraOnly,
+  getSatFromObjNum,
+  getSatInSun,
+  getSatInView,
+  getSatInViewOnly,
+  getSatPosOnly,
+  getSatVel,
+  getScreenCoords,
   gotExtraData: false,
   gsInfo: null,
-  init: init,
-  insertNewAnalystSatellite: insertNewAnalystSatellite,
-  mergeSat: mergeSat,
+  init,
+  insertNewAnalystSatellite,
+  mergeSat,
   missileSats: null,
   numSats: null,
-  onCruncherReady: onCruncherReady,
+  onCruncherReady,
   orbitalSats: null,
   queryStr: null,
-  resetSatInSun: resetSatInSun,
-  resetSatInView: resetSatInView,
+  resetSatInSun,
+  resetSatInView,
   satCruncher: null,
   satData: null,
   satExtraData: null,
   satSensorMarkerArray: null,
   sccIndex: null,
-  selectSat: selectSat,
+  selectSat,
   setColorScheme: <any>setColorScheme,
-  setHover: setHover,
-  setSat: setSat,
+  setHover,
+  setSat,
   sunECI: null,
-  search: search,
+  search,
 };

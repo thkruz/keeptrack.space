@@ -282,26 +282,36 @@ export const nextpass = (sat: SatObject, sensors?: SensorObject[], searchLength?
   const { timeManager, sensorManager } = keepTrackApi.programs;
 
   sensors = verifySensors(sensors, sensorManager);
-  // TODO: Instead of doing the first sensor this should return an array.
-  const sensor = sensors[0];
-
+  // Loop through sensors looking for in view times
+  const inViewTime = [];
   // If length and interval not set try to use defaults
   searchLength ??= satellite.lookanglesLength;
   interval ??= satellite.lookanglesInterval;
 
   const simulationTime = timeManager.calculateSimulationTime();
   let offset = 0;
-  let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-  for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
-    // 5second Looks
-    offset = i * 1000; // Offset in seconds (msec * 1000)
-    let now = timeManager.getOffsetTimeObj(offset, simulationTime);
-    let aer = satellite.getRae(now, satrec, sensor);
+  const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  for (const sensor of sensors) {
+    for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
+      // 5second Looks
+      offset = i * 1000; // Offset in seconds (msec * 1000)
+      const now = timeManager.getOffsetTimeObj(offset, simulationTime);
+      const aer = satellite.getRae(now, satrec, sensor);
 
-    let isInFOV = satellite.checkIsInView(sensor, aer);
-    if (isInFOV) return dateFormat(now, 'isoDateTime', true);
+      const isInFOV = satellite.checkIsInView(sensor, aer);
+      if (isInFOV) {
+        inViewTime.push(now);
+        break;
+      }
+    }
   }
-  return 'No Passes in ' + searchLength + ' Days';
+  // If there are in view times find the earlierst and return it formatted
+  if (inViewTime.length > 0) {
+    inViewTime.sort((a, b) => a.getTime() - b.getTime());
+    return dateFormat(inViewTime[0], 'isoDateTime', true);
+  } else {
+    return 'No Passes in ' + searchLength + ' Days';
+  }
 };
 export const nextNpasses = (sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) => {
   const { timeManager, sensorManager } = keepTrackApi.programs;
@@ -984,27 +994,33 @@ export const getEci = (sat: SatObject, now: Date) => {
   return satellite.sgp4(satrec, m);
 };
 /* istanbul ignore next */
-export const findNearbyObjectsByOrbit = (sat: SatObject) => {
-  const { satSet } = keepTrackApi.programs;
+export const findNearbyObjectsByOrbit = (sat: SatObject) => { // NOSONAR
+  const { satData: catalog } = keepTrackApi.programs.satSet;
 
-  let catalog = satSet.satData;
-  let possibleMatches = [];
-  let maxPeriod = sat.period * 1.05;
-  let minPeriod = sat.period * 0.95;
-  let maxInclination = sat.inclination * 1.025;
-  let minInclination = sat.inclination * 0.975;
-  let maxRaan = sat.raan * 1.025;
-  let minRaan = sat.raan * 0.975;
-  for (let ss = 0; ss < catalog.length; ss++) {
-    let sat2 = catalog[ss];
-    if (sat2.static) break;
-    if (sat2.period > maxPeriod || sat2.period < minPeriod) continue;
-    if (sat2.inclination > maxInclination || sat2.inclination < minInclination) continue;
-    if (sat2.raan > maxRaan || sat2.raan < minRaan) continue;
-    possibleMatches.push(sat2.id);
+  const maxPeriod = sat.period * 1.1;
+  const minPeriod = sat.period * 0.9;
+  const maxInclination = sat.inclination + 10 * DEG2RAD;
+  const minInclination = sat.inclination - 10 * DEG2RAD;
+  let maxRaan = sat.raan + 10 * DEG2RAD;
+  let minRaan = sat.raan - 10 * DEG2RAD;
+  if (sat.raan >= 350 * DEG2RAD) {
+    maxRaan -= 360 * DEG2RAD;
+  }
+  if (sat.raan <= 10 * DEG2RAD) {
+    minRaan += 360 * DEG2RAD;
   }
 
-  return possibleMatches;
+  return catalog.filter((s) => {
+    if (s.static) return false;
+    if (s.inclination < minInclination || s.inclination > maxInclination) return false;
+    if (sat.raan > 350 * DEG2RAD || sat.raan < 10 * DEG2RAD) {
+      if (s.raan > maxRaan && s.raan < minRaan) return false;
+    } else {
+      if (s.raan < minRaan || s.raan > maxRaan) return false;
+    }
+    if (s.period < minPeriod || s.period > maxPeriod) return false;
+    return true;
+  }).map((s) => s.id);
 };
 export const findClosestApproachTime = (
   sat1: SatObject,

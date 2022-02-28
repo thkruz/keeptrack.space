@@ -24,7 +24,7 @@
  */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { Watchlist } from '@app/js/api/keepTrackTypes';
+import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { saveAs } from '@app/js/lib/helpers';
 import $ from 'jquery';
@@ -112,7 +112,7 @@ export const init = (): void => {
   });
 };
 
-export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any, isSkipSearch = false) => {
+export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any, isSkipSearch = false) => { // NOSONAR
   const settingsManager: any = window.settingsManager;
   const { satSet, uiManager }: { satSet: any; uiManager: any } = keepTrackApi.programs;
   if (typeof updateWatchlistList !== 'undefined') {
@@ -127,25 +127,25 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
   isWatchlistChanged = isWatchlistChanged != null;
   let watchlistString = '';
   let watchlistListHTML = '';
-  let sat;
+  let sat: SatObject;
   for (let i = 0; i < watchlistList.length; i++) {
     sat = satSet.getSatExtraOnly(watchlistList[i]);
     if (sat == null) {
       watchlistList.splice(i, 1);
-      continue;
+    } else {
+    watchlistListHTML +=`
+      <div class="row">
+        <div class="col s3 m3 l3">
+          ${sat.sccNum}
+        </div>
+        <div class="col s7 m7 l7">
+          ${sat.name || 'Unknown'}
+        </div>
+        <div class="col s2 m2 l2 center-align remove-icon">
+          <img class="watchlist-remove" data-sat-id="${sat.id}" src="img/remove.png"></img>
+        </div>
+      </div>`;
     }
-    watchlistListHTML +=
-      '<div class="row">' +
-      '<div class="col s3 m3 l3">' +
-      sat.sccNum +
-      '</div>' +
-      '<div class="col s7 m7 l7">' +
-      sat.ON +
-      '</div>' +
-      '<div class="col s2 m2 l2 center-align remove-icon"><img class="watchlist-remove" data-sat-id="' +
-      sat.id +
-      '" src="img/remove.png"></img></div>' +
-      '</div>';
   }
   $('#watchlist-list').html(watchlistListHTML);
   for (let i = 0; i < watchlistList.length; i++) {
@@ -403,15 +403,22 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
   }
 };
 
-export const onCruncherReady = (): any => {
+export const onCruncherReady = async (): Promise<void> => {
   const { satSet, sensorManager }: { satSet: any; sensorManager: any } = keepTrackApi.programs;
   let watchlistJSON;
   try {
     watchlistJSON = localStorage.getItem('watchlistList');
-  } catch (e) {
+  } catch {
     watchlistJSON = null;
   }
-  if (watchlistJSON !== null) {
+  if (watchlistJSON === null || watchlistJSON === '[]') {
+    try {
+      watchlistJSON = await $.get(`${settingsManager.installDirectory}tle/watchlist.json`);
+    } catch {
+      watchlistJSON = null;
+    }
+  }
+  if (watchlistJSON !== null && watchlistJSON !== '[]') {
     const newWatchlist = JSON.parse(watchlistJSON);
     const _watchlistInViewList = [];
     for (let i = 0; i < newWatchlist.length; i++) {

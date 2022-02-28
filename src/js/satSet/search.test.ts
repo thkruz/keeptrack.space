@@ -46,7 +46,7 @@ describe('search.yearOrLess', () => {
   test('0', () => {
     const callFunction: any = () => {
       const satObjs = externalApi.keepTrackApi.programs.satSet.satData.map((sat) => {
-        sat.TLE1 = '12345678958234567890';
+        sat.TLE1 = '         58   ';
         return sat;
       });
       search.yearOrLess(satObjs, 22);
@@ -58,7 +58,7 @@ describe('search.yearOrLess', () => {
   test('1', () => {
     const callFunction: any = () => {
       const satObjs = externalApi.keepTrackApi.programs.satSet.satData.map((sat) => {
-        sat.TLE1 = '12345678957234567890';
+        sat.TLE1 = '         57   ';
         return sat;
       });
       search.yearOrLess(satObjs, 85);
@@ -70,7 +70,7 @@ describe('search.yearOrLess', () => {
   test('2', () => {
     const callFunction: any = () => {
       const satObjs = externalApi.keepTrackApi.programs.satSet.satData.map((sat) => {
-        sat.TLE1 = '12345678999234567890';
+        sat.TLE1 = '         99   ';
         return sat;
       });
       search.yearOrLess(satObjs, 85);

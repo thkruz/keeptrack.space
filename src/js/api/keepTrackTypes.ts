@@ -1054,7 +1054,7 @@ export interface EarthObject {
 export interface CatalogManager {
   resetSatInView(): void;
   convertIdArrayToSatnumArray(aehf: any): any;
-  init(): void;
+  init(): Promise<number>;
   gotExtraData: boolean;
   convertSatnumArrayToIdArray: any;
   exportTle2Csv: any;

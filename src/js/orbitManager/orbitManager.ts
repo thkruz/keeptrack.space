@@ -287,6 +287,7 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
       rate: timeManager.propRate,
       TLE1: TLE1,
       TLE2: TLE2,
+      isEcfOutput: settingsManager.isOrbitCruncherInEcf,
     });
   } else if (!inProgress[satId] && !sat.static) {
     if (missile) {
@@ -306,6 +307,7 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
         dynamicOffsetEpoch: timeManager.dynamicOffsetEpoch,
         staticOffset: timeManager.staticOffset,
         rate: timeManager.propRate,
+        isEcfOutput: settingsManager.isOrbitCruncherInEcf,
       });
       inProgress[satId] = true;
     }

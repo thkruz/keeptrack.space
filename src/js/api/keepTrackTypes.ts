@@ -317,6 +317,7 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isOrbitCruncherInEcf: boolean;
   lastSearch: any;
   db: any;
   isGroupOverlayDisabled: any;

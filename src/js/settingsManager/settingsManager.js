@@ -249,6 +249,9 @@ settingsManager = {
 
     settingsManager.videoBitsPerSecond = 30000000; // 10.0Mbps
 
+    // Show orbits in ECF vs ECI
+    settingsManager.isOrbitCruncherInEcf = false;
+
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
     // Use these to default smallest resolution maps and limited "extras" like

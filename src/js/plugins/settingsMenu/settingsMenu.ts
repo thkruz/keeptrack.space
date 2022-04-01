@@ -61,6 +61,13 @@ export const uiManagerInit = (): void => {
             <div id="settings-general">
               <h5 class="center-align">General Settings</h5>
               <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
+                  <input id="settings-drawEcf" type="checkbox" />
+                  <span class="lever"></span>
+                  Draw Orbits in ECF
+                </label>
+              </div>
+              <div class="switch row">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
                   <input id="settings-hos" type="checkbox" />
                   <span class="lever"></span>
@@ -310,10 +317,11 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
   }
 };
 
-export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?: boolean, isSLMChecked?: boolean, isSNPChecked?: boolean) => {
+export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?: boolean, isSLMChecked?: boolean, isSNPChecked?: boolean, isDrawEcfChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
   const { satSet, colorSchemeManager, uiManager } = keepTrackApi.programs;
 
+  isDrawEcfChecked ??= (<HTMLInputElement>document.getElementById('settings-drawEcf')).checked;
   isHOSChecked ??= (<HTMLInputElement>document.getElementById('settings-hos')).checked;
   isDMChecked ??= (<HTMLInputElement>document.getElementById('settings-demo-mode')).checked;
   isSLMChecked ??= (<HTMLInputElement>document.getElementById('settings-sat-label-mode')).checked;
@@ -322,6 +330,7 @@ export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?:
   settingsManager.isSatLabelModeOn = isSLMChecked;
   settingsManager.isDemoModeOn = isDMChecked;
   settingsManager.colors.transparent = isHOSChecked ? [1.0, 1.0, 1.0, 0] : [1.0, 1.0, 1.0, 0.1];
+  settingsManager.isOrbitCruncherInEcf = isDrawEcfChecked;
 
   colorSchemeManager.reloadColors();
 

@@ -52,6 +52,7 @@ settingsManager = {
     orbitReferences: true,
     externalSources: true,
     analysis: true,
+    plotAnalysis: true,
     sensorFov: true,
     sensorSurv: true,
     satelliteFov: true,

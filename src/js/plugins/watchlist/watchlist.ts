@@ -418,7 +418,7 @@ export const onCruncherReady = async (): Promise<void> => {
       watchlistJSON = null;
     }
   }
-  if (watchlistJSON !== null && watchlistJSON !== '[]') {
+  if (watchlistJSON !== null && watchlistJSON !== '[]' && watchlistJSON.length > 0) {
     const newWatchlist = JSON.parse(watchlistJSON);
     const _watchlistInViewList = [];
     for (let i = 0; i < newWatchlist.length; i++) {

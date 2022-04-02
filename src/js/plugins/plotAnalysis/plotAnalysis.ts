@@ -2,9 +2,9 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import $ from 'jquery';
-import { createEcfScatterPlot, getEcfScatterData } from './components/ecfScatterPlot';
 import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
 import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
+import { createRicScatterPlot, getRicScatterData } from './components/ricScatterPlot';
 
 export let isPlotAnalyisMenuOpen = false;
 export let curChart: echarts.ECharts;
@@ -78,7 +78,7 @@ export const bottomMenuClick = (iconName: string) => {
       let existInstance = echarts.getInstanceByDom(chartDom);
 
       if (!existInstance) {
-        curChart = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen, curChart);
+        curChart = createRicScatterPlot(getRicScatterData(), isPlotAnalyisMenuOpen, curChart);
       }
       setTimeout(() => {
         curChart.resize();
@@ -96,5 +96,5 @@ export const hideSideMenus = () => {
 };
 
 export const selectSatData = () => {
-  curChart = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen, curChart);
+  curChart = createRicScatterPlot(getRicScatterData(), isPlotAnalyisMenuOpen, curChart);
 };

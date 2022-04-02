@@ -1513,6 +1513,20 @@ export const map = (sat: SatObject, i: number): { time: string; lat: number; lon
   return getLlaTimeView(now, sat);
 };
 
+export const getEciOfCurrentObit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
+  const { timeManager } = keepTrackApi.programs;
+
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  const simulationTime = timeManager.calculateSimulationTime();
+  let eciPoints = [];
+  for (let i = 0; i < points; i++) {
+    let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    eciPoints.push(getEci(sat, now).position);
+  }
+  return eciPoints;
+}
+
 export const calculateSensorPos = (sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: number } => {
   const { timeManager, sensorManager } = keepTrackApi.programs;
   sensors = verifySensors(sensors, sensorManager);
@@ -1669,6 +1683,7 @@ export const satellite: SatMath = {
   findNearbyObjectsByOrbit,
   getDops,
   getEci,
+  getEciOfCurrentObit,
   getlookangles,
   getlookanglesMultiSite,
   getOrbitByLatLon,

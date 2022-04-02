@@ -1133,6 +1133,7 @@ export type lookanglesRow = {
 };
 
 export interface SatMath {
+  getEcfOfCurrentObit(sat: SatObject, points: number);
   getEciOfCurrentObit(sat: SatObject, points: number): { x: number; y: number; z: number }[];
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };

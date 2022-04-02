@@ -1,5 +1,5 @@
 import * as satellite from 'satellite.js';
-import { DEG2RAD, RADIUS_OF_EARTH } from '../lib/constants';
+import { DEG2RAD, RADIUS_OF_EARTH, TAU } from '../lib/constants';
 import { jday } from '../timeManager/transforms';
 import { propTime } from './positionCruncher/calculations';
 
@@ -111,7 +111,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
         p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
         // eslint-disable-next-line no-constant-condition
         if (isEcfOutput) {
-          p = <satellite.EcfVec3<number>>satellite.ecfToEci(p, -i * timeslice * 2 * Math.PI / period);
+          p = <satellite.EcfVec3<number>>satellite.ecfToEci(p, -i * timeslice * TAU / period);
         }
         if (p.x && p.y && p.z) {
           pointsOut[i * 4] = p.x;

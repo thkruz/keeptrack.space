@@ -2,7 +2,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import $ from 'jquery';
-import { createEciScatterPlot, getEciScatterData } from './components/eciScatterPlot';
+import { createEcfScatterPlot, getEcfScatterData } from './components/ecfScatterPlot';
 import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
 import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
 
@@ -78,7 +78,7 @@ export const bottomMenuClick = (iconName: string) => {
       let existInstance = echarts.getInstanceByDom(chartDom);
 
       if (!existInstance) {
-        curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart);
+        curChart = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen, curChart);
       }
       setTimeout(() => {
         curChart.resize();
@@ -96,5 +96,5 @@ export const hideSideMenus = () => {
 };
 
 export const selectSatData = () => {
-  curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart);
+  curChart = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen, curChart);
 };

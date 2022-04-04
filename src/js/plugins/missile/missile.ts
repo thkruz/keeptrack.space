@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import { missileManager } from './missileManager';
+import missilePng from '@app/img/icons/missile.png';
 
 keepTrackApi.programs.missileManager = missileManager;
 
@@ -463,7 +464,8 @@ export const uiManagerInit = (): void => {
         <div id="menu-missile" class="bmenu-item">
           <img
             alt="missile"
-            src="data:image/png;base64,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"/> <!-- // NO-PIG -->
+            src="" delayedsrc=${missilePng}
+          />
           <span class="bmenu-title">Missile</span>
           <div class="status-icon"></div>
         </div>

@@ -20,7 +20,7 @@
     // "sourceMap": true,                     /* Generates corresponding '.map' file. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
     "outDir": "./dist" /* Redirect output structure to the directory. */,
-    // "rootDir": "./"                        /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
+    // "rootDir": "./" /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
     // "composite": true,                     /* Enable project compilation */
     // "tsBuildInfoFile": "./",               /* Specify file to store incremental compilation information */
     // "removeComments": true,                /* Do not emit comments to output. */
@@ -78,6 +78,7 @@
     "suppressImplicitAnyIndexErrors": false /* suppresses the errors about accessing any as a type */,
     "resolveJsonModule": true /* Allows a module id to be a json file. */
   },
-  "exclude": ["node_modules/**/*", "dist/**/*", "embed/**/*", "coverage/**/*", "tsconfig.json", "**/*.test.ts", "**/*.test.js"],
-  "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "!node_modules/**"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx", "src/**/*.png", "src/**/*.jpg"],
+  "exclude": ["node_modules/**/*", "dist/**/*", "src/**/*.test.*", "src/admin/**/*", "embed/**/*", "coverage/**/*", "tsconfig.json"],
+  "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.png", "src/**/*.jpg", "!**/node_modules/**"]
 }

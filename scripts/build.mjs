@@ -76,16 +76,16 @@ if (isWatch) {
   });
 
   process.on('SIGINT', () => {
-    process.exit(0);
+    throw new Error('SIGINT');
   });
   process.on('SIGTERM', () => {
-    process.exit(0);
+    throw new Error('SIGTERM');
   });
   process.on('SIGUSR2', () => {
-    process.exit(0);
+    throw new Error('SIGUSR2');
   });
   process.on('exit', () => {
-    process.exit(0);
+    throw new Error('exit');
   });
 } else {
   compiler.run((runErrors, runStats) => {

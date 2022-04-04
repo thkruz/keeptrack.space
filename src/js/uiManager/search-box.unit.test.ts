@@ -3,32 +3,33 @@ import { useMockWorkers } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
+import { KeepTrackPrograms, SatObject } from '../api/keepTrackTypes';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 useMockWorkers();
 
 test(`Basic Functions of Search Box`, () => {
   const { satSet } = keepTrackApi.programs;
   // Setup a unit test enviornment that doesn't worry about other modules
-  keepTrackApi.programs.satSet.satData[0] = {
+  keepTrackApi.programs.satSet.satData[0] = <SatObject>{
     static: true,
   };
   keepTrackApi.programs.satSet.satData[1] = defaultSat;
   keepTrackApi.programs.satSet.satData[2] = defaultSat;
-  keepTrackApi.programs.satSet.satData[3] = {
+  keepTrackApi.programs.satSet.satData[3] = <SatObject>(<unknown>{
     C: 'ANALSAT',
     active: false,
-  };
-  keepTrackApi.programs.satSet.satData[4] = {
+  });
+  keepTrackApi.programs.satSet.satData[4] = <SatObject>{
     active: false,
   };
-  keepTrackApi.programs.satSet.satData[5] = {
+  keepTrackApi.programs.satSet.satData[5] = <SatObject>{
     country: 'US',
     launchSite: 'AFETR',
     launchVehicle: 'U',
     name: 'VANGUARD 1',
-    OT: 1,
+    type: 1,
     rcs: '0.1220',
     sccNum: '00005',
     TLE1: '1     5U 58002B   21107.45725112 -.00000113  00000-0 -16194-3 0  9999',
@@ -46,13 +47,13 @@ test(`Basic Functions of Search Box`, () => {
     raan: 0.2039103071690015,
     semiMajorAxis: 8622.494665143116,
     semiMinorAxis: 8473.945136538932,
-    velocity: {},
+    velocity: <any>{},
   };
-  keepTrackApi.programs.satSet.satData[6] = {
+  keepTrackApi.programs.satSet.satData[6] = <SatObject>{
     missile: true,
     active: false,
   };
-  keepTrackApi.programs.satSet.satData[7] = {
+  keepTrackApi.programs.satSet.satData[7] = <SatObject>{
     marker: true,
   };
 

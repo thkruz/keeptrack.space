@@ -1513,7 +1513,7 @@ export const map = (sat: SatObject, i: number): { time: string; lat: number; lon
   return getLlaTimeView(now, sat);
 };
 
-export const getEciOfCurrentObit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
+export const getEciOfCurrentOrbit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
@@ -1527,7 +1527,7 @@ export const getEciOfCurrentObit = (sat: SatObject, points: number): { x: number
   return eciPoints;
 }
 
-export const getEcfOfCurrentObit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
+export const getEcfOfCurrentOrbit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
@@ -1541,7 +1541,7 @@ export const getEcfOfCurrentObit = (sat: SatObject, points: number): { x: number
   return ecfPoints;
 }
 
-export const getRicOfCurrentObit = (sat: SatObject, sat2: SatObject, points: number, orbits?: number): { x: number; y: number; z: number }[] => {
+export const getRicOfCurrentOrbit = (sat: SatObject, sat2: SatObject, points: number, orbits?: number): { x: number; y: number; z: number }[] => {
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
@@ -1556,6 +1556,24 @@ export const getRicOfCurrentObit = (sat: SatObject, sat2: SatObject, points: num
     ricPoints.push(sat2ric(sat, sat2).position);
   }
   return ricPoints;
+}
+
+export const getLlaOfCurrentOrbit = (sat: SatObject, points: number): { lat: number; lon: number; alt: number, time: number }[] => {
+  const { timeManager } = keepTrackApi.programs;
+
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  const simulationTime = timeManager.calculateSimulationTime();
+  let llaPoints = [];
+  for (let i = 0; i < points; i++) {
+    let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    const { gmst } = calculateTimeVariables(now);
+    const eci = getEci(sat, now).position;
+    const lla = satellite.eciToGeodetic(eci, gmst);
+    const llat = {...lla, ...{time: now.getTime()}};
+    llaPoints.push(llat);
+  }
+  return llaPoints;
 }
 
 export const calculateSensorPos = (sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: number } => {
@@ -1714,9 +1732,10 @@ export const satellite: SatMath = {
   findNearbyObjectsByOrbit,
   getDops,
   getEci,
-  getEciOfCurrentObit,
-  getEcfOfCurrentObit,
-  getRicOfCurrentObit,
+  getEciOfCurrentOrbit,
+  getEcfOfCurrentOrbit,
+  getRicOfCurrentOrbit,
+  getLlaOfCurrentOrbit,
   getlookangles,
   getlookanglesMultiSite,
   getOrbitByLatLon,

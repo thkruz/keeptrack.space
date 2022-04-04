@@ -1133,9 +1133,10 @@ export type lookanglesRow = {
 };
 
 export interface SatMath {
-  getRicOfCurrentObit(sat: SatObject, sat2: SatObject, points: number, orbits?: number);
-  getEcfOfCurrentObit(sat: SatObject, points: number);
-  getEciOfCurrentObit(sat: SatObject, points: number): { x: number; y: number; z: number }[];
+  getLlaOfCurrentOrbit(sat: SatObject, points: number): { lat: number; lon: number; alt: number; time: number }[];
+  getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits?: number);
+  getEcfOfCurrentOrbit(sat: SatObject, points: number);
+  getEciOfCurrentOrbit(sat: SatObject, points: number): { x: number; y: number; z: number }[];
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };
   calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => boolean[];

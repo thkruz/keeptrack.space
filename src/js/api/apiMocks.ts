@@ -411,6 +411,10 @@ export const keepTrackApiStubs = {
       calculateSensorPos: jest.fn(),
       degreesLong: (num: number) => num,
       degreesLat: (num: number) => num,
+      getEciOfCurrentOrbit: () => [{ x: 0, y: 0, z: 0 }],
+      getEcfOfCurrentOrbit: () => [{ x: 0, y: 0, z: 0 }],
+      getRicOfCurrentOrbit: () => [{ x: 0, y: 0, z: 0 }], // TODO: Update
+      getLlaOfCurrentOrbit: () => [{ lat: 0, lon: 0, alt: 0, time: new Date().getTime() }],
       currentEpoch: () => ['21', '150'],
       getOrbitByLatLon: () => ['1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991', '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053'],
       nextpassList: () => [new Date().getTime(), new Date().getTime() + 1],

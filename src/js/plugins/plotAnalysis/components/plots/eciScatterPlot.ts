@@ -1,14 +1,14 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { EciPos } from '@app/js/api/keepTrackTypes';
 import * as echarts from 'echarts';
 
 type EChartsOption = echarts.EChartsOption;
 
-export const createEcfScatterPlot = (data, isPlotAnalyisMenuOpen, curChart) => {
+export const createEciScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, chartDom) => {
   // Dont Load Anything if the Chart is Closed
-  if (!isPlotAnalyisMenuOpen) return;
+  if (!isPlotAnalyisMenuOpen) return curChart;
 
   // Delete any old charts and start fresh
-  const chartDom = document.getElementById('plot-analysis-chart');
   let existInstance = echarts.getInstanceByDom(chartDom);
   if (existInstance) {
     echarts.dispose(curChart);
@@ -42,20 +42,40 @@ export const createEcfScatterPlot = (data, isPlotAnalyisMenuOpen, curChart) => {
     };
   });
 
+  // Get the Data
+  const dataRange = data.reduce((dataRange, sat) => {
+    const minDataX = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[0]), Infinity);
+    const maxDataX = sat.value.reduce((max: number, item: EciPos) => Math.max(max, item[0]), -Infinity);
+    const minDataY = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[1]), Infinity);
+    const maxDataY = sat.value.reduce((max: number, item: EciPos) => Math.max(max, item[1]), -Infinity);
+    const minDataZ = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[2]), Infinity);
+    const maxDataZ = sat.value.reduce((max: number, item: EciPos) => Math.max(max, item[2]), -Infinity);
+    const minData = Math.round(Math.min(minDataX, minDataY, minDataZ) / 1000) * 1000;
+    const maxData = Math.round(Math.max(maxDataX, maxDataY, maxDataZ) / 1000) * 1000;
+    const _dataRange = Math.max(maxData, Math.abs(minData));
+    return Math.max(dataRange, _dataRange);
+  }, 0);
+
   // Setup Chart
   curChart.setOption({
     tooltip: {},
     xAxis3D: {
       name: app.config.xAxis3D,
       type: 'value',
+      min: -dataRange,
+      max: dataRange,
     },
     yAxis3D: {
       name: app.config.yAxis3D,
       type: 'value',
+      min: -dataRange,
+      max: dataRange,
     },
     zAxis3D: {
       name: app.config.zAxis3D,
       type: 'value',
+      min: -dataRange,
+      max: dataRange,
     },
     grid3D: {
       axisLine: {
@@ -69,7 +89,9 @@ export const createEcfScatterPlot = (data, isPlotAnalyisMenuOpen, curChart) => {
         },
       },
       viewControl: {
-        rotateSensitivity: 5,
+        rotateSensitivity: 10,
+        distance: 600,
+        zoomSensitivity: 5,
       },
     },
     series: data.map((sat) => ({
@@ -83,6 +105,7 @@ export const createEcfScatterPlot = (data, isPlotAnalyisMenuOpen, curChart) => {
         value: [item[fieldIndices[app.config.xAxis3D]], item[fieldIndices[app.config.yAxis3D]], item[fieldIndices[app.config.zAxis3D]]],
       })),
       symbolSize: 12,
+      // symbol: 'triangle',
       itemStyle: {
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.8)',
@@ -98,17 +121,17 @@ export const createEcfScatterPlot = (data, isPlotAnalyisMenuOpen, curChart) => {
   return curChart;
 };
 
-export const getEcfScatterData = () => {
+export const getEciScatterData = () => {
   const NUMBER_OF_POINTS = 100;
   const { satSet, objectManager, satellite } = keepTrackApi.programs;
 
   const data = [];
   let sat = satSet.getSat(objectManager.selectedSat);
-  data.push({ name: sat.name, value: satellite.getEcfOfCurrentObit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+  data.push({ name: sat.name, value: satellite.getEciOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
   const lastSat = objectManager.lastSelectedSat();
   if (lastSat !== -1) {
     sat = satSet.getSat(lastSat);
-    data.push({ name: sat.name, value: satellite.getEcfOfCurrentObit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+    data.push({ name: sat.name, value: satellite.getEciOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
   }
 
   return data;

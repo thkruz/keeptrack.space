@@ -74,7 +74,7 @@
     ],
     "moduleNameMapper": {
       "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
-      "\\.(gif|ttf|eot|svg)$": "<rootDir>/scripts/fileMock.js",
+      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/scripts/fileMock.js",
       "@app(.*)$": "<rootDir>/src/$1"
     },
     "coverageReporters": [

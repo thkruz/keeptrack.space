@@ -3,12 +3,11 @@ import * as echarts from 'echarts';
 
 type EChartsOption = echarts.EChartsOption;
 
-export const createRicScatterPlot = (data, isPlotAnalyisMenuOpen, curChart) => {
+export const createRicScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, chartDom) => {
   // Dont Load Anything if the Chart is Closed
-  if (!isPlotAnalyisMenuOpen) return;
+  if (!isPlotAnalyisMenuOpen) return curChart;
 
   // Delete any old charts and start fresh
-  const chartDom = document.getElementById('plot-analysis-chart');
   let existInstance = echarts.getInstanceByDom(chartDom);
   if (existInstance) {
     echarts.dispose(curChart);
@@ -82,7 +81,9 @@ export const createRicScatterPlot = (data, isPlotAnalyisMenuOpen, curChart) => {
         },
       },
       viewControl: {
-        rotateSensitivity: 5,
+        rotateSensitivity: 10,
+        distance: 600,
+        zoomSensitivity: 5,
       },
     },
     series: data.map((sat) => ({
@@ -122,7 +123,7 @@ export const getRicScatterData = () => {
   const sat = satSet.getSat(objectManager.selectedSat);
   const sat2 = satSet.getSat(objectManager.lastSelectedSat());
   data.push({ name: sat.name, value: [[0, 0, 0]] });
-  data.push({ name: sat2.name, value: satellite.getRicOfCurrentObit(sat2, sat, NUMBER_OF_POINTS, 5) });
+  data.push({ name: sat2.name, value: satellite.getRicOfCurrentOrbit(sat2, sat, NUMBER_OF_POINTS, 5) });
 
   return data;
 };

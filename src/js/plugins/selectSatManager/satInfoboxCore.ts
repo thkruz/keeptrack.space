@@ -20,6 +20,8 @@ const satInfoboxCore = {
 };
 
 export const sensorInfo = (sat: SatObject): void => {
+  if (sat === null || typeof sat === "undefined") return;
+  
   if (!satInfoboxCore.sensorInfo.isLoaded && settingsManager.plugins.sensor) {
     $('#sat-infobox').append(keepTrackApi.html`
         <div id="sensor-sat-info">
@@ -95,6 +97,8 @@ export const sensorInfo = (sat: SatObject): void => {
   }
 };
 export const launchData = (sat: SatObject): void => {
+  if (sat === null || typeof sat === "undefined") return;
+  
   if (!satInfoboxCore.launchData.isLoaded) {
     $('#sat-infobox').append(keepTrackApi.html`
           <li class="divider"></li>
@@ -227,6 +231,9 @@ export const allObjectsLink = (): void => {
   $('#search').val(searchStr);
 };
 export const orbitalData = (sat: SatObject): void => { // NOSONAR
+  // Only show orbital data if it is available
+  if (sat === null || typeof sat === "undefined") return;
+
   if (!satInfoboxCore.orbitalData.isLoaded) {
     $('#ui-wrapper').append(keepTrackApi.html`
           <div id="sat-infobox" class="text-select satinfo-fixed">
@@ -449,6 +456,8 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
   $('#near-objects-link').on('click', nearObjectsLinkClick);
 };
 export const satMissionData = (sat: SatObject): void => { // NOSONAR
+  if (sat === null || typeof sat === "undefined") return;
+
   if (!satInfoboxCore.satMissionData.isLoaded) {
     $('#sat-infobox').append(`
         <li class="divider"></li>
@@ -671,6 +680,8 @@ export const intelData = (sat: SatObject, satId?: number): void => { // NOSONAR
   }
 };
 export const objectData = (sat: SatObject): void => {
+  if (sat === null || typeof sat === "undefined") return;
+  
   $('#sat-info-title').html(sat.name);
 
   switch (sat.type) {

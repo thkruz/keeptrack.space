@@ -9,7 +9,7 @@ export const PlotAnalysisBottomIcon = keepTrackApi.html`
       <div id="menu-plot-analysis" class="bmenu-item bmenu-item-disabled">
         <img
           alt="ECI Plots"
-          src=${scatterPlotPng2}
+          src="" delayedsrc=${scatterPlotPng2}
         />
         <span class="bmenu-title">ECI Plots</span>
         <div class="status-icon"></div>
@@ -17,7 +17,7 @@ export const PlotAnalysisBottomIcon = keepTrackApi.html`
       <div id="menu-plot-analysis2" class="bmenu-item bmenu-item-disabled">
         <img
           alt="ECF Plots"
-          src=${scatterPlotPng3}
+          src="" delayedsrc=${scatterPlotPng3}
         />
         <span class="bmenu-title">ECF Plots</span>
         <div class="status-icon"></div>
@@ -25,7 +25,7 @@ export const PlotAnalysisBottomIcon = keepTrackApi.html`
       <div id="menu-plot-analysis3" class="bmenu-item bmenu-item-disabled">
         <img
           alt="RIC Plots"
-          src=${scatterPlotPng4}
+          src="" delayedsrc=${scatterPlotPng4}
         />
         <span class="bmenu-title">RIC Plots</span>
         <div class="status-icon"></div>
@@ -33,7 +33,7 @@ export const PlotAnalysisBottomIcon = keepTrackApi.html`
       <div id="menu-plot-analysis4" class="bmenu-item">
         <img
           alt="Inc v Lon Plots"
-          src=${scatterPlotPng}
+          src="" delayedsrc=${scatterPlotPng}
         />
         <span class="bmenu-title">Inc v Lon Plots</span>
         <div class="status-icon"></div>
@@ -41,7 +41,7 @@ export const PlotAnalysisBottomIcon = keepTrackApi.html`
       <div id="menu-plot-analysis5" class="bmenu-item">
         <img
           alt="Time v Lon Plots"
-          src=${linePlotPng}
+          src="" delayedsrc=${linePlotPng}
         />
         <span class="bmenu-title">Time v Lon Plots</span>
         <div class="status-icon"></div>

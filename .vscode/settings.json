@@ -15,6 +15,7 @@
       "source.addMissingImports": true
     }
   },
+  "git.enableCommitSigning": true,
   "files.exclude": {
     "**/.git": true,
     "**/.svn": true,

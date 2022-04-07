@@ -76,7 +76,7 @@ export const uiManagerInit = (): any => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
     <div id="menu-launches" class="bmenu-item">
-      <img alt="calendar2" src="" delayedsrc=${calendarPng}/>
+      <img alt="calendar2" src="" delayedsrc="${calendarPng}" />
       <span class="bmenu-title">Launch Calendar</span>
       <div class="status-icon"></div>
     </div> 

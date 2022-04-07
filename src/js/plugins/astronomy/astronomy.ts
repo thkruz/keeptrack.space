@@ -35,7 +35,8 @@ export const uiManagerInit = () => {
           <img
             alt="telescope"
             src=""
-            delayedsrc=${constellationPng}/>
+            delayedsrc="${constellationPng}"
+          />
           <span class="bmenu-title">Astronomy View</span>
           <div class="status-icon"></div>
         </div>

@@ -35,7 +35,8 @@ export const uiManagerInit = () => {
           <img
             alt="planetarium"
             src=""
-            delayedsrc=${planetariumPng}/>
+            delayedsrc="${planetariumPng}"
+          />
           <span class="bmenu-title">Planetarium View</span>
           <div class="status-icon"></div>
         </div>

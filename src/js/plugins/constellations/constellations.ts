@@ -30,7 +30,8 @@ export const uiManagerInit = () => {
         <img
           alt="constellation"
           src=""
-          delayedsrc=${satChngPng}/>
+          delayedsrc="${satChngPng}"
+        />
         <span class="bmenu-title">Constellations</span>
         <div class="status-icon"></div>
       </div>

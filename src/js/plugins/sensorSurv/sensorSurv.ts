@@ -35,7 +35,8 @@ export const uiManagerInit = () => {
           <img
             alt="fence"
             src=""
-            delayedsrc=${fencePng}/>
+            delayedsrc="${fencePng}"
+          />
           <span class="bmenu-title">Sesnor Fence</span>
           <div class="status-icon"></div>
         </div>

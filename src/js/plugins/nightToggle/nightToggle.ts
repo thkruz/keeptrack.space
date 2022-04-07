@@ -11,7 +11,7 @@ export const init = (): void => {
       // Bottom Icon
       $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-day-night" class="bmenu-item">
-          <img alt="day-night" src="" delayedsrc=${dayNightPng}/>
+          <img alt="day-night" src="" delayedsrc="${dayNightPng}" />
           <span class="bmenu-title">Night Toggle</span>
           <div class="status-icon"></div>
         </div>

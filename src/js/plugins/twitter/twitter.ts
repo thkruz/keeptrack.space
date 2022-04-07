@@ -18,7 +18,7 @@ export const init = (): void => {
       // Bottom Icon
       $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-twitter" class="bmenu-item">
-          <img alt="twitter" src="" delayedsrc=${twitterPng}/>
+          <img alt="twitter" src="" delayedsrc="${twitterPng}" />
           <span class="bmenu-title">Twitter</span>
           <div class="status-icon"></div>
         </div>

@@ -397,35 +397,40 @@ export const uiManagerInit = () => {
         <div id="menu-sensor-list" class="bmenu-item">
           <img
             alt="radar"
-            src="" delayedsrc=${radarPng}/>
+            src="" delayedsrc="${radarPng}" 
+          />
           <span class="bmenu-title">Sensors</span>
           <div class="status-icon"></div>
         </div>
         <div id="menu-customSensor" class="bmenu-item">
           <img
             alt="custom"
-            src="" delayedsrc=${customPng}/>
+            src="" delayedsrc="${customPng}"
+          />
           <span class="bmenu-title">Custom Sensor</span>
           <div class="status-icon"></div>
         </div>
         <div id="menu-sensor-info" class="bmenu-item bmenu-item-disabled">
           <img
             alt="radiotower"
-            src="" delayedsrc=${radioTowerPng}/>
+            src="" delayedsrc="${radioTowerPng}"
+          />
           <span class="bmenu-title">Sensor Info</span>
           <div class="status-icon"></div>
         </div>
         <div id="menu-lookangles" class="bmenu-item bmenu-item-disabled">
           <img
             alt="lookangles"
-            src="" delayedsrc=${lookanglesPng}/>
+            src="" delayedsrc="${lookanglesPng}"
+          />
           <span class="bmenu-title">Look Angles</span>
           <div class="status-icon"></div>
         </div>
         <div id="menu-lookanglesmultisite" class="bmenu-item bmenu-item-disabled">
           <img
             alt="multisite"
-            src="" delayedsrc=${multiSitePng}/>
+            src="" delayedsrc="${multiSitePng}"
+          />
           <span class="bmenu-title">Multi-Site Looks</span>
           <div class="status-icon"></div>
         </div>

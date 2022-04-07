@@ -30,7 +30,7 @@ export const uiManagerInit = (): any => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-time-machine" class="bmenu-item">
-          <img alt="time-machine" src="" delayedsrc=${timeMachinePng}/>
+          <img alt="time-machine" src="" delayedsrc="${timeMachinePng}" />
           <span class="bmenu-title">Time Machine</span>
           <div class="status-icon"></div>
         </div>

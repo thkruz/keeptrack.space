@@ -178,7 +178,8 @@ export const uiManagerInit = (): void => {
       <img
         alt="settings"
         src=""
-        delayedsrc=${settingsPng}/>
+        delayedsrc="${settingsPng}"
+      />
       <span class="bmenu-title">Settings</span>
       <div class="status-icon"></div>
     </div>

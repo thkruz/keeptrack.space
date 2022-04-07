@@ -41,7 +41,8 @@ export const init = (): void => {
           <img
             alt="sat3"
             src=""
-            delayedsrc=${sat3Png}/>
+            delayedsrc="${sat3Png}"
+          />
           <span class="bmenu-title">Satellite View</span>
           <div class="status-icon"></div>
         </div>

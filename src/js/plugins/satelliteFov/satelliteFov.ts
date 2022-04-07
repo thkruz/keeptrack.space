@@ -34,7 +34,7 @@ export const uiManagerInit = () => {
     <div id="menu-sat-fov" class="bmenu-item bmenu-item-disabled">
       <img
         alt="sat2"
-        src="" delayedsrc=${sat2Png}/>
+        src="" delayedsrc="${sat2Png}" />
       <span class="bmenu-title">Satellite FOV</span>
       <div class="status-icon"></div>
     </div>

@@ -81,7 +81,8 @@ export const uiManagerInit = () => {
           <img
             alt="colors"
             src=""
-            delayedsrc=${colorsPng}/>
+            delayedsrc="${colorsPng}"
+          />
           <span class="bmenu-title">Color Schemes</span>
           <div class="status-icon"></div>
         </div>

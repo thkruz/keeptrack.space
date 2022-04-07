@@ -132,7 +132,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-nextLaunch" class="bmenu-item">
-          <img alt="calendar" src="" delayedsrc=${calendar2Png}/>
+          <img alt="calendar" src="" delayedsrc="${calendar2Png}" />
           <span class="bmenu-title">Next Launches</span>
           <div class="status-icon"></div>
         </div>

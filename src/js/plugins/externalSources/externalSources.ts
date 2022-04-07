@@ -86,7 +86,7 @@ export const uiManagerInit = () => {
           <img
             alt="external"
             src=""
-            delayedsrc=${externalPng}/>
+            delayedsrc="${externalPng}" />
           <span class="bmenu-title">External Source</span>
           <div class="status-icon"></div>
         </div>

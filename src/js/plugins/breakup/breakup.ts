@@ -95,7 +95,8 @@ export const uiManagerInit = (): void => {
       <div id="menu-breakup" class="bmenu-item bmenu-item-disabled">
         <img
           alt="breakup"
-          src="" delayedsrc=${breakupPng}/>
+          src="" delayedsrc="${breakupPng}"
+        />
         <span class="bmenu-title">Breakup</span>
         <div class="status-icon"></div>
       </div>

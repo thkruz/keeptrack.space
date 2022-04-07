@@ -188,7 +188,7 @@ export const uiManagerInit = (): void => {
             <div class="col s2 m2 l2 center-align remove-icon">
               <img
                 alt="remove"
-                src="" delayedsrc=${removePng}/>
+                src="" delayedsrc="${removePng}" />
             </div>
           </div>
         </div>
@@ -203,7 +203,7 @@ export const uiManagerInit = (): void => {
           <div class="col s2 m2 l2 center-align add-icon">
             <img
               class="watchlist-add"
-              src="" delayedsrc=${addPng}/>
+              src="" delayedsrc="${addPng}" />
           </div>
         </div>
         <div class="center-align row">
@@ -226,14 +226,14 @@ export const uiManagerInit = (): void => {
   <div id="menu-watchlist" class="bmenu-item">
     <img
       alt="watchlist"
-      src="" delayedsrc=${watchlistPng}/>
+      src="" delayedsrc="${watchlistPng}" />
     <span class="bmenu-title">Watchlist</span>
     <div class="status-icon"></div>
   </div>    
   <div id="menu-info-overlay" class="bmenu-item bmenu-item-disabled">
     <img
       alt="info"
-      src="" delayedsrc=${infoPng}/>
+      src="" delayedsrc="${infoPng}" />
     <span class="bmenu-title">Overlay</span>
     <div class="status-icon"></div>
   </div>

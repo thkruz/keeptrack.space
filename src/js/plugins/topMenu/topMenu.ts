@@ -42,7 +42,8 @@ export const init = (): void => {
                   <a id="search-icon" class="top-menu-icons">
                     <img
                       alt="search-icon"
-                      src="" delayedsrc=${findPng}/>
+                      src="" delayedsrc="${findPng}" 
+                    />
                   </a>
                 </li>
                 <div id="search-holder" class="menu-item search-slide-up">
@@ -57,13 +58,15 @@ export const init = (): void => {
                     alt="github"
                     width="32"
                     height="32"
-                    src="" delayedsrc=${githubPng}/>
+                    src="" delayedsrc="${githubPng}"
+                  />
                 </a>
                 <a id="twitter-share" class="share-up share-icons" rel="noreferrer" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank">
                   <img
                   width="32"
                   height="32"
-                    src="" delayedsrc=${twitterPng}/>
+                    src="" delayedsrc="${twitterPng}" 
+                  />
                 </a>
               </div>
             </div>

@@ -6,7 +6,8 @@ export const AnalysisBottomIcon = keepTrackApi.html`
           <img
             alt="analysis"
             src=""
-            delayedsrc=${analysisPng}/>
+            delayedsrc="${analysisPng}"
+          />
           <span class="bmenu-title">Analysis</span>
           <div class="status-icon"></div>
         </div>

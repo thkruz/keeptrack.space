@@ -40,7 +40,8 @@ export const uiManagerInit = () => {
           <img
             alt="camera"
             src=""
-            delayedsrc=${cameraPng}/>
+            delayedsrc="${cameraPng}"
+          />
           <span class="bmenu-title">Take Photo</span>
           <div class="status-icon"></div>
         </div>

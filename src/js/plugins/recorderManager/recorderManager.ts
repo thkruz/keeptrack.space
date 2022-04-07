@@ -11,7 +11,7 @@ export const uiManagerInit = (): void => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
       <div id="menu-record" class="bmenu-item">
-        <img alt="video" src="" delayedsrc=${recorderPng}/>
+        <img alt="video" src="" delayedsrc="${recorderPng}" />
         <span class="bmenu-title">Record Video</span>
         <div class="status-icon"></div>
       </div>     

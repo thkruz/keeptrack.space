@@ -70,7 +70,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-dops" class="bmenu-item">
-          <img alt="gps" src="" delayedsrc=${gpsPng}/>
+          <img alt="gps" src="" delayedsrc="${gpsPng}" />
           <span class="bmenu-title">DOPs</span>
           <div class="status-icon"></div>
         </div>      

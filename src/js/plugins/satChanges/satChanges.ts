@@ -47,7 +47,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-satChng" class="bmenu-item">
-          <img alt="satchng" src="" delayedsrc=${satChngPng}/>
+          <img alt="satchng" src="" delayedsrc="${satChngPng}" />
           <span class="bmenu-title">Satellite Changes</span>
           <div class="status-icon"></div>
         </div>

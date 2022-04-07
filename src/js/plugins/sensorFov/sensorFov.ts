@@ -35,7 +35,8 @@ export const uiManagerInit = () => {
           <img
             alt="fov"
             src=""
-            delayedsrc=${fovPng}/>
+            delayedsrc="${fovPng}" 
+          />
           <span class="bmenu-title">Sensor FOV</span>
           <div class="status-icon"></div>
         </div>

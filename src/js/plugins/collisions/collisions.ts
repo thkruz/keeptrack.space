@@ -34,7 +34,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-satellite-collision" class="bmenu-item">
-          <img alt="socrates" src="" delayedsrc=${socratesPng}/>
+          <img alt="socrates" src="" delayedsrc="${socratesPng}" />
           <span class="bmenu-title">Collisions</span>
           <div class="status-icon"></div>
         </div>

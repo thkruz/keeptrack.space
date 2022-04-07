@@ -297,7 +297,7 @@ export const uiManagerInit = (): void => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-map" class="bmenu-item bmenu-item-disabled">
-          <img alt="map" src="" delayedsrc=${mapPng}/>
+          <img alt="map" src="" delayedsrc="${mapPng}" />
           <span class="bmenu-title">Stereo Map</span>
           <div class="status-icon"></div>
         </div>

@@ -183,7 +183,7 @@ export const uiManagerInit = () => {
       <img
         alt="obfit"
         src=""
-        delayedsrc=${iodPng}/>
+        delayedsrc="${iodPng}" />
       <span class="bmenu-title">Initial Orbit</span>
       <div class="status-icon"></div>
     </div>

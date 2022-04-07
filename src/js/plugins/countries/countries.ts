@@ -75,7 +75,8 @@ export const uiManagerInit = () => {
           <img
             alt="flag"
             src=""
-            delayedsrc=${flagPng} />
+            delayedsrc="${flagPng}"
+          />
           <span class="bmenu-title">Countries</span>
           <div class="status-icon"></div>
         </div>

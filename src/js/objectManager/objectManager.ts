@@ -440,12 +440,34 @@ const extractLaunchSite = (LS: string): { site: string; sitec: string } => {
 const setHoveringSat = (id: number): void => {
   objectManager.hoveringSat = id;
 };
-const setSelectedSat = (id: number): void => {
-  objectManager.selectedSat = id;
-};
 const setLasthoveringSat = (id: number): void => {
   objectManager.lasthoveringSat = id;
 };
+const setSelectedSat = (id: number): void => {
+  objectManager.selectedSat = id;
+};
+const setSecondarySat = (id: number): void => {
+  const {satSet} = keepTrackApi.programs;
+  objectManager.secondarySat = id;
+  objectManager.secondarySatObj = satSet.getSat(id);
+  if (objectManager.selectedSat !== -1) {
+    $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+  }
+};
+
+const switchPrimarySecondary = (): void => {
+  const {orbitManager} = keepTrackApi.programs;
+  const _primary = objectManager.selectedSat;
+  const _secondary = objectManager.secondarySat;
+  setSecondarySat(_primary);  
+  if (_primary !== -1) {
+    orbitManager.setSelectOrbit(_primary, true);
+  } else {
+    orbitManager.clearSelectOrbit(true);
+  }
+  setSelectedSat(_secondary);
+}
+
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
@@ -605,16 +627,20 @@ export const objectManager: ObjectManager = {
   rocketUrls: [],
   satLinkManager: null,
   selectedSat: -1,
+  secondarySat: -1,
+  secondarySatObj: null,
   selectedSatData: null,
   starIndex1: 0,
   starIndex2: 0,
   staticSet: [],
   _lastSelectedSat: -1,
   init: init,
-  setSelectedSat: setSelectedSat,
-  setHoveringSat: setHoveringSat,
-  setLasthoveringSat: setLasthoveringSat,
-  extractCountry: extractCountry,
-  extractLiftVehicle: extractLiftVehicle,
-  lastSelectedSat: lastSelectedSat,
+  setSelectedSat,
+  setSecondarySat,
+  setHoveringSat,
+  setLasthoveringSat,
+  extractCountry,
+  extractLiftVehicle,
+  lastSelectedSat,
+  switchPrimarySecondary
 };

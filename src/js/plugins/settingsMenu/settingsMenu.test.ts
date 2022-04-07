@@ -1,10 +1,11 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import * as settingsMenu from '@app/js/plugins/settingsMenu/settingsMenu';
 import { expect } from '@jest/globals';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('settingsMenu.init', () => {

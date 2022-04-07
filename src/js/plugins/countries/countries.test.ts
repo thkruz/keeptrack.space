@@ -1,3 +1,4 @@
+import { SatGroup } from '@app/js/groupsManager/sat-group';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
@@ -19,13 +20,13 @@ describe('countries.init', () => {
 });
 
 describe('countries.countryMenuClick', () => {
-  keepTrackApi.programs.groupsManager.createGroup = () => ({
-    sats: [
-      { satId: 1, sccNum: '25544' },
-      { satId: 1, sccNum: '25544' },
-    ],
-    updateOrbits: jest.fn(),
-  });
+  keepTrackApi.programs.groupsManager.createGroup = () => <SatGroup>(<unknown>{
+      sats: [
+        { satId: 1, sccNum: '25544' },
+        { satId: 1, sccNum: '25544' },
+      ],
+      updateOrbits: jest.fn(),
+    });
 
   test('0', () => {
     const callFunction: any = () => {

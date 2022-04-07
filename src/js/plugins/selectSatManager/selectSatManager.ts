@@ -135,7 +135,9 @@ const selectSatManager = {
       $('#menu-newLaunch').removeClass('bmenu-item-disabled');
       $('#menu-plot-analysis').removeClass('bmenu-item-disabled');
       $('#menu-plot-analysis2').removeClass('bmenu-item-disabled');
-      $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+      if (objectManager.secondarySat !== -1) {
+        $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+      }
 
       $('#sat-infobox').fadeIn();
 

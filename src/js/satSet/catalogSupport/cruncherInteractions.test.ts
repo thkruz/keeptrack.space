@@ -1,3 +1,4 @@
+import { SatCruncherMessage } from '@app/js/api/keepTrackTypes';
 import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { KeepTrackPrograms } from '../../api/keepTrackTypes';
@@ -7,33 +8,33 @@ keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs,
 
 describe('cruncherExtraData', () => {
   it('should work', () => {
-    const m = {
+    const m = <SatCruncherMessage>(<unknown>{
       data: {
         extraData: JSON.stringify([defaultSat]),
       },
-    };
+    });
     expect(() => cruncherExtraData(m)).not.toThrow();
   });
 
   it('should handle missing information', () => {
-    const m = {
+    const m = <SatCruncherMessage>(<unknown>{
       data: {
         extraData: JSON.stringify([defaultSat, []]),
       },
-    };
+    });
     expect(() => cruncherExtraData(m)).not.toThrow();
   });
 });
 
 describe('cruncherExtraUpdate', () => {
   it('should work', () => {
-    const m = {
+    const m = <SatCruncherMessage>(<unknown>{
       data: {
         extraUpdate: true,
         satId: 0,
         extraData: JSON.stringify([defaultSat]),
       },
-    };
+    });
     expect(() => cruncherExtraUpdate(m)).not.toThrow();
   });
 });
@@ -55,7 +56,7 @@ describe('cruncherDotsManagerInteraction', () => {
   });
 
   it('should handle missing information', () => {
-    let m = {
+    let m = <SatCruncherMessage>(<unknown>{
       data: {
         satPos: keepTrackApi.programs.dotsManager.positionData,
         satVel: keepTrackApi.programs.dotsManager.velocityData,
@@ -65,7 +66,7 @@ describe('cruncherDotsManagerInteraction', () => {
         satId: 0,
         extraData: JSON.stringify([defaultSat]),
       },
-    };
+    });
     expect(() => cruncherDotsManagerInteraction(m)).not.toThrow();
 
     delete keepTrackApi.programs.dotsManager.positionData;
@@ -73,7 +74,7 @@ describe('cruncherDotsManagerInteraction', () => {
     delete keepTrackApi.programs.dotsManager.inViewData;
     delete keepTrackApi.programs.dotsManager.inSunData;
 
-    m = <any>{
+    m = {
       data: {
         satPos: [0, 0, 0],
         satVel: [0, 0, 0],

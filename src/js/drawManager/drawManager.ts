@@ -233,8 +233,13 @@ export const drawLoop = (preciseDt: number) => {
   lineManager.draw();
 
   if (objectManager.selectedSat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
-    orbitManager.clearSelectOrbit();
-    orbitManager.setSelectOrbit(objectManager.selectedSat);
+    orbitManager.clearSelectOrbit(false);
+    orbitManager.setSelectOrbit(objectManager.selectedSat, false);
+  }
+
+  if (objectManager.secondarySat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
+    orbitManager.clearSelectOrbit(true);
+    orbitManager.setSelectOrbit(objectManager.secondarySat, true);
   }
 
   // Draw Satellite Model if a satellite is selected and meshManager is loaded

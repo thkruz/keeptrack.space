@@ -1,10 +1,11 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import * as photoManager from '@app/js/plugins/photoManager/photoManager';
 import { expect } from '@jest/globals';
 /* eslint-disable camelcase */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 settingsManager = window.settingsManager;
 // @ponicode
 describe('photoManager.init', () => {

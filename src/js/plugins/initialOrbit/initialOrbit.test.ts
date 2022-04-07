@@ -1,8 +1,10 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import * as initialOrbit from '@app/js/plugins/initialOrbit/initialOrbit';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
+
 // @ponicode
 describe('initialOrbit.init', () => {
   test('0', () => {

@@ -199,7 +199,13 @@ describe('timeMachine.timeMachineIconClick', () => {
 describe('timeMachine.timeMachineRemoveSatellite', () => {
   test('0', () => {
     const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(100, 'Face to face', 'Customer Metrics Consultant', false, false);
+      timeMachine.timeMachineRemoveSatellite(
+        100,
+        keepTrackApi.programs.orbitManager,
+        keepTrackApi.programs.groupsManager,
+        keepTrackApi.programs.satSet,
+        keepTrackApi.programs.colorSchemeManager
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -207,7 +213,13 @@ describe('timeMachine.timeMachineRemoveSatellite', () => {
 
   test('1', () => {
     const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(1, 'Customizable', 'Principal Implementation Strategist', false, false);
+      timeMachine.timeMachineRemoveSatellite(
+        1,
+        keepTrackApi.programs.orbitManager,
+        keepTrackApi.programs.groupsManager,
+        keepTrackApi.programs.satSet,
+        keepTrackApi.programs.colorSchemeManager
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -215,7 +227,13 @@ describe('timeMachine.timeMachineRemoveSatellite', () => {
 
   test('2', () => {
     const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(0, true, 'Product Accountability Executive', '1.0.0', { default: 'v1.2.4' });
+      timeMachine.timeMachineRemoveSatellite(
+        0,
+        keepTrackApi.programs.orbitManager,
+        keepTrackApi.programs.groupsManager,
+        keepTrackApi.programs.satSet,
+        keepTrackApi.programs.colorSchemeManager
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -223,7 +241,13 @@ describe('timeMachine.timeMachineRemoveSatellite', () => {
 
   test('3', () => {
     const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(-5.48, true, 'Customer Metrics Consultant', '^5.0.0', 'and Sons');
+      timeMachine.timeMachineRemoveSatellite(
+        -5.48,
+        keepTrackApi.programs.orbitManager,
+        keepTrackApi.programs.groupsManager,
+        keepTrackApi.programs.satSet,
+        keepTrackApi.programs.colorSchemeManager
+      );
     };
 
     expect(callFunction).not.toThrow();
@@ -231,15 +255,13 @@ describe('timeMachine.timeMachineRemoveSatellite', () => {
 
   test('4', () => {
     const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(100, false, 'Product Accountability Executive', '^5.0.0', { default: '^5.0.0' });
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('5', () => {
-    const callFunction: any = () => {
-      timeMachine.timeMachineRemoveSatellite(NaN, { tempTransColor: '', historyOfSatellitesRunCount: '', isTimeMachineRunning: '', isTimeMachineVisible: NaN }, '', '', NaN);
+      timeMachine.timeMachineRemoveSatellite(
+        100,
+        keepTrackApi.programs.orbitManager,
+        keepTrackApi.programs.groupsManager,
+        keepTrackApi.programs.satSet,
+        keepTrackApi.programs.colorSchemeManager
+      );
     };
 
     expect(callFunction).not.toThrow();

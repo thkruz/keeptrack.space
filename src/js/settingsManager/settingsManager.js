@@ -452,6 +452,7 @@ settingsManager = {
     // Orbit Color Settings
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
+    settingsManager.orbitSelectColor2 = [0.0, 0.4, 1.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
     settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE

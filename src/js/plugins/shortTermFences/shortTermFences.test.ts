@@ -1,10 +1,11 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import * as shortTermFences from '@app/js/plugins/shortTermFences/shortTermFences';
 import { expect } from '@jest/globals';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('shortTermFences.init', () => {

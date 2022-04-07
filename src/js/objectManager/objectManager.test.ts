@@ -1,7 +1,7 @@
 /* eslint-disable no-undefined */
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { KeepTrackPrograms } from '../api/keepTrackTypes';
+import { KeepTrackPrograms, SettingsManager } from '../api/keepTrackTypes';
 import { objectManager } from './objectManager';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
@@ -27,23 +27,23 @@ describe('ObjectManager Unit Tests', () => {
 
   test('ObjectManager Init', () => {
     objectManager.init();
-    global.settingsManager = {};
+    settingsManager = <SettingsManager>{};
     objectManager.init();
-    global.settingsManager.maxMissiles = 1;
+    settingsManager.maxMissiles = 1;
     objectManager.init();
-    global.settingsManager.maxRadarData = 1;
+    settingsManager.maxRadarData = 1;
     objectManager.init();
-    global.settingsManager.maxAnalystSats = 1;
+    settingsManager.maxAnalystSats = 1;
     objectManager.init();
-    global.settingsManager.lowPerf = true;
+    settingsManager.lowPerf = true;
     objectManager.init();
-    global.settingsManager.lowPerf = false;
-    global.settingsManager.noStars = true;
+    settingsManager.lowPerf = false;
+    settingsManager.noStars = true;
     objectManager.init();
-    global.settingsManager.noStars = false;
+    settingsManager.noStars = false;
     objectManager.init();
 
-    global.settingsManager.maxFieldOfViewMarkers = null;
+    settingsManager.maxFieldOfViewMarkers = null;
     objectManager.init();
   });
 

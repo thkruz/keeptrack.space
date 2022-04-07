@@ -11,6 +11,10 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
     case 'R':
       mainCamera.autoRotate();
       break;
+    case ']':
+    case '[':
+      objectManager.switchPrimarySecondary();
+    break;
     case 'C':
       mainCamera.changeCameraType(orbitManager, drawManager, objectManager, sensorManager);
 

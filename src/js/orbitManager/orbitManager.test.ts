@@ -1,7 +1,8 @@
 import * as orbitManager from '@app/js/orbitManager/orbitManager';
 import { keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+import { KeepTrackPrograms, SatObject } from '../api/keepTrackTypes';
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 describe('orbitManager.init', () => {
   test('0', () => {
@@ -179,9 +180,10 @@ describe('orbitManager.draw', () => {
   });
 
   test('1', () => {
-    keepTrackApi.programs.satSet.getSatExtraOnly = () => ({
-      static: false,
-    });
+    keepTrackApi.programs.satSet.getSatExtraOnly = () =>
+      <SatObject>{
+        static: false,
+      };
     orbitManager.setSelectOrbit(1);
     let result: any = orbitManager.draw([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], null);
     expect(result).toMatchSnapshot();

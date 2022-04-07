@@ -148,7 +148,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-sat-photo" class="bmenu-item">
-          <img alt="photographs" src="" delayedsrc=${photoManagerPng}/>
+          <img alt="photographs" src="" delayedsrc="${photoManagerPng}" />
           <span class="bmenu-title">Satellite Photos</span>
           <div class="status-icon"></div>
         </div>

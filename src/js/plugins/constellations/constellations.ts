@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
-import satChngPng from '@app/img/icons/satChng.png';
+import satChngPng from '@app/img/icons/satchng.png';
 
 let isConstellationsMenuOpen = false;
 

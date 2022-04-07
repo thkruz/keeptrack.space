@@ -1,8 +1,9 @@
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as orbitReferences from './orbitReferences';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('orbitReferences.init', () => {
@@ -23,17 +24,7 @@ describe('orbitReferences.uiManagerInit', () => {
 // @ponicode
 describe('orbitReferences.selectSatData', () => {
   test('0', () => {
-    let result: any = orbitReferences.selectSatData(false);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    let result: any = orbitReferences.selectSatData(true);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('2', () => {
-    let result: any = orbitReferences.selectSatData(null);
+    let result: any = orbitReferences.selectSatData();
     expect(result).toMatchSnapshot();
   });
 });

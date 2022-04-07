@@ -7,7 +7,7 @@ interface SensorList {
 
 const sensorList: SensorList = {
   COD: {
-    name: 'Cape Cod AFS, Massachusetts',
+    name: 'Cape Cod SFS, Massachusetts',
     shortName: 'COD',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 41.754785,
@@ -52,7 +52,7 @@ const sensorList: SensorList = {
     volume: false,
   },
   CLR: {
-    name: 'Clear AFS, Alaska',
+    name: 'Clear SFS, Alaska',
     shortName: 'CLR',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 64.290556,
@@ -117,7 +117,7 @@ const sensorList: SensorList = {
     volume: false,
   },
   CAV: {
-    name: 'Cavalier AFS, North Dakota',
+    name: 'Cavalier SFS, North Dakota',
     shortName: 'CAV',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: 48.724567,

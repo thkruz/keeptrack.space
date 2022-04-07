@@ -189,8 +189,8 @@ export interface OrbitManager {
   orbitWorker: any;
   removeInViewOrbit(arg0: any): void;
   draw(pMatrix: any, camMatrix: any, curBuffer: any): void;
-  clearSelectOrbit(): void;
-  setSelectOrbit(selectedSat: number): void;
+  clearSelectOrbit(isSecondary?: boolean): void;
+  setSelectOrbit(selectedSat: number, isSecondary?: boolean): void;
   updateOrbitBuffer(satId: number, force?: boolean, TLE1?: string, TLE2?: string, missileParams?: MissileParams): void;
   addInViewOrbit(i: number): void;
   setHoverOrbit(mouseSat: any): void;
@@ -463,6 +463,7 @@ export interface SettingsManager {
   orbitInViewColor: [number, number, number, number];
   orbitPlanetariumColor: [number, number, number, number];
   orbitSelectColor: [number, number, number, number];
+  orbitSelectColor2: [number, number, number, number];
   plugins: any;
   politicalImages: boolean;
   pTime: any[];
@@ -498,6 +499,9 @@ export type RocketUrl = {
 };
 
 export interface ObjectManager {
+  secondarySatObj: SatObject;
+  secondarySat: number;
+  switchPrimarySecondary: () => void;
   init: () => void;
   rocketUrls: RocketUrl[];
   satLinkManager: any;
@@ -507,6 +511,7 @@ export interface ObjectManager {
   isLaunchSiteManagerLoaded: any;
   launchSiteManager: any;
   setHoveringSat(i: number): void;
+  setSecondarySat(i: number): void;
   setLasthoveringSat(hoveringSat: number): void;
   lastSelectedSat(id?: number): number;
   extractLaunchSite(name: string): {

@@ -1,7 +1,7 @@
 import 'jquery-ui-bundle';
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { KeepTrackPrograms } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import * as satInfoboxCore from './satInfoboxCore';
 
@@ -100,12 +100,12 @@ describe('satInfoboxCore.satMissionData', () => {
   });
 
   test('1', () => {
-    let result: any = satInfoboxCore.satMissionData({ LM: '1', DM: '2', Pw: '3', vmag: '4', S2: '1', S4: '1', S5: '1', S6: '1', S7: '1' });
+    let result: any = satInfoboxCore.satMissionData({ ...defaultSat, ...{ vmag: 1 } });
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satInfoboxCore.satMissionData({ missile: true });
+    let result: any = satInfoboxCore.satMissionData(<SatObject>{ missile: true });
     expect(result).toMatchSnapshot();
   });
 });
@@ -128,37 +128,37 @@ describe('satInfoboxCore.intelData', () => {
   });
 
   test('3', () => {
-    let result: any = satInfoboxCore.intelData({ TTP: 'test' }, 1);
+    let result: any = satInfoboxCore.intelData(<SatObject>{ TTP: 'test' }, 1);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satInfoboxCore.intelData({ NOTES: 'test' }, 1);
+    let result: any = satInfoboxCore.intelData(<SatObject>{ NOTES: 'test' }, 1);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satInfoboxCore.intelData({ FMISSED: 'test' }, 1);
+    let result: any = satInfoboxCore.intelData(<SatObject>{ FMISSED: 'test' }, 1);
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    let result: any = satInfoboxCore.intelData({ ORPO: 'test' }, 1);
+    let result: any = satInfoboxCore.intelData(<SatObject>{ ORPO: 'test' }, 1);
     expect(result).toMatchSnapshot();
   });
 
   test('7', () => {
-    let result: any = satInfoboxCore.intelData({ constellation: 'test' }, 1);
+    let result: any = satInfoboxCore.intelData(<SatObject>{ constellation: 'test' }, 1);
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    let result: any = satInfoboxCore.intelData({ maneuver: 'test' }, 1);
+    let result: any = satInfoboxCore.intelData(<SatObject>{ maneuver: 'test' }, 1);
     expect(result).toMatchSnapshot();
   });
 
   test('9', () => {
-    let result: any = satInfoboxCore.intelData({ associates: 'test' }, 1);
+    let result: any = satInfoboxCore.intelData(<SatObject>{ associates: 'test' }, 1);
     expect(result).toMatchSnapshot();
   });
 });
@@ -171,66 +171,66 @@ describe('satInfoboxCore.objectData', () => {
   });
 
   test('1', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 0 });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 0 }));
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 2 });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 2 }));
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 3 });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 3 }));
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 4 });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 4 }));
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 5, TLE2: '1234556767' });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 5, TLE2: '1234556767' }));
     expect(result).toMatchSnapshot();
   });
 
   test('6', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 6, TLE2: '1234556767' });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 6, TLE2: '1234556767' }));
     expect(result).toMatchSnapshot();
   });
 
   test('7', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 7, TLE2: '1234556767' });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 7, TLE2: '1234556767' }));
     expect(result).toMatchSnapshot();
   });
 
   test('8', () => {
-    let result: any = satInfoboxCore.objectData({ missile: true });
+    let result: any = satInfoboxCore.objectData(<SatObject>{ missile: true });
     expect(result).toMatchSnapshot();
   });
 
   test('9', () => {
-    let result: any = satInfoboxCore.objectData({ OT: 'unknown', TLE2: '1234556767' });
+    let result: any = satInfoboxCore.objectData(<SatObject>(<unknown>{ OT: 'unknown', TLE2: '1234556767' }));
     expect(result).toMatchSnapshot();
   });
 
   it('should handle all sat-types', () => {
-    let result: any = satInfoboxCore.objectData({ type: SpaceObjectType.UNKNOWN });
+    let result: any = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.UNKNOWN });
     expect(result).toMatchSnapshot();
-    result = satInfoboxCore.objectData({ type: SpaceObjectType.PAYLOAD });
+    result = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.PAYLOAD });
     expect(result).toMatchSnapshot();
-    result = satInfoboxCore.objectData({ type: SpaceObjectType.ROCKET_BODY });
+    result = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.ROCKET_BODY });
     expect(result).toMatchSnapshot();
-    result = satInfoboxCore.objectData({ type: SpaceObjectType.DEBRIS });
+    result = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.DEBRIS });
     expect(result).toMatchSnapshot();
-    result = satInfoboxCore.objectData({ type: SpaceObjectType.SPECIAL });
+    result = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.SPECIAL });
     expect(result).toMatchSnapshot();
-    result = satInfoboxCore.objectData({ type: SpaceObjectType.RADAR_MEASUREMENT, TLE2: '1234556767' });
+    result = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.RADAR_MEASUREMENT, TLE2: '1234556767' });
     expect(result).toMatchSnapshot();
-    result = satInfoboxCore.objectData({ type: SpaceObjectType.RADAR_TRACK, TLE2: '1234556767' });
+    result = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.RADAR_TRACK, TLE2: '1234556767' });
     expect(result).toMatchSnapshot();
-    result = satInfoboxCore.objectData({ type: SpaceObjectType.RADAR_OBJECT, TLE2: '1234556767' });
+    result = satInfoboxCore.objectData(<SatObject>{ type: SpaceObjectType.RADAR_OBJECT, TLE2: '1234556767' });
     expect(result).toMatchSnapshot();
   });
 });

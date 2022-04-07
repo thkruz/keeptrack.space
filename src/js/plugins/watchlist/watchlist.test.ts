@@ -1,10 +1,11 @@
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import * as watchlist from '@app/js/plugins/watchlist/watchlist';
 import { expect } from '@jest/globals';
 /* eslint-disable no-undefined */
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('watchlist.init', () => {

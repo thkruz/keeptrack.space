@@ -45,7 +45,7 @@ describe('httpsOnly.updateSettingsManager', () => {
     expect(() => result).not.toThrow();
   });
   it('should update the settingsManager', () => {
-    const result = httpsOnly.updateSettingsManager({
+    httpsOnly.updateSettingsManager({
       coords: {
         latitude: 41,
         longitude: -71,

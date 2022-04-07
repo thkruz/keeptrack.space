@@ -1,7 +1,8 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import * as gamepad from '@app/js/plugins/gamepad/gamepad';
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 Object.defineProperty(global.navigator, 'getGamepads', {
   value: () => [
@@ -49,40 +50,32 @@ describe('gamepad.getController', () => {
 // @ponicode
 describe('gamepad.gamepadConnected', () => {
   test('0', () => {
-    let inst3: any = new Float32Array([]);
-    let inst2: any = new Float32Array([]);
-    let inst: any = new Float32Array([]);
-    let result: any = gamepad.gamepadConnected({
+    let result: any = gamepad.gamepadConnected(<GamepadEvent>(<unknown>{
       gamepad: {
         axes: [],
         buttons: [],
         connected: true,
-        hand: 'right',
         hapticActuators: [],
         id: '',
         index: -Infinity,
         mapping: 'standard',
-        pose: { angularAcceleration: inst, angularVelocity: null, hasOrientation: false, hasPosition: false, linearAcceleration: inst2, linearVelocity: null, orientation: null, position: inst3 },
         timestamp: -Infinity,
       },
       bubbles: true,
       cancelBubble: false,
       cancelable: false,
       composed: true,
-      currentTarget: {},
       defaultPrevented: true,
       eventPhase: -Infinity,
       isTrusted: true,
       returnValue: true,
-      srcElement: {},
-      target: {},
       timeStamp: -Infinity,
       type: '',
       AT_TARGET: -Infinity,
       BUBBLING_PHASE: -Infinity,
       CAPTURING_PHASE: -Infinity,
       NONE: -Infinity,
-    });
+    }));
     expect(result).toMatchSnapshot();
   });
 });
@@ -196,23 +189,23 @@ describe('gamepad.updateZoom', () => {
 describe('gamepad.updateButtons', () => {
   test('0', () => {
     let result: any = gamepad.updateButtons([
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
-      { pressed: true },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
+      { pressed: true, touched: true, value: 0.5 },
     ]);
     expect(result).toMatchSnapshot();
   });

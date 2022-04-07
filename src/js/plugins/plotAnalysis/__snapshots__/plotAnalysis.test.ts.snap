@@ -22,7 +22,9 @@ Object {
               },
             },
             "viewControl": Object {
-              "rotateSensitivity": 5,
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
             },
           },
           "series": Array [
@@ -136,7 +138,9 @@ Object {
               },
             },
             "viewControl": Object {
-              "rotateSensitivity": 5,
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
             },
           },
           "series": Array [
@@ -252,7 +256,9 @@ Object {
               },
             },
             "viewControl": Object {
-              "rotateSensitivity": 5,
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
             },
           },
           "series": Array [
@@ -372,7 +378,9 @@ Object {
               },
             },
             "viewControl": Object {
-              "rotateSensitivity": 5,
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
             },
           },
           "series": Array [
@@ -684,10 +692,12 @@ Object {
           ],
           "xAxis": Object {
             "name": "Longitude",
+            "position": "bottom",
             "type": "value",
           },
           "yAxis": Object {
             "name": "Inclination",
+            "position": "left",
             "type": "value",
           },
           "zAxis": Object {
@@ -918,10 +928,12 @@ Object {
           ],
           "xAxis": Object {
             "name": "Longitude",
+            "position": "bottom",
             "type": "value",
           },
           "yAxis": Object {
             "name": "Inclination",
+            "position": "left",
             "type": "value",
           },
           "zAxis": Object {
@@ -964,7 +976,9 @@ Object {
               },
             },
             "viewControl": Object {
-              "rotateSensitivity": 5,
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
             },
           },
           "legend": Object {
@@ -973,70 +987,7 @@ Object {
               "color": "#fff",
             },
           },
-          "series": Array [
-            Object {
-              "data": Array [
-                Object {
-                  "itemStyle": Object {
-                    "opacity": 1,
-                  },
-                  "value": Array [
-                    0,
-                    0,
-                    0,
-                  ],
-                },
-              ],
-              "dimensions": Array [
-                "Radial",
-                "In-Track",
-                "In-Track",
-              ],
-              "emphasis": Object {
-                "itemStyle": Object {
-                  "color": "#fff",
-                },
-              },
-              "itemStyle": Object {
-                "borderColor": "rgba(255,255,255,0.8)",
-                "borderWidth": 1,
-              },
-              "name": "ISS (ZARYA)",
-              "symbolSize": 12,
-              "type": "scatter3D",
-            },
-            Object {
-              "data": Array [
-                Object {
-                  "itemStyle": Object {
-                    "opacity": 1,
-                  },
-                  "value": Array [
-                    undefined,
-                    undefined,
-                    undefined,
-                  ],
-                },
-              ],
-              "dimensions": Array [
-                "Radial",
-                "In-Track",
-                "In-Track",
-              ],
-              "emphasis": Object {
-                "itemStyle": Object {
-                  "color": "#fff",
-                },
-              },
-              "itemStyle": Object {
-                "borderColor": "rgba(255,255,255,0.8)",
-                "borderWidth": 1,
-              },
-              "name": "ISS (ZARYA)",
-              "symbolSize": 12,
-              "type": "scatter3D",
-            },
-          ],
+          "series": Array [],
           "title": Object {
             "text": "RIC Scatter Plot",
             "textStyle": Object {
@@ -1091,7 +1042,9 @@ Object {
               },
             },
             "viewControl": Object {
-              "rotateSensitivity": 5,
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
             },
           },
           "legend": Object {
@@ -1100,70 +1053,7 @@ Object {
               "color": "#fff",
             },
           },
-          "series": Array [
-            Object {
-              "data": Array [
-                Object {
-                  "itemStyle": Object {
-                    "opacity": 1,
-                  },
-                  "value": Array [
-                    0,
-                    0,
-                    0,
-                  ],
-                },
-              ],
-              "dimensions": Array [
-                "Radial",
-                "In-Track",
-                "In-Track",
-              ],
-              "emphasis": Object {
-                "itemStyle": Object {
-                  "color": "#fff",
-                },
-              },
-              "itemStyle": Object {
-                "borderColor": "rgba(255,255,255,0.8)",
-                "borderWidth": 1,
-              },
-              "name": "ISS (ZARYA)",
-              "symbolSize": 12,
-              "type": "scatter3D",
-            },
-            Object {
-              "data": Array [
-                Object {
-                  "itemStyle": Object {
-                    "opacity": 1,
-                  },
-                  "value": Array [
-                    undefined,
-                    undefined,
-                    undefined,
-                  ],
-                },
-              ],
-              "dimensions": Array [
-                "Radial",
-                "In-Track",
-                "In-Track",
-              ],
-              "emphasis": Object {
-                "itemStyle": Object {
-                  "color": "#fff",
-                },
-              },
-              "itemStyle": Object {
-                "borderColor": "rgba(255,255,255,0.8)",
-                "borderWidth": 1,
-              },
-              "name": "ISS (ZARYA)",
-              "symbolSize": 12,
-              "type": "scatter3D",
-            },
-          ],
+          "series": Array [],
           "title": Object {
             "text": "RIC Scatter Plot",
             "textStyle": Object {
@@ -1327,10 +1217,12 @@ Object {
           "tooltip": Object {},
           "xAxis": Object {
             "name": "Longitude",
+            "position": "bottom",
             "type": "value",
           },
           "yAxis": Object {
             "name": "Time",
+            "position": "left",
             "type": "value",
           },
           "zAxis": Object {
@@ -1478,10 +1370,12 @@ Object {
           "tooltip": Object {},
           "xAxis": Object {
             "name": "Longitude",
+            "position": "bottom",
             "type": "value",
           },
           "yAxis": Object {
             "name": "Time",
+            "position": "left",
             "type": "value",
           },
           "zAxis": Object {
@@ -1660,7 +1554,6 @@ exports[`plotAnalysis.onInc2LonPlotBtnClick 0 2`] = `
     
           
     <div
-      class="bmenu-item-selected"
       id="menu-plot-analysis3"
     />
     
@@ -1795,7 +1688,7 @@ exports[`plotAnalysis.selectSatData 0 4`] = `
     
           
     <div
-      class="bmenu-item-selected"
+      class=""
       id="menu-plot-analysis3"
     />
     
@@ -1843,7 +1736,7 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       
       <div
-        class="side-menu-parent start-hidden text-select"
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
         id="plot-analysis-menu"
       >
         
@@ -1868,7 +1761,7 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       
       <div
-        class="side-menu-parent start-hidden text-select"
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
         id="plot-analysis-menu2"
       >
         
@@ -1893,7 +1786,7 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       
       <div
-        class="side-menu-parent start-hidden text-select"
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
         id="plot-analysis-menu3"
       >
         
@@ -1969,7 +1862,7 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       
       <div
-        class="side-menu-parent start-hidden text-select"
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
         id="plot-analysis-menu"
       >
         
@@ -1994,7 +1887,7 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       
       <div
-        class="side-menu-parent start-hidden text-select"
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
         id="plot-analysis-menu2"
       >
         
@@ -2019,7 +1912,7 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       
       <div
-        class="side-menu-parent start-hidden text-select"
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
         id="plot-analysis-menu3"
       >
         
@@ -2108,7 +2001,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="ECI Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2135,7 +2029,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="ECF Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2162,7 +2057,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="RIC Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2189,7 +2085,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="Inc v Lon Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2216,7 +2113,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="Time v Lon Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2245,7 +2143,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="ECI Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2272,7 +2171,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="ECF Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2299,7 +2199,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="RIC Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2326,7 +2227,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="Inc v Lon Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         
@@ -2353,7 +2255,8 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
         
         <img
           alt="Time v Lon Plots"
-          src="/"
+          delayedsrc="/"
+          src=""
         />
         
         

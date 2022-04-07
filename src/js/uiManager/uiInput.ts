@@ -61,6 +61,7 @@ export const init = (): void => { // NOSONAR
       <div id="edit-rmb-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
           <li id="edit-sat-rmb"><a href="#">Edit Satellite</a></li>
+          <li id="set-sec-sat-rmb"><a href="#">Set as Secondary Sat</a></li>
         </ul>
       </div>
       <div id="draw-rmb-menu" class="right-btn-menu">
@@ -691,6 +692,9 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
         isSunlightView: false,
       });
       break;
+    case 'set-sec-sat-rmb':
+      objectManager.setSecondarySat(clickedSat);
+      break;
     case 'reset-camera-rmb':
       mainCamera.isPanReset = true;
       mainCamera.isLocalRotateReset = true;
@@ -715,7 +719,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       lineManager.create('sat5', [clickedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name)], 'p');
       break;
     case 'line-sat-sat-rmb':
-      lineManager.create('sat3', [clickedSat, objectManager.selectedSat], 'p');
+      lineManager.create('sat5', [clickedSat, objectManager.selectedSat], 'b');
       break;
     case 'line-sat-sun-rmb':
       lineManager.create('sat2', [clickedSat, drawManager.sceneManager.sun.pos[0], drawManager.sceneManager.sun.pos[1], drawManager.sceneManager.sun.pos[2]], 'o');
@@ -1229,6 +1233,7 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
 
   // Edit
   $('#edit-sat-rmb').hide();
+  $('#set-sec-sat-rmb').hide();
 
   // Create
   $('#create-observer-rmb ').hide();
@@ -1270,15 +1275,23 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
     if (typeof clickedSat == 'undefined') return;
     const sat = satSet.getSat(clickedSat);
     if (typeof sat == 'undefined' || sat == null) return;
-    if (typeof satSet.getSat(clickedSat).type == 'undefined' || satSet.getSat(clickedSat).type !== SpaceObjectType.STAR) {
+    if (typeof sat.type == 'undefined' || sat.type !== SpaceObjectType.STAR) {
       rightBtnViewDOM.show();
       isViewDOM = true;
       numMenuItems++;
     }
-    if (!satSet.getSat(clickedSat).static) {
-      $('#edit-sat-rmb').show();
+
+    if (sat.type === SpaceObjectType.PAYLOAD || sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS || sat.type === SpaceObjectType.SPECIAL) {
+      $('#set-sec-sat-rmb').show();
       rightBtnEditDOM.show();
       numMenuItems++;
+    } else if (!sat.static) {
+      numMenuItems++;
+    }
+
+    if (!sat.static) {
+      $('#edit-sat-rmb').show();
+      rightBtnEditDOM.show();
 
       $('#view-sat-info-rmb').show();
       $('#view-related-sats-rmb').show();
@@ -1293,7 +1306,7 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
       isDrawDOM = true;
       numMenuItems++;
     } else {
-      switch (satSet.getSat(clickedSat).type) {
+      switch (sat.type) {
         case SpaceObjectType.PHASED_ARRAY_RADAR:
         case SpaceObjectType.OPTICAL:
         case SpaceObjectType.MECHANICAL:

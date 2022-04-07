@@ -6,22 +6,6 @@ import * as main from './main';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
-const setUrl = (url) => {
-  const host = url.split('/')[2] || '';
-  let search = url.split('?')[1] || '';
-  search = search !== '' ? `?${search}` : '';
-
-  global.window = Object.create(window);
-  Object.defineProperty(window, 'location', {
-    value: {
-      href: url,
-      host: host,
-      search: search,
-    },
-    writable: true,
-  });
-};
-
 describe('main.importCss', () => {
   test('0', async () => {
     const result = await importCss();

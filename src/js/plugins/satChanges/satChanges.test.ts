@@ -34,9 +34,8 @@ describe('satChanges.hideSideMenus', () => {
 
 describe('satChanges.bottomMenuClick', () => {
   test('0', () => {
-    const fakeTable = [{ SCC: 25544, inc: 51, meanmo: 120 }];
     window.document.body.innerHTML = `<table id="satChng-table"></table>`;
-    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }], fakeTable);
+    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }]);
     let result: any = satChanges.bottomMenuClick('menu-satChng');
     expect(result).toMatchSnapshot();
   });
@@ -47,9 +46,8 @@ describe('satChanges.bottomMenuClick', () => {
   });
 
   test('2', () => {
-    const fakeTable = [{ SCC: 25544, inc: 51, meanmo: 120 }];
     window.document.body.innerHTML = `<table id="satChng-table"></table>`;
-    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }], fakeTable);
+    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }]);
     satChanges.bottomMenuClick('menu-satChng');
     satChanges.bottomMenuClick('menu-satChng');
     let result: any = () => {
@@ -97,8 +95,7 @@ describe('satChanges.satChng', () => {
 // @ponicode
 describe('satChanges.getSatChngJson', () => {
   test('0', () => {
-    const fakeTable = [{ SCC: 25544, inc: 51, meanmo: 120 }];
     window.document.body.innerHTML = `<table id="satChng-table"></table>`;
-    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }], fakeTable);
+    satChanges.getSatChngJson([{ SCC: 25544, day: 100, year: 2020, inc: 10 }]);
   });
 });

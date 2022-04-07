@@ -118,10 +118,10 @@ export const getRicScatterData = () => {
 
   const data = [];
 
-  if (objectManager.selectedSat === -1 || objectManager.lastSelectedSat() === -1) return [];
+  if (objectManager.selectedSat === -1 || objectManager.secondarySat === -1) return [];
 
   const sat = satSet.getSat(objectManager.selectedSat);
-  const sat2 = satSet.getSat(objectManager.lastSelectedSat());
+  const sat2 = objectManager.secondarySatObj;
   data.push({ name: sat.name, value: [[0, 0, 0]] });
   data.push({ name: sat2.name, value: satellite.getRicOfCurrentOrbit(sat2, sat, NUMBER_OF_POINTS, 5) });
 

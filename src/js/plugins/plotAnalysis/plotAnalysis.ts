@@ -129,11 +129,11 @@ export const onEciPlotBtnClick = () => {
     isPlotAnalyisMenuOpen = true;
 
     const chartDom = document.getElementById('plot-analysis-chart');
-    let existInstance = echarts.getInstanceByDom(chartDom);
+    // let existInstance = echarts.getInstanceByDom(chartDom);
 
-    if (!existInstance) {
-      curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart, chartDom);
-    }
+    // if (!existInstance) {
+    curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart, chartDom);
+    // }
     setTimeout(() => {
       curChart.resize();
     }, 1000);
@@ -164,11 +164,11 @@ export const onEcfPlotBtnClick = () => {
     isPlotAnalyisMenuOpen2 = true;
 
     const chartDom2 = document.getElementById('plot-analysis-chart2');
-    let existInstance = echarts.getInstanceByDom(chartDom2);
+    // let existInstance = echarts.getInstanceByDom(chartDom2);
 
-    if (!existInstance) {
-      curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
-    }
+    // if (!existInstance) {
+    curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
+    // }
     setTimeout(() => {
       curChart2.resize();
     }, 1000);
@@ -179,8 +179,18 @@ export const onEcfPlotBtnClick = () => {
 
 export const onRicPlotBtnClick = () => {
   const { objectManager, uiManager } = keepTrackApi.programs;
+  if (objectManager.secondarySat === -1) {
+    uiManager.toast(`Select a Secondary Satellite First!`, 'caution');
+    if (!$('#menu-plot-analysis3:animated').length) {
+      $('#menu-plot-analysis3').effect('shake', {
+        distance: 10,
+      });
+    }
+    return;
+  }
+
   if (objectManager.selectedSat === -1 || objectManager.lastSelectedSat() === -1) {
-    uiManager.toast(`Select Two Satellites First!`, 'caution');
+    uiManager.toast(`Select a Primary Satellite First!`, 'caution');
     if (!$('#menu-plot-analysis3:animated').length) {
       $('#menu-plot-analysis3').effect('shake', {
         distance: 10,
@@ -199,11 +209,11 @@ export const onRicPlotBtnClick = () => {
     isPlotAnalyisMenuOpen3 = true;
 
     const chartDom3 = document.getElementById('plot-analysis-chart3');
-    let existInstance = echarts.getInstanceByDom(chartDom3);
+    // let existInstance = echarts.getInstanceByDom(chartDom3);
 
-    if (!existInstance) {
-      curChart3 = createRicScatterPlot(getRicScatterData(), isPlotAnalyisMenuOpen3, curChart3, chartDom3);
-    }
+    // if (!existInstance) {
+    curChart3 = createRicScatterPlot(getRicScatterData(), isPlotAnalyisMenuOpen3, curChart3, chartDom3);
+    // }
     setTimeout(() => {
       curChart3.resize();
     }, 1000);
@@ -292,6 +302,7 @@ export const hideSideMenus = (): void => {
  * @returns {void}
  */
 export const selectSatData = (_sat: SatObject, satId: number): void => {
+  const { objectManager } = keepTrackApi.programs;
   if (satId === -1) {
     hideSideMenus();
     return;
@@ -306,7 +317,7 @@ export const selectSatData = (_sat: SatObject, satId: number): void => {
     const chartDom2 = document.getElementById('plot-analysis-chart2');
     curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
   }
-  if (isPlotAnalyisMenuOpen3) {
+  if (objectManager.secondarySat !== -1 && isPlotAnalyisMenuOpen3) {
     $('#menu-plot-analysis3').addClass('bmenu-item-selected');
     const chartDom3 = document.getElementById('plot-analysis-chart3');
     curChart3 = createRicScatterPlot(getRicScatterData(), isPlotAnalyisMenuOpen3, curChart3, chartDom3);

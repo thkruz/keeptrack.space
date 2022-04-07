@@ -1,8 +1,9 @@
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as dops from '../../plugins/dops/dops';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 // @ponicode
 describe('dops.init', () => {
   test('0', () => {

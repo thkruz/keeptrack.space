@@ -4,8 +4,10 @@ import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getDayOfYear } from '../timeManager/transforms';
+import { KeepTrackPrograms } from './../api/keepTrackTypes';
 import { colorSchemeManager, isDebrisOff, isInViewOff, isPayloadOff, isRocketBodyOff } from './colorSchemeManager';
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 const RealNow = Date.now;
 

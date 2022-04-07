@@ -55,9 +55,20 @@ describe('plotAnalysis.bottomMenuClick', () => {
           showLoading: jest.fn(),
         }
     );
+    spy2 = jest.spyOn(echarts, 'dispose').mockImplementation(() => {});
+    spy3 = jest.spyOn(echarts, 'init').mockImplementation(
+      () =>
+        <any>{
+          hideLoading: jest.fn(),
+          setOption: jest.fn(),
+          showLoading: jest.fn(),
+        }
+    );
   });
   afterAll(() => {
     spy.mockRestore();
+    spy2.mockRestore();
+    spy3.mockRestore();
   });
 
   document.body.insertAdjacentHTML(
@@ -136,7 +147,15 @@ describe('plotAnalysis.onEciPlotBtnClick', () => {
       () =>
         <any>{
           hideLoading: jest.fn(),
-          dispose: jest.fn(),
+          setOption: jest.fn(),
+          showLoading: jest.fn(),
+        }
+    );
+    spy2 = jest.spyOn(echarts, 'dispose').mockImplementation(() => {});
+    spy3 = jest.spyOn(echarts, 'init').mockImplementation(
+      () =>
+        <any>{
+          hideLoading: jest.fn(),
           setOption: jest.fn(),
           showLoading: jest.fn(),
         }
@@ -144,6 +163,8 @@ describe('plotAnalysis.onEciPlotBtnClick', () => {
   });
   afterAll(() => {
     spy.mockRestore();
+    spy2.mockRestore();
+    spy3.mockRestore();
   });
   test('0', () => {
     document.body.insertAdjacentHTML(
@@ -170,7 +191,15 @@ describe('plotAnalysis.onEcfPlotBtnClick', () => {
       () =>
         <any>{
           hideLoading: jest.fn(),
-          dispose: jest.fn(),
+          setOption: jest.fn(),
+          showLoading: jest.fn(),
+        }
+    );
+    spy2 = jest.spyOn(echarts, 'dispose').mockImplementation(() => {});
+    spy3 = jest.spyOn(echarts, 'init').mockImplementation(
+      () =>
+        <any>{
+          hideLoading: jest.fn(),
           setOption: jest.fn(),
           showLoading: jest.fn(),
         }
@@ -178,6 +207,8 @@ describe('plotAnalysis.onEcfPlotBtnClick', () => {
   });
   afterAll(() => {
     spy.mockRestore();
+    spy2.mockRestore();
+    spy3.mockRestore();
   });
   test('0', () => {
     document.body.insertAdjacentHTML(
@@ -422,13 +453,13 @@ describe('plotAnalysis.selectSatData', () => {
     plotAnalysis.uiManagerInit();
 
     plotAnalysis.bottomMenuClick('menu-plot-analysis');
-    let result: any = plotAnalysis.selectSatData();
+    let result: any = plotAnalysis.selectSatData(defaultSat, 0);
     expect(result).toMatchSnapshot();
     plotAnalysis.bottomMenuClick('menu-plot-analysis2');
-    result = plotAnalysis.selectSatData();
+    result = plotAnalysis.selectSatData(defaultSat, 0);
     expect(result).toMatchSnapshot();
     plotAnalysis.bottomMenuClick('menu-plot-analysis3');
-    result = plotAnalysis.selectSatData();
+    result = plotAnalysis.selectSatData(defaultSat, 0);
     expect(result).toMatchSnapshot();
 
     expect(document.getElementById('wrapper0')).toMatchSnapshot();

@@ -72,7 +72,7 @@ export const defaultSensor: SensorObject = {
   linkAehf: true,
   linkWgs: true,
   lon: -70.539151,
-  name: 'Cape Cod AFS, Massachusetts',
+  name: 'Cape Cod SFS, Massachusetts',
   observerGd: { lat: 0.7287584767123405, lon: -1.2311404365114507, alt: 0.060966 },
   obsmaxaz: 227,
   obsmaxel: 85,
@@ -352,6 +352,8 @@ export const keepTrackApiStubs = {
         launchSiteList: ['AFWTR'],
       },
       selectedSat: -1,
+      secondarySat: -1,
+      setSecondarySat: jest.fn(),
       setSelectedSat: jest.fn(),
       staticSet: {
         id: 0,

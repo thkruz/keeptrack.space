@@ -241,7 +241,9 @@ export const selectSat = (i: number): void => {
   $('#menu-breakup').removeClass('bmenu-item-disabled');
   $('#menu-plot-analysis').removeClass('bmenu-item-disabled');
   $('#menu-plot-analysis2').removeClass('bmenu-item-disabled');
-  $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+  if (objectManager.secondarySat !== -1) {
+    $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+  }
 };
 export const convertIdArrayToSatnumArray = (satIdArray: number[]) => satIdArray.map((id) => (satSet.getSat(id)?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
 export const convertSatnumArrayToIdArray = (satnumArray: number[]) => satnumArray.map((satnum) => satSet.getSatFromObjNum(satnum)?.id || null).filter((id) => id !== null);

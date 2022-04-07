@@ -3,6 +3,7 @@ import { LaunchInfoObject } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { saveCsv, truncateString } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import calendar2Png from '@app/img/icons/calendar2.png';
 /* */
 
 let isNextLaunchMenuOpen = false;
@@ -131,7 +132,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   $('#bottom-icons').append(keepTrackApi.html`
         <div id="menu-nextLaunch" class="bmenu-item">
-          <img alt="calendar" src="" delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAABNUlEQVR4nO3cQWrCQBiAUS29Tne9/wm680C6Erow0GBnvtG8txQxkY8/jBP1dAIAAADgKM4zD/b1c70+evzyfZ56HncrnM/HrAPxmACxp0Zta4SP5plLlgmICRATICZATIDY54gX3VoVrPDB57e95zNi1WcCYgLEhlyCtlSXmi0rnI8JiAkQG3IJskf0dyYgJkBMgJgAMQFiU/eCXp29oDckQEyAmAAxAWJTt6P3+q87VivfoTMBMQFiAsQEiAkQW3oVtHc1Mvr5I5iAmAAxAWICxASITV0Frba3Yy8IAWoCxASICRAb8kv5FfZYRhjxfk1ATICYADEBYgLEDr0XtAITEBMgJkBMgJgAsaX/rOMVv+ezlwmICRATICZATICY/wuKmYCYADEBYgLEBAAAAAAAgPd3AzYrWtKgtEhrAAAAAElFTkSuQmCC"> <!-- // NO-PIG -->
+          <img alt="calendar" src="" delayedsrc=${calendar2Png}/>
           <span class="bmenu-title">Next Launches</span>
           <div class="status-icon"></div>
         </div>

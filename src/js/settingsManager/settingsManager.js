@@ -52,6 +52,7 @@ settingsManager = {
     orbitReferences: true,
     externalSources: true,
     analysis: true,
+    plotAnalysis: true,
     sensorFov: true,
     sensorSurv: true,
     satelliteFov: true,
@@ -248,6 +249,9 @@ settingsManager = {
     settingsManager.timeMachineDelay = 5000;
 
     settingsManager.videoBitsPerSecond = 30000000; // 10.0Mbps
+
+    // Show orbits in ECF vs ECI
+    settingsManager.isOrbitCruncherInEcf = false;
 
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
@@ -448,6 +452,7 @@ settingsManager = {
     // Orbit Color Settings
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
+    settingsManager.orbitSelectColor2 = [0.0, 0.4, 1.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
     settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE

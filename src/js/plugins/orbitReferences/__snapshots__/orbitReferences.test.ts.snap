@@ -6,8 +6,4 @@ exports[`orbitReferences.orbitReferencesLinkClick 0 1`] = `undefined`;
 
 exports[`orbitReferences.selectSatData 0 1`] = `undefined`;
 
-exports[`orbitReferences.selectSatData 1 1`] = `undefined`;
-
-exports[`orbitReferences.selectSatData 2 1`] = `undefined`;
-
 exports[`orbitReferences.uiManagerInit 0 1`] = `undefined`;

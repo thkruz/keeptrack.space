@@ -62,6 +62,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.photoManager) await import('@app/js/plugins/photoManager/photoManager').then((mod) => mod.init());
     if (plugins.recorderManager) await import('@app/js/plugins/recorderManager/recorderManager').then((mod) => mod.init());
     if (plugins.analysis) await import('@app/js/plugins/analysis/analysis').then((mod) => mod.init());
+    if (plugins.plotAnalysis) await import('@app/js/plugins/plotAnalysis/plotAnalysis').then((mod) => mod.init());
     if (plugins.twitter) await import('@app/js/plugins/twitter/twitter').then((mod) => mod.init());
     if (plugins.externalSources) await import('@app/js/plugins/externalSources/externalSources').then((mod) => mod.init());
     if (plugins.aboutManager) await import('@app/js/plugins/aboutManager/aboutManager').then((mod) => mod.init());

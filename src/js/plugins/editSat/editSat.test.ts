@@ -1,10 +1,11 @@
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import '@app/js/settingsManager/settingsManager';
 import { expect } from '@jest/globals';
 import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as editSat from './editSat';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode
 describe('editSat.init', () => {

@@ -830,44 +830,6 @@ ul li {
   text-align: center;
 }
 
-#sat-infobox a {
-  color: white;
-}
-
-.sat-infobox-links {
-  font-size: 12px;
-  margin: 5px 0;
-}
-
-#sat-info-title {
-  margin-bottom: 5px;
-  font-size: 18px;
-}
-
-.sat-info-row {
-  margin-bottom: 3px;
-  height: 18px;
-}
-
-#sat-site {
-  max-height: 40px;
-}
-
-#sat-site-row {
-  max-height: 40px;
-}
-
-.sat-info-key,
-.sat-info-value {
-  display: inline-block;
-}
-
-.sat-info-key {
-  font-size: 12px;
-  color: white;
-  float: left;
-}
-
 .ui-priority-secondary {
   font-weight: bold !important;
   opacity: 1 !important;

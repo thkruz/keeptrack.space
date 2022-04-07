@@ -189,8 +189,8 @@ export interface OrbitManager {
   orbitWorker: any;
   removeInViewOrbit(arg0: any): void;
   draw(pMatrix: any, camMatrix: any, curBuffer: any): void;
-  clearSelectOrbit(): void;
-  setSelectOrbit(selectedSat: number): void;
+  clearSelectOrbit(isSecondary?: boolean): void;
+  setSelectOrbit(selectedSat: number, isSecondary?: boolean): void;
   updateOrbitBuffer(satId: number, force?: boolean, TLE1?: string, TLE2?: string, missileParams?: MissileParams): void;
   addInViewOrbit(i: number): void;
   setHoverOrbit(mouseSat: any): void;
@@ -317,6 +317,7 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isOrbitCruncherInEcf: boolean;
   lastSearch: any;
   db: any;
   isGroupOverlayDisabled: any;
@@ -462,6 +463,7 @@ export interface SettingsManager {
   orbitInViewColor: [number, number, number, number];
   orbitPlanetariumColor: [number, number, number, number];
   orbitSelectColor: [number, number, number, number];
+  orbitSelectColor2: [number, number, number, number];
   plugins: any;
   politicalImages: boolean;
   pTime: any[];
@@ -497,6 +499,9 @@ export type RocketUrl = {
 };
 
 export interface ObjectManager {
+  secondarySatObj: SatObject;
+  secondarySat: number;
+  switchPrimarySecondary: () => void;
   init: () => void;
   rocketUrls: RocketUrl[];
   satLinkManager: any;
@@ -506,6 +511,7 @@ export interface ObjectManager {
   isLaunchSiteManagerLoaded: any;
   launchSiteManager: any;
   setHoveringSat(i: number): void;
+  setSecondarySat(i: number): void;
   setLasthoveringSat(hoveringSat: number): void;
   lastSelectedSat(id?: number): number;
   extractLaunchSite(name: string): {
@@ -1132,6 +1138,10 @@ export type lookanglesRow = {
 };
 
 export interface SatMath {
+  getLlaOfCurrentOrbit(sat: SatObject, points: number): { lat: number; lon: number; alt: number; time: number }[];
+  getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits?: number);
+  getEcfOfCurrentOrbit(sat: SatObject, points: number);
+  getEciOfCurrentOrbit(sat: SatObject, points: number): { x: number; y: number; z: number }[];
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };
   calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => boolean[];

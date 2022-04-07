@@ -1,3 +1,4 @@
+import './satInfoboxCore.css';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
@@ -14,16 +15,21 @@ const satInfoboxCore = {
   orbitalData: {
     isLoaded: false,
   },
+  secondaryData: {
+    isLoaded: false,
+  },
   satMissionData: {
     isLoaded: false,
   },
 };
 
 export const sensorInfo = (sat: SatObject): void => {
+  if (sat === null || typeof sat === "undefined") return;
+  
   if (!satInfoboxCore.sensorInfo.isLoaded && settingsManager.plugins.sensor) {
     $('#sat-infobox').append(keepTrackApi.html`
         <div id="sensor-sat-info">
-          <li class="divider"></li>
+        <div class="sat-info-section-header">Sensor Data</div>
           <div class="sat-info-row">
             <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
               data-tooltip="Distance from the Sensor">
@@ -95,9 +101,11 @@ export const sensorInfo = (sat: SatObject): void => {
   }
 };
 export const launchData = (sat: SatObject): void => {
+  if (sat === null || typeof sat === "undefined") return;
+  
   if (!satInfoboxCore.launchData.isLoaded) {
     $('#sat-infobox').append(keepTrackApi.html`
-          <li class="divider"></li>
+          <div class="sat-info-section-header">Object Data</div>
           <div class="sat-info-row">
             <div class="sat-info-key">Type</div>
             <div class="sat-info-value" id="sat-type">PAYLOAD</div>
@@ -179,7 +187,7 @@ export const launchData = (sat: SatObject): void => {
     closeButton: false,
   });
 };
-export const nearObjectsLinkClick = (): void => {
+export const nearObjectsLinkClick = (distance: number = 100): void => {
   const { uiManager, satSet, objectManager } = keepTrackApi.programs;
   if (objectManager.selectedSat === -1) {
     return;
@@ -187,12 +195,12 @@ export const nearObjectsLinkClick = (): void => {
   const sat = objectManager.selectedSat;
   const SCCs = [];
   let pos = satSet.getSatPosOnly(sat).position;
-  const posXmin = pos.x - 100;
-  const posXmax = pos.x + 100;
-  const posYmin = pos.y - 100;
-  const posYmax = pos.y + 100;
-  const posZmin = pos.z - 100;
-  const posZmax = pos.z + 100;
+  const posXmin = pos.x - distance;
+  const posXmax = pos.x + distance;
+  const posYmin = pos.y - distance;
+  const posYmax = pos.y + distance;
+  const posZmin = pos.z - distance;
+  const posZmax = pos.z + distance;
   $('#search').val('');
   for (let i = 0; i < satSet.numSats; i++) {
     pos = satSet.getSatPosOnly(i).position;
@@ -227,16 +235,24 @@ export const allObjectsLink = (): void => {
   $('#search').val(searchStr);
 };
 export const orbitalData = (sat: SatObject): void => { // NOSONAR
+  // Only show orbital data if it is available
+  if (sat === null || typeof sat === "undefined") return;
+
   if (!satInfoboxCore.orbitalData.isLoaded) {
     $('#ui-wrapper').append(keepTrackApi.html`
           <div id="sat-infobox" class="text-select satinfo-fixed">
             <div id="sat-info-top-links">
-              <div id="sat-info-title" class="center-text">This is a title</div>
+              <div id="sat-info-title" class="center-text sat-info-section-header sat-info-title-header">This is a title</div>
               <div id="all-objects-link" class="link sat-infobox-links sat-only-info">Find all objects from this launch...</div>
               <div id="near-orbits-link" class="link sat-infobox-links sat-only-info">Find all objects near this orbit...</div>
-              <div id="near-objects-link" class="link sat-infobox-links">Find all objects near this object...</div>              
+              <div id="near-objects-link1" class="link sat-infobox-links">Find all objects within 100km...</div>
+              <div id="near-objects-link2" class="link sat-infobox-links">Find all objects within 200km...</div>
+              <div id="near-objects-link4" class="link sat-infobox-links">Find all objects within 400km...</div>
+              <div id="sun-angle-link" class="link sat-infobox-links">Draw sat to sun line...</div>
+              <div id="nadir-angle-link" class="link sat-infobox-links">Draw sat to nadir line...</div>
+              <div id="sec-angle-link" class="link sat-infobox-links">Draw sat to second sat line...</div>
             </div>
-            <li class="divider"></li>
+            <div class="sat-info-section-header">Identifiers</div>
             <div class="sat-info-row sat-only-info">
               <div class="sat-info-key">COSPAR</div>
               <div class="sat-info-value" id="sat-intl-des">xxxx-xxxA</div>
@@ -245,7 +261,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
               <div class="sat-info-key">NORAD</div>
               <div class="sat-info-value" id="sat-objnum">99999</div>
             </div>          
-            <li class="divider"></li>
+            <div class="sat-info-section-header">Orbit Data</div>
             <div class="sat-info-row sat-only-info">
               <div class="sat-info-key tooltipped" data-position="left" data-delay="50"
                 data-tooltip="Highest Point in the Orbit">
@@ -351,6 +367,12 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     });
 
     satInfoboxCore.orbitalData.isLoaded = true;
+
+    // Give the DOM time load and then redo
+    setTimeout(() => {
+      orbitalData(sat);
+    }, 500);
+    return;
   }
 
   if (!sat.missile) {
@@ -446,12 +468,75 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
 
   $('#all-objects-link').on('click', allObjectsLink);
   $('#near-orbits-link').on('click', nearOrbitsLink);
-  $('#near-objects-link').on('click', nearObjectsLinkClick);
+  $('#near-objects-link1').on('click', () => nearObjectsLinkClick(100));
+  $('#near-objects-link2').on('click', () => nearObjectsLinkClick(200));
+  $('#near-objects-link4').on('click', () => nearObjectsLinkClick(400));
+  $('#sun-angle-link').on('click', drawLineToSun);
+  $('#nadir-angle-link').on('click', drawLineToEarth);
+  $('#sec-angle-link').on('click', drawLineToSat);
+};
+
+const drawLineToSun = () => {
+  const {lineManager, objectManager, drawManager} = keepTrackApi.programs;
+  lineManager.create('sat2', [objectManager.selectedSat, drawManager.sceneManager.sun.pos[0], drawManager.sceneManager.sun.pos[1], drawManager.sceneManager.sun.pos[2]], 'o');
+};
+
+const drawLineToEarth = () => {
+  const {lineManager, objectManager} = keepTrackApi.programs;
+  lineManager.create('sat', objectManager.selectedSat, 'p');
+};
+
+const drawLineToSat = () => {
+  const {lineManager, objectManager} = keepTrackApi.programs;
+  lineManager.create('sat5', [objectManager.selectedSat, objectManager.secondarySat], 'b');
+};
+
+export const secondaryData = (sat: SatObject): void => {
+  if (sat === null || typeof sat === "undefined") return;
+  
+  if (!satInfoboxCore.secondaryData.isLoaded) {
+    $('#sat-infobox').append(keepTrackApi.html`
+        <div id="secondary-sat-info">
+          <div class="sat-info-section-header">Secondary Satellite</div>
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Linear Distance from Secondary Satellite">
+              Linear
+            </div>
+            <div class="sat-info-value" id="sat-sec-dist">xxxx km</div>
+          </div>
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Radial Distance">
+              Radial
+            </div>
+            <div class="sat-info-value" id="sat-sec-rad">XX deg</div>
+          </div>
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="In-Track Distance from Secondary Satellite">
+              In-Track
+            </div>
+            <div class="sat-info-value" id="sat-sec-intrack">XX deg</div>
+          </div>
+          <div class="sat-info-row">
+            <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+              data-tooltip="Cross-Track Distance from Secondary Satellite">
+              Cross-Track
+            </div>
+            <div class="sat-info-value" id="sat-sec-crosstrack">xxxx km</div>
+          </div>
+        </div> 
+        `);
+    satInfoboxCore.secondaryData.isLoaded = true;
+  }
 };
 export const satMissionData = (sat: SatObject): void => { // NOSONAR
+  if (sat === null || typeof sat === "undefined") return;
+
   if (!satInfoboxCore.satMissionData.isLoaded) {
-    $('#sat-infobox').append(`
-        <li class="divider"></li>
+    $('#sat-infobox').append(keepTrackApi.html`
+      <div class="sat-info-section-header">Mission</div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
             data-tooltip="Visual Magnitude - Smaller Numbers Are Brighter">
@@ -671,6 +756,8 @@ export const intelData = (sat: SatObject, satId?: number): void => { // NOSONAR
   }
 };
 export const objectData = (sat: SatObject): void => {
+  if (sat === null || typeof sat === "undefined") return;
+  
   $('#sat-info-title').html(sat.name);
 
   switch (sat.type) {
@@ -735,6 +822,12 @@ export const init = (): void => {
     method: 'selectSatData',
     cbName: 'orbitalData',
     cb: orbitalData,
+  });
+
+  keepTrackApi.register({
+    method: 'selectSatData',
+    cbName: 'secondaryData',
+    cb: secondaryData,
   });
 
   // Register sensor data

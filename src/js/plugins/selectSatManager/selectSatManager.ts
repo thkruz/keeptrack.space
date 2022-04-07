@@ -73,6 +73,10 @@ const selectSatManager = {
       $('#menu-map').addClass('bmenu-item-disabled');
       $('#menu-newLaunch').addClass('bmenu-item-disabled');
       $('#menu-breakup').addClass('bmenu-item-disabled');
+      $('#menu-plot-analysis').addClass('bmenu-item-disabled');
+      $('#menu-plot-analysis2').addClass('bmenu-item-disabled');
+      $('#menu-plot-analysis3').addClass('bmenu-item-disabled');
+      keepTrackApi.methods.selectSatData(null, satId);
     } else if (satId !== -1) {
       if (mainCamera.cameraType.current == mainCamera.cameraType.Default) {
         mainCamera.ecLastZoom = mainCamera.zoomLevel();
@@ -129,6 +133,11 @@ const selectSatManager = {
       $('#menu-sat-fov').removeClass('bmenu-item-disabled');
       $('#menu-map').removeClass('bmenu-item-disabled');
       $('#menu-newLaunch').removeClass('bmenu-item-disabled');
+      $('#menu-plot-analysis').removeClass('bmenu-item-disabled');
+      $('#menu-plot-analysis2').removeClass('bmenu-item-disabled');
+      if (objectManager.secondarySat !== -1) {
+        $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+      }
 
       $('#sat-infobox').fadeIn();
 

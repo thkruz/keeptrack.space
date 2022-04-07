@@ -1,0 +1,2310 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test all plots should be able to plot ecf scatter plots 1`] = `undefined`;
+
+exports[`Test all plots should be able to plot ecf scatter plots 2`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction],
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "grid3D": Object {
+            "axisLine": Object {
+              "lineStyle": Object {
+                "color": "#fff",
+              },
+            },
+            "axisPointer": Object {
+              "lineStyle": Object {
+                "color": "#ffbd67",
+              },
+            },
+            "viewControl": Object {
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
+            },
+          },
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+          ],
+          "tooltip": Object {},
+          "xAxis3D": Object {
+            "name": "X",
+            "type": "value",
+          },
+          "yAxis3D": Object {
+            "name": "Y",
+            "type": "value",
+          },
+          "zAxis3D": Object {
+            "name": "Z",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot ecf scatter plots 3`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction],
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "grid3D": Object {
+            "axisLine": Object {
+              "lineStyle": Object {
+                "color": "#fff",
+              },
+            },
+            "axisPointer": Object {
+              "lineStyle": Object {
+                "color": "#ffbd67",
+              },
+            },
+            "viewControl": Object {
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
+            },
+          },
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+          ],
+          "tooltip": Object {},
+          "xAxis3D": Object {
+            "name": "X",
+            "type": "value",
+          },
+          "yAxis3D": Object {
+            "name": "Y",
+            "type": "value",
+          },
+          "zAxis3D": Object {
+            "name": "Z",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot eci scatter plots 1`] = `undefined`;
+
+exports[`Test all plots should be able to plot eci scatter plots 2`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction],
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "grid3D": Object {
+            "axisLine": Object {
+              "lineStyle": Object {
+                "color": "#fff",
+              },
+            },
+            "axisPointer": Object {
+              "lineStyle": Object {
+                "color": "#ffbd67",
+              },
+            },
+            "viewControl": Object {
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
+            },
+          },
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+          ],
+          "tooltip": Object {},
+          "xAxis3D": Object {
+            "max": 0,
+            "min": -0,
+            "name": "X",
+            "type": "value",
+          },
+          "yAxis3D": Object {
+            "max": 0,
+            "min": -0,
+            "name": "Y",
+            "type": "value",
+          },
+          "zAxis3D": Object {
+            "max": 0,
+            "min": -0,
+            "name": "Z",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot eci scatter plots 3`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction],
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "grid3D": Object {
+            "axisLine": Object {
+              "lineStyle": Object {
+                "color": "#fff",
+              },
+            },
+            "axisPointer": Object {
+              "lineStyle": Object {
+                "color": "#ffbd67",
+              },
+            },
+            "viewControl": Object {
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
+            },
+          },
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "itemStyle": Object {
+                    "opacity": 1,
+                  },
+                  "value": Array [
+                    0,
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "dimensions": Array [
+                "X",
+                "Y",
+                "Y",
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "ISS (ZARYA)",
+              "symbolSize": 12,
+              "type": "scatter3D",
+            },
+          ],
+          "tooltip": Object {},
+          "xAxis3D": Object {
+            "max": 0,
+            "min": -0,
+            "name": "X",
+            "type": "value",
+          },
+          "yAxis3D": Object {
+            "max": 0,
+            "min": -0,
+            "name": "Y",
+            "type": "value",
+          },
+          "zAxis3D": Object {
+            "max": 0,
+            "min": -0,
+            "name": "Z",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot inc2lon scatter plots 1`] = `undefined`;
+
+exports[`Test all plots should be able to plot inc2lon scatter plots 2`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction] {
+    "calls": Array [
+      Array [
+        "click",
+        [Function],
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "dataZoom": Array [
+            Object {
+              "end": 180,
+              "show": true,
+              "start": -180,
+              "type": "slider",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 65,
+              "left": "93%",
+              "show": true,
+              "start": 0,
+              "type": "slider",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 180,
+              "start": -180,
+              "type": "inside",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 65,
+              "start": 0,
+              "type": "inside",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+          ],
+          "legend": Object {
+            "show": true,
+            "textStyle": Object {
+              "color": "#fff",
+            },
+          },
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "USA",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+            Object {
+              "data": Array [],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "Other",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+            Object {
+              "data": Array [],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "Russia",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+            Object {
+              "data": Array [],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "China",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+          ],
+          "title": Object {
+            "text": "Inclination vs Longitude Scatter Plot",
+            "textStyle": Object {
+              "color": "#fff",
+              "fontSize": 16,
+            },
+          },
+          "tooltip": Object {},
+          "visualMap": Array [
+            Object {
+              "calculable": true,
+              "controller": Object {
+                "inRange": Object {
+                  "color": Array [
+                    "#41577c",
+                  ],
+                },
+                "outOfRange": Object {
+                  "color": Array [
+                    "#999",
+                  ],
+                },
+              },
+              "dimension": 2,
+              "inRange": Object {},
+              "itemHeight": 500,
+              "itemWidth": 30,
+              "left": "left",
+              "max": 1640,
+              "min": 1240,
+              "outOfRange": Object {
+                "opacity": 0,
+                "symbol": "none",
+              },
+              "precision": 0.05,
+              "text": Array [
+                "Period (minutes)",
+              ],
+              "textGap": 30,
+              "textStyle": Object {
+                "color": "#fff",
+              },
+              "top": "10%",
+            },
+          ],
+          "xAxis": Object {
+            "name": "Longitude",
+            "position": "bottom",
+            "type": "value",
+          },
+          "yAxis": Object {
+            "name": "Inclination",
+            "position": "left",
+            "type": "value",
+          },
+          "zAxis": Object {
+            "name": "Period",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot inc2lon scatter plots 3`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction] {
+    "calls": Array [
+      Array [
+        "click",
+        [Function],
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "dataZoom": Array [
+            Object {
+              "end": 180,
+              "show": true,
+              "start": -180,
+              "type": "slider",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 65,
+              "left": "93%",
+              "show": true,
+              "start": 0,
+              "type": "slider",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 180,
+              "start": -180,
+              "type": "inside",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 65,
+              "start": 0,
+              "type": "inside",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+          ],
+          "legend": Object {
+            "show": true,
+            "textStyle": Object {
+              "color": "#fff",
+            },
+          },
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+                Object {
+                  "id": 1,
+                  "name": "ISS (ZARYA)",
+                  "value": Array [
+                    0,
+                    0,
+                    1440,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "USA",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+            Object {
+              "data": Array [],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "Other",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+            Object {
+              "data": Array [],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "Russia",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+            Object {
+              "data": Array [],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "itemStyle": Object {
+                "borderColor": "rgba(255,255,255,0.8)",
+                "borderWidth": 1,
+              },
+              "name": "China",
+              "symbolSize": 12,
+              "type": "scatter",
+            },
+          ],
+          "title": Object {
+            "text": "Inclination vs Longitude Scatter Plot",
+            "textStyle": Object {
+              "color": "#fff",
+              "fontSize": 16,
+            },
+          },
+          "tooltip": Object {},
+          "visualMap": Array [
+            Object {
+              "calculable": true,
+              "controller": Object {
+                "inRange": Object {
+                  "color": Array [
+                    "#41577c",
+                  ],
+                },
+                "outOfRange": Object {
+                  "color": Array [
+                    "#999",
+                  ],
+                },
+              },
+              "dimension": 2,
+              "inRange": Object {},
+              "itemHeight": 500,
+              "itemWidth": 30,
+              "left": "left",
+              "max": 1640,
+              "min": 1240,
+              "outOfRange": Object {
+                "opacity": 0,
+                "symbol": "none",
+              },
+              "precision": 0.05,
+              "text": Array [
+                "Period (minutes)",
+              ],
+              "textGap": 30,
+              "textStyle": Object {
+                "color": "#fff",
+              },
+              "top": "10%",
+            },
+          ],
+          "xAxis": Object {
+            "name": "Longitude",
+            "position": "bottom",
+            "type": "value",
+          },
+          "yAxis": Object {
+            "name": "Inclination",
+            "position": "left",
+            "type": "value",
+          },
+          "zAxis": Object {
+            "name": "Period",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot ric scatter plots 1`] = `undefined`;
+
+exports[`Test all plots should be able to plot ric scatter plots 2`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction],
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "grid3D": Object {
+            "axisLine": Object {
+              "lineStyle": Object {
+                "color": "#fff",
+              },
+            },
+            "axisPointer": Object {
+              "lineStyle": Object {
+                "color": "#ffbd67",
+              },
+            },
+            "viewControl": Object {
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
+            },
+          },
+          "legend": Object {
+            "show": true,
+            "textStyle": Object {
+              "color": "#fff",
+            },
+          },
+          "series": Array [],
+          "title": Object {
+            "text": "RIC Scatter Plot",
+            "textStyle": Object {
+              "color": "#fff",
+              "fontSize": 16,
+            },
+          },
+          "tooltip": Object {},
+          "xAxis3D": Object {
+            "name": "Radial",
+            "type": "value",
+          },
+          "yAxis3D": Object {
+            "name": "In-Track",
+            "type": "value",
+          },
+          "zAxis3D": Object {
+            "name": "Cross-Track",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot ric scatter plots 3`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction],
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "grid3D": Object {
+            "axisLine": Object {
+              "lineStyle": Object {
+                "color": "#fff",
+              },
+            },
+            "axisPointer": Object {
+              "lineStyle": Object {
+                "color": "#ffbd67",
+              },
+            },
+            "viewControl": Object {
+              "distance": 600,
+              "rotateSensitivity": 10,
+              "zoomSensitivity": 5,
+            },
+          },
+          "legend": Object {
+            "show": true,
+            "textStyle": Object {
+              "color": "#fff",
+            },
+          },
+          "series": Array [],
+          "title": Object {
+            "text": "RIC Scatter Plot",
+            "textStyle": Object {
+              "color": "#fff",
+              "fontSize": 16,
+            },
+          },
+          "tooltip": Object {},
+          "xAxis3D": Object {
+            "name": "Radial",
+            "type": "value",
+          },
+          "yAxis3D": Object {
+            "name": "In-Track",
+            "type": "value",
+          },
+          "zAxis3D": Object {
+            "name": "Cross-Track",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot time2lon plots 1`] = `undefined`;
+
+exports[`Test all plots should be able to plot time2lon plots 2`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction] {
+    "calls": Array [
+      Array [
+        "click",
+        [Function],
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "dataZoom": Array [
+            Object {
+              "end": 180,
+              "show": true,
+              "start": -180,
+              "type": "slider",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 1440,
+              "left": "93%",
+              "show": true,
+              "start": 0,
+              "type": "slider",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 180,
+              "start": -180,
+              "type": "inside",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 1440,
+              "start": 0,
+              "type": "inside",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+          ],
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "US",
+                  "value": Array [
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "name": "ISS (ZARYA)",
+              "type": "line",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "US",
+                  "value": Array [
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "name": "ISS (ZARYA)",
+              "type": "line",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "US",
+                  "value": Array [
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "name": "ISS (ZARYA)",
+              "type": "line",
+            },
+          ],
+          "title": Object {
+            "text": "Time vs Longitude Scatter Plot",
+            "textStyle": Object {
+              "color": "#fff",
+              "fontSize": 16,
+            },
+          },
+          "tooltip": Object {},
+          "xAxis": Object {
+            "name": "Longitude",
+            "position": "bottom",
+            "type": "value",
+          },
+          "yAxis": Object {
+            "name": "Time",
+            "position": "left",
+            "type": "value",
+          },
+          "zAxis": Object {
+            "name": "Mean Motion",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`Test all plots should be able to plot time2lon plots 3`] = `
+Object {
+  "hideLoading": [MockFunction],
+  "on": [MockFunction] {
+    "calls": Array [
+      Array [
+        "click",
+        [Function],
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "setOption": [MockFunction] {
+    "calls": Array [
+      Array [
+        Object {
+          "dataZoom": Array [
+            Object {
+              "end": 180,
+              "show": true,
+              "start": -180,
+              "type": "slider",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 1440,
+              "left": "93%",
+              "show": true,
+              "start": 0,
+              "type": "slider",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 180,
+              "start": -180,
+              "type": "inside",
+              "xAxisIndex": Array [
+                0,
+              ],
+            },
+            Object {
+              "end": 1440,
+              "start": 0,
+              "type": "inside",
+              "yAxisIndex": Array [
+                0,
+              ],
+            },
+          ],
+          "series": Array [
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "US",
+                  "value": Array [
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "name": "ISS (ZARYA)",
+              "type": "line",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "US",
+                  "value": Array [
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "name": "ISS (ZARYA)",
+              "type": "line",
+            },
+            Object {
+              "data": Array [
+                Object {
+                  "id": 1,
+                  "name": "US",
+                  "value": Array [
+                    0,
+                    0,
+                  ],
+                },
+              ],
+              "emphasis": Object {
+                "itemStyle": Object {
+                  "color": "#fff",
+                },
+              },
+              "name": "ISS (ZARYA)",
+              "type": "line",
+            },
+          ],
+          "title": Object {
+            "text": "Time vs Longitude Scatter Plot",
+            "textStyle": Object {
+              "color": "#fff",
+              "fontSize": 16,
+            },
+          },
+          "tooltip": Object {},
+          "xAxis": Object {
+            "name": "Longitude",
+            "position": "bottom",
+            "type": "value",
+          },
+          "yAxis": Object {
+            "name": "Time",
+            "position": "left",
+            "type": "value",
+          },
+          "zAxis": Object {
+            "name": "Mean Motion",
+            "type": "value",
+          },
+        },
+      ],
+    ],
+    "results": Array [
+      Object {
+        "type": "return",
+        "value": undefined,
+      },
+    ],
+  },
+  "showLoading": [MockFunction],
+}
+`;
+
+exports[`plotAnalysis.bottomMenuClick 0 1`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 0 2`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 0 3`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 2 1`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 2 2`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 2 3`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 3 1`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 3 2`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 3 3`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 4 1`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 4 2`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 5 1`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 5 2`] = `undefined`;
+
+exports[`plotAnalysis.bottomMenuClick 6 1`] = `undefined`;
+
+exports[`plotAnalysis.hideSideMenus 0 1`] = `undefined`;
+
+exports[`plotAnalysis.hideSideMenus 0 2`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+        
+    <div
+      id="menu-plot-analysis5:animated"
+    />
+    
+        
+    <div
+      class=""
+      id="menu-plot-analysis5"
+    />
+    
+        
+    <div
+      id="plot-analysis-menu5"
+    />
+    
+        
+    <canvas
+      id="plot-analysis-chart5"
+    >
+      
+        
+    </canvas>
+  </div>
+  
+        
+</div>
+`;
+
+exports[`plotAnalysis.init 0 1`] = `undefined`;
+
+exports[`plotAnalysis.onEcfPlotBtnClick 0 1`] = `undefined`;
+
+exports[`plotAnalysis.onEcfPlotBtnClick 0 2`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+          
+    <div
+      id="menu-plot-analysis:animated"
+    />
+    
+          
+    <div
+      class="bmenu-item-selected"
+      id="menu-plot-analysis"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu"
+    />
+    
+          
+    <div
+      id="plot-analysis-chart"
+    />
+    
+        
+  </div>
+  
+        
+</div>
+`;
+
+exports[`plotAnalysis.onEciPlotBtnClick 0 1`] = `undefined`;
+
+exports[`plotAnalysis.onEciPlotBtnClick 0 2`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+        
+    <div
+      id="left-menus"
+    />
+    
+        
+    <div
+      id="bottom-icons"
+    />
+    
+        
+    <div
+      id="plot-analysis-menu"
+    />
+    
+        
+    <div
+      id="plot-analysis-menu2"
+    />
+    
+        
+    <div
+      id="plot-analysis-menu3"
+    />
+    
+        
+  </div>
+  
+        
+</div>
+`;
+
+exports[`plotAnalysis.onInc2LonPlotBtnClick 0 1`] = `undefined`;
+
+exports[`plotAnalysis.onInc2LonPlotBtnClick 0 2`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+          
+    <div
+      id="menu-plot-analysis3:animated"
+    />
+    
+          
+    <div
+      id="menu-plot-analysis3"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu3"
+    />
+    
+          
+    <div
+      id="plot-analysis-chart3"
+    />
+    
+        
+  </div>
+  
+        
+</div>
+`;
+
+exports[`plotAnalysis.onRicPlotBtnClick 0 1`] = `undefined`;
+
+exports[`plotAnalysis.onRicPlotBtnClick 0 2`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+          
+    <div
+      id="menu-plot-analysis2:animated"
+    />
+    
+          
+    <div
+      class="bmenu-item-selected"
+      id="menu-plot-analysis2"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu2"
+    />
+    
+          
+    <div
+      id="plot-analysis-chart2"
+    />
+    
+        
+  </div>
+  
+        
+</div>
+`;
+
+exports[`plotAnalysis.onTime2LonPlotBtnClick 0 1`] = `undefined`;
+
+exports[`plotAnalysis.onTime2LonPlotBtnClick 0 2`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+          
+    <div
+      id="menu-plot-analysis4:animated"
+    />
+    
+          
+    <div
+      class="bmenu-item-selected"
+      id="menu-plot-analysis4"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu4"
+    />
+    
+          
+    <canvas
+      id="plot-analysis-chart4"
+    >
+      
+        
+    </canvas>
+  </div>
+  
+        
+</div>
+`;
+
+exports[`plotAnalysis.selectSatData 0 1`] = `undefined`;
+
+exports[`plotAnalysis.selectSatData 0 2`] = `undefined`;
+
+exports[`plotAnalysis.selectSatData 0 3`] = `undefined`;
+
+exports[`plotAnalysis.selectSatData 0 4`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+          
+    <div
+      id="plot-analysis-menu"
+    />
+    
+          
+    <div
+      class="bmenu-item-selected"
+      id="menu-plot-analysis"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu2"
+    />
+    
+          
+    <div
+      class="bmenu-item-selected"
+      id="menu-plot-analysis2"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu3"
+    />
+    
+          
+    <div
+      class=""
+      id="menu-plot-analysis3"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu4"
+    />
+    
+          
+    <div
+      class=""
+      id="menu-plot-analysis4"
+    />
+    
+          
+    <div
+      id="plot-analysis-menu5"
+    />
+    
+          
+    <div
+      class="bmenu-item-selected"
+      id="menu-plot-analysis5"
+    />
+    
+        
+  </div>
+  
+        
+</div>
+`;
+
+exports[`plotAnalysis.uiManagerInit 0 1`] = `undefined`;
+
+exports[`plotAnalysis.uiManagerInit 0 2`] = `
+<div
+  id="wrapper0"
+>
+  <div>
+    
+      
+    <div
+      id="left-menus"
+    >
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
+        id="plot-analysis-menu"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
+        id="plot-analysis-menu2"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content2"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart2"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
+        id="plot-analysis-menu3"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content3"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart3"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized"
+        id="plot-analysis-menu4"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content4"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart4"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized"
+        id="plot-analysis-menu5"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content5"
+        >
+          
+          
+          <div
+            class="plot-analysis-chart"
+            id="plot-analysis-chart5"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+    
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
+        id="plot-analysis-menu"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
+        id="plot-analysis-menu2"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content2"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart2"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-normal"
+        id="plot-analysis-menu3"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content3"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart3"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized"
+        id="plot-analysis-menu4"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content4"
+        >
+          
+          
+          <div
+            "=""
+            class="plot-analysis-chart"
+            id="plot-analysis-chart4"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized"
+        id="plot-analysis-menu5"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content5"
+        >
+          
+          
+          <div
+            class="plot-analysis-chart"
+            id="plot-analysis-chart5"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+    
+    </div>
+    
+      
+    <div
+      id="bottom-icons"
+    >
+      
+      
+      <div
+        class="bmenu-item bmenu-item-disabled"
+        id="menu-plot-analysis"
+      >
+        
+        
+        <img
+          alt="ECI Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          ECI Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item bmenu-item-disabled"
+        id="menu-plot-analysis2"
+      >
+        
+        
+        <img
+          alt="ECF Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          ECF Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item bmenu-item-disabled"
+        id="menu-plot-analysis3"
+      >
+        
+        
+        <img
+          alt="RIC Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          RIC Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item"
+        id="menu-plot-analysis4"
+      >
+        
+        
+        <img
+          alt="Inc v Lon Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          Inc v Lon Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item"
+        id="menu-plot-analysis5"
+      >
+        
+        
+        <img
+          alt="Time v Lon Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          Time v Lon Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+    
+      
+      
+      <div
+        class="bmenu-item bmenu-item-disabled"
+        id="menu-plot-analysis"
+      >
+        
+        
+        <img
+          alt="ECI Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          ECI Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item bmenu-item-disabled"
+        id="menu-plot-analysis2"
+      >
+        
+        
+        <img
+          alt="ECF Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          ECF Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item bmenu-item-disabled"
+        id="menu-plot-analysis3"
+      >
+        
+        
+        <img
+          alt="RIC Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          RIC Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item"
+        id="menu-plot-analysis4"
+      >
+        
+        
+        <img
+          alt="Inc v Lon Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          Inc v Lon Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item"
+        id="menu-plot-analysis5"
+      >
+        
+        
+        <img
+          alt="Time v Lon Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          Time v Lon Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+    
+    </div>
+    
+      
+    <div
+      id="plot-analysis-menu"
+    />
+    
+      
+    <div
+      id="plot-analysis-menu2"
+    />
+    
+      
+    <div
+      id="plot-analysis-menu3"
+    />
+    
+      
+    <div
+      id="plot-analysis-menu4"
+    />
+    
+      
+    <div
+      id="plot-analysis-menu5"
+    />
+    
+      
+  </div>
+  
+      
+</div>
+`;

@@ -9,9 +9,11 @@ const glBuffers = <WebGLBuffer[]>[];
 const inProgress = <boolean[]>[];
 let pathShader: any;
 let selectOrbitBuf: WebGLBuffer;
+let secondaryOrbitBuf: WebGLBuffer;
 let hoverOrbitBuf: WebGLBuffer;
 let currentHoverId = -1;
 let currentSelectId = -1;
+let secondarySelectId = -1;
 let currentInView = <number[]>[];
 let gl: WebGL2RenderingContext;
 let mainCamera: Camera;
@@ -86,6 +88,10 @@ export const init = (orbitWorker?: Worker): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
 
+  secondaryOrbitBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, secondaryOrbitBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+
   hoverOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
@@ -128,14 +134,23 @@ orbitManager.clearOrbit = function () {
 glm.mat4.identity(glm.mat4.create());
 } */
 
-export const setSelectOrbit = (satId: number): void => {
-  currentSelectId = satId;
+export const setSelectOrbit = (satId: number, isSecondary: boolean = false): void => {
+  if (isSecondary) {
+    secondarySelectId = satId;
+  } else {
+    currentSelectId = satId;
+  }
   orbitManager.updateOrbitBuffer(satId);
 };
 
-export const clearSelectOrbit = (): void => {
-  currentSelectId = -1;
-  gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
+export const clearSelectOrbit = (isSecondary: boolean = false): void => {
+  if (isSecondary) {
+    secondarySelectId = -1;
+    gl.bindBuffer(gl.ARRAY_BUFFER, secondaryOrbitBuf);
+  } else {
+    currentSelectId = -1;
+    gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
+  }
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
 };
 
@@ -201,6 +216,14 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
   if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
+    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(pathShader.aPos);
+    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+  }
+
+  if (secondarySelectId !== -1 && !satSet.getSatExtraOnly(secondarySelectId).static) {
+    gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor2);
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(pathShader.aPos);
     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
@@ -287,6 +310,7 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
       rate: timeManager.propRate,
       TLE1: TLE1,
       TLE2: TLE2,
+      isEcfOutput: settingsManager.isOrbitCruncherInEcf,
     });
   } else if (!inProgress[satId] && !sat.static) {
     if (missile) {
@@ -306,6 +330,7 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
         dynamicOffsetEpoch: timeManager.dynamicOffsetEpoch,
         staticOffset: timeManager.staticOffset,
         rate: timeManager.propRate,
+        isEcfOutput: settingsManager.isOrbitCruncherInEcf,
       });
       inProgress[satId] = true;
     }

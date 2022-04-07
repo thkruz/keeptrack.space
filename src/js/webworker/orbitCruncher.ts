@@ -1,5 +1,5 @@
 import * as satellite from 'satellite.js';
-import { DEG2RAD, RADIUS_OF_EARTH } from '../lib/constants';
+import { DEG2RAD, RADIUS_OF_EARTH, TAU } from '../lib/constants';
 import { jday } from '../timeManager/transforms';
 import { propTime } from './positionCruncher/calculations';
 
@@ -61,6 +61,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
     // position slices, not timeslices (ugly perigees on HEOs)
 
     const satId = m.data.satId;
+    const isEcfOutput = m.data.isEcfOutput || false;
     const pointsOut = new Float32Array((NUM_SEGS + 1) * 4);
 
     const nowDate = propTime(dynamicOffsetEpoch, staticOffset, propRate);
@@ -106,7 +107,12 @@ export const onmessageProcessing = (m) => { // NOSONAR
 
       while (i < len) {
         const t = now + i * timeslice;
-        const p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
+        let p: satellite.EciVec3<number> | satellite.EcfVec3<number>;
+        p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
+        // eslint-disable-next-line no-constant-condition
+        if (isEcfOutput) {
+          p = <satellite.EcfVec3<number>>satellite.ecfToEci(p, -i * timeslice * TAU / period);
+        }
         if (p.x && p.y && p.z) {
           pointsOut[i * 4] = p.x;
           pointsOut[i * 4 + 1] = p.y;

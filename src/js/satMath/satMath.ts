@@ -407,42 +407,17 @@ export const getlookangles = (sat: SatObject): TearrData[] => { // NOSONAR
     tdR.setAttribute('style', 'text-decoration: underline');
 
     for (let i = 0; i < looksArray.length; i++) {
-      if (tbl.rows.length > 0) {
-        for (let r = 0; r < tbl.rows.length; r++) {
-          let dateString = tbl.rows[r].cells[0].textContent;
-
-          let sYear = parseInt(dateString.substr(0, 4)); // UTC Year
-          let sMon = parseInt(dateString.substr(5, 2)) - 1; // UTC Month in MMM prior to converting
-          let sDay = parseInt(dateString.substr(8, 2)); // UTC Day
-          let sHour = parseInt(dateString.substr(11, 2)); // UTC Hour
-          let sMin = parseInt(dateString.substr(14, 2)); // UTC Min
-          let sSec = parseInt(dateString.substr(17, 2)); // UTC Sec
-
-          let topTime = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
-
-          // Date object defaults to local time.
-          topTime.setUTCDate(sDay); // Move to UTC day.
-          topTime.setUTCHours(sHour); // Move to UTC Hour
-
-          if (new Date(looksArray[i].time) < topTime) {
-            tr = tbl.insertRow(i);
-            break;
-          }
-        }
-      }
-
-      if (tr == null) {
+      if (tbl.rows.length > 0) {       
         tr = tbl.insertRow();
+        tdT = tr.insertCell();
+        tdT.appendChild(document.createTextNode(dateFormat(looksArray[i].time, 'isoDateTime', false)));
+        tdE = tr.insertCell();
+        tdE.appendChild(document.createTextNode(looksArray[i].el.toFixed(1)));
+        tdA = tr.insertCell();
+        tdA.appendChild(document.createTextNode(looksArray[i].az.toFixed(0)));
+        tdR = tr.insertCell();
+        tdR.appendChild(document.createTextNode(looksArray[i].rng.toFixed(0)));
       }
-
-      tdT = tr.insertCell();
-      tdT.appendChild(document.createTextNode(dateFormat(looksArray[i].time, 'isoDateTime', false)));
-      tdE = tr.insertCell();
-      tdE.appendChild(document.createTextNode(looksArray[i].el.toFixed(1)));
-      tdA = tr.insertCell();
-      tdA.appendChild(document.createTextNode(looksArray[i].az.toFixed(0)));
-      tdR = tr.insertCell();
-      tdR.appendChild(document.createTextNode(looksArray[i].rng.toFixed(0)));
     }
   })();
 
@@ -1538,6 +1513,69 @@ export const map = (sat: SatObject, i: number): { time: string; lat: number; lon
   return getLlaTimeView(now, sat);
 };
 
+export const getEciOfCurrentOrbit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
+  const { timeManager } = keepTrackApi.programs;
+
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  const simulationTime = timeManager.calculateSimulationTime();
+  let eciPoints = [];
+  for (let i = 0; i < points; i++) {
+    let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    eciPoints.push(getEci(sat, now).position);
+  }
+  return eciPoints;
+}
+
+export const getEcfOfCurrentOrbit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
+  const { timeManager } = keepTrackApi.programs;
+
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  const simulationTime = timeManager.calculateSimulationTime();
+  let ecfPoints = [];
+  for (let i = 0; i < points; i++) {
+    let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    ecfPoints.push(satellite.ecfToEci(getEci(sat, now).position, -i * (sat.period / points) * TAU / sat.period));
+  }
+  return ecfPoints;
+}
+
+export const getRicOfCurrentOrbit = (sat: SatObject, sat2: SatObject, points: number, orbits?: number): { x: number; y: number; z: number }[] => {
+  const { timeManager } = keepTrackApi.programs;
+
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  const simulationTime = timeManager.calculateSimulationTime();
+  orbits ??= 1;
+  let ricPoints = [];
+  for (let i = 0; i < points; i++) {
+    let offset = ((i * sat.period * orbits) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    sat = {...sat, ...<SatObject>getEci(sat, now)};
+    sat2 = {...sat2, ...<SatObject>getEci(sat2, now)};
+    ricPoints.push(sat2ric(sat, sat2).position);
+  }
+  return ricPoints;
+}
+
+export const getLlaOfCurrentOrbit = (sat: SatObject, points: number): { lat: number; lon: number; alt: number, time: number }[] => {
+  const { timeManager } = keepTrackApi.programs;
+
+  // Set default timing settings. These will be changed to find look angles at different times in future.
+  const simulationTime = timeManager.calculateSimulationTime();
+  let llaPoints = [];
+  for (let i = 0; i < points; i++) {
+    let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
+    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
+    const { gmst } = calculateTimeVariables(now);
+    const eci = getEci(sat, now).position;
+    const lla = satellite.eciToGeodetic(eci, gmst);
+    const llat = {...lla, ...{time: now.getTime()}};
+    llaPoints.push(llat);
+  }
+  return llaPoints;
+}
+
 export const calculateSensorPos = (sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: number } => {
   const { timeManager, sensorManager } = keepTrackApi.programs;
   sensors = verifySensors(sensors, sensorManager);
@@ -1694,6 +1732,10 @@ export const satellite: SatMath = {
   findNearbyObjectsByOrbit,
   getDops,
   getEci,
+  getEciOfCurrentOrbit,
+  getEcfOfCurrentOrbit,
+  getRicOfCurrentOrbit,
+  getLlaOfCurrentOrbit,
   getlookangles,
   getlookanglesMultiSite,
   getOrbitByLatLon,
@@ -1706,7 +1748,7 @@ export const satellite: SatMath = {
   lastMultiSiteArray: [],
   lookAngles2Ecf,
   lookanglesInterval: 30,
-  lookanglesLength: 1,
+  lookanglesLength: 7,
   map,
   nextNpasses,
   nextpass,

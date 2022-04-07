@@ -1,0 +1,15 @@
+.plot-analysis-menu-maximized {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.plot-analysis-menu-normal {
+  width: 500px;
+}
+
+.plot-analysis-chart {
+  width: 100%;
+  height: 90%;
+  padding: 10px;
+  margin: 0;
+}

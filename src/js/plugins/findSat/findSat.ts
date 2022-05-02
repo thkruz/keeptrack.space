@@ -6,29 +6,11 @@ import { RAD2DEG } from '../../lib/constants';
 import findSatPng from '@app/img/icons/find2.png';
 
 let isFindByLooksMenuOpen = false;
-export const checkInc = (possibles: any[], min: number, max: number) => {
-  possibles = possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
-  return limitPossibles(possibles, settingsManager.searchLimit);
-};
-
-export const checkRaan = (possibles: any[], min: number, max: number) => {
-  possibles = possibles.filter((possible) => possible.raan * RAD2DEG < max && possible.raan * RAD2DEG > min);
-  return limitPossibles(possibles, settingsManager.searchLimit);
-};
-
-export const checkArgPe = (possibles: any[], min: number, max: number) => {
-  possibles = possibles.filter((possible) => possible.argPe * RAD2DEG < max && possible.argPe * RAD2DEG > min);
-  return limitPossibles(possibles, settingsManager.searchLimit);
-};
-
-export const checkPeriod = (possibles: any[], minPeriod: number, maxPeriod: number) => {
-  possibles = possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
-  return limitPossibles(possibles, settingsManager.searchLimit);
-};
-export const checkRcs = (possibles: any[], minRcs: number, maxRcs: number) => {
-  possibles = possibles.filter((possible) => parseFloat(possible.R) > minRcs && parseFloat(possible.R) < maxRcs);
-  return limitPossibles(possibles, settingsManager.searchLimit);
-};
+export const checkInc = (possibles: any[], min: number, max: number) => possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
+export const checkRaan = (possibles: any[], min: number, max: number) => possibles.filter((possible) => possible.raan * RAD2DEG < max && possible.raan * RAD2DEG > min);
+export const checkArgPe = (possibles: any[], min: number, max: number) => possibles.filter((possible) => possible.argPe * RAD2DEG < max && possible.argPe * RAD2DEG > min);
+export const checkPeriod = (possibles: any[], minPeriod: number, maxPeriod: number) => possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
+export const checkRcs = (possibles: any[], minRcs: number, maxRcs: number) => possibles.filter((possible) => parseFloat(possible.R) > minRcs && parseFloat(possible.R) < maxRcs);
 
 export interface SearchSatParams {
   az: number;
@@ -130,6 +112,8 @@ export const searchSats = (searchParams: SearchSatParams) => { // NOSONAR
           ?.replace(/[^a-zA-Z]/gu, '') === payload
     );
   }
+
+  res = limitPossibles(res, settingsManager.searchLimit);
 
   let result = '';
   res.forEach((sat: SatObject, i: number) => {

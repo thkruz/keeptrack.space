@@ -498,6 +498,21 @@ const getSatPos = (offset: number, satrec: SatRec): Eci => {
   }
 };
 
+export const findReentries = (): string => {
+  const { satSet } = keepTrackApi.programs;  
+  const reentries = satSet.satData.filter((sat) =>
+    (sat.type === SpaceObjectType.PAYLOAD || sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS));
+
+  const reentriesStr = reentries
+    .filter((sat) => sat.perigee > 0)
+    .sort((a, b) => a.perigee - b.perigee)
+    .slice(0, 100)
+    .map((sat) => sat.sccNum).join(',');
+
+  return reentriesStr;
+};
+
+
 /* istanbul ignore next */
 export const findCloseObjects = () => { // NOSONAR
   const { satSet } = keepTrackApi.programs;
@@ -1728,6 +1743,7 @@ export const satellite: SatMath = {
   findBestPass,
   findBestPasses,
   findCloseObjects,
+  findReentries,
   findClosestApproachTime,
   findNearbyObjectsByOrbit,
   getDops,

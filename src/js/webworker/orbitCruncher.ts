@@ -113,7 +113,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
         if (isEcfOutput) {
           p = <satellite.EcfVec3<number>>satellite.ecfToEci(p, -i * timeslice * TAU / period);
         }
-        if (p.x && p.y && p.z) {
+        if (p?.x && p?.y && p?.z) {
           pointsOut[i * 4] = p.x;
           pointsOut[i * 4 + 1] = p.y;
           pointsOut[i * 4 + 2] = p.z;

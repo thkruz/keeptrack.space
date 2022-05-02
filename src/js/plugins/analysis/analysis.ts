@@ -109,6 +109,10 @@ export const uiManagerInit = () => {
     $('#loading-screen').fadeIn(1000, findCsoBtnClick);
   });
 
+  $('#findReentries').on('click', () => {
+    $('#loading-screen').fadeIn(1000, findRaBtnClick);
+  });
+
   $('#analysis-menu').resizable({
     handles: 'e',
     stop: function () {
@@ -146,6 +150,12 @@ export const analysisFormSubmit = () => {
 export const findCsoBtnClick = () => {
   const { satellite, uiManager } = keepTrackApi.programs;
   const searchStr = satellite.findCloseObjects();
+  uiManager.doSearch(searchStr);
+  $('#loading-screen').fadeOut('slow');
+};
+export const findRaBtnClick = () => {
+  const { satellite, uiManager } = keepTrackApi.programs;
+  const searchStr = satellite.findReentries();
   uiManager.doSearch(searchStr);
   $('#loading-screen').fadeOut('slow');
 };

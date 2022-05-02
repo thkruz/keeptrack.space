@@ -16,6 +16,16 @@ export const ExportTleButton = keepTrackApi.html`
       </button>
     </center>
   </div>`;
+
+export const FindReentries = keepTrackApi.html`
+  <div class="row">
+    <center>
+      <button id="findReentries" class="btn btn-ui waves-effect waves-light">
+      Find Reentries &#9658;
+      </button>
+    </center>
+  </div>`;
+
 export const ExportCatalogCsvButton = keepTrackApi.html`
   <div class="row">
     <center>
@@ -41,6 +51,7 @@ export const AnalysisSideMenu = keepTrackApi.html`
     ${ExportTleButton}
     ${ExportCatalogCsvButton}
     ${FindCsoButton}
+    ${FindReentries}
     ${BestPassTime}       
   </div>
 </div>`;

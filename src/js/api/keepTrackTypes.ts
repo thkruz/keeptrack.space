@@ -1163,6 +1163,7 @@ export interface SatMath {
   findBestPass(sat: SatObject, sensors: SensorObject[]): lookanglesRow[];
   findBestPasses: (sats: string, sensor: SensorObject) => void;
   findCloseObjects: () => string;
+  findReentries: () => string;
   findClosestApproachTime: (
     sat1: SatObject,
     sat2: SatObject,

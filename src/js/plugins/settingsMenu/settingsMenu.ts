@@ -147,6 +147,14 @@ export const uiManagerInit = (): void => {
               </div>
               <div class="row"></div>
             </div>
+            <div id="settings-opt">
+              <h5 class="center-align">Settings Overrides</h5>
+              <div class="input-field col s12">
+                <input value="150" id="maxSearchSats" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Maximum satellites to display in search" />
+                <label for="maxSearchSats" class="active">Maximum Satellites in Search</label>
+              </div>
+              <div class="row"></div>
+            </div>
             <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
             <div id="fastCompSettings">
               <h5 class="center-align">Fast CPU Required</h5>
@@ -348,6 +356,15 @@ export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?:
       typ: 'isShowSatOverfly',
       selectedSatFOV: newFieldOfView,
     });
+  }
+
+  const maxSearchSats = parseInt($('#maxSearchSats').val());
+  if (isNaN(maxSearchSats)) {
+    $('#maxSearchSats').val(settingsManager.searchLimit);
+    uiManager.toast('Invalid max search sats value!', 'critical');
+  } else {
+    settingsManager.searchLimit = maxSearchSats;
+    uiManager.searchBox.doSearch(uiManager.searchBox.getCurrentSearch());
   }
 
   settingsManager.isForceColorScheme = true;

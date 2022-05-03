@@ -81,6 +81,18 @@ export const uiManagerInit = (): void => {
                 </select>
                 <label>Right Ascension Variation</label>
               </div>
+              <div class="input-field col s12">
+                <select id="hc-count">
+                  <option value="10">10</option>
+                  <option value="25" selected>25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                  <option value="200">200</option>
+                  <option value="500">500</option>
+                  <option value="1000">1000</option>
+                </select>
+                <label>Pieces</label>
+              </div>
               <div class="center-align">
                 <button class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Breakup &#9658;</button>
               </div>
@@ -154,63 +166,60 @@ export const breakupOnSubmit = (): void => { // NOSONAR
   const meanmoVariation = parseFloat(<string>$('#hc-per').val());
   const incVariation = parseFloat(<string>$('#hc-inc').val());
   const rascVariation = parseFloat(<string>$('#hc-raan').val());
-  // TODO: Is this needed still?
-  // const eVariation = 0.001;
-  // const origEcc = mainsat.eccentricity;
+  const breakupCount = parseInt(<string>$('#hc-count').val());
+  const eVariation = 0.00015;
+  const origEcc = mainsat.eccentricity;
 
   // NOTE: Previously we used - settingsManager.maxAnalystSats;
-  const breakupCount = 256;
-  for (let i = 0; i < breakupCount; i++) {
-    for (let incIterat = 0; incIterat <= 4; incIterat++) {
-      for (let meanmoIterat = 0; meanmoIterat <= 4; meanmoIterat++) {
-        for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
-          if (i >= breakupCount) break;
-          satId = satSet.getIdFromObjNum(80000 + i);
-          satSet.getSat(satId); // TODO: This may be unnecessary needs tested
-          let sat = origsat;
-          let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
+  let i = 0;
+  for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
+    if (i >= breakupCount) break;
+    satId = satSet.getIdFromObjNum(80000 + i);
+    satSet.getSat(satId); // TODO: This may be unnecessary needs tested
+    let sat = origsat;
+    let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
 
-          const rascOffset = -rascVariation / 2 + rascVariation * (rascIterat / 4);
-          // TODO: Is this needed still?
-          // sat.eccentricity = origEcc;
-          // sat.eccentricity += -eVariation / 2 + eVariation * (eVariation / 4);
+    const rascOffset = -rascVariation / 2 + rascVariation * (rascIterat / 4);
+    // const rascOffset = Math.random() * rascVariation * 2 - rascVariation;      
+    const newAlt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
+    let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, newAlt, rascOffset);
 
-          const newAlt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
-          let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, newAlt, rascOffset);
+    iTLE1 = iTLEs[0];
+    let iTLE2 = iTLEs[1];    
+    for (; i < (rascIterat + 1) * breakupCount / 4; i++) {
 
-          iTLE1 = iTLEs[0];
-          let iTLE2 = iTLEs[1];
+      // Inclination
+      let inc = parseFloat(TLE2.substr(8, 8));
+      inc = inc + Math.random() * incVariation * 2 - incVariation;
+      const incStr = stringPad.pad0(inc.toPrecision(7), 8);
 
-          // For the first 30
-          let inc = parseFloat(TLE2.substr(8, 8));
-          inc = inc - incVariation / 2 + incVariation * (incIterat / 4);
-          const incStr = stringPad.pad0(inc.toPrecision(7), 8);
+      // Ecentricity
+      sat.eccentricity = origEcc;
+      sat.eccentricity += Math.random() * eVariation * 2 - eVariation;
 
-          // For the second 30
-          let meanmo = parseFloat(iTLE2.substr(52, 10));
-          meanmo = meanmo - (meanmo * meanmoVariation) / 2 + meanmo * meanmoVariation * (meanmoIterat / 4);
-          const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
+      // Mean Motion
+      let meanmo = parseFloat(iTLE2.substr(52, 10));
+      meanmo = meanmo + Math.random() * meanmoVariation * 2 - meanmoVariation;
+      const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
 
-          iTLE2 = `2 ${80000 + i} ${incStr} ${iTLE2.substr(17, 35)}${meanmoStr}${iTLE2.substr(63)}`;
-          sat = satSet.getSat(satId);
-          sat.TLE1 = iTLE1;
-          sat.TLE2 = iTLE2;
-          sat.active = true;
-          if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.calculateSimulationTime()) > 1) {
-            satSet.satCruncher.postMessage({
-              typ: 'satEdit',
-              id: satId,
-              TLE1: iTLE1,
-              TLE2: iTLE2,
-            });
-            orbitManager.updateOrbitBuffer(satId, true, iTLE1, iTLE2);
-          } else {
-            // DEBUG:
-            // console.debug('Breakup Generator Failed');
-          }
-          // TODO: This is a terrible implementation but removing it crashes everything
-          i++; // NOSONAR
-        }
+      satId = satSet.getIdFromObjNum(80000 + i);
+      iTLE1 = `1 ${80000 + i}` + iTLE1.substr(7);
+      iTLE2 = `2 ${80000 + i} ${incStr} ${iTLE2.substr(17, 35)}${meanmoStr}${iTLE2.substr(63)}`;
+      sat = satSet.getSat(satId);
+      sat.TLE1 = iTLE1;
+      sat.TLE2 = iTLE2;
+      sat.active = true;
+      if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.calculateSimulationTime()) > 1) {
+        satSet.satCruncher.postMessage({
+          typ: 'satEdit',
+          id: satId,
+          TLE1: iTLE1,
+          TLE2: iTLE2,
+        });
+        orbitManager.updateOrbitBuffer(satId, true, iTLE1, iTLE2);
+      } else {
+        // DEBUG:
+        // console.debug('Breakup Generator Failed');
       }
     }
   }

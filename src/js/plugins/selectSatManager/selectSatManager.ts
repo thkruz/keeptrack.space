@@ -17,9 +17,9 @@ const selectSatManager = {
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
   selectSat: (satId: number, mainCamera: Camera) => { // NOSONAR
-    const { objectManager, satSet, sensorManager } = keepTrackApi.programs;
+    const { objectManager, satSet, sensorManager, uiManager } = keepTrackApi.programs;
 
-    let sat: SatObject;
+    let sat: SatObject | any;
 
     // If selecting an object
     if (satId !== -1) {
@@ -28,7 +28,13 @@ const selectSatManager = {
       // Selecting a star does nothing
       if (sat.type == SpaceObjectType.STAR) return;
       // Selecting a non-missile non-sensor object does nothing
-      if ((!sat.active || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') return;
+      if ((!sat.active || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') {
+        if (sat.type == SpaceObjectType.PAYLOAD_OWNER || sat.type == SpaceObjectType.PAYLOAD_MANUFACTURER) {
+          const searchStr = satSet.satData.filter((_sat) => _sat.owner === sat.Code || _sat.manufacturer === sat.Code).map((_sat) => _sat.sccNum).join(', ');
+          uiManager.searchBox.doSearch(searchStr);
+        }
+        return;
+      }
       // stop rotation if it is on
       mainCamera.autoRotate(false);
     }

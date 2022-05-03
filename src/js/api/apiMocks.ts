@@ -507,6 +507,7 @@ export const keepTrackApiStubs = {
       fillResultBox: jest.fn(),
       doArraySearch: jest.fn(),
       doSearch: jest.fn(),
+      getCurrentSearch: jest.fn(),
       getLastResultGroup: jest.fn(),
       isHovering: jest.fn(),
       setHoverSat: jest.fn(),

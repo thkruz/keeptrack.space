@@ -17,7 +17,7 @@ export const init = (): void => {
             width="22"
             height="22"
             style="margin-top: 1px;"
-            src="" delayedsrc="${githubPng}" 
+            src="${githubPng}" 
             />
           </a>
         </li>
@@ -26,7 +26,7 @@ export const init = (): void => {
             <img
             width="25"
             height="25"
-            src="" delayedsrc="${twitterPng}" 
+            src="${twitterPng}" 
             />
           </a>
         </li>

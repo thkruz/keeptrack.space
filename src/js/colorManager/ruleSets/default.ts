@@ -246,7 +246,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
       // Intentional
     } else {
       return {
-        color: colorSchemeManager.colorTheme.inView,
+        color: colorSchemeManager.colorTheme.inFOV,
         pickable: Pickable.Yes,
       };
     }

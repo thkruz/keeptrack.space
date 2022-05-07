@@ -155,7 +155,7 @@ export const uiManagerInit = () => {
 
 export const init = (): void => {
   // Load CSS
-  import('@app/js/plugins/nextLaunch/nextLaunch.css').then((resp) => resp);
+  import('@app/js/plugins/next-launch/next-launch.css').then((resp) => resp);
 
   // Add HTML
   keepTrackApi.register({

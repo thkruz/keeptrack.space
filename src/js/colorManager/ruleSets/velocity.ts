@@ -63,7 +63,7 @@ export const velocityRules = (sat: SatObject): ColorInformation => { // NOSONAR
       };
     } else {
       return {
-        color: colorSchemeManager.colorTheme.inViewAlt,
+        color: colorSchemeManager.colorTheme.inFOVAlt,
         pickable: Pickable.Yes,
       };
     }

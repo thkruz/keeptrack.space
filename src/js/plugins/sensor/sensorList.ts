@@ -1018,9 +1018,9 @@ const sensorList: SensorList = {
     lat: 24.499,
     lon: 121.072,
     alt: 0.060966, // Find accurate altitude
-    obsminaz: 180,
-    obsmaxaz: 60,
-    obsminel: 3,
+    obsminaz: 0, // Appears to be 3 faced
+    obsmaxaz: 360, // https://www.google.com/maps/place/24%C2%B029'45.6%22N+121%C2%B004'15.6%22E/@24.4985462,121.0709751,154m/data=!3m1!1e3!4m5!3m4!1s0x0:0xe0073e890dc05d63!8m2!3d24.496!4d121.071
+    obsminel: -1, // "Tracks surface ships" https://www.globalsecurity.org/military/world/taiwan/air-defense-over.htm
     obsmaxel: 85,
     obsminrange: 200,
     obsmaxrange: 5556,

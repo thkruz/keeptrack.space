@@ -37,7 +37,7 @@ import { LineFactory } from './drawManager/sceneManager/sceneManager';
 import { groupsManager } from './groupsManager/groupsManager';
 import { objectManager } from './objectManager/objectManager';
 import { orbitManager } from './orbitManager/orbitManager';
-import { sensorManager } from './plugins/sensor/sensorManager';
+import { sensorManager } from './plugins';
 import { satellite } from './satMath/satMath';
 import { satSet } from './satSet/satSet';
 import { VERSION } from './settingsManager/version.js';
@@ -86,13 +86,8 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     uiManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
-    await import('./plugins/core')
+    await import('./plugins')
       .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
-      .catch(() => {
-        // intentionally left blank
-      });
-    await import('./plugins/plugins')
-      .then((mod) => mod.loadExtraPlugins(keepTrackApi))
       .catch(() => {
         // intentionally left blank
       });

@@ -3,7 +3,7 @@ import { meshManager } from '@app/js/drawManager/meshManager';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager';
+import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins';
 import { mat4 } from 'gl-matrix';
 import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';

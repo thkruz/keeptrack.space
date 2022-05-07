@@ -57,16 +57,17 @@ export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: 
   }
   return screenPos;
 };
-export const getIdFromObjNum = (objNum: number): number => {
+
+export const getIdFromObjNum = (objNum: number, isExtensiveSearch = true): number => {
   const { satSet } = keepTrackApi.programs;
   if (typeof satSet.sccIndex?.[`${objNum}`] !== 'undefined') {
     return satSet.sccIndex[`${objNum}`];
-  } else {
+  } else if (isExtensiveSearch) {
     for (let i = 0; i < satSet.satData.length; i++) {
       if (parseInt(satSet.satData[i].sccNum) == objNum) return i;
     }
-    return null;
   }
+  return null;
 };
 export const getSatInViewOnly = (i: number): SatObject => {
   const { dotsManager, satSet } = keepTrackApi.programs;

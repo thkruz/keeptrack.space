@@ -1094,7 +1094,7 @@ export interface CatalogManager {
   numSats: any;
   satCruncher: any;
   getSat: (id: number) => SatObject;
-  getIdFromObjNum(arg0: number): any;
+  getIdFromObjNum(objNum: number, isExtensiveSearch?: boolean): number;
   sccIndex: { [key: string]: number };
   cosparIndex: { [key: string]: number };
   orbitalSats: number;
@@ -1288,6 +1288,7 @@ export interface DrawManager {
   glInit: any;
   createDotsManager: any;
   loadScene: any;
+  loadHiRes: any;
   resizeCanvas: any;
   calculatePMatrix: any;
   startWithOrbits: any;

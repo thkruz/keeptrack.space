@@ -1,74 +1,110 @@
-import { isThisJest } from '../api/keepTrackApi';
+import * as classification from '@app/js/plugins/classification/classification';
+import * as sensor from '@app/js/plugins/sensor/sensor';
+import * as watchlist from '@app/js/plugins/watchlist/watchlist';
+import * as nextLaunch from '@app/js/plugins/nextLaunch/nextLaunch';
+import * as findSat from '@app/js/plugins/findSat/findSat';
+import * as shortTermFences from '@app/js/plugins/shortTermFences/shortTermFences';
+import * as orbitReferences from '@app/js/plugins/orbitReferences/orbitReferences';
+import * as collisions from '@app/js/plugins/collisions/collisions';
+import * as breakup from '@app/js/plugins/breakup/breakup';
+import * as editSat from '@app/js/plugins/editSat/editSat';
+import * as newLaunch from '@app/js/plugins/newLaunch/newLaunch';
+import * as satChanges from '@app/js/plugins/satChanges/satChanges';
+import * as initialOrbit from '@app/js/plugins/initialOrbit/initialOrbit';
+import * as missile from '@app/js/plugins/missile/missile';
+import * as stereoMap from '@app/js/plugins/stereoMap/stereoMap';
+import * as sensorFov from '@app/js/plugins/sensorFov/sensorFov';
+import * as sensorSurv from '@app/js/plugins/sensorSurv/sensorSurv';
+import * as satelliteView from '@app/js/plugins/satelliteView/satelliteView';
+import * as satelliteFov from '@app/js/plugins/satelliteFov/satelliteFov';
+import * as planetarium from '@app/js/plugins/planetarium/planetarium';
+import * as astronomy from '@app/js/plugins/astronomy/astronomy';
+import * as nightToggle from '@app/js/plugins/nightToggle/nightToggle';
+import * as dops from '@app/js/plugins/dops/dops';
+import * as constellations from '@app/js/plugins/constellations/constellations';
+import * as countries from '@app/js/plugins/countries/countries';
+import * as colorsMenu from '@app/js/plugins/colorsMenu/colorsMenu';
+import * as photo from '@app/js/plugins/photo/photo';
+import * as launchCalendar from '@app/js/plugins/launchCalendar/launchCalendar';
+import * as timeMachine from '@app/js/plugins/timeMachine/timeMachine';
+import * as photoManager from '@app/js/plugins/photoManager/photoManager';
+import * as recorderManager from '@app/js/plugins/recorderManager/recorderManager';
+import * as analysis from '@app/js/plugins/analysis/analysis';
+import * as plotAnalysis from '@app/js/plugins/plotAnalysis/plotAnalysis';
+import * as twitter from '@app/js/plugins/twitter/twitter';
+import * as externalSources from '@app/js/plugins/externalSources/externalSources';
+import * as aboutManager from '@app/js/plugins/aboutManager/aboutManager';
+import * as settingsMenu from '@app/js/plugins/settingsMenu/settingsMenu';
+import * as soundManager from '@app/js/plugins/sounds/sounds';
+import * as gamepad from '@app/js/plugins/gamepad/gamepad';
+import * as catalogLoader from '@app/js/plugins/catalogLoader/catalogLoader';
+import * as debug from '@app/js/plugins/debug/debug';
+import * as satInfoboxCore from '@app/js/plugins/selectSatManager/satInfoboxCore';
+import * as updateSelectBoxCore from '@app/js/plugins/updateSelectBox/updateSelectBoxCore';
+import * as topMenu from '@app/js/plugins/topMenu/topMenu';
+import * as datetime from '@app/js/plugins/datetime/datetime';
+import * as social from '@app/js/plugins/social/social';
+
 
 // Register all core modules
 export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => { // NOSONAR
   plugins ??= {};
   try {
     // Register Catalog Loader
-    await import('@app/js/plugins/catalogLoader/catalogLoader').then((mod) => mod.init());
+    catalogLoader.init();
 
     // Load Debug Plugins
-    if (plugins.debug) await import('@app/js/plugins/debug/debug').then((mod) => mod.init());
+    if (plugins.debug) debug.init();
 
     // Register selectSatData
-    if (plugins.satInfoboxCore) await import('@app/js/plugins/selectSatManager/satInfoboxCore').then((mod) => mod.init());
+    if (plugins.satInfoboxCore) satInfoboxCore.init();
 
-    // Update Select Box
-    if (plugins.updateSelectBoxCore) await import('@app/js/plugins/updateSelectBox/updateSelectBoxCore').then((mod) => mod.init());
-
-    if (plugins.topMenu) await import('@app/js/plugins/topMenu/topMenu').then((mod) => mod.init());
-    if (plugins.datetime) await import('@app/js/plugins/datetime/datetime').then((mod) => mod.init());
-    if (plugins.social) await import('@app/js/plugins/social/social').then((mod) => mod.init());
+    // Core Features
+    if (plugins.updateSelectBoxCore) updateSelectBoxCore.init();
+    if (plugins.topMenu) topMenu.init();
+    if (plugins.datetime) datetime.init();
+    if (plugins.social) social.init();
 
     // UI Menu
-    // Load order determines menu order
-    if (plugins.classification) await import('@app/js/plugins/classification/classification').then((mod) => mod.init());
-    if (plugins.sensor) await import('@app/js/plugins/sensor/sensor').then((mod) => mod.init());
-    if (plugins.watchlist) await import('@app/js/plugins/watchlist/watchlist').then((mod) => mod.init());
-    if (plugins.nextLaunch) await import('@app/js/plugins/nextLaunch/nextLaunch').then((mod) => mod.init());
-    if (plugins.findSat) await import('@app/js/plugins/findSat/findSat').then((mod) => mod.init());
-    if (plugins.shortTermFences) await import('@app/js/plugins/shortTermFences/shortTermFences').then((mod) => mod.init());
-    if (plugins.orbitReferences) await import('@app/js/plugins/orbitReferences/orbitReferences').then((mod) => mod.init());
-    if (plugins.collisions) await import('@app/js/plugins/collisions/collisions').then((mod) => mod.init());
-    if (plugins.breakup) await import('@app/js/plugins/breakup/breakup').then((mod) => mod.init());
-    if (plugins.editSat) await import('@app/js/plugins/editSat/editSat').then((mod) => mod.init());
-    if (plugins.newLaunch) await import('@app/js/plugins/newLaunch/newLaunch').then((mod) => mod.init());
-    if (plugins.satChanges) await import('@app/js/plugins/satChanges/satChanges').then((mod) => mod.init());
-    if (plugins.initialOrbit) await import('@app/js/plugins/initialOrbit/initialOrbit').then((mod) => mod.init());
-    if (plugins.missile)
-      await import('@app/js/plugins/missile/missile')
-        .then((mod) => mod.init())
-        .catch((err) => {
-          // If this fails and it isn't jest then throw an error
-          if (!isThisJest()) {
-            console.debug(err);
-          }
-        });
-    if (plugins.stereoMap) await import('@app/js/plugins/stereoMap/stereoMap').then((mod) => mod.init());
-    if (plugins.sensorFov) await import('@app/js/plugins/sensorFov/sensorFov').then((mod) => mod.init());
-    if (plugins.sensorSurv) await import('@app/js/plugins/sensorSurv/sensorSurv').then((mod) => mod.init());
-    if (plugins.satelliteView) await import('@app/js/plugins/satelliteView/satelliteView').then((mod) => mod.init());
-    if (plugins.satelliteFov) await import('@app/js/plugins/satelliteFov/satelliteFov').then((mod) => mod.init());
-    if (plugins.planetarium) await import('@app/js/plugins/planetarium/planetarium').then((mod) => mod.init());
-    if (plugins.astronomy) await import('@app/js/plugins/astronomy/astronomy').then((mod) => mod.init());
-    if (plugins.nightToggle) await import('@app/js/plugins/nightToggle/nightToggle').then((mod) => mod.init());
-    if (plugins.dops) await import('@app/js/plugins/dops/dops').then((mod) => mod.init());
-    if (plugins.constellations) await import('@app/js/plugins/constellations/constellations').then((mod) => mod.init());
-    if (plugins.countries) await import('@app/js/plugins/countries/countries').then((mod) => mod.init());
-    if (plugins.colorsMenu) await import('@app/js/plugins/colorsMenu/colorsMenu').then((mod) => mod.init());
-    if (plugins.photo) await import('@app/js/plugins/photo/photo').then((mod) => mod.init());
-    if (plugins.launchCalendar) await import('@app/js/plugins/launchCalendar/launchCalendar').then((mod) => mod.init());
-    if (plugins.timeMachine) await import('@app/js/plugins/timeMachine/timeMachine').then((mod) => mod.init());
-    if (plugins.photoManager) await import('@app/js/plugins/photoManager/photoManager').then((mod) => mod.init());
-    if (plugins.recorderManager) await import('@app/js/plugins/recorderManager/recorderManager').then((mod) => mod.init());
-    if (plugins.analysis) await import('@app/js/plugins/analysis/analysis').then((mod) => mod.init());
-    if (plugins.plotAnalysis) await import('@app/js/plugins/plotAnalysis/plotAnalysis').then((mod) => mod.init());
-    if (plugins.twitter) await import('@app/js/plugins/twitter/twitter').then((mod) => mod.init());
-    if (plugins.externalSources) await import('@app/js/plugins/externalSources/externalSources').then((mod) => mod.init());
-    if (plugins.aboutManager) await import('@app/js/plugins/aboutManager/aboutManager').then((mod) => mod.init());
-    if (plugins.settingsMenu) await import('@app/js/plugins/settingsMenu/settingsMenu').then((mod) => mod.init());
-    if (plugins.soundManager) await import('@app/js/plugins/sounds/sounds').then((mod) => mod.init());
-    if (plugins.gamepad) await import('@app/js/plugins/gamepad/gamepad').then((mod) => mod.init());
+    if (plugins.classification) classification.init();
+    if (plugins.sensor) sensor.init();
+    if (plugins.watchlist) watchlist.init();
+    if (plugins.nextLaunch) nextLaunch.init();
+    if (plugins.findSat) findSat.init();
+    if (plugins.shortTermFences) shortTermFences.init();
+    if (plugins.orbitReferences) orbitReferences.init();
+    if (plugins.collisions) collisions.init();
+    if (plugins.breakup) breakup.init();
+    if (plugins.editSat) editSat.init();
+    if (plugins.newLaunch) newLaunch.init();
+    if (plugins.satChanges) satChanges.init();
+    if (plugins.initialOrbit) initialOrbit.init();
+    if (plugins.missile) missile.init();
+    if (plugins.stereoMap) stereoMap.init();
+    if (plugins.sensorFov) sensorFov.init();
+    if (plugins.sensorSurv) sensorSurv.init();
+    if (plugins.satelliteView) satelliteView.init();
+    if (plugins.satelliteFov) satelliteFov.init();
+    if (plugins.planetarium) planetarium.init();
+    if (plugins.astronomy) astronomy.init();
+    if (plugins.nightToggle) nightToggle.init();
+    if (plugins.dops) dops.init();
+    if (plugins.constellations) constellations.init();
+    if (plugins.countries) countries.init();
+    if (plugins.colorsMenu) colorsMenu.init();
+    if (plugins.photo) photo.init();
+    if (plugins.launchCalendar) launchCalendar.init();
+    if (plugins.timeMachine) timeMachine.init();
+    if (plugins.photoManager) photoManager.init();
+    if (plugins.recorderManager) recorderManager.init();
+    if (plugins.analysis) analysis.init();
+    if (plugins.plotAnalysis) plotAnalysis.init();
+    if (plugins.twitter) twitter.init();
+    if (plugins.externalSources) externalSources.init();
+    if (plugins.aboutManager) aboutManager.init();
+    if (plugins.settingsMenu) settingsMenu.init();
+    if (plugins.soundManager) soundManager.init();
+    if (plugins.gamepad) gamepad.init();
 
     keepTrackApi.register({
       method: 'uiManagerFinal',

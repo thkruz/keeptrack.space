@@ -154,10 +154,20 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     uiManager.postStart();
 
-    // Update any CSS now that we know what is loaded
-    keepTrackApi.methods.uiManagerFinal();
+    loadAfterStart();
   } catch (error) {
     showErrorCode(<Error & { lineNumber: number }>error);
+  }
+};
+
+const loadAfterStart = () => {
+  if (settingsManager.cruncherReady) {
+    // Update any CSS now that we know what is loaded
+    keepTrackApi.methods.uiManagerFinal();
+
+    drawManager.loadHiRes();
+  } else {
+    setTimeout(loadAfterStart, 100);
   }
 };
 

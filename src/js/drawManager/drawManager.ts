@@ -101,10 +101,7 @@ export const loadScene = async () => {
   // Make this public
   drawManager.sceneManager = sceneManager;
   try {
-    await sceneManager.earth.init(gl);
-    sceneManager.earth.loadHiRes();
-    sceneManager.earth.loadHiResNight();
-    meshManager.init(gl, sceneManager.earth);
+    await sceneManager.earth.init(gl);        
     keepTrackApi.methods.drawManagerLoadScene();
     await sceneManager.sun.init();
     await sceneManager.moon.init();
@@ -112,6 +109,18 @@ export const loadScene = async () => {
     console.debug(error);
   }
 };
+
+export const loadHiRes = async () => {
+  const { gl } = keepTrackApi.programs.drawManager;
+  try {
+    sceneManager.earth.loadHiRes();
+    sceneManager.earth.loadHiResNight();
+    meshManager.init(gl, sceneManager.earth);
+  } catch (error) {
+    console.debug(error);
+  }
+};
+
 export const getCanvasInfo = () => {
   // Using minimum allows the canvas to be full screen without fighting with scrollbars
   const cw = document.documentElement.clientWidth || 0;
@@ -596,6 +605,7 @@ export let drawManager: DrawManager = {
   glInit: glInit,
   createDotsManager: createDotsManager,
   loadScene: loadScene,
+  loadHiRes,
   resizeCanvas: resizeCanvas,
   calculatePMatrix: calculatePMatrix,
   startWithOrbits: startWithOrbits,

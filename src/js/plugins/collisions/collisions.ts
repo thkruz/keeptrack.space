@@ -5,10 +5,8 @@ import { stringPad } from '../../lib/helpers';
 
 let isSocratesMenuOpen = false;
 let socratesOnSatCruncher: number | null = null;
-keepTrackApi.programs.socrates = {
-  socratesObjOne: [], // Array for tr containing CATNR1
-  socratesObjTwo: [], // Array for tr containing CATNR2
-};
+const socratesObjOne = []; // Array for tr containing CATNR1
+const socratesObjTwo = []; // Array for tr containing CATNR2
 
 export const uiManagerInit = () => {
   // Side Menu
@@ -188,9 +186,8 @@ export const socrates = (row: number) => {
   if (isNaN(row)) throw new Error('SOCRATES: Row is not a number');
 
   // SOCRATES Variables
-  const { socratesObjOne, socratesObjTwo } = keepTrackApi.programs.socrates;
 
-  /* SOCRATES.htm is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
+  /* SOCRATES.html is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
     If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
     created using satCruncer.
 
@@ -198,7 +195,7 @@ export const socrates = (row: number) => {
     row is 0 and last one is 19. */
   if (row === -1 && socratesObjOne.length === 0 && socratesObjTwo.length === 0) {
     // Only generate the table if receiving the -1 argument for the first time
-    $.get('/SOCRATES.htm', (socratesHTM: Document) => processSocratesHtm(socratesHTM));
+    $.get('/SOCRATES.html', (socratesHTM: Document) => processSocratesHtm(socratesHTM));
   }
   if (row !== -1) {
     // If an object was selected from the menu
@@ -209,9 +206,7 @@ export const socrates = (row: number) => {
   } // If a row was selected
 };
 export const processSocratesHtm = (socratesHTM: Document): void => {
-  const { socratesObjOne, socratesObjTwo } = keepTrackApi.programs.socrates;
-
-  // Load SOCRATES.htm so we can use it instead of index.html
+  // Load SOCRATES.html so we can use it instead of index.html
   const tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
   const tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
 

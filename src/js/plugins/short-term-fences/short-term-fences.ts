@@ -1,8 +1,8 @@
 import searchPng from '@app/img/icons/search.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { addCustomSensor, clearCustomSensors, removeLastSensor } from '@app/js/plugins';
 import $ from 'jquery';
-import { addCustomSensor } from '../sensor/sensor';
 
 let isStfMenuOpen = false;
 let stfInfoLinks = false;
@@ -74,9 +74,17 @@ export const uiManagerInit = (): void => {
                 <label for="stf-rngExt" class="active">Range Extent</label>
               </div>
               <div class="center-align">
-                <button id="stf-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Short Term Fence &#9658;</button>
+                <button id="stf-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create New STF &#9658;</button>
               </div>
             </form>
+            <br>
+            <div class="center-align">
+              <button id="stf-remove-last" class="btn btn-ui waves-effect waves-light" type="button" name="action">Remove Last &#9658;</button>
+            </div>
+            <br>
+            <div class="center-align">
+              <button id="stf-clear-all" class="btn btn-ui waves-effect waves-light" type="button" name="action">Clear All STFs &#9658;</button>
+            </div>
           </div>
         </div>
       </div>
@@ -105,6 +113,8 @@ export const uiManagerInit = (): void => {
   });
 
   $('#stfForm').on('submit', stfFormOnSubmit);
+  $('#stf-remove-last').on('click', stfRemoveLast);
+  $('#stf-clear-all').on('click', stfClearAll);
 };
 
 export const bottomMenuClick = (iconName: string) => {
@@ -182,12 +192,12 @@ export const stfFormOnSubmit = (e: Event) => {
   const rng = parseFloat(<string>$('#stf-rng').val());
   const rngExt = parseFloat(<string>$('#stf-rngExt').val());
 
-  const minaz = az - azExt < 0 ? az - azExt + 360 : az - azExt;
-  const maxaz = az + azExt > 360 ? az + azExt - 360 : az + azExt;
-  const minel = el - elExt;
-  const maxel = el + elExt;
-  const minrange = rng - rngExt;
-  const maxrange = rng + rngExt;
+  const minaz = az - azExt < 0 ? az - azExt + 360 : az - azExt / 2;
+  const maxaz = az + azExt > 360 ? az + azExt - 360 : az + azExt / 2;
+  const minel = el - elExt / 2;
+  const maxel = el + elExt / 2;
+  const minrange = rng - rngExt / 2;
+  const maxrange = rng + rngExt / 2;
 
   const stfSensor = <SensorObject>(<unknown>{
     lat,
@@ -216,6 +226,14 @@ export const stfFormOnSubmit = (e: Event) => {
   $('#sensor-selected').text('Short Term Fence');
 
   keepTrackApi.programs.sensorFov.enableFovView();
+};
+
+export const stfRemoveLast = () => {
+  removeLastSensor();
+};
+
+export const stfClearAll = () => {
+  clearCustomSensors();
 };
 
 export const stfOnObjectLinkClick = () => {

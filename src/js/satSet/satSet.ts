@@ -246,7 +246,7 @@ export const selectSat = (i: number): void => {
   }
 };
 export const convertIdArrayToSatnumArray = (satIdArray: number[]) => satIdArray.map((id) => (satSet.getSat(id)?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
-export const convertSatnumArrayToIdArray = (satnumArray: number[]) => satnumArray.map((satnum) => satSet.getSatFromObjNum(satnum)?.id || null).filter((id) => id !== null);
+export const convertSatnumArrayToIdArray = (satnumArray: number[]) => satnumArray.map((satnum) => satSet.getIdFromObjNum(satnum, false) || null).filter((id) => id !== null);
 export const resetSatInView = () => {
   const { dotsManager } = keepTrackApi.programs;
   dotsManager.inViewData = new Int8Array(dotsManager.inViewData.length);

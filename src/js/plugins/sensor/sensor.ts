@@ -53,9 +53,18 @@ export const clearCustomSensors = () => {
   const { sensorManager } = keepTrackApi.programs;
   customSensors = [];
   if (sensorManager.whichRadar === 'MULTI CUSTOM' || sensorManager.whichRadar === 'CUSTOM') {
-    resetSensorButtonClick();
+    sensorManager.setSensor(sensorManager.selectedSensor);
   }
 };
+
+export const removeLastSensor = () => {
+  if (customSensors.length > 1) {
+    customSensors.pop();
+    updateCruncherOnCustomSensors();
+  } else {
+    clearCustomSensors();
+  }
+}
 
 export const csTelescopeClick = () => {
   const { sensorManager } = keepTrackApi.programs;
@@ -758,9 +767,8 @@ export const addCustomSensor = (sensor: SensorObject): SensorObject[] => {
   return customSensors;
 };
 
-
 export const customSensorSubmit = (): void => {
-  const { sensorManager, satSet, satellite, mainCamera, timeManager, objectManager } = keepTrackApi.programs;
+  const { mainCamera, timeManager } = keepTrackApi.programs;
   $('#menu-sensor-info').removeClass('bmenu-item-disabled');
   $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
   $('#menu-surveillance').removeClass('bmenu-item-disabled');
@@ -794,6 +802,20 @@ export const customSensorSubmit = (): void => {
     type: sensorType,
   });
 
+  updateCruncherOnCustomSensors();
+
+  if (customSensors.length === 1) {
+    if (maxrange > 6000) {
+      mainCamera.changeZoom('geo');
+    } else {
+      mainCamera.changeZoom('leo');
+    }
+    mainCamera.camSnap(mainCamera.lat2pitch(lat), mainCamera.lon2yaw(lon, timeManager.selectedDate));
+  }
+};
+
+export const updateCruncherOnCustomSensors = () => {
+  const { sensorManager, satSet, satellite, objectManager } = keepTrackApi.programs;
   sensorManager.whichRadar = customSensors.length > 1 ? 'MULTI CUSTOM' : 'CUSTOM';
 
   satSet.satCruncher.postMessage({
@@ -805,13 +827,5 @@ export const customSensorSubmit = (): void => {
   satellite.setobs(customSensors);
   objectManager.setSelectedSat(-1);
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
+}
 
-  if (customSensors.length === 1) {
-    if (maxrange > 6000) {
-      mainCamera.changeZoom('geo');
-    } else {
-      mainCamera.changeZoom('leo');
-    }
-    mainCamera.camSnap(mainCamera.lat2pitch(lat), mainCamera.lon2yaw(lon, timeManager.selectedDate));
-  }
-};

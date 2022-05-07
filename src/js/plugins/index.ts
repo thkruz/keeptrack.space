@@ -48,6 +48,7 @@ import * as watchlist from '@app/js/plugins/watchlist/watchlist';
 import { omManager } from './initial-orbit/om-manager';
 import { CanvasRecorder } from './recorder-manager/canvas-recorder/canvas-recorder';
 import { isselectedSatNegativeOne, selectSatManager } from './select-sat-manager/select-sat-manager';
+import { addCustomSensor, clearCustomSensors, removeLastSensor } from './sensor/sensor';
 import { sensorManager } from './sensor/sensorManager';
 
 // Register all core modules
@@ -239,4 +240,7 @@ export {
   selectSatManager,
   omManager,
   CanvasRecorder,
+  clearCustomSensors,
+  addCustomSensor,
+  removeLastSensor,
 };

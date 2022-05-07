@@ -1,0 +1,8 @@
+.scenario-creator-menu-maximized {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.scenario-creator-menu-normal {
+  width: 500px;
+}

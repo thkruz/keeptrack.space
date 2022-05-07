@@ -69,6 +69,7 @@ settingsManager = {
     classification: true,
     soundManager: true,
     gamepad: true,
+    scenarioCreator: true,
   },
   colors: {
     transparent: null,

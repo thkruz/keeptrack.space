@@ -44,6 +44,7 @@ import * as updateSelectBoxCore from '@app/js/plugins/updateSelectBox/updateSele
 import * as topMenu from '@app/js/plugins/topMenu/topMenu';
 import * as datetime from '@app/js/plugins/datetime/datetime';
 import * as social from '@app/js/plugins/social/social';
+import * as scenarioCreator from '@app/js/plugins/scenarioCreator/scenario-creator';
 
 
 // Register all core modules
@@ -98,6 +99,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.photoManager) photoManager.init();
     if (plugins.recorderManager) recorderManager.init();
     if (plugins.analysis) analysis.init();
+    if (plugins.scenarioCreator) scenarioCreator.init();
     if (plugins.plotAnalysis) plotAnalysis.init();
     if (plugins.twitter) twitter.init();
     if (plugins.externalSources) externalSources.init();

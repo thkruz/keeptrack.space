@@ -124,25 +124,21 @@ export const uiManagerInit = () => {
 };
 export const analysisFormSubmit = () => {
   const { sensorManager } = keepTrackApi.programs;
-  const chartType = $('#anal-type').val();
-  const sat = $('#anal-sat').val();
+  // const chartType = $('#anal-type').val();
+  // const sat = $('#anal-sat').val();
   const sensor = sensorManager.currentSensor[0].shortName;
   if (typeof sensor == 'undefined') {
     $.colorbox({
-      href: `analysis/index.html?sat=${sat}&type=${chartType}`,
-      iframe: true,
+      html: `<html><body><div><h1>Test</h1></div></body></html>`,
       width: '60%',
       height: '60%',
-      fastIframe: false,
       closeButton: false,
     });
   } else {
     $.colorbox({
-      href: `analysis/index.html?sat=${sat}&type=${chartType}&sensor=${sensor}`,
-      iframe: true,
+      html: `<html><body><div><h1>Test</h1></div></body></html>`,
       width: '60%',
       height: '60%',
-      fastIframe: false,
       closeButton: false,
     });
   }

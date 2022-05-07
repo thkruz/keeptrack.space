@@ -5,9 +5,6 @@ import { dateFromJday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
 
 let issatChngMenuOpen = false;
-keepTrackApi.programs.satChange = {
-  satChngTable: null,
-};
 
 export const init = (): void => {
   // Add HTML
@@ -71,9 +68,9 @@ export const uiManagerInit = () => {
   });
 };
 
+let satChngTable: SatChngObject[] = [];
 export const satChng = (row: number): void => {
   const { satChange, uiManager } = keepTrackApi.programs;
-  let satChngTable: SatChngObject[] = satChange.satChngTable;
   if (typeof row !== 'number') throw new Error('Row must be a number');
   if (row !== -1 && typeof satChngTable[row] === 'undefined') throw new Error('Row does not exist');
 

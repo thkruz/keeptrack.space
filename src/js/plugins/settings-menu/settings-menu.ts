@@ -132,7 +132,7 @@ export const uiManagerInit = (): void => {
               </div>
               <div class="input-field col s6">
                 <center>
-                  <p>TruSat</p>
+                  <p>Special Sats</p>
                   <button id="settings-color-trusat" class="btn waves-effect waves-light"></button>
                 </center>
               </div>
@@ -237,7 +237,7 @@ export const uiManagerInit = (): void => {
       },
     });
     (<any>$('#settings-color-inview')).colorPick({
-      initialColor: rgbCss(settingsManager.colors?.inView || [0.85, 0.5, 0.0, 1.0]),
+      initialColor: rgbCss(settingsManager.colors?.inFOV || [0.85, 0.5, 0.0, 1.0]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'inview');

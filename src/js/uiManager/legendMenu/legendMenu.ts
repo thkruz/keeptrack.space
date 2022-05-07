@@ -48,7 +48,7 @@ const defaultDiv = keepTrackApi.html`
   </li>
   <li class="legend-trusat">
     <div class="Square-Box legend-trusat-box"></div>
-    TruSat
+    Special Sats
   </li>
   <li>
     <div class="Square-Box legend-sensor-box"></div>
@@ -76,7 +76,7 @@ const planetariumDiv = keepTrackApi.html`
   </li>
   <li>
     <div class="Square-Box legend-trusat-box"></div>
-    TruSat
+    Special Sats
   </li>
 </ul>
 `.trim();
@@ -132,7 +132,7 @@ const defaultSensorDiv = keepTrackApi.html`
   </li>
   <li>
     <div class="Square-Box legend-trusat-box"></div>
-    TruSat
+    Special Sats
   </li>
   <li>
     <div class="Square-Box legend-inFOV-box"></div>
@@ -209,7 +209,7 @@ const nearDiv = keepTrackApi.html`
 <ul id="legend-list-near">
   <li>
     <div class="Square-Box legend-satLEO-box"></div>
-    Period Less Than 225 min
+    Apogee < Than 2000 km
   </li>
   <!-- <li><div class="Square-Box legend-satOther-box"></div>Other Satellite</li> -->
   <li>
@@ -222,7 +222,7 @@ const deepDiv = keepTrackApi.html`
 <ul id="legend-list-deep">
   <li>
     <div class="Square-Box legend-satGEO-box"></div>
-    Period More Than 225 min
+    Perigee > Than 35000 km
   </li>
   <!-- <li><div class="Square-Box legend-satOther-box"></div>Other Satellite</li> -->
   <li>
@@ -340,7 +340,7 @@ export const legendMenuChange = (menu: string) => {
     colorSchemeManager.objectTypeFlags.missileInview = true;
     $('.legend-trusat-box').css('background', settingsManager.colors.trusat.toString());
     colorSchemeManager.objectTypeFlags.trusat = true;
-    $('.legend-inFOV-box').css('background', settingsManager.colors.inView.toString());
+    $('.legend-inFOV-box').css('background', settingsManager.colors.inFOV.toString());
     colorSchemeManager.objectTypeFlags.inFOV = true;
     $('.legend-starLow-box').css('background', settingsManager.colors.starLow.toString());
     colorSchemeManager.objectTypeFlags.starLow = true;
@@ -364,13 +364,13 @@ export const legendMenuChange = (menu: string) => {
     colorSchemeManager.objectTypeFlags.rcsLarge = true;
     $('.legend-rcsUnknown-box').css('background', settingsManager.colors.rcsUnknown.toString());
     colorSchemeManager.objectTypeFlags.rcsUnknown = true;
-    $('.legend-velocitySlow-box').css('background', [1.0, 0, 0.0, 1.0].toString());
+    $('.legend-velocitySlow-box').css('background', rgbCss([1, 0, 0, 1]));
     colorSchemeManager.objectTypeFlags.velocitySlow = true;
-    $('.legend-velocityMed-box').css('background', [0.5, 0.5, 0.0, 1.0].toString());
+    $('.legend-velocityMed-box').css('background', rgbCss([0.75, 0.25, 0, 1]));
     colorSchemeManager.objectTypeFlags.velocityMed = true;
-    $('.legend-velocityFast-box').css('background', [0, 1, 0.0, 1.0].toString());
+    $('.legend-velocityFast-box').css('background', rgbCss([0.75, 0.75, 0, 1]));
     colorSchemeManager.objectTypeFlags.velocityFast = true;
-    $('.legend-inviewAlt-box').css('background', settingsManager.colors.inViewAlt.toString());
+    $('.legend-inviewAlt-box').css('background', settingsManager.colors.inFOVAlt.toString());
     colorSchemeManager.objectTypeFlags.inViewAlt = true;
     $('.legend-satLEO-box').css('background', settingsManager.colors.satLEO.toString());
     colorSchemeManager.objectTypeFlags.satLEO = true;
@@ -403,7 +403,7 @@ export const legendColorsChange = function (): void {
   $('.legend-payload-box').css('background', rgbCss(settingsManager.colors.payload));
   $('.legend-rocketBody-box').css('background', rgbCss(settingsManager.colors.rocketBody));
   $('.legend-debris-box').css('background', rgbCss(settingsManager.colors.debris));
-  $('.legend-inFOV-box').css('background', rgbCss(settingsManager.colors.inView));
+  $('.legend-inFOV-box').css('background', rgbCss(settingsManager.colors.inFOV));
   $('.legend-facility-box').css('background', rgbCss(settingsManager.colors.facility));
   $('.legend-sensor-box').css('background', rgbCss(settingsManager.colors.sensor));
   if (settingsManager.trusatMode || settingsManager.isExtraSatellitesAdded) {
@@ -420,7 +420,7 @@ export const legendColorsChange = function (): void {
   $('.legend-velocityFast-box').css('background', rgbCss([0.75, 0.75, 0, 1]));
   $('.legend-velocityMed-box').css('background', rgbCss([0.75, 0.25, 0, 1]));
   $('.legend-velocitySlow-box').css('background', rgbCss([1, 0, 0, 1]));
-  $('.legend-inviewAlt-box').css('background', rgbCss(settingsManager.colors.inViewAlt));
+  $('.legend-inviewAlt-box').css('background', rgbCss(settingsManager.colors.inFOVAlt));
   $('.legend-rcsSmall-box').css('background', rgbCss(settingsManager.colors.rcsSmall));
   $('.legend-rcsMed-box').css('background', rgbCss(settingsManager.colors.rcsMed));
   $('.legend-rcsLarge-box').css('background', rgbCss(settingsManager.colors.rcsLarge));

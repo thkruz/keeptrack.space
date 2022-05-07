@@ -199,7 +199,8 @@ export interface OrbitManager {
 }
 
 export interface Colors {
-  inViewAlt: [number, number, number, number];
+  inFOV: [number, number, number, number];
+  inFOVAlt: [number, number, number, number];
   sunlight60: [number, number, number, number];
   sunlight80: [number, number, number, number];
   sunlight100: [number, number, number, number];
@@ -212,8 +213,6 @@ export interface Colors {
   sensor: [number, number, number, number];
   marker: [number, number, number, number][];
   deselected: [number, number, number, number];
-  inView: [number, number, number, number];
-  inviewAlt: [number, number, number, number];
   radarData: [number, number, number, number];
   radarDataMissile: [number, number, number, number];
   radarDataSatellite: [number, number, number, number];

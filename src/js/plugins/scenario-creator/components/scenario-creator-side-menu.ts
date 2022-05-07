@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import './side-menu.css';
+import './scenario-creator-side-menu.css';
 
 export const scenarioCreatorSideMenu = keepTrackApi.html`
       <div id="scenario-creator-menu" class="side-menu-parent start-hidden text-select scenario-creator-menu-normal">

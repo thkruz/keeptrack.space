@@ -28,7 +28,9 @@ export const initMenuController = () => {
   });
 
   $('#legend-hover-menu').on('click', function (e: any) {
-    uiManager.legendHoverMenuClick(e.target.classList[1]);
+    if (e.target.classList[1]) {
+      uiManager.legendHoverMenuClick(e.target.classList[1]);
+    }
   });
 
   $('#legend-menu').on('click', () => {

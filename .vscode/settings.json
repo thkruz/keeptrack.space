@@ -7,6 +7,7 @@
   "npm.exclude": ["**/dist/**", "**/src/admin", "**/src/admin/*"],
   "eslint.workingDirectories": ["./"],
   "typescript.tsdk": "./node_modules/typescript/lib",
+  // "workbench.editor.labelFormat": "short",
   "[typescript]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": false,

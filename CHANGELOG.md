@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v5.4.0
+
+>  
+
+- feat: :sparkles: add satellite search on control site clicked
+- style: :art: replace all camelCase files with hyphens for better git detection
+- feat: :sparkles: add scenario-creator scaffold
+- fix: :zap: reduce complexity of legend color code
+- fix: :zap: improve loading times
+- fix: :bug: fix time not moving at correct speed
+- feat: :sparkles: add better breakup logic
+- fix: :zap: fix minor issues with stf menu
+- fix: :beers: start fixing trend analysis menu
+- feat: :triangular_flag_on_post: modify breakup options to be more realistic
+- fix: :bug: fix ray casting on earth functionality
+- fix: :bug: fix socrates
+- fix: :bug: fix countries filters
+- fix: :bug: fix next pass time not updating
+- fix: :bug: include TBA sats as Special
+- fix: :sparkles: update SRP FOV
+- fix: :bug: fix missing top menu icons
+- fix: :bug: fix umbral not showing
+- test: :bug: fix settingsmenu tests
+- fix: :lock: bump async
+
 #### v5.3.0
 
 >  

@@ -994,6 +994,8 @@ export const getSatIdFromCoord = (x: number, y: number): number => {
 };
 export const getEarthScreenPoint = (x: number, y: number) => {
   const { mainCamera } = keepTrackApi.programs;
+  if (typeof x === 'undefined' || typeof y === 'undefined') throw new Error('x and y must be defined');
+  if (isNaN(x) || isNaN(y)) throw new Error('x and y must be numbers');
 
   // Where is the camera
   const rayOrigin = mainCamera.getForwardVector();

@@ -76,7 +76,7 @@ describe('uiManager.legendHoverMenuClick', () => {
   });
 
   test('14', () => {
-    let result = uiManager.legendHoverMenuClick('legend-inviewAlt-box');
+    let result = uiManager.legendHoverMenuClick('legend-inFOVAlt-box');
     expect(result).toMatchSnapshot();
   });
 
@@ -314,7 +314,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   });
 
   test('14', () => {
-    let result = uiManager.legendHoverMenuClick('legend-inviewAlt-box');
+    let result = uiManager.legendHoverMenuClick('legend-inFOVAlt-box');
     expect(result).toMatchSnapshot();
   });
 

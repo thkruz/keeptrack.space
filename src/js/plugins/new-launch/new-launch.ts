@@ -1,7 +1,7 @@
+import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import $ from 'jquery';
-import rocketPng from '@app/img/icons/rocket.png';
 
 let isNewLaunchMenuOpen = false;
 
@@ -44,7 +44,7 @@ export const newLaunchSubmit = () => {
   timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
   mainCamera.isCamSnapMode = false;
 
-  const simulationTimeObj = timeManager.calculateSimulationTime();
+  const simulationTimeObj = timeManager.simulationTimeObj;
 
   const TLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj);
 
@@ -173,7 +173,8 @@ export const uiManagerInit = () => {
       `);
 };
 
-export const bottomMenuClick = (iconName: string): void => { // NOSONAR
+export const bottomMenuClick = (iconName: string): void => {
+  // NOSONAR
   const aM = keepTrackApi.programs.adviceManager;
   if (iconName === 'menu-newLaunch') {
     if (isNewLaunchMenuOpen) {

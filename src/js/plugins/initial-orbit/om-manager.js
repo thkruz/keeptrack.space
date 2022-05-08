@@ -41,7 +41,7 @@ const RAD2DEG = 360 / TAU;
 let om = {};
 
 // Public Functions
-om.sat2sv = (sat, timeManager) => [timeManager.calculateSimulationTime(), sat.position.x, sat.position.y, sat.position.z, sat.velocity.x, sat.velocity.y, sat.velocity.z];
+om.sat2sv = (sat, timeManager) => [timeManager.simulationTimeObj, sat.position.x, sat.position.y, sat.position.z, sat.velocity.x, sat.velocity.y, sat.velocity.z];
 om.sat2kp = (sat, timeManager) => {
   const sv = om.sat2sv(sat, timeManager);
   return om.sv2kp(sv, timeManager);
@@ -66,11 +66,15 @@ om.kp2tle = (kp, epoch, timeManager) => {
   let epochd = _dayOfYear(epoch.getUTCMonth(), epoch.getUTCDate(), epoch.getUTCHours(), epoch.getUTCMinutes(), epoch.getUTCSeconds());
   epochd = epochd * 1 + epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
   const tle1 = `1 80000U 58001A   ${yy}${_pad0(parseFloat(epochd).toFixed(8), 12)} 0.00000000 +00000-0 +00000-0 0 99990`;
-  const tle2 = `2 80000 ${_pad0(inc.toFixed(4), 8)} ${_pad0(raan.toFixed(4), 8)} ${ecc.toPrecision(7).substr(2, 7)} ${_pad0(parseFloat(argpe).toFixed(4), 8)} ${_pad0(meana.toFixed(4), 8)} ${_pad0(meanmo.toFixed(8), 11)}000010`;
+  const tle2 = `2 80000 ${_pad0(inc.toFixed(4), 8)} ${_pad0(raan.toFixed(4), 8)} ${ecc.toPrecision(7).substr(2, 7)} ${_pad0(parseFloat(argpe).toFixed(4), 8)} ${_pad0(
+    meana.toFixed(4),
+    8
+  )} ${_pad0(meanmo.toFixed(8), 11)}000010`;
   return { tle1: tle1, tle2: tle2 };
 };
 // State Vectors to Keplerian Min/Max/Avg
-om.svs2kps = (svs) => { // NOSONAR
+om.svs2kps = (svs) => {
+  // NOSONAR
   let kpList = [];
   for (let i = 0; i < svs.length; i++) {
     kpList.push(om.sv2kp(svs[i]));
@@ -186,7 +190,8 @@ om.iod = async (svs, timeManager, satellite) => {
   }
 };
 
-om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
+om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
+  // NOSONAR
   try {
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
@@ -299,7 +304,7 @@ export const _propagate = async (tle1, tle2, epoch, satellite) => {
     let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
     let eci = satellite.sgp4(satrec, m);
     return eci;
- } catch (error) {
+  } catch (error) {
     // intentionally left blank
   }
 };
@@ -310,14 +315,15 @@ export const _jday = (year, mon, day, hr, minute, sec) => {
   );
 };
 // Converts State Vectors to Keplerian Elements
-export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => { // NOSONAR
+export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => {
+  // NOSONAR
   let rx = vector[1] * 1000;
   let ry = vector[2] * 1000;
   let rz = vector[3] * 1000;
   let vx = vector[4] * 1000;
   let vy = vector[5] * 1000;
   let vz = vector[6] * 1000;
-  
+
   if (massSecondaryU === 'M_Earth') {
     massSecondary = massSecondary * 5.97378250603408e24;
   }

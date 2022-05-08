@@ -1,9 +1,9 @@
+import editPng from '@app/img/icons/edit.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { saveAs, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tleFormater';
 import $ from 'jquery';
-import editPng from '@app/img/icons/edit.png';
 
 let isEditSatMenuOpen = false;
 export const init = (): void => {
@@ -163,7 +163,7 @@ export const readerOnLoad = (evt: any) => {
   const scc = parseInt(stringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
   const satId = satSet.getIdFromObjNum(scc);
   const sat = satSet.getSatExtraOnly(satId);
-  if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.calculateSimulationTime()) > 1) {
+  if (satellite.altitudeCheck(object.TLE1, object.TLE2, timeManager.simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: sat.id,
@@ -179,7 +179,8 @@ export const readerOnLoad = (evt: any) => {
   }
 };
 
-export const bottomMenuClick = (iconName: string) => { // NOSONAR
+export const bottomMenuClick = (iconName: string) => {
+  // NOSONAR
   const { uiManager, satSet, objectManager } = keepTrackApi.programs;
   if (iconName === 'menu-editSat') {
     if (isEditSatMenuOpen) {
@@ -278,7 +279,7 @@ export const editSatNewTleClickFadeIn = () => {
 
     const upOrDown = mainsat.getDirection();
 
-    const simulationTimeObj = timeManager.calculateSimulationTime();
+    const simulationTimeObj = timeManager.simulationTimeObj;
 
     const currentEpoch = satellite.currentEpoch(simulationTimeObj);
     mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
@@ -372,7 +373,7 @@ export const editSatSubmit = (e: Event) => {
 
   const { TLE1, TLE2 } = satellite.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
 
-  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.calculateSimulationTime()) > 1) {
+  if (satellite.altitudeCheck(TLE1, TLE2, timeManager.simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
       id: satId,

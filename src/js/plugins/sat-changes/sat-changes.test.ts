@@ -58,28 +58,29 @@ describe('satChanges.bottomMenuClick', () => {
 });
 
 describe('satChanges.satChng', () => {
-  beforeAll(() => {
-    keepTrackApi.programs.satChange.satChngTable = [
-      { SCC: 25544, inc: 51, meanmo: 120, date: new Date('2019-01-02') },
-      { SCC: 25545, inc: 51, meanmo: 120, date: new Date('2019-01-01') },
-    ];
-  });
+  const mockSatChngTable = [
+    { SCC: 25544, year: '58', day: '001', inc: 51, meanmo: 120, date: new Date(2019, 1, 2).toString() },
+    { SCC: 25545, year: '08', day: '001', inc: 51, meanmo: 120, date: new Date(2019, 1, 2).toString() },
+  ];
   test('0', () => {
-    document.body.innerHTML = `<div id="search-results"></div>`;
-    let result: any = satChanges.satChng(0);
+    document.body.innerHTML = `
+    <div id="search-results"></div>
+    <table id="satChng-table"></table>`;
+    let result: any = satChanges.satChng(0, mockSatChngTable);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    document.body.innerHTML = `<div id="search-results"></div>`;
-    let result: any = satChanges.satChng(1);
+    document.body.innerHTML = `
+    <div id="search-results"></div>
+    <table id="satChng-table"></table>`;
+    let result: any = satChanges.satChng(1, mockSatChngTable);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
     let result: any = () => {
-      keepTrackApi.programs.satChange.satChngTable = [];
-      satChanges.satChng(-1);
+      satChanges.satChng(-1, []);
     };
     expect(result).toMatchSnapshot();
   });

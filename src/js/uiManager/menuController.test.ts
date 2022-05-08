@@ -61,12 +61,12 @@ describe('Menu Controller', () => {
     searchClose.click();
     expect(spy).toHaveBeenCalled();
   });
-  it('should respond to legend-hover-menu clicks', () => {
+  it('should NOT respond to legend-hover-menu clicks', () => {
     const { uiManager } = keepTrackApi.programs;
     const spy = jest.spyOn(uiManager, 'legendHoverMenuClick');
     const legendHoverMenu = document.getElementById('legend-hover-menu');
     legendHoverMenu.click();
-    expect(spy).toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
   });
   it('should respond to legend-menu clicks', () => {
     const legendMenu = document.getElementById('legend-menu');

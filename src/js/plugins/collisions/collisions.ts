@@ -1,12 +1,12 @@
 import socratesPng from '@app/img/icons/socrates.png';
 import $ from 'jquery';
-import { keepTrackApi } from '../../api/keepTrackApi';
+import { isThisJest, keepTrackApi } from '../../api/keepTrackApi';
 import { stringPad } from '../../lib/helpers';
 
 let isSocratesMenuOpen = false;
 let socratesOnSatCruncher: number | null = null;
-const socratesObjOne = []; // Array for tr containing CATNR1
-const socratesObjTwo = []; // Array for tr containing CATNR2
+let socratesObjOne = []; // Array for tr containing CATNR1
+let socratesObjTwo = []; // Array for tr containing CATNR2
 
 export const uiManagerInit = () => {
   // Side Menu
@@ -182,10 +182,13 @@ export const findFutureDate = (socratesObjTwo: any[][], row: number) => {
   keepTrackApi.programs.timeManager.simulationTimeObj;
 }; // Allows passing -1 argument to socrates function to skip these steps
 
-export const socrates = (row: number) => {
+export const socrates = (row: number, testOverride?: any) => {
   if (isNaN(row)) throw new Error('SOCRATES: Row is not a number');
 
-  // SOCRATES Variables
+  if (isThisJest() && (socratesObjOne?.length === 0 || socratesObjTwo?.length === 0)) {
+    socratesObjOne = testOverride.socratesObjOne;
+    socratesObjTwo = testOverride.socratesObjTwo;
+  }
 
   /* SOCRATES.html is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
     If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be

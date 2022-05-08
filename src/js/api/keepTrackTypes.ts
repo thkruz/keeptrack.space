@@ -1136,6 +1136,7 @@ export type lookanglesRow = {
 };
 
 export interface SatMath {
+  getAngleBetweenTwoSatellites(sat1: SatObject, sat2: SatObject): { az: number; el: number };
   getLlaOfCurrentOrbit(sat: SatObject, points: number): { lat: number; lon: number; alt: number; time: number }[];
   getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits?: number);
   getEcfOfCurrentOrbit(sat: SatObject, points: number);

@@ -1,5 +1,5 @@
 import satChngPng from '@app/img/icons/sats.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatChngObject } from '@app/js/api/keepTrackTypes';
 import { dateFromJday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
@@ -69,8 +69,14 @@ export const uiManagerInit = () => {
 };
 
 let satChngTable: SatChngObject[] = [];
-export const satChng = (row: number): void => {
+export const satChng = (row: number, testOverride?: any): void => {
   const { satChange, uiManager } = keepTrackApi.programs;
+
+  // If we are testing, we can override the satChange object.
+  if (isThisJest()) {
+    ({ satChngTable } = getSatChngJson(testOverride));
+  }
+
   if (typeof row !== 'number') throw new Error('Row must be a number');
   if (row !== -1 && typeof satChngTable[row] === 'undefined') throw new Error('Row does not exist');
 
@@ -78,7 +84,6 @@ export const satChng = (row: number): void => {
     // Only generate the table if receiving the -1 argument for the first time
     $.get('./analysis/satchng.json?v=' + settingsManager.versionNumber).done((resp) => {
       ({ satChngTable } = getSatChngJson(resp));
-      satChange.satChngTable = satChngTable;
     });
   }
   if (row !== -1) {

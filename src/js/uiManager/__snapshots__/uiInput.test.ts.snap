@@ -48,14 +48,6 @@ Float32Array [
 ]
 `;
 
-exports[`Legacy Tests uiInput.getEarthScreenPoint 5 1`] = `
-Float32Array [
-  NaN,
-  NaN,
-  NaN,
-]
-`;
-
 exports[`Legacy Tests uiInput.getSatIdFromCoord 0 1`] = `-1`;
 
 exports[`Legacy Tests uiInput.getSatIdFromCoord 1 1`] = `-1`;

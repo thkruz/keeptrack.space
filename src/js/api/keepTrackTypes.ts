@@ -662,7 +662,6 @@ export interface UiInputInterface {
   getSatIdFromCoordAlt: any;
   openRmbMenu: any;
   rmbMenuActions: any;
-  getRayOrigin: any;
   canvasMouseMove: any;
   canvasTouchMove: any;
   canvasTouchEnd: any;

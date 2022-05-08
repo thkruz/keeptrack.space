@@ -134,7 +134,7 @@ export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart,
 
 export const getTime2LonScatterData = () => {
   const { satSet, satellite, timeManager } = keepTrackApi.programs;
-  const now = timeManager.calculateSimulationTime().getTime();
+  const now = timeManager.simulationTimeObj.getTime();
 
   const data = [];
   satSet.satData.forEach((sat) => {

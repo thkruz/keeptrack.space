@@ -474,7 +474,7 @@ export const drawOcclusion = (pMatrix: glm.mat4, camMatrix: glm.mat4, occlusionP
 };
 export const update = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  earthNow = timeManager.calculateSimulationTime();
+  earthNow = timeManager.simulationTimeObj;
 
   earth.earthJ = jday(
     earthNow.getUTCFullYear(),
@@ -502,7 +502,7 @@ export const update = (): void => {
 };
 export const updateSunCurrentDirection = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  earth.sunvar.now = timeManager.calculateSimulationTime();
+  earth.sunvar.now = timeManager.simulationTimeObj;
   earth.sunvar.jd = jday(
     earth.sunvar.now.getUTCFullYear(),
     earth.sunvar.now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.

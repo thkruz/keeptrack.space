@@ -150,7 +150,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
   const launchLat = satellite.degreesLat(TEARR.lat);
   const launchLon = satellite.degreesLong(TEARR.lon);
 
-  const simulationTimeObj = timeManager.calculateSimulationTime();
+  const simulationTimeObj = timeManager.simulationTimeObj;
 
   const upOrDown = mainsat.getDirection();
   const currentEpoch = satellite.currentEpoch(simulationTimeObj);
@@ -216,7 +216,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       sat.TLE1 = iTLE1;
       sat.TLE2 = iTLE2;
       sat.active = true;
-      if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.calculateSimulationTime()) > 1) {
+      if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.simulationTimeObj) > 1) {
         satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,

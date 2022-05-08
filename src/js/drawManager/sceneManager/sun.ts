@@ -222,7 +222,7 @@ export const initGodraysProgram = (gl: WebGL2RenderingContext): void => {
  * ***************************************************************************/
 export const update = () => {
   const { timeManager } = keepTrackApi.programs;
-  sun.now = timeManager.calculateSimulationTime();
+  sun.now = timeManager.simulationTimeObj;
 
   sun.sunvar.j = jday(
     sun.now.getUTCFullYear(),

@@ -515,7 +515,7 @@ export const Missile = (
 };
 export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[]) => { // NOSONAR
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
-  const now = timeManager.calculateSimulationTime();
+  const now = timeManager.simulationTimeObj;
   let j = jday(
     now.getUTCFullYear(),
     now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.

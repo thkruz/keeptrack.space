@@ -392,7 +392,7 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
       dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * timeManager.drawDt;
     }
 
-    const { gmst } = calculateTimeVariables(timeManager.calculateSimulationTime());
+    const { gmst } = calculateTimeVariables(timeManager.simulationTimeObj);
     objectManager.staticSet
       .filter((object) => object.static && !object.marker && object.type !== SpaceObjectType.STAR)
       .forEach((object) => {

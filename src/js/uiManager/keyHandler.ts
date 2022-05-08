@@ -143,7 +143,7 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
   }
 
   if (settingsManager.isPropRateChange) {
-    timeManager.calculateSimulationTime();
+    // timeManager.calculateSimulationTime();
     timeManager.synchronize();
     if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate && timeManager.propRate0 !== timeManager.propRate) {
       if (timeManager.propRate > 1.01 || timeManager.propRate < 0.99) {

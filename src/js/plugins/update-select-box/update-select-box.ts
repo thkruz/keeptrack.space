@@ -2,7 +2,8 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { cKmPerMs, DEG2RAD } from '@app/js/lib/constants';
 
-export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONAR
+export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
+  // NOSONAR
   try {
     const { satellite, missileManager, timeManager, objectManager, sensorManager, uiManager } = keepTrackApi.programs;
 
@@ -45,7 +46,9 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
         $('#sat-azimuth').html(satellite.currentTEARR.az.toFixed(0) + '°'); // Convert to Degrees
         $('#sat-elevation').html(satellite.currentTEARR.el.toFixed(1) + '°');
         $('#sat-range').html(satellite.currentTEARR.rng.toFixed(2) + ' km');
-        const beamwidthString = sensorManager.currentSensor[0].beamwidth ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor[0].beamwidth)).toFixed(2) + ' km' : 'Unknown';
+        const beamwidthString = sensorManager.currentSensor[0].beamwidth
+          ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor[0].beamwidth)).toFixed(2) + ' km'
+          : 'Unknown';
         $('#sat-beamwidth').html(beamwidthString);
         $('#sat-maxTmx').html(((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'); // Time for RF to hit target and bounce back
       } else {
@@ -87,7 +90,7 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
       if (sensorManager.checkSensorSelected()) {
         // If we didn't just calculate next pass time for this satellite and sensor combination do it
         // TODO: Make new logic for this to allow it to be updated while selected
-        if (objectManager.selectedSat !== uiManager.lastNextPassCalcSatId && sensorManager.currentSensor[0].shortName !== uiManager.lastNextPassCalcSensorId && !sat.missile) {
+        if ((objectManager.selectedSat !== uiManager.lastNextPassCalcSatId || sensorManager.currentSensor[0].shortName !== uiManager.lastNextPassCalcSensorId) && !sat.missile) {
           if (sat.perigee > sensorManager.currentSensor[0].obsmaxrange) {
             $('#sat-nextpass').html('Beyond Max Range');
           } else {

@@ -101,31 +101,31 @@ export const countryMenuClick = (groupName: string): void => { // NOSONAR
   const { groupsManager } = keepTrackApi.programs;
   switch (groupName) {
     case 'Canada':
-      if (!groupsManager.Canada) groupsManager.Canada = groupsManager.createGroup('countryRegex', /CA/u);
+      if (!groupsManager.Canada) groupsManager.Canada = groupsManager.createGroup('countryRegex', /Canada/u);
       break;
     case 'China':
-      if (!groupsManager.China) groupsManager.China = groupsManager.createGroup('countryRegex', /PRC/u);
+      if (!groupsManager.China) groupsManager.China = groupsManager.createGroup('countryRegex', /China/u);
       break;
     case 'France':
-      if (!groupsManager.France) groupsManager.France = groupsManager.createGroup('countryRegex', /FR/u);
+      if (!groupsManager.France) groupsManager.France = groupsManager.createGroup('countryRegex', /France/u);
       break;
     case 'India':
-      if (!groupsManager.India) groupsManager.India = groupsManager.createGroup('countryRegex', /IND/u);
+      if (!groupsManager.India) groupsManager.India = groupsManager.createGroup('countryRegex', /India/u);
       break;
     case 'Israel':
-      if (!groupsManager.Israel) groupsManager.Israel = groupsManager.createGroup('countryRegex', /ISRA/u);
+      if (!groupsManager.Israel) groupsManager.Israel = groupsManager.createGroup('countryRegex', /Israel/u);
       break;
     case 'Japan':
-      if (!groupsManager.Japan) groupsManager.Japan = groupsManager.createGroup('countryRegex', /JPN/u);
+      if (!groupsManager.Japan) groupsManager.Japan = groupsManager.createGroup('countryRegex', /Japan/u);
       break;
     case 'Russia':
-      if (!groupsManager.Russia) groupsManager.Russia = groupsManager.createGroup('countryRegex', /CIS/u);
+      if (!groupsManager.Russia) groupsManager.Russia = groupsManager.createGroup('countryRegex', /Russia/u);
       break;
     case 'UnitedKingdom':
-      if (!groupsManager.UnitedKingdom) groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /UK/u);
+      if (!groupsManager.UnitedKingdom) groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /United Kingdom/u);
       break;
     case 'UnitedStates':
-      if (!groupsManager.UnitedStates) groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /US/u);
+      if (!groupsManager.UnitedStates) groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /United States/u);
       break;
     default:
       throw new Error('Unknown country group');

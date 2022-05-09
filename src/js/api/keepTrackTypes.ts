@@ -199,7 +199,8 @@ export interface OrbitManager {
 }
 
 export interface Colors {
-  inViewAlt: [number, number, number, number];
+  inFOV: [number, number, number, number];
+  inFOVAlt: [number, number, number, number];
   sunlight60: [number, number, number, number];
   sunlight80: [number, number, number, number];
   sunlight100: [number, number, number, number];
@@ -212,8 +213,6 @@ export interface Colors {
   sensor: [number, number, number, number];
   marker: [number, number, number, number][];
   deselected: [number, number, number, number];
-  inView: [number, number, number, number];
-  inviewAlt: [number, number, number, number];
   radarData: [number, number, number, number];
   radarDataMissile: [number, number, number, number];
   radarDataSatellite: [number, number, number, number];
@@ -663,7 +662,6 @@ export interface UiInputInterface {
   getSatIdFromCoordAlt: any;
   openRmbMenu: any;
   rmbMenuActions: any;
-  getRayOrigin: any;
   canvasMouseMove: any;
   canvasTouchMove: any;
   canvasTouchEnd: any;
@@ -1094,7 +1092,7 @@ export interface CatalogManager {
   numSats: any;
   satCruncher: any;
   getSat: (id: number) => SatObject;
-  getIdFromObjNum(arg0: number): any;
+  getIdFromObjNum(objNum: number, isExtensiveSearch?: boolean): number;
   sccIndex: { [key: string]: number };
   cosparIndex: { [key: string]: number };
   orbitalSats: number;
@@ -1138,6 +1136,7 @@ export type lookanglesRow = {
 };
 
 export interface SatMath {
+  getAngleBetweenTwoSatellites(sat1: SatObject, sat2: SatObject): { az: number; el: number };
   getLlaOfCurrentOrbit(sat: SatObject, points: number): { lat: number; lon: number; alt: number; time: number }[];
   getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits?: number);
   getEcfOfCurrentOrbit(sat: SatObject, points: number);
@@ -1288,6 +1287,7 @@ export interface DrawManager {
   glInit: any;
   createDotsManager: any;
   loadScene: any;
+  loadHiRes: any;
   resizeCanvas: any;
   calculatePMatrix: any;
   startWithOrbits: any;

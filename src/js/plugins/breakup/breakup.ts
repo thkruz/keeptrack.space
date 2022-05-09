@@ -43,41 +43,48 @@ export const uiManagerInit = (): void => {
               <div class="input-field col s12">
                 <select id="hc-inc">
                   <option value="0">0 Degrees</option>
+                  <option value="0.1">0.1 Degrees</option>
+                  <option value="0.2" selected>0.2 Degrees</option>
+                  <option value="0.3">0.3 Degrees</option>
+                  <option value="0.4">0.4 Degrees</option>
                   <option value="0.5">0.5 Degrees</option>
-                  <option value="0.75">0.75 Degrees</option>
-                  <option value="1" selected>1 Degrees</option>
-                  <option value="1.25">1.25 Degrees</option>
-                  <option value="1.5">1.5 Degrees</option>
-                  <option value="1.75">1.75 Degrees</option>
-                  <option value="2">2 Degrees</option>
-                  <option value="2.25">2.25 Degrees</option>
-                  <option value="2.5">2.5 Degrees</option>
+                  <option value="0.6">0.6 Degrees</option>
+                  <option value="0.7">0.7 Degrees</option>
+                  <option value="0.8">0.8 Degrees</option>
+                  <option value="0.9">0.9 Degrees</option>
+                  <option value="1">1 Degrees</option>
                 </select>
                 <label>Inclination Variation</label>
               </div>
               <div class="input-field col s12">
                 <select id="hc-per">
                   <option value="0">0 Percent</option>
+                  <option value="0.005">0.5 Percent</option>
                   <option value="0.01">1 Percent</option>
+                  <option value="0.015">1.5 Percent</option>
                   <option value="0.02" selected>2 Percent</option>
+                  <option value="0.025">2.5 Percent</option>
                   <option value="0.03">3 Percent</option>
+                  <option value="0.035">3.5 Percent</option>
                   <option value="0.04">4 Percent</option>
+                  <option value="0.045">4.5 Percent</option>
                   <option value="0.05">5 Percent</option>
                 </select>
                 <label>Period Variation</label>
               </div>
               <div class="input-field col s12">
                 <select id="hc-raan">
-                  <option value="0">0 Degrees</option>
+                <option value="0">0 Degrees</option>
+                  <option value="0.1">0.1 Degrees</option>
+                  <option value="0.2" selected>0.2 Degrees</option>
+                  <option value="0.3">0.3 Degrees</option>
+                  <option value="0.4">0.4 Degrees</option>
                   <option value="0.5">0.5 Degrees</option>
-                  <option value="0.75">0.75 Degrees</option>
-                  <option value="1" selected>1 Degrees</option>
-                  <option value="1.25">1.25 Degrees</option>
-                  <option value="1.5">1.5 Degrees</option>
-                  <option value="1.75">1.75 Degrees</option>
-                  <option value="2">2 Degrees</option>
-                  <option value="2.25">2.25 Degrees</option>
-                  <option value="2.5">2.5 Degrees</option>
+                  <option value="0.6">0.6 Degrees</option>
+                  <option value="0.7">0.7 Degrees</option>
+                  <option value="0.8">0.8 Degrees</option>
+                  <option value="0.9">0.9 Degrees</option>
+                  <option value="1">1 Degrees</option>
                 </select>
                 <label>Right Ascension Variation</label>
               </div>
@@ -143,7 +150,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
   const launchLat = satellite.degreesLat(TEARR.lat);
   const launchLon = satellite.degreesLong(TEARR.lon);
 
-  const simulationTimeObj = timeManager.calculateSimulationTime();
+  const simulationTimeObj = timeManager.simulationTimeObj;
 
   const upOrDown = mainsat.getDirection();
   const currentEpoch = satellite.currentEpoch(simulationTimeObj);
@@ -209,7 +216,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       sat.TLE1 = iTLE1;
       sat.TLE2 = iTLE2;
       sat.active = true;
-      if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.calculateSimulationTime()) > 1) {
+      if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.simulationTimeObj) > 1) {
         satSet.satCruncher.postMessage({
           typ: 'satEdit',
           id: satId,

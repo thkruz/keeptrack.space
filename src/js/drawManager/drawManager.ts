@@ -3,7 +3,7 @@ import { meshManager } from '@app/js/drawManager/meshManager';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
-import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins/selectSatManager/selectSatManager';
+import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins';
 import { mat4 } from 'gl-matrix';
 import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
@@ -101,10 +101,7 @@ export const loadScene = async () => {
   // Make this public
   drawManager.sceneManager = sceneManager;
   try {
-    await sceneManager.earth.init(gl);
-    sceneManager.earth.loadHiRes();
-    sceneManager.earth.loadHiResNight();
-    meshManager.init(gl, sceneManager.earth);
+    await sceneManager.earth.init(gl);        
     keepTrackApi.methods.drawManagerLoadScene();
     await sceneManager.sun.init();
     await sceneManager.moon.init();
@@ -112,6 +109,18 @@ export const loadScene = async () => {
     console.debug(error);
   }
 };
+
+export const loadHiRes = async () => {
+  const { gl } = keepTrackApi.programs.drawManager;
+  try {
+    sceneManager.earth.loadHiRes();
+    sceneManager.earth.loadHiResNight();
+    meshManager.init(gl, sceneManager.earth);
+  } catch (error) {
+    console.debug(error);
+  }
+};
+
 export const getCanvasInfo = () => {
   // Using minimum allows the canvas to be full screen without fighting with scrollbars
   const cw = document.documentElement.clientWidth || 0;
@@ -596,6 +605,7 @@ export let drawManager: DrawManager = {
   glInit: glInit,
   createDotsManager: createDotsManager,
   loadScene: loadScene,
+  loadHiRes,
   resizeCanvas: resizeCanvas,
   calculatePMatrix: calculatePMatrix,
   startWithOrbits: startWithOrbits,

@@ -41,7 +41,7 @@ var millisecondsPerDay = 1.15741e-8;
 var raeType = 1;
 
 satellite.lookanglesInterval = 60;
-satellite.calculateLookAngles = function (sat, sensor, tableType) { // NOSONAR
+satellite.calculateLookAngles = (sat, sensor, tableType) => { // NOSONAR
   var propOffset;
   (function _inputValidation() {
     // Check if there is a sensor
@@ -595,7 +595,7 @@ var drawChart = (data) => {
 };
 
 var loadJSON = () => {
-  $.get(`sathist/${requestInfo.sat}.json`)
+  $.get(`./js/analysis/sathist/${requestInfo.sat}.json`)
     .done(function (resp) {
       // if the .json loads then use it
       drawChart(resp);

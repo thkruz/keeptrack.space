@@ -994,42 +994,36 @@ export const getSatIdFromCoord = (x: number, y: number): number => {
 };
 export const getEarthScreenPoint = (x: number, y: number) => {
   const { mainCamera } = keepTrackApi.programs;
+  if (typeof x === 'undefined' || typeof y === 'undefined') throw new Error('x and y must be defined');
+  if (isNaN(x) || isNaN(y)) throw new Error('x and y must be numbers');
 
-  // getEarthScreenPoint
-  let rayOrigin, ptThru, rayDir, toCenterVec, dParallel, longDir, dPerp, dSubSurf, dSurf, ptSurf;
+  // Where is the camera
+  const rayOrigin = mainCamera.getForwardVector();
+  // What did we click on
+  const ptThru = uiInput.unProject(x, y);
 
-  rayOrigin = uiInput.getRayOrigin(mainCamera);
-  ptThru = uiInput.unProject(x, y);
-
-  rayDir = glm.vec3.create();
+  // Clicked on minus starting point is our direction vector
+  const rayDir = glm.vec3.create();
   glm.vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
   glm.vec3.normalize(rayDir, rayDir);
-
-  toCenterVec = glm.vec3.create();
+  
+  const toCenterVec = glm.vec3.create();
   glm.vec3.scale(toCenterVec, rayOrigin, -1); // toCenter is just -camera pos because center is at [0,0,0]
-  dParallel = glm.vec3.dot(rayDir, toCenterVec);
+  const dParallel = glm.vec3.dot(rayDir, toCenterVec);
 
-  longDir = glm.vec3.create();
+  const longDir = glm.vec3.create();
   glm.vec3.scale(longDir, rayDir, dParallel); // longDir = rayDir * distParallel
   glm.vec3.add(ptThru, rayOrigin, longDir); // ptThru is now on the plane going through the center of sphere
-  dPerp = glm.vec3.len(ptThru);
+  const dPerp = glm.vec3.len(ptThru);
 
-  dSubSurf = Math.sqrt(RADIUS_OF_EARTH * RADIUS_OF_EARTH - dPerp * dPerp);
-  dSurf = dParallel - dSubSurf;
+  const dSubSurf = Math.sqrt(RADIUS_OF_EARTH * RADIUS_OF_EARTH - dPerp * dPerp);
+  const dSurf = dParallel - dSubSurf;
 
-  ptSurf = glm.vec3.create();
+  const ptSurf = glm.vec3.create();
   glm.vec3.scale(ptSurf, rayDir, dSurf);
   glm.vec3.add(ptSurf, ptSurf, rayOrigin);
 
   return ptSurf;
-};
-export const getRayOrigin = (mainCamera: Camera) => {
-  const gCPr = mainCamera.getCamDist();
-  const gCPz = gCPr * Math.sin(mainCamera.camPitch);
-  const gCPrYaw = gCPr * Math.cos(mainCamera.camPitch);
-  const gCPx = gCPrYaw * Math.sin(mainCamera.camYaw);
-  const gCPy = gCPrYaw * -Math.cos(mainCamera.camYaw);
-  return [gCPx, gCPy, gCPz];
 };
 export const canvasWheel = (evt: any): void => { // NOSONAR
   const { mainCamera, objectManager, drawManager } = keepTrackApi.programs;
@@ -1532,7 +1526,6 @@ export const uiInput: UiInputInterface = {
   isAsyncWorking: true,
   getSatIdFromCoord: getSatIdFromCoord,
   getEarthScreenPoint: getEarthScreenPoint, // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
-  getRayOrigin: getRayOrigin,
 };
 
 export const earthClicked = ({ isViewDOM, rightBtnViewDOM, numMenuItems, isCreateDOM, rightBtnCreateDOM, isDrawDOM, rightBtnDrawDOM, isEarthDOM, rightBtnEarthDOM, rightBtnSaveDOM }: { isViewDOM: boolean; rightBtnViewDOM: any; numMenuItems: number; isCreateDOM: boolean; rightBtnCreateDOM: any; isDrawDOM: boolean; rightBtnDrawDOM: any; isEarthDOM: boolean; rightBtnEarthDOM: any; rightBtnSaveDOM: any; }) => {

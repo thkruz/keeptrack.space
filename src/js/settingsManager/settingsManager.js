@@ -69,6 +69,7 @@ settingsManager = {
     classification: true,
     soundManager: true,
     gamepad: true,
+    scenarioCreator: true,
   },
   colors: {
     transparent: null,
@@ -363,9 +364,9 @@ settingsManager = {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.4') {
+    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.5') {
       settingsManager.colors = {};
-      settingsManager.colors.version = '1.0.4';
+      settingsManager.colors.version = '1.0.5';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
       settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];
       settingsManager.colors.sunlight80 = [1.0, 1.0, 1.0, 0.85];
@@ -395,8 +396,8 @@ settingsManager = {
         [0.6, 0.5, 1.0, 1.0],
       ];
       settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
-      settingsManager.colors.inView = [0.85, 0.5, 0.0, 1.0];
-      settingsManager.colors.inViewAlt = [0.2, 0.4, 1.0, 1];
+      settingsManager.colors.inFOV = [0.85, 0.5, 0.0, 1.0];
+      settingsManager.colors.inFOVAlt = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.radarData = [0.0, 1.0, 1.0, 1.0];
       settingsManager.colors.radarDataMissile = [1.0, 0.0, 0.0, 1.0];
       settingsManager.colors.radarDataSatellite = [0.0, 1.0, 0.0, 1.0];

@@ -158,8 +158,8 @@ export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
 
     if (sat.inSun == 0 && colorSchemeManager.objectTypeFlags.satLow === true) {
       return {
-        color: colorSchemeManager.colorTheme.deselected,
-        pickable: Pickable.No,
+        color: colorSchemeManager.colorTheme.umbral,
+        pickable: Pickable.Yes,
       };
     }
     // Not in the vmag database

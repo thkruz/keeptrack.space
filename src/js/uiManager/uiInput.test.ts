@@ -212,8 +212,8 @@ describe('Legacy Tests', () => {
     });
 
     test('5', () => {
-      let result: any = uiInput.getEarthScreenPoint(NaN, NaN);
-      expect(result).toMatchSnapshot();
+      let result: any = () => uiInput.getEarthScreenPoint(NaN, NaN);
+      expect(() => result()).toThrowError();
     });
   });
   describe('uiInput.rmbMenuActions', () => {

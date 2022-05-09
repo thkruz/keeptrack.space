@@ -4,7 +4,7 @@ import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeMa
 export const onlyFovRules = (sat: SatObject): ColorInformation => {
   if (sat.inView === 1) {
     return {
-      color: colorSchemeManager.colorTheme.inView,
+      color: colorSchemeManager.colorTheme.inFOV,
       pickable: Pickable.Yes,
     };
   } else {

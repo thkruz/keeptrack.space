@@ -5,6 +5,17 @@ import * as collisions from './collisions';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
+const socratesTestOverride = {
+  socratesObjOne: [
+    ['a b', 'a b', 'a b', 'a b', 'a b'],
+    ['a b', 'a b', 'a b', 'a b', 'a b'],
+  ],
+  socratesObjTwo: [
+    ['a b', 'a b', 'a b', 'a b', '2020 Jan 3 12:30:40.50'], // Date is a specific format to SOCRATES.htm
+    ['a b', 'a b', 'a b', 'a b', '2020 Jan 3 12:30:40.50'],
+  ],
+};
+
 // @ponicode
 describe('collisions.uiManagerInit', () => {
   test('0', () => {
@@ -37,17 +48,7 @@ describe('collisions.onCruncherMessage', () => {
   });
 
   test('1', () => {
-    keepTrackApi.programs.socrates = {
-      socratesObjOne: [
-        ['a b', 'a b', 'a b', 'a b', 'a b'],
-        ['a b', 'a b', 'a b', 'a b', 'a b'],
-      ],
-      socratesObjTwo: [
-        ['a b', 'a b', 'a b', 'a b', '2020 Jan 3 12:30:40.50'],
-        ['a b', 'a b', 'a b', 'a b', '2020 Jan 3 12:30:40.50'],
-      ],
-    };
-    collisions.socrates(0);
+    collisions.socrates(0, socratesTestOverride);
     let result: any = collisions.onCruncherMessage();
     expect(result).toMatchSnapshot();
   });
@@ -63,6 +64,7 @@ describe('collisions.init', () => {
 
 describe('collisions.bottomMenuClick', () => {
   test('0', () => {
+    collisions.socrates(0, socratesTestOverride);
     let result: any = collisions.bottomMenuClick('menu-satellite-collision');
     expect(result).toMatchSnapshot();
   });
@@ -83,36 +85,24 @@ describe('collisions.bottomMenuClick', () => {
 
 // @ponicode
 describe('collisions.socrates', () => {
-  beforeAll(() => {
-    keepTrackApi.programs.socrates = {
-      socratesObjOne: [
-        ['a b', 'a b', 'a b', 'a b', 'a b'],
-        ['a b', 'a b', 'a b', 'a b', 'a b'],
-      ],
-      socratesObjTwo: [
-        ['a b', 'a b', 'a b', 'a b', '2020 Jan 3 12:30:40.50'],
-        ['a b', 'a b', 'a b', 'a b', '2020 Jan 3 12:30:40.50'],
-      ],
-    };
-  });
   test('0', () => {
-    let result: any = collisions.socrates(1);
+    let result: any = collisions.socrates(1, socratesTestOverride);
     expect(result).toMatchSnapshot();
   });
 
   test('3', () => {
-    let result: any = collisions.socrates(0);
+    let result: any = collisions.socrates(0, socratesTestOverride);
     expect(result).toMatchSnapshot();
   });
 
   test('4', () => {
-    let result: any = collisions.socrates(-1);
+    let result: any = collisions.socrates(-1, socratesTestOverride);
     expect(result).toMatchSnapshot();
   });
 
   test('5', () => {
     let callFunction: any = () => {
-      collisions.socrates(NaN);
+      collisions.socrates(NaN, socratesTestOverride);
     };
 
     expect(callFunction).toThrow();

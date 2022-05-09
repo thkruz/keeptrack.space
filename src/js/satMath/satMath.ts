@@ -232,7 +232,7 @@ export const getTEARR = (sat?: SatObject, sensors?: SensorObject[], propTime?: D
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
   let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-  const now = typeof propTime !== 'undefined' ? propTime : timeManager.calculateSimulationTime();
+  const now = typeof propTime !== 'undefined' ? propTime : timeManager.simulationTimeObj;
   const { m, gmst } = calculateTimeVariables(now, satrec);
   let positionEci = satellite.sgp4(satrec, m);
 
@@ -288,7 +288,7 @@ export const nextpass = (sat: SatObject, sensors?: SensorObject[], searchLength?
   searchLength ??= satellite.lookanglesLength;
   interval ??= satellite.lookanglesInterval;
 
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
   const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   for (const sensor of sensors) {
@@ -326,7 +326,7 @@ export const nextNpasses = (sat: SatObject, sensors: SensorObject[], searchLengt
   numPasses = numPasses || 1;
 
   let passTimesArray = [];
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
   let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
@@ -362,7 +362,7 @@ export const getlookangles = (sat: SatObject): TearrData[] => { // NOSONAR
   let sensor = sensorManager.currentSensor;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
   let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
@@ -455,7 +455,7 @@ export const getlookanglesMultiSite = (sat: SatObject) => {
   // Save Current Sensor
   sensorManager.tempSensor = sensorManager.currentSensor;
 
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
   // Get Satellite Info
@@ -672,7 +672,7 @@ export const calculateLookAngles = (sat: SatObject, sensors: SensorObject[]) => 
   // TOOD: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
   const sensor = sensors[0];
 
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
   var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   var lookanglesTable = []; // Iniially no rows to the table
@@ -777,7 +777,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookangle
   // TOOD: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
   const sensor = sensors[0];
 
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
   var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
@@ -1069,7 +1069,7 @@ export const findClosestApproachTime = (
 //   launchLon = satellite.degreesLong(TEARR.lon);
 //   alt = TEARR.alt;
 //   var upOrDown = mainsat.getDirection();
-//   var currentEpoch = satellite.currentEpoch(timeManager.calculateSimulationTime());
+//   var currentEpoch = satellite.currentEpoch(timeManager.simulationTimeObj);
 //   mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
 //   var TLEs;
 //   // Ignore argument of perigee for round orbits OPTIMIZE
@@ -1123,7 +1123,7 @@ export const findClosestApproachTime = (
 //   sat.TLE1 = iTLE1;
 //   sat.TLE2 = iTLE2;
 //   sat.active = true;
-//   if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.calculateSimulationTime()) > 1) {
+//   if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.simulationTimeObj) > 1) {
 //     satSet.satCruncher.postMessage({
 //       type: 'satEdit',
 //       id: satId,
@@ -1205,7 +1205,7 @@ export const updateDopsTable = (lat: number, lon: number, alt: number) => {
     let tbl = <HTMLTableElement>document.getElementById('dops'); // Identify the table to update
     tbl.innerHTML = ''; // Clear the table from old object data
 
-    const simulationTime = timeManager.calculateSimulationTime();
+    const simulationTime = timeManager.simulationTimeObj;
     let offset = 0;
 
     let tr = tbl.insertRow();
@@ -1248,7 +1248,7 @@ export const getDops = (lat: number, lon: number, alt?: number, propTime?: Date)
   lon = lon * DEG2RAD;
   alt ??= 0;
   groupsManager.GPSGroup ??= groupsManager.createGroup('nameRegex', /NAVSTAR/iu);
-  propTime ??= timeManager.calculateSimulationTime();
+  propTime ??= timeManager.simulationTimeObj;
 
   const { gmst } = calculateTimeVariables(propTime);
 
@@ -1375,7 +1375,7 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
   searchLength ??= satellite.lookanglesLength;
   interval ??= satellite.lookanglesInterval;
 
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
   const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   let minDistanceApart = 100000000000; // Arbitrarily large number
@@ -1458,7 +1458,7 @@ export const lookAngles2Ecf = (az: number, el: number, rng: number, lat: number,
 export const eci2ll = (x: number, y: number, z: number): { lat: number; lon: number; alt: number } => {
   const { timeManager } = keepTrackApi.programs;
 
-  const now = timeManager.calculateSimulationTime();
+  const now = timeManager.simulationTimeObj;
   const { gmst } = calculateTimeVariables(now);
   var latLon = satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst);
   latLon.lat = latLon.lat * RAD2DEG;
@@ -1495,6 +1495,38 @@ export const sat2ric = (sat: SatObject, reference: SatObject): { position: vec3;
   };
 };
 
+export const getAngleBetweenTwoSatellites = (sat1: SatObject, sat2: SatObject): {az: number, el: number} => {
+  const { position: pos1, velocity: vel1 } = sat1;
+  const { position: pos2, velocity: vel2 } = sat2;
+
+  if (typeof pos1 === 'undefined') {
+    throw new Error('Sat1 position is undefined');
+  }
+  if (typeof pos2 === 'undefined') {
+    throw new Error('Sat2 position is undefined');
+  }
+  if (typeof vel1 === 'undefined') {
+    throw new Error('Sat1 velocity is undefined');
+  }
+  if (typeof vel2 === 'undefined') {
+    throw new Error('Sat2 velocity is undefined');
+  }
+
+  const r1 = vec3.fromValues(pos1.x, pos1.y, pos1.z);
+  const r2 = vec3.fromValues(pos2.x, pos2.y, pos2.z);
+  const v1 = vec3.fromValues(vel1.x, vel1.y, vel1.z);
+  const v2 = vec3.fromValues(vel2.x, vel2.y, vel2.z);
+  const r = vec3.sub(vec3.create(), r1, r2);
+  const v = vec3.sub(vec3.create(), v1, v2);
+  const rcrossv = vec3.cross(vec3.create(), r, v);
+  const rcrossvmag = vec3.length(rcrossv);  
+
+  const az = Math.atan2(rcrossv[1], rcrossv[0]) * RAD2DEG;
+  const el = Math.asin(rcrossv[2] / rcrossvmag) * RAD2DEG;
+
+  return {az, el};
+};
+
 export const getLlaTimeView = (now: Date, sat: SatObject) => {
   const { sensorManager } = keepTrackApi.programs;
   const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
@@ -1521,7 +1553,7 @@ export const map = (sat: SatObject, i: number): { time: string; lat: number; lon
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let offset = ((i * sat.period) / 50) * 60 * 1000; // Offset in seconds (msec * 1000)
   const now = timeManager.getOffsetTimeObj(offset, simulationTime);
 
@@ -1532,7 +1564,7 @@ export const getEciOfCurrentOrbit = (sat: SatObject, points: number): { x: numbe
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let eciPoints = [];
   for (let i = 0; i < points; i++) {
     let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
@@ -1546,7 +1578,7 @@ export const getEcfOfCurrentOrbit = (sat: SatObject, points: number): { x: numbe
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let ecfPoints = [];
   for (let i = 0; i < points; i++) {
     let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
@@ -1560,7 +1592,7 @@ export const getRicOfCurrentOrbit = (sat: SatObject, sat2: SatObject, points: nu
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   orbits ??= 1;
   let ricPoints = [];
   for (let i = 0; i < points; i++) {
@@ -1577,7 +1609,7 @@ export const getLlaOfCurrentOrbit = (sat: SatObject, points: number): { lat: num
   const { timeManager } = keepTrackApi.programs;
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.calculateSimulationTime();
+  const simulationTime = timeManager.simulationTimeObj;
   let llaPoints = [];
   for (let i = 0; i < points; i++) {
     let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
@@ -1596,7 +1628,7 @@ export const calculateSensorPos = (sensors?: SensorObject[]): { x: number; y: nu
   sensors = verifySensors(sensors, sensorManager);
   const sensor = sensors[0];
 
-  const now = timeManager.calculateSimulationTime();
+  const now = timeManager.simulationTimeObj;
   const { gmst } = calculateTimeVariables(now);
 
   const cosLat = Math.cos(sensor.lat * DEG2RAD);
@@ -1759,6 +1791,7 @@ export const satellite: SatMath = {
   getSunTimes,
   getTEARR,
   getTearData,
+  getAngleBetweenTwoSatellites,
   isRiseSetLookangles: false,
   lastlooksArray: [],
   lastMultiSiteArray: [],

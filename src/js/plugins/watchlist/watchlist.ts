@@ -78,7 +78,7 @@ export const init = (): void => {
         mainCamera.zoomLevel === mainCamera.zoomTarget) ||
       isForceUpdate
     ) {
-      const propTime = timeManager.calculateSimulationTime();
+      const propTime = timeManager.simulationTimeObj;
       infoOverlayDOM = [];
       infoOverlayDOM.push('<div>');
       for (let s = 0; s < nextPassArrayIn.length; s++) {

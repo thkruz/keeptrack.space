@@ -185,7 +185,7 @@ export const keepTrackApiStubs = {
         y: 0,
         z: 0,
       },
-      getForwardVector: jest.fn(),
+      getForwardVector: () => [0, 0, 0],
     },
     colorSchemeManager: {
       objectTypeFlags: {
@@ -551,6 +551,7 @@ export const keepTrackApiStubs = {
       getDayOfYear: () => 0,
       updatePropTime: jest.fn(),
       jday: () => 0,
+      simulationTimeObj: fakeTimeObj,
       dateFromDay: () => fakeTimeObj,
       setNow: jest.fn(),
       changePropRate: jest.fn(),

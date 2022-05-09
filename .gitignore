@@ -101,3 +101,6 @@ key.pem
 .dccache
 .dcignore
 .cache/server.pem
+
+# TLE History
+src/analysis/sathist/*.json

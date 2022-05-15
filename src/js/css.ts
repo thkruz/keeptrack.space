@@ -3,9 +3,6 @@
 export const importCss = async (): Promise<void> => {
   try {
     if (!settingsManager.disableUI) {
-      import('../css/fonts.css').catch(() => {
-        // This is intentional
-      });
       import('../css/materialize.css').catch(() => {
         // This is intentional
       });

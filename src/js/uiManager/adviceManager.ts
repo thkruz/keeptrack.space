@@ -15,7 +15,6 @@ for derivative works, or offered for sale, or used to construct any kind of data
 or mirrored at any other location without the express written permission of the author.
 
 ///////////////////////////////////////////////////////////////////////////// */
-import $ from 'jquery';
 // eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
 import { keepTrackApi } from '../api/keepTrackApi';
@@ -75,7 +74,7 @@ export const welcome = (): void => {
   adviceManager.showAdvice(
     'Welcome',
     'Welcome to KeepTrack.Space! This is the advice system. It will offer ideas on how to use the features on this site. You can enable/disable it at anytime in the top right.',
-    $('#tutorial-icon'),
+    <HTMLDivElement>(<unknown>document.getElementById('tutorial-icon')),
     'top-left'
   );
 };
@@ -84,28 +83,48 @@ export const findIss = (): void => {
   if (adviceCount.findIss >= 3) return;
   adviceCount.findIss += 1;
 
-  adviceManager.showAdvice('Space Station', 'Did you know the international space station is object 25544?', $('#search-holder'), 'top-right');
+  adviceManager.showAdvice(
+    'Space Station',
+    'Did you know the international space station is object 25544?',
+    <HTMLDivElement>(<unknown>document.getElementById('search-holder')),
+    'top-right'
+  );
 };
 export const showSensors = (): void => {
   // Only Do this Twice Times
   if (adviceCount.showSensors >= 3) return;
   adviceCount.showSensors += 1;
 
-  adviceManager.showAdvice('Sensor List', 'Have you tried looking at some of the ground-based sensors?', $('#menu-sensor-list'), 'bottom-left');
+  adviceManager.showAdvice(
+    'Sensor List',
+    'Have you tried looking at some of the ground-based sensors?',
+    <HTMLDivElement>(<unknown>document.getElementById('menu-sensor-list')),
+    'bottom-left'
+  );
 };
 export const useLegend = (): void => {
   // Only Do this Twice
   if (adviceCount.useLegend >= 3) return;
   adviceCount.useLegend += 1;
 
-  adviceManager.showAdvice('Filters', "Sometimes it is helpful to filter out satellites you don't want to see right now!", $('#legend-menu'), 'top-right');
+  adviceManager.showAdvice(
+    'Filters',
+    "Sometimes it is helpful to filter out satellites you don't want to see right now!",
+    <HTMLDivElement>(<unknown>document.getElementById('legend-menu')),
+    'top-right'
+  );
 };
 export const togleNight = (): void => {
   // Only Do this Twice
   if (adviceCount.toggleNight >= 3) return;
   adviceCount.toggleNight += 1;
 
-  adviceManager.showAdvice('Day/Night Toggle', 'Having trouble seeing parts of the earth? You can toggle on/off the night effect.', $('#menu-day-night'), 'bottom');
+  adviceManager.showAdvice(
+    'Day/Night Toggle',
+    'Having trouble seeing parts of the earth? You can toggle on/off the night effect.',
+    <HTMLDivElement>(<unknown>document.getElementById('menu-day-night')),
+    'bottom'
+  );
 };
 export const missileMenu = (): void => {
   // Only Do this Twice
@@ -115,7 +134,7 @@ export const missileMenu = (): void => {
   adviceManager.showAdvice(
     'Missile Scenarios',
     'Curious how intercontinental ballistic missiles work? Try launching a few from the missile menu.',
-    $('#menu-missile'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-missile')),
     'bottom-right'
   );
 };
@@ -153,7 +172,7 @@ export const colorScheme = (): void => {
   adviceManager.showAdvice(
     'Color Schemes',
     'Sometimes it is easier to visualize data by changing the color scheme. You can select from a collection of premade color schemes!',
-    $('#menu-color-scheme'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-color-scheme')),
     'bottom'
   );
 };
@@ -165,7 +184,7 @@ export const countries = (): void => {
   adviceManager.showAdvice(
     'Countries Menu',
     'Did you know that most orbital objects were launched by three countries! Check out the countries menu to view all the satellites launched by a coutnry.',
-    $('#menu-countries'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-countries')),
     'bottom'
   );
 };
@@ -201,7 +220,7 @@ export const customSensors = (): void => {
   adviceManager.showAdvice(
     'Custom Sensor',
     'Trying to visualize a new sensor or what a current sensor would look like with a different configuration? Try making your own using the custom sensor menu!',
-    $('#menu-customSensor'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-customSensor')),
     'bottom-left'
   );
 };
@@ -213,7 +232,7 @@ export const planetariumDisabled = (): void => {
   adviceManager.showAdvice(
     'Planetarium View',
     'Using Planetarium View requres a sensor to be selected first. Try selecting a sensor using the Sensor List to find one!',
-    $('#menu-sensor-list'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-sensor-list')),
     'bottom-right'
   );
 };
@@ -273,7 +292,7 @@ export const survFenceDisabled = (): void => {
   adviceManager.showAdvice(
     'Show/Hide Surveillance Fence',
     'Displaying the Surveillance Fence requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
-    $('#menu-sensor-list'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-sensor-list')),
     'bottom-left'
   );
 };
@@ -285,7 +304,7 @@ export const bubbleDisabled = (): void => {
   adviceManager.showAdvice(
     'Show/Hide Field Of View Bubble',
     'Displaying the FOV Bubble requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
-    $('#menu-sensor-list'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-sensor-list')),
     'bottom-left'
   );
 };
@@ -297,7 +316,7 @@ export const sensorInfoDisabled = (): void => {
   adviceManager.showAdvice(
     'Sensor Information',
     'Displaying Sensor Information requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
-    $('#menu-sensor-list'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-sensor-list')),
     'bottom-left'
   );
 };
@@ -357,7 +376,7 @@ export const on = () => {
     // Do Nothing
   }
   isAdviceEnabled = true;
-  tutIconDOM.addClass('bmenu-item-selected');
+  tutIconDOM.classList.add('bmenu-item-selected');
 };
 export const off = () => {
   try {
@@ -367,7 +386,7 @@ export const off = () => {
   }
   isAdviceEnabled = false;
   helpDOM.hide();
-  tutIconDOM.removeClass('bmenu-item-selected');
+  tutIconDOM.classList.remove('bmenu-item-selected');
 };
 export const showAdvice = (header: string, text: string, focusDOM: HTMLDivElement, setLocation: string) => {
   if (!isAdviceEnabled) return;
@@ -440,25 +459,25 @@ export const showAdvice = (header: string, text: string, focusDOM: HTMLDivElemen
   helpTextDOM.text(text);
   if (typeof focusDOM != 'undefined' && focusDOM != null) {
     focusDOM.effect('shake', { distance: 10 });
-    focusDOM.addClass('bmenu-item-help');
-    helpHeaderDOM.addClass('help-header-sel');
+    focusDOM.classList.add('bmenu-item-help');
+    helpHeaderDOM.classList.add('help-header-sel');
 
-    helpHeaderDOM.on('click', function () {
+    helpHeaderDOM.addEventListener('click', function () {
       focusDOM.effect('shake', { distance: 10 });
-      focusDOM.addClass('bmenu-item-help');
+      focusDOM.classList.add('bmenu-item-help');
     });
     focusDOM.on('mouseover', function () {
-      focusDOM.removeClass('bmenu-item-help');
+      focusDOM.classList.remove('bmenu-item-help');
     });
 
-    focusDOM.on('click', function () {
-      focusDOM.removeClass('bmenu-item-help');
+    focusDOM.addEventListener('click', function () {
+      focusDOM.classList.remove('bmenu-item-help');
       helpDOM.hide();
     });
 
-    helpCloseDOM.on('click', function () {
-      helpHeaderDOM.removeClass('help-header-sel');
-      focusDOM.removeClass('bmenu-item-help');
+    helpCloseDOM.addEventListener('click', function () {
+      helpHeaderDOM.classList.remove('help-header-sel');
+      focusDOM.classList.remove('bmenu-item-help');
       helpHeaderDOM.off();
       if (!focusDOM.is(tutIconDOM)) {
         focusDOM.off();
@@ -466,16 +485,16 @@ export const showAdvice = (header: string, text: string, focusDOM: HTMLDivElemen
       helpDOM.hide();
     });
   } else {
-    helpCloseDOM.on('click', function () {
+    helpCloseDOM.addEventListener('click', function () {
       helpDOM.hide();
     });
   }
 };
 export const clearAdvice = function (): void {
-  helpHeaderDOM.removeClass('help-header-sel');
+  helpHeaderDOM.classList.remove('help-header-sel');
   helpHeaderDOM.off();
   if (typeof curFocusDOM != 'undefined' && curFocusDOM != null) {
-    curFocusDOM.removeClass('bmenu-item-help');
+    curFocusDOM.classList.remove('bmenu-item-help');
     if (!curFocusDOM.is(tutIconDOM)) {
       curFocusDOM.off();
     }
@@ -487,13 +506,13 @@ export const init = () => {
     containment: 'window',
     scroll: false,
   });
-  helpCloseDOM = $('#help-close');
-  helpHeaderDOM = $('#help-header');
-  helpTextDOM = $('#help-text');
-  tutIconDOM = $('#tutorial-icon');
+  helpCloseDOM = <HTMLDivElement>(<unknown>document.getElementById('help-close'));
+  helpHeaderDOM = <HTMLDivElement>(<unknown>document.getElementById('help-header'));
+  helpTextDOM = <HTMLDivElement>(<unknown>document.getElementById('help-text'));
+  tutIconDOM = <HTMLDivElement>(<unknown>document.getElementById('tutorial-icon'));
 
   // Used on a timer to hint at other ideas
-  tutIconDOM.on('click', function () {
+  tutIconDOM.addEventListener('click', function () {
     if (isAdviceEnabled) {
       adviceManager.off();
     } else {
@@ -579,7 +598,7 @@ const showEditSatAdvice = () => {
   adviceManager.showAdvice(
     'Edit Satellite',
     'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?',
-    $('#menu-editSat'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-editSat')),
     'bottom-right'
   );
 };
@@ -590,7 +609,7 @@ const showBreakupAdvice = () => {
   adviceManager.showAdvice(
     'Create a Breakup',
     'Curious what this satellite would look like in a 100 pieces? Create a breakup using the breakup menu below! This is also helpful for understanding what a large cubesat launch looks like over time.',
-    $('#menu-breakup'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-breakup')),
     'right'
   );
 };
@@ -604,7 +623,7 @@ const showLaunchNominalAdvice = () => {
       'object with a similar orbit, use the launch nominal creator menu to position the ' +
       'satellite over the launch site at a time of 0000z. Now you can see details using ' +
       'relative time.',
-    $('#menu-newLaunch'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-newLaunch')),
     'top-right'
   );
 };
@@ -615,7 +634,7 @@ const showSatelliteCameraAdvice = () => {
   adviceManager.showAdvice(
     'Satellite Camera View',
     'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
-    $('#menu-satview'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-satview')),
     'bottom'
   );
 };
@@ -625,7 +644,7 @@ const showSurvFenceAdvice = () => {
   adviceManager.showAdvice(
     'Surveillance Fence',
     "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
-    $('#menu-surveillance'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-surveillance')),
     'bottom-left'
   );
 };
@@ -635,7 +654,7 @@ const shoFieldOfViewAdvice = () => {
   adviceManager.showAdvice(
     'Field Of View Bubbles',
     'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
-    $('#menu-fov-bubble'),
+    <HTMLDivElement>(<unknown>document.getElementById('menu-fov-bubble')),
     'bottom-left'
   );
 };

@@ -1,6 +1,7 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let isNewLaunchMenuOpen = false;
@@ -8,12 +9,12 @@ let isNewLaunchMenuOpen = false;
 export const newLaunchSubmit = () => {
   const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
 
-  const scc = $('#nl-scc').val();
-  const satId = satSet.getIdFromObjNum(scc);
+  const scc = (<HTMLInputElement>document.getElementById('nl-scc')).value;
+  const satId = satSet.getIdFromObjNum(parseInt(scc));
   let sat = satSet.getSat(satId);
 
-  const upOrDown = $('#nl-updown').val();
-  const launchFac = $('#nl-facility').val();
+  const upOrDown = (<HTMLInputElement>document.getElementById('nl-updown')).value;
+  const launchFac = (<HTMLInputElement>document.getElementById('nl-facility')).value;
   let launchLat, launchLon;
 
   if (objectManager.isLaunchSiteManagerLoaded) {
@@ -185,13 +186,13 @@ export const bottomMenuClick = (iconName: string): void => {
       if (keepTrackApi.programs.objectManager.selectedSat !== -1) {
         if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
         keepTrackApi.programs.uiManager.hideSideMenus();
-        $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-        $('#menu-newLaunch').addClass('bmenu-item-selected');
+        slideInRight(document.getElementById('newLaunch-menu'), 1000);
+        document.getElementById('menu-newLaunch').classList.add('bmenu-item-selected');
         isNewLaunchMenuOpen = true;
 
         const sat = keepTrackApi.programs.satSet.getSatExtraOnly(keepTrackApi.programs.objectManager.selectedSat);
-        $('#nl-scc').val(sat.sccNum);
-        $('#nl-inc').val((sat.inclination * RAD2DEG).toPrecision(2));
+        (<HTMLInputElement>document.getElementById('nl-scc')).value = sat.sccNum;
+        (<HTMLInputElement>document.getElementById('nl-inc')).value = (sat.inclination * RAD2DEG).toPrecision(2);
       } else {
         aM.adviceList?.newLaunchDisabled();
         keepTrackApi.programs.uiManager.toast(`Select a Satellite First!`, 'caution');
@@ -235,8 +236,8 @@ export const init = (): void => {
 };
 
 export const hideSideMenus = (): void => {
-  $('#newLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-newLaunch').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('newLaunch-menu'), 1000);
+  document.getElementById('menu-newLaunch').classList.remove('bmenu-item-selected');
   isNewLaunchMenuOpen = false;
 };
 

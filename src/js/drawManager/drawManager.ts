@@ -31,7 +31,7 @@ export const init = () => {
 };
 export const glInit = async () => {
   // Ensure the canvas is available
-  if (drawManager.canvas === null) {
+  if (drawManager.canvas === null) {    
     throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
   }
 

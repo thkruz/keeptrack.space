@@ -27,7 +27,7 @@ export const getLastResultGroup = () => lastResultGroup;
 export const getHoverSat = () => hoverSatId;
 export const isHovering = (val?: boolean): boolean => (hovering = typeof val !== 'undefined' ? val : hovering);
 export const setHoverSat = (satId: number): number => (hoverSatId = satId);
-export const getCurrentSearch = () => (resultsOpen ? $('#search').val() : '');
+export const getCurrentSearch = () => (resultsOpen ? (<HTMLInputElement>document.getElementById('search')).value : '');
 
 export const hideResults = () => {
   try {
@@ -60,12 +60,12 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];
     dotsManager.updateSizeBuffer(satSet.satData.length);
-    $('#search').val('');
+    (<HTMLInputElement>document.getElementById('search')).value = '';
     searchBox.hideResults();
     return [];
   }
 
-  $('#search').val(searchString);
+  (<HTMLInputElement>document.getElementById('search')).value = searchString;
 
   // Don't search for things until at least the minimum characters
   // are typed otherwise there are just too many search results.

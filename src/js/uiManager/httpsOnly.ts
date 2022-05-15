@@ -41,9 +41,15 @@ export const updateUi = (): void => {
   if (typeof settingsManager.geolocation.lon !== 'number') throw new Error('geolocation.lon is not valid');
   if (typeof settingsManager.geolocation.alt !== 'number') throw new Error('geolocation.alt is not valid');
 
-  $('#cs-lat').val(settingsManager.geolocation.lat).trigger('change');
-  $('#cs-lon').val(settingsManager.geolocation.lon).trigger('change');
-  $('#cs-hei').val(settingsManager.geolocation.alt).trigger('change');
+  const csLat = <HTMLInputElement>document.getElementById('cs-lat');
+  const csLon = <HTMLInputElement>document.getElementById('cs-lon');
+  const csHei = <HTMLInputElement>document.getElementById('cs-hei');
+  csLat.value = settingsManager.geolocation.lat;
+  csLat.dispatchEvent(new Event('change'));
+  csLon.value = settingsManager.geolocation.lon;
+  csLon.dispatchEvent(new Event('change'));
+  csHei.value = settingsManager.geolocation.alt;
+  csHei.dispatchEvent(new Event('change'));
 
   $('#cs-telescope').attr('checked', 'checked');
   $('#cs-minaz').attr('disabled', true.toString());
@@ -52,18 +58,18 @@ export const updateUi = (): void => {
   $('#cs-maxel').attr('disabled', true.toString());
   $('#cs-minrange').attr('disabled', true.toString());
   $('#cs-maxrange').attr('disabled', true.toString());
-  $('#cs-minaz-div').hide();
-  $('#cs-maxaz-div').hide();
-  $('#cs-minel-div').hide();
-  $('#cs-maxel-div').hide();
-  $('#cs-minrange-div').hide();
-  $('#cs-maxrange-div').hide();
-  $('#cs-minaz').val(0);
-  $('#cs-maxaz').val(360);
-  $('#cs-minel').val(10);
-  $('#cs-maxel').val(90);
-  $('#cs-minrange').val(100);
-  $('#cs-maxrange').val(50000);
+  document.getElementById('cs-minaz-div').style.display = 'none';
+  document.getElementById('cs-maxaz-div').style.display = 'none';
+  document.getElementById('cs-minel-div').style.display = 'none';
+  document.getElementById('cs-maxel-div').style.display = 'none';
+  document.getElementById('cs-minrange-div').style.display = 'none';
+  document.getElementById('cs-maxrange-div').style.display = 'none';
+  (<HTMLInputElement>document.getElementById('cs-minaz')).value = '0';
+  (<HTMLInputElement>document.getElementById('cs-maxaz')).value = '360';
+  (<HTMLInputElement>document.getElementById('cs-minel')).value = '10';
+  (<HTMLInputElement>document.getElementById('cs-maxel')).value = '90';
+  (<HTMLInputElement>document.getElementById('cs-minrange')).value = '100';
+  (<HTMLInputElement>document.getElementById('cs-maxrange')).value = '50000';
 
   $('#sensor-type').html('Telescope');
   $('#sensor-info-title').html('Custom Sensor');

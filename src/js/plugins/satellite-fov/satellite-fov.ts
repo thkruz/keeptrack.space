@@ -59,7 +59,7 @@ export const bottomMenuClick = (iconName: string): void => {
   // NOSONAR
   const { satSet, objectManager, uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-sat-fov') {
-    if (objectManager.selectedSat === -1 && $('#search').val() === '') {
+    if (objectManager.selectedSat === -1 && (<HTMLInputElement>document.getElementById('search')).value === '') {
       // No Sat Selected and No Search Present
       if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satFovDisabled();
       uiManager.toast(`Select a Satellite First!`, 'caution');
@@ -72,27 +72,27 @@ export const bottomMenuClick = (iconName: string): void => {
     }
     if (settingsManager.isSatOverflyModeOn) {
       settingsManager.isSatOverflyModeOn = false;
-      $('#menu-sat-fov').removeClass('bmenu-item-selected');
+      document.getElementById('menu-sat-fov').classList.remove('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         typ: 'isShowSatOverfly',
         isShowSatOverfly: 'reset',
       });
       return;
     } else {
-      $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-      $('#menu-surveillance').removeClass('bmenu-item-selected');
+      document.getElementById('menu-fov-bubble').classList.remove('bmenu-item-selected');
+      document.getElementById('menu-surveillance').classList.remove('bmenu-item-selected');
       settingsManager.isShowSurvFence = false;
       settingsManager.isFOVBubbleModeOn = false;
 
       settingsManager.isSatOverflyModeOn = true;
 
-      if ($('#search').val() !== '') {
+      if ((<HTMLInputElement>document.getElementById('search')).value !== '') {
         // If Group Selected
-        uiManager.doSearch($('#search').val());
+        uiManager.doSearch((<HTMLInputElement>document.getElementById('search')).value);
       }
 
-      const satFieldOfView = parseFloat(<string>$('#satFieldOfView').val());
-      $('#menu-sat-fov').addClass('bmenu-item-selected');
+      const satFieldOfView = parseFloat(<string>(<HTMLInputElement>document.getElementById('satFieldOfView')).value);
+      document.getElementById('menu-sat-fov').classList.add('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowFOVBubble: 'reset',
         isShowSurvFence: 'disable',

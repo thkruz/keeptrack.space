@@ -56,20 +56,20 @@ export const bottomMenuClick = (iconName: string): void => {
         // console.debug(error);
       }
       isLaunchMenuOpen = true;
-      $('#menu-launches').addClass('bmenu-item-selected');
+      document.getElementById('menu-launches').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 
 export const hideSideMenus = (): void => {
-  $('#menu-launches').removeClass('bmenu-item-selected');
+  document.getElementById('menu-launches').classList.remove('bmenu-item-selected');
 };
 
 export const cboxClosed = (): void => {
   if (isLaunchMenuOpen) {
     isLaunchMenuOpen = false;
-    $('#menu-launches').removeClass('bmenu-item-selected');
+    document.getElementById('menu-launches').classList.remove('bmenu-item-selected');
   }
 };
 export const uiManagerInit = (): any => {

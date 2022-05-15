@@ -48,14 +48,17 @@ describe('satInfoboxCore.launchData', () => {
 
 // @ponicode
 describe('satInfoboxCore.orbitalData', () => {
+  beforeEach(() => {
+    window.document.body.innerHTML = `
+    <div id="ui-wrapper"></div>
+    <div id="sat-infobox"></div>`;
+  });
   test('0', () => {
-    window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     let result: any = satInfoboxCore.orbitalData(defaultSat);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
     let sat = defaultSat;
     sat.TLE1 = 'fakeData';
@@ -64,7 +67,6 @@ describe('satInfoboxCore.orbitalData', () => {
   });
 
   test('2', () => {
-    window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
     keepTrackApi.programs.sensorManager.currentSensor[0] = {
       ...defaultSensor,
@@ -78,7 +80,6 @@ describe('satInfoboxCore.orbitalData', () => {
   });
 
   test('3', () => {
-    window.document.body.innerHTML = '<div id="sat-infobox"></div>';
     keepTrackApi.programs.objectManager.isSensorManagerLoaded = true;
     keepTrackApi.programs.sensorManager.currentSensor[0] = {
       ...defaultSensor,

@@ -1,11 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import flagPng from '@app/img/icons/flag.png';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isCountriesMenuOpen = false;
 export const hideSideMenus = (): void => {
-  $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-countries').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('countries-menu'), 1000);
+  document.getElementById('menu-countries').classList.remove('bmenu-item-selected');
   isCountriesMenuOpen = false;
 };
 export const init = (): void => {
@@ -39,9 +40,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#countries-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('countries-menu'), 1000);
       isCountriesMenuOpen = true;
-      $('#menu-countries').addClass('bmenu-item-selected');
+      document.getElementById('menu-countries').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -83,9 +84,11 @@ export const uiManagerInit = () => {
       `);
 
   // NOTE: Must use function not arrow function to access 'this'
-  $('#country-menu>ul>li').on('click', function () {
-    countryMenuClick($(this).data('group'));
-  });
+  document.getElementById('country-menu').querySelectorAll('li').forEach((element) => {
+    element.addEventListener('click', function () {
+      countryMenuClick($(this).data('group'));
+    });
+  })
 
   $('#countries-menu').resizable({
     handles: 'e',

@@ -8,6 +8,7 @@ import { mat4 } from 'gl-matrix';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { Camera, SatObject, TimeManager } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
+import { loadStr } from '../uiManager/uiManager';
 import { aehfSccNums, dspSccNums, issSccNum } from './meshManager/modelConstants';
 
 const meshList = [
@@ -56,6 +57,8 @@ export const init: any = async () => {
 
     // Don't Continue until you have populated the mesh list
     meshManager.populateFileList();
+
+    loadStr('models');
 
     let p = OBJ.downloadModels(meshManager.fileList);
 

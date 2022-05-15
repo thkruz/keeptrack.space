@@ -1,5 +1,6 @@
 import iodPng from '@app/img/icons/iod.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { omManager } from '@app/js/plugins';
 import $ from 'jquery';
 
@@ -27,8 +28,8 @@ export const init = (): void => {
 };
 
 export const hideSideMenus = (): void => {
-  $('#obfit-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-obfit').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('obfit-menu'), 1000);
+  document.getElementById('menu-obfit').classList.remove('bmenu-item-selected');
   isObfitMenuOpen = false;
 };
 
@@ -212,9 +213,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#obfit-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('obfit-menu'), 1000);
       isObfitMenuOpen = true;
-      $('#menu-obfit').addClass('bmenu-item-selected');
+      document.getElementById('menu-obfit').classList.add('bmenu-item-selected');
       return;
     }
   }

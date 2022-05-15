@@ -6,7 +6,7 @@ import { SpaceObjectType } from '../api/SpaceObjectType';
 export const initMenuController = () => {
   const { objectManager, orbitManager, satSet, satellite, searchBox, uiManager } = keepTrackApi.programs;
 
-  $('#search-icon').on('click', () => {
+  document.getElementById('search-icon').addEventListener('click', () => {
     uiManager.searchToggle();
   });
 
@@ -22,35 +22,35 @@ export const initMenuController = () => {
     });
   });
 
-  $('#search-close').on('click', () => {
-    searchBox.hideResults();
-    $('#menu-space-stations').removeClass('bmenu-item-selected');
-  });
+  // document.getElementById('search-close').addEventListener('click', () => {
+  //   searchBox.hideResults();
+  //   document.getElementById('menu-space-stations').classList.remove('bmenu-item-selected');
+  // });
 
-  $('#legend-hover-menu').on('click', function (e: any) {
+  document.getElementById('legend-hover-menu').addEventListener('click', function (e: any) {
     if (e.target.classList[1]) {
       uiManager.legendHoverMenuClick(e.target.classList[1]);
     }
   });
 
-  $('#legend-menu').on('click', () => {
+  document.getElementById('legend-menu').addEventListener('click', () => {
     if (settingsManager.legendMenuOpen) {
-      $('#legend-hover-menu').hide();
-      $('#legend-icon').removeClass('bmenu-item-selected');
+      document.getElementById('legend-hover-menu').style.display = 'none';
+      document.getElementById('legend-icon').classList.remove('bmenu-item-selected');
       settingsManager.legendMenuOpen = false;
     } else {
-      $('#legend-hover-menu').show();
-      $('#legend-icon').addClass('bmenu-item-selected');
+      document.getElementById('legend-hover-menu').style.display = 'block';
+      document.getElementById('legend-icon').classList.add('bmenu-item-selected');
       searchBox.hideResults();
-      $('#search-results').hide();
+      document.getElementById('search-results').style.display = 'none';
       settingsManager.legendMenuOpen = true;
     }
   });
 
-  $('.menu-selectable').on('click', () => {
+  document.querySelector('.menu-selectable').addEventListener('click', () => {
     if (objectManager.selectedSat !== -1) {
-      $('#menu-lookangles').removeClass('bmenu-item-disabled');
-      $('#menu-satview').removeClass('bmenu-item-disabled');
+      document.getElementById('menu-lookangles').classList.remove('bmenu-item-disabled');
+      document.getElementById('menu-satview').classList.remove('bmenu-item-disabled');
     }
   });
 
@@ -58,16 +58,16 @@ export const initMenuController = () => {
   $(window).on('resize', () => {
     uiManager.mobileManager.checkMobileMode();
     if (!settingsManager.disableUI) {
-      const bodyDOM = $('#bodyDOM');
+      const bodyDOM = document.getElementById('bodyDOM');
       if (settingsManager.screenshotMode) {
-        bodyDOM.css('overflow', 'visible');
+        bodyDOM.style.overflow = 'visible';
         $('#canvas-holder').css('overflow', 'visible');
         $('#canvas-holder').width(3840);
         $('#canvas-holder').height(2160);
-        bodyDOM.width(3840);
-        bodyDOM.height(2160);
+        bodyDOM.style.width = '3840px';
+        bodyDOM.style.height = '2160px';
       } else {
-        bodyDOM.css('overflow', 'hidden');
+        bodyDOM.style.overflow = 'hidden';
         $('#canvas-holder').css('overflow', 'hidden');
       }
     }
@@ -88,7 +88,9 @@ export const initMenuController = () => {
     uiManager.isCurrentlyTyping = false;
   });
 
-  $('#search-results').on('click', '.search-result', function () {
+  document.getElementById('search-results').addEventListener('click', function (evt: Event) {
+    // must be '.search-result' class
+    if (!(<HTMLElement>evt.target).classList.contains('search-result')) return;
     var satId = $(this).data('obj-id');
     const sat = satSet.getSat(satId);
     if (sat.type === SpaceObjectType.STAR) {
@@ -109,32 +111,32 @@ export const initMenuController = () => {
   });
 
   $('#search').on('input', () => {
-    const searchStr = <string>$('#search').val();
+    const searchStr = <string>(<HTMLInputElement>document.getElementById('search')).value;
     uiManager.doSearch(searchStr);
   });
 
   var isSocialOpen = false;
-  $('#share-icon').on('click', () => {
+  document.getElementById('share-icon').addEventListener('click', () => {
     if (!isSocialOpen) {
       isSocialOpen = true;
-      $('#github-share').removeClass('share-up');
-      $('#twitter-share').removeClass('share-up');
-      $('#github-share').addClass('github-share-down');
-      $('#twitter-share').addClass('twitter-share-down');
+      document.getElementById('github-share').classList.remove('share-up');
+      document.getElementById('twitter-share').classList.remove('share-up');
+      document.getElementById('github-share').classList.add('github-share-down');
+      document.getElementById('twitter-share').classList.add('twitter-share-down');
     } else {
       isSocialOpen = false;
-      $('#github-share').addClass('share-up');
-      $('#twitter-share').addClass('share-up');
-      $('#github-share').removeClass('github-share-down');
-      $('#twitter-share').removeClass('twitter-share-down');
+      document.getElementById('github-share').classList.add('share-up');
+      document.getElementById('twitter-share').classList.add('share-up');
+      document.getElementById('github-share').classList.remove('github-share-down');
+      document.getElementById('twitter-share').classList.remove('twitter-share-down');
     }
   });
 
-  $('#fullscreen-icon').on('click', () => {
+  document.getElementById('fullscreen-icon').addEventListener('click', () => {
     uiManager.mobileManager.fullscreenToggle();
   });
 
-  $('#nav-footer-toggle').on('click', () => {
+  document.getElementById('nav-footer-toggle').addEventListener('click', () => {
     uiManager.footerToggle();
     if (parseInt(window.getComputedStyle(document.getElementById('nav-footer')).bottom.replace('px', '')) < 0) {
       setTimeout(() => {
@@ -211,11 +213,11 @@ export const initMenuController = () => {
     minWidth: 280,
   });
 
-  $('#export-lookangles').on('click', () => {
+  document.getElementById('export-lookangles').addEventListener('click', () => {
     saveCsv(satellite.lastlooksArray, 'lookAngles');
   });
 
-  $('#export-multiSiteArray').on('click', () => {
+  document.getElementById('export-multiSiteArray').addEventListener('click', () => {
     saveCsv(satellite.lastMultiSiteArray, 'multiSiteLooks');
   });
 };

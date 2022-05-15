@@ -14,6 +14,8 @@ let updateHoverDelayLimit = 3;
 let updateHoverSatId: number;
 
 export const init = () => {
+  // NOTE: Reusing these cached value causes the hover menu to get stuck on or off
+  // when the user clicks on a satellite. You need to getElementById every time.
   satHoverBoxNode1 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox1'));
   satHoverBoxNode2 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox2'));
   satHoverBoxNode3 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox3'));
@@ -21,7 +23,8 @@ export const init = () => {
 };
 export const hoverOverNothing = () => {
   const { drawManager } = keepTrackApi.programs;
-  if (!drawManager.isHoverBoxVisible || !settingsManager.enableHoverOverlay) return false;
+  satHoverBoxDOM = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox'));
+  if (satHoverBoxDOM.style.display === 'none' || !settingsManager.enableHoverOverlay) return false;
   const { objectManager, starManager } = keepTrackApi.programs;
   if (objectManager.isStarManagerLoaded) {
     if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
@@ -36,13 +39,11 @@ export const hoverOverSomething = (satId: number, satX: number, satY: number) =>
   const { drawManager, mainCamera, satSet } = keepTrackApi.programs;
   if (!mainCamera.isDragging && settingsManager.enableHoverOverlay) {
     // NOTE: The radar mesurement logic breaks if you call it a SatObject
-    const sat = <any>satSet.getSat(satId);
-    drawManager.isHoverBoxVisible = true;
 
-    const parentNode = satHoverBoxDOM.parentNode;
-    if (parentNode == null) return;
-    const nextSibling = satHoverBoxDOM.nextSibling;
-    parentNode.removeChild(satHoverBoxDOM); // reflow
+    const sat = <any>satSet.getSat(satId);
+    drawManager.isHoverBoxVisible = true;    
+
+    init();
 
     if (sat.static || sat.isRadarData) {
       staticObj(sat);
@@ -54,13 +55,14 @@ export const hoverOverSomething = (satId: number, satX: number, satY: number) =>
       staticObj(sat);
     }
 
-    satHoverBoxDOM.style.display = 'block';
-    satHoverBoxDOM.style.textAlign = 'center';
-    satHoverBoxDOM.style.position = 'fixed';
-    satHoverBoxDOM.style.left = `${satX + 20}px`;
-    satHoverBoxDOM.style.top = `${satY - 10}px`;
+    const style = {
+      display: 'block',
+      left: `${satX + 20}px`,
+      top: `${satY - 10}px`,
+    };
+    Object.assign(satHoverBoxDOM.style, style);
+
     drawManager.canvas.style.cursor = 'pointer';
-    parentNode.insertBefore(satHoverBoxDOM, nextSibling); // reflow
   }
 };
 export const staticObj = (sat: any) => {

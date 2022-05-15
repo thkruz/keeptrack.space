@@ -1,5 +1,6 @@
 import gpsPng from '@app/img/icons/gps.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let isDOPMenuOpen = false;
@@ -96,15 +97,15 @@ export const adviceReady = () => {
 };
 
 export const loadingScreenFadeIn = (): void => {
-  const lat = parseFloat(<string>$('#dops-lat').val());
-  const lon = parseFloat(<string>$('#dops-lon').val());
-  const alt = parseFloat(<string>$('#dops-alt').val());
-  const el = parseFloat(<string>$('#dops-el').val());
+  const lat = parseFloat(<string>(<HTMLInputElement>document.getElementById('dops-lat')).value);
+  const lon = parseFloat(<string>(<HTMLInputElement>document.getElementById('dops-lon')).value);
+  const alt = parseFloat(<string>(<HTMLInputElement>document.getElementById('dops-alt')).value);
+  const el = parseFloat(<string>(<HTMLInputElement>document.getElementById('dops-el')).value);
   settingsManager.gpsElevationMask = el;
   keepTrackApi.programs.satellite.updateDopsTable(lat, lon, alt);
-  $('#menu-dops').addClass('bmenu-item-selected');
+  document.getElementById('menu-dops').classList.add('bmenu-item-selected');
   $('#loading-screen').fadeOut('slow');
-  $('#dops-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+  slideInRight(document.getElementById('dops-menu'), 1000);
 };
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-dops') {
@@ -121,8 +122,8 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 export const hideSideMenus = (): void => {
-  $('#dops-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-dops').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('dops-menu'), 1000);
+  document.getElementById('menu-dops').classList.remove('bmenu-item-selected');
   isDOPMenuOpen = false;
 };
 export const init = (): void => {

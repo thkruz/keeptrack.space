@@ -2,6 +2,7 @@ import { keepTrackApiStubs } from './api/apiMocks';
 import { keepTrackApi } from './api/keepTrackApi';
 import { KeepTrackPrograms } from './api/keepTrackTypes';
 import { importCss } from './css';
+import * as initalizeKeepTrack from './initalizeKeepTrack';
 import * as main from './main';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
@@ -25,11 +26,11 @@ describe('main.showErrorCode', () => {
 // @ponicode
 describe('main.initalizeKeepTrack', () => {
   it('should be a function', () => {
-    expect(main.initalizeKeepTrack).toBeInstanceOf(Function);
+    expect(initalizeKeepTrack.initalizeKeepTrack).toBeInstanceOf(Function);
   });
 
   it('should return a promise', () => {
-    expect(main.initalizeKeepTrack()).toBeInstanceOf(Promise);
+    expect(initalizeKeepTrack.initalizeKeepTrack()).toBeInstanceOf(Promise);
   });
 
   it('should not throw any errors', async () => {
@@ -37,7 +38,7 @@ describe('main.initalizeKeepTrack', () => {
     keepTrackApi.methods.loadCatalog = jest.fn();
     // Replace satSet.satData with a mock
     const spy = jest.spyOn(main, 'showErrorCode');
-    const result = await main.initalizeKeepTrack();
+    const result = await initalizeKeepTrack.initalizeKeepTrack();
     expect(() => result).not.toThrow();
     expect(spy).not.toBeCalled();
   });

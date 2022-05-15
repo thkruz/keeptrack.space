@@ -99,5 +99,54 @@ export const truncateString = (str: string, num: number): string => {
   return str.slice(0, num) + '...';
 };
 
+export const slideOutLeft = (el: HTMLElement, duration: number, callback?: () => void): void => {
+  if (el.style.display === 'none') return;
+  el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+  el.style.transform = `translateX(-100%)`;
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
+export const slideInRight = (el: HTMLElement, duration: number, callback?: () => void): void => {
+  // Start off the screen
+  el.style.display = 'block';
+  el.style.transform = `translateX(-100%)`;
+  el.style.transition = `all 0s ease-in-out`;
+  setTimeout(() => {
+    el.style.display = 'block';
+    el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+    el.style.transform = 'translateX(0)';
+  }, 50);
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
+export const slideOutUp = (el: HTMLElement, duration: number, callback?: () => void): void => {
+  if (el.style.display === 'none') return;
+  el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+  el.style.transform = 'translateY(-100%)';
+  setTimeout(() => {
+    el.style.display = 'none';
+    el.style.transition = '';
+    el.style.transform = '';
+    if (callback) callback();
+  }, duration);
+};
+
+export const slideInDown = (el: HTMLElement, duration: number, callback?: () => void): void => {
+  if (el.style.display === 'block') return;
+  el.style.display = 'block';
+  el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+  el.style.transform = 'translateY(100%)';
+  setTimeout(() => {
+    el.style.display = 'block';
+    el.style.transition = '';
+    el.style.transform = '';
+    if (callback) callback();
+  }, duration);
+};
+
 (<any>window).getUnique = getUnique;
 (<any>window).saveCsv = saveCsv;

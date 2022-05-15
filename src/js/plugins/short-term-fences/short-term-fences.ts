@@ -1,6 +1,7 @@
 import searchPng from '@app/img/icons/search.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { slideOutLeft } from '@app/js/lib/helpers';
 import { addCustomSensor, clearCustomSensors, removeLastSensor } from '@app/js/plugins';
 import $ from 'jquery';
 
@@ -112,9 +113,9 @@ export const uiManagerInit = (): void => {
     },
   });
 
-  $('#stfForm').on('submit', stfFormOnSubmit);
-  $('#stf-remove-last').on('click', stfRemoveLast);
-  $('#stf-clear-all').on('click', stfClearAll);
+  document.getElementById('stfForm').addEventListener('submit', stfFormOnSubmit);
+  document.getElementById('stf-remove-last').addEventListener('click', stfRemoveLast);
+  document.getElementById('stf-clear-all').addEventListener('click', stfClearAll);
 };
 
 export const bottomMenuClick = (iconName: string) => {
@@ -139,19 +140,19 @@ export const bottomMenuClick = (iconName: string) => {
       uiManager.hideSideMenus();
       (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
       isStfMenuOpen = true;
-      $('#menu-stf').addClass('bmenu-item-selected');
+      document.getElementById('menu-stf').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 
 export const resetSensor = () => {
-  $('#menu-stf').addClass('bmenu-item-disabled');
+  document.getElementById('menu-stf').classList.add('bmenu-item-disabled');
 };
 
 export const hideSideMenus = () => {
-  $('#stf-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-stf').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('stf-menu'), 1000);
+  document.getElementById('menu-stf').classList.remove('bmenu-item-selected');
   isStfMenuOpen = false;
 };
 
@@ -160,15 +161,15 @@ export const selectSatData = (isShowStfLink: boolean) => {
     $('#sat-info-top-links').append(keepTrackApi.html`
         <div id="stf-on-object-link" class="link sat-infobox-links">Build Short Term Fence on this object...</div>
       `);
-    $('#stf-on-object-link').on('click', stfOnObjectLinkClick);
+    document.getElementById('stf-on-object-link').addEventListener('click', stfOnObjectLinkClick);
   }
 };
 
 export const setSensor = (sensor: any, id?: number) => {
   if (sensor == null && id == null) {
-    $('#menu-stf').addClass('bmenu-item-disabled');
+    document.getElementById('menu-stf').classList.add('bmenu-item-disabled');
   } else {
-    $('#menu-stf').removeClass('bmenu-item-disabled');
+    document.getElementById('menu-stf').classList.remove('bmenu-item-disabled');
   }
 };
 
@@ -185,12 +186,12 @@ export const stfFormOnSubmit = (e: Event) => {
   const sensorType = 'Short Range Fence';
 
   // Multiply everything by 1 to convert string to number
-  const az = parseFloat(<string>$('#stf-az').val());
-  const azExt = parseFloat(<string>$('#stf-azExt').val());
-  const el = parseFloat(<string>$('#stf-el').val());
-  const elExt = parseFloat(<string>$('#stf-elExt').val());
-  const rng = parseFloat(<string>$('#stf-rng').val());
-  const rngExt = parseFloat(<string>$('#stf-rngExt').val());
+  const az = parseFloat(<string>(<HTMLInputElement>document.getElementById('stf-az')).value);
+  const azExt = parseFloat(<string>(<HTMLInputElement>document.getElementById('stf-azExt')).value);
+  const el = parseFloat(<string>(<HTMLInputElement>document.getElementById('stf-el')).value);
+  const elExt = parseFloat(<string>(<HTMLInputElement>document.getElementById('stf-elExt')).value);
+  const rng = parseFloat(<string>(<HTMLInputElement>document.getElementById('stf-rng')).value);
+  const rngExt = parseFloat(<string>(<HTMLInputElement>document.getElementById('stf-rngExt')).value);
 
   const minaz = az - azExt < 0 ? az - azExt + 360 : az - azExt / 2;
   const maxaz = az + azExt > 360 ? az + azExt - 360 : az + azExt / 2;
@@ -248,11 +249,11 @@ export const stfOnObjectLinkClick = () => {
   // Update TEARR
   satellite.getTEARR(satSet.getSat(objectManager.selectedSat));
 
-  $('#stf-az').val(satellite.currentTEARR.az.toFixed(1));
-  $('#stf-el').val(satellite.currentTEARR.el.toFixed(1));
-  $('#stf-rng').val(satellite.currentTEARR.rng.toFixed(1));
+  (<HTMLInputElement>document.getElementById('stf-az')).value = satellite.currentTEARR.az.toFixed(1);
+  (<HTMLInputElement>document.getElementById('stf-el')).value = satellite.currentTEARR.el.toFixed(1);
+  (<HTMLInputElement>document.getElementById('stf-rng')).value = satellite.currentTEARR.rng.toFixed(1);
   uiManager.hideSideMenus();
   (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
   isStfMenuOpen = true;
-  $('#menu-stf').addClass('bmenu-item-selected');
+  document.getElementById('menu-stf').classList.add('bmenu-item-selected');
 };

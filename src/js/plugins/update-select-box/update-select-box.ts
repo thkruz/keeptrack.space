@@ -72,9 +72,9 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
     }
 
     if (objectManager.secondarySat !== -1 && document.getElementById('secondary-sat-info')?.style?.display === 'none') {
-      $('#secondary-sat-info').show();
+      document.getElementById('secondary-sat-info').style.display = 'block';
     } else if (objectManager.secondarySat === -1 && document.getElementById('secondary-sat-info')?.style?.display !== 'none') {
-      $('#secondary-sat-info').hide();
+      document.getElementById('secondary-sat-info').style.display = 'none';
     }
 
     if (objectManager.secondarySat !== -1) {

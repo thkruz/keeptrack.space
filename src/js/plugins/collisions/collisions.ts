@@ -1,7 +1,7 @@
 import socratesPng from '@app/img/icons/socrates.png';
 import $ from 'jquery';
 import { isThisJest, keepTrackApi } from '../../api/keepTrackApi';
-import { stringPad } from '../../lib/helpers';
+import { slideInRight, slideOutLeft, stringPad } from '../../lib/helpers';
 
 let isSocratesMenuOpen = false;
 let socratesOnSatCruncher: number | null = null;
@@ -21,7 +21,9 @@ export const uiManagerInit = () => {
         </div>
       `);
 
-  $('#socrates-menu').on('click', '.socrates-object', (evt: any) => {
+  document.getElementById('socrates-menu').addEventListener('click', (evt: any) => {
+    // must have '.socrates-object' class
+    if (!(<HTMLElement>evt.target).classList.contains('socrates-object')) return;
     // Might be better code for this.
     const hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
     if (hiddenRow !== null) {
@@ -75,17 +77,17 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
       keepTrackApi.programs.uiManager.hideSideMenus();
-      $('#socrates-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('socrates-menu'), 1000);
       isSocratesMenuOpen = true;
       socrates(-1);
-      $('#menu-satellite-collision').addClass('bmenu-item-selected');
+      document.getElementById('menu-satellite-collision').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 export const hideSideMenus = (): void => {
-  $('#socrates-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-satellite-collision').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('socrates-menu'), 1000);
+  document.getElementById('menu-satellite-collision').classList.remove('bmenu-item-selected');
   isSocratesMenuOpen = false;
 };
 export const onCruncherMessage = (): void => {

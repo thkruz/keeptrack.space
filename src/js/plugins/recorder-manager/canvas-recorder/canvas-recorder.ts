@@ -41,8 +41,8 @@ export class CanvasRecorder {
         } else {
           console.debug('No Recording Support');
           CanvasRecorder.isVideoRecording = false;
-          $('#menu-record').removeClass('bmenu-item-selected');
-          $('#menu-record').addClass('bmenu-item-disabled');
+          document.getElementById('menu-record').classList.remove('bmenu-item-selected');
+          document.getElementById('menu-record').classList.add('bmenu-item-disabled');
           M.toast({
             html: `Compatibility Error with Recording`,
           });
@@ -54,8 +54,8 @@ export class CanvasRecorder {
       } else {
         console.debug('No Recording Support in Http! Try Https!');
         CanvasRecorder.isVideoRecording = false;
-        $('#menu-record').removeClass('bmenu-item-selected');
-        $('#menu-record').addClass('bmenu-item-disabled');
+        document.getElementById('menu-record').classList.remove('bmenu-item-selected');
+        document.getElementById('menu-record').classList.add('bmenu-item-disabled');
         M.toast({
           html: `Recording Only Available with HTTPS`,
         });
@@ -74,7 +74,7 @@ export class CanvasRecorder {
         .then(function beginRecording(srcObject) {
           if (srcObject == false) return;
           CanvasRecorder.isVideoRecording = true;
-          $('#menu-record').addClass('bmenu-item-selected');
+          document.getElementById('menu-record').classList.add('bmenu-item-selected');
           let stream = srcObject;
           video.srcObject = <any>srcObject;
           let types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
@@ -101,7 +101,7 @@ export class CanvasRecorder {
             mediaRecorder = new window.MediaRecorder(stream, options);
           } catch (e) {
             CanvasRecorder.isVideoRecording = false;
-            $('#menu-record').removeClass('bmenu-item-selected');
+            document.getElementById('menu-record').classList.remove('bmenu-item-selected');
             console.warn('Exception while creating MediaRecorder:', e);
             return;
           }

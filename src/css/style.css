@@ -276,11 +276,12 @@ ul {
 }
 
 #sat-hoverbox {
-  display: none;
+  display: block;
   background: var(--colorTertiaryDarken2) !important;
   cursor: default;
   color: white;
   position: absolute;
+  text-align: center;
   padding: 10px;
   border-radius: 0px;
   border: 5px solid var(--colorTertiaryDarken3);
@@ -685,11 +686,13 @@ ul {
 
 .side-menu-parent {
   position: absolute !important;
-  width: 265px;
+  min-width: 265px;
   top: var(--top-menu-height);
   bottom: var(--bottom-menu-top);
   margin-top: -2px;
   left: 0px;
+  transition: all 1s ease-in-out;
+  transform: translateX(-100%);
 }
 
 input[type='checkbox'].css-checkbox {

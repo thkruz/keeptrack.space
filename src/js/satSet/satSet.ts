@@ -27,7 +27,6 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
-import $ from 'jquery';
 import numeric from 'numeric';
 import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
@@ -81,7 +80,7 @@ export const init = async (satCruncherOveride?: any): Promise<number> => { // NO
       }
     } else {
       if (typeof Worker === 'undefined') {
-        $('#loader-text').text(
+        document.getElementById('loader-text').innerText = (
           'Your browser does not support web workers.'
         );
         return 1;
@@ -93,13 +92,13 @@ export const init = async (satCruncherOveride?: any): Promise<number> => { // NO
       } catch (error) {
         // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
         if (window.location.href.indexOf('file://') === 0) {
-          $('#loader-text').text(
+          document.getElementById('loader-text').innerText = (
             'Critical Error: You need to allow access to files from your computer! ' + 
             'Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
           );
           return 1;
         } else {
-          $('#loader-text').text(
+          document.getElementById('loader-text').innerText = (
             error
           );
           return 1;
@@ -113,7 +112,7 @@ export const init = async (satCruncherOveride?: any): Promise<number> => { // NO
     // satSet.radarDataManager = radarDataManager;
     return 0;
   } catch (error) {
-    $('#loader-text').text(
+    document.getElementById('loader-text').innerText = (
       error
     );
     return 1;
@@ -230,19 +229,19 @@ export const selectSat = (i: number): void => {
   objectManager.setSelectedSat(i);
 
   if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
-    $('#menu-lookangles').removeClass('bmenu-item-disabled');
+    document.getElementById('menu-lookangles').classList.remove('bmenu-item-disabled');
   }
-  $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
-  $('#menu-satview').removeClass('bmenu-item-disabled');
-  $('#menu-map').removeClass('bmenu-item-disabled');
-  $('#menu-editSat').removeClass('bmenu-item-disabled');
-  $('#menu-sat-fov').removeClass('bmenu-item-disabled');
-  $('#menu-newLaunch').removeClass('bmenu-item-disabled');
-  $('#menu-breakup').removeClass('bmenu-item-disabled');
-  $('#menu-plot-analysis').removeClass('bmenu-item-disabled');
-  $('#menu-plot-analysis2').removeClass('bmenu-item-disabled');
+  document.getElementById('menu-lookanglesmultisite').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-satview').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-map').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-editSat').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-sat-fov').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-newLaunch').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-breakup').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-plot-analysis').classList.remove('bmenu-item-disabled');
+  document.getElementById('menu-plot-analysis2').classList.remove('bmenu-item-disabled');
   if (objectManager.secondarySat !== -1) {
-    $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+    document.getElementById('menu-plot-analysis3').classList.remove('bmenu-item-disabled');
   }
 };
 export const convertIdArrayToSatnumArray = (satIdArray: number[]) => satIdArray.map((id) => (satSet.getSat(id)?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');

@@ -160,11 +160,6 @@
     border-style: solid;
   }
 
-  #twitter-menu {
-    overflow: scroll;
-    background: #292f33;
-  }
-
   #membership-menu {
     width: 450px !important;
   }

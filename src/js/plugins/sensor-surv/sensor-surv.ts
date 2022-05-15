@@ -72,7 +72,7 @@ export const bottomMenuClick = (iconName: string): void => {
     }
     if ((<any>settingsManager).isShowSurvFence) {
       (<any>settingsManager).isShowSurvFence = false;
-      $('#menu-surveillance').removeClass('bmenu-item-selected');
+      document.getElementById('menu-surveillance').classList.remove('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowSurvFence: 'disable',
         isShowFOVBubble: 'reset',
@@ -81,11 +81,11 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       // Disable Satellite Overfly
       (<any>settingsManager).isSatOverflyModeOn = false;
-      $('#menu-sat-fov').removeClass('bmenu-item-selected');
+      document.getElementById('menu-sat-fov').classList.remove('bmenu-item-selected');
 
       (<any>settingsManager).isShowSurvFence = true;
-      $('#menu-surveillance').addClass('bmenu-item-selected');
-      $('#menu-fov-bubble').removeClass('bmenu-item-selected');
+      document.getElementById('menu-surveillance').classList.add('bmenu-item-selected');
+      document.getElementById('menu-fov-bubble').classList.remove('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowFOVBubble: 'enable',
         isShowSurvFence: 'enable',

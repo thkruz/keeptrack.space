@@ -1,5 +1,6 @@
 import photoManagerPng from '@app/img/icons/photoManager.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let isSatPhotoMenuOpen = false;
@@ -109,8 +110,8 @@ export const colorbox = (url: string): void => {
 };
 
 export const hideSideMenus = (): void => {
-  $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-sat-photo').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('sat-photo-menu'), 1000);
+  document.getElementById('menu-sat-photo').classList.remove('bmenu-item-selected');
   isSatPhotoMenuOpen = false;
 };
 export const bottomMenuClick = (iconName: string): void => {
@@ -121,9 +122,9 @@ export const bottomMenuClick = (iconName: string): void => {
       return;
     } else {
       keepTrackApi.programs.uiManager.hideSideMenus();
-      $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('sat-photo-menu'), 1000);
       isSatPhotoMenuOpen = true;
-      $('#menu-sat-photo').addClass('bmenu-item-selected');
+      document.getElementById('menu-sat-photo').classList.add('bmenu-item-selected');
       return;
     }
   }

@@ -50,7 +50,7 @@ export const uiManagerInit = () => {
         </ul>
       `);
 
-  $('#datetime-text').on('click', datetimeTextClick);
+  document.getElementById('datetime-text').addEventListener('click', datetimeTextClick);
 
   $('#datetime-input-form').on('change', function (e: Event) {
     datetimeInputFormChange();

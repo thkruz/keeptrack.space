@@ -44,8 +44,8 @@ let isInfoOverlayMenuOpen = false;
 export const hideSideMenus = (): void => {
   (<any>$('#watchlist-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
   (<any>$('#info-overlay-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-info-overlay').removeClass('bmenu-item-selected');
-  $('#menu-watchlist').removeClass('bmenu-item-selected');
+  document.getElementById('menu-info-overlay').classList.remove('bmenu-item-selected');
+  document.getElementById('menu-watchlist').classList.remove('bmenu-item-selected');
   isInfoOverlayMenuOpen = false;
   isWatchlistMenuOpen = false;
 };
@@ -248,34 +248,36 @@ export const uiManagerInit = (): void => {
     minWidth: 280,
   });
 
-  $('.menu-selectable').on('click', menuSelectableClick);
+  document.querySelector('.menu-selectable').addEventListener('click', menuSelectableClick);
 
-  $('#info-overlay-content').on('click', '.watchlist-object', function (evt: Event) {
+  document.getElementById('info-overlay-content').addEventListener('click', function (evt: Event) {
+    if (!(<HTMLElement>evt.target).classList.contains('watchlist-object')) return;
     infoOverlayContentClick(evt);
   });
 
-  $('#watchlist-list').on('click', '.watchlist-remove', function () {
-    const satId = $(this).data('sat-id');
+  document.getElementById('watchlist-list').addEventListener('click', function (evt: Event) {
+    const satId = parseInt((<HTMLElement>evt.target).dataset.satId);
     watchlistListClick(satId);
   });
 
   // Add button selected on watchlist menu
-  $('#watchlist-content').on('click', '.watchlist-add', watchlistContentEvent);
+  document.getElementById('watchlist-content').addEventListener('click', watchlistContentEvent);
 
   // Enter pressed/selected on watchlist menu
-  $('#watchlist-content').on('submit', function (evt: Event) {
+  document.getElementById('watchlist-content').addEventListener('submit', function (evt: Event) {
+    evt.preventDefault();
     watchlistContentEvent(evt);
   });
 
-  $('#watchlist-save').on('click', function (evt: Event) {
+  document.getElementById('watchlist-save').addEventListener('click', function (evt: Event) {
     watchlistSaveClick(evt);
   });
 
-  $('#watchlist-open').on('click', function () {
-    $('#watchlist-file').trigger('click');
+  document.getElementById('watchlist-open').addEventListener('click', function () {
+    document.getElementById('watchlist-file').click()
   });
 
-  $('#watchlist-file').on('change', function (evt: Event) {
+  document.getElementById('watchlist-file').addEventListener('change', function (evt: Event) {
     watchlistFileChange(evt);
   });
 };
@@ -384,7 +386,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
       }
 
       (<any>$('#info-overlay-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      $('#menu-info-overlay').addClass('bmenu-item-selected');
+      document.getElementById('menu-info-overlay').classList.add('bmenu-item-selected');
       isInfoOverlayMenuOpen = true;
       return;
     }
@@ -392,7 +394,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
   if (iconName === 'menu-watchlist') {
     if (isWatchlistMenuOpen) {
       isWatchlistMenuOpen = false;
-      $('#menu-watchlist').removeClass('bmenu-item-selected');
+      document.getElementById('menu-watchlist').classList.remove('bmenu-item-selected');
       uiManager.hideSideMenus();
       return;
     } else {
@@ -401,7 +403,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
       (<any>$('#watchlist-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
       updateWatchlist();
       isWatchlistMenuOpen = true;
-      $('#menu-watchlist').addClass('bmenu-item-selected');
+      document.getElementById('menu-watchlist').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -437,7 +439,7 @@ export const onCruncherReady = async (): Promise<void> => {
       }
     }
     if (sensorManager.checkSensorSelected() && newWatchlist.length > 0) {
-      $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+      document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
     }
     updateWatchlist(newWatchlist, _watchlistInViewList, true);
   }
@@ -497,13 +499,15 @@ export const watchlistListClick = (satId: number): void => {
   }
   if (!sensorManager.checkSensorSelected() || watchlistList.length <= 0) {
     isWatchlistChanged = false;
-    $('#menu-info-overlay').addClass('bmenu-item-disabled');
+    document.getElementById('menu-info-overlay').classList.add('bmenu-item-disabled');
   }
 };
 
 export const watchlistContentEvent = (e?: any, satId?: number) => {
+  // if (!e.target.classList.contains('watchlist-add')) return;
+
   const { satSet, sensorManager } = keepTrackApi.programs;
-  satId ??= satSet.getIdFromObjNum($('#watchlist-new').val());
+  satId ??= satSet.getIdFromObjNum(parseInt((<HTMLInputElement>document.getElementById('watchlist-new')).value));
   let duplicate = false;
   for (let i = 0; i < watchlistList.length; i++) {
     // No duplicates
@@ -515,9 +519,9 @@ export const watchlistContentEvent = (e?: any, satId?: number) => {
     updateWatchlist();
   }
   if (sensorManager.checkSensorSelected()) {
-    $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+    document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }
-  $('#watchlist-new').val(''); // Clear the search box after enter pressed/selected
+  (<HTMLInputElement>document.getElementById('watchlist-new')).value = ''; // Clear the search box after enter pressed/selected
   if (typeof e !== 'undefined' && e !== null) e.preventDefault();
 };
 
@@ -588,12 +592,12 @@ export const watchListReaderOnLoad = (evt: any) => {
   watchlistList = newWatchlist;
   updateWatchlist();
   if (sensorManager.checkSensorSelected()) {
-    $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+    document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }
 };
 
 export const menuSelectableClick = (): void => {
   if (watchlistList.length > 0) {
-    $('#menu-info-overlay').removeClass('bmenu-item-disabled');
+    document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }
 };

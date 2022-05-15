@@ -2,7 +2,8 @@ import calendar2Png from '@app/img/icons/calendar2.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { LaunchInfoObject } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { saveCsv, truncateString } from '@app/js/lib/helpers';
+import { saveCsv, slideInRight, slideOutLeft, truncateString } from '@app/js/lib/helpers';
+import { uiManager } from '@app/js/uiManager/uiManager';
 import $ from 'jquery';
 /* */
 
@@ -108,13 +109,13 @@ export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[])
 };
 
 export const hideSideMenus = (): void => {
-  $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-nextLaunch').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('nextLaunch-menu'), 1000);
+  document.getElementById('menu-nextLaunch').classList.remove('bmenu-item-selected');
   isNextLaunchMenuOpen = false;
 };
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  document.getElementById('left-menus').innerHTML += keepTrackApi.html`
       <div id="nextLaunch-menu" class="side-menu-parent start-hidden text-select">
         <div id="nextLaunch-content" class="side-menu">
           <div class="row">
@@ -128,16 +129,16 @@ export const uiManagerInit = () => {
           </div>
         </div>
       </div>
-    `);
+    `;
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  document.getElementById('bottom-icons').innerHTML += keepTrackApi.html`
         <div id="menu-nextLaunch" class="bmenu-item">
           <img alt="calendar" src="" delayedsrc="${calendar2Png}" />
           <span class="bmenu-title">Next Launches</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `;
 
   $('#nextLaunch-menu').resizable({
     handles: 'e',
@@ -148,14 +149,14 @@ export const uiManagerInit = () => {
     minWidth: 450,
   });
 
-  $('#export-launch-info').on('click', function () {
+  document.getElementById('export-launch-info').addEventListener('click', function () {
     saveCsv(<any>nextLaunchManager.launchList, 'launchList');
   });
 };
 
 export const init = (): void => {
   // Load CSS
-  import('@app/js/plugins/next-launch/next-launch.css').then((resp) => resp);
+  import('./next-launch.css').then((resp) => resp);
 
   // Add HTML
   keepTrackApi.register({
@@ -188,17 +189,21 @@ export const init = (): void => {
 
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-nextLaunch') {
-    if (isNextLaunchMenuOpen) {
-      keepTrackApi.programs.uiManager.hideSideMenus();
-      isNextLaunchMenuOpen = false;
-      return;
+    if (window.location.hostname === 'localhost') {
+      uiManager.toast('This feature is not available offline.', 'critical');
     } else {
-      keepTrackApi.programs.uiManager.hideSideMenus();
-      nextLaunchManager.showTable();
-      $('#nextLaunch-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      isNextLaunchMenuOpen = true;
-      $('#menu-nextLaunch').addClass('bmenu-item-selected');
-      return;
+      if (isNextLaunchMenuOpen) {
+        keepTrackApi.programs.uiManager.hideSideMenus();
+        isNextLaunchMenuOpen = false;
+        return;
+      } else {
+        keepTrackApi.programs.uiManager.hideSideMenus();
+        nextLaunchManager.showTable();
+        slideInRight(document.getElementById('nextLaunch-menu'), 1000);
+        isNextLaunchMenuOpen = true;
+        document.getElementById('menu-nextLaunch').classList.add('bmenu-item-selected');
+        return;
+      }
     }
   }
 };
@@ -206,7 +211,7 @@ export const bottomMenuClick = (iconName: string): void => {
 export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void; processData: any } = {
   launchList: [],
   init: () => {
-    if (settingsManager.offline) $('#menu-nextLaunch').hide();
+    if (settingsManager.offline) document.getElementById('menu-nextLaunch').style.display = 'none';
   },
   showTable: () => {
     // NOSONAR

@@ -29,7 +29,7 @@ export const selectSatData = () => {
     $('#sat-info-top-links').append(keepTrackApi.html`
         <div id="orbit-references-link" class="link sat-infobox-links">Generate Orbit Reference Satellites...</div>
       `);
-    $('#orbit-references-link').on('click', orbitReferencesLinkClick);
+    document.getElementById('orbit-references-link').addEventListener('click', orbitReferencesLinkClick);
     doOnce = true;
   }
 };

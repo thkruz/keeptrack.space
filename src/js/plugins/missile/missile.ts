@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import { missileManager } from './missileManager';
 import missilePng from '@app/img/icons/missile.png';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 keepTrackApi.programs.missileManager = missileManager;
 
@@ -17,8 +18,8 @@ export const updateLoop = (): void => {
   }
 };
 export const hideSideMenus = (): void => {
-  $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-missile').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('missile-menu'), 1000);
+  document.getElementById('menu-missile').classList.remove('bmenu-item-selected');
   isMissileMenuOpen = false;
 };
 export const bottomMenuClick = (iconName: string): void => {
@@ -31,43 +32,43 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      $('#menu-missile').addClass('bmenu-item-selected');
+      slideInRight(document.getElementById('missile-menu'), 1000);
+      document.getElementById('menu-missile').classList.add('bmenu-item-selected');
       isMissileMenuOpen = true;
       return;
     }
   }
 };
 export const missileChange = (): void => {
-  if (parseFloat(<string>$('#ms-type').val()) !== 0) {
-    $('#ms-custom-opt').hide();
+  if (parseFloat((<HTMLInputElement>document.getElementById('ms-type')).value) !== 0) {
+    document.getElementById('ms-custom-opt').style.display = 'none';
   } else {
-    $('#ms-custom-opt').show();
+    document.getElementById('ms-custom-opt').style.display = 'block';
   }
 };
 export const msErrorClick = (): void => {
-  $('#ms-error').hide();
+  document.getElementById('ms-error').style.display = 'none';
 };
 export const msTargetChange = () => {
-  if (parseInt(<string>$('#ms-target').val()) !== -1) {
-    $('#ms-tgt-holder-lat').hide();
-    $('#ms-tgt-holder-lon').hide();
+  if (parseInt((<HTMLInputElement>document.getElementById('ms-target')).value) !== -1) {
+    document.getElementById('ms-tgt-holder-lat').style.display = 'none';
+    document.getElementById('ms-tgt-holder-lon').style.display = 'none';
   } else {
-    $('#ms-tgt-holder-lat').show();
-    $('#ms-tgt-holder-lon').show();
+    document.getElementById('ms-tgt-holder-lat').style.display = 'block';
+    document.getElementById('ms-tgt-holder-lon').style.display = 'block';
   }
 };
 export const missileSubmit = (): void => {
   $('#loading-screen').fadeIn(1000, () => { // NOSONAR
     const { uiManager, satSet, timeManager } = keepTrackApi.programs;
-    $('#ms-error').hide();
-    const type = parseFloat(<string>$('#ms-type').val());
-    const attacker = parseFloat(<string>$('#ms-attacker').val());
-    let lauLat = parseFloat(<string>$('#ms-lat-lau').val());
-    let lauLon = parseFloat(<string>$('#ms-lon-lau').val());
-    const target = parseFloat(<string>$('#ms-target').val());
-    let tgtLat = parseFloat(<string>$('#ms-lat').val());
-    let tgtLon = parseFloat(<string>$('#ms-lon').val());
+    document.getElementById('ms-error').style.display = 'none';
+    const type = parseFloat((<HTMLInputElement>document.getElementById('ms-type')).value);
+    const attacker = parseFloat((<HTMLInputElement>document.getElementById('ms-attacker')).value);
+    let lauLat = parseFloat((<HTMLInputElement>document.getElementById('ms-lat-lau')).value);
+    let lauLon = parseFloat((<HTMLInputElement>document.getElementById('ms-lon-lau')).value);
+    const target = parseFloat((<HTMLInputElement>document.getElementById('ms-target')).value);
+    let tgtLat = parseFloat((<HTMLInputElement>document.getElementById('ms-lat')).value);
+    let tgtLon = parseFloat((<HTMLInputElement>document.getElementById('ms-lon')).value);
     const launchTime = timeManager.selectedDate * 1;
 
     let sim = '';
@@ -107,12 +108,12 @@ export const missileSubmit = (): void => {
         // Custom Target
         if (isNaN(tgtLat)) {
           uiManager.toast(`Invalid Target Latitude!`, 'critical');
-          $('#loading-screen').hide();
+          document.getElementById('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(tgtLon)) {
           uiManager.toast(`Invalid Target Longitude!`, 'critical');
-          $('#loading-screen').hide();
+          document.getElementById('loading-screen').style.display = 'none';
           return;
         }
       } else {
@@ -124,12 +125,12 @@ export const missileSubmit = (): void => {
       if (isSub) {
         if (isNaN(lauLat)) {
           uiManager.toast(`Invalid Launch Latitude!`, 'critical');
-          $('#loading-screen').hide();
+          document.getElementById('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(lauLon)) {
           uiManager.toast(`Invalid Launch Longitude!`, 'critical');
-          $('#loading-screen').hide();
+          document.getElementById('loading-screen').style.display = 'none';
           return;
         }
       }
@@ -298,7 +299,7 @@ export const missileSubmit = (): void => {
       uiManager.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
       uiManager.doSearch('RV_');
     }
-    $('#loading-screen').hide();
+    document.getElementById('loading-screen').style.display = 'none';
   });
 };
 export const uiManagerInit = (): void => {
@@ -471,7 +472,7 @@ export const uiManagerInit = (): void => {
         </div>
       `);
 
-  $('#missile').on('submit', (e: Event): void => {
+  document.getElementById('missile').addEventListener('submit', (e: Event): void => {
     missileSubmit();
     e.preventDefault();
   });
@@ -485,13 +486,13 @@ export const uiManagerInit = (): void => {
     minWidth: 280,
   });
 
-  $('#ms-attacker').on('change', msAttackerChange);
+  document.getElementById('ms-attacker').addEventListener('change', msAttackerChange);
 
-  $('#ms-target').on('change', msTargetChange);
+  document.getElementById('ms-target').addEventListener('change', msTargetChange);
 
-  $('#ms-error').on('click', msErrorClick);
+  document.getElementById('ms-error').addEventListener('click', msErrorClick);
 
-  $('#missile').on('change', missileChange);
+  document.getElementById('missile').addEventListener('change', missileChange);
 };
 export const init = (): void => {
   // Add HTML
@@ -525,15 +526,15 @@ export const msAttackerChange = () => {
   isSub = false;
   const subList = [100, 600, 213, 214, 215, 321, 500, 400];
   for (let i = 0; i < subList.length; i++) {
-    if (subList[i] == parseInt(<string>$('#ms-attacker').val())) {
+    if (subList[i] == parseInt((<HTMLInputElement>document.getElementById('ms-attacker')).value)) {
       isSub = true;
     }
   }
   if (!isSub) {
-    $('#ms-lau-holder-lat').hide();
-    $('#ms-lau-holder-lon').hide();
+    document.getElementById('ms-lau-holder-lat').style.display = 'none';
+    document.getElementById('ms-lau-holder-lon').style.display = 'none';
   } else {
-    $('#ms-lau-holder-lat').show();
-    $('#ms-lau-holder-lon').show();
+    document.getElementById('ms-lau-holder-lat').style.display = 'block';
+    document.getElementById('ms-lau-holder-lon').style.display = 'block';
   }
 };

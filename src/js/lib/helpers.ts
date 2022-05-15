@@ -148,5 +148,14 @@ export const slideInDown = (el: HTMLElement, duration: number, callback?: () => 
   }, duration);
 };
 
+export const shake = (el: HTMLElement | HTMLDivElement, duration?: number, callback?: () => void): void => {
+  duration ??= 500;
+  el.classList.add('shake');
+  setTimeout(() => {
+    el.classList.remove('shake');
+    if (callback) callback();
+  }, duration);
+};
+
 (<any>window).getUnique = getUnique;
 (<any>window).saveCsv = saveCsv;

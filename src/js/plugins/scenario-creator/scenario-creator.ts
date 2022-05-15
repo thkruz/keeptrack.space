@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { scenarioCreatorBottomIcon } from './components/scenario-creator-bottom-icon';
 import { scenarioCreatorSideMenu } from './components/scenario-creator-side-menu';
@@ -46,10 +47,10 @@ export const uiManagerInit = (): void => {
 export const scenarioCreatorOnSubmit = (): void => {
   const { satSet, satellite, sensorManager } = keepTrackApi.programs;
 
-  const scenarioName: string = $('#scenario-creator-name').val();
-  const scenarioStart: string = $('#scenario-creator-start').val();
-  const scenarioStop: string = $('#scenario-creator-stop').val();
-  const scenarioDensity: string = $('#scenario-creator-density').val();
+  const scenarioName: string = (<HTMLInputElement>document.getElementById('scenario-creator-name')).value;
+  const scenarioStart: string = (<HTMLInputElement>document.getElementById('scenario-creator-start')).value;
+  const scenarioStop: string = (<HTMLInputElement>document.getElementById('scenario-creator-stop')).value;
+  const scenarioDensity: string = (<HTMLInputElement>document.getElementById('scenario-creator-density')).value;
 
   console.log(scenarioName, scenarioStart, scenarioStop, scenarioDensity);
 
@@ -98,13 +99,13 @@ export const onScenarioCreatorBtnClick = (): void => {
  * @returns {void}
  */
 export const hideSideMenus = (): void => {
-  $('#scenario-creator-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-scenario-creator').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('scenario-creator-menu'), 1000);
+  document.getElementById('menu-scenario-creator').classList.remove('bmenu-item-selected');
   isScenarioCreatorMenuOpen = false;
 };
 
 export const showSideMenu = (): void => {
-  $('#scenario-creator-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-  $('#menu-scenario-creator').addClass('bmenu-item-selected');
+  slideInRight(document.getElementById('scenario-creator-menu'), 1000);
+  document.getElementById('menu-scenario-creator').classList.add('bmenu-item-selected');
   isScenarioCreatorMenuOpen = true;
 };

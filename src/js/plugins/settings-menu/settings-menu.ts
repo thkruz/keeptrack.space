@@ -1,6 +1,6 @@
 import settingsPng from '@app/img/icons/settings.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { parseRgba, rgbCss } from '@app/js/lib/helpers';
+import { parseRgba, rgbCss, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 /**
@@ -278,17 +278,17 @@ export const bottomMenuClick = (iconName: string) => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#settings-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('settings-menu'), 1000);
       isSettingsMenuOpen = true;
-      $('#menu-settings').addClass('bmenu-item-selected');
+      document.getElementById('menu-settings').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 
 export const hideSideMenus = () => {
-  $('#settings-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-settings').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('settings-menu'), 1000);
+  document.getElementById('menu-settings').classList.remove('bmenu-item-selected');
   isSettingsMenuOpen = false;
 };
 
@@ -319,12 +319,12 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
   if (isSLMChecked && (<HTMLElement>e.target).id === 'settings-demo-mode') {
     (<HTMLInputElement>document.getElementById('settings-sat-label-mode')).checked = false;
-    $('#settings-demo-mode').removeClass('lever:after');
+    document.getElementById('settings-demo-mode').classList.remove('lever:after');
   }
 
   if (isDMChecked && (<HTMLElement>e.target).id === 'settings-sat-label-mode') {
     (<HTMLInputElement>document.getElementById('settings-demo-mode')).checked = false;
-    $('#settings-sat-label-mode').removeClass('lever:after');
+    document.getElementById('settings-sat-label-mode').classList.remove('lever:after');
   }
 };
 
@@ -347,9 +347,9 @@ export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?:
 
   settingsManager.isShowNextPass = isSNPChecked;
 
-  const newFieldOfView = parseInt($('#satFieldOfView').val());
+  const newFieldOfView = parseInt((<HTMLInputElement>document.getElementById('satFieldOfView')).value);
   if (isNaN(newFieldOfView)) {
-    $('#satFieldOfView').val('30');
+    (<HTMLInputElement>document.getElementById('satFieldOfView')).value = '30';
     uiManager.toast('Invalid field of view value!', 'critical');
   } else {
     satSet.satCruncher.postMessage({
@@ -358,9 +358,9 @@ export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?:
     });
   }
 
-  const maxSearchSats = parseInt($('#maxSearchSats').val());
+  const maxSearchSats = parseInt((<HTMLInputElement>document.getElementById('maxSearchSats')).value);
   if (isNaN(maxSearchSats)) {
-    $('#maxSearchSats').val(settingsManager.searchLimit);
+    (<HTMLInputElement>document.getElementById('maxSearchSats')).value = settingsManager.searchLimit.toString();
     uiManager.toast('Invalid max search sats value!', 'critical');
   } else {
     settingsManager.searchLimit = maxSearchSats;

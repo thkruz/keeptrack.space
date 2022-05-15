@@ -24,10 +24,10 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+import mapPng from '@app/img/icons/map.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { MapManager } from '@app/js/api/keepTrackTypes';
 import $ from 'jquery';
-import mapPng from '@app/img/icons/map.png';
 
 const defaults = {
   meridian: 0,
@@ -194,7 +194,8 @@ export const resize2DMap = function (isForceWidescreen?: boolean): void {
     mapMenuDOM.width($(window).width());
   }
 };
-export const bottomMenuClick = (iconName: string): void => { // NOSONAR
+export const bottomMenuClick = (iconName: string): void => {
+  // NOSONAR
   if (iconName === 'menu-map') {
     const { mapManager, uiManager, objectManager, satSet } = keepTrackApi.programs;
     if (mapManager.isMapMenuOpen) {
@@ -224,7 +225,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         html: satData.sccNum,
         position: 'left',
       });
-      $('#menu-map').addClass('bmenu-item-selected');
+      document.getElementById('menu-map').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -311,11 +312,12 @@ export const uiManagerInit = (): void => {
     }
   });
 
-  $('#fullscreen-icon').on('click', function () {
+  document.getElementById('fullscreen-icon').addEventListener('click', function () {
     uiManager.resize2DMap();
   });
 
-  $('#map-menu').on('click', '.map-look', function (evt: Event) {
+  document.getElementById('map-menu').addEventListener('click', function (evt: Event) {
+    if (!(<HTMLElement>evt.target).classList.contains('map-look')) return;
     mapMenuClick(evt);
   });
 
@@ -335,7 +337,7 @@ export const onCruncherMessage = (): void => {
 export const hideSideMenus = (): void => {
   const { mapManager } = keepTrackApi.programs;
   (<any>$('#map-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-map').removeClass('bmenu-item-selected');
+  document.getElementById('menu-map').classList.remove('bmenu-item-selected');
   mapManager.isMapMenuOpen = false;
 };
 export const mapMenuClick = (evt: any) => {

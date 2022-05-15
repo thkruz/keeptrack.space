@@ -74,7 +74,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
       mainCamera.cameraType.current = mainCamera.cameraType.Default; // Back to normal Camera Mode
       $('#fov-text').html('');
-      $('#menu-planetarium').removeClass('bmenu-item-selected');
+      document.getElementById('menu-planetarium').classList.remove('bmenu-item-selected');
       return;
     } else {
       if (sensorManager.checkSensorSelected()) {
@@ -87,10 +87,10 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         // If astronomy plugin is available then set it to false
         if (typeof keepTrackApi.programs.astronomy !== 'undefined') {
           keepTrackApi.programs.astronomy.isAstronomyView = false;
-          $('#menu-astronomy').removeClass('bmenu-item-selected');
+          document.getElementById('menu-astronomy').classList.remove('bmenu-item-selected');
         }
         keepTrackApi.programs.planetarium.isPlanetariumView = true;
-        $('#menu-planetarium').addClass('bmenu-item-selected');
+        document.getElementById('menu-planetarium').classList.add('bmenu-item-selected');
       } else {
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.planetariumDisabled();
         uiManager.toast(`Select a Sensor First!`, 'caution');

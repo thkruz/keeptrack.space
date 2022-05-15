@@ -1,12 +1,13 @@
+import findSatPng from '@app/img/icons/find2.png';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { getUnique } from '@app/js/lib/helpers';
+import { getUnique, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
-import findSatPng from '@app/img/icons/find2.png';
 
 let isFindByLooksMenuOpen = false;
-export const checkInc = (possibles: any[], min: number, max: number) => possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
+export const checkInc = (possibles: any[], min: number, max: number) =>
+  possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
 export const checkRaan = (possibles: any[], min: number, max: number) => possibles.filter((possible) => possible.raan * RAD2DEG < max && possible.raan * RAD2DEG > min);
 export const checkArgPe = (possibles: any[], min: number, max: number) => possibles.filter((possible) => possible.argPe * RAD2DEG < max && possible.argPe * RAD2DEG > min);
 export const checkPeriod = (possibles: any[], minPeriod: number, maxPeriod: number) => possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
@@ -39,7 +40,8 @@ interface SearchResults extends SatObject {
   rng: number;
 }
 
-export const searchSats = (searchParams: SearchSatParams) => { // NOSONAR
+export const searchSats = (searchParams: SearchSatParams) => {
+  // NOSONAR
   let { az, el, rng, inc, azMarg, elMarg, rngMarg, incMarg, period, periodMarg, rcs, rcsMarg, objType, raan, raanMarg, argPe, argPeMarg, bus, shape, payload } = searchParams;
 
   const isValidAz = !isNaN(az) && isFinite(az);
@@ -120,8 +122,8 @@ export const searchSats = (searchParams: SearchSatParams) => { // NOSONAR
     result += i < res.length - 1 ? `${sat.sccNum},` : `${sat.sccNum}`;
   });
 
-  $('#search').val(result);
-  uiManager.doSearch($('#search').val());
+  (<HTMLInputElement>document.getElementById('search')).value = result;
+  uiManager.doSearch((<HTMLInputElement>document.getElementById('search')).value);
   return res;
 };
 
@@ -270,8 +272,8 @@ export const uiManagerInit = (): void => {
         </div>
       `);
 
-  $('#fbl-error').on('click', function () {
-    $('#fbl-error').hide();
+  document.getElementById('fbl-error').addEventListener('click', function () {
+    document.getElementById('fbl-error').style.display = 'none';
   });
 
   // Bottom Icon
@@ -338,16 +340,16 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('findByLooks-menu'), 1000);
       isFindByLooksMenuOpen = true;
-      $('#menu-find-sat').addClass('bmenu-item-selected');
+      document.getElementById('menu-find-sat').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 export const hideSideMenus = (): void => {
-  $('#findByLooks-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-find-sat').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('findByLooks-menu'), 1000);
+  document.getElementById('menu-find-sat').classList.remove('bmenu-item-selected');
   isFindByLooksMenuOpen = false;
 };
 export const init = (): void => {
@@ -378,27 +380,27 @@ export const init = (): void => {
   });
 };
 export const findByLooksSubmit = () => {
-  const az = parseFloat($('#fbl-azimuth').val());
-  const el = parseFloat($('#fbl-elevation').val());
-  const rng = parseFloat($('#fbl-range').val());
-  const inc = parseFloat($('#fbl-inc').val());
-  const period = parseFloat($('#fbl-period').val());
-  const rcs = parseFloat($('#fbl-rcs').val());
-  const azMarg = parseFloat($('#fbl-azimuth-margin').val());
-  const elMarg = parseFloat($('#fbl-elevation-margin').val());
-  const rngMarg = parseFloat($('#fbl-range-margin').val());
-  const incMarg = parseFloat($('#fbl-inc-margin').val());
-  const periodMarg = parseFloat($('#fbl-period-margin').val());
-  const rcsMarg = parseFloat($('#fbl-rcs-margin').val());
-  const objType = parseInt($('#fbl-type').val());
-  const raan = parseFloat($('#fbl-raan').val());
-  const raanMarg = parseFloat($('#fbl-raan-margin').val());
-  const argPe = parseFloat($('#fbl-argPe').val());
-  const argPeMarg = parseFloat($('#fbl-argPe-margin').val());
-  const bus = $('#fbl-bus').val();
-  const payload = $('#fbl-payload').val();
-  const shape = $('#fbl-shape').val();
-  $('#search').val(''); // Reset the search first
+  const az = parseFloat((<HTMLInputElement>document.getElementById('fbl-azimuth')).value);
+  const el = parseFloat((<HTMLInputElement>document.getElementById('fbl-elevation')).value);
+  const rng = parseFloat((<HTMLInputElement>document.getElementById('fbl-range')).value);
+  const inc = parseFloat((<HTMLInputElement>document.getElementById('fbl-inc')).value);
+  const period = parseFloat((<HTMLInputElement>document.getElementById('fbl-period')).value);
+  const rcs = parseFloat((<HTMLInputElement>document.getElementById('fbl-rcs')).value);
+  const azMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-azimuth-margin')).value);
+  const elMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-elevation-margin')).value);
+  const rngMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-range-margin')).value);
+  const incMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-inc-margin')).value);
+  const periodMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-period-margin')).value);
+  const rcsMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-rcs-margin')).value);
+  const objType = parseInt((<HTMLInputElement>document.getElementById('fbl-type')).value);
+  const raan = parseFloat((<HTMLInputElement>document.getElementById('fbl-raan')).value);
+  const raanMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-raan-margin')).value);
+  const argPe = parseFloat((<HTMLInputElement>document.getElementById('fbl-argPe')).value);
+  const argPeMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-argPe-margin')).value);
+  const bus = (<HTMLInputElement>document.getElementById('fbl-bus')).value;
+  const payload = (<HTMLInputElement>document.getElementById('fbl-payload')).value;
+  const shape = (<HTMLInputElement>document.getElementById('fbl-shape')).value;
+  (<HTMLInputElement>document.getElementById('search')).value = ''; // Reset the search first
   const { uiManager } = keepTrackApi.programs;
   try {
     const searchParams = {

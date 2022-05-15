@@ -152,7 +152,7 @@ export const timeManager: TimeManager = {
         // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
         if (timeManager.dateDOM == null) timeManager.dateDOM = window.document.getElementById('datetime-text');
         if (timeManager.dateDOM == null) {
-          console.debug('Cant find datetime-text!');
+          // Avoid race condition
           return;
         }
         timeManager.dateDOM.textContent = timeManager.timeTextStr;

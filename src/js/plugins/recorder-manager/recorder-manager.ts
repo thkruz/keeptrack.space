@@ -32,7 +32,7 @@ export const bottomMenuClick = (iconName: string): void => {
       recorder.stop();
       recorder.save('keeptrack.webm');
       recorder.setIsRecording(false);
-      $('#menu-record').removeClass('bmenu-item-selected');
+      document.getElementById('menu-record').classList.remove('bmenu-item-selected');
       return;
     } else {
       try {
@@ -42,8 +42,8 @@ export const bottomMenuClick = (iconName: string): void => {
           html: `Compatibility Error with Recording`,
         });
         recorder.setIsRecording(false);
-        $('#menu-record').removeClass('bmenu-item-selected');
-        $('#menu-record').addClass('bmenu-item-disabled');
+        document.getElementById('menu-record').classList.remove('bmenu-item-selected');
+        document.getElementById('menu-record').classList.add('bmenu-item-disabled');
         if (!$('#menu-record:animated').length) {
           $('#menu-record').effect('shake', {
             distance: 10,

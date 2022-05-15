@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { stringPad } from '@app/js/lib/helpers';
+import { slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import breakupPng from '@app/img/icons/breakup.png';
 
@@ -140,7 +140,7 @@ export const uiManagerInit = (): void => {
   // Splitting it into subfunctions would not be optimal
 export const breakupOnSubmit = (): void => { // NOSONAR
   const { orbitManager, satellite, timeManager, uiManager, satSet } = keepTrackApi.programs;
-  let satId = satSet.getIdFromObjNum($('#hc-scc').val());
+  let satId = satSet.getIdFromObjNum(parseInt((<HTMLInputElement>document.getElementById('hc-scc')).value));
   const mainsat: SatObject = satSet.getSat(satId);
   const origsat = mainsat;
 
@@ -170,10 +170,10 @@ export const breakupOnSubmit = (): void => { // NOSONAR
   });
   orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-  const meanmoVariation = parseFloat(<string>$('#hc-per').val());
-  const incVariation = parseFloat(<string>$('#hc-inc').val());
-  const rascVariation = parseFloat(<string>$('#hc-raan').val());
-  const breakupCount = parseInt(<string>$('#hc-count').val());
+  const meanmoVariation = parseFloat(<string>(<HTMLInputElement>document.getElementById('hc-per')).value);
+  const incVariation = parseFloat(<string>(<HTMLInputElement>document.getElementById('hc-inc')).value);
+  const rascVariation = parseFloat(<string>(<HTMLInputElement>document.getElementById('hc-raan')).value);
+  const breakupCount = parseInt(<string>(<HTMLInputElement>document.getElementById('hc-count')).value);
   const eVariation = 0.00015;
   const origEcc = mainsat.eccentricity;
 
@@ -236,8 +236,8 @@ export const breakupOnSubmit = (): void => { // NOSONAR
 };
 
 export const hideSideMenus = (): void => {
-  $('#breakup-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-breakup').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('breakup-menu'), 1000);
+  document.getElementById('menu-breakup').classList.remove('bmenu-item-selected');
   isBreakupMenuOpen = false;
 };
 export const bottomMenuClick = (iconName: string): void => { // NOSONAR
@@ -251,12 +251,12 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       if (objectManager.selectedSat !== -1) {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
-        $('#breakup-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-        $('#menu-breakup').addClass('bmenu-item-selected');
+        slideInRight(document.getElementById('breakup-menu'), 1000);
+        document.getElementById('menu-breakup').classList.add('bmenu-item-selected');
         isBreakupMenuOpen = true;
 
         const sat: SatObject = satSet.getSatExtraOnly(objectManager.selectedSat);
-        $('#hc-scc').val(sat.sccNum);
+        (<HTMLInputElement>document.getElementById('hc-scc')).value = sat.sccNum;
       } else {
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.breakupDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');

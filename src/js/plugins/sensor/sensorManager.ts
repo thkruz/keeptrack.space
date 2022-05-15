@@ -221,7 +221,9 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
             fastIframe: false,
             closeButton: false,
           });
-        }).catch((err) => console.warn(err));
+        }).catch(() => {
+          // Intentionally Left Blank
+        });
 
         $('#sensor-type').html(spaceObjType2Str(sensorManager.selectedSensor.type));
         $('#sensor-country').html(sensorManager.selectedSensor.country);

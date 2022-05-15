@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { AnalysisBottomIcon } from './components/AnalysisBottomIcon';
 import { AnalysisSideMenu } from './components/AnalysisSideMenu';
@@ -45,7 +46,7 @@ export const init = (): void => {
       if (iconName === 'menu-analysis') {
         if (isAnalysisMenuOpen) {
           isAnalysisMenuOpen = false;
-          $('#menu-analysis').removeClass('bmenu-item-selected');
+          document.getElementById('menu-analysis').classList.remove('bmenu-item-selected');
           uiManager.hideSideMenus();
           return;
         } else {
@@ -53,7 +54,7 @@ export const init = (): void => {
           isAnalysisMenuOpen = true;
           if (objectManager.selectedSat != -1) {
             const sat: SatObject = satSet.getSat(objectManager.selectedSat);
-            $('#anal-sat').val(sat.sccNum);
+            (<HTMLInputElement>document.getElementById('anal-sat')).value = sat.sccNum;
           }
           if (sensorManager.checkSensorSelected()) {
             $('#anal-type').html(`${OrbitOptionGroup}${RaeOptionGroup}`);
@@ -64,8 +65,8 @@ export const init = (): void => {
           const elems = document.querySelectorAll('select');
           (<any>window.M).FormSelect.init(elems);
 
-          $('#analysis-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-          $('#menu-analysis').addClass('bmenu-item-selected');
+          slideInRight(document.getElementById('analysis-menu'), 1000);
+          document.getElementById('menu-analysis').classList.add('bmenu-item-selected');
           return;
         }
       }
@@ -77,7 +78,7 @@ export const init = (): void => {
     cbName: 'analysis',
     cb: (sat: any): void => {
       if (uiManager.isAnalysisMenuOpen) {
-        $('#anal-sat').val(sat.sccNum);
+        (<HTMLInputElement>document.getElementById('anal-sat')).value = sat.sccNum;
       }
     },
   });
@@ -86,8 +87,8 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'analysis',
     cb: (): void => {
-      $('#analysis-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-analysis').removeClass('bmenu-item-selected');
+      slideOutLeft(document.getElementById('analysis-menu'), 1000);
+      document.getElementById('menu-analysis').classList.remove('bmenu-item-selected');
       isAnalysisMenuOpen = false;
     },
   });
@@ -105,11 +106,11 @@ export const uiManagerInit = () => {
     analysisBptSumbit();
   });
 
-  $('#findCsoBtn').on('click', () => {
+  document.getElementById('findCsoBtn').addEventListener('click', () => {
     $('#loading-screen').fadeIn(1000, findCsoBtnClick);
   });
 
-  $('#findReentries').on('click', () => {
+  document.getElementById('findReentries').addEventListener('click', () => {
     $('#loading-screen').fadeIn(1000, findRaBtnClick);
   });
 
@@ -124,8 +125,8 @@ export const uiManagerInit = () => {
 };
 export const analysisFormSubmit = () => {
   const { sensorManager } = keepTrackApi.programs;
-  // const chartType = $('#anal-type').val();
-  // const sat = $('#anal-sat').val();
+  // const chartType = (<HTMLInputElement>document.getElementById('anal-type')).value;
+  // const sat = (<HTMLInputElement>document.getElementById('anal-sat')).value;
   const sensor = sensorManager.currentSensor[0].shortName;
   if (typeof sensor == 'undefined') {
     $.colorbox({
@@ -157,7 +158,7 @@ export const findRaBtnClick = () => {
 };
 export const analysisBptSumbit = () => {
   const { satellite, sensorManager, uiManager } = keepTrackApi.programs;
-  const sats = $('#analysis-bpt-sats').val();
+  const sats = (<HTMLInputElement>document.getElementById('analysis-bpt-sats')).value;
   if (!sensorManager.checkSensorSelected()) {
     uiManager.toast(`You must select a sensor first!`, 'critical');
   } else {

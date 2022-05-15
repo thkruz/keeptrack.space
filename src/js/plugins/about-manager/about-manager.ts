@@ -1,5 +1,6 @@
 import aboutPng from '@app/img/icons/about.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -98,9 +99,9 @@ export const init = (): void => {
           return;
         } else {
           keepTrackApi.programs.uiManager.hideSideMenus();
-          $('#about-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          slideInRight(document.getElementById('about-menu'), 1000);
           isAboutSelected = true;
-          $('#menu-about').addClass('bmenu-item-selected');
+          document.getElementById('menu-about').classList.add('bmenu-item-selected');
           return;
         }
       }
@@ -111,8 +112,8 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'about',
     cb: (): void => {
-      $('#about-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-about').removeClass('bmenu-item-selected');
+      slideOutLeft(document.getElementById('about-menu'), 1000);
+      document.getElementById('menu-about').classList.remove('bmenu-item-selected');
       isAboutSelected = false;
     },
   });

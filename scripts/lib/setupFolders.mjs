@@ -1,23 +1,23 @@
+import { rmSync } from 'fs';
 import mkdirp from 'mkdirp';
-import rimraf from 'rimraf';
 
 export const setupDistFolders = () => {
-  rimraf.sync('./dist/admin', { recursive: true });
-  rimraf.sync('./dist/audio', { recursive: true });
-  rimraf.sync('./dist/css', { recursive: true });
-  rimraf.sync('./dist/img', { recursive: true });
-  rimraf.sync('./dist/js', { recursive: true });
-  rimraf.sync('./dist/meshes', { recursive: true });
-  rimraf.sync('./dist/offline', { recursive: true });
-  rimraf.sync('./dist/php', { recursive: true });
-  rimraf.sync('./dist/plugins', { recursive: true });
-  rimraf.sync('./dist/radarData', { recursive: true });
-  rimraf.sync('./dist/res', { recursive: true });
-  rimraf.sync('./dist/settings', { recursive: true });
-  rimraf.sync('./dist/simulation', { recursive: true });
-  rimraf.sync('./dist/textures', { recursive: true });
-  rimraf.sync('./dist/tle', { recursive: true });
-  rimraf.sync('./dist/*', { recursive: false });
+  rmSync('./dist/admin', { recursive: true, force: true });
+  rmSync('./dist/audio', { recursive: true, force: true });
+  rmSync('./dist/css', { recursive: true, force: true });
+  rmSync('./dist/img', { recursive: true, force: true });
+  rmSync('./dist/js', { recursive: true, force: true });
+  rmSync('./dist/meshes', { recursive: true, force: true });
+  rmSync('./dist/offline', { recursive: true, force: true });
+  rmSync('./dist/php', { recursive: true, force: true });
+  rmSync('./dist/plugins', { recursive: true, force: true });
+  rmSync('./dist/radarData', { recursive: true, force: true });
+  rmSync('./dist/res', { recursive: true, force: true });
+  rmSync('./dist/settings', { recursive: true, force: true });
+  rmSync('./dist/simulation', { recursive: true, force: true });
+  rmSync('./dist/textures', { recursive: true, force: true });
+  rmSync('./dist/tle', { recursive: true, force: true });
+  rmSync('./dist/*', { recursive: true, force: true });
   mkdirp.sync('./dist');
 
   mkdirp.sync('./dist/plugins');
@@ -26,7 +26,7 @@ export const setupDistFolders = () => {
 };
 
 export const setupEmbedFolders = () => {
-  rimraf.sync('./embed');
+  rmSync('./embed');
   mkdirp.sync('./embed');
 
   mkdirp.sync('./embed/keepTrack');

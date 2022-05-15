@@ -78,7 +78,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         starManager.clearConstellations();
       }
       $('#fov-text').html('');
-      $('#menu-astronomy').removeClass('bmenu-item-selected');
+      document.getElementById('menu-astronomy').classList.remove('bmenu-item-selected');
       return;
     } else {
       if (sensorManager.checkSensorSelected()) {
@@ -93,10 +93,10 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         uiManager.legendMenuChange('astronomy');
         if (typeof keepTrackApi.programs.planetarium !== 'undefined') {
           keepTrackApi.programs.planetarium.isPlanetariumView = false;
-          $('#menu-planetarium').removeClass('bmenu-item-selected');
+          document.getElementById('menu-planetarium').classList.remove('bmenu-item-selected');
         }
         keepTrackApi.programs.astronomy.isAstronomyView = true;
-        $('#menu-astronomy').addClass('bmenu-item-selected');
+        document.getElementById('menu-astronomy').classList.add('bmenu-item-selected');
       } else {
         uiManager.toast(`Select a Sensor First!`, 'caution');
         if (!$('#menu-astronomy:animated').length) {

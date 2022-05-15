@@ -36,7 +36,7 @@ export const uiManagerInit = (): any => {
         </div>
       `);
 
-  $('#time-machine-icon').on('click', timeMachineIconClick);
+  document.getElementById('menu-time-machine').addEventListener('click', timeMachineIconClick);
 };
 
 export const bottomMenuClick = (iconName: string): void => {
@@ -51,13 +51,13 @@ export const bottomMenuClick = (iconName: string): void => {
       groupsManager.clearSelect();
       satSet.setColorScheme(colorSchemeManager.default, true); // force color recalc
 
-      $('#menu-time-machine').removeClass('bmenu-item-selected');
+      document.getElementById('menu-time-machine').classList.remove('bmenu-item-selected');
       return;
     } else {
       // Merge to one variable?
       orbitManager.isTimeMachineRunning = true;
       orbitManager.isTimeMachineVisible = true;
-      $('#menu-time-machine').addClass('bmenu-item-selected');
+      document.getElementById('menu-time-machine').classList.add('bmenu-item-selected');
       orbitManager.historyOfSatellitesPlay();
       return;
     }
@@ -117,7 +117,7 @@ export const timeMachineIconClick = () => {
   } else {
     uiManager.legendMenuChange('timeMachine');
     searchBox.hideResults();
-    $('#search-results').hide();
+    document.getElementById('search-results').style.display = 'none';
   }
 };
 export const timeMachineRemoveSatellite = (

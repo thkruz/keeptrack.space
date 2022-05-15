@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import satChngPng from '@app/img/icons/satchng.png';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isConstellationsMenuOpen = false;
 
@@ -46,8 +47,10 @@ export const uiManagerInit = () => {
     minWidth: 280,
   });
 
-  $('#constellation-menu>ul>li').on('click', function () {
+  document.getElementById('constellation-menu').querySelectorAll('li').forEach((element) => {
+    element.addEventListener('click', function () {
     constellationMenuClick($(this).data('group'));
+    });
   });
 };
 
@@ -122,7 +125,7 @@ export const constellationMenuClick = (groupName: any) => { // NOSONAR
       throw new Error('Unknown group name: ' + groupName);
   }
   groupSelected(groupName);
-  uiManager.doSearch($('#search').val());
+  uiManager.doSearch((<HTMLInputElement>document.getElementById('search')).value);
 };
 
 export const groupSelected = (groupName: string) => {
@@ -146,8 +149,8 @@ export const groupSelected = (groupName: string) => {
 };
 
 export const hideSideMenus = (): void => {
-  $('#constellations-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-constellations').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('constellations-menu'), 1000);
+  document.getElementById('menu-constellations').classList.remove('bmenu-item-selected');
   isConstellationsMenuOpen = false;
 };
 
@@ -161,9 +164,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#constellations-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('constellations-menu'), 1000);
       isConstellationsMenuOpen = true;
-      $('#menu-constellations').addClass('bmenu-item-selected');
+      document.getElementById('menu-constellations').classList.add('bmenu-item-selected');
       return;
     }
   }

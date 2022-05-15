@@ -28,11 +28,11 @@ export const init = (): void => {
       if (iconName === 'menu-day-night') {
         if (settingsManager.isDayNightToggle) {
           settingsManager.isDayNightToggle = false;
-          $('#menu-day-night').removeClass('bmenu-item-selected');
+          document.getElementById('menu-day-night').classList.remove('bmenu-item-selected');
           return;
         } else {
           settingsManager.isDayNightToggle = true;
-          $('#menu-day-night').addClass('bmenu-item-selected');
+          document.getElementById('menu-day-night').classList.add('bmenu-item-selected');
           return;
         }
       }

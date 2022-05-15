@@ -451,7 +451,7 @@ const setSecondarySat = (id: number): void => {
   objectManager.secondarySat = id;
   objectManager.secondarySatObj = satSet.getSat(id);
   if (objectManager.selectedSat !== -1) {
-    $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+    document.getElementById('menu-plot-analysis3').classList.remove('bmenu-item-disabled');
   }
 };
 

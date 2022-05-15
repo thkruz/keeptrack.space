@@ -163,11 +163,11 @@ export const setobs = (sensors: SensorObject[]) => {
       $('.sensor-reset-menu').hide();
       return;
     } else {
-      $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-      $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
-      $('#menu-surveillance').removeClass('bmenu-item-disabled');
-      $('#menu-planetarium').removeClass('bmenu-item-disabled');
-      $('#menu-astronomy').removeClass('bmenu-item-disabled');
+      document.getElementById('menu-sensor-info').classList.remove('bmenu-item-disabled');
+      document.getElementById('menu-fov-bubble').classList.remove('bmenu-item-disabled');
+      document.getElementById('menu-surveillance').classList.remove('bmenu-item-disabled');
+      document.getElementById('menu-planetarium').classList.remove('bmenu-item-disabled');
+      document.getElementById('menu-astronomy').classList.remove('bmenu-item-disabled');
       $('.sensor-reset-menu').show();
     }
 

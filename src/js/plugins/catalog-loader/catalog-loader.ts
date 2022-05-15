@@ -88,8 +88,8 @@ export const setupGetVariables = () => {
     switch (key) {
       case 'limitSats':
         settingsManager.limitSats = val;
-        $('#limitSats').val(val);
-        $('#limitSats-Label').addClass('active');
+        (<HTMLInputElement>document.getElementById('limitSats')).value = val;
+        (<HTMLElement>document.getElementById('limitSats-Label')).classList.add('active');
         limitSatsArray = val.split(',');
         break;
       case 'future use':
@@ -103,7 +103,8 @@ export const setupGetVariables = () => {
   return limitSatsArray;
 };
 
-export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[]) => { // NOSONAR
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[]) => {
+  // NOSONAR
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];
@@ -262,14 +263,12 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
   }
 
   if (settingsManager.isExtraSatellitesAdded) {
-    $('.legend-pink-box').show();
+    (<HTMLElement>document.querySelector('.legend-pink-box')).style.display = 'block';
     try {
-      $('.legend-trusat-box')[1].parentElement.style.display = '';
-      $('.legend-trusat-box')[2].parentElement.style.display = '';
-      $('.legend-trusat-box')[3].parentElement.style.display = '';
-      $('.legend-trusat-box')[1].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
-      $('.legend-trusat-box')[2].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
-      $('.legend-trusat-box')[3].parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+      document.querySelectorAll('.legend-trusat-box').forEach((element) => {
+        element.parentElement.style.display = 'none';
+        element.parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+      });
     } catch (e) {
       // Intentionally Blank
     }

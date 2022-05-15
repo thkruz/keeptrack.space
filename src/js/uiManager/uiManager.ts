@@ -47,7 +47,7 @@ let forceOpen = false;
 let isFooterShown = true;
 let updateInterval = 1000;
 
-export const init = () => {
+export const init = () => {  
   initUiValidation();
 
   // Register all UI callbacks to run at the end of the draw loop
@@ -57,7 +57,7 @@ export const init = () => {
     cb: updateSelectBox,
   });
 
-  if (settingsManager.isShowLogo) $('#demo-logo').removeClass('start-hidden');
+  if (settingsManager.isShowLogo) document.getElementById('demo-logo').classList.remove('start-hidden');
 
   keepTrackApi.methods.uiManagerInit();
 
@@ -78,6 +78,17 @@ export const postStart = () => {
       $(this).attr('src', $(this).attr('delayedsrc'));
     });
   }, 0);
+
+  (function _httpsCheck() {
+    if (location.protocol !== 'https:') {
+      try {
+        document.getElementById('cs-geolocation').style.display = 'none';
+        document.getElementById('geolocation-btn').style.display = 'none';
+      } catch {
+        // Intended to catch errors when the page is not loaded yet
+      }
+    }
+  })();  
 
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
@@ -101,14 +112,14 @@ export const postStart = () => {
 };
 export const hideUi = () => {
   if (uiManager.isUiVisible) {
-    $('#header').hide();
-    $('#ui-wrapper').hide();
-    $('#nav-footer').hide();
+    document.getElementById('header').style.display = 'none';
+    document.getElementById('ui-wrapper').style.display = 'none';
+    document.getElementById('nav-footer').style.display = 'none';
     uiManager.isUiVisible = false;
   } else {
-    $('#header').show();
-    $('#ui-wrapper').show();
-    $('#nav-footer').show();
+    document.getElementById('header').style.display = 'block';
+    document.getElementById('ui-wrapper').style.display = 'block';
+    document.getElementById('nav-footer').style.display = 'block';
     uiManager.isUiVisible = true;
   }
 };
@@ -133,22 +144,22 @@ export const updateSelectBox = () => {
 export const footerToggle = function () {
   if (isFooterShown) {
     isFooterShown = false;
-    $('#sat-infobox').addClass('sat-infobox-fullsize');
-    $('#nav-footer').addClass('footer-slide-trans');
-    $('#nav-footer').removeClass('footer-slide-up');
-    $('#nav-footer').addClass('footer-slide-down');
+    document.getElementById('sat-infobox').classList.add('sat-infobox-fullsize');
+    document.getElementById('nav-footer').classList.add('footer-slide-trans');
+    document.getElementById('nav-footer').classList.remove('footer-slide-up');
+    document.getElementById('nav-footer').classList.add('footer-slide-down');
     $('#nav-footer-toggle').html('&#x25B2;');
   } else {
     isFooterShown = true;
-    $('#sat-infobox').removeClass('sat-infobox-fullsize');
-    $('#nav-footer').addClass('footer-slide-trans');
-    $('#nav-footer').removeClass('footer-slide-down');
-    $('#nav-footer').addClass('footer-slide-up');
+    document.getElementById('sat-infobox').classList.remove('sat-infobox-fullsize');
+    document.getElementById('nav-footer').classList.add('footer-slide-trans');
+    document.getElementById('nav-footer').classList.remove('footer-slide-down');
+    document.getElementById('nav-footer').classList.add('footer-slide-up');
     $('#nav-footer-toggle').html('&#x25BC;');
   }
   // After 1 second the transition should be complete so lets stop moving slowly
   setTimeout(() => {
-    $('#nav-footer').removeClass('footer-slide-trans');
+    document.getElementById('nav-footer').classList.remove('footer-slide-trans');
   }, 1000);
 };
 export const getsensorinfo = () => {
@@ -209,13 +220,7 @@ export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
 };
 export const onReady = () => {
   // Code Once index.htm is loaded
-  if (settingsManager.offline) updateInterval = 250;
-  (function _httpsCheck() {
-    if (location.protocol !== 'https:') {
-      $('#cs-geolocation').hide();
-      $('#geolocation-btn').hide();
-    }
-  })();
+  if (settingsManager.offline) updateInterval = 250;  
 
   // Load Bottom icons
   if (!settingsManager.disableUI) {
@@ -238,22 +243,25 @@ export const onReady = () => {
   })();
 
   uiManager.clearRMBSubMenu = () => {
-    $('#save-rmb-menu').hide();
-    $('#view-rmb-menu').hide();
-    $('#edit-rmb-menu').hide();
-    $('#create-rmb-menu').hide();
-    $('#colors-rmb-menu').hide();
-    $('#draw-rmb-menu').hide();
-    $('#earth-rmb-menu').hide();
+    document.getElementById('save-rmb-menu').style.display = 'none';
+    document.getElementById('view-rmb-menu').style.display = 'none';
+    document.getElementById('edit-rmb-menu').style.display = 'none';
+    document.getElementById('create-rmb-menu').style.display = 'none';
+    document.getElementById('colors-rmb-menu').style.display = 'none';
+    document.getElementById('draw-rmb-menu').style.display = 'none';
+    document.getElementById('earth-rmb-menu').style.display = 'none';
   };
 
   uiManager.menuController = initMenuController;
 
   // Run any plugins code
   keepTrackApi.methods.uiManagerOnReady();
-  uiManager.bottomIconPress = (evt: Event) => keepTrackApi.methods.bottomMenuClick((<any>evt.currentTarget).id);
-  $('#bottom-icons').on('click', '.bmenu-item', function (evt: Event) {
-    uiManager.bottomIconPress(evt);
+  uiManager.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
+  document.getElementById('bottom-icons').addEventListener('click', function (evt: Event) {
+    // Only if '.bmenu-item' class is clicked
+    // if ((<HTMLDivElement>evt.target).classList.contains('bmenu-item')) {
+      uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
+    // }
   });
   uiManager.hideSideMenus = () => {
     // Close any open colorboxes
@@ -298,30 +306,43 @@ export const loadStr = (str) => {
   switch (str) {
     case 'science':
       $('#loader-text').html('Locating Science...');
+      console.log('Locating Science...');
       break;
     case 'science2':
       $('#loader-text').html('Found Science...');
+      console.log('Found Science...');
       break;
     case 'dots':
       $('#loader-text').html('Drawing Dots in Space...');
+      console.log('Drawing Dots in Space...');
       break;
     case 'satIntel':
       $('#loader-text').html('Integrating Satellite Intel...');
+      console.log('Integrating Satellite Intel...');
       break;
     case 'radarData':
       $('#loader-text').html('Importing Radar Data...');
+      console.log('Importing Radar Data...');
       break;
     case 'painting':
       $('#loader-text').html('Painting the Earth...');
+      console.log('Painting the Earth...');
       break;
     case 'coloring':
       $('#loader-text').html('Coloring Inside the Lines...');
+      console.log('Coloring Inside the Lines...');
       break;
     case 'elsets':
       $('#loader-text').html('Locating ELSETs...');
+      console.log('Locating ELSETs...');
+      break;
+    case 'models':
+      $('#loader-text').html('Loading 3D Models...');
+      console.log('Loading 3D Models...');
       break;
     case 'easterEgg':
       $('#loader-text').html('Llama Llama Llama Duck!');
+      console.log('Llama Llama Llama Duck!');
   }
 };
 export const doSearch = (searchString: string, isPreventDropDown: boolean) => {
@@ -484,19 +505,18 @@ export const hideLoadingScreen = () => {
   mobileManager.checkMobileMode();
 
   if (settingsManager.isMobileModeEnabled) {
-    $('#spinner').hide();
+    document.getElementById('spinner').style.display = 'none';
     uiManager.loadStr('math');
-    $('#loading-screen').hide();
+    document.getElementById('loading-screen').style.display = 'none';
   } else {
     // Loading Screen Resized and Hidden
     setTimeout(function () {
-      $('#loading-screen').removeClass('full-loader');
-      $('#loading-screen').addClass('mini-loader-container');
-      $('#logo-inner-container').addClass('mini-loader');
-      $('#logo-text').html('');
-      $('#logo-text-version').html('');
-      $('#logo-trusat').hide();
-      $('#loading-screen').hide();
+      document.getElementById('loading-screen').classList.remove('full-loader');
+      document.getElementById('loading-screen').classList.add('mini-loader-container');
+      document.getElementById('logo-inner-container').classList.add('mini-loader');
+      document.getElementById('logo-text').innerHTML = '';
+      document.getElementById('logo-text-version').innerHTML = '';
+      document.getElementById('loading-screen').style.display = 'none';
       uiManager.loadStr('math');
     }, 100);
   }
@@ -514,25 +534,25 @@ export const searchToggle = (force?: boolean) => {
 
   if ((!isSearchOpen && !forceClose) || forceOpen) {
     isSearchOpen = true;
-    $('#search-holder').removeClass('search-slide-up');
-    $('#search-holder').addClass('search-slide-down');
-    $('#search-icon').addClass('search-icon-search-on');
-    $('#fullscreen-icon').addClass('top-menu-icons-search-on');
-    $('#tutorial-icon').addClass('top-menu-icons-search-on');
-    $('#legend-icon').addClass('top-menu-icons-search-on');
+    document.getElementById('search-holder').classList.remove('search-slide-up');
+    document.getElementById('search-holder').classList.add('search-slide-down');
+    document.getElementById('search-icon').classList.add('search-icon-search-on');
+    document.getElementById('fullscreen-icon').classList.add('top-menu-icons-search-on');
+    document.getElementById('tutorial-icon').classList.add('top-menu-icons-search-on');
+    document.getElementById('legend-icon').classList.add('top-menu-icons-search-on');
   } else {
     isSearchOpen = false;
-    $('#search-holder').removeClass('search-slide-down');
-    $('#search-holder').addClass('search-slide-up');
-    $('#search-icon').removeClass('search-icon-search-on');
+    document.getElementById('search-holder').classList.remove('search-slide-down');
+    document.getElementById('search-holder').classList.add('search-slide-up');
+    document.getElementById('search-icon').classList.remove('search-icon-search-on');
     setTimeout(function () {
-      $('#fullscreen-icon').removeClass('top-menu-icons-search-on');
-      $('#tutorial-icon').removeClass('top-menu-icons-search-on');
-      $('#legend-icon').removeClass('top-menu-icons-search-on');
+      document.getElementById('fullscreen-icon').classList.remove('top-menu-icons-search-on');
+      document.getElementById('tutorial-icon').classList.remove('top-menu-icons-search-on');
+      document.getElementById('legend-icon').classList.remove('top-menu-icons-search-on');
     }, 500);
     uiManager.hideSideMenus();
     searchBox.hideResults();
-    // $('#menu-space-stations').removeClass('bmenu-item-selected');
+    // document.getElementById('menu-space-stations').classList.remove('bmenu-item-selected');
     // This is getting called too much. Not sure what it was meant to prevent?
     // satSet.setColorScheme(colorSchemeManager.default, true);
     // uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);

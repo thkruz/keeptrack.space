@@ -1,6 +1,7 @@
 import satChngPng from '@app/img/icons/sats.png';
 import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatChngObject } from '@app/js/api/keepTrackTypes';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { dateFromJday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
 
@@ -59,7 +60,8 @@ export const uiManagerInit = () => {
     minWidth: 280,
   });
 
-  $('#satChng-menu').on('click', '.satChng-object', function (evt: Event) {
+  document.getElementById('satChng-menu').addEventListener('click', function (evt: Event) {
+    if (!(<HTMLElement>evt.target).classList.contains('satChng-object')) return;
     // Might be better code for this.
     const hiddenRow = (<any>evt.currentTarget).attributes.hiddenrow.value;
     if (hiddenRow !== null) {
@@ -70,7 +72,7 @@ export const uiManagerInit = () => {
 
 let satChngTable: SatChngObject[] = [];
 export const satChng = (row: number, testOverride?: any): void => {
-  const { satChange, uiManager } = keepTrackApi.programs;
+  const { uiManager } = keepTrackApi.programs;
 
   // If we are testing, we can override the satChange object.
   if (isThisJest()) {
@@ -90,13 +92,13 @@ export const satChng = (row: number, testOverride?: any): void => {
     // If an object was selected from the menu
     if (!satChngTable[row].SCC) return;
     uiManager.doSearch(satChngTable[row].SCC.toString()); // Actually perform the search of the two objects
-    $('#anal-sat').val(satChngTable[row].SCC.toString());
+    (<HTMLInputElement>document.getElementById('anal-sat')).value = satChngTable[row].SCC.toString();
   } // If a row was selected
 };
 
 export const hideSideMenus = (): void => {
-  $('#satChng-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-satChng').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('satChng-menu'), 1000);
+  document.getElementById('menu-satChng').classList.remove('bmenu-item-selected');
   issatChngMenuOpen = false;
 };
 
@@ -110,10 +112,10 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#satChng-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('satChng-menu'), 1000);
       issatChngMenuOpen = true;
       satChng(-1);
-      $('#menu-satChng').addClass('bmenu-item-selected');
+      document.getElementById('menu-satChng').classList.add('bmenu-item-selected');
       return;
     }
   }

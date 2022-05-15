@@ -26,13 +26,14 @@
 
 import externalPng from '@app/img/icons/external.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let isExternalMenuOpen = false;
 
 export const hideSideMenus = (): void => {
-  $('#external-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-external').removeClass('bmenu-item-selected');
+  slideOutLeft(document.getElementById('external-menu'), 1000);
+  document.getElementById('menu-external').classList.remove('bmenu-item-selected');
   isExternalMenuOpen = false;
 };
 export const uiManagerInit = () => {
@@ -134,7 +135,7 @@ export const init = (): void => {
 
 export const n2yoFormSubmit = () => {
   $('#loading-screen').fadeIn(1000, function () {
-    const satnum = parseInt(<string>$('#ext-n2yo').val());
+    const satnum = parseInt(<string>(<HTMLInputElement>document.getElementById('ext-n2yo')).value);
     searchN2yo(satnum);
     $('#loading-screen').fadeOut('slow');
   });
@@ -188,15 +189,15 @@ export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-external') {
     if (isExternalMenuOpen) {
       isExternalMenuOpen = false;
-      $('#menu-external').removeClass('bmenu-item-selected');
+      document.getElementById('menu-external').classList.remove('bmenu-item-selected');
       uiManager.hideSideMenus();
       return;
     } else {
       uiManager.hideSideMenus();
-      $('#external-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('external-menu'), 1000);
       keepTrackApi.programs.watchlist.updateWatchlist();
       isExternalMenuOpen = true;
-      $('#menu-external').addClass('bmenu-item-selected');
+      document.getElementById('menu-external').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -244,7 +245,7 @@ export const searchCelestrak = (satNum: any, analsat?: number) => {
 
 export const celestrakFormSubmit = () => {
   $('#loading-screen').fadeIn(1000, function () {
-    const satnum = parseInt(<string>$('#ext-celestrak').val());
+    const satnum = parseInt(<string>(<HTMLInputElement>document.getElementById('ext-celestrak')).value);
     searchCelestrak(satnum);
     $('#loading-screen').fadeOut('slow');
   });

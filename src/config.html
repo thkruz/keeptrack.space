@@ -10,10 +10,10 @@
       // Settings Manager Overrides
       const settingsManagerOverride = {
         // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
-        classificationStr: `${document.getElementById('classification').value}`,
-        // This controls which of the built-in plugins are loaded
-        plugins: {
-          atmosphere: true,
+        classificationStr: `${(<HTMLInputElement>document.getElementById('classification')).value}`,
+          // This controls which of the built-in plugins are loaded
+          plugins: {
+            atmosphere: true,
           satInfoboxCore: true,
           updateSelectBoxCore: true,
           aboutManager: document.getElementById('aboutManager').nodeValue,
@@ -56,7 +56,7 @@
           soundManager: true,
         },
       };
-      window.open(`index.html?settingsManagerOverride=${encodeURIComponent(JSON.stringify(settingsManagerOverride))}`);
+          window.open(`index.html?settingsManagerOverride=${encodeURIComponent(JSON.stringify(settingsManagerOverride))}`);
     };
   </script>
 </head>

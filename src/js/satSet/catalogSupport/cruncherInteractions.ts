@@ -131,10 +131,10 @@ export const getVariableActions = (params: string[]) => { // NOSONAR
         break;
       case 'misl':
         var subVal = val.split(',');
-        $('#ms-type').val(subVal[0].toString());
-        $('#ms-attacker').val(subVal[1].toString());
-        $('#ms-target').val(subVal[2].toString());
-        $('#missile').trigger('submit');
+        (<HTMLSelectElement>document.getElementById('ms-type')).value = (subVal[0].toString());
+        (<HTMLSelectElement>document.getElementById('ms-attacker')).value = (subVal[1].toString());
+        (<HTMLSelectElement>document.getElementById('ms-target')).value = (subVal[2].toString());
+        (<HTMLButtonElement>document.getElementById('missile')).click();
         break;
       case 'date':
         if (isNaN(parseInt(val))) {

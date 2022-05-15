@@ -57,7 +57,7 @@ export const startGremlins = () => {
 };
 export const runGremlins = () => {
   $('#nav-footer').height(200);
-  $('#nav-footer-toggle').hide();
+  document.getElementById('nav-footer-toggle').style.display = 'none';
   $('#bottom-icons-container').height(200);
   $('#bottom-icons').height(200);
   startGremlins();

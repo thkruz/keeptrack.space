@@ -17,17 +17,17 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
       satellite.setTEARR(missileManager.getMissileTEARR(sat));
     }
     if (satellite.degreesLong(satellite.currentTEARR.lon) >= 0) {
-      $('#sat-longitude').html(satellite.degreesLong(satellite.currentTEARR.lon).toFixed(3) + '°E');
+      document.getElementById('sat-longitude').innerHTML = satellite.degreesLong(satellite.currentTEARR.lon).toFixed(3) + '°E';
     } else {
-      $('#sat-longitude').html((satellite.degreesLong(satellite.currentTEARR.lon) * -1).toFixed(3) + '°W');
+      document.getElementById('sat-longitude').innerHTML = (satellite.degreesLong(satellite.currentTEARR.lon) * -1).toFixed(3) + '°W';
     }
     if (satellite.degreesLat(satellite.currentTEARR.lat) >= 0) {
-      $('#sat-latitude').html(satellite.degreesLat(satellite.currentTEARR.lat).toFixed(3) + '°N');
+      document.getElementById('sat-latitude').innerHTML = satellite.degreesLat(satellite.currentTEARR.lat).toFixed(3) + '°N';
     } else {
-      $('#sat-latitude').html((satellite.degreesLat(satellite.currentTEARR.lat) * -1).toFixed(3) + '°S');
+      document.getElementById('sat-latitude').innerHTML = (satellite.degreesLat(satellite.currentTEARR.lat) * -1).toFixed(3) + '°S';
     }
     const jday = timeManager.getDayOfYear(timeManager.simulationTimeObj);
-    $('#jday').html(jday);
+    document.getElementById('jday').innerHTML = jday.toString();
 
     if (settingsManager.plugins?.stereoMap && keepTrackApi.programs.mapManager.isMapMenuOpen && timeManager.realTime > settingsManager.lastMapUpdateTime + 30000) {
       keepTrackApi.programs.mapManager.updateMap();
@@ -35,40 +35,40 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
     }
 
     if (!sat.missile) {
-      $('#sat-altitude').html(sat.getAltitude().toFixed(2) + ' km');
-      $('#sat-velocity').html(sat.velocity.total.toFixed(2) + ' km/s');
+      document.getElementById('sat-altitude').innerHTML = sat.getAltitude().toFixed(2) + ' km';
+      document.getElementById('sat-velocity').innerHTML = sat.velocity.total.toFixed(2) + ' km/s';
     } else {
-      $('#sat-altitude').html(satellite.currentTEARR.alt.toFixed(2) + ' km');
+      document.getElementById('sat-altitude').innerHTML = satellite.currentTEARR.alt.toFixed(2) + ' km';
     }
 
     if (objectManager.isSensorManagerLoaded) {
       if (satellite.currentTEARR.inView) {
-        $('#sat-azimuth').html(satellite.currentTEARR.az.toFixed(0) + '°'); // Convert to Degrees
-        $('#sat-elevation').html(satellite.currentTEARR.el.toFixed(1) + '°');
-        $('#sat-range').html(satellite.currentTEARR.rng.toFixed(2) + ' km');
+        document.getElementById('sat-azimuth').innerHTML = satellite.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
+        document.getElementById('sat-elevation').innerHTML = satellite.currentTEARR.el.toFixed(1) + '°';
+        document.getElementById('sat-range').innerHTML = satellite.currentTEARR.rng.toFixed(2) + ' km';
         const beamwidthString = sensorManager.currentSensor[0].beamwidth
           ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor[0].beamwidth)).toFixed(2) + ' km'
           : 'Unknown';
-        $('#sat-beamwidth').html(beamwidthString);
-        $('#sat-maxTmx').html(((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'); // Time for RF to hit target and bounce back
+        document.getElementById('sat-beamwidth').innerHTML = beamwidthString;
+        document.getElementById('sat-maxTmx').innerHTML = ((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
       } else {
-        $('#sat-azimuth').html('Out of FOV');
-        $('#sat-azimuth').prop('title', 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°');
-        $('#sat-elevation').html('Out of FOV');
-        $('#sat-elevation').prop('title', 'Elevation: ' + satellite.currentTEARR.el.toFixed(1) + '°');
-        $('#sat-range').html('Out of FOV');
-        $('#sat-range').prop('title', 'Range: ' + satellite.currentTEARR.rng.toFixed(2) + ' km');
+        document.getElementById('sat-azimuth').innerHTML = 'Out of FOV';
+        document.getElementById('sat-azimuth').title = 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°';
+        document.getElementById('sat-elevation').innerHTML = 'Out of FOV';
+        document.getElementById('sat-elevation').title = 'Elevation: ' + satellite.currentTEARR.el.toFixed(1) + '°';
+        document.getElementById('sat-range').innerHTML = 'Out of FOV';
+        document.getElementById('sat-range').title = 'Range: ' + satellite.currentTEARR.rng.toFixed(2) + ' km';
         const beamwidthString = sensorManager.currentSensor[0].beamwidth ? sensorManager.currentSensor[0].beamwidth + '°' : 'Unknown';
-        $('#sat-beamwidth').html('Out of FOV');
-        $('#sat-beamwidth').prop('title', beamwidthString);
-        $('#sat-maxTmx').html('Out of FOV');
+        document.getElementById('sat-beamwidth').innerHTML = 'Out of FOV';
+        document.getElementById('sat-beamwidth').title = beamwidthString;
+        document.getElementById('sat-maxTmx').innerHTML = 'Out of FOV';
       }
     } else {
-      $('#sat-azimuth').parent().hide();
-      $('#sat-elevation').parent().hide();
-      $('#sat-range').parent().hide();
-      $('#sat-beamwidth').parent().hide();
-      $('#sat-maxTmx').parent().hide();
+      document.getElementById('sat-azimuth').parentElement.style.display = 'none';
+      document.getElementById('sat-elevation').parentElement.style.display = 'none';
+      document.getElementById('sat-range').parentElement.style.display = 'none';
+      document.getElementById('sat-beamwidth').parentElement.style.display = 'none';
+      document.getElementById('sat-maxTmx').parentElement.style.display = 'none';
     }
 
     if (objectManager.secondarySat !== -1 && document.getElementById('secondary-sat-info')?.style?.display === 'none') {
@@ -80,10 +80,10 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
     if (objectManager.secondarySat !== -1) {
       const ric = satellite.sat2ric(objectManager.secondarySatObj, sat);
       const dist = satellite.distance(sat, objectManager.secondarySatObj).split(' ')[2];
-      $('#sat-sec-dist').html(`${dist} km`);
-      $('#sat-sec-rad').html(`${ric.position[0].toFixed(2)}km`);
-      $('#sat-sec-intrack').html(`${ric.position[1].toFixed(2)}km`);
-      $('#sat-sec-crosstrack').html(`${ric.position[2].toFixed(2)}km`);
+      document.getElementById('sat-sec-dist').innerHTML = `${dist} km`;
+      document.getElementById('sat-sec-rad').innerHTML = `${ric.position[0].toFixed(2)}km`;
+      document.getElementById('sat-sec-intrack').innerHTML = `${ric.position[1].toFixed(2)}km`;
+      document.getElementById('sat-sec-crosstrack').innerHTML = `${ric.position[2].toFixed(2)}km`;
     }
 
     if (objectManager.isSensorManagerLoaded) {
@@ -92,9 +92,9 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
         // TODO: Make new logic for this to allow it to be updated while selected
         if ((objectManager.selectedSat !== uiManager.lastNextPassCalcSatId || sensorManager.currentSensor[0].shortName !== uiManager.lastNextPassCalcSensorId) && !sat.missile) {
           if (sat.perigee > sensorManager.currentSensor[0].obsmaxrange) {
-            $('#sat-nextpass').html('Beyond Max Range');
+            document.getElementById('sat-nextpass').innerHTML = 'Beyond Max Range';
           } else {
-            $('#sat-nextpass').html(satellite.nextpass(sat, sensorManager.currentSensor, 2, 5));
+            document.getElementById('sat-nextpass').innerHTML = satellite.nextpass(sat, sensorManager.currentSensor, 2, 5);
           }
 
           // IDEA: Code isInSun()
@@ -104,10 +104,10 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
         uiManager.lastNextPassCalcSatId = objectManager.selectedSat;
         uiManager.lastNextPassCalcSensorId = sensorManager.currentSensor[0].shortName;
       } else {
-        $('#sat-nextpass').html('Unavailable');
+        document.getElementById('sat-nextpass').innerHTML = 'Unavailable';
       }
     } else {
-      $('#sat-nextpass').parent().hide();
+      document.getElementById('sat-nextpass').parentElement.style.display = 'none';
     }
   } catch (e) {
     console.error(e);

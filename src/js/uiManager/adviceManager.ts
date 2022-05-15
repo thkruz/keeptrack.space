@@ -501,7 +501,7 @@ export const clearAdvice = function (): void {
   }
 };
 export const init = () => {
-  helpDOM = $('#help-screen');
+  helpDOM = <HTMLDivElement>(<unknown>document.getElementById('help-screen'));
   helpDOM.draggable({
     containment: 'window',
     scroll: false,

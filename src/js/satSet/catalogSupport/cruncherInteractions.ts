@@ -142,7 +142,7 @@ export const getVariableActions = (params: string[]) => { // NOSONAR
           break;
         }
         timeManager.changeStaticOffset(Number(val) - Date.now());
-        $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.dynamicOffsetEpoch + timeManager.propOffset));
+        // $('#datetime-input-tb').datepicker('setDate', new Date(timeManager.dynamicOffsetEpoch + timeManager.propOffset));
         break;
       case 'rate':
         var rate = parseFloat(val);

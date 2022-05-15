@@ -45,6 +45,7 @@ import * as topMenu from '@app/js/plugins/top-menu/top-menu';
 import * as twitter from '@app/js/plugins/twitter/twitter';
 import * as updateSelectBoxCore from '@app/js/plugins/update-select-box/update-select-box';
 import * as watchlist from '@app/js/plugins/watchlist/watchlist';
+import $ from 'jquery';
 import { omManager } from './initial-orbit/om-manager';
 import { CanvasRecorder } from './recorder-manager/canvas-recorder/canvas-recorder';
 import { isselectedSatNegativeOne, selectSatManager } from './select-sat-manager/select-sat-manager';
@@ -149,7 +150,7 @@ export const uiManagerFinal = (plugins: any): void => {
     document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
   }
 
-  $('#versionNumber-text').html(`${settingsManager.versionNumber} - ${settingsManager.versionDate}`);
+  document.getElementById('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
 
   // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {

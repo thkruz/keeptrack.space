@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import $ from 'jquery';
@@ -112,11 +112,7 @@ export const onEciPlotBtnClick = () => {
   const { objectManager, uiManager } = keepTrackApi.programs;
   if (objectManager.selectedSat === -1) {
     uiManager.toast(`Select a Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis:animated').length) {
-      $('#menu-plot-analysis').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(document.getElementById('menu-plot-analysis'));
     return;
   }
 
@@ -147,11 +143,7 @@ export const onEcfPlotBtnClick = () => {
   const { objectManager, uiManager } = keepTrackApi.programs;
   if (objectManager.selectedSat === -1) {
     uiManager.toast(`Select a Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis2:animated').length) {
-      $('#menu-plot-analysis2').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(document.getElementById('menu-plot-analysis2'));
     return;
   }
 
@@ -182,21 +174,13 @@ export const onRicPlotBtnClick = () => {
   const { objectManager, uiManager } = keepTrackApi.programs;
   if (objectManager.secondarySat === -1) {
     uiManager.toast(`Select a Secondary Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis3:animated').length) {
-      $('#menu-plot-analysis3').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(document.getElementById('menu-plot-analysis3'));
     return;
   }
 
   if (objectManager.selectedSat === -1 || objectManager.lastSelectedSat() === -1) {
     uiManager.toast(`Select a Primary Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis3:animated').length) {
-      $('#menu-plot-analysis3').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(document.getElementById('menu-plot-analysis3'));
     return;
   }
 

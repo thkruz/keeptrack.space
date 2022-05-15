@@ -472,11 +472,6 @@ export const uiManagerInit = (): void => {
         </div>
       `);
 
-  document.getElementById('missile').addEventListener('submit', (e: Event): void => {
-    missileSubmit();
-    e.preventDefault();
-  });
-
   $('#missile-menu').resizable({
     handles: 'e',
     stop: function () {
@@ -485,21 +480,31 @@ export const uiManagerInit = (): void => {
     maxWidth: 450,
     minWidth: 280,
   });
-
-  document.getElementById('ms-attacker').addEventListener('change', msAttackerChange);
-
-  document.getElementById('ms-target').addEventListener('change', msTargetChange);
-
-  document.getElementById('ms-error').addEventListener('click', msErrorClick);
-
-  document.getElementById('missile').addEventListener('change', missileChange);
 };
+
+export const uiManagerFinal = (): void => {
+  document.getElementById('missile').addEventListener('submit', (e: Event): void => {
+    e.preventDefault();
+    missileSubmit();
+  });
+  document.getElementById('ms-attacker').addEventListener('change', msAttackerChange);
+  document.getElementById('ms-target').addEventListener('change', msTargetChange);
+  document.getElementById('ms-error').addEventListener('click', msErrorClick);
+  document.getElementById('missile').addEventListener('change', missileChange);
+}
+
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'missile',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'missile',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript

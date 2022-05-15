@@ -1268,7 +1268,7 @@ export interface SensorFovPlugin {
 }
 export interface AdviceManager {
   adviceCount: any;
-  showAdvice(arg0: string, arg1: string, arg2: null, arg3: string);
+  showAdvice(header: string, text: string, focusDOM: HTMLElement, setLocation: string);
   adviceArray: any;
   adviceList: any;
 }

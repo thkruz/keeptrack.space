@@ -26,6 +26,7 @@
 
 import fencePng from '@app/img/icons/fence.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { shake } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const uiManagerInit = () => {
@@ -63,11 +64,7 @@ export const bottomMenuClick = (iconName: string): void => {
       // No Sensor Selected
       if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.survFenceDisabled();
       uiManager.toast(`Select a Sensor First!`, 'caution');
-      if (!$('#menu-surveillance:animated').length) {
-        $('#menu-surveillance').effect('shake', {
-          distance: 10,
-        });
-      }
+      shake(document.getElementById('menu-surveillance'));
       return;
     }
     if ((<any>settingsManager).isShowSurvFence) {

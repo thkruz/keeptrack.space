@@ -1,3 +1,15 @@
+:root {
+  --colorTertiary: rgb(40, 63, 88);
+  --colorTertiaryLighten1: rgb(82, 102, 122);
+  --colorTertiaryLighten2: rgb(126, 140, 155);
+  --colorTertiaryLighten3: rgb(169, 178, 188);
+  --colorTertiaryLighten4: rgb(212, 217, 222);
+  --colorTertiaryDarken1: rgb(31, 51, 71);
+  --colorTertiaryDarken2: rgb(24, 38, 53);
+  --colorTertiaryDarken3: rgb(16, 25, 35);
+  --colorTertiaryDarken4: rgb(8, 13, 18);
+}
+
 body {
   overflow: hidden;
   font-family: 'Open Sans', sans-serif;
@@ -26,6 +38,7 @@ body {
 }
 
 #loading-screen {
+  display: flex;
   padding: 0;
   z-index: 101;
   text-align: center;
@@ -73,9 +86,11 @@ body {
 #logo-inner-container {
   margin: auto;
   display: flex;
+  justify-content: center;
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: center;
+  height: 150px;
 }
 
 #logo-text {
@@ -109,14 +124,11 @@ body {
   line-height: 50px;
 }
 
-#spinner {
-  display: inline-block;
-  height: 50px;
-  width: 50px;
-  position: relative;
-}
-
 #mobile-start-button {
   display: none;
   margin-top: 10px;
+}
+
+.start-hidden {
+  display: none;
 }

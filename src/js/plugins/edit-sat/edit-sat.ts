@@ -1,7 +1,7 @@
 import editPng from '@app/img/icons/edit.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { saveAs, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
+import { saveAs, shake, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tleFormater';
 import $ from 'jquery';
 
@@ -12,6 +12,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'editSat',
     cb: () => uiManagerInit(),
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'editSat',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript
@@ -119,10 +125,15 @@ export const uiManagerInit = (): void => {
     maxWidth: 450,
     minWidth: 280,
   });
+};
 
+export const uiManagerFinal = (): void => {
   document.getElementById('editSat-newTLE').addEventListener('click', editSatNewTleClick);
 
-  document.getElementById('editSat').addEventListener('submit', editSatSubmit);
+  document.getElementById('editSat').addEventListener('submit', function (e: Event) {
+    e.preventDefault();
+    editSatSubmit();
+  });
 
   document.getElementById('editSat-save').addEventListener('click', editSatSaveClick);
 
@@ -229,11 +240,7 @@ export const bottomMenuClick = (iconName: string) => {
       } else {
         if (settingsManager.plugins?.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
-        if (!$('#menu-editSat:animated').length) {
-          $('#menu-editSat').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-editSat'));
       }
     }
     return;
@@ -350,15 +357,13 @@ export const editSatNewTleClickFadeIn = () => {
   $('#loading-screen').fadeOut('slow');
 };
 
-export const editSatSubmit = (e: Event) => {
+export const editSatSubmit = () => {
   const { satellite, satSet, timeManager, orbitManager } = keepTrackApi.programs;
   document.getElementById('es-error').style.display = 'none';
   const scc = (<HTMLInputElement>document.getElementById('es-scc')).value;
   const satId = satSet.getIdFromObjNum(parseInt(scc));
   if (satId === null) {
     console.log('Not a Real Satellite');
-    e.preventDefault();
-    return false;
   }
   const sat = satSet.getSatExtraOnly(satId);
   const intl = sat.TLE1.substr(9, 8);
@@ -387,8 +392,6 @@ export const editSatSubmit = (e: Event) => {
     $('#es-error').html('Failed Altitude Check</br>Try Different Parameters');
     document.getElementById('es-error').style.display = 'block';
   }
-  e.preventDefault();
-  return true;
 };
 
 export const editSatSaveClick = (e: Event) => {

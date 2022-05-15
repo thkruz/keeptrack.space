@@ -1,7 +1,7 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let isNewLaunchMenuOpen = false;
@@ -196,11 +196,7 @@ export const bottomMenuClick = (iconName: string): void => {
       } else {
         aM.adviceList?.newLaunchDisabled();
         keepTrackApi.programs.uiManager.toast(`Select a Satellite First!`, 'caution');
-        if (!$('#menu-newLaunch:animated').length) {
-          $('#menu-newLaunch').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-newLaunch'));
       }
       return;
     }

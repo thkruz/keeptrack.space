@@ -26,6 +26,7 @@
 
 import sat3Png from '@app/img/icons/sat3.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { shake } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -70,11 +71,7 @@ export const init = (): void => {
           } else {
             uiManager.toast(`Select a Satellite First!`, 'caution');
             if (settingsManager.plugins.topMenu) adviceManager.adviceList.satViewDisabled();
-            if (!$('#menu-satview:animated').length) {
-              $('#menu-satview').effect('shake', {
-                distance: 10,
-              });
-            }
+            shake(document.getElementById('menu-satview'));
           }
           return;
         }

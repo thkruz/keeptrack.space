@@ -42,6 +42,7 @@
     "version:patch": "npm version patch && npm run changelog",
     "prepare": "husky install"
   },
+  "chromium-args": "--enable-threaded-compositing",
   "jest": {
     "testEnvironment": "jsdom",
     "transform": {

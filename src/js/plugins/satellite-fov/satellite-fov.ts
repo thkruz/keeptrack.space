@@ -26,6 +26,7 @@
 
 import sat2Png from '@app/img/icons/sat2.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { shake } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const uiManagerInit = () => {
@@ -63,11 +64,7 @@ export const bottomMenuClick = (iconName: string): void => {
       // No Sat Selected and No Search Present
       if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satFovDisabled();
       uiManager.toast(`Select a Satellite First!`, 'caution');
-      if (!$('#menu-sat-fov:animated').length) {
-        $('#menu-sat-fov').effect('shake', {
-          distance: 10,
-        });
-      }
+      shake(document.getElementById('menu-sat-fov'));
       return;
     }
     if (settingsManager.isSatOverflyModeOn) {

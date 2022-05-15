@@ -1,7 +1,7 @@
 // @ts-nocheck
 
+import { shake } from '@app/js/lib/helpers';
 import { MediaRecorderOptions } from '@app/types/types';
-import $ from 'jquery';
 
 export class CanvasRecorder {
   isVideoRecording: boolean;
@@ -47,9 +47,7 @@ export class CanvasRecorder {
           M.toast({
             html: `Compatibility Error with Recording`,
           });
-          if (!$('#menu-record:animated').length) {
-            $('#menu-record').effect('shake', { distance: 10 });
-          }
+          shake(document.getElementById('menu-record'));
           return false;
         }
       } else {
@@ -60,10 +58,7 @@ export class CanvasRecorder {
         M.toast({
           html: `Recording Only Available with HTTPS`,
         });
-        /* istanbul ignore next */
-        if (!$('#menu-record:animated').length) {
-          $('#menu-record').effect('shake', { distance: 10 });
-        }
+        shake(document.getElementById('menu-record'));
         return false;
       }
     };

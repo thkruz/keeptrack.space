@@ -184,26 +184,7 @@ describe('shortTermFences.setSensor', () => {
 describe('shortTermFences.stfFormOnSubmit', () => {
   test('0', () => {
     const callFunction: any = () => {
-      shortTermFences.stfFormOnSubmit({
-        bubbles: false,
-        cancelBubble: false,
-        cancelable: true,
-        composed: false,
-        currentTarget: {},
-        defaultPrevented: false,
-        eventPhase: 'fakeData',
-        isTrusted: false,
-        returnValue: false,
-        srcElement: {},
-        target: {},
-        timeStamp: 12345,
-        type: 'number',
-        AT_TARGET: 987650,
-        BUBBLING_PHASE: 10.0,
-        CAPTURING_PHASE: 10.0,
-        NONE: 5,
-        preventDefault: jest.fn(),
-      } as any);
+      shortTermFences.stfFormOnSubmit();
     };
 
     expect(callFunction).not.toThrow();
@@ -213,26 +194,7 @@ describe('shortTermFences.stfFormOnSubmit', () => {
     const callFunction: any = () => {
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
 
-      shortTermFences.stfFormOnSubmit({
-        bubbles: false,
-        cancelBubble: true,
-        cancelable: true,
-        composed: false,
-        currentTarget: {},
-        defaultPrevented: false,
-        eventPhase: 9876,
-        isTrusted: false,
-        returnValue: false,
-        srcElement: {},
-        target: {},
-        timeStamp: '1234',
-        type: 'object',
-        AT_TARGET: 987650,
-        BUBBLING_PHASE: -1.0,
-        CAPTURING_PHASE: 0.0,
-        NONE: 10,
-        preventDefault: jest.fn(),
-      } as any);
+      shortTermFences.stfFormOnSubmit();
     };
 
     expect(callFunction).not.toThrow();
@@ -242,26 +204,7 @@ describe('shortTermFences.stfFormOnSubmit', () => {
     const callFunction: any = () => {
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => false;
 
-      shortTermFences.stfFormOnSubmit({
-        bubbles: false,
-        cancelBubble: true,
-        cancelable: true,
-        composed: false,
-        currentTarget: {},
-        defaultPrevented: false,
-        eventPhase: 9876,
-        isTrusted: false,
-        returnValue: false,
-        srcElement: {},
-        target: {},
-        timeStamp: '1234',
-        type: 'object',
-        AT_TARGET: 987650,
-        BUBBLING_PHASE: -1.0,
-        CAPTURING_PHASE: 0.0,
-        NONE: 10,
-        preventDefault: jest.fn(),
-      } as any);
+      shortTermFences.stfFormOnSubmit();
     };
 
     expect(callFunction).not.toThrow();

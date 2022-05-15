@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
+import { shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import breakupPng from '@app/img/icons/breakup.png';
 
@@ -12,6 +12,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'breakup',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'breakup',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript
@@ -30,7 +36,7 @@ export const init = (): void => {
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  document.getElementById('left-menus').innerHTML += (keepTrackApi.html`
       <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
         <div id="breakup-content" class="side-menu">
           <div class="row">
@@ -110,7 +116,7 @@ export const uiManagerInit = (): void => {
     `);
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  document.getElementById('bottom-icons').innerHTML += (keepTrackApi.html`
       <div id="menu-breakup" class="bmenu-item bmenu-item-disabled">
         <img
           alt="breakup"
@@ -121,18 +127,21 @@ export const uiManagerInit = (): void => {
       </div>
     `);
 
-  $('#breakup').on('submit', function (e: Event) {
-    $('#loading-screen').fadeIn(1000, breakupOnSubmit);
-    e.preventDefault();
-  });
 
-  $('#breakup-menu').resizable({
+$('#breakup-menu').resizable({
     handles: 'e',
     stop: function () {
       $(this).css('height', '');
     },
     maxWidth: 450,
     minWidth: 280,
+  });
+};
+
+export const uiManagerFinal = (): void => {
+  document.getElementById('breakup').addEventListener('submit', function (e: Event) {
+    e.preventDefault();
+    showLoading(() => breakupOnSubmit());
   });
 };
 
@@ -232,7 +241,6 @@ export const breakupOnSubmit = (): void => { // NOSONAR
   }
 
   uiManager.doSearch(`${mainsat.sccNum},Analyst Sat`);
-  $('#loading-screen').fadeOut('slow');
 };
 
 export const hideSideMenus = (): void => {
@@ -260,11 +268,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       } else {
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.breakupDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
-        if (!$('#menu-breakup:animated').length) {
-          $('#menu-breakup').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-breakup'));
       }
       return;
     }

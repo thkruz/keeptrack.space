@@ -725,7 +725,7 @@ export const intelData = (sat: SatObject, satId?: number): void => {
   if (satId !== -1) {
     if (!satInfoboxCore.intelData.isLoaded) {
       document.getElementById('sat-infobox').innerHTML += keepTrackApi.html`
-        <div class="sat-info-section-header">Intel Data</div>
+        <div id="intel-data-section" class="sat-info-section-header">Intel Data</div>
           <div class="sat-info-row sat-only-info" id="sat-ttp-wrapper">
             <div class="sat-info-key">
               TTPs
@@ -828,6 +828,18 @@ export const intelData = (sat: SatObject, satId?: number): void => {
     } else {
       document.getElementById('sat-associates-wrapper').style.display = 'none';
     }
+
+    if (
+      typeof sat.TTP === 'undefined' &&
+      typeof sat.NOTES === 'undefined' &&
+      typeof sat.FMISSED === 'undefined' &&
+      typeof sat.ORPO === 'undefined' &&
+      typeof sat.constellation === 'undefined' &&
+      typeof sat.maneuver === 'undefined' &&
+      typeof sat.associates === 'undefined'
+    ) {
+      document.getElementById('intel-data-section').style.display = 'none';
+    }
   }
 };
 export const objectData = (sat: SatObject): void => {
@@ -885,7 +897,7 @@ export const objectData = (sat: SatObject): void => {
   // /////////////////////////////////////////////////////////////////////////
   // RCS Correlation Table
   // /////////////////////////////////////////////////////////////////////////
-  if (sat.rcs === null || typeof sat.rcs == 'undefined') {
+  if (sat.rcs === null || typeof sat.rcs == 'undefined' || sat.rcs === '') {
     document.getElementById('sat-rcs').innerHTML = 'Unknown';
   } else {
     document.getElementById('sat-rcs').innerHTML = sat.rcs;

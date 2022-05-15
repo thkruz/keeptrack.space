@@ -27,6 +27,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import constellationPng from '@app/img/icons/constellation.png';
+import { shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
@@ -99,11 +100,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         document.getElementById('menu-astronomy').classList.add('bmenu-item-selected');
       } else {
         uiManager.toast(`Select a Sensor First!`, 'caution');
-        if (!$('#menu-astronomy:animated').length) {
-          $('#menu-astronomy').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-astronomy'));
       }
       return;
     }

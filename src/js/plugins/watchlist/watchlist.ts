@@ -26,7 +26,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { saveAs, slideOutLeft, slideInRight } from '@app/js/lib/helpers';
+import { shake, saveAs, slideOutLeft, slideInRight } from '@app/js/lib/helpers';
 import removePng from '@app/img/remove.png';
 import addPng from '@app/img/add.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
@@ -60,6 +60,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'watchlist',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'watchlist',
+    cb: uiManagerFinal,
   });
 
   keepTrackApi.programs.watchlist.updateWatchlist = updateWatchlist;
@@ -247,40 +253,42 @@ export const uiManagerInit = (): void => {
     maxWidth: 450,
     minWidth: 280,
   });
+};
 
+export const uiManagerFinal = (): void => {
   document.querySelector('.menu-selectable').addEventListener('click', menuSelectableClick);
-
+  
   document.getElementById('info-overlay-content').addEventListener('click', function (evt: Event) {
     if (!(<HTMLElement>evt.target).classList.contains('watchlist-object')) return;
     infoOverlayContentClick(evt);
   });
-
+  
   document.getElementById('watchlist-list').addEventListener('click', function (evt: Event) {
     const satId = parseInt((<HTMLElement>evt.target).dataset.satId);
     watchlistListClick(satId);
   });
-
+  
   // Add button selected on watchlist menu
   document.getElementById('watchlist-content').addEventListener('click', watchlistContentEvent);
-
+  
   // Enter pressed/selected on watchlist menu
   document.getElementById('watchlist-content').addEventListener('submit', function (evt: Event) {
     evt.preventDefault();
     watchlistContentEvent(evt);
   });
-
+  
   document.getElementById('watchlist-save').addEventListener('click', function (evt: Event) {
     watchlistSaveClick(evt);
   });
-
+  
   document.getElementById('watchlist-open').addEventListener('click', function () {
     document.getElementById('watchlist-file').click()
   });
-
+  
   document.getElementById('watchlist-file').addEventListener('change', function (evt: Event) {
     watchlistFileChange(evt);
   });
-};
+}
 
 export const updateLoop = () => { // NOSONAR
   const {
@@ -337,11 +345,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
     if (!sensorManager.checkSensorSelected()) {
       // No Sensor Selected
       uiManager.toast(`Select a Sensor First!`, 'caution', true);
-      if (!$('#menu-info-overlay:animated').length) {
-        (<any>$('#menu-info-overlay')).effect('shake', {
-          distance: 10,
-        });
-      }
+      shake(document.getElementById('menu-info-overlay'));
       return;
     }
     if (isInfoOverlayMenuOpen) {
@@ -351,11 +355,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
     } else {
       if (watchlistList.length === 0 && !isWatchlistChanged) {
         uiManager.toast(`Add Satellites to Watchlist!`, 'caution');
-        if (!$('#menu-info-overlay:animated').length) {
-          (<any>$('#menu-info-overlay')).effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-info-overlay'));
         nextPassArray = [];
         return;
       }

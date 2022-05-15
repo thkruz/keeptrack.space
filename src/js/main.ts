@@ -43,6 +43,8 @@ export const loadAfterStart = () => {
   if (settingsManager.cruncherReady) {
     // Update any CSS now that we know what is loaded
     keepTrackApi.methods.uiManagerFinal();
+    // Update MaterialUI with new menu options
+    window.M.AutoInit();
   } else {
     setTimeout(loadAfterStart, 100);
   }
@@ -53,5 +55,4 @@ importCss();
 // Load the main website
 import('./initalizeKeepTrack').then(({ initalizeKeepTrack }) => {
   initalizeKeepTrack();
-  loadAfterStart();
 });

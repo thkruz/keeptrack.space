@@ -32,7 +32,7 @@ import radarPng from '@app/img/icons/radar.png';
 import customPng from '@app/img/icons/custom.png';
 import lookanglesPng from '@app/img/icons/lookangles.png';
 import multiSitePng from '@app/img/icons/multi-site.png';
-import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
@@ -581,11 +581,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         // No Sensor Selected
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensorInfoDisabled();
         uiManager.toast(`Select a Sensor First!`, 'caution');
-        if (!$('#menu-sensor-info:animated').length) {
-          $('#menu-sensor-info').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-sensor-info'));
         break;
       }
       if (isSensorInfoMenuOpen) {
@@ -612,11 +608,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
           // No Sensor or Satellite Selected
           if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.lookanglesDisabled();
           uiManager.toast(`Select a Satellite First!`, 'caution');
-          if (!$('#menu-lookangles:animated').length) {
-            $('#menu-lookangles').effect('shake', {
-              distance: 10,
-            });
-          }
+          shake(document.getElementById('menu-lookangles'));
           break;
         }
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
@@ -640,11 +632,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
           // No Satellite Selected
           if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.ssnLookanglesDisabled();
           uiManager.toast(`Select a Satellite First!`, 'caution');
-          if (!$('#menu-lookanglesmultisite:animated').length) {
-            $('#menu-lookanglesmultisite').effect('shake', {
-              distance: 10,
-            });
-          }
+          shake(document.getElementById('menu-lookanglesmultisite'));
           break;
         }
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);

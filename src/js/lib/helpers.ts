@@ -148,7 +148,44 @@ export const slideInDown = (el: HTMLElement, duration: number, callback?: () => 
   }, duration);
 };
 
+export const showLoading = (callback?: () => void): void => {
+  const loading = document.getElementById('loading-screen');
+  fadeIn(loading, 'flex', 500);
+  setTimeout(() => {
+    if (callback) callback();
+    fadeOut(loading, 500);
+  }, 100);
+};
+
+export const hideLoading = () => {
+  const loading = document.getElementById('loading-screen');
+  fadeOut(loading, 500);
+};
+
+export const fadeIn = (el: HTMLElement, type?: string, duration?: number, callback?: () => void): void => {
+  type ??= 'block';
+  if (el.style.display === type) return;
+  duration = duration ?? 1000;
+  el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+  el.style.display = type;
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
+export const fadeOut = (el: HTMLElement, duration?: number, callback?: () => void): void => {
+  if (el.style.display === 'none') return;
+  duration = duration ?? 1000;
+  el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+  el.style.display = 'none';
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
 export const shake = (el: HTMLElement | HTMLDivElement, duration?: number, callback?: () => void): void => {
+  if (el.classList.contains('shake')) return;
+
   duration ??= 500;
   el.classList.add('shake');
   setTimeout(() => {

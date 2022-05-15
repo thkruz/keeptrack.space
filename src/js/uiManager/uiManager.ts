@@ -61,10 +61,7 @@ export const init = () => {
 
   keepTrackApi.methods.uiManagerInit();
 
-  initBottomMenuResizing();
-
-  // Initialize Materialize
-  M.AutoInit();
+  initBottomMenuResizing();  
 
   // Initialize Navigation and Select Menus
   let elems;
@@ -88,7 +85,7 @@ export const postStart = () => {
         // Intended to catch errors when the page is not loaded yet
       }
     }
-  })();  
+  })();    
 
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
@@ -306,43 +303,33 @@ export const loadStr = (str) => {
   switch (str) {
     case 'science':
       $('#loader-text').html('Locating Science...');
-      console.log('Locating Science...');
       break;
     case 'science2':
       $('#loader-text').html('Found Science...');
-      console.log('Found Science...');
       break;
     case 'dots':
       $('#loader-text').html('Drawing Dots in Space...');
-      console.log('Drawing Dots in Space...');
       break;
     case 'satIntel':
       $('#loader-text').html('Integrating Satellite Intel...');
-      console.log('Integrating Satellite Intel...');
       break;
     case 'radarData':
       $('#loader-text').html('Importing Radar Data...');
-      console.log('Importing Radar Data...');
       break;
     case 'painting':
       $('#loader-text').html('Painting the Earth...');
-      console.log('Painting the Earth...');
       break;
     case 'coloring':
       $('#loader-text').html('Coloring Inside the Lines...');
-      console.log('Coloring Inside the Lines...');
       break;
     case 'elsets':
       $('#loader-text').html('Locating ELSETs...');
-      console.log('Locating ELSETs...');
       break;
     case 'models':
       $('#loader-text').html('Loading 3D Models...');
-      console.log('Loading 3D Models...');
       break;
     case 'easterEgg':
       $('#loader-text').html('Llama Llama Llama Duck!');
-      console.log('Llama Llama Llama Duck!');
   }
 };
 export const doSearch = (searchString: string, isPreventDropDown: boolean) => {

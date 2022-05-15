@@ -1,5 +1,6 @@
 import recorderPng from '@app/img/icons/video.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { shake } from '@app/js/lib/helpers';
 import { CanvasRecorder } from '@app/js/plugins';
 import $ from 'jquery';
 
@@ -44,11 +45,7 @@ export const bottomMenuClick = (iconName: string): void => {
         recorder.setIsRecording(false);
         document.getElementById('menu-record').classList.remove('bmenu-item-selected');
         document.getElementById('menu-record').classList.add('bmenu-item-disabled');
-        if (!$('#menu-record:animated').length) {
-          $('#menu-record').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-record'));
       }
       return;
     }

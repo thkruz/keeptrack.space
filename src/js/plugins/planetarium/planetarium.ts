@@ -27,6 +27,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import planetariumPng from '@app/img/icons/planetarium.png';
+import { shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
@@ -94,11 +95,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       } else {
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.planetariumDisabled();
         uiManager.toast(`Select a Sensor First!`, 'caution');
-        if (!$('#menu-planetarium:animated').length) {
-          $('#menu-planetarium').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-planetarium'));
       }
       return;
     }

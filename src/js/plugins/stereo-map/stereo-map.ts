@@ -27,6 +27,7 @@
 import mapPng from '@app/img/icons/map.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { MapManager } from '@app/js/api/keepTrackTypes';
+import { shake } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 const defaults = {
@@ -207,11 +208,7 @@ export const bottomMenuClick = (iconName: string): void => {
         // No Satellite Selected
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.mapDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
-        if (!$('#menu-map:animated').length) {
-          (<any>$('#menu-map')).effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(document.getElementById('menu-map'));
         return;
       }
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);

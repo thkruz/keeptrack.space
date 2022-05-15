@@ -1,7 +1,7 @@
 import searchPng from '@app/img/icons/search.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SensorObject } from '@app/js/api/keepTrackTypes';
-import { slideOutLeft } from '@app/js/lib/helpers';
+import { shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { addCustomSensor, clearCustomSensors, removeLastSensor } from '@app/js/plugins';
 import $ from 'jquery';
 
@@ -14,6 +14,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'shortTermFences',
     cb: () => uiManagerInit(),
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'shortTermFences',
+    cb: () => uiManagerFinal(),
   });
 
   // Add JavaScript
@@ -112,8 +118,13 @@ export const uiManagerInit = (): void => {
       stfInfoLinks = true;
     },
   });
+};
 
-  document.getElementById('stfForm').addEventListener('submit', stfFormOnSubmit);
+export const uiManagerFinal = (): void => {
+  document.getElementById('stfForm').addEventListener('submit', function (e: Event) {
+    e.preventDefault();
+    stfFormOnSubmit();
+  });
   document.getElementById('stf-remove-last').addEventListener('click', stfRemoveLast);
   document.getElementById('stf-clear-all').addEventListener('click', stfClearAll);
 };
@@ -124,11 +135,7 @@ export const bottomMenuClick = (iconName: string) => {
     if (!sensorManager.checkSensorSelected()) {
       // No Sensor Selected
       uiManager.toast(`Select a Sensor First!`, 'caution', true);
-      if (!$('#menu-stf:animated').length) {
-        $('#menu-stf').effect('shake', {
-          distance: 10,
-        });
-      }
+      shake(document.getElementById('menu-stf'));
       return;
     }
 
@@ -138,7 +145,7 @@ export const bottomMenuClick = (iconName: string) => {
       return;
     } else {
       uiManager.hideSideMenus();
-      (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('stf-menu'), 1000);
       isStfMenuOpen = true;
       document.getElementById('menu-stf').classList.add('bmenu-item-selected');
       return;
@@ -173,10 +180,8 @@ export const setSensor = (sensor: any, id?: number) => {
   }
 };
 
-export const stfFormOnSubmit = (e: Event) => {
+export const stfFormOnSubmit = () => {
   const { sensorManager, satellite, satSet, uiManager } = keepTrackApi.programs;
-  e.preventDefault();
-
   if (!sensorManager.checkSensorSelected()) {
     uiManager.toast(`Select a Sensor First!`, 'caution', true);
     return;
@@ -253,7 +258,7 @@ export const stfOnObjectLinkClick = () => {
   (<HTMLInputElement>document.getElementById('stf-el')).value = satellite.currentTEARR.el.toFixed(1);
   (<HTMLInputElement>document.getElementById('stf-rng')).value = satellite.currentTEARR.rng.toFixed(1);
   uiManager.hideSideMenus();
-  (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+  slideOutLeft(document.getElementById('stf-menu'), 1000);
   isStfMenuOpen = true;
   document.getElementById('menu-stf').classList.add('bmenu-item-selected');
 };

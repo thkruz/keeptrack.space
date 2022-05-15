@@ -10,7 +10,7 @@ let socratesObjTwo = []; // Array for tr containing CATNR2
 
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  document.getElementById('left-menus').innerHTML += keepTrackApi.html`
         <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
           <div id="socrates-content" class="side-menu">
             <div class="row">
@@ -19,26 +19,16 @@ export const uiManagerInit = () => {
             </div>
           </div>
         </div>
-      `);
-
-  document.getElementById('socrates-menu').addEventListener('click', (evt: any) => {
-    // must have '.socrates-object' class
-    if (!(<HTMLElement>evt.target).classList.contains('socrates-object')) return;
-    // Might be better code for this.
-    const hiddenRow = evt.currentTarget.attributes.hiddenrow.value;
-    if (hiddenRow !== null) {
-      socrates(hiddenRow);
-    }
-  });
+      `;
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  document.getElementById('bottom-icons').innerHTML += keepTrackApi.html`
         <div id="menu-satellite-collision" class="bmenu-item">
           <img alt="socrates" src="" delayedsrc="${socratesPng}" />
           <span class="bmenu-title">Collisions</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `;
 
   // Allow resizing of the side menu
   $('#socrates-menu').resizable({
@@ -50,6 +40,19 @@ export const uiManagerInit = () => {
     minWidth: 290,
   });
 };
+
+export const uiManagerFinal = () => {
+  document.getElementById('socrates-menu').addEventListener('click', (evt: any) => {
+    const el = <HTMLElement>evt.target.parentElement;
+    if (!el.classList.contains('socrates-object')) return;
+    // Might be better code for this.
+    const hiddenRow = (<any>el.attributes).hiddenrow.value;
+    if (hiddenRow !== null) {
+      socrates(hiddenRow);
+    }
+  });
+};
+
 export const adviceReady = () => {
   const aM = keepTrackApi.programs.adviceManager;
   aM.adviceCount.socrates = 0;
@@ -62,7 +65,7 @@ export const adviceReady = () => {
     aM.showAdvice(
       'SOCRATES Near Conjunction List',
       'Did you know that objects frequently come close to colliding? Using data from Center for Space Standards and Innovation you can find upcoming possible collisions.',
-      $('#menu-satellite-collision'),
+      document.getElementById('menu-satellite-collision'),
       'bottom'
     );
   };
@@ -102,6 +105,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'collisions',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'collisions',
+    cb: uiManagerFinal,
   });
 
   // Add Advice Info

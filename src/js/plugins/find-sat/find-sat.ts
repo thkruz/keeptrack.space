@@ -1,7 +1,6 @@
 import findSatPng from '@app/img/icons/find2.png';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { getUnique, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
-import $ from 'jquery';
+import { getUnique, hideLoading, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
 
@@ -137,12 +136,12 @@ export const checkRange = (posAll: SearchResults[], min: number, max: number) =>
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  document.getElementById('left-menus').innerHTML += keepTrackApi.html`
         <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
           <div id="findByLooks-content" class="side-menu">
             <div class="row">
               <h5 class="center-align">Find By Looks</h5>
-              <form id="findByLooks">
+              <form id="findByLooks-form">
                 <div class="row">
                   <div class="input-field col s12">
                     <select value=0 id="fbl-type" type="text">
@@ -270,41 +269,45 @@ export const uiManagerInit = (): void => {
             </div>
           </div>
         </div>
-      `);
+      `;
 
   document.getElementById('fbl-error').addEventListener('click', function () {
     document.getElementById('fbl-error').style.display = 'none';
   });
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  document.getElementById('bottom-icons').innerHTML += keepTrackApi.html`
         <div id="menu-find-sat" class="bmenu-item">
           <img alt="find2" src="${findSatPng}"/>
           <span class="bmenu-title">Find Satellite</span>
           <div class="status-icon"></div>
         </div>     
-      `);
-
-  $('#findByLooks').on('submit', function (e: Event) {
-    findByLooksSubmit();
-    e.preventDefault();
-  });
+      `;
 };
 
 export const uiManagerFinal = () => {
   const { satSet } = keepTrackApi.programs;
+
+  document.getElementById('findByLooks-form').addEventListener('submit', function (e: Event) {
+    e.preventDefault();
+    showLoading(() => {
+      findByLooksSubmit();
+      hideLoading();
+    });
+  });
+
   getUnique(satSet.satData.filter((obj: SatObject) => obj.bus).map((obj) => obj.bus))
     // Sort using lower case
     .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
     .forEach((bus) => {
-      $('#fbl-bus').append(`<option value="${bus}">${bus}</option>`);
+      document.getElementById('fbl-bus').innerHTML += `<option value="${bus}">${bus}</option>`;
     });
 
   getUnique(satSet.satData.filter((obj: SatObject) => obj.shape).map((obj) => obj.shape))
     // Sort using lower case
     .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
     .forEach((shape) => {
-      $('#fbl-shape').append(`<option value="${shape}">${shape}</option>`);
+      document.getElementById('fbl-shape').innerHTML += `<option value="${shape}">${shape}</option>`;
     });
 
   const payloadPartials = satSet.satData
@@ -322,12 +325,9 @@ export const uiManagerFinal = () => {
     .forEach((payload) => {
       if (payload === '') return;
       if (payload.length > 3) {
-        $('#fbl-payload').append(`<option value="${payload}">${payload}</option>`);
+        document.getElementById('fbl-payload').innerHTML += `<option value="${payload}">${payload}</option>`;
       }
     });
-
-  // Update MaterialUI with new menu options
-  window.M.AutoInit();
 };
 
 export const bottomMenuClick = (iconName: string): void => {
@@ -379,7 +379,7 @@ export const init = (): void => {
     cb: hideSideMenus,
   });
 };
-export const findByLooksSubmit = () => {
+export const findByLooksSubmit = async () => {
   const az = parseFloat((<HTMLInputElement>document.getElementById('fbl-azimuth')).value);
   const el = parseFloat((<HTMLInputElement>document.getElementById('fbl-elevation')).value);
   const rng = parseFloat((<HTMLInputElement>document.getElementById('fbl-range')).value);

@@ -92,7 +92,7 @@ body {
 .logo-font {
   font-family: 'nasalization', sans-serif;
   font-size: 8em;
-  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.75);
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 800px) {

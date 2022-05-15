@@ -26,7 +26,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { saveAs } from '@app/js/lib/helpers';
+import { saveAs, slideOutLeft, slideInRight } from '@app/js/lib/helpers';
 import removePng from '@app/img/remove.png';
 import addPng from '@app/img/add.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
@@ -42,8 +42,8 @@ let nextPassArray: any = [];
 let isInfoOverlayMenuOpen = false;
 
 export const hideSideMenus = (): void => {
-  (<any>$('#watchlist-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  (<any>$('#info-overlay-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
+  slideOutLeft(document.getElementById('watchlist-menu'), 1000);
+  slideOutLeft(document.getElementById('info-overlay-menu'), 1000);
   document.getElementById('menu-info-overlay').classList.remove('bmenu-item-selected');
   document.getElementById('menu-watchlist').classList.remove('bmenu-item-selected');
   isInfoOverlayMenuOpen = false;
@@ -385,7 +385,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
         uiManager.updateNextPassOverlay(nextPassArray, true);
       }
 
-      (<any>$('#info-overlay-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(document.getElementById('info-overlay-menu'), 1000);
       document.getElementById('menu-info-overlay').classList.add('bmenu-item-selected');
       isInfoOverlayMenuOpen = true;
       return;
@@ -399,8 +399,8 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
       return;
     } else {
       if ((<any>settingsManager).isMobileModeEnabled) uiManager.searchToggle(false);
-      uiManager.hideSideMenus();
-      (<any>$('#watchlist-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      uiManager.hideSideMenus();      
+      slideInRight(document.getElementById('watchlist-menu'), 1000);
       updateWatchlist();
       isWatchlistMenuOpen = true;
       document.getElementById('menu-watchlist').classList.add('bmenu-item-selected');

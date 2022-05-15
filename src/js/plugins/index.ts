@@ -45,7 +45,6 @@ import * as topMenu from '@app/js/plugins/top-menu/top-menu';
 import * as twitter from '@app/js/plugins/twitter/twitter';
 import * as updateSelectBoxCore from '@app/js/plugins/update-select-box/update-select-box';
 import * as watchlist from '@app/js/plugins/watchlist/watchlist';
-import $ from 'jquery';
 import { omManager } from './initial-orbit/om-manager';
 import { CanvasRecorder } from './recorder-manager/canvas-recorder/canvas-recorder';
 import { isselectedSatNegativeOne, selectSatManager } from './select-sat-manager/select-sat-manager';
@@ -157,16 +156,16 @@ export const uiManagerFinal = (plugins: any): void => {
     startGoogleAnalytics();
   }
 
-  const wheel = (dom: HTMLDivElement, deltaY: number) => {
+  const wheel = (dom: any, deltaY: number) => {
     const step = 0.15;
-    const pos = dom.scrollTop();
+    const pos = dom.scrollTop;
     const nextPos = pos + step * deltaY;
-    dom.scrollTop(nextPos);
+    dom.scrollTop = nextPos;
   };
 
-  $('#bottom-icons-container').bind('mousewheel', function (event: any) {
-    wheel($(this), event.originalEvent.deltaY);
+  document.getElementById('bottom-icons-container').addEventListener('mousewheel', (event: any) => {
     event.preventDefault();
+    wheel(event.currentTarget, event.deltaY);
   });
 };
 

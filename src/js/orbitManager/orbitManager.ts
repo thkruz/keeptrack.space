@@ -48,9 +48,8 @@ export const init = (orbitWorker?: Worker): void => {
     } catch (error) {
       // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
       if (window.location.href.indexOf('file://') === 0) {
-        $('#loader-text').text(
-          'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
-        );
+        document.getElementById('loader-text').innerText =
+          'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.';
       } else {
         console.error(error);
       }

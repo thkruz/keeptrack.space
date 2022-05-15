@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { MediaRecorderOptions } from '@app/types/types';
+import $ from 'jquery';
 
 export class CanvasRecorder {
   isVideoRecording: boolean;

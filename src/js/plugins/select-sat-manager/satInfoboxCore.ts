@@ -3,6 +3,7 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { SunCalc } from '@app/js/lib/suncalc.js';
+import $ from 'jquery';
 import './satInfoboxCore.css';
 
 const satInfoboxCore = {

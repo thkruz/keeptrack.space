@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { stringPad } from '@app/js/lib/helpers';
+import $ from 'jquery';
 
 /**
  *  @returns {Promise<any>}

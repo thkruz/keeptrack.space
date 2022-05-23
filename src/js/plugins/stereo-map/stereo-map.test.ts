@@ -19,6 +19,9 @@ describe('stereoMap.init', () => {
 describe('stereoMap.resize2DMap', () => {
   test('0', () => {
     let callFunction: any = () => {
+      document.body.innerHTML = `
+        <canvas id="map-2d"/>
+      `;
       stereoMap.resize2DMap(true);
     };
 
@@ -27,6 +30,9 @@ describe('stereoMap.resize2DMap', () => {
 
   test('1', () => {
     let callFunction: any = () => {
+      document.body.innerHTML = `
+        <canvas id="map-2d"/>
+      `;
       stereoMap.resize2DMap(false);
     };
 
@@ -84,35 +90,6 @@ describe('stereoMap.onCruncherMessage', () => {
   test('0', () => {
     keepTrackApi.programs.mapManager.isMapMenuOpen = true;
     let result: any = stereoMap.onCruncherMessage();
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('stereoMap.braun', () => {
-  test('0', () => {
-    let result: any = stereoMap.braun({ lon: 0, lat: 90 }, { meridian: 12, latLimit: 10 });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    let result: any = stereoMap.braun({ x: 0.5, y: 0.5 }, { meridian: 12, latLimit: 10 });
-    expect(result).toMatchSnapshot();
-  });
-
-  test('2', () => {
-    let callFunction: any = () => {
-      stereoMap.braun({ x: 'a', y: 0.5 }, { meridian: 12, latLimit: 10 });
-    };
-
-    expect(callFunction).toThrow();
-  });
-});
-
-// @ponicode
-describe('stereoMap.options', () => {
-  test('0', () => {
-    let result: any = stereoMap.options({ test: 'test' });
     expect(result).toMatchSnapshot();
   });
 });

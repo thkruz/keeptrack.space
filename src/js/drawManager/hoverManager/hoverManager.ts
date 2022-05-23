@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { getEl } from '@app/js/lib/helpers';
 import { SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { spaceObjType2Str } from '../../lib/spaceObjType2Str';
@@ -14,14 +15,17 @@ let updateHoverDelayLimit = 3;
 let updateHoverSatId: number;
 
 export const init = () => {
-  satHoverBoxNode1 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox1'));
-  satHoverBoxNode2 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox2'));
-  satHoverBoxNode3 = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox3'));
-  satHoverBoxDOM = <HTMLDivElement>(<unknown>document.getElementById('sat-hoverbox'));
+  // NOTE: Reusing these cached value causes the hover menu to get stuck on or off
+  // when the user clicks on a satellite. You need to getElementById every time.
+  satHoverBoxNode1 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox1'));
+  satHoverBoxNode2 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox2'));
+  satHoverBoxNode3 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox3'));
+  satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
 };
 export const hoverOverNothing = () => {
   const { drawManager } = keepTrackApi.programs;
-  if (!drawManager.isHoverBoxVisible || !settingsManager.enableHoverOverlay) return false;
+  satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
+  if (satHoverBoxDOM.style.display === 'none' || !settingsManager.enableHoverOverlay) return false;
   const { objectManager, starManager } = keepTrackApi.programs;
   if (objectManager.isStarManagerLoaded) {
     if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
@@ -36,13 +40,11 @@ export const hoverOverSomething = (satId: number, satX: number, satY: number) =>
   const { drawManager, mainCamera, satSet } = keepTrackApi.programs;
   if (!mainCamera.isDragging && settingsManager.enableHoverOverlay) {
     // NOTE: The radar mesurement logic breaks if you call it a SatObject
-    const sat = <any>satSet.getSat(satId);
-    drawManager.isHoverBoxVisible = true;
 
-    const parentNode = satHoverBoxDOM.parentNode;
-    if (parentNode == null) return;
-    const nextSibling = satHoverBoxDOM.nextSibling;
-    parentNode.removeChild(satHoverBoxDOM); // reflow
+    const sat = <any>satSet.getSat(satId);
+    drawManager.isHoverBoxVisible = true;    
+
+    init();    
 
     if (sat.static || sat.isRadarData) {
       staticObj(sat);
@@ -54,13 +56,14 @@ export const hoverOverSomething = (satId: number, satX: number, satY: number) =>
       staticObj(sat);
     }
 
-    satHoverBoxDOM.style.display = 'block';
-    satHoverBoxDOM.style.textAlign = 'center';
-    satHoverBoxDOM.style.position = 'fixed';
-    satHoverBoxDOM.style.left = `${satX + 20}px`;
-    satHoverBoxDOM.style.top = `${satY - 10}px`;
+    const style = {
+      display: 'block',
+      left: `${satX + 20}px`,
+      top: `${satY - 10}px`,
+    };
+    Object.assign(satHoverBoxDOM.style, style);
+
     drawManager.canvas.style.cursor = 'pointer';
-    parentNode.insertBefore(satHoverBoxDOM, nextSibling); // reflow
   }
 };
 export const staticObj = (sat: any) => {
@@ -109,6 +112,7 @@ export const satObj = (sat: SatObject) => {
           `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
       } else {
         satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, drawManager.sat2)}`;
+        if (settingsManager.isEciOnHover) {
         satHoverBoxNode3.innerHTML =
           'X: ' +
           sat.position.x.toFixed(2) +
@@ -129,6 +133,9 @@ export const satObj = (sat: SatObject) => {
           ' ZDot: ' +
           sat.velocity.z.toFixed(2) +
           ' km/s';
+        } else {
+          satHoverBoxNode3.innerHTML = '';
+        }
       }
     } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass) {
       satHoverBoxNode1.textContent = sat.name;
@@ -137,7 +144,8 @@ export const satObj = (sat: SatObject) => {
     } else {
       satHoverBoxNode1.textContent = sat.name;
       satHoverBoxNode2.textContent = sat.sccNum;
-      satHoverBoxNode3.innerHTML =
+      if (settingsManager.isEciOnHover) {
+        satHoverBoxNode3.innerHTML =
         'X: ' +
         sat.position.x.toFixed(2) +
         ' Y: ' +
@@ -150,6 +158,9 @@ export const satObj = (sat: SatObject) => {
         sat.velocity.y.toFixed(2) +
         ' Z: ' +
         sat.velocity.z.toFixed(2);
+      } else {
+        satHoverBoxNode3.innerHTML = '';
+      }
     }
   }
 };
@@ -158,10 +169,10 @@ export const radarData = (sat: any) => {
 
   satHoverBoxNode1.innerHTML = 'Measurement: ' + sat.mId + '</br>Track: ' + sat.trackId + '</br>Object: ' + sat.objectId;
   if (sat.missileComplex !== -1) {
-    satHoverBoxNode1.innerHTML += '</br>Missile Complex: ' + sat.missileComplex;
-    satHoverBoxNode1.innerHTML += '</br>Missile Object: ' + sat.missileObject;
+    satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Missile Complex: ' + sat.missileComplex);
+    satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Missile Object: ' + sat.missileObject);
   }
-  if (parseInt(sat.sccNum) !== -1) satHoverBoxNode1.innerHTML += '</br>Satellite: ' + sat.sccNum;
+  if (parseInt(sat.sccNum) !== -1) satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Satellite: ' + sat.sccNum);
   if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
     sat.rae = satellite.eci2Rae(sat.t, sat.position, sensorManager.currentSensor[0]);
     sat.setRAE(sat.rae);
@@ -228,7 +239,7 @@ export const planetariumView = (satId: number) => {
   }
   return false;
 };
-export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
+export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {  
   if (typeof satHoverBoxDOM === 'undefined' || satHoverBoxDOM === null) return;
 
   if (planetariumView(satId)) return;
@@ -242,7 +253,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
 export const updateHover = () => { // NOSONAR
-  const { drawManager, mainCamera, orbitManager, uiManager, searchBox, satSet, timeManager } = keepTrackApi.programs;
+  const { drawManager, mainCamera, orbitManager, uiManager, searchBox, satSet, timeManager } = keepTrackApi.programs;  
 
   if (searchBox.isResultBoxOpen() && !settingsManager.disableUI && !settingsManager.lowPerf) {
     currentSearchSats = searchBox.getLastResultGroup();

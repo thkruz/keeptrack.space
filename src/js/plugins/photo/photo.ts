@@ -26,16 +26,21 @@
 
 import cameraPng from '@app/img/icons/camera.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl } from '@app/js/lib/helpers';
 
 export const rightBtnMenuAdd = () => {
-  $('#right-btn-menu-ul').append(keepTrackApi.html`   
+  getEl('right-btn-menu-ul').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`   
             <li class="rmb-menu-item" id="save-rmb"><a href="#">Save Image &#x27A4;</a></li>
-          `);
+          `
+  );
 };
 export const uiManagerInit = () => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-photo" class="bmenu-item">
           <img
             alt="camera"
@@ -45,7 +50,8 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Take Photo</span>
           <div class="status-icon"></div>
         </div>
-      `);
+        `
+  );
 
   keepTrackApi.register({
     method: 'rightBtnMenuAdd',
@@ -53,7 +59,9 @@ export const uiManagerInit = () => {
     cb: rightBtnMenuAdd,
   });
 
-  $('#rmb-wrapper').append(keepTrackApi.html`
+  getEl('rmb-wrapper').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="save-rmb-menu" class="right-btn-menu">
           <ul class='dropdown-contents'>
             <li id="save-hd-rmb"><a href="#">HD (1920 x 1080)</a></li>
@@ -61,7 +69,8 @@ export const uiManagerInit = () => {
             <li id="save-8k-rmb"><a href="#">8K (7680 x 4320)</a></li>
           </ul>
         </div>
-      `);
+        `
+  );
 };
 export const rmbMenuActions = (iconName: string): void => {
   switch (iconName) {

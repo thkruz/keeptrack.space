@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { getEl, shake } from '@app/js/lib/helpers';
 import { MediaRecorderOptions } from '@app/types/types';
 
 export class CanvasRecorder {
@@ -41,28 +42,23 @@ export class CanvasRecorder {
         } else {
           console.debug('No Recording Support');
           CanvasRecorder.isVideoRecording = false;
-          $('#menu-record').removeClass('bmenu-item-selected');
-          $('#menu-record').addClass('bmenu-item-disabled');
+          getEl('menu-record').classList.remove('bmenu-item-selected');
+          getEl('menu-record').classList.add('bmenu-item-disabled');
           M.toast({
             html: `Compatibility Error with Recording`,
           });
-          if (!$('#menu-record:animated').length) {
-            $('#menu-record').effect('shake', { distance: 10 });
-          }
+          shake(getEl('menu-record'));
           return false;
         }
       } else {
         console.debug('No Recording Support in Http! Try Https!');
         CanvasRecorder.isVideoRecording = false;
-        $('#menu-record').removeClass('bmenu-item-selected');
-        $('#menu-record').addClass('bmenu-item-disabled');
+        getEl('menu-record').classList.remove('bmenu-item-selected');
+        getEl('menu-record').classList.add('bmenu-item-disabled');
         M.toast({
           html: `Recording Only Available with HTTPS`,
         });
-        /* istanbul ignore next */
-        if (!$('#menu-record:animated').length) {
-          $('#menu-record').effect('shake', { distance: 10 });
-        }
+        shake(getEl('menu-record'));
         return false;
       }
     };
@@ -74,7 +70,7 @@ export class CanvasRecorder {
         .then(function beginRecording(srcObject) {
           if (srcObject == false) return;
           CanvasRecorder.isVideoRecording = true;
-          $('#menu-record').addClass('bmenu-item-selected');
+          getEl('menu-record').classList.add('bmenu-item-selected');
           let stream = srcObject;
           video.srcObject = <any>srcObject;
           let types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
@@ -101,7 +97,7 @@ export class CanvasRecorder {
             mediaRecorder = new window.MediaRecorder(stream, options);
           } catch (e) {
             CanvasRecorder.isVideoRecording = false;
-            $('#menu-record').removeClass('bmenu-item-selected');
+            getEl('menu-record').classList.remove('bmenu-item-selected');
             console.warn('Exception while creating MediaRecorder:', e);
             return;
           }

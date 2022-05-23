@@ -276,11 +276,12 @@ ul {
 }
 
 #sat-hoverbox {
-  display: none;
+  display: block;
   background: var(--colorTertiaryDarken2) !important;
   cursor: default;
   color: white;
   position: absolute;
+  text-align: center;
   padding: 10px;
   border-radius: 0px;
   border: 5px solid var(--colorTertiaryDarken3);
@@ -443,7 +444,7 @@ ul {
   background: rgb(255, 0, 0);
 }
 
-.legend-trusat-box {
+.legend-pink-box {
   background: rgb(108, 0, 50);
   display: hidden;
 }
@@ -571,10 +572,6 @@ ul {
   width: 15px;
 }
 
-#satChng-content {
-  width: 330px;
-}
-
 #map-menu {
   display: none;
   position: absolute;
@@ -586,7 +583,6 @@ ul {
 
 #map-sensor {
   position: absolute;
-  z-index: -1;
 }
 
 #map-sat {
@@ -685,11 +681,13 @@ ul {
 
 .side-menu-parent {
   position: absolute !important;
-  width: 265px;
+  min-width: 265px;
   top: var(--top-menu-height);
   bottom: var(--bottom-menu-top);
   margin-top: -2px;
   left: 0px;
+  transition: all 1s ease-in-out;
+  transform: translateX(-100%);
 }
 
 input[type='checkbox'].css-checkbox {
@@ -1229,4 +1227,70 @@ input:focus {
   border-radius: 10px !important;
   background: var(--colorPrimary) !important;
   border: 2px solid white !important;
+}
+
+@keyframes shake {
+  0% {
+    filter: brightness(1.5);
+  }
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+  100% {
+    filter: '';
+  }
+}
+
+.shake {
+  animation: shake 1s;
+  animation-iteration-count: infinite;
+}
+
+#colorbox-div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  padding: 5%;
+}
+
+#colorbox-container {
+  background-color: 'white';
+  transform: translateX(-200%);
+  transition: transform 1s ease-in-out 0s;
+  display: block;
+  z-index: 100;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  border-color: var(--colorTertiaryDarken3);
+  border-width: 10px;
+  border-style: solid;
+  border-radius: 5px;
+}
+
+#colorbox-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
 }

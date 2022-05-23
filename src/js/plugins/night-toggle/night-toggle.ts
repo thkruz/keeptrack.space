@@ -1,6 +1,6 @@
 import dayNightPng from '@app/img/icons/day-night.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl } from '@app/js/lib/helpers';
 
 export const init = (): void => {
   // Add HTML
@@ -9,13 +9,16 @@ export const init = (): void => {
     cbName: 'nightToggle',
     cb: () => {
       // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+      getEl('bottom-icons').insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
         <div id="menu-day-night" class="bmenu-item">
           <img alt="day-night" src="" delayedsrc="${dayNightPng}" />
           <span class="bmenu-title">Night Toggle</span>
           <div class="status-icon"></div>
         </div>
-      `);
+        `
+      );
       settingsManager.isDayNightToggle = false;
     },
   });
@@ -28,11 +31,11 @@ export const init = (): void => {
       if (iconName === 'menu-day-night') {
         if (settingsManager.isDayNightToggle) {
           settingsManager.isDayNightToggle = false;
-          $('#menu-day-night').removeClass('bmenu-item-selected');
+          getEl('menu-day-night').classList.remove('bmenu-item-selected');
           return;
         } else {
           settingsManager.isDayNightToggle = true;
-          $('#menu-day-night').addClass('bmenu-item-selected');
+          getEl('menu-day-night').classList.add('bmenu-item-selected');
           return;
         }
       }

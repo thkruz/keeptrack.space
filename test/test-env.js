@@ -84,10 +84,8 @@ window.jQuery = $;
 
 $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
 
-$.colorbox = jest.fn();
 $.datepicker = jest.fn();
 $.fn.datepicker = jest.fn();
-$.fn.colorbox = jest.fn();
 $.fn.colorPick = jest.fn();
 $.fn.effect = jest.fn();
 $.fn.resizable = jest.fn();

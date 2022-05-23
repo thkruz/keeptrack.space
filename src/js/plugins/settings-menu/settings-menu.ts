@@ -1,6 +1,6 @@
 import settingsPng from '@app/img/icons/settings.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { parseRgba, rgbCss } from '@app/js/lib/helpers';
+import { getEl, parseRgba, rgbCss, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 /**
@@ -39,6 +39,12 @@ export const init = (): void => {
     cb: () => uiManagerInit(),
   });
 
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'settingsMenu',
+    cb: () => uiManagerFinal(),
+  });
+
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
@@ -55,18 +61,39 @@ export const init = (): void => {
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
     <div id="settings-menu" class="side-menu-parent start-hidden text-select">
       <div id="settings-content" class="side-menu">
         <div class="row">
           <form id="settings-form">
             <div id="settings-general">
+              <div class="row center"></div>
+              </br>
+              <div class="row center">
+                <button id="settings-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Settings &#9658;</button>
+              </div>
               <h5 class="center-align">General Settings</h5>
               <div class="switch row">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
                   <input id="settings-drawEcf" type="checkbox" />
                   <span class="lever"></span>
                   Draw Orbits in ECF
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Draw Milky Way in Background">
+                  <input id="settings-drawMilkyWay" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Draw the Milky Way
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Display ECI Coordinates on Hover">
+                  <input id="settings-eciOnHover" type="checkbox"/>
+                  <span class="lever"></span>
+                  Display ECI on Hover
                 </label>
               </div>
               <div class="switch row">
@@ -138,24 +165,18 @@ export const uiManagerInit = (): void => {
               </div>
             </div>
             <div class="row"></div>
-            <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-            <div id="satOverfly-opt">
-              <h5 class="center-align">Satellite Overfly Settings</h5>
-              <div class="input-field col s12">
-                <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees" />
-                <label for="satFieldOfView" class="active">Satellite Field of View</label>
-              </div>
-              <div class="row"></div>
-            </div>
             <div id="settings-opt">
               <h5 class="center-align">Settings Overrides</h5>
               <div class="input-field col s12">
                 <input value="150" id="maxSearchSats" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Maximum satellites to display in search" />
                 <label for="maxSearchSats" class="active">Maximum Satellites in Search</label>
               </div>
+              <div class="input-field col s12">
+                <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees" />
+                <label for="satFieldOfView" class="active">Satellite Field of View</label>
+              </div>
               <div class="row"></div>
             </div>
-            <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
             <div id="fastCompSettings">
               <h5 class="center-align">Fast CPU Required</h5>
               <div class="switch row">
@@ -165,11 +186,6 @@ export const uiManagerInit = (): void => {
                   Show Next Pass on Hover
                 </label>
               </div>
-              <div class="row"></div>
-              <br />
-              <div class="row center">
-                <button id="settings-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Settings &#9658;</button>
-              </div>
             </div>
             <!-- <div id="settings-lowperf" class="row center">
               <button class="red btn waves-effect waves-light" onclick="uiManager.startLowPerf();">Low End PC Version &#9658;</button>
@@ -178,10 +194,13 @@ export const uiManagerInit = (): void => {
         </div>
       </div>
     </div>
-  `);
+    `
+  );
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
     <div id="menu-settings" class="bmenu-item">
       <img
         alt="settings"
@@ -191,13 +210,8 @@ export const uiManagerInit = (): void => {
       <span class="bmenu-title">Settings</span>
       <div class="status-icon"></div>
     </div>
-  `);
-
-  $('#settings-form').on('change', settingsFormChange);
-
-  $('#settings-riseset').on('change', settingsRisesetChange);
-
-  $('#settings-form').on('submit', settingsFormSubmit);
+  `
+  );
 
   (() => {
     const colorPalette = [
@@ -268,6 +282,11 @@ export const uiManagerInit = (): void => {
   })();
 };
 
+export const uiManagerFinal = () => {
+  getEl('settings-form').addEventListener('change', settingsFormChange);
+  getEl('settings-form').addEventListener('submit', settingsFormSubmit);
+};
+
 export const bottomMenuClick = (iconName: string) => {
   const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-settings') {
@@ -278,17 +297,17 @@ export const bottomMenuClick = (iconName: string) => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#settings-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('settings-menu'), 1000);
       isSettingsMenuOpen = true;
-      $('#menu-settings').addClass('bmenu-item-selected');
+      getEl('menu-settings').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 
 export const hideSideMenus = () => {
-  $('#settings-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-settings').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('settings-menu'), 1000);
+  getEl('menu-settings').classList.remove('bmenu-item-selected');
   isSettingsMenuOpen = false;
 };
 
@@ -314,42 +333,38 @@ export const onColorSelected = (context: any, colorStr: string) => {
 export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
 
-  isDMChecked ??= (<HTMLInputElement>document.getElementById('settings-demo-mode')).checked;
-  isSLMChecked ??= (<HTMLInputElement>document.getElementById('settings-sat-label-mode')).checked;
+  isDMChecked ??= (<HTMLInputElement>getEl('settings-demo-mode')).checked;
+  isSLMChecked ??= (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
 
   if (isSLMChecked && (<HTMLElement>e.target).id === 'settings-demo-mode') {
-    (<HTMLInputElement>document.getElementById('settings-sat-label-mode')).checked = false;
-    $('#settings-demo-mode').removeClass('lever:after');
+    (<HTMLInputElement>getEl('settings-sat-label-mode')).checked = false;
+    getEl('settings-demo-mode').classList.remove('lever:after');
   }
 
   if (isDMChecked && (<HTMLElement>e.target).id === 'settings-sat-label-mode') {
-    (<HTMLInputElement>document.getElementById('settings-demo-mode')).checked = false;
-    $('#settings-sat-label-mode').removeClass('lever:after');
+    (<HTMLInputElement>getEl('settings-demo-mode')).checked = false;
+    getEl('settings-sat-label-mode').classList.remove('lever:after');
   }
 };
 
-export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?: boolean, isSLMChecked?: boolean, isSNPChecked?: boolean, isDrawEcfChecked?: boolean) => {
+export const settingsFormSubmit = (e: any) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
   const { satSet, colorSchemeManager, uiManager } = keepTrackApi.programs;
 
-  isDrawEcfChecked ??= (<HTMLInputElement>document.getElementById('settings-drawEcf')).checked;
-  isHOSChecked ??= (<HTMLInputElement>document.getElementById('settings-hos')).checked;
-  isDMChecked ??= (<HTMLInputElement>document.getElementById('settings-demo-mode')).checked;
-  isSLMChecked ??= (<HTMLInputElement>document.getElementById('settings-sat-label-mode')).checked;
-  isSNPChecked ??= (<HTMLInputElement>document.getElementById('settings-snp')).checked;
-
-  settingsManager.isSatLabelModeOn = isSLMChecked;
-  settingsManager.isDemoModeOn = isDMChecked;
+  settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
+  settingsManager.isDrawMilkyWay = (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
+  settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
+  const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;
   settingsManager.colors.transparent = isHOSChecked ? [1.0, 1.0, 1.0, 0] : [1.0, 1.0, 1.0, 0.1];
-  settingsManager.isOrbitCruncherInEcf = isDrawEcfChecked;
+  settingsManager.isDemoModeOn = (<HTMLInputElement>getEl('settings-demo-mode')).checked;
+  settingsManager.isSatLabelModeOn = (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
+  settingsManager.isShowNextPass = (<HTMLInputElement>getEl('settings-snp')).checked;
 
   colorSchemeManager.reloadColors();
 
-  settingsManager.isShowNextPass = isSNPChecked;
-
-  const newFieldOfView = parseInt($('#satFieldOfView').val());
+  const newFieldOfView = parseInt((<HTMLInputElement>getEl('satFieldOfView')).value);
   if (isNaN(newFieldOfView)) {
-    $('#satFieldOfView').val('30');
+    (<HTMLInputElement>getEl('satFieldOfView')).value = '30';
     uiManager.toast('Invalid field of view value!', 'critical');
   } else {
     satSet.satCruncher.postMessage({
@@ -358,9 +373,9 @@ export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?:
     });
   }
 
-  const maxSearchSats = parseInt($('#maxSearchSats').val());
+  const maxSearchSats = parseInt((<HTMLInputElement>getEl('maxSearchSats')).value);
   if (isNaN(maxSearchSats)) {
-    $('#maxSearchSats').val(settingsManager.searchLimit);
+    (<HTMLInputElement>getEl('maxSearchSats')).value = settingsManager.searchLimit.toString();
     uiManager.toast('Invalid max search sats value!', 'critical');
   } else {
     settingsManager.searchLimit = maxSearchSats;
@@ -370,16 +385,4 @@ export const settingsFormSubmit = (e: any, isHOSChecked?: boolean, isDMChecked?:
   settingsManager.isForceColorScheme = true;
   satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
   e.preventDefault();
-};
-
-export const settingsRisesetChange = (e: any, isRiseSetChecked?: boolean) => {
-  const { satellite } = keepTrackApi.programs;
-  if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-
-  isRiseSetChecked ??= (<HTMLInputElement>document.getElementById('settings-riseset')).checked;
-  if (isRiseSetChecked) {
-    satellite.isRiseSetLookangles = true;
-  } else {
-    satellite.isRiseSetLookangles = false;
-  }
 };

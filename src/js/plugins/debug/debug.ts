@@ -1,4 +1,5 @@
 // @ts-ignore-next-line
+import { getEl } from '@app/js/lib/helpers';
 import * as gremlins from 'gremlins.js';
 import $ from 'jquery';
 
@@ -57,7 +58,7 @@ export const startGremlins = () => {
 };
 export const runGremlins = () => {
   $('#nav-footer').height(200);
-  $('#nav-footer-toggle').hide();
+  getEl('nav-footer-toggle').style.display = 'none';
   $('#bottom-icons-container').height(200);
   $('#bottom-icons').height(200);
   startGremlins();

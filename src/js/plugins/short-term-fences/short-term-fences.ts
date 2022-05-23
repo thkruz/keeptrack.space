@@ -1,8 +1,8 @@
 import searchPng from '@app/img/icons/search.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SensorObject } from '@app/js/api/keepTrackTypes';
-import { addCustomSensor, clearCustomSensors, removeLastSensor } from '@app/js/plugins';
-import $ from 'jquery';
+import { getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { addCustomSensor, clearCustomSensors, removeLastSensor } from './../sensor/sensor';
 
 let isStfMenuOpen = false;
 let stfInfoLinks = false;
@@ -13,6 +13,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'shortTermFences',
     cb: () => uiManagerInit(),
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'shortTermFences',
+    cb: () => uiManagerFinal(),
   });
 
   // Add JavaScript
@@ -43,7 +49,9 @@ export const init = (): void => {
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="stf-menu" class="side-menu-parent start-hidden text-select">
         <div id="stf-content" class="side-menu">
           <div class="row">
@@ -88,10 +96,13 @@ export const uiManagerInit = (): void => {
           </div>
         </div>
       </div>
-    `);
+      `
+  );
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="menu-stf" class="bmenu-item">
         <img
           alt="stf"
@@ -100,7 +111,8 @@ export const uiManagerInit = (): void => {
         <span class="bmenu-title">Short Term Fence</span>
         <div class="status-icon"></div>
       </div>
-    `);
+      `
+  );
 
   // Register orbital element data
   keepTrackApi.register({
@@ -111,10 +123,15 @@ export const uiManagerInit = (): void => {
       stfInfoLinks = true;
     },
   });
+};
 
-  $('#stfForm').on('submit', stfFormOnSubmit);
-  $('#stf-remove-last').on('click', stfRemoveLast);
-  $('#stf-clear-all').on('click', stfClearAll);
+export const uiManagerFinal = (): void => {
+  getEl('stfForm').addEventListener('submit', function (e: Event) {
+    e.preventDefault();
+    stfFormOnSubmit();
+  });
+  getEl('stf-remove-last').addEventListener('click', stfRemoveLast);
+  getEl('stf-clear-all').addEventListener('click', stfClearAll);
 };
 
 export const bottomMenuClick = (iconName: string) => {
@@ -123,11 +140,7 @@ export const bottomMenuClick = (iconName: string) => {
     if (!sensorManager.checkSensorSelected()) {
       // No Sensor Selected
       uiManager.toast(`Select a Sensor First!`, 'caution', true);
-      if (!$('#menu-stf:animated').length) {
-        $('#menu-stf').effect('shake', {
-          distance: 10,
-        });
-      }
+      shake(getEl('menu-stf'));
       return;
     }
 
@@ -137,45 +150,46 @@ export const bottomMenuClick = (iconName: string) => {
       return;
     } else {
       uiManager.hideSideMenus();
-      (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('stf-menu'), 1000);
       isStfMenuOpen = true;
-      $('#menu-stf').addClass('bmenu-item-selected');
+      getEl('menu-stf').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 
 export const resetSensor = () => {
-  $('#menu-stf').addClass('bmenu-item-disabled');
+  getEl('menu-stf').classList.add('bmenu-item-disabled');
 };
 
 export const hideSideMenus = () => {
-  $('#stf-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-stf').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('stf-menu'), 1000);
+  getEl('menu-stf').classList.remove('bmenu-item-selected');
   isStfMenuOpen = false;
 };
 
 export const selectSatData = (isShowStfLink: boolean) => {
   if (!isShowStfLink) {
-    $('#sat-info-top-links').append(keepTrackApi.html`
+    getEl('sat-info-top-links').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
         <div id="stf-on-object-link" class="link sat-infobox-links">Build Short Term Fence on this object...</div>
-      `);
-    $('#stf-on-object-link').on('click', stfOnObjectLinkClick);
+        `
+    );
+    getEl('stf-on-object-link').addEventListener('click', stfOnObjectLinkClick);
   }
 };
 
 export const setSensor = (sensor: any, id?: number) => {
   if (sensor == null && id == null) {
-    $('#menu-stf').addClass('bmenu-item-disabled');
+    getEl('menu-stf').classList.add('bmenu-item-disabled');
   } else {
-    $('#menu-stf').removeClass('bmenu-item-disabled');
+    getEl('menu-stf').classList.remove('bmenu-item-disabled');
   }
 };
 
-export const stfFormOnSubmit = (e: Event) => {
+export const stfFormOnSubmit = () => {
   const { sensorManager, satellite, satSet, uiManager } = keepTrackApi.programs;
-  e.preventDefault();
-
   if (!sensorManager.checkSensorSelected()) {
     uiManager.toast(`Select a Sensor First!`, 'caution', true);
     return;
@@ -185,12 +199,12 @@ export const stfFormOnSubmit = (e: Event) => {
   const sensorType = 'Short Range Fence';
 
   // Multiply everything by 1 to convert string to number
-  const az = parseFloat(<string>$('#stf-az').val());
-  const azExt = parseFloat(<string>$('#stf-azExt').val());
-  const el = parseFloat(<string>$('#stf-el').val());
-  const elExt = parseFloat(<string>$('#stf-elExt').val());
-  const rng = parseFloat(<string>$('#stf-rng').val());
-  const rngExt = parseFloat(<string>$('#stf-rngExt').val());
+  const az = parseFloat(<string>(<HTMLInputElement>getEl('stf-az')).value);
+  const azExt = parseFloat(<string>(<HTMLInputElement>getEl('stf-azExt')).value);
+  const el = parseFloat(<string>(<HTMLInputElement>getEl('stf-el')).value);
+  const elExt = parseFloat(<string>(<HTMLInputElement>getEl('stf-elExt')).value);
+  const rng = parseFloat(<string>(<HTMLInputElement>getEl('stf-rng')).value);
+  const rngExt = parseFloat(<string>(<HTMLInputElement>getEl('stf-rngExt')).value);
 
   const minaz = az - azExt < 0 ? az - azExt + 360 : az - azExt / 2;
   const maxaz = az + azExt > 360 ? az + azExt - 360 : az + azExt / 2;
@@ -223,7 +237,7 @@ export const stfFormOnSubmit = (e: Event) => {
     multiSensor: customSensors.length > 1,
   });
   satellite.setobs(customSensors);
-  $('#sensor-selected').text('Short Term Fence');
+  getEl('sensor-selected').innerText = 'Short Term Fence';
 
   keepTrackApi.programs.sensorFov.enableFovView();
 };
@@ -248,11 +262,11 @@ export const stfOnObjectLinkClick = () => {
   // Update TEARR
   satellite.getTEARR(satSet.getSat(objectManager.selectedSat));
 
-  $('#stf-az').val(satellite.currentTEARR.az.toFixed(1));
-  $('#stf-el').val(satellite.currentTEARR.el.toFixed(1));
-  $('#stf-rng').val(satellite.currentTEARR.rng.toFixed(1));
+  (<HTMLInputElement>getEl('stf-az')).value = satellite.currentTEARR.az.toFixed(1);
+  (<HTMLInputElement>getEl('stf-el')).value = satellite.currentTEARR.el.toFixed(1);
+  (<HTMLInputElement>getEl('stf-rng')).value = satellite.currentTEARR.rng.toFixed(1);
   uiManager.hideSideMenus();
-  (<any>$('#stf-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+  slideOutLeft(getEl('stf-menu'), 1000);
   isStfMenuOpen = true;
-  $('#menu-stf').addClass('bmenu-item-selected');
+  getEl('menu-stf').classList.add('bmenu-item-selected');
 };

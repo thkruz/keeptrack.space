@@ -2,6 +2,7 @@ import timeMachinePng from '@app/img/icons/time-machine.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { CatalogManager, GroupsManager, OrbitManager } from '@app/js/api/keepTrackTypes';
 import { ColorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
+import { getEl } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -28,15 +29,18 @@ export const init = (): void => {
 
 export const uiManagerInit = (): any => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-time-machine" class="bmenu-item">
           <img alt="time-machine" src="" delayedsrc="${timeMachinePng}" />
           <span class="bmenu-title">Time Machine</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `
+  );
 
-  $('#time-machine-icon').on('click', timeMachineIconClick);
+  getEl('menu-time-machine').addEventListener('click', timeMachineIconClick);
 };
 
 export const bottomMenuClick = (iconName: string): void => {
@@ -51,13 +55,13 @@ export const bottomMenuClick = (iconName: string): void => {
       groupsManager.clearSelect();
       satSet.setColorScheme(colorSchemeManager.default, true); // force color recalc
 
-      $('#menu-time-machine').removeClass('bmenu-item-selected');
+      getEl('menu-time-machine').classList.remove('bmenu-item-selected');
       return;
     } else {
       // Merge to one variable?
       orbitManager.isTimeMachineRunning = true;
       orbitManager.isTimeMachineVisible = true;
-      $('#menu-time-machine').addClass('bmenu-item-selected');
+      getEl('menu-time-machine').classList.add('bmenu-item-selected');
       orbitManager.historyOfSatellitesPlay();
       return;
     }
@@ -117,7 +121,7 @@ export const timeMachineIconClick = () => {
   } else {
     uiManager.legendMenuChange('timeMachine');
     searchBox.hideResults();
-    $('#search-results').hide();
+    getEl('search-results').style.display = 'none';
   }
 };
 export const timeMachineRemoveSatellite = (

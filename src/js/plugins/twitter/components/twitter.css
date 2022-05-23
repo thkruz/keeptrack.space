@@ -1,0 +1,7 @@
+/* Desktop Only */
+@media (min-width: 1301px) {
+  #twitter-menu {
+    overflow-y: scroll;
+    background: var(--colorQuaternaryDarken4);
+  }
+}

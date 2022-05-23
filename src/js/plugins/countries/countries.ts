@@ -1,11 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import flagPng from '@app/img/icons/flag.png';
+import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isCountriesMenuOpen = false;
 export const hideSideMenus = (): void => {
-  $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-countries').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('countries-menu'), 1000);
+  getEl('menu-countries').classList.remove('bmenu-item-selected');
   isCountriesMenuOpen = false;
 };
 export const init = (): void => {
@@ -39,9 +40,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#countries-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('countries-menu'), 1000);
       isCountriesMenuOpen = true;
-      $('#menu-countries').addClass('bmenu-item-selected');
+      getEl('menu-countries').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -49,7 +50,7 @@ export const bottomMenuClick = (iconName: string): void => {
 
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="countries-menu" class="side-menu-parent start-hidden text-select">
           <div id="country-menu" class="side-menu">
             <ul>
@@ -67,10 +68,10 @@ export const uiManagerInit = () => {
             </ul>
           </div>
         </div>
-      `);
+        `));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="menu-countries" class="bmenu-item">
           <img
             alt="flag"
@@ -80,21 +81,16 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Countries</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `));
 
   // NOTE: Must use function not arrow function to access 'this'
-  $('#country-menu>ul>li').on('click', function () {
-    countryMenuClick($(this).data('group'));
-  });
+  getEl('country-menu').querySelectorAll('li').forEach((element) => {
+    element.addEventListener('click', function () {
+      countryMenuClick($(this).data('group'));
+    });
+  })
 
-  $('#countries-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('countries-menu'));
 };
 
 export const countryMenuClick = (groupName: string): void => { // NOSONAR

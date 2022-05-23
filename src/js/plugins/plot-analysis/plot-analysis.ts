@@ -1,8 +1,8 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
+import { clickAndDragWidth, getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import $ from 'jquery';
 import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
 import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
 import { createEcfScatterPlot, getEcfScatterData } from './components/plots/ecfScatterPlot';
@@ -51,30 +51,18 @@ export const init = (): void => {
 };
 
 export const uiManagerInit = (): void => {
-  $('#left-menus').append(PlotAnalysisSideMenu);
-  $('#bottom-icons').append(PlotAnalysisBottomIcon);
+  getEl('left-menus').insertAdjacentHTML('beforeend', PlotAnalysisSideMenu);
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', PlotAnalysisBottomIcon);
 
-  $('#plot-analysis-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      curChart.resize();
-    },
+  clickAndDragWidth(getEl('plot-analysis-menu'), {
     maxWidth: 1200,
     minWidth: 500,
   });
-  $('#plot-analysis-menu2').resizable({
-    handles: 'e',
-    stop: function () {
-      curChart2.resize();
-    },
+  clickAndDragWidth(getEl('plot-analysis-menu2'), {
     maxWidth: 1200,
     minWidth: 500,
   });
-  $('#plot-analysis-menu3').resizable({
-    handles: 'e',
-    stop: function () {
-      curChart3.resize();
-    },
+  clickAndDragWidth(getEl('plot-analysis-menu3'), {
     maxWidth: 1200,
     minWidth: 500,
   });
@@ -111,11 +99,7 @@ export const onEciPlotBtnClick = () => {
   const { objectManager, uiManager } = keepTrackApi.programs;
   if (objectManager.selectedSat === -1) {
     uiManager.toast(`Select a Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis:animated').length) {
-      $('#menu-plot-analysis').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(getEl('menu-plot-analysis'));
     return;
   }
 
@@ -125,10 +109,10 @@ export const onEciPlotBtnClick = () => {
     return;
   } else {
     uiManager.hideSideMenus();
-    (<any>$('#plot-analysis-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    slideInRight(getEl('plot-analysis-menu'), 1000);
     isPlotAnalyisMenuOpen = true;
 
-    const chartDom = document.getElementById('plot-analysis-chart');
+    const chartDom = getEl('plot-analysis-chart');
     // let existInstance = echarts.getInstanceByDom(chartDom);
 
     // if (!existInstance) {
@@ -137,7 +121,7 @@ export const onEciPlotBtnClick = () => {
     setTimeout(() => {
       curChart.resize();
     }, 1000);
-    $('#menu-plot-analysis').addClass('bmenu-item-selected');
+    getEl('menu-plot-analysis').classList.add('bmenu-item-selected');
     return;
   }
 };
@@ -146,11 +130,7 @@ export const onEcfPlotBtnClick = () => {
   const { objectManager, uiManager } = keepTrackApi.programs;
   if (objectManager.selectedSat === -1) {
     uiManager.toast(`Select a Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis2:animated').length) {
-      $('#menu-plot-analysis2').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(getEl('menu-plot-analysis2'));
     return;
   }
 
@@ -160,10 +140,10 @@ export const onEcfPlotBtnClick = () => {
     return;
   } else {
     uiManager.hideSideMenus();
-    (<any>$('#plot-analysis-menu2')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    slideInRight(getEl('plot-analysis-menu2'), 1000);
     isPlotAnalyisMenuOpen2 = true;
 
-    const chartDom2 = document.getElementById('plot-analysis-chart2');
+    const chartDom2 = getEl('plot-analysis-chart2');
     // let existInstance = echarts.getInstanceByDom(chartDom2);
 
     // if (!existInstance) {
@@ -172,7 +152,7 @@ export const onEcfPlotBtnClick = () => {
     setTimeout(() => {
       curChart2.resize();
     }, 1000);
-    $('#menu-plot-analysis2').addClass('bmenu-item-selected');
+    getEl('menu-plot-analysis2').classList.add('bmenu-item-selected');
     return;
   }
 };
@@ -181,21 +161,13 @@ export const onRicPlotBtnClick = () => {
   const { objectManager, uiManager } = keepTrackApi.programs;
   if (objectManager.secondarySat === -1) {
     uiManager.toast(`Select a Secondary Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis3:animated').length) {
-      $('#menu-plot-analysis3').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(getEl('menu-plot-analysis3'));
     return;
   }
 
   if (objectManager.selectedSat === -1 || objectManager.lastSelectedSat() === -1) {
     uiManager.toast(`Select a Primary Satellite First!`, 'caution');
-    if (!$('#menu-plot-analysis3:animated').length) {
-      $('#menu-plot-analysis3').effect('shake', {
-        distance: 10,
-      });
-    }
+    shake(getEl('menu-plot-analysis3'));
     return;
   }
 
@@ -205,10 +177,10 @@ export const onRicPlotBtnClick = () => {
     return;
   } else {
     uiManager.hideSideMenus();
-    (<any>$('#plot-analysis-menu3')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    slideInRight(getEl('plot-analysis-menu3'), 1000);
     isPlotAnalyisMenuOpen3 = true;
 
-    const chartDom3 = document.getElementById('plot-analysis-chart3');
+    const chartDom3 = getEl('plot-analysis-chart3');
     // let existInstance = echarts.getInstanceByDom(chartDom3);
 
     // if (!existInstance) {
@@ -217,7 +189,7 @@ export const onRicPlotBtnClick = () => {
     setTimeout(() => {
       curChart3.resize();
     }, 1000);
-    $('#menu-plot-analysis3').addClass('bmenu-item-selected');
+    getEl('menu-plot-analysis3').classList.add('bmenu-item-selected');
     return;
   }
 };
@@ -230,10 +202,10 @@ export const onInc2LonPlotBtnClick = () => {
     return;
   } else {
     uiManager.hideSideMenus();
-    (<any>$('#plot-analysis-menu4')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    slideInRight(getEl('plot-analysis-menu4'), 1000);
     isPlotAnalyisMenuOpen4 = true;
 
-    const chartDom4 = document.getElementById('plot-analysis-chart4');
+    const chartDom4 = getEl('plot-analysis-chart4');
     let existInstance = echarts.getInstanceByDom(chartDom4);
 
     if (!existInstance) {
@@ -242,7 +214,7 @@ export const onInc2LonPlotBtnClick = () => {
     setTimeout(() => {
       curChart4.resize();
     }, 1000);
-    $('#menu-plot-analysis4').addClass('bmenu-item-selected');
+    getEl('menu-plot-analysis4').classList.add('bmenu-item-selected');
     return;
   }
 };
@@ -255,10 +227,10 @@ export const onTime2LonPlotBtnClick = () => {
     return;
   } else {
     uiManager.hideSideMenus();
-    (<any>$('#plot-analysis-menu5')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    slideInRight(getEl('plot-analysis-menu5'), 1000);
     isPlotAnalyisMenuOpen5 = true;
 
-    const chartDom5 = document.getElementById('plot-analysis-chart5');
+    const chartDom5 = getEl('plot-analysis-chart5');
     let existInstance = echarts.getInstanceByDom(chartDom5);
 
     if (!existInstance) {
@@ -267,7 +239,7 @@ export const onTime2LonPlotBtnClick = () => {
     setTimeout(() => {
       curChart5.resize();
     }, 1000);
-    $('#menu-plot-analysis5').addClass('bmenu-item-selected');
+    getEl('menu-plot-analysis5').classList.add('bmenu-item-selected');
     return;
   }
 };
@@ -277,20 +249,20 @@ export const onTime2LonPlotBtnClick = () => {
  * @returns {void}
  */
 export const hideSideMenus = (): void => {
-  $('#plot-analysis-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-plot-analysis').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('plot-analysis-menu'), 1000);
+  getEl('menu-plot-analysis').classList.remove('bmenu-item-selected');
   isPlotAnalyisMenuOpen = false;
-  $('#plot-analysis-menu2').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-plot-analysis2').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('plot-analysis-menu2'), 1000);
+  getEl('menu-plot-analysis2').classList.remove('bmenu-item-selected');
   isPlotAnalyisMenuOpen2 = false;
-  $('#plot-analysis-menu3').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-plot-analysis3').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('plot-analysis-menu3'), 1000);
+  getEl('menu-plot-analysis3').classList.remove('bmenu-item-selected');
   isPlotAnalyisMenuOpen3 = false;
-  $('#plot-analysis-menu4').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-plot-analysis4').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('plot-analysis-menu4'), 1000);
+  getEl('menu-plot-analysis4').classList.remove('bmenu-item-selected');
   isPlotAnalyisMenuOpen4 = false;
-  $('#plot-analysis-menu5').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-plot-analysis5').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('plot-analysis-menu5'), 1000);
+  getEl('menu-plot-analysis5').classList.remove('bmenu-item-selected');
   isPlotAnalyisMenuOpen5 = false;
 };
 
@@ -308,18 +280,18 @@ export const selectSatData = (_sat: SatObject, satId: number): void => {
     return;
   }
   if (isPlotAnalyisMenuOpen) {
-    $('#menu-plot-analysis').addClass('bmenu-item-selected');
-    const chartDom = document.getElementById('plot-analysis-chart');
+    getEl('menu-plot-analysis').classList.add('bmenu-item-selected');
+    const chartDom = getEl('plot-analysis-chart');
     curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart, chartDom);
   }
   if (isPlotAnalyisMenuOpen2) {
-    $('#menu-plot-analysis2').addClass('bmenu-item-selected');
-    const chartDom2 = document.getElementById('plot-analysis-chart2');
+    getEl('menu-plot-analysis2').classList.add('bmenu-item-selected');
+    const chartDom2 = getEl('plot-analysis-chart2');
     curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
   }
   if (objectManager.secondarySat !== -1 && isPlotAnalyisMenuOpen3) {
-    $('#menu-plot-analysis3').addClass('bmenu-item-selected');
-    const chartDom3 = document.getElementById('plot-analysis-chart3');
+    getEl('menu-plot-analysis3').classList.add('bmenu-item-selected');
+    const chartDom3 = getEl('plot-analysis-chart3');
     curChart3 = createRicScatterPlot(getRicScatterData(), isPlotAnalyisMenuOpen3, curChart3, chartDom3);
   }
 };

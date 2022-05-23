@@ -1,5 +1,4 @@
-/* MEDIA @ 1301px */
-
+/* Desktops */
 @media (min-width: 1301px) {
   #fullscreen-icon {
     display: none;
@@ -160,11 +159,6 @@
     border-style: solid;
   }
 
-  #twitter-menu {
-    overflow: scroll;
-    background: #292f33;
-  }
-
   #membership-menu {
     width: 450px !important;
   }
@@ -284,12 +278,9 @@
     padding-left: 25px;
   }
 }
-/* MEDIA @ 1301px */
+/* Desktops */
 
-/* MEDIA @ 1301px */
-
-/* MEDIA @ 695px & 1300px */
-
+/* Tablets */
 @media (min-width: 695px) and (max-width: 1300px) {
   .side-menu-parent {
     position: absolute;
@@ -388,12 +379,9 @@
     margin-left: -35px !important;
   }
 }
-/* MEDIA @ 695px & 1300px */
+/* Tablets */
 
-/* MEDIA @ 695px & 1300px */
-
-/* MEDIA @ 1300px */
-
+/* Non-Desktops */
 @media (max-width: 1300px) {
   #social-alt {
     display: block;
@@ -586,12 +574,9 @@
     width: 0px;
   }
 }
-/* MEDIA @ 695px & 1300px */
+/* Non-Desktops */
 
-/* MEDIA @ 695px & 1300px */
-
-/* MEDIA @ 694px */
-
+/* Large Cellphones */
 @media (max-width: 694px) {
   .material-tooltip {
     display: none !important;
@@ -687,10 +672,6 @@
     padding: 0px 5px 150px 0px;
   }
 
-  #satChng-content {
-    width: 100%;
-  }
-
   .ui-slider {
     width: 160px !important;
   }
@@ -703,11 +684,9 @@
     border-radius: 0px !important;
   }
 }
+/* Large Cellphones */
 
-/* MEDIA @ 694px */
-
-/* MEDIA @ 320px */
-
+/* Small Cellphones */
 @media (max-width: 320px) {
   #search {
     padding-bottom: 5px;
@@ -724,5 +703,4 @@
     width: 0px;
   }
 }
-
-/* MEDIA @ 320px */
+/* Small Cellphones */

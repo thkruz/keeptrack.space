@@ -1,11 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { Camera, SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
+import { getEl } from '@app/js/lib/helpers';
 import { satellite } from '@app/js/satMath/satMath';
 import $ from 'jquery';
 
-let isselectedSatNegativeOne = false;
-const selectSatManager = {
+export let isselectedSatNegativeOne = false;
+export const selectSatManager = {
   init: () => {
     keepTrackApi.register({
       method: 'updateLoop',
@@ -16,7 +17,8 @@ const selectSatManager = {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  selectSat: (satId: number, mainCamera: Camera) => { // NOSONAR
+  selectSat: (satId: number, mainCamera: Camera) => {
+    // NOSONAR
     const { objectManager, satSet, sensorManager, uiManager } = keepTrackApi.programs;
 
     let sat: SatObject | any;
@@ -30,7 +32,10 @@ const selectSatManager = {
       // Selecting a non-missile non-sensor object does nothing
       if ((!sat.active || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') {
         if (sat.type == SpaceObjectType.PAYLOAD_OWNER || sat.type == SpaceObjectType.PAYLOAD_MANUFACTURER) {
-          const searchStr = satSet.satData.filter((_sat) => _sat.owner === sat.Code || _sat.manufacturer === sat.Code).map((_sat) => _sat.sccNum).join(', ');
+          const searchStr = satSet.satData
+            .filter((_sat) => _sat.owner === sat.Code || _sat.manufacturer === sat.Code)
+            .map((_sat) => _sat.sccNum)
+            .join(', ');
           uiManager.searchBox.doSearch(searchStr);
         }
         return;
@@ -49,13 +54,13 @@ const selectSatManager = {
     if (satId === -1) {
       if (
         settingsManager.currentColorScheme === keepTrackApi.programs.colorSchemeManager.group ||
-        (typeof $('#search').val() !== 'undefined' && $('#search').val().length >= 3)
+        (typeof (<HTMLInputElement>getEl('search')).value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
       ) {
         // If group selected
-        $('#menu-sat-fov').removeClass('bmenu-item-disabled');
+        getEl('menu-sat-fov')?.classList.remove('bmenu-item-disabled');
       } else {
-        $('#menu-sat-fov').removeClass('bmenu-item-selected');
-        $('#menu-sat-fov').addClass('bmenu-item-disabled');
+        getEl('menu-sat-fov')?.classList.remove('bmenu-item-selected');
+        getEl('menu-sat-fov')?.classList.add('bmenu-item-disabled');
         settingsManager.isSatOverflyModeOn = false;
         satSet.satCruncher.postMessage({
           typ: 'isShowSatOverfly',
@@ -72,16 +77,16 @@ const selectSatManager = {
       $('#sat-infobox').fadeOut();
 
       // Add Grey Out
-      $('#menu-lookanglesmultisite').addClass('bmenu-item-disabled');
-      $('#menu-lookangles').addClass('bmenu-item-disabled');
-      $('#menu-satview').addClass('bmenu-item-disabled');
-      $('#menu-editSat').addClass('bmenu-item-disabled');
-      $('#menu-map').addClass('bmenu-item-disabled');
-      $('#menu-newLaunch').addClass('bmenu-item-disabled');
-      $('#menu-breakup').addClass('bmenu-item-disabled');
-      $('#menu-plot-analysis').addClass('bmenu-item-disabled');
-      $('#menu-plot-analysis2').addClass('bmenu-item-disabled');
-      $('#menu-plot-analysis3').addClass('bmenu-item-disabled');
+      getEl('menu-lookanglesmultisite')?.classList.add('bmenu-item-disabled');
+      getEl('menu-lookangles')?.classList.add('bmenu-item-disabled');
+      getEl('menu-satview')?.classList.add('bmenu-item-disabled');
+      getEl('menu-editSat')?.classList.add('bmenu-item-disabled');
+      getEl('menu-map')?.classList.add('bmenu-item-disabled');
+      getEl('menu-newLaunch')?.classList.add('bmenu-item-disabled');
+      getEl('menu-breakup')?.classList.add('bmenu-item-disabled');
+      getEl('menu-plot-analysis')?.classList.add('bmenu-item-disabled');
+      getEl('menu-plot-analysis2')?.classList.add('bmenu-item-disabled');
+      getEl('menu-plot-analysis3')?.classList.add('bmenu-item-disabled');
       keepTrackApi.methods.selectSatData(null, satId);
     } else if (satId !== -1) {
       if (mainCamera.cameraType.current == mainCamera.cameraType.Default) {
@@ -113,16 +118,15 @@ const selectSatManager = {
 
         // Todo: Needs to run uiManager.getsensorinfo();
 
-        if (objectManager.isSensorManagerLoaded)
-          sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
+        if (objectManager.isSensorManagerLoaded) sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
         objectManager.setSelectedSat(-1);
-        $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-        $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
-        $('#menu-surveillance').removeClass('bmenu-item-disabled');
-        $('#menu-planetarium').removeClass('bmenu-item-disabled');
-        $('#menu-astronomy').removeClass('bmenu-item-disabled');
+        getEl('menu-sensor-info')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-fov-bubble')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-surveillance')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-planetarium')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-astronomy')?.classList.remove('bmenu-item-disabled');
         if (objectManager.selectedSat !== -1) {
-          $('#menu-lookangles').removeClass('bmenu-item-disabled');
+          getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
         }
         return;
       }
@@ -130,19 +134,19 @@ const selectSatManager = {
       mainCamera.camAngleSnappedOnSat = true;
 
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
-        $('#menu-lookangles').removeClass('bmenu-item-disabled');
+        getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
       }
 
-      $('#menu-lookanglesmultisite').removeClass('bmenu-item-disabled');
-      $('#menu-satview').removeClass('bmenu-item-disabled');
-      $('#menu-editSat').removeClass('bmenu-item-disabled');
-      $('#menu-sat-fov').removeClass('bmenu-item-disabled');
-      $('#menu-map').removeClass('bmenu-item-disabled');
-      $('#menu-newLaunch').removeClass('bmenu-item-disabled');
-      $('#menu-plot-analysis').removeClass('bmenu-item-disabled');
-      $('#menu-plot-analysis2').removeClass('bmenu-item-disabled');
+      getEl('menu-lookanglesmultisite')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-satview')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-editSat')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-sat-fov')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-map')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-newLaunch')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-plot-analysis')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-plot-analysis2')?.classList.remove('bmenu-item-disabled');
       if (objectManager.secondarySat !== -1) {
-        $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+        getEl('menu-plot-analysis3')?.classList.remove('bmenu-item-disabled');
       }
 
       $('#sat-infobox').fadeIn();
@@ -173,8 +177,7 @@ export const checkIfSelectSatVisible = () => {
     let cssStyle = searchVal.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
 
     // If a satellite is selected on a desktop computer then shrink the search box
-    if (window.innerWidth > 1000 && objectManager.selectedSat !== -1)
-      cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
+    if (window.innerWidth > 1000 && objectManager.selectedSat !== -1) cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
 
     // Avoid unnecessary dom updates
     if (cssStyle !== selectSatManager.lastCssStyle && selectSatManager.searchResultDom) {
@@ -183,5 +186,3 @@ export const checkIfSelectSatVisible = () => {
     }
   }
 };
-
-export { selectSatManager, isselectedSatNegativeOne };

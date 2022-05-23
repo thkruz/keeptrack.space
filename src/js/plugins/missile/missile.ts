@@ -1,9 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import { missileManager } from './missileManager';
 import missilePng from '@app/img/icons/missile.png';
-
-keepTrackApi.programs.missileManager = missileManager;
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isMissileMenuOpen = false;
 let isSub = false;
@@ -17,8 +15,8 @@ export const updateLoop = (): void => {
   }
 };
 export const hideSideMenus = (): void => {
-  $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-missile').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('missile-menu'), 1000);
+  getEl('menu-missile').classList.remove('bmenu-item-selected');
   isMissileMenuOpen = false;
 };
 export const bottomMenuClick = (iconName: string): void => {
@@ -31,43 +29,43 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      $('#menu-missile').addClass('bmenu-item-selected');
+      slideInRight(getEl('missile-menu'), 1000);
+      getEl('menu-missile').classList.add('bmenu-item-selected');
       isMissileMenuOpen = true;
       return;
     }
   }
 };
 export const missileChange = (): void => {
-  if (parseFloat(<string>$('#ms-type').val()) !== 0) {
-    $('#ms-custom-opt').hide();
+  if (parseFloat((<HTMLInputElement>getEl('ms-type')).value) !== 0) {
+    getEl('ms-custom-opt').style.display = 'none';
   } else {
-    $('#ms-custom-opt').show();
+    getEl('ms-custom-opt').style.display = 'block';
   }
 };
 export const msErrorClick = (): void => {
-  $('#ms-error').hide();
+  getEl('ms-error').style.display = 'none';
 };
 export const msTargetChange = () => {
-  if (parseInt(<string>$('#ms-target').val()) !== -1) {
-    $('#ms-tgt-holder-lat').hide();
-    $('#ms-tgt-holder-lon').hide();
+  if (parseInt((<HTMLInputElement>getEl('ms-target')).value) !== -1) {
+    getEl('ms-tgt-holder-lat').style.display = 'none';
+    getEl('ms-tgt-holder-lon').style.display = 'none';
   } else {
-    $('#ms-tgt-holder-lat').show();
-    $('#ms-tgt-holder-lon').show();
+    getEl('ms-tgt-holder-lat').style.display = 'block';
+    getEl('ms-tgt-holder-lon').style.display = 'block';
   }
 };
 export const missileSubmit = (): void => {
-  $('#loading-screen').fadeIn(1000, () => { // NOSONAR
+  showLoading(() => { // NOSONAR
     const { uiManager, satSet, timeManager } = keepTrackApi.programs;
-    $('#ms-error').hide();
-    const type = parseFloat(<string>$('#ms-type').val());
-    const attacker = parseFloat(<string>$('#ms-attacker').val());
-    let lauLat = parseFloat(<string>$('#ms-lat-lau').val());
-    let lauLon = parseFloat(<string>$('#ms-lon-lau').val());
-    const target = parseFloat(<string>$('#ms-target').val());
-    let tgtLat = parseFloat(<string>$('#ms-lat').val());
-    let tgtLon = parseFloat(<string>$('#ms-lon').val());
+    getEl('ms-error').style.display = 'none';
+    const type = parseFloat((<HTMLInputElement>getEl('ms-type')).value);
+    const attacker = parseFloat((<HTMLInputElement>getEl('ms-attacker')).value);
+    let lauLat = parseFloat((<HTMLInputElement>getEl('ms-lat-lau')).value);
+    let lauLon = parseFloat((<HTMLInputElement>getEl('ms-lon-lau')).value);
+    const target = parseFloat((<HTMLInputElement>getEl('ms-target')).value);
+    let tgtLat = parseFloat((<HTMLInputElement>getEl('ms-lat')).value);
+    let tgtLon = parseFloat((<HTMLInputElement>getEl('ms-lon')).value);
     const launchTime = timeManager.selectedDate * 1;
 
     let sim = '';
@@ -107,12 +105,12 @@ export const missileSubmit = (): void => {
         // Custom Target
         if (isNaN(tgtLat)) {
           uiManager.toast(`Invalid Target Latitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(tgtLon)) {
           uiManager.toast(`Invalid Target Longitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
       } else {
@@ -124,12 +122,12 @@ export const missileSubmit = (): void => {
       if (isSub) {
         if (isNaN(lauLat)) {
           uiManager.toast(`Invalid Launch Latitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(lauLon)) {
           uiManager.toast(`Invalid Launch Longitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
       }
@@ -298,12 +296,12 @@ export const missileSubmit = (): void => {
       uiManager.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
       uiManager.doSearch('RV_');
     }
-    $('#loading-screen').hide();
+    getEl('loading-screen').style.display = 'none';
   });
 };
 export const uiManagerInit = (): void => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="missile-menu" class="side-menu-parent start-hidden text-select">
           <div id="missile-content" class="side-menu">
             <div class="row">
@@ -449,7 +447,7 @@ export const uiManagerInit = (): void => {
               </form>
               <div class="row"></div>
               <div class="center-align">
-                <button class="btn btn-ui waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;</button>
+                <button id="searchRvBtn" class="btn btn-ui waves-effect waves-light" name="search">Show All Missiles &#9658;</button>
               </div>
             </div>
             <div id="ms-error" class="center-align menu-selectable start-hidden">
@@ -457,10 +455,10 @@ export const uiManagerInit = (): void => {
             </div>
           </div>
         </div>   
-      `);
+      `));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="menu-missile" class="bmenu-item">
           <img
             alt="missile"
@@ -469,36 +467,39 @@ export const uiManagerInit = (): void => {
           <span class="bmenu-title">Missile</span>
           <div class="status-icon"></div>
         </div>
-      `);
-
-  $('#missile').on('submit', (e: Event): void => {
-    missileSubmit();
-    e.preventDefault();
-  });
-
-  $('#missile-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
-
-  $('#ms-attacker').on('change', msAttackerChange);
-
-  $('#ms-target').on('change', msTargetChange);
-
-  $('#ms-error').on('click', msErrorClick);
-
-  $('#missile').on('change', missileChange);
+        `));
 };
+
+export const searchForRvs = () => {
+  const { uiManager } = keepTrackApi.programs;
+  uiManager.doSearch('RV_');
+};
+
+export const uiManagerFinal = (): void => {
+  clickAndDragWidth(getEl('missile-menu'));
+  getEl('missile').addEventListener('submit', (e: Event): void => {
+    e.preventDefault();
+    missileSubmit();
+  });
+  getEl('ms-attacker').addEventListener('change', msAttackerChange);
+  getEl('ms-target').addEventListener('change', msTargetChange);
+  getEl('ms-error').addEventListener('click', msErrorClick);
+  getEl('missile').addEventListener('change', missileChange);
+  getEl('searchRvBtn').addEventListener('click', searchForRvs);
+}
+
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'missile',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'missile',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript
@@ -525,15 +526,15 @@ export const msAttackerChange = () => {
   isSub = false;
   const subList = [100, 600, 213, 214, 215, 321, 500, 400];
   for (let i = 0; i < subList.length; i++) {
-    if (subList[i] == parseInt(<string>$('#ms-attacker').val())) {
+    if (subList[i] == parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
       isSub = true;
     }
   }
   if (!isSub) {
-    $('#ms-lau-holder-lat').hide();
-    $('#ms-lau-holder-lon').hide();
+    getEl('ms-lau-holder-lat').style.display = 'none';
+    getEl('ms-lau-holder-lon').style.display = 'none';
   } else {
-    $('#ms-lau-holder-lat').show();
-    $('#ms-lau-holder-lon').show();
+    getEl('ms-lau-holder-lat').style.display = 'block';
+    getEl('ms-lau-holder-lon').style.display = 'block';
   }
 };

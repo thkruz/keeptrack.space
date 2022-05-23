@@ -1,17 +1,24 @@
+:root {
+  --colorTertiary: rgb(40, 63, 88);
+  --colorTertiaryLighten1: rgb(82, 102, 122);
+  --colorTertiaryLighten2: rgb(126, 140, 155);
+  --colorTertiaryLighten3: rgb(169, 178, 188);
+  --colorTertiaryLighten4: rgb(212, 217, 222);
+  --colorTertiaryDarken1: rgb(31, 51, 71);
+  --colorTertiaryDarken2: rgb(24, 38, 53);
+  --colorTertiaryDarken3: rgb(16, 25, 35);
+  --colorTertiaryDarken4: rgb(8, 13, 18);
+}
+
 body {
   overflow: hidden;
   font-family: 'Open Sans', sans-serif;
   color: white;
   background: var(--colorTertiaryDarken2);
-  /* Old browsers */
   background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
-  /* FF3.6-15 */
   background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
-  /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
-  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
-  /* IE6-9 fallback on horizontal gradient */
 }
 
 .ui-icon-minus {
@@ -26,28 +33,33 @@ body {
   text-align: center !important;
 }
 
-/* Display none till loading is complete main.js -227 */
-
 #canvas-holder {
-  display: none;
+  display: none; /* Display none till loading is complete main.js -227 */
 }
 
-/* Display none till loading is complete main.js -227 */
-
 #loading-screen {
+  display: flex;
   padding: 0;
   z-index: 101;
   text-align: center;
+  background: var(--colorTertiaryDarken4);
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
+  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
+}
+
+#loading-earth {
+  height: 40%;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
   background: var(--colorTertiaryDarken2);
-  /* Old browsers */
   background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* FF3.6-15 */
   background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
-  /* IE6-9 fallback on horizontal gradient */
+  box-shadow: inset 16px 0 40px 6px rgb(0 0 0), inset -3px 0 6px 2px rgb(255 255 255 / 20%);
+  position: absolute;
+  left: auto;
+  right: auto;
 }
 
 .full-loader {
@@ -61,7 +73,6 @@ body {
 
 .mini-loader-container {
   background: rgba(0, 0, 0, 0) !important;
-  /* Old browsers */
   position: absolute;
   width: 100%;
   height: 100%;
@@ -76,16 +87,10 @@ body {
   padding-bottom: 5px;
   overflow: hidden;
   background: var(--colorTertiaryDarken2);
-  /* Old browsers */
   background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* FF3.6-15 */
   background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
-  /* IE6-9 fallback on horizontal gradient */
-
   -moz-background-clip: padding; /* Firefox 3.6 */
   -webkit-background-clip: padding; /* Safari 4? Chrome 6? */
   background-clip: padding-box; /* Firefox 4, Safari 5, Opera 10, IE 9 */
@@ -94,9 +99,11 @@ body {
 #logo-inner-container {
   margin: auto;
   display: flex;
+  justify-content: center;
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: center;
+  height: 150px;
 }
 
 #logo-text {
@@ -113,6 +120,7 @@ body {
 .logo-font {
   font-family: 'nasalization', sans-serif;
   font-size: 8em;
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 800px) {
@@ -129,14 +137,11 @@ body {
   line-height: 50px;
 }
 
-#spinner {
-  display: inline-block;
-  height: 50px;
-  width: 50px;
-  position: relative;
-}
-
 #mobile-start-button {
   display: none;
   margin-top: 10px;
+}
+
+.start-hidden {
+  display: none;
 }

@@ -1,12 +1,13 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
 import satChngPng from '@app/img/icons/satchng.png';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isConstellationsMenuOpen = false;
 
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
       <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
         <div id="constellation-menu" class="side-menu">
           <ul>
@@ -22,10 +23,10 @@ export const uiManagerInit = () => {
           </ul>
         </div>
       </div>
-    `);
+      `));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
       <div id="menu-constellations" class="bmenu-item">
         <img
           alt="constellation"
@@ -35,19 +36,14 @@ export const uiManagerInit = () => {
         <span class="bmenu-title">Constellations</span>
         <div class="status-icon"></div>
       </div>
-    `);
+    `));
 
-  $('#constellations-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('constellations-menu'));  
 
-  $('#constellation-menu>ul>li').on('click', function () {
+  getEl('constellation-menu').querySelectorAll('li').forEach((element) => {
+    element.addEventListener('click', function () {
     constellationMenuClick($(this).data('group'));
+    });
   });
 };
 
@@ -84,45 +80,41 @@ export const constellationMenuClick = (groupName: any) => { // NOSONAR
       break;
     case 'aehf':
       if (!groupsManager.aehf) groupsManager.aehf = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.aehf));
-      $('#loading-screen').fadeIn(1000, () => {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'wgs':
       // WGS also selects DSCS
       if (!groupsManager.wgs)
         groupsManager.wgs = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.wgs.concat(objectManager.satLinkManager.dscs)));
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'wgs');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'starlink':
       if (!groupsManager.starlink) groupsManager.starlink = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.starlink));
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'sbirs': // SBIRS and DSP
       if (!groupsManager.sbirs) {
         groupsManager.sbirs = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.sbirs));
       }
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     default:
       throw new Error('Unknown group name: ' + groupName);
   }
   groupSelected(groupName);
-  uiManager.doSearch($('#search').val());
+  uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
 };
 
 export const groupSelected = (groupName: string) => {
@@ -146,8 +138,8 @@ export const groupSelected = (groupName: string) => {
 };
 
 export const hideSideMenus = (): void => {
-  $('#constellations-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-constellations').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('constellations-menu'), 1000);
+  getEl('menu-constellations').classList.remove('bmenu-item-selected');
   isConstellationsMenuOpen = false;
 };
 
@@ -161,9 +153,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#constellations-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('constellations-menu'), 1000);
       isConstellationsMenuOpen = true;
-      $('#menu-constellations').addClass('bmenu-item-selected');
+      getEl('menu-constellations').classList.add('bmenu-item-selected');
       return;
     }
   }

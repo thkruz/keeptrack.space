@@ -1,8 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { stringPad } from '@app/js/lib/helpers';
+import { getEl, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tleFormater';
-import $ from 'jquery';
 
 let doOnce = false;
 
@@ -26,10 +25,13 @@ export const uiManagerInit = (): void => {
 
 export const selectSatData = () => {
   if (!doOnce) {
-    $('#sat-info-top-links').append(keepTrackApi.html`
+    getEl('sat-info-top-links').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
         <div id="orbit-references-link" class="link sat-infobox-links">Generate Orbit Reference Satellites...</div>
-      `);
-    $('#orbit-references-link').on('click', orbitReferencesLinkClick);
+      `
+    );
+    getEl('orbit-references-link').addEventListener('click', orbitReferencesLinkClick);
     doOnce = true;
   }
 };

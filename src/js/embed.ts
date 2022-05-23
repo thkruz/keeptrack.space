@@ -141,4 +141,4 @@ settingsManager.versionNumber = VERSION;
 settingsManager.versionDate = VERSION_DATE;
 
 // Load the main website
-$(document).on('ready', initalizeKeepTrack);
+document.addEventListener('DOMContentLoaded', initalizeKeepTrack);

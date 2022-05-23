@@ -1,6 +1,6 @@
 import photoManagerPng from '@app/img/icons/photoManager.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl, openColorbox, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isSatPhotoMenuOpen = false;
 
@@ -76,21 +76,7 @@ export const himawari8 = (): void => {
     settingsManager.isPreventColorboxClose = false;
   }, 2000);
 
-  $.colorbox({
-    href: `https://himawari8.nict.go.jp/img/D531106/1d/550/${year}/${mon}/${day}/${hour}${min}00_0_0.png`,
-    photo: true,
-    width: imgWidth,
-    height: imgHeight,
-    scalePhotos: true,
-    fastIframe: false,
-    closeButton: false,
-    onComplete: () => {
-      const cbImg = $('#cboxLoadedContent img')[0];
-      cbImg.style.width = '100%';
-      cbImg.style.height = '100%';
-      cbImg.style.marginTop = '';
-    },
-  });
+  openColorbox(`https://himawari8.nict.go.jp/img/D531106/1d/550/${year}/${mon}/${day}/${hour}${min}00_0_0.png`, { image: true });
 };
 export const colorbox = (url: string): void => {
   settingsManager.isPreventColorboxClose = true;
@@ -98,19 +84,12 @@ export const colorbox = (url: string): void => {
     settingsManager.isPreventColorboxClose = false;
   }, 2000);
 
-  $.colorbox({
-    href: url,
-    photo: true,
-    scalePhotos: true,
-    height: '80%',
-    fastIframe: false,
-    closeButton: false,
-  });
+  openColorbox(url, { image: true });
 };
 
 export const hideSideMenus = (): void => {
-  $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-sat-photo').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('sat-photo-menu'), 1000);
+  getEl('menu-sat-photo').classList.remove('bmenu-item-selected');
   isSatPhotoMenuOpen = false;
 };
 export const bottomMenuClick = (iconName: string): void => {
@@ -121,16 +100,18 @@ export const bottomMenuClick = (iconName: string): void => {
       return;
     } else {
       keepTrackApi.programs.uiManager.hideSideMenus();
-      $('#sat-photo-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('sat-photo-menu'), 1000);
       isSatPhotoMenuOpen = true;
-      $('#menu-sat-photo').addClass('bmenu-item-selected');
+      getEl('menu-sat-photo').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="sat-photo-menu" class="side-menu-parent start-hidden text-select">
           <div id="sat-photo-menu-content" class="side-menu">
             <ul>
@@ -143,16 +124,20 @@ export const uiManagerInit = () => {
             </ul>
           </div>
         </div>
-      `);
+      `
+  );
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-sat-photo" class="bmenu-item">
           <img alt="photographs" src="" delayedsrc="${photoManagerPng}" />
           <span class="bmenu-title">Satellite Photos</span>
           <div class="status-icon"></div>
         </div>
-      `);
+        `
+  );
 };
 export const init = (): void => {
   // Add HTML

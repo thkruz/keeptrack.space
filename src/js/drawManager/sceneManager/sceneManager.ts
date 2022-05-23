@@ -21,12 +21,14 @@
 import { earth } from './earth';
 import { LineFactory } from './line-factory';
 import { moon } from './moon';
+import { skyboxSphere } from './skybox-sphere';
 import { sun } from './sun';
 
 const sceneManager = {
-  moon: moon,
-  earth: earth,
-  sun: sun,
+  moon,
+  earth,
+  sun,
+  skybox: skyboxSphere,
 };
 
 export { LineFactory, sceneManager };

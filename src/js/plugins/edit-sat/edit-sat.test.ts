@@ -173,26 +173,7 @@ describe('editSat.editSatNewTleClickFadeIn', () => {
 describe('editSat.editSatSubmit', () => {
   test('0', () => {
     const callFunction: any = () => {
-      editSat.editSatSubmit({
-        bubbles: true,
-        cancelBubble: true,
-        cancelable: true,
-        composed: false,
-        currentTarget: {} as any,
-        defaultPrevented: true,
-        eventPhase: 7588892,
-        isTrusted: false,
-        returnValue: true,
-        srcElement: {} as any,
-        target: {} as any,
-        timeStamp: 123456,
-        type: 'number',
-        AT_TARGET: 56784,
-        BUBBLING_PHASE: 1.0,
-        CAPTURING_PHASE: 10.23,
-        NONE: 1,
-        preventDefault: () => {},
-      } as any);
+      editSat.editSatSubmit();
     };
 
     expect(callFunction).not.toThrow();

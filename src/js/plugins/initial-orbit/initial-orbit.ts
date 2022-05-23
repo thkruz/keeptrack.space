@@ -1,7 +1,7 @@
 import iodPng from '@app/img/icons/iod.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { omManager } from '@app/js/plugins';
-import $ from 'jquery';
+import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { omManager } from '@app/js/plugins/initial-orbit/om-manager';
 
 let isObfitMenuOpen = false;
 export const init = (): void => {
@@ -10,6 +10,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'initialOrbit',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'initialOrbit',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript
@@ -27,14 +33,16 @@ export const init = (): void => {
 };
 
 export const hideSideMenus = (): void => {
-  $('#obfit-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-obfit').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('obfit-menu'), 1000);
+  getEl('menu-obfit').classList.remove('bmenu-item-selected');
   isObfitMenuOpen = false;
 };
 
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
     <div id="obfit-menu" class="side-menu-parent start-hidden text-select">
       <div id="obfit-content" class="side-menu">
         <form id="obfit-form">
@@ -44,40 +52,40 @@ export const uiManagerInit = () => {
           <div class="switch row">
             <h6 class="center-align">Observation 1</h5>
             <div class="input-field col s12">
-              <input value="1606439414717" id="obfit-t1" type="text" class="tooltipped" data-position="right"
+              <input value="1653098333497" id="obfit-t1" type="text" class="tooltipped" data-position="right"
                 data-delay="50" data-tooltip="Time in Unix Time">
               <label for="obfit-t" class="active">Time</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="-3323.62939453125" id="obfit-x1" type="text" class="tooltipped" data-position="right"
+              <input value="1977.3758544921875" id="obfit-x1" type="text" class="tooltipped" data-position="right"
                 data-delay="50" data-tooltip="X">
               <label for="obfit-lat" class="active">X</label>
             </div>
             <div class="input-field col s4">
-              <input value="-4930.19384765625" id="obfit-y1" type="text" class="tooltipped" data-position="right"
+              <input value="5811.54248046875" id="obfit-y1" type="text" class="tooltipped" data-position="right"
                 data-delay="50" data-tooltip="Y">
               <label for="obfit-lat" class="active">Y</label>
             </div><div class="input-field col s4">
-              <input value="-3303.053955078125" id="obfit-z1" type="text" class="tooltipped" data-position="right"
+              <input value="3240.01123046875" id="obfit-z1" type="text" class="tooltipped" data-position="right"
                 data-delay="50" data-tooltip="Z">
               <label for="obfit-lat" class="active">Z</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="3.2059669494628906" id="obfit-xd1" type="text" class="tooltipped" data-position="right"
+              <input value="-7.044088363647461" id="obfit-xd1" type="text" class="tooltipped" data-position="right"
               data-delay="50" data-tooltip="X Dot">
               <label for="obfit-lat" class="active">X Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="-4.953164100646973" id="obfit-yd1" type="text" class="tooltipped" data-position="right"
+              <input value="0.5667343735694885" id="obfit-yd1" type="text" class="tooltipped" data-position="right"
                 data-delay="50" data-tooltip="Y Dot">
               <label for="obfit-lat" class="active">Y Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="4.8763322830200195" id="obfit-zd1" type="text" class="tooltipped" data-position="right"
+              <input value="2.7424800395965576" id="obfit-zd1" type="text" class="tooltipped" data-position="right"
                 data-delay="50" data-tooltip="Z Dot">
               <label for="obfit-lat" class="active">Z Dot</label>
             </div>
@@ -175,10 +183,13 @@ export const uiManagerInit = () => {
         </div>
       </div>
     </div>     
-  `);
+  `
+  );
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
     <div id="menu-obfit" class="bmenu-item">
       <img
         alt="obfit"
@@ -187,21 +198,21 @@ export const uiManagerInit = () => {
       <span class="bmenu-title">Initial Orbit</span>
       <div class="status-icon"></div>
     </div>
-  `);
+  `
+  );
+};
 
-  $('#obfit-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
+export const uiManagerFinal = (): void => {
+  clickAndDragWidth(getEl('external-menu'), {
     maxWidth: 650,
     minWidth: 400,
   });
 
-  $('#obfit-form').on('submit', function (e: Event) {
+  getEl('obfit-form').addEventListener('submit', function (e: Event) {
     obfitFormSubmit(e);
   });
 };
+
 export const bottomMenuClick = (iconName: string): void => {
   const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-obfit') {
@@ -212,9 +223,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#obfit-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('obfit-menu'), 1000);
       isObfitMenuOpen = true;
-      $('#menu-obfit').addClass('bmenu-item-selected');
+      getEl('menu-obfit').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -227,127 +238,127 @@ export const obfitFormSubmit = (e: any) => {
   let t3v, x3v, y3v, z3v, xd3v, yd3v, zd3v;
   let isOb2 = true;
   let isOb3 = true;
-  const t1 = (<HTMLInputElement>document.getElementById('obfit-t1')).value;
+  const t1 = (<HTMLInputElement>getEl('obfit-t1')).value;
   if (t1.length > 0) {
     t1v = parseFloat(t1);
   } else {
     t1v = NaN;
   }
-  const x1 = (<HTMLInputElement>document.getElementById('obfit-x1')).value;
+  const x1 = (<HTMLInputElement>getEl('obfit-x1')).value;
   if (x1.length > 0) {
     x1v = parseFloat(x1);
   } else {
     x1v = NaN;
   }
-  const y1 = (<HTMLInputElement>document.getElementById('obfit-y1')).value;
+  const y1 = (<HTMLInputElement>getEl('obfit-y1')).value;
   if (y1.length > 0) {
     y1v = parseFloat(y1);
   } else {
     y1v = NaN;
   }
-  const z1 = (<HTMLInputElement>document.getElementById('obfit-z1')).value;
+  const z1 = (<HTMLInputElement>getEl('obfit-z1')).value;
   if (z1.length > 0) {
     z1v = parseFloat(z1);
   } else {
     z1v = NaN;
   }
-  const xd1 = (<HTMLInputElement>document.getElementById('obfit-xd1')).value;
+  const xd1 = (<HTMLInputElement>getEl('obfit-xd1')).value;
   if (xd1.length > 0) {
     xd1v = parseFloat(xd1);
   } else {
     xd1v = NaN;
   }
-  const yd1 = (<HTMLInputElement>document.getElementById('obfit-yd1')).value;
+  const yd1 = (<HTMLInputElement>getEl('obfit-yd1')).value;
   if (yd1.length > 0) {
     yd1v = parseFloat(yd1);
   } else {
     yd1v = NaN;
   }
-  const zd1 = (<HTMLInputElement>document.getElementById('obfit-zd1')).value;
+  const zd1 = (<HTMLInputElement>getEl('obfit-zd1')).value;
   if (zd1.length > 0) {
     zd1v = parseFloat(zd1);
   } else {
     zd1v = NaN;
   }
-  const t2 = (<HTMLInputElement>document.getElementById('obfit-t2')).value;
+  const t2 = (<HTMLInputElement>getEl('obfit-t2')).value;
   if (t2.length > 0) {
     t2v = parseFloat(t2);
   } else {
     isOb2 = false;
   }
-  const x2 = (<HTMLInputElement>document.getElementById('obfit-x2')).value;
+  const x2 = (<HTMLInputElement>getEl('obfit-x2')).value;
   if (x2.length > 0) {
     x2v = parseFloat(x2);
   } else {
     isOb2 = false;
   }
-  const y2 = (<HTMLInputElement>document.getElementById('obfit-y2')).value;
+  const y2 = (<HTMLInputElement>getEl('obfit-y2')).value;
   if (y2.length > 0) {
     y2v = parseFloat(y2);
   } else {
     isOb2 = false;
   }
-  const z2 = (<HTMLInputElement>document.getElementById('obfit-z2')).value;
+  const z2 = (<HTMLInputElement>getEl('obfit-z2')).value;
   if (z2.length > 0) {
     z2v = parseFloat(z2);
   } else {
     isOb2 = false;
   }
-  const xd2 = (<HTMLInputElement>document.getElementById('obfit-xd2')).value;
+  const xd2 = (<HTMLInputElement>getEl('obfit-xd2')).value;
   if (xd2.length > 0) {
     xd2v = parseFloat(xd2);
   } else {
     isOb2 = false;
   }
-  const yd2 = (<HTMLInputElement>document.getElementById('obfit-yd2')).value;
+  const yd2 = (<HTMLInputElement>getEl('obfit-yd2')).value;
   if (yd2.length > 0) {
     yd2v = parseFloat(yd2);
   } else {
     isOb2 = false;
   }
-  const zd2 = (<HTMLInputElement>document.getElementById('obfit-zd2')).value;
+  const zd2 = (<HTMLInputElement>getEl('obfit-zd2')).value;
   if (zd2.length > 0) {
     zd2v = parseFloat(zd2);
   } else {
     isOb2 = false;
   }
-  const t3 = (<HTMLInputElement>document.getElementById('obfit-t3')).value;
+  const t3 = (<HTMLInputElement>getEl('obfit-t3')).value;
   if (t3.length > 0) {
     t3v = parseFloat(t3);
   } else {
     isOb3 = false;
   }
-  const x3 = (<HTMLInputElement>document.getElementById('obfit-x3')).value;
+  const x3 = (<HTMLInputElement>getEl('obfit-x3')).value;
   if (x3.length > 0) {
     x3v = parseFloat(x3);
   } else {
     isOb3 = false;
   }
-  const y3 = (<HTMLInputElement>document.getElementById('obfit-y3')).value;
+  const y3 = (<HTMLInputElement>getEl('obfit-y3')).value;
   if (y3.length > 0) {
     y3v = parseFloat(y3);
   } else {
     isOb3 = false;
   }
-  const z3 = (<HTMLInputElement>document.getElementById('obfit-z3')).value;
+  const z3 = (<HTMLInputElement>getEl('obfit-z3')).value;
   if (z3.length > 0) {
     z3v = parseFloat(z3);
   } else {
     isOb3 = false;
   }
-  const xd3 = (<HTMLInputElement>document.getElementById('obfit-xd3')).value;
+  const xd3 = (<HTMLInputElement>getEl('obfit-xd3')).value;
   if (xd3.length > 0) {
     xd3v = parseFloat(xd3);
   } else {
     isOb3 = false;
   }
-  const yd3 = (<HTMLInputElement>document.getElementById('obfit-yd3')).value;
+  const yd3 = (<HTMLInputElement>getEl('obfit-yd3')).value;
   if (yd3.length > 0) {
     yd3v = parseFloat(yd3);
   } else {
     isOb3 = false;
   }
-  const zd3 = (<HTMLInputElement>document.getElementById('obfit-zd3')).value;
+  const zd3 = (<HTMLInputElement>getEl('obfit-zd3')).value;
   if (zd3.length > 0) {
     zd3v = parseFloat(zd3);
   } else {

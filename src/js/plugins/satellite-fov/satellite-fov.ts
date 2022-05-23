@@ -26,11 +26,14 @@
 
 import sat2Png from '@app/img/icons/sat2.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl, shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
+    <!-- ########################## HTML ########################## -->
     <div id="menu-sat-fov" class="bmenu-item bmenu-item-disabled">
       <img
         alt="sat2"
@@ -38,7 +41,9 @@ export const uiManagerInit = () => {
       <span class="bmenu-title">Satellite FOV</span>
       <div class="status-icon"></div>
     </div>
-  `);
+    <!-- ########################## HTML ########################## -->
+  `
+  );
 };
 export const init = (): void => {
   // Add HTML
@@ -59,40 +64,36 @@ export const bottomMenuClick = (iconName: string): void => {
   // NOSONAR
   const { satSet, objectManager, uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-sat-fov') {
-    if (objectManager.selectedSat === -1 && $('#search').val() === '') {
+    if (objectManager.selectedSat === -1 && (<HTMLInputElement>getEl('search')).value === '') {
       // No Sat Selected and No Search Present
       if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satFovDisabled();
       uiManager.toast(`Select a Satellite First!`, 'caution');
-      if (!$('#menu-sat-fov:animated').length) {
-        $('#menu-sat-fov').effect('shake', {
-          distance: 10,
-        });
-      }
+      shake(getEl('menu-sat-fov'));
       return;
     }
     if (settingsManager.isSatOverflyModeOn) {
       settingsManager.isSatOverflyModeOn = false;
-      $('#menu-sat-fov').removeClass('bmenu-item-selected');
+      getEl('menu-sat-fov').classList.remove('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         typ: 'isShowSatOverfly',
         isShowSatOverfly: 'reset',
       });
       return;
     } else {
-      $('#menu-fov-bubble').removeClass('bmenu-item-selected');
-      $('#menu-surveillance').removeClass('bmenu-item-selected');
+      getEl('menu-fov-bubble').classList.remove('bmenu-item-selected');
+      getEl('menu-surveillance').classList.remove('bmenu-item-selected');
       settingsManager.isShowSurvFence = false;
       settingsManager.isFOVBubbleModeOn = false;
 
       settingsManager.isSatOverflyModeOn = true;
 
-      if ($('#search').val() !== '') {
+      if ((<HTMLInputElement>getEl('search')).value !== '') {
         // If Group Selected
-        uiManager.doSearch($('#search').val());
+        uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
       }
 
-      const satFieldOfView = parseFloat(<string>$('#satFieldOfView').val());
-      $('#menu-sat-fov').addClass('bmenu-item-selected');
+      const satFieldOfView = parseFloat(<string>(<HTMLInputElement>getEl('satFieldOfView')).value);
+      getEl('menu-sat-fov').classList.add('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowFOVBubble: 'reset',
         isShowSurvFence: 'disable',

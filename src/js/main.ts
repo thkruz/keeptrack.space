@@ -27,140 +27,25 @@
  */
 
 import { isThisJest, keepTrackApi } from './api/keepTrackApi';
-import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
-import { camera } from './camera/camera';
-import { colorSchemeManager } from './colorManager/colorSchemeManager';
 import { importCss } from './css';
-import { dotsManager } from './drawManager/dots';
-import { drawManager } from './drawManager/drawManager';
-import { LineFactory } from './drawManager/sceneManager/sceneManager';
-import { groupsManager } from './groupsManager/groupsManager';
-import { objectManager } from './objectManager/objectManager';
-import { orbitManager } from './orbitManager/orbitManager';
-import { sensorManager } from './plugins';
-import { satellite } from './satMath/satMath';
-import { satSet } from './satSet/satSet';
-import { VERSION } from './settingsManager/version.js';
-import { VERSION_DATE } from './settingsManager/versionDate.js';
-import { starManager } from './starManager/starManager';
-import { timeManager } from './timeManager/timeManager';
-import { adviceManager } from './uiManager/adviceManager';
-import { searchBox } from './uiManager/searchBox';
-import { uiManager } from './uiManager/uiManager';
+import { getEl } from './lib/helpers';
 
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {
   let errorHtml = '';
   errorHtml += error?.message ? `${error.message}<br>` : '';
   errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
   errorHtml += error?.stack ? `${error.stack}<br>` : '';
-  $('#loader-text').html(errorHtml);
+  getEl('loader-text').innerHTML = errorHtml;
   // istanbul ignore next
   if (!isThisJest()) console.warn(error);
 };
 
-export const initalizeKeepTrack = async (): Promise<void> => {
-  try {
-    // Upodate the version number and date
-    settingsManager.versionNumber = VERSION;
-    settingsManager.versionDate = VERSION_DATE;
-
-    // Add all of the imported programs to the API
-    keepTrackApi.programs = <any>{
-      adviceManager,
-      mainCamera: camera,
-      colorSchemeManager,
-      drawManager,
-      dotsManager,
-      groupsManager,
-      mapManager: <MapManager>(<unknown>{}),
-      objectManager: <ObjectManager>(<unknown>objectManager),
-      orbitManager: <OrbitManager>(<unknown>orbitManager),
-      satSet,
-      satellite,
-      searchBox,
-      sensorManager: <SensorManager>(<unknown>sensorManager),
-      starManager,
-      timeManager,
-      uiManager,
-    };
-
-    uiManager.loadStr('science');
-    // Load all the plugins now that we have the API initialized
-    await import('./plugins')
-      .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
-      .catch(() => {
-        // intentionally left blank
-      });
-
-    uiManager.loadStr('science2');
-    // Start initializing the rest of the website
-    timeManager.init();
-    uiManager.onReady();
-    uiManager.loadStr('dots');
-    uiManager.mobileManager.init();
-    // We need to know if we are on a small screen before starting webgl
-    await drawManager.glInit();
-    if (typeof process !== 'undefined') {
-      // NOTE: Jest fails with webgl2 so we use webgl1 during testing
-      // This means we need to mock some of the webgl2 code
-      keepTrackApi.programs.drawManager.gl = global.mocks.glMock;
-    }
-
-    window.addEventListener('resize', drawManager.resizeCanvas);
-
-    drawManager.loadScene();
-
-    await drawManager.createDotsManager(drawManager.gl);
-
-    const satSetErrorCode = await satSet.init();
-    if (satSetErrorCode !== 0) return;
-    objectManager.init();
-    colorSchemeManager.init();
-    drawManager.selectSatManager.init();
-
-    await keepTrackApi.methods.loadCatalog(); // Needs Object Manager and gl first
-    const satCruncher = satSet.satCruncher;
-    // eslint-disable-next-line require-atomic-updates
-    keepTrackApi.programs.satCruncher = satCruncher;
-
-    keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData?.length);
-    satSet.setColorScheme(colorSchemeManager.default, true);
-
-    orbitManager.init();
-
-    const lineManager = new LineFactory();
-    // eslint-disable-next-line require-atomic-updates
-    keepTrackApi.programs.lineManager = lineManager;
-
-    starManager.init();
-    uiManager.init();
-    keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData?.length);
-    // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
-    satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
-    objectManager?.satLinkManager?.idToSatnum(satSet);
-
-    uiManager.uiInput.init();
-
-    drawManager.init();
-
-    // Now that everything is loaded, start rendering to thg canvas
-    drawManager.drawLoop();
-
-    // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
-    uiManager.postStart();
-
-    loadAfterStart();
-  } catch (error) {
-    showErrorCode(<Error & { lineNumber: number }>error);
-  }
-};
-
-const loadAfterStart = () => {
+export const loadAfterStart = () => {
   if (settingsManager.cruncherReady) {
     // Update any CSS now that we know what is loaded
     keepTrackApi.methods.uiManagerFinal();
-
-    drawManager.loadHiRes();
+    // Update MaterialUI with new menu options
+    window.M.AutoInit();
   } else {
     setTimeout(loadAfterStart, 100);
   }
@@ -169,4 +54,22 @@ const loadAfterStart = () => {
 // Load the CSS
 importCss();
 // Load the main website
-$(initalizeKeepTrack);
+import('./initalizeKeepTrack').then(({ initalizeKeepTrack }) => {
+  if (!isThisJest()) {
+    console.log(`
+      _  __            _______             _       _____                       
+      | |/ /           |__   __|           | |     / ____|                     
+      | ' / ___  ___ _ __ | |_ __ __ _  ___| | __ | (___  _ __   __ _  ___ ___ 
+      |  < / _ \\/ _ | '_ \\| | '__/ _\` |/ __| |/ /  \\___ \\| '_ \\ / _\` |/ __/ _ \\ 
+      | . |  __|  __| |_) | | | | (_| | (__|   < _ ____) | |_) | (_| | (_|  __/
+      |_|\\_\\___|\\___| .__/|_|_|  \\__,_|\\___|_|\\_(_|_____/| .__/ \\__,_|\\___\\___|
+                    | |                                  | |                   
+                    |_|                                  |_|                   
+      #########################################################################
+      Trying to figure out how the code works? Check out 
+      https://github.com/thkruz/keeptrack.space/ or send me an email at
+      theodore.kruczek at gmail dot com.
+    `);
+  }
+  initalizeKeepTrack();
+});

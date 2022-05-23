@@ -1,12 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { saveCsv } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, saveCsv } from '@app/js/lib/helpers';
 import $ from 'jquery';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 
 export const initMenuController = () => {
   const { objectManager, orbitManager, satSet, satellite, searchBox, uiManager } = keepTrackApi.programs;
 
-  $('#search-icon').on('click', () => {
+  getEl('search-icon').addEventListener('click', () => {
     uiManager.searchToggle();
   });
 
@@ -22,74 +22,76 @@ export const initMenuController = () => {
     });
   });
 
-  $('#search-close').on('click', () => {
-    searchBox.hideResults();
-    $('#menu-space-stations').removeClass('bmenu-item-selected');
-  });
+  // getEl('search-close').addEventListener('click', () => {
+  //   searchBox.hideResults();
+  //   getEl('menu-space-stations').classList.remove('bmenu-item-selected');
+  // });
 
-  $('#legend-hover-menu').on('click', function (e: any) {
+  getEl('legend-hover-menu').addEventListener('click', function (e: any) {
     if (e.target.classList[1]) {
       uiManager.legendHoverMenuClick(e.target.classList[1]);
     }
   });
 
-  $('#legend-menu').on('click', () => {
+  getEl('legend-menu').addEventListener('click', () => {
     if (settingsManager.legendMenuOpen) {
-      $('#legend-hover-menu').hide();
-      $('#legend-icon').removeClass('bmenu-item-selected');
+      getEl('legend-hover-menu').style.display = 'none';
+      getEl('legend-icon').classList.remove('bmenu-item-selected');
       settingsManager.legendMenuOpen = false;
     } else {
-      $('#legend-hover-menu').show();
-      $('#legend-icon').addClass('bmenu-item-selected');
+      getEl('legend-hover-menu').style.display = 'block';
+      getEl('legend-icon').classList.add('bmenu-item-selected');
       searchBox.hideResults();
-      $('#search-results').hide();
+      getEl('search-results').style.display = 'none';
       settingsManager.legendMenuOpen = true;
     }
   });
 
-  $('.menu-selectable').on('click', () => {
+  document.querySelector('.menu-selectable').addEventListener('click', () => {
     if (objectManager.selectedSat !== -1) {
-      $('#menu-lookangles').removeClass('bmenu-item-disabled');
-      $('#menu-satview').removeClass('bmenu-item-disabled');
+      getEl('menu-lookangles').classList.remove('bmenu-item-disabled');
+      getEl('menu-satview').classList.remove('bmenu-item-disabled');
     }
   });
 
   // Resizing Listener
-  $(window).on('resize', () => {
+  window.addEventListener('resize', () => {
     uiManager.mobileManager.checkMobileMode();
     if (!settingsManager.disableUI) {
-      const bodyDOM = $('#bodyDOM');
+      const bodyDOM = getEl('bodyDOM');
       if (settingsManager.screenshotMode) {
-        bodyDOM.css('overflow', 'visible');
-        $('#canvas-holder').css('overflow', 'visible');
-        $('#canvas-holder').width(3840);
-        $('#canvas-holder').height(2160);
-        bodyDOM.width(3840);
-        bodyDOM.height(2160);
+        bodyDOM.style.overflow = 'visible';
+        getEl('canvas-holder').style.overflow = 'visible';
+        getEl('canvas-holder').style.width = '3840px';
+        getEl('canvas-holder').style.height = '2160px';
+        bodyDOM.style.width = '3840px';
+        bodyDOM.style.height = '2160px';
       } else {
-        bodyDOM.css('overflow', 'hidden');
-        $('#canvas-holder').css('overflow', 'hidden');
+        bodyDOM.style.overflow = 'hidden';
+        getEl('canvas-holder').style.overflow = 'hidden';
       }
     }
     settingsManager.isResizing = true;
   });
 
-  $('#search').on('focus', function () {
+  getEl('search').addEventListener('focus', () => {
     uiManager.isCurrentlyTyping = true;
   });
-  $('#ui-wrapper').on('focusin', function () {
+  getEl('ui-wrapper').addEventListener('focusin', () => {
     uiManager.isCurrentlyTyping = true;
   });
 
-  $('#search').on('blur', function () {
+  getEl('search').addEventListener('blur', () => {
     uiManager.isCurrentlyTyping = false;
   });
-  $('#ui-wrapper').on('focusout', function () {
+  getEl('ui-wrapper').addEventListener('focusout', () => {
     uiManager.isCurrentlyTyping = false;
   });
 
-  $('#search-results').on('click', '.search-result', function () {
-    var satId = $(this).data('obj-id');
+  getEl('search-results').addEventListener('click', function (evt: Event) {
+    // must be '.search-result' class
+    if (!(<HTMLElement>evt.target).parentElement.classList.contains('search-result')) return;
+    const satId = parseInt((<HTMLElement>evt.target).parentElement.dataset.objId);
     const sat = satSet.getSat(satId);
     if (sat.type === SpaceObjectType.STAR) {
       uiManager.panToStar(sat);
@@ -98,47 +100,48 @@ export const initMenuController = () => {
     }
   });
 
-  $('#search-results').on('mouseover', '.search-result', function () {
-    const satId = <number>$(this).data('obj-id');
+  getEl('search-results').addEventListener('mouseover', function (evt) {
+    if (!(<HTMLElement>evt.target).parentElement.classList.contains('search-result')) return;
+    const satId = parseInt((<HTMLElement>evt.target).parentElement.dataset.objId);
     searchForSat(satId);
   });
-  $('#search-results').on('mouseout', () => {
+  getEl('search-results').addEventListener('mouseout', () => {
     orbitManager.clearHoverOrbit();
     satSet.setHover(-1);
     searchBox.isHovering(false);
   });
 
-  $('#search').on('input', () => {
-    const searchStr = <string>$('#search').val();
+  getEl('search').addEventListener('input', () => {
+    const searchStr = <string>(<HTMLInputElement>getEl('search')).value;
     uiManager.doSearch(searchStr);
   });
 
   var isSocialOpen = false;
-  $('#share-icon').on('click', () => {
+  getEl('share-icon').addEventListener('click', () => {
     if (!isSocialOpen) {
       isSocialOpen = true;
-      $('#github-share').removeClass('share-up');
-      $('#twitter-share').removeClass('share-up');
-      $('#github-share').addClass('github-share-down');
-      $('#twitter-share').addClass('twitter-share-down');
+      getEl('github-share').classList.remove('share-up');
+      getEl('twitter-share').classList.remove('share-up');
+      getEl('github-share').classList.add('github-share-down');
+      getEl('twitter-share').classList.add('twitter-share-down');
     } else {
       isSocialOpen = false;
-      $('#github-share').addClass('share-up');
-      $('#twitter-share').addClass('share-up');
-      $('#github-share').removeClass('github-share-down');
-      $('#twitter-share').removeClass('twitter-share-down');
+      getEl('github-share').classList.add('share-up');
+      getEl('twitter-share').classList.add('share-up');
+      getEl('github-share').classList.remove('github-share-down');
+      getEl('twitter-share').classList.remove('twitter-share-down');
     }
   });
 
-  $('#fullscreen-icon').on('click', () => {
+  getEl('fullscreen-icon').addEventListener('click', () => {
     uiManager.mobileManager.fullscreenToggle();
   });
 
-  $('#nav-footer-toggle').on('click', () => {
+  getEl('nav-footer-toggle').addEventListener('click', () => {
     uiManager.footerToggle();
-    if (parseInt(window.getComputedStyle(document.getElementById('nav-footer')).bottom.replace('px', '')) < 0) {
+    if (parseInt(window.getComputedStyle(getEl('nav-footer')).bottom.replace('px', '')) < 0) {
       setTimeout(() => {
-        const bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
+        const bottomHeight = getEl('bottom-icons-container').offsetHeight;
         document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
       }, 1000); // Wait for the footer to be fully visible.
     } else {
@@ -147,75 +150,14 @@ export const initMenuController = () => {
     }
   });
 
-  // Allow All Side Menu Resizing
-  (<any>$('#sensor-info-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 400,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('settings-menu'));
+  clickAndDragWidth(getEl('about-menu'));
 
-  (<any>$('#lookangles-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
-
-  (<any>$('#lookanglesmultisite-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 600,
-    minWidth: 300,
-  });
-
-  (<any>$('#findByLooks-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
-
-  (<any>$('#customSensor-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
-
-  (<any>$('#settings-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
-
-  (<any>$('#about-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
-
-  $('#export-lookangles').on('click', () => {
+  getEl('export-lookangles').addEventListener('click', () => {
     saveCsv(satellite.lastlooksArray, 'lookAngles');
   });
 
-  $('#export-multiSiteArray').on('click', () => {
+  getEl('export-multiSiteArray').addEventListener('click', () => {
     saveCsv(satellite.lastMultiSiteArray, 'multiSiteLooks');
   });
 };

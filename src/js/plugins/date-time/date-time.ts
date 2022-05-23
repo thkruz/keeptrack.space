@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { getEl } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const updateDateTime = (date: Date) => {
@@ -12,6 +13,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'datetime',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'datetime',
+    cb: uiManagerFinal,
   });
 
   keepTrackApi.register({
@@ -34,9 +41,10 @@ export const datetimeTextClick = (): void => {
 };
 
 export const uiManagerInit = () => {
-  const { uiManager } = keepTrackApi.programs;
   // Bottom Icon
-  $('#nav-wrapper').append(keepTrackApi.html`
+  getEl('nav-wrapper').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <ul id="nav-mobile">
           <li id="jday"></li>
           <div id="datetime" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Time Menu">
@@ -48,9 +56,13 @@ export const uiManagerInit = () => {
             </div>
           </div>
         </ul>
-      `);
+        `
+  );
+};
 
-  $('#datetime-text').on('click', datetimeTextClick);
+export const uiManagerFinal = () => {
+  const { uiManager } = keepTrackApi.programs;
+  getEl('datetime-text').addEventListener('click', datetimeTextClick);
 
   $('#datetime-input-form').on('change', function (e: Event) {
     datetimeInputFormChange();

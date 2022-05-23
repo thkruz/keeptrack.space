@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SensorObject } from '../api/keepTrackTypes';
+import { getEl } from '../lib/helpers';
 
 export type GeolocationPosition = {
   coords: {
@@ -41,9 +42,15 @@ export const updateUi = (): void => {
   if (typeof settingsManager.geolocation.lon !== 'number') throw new Error('geolocation.lon is not valid');
   if (typeof settingsManager.geolocation.alt !== 'number') throw new Error('geolocation.alt is not valid');
 
-  $('#cs-lat').val(settingsManager.geolocation.lat).trigger('change');
-  $('#cs-lon').val(settingsManager.geolocation.lon).trigger('change');
-  $('#cs-hei').val(settingsManager.geolocation.alt).trigger('change');
+  const csLat = <HTMLInputElement>getEl('cs-lat');
+  const csLon = <HTMLInputElement>getEl('cs-lon');
+  const csHei = <HTMLInputElement>getEl('cs-hei');
+  csLat.value = settingsManager.geolocation.lat;
+  csLat.dispatchEvent(new Event('change'));
+  csLon.value = settingsManager.geolocation.lon;
+  csLon.dispatchEvent(new Event('change'));
+  csHei.value = settingsManager.geolocation.alt;
+  csHei.dispatchEvent(new Event('change'));
 
   $('#cs-telescope').attr('checked', 'checked');
   $('#cs-minaz').attr('disabled', true.toString());
@@ -52,18 +59,18 @@ export const updateUi = (): void => {
   $('#cs-maxel').attr('disabled', true.toString());
   $('#cs-minrange').attr('disabled', true.toString());
   $('#cs-maxrange').attr('disabled', true.toString());
-  $('#cs-minaz-div').hide();
-  $('#cs-maxaz-div').hide();
-  $('#cs-minel-div').hide();
-  $('#cs-maxel-div').hide();
-  $('#cs-minrange-div').hide();
-  $('#cs-maxrange-div').hide();
-  $('#cs-minaz').val(0);
-  $('#cs-maxaz').val(360);
-  $('#cs-minel').val(10);
-  $('#cs-maxel').val(90);
-  $('#cs-minrange').val(100);
-  $('#cs-maxrange').val(50000);
+  getEl('cs-minaz-div').style.display = 'none';
+  getEl('cs-maxaz-div').style.display = 'none';
+  getEl('cs-minel-div').style.display = 'none';
+  getEl('cs-maxel-div').style.display = 'none';
+  getEl('cs-minrange-div').style.display = 'none';
+  getEl('cs-maxrange-div').style.display = 'none';
+  (<HTMLInputElement>getEl('cs-minaz')).value = '0';
+  (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
+  (<HTMLInputElement>getEl('cs-minel')).value = '10';
+  (<HTMLInputElement>getEl('cs-maxel')).value = '90';
+  (<HTMLInputElement>getEl('cs-minrange')).value = '100';
+  (<HTMLInputElement>getEl('cs-maxrange')).value = '50000';
 
   $('#sensor-type').html('Telescope');
   $('#sensor-info-title').html('Custom Sensor');

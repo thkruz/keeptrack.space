@@ -26,18 +26,20 @@
 
 import externalPng from '@app/img/icons/external.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isExternalMenuOpen = false;
 
 export const hideSideMenus = (): void => {
-  $('#external-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-external').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('external-menu'), 1000);
+  getEl('menu-external').classList.remove('bmenu-item-selected');
   isExternalMenuOpen = false;
 };
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="external-menu" class="side-menu-parent start-hidden text-select">
           <div id="external-inner-menu" class="side-menu">
             <ul>
@@ -78,10 +80,13 @@ export const uiManagerInit = () => {
             </form>
           </div>
         </div>
-      `);
+      `
+  );
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-external" class="bmenu-item">
           <img
             alt="external"
@@ -90,32 +95,35 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">External Source</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `
+  );
+};
 
-  $('#n2yo-form').on('submit', function (e: Event) {
+export const uiManagerFinal = () => {
+  getEl('n2yo-form').addEventListener('submit', function (e: Event) {
     n2yoFormSubmit();
     e.preventDefault();
   });
 
-  $('#celestrak-form').on('submit', function (e: Event) {
+  getEl('celestrak-form').addEventListener('submit', function (e: Event) {
     celestrakFormSubmit();
     e.preventDefault();
   });
 
-  $('#external-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('external-menu'));
 };
+
 export const init = (): void => {
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'externalSources',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'externalSources',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript
@@ -133,10 +141,9 @@ export const init = (): void => {
 };
 
 export const n2yoFormSubmit = () => {
-  $('#loading-screen').fadeIn(1000, function () {
-    const satnum = parseInt(<string>$('#ext-n2yo').val());
+  showLoading(() => {
+    const satnum = parseInt(<string>(<HTMLInputElement>getEl('ext-n2yo')).value);
     searchN2yo(satnum);
-    $('#loading-screen').fadeOut('slow');
   });
 };
 
@@ -188,15 +195,15 @@ export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-external') {
     if (isExternalMenuOpen) {
       isExternalMenuOpen = false;
-      $('#menu-external').removeClass('bmenu-item-selected');
+      getEl('menu-external').classList.remove('bmenu-item-selected');
       uiManager.hideSideMenus();
       return;
     } else {
       uiManager.hideSideMenus();
-      $('#external-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('external-menu'), 1000);
       keepTrackApi.programs.watchlist.updateWatchlist();
       isExternalMenuOpen = true;
-      $('#menu-external').addClass('bmenu-item-selected');
+      getEl('menu-external').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -243,9 +250,8 @@ export const searchCelestrak = (satNum: any, analsat?: number) => {
 };
 
 export const celestrakFormSubmit = () => {
-  $('#loading-screen').fadeIn(1000, function () {
-    const satnum = parseInt(<string>$('#ext-celestrak').val());
+  showLoading(() => {
+    const satnum = parseInt(<string>(<HTMLInputElement>getEl('ext-celestrak')).value);
     searchCelestrak(satnum);
-    $('#loading-screen').fadeOut('slow');
   });
 };

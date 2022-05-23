@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
+import { getEl } from '../lib/helpers';
 
 export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
@@ -157,10 +158,10 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
 
     if (!settingsManager.disableUI) {
       if (!uiManager.createClockDOMOnce) {
-        document.getElementById('datetime-text').innerText = timeManager.timeTextStr;
+        getEl('datetime-text').innerText = timeManager.timeTextStr;
         uiManager.createClockDOMOnce = true;
       } else {
-        document.getElementById('datetime-text').childNodes[0].nodeValue = timeManager.timeTextStr;
+        getEl('datetime-text').childNodes[0].nodeValue = timeManager.timeTextStr;
       }
     }
   }

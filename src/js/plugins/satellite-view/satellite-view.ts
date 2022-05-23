@@ -24,9 +24,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import sat3Png from '@app/img/icons/sat3.png';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { getEl, shake } from '@app/js/lib/helpers';
 
 export const init = (): void => {
   const { adviceManager, objectManager, uiManager } = keepTrackApi.programs;
@@ -36,7 +36,9 @@ export const init = (): void => {
     cbName: 'satelliteView',
     cb: () => {
       // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+      getEl('bottom-icons').insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
         <div id="menu-satview" class="bmenu-item bmenu-item-disabled">
           <img
             alt="sat3"
@@ -46,7 +48,8 @@ export const init = (): void => {
           <span class="bmenu-title">Satellite View</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `
+      );
     },
   });
 
@@ -54,26 +57,23 @@ export const init = (): void => {
   keepTrackApi.register({
     method: 'bottomMenuClick',
     cbName: 'satelliteView',
-    cb: (iconName: string): void => { // NOSONAR
+    cb: (iconName: string): void => {
+      // NOSONAR
       if (iconName === 'menu-satview') {
         const mainCamera = keepTrackApi.programs.mainCamera;
         if (mainCamera.cameraType.current === mainCamera.cameraType.Satellite) {
           uiManager.hideSideMenus();
           mainCamera.cameraType.current = mainCamera.cameraType.FixedToSat; // Back to normal Camera Mode
-          $('#menu-satview').removeClass('bmenu-item-selected');
+          getEl('menu-satview').classList.remove('bmenu-item-selected');
           return;
         } else {
           if (objectManager.selectedSat !== -1) {
             mainCamera.cameraType.current = mainCamera.cameraType.Satellite; // Activate Satellite Camera Mode
-            $('#menu-satview').addClass('bmenu-item-selected');
+            getEl('menu-satview').classList.add('bmenu-item-selected');
           } else {
             uiManager.toast(`Select a Satellite First!`, 'caution');
             if (settingsManager.plugins.topMenu) adviceManager.adviceList.satViewDisabled();
-            if (!$('#menu-satview:animated').length) {
-              $('#menu-satview').effect('shake', {
-                distance: 10,
-              });
-            }
+            shake(getEl('menu-satview'));
           }
           return;
         }

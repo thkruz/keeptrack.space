@@ -5,6 +5,7 @@ import $ from 'jquery';
 import { CatalogManager, SearchBox } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { SatGroup } from '../groupsManager/sat-group';
+import { getEl } from '../lib/helpers';
 
 let hoverSatId = -1;
 let hovering = false;
@@ -27,7 +28,7 @@ export const getLastResultGroup = () => lastResultGroup;
 export const getHoverSat = () => hoverSatId;
 export const isHovering = (val?: boolean): boolean => (hovering = typeof val !== 'undefined' ? val : hovering);
 export const setHoverSat = (satId: number): number => (hoverSatId = satId);
-export const getCurrentSearch = () => (resultsOpen ? $('#search').val() : '');
+export const getCurrentSearch = () => (resultsOpen ? (<HTMLInputElement>getEl('search')).value : '');
 
 export const hideResults = () => {
   try {
@@ -60,12 +61,12 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];
     dotsManager.updateSizeBuffer(satSet.satData.length);
-    $('#search').val('');
+    (<HTMLInputElement>getEl('search')).value = '';
     searchBox.hideResults();
     return [];
   }
 
-  $('#search').val(searchString);
+  (<HTMLInputElement>getEl('search')).value = searchString;
 
   // Don't search for things until at least the minimum characters
   // are typed otherwise there are just too many search results.

@@ -1,6 +1,8 @@
-import twitterPng from '@app/img/icons/twitter.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { twitterBottomIcon } from './components/twitter-bottom-icon';
+import { twitterSideMenu } from './components/twitter-side-menu';
+import './components/twitter.css';
 
 export const init = (): void => {
   let isTwitterMenuOpen = false;
@@ -10,19 +12,8 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'twitterManager',
     cb: () => {
-      // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
-        <div id="twitter-menu" class="side-menu-parent start-hidden text-select"></div>
-      `);
-
-      // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
-        <div id="menu-twitter" class="bmenu-item">
-          <img alt="twitter" src="" delayedsrc="${twitterPng}" />
-          <span class="bmenu-title">Twitter</span>
-          <div class="status-icon"></div>
-        </div>
-      `);
+      getEl('left-menus').insertAdjacentHTML('beforeend', twitterSideMenu);
+      getEl('bottom-icons').insertAdjacentHTML('beforeend', twitterBottomIcon);
     },
   });
 
@@ -39,14 +30,18 @@ export const init = (): void => {
         } else {
           if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
           keepTrackApi.programs.uiManager.hideSideMenus();
-          if ($('#twitter-menu').html() == '') {
-            $('#twitter-menu').html(
-              '<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>'
-            );
+          // Initial Load Only
+          if (getEl('twitter-menu').innerHTML === '') {
+            getEl('twitter-menu').innerHTML =
+              '<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a>';
+            const script = document.createElement('script');
+            script.src = 'https://platform.twitter.com/widgets.js';
+            script.async = true;
+            getEl('twitter-menu').appendChild(script);
           }
-          (<any>$('#twitter-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          slideInRight(getEl('twitter-menu'), 1000);
           isTwitterMenuOpen = true;
-          $('#menu-twitter').addClass('bmenu-item-selected');
+          getEl('menu-twitter').classList.add('bmenu-item-selected');
           return;
         }
       }
@@ -57,8 +52,8 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'twitter',
     cb: (): void => {
-      (<any>$('#twitter-menu')).effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-      $('#menu-twitter').removeClass('bmenu-item-selected');
+      slideOutLeft(getEl('twitter-menu'), 1000);
+      getEl('menu-twitter').classList.remove('bmenu-item-selected');
       isTwitterMenuOpen = false;
     },
   });

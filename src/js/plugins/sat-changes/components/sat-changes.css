@@ -1,0 +1,9 @@
+#satChng-menu {
+  width: 330px;
+}
+
+@media (max-width: 694px) {
+  #satChng-menu {
+    width: 100% !important;
+  }
+}

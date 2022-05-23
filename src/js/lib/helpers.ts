@@ -1,4 +1,6 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { saveAs } from 'file-saver';
+import { isThisJest } from './../api/keepTrackApi';
 
 export { saveAs };
 
@@ -28,6 +30,22 @@ export const saveVariable = (variable: any, filename?: string): void => {
   } catch (e) {
     // Intentionally Left Blank
   }
+};
+
+export const getEl = (id: string): HTMLElement => {
+  const el = document.getElementById(id);
+  if (el) return el;
+  if (isThisJest()) {
+    // Create an empty DIV and send that back
+    // TODO - This is a hack. Tests should provide the right environment.
+    const el = document.createElement('div');
+    el.id = id;
+    document.body.appendChild(el);
+    return <HTMLElement>(<unknown>el);
+  }
+  return null;
+  // DEBUG: Use this code for finding bad requests
+  // throw new Error(`Element with id ${id} not found!`);
 };
 
 export const saveCsv = (items: Array<any>, name?: string): void => {
@@ -97,6 +115,303 @@ export const truncateString = (str: string, num: number): string => {
   }
   // Return str truncated with '...' concatenated to the end of str.
   return str.slice(0, num) + '...';
+};
+
+export const slideOutLeft = (el: HTMLElement, duration: number, callback?: () => void, offset?: number): void => {
+  // Avoid errors for now
+  // TODO: Throw an error here
+  if (el === null) return;
+
+  if (el.style.display === 'none') return;
+  el.style.transition = `transform ${duration / 1e3}s ease-in-out`;
+  el.style.transform = `translateX(${offset || -100}%)`;
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
+export const slideInRight = (el: HTMLElement, duration: number, callback?: () => void): void => {
+  // Avoid errors for now
+  // TODO: Throw an error here
+  if (el === null) return;
+
+  // Start off the screen
+  el.style.display = 'block';
+  el.style.transform = `translateX(-100%)`;
+  el.style.transition = `transform 0s ease-in-out`;
+  setTimeout(() => {
+    el.style.display = 'block';
+    el.style.transition = `transform ${duration / 1e3}s ease-in-out`;
+    el.style.transform = 'translateX(0)';
+  }, 50);
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
+export const slideOutUp = (el: HTMLElement, duration: number, callback?: () => void): void => {
+  // Avoid errors for now
+  // TODO: Throw an error here
+  if (el === null) return;
+
+  if (el.style.display === 'none') return;
+  el.style.transition = `transform ${duration / 1e3}s ease-in-out`;
+  el.style.transform = 'translateY(-100%)';
+  setTimeout(() => {
+    el.style.display = 'none';
+    el.style.transition = '';
+    el.style.transform = '';
+    if (callback) callback();
+  }, duration);
+};
+
+export const slideInDown = (el: HTMLElement, duration: number, callback?: () => void): void => {
+  // Avoid errors for now
+  // TODO: Throw an error here
+  if (el === null) return;
+
+  if (el.style.display === 'block') return;
+  el.style.display = 'block';
+  el.style.transition = `transform ${duration / 1e3}s ease-in-out`;
+  el.style.transform = 'translateY(100%)';
+  setTimeout(() => {
+    el.style.display = 'block';
+    el.style.transition = '';
+    el.style.transform = '';
+    if (callback) callback();
+  }, duration);
+};
+
+export const showLoading = (callback?: () => void, delay?: number): void => {
+  const loading = document.getElementById('loading-screen');
+  fadeIn(loading, 'flex', 500);
+  setTimeout(() => {
+    if (callback) callback();
+    fadeOut(loading, 500);
+  }, delay || 100);
+};
+
+export const hideLoading = () => {
+  const loading = document.getElementById('loading-screen');
+  fadeOut(loading, 500);
+};
+
+export const fadeIn = (el: HTMLElement, type?: string, duration?: number, callback?: () => void): void => {
+  // Avoid errors for now
+  // TODO: Throw an error here
+  if (el === null) return;
+
+  type ??= 'block';
+  if (el.style.display === type) return;
+  duration = duration ?? 1000;
+  el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+  el.style.display = type;
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
+export const fadeOut = (el: HTMLElement, duration?: number, callback?: () => void): void => {
+  // Avoid errors for now
+  // TODO: Throw an error here
+  if (el === null) return;
+
+  if (el.style.display === 'none') return;
+  duration = duration ?? 1000;
+  el.style.transition = `all ${duration / 1e3}s ease-in-out`;
+  el.style.display = 'none';
+  setTimeout(() => {
+    if (callback) callback();
+  }, duration);
+};
+
+interface clickDragOptions {
+  minWidth?: number;
+  maxWidth?: number;
+}
+
+export const clickAndDragWidth = (el: HTMLElement, options: clickDragOptions = {}): void => {
+  const minWidth = options.minWidth || 280;
+  const maxWidth = options.maxWidth || 450;
+
+  let lastUpdate = Date.now();
+
+  let startX: number;
+  let startWidth: number;
+  let width: number;
+  settingsManager.isDragging = false;
+
+  // create new element on right edge
+  const edgeEl = document.createElement('div');
+  edgeEl.style.position = 'relative';
+  edgeEl.style.height = '100%';
+  edgeEl.style.width = '8px';
+  edgeEl.style.right = '0px';
+  edgeEl.style.cursor = 'w-resize';
+  edgeEl.style.zIndex = '9999';
+  edgeEl.style.marginLeft = 'auto';
+  el.appendChild(edgeEl);
+
+  edgeEl.addEventListener('mousedown', (e: MouseEvent) => {
+    Object.assign(edgeEl.style, {
+      width: '100vw',
+      height: '100vh',
+      position: 'fixed',
+    } as CSSStyleDeclaration);
+    edgeEl.style.right = '';
+
+    startX = e.clientX;
+    startWidth = el.clientWidth;
+    settingsManager.isDragging = true;
+  });
+  edgeEl.addEventListener('mouseup', () => {
+    settingsManager.isDragging = false;
+    Object.assign(edgeEl.style, {
+      height: '100%',
+      width: '8px',
+      right: '0px',
+      position: 'absolute',
+    } as CSSStyleDeclaration);
+  });
+  edgeEl.addEventListener('mousemove', (e: MouseEvent) => {
+    // This can crush FPS so let's put a limit on it
+    if (settingsManager.isDragging && lastUpdate + keepTrackApi.programs.drawManager.dt < Date.now()) {
+      width = startWidth + e.clientX - startX;
+      width = width < minWidth ? minWidth : width;
+      width = width > maxWidth ? maxWidth : width;
+      el.style.width = `${width}px`;
+      lastUpdate = Date.now();
+    }
+  });
+};
+
+export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback?: () => void): void => {
+  let lastUpdate = Date.now();
+  let startY: number;
+  let startHeight: number;
+  let height: number;
+  settingsManager.isDragging = false;
+
+  // create new element on right edge
+  const edgeEl = document.createElement('div');
+  edgeEl.style.position = 'absolute';
+  edgeEl.style.width = '100%';
+  edgeEl.style.height = '8px';
+  edgeEl.style.top = '0px';
+  edgeEl.style.cursor = 'n-resize';
+  edgeEl.style.zIndex = '9999';
+  edgeEl.style.marginBottom = 'auto';
+  edgeEl.style.marginLeft = 'auto';
+  edgeEl.style.marginRight = 'auto';
+  el.appendChild(edgeEl);
+
+  edgeEl.addEventListener('mousedown', (e: MouseEvent) => {
+    Object.assign(edgeEl.style, {
+      width: '100vw',
+      height: '100vh',
+      position: 'fixed',
+    } as CSSStyleDeclaration);
+
+    startY = e.clientY;
+    startHeight = el.clientHeight;
+    settingsManager.isDragging = true;
+  });
+  edgeEl.addEventListener('mouseup', () => {
+    settingsManager.isDragging = false;
+    Object.assign(edgeEl.style, {
+      width: '100%',
+      height: '8px',
+      position: 'absolute',
+    } as CSSStyleDeclaration);
+
+    if (callback) callback();
+  });
+  edgeEl.addEventListener('mousemove', (e: MouseEvent) => {
+    // This can crush FPS so let's put a limit on it
+    if (settingsManager.isDragging && lastUpdate + keepTrackApi.programs.drawManager.dt < Date.now()) {
+      height = startHeight - (e.clientY - startY);
+      height = maxHeight ? Math.min(height, maxHeight) : height;
+      el.style.height = `${height}px`;
+      lastUpdate = Date.now();
+    }
+  });
+};
+
+export const openColorbox = (url: string, options: any = {}): void => {
+  // Check for coloroxDiv
+  if (!getEl('colorbox-div')) {
+    const colorboxDiv = document.createElement('div');
+    colorboxDiv.id = 'colorbox-div';
+    document.body.appendChild(colorboxDiv);
+    const colorboxContainer = document.createElement('div');
+    colorboxContainer.id = 'colorbox-container';
+    colorboxDiv.appendChild(colorboxContainer);
+    const colorboxIframe = document.createElement('iframe');
+    colorboxIframe.id = 'colorbox-iframe';
+    colorboxContainer.appendChild(colorboxIframe);
+    const img = document.createElement('img');
+    img.id = 'colorbox-img';
+    img.src = url;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.display = 'block';
+    img.style.objectFit = 'cover';
+    getEl('colorbox-container').appendChild(img);
+
+    getEl('colorbox-div').addEventListener('click', () => {
+      closeColorbox();
+      if (options.callback) options.callback();
+    });
+  }
+
+  showLoading(null, 2000);
+  getEl('colorbox-div').style.display = 'block';
+
+  if (options.image) {
+    getEl('colorbox-container').style.width = '45%';
+    getEl('colorbox-container').style.transform = 'translateX(-200%)';
+    (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'none';
+    (<HTMLImageElement>getEl('colorbox-img')).style.display = 'block';
+    (<HTMLImageElement>getEl('colorbox-img')).src = url;
+  } else {
+    getEl('colorbox-container').style.width = '100%';
+    (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'block';
+    (<HTMLIFrameElement>getEl('colorbox-iframe')).src = url;
+    (<HTMLImageElement>getEl('colorbox-img')).style.display = 'none';
+  }
+
+  setTimeout(() => {
+    slideInRight(getEl('colorbox-container'), 1000, null);
+  }, 2000);
+};
+
+export const closeColorbox = (): void => {
+  if (!getEl('colorbox-div')) return;
+  if (getEl('colorbox-div').style.display !== 'block') return;
+
+  slideOutLeft(
+    getEl('colorbox-container'),
+    1000,
+    () => {
+      getEl('colorbox-div').style.display = 'none';
+    },
+    -200
+  );
+};
+
+export const shake = (el: HTMLElement | HTMLDivElement, duration?: number, callback?: () => void): void => {
+  // Avoid errors for now
+  // TODO: Throw an error here
+  if (el === null) return;
+
+  if (el.classList.contains('shake')) return;
+
+  duration ??= 500;
+  el.classList.add('shake');
+  setTimeout(() => {
+    el.classList.remove('shake');
+    if (callback) callback();
+  }, duration);
 };
 
 (<any>window).getUnique = getUnique;

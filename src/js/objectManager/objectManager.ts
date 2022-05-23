@@ -4,6 +4,7 @@
 import { keepTrackApi } from '../api/keepTrackApi';
 import { ObjectManager, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
+import { getEl } from '../lib/helpers';
 import { stars } from '../starManager/stars';
 import { controlSiteManager, ControlSiteObject } from './controlSiteManager';
 import { launchSiteManager } from './launchSiteManager';
@@ -451,7 +452,7 @@ const setSecondarySat = (id: number): void => {
   objectManager.secondarySat = id;
   objectManager.secondarySatObj = satSet.getSat(id);
   if (objectManager.selectedSat !== -1) {
-    $('#menu-plot-analysis3').removeClass('bmenu-item-disabled');
+    getEl('menu-plot-analysis3').classList.remove('bmenu-item-disabled');
   }
 };
 

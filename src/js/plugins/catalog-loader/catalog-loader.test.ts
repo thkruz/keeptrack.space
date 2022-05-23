@@ -9,6 +9,7 @@ keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs,
 const settingsManager = <SettingsManager>(<any>window).settingsManager;
 settingsManager.installDirectory = '/';
 
+// eslint-disable-next-line no-undef
 $.get = jest.fn();
 
 const respMock = [

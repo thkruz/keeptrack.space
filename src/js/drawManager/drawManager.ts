@@ -10,6 +10,7 @@ import { SpaceObjectType } from '../api/SpaceObjectType';
 import { demoMode } from './demoMode';
 import { hoverBoxOnSat, hoverManager, updateHover } from './hoverManager/hoverManager';
 import { screenShot, watermarkedDataUrl } from './screenShot';
+import { getEl } from '@app/js/lib/helpers';
 
 let satMiniBox: HTMLDivElement;
 let satLabelModeLastTime = 0;
@@ -20,7 +21,7 @@ let satHoverMiniDOM;
 settingsManager.isShowNextPass = false;
 
 export const init = () => {
-  satMiniBox = <HTMLDivElement>(<unknown>document.getElementById('sat-minibox'));
+  satMiniBox = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
   hoverManager.init();
   drawManager.startWithOrbits();
 
@@ -31,7 +32,7 @@ export const init = () => {
 };
 export const glInit = async () => {
   // Ensure the canvas is available
-  if (drawManager.canvas === null) {
+  if (drawManager.canvas === null) {    
     throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
   }
 
@@ -105,6 +106,7 @@ export const loadScene = async () => {
     keepTrackApi.methods.drawManagerLoadScene();
     await sceneManager.sun.init();
     await sceneManager.moon.init();
+    await sceneManager.skybox.init();
   } catch (error) {
     console.debug(error);
   }
@@ -260,7 +262,7 @@ export const drawLoop = (preciseDt: number) => {
   // Update orbit currently being hovered over
   // Only if last frame was 30 FPS or more. readpixels used to determine which satellite is hovered
   // is the biggest performance hit and we should throttle that.
-  if (1000 / timeManager.dt > 5 && !settingsManager.lowPerf) {
+  if (1000 / timeManager.dt > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
     updateHover();
   }
 
@@ -351,9 +353,10 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
   if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
     if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
     const { mainCamera, objectManager } = keepTrackApi.programs;
+    
     // Draw the Sun to the Godrays Frame Buffer
     sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godrays.frameBuffer);
-
+    
     // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
     sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager?.postProcessingManager?.programs?.occlusion, sceneManager?.sun?.godrays?.frameBuffer);
     if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
@@ -363,6 +366,9 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
     // todo: this should be a dynamic buffer not hardcoded to bufffer two
     drawManager.postProcessingManager.curBuffer = null;
     drawManager.sceneManager.sun.drawGodrays(gl, drawManager.postProcessingManager.curBuffer);
+    if (settingsManager.isDrawMilkyWay) {
+      drawManager.sceneManager.skybox.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);
+    }
 
     // Apply two pass gaussian blur to the godrays to smooth them out
     // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
@@ -433,7 +439,7 @@ export const orbitsAbove = () => { // NOSONAR
     // Previously called showOrbitsAbove();
     if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
       if (isSatMiniBoxInUse) {
-        hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
+        hoverBoxOnSatMiniElements = getEl('sat-minibox');
         hoverBoxOnSatMiniElements.innerHTML = '';
       }
       isSatMiniBoxInUse = false;
@@ -449,7 +455,7 @@ export const orbitsAbove = () => { // NOSONAR
     labelCount = 0;
     drawManager.isHoverBoxVisible = true;
 
-    hoverBoxOnSatMiniElements = document.getElementById('sat-minibox');
+    hoverBoxOnSatMiniElements = getEl('sat-minibox');
 
     /**
      * @todo Reuse hoverBoxOnSatMini DOM Elements
@@ -646,7 +652,7 @@ export let drawManager: DrawManager = {
     satId: -1,
   }),
   // Canvas needs to account for jest
-  canvas: typeof process !== 'undefined' ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>document.getElementById('keeptrack-canvas'),
+  canvas: typeof process !== 'undefined' ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas'),
   sceneManager: null,
   gl: <WebGL2RenderingContext>null,
   isNeedPostProcessing: false,

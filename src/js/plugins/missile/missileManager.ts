@@ -5,8 +5,6 @@ import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js
 import { jday } from '@app/js/timeManager/transforms';
 import $ from 'jquery';
 
-const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
-
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
 const missileArray: any[] = [];
 
@@ -19,6 +17,7 @@ export const MassRaidPre = (time: number, simFile: string) => {
   missileManager.clearMissiles();
   $.get(simFile, function (newMissileArray) {
     const satSetLen = satSet.missileSats;
+    missileManager.missilesInUse = satSetLen;
     for (let i = 0; i < newMissileArray.length; i++) {
       const x = satSetLen - 500 + i;
       newMissileArray[i].startTime = time;
@@ -56,15 +55,19 @@ export const MassRaidPre = (time: number, simFile: string) => {
   });
 };
 export const clearMissiles = () => {
-  const { satSet } = keepTrackApi.programs;
-  missileManager.missilesInUse = 0;
+  const { satSet, orbitManager } = keepTrackApi.programs;  
   keepTrackApi.programs.uiManager.doSearch('');
-  const satSetLen = satSet.satData.length;
+  const satSetLen = satSet.missileSats;  
   for (let i = 0; i < 500; i++) {
     const x = satSetLen - 500 + i;
 
     const missileObj: MissileObject = <MissileObject>satSet.getSat(x);
     missileObj.active = false;
+    missileObj.latList = [];
+    missileObj.lonList = [];
+    missileObj.name = '';
+    missileObj.startTime = 0;
+    satSet.setSat(x, missileObj);
 
     keepTrackApi.programs.satSet.satCruncher.postMessage({
       id: missileObj.id,
@@ -81,7 +84,17 @@ export const clearMissiles = () => {
       altList: missileObj.altList,
       startTime: missileObj.startTime,
     });
-  }
+
+    if (missileObj.id) {
+      orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, {
+        missile: true,
+        latList: [],
+        lonList: [],
+        altList: [],
+      });
+    }
+  }  
+  missileManager.missilesInUse = 0;   
 };
 
 // This function stalls Jest for multiple minutes.
@@ -514,6 +527,8 @@ export const Missile = (
   return 1; // Successful Launch
 };
 export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[]) => { // NOSONAR
+  const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
+  
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
   const now = timeManager.simulationTimeObj;
   let j = jday(

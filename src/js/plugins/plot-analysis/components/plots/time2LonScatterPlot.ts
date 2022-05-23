@@ -12,7 +12,7 @@ export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart,
   if (!existInstance) {
     // Setup Configuration
     curChart = echarts.init(chartDom);
-    curChart.on('click', function (event) {
+    curChart.on('click', (event) => {
       if (event.data?.id) {
         keepTrackApi.programs.satSet.selectSat(event.data.id);
       }

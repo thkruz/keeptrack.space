@@ -25,12 +25,12 @@
  */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import planetariumPng from '@app/img/icons/planetarium.png';
+import { getEl, shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="menu-planetarium" class="bmenu-item bmenu-item-disabled">
           <img
             alt="planetarium"
@@ -40,7 +40,7 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Planetarium View</span>
           <div class="status-icon"></div>
         </div>
-      `);
+        `));
 };
 export const init = (): void => {
   // Add HTML
@@ -73,13 +73,15 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       uiManager.hideSideMenus();
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
       mainCamera.cameraType.current = mainCamera.cameraType.Default; // Back to normal Camera Mode
-      $('#fov-text').html('');
-      $('#menu-planetarium').removeClass('bmenu-item-selected');
+      // TODO: implement fov information
+      // getEl('fov-text').innerHTML = ('');
+      getEl('menu-planetarium').classList.remove('bmenu-item-selected');
       return;
     } else {
       if (sensorManager.checkSensorSelected()) {
         mainCamera.cameraType.current = mainCamera.cameraType.Planetarium; // Activate Planetarium Camera Mode
-        $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+        // TODO: implement fov information
+        // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
         uiManager.legendMenuChange('planetarium');
         if (objectManager.isStarManagerLoaded) {
           starManager.clearConstellations();
@@ -87,18 +89,14 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         // If astronomy plugin is available then set it to false
         if (typeof keepTrackApi.programs.astronomy !== 'undefined') {
           keepTrackApi.programs.astronomy.isAstronomyView = false;
-          $('#menu-astronomy').removeClass('bmenu-item-selected');
+          getEl('menu-astronomy')?.classList.remove('bmenu-item-selected');
         }
         keepTrackApi.programs.planetarium.isPlanetariumView = true;
-        $('#menu-planetarium').addClass('bmenu-item-selected');
+        getEl('menu-planetarium').classList.add('bmenu-item-selected');
       } else {
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.planetariumDisabled();
         uiManager.toast(`Select a Sensor First!`, 'caution');
-        if (!$('#menu-planetarium:animated').length) {
-          $('#menu-planetarium').effect('shake', {
-            distance: 10,
-          });
-        }
+        shake(getEl('menu-planetarium'));
       }
       return;
     }

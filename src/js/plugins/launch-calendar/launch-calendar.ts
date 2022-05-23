@@ -1,10 +1,10 @@
 /* */
 
-import calendarPng from '@app/img/icons/calendar.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl, openColorbox } from '@app/js/lib/helpers';
+import { LaunchCalendarButton } from './components/launch-calendar-button';
 
-let isLaunchMenuOpen = true;
+let isLaunchMenuOpen = false;
 
 export const init = (): void => {
   // Add HTML
@@ -31,6 +31,7 @@ export const init = (): void => {
 
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-launches') {
+    console.log('launches clicked');
     if (isLaunchMenuOpen) {
       isLaunchMenuOpen = false;
       keepTrackApi.programs.uiManager.hideSideMenus();
@@ -42,45 +43,28 @@ export const bottomMenuClick = (iconName: string): void => {
         settingsManager.isPreventColorboxClose = false;
       }, 2000);
       keepTrackApi.programs.uiManager.hideSideMenus();
-      try {
-        $.colorbox({
-          href: 'https://space.skyrocket.de/doc_chr/lau2020.htm',
-          iframe: true,
-          width: '80%',
-          height: '80%',
-          fastIframe: false,
-          closeButton: false,
-        });
-      } catch (error) {
-        // DEBUG:
-        // console.debug(error);
-      }
+      const year = new Date().getFullYear();
+      openColorbox(`https://space.skyrocket.de/doc_chr/lau${year}.htm`, {
+        callback: cboxClosed,
+      });
       isLaunchMenuOpen = true;
-      $('#menu-launches').addClass('bmenu-item-selected');
+      getEl('menu-launches').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 
 export const hideSideMenus = (): void => {
-  $('#menu-launches').removeClass('bmenu-item-selected');
+  getEl('menu-launches').classList.remove('bmenu-item-selected');
 };
 
 export const cboxClosed = (): void => {
   if (isLaunchMenuOpen) {
     isLaunchMenuOpen = false;
-    $('#menu-launches').removeClass('bmenu-item-selected');
+    getEl('menu-launches').classList.remove('bmenu-item-selected');
   }
 };
 export const uiManagerInit = (): any => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
-    <div id="menu-launches" class="bmenu-item">
-      <img alt="calendar2" src="" delayedsrc="${calendarPng}" />
-      <span class="bmenu-title">Launch Calendar</span>
-      <div class="status-icon"></div>
-    </div> 
-  `);
-
-  $(document).on('cbox_closed', cboxClosed);
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', LaunchCalendarButton);
 };

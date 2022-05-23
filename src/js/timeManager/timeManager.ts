@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { TimeManager } from '../api/keepTrackTypes';
+import { getEl } from '../lib/helpers';
 import { getDayOfYear } from './transforms';
 
 export const changePropRate = (propRate: number) => {
@@ -150,10 +151,14 @@ export const timeManager: TimeManager = {
           settingsManager.isPropRateChange = false;
         }
         // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
-        if (timeManager.dateDOM == null) timeManager.dateDOM = window.document.getElementById('datetime-text');
         if (timeManager.dateDOM == null) {
-          console.debug('Cant find datetime-text!');
-          return;
+          try {
+            timeManager.dateDOM = getEl('datetime-text');
+            if (timeManager.dateDOM == null) return; // Avoid race condition
+          } catch {
+            // Avoid race condition
+            return;
+          }
         }
         timeManager.dateDOM.textContent = timeManager.timeTextStr;
 

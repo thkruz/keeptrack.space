@@ -57,6 +57,7 @@ export const drawAllConstellations = () => {
   }
 };
 export const drawConstellations = (C: string) => { // NOSONAR
+  // eslint-disable-next-line no-unreachable
   if (typeof C === 'undefined') return;
 
   const getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;

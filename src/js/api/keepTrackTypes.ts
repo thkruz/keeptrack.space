@@ -316,6 +316,9 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isEciOnHover: boolean;
+  isDrawMilkyWay: boolean;
+  isDragging: boolean;
   isOrbitCruncherInEcf: boolean;
   lastSearch: any;
   db: any;
@@ -1191,7 +1194,7 @@ export interface SatMath {
   lookAngles2Ecf: (az: number, el: number, rng: number, lat: number, lon: number, alt: number) => { x: number; y: number; z: number };
   lookanglesInterval: number;
   lookanglesLength: number;
-  map: (sat: SatObject, i: number) => { time: string; lat: number; lon: number; inView: boolean };
+  map: (sat: SatObject, i: number, pointPerOrbit?: number) => { time: string; lat: number; lon: number; inView: boolean };
   nextNpasses: (sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) => any[];
   nextpass: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => any;
   nextpassList: (satArray: SatObject[]) => { sccNum: string; time: any }[];
@@ -1268,7 +1271,7 @@ export interface SensorFovPlugin {
 }
 export interface AdviceManager {
   adviceCount: any;
-  showAdvice(arg0: string, arg1: string, arg2: null, arg3: string);
+  showAdvice(header: string, text: string, focusDOM: HTMLElement, setLocation: string);
   adviceArray: any;
   adviceList: any;
 }

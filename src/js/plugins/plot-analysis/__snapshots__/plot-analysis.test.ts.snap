@@ -1439,7 +1439,6 @@ exports[`plotAnalysis.hideSideMenus 0 2`] = `
     
         
     <div
-      class=""
       id="menu-plot-analysis5"
     />
     
@@ -1478,7 +1477,6 @@ exports[`plotAnalysis.onEcfPlotBtnClick 0 2`] = `
     
           
     <div
-      class="bmenu-item-selected"
       id="menu-plot-analysis"
     />
     
@@ -1520,11 +1518,13 @@ exports[`plotAnalysis.onEciPlotBtnClick 0 2`] = `
         
     <div
       id="plot-analysis-menu"
+      style="display: block; transform: translateX(-100%); transition: transform 0s ease-in-out;"
     />
     
         
     <div
       id="plot-analysis-menu2"
+      style="display: block; transform: translateX(-100%); transition: transform 0s ease-in-out;"
     />
     
         
@@ -1560,7 +1560,14 @@ exports[`plotAnalysis.onInc2LonPlotBtnClick 0 2`] = `
           
     <div
       id="plot-analysis-menu3"
-    />
+    >
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+    </div>
     
           
     <div
@@ -1589,14 +1596,18 @@ exports[`plotAnalysis.onRicPlotBtnClick 0 2`] = `
     
           
     <div
-      class="bmenu-item-selected"
       id="menu-plot-analysis2"
     />
     
           
     <div
       id="plot-analysis-menu2"
-    />
+      style="display: block; transform: translateX(-100%); transition: transform 0s ease-in-out;"
+    >
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+    </div>
     
           
     <div
@@ -1625,7 +1636,6 @@ exports[`plotAnalysis.onTime2LonPlotBtnClick 0 2`] = `
     
           
     <div
-      class="bmenu-item-selected"
       id="menu-plot-analysis4"
     />
     
@@ -1688,7 +1698,7 @@ exports[`plotAnalysis.selectSatData 0 4`] = `
     
           
     <div
-      class=""
+      class="bmenu-item-selected"
       id="menu-plot-analysis3"
     />
     
@@ -1699,7 +1709,7 @@ exports[`plotAnalysis.selectSatData 0 4`] = `
     
           
     <div
-      class=""
+      class="bmenu-item-selected"
       id="menu-plot-analysis4"
     />
     
@@ -2280,17 +2290,38 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
     <div
       id="plot-analysis-menu"
-    />
+    >
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+    </div>
     
       
     <div
       id="plot-analysis-menu2"
-    />
+    >
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+    </div>
     
       
     <div
       id="plot-analysis-menu3"
-    />
+    >
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+      <div
+        style="position: relative; height: 100%; width: 8px; right: 0px; cursor: w-resize; z-index: 9999; margin-left: auto;"
+      />
+    </div>
     
       
     <div

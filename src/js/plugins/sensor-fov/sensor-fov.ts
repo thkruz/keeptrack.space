@@ -26,11 +26,13 @@
 
 import fovPng from '@app/img/icons/fov.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl, shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-fov-bubble" class="bmenu-item bmenu-item-disabled">
           <img
             alt="fov"
@@ -40,7 +42,8 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Sensor FOV</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `
+  );
 };
 export const init = (): void => {
   // Add HTML
@@ -65,12 +68,12 @@ export const enableFovView = () => {
   const { satSet } = keepTrackApi.programs;
   // Disable Satellite Overfly
   settingsManager.isSatOverflyModeOn = false;
-  $('#menu-sat-fov').removeClass('bmenu-item-selected');
+  getEl('menu-sat-fov').classList.remove('bmenu-item-selected');
 
   settingsManager.isFOVBubbleModeOn = true;
   settingsManager.isShowSurvFence = false;
-  $('#menu-fov-bubble').addClass('bmenu-item-selected');
-  $('#menu-surveillance').removeClass('bmenu-item-selected');
+  getEl('menu-fov-bubble').classList.add('bmenu-item-selected');
+  getEl('menu-surveillance').classList.remove('bmenu-item-selected');
   satSet.satCruncher.postMessage({
     isShowFOVBubble: 'enable',
     isShowSurvFence: 'disable',
@@ -88,16 +91,12 @@ export const bottomMenuClick = (iconName: string): void => {
       // No Sensor Selected
       if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.bubbleDisabled();
       uiManager.toast(`Select a Sensor First!`, 'caution');
-      if (!$('#menu-fov-bubble:animated').length) {
-        $('#menu-fov-bubble').effect('shake', {
-          distance: 10,
-        });
-      }
+      shake(getEl('menu-fov-bubble'));
       return;
     }
     if (settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence) {
       settingsManager.isFOVBubbleModeOn = false;
-      $('#menu-fov-bubble').removeClass('bmenu-item-selected');
+      getEl('menu-fov-bubble').classList.remove('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowFOVBubble: 'reset',
         isShowSurvFence: 'disable',

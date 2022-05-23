@@ -1,9 +1,11 @@
-import './satInfoboxCore.css';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
+import { getEl, openColorbox } from '@app/js/lib/helpers';
 import { SunCalc } from '@app/js/lib/suncalc.js';
+import $ from 'jquery';
+import './satInfoboxCore.css';
 
 const satInfoboxCore = {
   sensorInfo: {
@@ -21,13 +23,18 @@ const satInfoboxCore = {
   satMissionData: {
     isLoaded: false,
   },
+  intelData: {
+    isLoaded: false,
+  },
 };
 
 export const sensorInfo = (sat: SatObject): void => {
-  if (sat === null || typeof sat === "undefined") return;
-  
+  if (sat === null || typeof sat === 'undefined') return;
+
   if (!satInfoboxCore.sensorInfo.isLoaded && settingsManager.plugins.sensor) {
-    $('#sat-infobox').append(keepTrackApi.html`
+    getEl('sat-infobox').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
         <div id="sensor-sat-info">
         <div class="sat-info-section-header">Sensor Data</div>
           <div class="sat-info-row">
@@ -80,7 +87,8 @@ export const sensorInfo = (sat: SatObject): void => {
             <div id="sat-nextpass" class="sat-info-value">00:00:00z</div>
           </div>
         </div> 
-        `);
+        `
+    );
     satInfoboxCore.sensorInfo.isLoaded = true;
   }
 
@@ -88,23 +96,25 @@ export const sensorInfo = (sat: SatObject): void => {
   // info when there is no sensor selected
   if (settingsManager.plugins.sensor) {
     if (keepTrackApi.programs.sensorManager.checkSensorSelected()) {
-      $('#sensor-sat-info').show();
+      getEl('sensor-sat-info').style.display = 'block';
     } else {
-      $('#sensor-sat-info').hide();
+      getEl('sensor-sat-info').style.display = 'none';
     }
   }
 
   if (!sat.missile) {
-    $('.sat-only-info').show();
+    (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'block';
   } else {
-    $('.sat-only-info').hide();
+    (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'none';
   }
 };
 export const launchData = (sat: SatObject): void => {
-  if (sat === null || typeof sat === "undefined") return;
-  
+  if (sat === null || typeof sat === 'undefined') return;
+
   if (!satInfoboxCore.launchData.isLoaded) {
-    $('#sat-infobox').append(keepTrackApi.html`
+    getEl('sat-infobox').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
           <div class="sat-info-section-header">Object Data</div>
           <div class="sat-info-row">
             <div class="sat-info-key">Type</div>
@@ -127,18 +137,32 @@ export const launchData = (sat: SatObject): void => {
             <div class="sat-info-value" id="sat-vehicle">VEHICLE</div>
           </div>
           <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Configuration of the Rocket">
+            Configuration
+          </div>
+          <div class="sat-info-value" id="sat-configuration">
+            NO DATA
+          </div>
+        </div>
+          <div class="sat-info-row sat-only-info">
             <div class="sat-info-key">RCS</div>
             <div class="sat-info-value" id="sat-rcs">NO DATA</div>
           </div>  
-        `);
+        `
+    );
     satInfoboxCore.launchData.isLoaded = true;
   }
 
   // /////////////////////////////////////////////////////////////////////////
   // Country Correlation Table
   // /////////////////////////////////////////////////////////////////////////
-  const country = keepTrackApi.programs.objectManager.extractCountry(sat.country);
-  $('#sat-country').html(country);
+  if (sat.country?.length > 4) {
+    getEl('sat-country').innerHTML = sat.country;
+  } else {
+    const country = keepTrackApi.programs.objectManager.extractCountry(sat.country);
+    getEl('sat-country').innerHTML = country;
+  }
 
   // /////////////////////////////////////////////////////////////////////////
   // Launch Site Correlation Table
@@ -159,33 +183,31 @@ export const launchData = (sat: SatObject): void => {
     site = keepTrackApi.programs.objectManager.extractLaunchSite(sat.launchSite);
   }
 
-  $('#sat-site').html(site.site);
-  $('#sat-sitec').html(site.sitec);
+  getEl('sat-site').innerHTML = site.site;
+  getEl('sat-sitec').innerHTML = site.sitec;
 
   // /////////////////////////////////////////////////////////////////////////
   // Launch Vehicle Correlation Table
   // /////////////////////////////////////////////////////////////////////////
   if (sat.missile) {
     sat.launchVehicle = missileLV;
-    $('#sat-vehicle').html(sat.launchVehicle);
+    getEl('sat-vehicle').innerHTML = sat.launchVehicle;
   } else {
-    $('#sat-vehicle').html(sat.launchVehicle); // Set to JSON record
+    getEl('sat-vehicle').innerHTML = sat.launchVehicle; // Set to JSON record
     if (sat.launchVehicle === 'U') {
-      $('#sat-vehicle').html('Unknown');
+      getEl('sat-vehicle').innerHTML = 'Unknown';
     } // Replace with Unknown if necessary
     satLvString = keepTrackApi.programs.objectManager.extractLiftVehicle(sat.launchVehicle); // Replace with link if available
-    $('#sat-vehicle').html(satLvString);
+    getEl('sat-vehicle').innerHTML = satLvString;
+    if (satLvString !== 'Unknown') {
+      getEl('sat-vehicle').addEventListener('click', (e) => {
+        e.preventDefault();
+        openColorbox((<HTMLAnchorElement>getEl('sat-vehicle')).href);
+      });
+    }
   }
 
-  $('#sat-configuration').html(sat.configuration !== '' ? sat.configuration : 'Unknown');
-
-  $('a.iframe').colorbox({
-    iframe: true,
-    width: '80%',
-    height: '80%',
-    fastIframe: false,
-    closeButton: false,
-  });
+  getEl('sat-configuration').innerHTML = sat.configuration !== '' ? sat.configuration : 'Unknown';
 };
 export const nearObjectsLinkClick = (distance: number = 100): void => {
   const { uiManager, satSet, objectManager } = keepTrackApi.programs;
@@ -201,7 +223,7 @@ export const nearObjectsLinkClick = (distance: number = 100): void => {
   const posYmax = pos.y + distance;
   const posZmin = pos.z - distance;
   const posZmax = pos.z + distance;
-  $('#search').val('');
+  (<HTMLInputElement>getEl('search')).value = '';
   for (let i = 0; i < satSet.numSats; i++) {
     pos = satSet.getSatPosOnly(i).position;
     if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
@@ -210,14 +232,10 @@ export const nearObjectsLinkClick = (distance: number = 100): void => {
   }
 
   for (let i = 0; i < SCCs.length; i++) {
-    if (i < SCCs.length - 1) {
-      $('#search').val($('#search').val() + SCCs[i] + ',');
-    } else {
-      $('#search').val($('#search').val() + SCCs[i]);
-    }
+    (<HTMLInputElement>getEl('search')).value += i < SCCs.length - 1 ? SCCs[i] + ',' : SCCs[i];
   }
 
-  uiManager.doSearch($('#search').val().toString());
+  uiManager.doSearch((<HTMLInputElement>getEl('search')).value.toString());
 };
 export const nearOrbitsLink = () => {
   const { satSet, searchBox, satellite } = keepTrackApi.programs;
@@ -232,14 +250,17 @@ export const allObjectsLink = (): void => {
   const intldes = satSet.getSatExtraOnly(objectManager.selectedSat).intlDes;
   const searchStr = intldes.slice(0, 8);
   uiManager.doSearch(searchStr);
-  $('#search').val(searchStr);
+  (<HTMLInputElement>getEl('search')).value = searchStr;
 };
-export const orbitalData = (sat: SatObject): void => { // NOSONAR
+export const orbitalData = (sat: SatObject): void => {
+  // NOSONAR
   // Only show orbital data if it is available
-  if (sat === null || typeof sat === "undefined") return;
+  if (sat === null || typeof sat === 'undefined') return;
 
   if (!satInfoboxCore.orbitalData.isLoaded) {
-    $('#ui-wrapper').append(keepTrackApi.html`
+    getEl('ui-wrapper').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
           <div id="sat-infobox" class="text-select satinfo-fixed">
             <div id="sat-info-top-links">
               <div id="sat-info-title" class="center-text sat-info-section-header sat-info-title-header">This is a title</div>
@@ -347,14 +368,15 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
               <div class="sat-info-value" id="sat-elset-age">xxx.xxxx</div>
             </div>
           </div>
-        `);
+        `
+    );
 
     // Create a Sat Info Box Initializing Script
     $('#sat-infobox').draggable({
       containment: 'window',
       drag: () => {
         $('#sat-infobox').height(600);
-        $('#sat-infobox').removeClass('satinfo-fixed');
+        getEl('sat-infobox').classList.remove('satinfo-fixed');
       },
     });
 
@@ -362,7 +384,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     $('#sat-infobox').on('mousedown', (e: any) => {
       if (e.button === 2) {
         $('#sat-infobox').removeClass().removeAttr('style');
-        $('#sat-infobox').addClass('satinfo-fixed');
+        getEl('sat-infobox').classList.add('satinfo-fixed');
       }
     });
 
@@ -376,26 +398,14 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
   }
 
   if (!sat.missile) {
-    try {
-      $('a.iframe').colorbox({
-        iframe: true,
-        width: '80%',
-        height: '80%',
-        fastIframe: false,
-        closeButton: false,
-      });
-    } catch (error) {
-      // Intentionally left blank
-    }
+    getEl('sat-apogee').innerHTML = sat.apogee.toFixed(0) + ' km';
+    getEl('sat-perigee').innerHTML = sat.perigee.toFixed(0) + ' km';
+    getEl('sat-inclination').innerHTML = (sat.inclination * RAD2DEG).toFixed(2) + '°';
+    getEl('sat-eccentricity').innerHTML = sat.eccentricity.toFixed(3);
+    getEl('sat-raan').innerHTML = (sat.raan * RAD2DEG).toFixed(2) + '°';
+    getEl('sat-argPe').innerHTML = (sat.argPe * RAD2DEG).toFixed(2) + '°';
 
-    $('#sat-apogee').html(sat.apogee.toFixed(0) + ' km');
-    $('#sat-perigee').html(sat.perigee.toFixed(0) + ' km');
-    $('#sat-inclination').html((sat.inclination * RAD2DEG).toFixed(2) + '°');
-    $('#sat-eccentricity').html(sat.eccentricity.toFixed(3));
-    $('#sat-raan').html((sat.raan * RAD2DEG).toFixed(2) + '°');
-    $('#sat-argPe').html((sat.argPe * RAD2DEG).toFixed(2) + '°');
-
-    $('#sat-period').html(sat.period.toFixed(2) + ' min');
+    getEl('sat-period').innerHTML = sat.period.toFixed(2) + ' min';
     $('#sat-period').tooltip({
       // delay: 50,
       html: 'Mean Motion: ' + (MINUTES_PER_DAY / sat.period).toFixed(2),
@@ -413,7 +423,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     } else {
       daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
     }
-    $('#sat-elset-age').html(daysold + ' Days');
+    getEl('sat-elset-age').innerHTML = daysold + ' Days';
     $('#sat-elset-age').tooltip({
       // delay: 50,
       html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(),
@@ -421,7 +431,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     });
 
     if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
-      $('#sat-sun').parent().hide();
+      getEl('sat-sun').parentElement.style.display = 'none';
     } else {
       now = new Date(keepTrackApi.programs.timeManager.dynamicOffsetEpoch + keepTrackApi.programs.timeManager.propOffset);
       const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor[0].lat, keepTrackApi.programs.sensorManager.currentSensor[0].lon);
@@ -433,10 +443,10 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
 
       // If No Sensor, then Ignore Sun Exclusion
       if (keepTrackApi.programs.sensorManager.currentSensor[0].lat === null) {
-        $('#sat-sun').hide();
+        getEl('sat-sun').style.display = 'none';
         return;
       } else {
-        $('#sat-sun').show();
+        getEl('sat-sun').style.display = 'block';
       }
 
       // If Radar Selected, then Say the Sun Doesn't Matter
@@ -444,58 +454,60 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
         keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OPTICAL &&
         keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OBSERVER
       ) {
-        $('#sat-sun').html('No Effect');
+        getEl('sat-sun').innerHTML = 'No Effect';
         // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
       } else if (sunTime.dawn.getTime() - now.getTime() > 0 || sunTime.dusk.getTime() - now.getTime() < 0) {
-        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
-        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
-        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
+        if (satInSun == 0) getEl('sat-sun').innerHTML = 'No Sunlight';
+        if (satInSun == 1) getEl('sat-sun').innerHTML = 'Limited Sunlight';
+        if (satInSun == 2) getEl('sat-sun').innerHTML = 'Direct Sunlight';
         // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
         // high latitude and we need to figure that out
       } else if (sunTime.night != 'Invalid Date' && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
         // TODO: Figure out how to calculate this
         console.debug('No Dawn or Dusk');
-        if (satInSun == 0) $('#sat-sun').html('No Sunlight');
-        if (satInSun == 1) $('#sat-sun').html('Limited Sunlight');
-        if (satInSun == 2) $('#sat-sun').html('Direct Sunlight');
+        if (satInSun == 0) getEl('sat-sun').innerHTML = 'No Sunlight';
+        if (satInSun == 1) getEl('sat-sun').innerHTML = 'Limited Sunlight';
+        if (satInSun == 2) getEl('sat-sun').innerHTML = 'Direct Sunlight';
       } else {
         // Unless you are in sun exclusion
-        $('#sat-sun').html('Sun Exclusion');
+        getEl('sat-sun').innerHTML = 'Sun Exclusion';
       }
-      if (satInSun == -1) $('#sat-sun').html('Unable to Calculate');
+      if (satInSun == -1) getEl('sat-sun').innerHTML = 'Unable to Calculate';
     }
   }
 
-  $('#all-objects-link').on('click', allObjectsLink);
-  $('#near-orbits-link').on('click', nearOrbitsLink);
-  $('#near-objects-link1').on('click', () => nearObjectsLinkClick(100));
-  $('#near-objects-link2').on('click', () => nearObjectsLinkClick(200));
-  $('#near-objects-link4').on('click', () => nearObjectsLinkClick(400));
-  $('#sun-angle-link').on('click', drawLineToSun);
-  $('#nadir-angle-link').on('click', drawLineToEarth);
-  $('#sec-angle-link').on('click', drawLineToSat);
+  getEl('all-objects-link').addEventListener('click', allObjectsLink);
+  getEl('near-orbits-link').addEventListener('click', nearOrbitsLink);
+  getEl('near-objects-link1').addEventListener('click', () => nearObjectsLinkClick(100));
+  getEl('near-objects-link2').addEventListener('click', () => nearObjectsLinkClick(200));
+  getEl('near-objects-link4').addEventListener('click', () => nearObjectsLinkClick(400));
+  getEl('sun-angle-link').addEventListener('click', drawLineToSun);
+  getEl('nadir-angle-link').addEventListener('click', drawLineToEarth);
+  getEl('sec-angle-link').addEventListener('click', drawLineToSat);
 };
 
 const drawLineToSun = () => {
-  const {lineManager, objectManager, drawManager} = keepTrackApi.programs;
+  const { lineManager, objectManager, drawManager } = keepTrackApi.programs;
   lineManager.create('sat2', [objectManager.selectedSat, drawManager.sceneManager.sun.pos[0], drawManager.sceneManager.sun.pos[1], drawManager.sceneManager.sun.pos[2]], 'o');
 };
 
 const drawLineToEarth = () => {
-  const {lineManager, objectManager} = keepTrackApi.programs;
+  const { lineManager, objectManager } = keepTrackApi.programs;
   lineManager.create('sat', objectManager.selectedSat, 'p');
 };
 
 const drawLineToSat = () => {
-  const {lineManager, objectManager} = keepTrackApi.programs;
+  const { lineManager, objectManager } = keepTrackApi.programs;
   lineManager.create('sat5', [objectManager.selectedSat, objectManager.secondarySat], 'b');
 };
 
 export const secondaryData = (sat: SatObject): void => {
-  if (sat === null || typeof sat === "undefined") return;
-  
+  if (sat === null || typeof sat === 'undefined') return;
+
   if (!satInfoboxCore.secondaryData.isLoaded) {
-    $('#sat-infobox').append(keepTrackApi.html`
+    getEl('sat-infobox').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
         <div id="secondary-sat-info">
           <div class="sat-info-section-header">Secondary Satellite</div>
           <div class="sat-info-row">
@@ -527,15 +539,19 @@ export const secondaryData = (sat: SatObject): void => {
             <div class="sat-info-value" id="sat-sec-crosstrack">xxxx km</div>
           </div>
         </div> 
-        `);
+        `
+    );
     satInfoboxCore.secondaryData.isLoaded = true;
   }
 };
-export const satMissionData = (sat: SatObject): void => { // NOSONAR
-  if (sat === null || typeof sat === "undefined") return;
+export const satMissionData = (sat: SatObject): void => {
+  // NOSONAR
+  if (sat === null || typeof sat === 'undefined') return;
 
   if (!satInfoboxCore.satMissionData.isLoaded) {
-    $('#sat-infobox').append(keepTrackApi.html`
+    getEl('sat-infobox').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
       <div class="sat-info-section-header">Mission</div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
@@ -563,7 +579,7 @@ export const satMissionData = (sat: SatObject): void => { // NOSONAR
           <div class="sat-info-value" id="sat-purpose">
             NO DATA
           </div>
-        </div>
+        </div>        
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
             data-tooltip="Contractor Who Built the Satellite">
@@ -671,148 +687,214 @@ export const satMissionData = (sat: SatObject): void => { // NOSONAR
             NO DATA
           </div>
         </div>
-        `);
+        `
+    );
     satInfoboxCore.satMissionData.isLoaded = true;
   }
 
   if (!sat.missile) {
-    $('.sat-only-info').show();
+    (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'block';
   } else {
-    $('.sat-only-info').hide();
+    (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'none';
   }
 
   if (!sat.missile) {
-    $('#sat-user').html(sat?.owner && sat?.owner !== '' ? sat?.owner : 'Unknown');
-    $('#sat-purpose').html(sat?.purpose && sat?.purpose !== '' ? sat?.purpose : 'Unknown');
-    $('#sat-contractor').html(sat?.manufacturer && sat?.manufacturer !== '' ? sat?.manufacturer : 'Unknown');
+    getEl('sat-user').innerHTML = sat?.owner && sat?.owner !== '' ? sat?.owner : 'Unknown';
+    getEl('sat-purpose').innerHTML = sat?.purpose && sat?.purpose !== '' ? sat?.purpose : 'Unknown';
+    getEl('sat-contractor').innerHTML = sat?.manufacturer && sat?.manufacturer !== '' ? sat?.manufacturer : 'Unknown';
     // Update with other mass options
-    $('#sat-launchMass').html(sat?.launchMass && sat?.launchMass !== '' ? sat?.launchMass + ' kg' : 'Unknown');
-    $('#sat-dryMass').html(sat?.dryMass && sat?.dryMass !== '' ? sat?.dryMass + ' kg' : 'Unknown');
-    $('#sat-lifetime').html(sat?.lifetime && sat?.lifetime !== '' ? sat?.lifetime + ' yrs' : 'Unknown');
-    $('#sat-power').html(sat?.power && sat?.power !== '' ? sat?.power + ' w' : 'Unknown');
-    $('#sat-vmag').html(sat?.vmag && sat?.vmag?.toString() !== '' ? sat?.vmag?.toString() : 'Unknown');
-    $('#sat-bus').html(sat?.bus && sat?.bus !== '' ? sat?.bus : 'Unknown');
-    $('#sat-configuration').html(sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown');
-    $('#sat-payload').html(sat?.payload && sat?.payload !== '' ? sat?.payload : 'Unknown');
-    $('#sat-motor').html(sat?.motor && sat?.motor !== '' ? sat?.motor : 'Unknown');
-    $('#sat-length').html(sat?.length && sat?.length !== '' ? sat?.length + ' m' : 'Unknown');
-    $('#sat-diameter').html(sat?.diameter && sat?.diameter !== '' ? sat?.diameter + ' m' : 'Unknown');
-    $('#sat-span').html(sat?.span && sat?.span !== '' ? sat?.span + ' m' : 'Unknown');
-    $('#sat-shape').html(sat?.shape && sat?.shape !== '' ? sat?.shape : 'Unknown');
-    $('#sat-configuration').html(sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown');
-    $('a.iframe').colorbox({
-      iframe: true,
-      width: '80%',
-      height: '80%',
-      fastIframe: false,
-      closeButton: false,
-    });
+    getEl('sat-launchMass').innerHTML = sat?.launchMass && sat?.launchMass !== '' ? sat?.launchMass + ' kg' : 'Unknown';
+    getEl('sat-dryMass').innerHTML = sat?.dryMass && sat?.dryMass !== '' ? sat?.dryMass + ' kg' : 'Unknown';
+    getEl('sat-lifetime').innerHTML = sat?.lifetime && sat?.lifetime !== '' ? sat?.lifetime + ' yrs' : 'Unknown';
+    getEl('sat-power').innerHTML = sat?.power && sat?.power !== '' ? sat?.power + ' w' : 'Unknown';
+    getEl('sat-vmag').innerHTML = sat?.vmag && sat?.vmag?.toString() !== '' ? sat?.vmag?.toString() : 'Unknown';
+    getEl('sat-bus').innerHTML = sat?.bus && sat?.bus !== '' ? sat?.bus : 'Unknown';
+    getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
+    getEl('sat-payload').innerHTML = sat?.payload && sat?.payload !== '' ? sat?.payload : 'Unknown';
+    getEl('sat-motor').innerHTML = sat?.motor && sat?.motor !== '' ? sat?.motor : 'Unknown';
+    getEl('sat-length').innerHTML = sat?.length && sat?.length !== '' ? sat?.length + ' m' : 'Unknown';
+    getEl('sat-diameter').innerHTML = sat?.diameter && sat?.diameter !== '' ? sat?.diameter + ' m' : 'Unknown';
+    getEl('sat-span').innerHTML = sat?.span && sat?.span !== '' ? sat?.span + ' m' : 'Unknown';
+    getEl('sat-shape').innerHTML = sat?.shape && sat?.shape !== '' ? sat?.shape : 'Unknown';
+    getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
   }
 };
-export const intelData = (sat: SatObject, satId?: number): void => { // NOSONAR
+export const intelData = (sat: SatObject, satId?: number): void => {
+  // NOSONAR
   if (satId !== -1) {
+    if (!satInfoboxCore.intelData.isLoaded) {
+      getEl('sat-infobox').insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
+        <div id="intel-data-section" class="sat-info-section-header">Intel Data</div>
+          <div class="sat-info-row sat-only-info" id="sat-ttp-wrapper">
+            <div class="sat-info-key">
+              TTPs
+            </div>
+            <div class="sat-info-value" id="sat-ttp">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-notes-wrapper">
+            <div class="sat-info-key">
+              Notes
+            </div>
+            <div class="sat-info-value" id="sat-notes">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-fmissed-wrapper">
+            <div class="sat-info-key">
+              Freq. Missed
+            </div>
+            <div class="sat-info-value" id="sat-fmissed">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-oRPO-wrapper">
+            <div class="sat-info-key">
+              Sec. Obj
+            </div>
+            <div class="sat-info-value" id="sat-oRPO">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-constellation-wrapper">
+            <div class="sat-info-key">
+              Constellation
+            </div>
+            <div class="sat-info-value" id="sat-constellation">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-maneuver-wrapper">
+            <div class="sat-info-key">
+              Maneuver
+            </div>
+            <div class="sat-info-value" id="sat-maneuver">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info" id="sat-associates-wrapper">
+            <div class="sat-info-key">
+              Associates
+            </div>
+            <div class="sat-info-value" id="sat-associates">
+              NO DATA
+            </div>
+          </div>
+        </div>`
+      );
+      satInfoboxCore.intelData.isLoaded = true;
+    }
+
     if (typeof sat.TTP != 'undefined') {
-      $('#sat-ttp-wrapper').show();
-      $('#sat-ttp').html(sat.TTP);
+      getEl('sat-ttp-wrapper').style.display = 'block';
+      getEl('sat-ttp').innerHTML = sat.TTP;
     } else {
-      $('#sat-ttp-wrapper').hide();
+      getEl('sat-ttp-wrapper').style.display = 'none';
     }
     if (typeof sat.NOTES != 'undefined') {
-      $('#sat-notes-wrapper').show();
-      $('#sat-notes').html(sat.NOTES);
+      getEl('sat-notes-wrapper').style.display = 'block';
+      getEl('sat-notes').innerHTML = sat.NOTES;
     } else {
-      $('#sat-notes-wrapper').hide();
+      getEl('sat-notes-wrapper').style.display = 'none';
     }
     if (typeof sat.FMISSED != 'undefined') {
-      $('#sat-fmissed-wrapper').show();
-      $('#sat-fmissed').html(sat.FMISSED);
+      getEl('sat-fmissed-wrapper').style.display = 'block';
+      getEl('sat-fmissed').innerHTML = sat.FMISSED;
     } else {
-      $('#sat-fmissed-wrapper').hide();
+      getEl('sat-fmissed-wrapper').style.display = 'none';
     }
     if (typeof sat.ORPO != 'undefined') {
-      $('#sat-oRPO-wrapper').show();
-      $('#sat-oRPO').html(sat.ORPO);
+      getEl('sat-oRPO-wrapper').style.display = 'block';
+      getEl('sat-oRPO').innerHTML = sat.ORPO;
     } else {
-      $('#sat-oRPO-wrapper').hide();
+      getEl('sat-oRPO-wrapper').style.display = 'none';
     }
     if (typeof sat.constellation != 'undefined') {
-      $('#sat-constellation-wrapper').show();
-      $('#sat-constellation').html(sat.constellation);
+      getEl('sat-constellation-wrapper').style.display = 'block';
+      getEl('sat-constellation').innerHTML = sat.constellation;
     } else {
-      $('#sat-constellation-wrapper').hide();
+      getEl('sat-constellation-wrapper').style.display = 'none';
     }
     if (typeof sat.maneuver != 'undefined') {
-      $('#sat-maneuver-wrapper').show();
-      $('#sat-maneuver').html(sat.maneuver);
+      getEl('sat-maneuver-wrapper').style.display = 'block';
+      getEl('sat-maneuver').innerHTML = sat.maneuver;
     } else {
-      $('#sat-maneuver-wrapper').hide();
+      getEl('sat-maneuver-wrapper').style.display = 'none';
     }
     if (typeof sat.associates != 'undefined') {
-      $('#sat-associates-wrapper').show();
-      $('#sat-associates').html(sat.associates);
+      getEl('sat-associates-wrapper').style.display = 'block';
+      getEl('sat-associates').innerHTML = sat.associates;
     } else {
-      $('#sat-associates-wrapper').hide();
+      getEl('sat-associates-wrapper').style.display = 'none';
+    }
+
+    if (
+      typeof sat.TTP === 'undefined' &&
+      typeof sat.NOTES === 'undefined' &&
+      typeof sat.FMISSED === 'undefined' &&
+      typeof sat.ORPO === 'undefined' &&
+      typeof sat.constellation === 'undefined' &&
+      typeof sat.maneuver === 'undefined' &&
+      typeof sat.associates === 'undefined'
+    ) {
+      getEl('intel-data-section').style.display = 'none';
     }
   }
 };
 export const objectData = (sat: SatObject): void => {
-  if (sat === null || typeof sat === "undefined") return;
-  
-  $('#sat-info-title').html(sat.name);
+  if (sat === null || typeof sat === 'undefined') return;
+
+  getEl('sat-info-title').innerHTML = sat.name;
 
   switch (sat.type) {
     case SpaceObjectType.UNKNOWN:
-      $('#sat-type').html('TBA');
+      getEl('sat-type').innerHTML = 'TBA';
       break;
     case SpaceObjectType.PAYLOAD:
-      $('#sat-type').html('Payload');
+      getEl('sat-type').innerHTML = 'Payload';
       break;
     case SpaceObjectType.ROCKET_BODY:
-      $('#sat-type').html('Rocket Body');
+      getEl('sat-type').innerHTML = 'Rocket Body';
       break;
     case SpaceObjectType.DEBRIS:
-      $('#sat-type').html('Debris');
+      getEl('sat-type').innerHTML = 'Debris';
       break;
     case SpaceObjectType.SPECIAL:
-      $('#sat-type').html('Special');
+      getEl('sat-type').innerHTML = 'Special';
       break;
     case SpaceObjectType.RADAR_MEASUREMENT:
-      $('#sat-type').html('Radar Measurement');
+      getEl('sat-type').innerHTML = 'Radar Measurement';
       break;
     case SpaceObjectType.RADAR_TRACK:
-      $('#sat-type').html('Radar Track');
+      getEl('sat-type').innerHTML = 'Radar Track';
       break;
     case SpaceObjectType.RADAR_OBJECT:
-      $('#sat-type').html('Radar Object');
+      getEl('sat-type').innerHTML = 'Radar Object';
       break;
     default:
-      if (sat.missile) $('#sat-type').html('Ballistic Missile');
+      if (sat.missile) getEl('sat-type').innerHTML = 'Ballistic Missile';
   }
 
-  $('#edit-satinfo-link').html("<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>");
+  // TODO:
+  // getEl('edit-satinfo-link').innerHTML = "<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>";
 
-  $('a.iframe').colorbox({
-    iframe: true,
-    width: '80%',
-    height: '80%',
-    fastIframe: false,
-    closeButton: false,
-  });
-
-  $('#sat-intl-des').html(sat.intlDes);
+  getEl('sat-intl-des').innerHTML = sat.intlDes;
   if (sat.type > 4) {
-    $('#sat-objnum').html(1 + sat.TLE2.substr(2, 7).toString());
+    getEl('sat-objnum').innerHTML = 1 + sat.TLE2.substr(2, 7).toString();
   } else {
-    $('#sat-objnum').html(sat.sccNum);
+    getEl('sat-objnum').innerHTML = sat.sccNum;
   }
 
   // /////////////////////////////////////////////////////////////////////////
   // RCS Correlation Table
   // /////////////////////////////////////////////////////////////////////////
-  if (sat.rcs === null || typeof sat.rcs == 'undefined') {
-    $('#sat-rcs').html('Unknown');
+  if (sat.rcs === null || typeof sat.rcs == 'undefined' || sat.rcs === '') {
+    getEl('sat-rcs').innerHTML = 'Unknown';
   } else {
-    $('#sat-rcs').html(sat.rcs);
+    getEl('sat-rcs').innerHTML = sat.rcs;
   }
 };
 export const init = (): void => {

@@ -22,7 +22,7 @@
  */
 
 import { DEG2RAD, DISTANCE_TO_SUN, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, PLANETARIUM_DIST, RAD2DEG, RADIUS_OF_EARTH, TAU } from '@app/js/lib/constants';
-import { getUnique, saveCsv, stringPad } from '@app/js/lib/helpers';
+import { getEl, getUnique, saveCsv, stringPad } from '@app/js/lib/helpers';
 import { ReadonlyMat3, vec3 } from 'gl-matrix';
 import $ from 'jquery';
 import numeric from 'numeric';
@@ -163,11 +163,11 @@ export const setobs = (sensors: SensorObject[]) => {
       $('.sensor-reset-menu').hide();
       return;
     } else {
-      $('#menu-sensor-info').removeClass('bmenu-item-disabled');
-      $('#menu-fov-bubble').removeClass('bmenu-item-disabled');
-      $('#menu-surveillance').removeClass('bmenu-item-disabled');
-      $('#menu-planetarium').removeClass('bmenu-item-disabled');
-      $('#menu-astronomy').removeClass('bmenu-item-disabled');
+      getEl('menu-sensor-info')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-fov-bubble')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-surveillance')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-planetarium')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-astronomy')?.classList.remove('bmenu-item-disabled');
       $('.sensor-reset-menu').show();
     }
 
@@ -390,7 +390,7 @@ export const getlookangles = (sat: SatObject): TearrData[] => { // NOSONAR
 
   // Populate the Side Menu
   (() => {
-    let tbl = <HTMLTableElement>document.getElementById('looks'); // Identify the table to update
+    let tbl = <HTMLTableElement>getEl('looks'); // Identify the table to update
     tbl.innerHTML = ''; // Clear the table from old object data
     let tr = tbl.insertRow();
     let tdT = tr.insertCell();
@@ -1202,7 +1202,7 @@ export const updateDopsTable = (lat: number, lon: number, alt: number) => {
   const { timeManager } = keepTrackApi.programs;
 
   try {
-    let tbl = <HTMLTableElement>document.getElementById('dops'); // Identify the table to update
+    let tbl = <HTMLTableElement>getEl('dops'); // Identify the table to update
     tbl.innerHTML = ''; // Clear the table from old object data
 
     const simulationTime = timeManager.simulationTimeObj;
@@ -1549,12 +1549,13 @@ export const getLlaTimeView = (now: Date, sat: SatObject) => {
   return { lat, lon, time, inView };
 };
 
-export const map = (sat: SatObject, i: number): { time: string; lat: number; lon: number; inView: boolean } => {
+export const map = (sat: SatObject, i: number, pointPerOrbit?: number): { time: string; lat: number; lon: number; inView: boolean } => {
   const { timeManager } = keepTrackApi.programs;
+  pointPerOrbit ??= 256; // TODO: This should be mandatory but tests need updated
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
   const simulationTime = timeManager.simulationTimeObj;
-  let offset = ((i * sat.period) / 50) * 60 * 1000; // Offset in seconds (msec * 1000)
+  let offset = ((i * sat.period) / pointPerOrbit) * 60 * 1000; // Offset in seconds (msec * 1000)
   const now = timeManager.getOffsetTimeObj(offset, simulationTime);
 
   return getLlaTimeView(now, sat);
@@ -1702,7 +1703,7 @@ const verifySensors = (sensors: SensorObject[], sensorManager: SensorManager): S
 export const populateMultiSiteTable = (multiSiteArray: TearrData[], sat: SatObject) => {
   const { sensorManager } = keepTrackApi.programs;
 
-  const tbl = <HTMLTableElement>document.getElementById('looksmultisite'); // Identify the table to update
+  const tbl = <HTMLTableElement>getEl('looksmultisite'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
   let tr = tbl.insertRow();
   let tdT = tr.insertCell();
@@ -1724,6 +1725,7 @@ export const populateMultiSiteTable = (multiSiteArray: TearrData[], sat: SatObje
   for (let i = 0; i < multiSiteArray.length; i++) {
     if (sensorManager.sensorListUS.includes(sensorManager.sensorList[multiSiteArray[i].name])) {
       tr = tbl.insertRow();
+      tr.setAttribute('style', 'cursor: pointer');
       tdT = tr.insertCell();
       tdT.appendChild(document.createTextNode(dateFormat(multiSiteArray[i].time, 'isoDateTime', true)));
       tdE = tr.insertCell();

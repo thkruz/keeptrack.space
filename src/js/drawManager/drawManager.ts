@@ -354,18 +354,20 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
     if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
     const { mainCamera, objectManager } = keepTrackApi.programs;
     
-    // Draw the Sun to the Godrays Frame Buffer
-    sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godrays.frameBuffer);
-    
-    // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
-    sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager?.postProcessingManager?.programs?.occlusion, sceneManager?.sun?.godrays?.frameBuffer);
-    if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
-      meshManager.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.programs.occlusion, sceneManager.sun.godrays.frameBuffer);
+    if (settingsManager.isDrawSun) {
+      // Draw the Sun to the Godrays Frame Buffer
+      sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godrays.frameBuffer);
+      
+      // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
+      sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager?.postProcessingManager?.programs?.occlusion, sceneManager?.sun?.godrays?.frameBuffer);
+      if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
+        meshManager.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.programs.occlusion, sceneManager.sun.godrays.frameBuffer);
+      }
+      // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
+      // todo: this should be a dynamic buffer not hardcoded to bufffer two
+      drawManager.postProcessingManager.curBuffer = null;
+      drawManager.sceneManager.sun.drawGodrays(gl, drawManager.postProcessingManager.curBuffer);
     }
-    // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
-    // todo: this should be a dynamic buffer not hardcoded to bufffer two
-    drawManager.postProcessingManager.curBuffer = null;
-    drawManager.sceneManager.sun.drawGodrays(gl, drawManager.postProcessingManager.curBuffer);
     if (settingsManager.isDrawMilkyWay) {
       drawManager.sceneManager.skybox.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);
     }

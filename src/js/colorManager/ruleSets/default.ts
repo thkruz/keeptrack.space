@@ -222,13 +222,13 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
 
   // NOTE: Treat TBA Satellites as SPECIAL if SCC NUM is less than 70000 (ie a real satellite)
   if (
-    (sat.inView === 0 && (sat.type === SpaceObjectType.SPECIAL || (parseInt(sat.sccNum) < 70000 && sat.type === SpaceObjectType.UNKNOWN)) && colorSchemeManager.objectTypeFlags.trusat === false) ||
-    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && (sat.type === SpaceObjectType.SPECIAL || (parseInt(sat.sccNum) < 70000 && sat.type === SpaceObjectType.UNKNOWN)) && colorSchemeManager.objectTypeFlags.trusat === false) ||
+    (sat.inView === 0 && (sat.type === SpaceObjectType.SPECIAL || (parseInt(sat.sccNum) < 70000 && sat.type === SpaceObjectType.UNKNOWN)) && colorSchemeManager.objectTypeFlags.pink === false) ||
+    (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && (sat.type === SpaceObjectType.SPECIAL || (parseInt(sat.sccNum) < 70000 && sat.type === SpaceObjectType.UNKNOWN)) && colorSchemeManager.objectTypeFlags.pink === false) ||
     (objectManager.isSensorManagerLoaded &&
       sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
       typeof sat.vmag == 'undefined' &&
       sat.type === SpaceObjectType.SPECIAL &&
-      colorSchemeManager.objectTypeFlags.trusat === false)
+      colorSchemeManager.objectTypeFlags.pink === false)
   ) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
@@ -266,8 +266,8 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
     // Debris
     color = colorSchemeManager.colorTheme.debris;
   } else if ((sat.type === SpaceObjectType.SPECIAL || (parseInt(sat.sccNum) < 70000 && sat.type === SpaceObjectType.UNKNOWN))) {
-    // TruSat Object
-    color = colorSchemeManager.colorTheme.trusat;
+    // Special Object
+    color = colorSchemeManager.colorTheme.pink;
   } else {
     color = colorSchemeManager.colorTheme.unknown;
   }

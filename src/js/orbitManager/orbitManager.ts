@@ -194,7 +194,6 @@ export const clearHoverOrbit = (): void => {
 };
 
 export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFramebuffer): boolean => {
-  // lol what do I do here
   if (!initialized) return false;
 
   const { satSet } = keepTrackApi.programs;
@@ -213,70 +212,72 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
   gl.uniformMatrix4fv(pathShader.uCamMatrix, false, camMatrix);
   gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
 
-  if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-  }
-
-  if (secondarySelectId !== -1 && !satSet.getSatExtraOnly(secondarySelectId).static) {
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor2);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-  }
-
-  if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) {
-    // avoid z-fighting
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-  }
-
-  if (currentInView.length >= 1) {
-    // There might be some z-fighting
-    if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
-    } else {
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+  if (settingsManager.isDrawOrbits) {
+    if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
+      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
+      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
-    currentInView.forEach((id) => {
-      writePathToGpu(id);
-    });
-  }
 
-  if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
-    // DEBUG: Planned future feature
-    // if (sensorManager.currentSensor?.lat) {
-    //   groupsManager.selectedGroup.forEach(function (id) {
-    //     let isInViewSoon = false;
-    //     for (let i = 0; i < orbitManager.inViewSoon.length; i++) {
-    //       if (id === orbitManager.inViewSoon[i]) {
-    //         isInViewSoon = true;
-    //         break;
-    //       }
-    //     }
-    //     if (isInViewSoon) {
-    //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
-    //     } else {
-    //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    //     }
+    if (secondarySelectId !== -1 && !satSet.getSatExtraOnly(secondarySelectId).static) {
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor2);
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
+      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
+      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    }
 
-    //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-    //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    //     gl.enableVertexAttribArray(pathShader.aPos);
-    //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-    //   });
-    // }
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    groupsManager.selectedGroup.forEach((id: number) => {
-      writePathToGpu(id);
-    });
+    if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) {
+      // avoid z-fighting
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
+      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
+      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    }
+
+    if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+      // DEBUG: Planned future feature
+      // if (sensorManager.currentSensor?.lat) {
+      //   groupsManager.selectedGroup.forEach(function (id) {
+      //     let isInViewSoon = false;
+      //     for (let i = 0; i < orbitManager.inViewSoon.length; i++) {
+      //       if (id === orbitManager.inViewSoon[i]) {
+      //         isInViewSoon = true;
+      //         break;
+      //       }
+      //     }
+      //     if (isInViewSoon) {
+      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+      //     } else {
+      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
+      //     }
+
+      //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
+      //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      //     gl.enableVertexAttribArray(pathShader.aPos);
+      //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+      //   });
+      // }
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
+      groupsManager.selectedGroup.forEach((id: number) => {
+        writePathToGpu(id);
+      });
+    }
+
+    if (currentInView.length >= 1) {
+      // There might be some z-fighting
+      if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
+        gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
+      } else {
+        gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+      }
+      currentInView.forEach((id) => {
+        writePathToGpu(id);
+      });
+    }
   }
 
   gl.disable(gl.BLEND);

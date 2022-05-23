@@ -76,10 +76,38 @@ export const uiManagerInit = (): void => {
               </div>
               <h5 class="center-align">General Settings</h5>
               <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable this to hide orbit lines">
+                  <input id="settings-drawOrbits" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Draw Orbits
+                </label>
+              </div>
+              <div class="switch row">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
                   <input id="settings-drawEcf" type="checkbox" />
                   <span class="lever"></span>
                   Draw Orbits in ECF
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Draw lines from sensor to satellites when in FOV">
+                  <input id="settings-isDrawInCoverageLines" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Draw FOV Lines
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Draw the Sun">
+                  <input id="settings-drawSun" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Draw the Sun
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Hides Earth Textures">
+                  <input id="settings-drawBlackEarth" type="checkbox"/>
+                  <span class="lever"></span>
+                  Draw Black Earth
                 </label>
               </div>
               <div class="switch row">
@@ -272,7 +300,7 @@ export const uiManagerInit = (): void => {
       },
     });
     (<any>$('#settings-color-trusat')).colorPick({
-      initialColor: rgbCss(settingsManager.colors?.trusat || [1.0, 0.0, 0.6, 1.0]),
+      initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
       palette: colorPalette,
       onColorSelected: function () {
         onColorSelected(this, 'trusat');
@@ -349,9 +377,17 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { satSet, colorSchemeManager, uiManager } = keepTrackApi.programs;
+  const { satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
 
   settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
+  settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
+  settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
+  let isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
+  settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
+  if (isBlackEarthChanged) {
+    drawManager.sceneManager.earth.init();
+  }
+  settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
   settingsManager.isDrawMilkyWay = (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
   settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
   const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;

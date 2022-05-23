@@ -1164,7 +1164,7 @@ input:focus {
 
 .top-menu-icons-search-on {
   transition: 1s;
-  display: none;
+  /* display: none; */
 }
 
 .ui-widget-content {

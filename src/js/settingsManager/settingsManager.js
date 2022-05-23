@@ -207,6 +207,8 @@ settingsManager = {
     settingsManager.enableConstantSelectedSatRedraw = true;
     // How much an orbit fades over time
     settingsManager.orbitFadeFactor = 0.6; // 1.0 == No Fade
+    // Toggle Drawing the Sun
+    settingsManager.isDrawSun = true;
     // Toggle drawing the milky way
     settingsManager.isDrawMilkyWay = true;
     // Automatically display all of the orbits
@@ -257,6 +259,12 @@ settingsManager = {
 
     // Show orbits in ECF vs ECI
     settingsManager.isOrbitCruncherInEcf = false;
+
+    // Draw Orbits
+    settingsManager.isDrawOrbits = true;
+
+    // Draw Lines from Sensors to Satellites When in FOV
+    settingsManager.isDrawInCoverageLines = true;
 
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
@@ -368,9 +376,9 @@ settingsManager = {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.5') {
+    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.1.0') {
       settingsManager.colors = {};
-      settingsManager.colors.version = '1.0.5';
+      settingsManager.colors.version = '1.1.0';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
       settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];
       settingsManager.colors.sunlight80 = [1.0, 1.0, 1.0, 0.85];
@@ -409,7 +417,7 @@ settingsManager = {
       settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
       settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
-      settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
+      settingsManager.colors.pink = [1.0, 0.0, 0.6, 1.0];
       settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
       settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
       settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];

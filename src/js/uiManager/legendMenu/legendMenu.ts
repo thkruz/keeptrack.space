@@ -16,7 +16,7 @@ const timeMachineMenuDiv = keepTrackApi.html`
       <div class="Square-Box legend-debris-box"></div>
       1980s
     </li>
-    <li class="legend-trusat">
+    <li>
       <div class="Square-Box legend-pink-box"></div>
       1990s
     </li>
@@ -45,7 +45,7 @@ const defaultDiv = keepTrackApi.html`
     <div class="Square-Box legend-debris-box"></div>
     Debris
   </li>
-  <li class="legend-trusat">
+  <li>
     <div class="Square-Box legend-pink-box"></div>
     Special Sats
   </li>
@@ -384,18 +384,6 @@ export const legendColorsChange = function (): void {
   colorSchemeManager.resetObjectTypeFlags();
 
   try {
-    if (settingsManager.trusatMode || settingsManager.isExtraSatellitesAdded) {
-      (<HTMLElement>document.querySelector('.legend-pink-box')).style.background = rgbCss(settingsManager.colors.trusat);
-    } else {
-      try {
-        document.querySelectorAll('.legend-pink-box').forEach((element) => {
-          (<HTMLElement>element).style.display = 'none';
-        });
-      } catch {
-        // do nothing
-      }
-    }
-
     try {
       (<HTMLElement>document.querySelector('.legend-velocityFast-box')).style.background = rgbCss([0.75, 0.75, 0, 1]);
       (<HTMLElement>document.querySelector('.legend-velocityMed-box')).style.background = rgbCss([0.75, 0.25, 0, 1]);
@@ -407,6 +395,7 @@ export const legendColorsChange = function (): void {
       '.legend-payload-box',
       '.legend-rocketBody-box',
       '.legend-debris-box',
+      '.legend-pink-box',
       '.legend-inFOV-box',
       '.legend-facility-box',
       '.legend-sensor-box',

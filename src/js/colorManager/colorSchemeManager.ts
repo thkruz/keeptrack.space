@@ -34,7 +34,7 @@ export interface ObjectTypeFlags {
   sensor: boolean;
   missile: boolean;
   missileInview: boolean;
-  trusat: boolean;
+  pink: boolean;
   inFOV: boolean;
   inViewAlt: boolean;
   starLow: boolean;
@@ -146,7 +146,7 @@ export const colorSchemeManager: ColorSchemeManager = {
     sensor: true,
     missile: true,
     missileInview: true,
-    trusat: true,
+    pink: true,
     inFOV: true,
     inViewAlt: true,
     starLow: true,
@@ -327,7 +327,7 @@ export const colorSchemeManager: ColorSchemeManager = {
     colorSchemeManager.objectTypeFlags.sensor = true;
     colorSchemeManager.objectTypeFlags.missile = true;
     colorSchemeManager.objectTypeFlags.missileInview = true;
-    colorSchemeManager.objectTypeFlags.trusat = true;
+    colorSchemeManager.objectTypeFlags.pink = true;
     colorSchemeManager.objectTypeFlags.inFOV = true;
     colorSchemeManager.objectTypeFlags.inViewAlt = true;
     colorSchemeManager.objectTypeFlags.starLow = true;

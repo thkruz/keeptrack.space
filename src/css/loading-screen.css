@@ -42,11 +42,24 @@ body {
   padding: 0;
   z-index: 101;
   text-align: center;
+  background: var(--colorTertiaryDarken4);
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
+  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
+}
+
+#loading-earth {
+  height: 40%;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
   background: var(--colorTertiaryDarken2);
   background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
   background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
   background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+  box-shadow: inset 16px 0 40px 6px rgb(0 0 0), inset -3px 0 6px 2px rgb(255 255 255 / 20%);
+  position: absolute;
+  left: auto;
+  right: auto;
 }
 
 .full-loader {

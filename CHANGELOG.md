@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v6.0.0
+
+>  
+
+- fix: :zap: remove jquery and fix open bugs
+- refactor: :zap: remove jquery
+- refactor: :zap: remove more jquery
+- refactor: :zap: remove jquery from adviceManager
+- test: :white_check_mark: fix all failing tests
+- refactor: :zap: remove jquery
+- chore: :bookmark: update to version 5.4
+
 #### v5.4.0
 
 >  

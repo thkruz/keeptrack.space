@@ -199,6 +199,7 @@ export interface OrbitManager {
 }
 
 export interface Colors {
+  pink: [number, number, number, number];
   inFOV: [number, number, number, number];
   inFOVAlt: [number, number, number, number];
   sunlight60: [number, number, number, number];
@@ -316,6 +317,9 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isDrawSun: any;
+  isDrawInCoverageLines: boolean;
+  isDrawOrbits: any;
   isEciOnHover: boolean;
   isDrawMilkyWay: boolean;
   isDragging: boolean;

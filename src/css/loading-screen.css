@@ -42,21 +42,22 @@ body {
   padding: 0;
   z-index: 101;
   text-align: center;
-  background: var(--colorTertiaryDarken4);
-  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
-  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
-  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiaryDarken3));
+  background: var(--colorTertiaryDarken3);
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken3), var(--colorTertiaryDarken2));
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken3), var(--colorTertiaryDarken2));
+  background: linear-gradient(45deg, var(--colorTertiaryDarken3), var(--colorTertiaryDarken2));
 }
 
 #loading-earth {
-  height: 40%;
+  height: 100%;
+  transform: translate(-40%, 40%);
   border-radius: 50%;
   aspect-ratio: 1/1;
   background: var(--colorTertiaryDarken2);
-  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  box-shadow: inset 16px 0 40px 6px rgb(0 0 0), inset -3px 0 6px 2px rgb(255 255 255 / 20%);
+  background: -moz-linear-gradient(45deg, var(--colorSecondaryDarken4), var(--colorSecondaryDarken2));
+  background: -webkit-linear-gradient(45deg, var(--colorSecondaryDarken4), var(--colorSecondaryDarken2));
+  background: linear-gradient(45deg, var(--colorSecondaryDarken4), var(--colorSecondaryDarken2));
+  box-shadow: inset 16px 0 40px 6px rgb(0 0 0 / 90%), inset -3px 0 6px 2px rgb(255 255 255 / 20%), 0 0 60px 5px rgb(0 0 0 / 50%);
   position: absolute;
   left: auto;
   right: auto;
@@ -104,6 +105,7 @@ body {
   flex-wrap: nowrap;
   align-items: center;
   height: 150px;
+  z-index: 1;
 }
 
 #logo-text {

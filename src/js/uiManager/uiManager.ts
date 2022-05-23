@@ -491,9 +491,9 @@ export const hideLoadingScreen = () => {
   mobileManager.checkMobileMode();
 
   if (settingsManager.isMobileModeEnabled) {
-    getEl('spinner').style.display = 'none';
     uiManager.loadStr('math');
     getEl('loading-screen').style.display = 'none';
+    getEl('loading-earth').style.display = 'none';
   } else {
     // Loading Screen Resized and Hidden
     setTimeout(function () {
@@ -501,6 +501,7 @@ export const hideLoadingScreen = () => {
       getEl('loading-screen').classList.add('mini-loader-container');
       getEl('logo-inner-container').classList.add('mini-loader');
       getEl('logo-text').innerHTML = '';
+      getEl('loading-earth').style.display = 'none';
       getEl('logo-text-version').innerHTML = '';
       getEl('loading-screen').style.display = 'none';
       uiManager.loadStr('math');

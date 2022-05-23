@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SensorObject } from '../api/keepTrackTypes';
+import { getEl } from '../lib/helpers';
 
 export type GeolocationPosition = {
   coords: {
@@ -41,9 +42,9 @@ export const updateUi = (): void => {
   if (typeof settingsManager.geolocation.lon !== 'number') throw new Error('geolocation.lon is not valid');
   if (typeof settingsManager.geolocation.alt !== 'number') throw new Error('geolocation.alt is not valid');
 
-  const csLat = <HTMLInputElement>document.getElementById('cs-lat');
-  const csLon = <HTMLInputElement>document.getElementById('cs-lon');
-  const csHei = <HTMLInputElement>document.getElementById('cs-hei');
+  const csLat = <HTMLInputElement>getEl('cs-lat');
+  const csLon = <HTMLInputElement>getEl('cs-lon');
+  const csHei = <HTMLInputElement>getEl('cs-hei');
   csLat.value = settingsManager.geolocation.lat;
   csLat.dispatchEvent(new Event('change'));
   csLon.value = settingsManager.geolocation.lon;
@@ -58,18 +59,18 @@ export const updateUi = (): void => {
   $('#cs-maxel').attr('disabled', true.toString());
   $('#cs-minrange').attr('disabled', true.toString());
   $('#cs-maxrange').attr('disabled', true.toString());
-  document.getElementById('cs-minaz-div').style.display = 'none';
-  document.getElementById('cs-maxaz-div').style.display = 'none';
-  document.getElementById('cs-minel-div').style.display = 'none';
-  document.getElementById('cs-maxel-div').style.display = 'none';
-  document.getElementById('cs-minrange-div').style.display = 'none';
-  document.getElementById('cs-maxrange-div').style.display = 'none';
-  (<HTMLInputElement>document.getElementById('cs-minaz')).value = '0';
-  (<HTMLInputElement>document.getElementById('cs-maxaz')).value = '360';
-  (<HTMLInputElement>document.getElementById('cs-minel')).value = '10';
-  (<HTMLInputElement>document.getElementById('cs-maxel')).value = '90';
-  (<HTMLInputElement>document.getElementById('cs-minrange')).value = '100';
-  (<HTMLInputElement>document.getElementById('cs-maxrange')).value = '50000';
+  getEl('cs-minaz-div').style.display = 'none';
+  getEl('cs-maxaz-div').style.display = 'none';
+  getEl('cs-minel-div').style.display = 'none';
+  getEl('cs-maxel-div').style.display = 'none';
+  getEl('cs-minrange-div').style.display = 'none';
+  getEl('cs-maxrange-div').style.display = 'none';
+  (<HTMLInputElement>getEl('cs-minaz')).value = '0';
+  (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
+  (<HTMLInputElement>getEl('cs-minel')).value = '10';
+  (<HTMLInputElement>getEl('cs-maxel')).value = '90';
+  (<HTMLInputElement>getEl('cs-minrange')).value = '100';
+  (<HTMLInputElement>getEl('cs-maxrange')).value = '50000';
 
   $('#sensor-type').html('Telescope');
   $('#sensor-info-title').html('Custom Sensor');

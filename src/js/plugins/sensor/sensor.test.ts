@@ -14,6 +14,28 @@ describe('sensor.init', () => {
   });
 });
 
+describe('sensor.settingsRisesetChange', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      document.body.innerHTML = '<div id="left-menus"></div>';
+      sensor.uiManagerInit(); // Need the HTML to be loaded
+
+      sensor.settingsRisesetChange({ preventDefault: () => true }, false);
+      sensor.settingsRisesetChange({ preventDefault: () => true }, true);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      sensor.settingsRisesetChange(null);
+    };
+
+    expect(callFunction).toThrow();
+  });
+});
+
 // @ponicode
 describe('sensor.hideSideMenus', () => {
   test('0', () => {

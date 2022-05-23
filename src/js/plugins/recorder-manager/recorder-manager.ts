@@ -1,8 +1,7 @@
 import recorderPng from '@app/img/icons/video.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { shake } from '@app/js/lib/helpers';
-import { CanvasRecorder } from '@app/js/plugins';
-import $ from 'jquery';
+import { getEl, shake } from '@app/js/lib/helpers';
+import { CanvasRecorder } from './canvas-recorder/canvas-recorder';
 
 let recorder: CanvasRecorder;
 
@@ -10,13 +9,16 @@ export const getRecorderObject = (): CanvasRecorder => recorder;
 
 export const uiManagerInit = (): void => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="menu-record" class="bmenu-item">
         <img alt="video" src="" delayedsrc="${recorderPng}" />
         <span class="bmenu-title">Record Video</span>
         <div class="status-icon"></div>
       </div>     
-    `);
+      `
+  );
 };
 export const uiManagerOnReady = (): void => {
   try {
@@ -33,7 +35,7 @@ export const bottomMenuClick = (iconName: string): void => {
       recorder.stop();
       recorder.save('keeptrack.webm');
       recorder.setIsRecording(false);
-      document.getElementById('menu-record').classList.remove('bmenu-item-selected');
+      getEl('menu-record').classList.remove('bmenu-item-selected');
       return;
     } else {
       try {
@@ -43,9 +45,9 @@ export const bottomMenuClick = (iconName: string): void => {
           html: `Compatibility Error with Recording`,
         });
         recorder.setIsRecording(false);
-        document.getElementById('menu-record').classList.remove('bmenu-item-selected');
-        document.getElementById('menu-record').classList.add('bmenu-item-disabled');
-        shake(document.getElementById('menu-record'));
+        getEl('menu-record').classList.remove('bmenu-item-selected');
+        getEl('menu-record').classList.add('bmenu-item-disabled');
+        shake(getEl('menu-record'));
       }
       return;
     }

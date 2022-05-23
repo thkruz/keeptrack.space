@@ -1,6 +1,6 @@
 import findSatPng from '@app/img/icons/find2.png';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { getUnique, hideLoading, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { getEl, getUnique, hideLoading, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
 
@@ -121,8 +121,8 @@ export const searchSats = (searchParams: SearchSatParams) => {
     result += i < res.length - 1 ? `${sat.sccNum},` : `${sat.sccNum}`;
   });
 
-  (<HTMLInputElement>document.getElementById('search')).value = result;
-  uiManager.doSearch((<HTMLInputElement>document.getElementById('search')).value);
+  (<HTMLInputElement>getEl('search')).value = result;
+  uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
   return res;
 };
 
@@ -136,7 +136,9 @@ export const checkRange = (posAll: SearchResults[], min: number, max: number) =>
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  document.getElementById('left-menus').innerHTML += keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
           <div id="findByLooks-content" class="side-menu">
             <div class="row">
@@ -269,26 +271,30 @@ export const uiManagerInit = (): void => {
             </div>
           </div>
         </div>
-      `;
+      `
+  );
 
-  document.getElementById('fbl-error').addEventListener('click', function () {
-    document.getElementById('fbl-error').style.display = 'none';
+  getEl('fbl-error').addEventListener('click', function () {
+    getEl('fbl-error').style.display = 'none';
   });
 
   // Bottom Icon
-  document.getElementById('bottom-icons').innerHTML += keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-find-sat" class="bmenu-item">
           <img alt="find2" src="${findSatPng}"/>
           <span class="bmenu-title">Find Satellite</span>
           <div class="status-icon"></div>
         </div>     
-      `;
+      `
+  );
 };
 
 export const uiManagerFinal = () => {
   const { satSet } = keepTrackApi.programs;
 
-  document.getElementById('findByLooks-form').addEventListener('submit', function (e: Event) {
+  getEl('findByLooks-form').addEventListener('submit', function (e: Event) {
     e.preventDefault();
     showLoading(() => {
       findByLooksSubmit();
@@ -300,14 +306,14 @@ export const uiManagerFinal = () => {
     // Sort using lower case
     .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
     .forEach((bus) => {
-      document.getElementById('fbl-bus').innerHTML += `<option value="${bus}">${bus}</option>`;
+      getEl('fbl-bus').insertAdjacentHTML('beforeend', `<option value="${bus}">${bus}</option>`);
     });
 
   getUnique(satSet.satData.filter((obj: SatObject) => obj.shape).map((obj) => obj.shape))
     // Sort using lower case
     .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
     .forEach((shape) => {
-      document.getElementById('fbl-shape').innerHTML += `<option value="${shape}">${shape}</option>`;
+      getEl('fbl-shape').insertAdjacentHTML('beforeend', `<option value="${shape}">${shape}</option>`);
     });
 
   const payloadPartials = satSet.satData
@@ -325,7 +331,7 @@ export const uiManagerFinal = () => {
     .forEach((payload) => {
       if (payload === '') return;
       if (payload.length > 3) {
-        document.getElementById('fbl-payload').innerHTML += `<option value="${payload}">${payload}</option>`;
+        getEl('fbl-payload').insertAdjacentHTML('beforeend', `<option value="${payload}">${payload}</option>`);
       }
     });
 };
@@ -340,16 +346,16 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      slideInRight(document.getElementById('findByLooks-menu'), 1000);
+      slideInRight(getEl('findByLooks-menu'), 1000);
       isFindByLooksMenuOpen = true;
-      document.getElementById('menu-find-sat').classList.add('bmenu-item-selected');
+      getEl('menu-find-sat').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('findByLooks-menu'), 1000);
-  document.getElementById('menu-find-sat').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('findByLooks-menu'), 1000);
+  getEl('menu-find-sat').classList.remove('bmenu-item-selected');
   isFindByLooksMenuOpen = false;
 };
 export const init = (): void => {
@@ -380,27 +386,27 @@ export const init = (): void => {
   });
 };
 export const findByLooksSubmit = async () => {
-  const az = parseFloat((<HTMLInputElement>document.getElementById('fbl-azimuth')).value);
-  const el = parseFloat((<HTMLInputElement>document.getElementById('fbl-elevation')).value);
-  const rng = parseFloat((<HTMLInputElement>document.getElementById('fbl-range')).value);
-  const inc = parseFloat((<HTMLInputElement>document.getElementById('fbl-inc')).value);
-  const period = parseFloat((<HTMLInputElement>document.getElementById('fbl-period')).value);
-  const rcs = parseFloat((<HTMLInputElement>document.getElementById('fbl-rcs')).value);
-  const azMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-azimuth-margin')).value);
-  const elMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-elevation-margin')).value);
-  const rngMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-range-margin')).value);
-  const incMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-inc-margin')).value);
-  const periodMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-period-margin')).value);
-  const rcsMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-rcs-margin')).value);
-  const objType = parseInt((<HTMLInputElement>document.getElementById('fbl-type')).value);
-  const raan = parseFloat((<HTMLInputElement>document.getElementById('fbl-raan')).value);
-  const raanMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-raan-margin')).value);
-  const argPe = parseFloat((<HTMLInputElement>document.getElementById('fbl-argPe')).value);
-  const argPeMarg = parseFloat((<HTMLInputElement>document.getElementById('fbl-argPe-margin')).value);
-  const bus = (<HTMLInputElement>document.getElementById('fbl-bus')).value;
-  const payload = (<HTMLInputElement>document.getElementById('fbl-payload')).value;
-  const shape = (<HTMLInputElement>document.getElementById('fbl-shape')).value;
-  (<HTMLInputElement>document.getElementById('search')).value = ''; // Reset the search first
+  const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
+  const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);
+  const rng = parseFloat((<HTMLInputElement>getEl('fbl-range')).value);
+  const inc = parseFloat((<HTMLInputElement>getEl('fbl-inc')).value);
+  const period = parseFloat((<HTMLInputElement>getEl('fbl-period')).value);
+  const rcs = parseFloat((<HTMLInputElement>getEl('fbl-rcs')).value);
+  const azMarg = parseFloat((<HTMLInputElement>getEl('fbl-azimuth-margin')).value);
+  const elMarg = parseFloat((<HTMLInputElement>getEl('fbl-elevation-margin')).value);
+  const rngMarg = parseFloat((<HTMLInputElement>getEl('fbl-range-margin')).value);
+  const incMarg = parseFloat((<HTMLInputElement>getEl('fbl-inc-margin')).value);
+  const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
+  const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
+  const objType = parseInt((<HTMLInputElement>getEl('fbl-type')).value);
+  const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
+  const raanMarg = parseFloat((<HTMLInputElement>getEl('fbl-raan-margin')).value);
+  const argPe = parseFloat((<HTMLInputElement>getEl('fbl-argPe')).value);
+  const argPeMarg = parseFloat((<HTMLInputElement>getEl('fbl-argPe-margin')).value);
+  const bus = (<HTMLInputElement>getEl('fbl-bus')).value;
+  const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
+  const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
+  (<HTMLInputElement>getEl('search')).value = ''; // Reset the search first
   const { uiManager } = keepTrackApi.programs;
   try {
     const searchParams = {

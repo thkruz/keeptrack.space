@@ -1,39 +1,40 @@
 import $ from 'jquery';
+import { getEl } from '../lib/helpers';
 
 export const allowPeriod = (e: KeyboardEvent) => {
   if (e.code === 'Period' || e.code === 'NumpadDecimal') e.preventDefault();
 };
 export const esDay366 = () => {
-  if (parseInt((<HTMLInputElement>document.getElementById('es-day')).value) < 0) (<HTMLInputElement>document.getElementById('es-day')).value = '000.00000000';
-  if (parseInt((<HTMLInputElement>document.getElementById('es-day')).value) >= 367) (<HTMLInputElement>document.getElementById('es-day')).value = '366.00000000';
+  if (parseInt((<HTMLInputElement>getEl('es-day')).value) < 0) (<HTMLInputElement>getEl('es-day')).value = '000.00000000';
+  if (parseInt((<HTMLInputElement>getEl('es-day')).value) >= 367) (<HTMLInputElement>getEl('es-day')).value = '366.00000000';
 };
 export const esInc180 = function (): void {
-  if (parseInt((<HTMLInputElement>document.getElementById('es-inc')).value) < 0) (<HTMLInputElement>document.getElementById('es-inc')).value = '000.0000';
-  if (parseInt((<HTMLInputElement>document.getElementById('es-inc')).value) > 180) (<HTMLInputElement>document.getElementById('es-inc')).value = '180.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-inc')).value) < 0) (<HTMLInputElement>getEl('es-inc')).value = '000.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-inc')).value) > 180) (<HTMLInputElement>getEl('es-inc')).value = '180.0000';
 };
 export const esRasc360 = function (): void {
-  if (parseInt((<HTMLInputElement>document.getElementById('es-rasc')).value) < 0) (<HTMLInputElement>document.getElementById('es-rasc')).value = '000.0000';
-  if (parseInt((<HTMLInputElement>document.getElementById('es-rasc')).value) > 360) (<HTMLInputElement>document.getElementById('es-rasc')).value = '360.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-rasc')).value) < 0) (<HTMLInputElement>getEl('es-rasc')).value = '000.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-rasc')).value) > 360) (<HTMLInputElement>getEl('es-rasc')).value = '360.0000';
 };
 export const esMeanmo18 = function (): void {
-  if (parseInt((<HTMLInputElement>document.getElementById('es-meanmo')).value) < 0) (<HTMLInputElement>document.getElementById('es-meanmo')).value = '00.00000000';
-  if (parseInt((<HTMLInputElement>document.getElementById('es-meanmo')).value) > 18) (<HTMLInputElement>document.getElementById('es-meanmo')).value = '18.00000000';
+  if (parseInt((<HTMLInputElement>getEl('es-meanmo')).value) < 0) (<HTMLInputElement>getEl('es-meanmo')).value = '00.00000000';
+  if (parseInt((<HTMLInputElement>getEl('es-meanmo')).value) > 18) (<HTMLInputElement>getEl('es-meanmo')).value = '18.00000000';
 };
 export const esArgPe360 = function (): void {
-  if (parseInt((<HTMLInputElement>document.getElementById('es-argPe')).value) < 0) (<HTMLInputElement>document.getElementById('es-argPe')).value = '000.0000';
-  if (parseInt((<HTMLInputElement>document.getElementById('es-argPe')).value) > 360) (<HTMLInputElement>document.getElementById('es-argPe')).value = '360.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-argPe')).value) < 0) (<HTMLInputElement>getEl('es-argPe')).value = '000.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-argPe')).value) > 360) (<HTMLInputElement>getEl('es-argPe')).value = '360.0000';
 };
 export const esMeana360 = function (): void {
-  if (parseInt((<HTMLInputElement>document.getElementById('es-meana')).value) < 0) (<HTMLInputElement>document.getElementById('es-meana')).value = '000.0000';
-  if (parseInt((<HTMLInputElement>document.getElementById('es-meana')).value) > 360) (<HTMLInputElement>document.getElementById('es-meana')).value = '360.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-meana')).value) < 0) (<HTMLInputElement>getEl('es-meana')).value = '000.0000';
+  if (parseInt((<HTMLInputElement>getEl('es-meana')).value) > 360) (<HTMLInputElement>getEl('es-meana')).value = '360.0000';
 };
 export const msLat90 = function (): void {
-  if (parseInt((<HTMLInputElement>document.getElementById('ms-lat')).value) < -90) (<HTMLInputElement>document.getElementById('ms-lat')).value = '-90.000';
-  if (parseInt((<HTMLInputElement>document.getElementById('ms-lat')).value) > 90) (<HTMLInputElement>document.getElementById('ms-lat')).value = '90.000';
+  if (parseInt((<HTMLInputElement>getEl('ms-lat')).value) < -90) (<HTMLInputElement>getEl('ms-lat')).value = '-90.000';
+  if (parseInt((<HTMLInputElement>getEl('ms-lat')).value) > 90) (<HTMLInputElement>getEl('ms-lat')).value = '90.000';
 };
 export const msLon180 = function (): void {
-  if (parseInt((<HTMLInputElement>document.getElementById('ms-lon')).value) < -180) (<HTMLInputElement>document.getElementById('ms-lon')).value = '-180.000';
-  if (parseInt((<HTMLInputElement>document.getElementById('ms-lon')).value) > 180) (<HTMLInputElement>document.getElementById('ms-lon')).value = '180.000';
+  if (parseInt((<HTMLInputElement>getEl('ms-lon')).value) < -180) (<HTMLInputElement>getEl('ms-lon')).value = '-180.000';
+  if (parseInt((<HTMLInputElement>getEl('ms-lon')).value) > 180) (<HTMLInputElement>getEl('ms-lon')).value = '180.000';
 };
 export const initUiValidation = () => {
   $('#editSat>div>input').on('keydown', validateNumOnly);

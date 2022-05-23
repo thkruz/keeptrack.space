@@ -1,7 +1,7 @@
 import socratesPng from '@app/img/icons/socrates.png';
 import $ from 'jquery';
 import { isThisJest, keepTrackApi } from '../../api/keepTrackApi';
-import { slideInRight, slideOutLeft, stringPad } from '../../lib/helpers';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft, stringPad } from '../../lib/helpers';
 
 let isSocratesMenuOpen = false;
 let socratesOnSatCruncher: number | null = null;
@@ -10,7 +10,9 @@ let socratesObjTwo = []; // Array for tr containing CATNR2
 
 export const uiManagerInit = () => {
   // Side Menu
-  document.getElementById('left-menus').innerHTML += keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
           <div id="socrates-content" class="side-menu">
             <div class="row">
@@ -19,38 +21,36 @@ export const uiManagerInit = () => {
             </div>
           </div>
         </div>
-      `;
+      `
+  );
 
   // Bottom Icon
-  document.getElementById('bottom-icons').innerHTML += keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-satellite-collision" class="bmenu-item">
           <img alt="socrates" src="" delayedsrc="${socratesPng}" />
           <span class="bmenu-title">Collisions</span>
           <div class="status-icon"></div>
         </div>
-      `;
-
-  // Allow resizing of the side menu
-  $('#socrates-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 290,
-  });
+      `
+  );
 };
 
 export const uiManagerFinal = () => {
-  document.getElementById('socrates-menu').addEventListener('click', (evt: any) => {
-    const el = <HTMLElement>evt.target.parentElement;
-    if (!el.classList.contains('socrates-object')) return;
-    // Might be better code for this.
-    const hiddenRow = (<any>el.attributes).hiddenrow.value;
-    if (hiddenRow !== null) {
-      socrates(hiddenRow);
-    }
+  getEl('socrates-menu').addEventListener('click', (evt: any) => {
+    showLoading(() => {
+      const el = <HTMLElement>evt.target.parentElement;
+      if (!el.classList.contains('socrates-object')) return;
+      // Might be better code for this.
+      const hiddenRow = (<any>el.attributes).hiddenrow.value;
+      if (hiddenRow !== null) {
+        socrates(hiddenRow);
+      }
+    });
   });
+
+  clickAndDragWidth(getEl('socrates-menu'), { minWidth: 280, maxWidth: 450 });
 };
 
 export const adviceReady = () => {
@@ -65,7 +65,7 @@ export const adviceReady = () => {
     aM.showAdvice(
       'SOCRATES Near Conjunction List',
       'Did you know that objects frequently come close to colliding? Using data from Center for Space Standards and Innovation you can find upcoming possible collisions.',
-      document.getElementById('menu-satellite-collision'),
+      getEl('menu-satellite-collision'),
       'bottom'
     );
   };
@@ -80,17 +80,17 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
       keepTrackApi.programs.uiManager.hideSideMenus();
-      slideInRight(document.getElementById('socrates-menu'), 1000);
+      slideInRight(getEl('socrates-menu'), 1000);
       isSocratesMenuOpen = true;
       socrates(-1);
-      document.getElementById('menu-satellite-collision').classList.add('bmenu-item-selected');
+      getEl('menu-satellite-collision').classList.add('bmenu-item-selected');
       return;
     }
   }
 };
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('socrates-menu'), 1000);
-  document.getElementById('menu-satellite-collision').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('socrates-menu'), 1000);
+  getEl('menu-satellite-collision').classList.remove('bmenu-item-selected');
   isSocratesMenuOpen = false;
 };
 export const onCruncherMessage = (): void => {
@@ -245,7 +245,7 @@ export const processSocratesHtm = (socratesHTM: Document): void => {
     socratesObjTwo.push(cols);
   });
   // SOCRATES Menu
-  const tbl = <HTMLTableElement>document.getElementById('socrates-table'); // Identify the table to update
+  const tbl = <HTMLTableElement>getEl('socrates-table'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
   let tr = tbl.insertRow();
   let tdT = tr.insertCell();

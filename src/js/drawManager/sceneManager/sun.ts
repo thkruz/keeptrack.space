@@ -26,9 +26,9 @@ import { A } from '../../lib/external/meuusjs';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-const NUM_LAT_SEGS = 64;
-const NUM_LON_SEGS = 64;
-const RADIUS_OF_DRAW_SUN = 6000;
+const NUM_LAT_SEGS = 32;
+const NUM_LON_SEGS = 32;
+const RADIUS_OF_DRAW_SUN = 6500;
 const SUN_SCALAR_DISTANCE = 220000;
 
 /* ***************************************************************************

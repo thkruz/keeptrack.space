@@ -1,18 +1,21 @@
 import colorsPng from '@app/img/icons/colors.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let isColorSchemeMenuOpen = false;
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('color-scheme-menu'), 1000);
-  document.getElementById('menu-color-scheme').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('color-scheme-menu'), 1000);
+  getEl('menu-color-scheme').classList.remove('bmenu-item-selected');
   isColorSchemeMenuOpen = false;
 };
 export const rightBtnMenuAdd = () => {
-  $('#right-btn-menu-ul').append(keepTrackApi.html`   
+  getEl('right-btn-menu-ul').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`   
         <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
-      `);
+        `
+  );
 };
 export const init = (): void => {
   // Add HTML
@@ -20,6 +23,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'colorsMenu',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'colorsMenu',
+    cb: uiManagerFinal,
   });
 
   keepTrackApi.register({
@@ -42,7 +51,9 @@ export const init = (): void => {
   });
 };
 export const uiManagerInit = () => {
-  $('#rmb-wrapper').append(keepTrackApi.html`
+  getEl('rmb-wrapper').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
     <div id="colors-rmb-menu" class="right-btn-menu">
       <ul class='dropdown-contents'>
         <li id="colors-default-rmb"><a href="#">Object Types</a></li>
@@ -52,10 +63,13 @@ export const uiManagerInit = () => {
         <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
       </ul>
     </div>
-  `);
+    `
+  );
 
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
           <div id="colors-menu" class="side-menu">
             <ul>
@@ -74,10 +88,13 @@ export const uiManagerInit = () => {
             </ul>
           </div>
         </div>
-      `);
+        `
+  );
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-color-scheme" class="bmenu-item">
           <img
             alt="colors"
@@ -87,8 +104,11 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Color Schemes</span>
           <div class="status-icon"></div>
         </div>
-      `);
+        `
+  );
+};
 
+export const uiManagerFinal = () => {
   document
     .getElementById('colors-menu')
     .querySelectorAll('li')
@@ -99,14 +119,7 @@ export const uiManagerInit = () => {
       });
     });
 
-  $('#color-scheme-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('color-scheme-menu'));
 };
 
 export const bottomMenuClick = (iconName: string): void => {
@@ -119,9 +132,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      slideInRight(document.getElementById('color-scheme-menu'), 1000);
+      slideInRight(getEl('color-scheme-menu'), 1000);
       isColorSchemeMenuOpen = true;
-      document.getElementById('menu-color-scheme').classList.add('bmenu-item-selected');
+      getEl('menu-color-scheme').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -165,22 +178,20 @@ export const colorsMenuClick = (colorName: string) => {
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'elset-age':
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         uiManager.legendMenuChange('ageOfElset');
         satSet.setColorScheme(colorSchemeManager.ageOfElset);
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'lost-objects':
-      (<HTMLInputElement>document.getElementById('search')).value = '';
-      $('#loading-screen').fadeIn(1000, function () {
+      (<HTMLInputElement>getEl('search')).value = '';
+      showLoading(() => {
         settingsManager.lostSatStr = '';
         satSet.setColorScheme(colorSchemeManager.lostobjects);
-        (<HTMLInputElement>document.getElementById('search')).value = settingsManager.lostSatStr;
+        (<HTMLInputElement>getEl('search')).value = settingsManager.lostSatStr;
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        uiManager.doSearch((<HTMLInputElement>document.getElementById('search')).value);
-        $('#loading-screen').fadeOut('slow');
+        uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
       });
       break;
     case 'rcs':

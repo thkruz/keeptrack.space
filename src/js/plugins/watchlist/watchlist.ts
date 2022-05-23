@@ -26,7 +26,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { shake, saveAs, slideOutLeft, slideInRight } from '@app/js/lib/helpers';
+import { shake, saveAs, slideOutLeft, slideInRight, showLoading, clickAndDragWidth, getEl } from '@app/js/lib/helpers';
 import removePng from '@app/img/remove.png';
 import addPng from '@app/img/add.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
@@ -42,10 +42,10 @@ let nextPassArray: any = [];
 let isInfoOverlayMenuOpen = false;
 
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('watchlist-menu'), 1000);
-  slideOutLeft(document.getElementById('info-overlay-menu'), 1000);
-  document.getElementById('menu-info-overlay').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-watchlist').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('watchlist-menu'), 1000);
+  slideOutLeft(getEl('info-overlay-menu'), 0);
+  getEl('menu-info-overlay').classList.remove('bmenu-item-selected');
+  getEl('menu-watchlist').classList.remove('bmenu-item-selected');
   isInfoOverlayMenuOpen = false;
   isWatchlistMenuOpen = false;
 };
@@ -91,7 +91,7 @@ export const init = (): void => {
         pushOverlayElement(satSet, nextPassArrayIn, s, propTime, infoOverlayDOM);
       }
       infoOverlayDOM.push('</div>');
-      document.getElementById('info-overlay-content').innerHTML = infoOverlayDOM.join('');
+      getEl('info-overlay-content').innerHTML = infoOverlayDOM.join('');
       keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManager.realTime;
     }
   };
@@ -157,7 +157,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
       </div>`;
     }
   }
-  $('#watchlist-list').html(watchlistListHTML);
+  getEl('watchlist-list').innerHTML = (watchlistListHTML);
   for (let i = 0; i < watchlistList.length; i++) {
     // No duplicates
     watchlistString += satSet.getSatExtraOnly(watchlistList[i]).sccNum;
@@ -182,7 +182,7 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
   <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
     <div id="watchlist-content" class="side-menu">
       <div class="row">
@@ -225,10 +225,10 @@ export const uiManagerInit = (): void => {
   <div id="info-overlay-menu" class="start-hidden text-select">
     <div id="info-overlay-content"></div>
   </div>
-`);
+`));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`  
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`  
   <div id="menu-watchlist" class="bmenu-item">
     <img
       alt="watchlist"
@@ -243,49 +243,41 @@ export const uiManagerInit = (): void => {
     <span class="bmenu-title">Overlay</span>
     <div class="status-icon"></div>
   </div>
-`);
-
-  (<any>$('#watchlist-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+`));
 };
 
 export const uiManagerFinal = (): void => {
   document.querySelector('.menu-selectable').addEventListener('click', menuSelectableClick);
+  clickAndDragWidth(getEl('watchlist-menu'));
   
-  document.getElementById('info-overlay-content').addEventListener('click', function (evt: Event) {
+  getEl('info-overlay-content').addEventListener('click', function (evt: Event) {
     if (!(<HTMLElement>evt.target).classList.contains('watchlist-object')) return;
     infoOverlayContentClick(evt);
   });
   
-  document.getElementById('watchlist-list').addEventListener('click', function (evt: Event) {
+  getEl('watchlist-list').addEventListener('click', function (evt: Event) {
     const satId = parseInt((<HTMLElement>evt.target).dataset.satId);
     watchlistListClick(satId);
   });
   
   // Add button selected on watchlist menu
-  document.getElementById('watchlist-content').addEventListener('click', watchlistContentEvent);
+  getEl('watchlist-content').addEventListener('click', watchlistContentEvent);
   
   // Enter pressed/selected on watchlist menu
-  document.getElementById('watchlist-content').addEventListener('submit', function (evt: Event) {
+  getEl('watchlist-content').addEventListener('submit', function (evt: Event) {
     evt.preventDefault();
     watchlistContentEvent(evt);
   });
   
-  document.getElementById('watchlist-save').addEventListener('click', function (evt: Event) {
+  getEl('watchlist-save').addEventListener('click', function (evt: Event) {
     watchlistSaveClick(evt);
   });
   
-  document.getElementById('watchlist-open').addEventListener('click', function () {
-    document.getElementById('watchlist-file').click()
+  getEl('watchlist-open').addEventListener('click', function () {
+    getEl('watchlist-file').click()
   });
   
-  document.getElementById('watchlist-file').addEventListener('change', function (evt: Event) {
+  getEl('watchlist-file').addEventListener('change', function (evt: Event) {
     watchlistFileChange(evt);
   });
 }
@@ -345,7 +337,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
     if (!sensorManager.checkSensorSelected()) {
       // No Sensor Selected
       uiManager.toast(`Select a Sensor First!`, 'caution', true);
-      shake(document.getElementById('menu-info-overlay'));
+      shake(getEl('menu-info-overlay'));
       return;
     }
     if (isInfoOverlayMenuOpen) {
@@ -355,7 +347,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
     } else {
       if (watchlistList.length === 0 && !isWatchlistChanged) {
         uiManager.toast(`Add Satellites to Watchlist!`, 'caution');
-        shake(document.getElementById('menu-info-overlay'));
+        shake(getEl('menu-info-overlay'));
         nextPassArray = [];
         return;
       }
@@ -366,7 +358,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
         new Date(nextPassEarliestTime * 1 + 1000 * 60 * 60 * 24) < timeManager.realTime ||
         isWatchlistChanged
       ) {
-        $('#loading-screen').fadeIn(1000, function () {
+        showLoading(() => {
           nextPassArray = [];
           for (let x = 0; x < watchlistList.length; x++) {
             nextPassArray.push(satSet.getSatExtraOnly(watchlistList[x]));
@@ -378,15 +370,16 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
           nextPassEarliestTime = timeManager.realTime;
           keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
           uiManager.updateNextPassOverlay(nextPassArray, true);
-          $('#loading-screen').fadeOut('slow');
           isWatchlistChanged = false;
         });
       } else {
         uiManager.updateNextPassOverlay(nextPassArray, true);
       }
 
-      slideInRight(document.getElementById('info-overlay-menu'), 1000);
-      document.getElementById('menu-info-overlay').classList.add('bmenu-item-selected');
+      slideInRight(getEl('info-overlay-menu'), 100, () => { 
+        getEl('info-overlay-menu').style.transform = '';
+      });
+      getEl('menu-info-overlay').classList.add('bmenu-item-selected');
       isInfoOverlayMenuOpen = true;
       return;
     }
@@ -394,16 +387,16 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
   if (iconName === 'menu-watchlist') {
     if (isWatchlistMenuOpen) {
       isWatchlistMenuOpen = false;
-      document.getElementById('menu-watchlist').classList.remove('bmenu-item-selected');
+      getEl('menu-watchlist').classList.remove('bmenu-item-selected');
       uiManager.hideSideMenus();
       return;
     } else {
       if ((<any>settingsManager).isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();      
-      slideInRight(document.getElementById('watchlist-menu'), 1000);
+      slideInRight(getEl('watchlist-menu'), 1000);
       updateWatchlist();
       isWatchlistMenuOpen = true;
-      document.getElementById('menu-watchlist').classList.add('bmenu-item-selected');
+      getEl('menu-watchlist').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -439,7 +432,7 @@ export const onCruncherReady = async (): Promise<void> => {
       }
     }
     if (sensorManager.checkSensorSelected() && newWatchlist.length > 0) {
-      document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
+      getEl('menu-info-overlay').classList.remove('bmenu-item-disabled');
     }
     updateWatchlist(newWatchlist, _watchlistInViewList, true);
   }
@@ -499,7 +492,7 @@ export const watchlistListClick = (satId: number): void => {
   }
   if (!sensorManager.checkSensorSelected() || watchlistList.length <= 0) {
     isWatchlistChanged = false;
-    document.getElementById('menu-info-overlay').classList.add('bmenu-item-disabled');
+    getEl('menu-info-overlay').classList.add('bmenu-item-disabled');
   }
 };
 
@@ -507,7 +500,7 @@ export const watchlistContentEvent = (e?: any, satId?: number) => {
   // if (!e.target.classList.contains('watchlist-add')) return;
 
   const { satSet, sensorManager } = keepTrackApi.programs;
-  satId ??= satSet.getIdFromObjNum(parseInt((<HTMLInputElement>document.getElementById('watchlist-new')).value));
+  satId ??= satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('watchlist-new')).value));
   let duplicate = false;
   for (let i = 0; i < watchlistList.length; i++) {
     // No duplicates
@@ -519,9 +512,9 @@ export const watchlistContentEvent = (e?: any, satId?: number) => {
     updateWatchlist();
   }
   if (sensorManager.checkSensorSelected()) {
-    document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
+    getEl('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }
-  (<HTMLInputElement>document.getElementById('watchlist-new')).value = ''; // Clear the search box after enter pressed/selected
+  (<HTMLInputElement>getEl('watchlist-new')).value = ''; // Clear the search box after enter pressed/selected
   if (typeof e !== 'undefined' && e !== null) e.preventDefault();
 };
 
@@ -592,12 +585,12 @@ export const watchListReaderOnLoad = (evt: any) => {
   watchlistList = newWatchlist;
   updateWatchlist();
   if (sensorManager.checkSensorSelected()) {
-    document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
+    getEl('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }
 };
 
 export const menuSelectableClick = (): void => {
   if (watchlistList.length > 0) {
-    document.getElementById('menu-info-overlay').classList.remove('bmenu-item-disabled');
+    getEl('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }
 };

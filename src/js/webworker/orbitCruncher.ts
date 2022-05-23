@@ -75,31 +75,40 @@ export const onmessageProcessing = (m) => { // NOSONAR
     if (satCache[satId].missile) {
       while (i < len) {
         const missile = satCache[satId];
-        const x = Math.round(missile.altList.length * (i / NUM_SEGS));
 
-        const missileTime = propTime(dynamicOffsetEpoch, staticOffset, propRate);
-        const j =
-          jday(
-            missileTime.getUTCFullYear(),
-            missileTime.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-            missileTime.getUTCDate(),
-            missileTime.getUTCHours(),
-            missileTime.getUTCMinutes(),
-            missileTime.getUTCSeconds()
-          ) +
-          missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-        const gmst = satellite.gstime(j);
+        if (missile.latList?.length === 0) {
+          pointsOut[i * 4] = 0;
+          pointsOut[i * 4 + 1] = 0;
+          pointsOut[i * 4 + 2] = 0;
+          pointsOut[i * 4 + 3] = 0;
+          i++;  
+        } else {
+          const x = Math.round(missile.altList.length * (i / NUM_SEGS));
 
-        const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
-        const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
-        const cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
-        const sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
+          const missileTime = propTime(dynamicOffsetEpoch, staticOffset, propRate);
+          const j =
+            jday(
+              missileTime.getUTCFullYear(),
+              missileTime.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+              missileTime.getUTCDate(),
+              missileTime.getUTCHours(),
+              missileTime.getUTCMinutes(),
+              missileTime.getUTCSeconds()
+            ) +
+            missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+          const gmst = satellite.gstime(j);
 
-        pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
-        pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
-        pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
-        pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
-        i++;
+          const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
+          const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
+          const cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
+          const sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
+
+          pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
+          pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
+          pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
+          pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
+          i++;
+        }
       }
     } else {
       const period = (2 * Math.PI) / satCache[satId].no; // convert rads/min to min

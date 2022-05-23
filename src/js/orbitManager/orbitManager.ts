@@ -3,6 +3,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
 import { Camera, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
+import { getEl } from '../lib/helpers';
 
 const NUM_SEGS = 255;
 const glBuffers = <WebGLBuffer[]>[];
@@ -48,7 +49,7 @@ export const init = (orbitWorker?: Worker): void => {
     } catch (error) {
       // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
       if (window.location.href.indexOf('file://') === 0) {
-        document.getElementById('loader-text').innerText =
+        getEl('loader-text').innerText =
           'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.';
       } else {
         console.error(error);

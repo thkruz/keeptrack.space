@@ -26,13 +26,12 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SensorObject } from '@app/js/api/keepTrackTypes';
-import $ from 'jquery';
 import radioTowerPng from '@app/img/icons/radio-tower.png';
 import radarPng from '@app/img/icons/radar.png';
 import customPng from '@app/img/icons/custom.png';
 import lookanglesPng from '@app/img/icons/lookangles.png';
 import multiSitePng from '@app/img/icons/multi-site.png';
-import { shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
@@ -42,11 +41,11 @@ let customSensors = <SensorObject[]>[];
 
 export const resetSensorButtonClick = () => {
   settingsManager.isForceColorScheme = false;
-  document.getElementById('menu-sensor-info').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-fov-bubble').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-surveillance').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-planetarium').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-astronomy').classList.add('bmenu-item-disabled');
+  getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
+  getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');
+  getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
+  getEl('menu-planetarium')?.classList.add('bmenu-item-disabled');
+  getEl('menu-astronomy')?.classList.add('bmenu-item-disabled');
   resetSensorSelected();
 };
 
@@ -68,46 +67,45 @@ export const removeLastSensor = () => {
 }
 
 export const csTelescopeClick = () => {
-  const { sensorManager } = keepTrackApi.programs;
-  if ($('#cs-telescope').is(':checked')) {
-    document.getElementById('cs-minaz-div').style.display = 'none';
-    document.getElementById('cs-maxaz-div').style.display = 'none';
-    document.getElementById('cs-minel-div').style.display = 'none';
-    document.getElementById('cs-maxel-div').style.display = 'none';
-    document.getElementById('cs-minrange-div').style.display = 'none';
-    document.getElementById('cs-maxrange-div').style.display = 'none';
-    (<HTMLInputElement>document.getElementById('cs-minaz')).value = '0';
-    (<HTMLInputElement>document.getElementById('cs-maxaz')).value = '360';
-    (<HTMLInputElement>document.getElementById('cs-minel')).value = '10';
-    (<HTMLInputElement>document.getElementById('cs-maxel')).value = '90';
-    (<HTMLInputElement>document.getElementById('cs-minrange')).value = '100';
-    (<HTMLInputElement>document.getElementById('cs-maxrange')).value = '1000000';
+  const { sensorManager } = keepTrackApi.programs;  
+  // If it is checked
+  if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
+    getEl('cs-minaz-div').style.display = 'none';
+    getEl('cs-maxaz-div').style.display = 'none';
+    getEl('cs-minel-div').style.display = 'none';
+    getEl('cs-maxel-div').style.display = 'none';
+    getEl('cs-minrange-div').style.display = 'none';
+    getEl('cs-maxrange-div').style.display = 'none';
+    (<HTMLInputElement>getEl('cs-minaz')).value = '0';
+    (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
+    (<HTMLInputElement>getEl('cs-minel')).value = '10';
+    (<HTMLInputElement>getEl('cs-maxel')).value = '90';
+    (<HTMLInputElement>getEl('cs-minrange')).value = '100';
+    (<HTMLInputElement>getEl('cs-maxrange')).value = '1000000';
   } else {
-    document.getElementById('cs-minaz-div').style.display = 'block';
-    document.getElementById('cs-maxaz-div').style.display = 'block';
-    document.getElementById('cs-minel-div').style.display = 'block';
-    document.getElementById('cs-maxel-div').style.display = 'block';
-    document.getElementById('cs-minrange-div').style.display = 'block';
-    document.getElementById('cs-maxrange-div').style.display = 'block';
+    getEl('cs-minaz-div').style.display = 'block';
+    getEl('cs-maxaz-div').style.display = 'block';
+    getEl('cs-minel-div').style.display = 'block';
+    getEl('cs-maxel-div').style.display = 'block';
+    getEl('cs-minrange-div').style.display = 'block';
+    getEl('cs-maxrange-div').style.display = 'block';
     if (sensorManager.checkSensorSelected()) {
-      (<HTMLInputElement>document.getElementById('cs-minaz')).value = sensorManager.currentSensor[0].obsminaz.toString();
-      (<HTMLInputElement>document.getElementById('cs-maxaz')).value = sensorManager.currentSensor[0].obsmaxaz.toString();
-      (<HTMLInputElement>document.getElementById('cs-minel')).value = sensorManager.currentSensor[0].obsminel.toString();
-      (<HTMLInputElement>document.getElementById('cs-maxel')).value = sensorManager.currentSensor[0].obsmaxel.toString();
-      (<HTMLInputElement>document.getElementById('cs-minrange')).value = sensorManager.currentSensor[0].obsminrange.toString();
-      (<HTMLInputElement>document.getElementById('cs-maxrange')).value = sensorManager.currentSensor[0].obsmaxrange.toString();
+      (<HTMLInputElement>getEl('cs-minaz')).value = sensorManager.currentSensor[0].obsminaz.toString();
+      (<HTMLInputElement>getEl('cs-maxaz')).value = sensorManager.currentSensor[0].obsmaxaz.toString();
+      (<HTMLInputElement>getEl('cs-minel')).value = sensorManager.currentSensor[0].obsminel.toString();
+      (<HTMLInputElement>getEl('cs-maxel')).value = sensorManager.currentSensor[0].obsmaxel.toString();
+      (<HTMLInputElement>getEl('cs-minrange')).value = sensorManager.currentSensor[0].obsminrange.toString();
+      (<HTMLInputElement>getEl('cs-maxrange')).value = sensorManager.currentSensor[0].obsmaxrange.toString();
     }
   }
 };
 export const uiManagerInit = () => {
-  const { satellite, uiManager } = keepTrackApi.programs;
-
-  (<any>$('#nav-mobile')).append(keepTrackApi.html`
+  getEl('nav-mobile').insertAdjacentHTML('beforeend', (keepTrackApi.html`
     <div id="sensor-selected"></div>
-  `);
+  `));
 
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
           <div id="sensor-list-content" class="side-menu">                  
             <div class="row">
@@ -400,10 +398,10 @@ export const uiManagerInit = () => {
             </div>
           </div>
         </div>
-      `);
+      `));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="menu-sensor-list" class="bmenu-item">
           <img
             alt="radar"
@@ -444,17 +442,46 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Multi-Site Looks</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `));  
+};
 
-  $('#lookanglesLength').on('change', function () {
-    satellite.lookanglesLength = parseInt(<string>(<HTMLInputElement>document.getElementById('lookanglesLength')).value);
+export const refreshLookanglesData = () => {
+  const { satellite, objectManager, satSet } = keepTrackApi.programs;
+  showLoading(() => {      
+    const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+    satellite.getlookangles(sat);
+  });
+};
+
+export const settingsRisesetChange = (e: any, isRiseSetChecked?: boolean) => {
+  const { satellite } = keepTrackApi.programs;
+  if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
+
+  isRiseSetChecked ??= (<HTMLInputElement>getEl('settings-riseset')).checked;
+  if (isRiseSetChecked) {
+    satellite.isRiseSetLookangles = true;
+  } else {
+    satellite.isRiseSetLookangles = false;
+  }
+  refreshLookanglesData();
+};
+
+export const uiManagerFinal = () => {
+  const { satellite, uiManager } = keepTrackApi.programs;
+
+  getEl('lookanglesLength').addEventListener('change', function () {
+    satellite.lookanglesLength = parseInt(<string>(<HTMLInputElement>getEl('lookanglesLength')).value);
+    refreshLookanglesData();
   });
 
-  $('#lookanglesInterval').on('change', function () {
-    satellite.lookanglesInterval = parseInt(<string>(<HTMLInputElement>document.getElementById('lookanglesInterval')).value);
+  getEl('lookanglesInterval').addEventListener('change', function () {
+    satellite.lookanglesInterval = parseInt(<string>(<HTMLInputElement>getEl('lookanglesInterval')).value);
+    refreshLookanglesData();
   });
 
-  document.getElementById('sensor-list-content').addEventListener('click', (e: any) => {
+  getEl('settings-riseset').addEventListener('change', settingsRisesetChange);
+
+  getEl('sensor-list-content').addEventListener('click', (e: any) => {
     if (!e.target.classList.contains('menu-selectable')) return
     if (e.target.id === 'reset-sensor-button') return;
     const sensorClick = e.target.dataset.sensor;
@@ -462,15 +489,21 @@ export const uiManagerInit = () => {
   });
 
 
-  $('#customSensor').on('submit', (e: Event) => {
+  getEl('customSensor').addEventListener('submit', (e: Event) => {
     e.preventDefault();
   });
 
-  document.getElementById('reset-sensor-button').addEventListener('click', resetSensorButtonClick);
-  document.getElementById('cs-telescope').addEventListener('click', csTelescopeClick);
-  document.getElementById('cs-submit').addEventListener('click', customSensorSubmit);
-  document.getElementById('cs-clear').addEventListener('click', clearCustomSensors);
-  document.getElementById('cs-geolocation').addEventListener('click', uiManager.useCurrentGeolocationAsSensor);
+  clickAndDragWidth(getEl('sensor-list-menu'), {minWidth: 280, maxWidth: 450});
+  clickAndDragWidth(getEl('sensor-info-menu'), {minWidth: 280, maxWidth: 450});
+  clickAndDragWidth(getEl('customSensor-menu'), {minWidth: 280, maxWidth: 450});
+  clickAndDragWidth(getEl('lookangles-menu'), {minWidth: 280, maxWidth: 450});
+  clickAndDragWidth(getEl('lookanglesmultisite-menu'), {minWidth: 280, maxWidth: 450});
+
+  getEl('reset-sensor-button').addEventListener('click', resetSensorButtonClick);
+  getEl('cs-telescope').addEventListener('click', csTelescopeClick);
+  getEl('cs-submit').addEventListener('click', customSensorSubmit);
+  getEl('cs-clear').addEventListener('click', clearCustomSensors);
+  getEl('cs-geolocation').addEventListener('click', uiManager.useCurrentGeolocationAsSensor);
 };
 
 export const resetSensorSelected = () => {
@@ -494,18 +527,18 @@ export const resetSensorSelected = () => {
   });
   settingsManager.isFOVBubbleModeOn = false;
   settingsManager.isShowSurvFence = false;
-  document.getElementById('menu-sensor-info').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-fov-bubble').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-surveillance').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-lookangles').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-planetarium').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-astronomy').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-sensor-info').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-fov-bubble').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-surveillance').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-lookangles').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-planetarium').classList.add('bmenu-item-disabled');
-  document.getElementById('menu-astronomy').classList.add('bmenu-item-disabled');
+  getEl('menu-sensor-info')?.classList.remove('bmenu-item-selected');
+  getEl('menu-fov-bubble')?.classList.remove('bmenu-item-selected');
+  getEl('menu-surveillance')?.classList.remove('bmenu-item-selected');
+  getEl('menu-lookangles')?.classList.remove('bmenu-item-selected');
+  getEl('menu-planetarium')?.classList.remove('bmenu-item-selected');
+  getEl('menu-astronomy')?.classList.remove('bmenu-item-selected');
+  getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
+  getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');
+  getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
+  getEl('menu-lookangles')?.classList.add('bmenu-item-disabled');
+  getEl('menu-planetarium')?.classList.add('bmenu-item-disabled');
+  getEl('menu-astronomy')?.classList.add('bmenu-item-disabled');
 
   setTimeout(() => {
     satSet.resetSatInView();
@@ -571,9 +604,9 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       } else {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
-        slideInRight(document.getElementById('sensor-list-menu'), 1000);
+        slideInRight(getEl('sensor-list-menu'), 1000);
         isSensorListMenuOpen = true;
-        document.getElementById('menu-sensor-list').classList.add('bmenu-item-selected');
+        getEl('menu-sensor-list')?.classList.add('bmenu-item-selected');
         break;
       }
     case 'menu-sensor-info': // No Keyboard Commands
@@ -581,7 +614,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         // No Sensor Selected
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensorInfoDisabled();
         uiManager.toast(`Select a Sensor First!`, 'caution');
-        shake(document.getElementById('menu-sensor-info'));
+        shake(getEl('menu-sensor-info'));
         break;
       }
       if (isSensorInfoMenuOpen) {
@@ -592,9 +625,9 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
         uiManager.getsensorinfo();
-        slideInRight(document.getElementById('sensor-info-menu'), 1000);
+        slideInRight(getEl('sensor-info-menu'), 1000);
         isSensorInfoMenuOpen = true;
-        document.getElementById('menu-sensor-info').classList.add('bmenu-item-selected');
+        getEl('menu-sensor-info')?.classList.add('bmenu-item-selected');
         break;
       }
     case 'menu-lookangles': // S
@@ -608,17 +641,16 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
           // No Sensor or Satellite Selected
           if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.lookanglesDisabled();
           uiManager.toast(`Select a Satellite First!`, 'caution');
-          shake(document.getElementById('menu-lookangles'));
+          shake(getEl('menu-lookangles'));
           break;
         }
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
         keepTrackApi.programs.sensorManager.isLookanglesMenuOpen = true;
-        $('#loading-screen').fadeIn(1000, () => {
+        showLoading(() => {
           satellite.getlookangles(sat);
-          document.getElementById('menu-lookangles').classList.add('bmenu-item-selected');
-          $('#loading-screen').fadeOut('slow');
-          slideInRight(document.getElementById('lookangles-menu'), 1000);
+          getEl('menu-lookangles')?.classList.add('bmenu-item-selected');
+          slideInRight(getEl('lookangles-menu'), 1000);
         });
         break;
       }
@@ -632,19 +664,18 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
           // No Satellite Selected
           if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.ssnLookanglesDisabled();
           uiManager.toast(`Select a Satellite First!`, 'caution');
-          shake(document.getElementById('menu-lookanglesmultisite'));
+          shake(getEl('menu-lookanglesmultisite'));
           break;
         }
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
         isLookanglesMultiSiteMenuOpen = true;
-        document.getElementById('menu-lookanglesmultisite').classList.add('bmenu-item-selected');
+        getEl('menu-lookanglesmultisite')?.classList.add('bmenu-item-selected');
         if (objectManager.selectedSat !== -1) {
-          $('#loading-screen').fadeIn(1000, () => {
+          showLoading(() => {
             const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
             satellite.getlookanglesMultiSite(sat);
-            $('#loading-screen').fadeOut('slow');
-            slideInRight(document.getElementById('lookanglesmultisite-menu'), 1000);
+            slideInRight(getEl('lookanglesmultisite-menu'), 1000);
           });
         }
         break;
@@ -659,14 +690,14 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         uiManager.hideSideMenus();
 
         if (sensorManager.checkSensorSelected()) {
-          (<HTMLInputElement>document.getElementById('cs-lat')).value = sensorManager.currentSensor[0].lat.toString();
-          (<HTMLInputElement>document.getElementById('cs-lon')).value = sensorManager.currentSensor[0].lon.toString();
-          (<HTMLInputElement>document.getElementById('cs-hei')).value = sensorManager.currentSensor[0].alt.toString();
+          (<HTMLInputElement>getEl('cs-lat')).value = sensorManager.currentSensor[0].lat.toString();
+          (<HTMLInputElement>getEl('cs-lon')).value = sensorManager.currentSensor[0].lon.toString();
+          (<HTMLInputElement>getEl('cs-hei')).value = sensorManager.currentSensor[0].alt.toString();
         }
 
-        slideInRight(document.getElementById('customSensor-menu'), 1000);
+        slideInRight(getEl('customSensor-menu'), 1000);
         keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
-        document.getElementById('menu-customSensor').classList.add('bmenu-item-selected');
+        getEl('menu-customSensor')?.classList.add('bmenu-item-selected');
         break;
       }
   }
@@ -682,6 +713,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'sensor',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'sensor',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript
@@ -702,25 +739,16 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'sensor',
     cb: hideSideMenus,
-  });
-
-  (<any>$('#sensor-list-menu')).resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 400,
-    minWidth: 280,
-  });
+  });  
 };
 
 export const selectSatData = () => {
   const { satSet } = keepTrackApi.programs;
   if (!sensorLinks) {
-    $('#sat-info-top-links').append(keepTrackApi.html`
+    getEl('sat-info-top-links').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="sensors-in-fov-link" class="link sat-infobox-links">Show All Sensors with FOV...</div>
-      `);
-    document.getElementById('sensors-in-fov-link').addEventListener('click', () => {
+      `));
+    getEl('sensors-in-fov-link').addEventListener('click', () => {
       Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
         const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
         const sat = keepTrackApi.programs.satSet.getSat(keepTrackApi.programs.objectManager.selectedSat);
@@ -735,17 +763,17 @@ export const selectSatData = () => {
 };
 
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('customSensor-menu'), 1000);
-  slideOutLeft(document.getElementById('sensor-info-menu'), 1000);
-  slideOutLeft(document.getElementById('sensor-list-menu'), 1000);
-  slideOutLeft(document.getElementById('lookangles-menu'), 1000);
-  slideOutLeft(document.getElementById('lookanglesmultisite-menu'), 1000);
-  slideOutLeft(document.getElementById('customSensor-menu'), 1000);
-  document.getElementById('menu-customSensor').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-sensor-list').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-sensor-info').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-lookangles').classList.remove('bmenu-item-selected');
-  document.getElementById('menu-lookanglesmultisite').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('customSensor-menu'), 1000);
+  slideOutLeft(getEl('sensor-info-menu'), 1000);
+  slideOutLeft(getEl('sensor-list-menu'), 1000);
+  slideOutLeft(getEl('lookangles-menu'), 1000);
+  slideOutLeft(getEl('lookanglesmultisite-menu'), 1000);
+  slideOutLeft(getEl('customSensor-menu'), 1000);
+  getEl('menu-customSensor')?.classList.remove('bmenu-item-selected');
+  getEl('menu-sensor-list')?.classList.remove('bmenu-item-selected');
+  getEl('menu-sensor-info')?.classList.remove('bmenu-item-selected');
+  getEl('menu-lookangles')?.classList.remove('bmenu-item-selected');
+  getEl('menu-lookanglesmultisite')?.classList.remove('bmenu-item-selected');
   keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = false;
   isSensorListMenuOpen = false;
   isSensorInfoMenuOpen = false;
@@ -760,25 +788,25 @@ export const addCustomSensor = (sensor: SensorObject): SensorObject[] => {
 
 export const customSensorSubmit = (): void => {
   const { mainCamera, timeManager } = keepTrackApi.programs;
-  document.getElementById('menu-sensor-info').classList.remove('bmenu-item-disabled');
-  document.getElementById('menu-fov-bubble').classList.remove('bmenu-item-disabled');
-  document.getElementById('menu-surveillance').classList.remove('bmenu-item-disabled');
-  document.getElementById('menu-planetarium').classList.remove('bmenu-item-disabled');
-  document.getElementById('menu-astronomy').classList.remove('bmenu-item-disabled');
-  (<HTMLInputElement>document.getElementById('sensor-type')).value = ((<HTMLInputElement>document.getElementById('cs-type')).value).replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
-  $('#sensor-info-title').html('Custom Sensor');
-  $('#sensor-country').html('Custom Sensor');
+  getEl('menu-sensor-info')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-fov-bubble')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-surveillance')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-planetarium')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-astronomy')?.classList.remove('bmenu-item-disabled');
+  (<HTMLInputElement>getEl('sensor-type')).value = ((<HTMLInputElement>getEl('cs-type')).value).replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
+  getEl('sensor-info-title').innerHTML = ('Custom Sensor');
+  getEl('sensor-country').innerHTML = ('Custom Sensor');
 
-  const lon = parseFloat(<string>(<HTMLInputElement>document.getElementById('cs-lon')).value);
-  const lat = parseFloat(<string>(<HTMLInputElement>document.getElementById('cs-lat')).value);
-  const alt = (<HTMLInputElement>document.getElementById('cs-hei')).value;
-  const sensorType = (<HTMLInputElement>document.getElementById('cs-type')).value;
-  const minaz = (<HTMLInputElement>document.getElementById('cs-minaz')).value;
-  const maxaz = (<HTMLInputElement>document.getElementById('cs-maxaz')).value;
-  const minel = (<HTMLInputElement>document.getElementById('cs-minel')).value;
-  const maxel = (<HTMLInputElement>document.getElementById('cs-maxel')).value;
-  const minrange = (<HTMLInputElement>document.getElementById('cs-minrange')).value;
-  const maxrange = (<HTMLInputElement>document.getElementById('cs-maxrange')).value;
+  const lon = parseFloat(<string>(<HTMLInputElement>getEl('cs-lon')).value);
+  const lat = parseFloat(<string>(<HTMLInputElement>getEl('cs-lat')).value);
+  const alt = (<HTMLInputElement>getEl('cs-hei')).value;
+  const sensorType = (<HTMLInputElement>getEl('cs-type')).value;
+  const minaz = (<HTMLInputElement>getEl('cs-minaz')).value;
+  const maxaz = (<HTMLInputElement>getEl('cs-maxaz')).value;
+  const minel = (<HTMLInputElement>getEl('cs-minel')).value;
+  const maxel = (<HTMLInputElement>getEl('cs-maxel')).value;
+  const minrange = (<HTMLInputElement>getEl('cs-minrange')).value;
+  const maxrange = (<HTMLInputElement>getEl('cs-maxrange')).value;
 
   addCustomSensor(<SensorObject><unknown>{
       lat,

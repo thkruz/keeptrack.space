@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { rgbCss } from '@app/js/lib/helpers';
+import { getEl, rgbCss } from '@app/js/lib/helpers';
 
 const timeMachineMenuDiv = keepTrackApi.html`
 <div id="time-machine-menu">
@@ -17,7 +17,7 @@ const timeMachineMenuDiv = keepTrackApi.html`
       1980s
     </li>
     <li class="legend-trusat">
-      <div class="Square-Box legend-trusat-box"></div>
+      <div class="Square-Box legend-pink-box"></div>
       1990s
     </li>
     <li>
@@ -46,7 +46,7 @@ const defaultDiv = keepTrackApi.html`
     Debris
   </li>
   <li class="legend-trusat">
-    <div class="Square-Box legend-trusat-box"></div>
+    <div class="Square-Box legend-pink-box"></div>
     Special Sats
   </li>
   <li>
@@ -74,7 +74,7 @@ const planetariumDiv = keepTrackApi.html`
     Debris
   </li>
   <li>
-    <div class="Square-Box legend-trusat-box"></div>
+    <div class="Square-Box legend-pink-box"></div>
     Special Sats
   </li>
 </ul>
@@ -130,7 +130,7 @@ const defaultSensorDiv = keepTrackApi.html`
     Debris
   </li>
   <li>
-    <div class="Square-Box legend-trusat-box"></div>
+    <div class="Square-Box legend-pink-box"></div>
     Special Sats
   </li>
   <li>
@@ -271,7 +271,7 @@ const countriesDiv = keepTrackApi.html`
 
 export const legendMenuChange = (menu: string) => {
   const { objectManager, sensorManager, colorSchemeManager } = keepTrackApi.programs;
-  const legendHoverDom = document.getElementById('legend-hover-menu');
+  const legendHoverDom = getEl('legend-hover-menu');
 
   switch (menu) {
     case 'rcs':
@@ -333,7 +333,7 @@ export const legendMenuChange = (menu: string) => {
       '.legend-facility-box',
       '.legend-missile-box',
       '.legend-missileInview-box',
-      '.legend-trusat-box',
+      '.legend-pink-box',
       '.legend-inFOV-box',
       '.legend-inviewAlt-box',
       '.legend-starLow-box',
@@ -361,7 +361,7 @@ export const legendMenuChange = (menu: string) => {
     ].forEach((selector) => {
       const element = <HTMLElement>document.querySelector(selector);
       if (element) {
-        element.style.background = settingsManager.colors[selector.split('-')[1]].toString();
+        element.style.background = settingsManager.colors[selector.split('-')[1]]?.toString();
       }
       colorSchemeManager.objectTypeFlags[selector.split('-')[1]] = true;
     });
@@ -385,10 +385,10 @@ export const legendColorsChange = function (): void {
 
   try {
     if (settingsManager.trusatMode || settingsManager.isExtraSatellitesAdded) {
-      (<HTMLElement>document.querySelector('.legend-trusat-box')).style.background = rgbCss(settingsManager.colors.trusat);
+      (<HTMLElement>document.querySelector('.legend-pink-box')).style.background = rgbCss(settingsManager.colors.trusat);
     } else {
       try {
-        document.querySelectorAll('.legend-trusat-box').forEach((element) => {
+        document.querySelectorAll('.legend-pink-box').forEach((element) => {
           (<HTMLElement>element).style.display = 'none';
         });
       } catch {

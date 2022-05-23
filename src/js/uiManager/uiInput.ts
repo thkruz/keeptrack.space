@@ -4,6 +4,7 @@ import { Camera, UiInputInterface } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import * as glm from '../lib/external/gl-matrix.js';
+import { closeColorbox, getEl, showLoading } from '../lib/helpers';
 
 type LatLon = {
   lat: number;
@@ -25,7 +26,7 @@ let latLon: LatLon;
 export const init = (): void => { // NOSONAR
   const { uiManager, mainCamera } = keepTrackApi.programs;
 
-  $('#rmb-wrapper').append(keepTrackApi.html`    
+  getEl('rmb-wrapper').insertAdjacentHTML('beforeend', (keepTrackApi.html`    
       <div id="right-btn-menu" class="right-btn-menu">
         <ul id="right-btn-menu-ul" class='dropdown-contents'>          
           <li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>
@@ -35,19 +36,19 @@ export const init = (): void => { // NOSONAR
           <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>          
         </ul>
       </div> 
-    `);
+      `));
 
   // Append any other menus before putting the reset/clear options
   keepTrackApi.methods.rightBtnMenuAdd();
 
   // Now add the reset/clear options
-  $('#right-btn-menu-ul').append(keepTrackApi.html`
+  getEl('right-btn-menu-ul').insertAdjacentHTML('beforeend', (keepTrackApi.html`
       <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
       <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
       <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
-    `);
+      `));
 
-  $('#rmb-wrapper').append(keepTrackApi.html`    
+  getEl('rmb-wrapper').insertAdjacentHTML('beforeend', (keepTrackApi.html`    
       <div id="view-rmb-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
           <li id="view-info-rmb"><a href="#">Earth Info</a></li>
@@ -90,7 +91,7 @@ export const init = (): void => { // NOSONAR
           <li id="earth-political-rmb"><a href="#">Political Map</a></li>
         </ul>
       </div>
-    `);
+    `));
 
   const bodyDOM = $('#bodyDOM');
   const canvasDOM = $('#keeptrack-canvas');
@@ -297,9 +298,7 @@ export const init = (): void => { // NOSONAR
         }
         rightBtnMenuDOM.hide();
         uiManager.clearRMBSubMenu();
-        if ($('#colorbox').css('display') === 'block') {
-          (<any>$).colorbox.close(); // Close colorbox if it was open
-        }
+        closeColorbox();
       };
       canvasDOM.on('click', function (evt: any) {
         uiInput.canvasClick(evt);
@@ -319,13 +318,13 @@ export const init = (): void => { // NOSONAR
       canvasTouchEnd(mainCamera);
     });
 
-    document.getElementById('nav-wrapper').addEventListener('click', function () {
+    getEl('nav-wrapper').addEventListener('click', function () {
       hidePopUps();
     });
-    document.getElementById('nav-footer').addEventListener('click', function () {
+    getEl('nav-footer').addEventListener('click', function () {
       hidePopUps();
     });
-    document.getElementById('ui-wrapper').addEventListener('click', function () {
+    getEl('ui-wrapper').addEventListener('click', function () {
       hidePopUps();
     });
 
@@ -635,47 +634,46 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       break;
     case 'view-24dops-rmb':
       if (!isDOPMenuOpen) {
-        (<HTMLInputElement>document.getElementById('dops-lat')).value = latLon.lat.toFixed(3);
-        (<HTMLInputElement>document.getElementById('dops-lon')).value = latLon.lon.toFixed(3);
-        (<HTMLInputElement>document.getElementById('dops-alt')).value = '0';
-        (<HTMLInputElement>document.getElementById('dops-el')).value = settingsManager.gpsElevationMask.toString();
+        (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
+        (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
+        (<HTMLInputElement>getEl('dops-alt')).value = '0';
+        (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
         uiManager.bottomIconPress({
           currentTarget: { id: 'menu-dops' },
         });
         isDOPMenuOpen = true;
       } else {
-        $('#loading-screen').fadeIn(1000, function () {
-          (<HTMLInputElement>document.getElementById('dops-lat')).value = latLon.lat.toFixed(3);
-          (<HTMLInputElement>document.getElementById('dops-lon')).value = latLon.lon.toFixed(3);
-          (<HTMLInputElement>document.getElementById('dops-alt')).value = '0';
-          (<HTMLInputElement>document.getElementById('dops-el')).value = settingsManager.gpsElevationMask.toString();
-          const lat: number = parseFloat(<string>(<HTMLInputElement>document.getElementById('dops-lat')).value);
-          const lon: number = parseFloat(<string>(<HTMLInputElement>document.getElementById('dops-lon')).value);
-          const alt: number = parseFloat(<string>(<HTMLInputElement>document.getElementById('dops-alt')).value);
+        showLoading(() => {        
+          (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
+          (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
+          (<HTMLInputElement>getEl('dops-alt')).value = '0';
+          (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
+          const lat: number = parseFloat(<string>(<HTMLInputElement>getEl('dops-lat')).value);
+          const lon: number = parseFloat(<string>(<HTMLInputElement>getEl('dops-lon')).value);
+          const alt: number = parseFloat(<string>(<HTMLInputElement>getEl('dops-alt')).value);
           satellite.updateDopsTable(lat, lon, alt);
-          document.getElementById('menu-dops').classList.add('bmenu-item-selected');
-          $('#loading-screen').fadeOut('slow');
-          (<any>$('#dops-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+          getEl('menu-dops').classList.add('bmenu-item-selected');          
+          (<any>$('#dops-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);        
         });
       }
       break;
     case 'create-sensor-rmb':
       (<any>$('#customSensor-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      document.getElementById('menu-customSensor').classList.add('bmenu-item-selected');
+      getEl('menu-customSensor').classList.add('bmenu-item-selected');
       keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
       if ($('#cs-telescope').prop('checked')) {
         $('#cs-telescope').trigger('click');
       }
-      (<HTMLInputElement>document.getElementById('cs-lat')).value = latLon.lat.toString();
-      (<HTMLInputElement>document.getElementById('cs-lon')).value = latLon.lon.toString();
-      (<HTMLInputElement>document.getElementById('cs-hei')).value = '0';
-      (<HTMLInputElement>document.getElementById('cs-type')).value = 'Phased Array Radar';
-      (<HTMLInputElement>document.getElementById('cs-minaz')).value = '0';
-      (<HTMLInputElement>document.getElementById('cs-maxaz')).value = '360';
-      (<HTMLInputElement>document.getElementById('cs-minel')).value = '10';
-      (<HTMLInputElement>document.getElementById('cs-maxel')).value = '90';
-      (<HTMLInputElement>document.getElementById('cs-minrange')).value = '0';
-      (<HTMLInputElement>document.getElementById('cs-maxrange')).value = "5556";
+      (<HTMLInputElement>getEl('cs-lat')).value = latLon.lat.toString();
+      (<HTMLInputElement>getEl('cs-lon')).value = latLon.lon.toString();
+      (<HTMLInputElement>getEl('cs-hei')).value = '0';
+      (<HTMLInputElement>getEl('cs-type')).value = 'Phased Array Radar';
+      (<HTMLInputElement>getEl('cs-minaz')).value = '0';
+      (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
+      (<HTMLInputElement>getEl('cs-minel')).value = '10';
+      (<HTMLInputElement>getEl('cs-maxel')).value = '90';
+      (<HTMLInputElement>getEl('cs-minrange')).value = '0';
+      (<HTMLInputElement>getEl('cs-maxrange')).value = "5556";
       $('#customSensor').trigger('submit');
 
       uiManager.legendMenuChange('default');
@@ -720,15 +718,15 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       break;
     case 'create-observer-rmb':
       (<any>$('#customSensor-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      document.getElementById('menu-customSensor').classList.add('bmenu-item-selected');
+      getEl('menu-customSensor').classList.add('bmenu-item-selected');
       keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
       if (!$('#cs-telescope').prop('checked')) {
         $('#cs-telescope').trigger('click');
       }
-      (<HTMLInputElement>document.getElementById('cs-lat')).value = latLon.lat.toString();
-      (<HTMLInputElement>document.getElementById('cs-lon')).value = latLon.lon.toString();
-      (<HTMLInputElement>document.getElementById('cs-hei')).value = '0';
-      (<HTMLInputElement>document.getElementById('cs-type')).value = 'Observer';
+      (<HTMLInputElement>getEl('cs-lat')).value = latLon.lat.toString();
+      (<HTMLInputElement>getEl('cs-lon')).value = latLon.lon.toString();
+      (<HTMLInputElement>getEl('cs-hei')).value = '0';
+      (<HTMLInputElement>getEl('cs-type')).value = 'Observer';
       $('#customSensor').trigger('submit');
       uiManager.legendMenuChange('sunlight');
       satSet.setColorScheme(colorSchemeManager.sunlight, true);
@@ -840,7 +838,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       drawManager.sceneManager.earth.loadHiResNight();
       break;
     case 'earth-high-rmb':
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         settingsManager.blueImages = false;
         settingsManager.nasaImages = false;
         settingsManager.trusatImages = false;
@@ -857,11 +855,10 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
         drawManager.sceneManager.earth.init(gl);
         drawManager.sceneManager.earth.loadHiRes();
         drawManager.sceneManager.earth.loadHiResNight();
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'earth-high-no-clouds-rmb':
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         settingsManager.blueImages = false;
         settingsManager.nasaImages = false;
         settingsManager.trusatImages = false;
@@ -878,7 +875,6 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
         drawManager.sceneManager.earth.init(gl);
         drawManager.sceneManager.earth.loadHiRes();
         drawManager.sceneManager.earth.loadHiResNight();
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'earth-vec-rmb':
@@ -939,7 +935,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       break;
   }
 
-  document.getElementById('right-btn-menu').style.display = 'none';
+  getEl('right-btn-menu').style.display = 'none';
   uiManager.clearRMBSubMenu();
 };
 
@@ -1208,43 +1204,43 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
   const satHoverBoxDOM = $('#sat-hoverbox');
 
   let numMenuItems = 0;
-  document.getElementById('clear-lines-rmb').style.display = 'none';
+  getEl('clear-lines-rmb').style.display = 'none';
 
   // View
-  document.getElementById('view-info-rmb').style.display = 'none';
-  document.getElementById('view-sensor-info-rmb').style.display = 'none';
-  document.getElementById('view-sat-info-rmb').style.display = 'none';
-  document.getElementById('view-related-sats-rmb').style.display = 'none';
-  document.getElementById('view-curdops-rmb').style.display = 'none';
-  document.getElementById('view-24dops-rmb').style.display = 'none';
+  getEl('view-info-rmb').style.display = 'none';
+  getEl('view-sensor-info-rmb').style.display = 'none';
+  getEl('view-sat-info-rmb').style.display = 'none';
+  getEl('view-related-sats-rmb').style.display = 'none';
+  getEl('view-curdops-rmb').style.display = 'none';
+  getEl('view-24dops-rmb').style.display = 'none';
 
   // Edit
-  document.getElementById('edit-sat-rmb').style.display = 'none';
-  document.getElementById('set-sec-sat-rmb').style.display = 'none';
+  getEl('edit-sat-rmb').style.display = 'none';
+  getEl('set-sec-sat-rmb').style.display = 'none';
 
   // Create
-  document.getElementById('create-observer-rmb').style.display = 'none';
-  document.getElementById('create-sensor-rmb').style.display = 'none';
+  getEl('create-observer-rmb').style.display = 'none';
+  getEl('create-sensor-rmb').style.display = 'none';
 
   // Draw
-  document.getElementById('line-eci-axis-rmb').style.display = 'none';
-  document.getElementById('line-sensor-sat-rmb').style.display = 'none';
-  document.getElementById('line-earth-sat-rmb').style.display = 'none';
-  document.getElementById('line-sat-sat-rmb').style.display = 'none';
-  document.getElementById('line-sat-sun-rmb').style.display = 'none';
+  getEl('line-eci-axis-rmb').style.display = 'none';
+  getEl('line-sensor-sat-rmb').style.display = 'none';
+  getEl('line-earth-sat-rmb').style.display = 'none';
+  getEl('line-sat-sat-rmb').style.display = 'none';
+  getEl('line-sat-sun-rmb').style.display = 'none';
 
   // Earth
-  const earthLowRmb = document.getElementById('earth-low-rmb')
+  const earthLowRmb = getEl('earth-low-rmb')
   if (earthLowRmb) earthLowRmb.style.display = 'none';
-  const earthHighRmb = document.getElementById('earth-high-rmb')
+  const earthHighRmb = getEl('earth-high-rmb')
   if (earthHighRmb) earthHighRmb.style.display = 'none';
-  const earthVecRmb = document.getElementById('earth-vec-rmb')
+  const earthVecRmb = getEl('earth-vec-rmb')
   if (earthVecRmb) earthVecRmb.style.display = 'none';
-  const earthPoliticalRmb = document.getElementById('earth-political-rmb')
+  const earthPoliticalRmb = getEl('earth-political-rmb')
   if (earthPoliticalRmb) earthPoliticalRmb.style.display = 'none';
 
   // Reset Camera
-  // document.getElementById('reset-camera-rmb').style.display = 'none';
+  // getEl('reset-camera-rmb').style.display = 'none';
   // Colors Always Present
   let isViewDOM = false;
   const isCreateDOM = false;
@@ -1259,7 +1255,7 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
   rightBtnEarthDOM.hide();
 
   if (lineManager.getLineListLen() > 0) {
-    document.getElementById('clear-lines-rmb').style.display = 'block';
+    getEl('clear-lines-rmb').style.display = 'block';
   }
 
   if (uiInput.mouseSat !== -1 || testmouseSat !== -1) {
@@ -1273,7 +1269,7 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
     }
 
     if (sat.type === SpaceObjectType.PAYLOAD || sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS || sat.type === SpaceObjectType.SPECIAL) {
-      document.getElementById('set-sec-sat-rmb').style.display = 'block';
+      getEl('set-sec-sat-rmb').style.display = 'block';
       rightBtnEditDOM.show();
       numMenuItems++;
     } else if (!sat.static) {
@@ -1281,18 +1277,18 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
     }
 
     if (!sat.static) {
-      document.getElementById('edit-sat-rmb').style.display = 'block';
+      getEl('edit-sat-rmb').style.display = 'block';
       rightBtnEditDOM.show();
 
-      document.getElementById('view-sat-info-rmb').style.display = 'block';
-      document.getElementById('view-related-sats-rmb').style.display = 'block';
+      getEl('view-sat-info-rmb').style.display = 'block';
+      getEl('view-related-sats-rmb').style.display = 'block';
 
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && sensorManager.whichRadar !== 'CUSTOM') {
-        document.getElementById('line-sensor-sat-rmb').style.display = 'block';
+        getEl('line-sensor-sat-rmb').style.display = 'block';
       }
-      document.getElementById('line-earth-sat-rmb').style.display = 'block';
-      document.getElementById('line-sat-sat-rmb').style.display = 'block';
-      document.getElementById('line-sat-sun-rmb').style.display = 'block';
+      getEl('line-earth-sat-rmb').style.display = 'block';
+      getEl('line-sat-sat-rmb').style.display = 'block';
+      getEl('line-sat-sun-rmb').style.display = 'block';
       rightBtnDrawDOM.show();
       isDrawDOM = true;
       numMenuItems++;
@@ -1302,7 +1298,7 @@ export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
         case SpaceObjectType.OPTICAL:
         case SpaceObjectType.MECHANICAL:
         case SpaceObjectType.GROUND_SENSOR_STATION:
-          document.getElementById('view-sensor-info-rmb').style.display = 'block';
+          getEl('view-sensor-info-rmb').style.display = 'block';
           break;
         default:
       }
@@ -1344,9 +1340,6 @@ export const hidePopUps = () => {
   const rightBtnMenuDOM = $('#right-btn-menu');
   rightBtnMenuDOM.hide();
   uiManager.clearRMBSubMenu();
-  if ($('#colorbox').css('display') === 'block') {
-    (<any>$).colorbox.close(); // Close colorbox if it was open
-  }
 };
 
 // *********************************************************************************************************************
@@ -1530,48 +1523,48 @@ export const earthClicked = ({ isViewDOM, rightBtnViewDOM, numMenuItems, isCreat
     rightBtnViewDOM.show();
     ++numMenuItems;
   }
-  document.getElementById('view-info-rmb').style.display = 'block';
-  document.getElementById('view-curdops-rmb').style.display = 'block';
-  document.getElementById('view-24dops-rmb').style.display = 'block';
+  getEl('view-info-rmb').style.display = 'block';
+  getEl('view-curdops-rmb').style.display = 'block';
+  getEl('view-24dops-rmb').style.display = 'block';
 
   if (!isCreateDOM) {
     rightBtnCreateDOM.show();
     ++numMenuItems;
   }
-  document.getElementById('create-observer-rmb').style.display = 'block';
-  document.getElementById('create-sensor-rmb').style.display = 'block';
+  getEl('create-observer-rmb').style.display = 'block';
+  getEl('create-sensor-rmb').style.display = 'block';
 
   if (!isDrawDOM) {
     rightBtnDrawDOM.show();
     ++numMenuItems;
   }
-  document.getElementById('line-eci-axis-rmb').style.display = 'block';
+  getEl('line-eci-axis-rmb').style.display = 'block';
 
   if (!isEarthDOM) {
     rightBtnEarthDOM.show();
     ++numMenuItems;
   }
 
-  document.getElementById('earth-nasa-rmb').style.display = 'block';
-  document.getElementById('earth-blue-rmb').style.display = 'block';
-  document.getElementById('earth-low-rmb').style.display = 'block';
-  document.getElementById('earth-high-no-clouds-rmb').style.display = 'block';
-  document.getElementById('earth-vec-rmb').style.display = 'block';
-  document.getElementById('earth-political-rmb').style.display = 'block';
+  getEl('earth-nasa-rmb').style.display = 'block';
+  getEl('earth-blue-rmb').style.display = 'block';
+  getEl('earth-low-rmb').style.display = 'block';
+  getEl('earth-high-no-clouds-rmb').style.display = 'block';
+  getEl('earth-vec-rmb').style.display = 'block';
+  getEl('earth-political-rmb').style.display = 'block';
   if (settingsManager.nasaImages)
-    document.getElementById('earth-nasa-rmb').style.display = 'none';
+    getEl('earth-nasa-rmb').style.display = 'none';
   if (settingsManager.trusatImages)
-    document.getElementById('earth-trusat-rmb').style.display = 'none';
+    getEl('earth-trusat-rmb').style.display = 'none';
   if (settingsManager.blueImages)
-    document.getElementById('earth-blue-rmb').style.display = 'none';
+    getEl('earth-blue-rmb').style.display = 'none';
   if (settingsManager.lowresImages)
-    document.getElementById('earth-low-rmb').style.display = 'none';
+    getEl('earth-low-rmb').style.display = 'none';
   if (settingsManager.hiresNoCloudsImages)
-    document.getElementById('earth-high-no-clouds-rmb').style.display = 'none';
+    getEl('earth-high-no-clouds-rmb').style.display = 'none';
   if (settingsManager.vectorImages)
-    document.getElementById('earth-vec-rmb').style.display = 'none';
+    getEl('earth-vec-rmb').style.display = 'none';
   if (settingsManager.politicalImages)
-    document.getElementById('earth-political-rmb').style.display = 'none';
+    getEl('earth-political-rmb').style.display = 'none';
 
   rightBtnSaveDOM.hide();
   return numMenuItems;

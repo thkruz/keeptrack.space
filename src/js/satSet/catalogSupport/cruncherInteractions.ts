@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatCruncherMessage } from '@app/js/api/keepTrackTypes';
+import { getEl } from '@app/js/lib/helpers';
 
 export const cruncherExtraData = (m: SatCruncherMessage) => {
   if (!m.data?.extraData) throw new Error('extraData required!');
@@ -131,10 +132,10 @@ export const getVariableActions = (params: string[]) => { // NOSONAR
         break;
       case 'misl':
         var subVal = val.split(',');
-        (<HTMLSelectElement>document.getElementById('ms-type')).value = (subVal[0].toString());
-        (<HTMLSelectElement>document.getElementById('ms-attacker')).value = (subVal[1].toString());
-        (<HTMLSelectElement>document.getElementById('ms-target')).value = (subVal[2].toString());
-        (<HTMLButtonElement>document.getElementById('missile')).click();
+        (<HTMLSelectElement>getEl('ms-type')).value = (subVal[0].toString());
+        (<HTMLSelectElement>getEl('ms-attacker')).value = (subVal[1].toString());
+        (<HTMLSelectElement>getEl('ms-target')).value = (subVal[2].toString());
+        (<HTMLButtonElement>getEl('missile')).click();
         break;
       case 'date':
         if (isNaN(parseInt(val))) {

@@ -23,13 +23,12 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
-import '@app/js/lib/external/jquery.colorbox.min.js';
 import '@app/js/lib/external/colorPick.js';
 import '@materializecss/materialize';
 // eslint-disable-next-line sort-imports
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { drawManager } from '@app/js/drawManager/drawManager';
-import { rgbCss } from '@app/js/lib/helpers';
+import { clickAndDragHeight, closeColorbox, getEl, rgbCss } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobileManager';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import $ from 'jquery';
@@ -57,7 +56,7 @@ export const init = () => {
     cb: updateSelectBox,
   });
 
-  if (settingsManager.isShowLogo) document.getElementById('demo-logo').classList.remove('start-hidden');
+  if (settingsManager.isShowLogo) getEl('demo-logo').classList.remove('start-hidden');
 
   keepTrackApi.methods.uiManagerInit();
 
@@ -79,8 +78,8 @@ export const postStart = () => {
   (function _httpsCheck() {
     if (location.protocol !== 'https:') {
       try {
-        document.getElementById('cs-geolocation').style.display = 'none';
-        document.getElementById('geolocation-btn').style.display = 'none';
+        getEl('cs-geolocation').style.display = 'none';
+        getEl('geolocation-btn').style.display = 'none';
       } catch {
         // Intended to catch errors when the page is not loaded yet
       }
@@ -100,7 +99,7 @@ export const postStart = () => {
           <span id="sat-hoverbox3"></span>
         </div>`;
 
-      document.getElementById('keeptrack-canvas').parentElement.append(hoverboxDOM);
+      getEl('keeptrack-canvas').parentElement.append(hoverboxDOM);
     } catch {
       /* istanbul ignore next */
       console.debug('document.createElement() failed!');
@@ -109,14 +108,14 @@ export const postStart = () => {
 };
 export const hideUi = () => {
   if (uiManager.isUiVisible) {
-    document.getElementById('header').style.display = 'none';
-    document.getElementById('ui-wrapper').style.display = 'none';
-    document.getElementById('nav-footer').style.display = 'none';
+    getEl('header').style.display = 'none';
+    getEl('ui-wrapper').style.display = 'none';
+    getEl('nav-footer').style.display = 'none';
     uiManager.isUiVisible = false;
   } else {
-    document.getElementById('header').style.display = 'block';
-    document.getElementById('ui-wrapper').style.display = 'block';
-    document.getElementById('nav-footer').style.display = 'block';
+    getEl('header').style.display = 'block';
+    getEl('ui-wrapper').style.display = 'block';
+    getEl('nav-footer').style.display = 'block';
     uiManager.isUiVisible = true;
   }
 };
@@ -141,22 +140,22 @@ export const updateSelectBox = () => {
 export const footerToggle = function () {
   if (isFooterShown) {
     isFooterShown = false;
-    document.getElementById('sat-infobox').classList.add('sat-infobox-fullsize');
-    document.getElementById('nav-footer').classList.add('footer-slide-trans');
-    document.getElementById('nav-footer').classList.remove('footer-slide-up');
-    document.getElementById('nav-footer').classList.add('footer-slide-down');
+    getEl('sat-infobox')?.classList.add('sat-infobox-fullsize');
+    getEl('nav-footer')?.classList.add('footer-slide-trans');
+    getEl('nav-footer')?.classList.remove('footer-slide-up');
+    getEl('nav-footer')?.classList.add('footer-slide-down');
     $('#nav-footer-toggle').html('&#x25B2;');
   } else {
     isFooterShown = true;
-    document.getElementById('sat-infobox').classList.remove('sat-infobox-fullsize');
-    document.getElementById('nav-footer').classList.add('footer-slide-trans');
-    document.getElementById('nav-footer').classList.remove('footer-slide-down');
-    document.getElementById('nav-footer').classList.add('footer-slide-up');
+    getEl('sat-infobox')?.classList.remove('sat-infobox-fullsize');
+    getEl('nav-footer')?.classList.add('footer-slide-trans');
+    getEl('nav-footer')?.classList.remove('footer-slide-down');
+    getEl('nav-footer')?.classList.add('footer-slide-up');
     $('#nav-footer-toggle').html('&#x25BC;');
   }
   // After 1 second the transition should be complete so lets stop moving slowly
   setTimeout(() => {
-    document.getElementById('nav-footer').classList.remove('footer-slide-trans');
+    getEl('nav-footer')?.classList.remove('footer-slide-trans');
   }, 1000);
 };
 export const getsensorinfo = () => {
@@ -240,13 +239,13 @@ export const onReady = () => {
   })();
 
   uiManager.clearRMBSubMenu = () => {
-    document.getElementById('save-rmb-menu').style.display = 'none';
-    document.getElementById('view-rmb-menu').style.display = 'none';
-    document.getElementById('edit-rmb-menu').style.display = 'none';
-    document.getElementById('create-rmb-menu').style.display = 'none';
-    document.getElementById('colors-rmb-menu').style.display = 'none';
-    document.getElementById('draw-rmb-menu').style.display = 'none';
-    document.getElementById('earth-rmb-menu').style.display = 'none';
+    getEl('save-rmb-menu').style.display = 'none';
+    getEl('view-rmb-menu').style.display = 'none';
+    getEl('edit-rmb-menu').style.display = 'none';
+    getEl('create-rmb-menu').style.display = 'none';
+    getEl('colors-rmb-menu').style.display = 'none';
+    getEl('draw-rmb-menu').style.display = 'none';
+    getEl('earth-rmb-menu').style.display = 'none';
   };
 
   uiManager.menuController = initMenuController;
@@ -254,20 +253,14 @@ export const onReady = () => {
   // Run any plugins code
   keepTrackApi.methods.uiManagerOnReady();
   uiManager.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
-  document.getElementById('bottom-icons').addEventListener('click', function (evt: Event) {
+  getEl('bottom-icons').addEventListener('click', function (evt: Event) {
     // Only if '.bmenu-item' class is clicked
     // if ((<HTMLDivElement>evt.target).classList.contains('bmenu-item')) {
       uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
     // }
   });
   uiManager.hideSideMenus = () => {
-    // Close any open colorboxes
-    try {
-      (<any>$).colorbox.close();
-    } catch {
-      // Intentionally Left Blank (Fails Jest Testing)
-    }
-
+    closeColorbox();
     keepTrackApi.methods.hideSideMenus();
   };
   (<any>$('#bottom-icons')).sortable({ tolerance: 'pointer' });
@@ -341,7 +334,13 @@ export const doSearch = (searchString: string, isPreventDropDown: boolean) => {
   const { satSet } = keepTrackApi.programs;
 
   let idList = searchBox.doSearch(searchString, isPreventDropDown);
-  if (idList.length === 0) return;
+  if (idList.length === 0) {
+    if (settingsManager.lastSearch?.length > settingsManager.minimumSearchCharacters) {
+      toast('No Results Found', 'serious', false);
+    }
+    searchBox.hideResults();
+    return;
+  }
 
   if (settingsManager.isSatOverflyModeOn) {
     satSet.satCruncher.postMessage({
@@ -355,7 +354,7 @@ export const doSearch = (searchString: string, isPreventDropDown: boolean) => {
 };
 export const toast = (toastText: string, type: toastMsgType, isLong: boolean) => {
   let toastMsg = M.toast({
-    html: toastText,
+    text: toastText,
   });
   type = type || 'standby';
   if (isLong) toastMsg.timeRemaining = 100000;
@@ -492,18 +491,18 @@ export const hideLoadingScreen = () => {
   mobileManager.checkMobileMode();
 
   if (settingsManager.isMobileModeEnabled) {
-    document.getElementById('spinner').style.display = 'none';
+    getEl('spinner').style.display = 'none';
     uiManager.loadStr('math');
-    document.getElementById('loading-screen').style.display = 'none';
+    getEl('loading-screen').style.display = 'none';
   } else {
     // Loading Screen Resized and Hidden
     setTimeout(function () {
-      document.getElementById('loading-screen').classList.remove('full-loader');
-      document.getElementById('loading-screen').classList.add('mini-loader-container');
-      document.getElementById('logo-inner-container').classList.add('mini-loader');
-      document.getElementById('logo-text').innerHTML = '';
-      document.getElementById('logo-text-version').innerHTML = '';
-      document.getElementById('loading-screen').style.display = 'none';
+      getEl('loading-screen').classList.remove('full-loader');
+      getEl('loading-screen').classList.add('mini-loader-container');
+      getEl('logo-inner-container').classList.add('mini-loader');
+      getEl('logo-text').innerHTML = '';
+      getEl('logo-text-version').innerHTML = '';
+      getEl('loading-screen').style.display = 'none';
       uiManager.loadStr('math');
     }, 100);
   }
@@ -521,25 +520,25 @@ export const searchToggle = (force?: boolean) => {
 
   if ((!isSearchOpen && !forceClose) || forceOpen) {
     isSearchOpen = true;
-    document.getElementById('search-holder').classList.remove('search-slide-up');
-    document.getElementById('search-holder').classList.add('search-slide-down');
-    document.getElementById('search-icon').classList.add('search-icon-search-on');
-    document.getElementById('fullscreen-icon').classList.add('top-menu-icons-search-on');
-    document.getElementById('tutorial-icon').classList.add('top-menu-icons-search-on');
-    document.getElementById('legend-icon').classList.add('top-menu-icons-search-on');
+    getEl('search-holder').classList.remove('search-slide-up');
+    getEl('search-holder').classList.add('search-slide-down');
+    getEl('search-icon').classList.add('search-icon-search-on');
+    getEl('fullscreen-icon').classList.add('top-menu-icons-search-on');
+    getEl('tutorial-icon').classList.add('top-menu-icons-search-on');
+    getEl('legend-icon').classList.add('top-menu-icons-search-on');
   } else {
     isSearchOpen = false;
-    document.getElementById('search-holder').classList.remove('search-slide-down');
-    document.getElementById('search-holder').classList.add('search-slide-up');
-    document.getElementById('search-icon').classList.remove('search-icon-search-on');
+    getEl('search-holder').classList.remove('search-slide-down');
+    getEl('search-holder').classList.add('search-slide-up');
+    getEl('search-icon').classList.remove('search-icon-search-on');
     setTimeout(function () {
-      document.getElementById('fullscreen-icon').classList.remove('top-menu-icons-search-on');
-      document.getElementById('tutorial-icon').classList.remove('top-menu-icons-search-on');
-      document.getElementById('legend-icon').classList.remove('top-menu-icons-search-on');
+      getEl('fullscreen-icon').classList.remove('top-menu-icons-search-on');
+      getEl('tutorial-icon').classList.remove('top-menu-icons-search-on');
+      getEl('legend-icon').classList.remove('top-menu-icons-search-on');
     }, 500);
     uiManager.hideSideMenus();
     searchBox.hideResults();
-    // document.getElementById('menu-space-stations').classList.remove('bmenu-item-selected');
+    // getEl('menu-space-stations').classList.remove('bmenu-item-selected');
     // This is getting called too much. Not sure what it was meant to prevent?
     // satSet.setColorScheme(colorSchemeManager.default, true);
     // uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
@@ -547,25 +546,16 @@ export const searchToggle = (force?: boolean) => {
 };
 export const initBottomMenuResizing = () => {
   // Allow Resizing the bottom menu
-  const maxHeight = document.getElementById('bottom-icons') !== null ? document.getElementById('bottom-icons').offsetHeight : 0;
-  $('.resizable').resizable({
-    handles: {
-      n: '#footer-handle',
-    },
-    alsoResize: '#bottom-icons-container',
-    // No larger than the stack of icons
-    maxHeight: maxHeight,
-    minHeight: 50,
-    stop: () => {
-      let bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
-      document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
-      if (window.getComputedStyle(document.getElementById('nav-footer')).bottom !== '0px') {
-        document.documentElement.style.setProperty('--bottom-menu-top', '0px');
-      } else {
-        bottomHeight = document.getElementById('bottom-icons-container').offsetHeight;
-        document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
-      }
-    },
+  const maxHeight = getEl('bottom-icons') !== null ? getEl('bottom-icons').offsetHeight : 0;
+  clickAndDragHeight(getEl('bottom-icons-container'), maxHeight, () => {
+    let bottomHeight = getEl('bottom-icons-container').offsetHeight;
+    document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
+    if (window.getComputedStyle(getEl('nav-footer')).bottom !== '0px') {
+      document.documentElement.style.setProperty('--bottom-menu-top', '0px');
+    } else {
+      bottomHeight = getEl('bottom-icons-container').offsetHeight;
+      document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+    }
   });
 };
 

@@ -1,20 +1,19 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
-import $ from 'jquery';
+import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isNewLaunchMenuOpen = false;
 
 export const newLaunchSubmit = () => {
   const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
 
-  const scc = (<HTMLInputElement>document.getElementById('nl-scc')).value;
+  const scc = (<HTMLInputElement>getEl('nl-scc')).value;
   const satId = satSet.getIdFromObjNum(parseInt(scc));
   let sat = satSet.getSat(satId);
 
-  const upOrDown = (<HTMLInputElement>document.getElementById('nl-updown')).value;
-  const launchFac = (<HTMLInputElement>document.getElementById('nl-facility')).value;
+  const upOrDown = (<HTMLInputElement>getEl('nl-updown')).value;
+  const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
   let launchLat, launchLon;
 
   if (objectManager.isLaunchSiteManagerLoaded) {
@@ -32,7 +31,6 @@ export const newLaunchSubmit = () => {
 
   // if (sat.inclination * RAD2DEG < launchLat) {
   //   keepTrackApi.programs.uiManager.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
-  //   $('#loading-screen').fadeOut('slow');
   //   return;
   // }
   // Set time to 0000z for relative time.
@@ -64,11 +62,12 @@ export const newLaunchSubmit = () => {
   } else {
     uiManager.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
   }
-  $('#loading-screen').fadeOut('slow');
 };
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
           <div id="newLaunch-content" class="side-menu">
             <div class="row">
@@ -147,31 +146,30 @@ export const uiManagerInit = () => {
             </div>
           </div>
         </div>
-      `);
-
-  $('#newLaunch').on('submit', function (e: Event) {
-    $('#loading-screen').fadeIn(1000, newLaunchSubmit);
-    e.preventDefault();
-  });
-
-  // Allow resizing of the side menu
-  $('#newLaunch-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+        `
+  );
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-newLaunch" class="bmenu-item bmenu-item-disabled">
           <img alt="rocket" src="" delayedsrc="${rocketPng}" />
           <span class="bmenu-title">New Launch</span>
           <div class="status-icon"></div>
         </div>  
-      `);
+      `
+  );
+};
+
+export const uiManagerFinal = () => {
+  getEl('newLaunch').addEventListener('submit', function (e: Event) {
+    showLoading(newLaunchSubmit);
+    e.preventDefault();
+  });
+
+  // Allow resizing of the side menu
+  clickAndDragWidth(getEl('newLaunch-menu'));
 };
 
 export const bottomMenuClick = (iconName: string): void => {
@@ -186,17 +184,17 @@ export const bottomMenuClick = (iconName: string): void => {
       if (keepTrackApi.programs.objectManager.selectedSat !== -1) {
         if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
         keepTrackApi.programs.uiManager.hideSideMenus();
-        slideInRight(document.getElementById('newLaunch-menu'), 1000);
-        document.getElementById('menu-newLaunch').classList.add('bmenu-item-selected');
+        slideInRight(getEl('newLaunch-menu'), 1000);
+        getEl('menu-newLaunch').classList.add('bmenu-item-selected');
         isNewLaunchMenuOpen = true;
 
         const sat = keepTrackApi.programs.satSet.getSatExtraOnly(keepTrackApi.programs.objectManager.selectedSat);
-        (<HTMLInputElement>document.getElementById('nl-scc')).value = sat.sccNum;
-        (<HTMLInputElement>document.getElementById('nl-inc')).value = (sat.inclination * RAD2DEG).toPrecision(2);
+        (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
+        (<HTMLInputElement>getEl('nl-inc')).value = (sat.inclination * RAD2DEG).toPrecision(2);
       } else {
         aM.adviceList?.newLaunchDisabled();
         keepTrackApi.programs.uiManager.toast(`Select a Satellite First!`, 'caution');
-        shake(document.getElementById('menu-newLaunch'));
+        shake(getEl('menu-newLaunch'));
       }
       return;
     }
@@ -208,6 +206,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'newLaunch',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'newLaunch',
+    cb: uiManagerFinal,
   });
 
   // Add Advice Info
@@ -232,8 +236,8 @@ export const init = (): void => {
 };
 
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('newLaunch-menu'), 1000);
-  document.getElementById('menu-newLaunch').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('newLaunch-menu'), 1000);
+  getEl('menu-newLaunch').classList.remove('bmenu-item-selected');
   isNewLaunchMenuOpen = false;
 };
 

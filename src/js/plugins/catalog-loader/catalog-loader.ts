@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { stringPad } from '@app/js/lib/helpers';
+import { getEl, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 /**
@@ -89,8 +89,8 @@ export const setupGetVariables = () => {
     switch (key) {
       case 'limitSats':
         settingsManager.limitSats = val;
-        (<HTMLInputElement>document.getElementById('limitSats')).value = val;
-        (<HTMLElement>document.getElementById('limitSats-Label')).classList.add('active');
+        (<HTMLInputElement>getEl('limitSats')).value = val;
+        (<HTMLElement>getEl('limitSats-Label')).classList.add('active');
         limitSatsArray = val.split(',');
         break;
       case 'future use':
@@ -264,11 +264,11 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
   }
 
   if (settingsManager.isExtraSatellitesAdded) {
-    (<HTMLElement>document.querySelector('.legend-pink-box')).style.display = 'block';
     try {
-      document.querySelectorAll('.legend-trusat-box').forEach((element) => {
+      (<HTMLElement>document.querySelector('.legend-pink-box')).style.display = 'block';
+      document.querySelectorAll('.legend-pink-box').forEach((element) => {
         element.parentElement.style.display = 'none';
-        element.parentElement.innerHTML = `<div class="Square-Box legend-trusat-box"></div>${settingsManager.nameOfSpecialSats}`;
+        element.parentElement.innerHTML = `<div class="Square-Box legend-pink-box"></div>${settingsManager.nameOfSpecialSats}`;
       });
     } catch (e) {
       // Intentionally Blank

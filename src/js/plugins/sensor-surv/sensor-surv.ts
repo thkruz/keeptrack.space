@@ -26,12 +26,13 @@
 
 import fencePng from '@app/img/icons/fence.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { shake } from '@app/js/lib/helpers';
-import $ from 'jquery';
+import { getEl, shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-surveillance" class="bmenu-item bmenu-item-disabled">
           <img
             alt="fence"
@@ -41,7 +42,8 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Sesnor Fence</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `
+  );
 };
 export const init = (): void => {
   // Add HTML
@@ -64,12 +66,12 @@ export const bottomMenuClick = (iconName: string): void => {
       // No Sensor Selected
       if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.survFenceDisabled();
       uiManager.toast(`Select a Sensor First!`, 'caution');
-      shake(document.getElementById('menu-surveillance'));
+      shake(getEl('menu-surveillance'));
       return;
     }
     if ((<any>settingsManager).isShowSurvFence) {
       (<any>settingsManager).isShowSurvFence = false;
-      document.getElementById('menu-surveillance').classList.remove('bmenu-item-selected');
+      getEl('menu-surveillance').classList.remove('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowSurvFence: 'disable',
         isShowFOVBubble: 'reset',
@@ -78,11 +80,11 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       // Disable Satellite Overfly
       (<any>settingsManager).isSatOverflyModeOn = false;
-      document.getElementById('menu-sat-fov').classList.remove('bmenu-item-selected');
+      getEl('menu-sat-fov').classList.remove('bmenu-item-selected');
 
       (<any>settingsManager).isShowSurvFence = true;
-      document.getElementById('menu-surveillance').classList.add('bmenu-item-selected');
-      document.getElementById('menu-fov-bubble').classList.remove('bmenu-item-selected');
+      getEl('menu-surveillance').classList.add('bmenu-item-selected');
+      getEl('menu-fov-bubble').classList.remove('bmenu-item-selected');
       satSet.satCruncher.postMessage({
         isShowFOVBubble: 'enable',
         isShowSurvFence: 'enable',

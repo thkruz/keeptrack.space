@@ -399,9 +399,18 @@ export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSec
   }
 
   const PlusMinus = a * e;
-  const periapsis = a - PlusMinus - RADIUS_OF_EARTH;
-  const apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
-  const period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
+  let periapsis = a - PlusMinus - RADIUS_OF_EARTH;
+  let apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
+  let period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
+
+  outputU ??= 'm';
+  // We typically use km
+  a = outputU === 'km' ? a / 1000 : a;
+  apoapsis = outputU === 'km' ? apoapsis / 1000 : apoapsis;
+  periapsis = outputU === 'km' ? periapsis / 1000 : periapsis;
+
+  outputU2 ??= 's';
+  period = outputU2 === 'm' ? period / 60 : period;
 
   // toDegrees
   i = RAD2DEG * i;

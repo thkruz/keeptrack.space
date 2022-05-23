@@ -19,7 +19,7 @@ or mirrored at any other location without the express written permission of the 
 import 'jquery-ui-bundle';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { AdviceCounter, AdviceList } from '../api/keepTrackTypes';
-import { shake } from '../lib/helpers';
+import { getEl, shake } from '../lib/helpers';
 
 let isAdviceEnabled = true;
 let helpDOM: HTMLElement;
@@ -75,7 +75,7 @@ export const welcome = (): void => {
   adviceManager.showAdvice(
     'Welcome',
     'Welcome to KeepTrack.Space! This is the advice system. It will offer ideas on how to use the features on this site. You can enable/disable it at anytime in the top right.',
-    document.getElementById('tutorial-icon'),
+    getEl('tutorial-icon'),
     'top-left'
   );
 };
@@ -84,33 +84,28 @@ export const findIss = (): void => {
   if (adviceCount.findIss >= 3) return;
   adviceCount.findIss += 1;
 
-  adviceManager.showAdvice('Space Station', 'Did you know the international space station is object 25544?', document.getElementById('search-holder'), 'top-right');
+  adviceManager.showAdvice('Space Station', 'Did you know the international space station is object 25544?', getEl('search-holder'), 'top-right');
 };
 export const showSensors = (): void => {
   // Only Do this Twice Times
   if (adviceCount.showSensors >= 3) return;
   adviceCount.showSensors += 1;
 
-  adviceManager.showAdvice('Sensor List', 'Have you tried looking at some of the ground-based sensors?', document.getElementById('menu-sensor-list'), 'bottom-left');
+  adviceManager.showAdvice('Sensor List', 'Have you tried looking at some of the ground-based sensors?', getEl('menu-sensor-list'), 'bottom-left');
 };
 export const useLegend = (): void => {
   // Only Do this Twice
   if (adviceCount.useLegend >= 3) return;
   adviceCount.useLegend += 1;
 
-  adviceManager.showAdvice('Filters', "Sometimes it is helpful to filter out satellites you don't want to see right now!", document.getElementById('legend-menu'), 'top-right');
+  adviceManager.showAdvice('Filters', "Sometimes it is helpful to filter out satellites you don't want to see right now!", getEl('legend-menu'), 'top-right');
 };
 export const togleNight = (): void => {
   // Only Do this Twice
   if (adviceCount.toggleNight >= 3) return;
   adviceCount.toggleNight += 1;
 
-  adviceManager.showAdvice(
-    'Day/Night Toggle',
-    'Having trouble seeing parts of the earth? You can toggle on/off the night effect.',
-    document.getElementById('menu-day-night'),
-    'bottom'
-  );
+  adviceManager.showAdvice('Day/Night Toggle', 'Having trouble seeing parts of the earth? You can toggle on/off the night effect.', getEl('menu-day-night'), 'bottom');
 };
 export const missileMenu = (): void => {
   // Only Do this Twice
@@ -120,7 +115,7 @@ export const missileMenu = (): void => {
   adviceManager.showAdvice(
     'Missile Scenarios',
     'Curious how intercontinental ballistic missiles work? Try launching a few from the missile menu.',
-    document.getElementById('menu-missile'),
+    getEl('menu-missile'),
     'bottom-right'
   );
 };
@@ -158,7 +153,7 @@ export const colorScheme = (): void => {
   adviceManager.showAdvice(
     'Color Schemes',
     'Sometimes it is easier to visualize data by changing the color scheme. You can select from a collection of premade color schemes!',
-    document.getElementById('menu-color-scheme'),
+    getEl('menu-color-scheme'),
     'bottom'
   );
 };
@@ -170,7 +165,7 @@ export const countries = (): void => {
   adviceManager.showAdvice(
     'Countries Menu',
     'Did you know that most orbital objects were launched by three countries! Check out the countries menu to view all the satellites launched by a coutnry.',
-    document.getElementById('menu-countries'),
+    getEl('menu-countries'),
     'bottom'
   );
 };
@@ -206,7 +201,7 @@ export const customSensors = (): void => {
   adviceManager.showAdvice(
     'Custom Sensor',
     'Trying to visualize a new sensor or what a current sensor would look like with a different configuration? Try making your own using the custom sensor menu!',
-    document.getElementById('menu-customSensor'),
+    getEl('menu-customSensor'),
     'bottom-left'
   );
 };
@@ -218,7 +213,7 @@ export const planetariumDisabled = (): void => {
   adviceManager.showAdvice(
     'Planetarium View',
     'Using Planetarium View requres a sensor to be selected first. Try selecting a sensor using the Sensor List to find one!',
-    document.getElementById('menu-sensor-list'),
+    getEl('menu-sensor-list'),
     'bottom-right'
   );
 };
@@ -278,7 +273,7 @@ export const survFenceDisabled = (): void => {
   adviceManager.showAdvice(
     'Show/Hide Surveillance Fence',
     'Displaying the Surveillance Fence requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
-    document.getElementById('menu-sensor-list'),
+    getEl('menu-sensor-list'),
     'bottom-left'
   );
 };
@@ -290,7 +285,7 @@ export const bubbleDisabled = (): void => {
   adviceManager.showAdvice(
     'Show/Hide Field Of View Bubble',
     'Displaying the FOV Bubble requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
-    document.getElementById('menu-sensor-list'),
+    getEl('menu-sensor-list'),
     'bottom-left'
   );
 };
@@ -302,7 +297,7 @@ export const sensorInfoDisabled = (): void => {
   adviceManager.showAdvice(
     'Sensor Information',
     'Displaying Sensor Information requres a sensor to be selected first. Try picking a sensor from the Sensor List and then try again!',
-    document.getElementById('menu-sensor-list'),
+    getEl('menu-sensor-list'),
     'bottom-left'
   );
 };
@@ -474,15 +469,15 @@ export const clearAdvice = function (): void {
   }
 };
 export const init = () => {
-  helpDOM = document.getElementById('help-screen');
+  helpDOM = getEl('help-screen');
   // helpDOM.draggable({
   //   containment: 'window',
   //   scroll: false,
   // });
-  helpCloseDOM = document.getElementById('help-close');
-  helpHeaderDOM = document.getElementById('help-header');
-  helpTextDOM = document.getElementById('help-text');
-  tutIconDOM = document.getElementById('tutorial-icon');
+  helpCloseDOM = getEl('help-close');
+  helpHeaderDOM = getEl('help-header');
+  helpTextDOM = getEl('help-text');
+  tutIconDOM = getEl('tutorial-icon');
 
   // Used on a timer to hint at other ideas
   tutIconDOM.addEventListener('click', function () {
@@ -571,7 +566,7 @@ const showEditSatAdvice = () => {
   adviceManager.showAdvice(
     'Edit Satellite',
     'Trying to understand how orbital parameters work? Have you tried editing a satellite to see what the impact is of changing those parameters?',
-    document.getElementById('menu-editSat'),
+    getEl('menu-editSat'),
     'bottom-right'
   );
 };
@@ -582,7 +577,7 @@ const showBreakupAdvice = () => {
   adviceManager.showAdvice(
     'Create a Breakup',
     'Curious what this satellite would look like in a 100 pieces? Create a breakup using the breakup menu below! This is also helpful for understanding what a large cubesat launch looks like over time.',
-    document.getElementById('menu-breakup'),
+    getEl('menu-breakup'),
     'right'
   );
 };
@@ -596,7 +591,7 @@ const showLaunchNominalAdvice = () => {
       'object with a similar orbit, use the launch nominal creator menu to position the ' +
       'satellite over the launch site at a time of 0000z. Now you can see details using ' +
       'relative time.',
-    document.getElementById('menu-newLaunch'),
+    getEl('menu-newLaunch'),
     'top-right'
   );
 };
@@ -607,7 +602,7 @@ const showSatelliteCameraAdvice = () => {
   adviceManager.showAdvice(
     'Satellite Camera View',
     'Did you know you can change the camera to show what a satellite sees? You have to have a satellite currently selected to use it.',
-    document.getElementById('menu-satview'),
+    getEl('menu-satview'),
     'bottom'
   );
 };
@@ -617,7 +612,7 @@ const showSurvFenceAdvice = () => {
   adviceManager.showAdvice(
     'Surveillance Fence',
     "Most ground-based sensors don't actively look at their entire field of view! They usually scan the horizon. You can see the difference by showing their surveillance fence.",
-    document.getElementById('menu-surveillance'),
+    getEl('menu-surveillance'),
     'bottom-left'
   );
 };
@@ -627,7 +622,7 @@ const shoFieldOfViewAdvice = () => {
   adviceManager.showAdvice(
     'Field Of View Bubbles',
     'Are you having trouble understanding what a sensor can see? Enable the Field of View Bubble to make it easier to visualize!',
-    document.getElementById('menu-fov-bubble'),
+    getEl('menu-fov-bubble'),
     'bottom-left'
   );
 };

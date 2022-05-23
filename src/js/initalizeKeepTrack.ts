@@ -10,6 +10,7 @@ import { loadAfterStart, showErrorCode } from './main';
 import { objectManager } from './objectManager/objectManager';
 import { orbitManager } from './orbitManager/orbitManager';
 import { sensorManager } from './plugins';
+import { missileManager } from './plugins/missile/missileManager';
 import { satellite } from './satMath/satMath';
 import { satSet } from './satSet/satSet';
 import { VERSION } from './settingsManager/version.js';
@@ -35,6 +36,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
       dotsManager,
       groupsManager,
       mapManager: <MapManager>(<unknown>{}),
+      missileManager,
       objectManager: <ObjectManager>(<unknown>objectManager),
       orbitManager: <OrbitManager>(<unknown>orbitManager),
       satSet,
@@ -104,7 +106,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     uiManager.uiInput.init();
 
     drawManager.init();
-    drawManager.loadHiRes(); // NOTE: Doing this after the draw loop causes a bad UX
+    await drawManager.loadHiRes(); // NOTE: Doing this after the draw loop causes a bad UX
 
     // Now that everything is loaded, start rendering to thg canvas
     drawManager.drawLoop();

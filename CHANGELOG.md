@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v6.0.1
+
+>  
+
+- fix: :bug: fix loading + legend + add more settings
+- feat: :sparkles: new loading screen
+
 #### v6.0.0
 
 >  

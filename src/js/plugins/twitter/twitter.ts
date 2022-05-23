@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { twitterBottomIcon } from './components/twitter-bottom-icon';
 import { twitterSideMenu } from './components/twitter-side-menu';
 import './components/twitter.css';
@@ -12,8 +12,8 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'twitterManager',
     cb: () => {
-      document.getElementById('left-menus').innerHTML += twitterSideMenu;
-      document.getElementById('bottom-icons').innerHTML += twitterBottomIcon;
+      getEl('left-menus').insertAdjacentHTML('beforeend', twitterSideMenu);
+      getEl('bottom-icons').insertAdjacentHTML('beforeend', twitterBottomIcon);
     },
   });
 
@@ -31,12 +31,17 @@ export const init = (): void => {
           if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
           keepTrackApi.programs.uiManager.hideSideMenus();
           // Initial Load Only
-          if (document.getElementById('twitter-menu').innerHTML === '') {
-            document.getElementById('twitter-menu').innerHTML = '<script async src="platform.twitter.com/widgets.js" charset="utf-8"></script>';
+          if (getEl('twitter-menu').innerHTML === '') {
+            getEl('twitter-menu').innerHTML =
+              '<a class="twitter-timeline" data-theme="dark" data-link-color="#2B7BB9" href="https://twitter.com/RedKosmonaut/lists/space-news">A Twitter List by RedKosmonaut</a>';
+            const script = document.createElement('script');
+            script.src = 'https://platform.twitter.com/widgets.js';
+            script.async = true;
+            getEl('twitter-menu').appendChild(script);
           }
-          slideInRight(document.getElementById('twitter-menu'), 1000);
+          slideInRight(getEl('twitter-menu'), 1000);
           isTwitterMenuOpen = true;
-          document.getElementById('menu-twitter').classList.add('bmenu-item-selected');
+          getEl('menu-twitter').classList.add('bmenu-item-selected');
           return;
         }
       }
@@ -47,8 +52,8 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'twitter',
     cb: (): void => {
-      slideOutLeft(document.getElementById('twitter-menu'), 1000);
-      document.getElementById('menu-twitter').classList.remove('bmenu-item-selected');
+      slideOutLeft(getEl('twitter-menu'), 1000);
+      getEl('menu-twitter').classList.remove('bmenu-item-selected');
       isTwitterMenuOpen = false;
     },
   });

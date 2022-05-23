@@ -28,13 +28,14 @@
 
 import { isThisJest, keepTrackApi } from './api/keepTrackApi';
 import { importCss } from './css';
+import { getEl } from './lib/helpers';
 
 export const showErrorCode = (error: Error & { lineNumber: number }): void => {
   let errorHtml = '';
   errorHtml += error?.message ? `${error.message}<br>` : '';
   errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
   errorHtml += error?.stack ? `${error.stack}<br>` : '';
-  document.getElementById('loader-text').innerHTML = errorHtml;
+  getEl('loader-text').innerHTML = errorHtml;
   // istanbul ignore next
   if (!isThisJest()) console.warn(error);
 };
@@ -54,5 +55,21 @@ export const loadAfterStart = () => {
 importCss();
 // Load the main website
 import('./initalizeKeepTrack').then(({ initalizeKeepTrack }) => {
+  if (!isThisJest()) {
+    console.log(`
+      _  __            _______             _       _____                       
+      | |/ /           |__   __|           | |     / ____|                     
+      | ' / ___  ___ _ __ | |_ __ __ _  ___| | __ | (___  _ __   __ _  ___ ___ 
+      |  < / _ \\/ _ | '_ \\| | '__/ _\` |/ __| |/ /  \\___ \\| '_ \\ / _\` |/ __/ _ \\ 
+      | . |  __|  __| |_) | | | | (_| | (__|   < _ ____) | |_) | (_| | (_|  __/
+      |_|\\_\\___|\\___| .__/|_|_|  \\__,_|\\___|_|\\_(_|_____/| .__/ \\__,_|\\___\\___|
+                    | |                                  | |                   
+                    |_|                                  |_|                   
+      #########################################################################
+      Trying to figure out how the code works? Check out 
+      https://github.com/thkruz/keeptrack.space/ or send me an email at
+      theodore.kruczek at gmail dot com.
+    `);
+  }
   initalizeKeepTrack();
 });

@@ -1,7 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
-import $ from 'jquery';
+import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import breakupPng from '@app/img/icons/breakup.png';
 
 let isBreakupMenuOpen = false;
@@ -36,7 +35,7 @@ export const init = (): void => {
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  document.getElementById('left-menus').innerHTML += (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
       <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
         <div id="breakup-content" class="side-menu">
           <div class="row">
@@ -113,10 +112,10 @@ export const uiManagerInit = (): void => {
           </div>
         </div>
       </div>   
-    `);
+    `));
 
   // Bottom Icon
-  document.getElementById('bottom-icons').innerHTML += (keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
       <div id="menu-breakup" class="bmenu-item bmenu-item-disabled">
         <img
           alt="breakup"
@@ -125,21 +124,14 @@ export const uiManagerInit = (): void => {
         <span class="bmenu-title">Breakup</span>
         <div class="status-icon"></div>
       </div>
-    `);
+    `));
 
 
-$('#breakup-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('breakup-menu'));
 };
 
 export const uiManagerFinal = (): void => {
-  document.getElementById('breakup').addEventListener('submit', function (e: Event) {
+  getEl('breakup').addEventListener('submit', function (e: Event) {
     e.preventDefault();
     showLoading(() => breakupOnSubmit());
   });
@@ -149,7 +141,7 @@ export const uiManagerFinal = (): void => {
   // Splitting it into subfunctions would not be optimal
 export const breakupOnSubmit = (): void => { // NOSONAR
   const { orbitManager, satellite, timeManager, uiManager, satSet } = keepTrackApi.programs;
-  let satId = satSet.getIdFromObjNum(parseInt((<HTMLInputElement>document.getElementById('hc-scc')).value));
+  let satId = satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('hc-scc')).value));
   const mainsat: SatObject = satSet.getSat(satId);
   const origsat = mainsat;
 
@@ -179,10 +171,10 @@ export const breakupOnSubmit = (): void => { // NOSONAR
   });
   orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
 
-  const meanmoVariation = parseFloat(<string>(<HTMLInputElement>document.getElementById('hc-per')).value);
-  const incVariation = parseFloat(<string>(<HTMLInputElement>document.getElementById('hc-inc')).value);
-  const rascVariation = parseFloat(<string>(<HTMLInputElement>document.getElementById('hc-raan')).value);
-  const breakupCount = parseInt(<string>(<HTMLInputElement>document.getElementById('hc-count')).value);
+  const meanmoVariation = parseFloat(<string>(<HTMLInputElement>getEl('hc-per')).value);
+  const incVariation = parseFloat(<string>(<HTMLInputElement>getEl('hc-inc')).value);
+  const rascVariation = parseFloat(<string>(<HTMLInputElement>getEl('hc-raan')).value);
+  const breakupCount = parseInt(<string>(<HTMLInputElement>getEl('hc-count')).value);
   const eVariation = 0.00015;
   const origEcc = mainsat.eccentricity;
 
@@ -244,8 +236,8 @@ export const breakupOnSubmit = (): void => { // NOSONAR
 };
 
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('breakup-menu'), 1000);
-  document.getElementById('menu-breakup').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('breakup-menu'), 1000);
+  getEl('menu-breakup').classList.remove('bmenu-item-selected');
   isBreakupMenuOpen = false;
 };
 export const bottomMenuClick = (iconName: string): void => { // NOSONAR
@@ -259,16 +251,16 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       if (objectManager.selectedSat !== -1) {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
-        slideInRight(document.getElementById('breakup-menu'), 1000);
-        document.getElementById('menu-breakup').classList.add('bmenu-item-selected');
+        slideInRight(getEl('breakup-menu'), 1000);
+        getEl('menu-breakup').classList.add('bmenu-item-selected');
         isBreakupMenuOpen = true;
 
         const sat: SatObject = satSet.getSatExtraOnly(objectManager.selectedSat);
-        (<HTMLInputElement>document.getElementById('hc-scc')).value = sat.sccNum;
+        (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
       } else {
         if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.breakupDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
-        shake(document.getElementById('menu-breakup'));
+        shake(getEl('menu-breakup'));
       }
       return;
     }

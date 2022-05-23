@@ -115,22 +115,22 @@ if (isWatch) {
   });
 } else {
   compiler.run((runErrors, runStats) => {
-    console.log(
-      runStats.toString({
-        cached: false,
-        colors: true,
-        assets: true,
-        chunks: false,
-        chunkModules: false,
-        chunkOrigins: false,
-        errors: true,
-        errorDetails: true,
-        hash: false,
-        modules: false,
-        timings: false,
-        warnings: false,
-        version: false,
-      })
-    );
+    // console.log(
+    //   runStats.toString({
+    //     cached: false,
+    //     colors: true,
+    //     assets: true,
+    //     chunks: false,
+    //     chunkModules: false,
+    //     chunkOrigins: false,
+    //     errors: true,
+    //     errorDetails: true,
+    //     hash: false,
+    //     modules: false,
+    //     timings: false,
+    //     warnings: false,
+    //     version: false,
+    //   })
+    // );
   });
 }

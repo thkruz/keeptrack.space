@@ -507,7 +507,12 @@ export const updateStar = (i: number, now: Date): void => {
   if (satPos[i * 3 + 2] === 0 || (satPos[i * 3 + 2] - pos.z < 0.1 && satPos[i * 3 + 2] - pos.z > -0.1)) satPos[i * 3 + 2] = pos.z;
 };
 export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: number): boolean => {
-  if (!satCache[i].active) return false; // Skip inactive missiles
+  if (!satCache[i].active) {
+    satPos[i * 3] = 0;
+    satPos[i * 3 + 1] = 0;
+    satPos[i * 3 + 2] = 0;
+    return false; // Skip inactive missiles
+  }
   let cosLat: number, sinLat: number, cosLon: number, sinLon: number;
 
   const tLen = satCache[i].altList.length;

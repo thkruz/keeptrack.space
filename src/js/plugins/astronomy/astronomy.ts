@@ -25,13 +25,12 @@
  */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import constellationPng from '@app/img/icons/constellation.png';
-import { shake } from '@app/js/lib/helpers';
+import { getEl, shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="menu-astronomy" class="bmenu-item bmenu-item-disabled">
           <img
             alt="telescope"
@@ -41,7 +40,7 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Astronomy View</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `));
 };
 
 export const init = (): void => {
@@ -78,8 +77,8 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       if (objectManager.isStarManagerLoaded) {
         starManager.clearConstellations();
       }
-      $('#fov-text').html('');
-      document.getElementById('menu-astronomy').classList.remove('bmenu-item-selected');
+      getEl('fov-text').innerHTML = ('');
+      getEl('menu-astronomy').classList.remove('bmenu-item-selected');
       return;
     } else {
       if (sensorManager.checkSensorSelected()) {
@@ -90,17 +89,17 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         }
         orbitManager.clearInViewOrbit();
         mainCamera.cameraType.current = mainCamera.cameraType.Astronomy; // Activate Astronomy Camera Mode
-        $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+        getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
         uiManager.legendMenuChange('astronomy');
         if (typeof keepTrackApi.programs.planetarium !== 'undefined') {
           keepTrackApi.programs.planetarium.isPlanetariumView = false;
-          document.getElementById('menu-planetarium').classList.remove('bmenu-item-selected');
+          getEl('menu-planetarium').classList.remove('bmenu-item-selected');
         }
         keepTrackApi.programs.astronomy.isAstronomyView = true;
-        document.getElementById('menu-astronomy').classList.add('bmenu-item-selected');
+        getEl('menu-astronomy').classList.add('bmenu-item-selected');
       } else {
         uiManager.toast(`Select a Sensor First!`, 'caution');
-        shake(document.getElementById('menu-astronomy'));
+        shake(getEl('menu-astronomy'));
       }
       return;
     }

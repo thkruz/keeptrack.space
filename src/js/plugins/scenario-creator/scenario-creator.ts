@@ -1,6 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
-import $ from 'jquery';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { scenarioCreatorBottomIcon } from './components/scenario-creator-bottom-icon';
 import { scenarioCreatorSideMenu } from './components/scenario-creator-side-menu';
 
@@ -12,6 +11,12 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'scenarioCreator',
     cb: () => uiManagerInit(),
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'scenarioCreator',
+    cb: () => uiManagerFinal(),
   });
 
   // Add JavaScript
@@ -29,17 +34,18 @@ export const init = (): void => {
 };
 
 export const uiManagerInit = (): void => {
-  $('#left-menus').append(scenarioCreatorSideMenu);
-  $('#bottom-icons').append(scenarioCreatorBottomIcon);
+  getEl('left-menus').insertAdjacentHTML('beforeend', scenarioCreatorSideMenu);
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', scenarioCreatorBottomIcon);
+};
 
-  $('#scenario-creator-menu').resizable({
-    handles: 'e',
+export const uiManagerFinal = (): void => {
+  clickAndDragWidth(getEl('scenario-creator-menu'), {
     maxWidth: 1200,
     minWidth: 500,
   });
 
-  $('#scenario-creator-form').on('submit', function (e: Event) {
-    $('#loading-screen').fadeIn(1000, scenarioCreatorOnSubmit);
+  getEl('scenario-creator-form').addEventListener('submit', function (e: Event) {
+    showLoading(scenarioCreatorOnSubmit);
     e.preventDefault();
   });
 };
@@ -47,10 +53,10 @@ export const uiManagerInit = (): void => {
 export const scenarioCreatorOnSubmit = (): void => {
   const { satSet, satellite, sensorManager } = keepTrackApi.programs;
 
-  const scenarioName: string = (<HTMLInputElement>document.getElementById('scenario-creator-name')).value;
-  const scenarioStart: string = (<HTMLInputElement>document.getElementById('scenario-creator-start')).value;
-  const scenarioStop: string = (<HTMLInputElement>document.getElementById('scenario-creator-stop')).value;
-  const scenarioDensity: string = (<HTMLInputElement>document.getElementById('scenario-creator-density')).value;
+  const scenarioName: string = (<HTMLInputElement>getEl('scenario-creator-name')).value;
+  const scenarioStart: string = (<HTMLInputElement>getEl('scenario-creator-start')).value;
+  const scenarioStop: string = (<HTMLInputElement>getEl('scenario-creator-stop')).value;
+  const scenarioDensity: string = (<HTMLInputElement>getEl('scenario-creator-density')).value;
 
   console.log(scenarioName, scenarioStart, scenarioStop, scenarioDensity);
 
@@ -67,8 +73,6 @@ export const scenarioCreatorOnSubmit = (): void => {
     const rae = satellite.getRae(now, satrec, sensor);
     console.log(rae);
   }
-
-  $('#loading-screen').fadeOut(1000);
 };
 
 /**
@@ -99,13 +103,13 @@ export const onScenarioCreatorBtnClick = (): void => {
  * @returns {void}
  */
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('scenario-creator-menu'), 1000);
-  document.getElementById('menu-scenario-creator').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('scenario-creator-menu'), 1000);
+  getEl('menu-scenario-creator').classList.remove('bmenu-item-selected');
   isScenarioCreatorMenuOpen = false;
 };
 
 export const showSideMenu = (): void => {
-  slideInRight(document.getElementById('scenario-creator-menu'), 1000);
-  document.getElementById('menu-scenario-creator').classList.add('bmenu-item-selected');
+  slideInRight(getEl('scenario-creator-menu'), 1000);
+  getEl('menu-scenario-creator').classList.add('bmenu-item-selected');
   isScenarioCreatorMenuOpen = true;
 };

@@ -45,6 +45,7 @@ import * as topMenu from '@app/js/plugins/top-menu/top-menu';
 import * as twitter from '@app/js/plugins/twitter/twitter';
 import * as updateSelectBoxCore from '@app/js/plugins/update-select-box/update-select-box';
 import * as watchlist from '@app/js/plugins/watchlist/watchlist';
+import { getEl } from '../lib/helpers';
 import { omManager } from './initial-orbit/om-manager';
 import { CanvasRecorder } from './recorder-manager/canvas-recorder/canvas-recorder';
 import { isselectedSatNegativeOne, selectSatManager } from './select-sat-manager/select-sat-manager';
@@ -92,7 +93,8 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.satelliteView) satelliteView.init();
     if (plugins.satelliteFov) satelliteFov.init();
     if (plugins.planetarium) planetarium.init();
-    if (plugins.astronomy) astronomy.init();
+    // TODO: Fix astronomy plugin
+    // if (plugins.astronomy) astronomy.init();
     if (plugins.nightToggle) nightToggle.init();
     if (plugins.dops) dops.init();
     if (plugins.constellations) constellations.init();
@@ -125,7 +127,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
   }
 };
 export const uiManagerFinal = (plugins: any): void => {
-  const bicDom = document.getElementById('bottom-icons-container');
+  const bicDom = getEl('bottom-icons-container');
   if (bicDom) {
     const bottomHeight = bicDom.offsetHeight;
     document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
@@ -139,17 +141,17 @@ export const uiManagerFinal = (plugins: any): void => {
     document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + 22 + 'px');
   }
 
-  if (document.getElementById('bottom-icons') && document.getElementById('bottom-icons').innerText == '') {
-    document.getElementById('nav-footer').style.visibility = 'hidden';
+  if (getEl('bottom-icons') && getEl('bottom-icons').innerText == '') {
+    getEl('nav-footer').style.visibility = 'hidden';
   }
 
-  const bottomContainer = document.getElementById('bottom-icons-container');
+  const bottomContainer = getEl('bottom-icons-container');
   if (bottomContainer) {
     const bottomHeight = bottomContainer.offsetHeight;
     document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
   }
 
-  document.getElementById('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
+  getEl('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
 
   // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
@@ -163,7 +165,7 @@ export const uiManagerFinal = (plugins: any): void => {
     dom.scrollTop = nextPos;
   };
 
-  document.getElementById('bottom-icons-container').addEventListener('mousewheel', (event: any) => {
+  getEl('bottom-icons-container').addEventListener('mousewheel', (event: any) => {
     event.preventDefault();
     wheel(event.currentTarget, event.deltaY);
   });

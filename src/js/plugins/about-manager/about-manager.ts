@@ -1,7 +1,6 @@
 import aboutPng from '@app/img/icons/about.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { slideInRight, slideOutLeft } from '@app/js/lib/helpers';
-import $ from 'jquery';
+import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 export const init = (): void => {
   // Reset Flag
@@ -12,7 +11,9 @@ export const init = (): void => {
     cbName: 'aboutManager',
     cb: () => {
       // Side Menu
-      $('#left-menus').append(keepTrackApi.html`
+      getEl('left-menus').insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
         <div id="about-menu" class="side-menu-parent start-hidden text-select">
           <div id="about-content" class="side-menu">
             <div class="row">
@@ -73,16 +74,20 @@ export const init = (): void => {
             </div>
           </div>
         </div>
-      `);
+      `
+      );
 
       // Bottom Icon
-      $('#bottom-icons').append(keepTrackApi.html`
+      getEl('bottom-icons').insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
         <div id="menu-about" class="bmenu-item">
           <img alt="about" src="" delayedsrc=${aboutPng}>
           <span class="bmenu-title">About</span>
           <div class="status-icon"></div>
         </div>
-      `);
+        `
+      );
     },
   });
 
@@ -99,9 +104,9 @@ export const init = (): void => {
           return;
         } else {
           keepTrackApi.programs.uiManager.hideSideMenus();
-          slideInRight(document.getElementById('about-menu'), 1000);
+          slideInRight(getEl('about-menu'), 1000);
           isAboutSelected = true;
-          document.getElementById('menu-about').classList.add('bmenu-item-selected');
+          getEl('menu-about').classList.add('bmenu-item-selected');
           return;
         }
       }
@@ -112,8 +117,8 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'about',
     cb: (): void => {
-      slideOutLeft(document.getElementById('about-menu'), 1000);
-      document.getElementById('menu-about').classList.remove('bmenu-item-selected');
+      slideOutLeft(getEl('about-menu'), 1000);
+      getEl('menu-about').classList.remove('bmenu-item-selected');
       isAboutSelected = false;
     },
   });

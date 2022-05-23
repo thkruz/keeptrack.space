@@ -9,9 +9,9 @@ import * as glm from 'gl-matrix';
 /* ***************************************************************************
  * Initialization Code
  * ***************************************************************************/
-const NUM_LAT_SEGS = 32;
-const NUM_LON_SEGS = 32;
-const DRAW_RADIUS = 4000;
+const NUM_LAT_SEGS = 16;
+const NUM_LON_SEGS = 16;
+const DRAW_RADIUS = 2500;
 const SCALAR_DISTANCE = 200000;
 export const init = async () => {
   const { gl } = keepTrackApi.programs.drawManager;

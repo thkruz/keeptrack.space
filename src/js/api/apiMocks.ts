@@ -250,6 +250,9 @@ export const keepTrackApiStubs = {
         moon: {
           draw: jest.fn(),
         },
+        skybox: {
+          draw: jest.fn(),
+        },
       },
       startWithOrbits: jest.fn(),
     },
@@ -471,6 +474,7 @@ export const keepTrackApiStubs = {
       getSatExtraOnly: () => defaultSat,
       getSatFromObjNum: () => defaultSat,
       getSat: () => defaultSat,
+      setSat: jest.fn(),
       getIdFromStarName: jest.fn(),
       initGsData: jest.fn(),
       setColorScheme: jest.fn(),

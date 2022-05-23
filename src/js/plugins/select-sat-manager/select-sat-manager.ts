@@ -1,11 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { Camera, SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
+import { getEl } from '@app/js/lib/helpers';
 import { satellite } from '@app/js/satMath/satMath';
 import $ from 'jquery';
 
-let isselectedSatNegativeOne = false;
-const selectSatManager = {
+export let isselectedSatNegativeOne = false;
+export const selectSatManager = {
   init: () => {
     keepTrackApi.register({
       method: 'updateLoop',
@@ -53,13 +54,13 @@ const selectSatManager = {
     if (satId === -1) {
       if (
         settingsManager.currentColorScheme === keepTrackApi.programs.colorSchemeManager.group ||
-        (typeof (<HTMLInputElement>document.getElementById('search')).value !== 'undefined' && (<HTMLInputElement>document.getElementById('search')).value.length >= 3)
+        (typeof (<HTMLInputElement>getEl('search')).value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
       ) {
         // If group selected
-        document.getElementById('menu-sat-fov').classList.remove('bmenu-item-disabled');
+        getEl('menu-sat-fov')?.classList.remove('bmenu-item-disabled');
       } else {
-        document.getElementById('menu-sat-fov').classList.remove('bmenu-item-selected');
-        document.getElementById('menu-sat-fov').classList.add('bmenu-item-disabled');
+        getEl('menu-sat-fov')?.classList.remove('bmenu-item-selected');
+        getEl('menu-sat-fov')?.classList.add('bmenu-item-disabled');
         settingsManager.isSatOverflyModeOn = false;
         satSet.satCruncher.postMessage({
           typ: 'isShowSatOverfly',
@@ -76,16 +77,16 @@ const selectSatManager = {
       $('#sat-infobox').fadeOut();
 
       // Add Grey Out
-      document.getElementById('menu-lookanglesmultisite').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-lookangles').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-satview').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-editSat').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-map').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-newLaunch').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-breakup').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-plot-analysis').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-plot-analysis2').classList.add('bmenu-item-disabled');
-      document.getElementById('menu-plot-analysis3').classList.add('bmenu-item-disabled');
+      getEl('menu-lookanglesmultisite')?.classList.add('bmenu-item-disabled');
+      getEl('menu-lookangles')?.classList.add('bmenu-item-disabled');
+      getEl('menu-satview')?.classList.add('bmenu-item-disabled');
+      getEl('menu-editSat')?.classList.add('bmenu-item-disabled');
+      getEl('menu-map')?.classList.add('bmenu-item-disabled');
+      getEl('menu-newLaunch')?.classList.add('bmenu-item-disabled');
+      getEl('menu-breakup')?.classList.add('bmenu-item-disabled');
+      getEl('menu-plot-analysis')?.classList.add('bmenu-item-disabled');
+      getEl('menu-plot-analysis2')?.classList.add('bmenu-item-disabled');
+      getEl('menu-plot-analysis3')?.classList.add('bmenu-item-disabled');
       keepTrackApi.methods.selectSatData(null, satId);
     } else if (satId !== -1) {
       if (mainCamera.cameraType.current == mainCamera.cameraType.Default) {
@@ -119,13 +120,13 @@ const selectSatManager = {
 
         if (objectManager.isSensorManagerLoaded) sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
         objectManager.setSelectedSat(-1);
-        document.getElementById('menu-sensor-info').classList.remove('bmenu-item-disabled');
-        document.getElementById('menu-fov-bubble').classList.remove('bmenu-item-disabled');
-        document.getElementById('menu-surveillance').classList.remove('bmenu-item-disabled');
-        document.getElementById('menu-planetarium').classList.remove('bmenu-item-disabled');
-        document.getElementById('menu-astronomy').classList.remove('bmenu-item-disabled');
+        getEl('menu-sensor-info')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-fov-bubble')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-surveillance')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-planetarium')?.classList.remove('bmenu-item-disabled');
+        getEl('menu-astronomy')?.classList.remove('bmenu-item-disabled');
         if (objectManager.selectedSat !== -1) {
-          document.getElementById('menu-lookangles').classList.remove('bmenu-item-disabled');
+          getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
         }
         return;
       }
@@ -133,19 +134,19 @@ const selectSatManager = {
       mainCamera.camAngleSnappedOnSat = true;
 
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
-        document.getElementById('menu-lookangles').classList.remove('bmenu-item-disabled');
+        getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
       }
 
-      document.getElementById('menu-lookanglesmultisite').classList.remove('bmenu-item-disabled');
-      document.getElementById('menu-satview').classList.remove('bmenu-item-disabled');
-      document.getElementById('menu-editSat').classList.remove('bmenu-item-disabled');
-      document.getElementById('menu-sat-fov').classList.remove('bmenu-item-disabled');
-      document.getElementById('menu-map').classList.remove('bmenu-item-disabled');
-      document.getElementById('menu-newLaunch').classList.remove('bmenu-item-disabled');
-      document.getElementById('menu-plot-analysis').classList.remove('bmenu-item-disabled');
-      document.getElementById('menu-plot-analysis2').classList.remove('bmenu-item-disabled');
+      getEl('menu-lookanglesmultisite')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-satview')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-editSat')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-sat-fov')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-map')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-newLaunch')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-plot-analysis')?.classList.remove('bmenu-item-disabled');
+      getEl('menu-plot-analysis2')?.classList.remove('bmenu-item-disabled');
       if (objectManager.secondarySat !== -1) {
-        document.getElementById('menu-plot-analysis3').classList.remove('bmenu-item-disabled');
+        getEl('menu-plot-analysis3')?.classList.remove('bmenu-item-disabled');
       }
 
       $('#sat-infobox').fadeIn();
@@ -185,5 +186,3 @@ export const checkIfSelectSatVisible = () => {
     }
   }
 };
-
-export { selectSatManager, isselectedSatNegativeOne };

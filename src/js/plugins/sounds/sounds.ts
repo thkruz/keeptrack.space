@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { getEl } from '@app/js/lib/helpers';
 
 export const init = (): void => {
   // const { settingsManager } = keepTrackApi.programs;
@@ -40,7 +41,7 @@ export const init = (): void => {
           standby: new Audio('./audio/Synth-Pop-Small-01.m4a'),
         },
         play: (sound: string) => {
-          if (document.getElementById('loading-screen').classList.contains('fullscreen')) return;
+          if (getEl('loading-screen').classList.contains('fullscreen')) return;
           keepTrackApi.programs.soundManager.sounds[sound].play();
         },
         voices: [],

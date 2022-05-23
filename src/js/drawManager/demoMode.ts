@@ -8,7 +8,7 @@ export const demoMode = () => {
   if (objectManager?.isSensorManagerLoaded && sensorManager?.currentSensor[0]?.lat === null) return;
   if (timeManager.realTime - demoModeLastTime < settingsManager.demoModeInterval) return;
 
-  drawManager.demoModeLast = timeManager.realTime;
+  demoModeLastTime = timeManager.realTime;
   drawManager.demoModeSatellite = drawManager.demoModeSatellite === satSet.satData.length ? 0 : drawManager.demoModeSatellite;
 
   let satData = satSet.satData;

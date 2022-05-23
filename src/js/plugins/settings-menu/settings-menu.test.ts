@@ -146,8 +146,9 @@ describe('settingsMenu.settingsFormSubmit', () => {
       document.body.innerHTML = '<div id="left-menus"></div>';
       settingsMenu.uiManagerInit(); // Need the HTML to be loaded
 
-      settingsMenu.settingsFormSubmit({ preventDefault: () => true }, false, false, false, false);
-      settingsMenu.settingsFormSubmit({ preventDefault: () => true }, true, true, true, true);
+      settingsMenu.settingsFormSubmit({ preventDefault: () => true });
+      // settingsMenu.settingsFormSubmit({ preventDefault: () => true }, {false, false, false, false);
+      // settingsMenu.settingsFormSubmit({ preventDefault: () => true }, true, true, true, true);
     };
 
     expect(callFunction).not.toThrow();
@@ -156,28 +157,6 @@ describe('settingsMenu.settingsFormSubmit', () => {
   test('1', () => {
     const callFunction: any = () => {
       settingsMenu.settingsFormSubmit(null);
-    };
-
-    expect(callFunction).toThrow();
-  });
-});
-
-describe('settingsMenu.settingsRisesetChange', () => {
-  test('0', () => {
-    const callFunction: any = () => {
-      document.body.innerHTML = '<div id="left-menus"></div>';
-      settingsMenu.uiManagerInit(); // Need the HTML to be loaded
-
-      settingsMenu.settingsRisesetChange({ preventDefault: () => true }, false);
-      settingsMenu.settingsRisesetChange({ preventDefault: () => true }, true);
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('1', () => {
-    const callFunction: any = () => {
-      settingsMenu.settingsRisesetChange(null);
     };
 
     expect(callFunction).toThrow();

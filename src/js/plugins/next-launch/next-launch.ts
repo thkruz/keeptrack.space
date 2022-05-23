@@ -2,9 +2,8 @@ import calendar2Png from '@app/img/icons/calendar2.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { LaunchInfoObject } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { saveCsv, slideInRight, slideOutLeft, truncateString } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, openColorbox, saveCsv, slideInRight, slideOutLeft, truncateString } from '@app/js/lib/helpers';
 import { uiManager } from '@app/js/uiManager/uiManager';
-import $ from 'jquery';
 /* */
 
 let isNextLaunchMenuOpen = false;
@@ -13,7 +12,7 @@ let isNextLaunchMenuOpen = false;
  * @returns {HTMLTableElement | boolean} The Table Element to be modified in the UI or a false boolean to kill the parent method
  */
 export const getTableElement = (): HTMLTableElement | boolean => {
-  const tbl: HTMLTableElement = <HTMLTableElement>document.getElementById('nextLaunch-table'); // Identify the table to update
+  const tbl: HTMLTableElement = <HTMLTableElement>getEl('nextLaunch-table'); // Identify the table to update
   if (tbl == null) {
     return false;
   }
@@ -109,13 +108,15 @@ export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[])
 };
 
 export const hideSideMenus = (): void => {
-  slideOutLeft(document.getElementById('nextLaunch-menu'), 1000);
-  document.getElementById('menu-nextLaunch').classList.remove('bmenu-item-selected');
+  slideOutLeft(getEl('nextLaunch-menu'), 1000);
+  getEl('menu-nextLaunch').classList.remove('bmenu-item-selected');
   isNextLaunchMenuOpen = false;
 };
 export const uiManagerInit = () => {
   // Side Menu
-  document.getElementById('left-menus').innerHTML += keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="nextLaunch-menu" class="side-menu-parent start-hidden text-select">
         <div id="nextLaunch-content" class="side-menu">
           <div class="row">
@@ -129,27 +130,27 @@ export const uiManagerInit = () => {
           </div>
         </div>
       </div>
-    `;
+    `
+  );
 
   // Bottom Icon
-  document.getElementById('bottom-icons').innerHTML += keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-nextLaunch" class="bmenu-item">
           <img alt="calendar" src="" delayedsrc="${calendar2Png}" />
           <span class="bmenu-title">Next Launches</span>
           <div class="status-icon"></div>
         </div>
-      `;
+      `
+  );
 
-  $('#nextLaunch-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
+  clickAndDragWidth(getEl('nextLaunch-menu'), {
     maxWidth: 650,
     minWidth: 450,
   });
 
-  document.getElementById('export-launch-info').addEventListener('click', function () {
+  getEl('export-launch-info').addEventListener('click', function () {
     saveCsv(<any>nextLaunchManager.launchList, 'launchList');
   });
 };
@@ -199,9 +200,9 @@ export const bottomMenuClick = (iconName: string): void => {
       } else {
         keepTrackApi.programs.uiManager.hideSideMenus();
         nextLaunchManager.showTable();
-        slideInRight(document.getElementById('nextLaunch-menu'), 1000);
+        slideInRight(getEl('nextLaunch-menu'), 1000);
         isNextLaunchMenuOpen = true;
-        document.getElementById('menu-nextLaunch').classList.add('bmenu-item-selected');
+        getEl('menu-nextLaunch').classList.add('bmenu-item-selected');
         return;
       }
     }
@@ -211,7 +212,7 @@ export const bottomMenuClick = (iconName: string): void => {
 export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () => void; showTable: () => void; processData: any } = {
   launchList: [],
   init: () => {
-    if (settingsManager.offline) document.getElementById('menu-nextLaunch').style.display = 'none';
+    if (settingsManager.offline) getEl('menu-nextLaunch').style.display = 'none';
   },
   showTable: () => {
     // NOSONAR
@@ -228,17 +229,13 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
             // Only needs populated once
             if (tbl.innerHTML == '') {
               initTable(tbl, nextLaunchManager.launchList);
-              try {
-                $('a.iframe').colorbox({
-                  iframe: true,
-                  width: '80%',
-                  height: '80%',
-                  fastIframe: false,
-                  closeButton: false,
+              const aElements = getEl('nextLaunch-table').querySelectorAll('a');
+              aElements.forEach((element) => {
+                element.addEventListener('click', (e) => {
+                  e.preventDefault();
+                  openColorbox(element.href);
                 });
-              } catch (error) {
-                console.warn(error);
-              }
+              });
             }
           });
       }

@@ -194,6 +194,8 @@ settingsManager = {
     settingsManager.disableZoomControls = true;
     // Disable Touch Move Causing Drag Errors on Desktop
     settingsManager.disableWindowTouchMove = true;
+    // Display ECI on Hover
+    settingsManager.isEciOnHover = false;
     // Allows canvas will steal focus on load
     settingsManager.startWithFocus = false;
     // Shows an overlay with object information
@@ -205,6 +207,8 @@ settingsManager = {
     settingsManager.enableConstantSelectedSatRedraw = true;
     // How much an orbit fades over time
     settingsManager.orbitFadeFactor = 0.6; // 1.0 == No Fade
+    // Toggle drawing the milky way
+    settingsManager.isDrawMilkyWay = true;
     // Automatically display all of the orbits
     settingsManager.startWithOrbitsDisplayed = false;
     // Maximum orbits allowed on fullsize screens
@@ -582,6 +586,7 @@ settingsManager = {
     settingsManager.isOnlyFOVChecked = false;
     settingsManager.isBottomMenuOpen = false;
     settingsManager.isForceColorScheme = false;
+    settingsManager.isDragging = false;
 
     settingsManager.isDemoModeOn = false;
     settingsManager.demoModeInterval = 3000; // in ms (3 second default)
@@ -619,6 +624,7 @@ settingsManager = {
               break;
             case 'lowperf':
               settingsManager.lowPerf = true;
+              settingsManager.isDrawMilkyWay = false;
               settingsManager.isDrawLess = true;
               settingsManager.zFar = 250000.0;
               settingsManager.noMeshManager = true;
@@ -631,8 +637,10 @@ settingsManager = {
               break;
             case 'nostars':
               settingsManager.noStars = true;
+              settingsManager.isDrawMilkyWay = false;
               break;
             case 'draw-less':
+              settingsManager.isDrawMilkyWay = false;
               settingsManager.isDrawLess = true;
               settingsManager.zFar = 250000.0;
               settingsManager.noMeshManager = true;
@@ -641,6 +649,7 @@ settingsManager = {
               settingsManager.isDrawLess = false;
               settingsManager.noMeshManager = false;
               settingsManager.smallImages = false;
+              settingsManager.isDrawMilkyWay = true;
               break;
             case 'vec':
               settingsManager.vectorImages = true;

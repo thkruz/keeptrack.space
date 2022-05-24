@@ -38,7 +38,6 @@ export const synchronize = () => {
 export const changeStaticOffset = (staticOffset: number) => {
   timeManager.dynamicOffsetEpoch = Date.now();
   timeManager.staticOffset = staticOffset;
-  console.debug('changeStaticOffset', staticOffset);
   synchronize();
 };
 

@@ -368,9 +368,8 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
       drawManager.postProcessingManager.curBuffer = null;
       drawManager.sceneManager.sun.drawGodrays(gl, drawManager.postProcessingManager.curBuffer);
     }
-    if (settingsManager.isDrawMilkyWay) {
-      drawManager.sceneManager.skybox.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);
-    }
+    
+    drawManager.sceneManager.skybox.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);    
 
     // Apply two pass gaussian blur to the godrays to smooth them out
     // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;

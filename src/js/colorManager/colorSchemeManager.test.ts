@@ -409,8 +409,8 @@ describe('colorSchemeManager.defaultRules', () => {
     expect(result).toMatchSnapshot();
   });
 
-  it('should hide rocket bodies out of FOV when told to', () => {
-    colorSchemeManager.objectTypeFlags.trusat = false;
+  it('should hide special sats out of FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.pink = false;
     const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.SPECIAL, inView: 0 } });
     expect(result).toMatchSnapshot();
   });

@@ -6,6 +6,8 @@ import { SpaceObjectType } from '../api/SpaceObjectType';
 // Typing
 // //////////////////////////////////////////////////////////////////////////////
 export interface SatCacheObject extends satellite.SatRec {
+  dec: number;
+  ra: number;
   id?: number;
   isimp: boolean;
   apogee: number;

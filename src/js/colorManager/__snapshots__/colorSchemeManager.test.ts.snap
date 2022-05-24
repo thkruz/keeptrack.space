@@ -1274,6 +1274,18 @@ Object {
 }
 `;
 
+exports[`colorSchemeManager.defaultRules should hide special sats out of FOV when told to 1`] = `
+Object {
+  "color": Array [
+    1,
+    1,
+    1,
+    0,
+  ],
+  "pickable": 0,
+}
+`;
+
 exports[`colorSchemeManager.defaultRules should hide things in FOV when told to 1`] = `
 Object {
   "color": Array [

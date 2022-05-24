@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { DEG2RAD } from '@app/js/lib/constants';
 import * as glm from 'gl-matrix';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
@@ -41,16 +42,45 @@ export const initProgram = (gl: WebGL2RenderingContext) => {
   skyboxSphere.program.u_camMatrix = gl.getUniformLocation(skyboxSphere.program, 'u_camMatrix');
   skyboxSphere.program.u_mvMatrix = gl.getUniformLocation(skyboxSphere.program, 'u_mvMatrix');
   skyboxSphere.program.u_nMatrix = gl.getUniformLocation(skyboxSphere.program, 'u_nMatrix');
-  skyboxSphere.program.u_sampler = gl.getUniformLocation(skyboxSphere.program, 'u_sampler');
+  skyboxSphere.program.u_texMilkyWay = gl.getUniformLocation(skyboxSphere.program, 'u_texMilkyWay');
+  skyboxSphere.program.u_texBoundaries = gl.getUniformLocation(skyboxSphere.program, 'u_texBoundaries');
+  skyboxSphere.program.u_texConstellations = gl.getUniformLocation(skyboxSphere.program, 'u_texConstellations');
+  skyboxSphere.program.u_fMilkyWay = gl.getUniformLocation(skyboxSphere.program, 'u_fMilkyWay');
 };
 export const initTextures = (gl: WebGL2RenderingContext) => {
-  skyboxSphere.textureMap.texture = gl.createTexture();
-  skyboxSphere.textureMap.img = new Image();
-  skyboxSphere.textureMap.img.onload = function () {
-    onTextureLoaded(gl);
-  };
-  skyboxSphere.textureMap.img.src = skyboxSphere.textureMap.src;
+  if (settingsManager.isDrawMilkyWay && !skyboxSphere.textureMilkyWay.loaded) {
+    initTexture(gl, skyboxSphere.textureMilkyWay);
+  }
+  if (settingsManager.isDrawConstellationBoundaries && !skyboxSphere.textureBoundaries.loaded) {
+    initTexture(gl, skyboxSphere.textureBoundaries);
+  }
+  if (settingsManager.isDrawNasaConstellations && !skyboxSphere.textureConstellations.loaded) {
+    initTexture(gl, skyboxSphere.textureConstellations);
+  }
 };
+
+export const initTexture = (gl: WebGL2RenderingContext, textureObj: any): void => {
+  textureObj.texture = gl.createTexture();
+  textureObj.img = new Image();
+  textureObj.img.onload = function () {
+    onTextureLoaded(gl, textureObj.texture, textureObj.img);
+    textureObj.loaded = true;
+  };
+  textureObj.img.src = textureObj.src;
+};
+
+// TODO: TexImageSource note defined?
+export const onTextureLoaded = (gl: WebGL2RenderingContext, texture: WebGLTexture, image: any): any => {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+};
+
 export const initBuffers = (gl: WebGL2RenderingContext) => {
   // generate a uvsphere bottom up, CCW order
   const vertPos = [];
@@ -141,9 +171,12 @@ export const initVao = (gl: WebGL2RenderingContext) => {
  * Render Loop Code
  * ***************************************************************************/
 export const update = () => {
+  // const { earth } = keepTrackApi.programs.drawManager.sceneManager;
   skyboxSphere.mvMatrix = glm.mat4.create();
   skyboxSphere.nMatrix = glm.mat3.create();
   glm.mat4.identity(skyboxSphere.mvMatrix);
+  // glm.mat4.rotateZ(skyboxSphere.mvMatrix, skyboxSphere.mvMatrix, earth.earthEra);
+  glm.mat4.rotateZ(skyboxSphere.mvMatrix, skyboxSphere.mvMatrix, -90 * DEG2RAD);
   glm.mat3.normalFromMat4(skyboxSphere.nMatrix, skyboxSphere.mvMatrix);
 };
 export const draw = function (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer?: WebGLFramebuffer) {
@@ -163,12 +196,48 @@ export const draw = function (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer?
   gl.uniformMatrix4fv(skyboxSphere.program.u_pMatrix, false, pMatrix);
   gl.uniformMatrix4fv(skyboxSphere.program.u_camMatrix, false, camMatrix);
 
-  gl.uniform1i(skyboxSphere.program.u_sampler, 0);
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, skyboxSphere.textureMap.texture);
+  if (settingsManager.isDrawMilkyWay) {
+    gl.uniform1i(skyboxSphere.program.u_texMilkyWay, 0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, skyboxSphere.textureMilkyWay.texture);
+  }
+
+  if (settingsManager.isDrawConstellationBoundaries) {
+    gl.uniform1i(skyboxSphere.program.u_texBoundaries, 1);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, skyboxSphere.textureBoundaries.texture);
+  } else {
+    gl.uniform1i(skyboxSphere.program.u_texMilkyWay, 1);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, skyboxSphere.textureMilkyWay.texture);
+  }
+
+  if (settingsManager.isDrawNasaConstellations) {
+    gl.uniform1i(skyboxSphere.program.u_texConstellations, 2);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, skyboxSphere.textureConstellations.texture);
+  } else {
+    gl.uniform1i(skyboxSphere.program.u_texMilkyWay, 2);
+    gl.activeTexture(gl.TEXTURE2);
+    gl.bindTexture(gl.TEXTURE_2D, skyboxSphere.textureMilkyWay.texture);
+  }
+
+  // Figure out how bright the milky way should be to make the blending consistent
+  // The more textures that are on the brighter the milky way needs to be
+  let milkyWayMul;
+  const factor1 = settingsManager.isDrawMilkyWay ? 1 : 0;
+  const factor2 = settingsManager.isDrawConstellationBoundaries ? 1 : 0;
+  const factor3 = settingsManager.isDrawNasaConstellations ? 1 : 0;
+  const sum = factor1 + factor2 + factor3;
+  if (sum === 3) milkyWayMul = 6;
+  else if (sum === 2) milkyWayMul = 4;
+  else if (sum === 1) milkyWayMul = 2;
+  else milkyWayMul = 0;
+
+  gl.uniform1f(skyboxSphere.program.u_fMilkyWay, milkyWayMul);
 
   gl.bindVertexArray(skyboxSphere.vao);
-  gl.blendFunc(gl.ONE_MINUS_SRC_ALPHA, gl.ONE);
+  gl.blendFunc(gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_COLOR);
   gl.enable(gl.BLEND);
   gl.disable(gl.DEPTH_TEST);
 
@@ -192,8 +261,11 @@ const shaders = {
         precision mediump float;
       #endif
   
-      uniform sampler2D u_sampler;
-      uniform vec3 u_sunPos;
+      uniform sampler2D u_texMilkyWay;
+      uniform sampler2D u_texBoundaries;
+      uniform sampler2D u_texConstellations;
+
+      uniform float u_fMilkyWay;
 
       in vec2 v_texcoord;
       in vec3 v_normal;
@@ -206,8 +278,14 @@ const shaders = {
           if (v_dist < 1.0) {
             discard;
           }
-  
-          fragColor = 0.2 * vec4(texture(u_sampler, v_texcoord).rgb, 1.0);
+          
+          // 20% goes to the boundaries
+          vec4 vecBoundaries = texture(u_texBoundaries, v_texcoord) * 0.2;
+          // 20% goes to the constellations
+          vec4 vecConstellations = texture(u_texConstellations, v_texcoord) * 0.2;
+          // 60% goes to the milky way no matter what
+          vec4 vecMilkyWay = texture(u_texMilkyWay, v_texcoord) * u_fMilkyWay * 0.1;
+          fragColor = vecMilkyWay + vecConstellations + vecBoundaries;
       }
       `,
     vert: `#version 300 es
@@ -232,6 +310,7 @@ const shaders = {
           v_dist = distance(position.xyz,vec3(0.0,0.0,0.0));
           
           v_texcoord = a_texCoord;
+          v_texcoord.x = 1.0 - v_texcoord.x;
           v_normal = u_nMatrix * a_normal;
       }
       `,
@@ -239,11 +318,25 @@ const shaders = {
 };
 export const skyboxSphere = {
   vao: <WebGLVertexArrayObject>null,
-  textureMap: {
+  textureMilkyWay: {
+    img: <HTMLImageElement>null,
+    src: `${settingsManager.installDirectory}textures/skybox8k.jpg`,
+    texture: <WebGLTexture>null,
+    loaded: false,
+  },
+  textureBoundaries: {
     isReady: false,
     img: <HTMLImageElement>null,
-    src: `${settingsManager.installDirectory}textures/skybox6k.jpg`,
+    src: `${settingsManager.installDirectory}textures/skyboxBoundaries8k.jpg`,
     texture: <WebGLTexture>null,
+    loaded: false,
+  },
+  textureConstellations: {
+    isReady: false,
+    img: <HTMLImageElement>null,
+    src: `${settingsManager.installDirectory}textures/skyboxConstellations8k.jpg`,
+    texture: <WebGLTexture>null,
+    loaded: false,
   },
   buffers: {
     vertCount: 0,
@@ -260,33 +353,10 @@ export const skyboxSphere = {
     u_camMatrix: <WebGLUniformLocation>null,
     u_mvMatrix: <WebGLUniformLocation>null,
     u_nMatrix: <WebGLUniformLocation>null,
-    u_sampler: <WebGLUniformLocation>null,
-  },
-  godrays: {
-    vao: <WebGLVertexArrayObject>null,
-    textureMap: {
-      texture: <WebGLTexture>null,
-    },
-    renderBuffer: <WebGLRenderbuffer>null,
-    frameBuffer: <WebGLFramebuffer>null,
-    buffers: {
-      vertCount: 0,
-      vertPosBuf: <WebGLBuffer>null,
-      texCoordBuf: <WebGLBuffer>null,
-      vertNormBuf: <WebGLBuffer>null,
-      vertIndexBuf: <WebGLBuffer>null,
-    },
-    program: {
-      a_position: <number>null,
-      a_texCoord: <number>null,
-      a_normal: <number>null,
-      u_pMatrix: <WebGLUniformLocation>null,
-      u_camMatrix: <WebGLUniformLocation>null,
-      u_mvMatrix: <WebGLUniformLocation>null,
-      u_nMatrix: <WebGLUniformLocation>null,
-      u_sampler: <WebGLUniformLocation>null,
-      u_resolution: <WebGLUniformLocation>null,
-    },
+    u_texMilkyWay: <WebGLUniformLocation>null,
+    u_texBoundaries: <WebGLUniformLocation>null,
+    u_texConstellations: <WebGLUniformLocation>null,
+    u_fMilkyWay: <WebGLUniformLocation>null,
   },
   camMatrix: glm.mat4.create(),
   mvMatrix: glm.mat4.create(),
@@ -295,22 +365,5 @@ export const skyboxSphere = {
   init: init,
   update: update,
   draw: draw,
-  eci: { x: 0, y: 0, z: 0 },
-  rae: { azimuth: 0, altitude: 0, distance: 0 },
-  positionModifier: { x: 0, y: 0, z: 0 },
-  drawPosition: [0, 0, 0],
-  pos: [0, 0, 0],
   isLoaded: false,
-};
-export const onTextureLoaded = (gl: WebGL2RenderingContext): any => {
-  gl.bindTexture(gl.TEXTURE_2D, skyboxSphere.textureMap.texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, skyboxSphere.textureMap.img);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-
-  gl.generateMipmap(gl.TEXTURE_2D);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-
-  skyboxSphere.textureMap.isReady = true;
 };

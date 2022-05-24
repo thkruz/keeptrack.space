@@ -141,7 +141,7 @@ describe('uiManager.legendHoverMenuClick', () => {
   });
 
   test('27', () => {
-    let result = uiManager.legendHoverMenuClick('legend-trusat-box');
+    let result = uiManager.legendHoverMenuClick('legend-pink-box');
     expect(result).toMatchSnapshot();
   });
 
@@ -379,7 +379,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   });
 
   test('27', () => {
-    let result = uiManager.legendHoverMenuClick('legend-trusat-box');
+    let result = uiManager.legendHoverMenuClick('legend-pink-box');
     expect(result).toMatchSnapshot();
   });
 

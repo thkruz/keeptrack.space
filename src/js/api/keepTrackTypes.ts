@@ -317,6 +317,8 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isDrawConstellationBoundaries: any;
+  isDrawNasaConstellations: any;
   isDrawSun: any;
   isDrawInCoverageLines: boolean;
   isDrawOrbits: any;

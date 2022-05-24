@@ -50,7 +50,7 @@ export const drawAllConstellations = () => {
         }
         continue;
       }
-      lineManager.create('sat5', [star1, star2], 'w');
+      lineManager.create('sat5', [star1, star2], 'p');
       starManager.isConstellationVisible = true;
       starManager.isAllConstellationVisible = true;
     }

@@ -1250,18 +1250,6 @@ Object {
 }
 `;
 
-exports[`colorSchemeManager.defaultRules should hide rocket bodies out of FOV when told to 2`] = `
-Object {
-  "color": Array [
-    1,
-    1,
-    1,
-    0,
-  ],
-  "pickable": 0,
-}
-`;
-
 exports[`colorSchemeManager.defaultRules should hide satellites in view if we are in planetarium view 1`] = `
 Object {
   "color": Array [

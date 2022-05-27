@@ -1,11 +1,11 @@
 /* */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import { CatalogManager, SearchBox } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { SatGroup } from '../groupsManager/sat-group';
-import { getEl } from '../lib/helpers';
+import { getEl, slideOutUp } from '../lib/helpers';
+import { slideInDown } from './../lib/helpers';
 
 let hoverSatId = -1;
 let hovering = false;
@@ -33,7 +33,7 @@ export const getCurrentSearch = () => (resultsOpen ? (<HTMLInputElement>getEl('s
 export const hideResults = () => {
   try {
     const { colorSchemeManager, groupsManager, dotsManager, satSet } = keepTrackApi.programs;
-    $('#search-results').slideUp();
+    slideOutUp(getEl('search-results'), 1000);
     groupsManager.clearSelect();
     resultsOpen = false;
 
@@ -191,8 +191,7 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
 
 export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) => {
   let satData = satSet.satData;
-  var resultBox = $('#search-results');
-  resultBox[0].innerHTML = results.reduce((html, result) => {
+  getEl('search-results').innerHTML = results.reduce((html, result) => {
     const sat = satData[result.satId];
     html += '<div class="search-result" data-obj-id="' + sat.id + '">';
     html += '<div class="truncate-search">';
@@ -252,7 +251,7 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
     html += '</div></div>';
     return html;
   }, '');
-  resultBox.slideDown();
+  slideInDown(getEl('search-results'), 1000);
   resultsOpen = true;
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };

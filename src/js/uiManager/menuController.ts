@@ -42,7 +42,6 @@ export const initMenuController = () => {
       getEl('legend-hover-menu').style.display = 'block';
       getEl('legend-icon').classList.add('bmenu-item-selected');
       searchBox.hideResults();
-      getEl('search-results').style.display = 'none';
       settingsManager.legendMenuOpen = true;
     }
   });

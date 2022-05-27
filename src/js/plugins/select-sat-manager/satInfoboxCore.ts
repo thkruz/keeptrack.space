@@ -375,7 +375,7 @@ export const orbitalData = (sat: SatObject): void => {
     $('#sat-infobox').draggable({
       containment: 'window',
       drag: () => {
-        $('#sat-infobox').height(600);
+        getEl('sat-infobox').style.height = '600px';
         getEl('sat-infobox').classList.remove('satinfo-fixed');
       },
     });

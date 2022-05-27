@@ -28,7 +28,7 @@ import '@materializecss/materialize';
 // eslint-disable-next-line sort-imports
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { drawManager } from '@app/js/drawManager/drawManager';
-import { clickAndDragHeight, closeColorbox, getEl, rgbCss } from '@app/js/lib/helpers';
+import { clickAndDragHeight, closeColorbox, getClass, getEl, rgbCss } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobileManager';
 import { searchBox } from '@app/js/uiManager/searchBox';
 import $ from 'jquery';
@@ -46,9 +46,7 @@ let forceOpen = false;
 let isFooterShown = true;
 let updateInterval = 1000;
 
-export const init = () => {  
-  initUiValidation();
-
+export const init = () => {    
   // Register all UI callbacks to run at the end of the draw loop
   keepTrackApi.register({
     method: 'onDrawLoopComplete',
@@ -69,9 +67,13 @@ export const init = () => {
 };
 // This runs after the drawManager starts
 export const postStart = () => {
+  initUiValidation();
+  
   setTimeout(() => {
-    $('img').each(function () {
-      $(this).attr('src', $(this).attr('delayedsrc'));
+    document.querySelectorAll('img').forEach((img: any) => {
+      if (!img.src.includes('.png') && !img.src.includes('.jpg')) {
+        img.src = img.attributes.delayedsrc?.value;
+      }
     });
   }, 0);
 
@@ -144,14 +146,14 @@ export const footerToggle = function () {
     getEl('nav-footer')?.classList.add('footer-slide-trans');
     getEl('nav-footer')?.classList.remove('footer-slide-up');
     getEl('nav-footer')?.classList.add('footer-slide-down');
-    $('#nav-footer-toggle').html('&#x25B2;');
+    getEl('nav-footer-toggle').innerHTML = ('&#x25B2;');
   } else {
     isFooterShown = true;
     getEl('sat-infobox')?.classList.remove('sat-infobox-fullsize');
     getEl('nav-footer')?.classList.add('footer-slide-trans');
     getEl('nav-footer')?.classList.remove('footer-slide-down');
     getEl('nav-footer')?.classList.add('footer-slide-up');
-    $('#nav-footer-toggle').html('&#x25BC;');
+    getEl('nav-footer-toggle').innerHTML = ('&#x25BC;');
   }
   // After 1 second the transition should be complete so lets stop moving slowly
   setTimeout(() => {
@@ -162,14 +164,14 @@ export const getsensorinfo = () => {
   const { currentSensor }: { currentSensor: SensorObject[] } = keepTrackApi.programs.sensorManager;
 
   const firstSensor = currentSensor[0];
-  $('#sensor-latitude').html(firstSensor.lat.toString());
-  $('#sensor-longitude').html(firstSensor.lon.toString());
-  $('#sensor-minazimuth').html(firstSensor.obsminaz.toString());
-  $('#sensor-maxazimuth').html(firstSensor.obsmaxaz.toString());
-  $('#sensor-minelevation').html(firstSensor.obsminel.toString());
-  $('#sensor-maxelevation').html(firstSensor.obsmaxel.toString());
-  $('#sensor-minrange').html(firstSensor.obsminrange.toString());
-  $('#sensor-maxrange').html(firstSensor.obsmaxrange.toString());
+  getEl('sensor-latitude').innerHTML = (firstSensor.lat.toString());
+  getEl('sensor-longitude').innerHTML = (firstSensor.lon.toString());
+  getEl('sensor-minazimuth').innerHTML = (firstSensor.obsminaz.toString());
+  getEl('sensor-maxazimuth').innerHTML = (firstSensor.obsmaxaz.toString());
+  getEl('sensor-minelevation').innerHTML = (firstSensor.obsminel.toString());
+  getEl('sensor-maxelevation').innerHTML = (firstSensor.obsmaxel.toString());
+  getEl('sensor-minrange').innerHTML = (firstSensor.obsminrange.toString());
+  getEl('sensor-maxrange').innerHTML = (firstSensor.obsmaxrange.toString());
 };
 export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
   const { satSet, colorSchemeManager } = keepTrackApi.programs;
@@ -191,28 +193,30 @@ export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
     }
     if (colorSchemeManager.objectTypeFlags[slug]) {
       colorSchemeManager.objectTypeFlags[slug] = false;
-      $(`.legend-${slug}-box`).css('background', 'black');
-      settingsManager.isForceColorScheme = true;
-      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      getClass(`legend-${slug}-box`).forEach((el) => {
+        el.style.background = 'black'
+      });
     } else {
       colorSchemeManager.objectTypeFlags[slug] = true;
-      $(`.legend-${slug}-box`).css('background', rgbCss(colorString).toString());
-      settingsManager.isForceColorScheme = true;
-      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      getClass(`legend-${slug}-box`).forEach((el) => {
+        el.style.background = rgbCss(colorString).toString()
+      });
     }
   } else {
     if (colorSchemeManager.objectTypeFlags[slug]) {
       colorSchemeManager.objectTypeFlags[slug] = false;
-      $(`.legend-${slug}-box`).css('background', 'black');
-      settingsManager.isForceColorScheme = true;
-      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      getClass(`legend-${slug}-box`).forEach((el) => {
+        el.style.background = 'black'
+      });
     } else {
       colorSchemeManager.objectTypeFlags[slug] = true;
-      $(`.legend-${slug}-box`).css('background', rgbCss(settingsManager.colors[slug]));
-      settingsManager.isForceColorScheme = true;
-      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      getClass(`legend-${slug}-box`).forEach((el) => {
+        el.style.background = rgbCss(settingsManager.colors[slug])
+      });
     }
   }
+  settingsManager.isForceColorScheme = true;
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
 };
 export const onReady = () => {
   // Code Once index.htm is loaded
@@ -286,43 +290,43 @@ export const panToStar = (c: SatObject): void => {
 };
 export const loadStr = (str) => {
   if (str == '') {
-    $('#loader-text').html('');
+    getEl('loader-text').innerHTML = ('');
     return;
   }
   if (str == 'math') {
-    $('#loader-text').html('Attempting to Math...');
+    getEl('loader-text').innerHTML = ('Attempting to Math...');
   }
 
   switch (str) {
     case 'science':
-      $('#loader-text').html('Locating Science...');
+      getEl('loader-text').innerHTML = ('Locating Science...');
       break;
     case 'science2':
-      $('#loader-text').html('Found Science...');
+      getEl('loader-text').innerHTML = ('Found Science...');
       break;
     case 'dots':
-      $('#loader-text').html('Drawing Dots in Space...');
+      getEl('loader-text').innerHTML = ('Drawing Dots in Space...');
       break;
     case 'satIntel':
-      $('#loader-text').html('Integrating Satellite Intel...');
+      getEl('loader-text').innerHTML = ('Integrating Satellite Intel...');
       break;
     case 'radarData':
-      $('#loader-text').html('Importing Radar Data...');
+      getEl('loader-text').innerHTML = ('Importing Radar Data...');
       break;
     case 'painting':
-      $('#loader-text').html('Painting the Earth...');
+      getEl('loader-text').innerHTML = ('Painting the Earth...');
       break;
     case 'coloring':
-      $('#loader-text').html('Coloring Inside the Lines...');
+      getEl('loader-text').innerHTML = ('Coloring Inside the Lines...');
       break;
     case 'elsets':
-      $('#loader-text').html('Locating ELSETs...');
+      getEl('loader-text').innerHTML = ('Locating ELSETs...');
       break;
     case 'models':
-      $('#loader-text').html('Loading 3D Models...');
+      getEl('loader-text').innerHTML = ('Loading 3D Models...');
       break;
     case 'easterEgg':
-      $('#loader-text').html('Llama Llama Llama Duck!');
+      getEl('loader-text').innerHTML = ('Llama Llama Llama Duck!');
   }
 };
 export const doSearch = (searchString: string, isPreventDropDown: boolean) => {
@@ -486,7 +490,7 @@ export const hideLoadingScreen = () => {
   }
 
   // Display content when loading is complete.
-  $('#canvas-holder').attr('style', 'display:block');
+  getEl('canvas-holder').style.display = 'block';
 
   mobileManager.checkMobileMode();
 

@@ -121,7 +121,6 @@ export const timeMachineIconClick = () => {
   } else {
     uiManager.legendMenuChange('timeMachine');
     searchBox.hideResults();
-    getEl('search-results').style.display = 'none';
   }
 };
 export const timeMachineRemoveSatellite = (

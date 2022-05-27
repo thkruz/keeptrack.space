@@ -181,7 +181,6 @@ export const checkIfSelectSatVisible = () => {
 
     // Avoid unnecessary dom updates
     if (cssStyle !== selectSatManager.lastCssStyle && selectSatManager.searchResultDom) {
-      selectSatManager.searchResultDom.attr('style', cssStyle);
       selectSatManager.lastCssStyle = cssStyle;
     }
   }

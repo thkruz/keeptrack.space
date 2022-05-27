@@ -193,9 +193,8 @@ export const satCruncherOnMessage = (m: SatCruncherMessage) => {
   if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) || settingsManager.isForceColorScheme) {
     // Don't change colors while dragging
     if (!mainCamera.isDragging) {
-      setTimeout(() => {
-        satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-      }, 0);
+      // TODO: SLOW!
+      satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
     }
   }
 

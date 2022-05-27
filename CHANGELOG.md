@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v6.0.2
+
+>  
+
+- feat: :zap: optimize milky way textures and rotate
+- chore: :bookmark: change to 6.0.1
+
 #### v6.0.1
 
 >  

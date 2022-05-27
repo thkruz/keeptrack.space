@@ -1,5 +1,4 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import { getEl } from '../lib/helpers';
 
 export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
@@ -29,21 +28,21 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
           break;
         case mainCamera.cameraType.Fps:
           uiManager.toast('Free Camera Mode', 'standby');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
         case mainCamera.cameraType.Planetarium:
           uiManager.toast('Planetarium Camera Mode', 'standby');
           uiManager.legendMenuChange('planetarium');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
         case mainCamera.cameraType.Satellite:
           uiManager.toast('Satellite Camera Mode', 'standby');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
         case mainCamera.cameraType.Astronomy:
           uiManager.toast('Astronomy Camera Mode', 'standby');
           uiManager.legendMenuChange('astronomy');
-          $('#fov-text').html('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
       }
       break;
@@ -53,15 +52,27 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
       if (mainCamera.isShiftPressed) {
         evt.preventDefault();
         uiManager.searchToggle(true);
-        $('#search').trigger('focus');
-        mainCamera.isShiftPressed = false;
+        getEl('search').focus();
+        setTimeout(() => {
+          mainCamera.isShiftPressed = false;
+          mainCamera.fpsRun = 1;
+          settingsManager.cameraMovementSpeed = 0.003;
+          settingsManager.cameraMovementSpeedMin = 0.005;
+          mainCamera.speedModifier = 1;
+        }, 100);
       }
       break;
     // Hide the UI
     case 'H':
       if (mainCamera.isShiftPressed) {
         uiManager.hideUi();
-        mainCamera.isShiftPressed = false;
+        setTimeout(() => {
+          mainCamera.isShiftPressed = false;
+          mainCamera.fpsRun = 1;
+          settingsManager.cameraMovementSpeed = 0.003;
+          settingsManager.cameraMovementSpeedMin = 0.005;
+          mainCamera.speedModifier = 1;
+        }, 100);
       }
       break;
   }

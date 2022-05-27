@@ -48,6 +48,22 @@ export const getEl = (id: string): HTMLElement => {
   // throw new Error(`Element with id ${id} not found!`);
 };
 
+export const getClass = (id: string): HTMLElement[] => {
+  const els = <HTMLElement[]>Array.from(document.getElementsByClassName(id));
+  if (els.length) return els;
+  if (isThisJest()) {
+    // Create an empty DIV and send that back
+    // TODO - This is a hack. Tests should provide the right environment.
+    const el = document.createElement('div');
+    el.id = id;
+    document.body.appendChild(el);
+    return [<HTMLElement>(<unknown>el)];
+  }
+  return [];
+  // DEBUG: Use this code for finding bad requests
+  // throw new Error(`Element with class ${id} not found!`);
+};
+
 export const saveCsv = (items: Array<any>, name?: string): void => {
   try {
     const replacer: any = (value: never) => (value === null ? '' : value); // specify how you want to handle null values here
@@ -156,11 +172,8 @@ export const slideOutUp = (el: HTMLElement, duration: number, callback?: () => v
 
   if (el.style.display === 'none') return;
   el.style.transition = `transform ${duration / 1e3}s ease-in-out`;
-  el.style.transform = 'translateY(-100%)';
+  el.style.transform = `translateY(${-100}%)`;
   setTimeout(() => {
-    el.style.display = 'none';
-    el.style.transition = '';
-    el.style.transform = '';
     if (callback) callback();
   }, duration);
 };
@@ -170,16 +183,15 @@ export const slideInDown = (el: HTMLElement, duration: number, callback?: () => 
   // TODO: Throw an error here
   if (el === null) return;
 
-  if (el.style.display === 'block') return;
+  el.style.transform = `translateY(-100%)`;
+  el.style.transition = `transform 0s ease-in-out`;
   el.style.display = 'block';
-  el.style.transition = `transform ${duration / 1e3}s ease-in-out`;
-  el.style.transform = 'translateY(100%)';
   setTimeout(() => {
     el.style.display = 'block';
-    el.style.transition = '';
-    el.style.transform = '';
+    el.style.transition = `transform ${duration / 1e3}s ease-in-out`;
+    el.style.transform = 'translateY(0)';
     if (callback) callback();
-  }, duration);
+  }, 50);
 };
 
 export const showLoading = (callback?: () => void, delay?: number): void => {

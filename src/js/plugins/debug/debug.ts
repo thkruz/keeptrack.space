@@ -1,7 +1,6 @@
 // @ts-ignore-next-line
 import { getEl } from '@app/js/lib/helpers';
 import * as gremlins from 'gremlins.js';
-import $ from 'jquery';
 
 /*
  * Returns a random integer between min (inclusive) and max (inclusive).
@@ -57,10 +56,10 @@ export const startGremlins = () => {
     .unleash();
 };
 export const runGremlins = () => {
-  $('#nav-footer').height(200);
+  getEl('nav-footer').style.height = '200px';
   getEl('nav-footer-toggle').style.display = 'none';
-  $('#bottom-icons-container').height(200);
-  $('#bottom-icons').height(200);
+  getEl('bottom-icons-container').style.height = '200px';
+  getEl('bottom-icons').style.height = '200px';
   startGremlins();
 };
 //Global Debug Manager

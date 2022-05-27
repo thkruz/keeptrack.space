@@ -294,6 +294,10 @@ ul {
   color: var(--colorSecondary);
 }
 
+#search-results {
+  transform: translateY(-100%);
+}
+
 .search-result {
   padding: 5px;
   height: 28px;

@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { getEl } from '@app/js/lib/helpers';
 
 export const init = (): void => {
   keepTrackApi.register({
@@ -11,28 +11,34 @@ export const init = (): void => {
 
 export const setClassificationBanner = (): void => {
   if (settingsManager.classificationStr !== '') {
-    (<any>$('#main-container')).prepend(keepTrackApi.html`
+    getEl('main-container').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
     <div id="classification-container">
       <span>${settingsManager.classificationStr}</span>
     </div>        
-  `);
+  `
+    );
 
     let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--top-menu-height').replace('px', ''));
     if (isNaN(topMenuHeight)) topMenuHeight = 0;
     document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + 20 + 'px');
-    const classificationContainerDOM = $('#classification-container');
 
     if (settingsManager.classificationStr.slice(0, 12) === 'Unclassified') {
-      classificationContainerDOM.css({ 'background-color': 'var(--classificationUnclassifiedBackgroundColor)', 'color': 'white' });
+      getEl('classification-container').style.backgroundColor = 'var(--classificationUnclassifiedBackgroundColor)';
+      getEl('classification-container').style.color = 'white';
     }
     if (settingsManager.classificationStr.slice(0, 6) === 'Secret') {
-      classificationContainerDOM.css({ 'background-color': 'var(--classificationSecretBackgroundColor)', 'color': 'white' });
+      getEl('classification-container').style.backgroundColor = 'var(--classificationSecretBackgroundColor)';
+      getEl('classification-container').style.color = 'white';
     }
     if (settingsManager.classificationStr.slice(0, 10) === 'Top Secret') {
-      classificationContainerDOM.css({ 'background-color': 'var(--classificationTopSecretBackgroundColor)', 'color': 'black' });
+      getEl('classification-container').style.backgroundColor = 'var(--classificationTopSecretBackgroundColor)';
+      getEl('classification-container').style.color = 'white';
     }
     if (settingsManager.classificationStr.slice(0, 15) === 'Top Secret//SCI') {
-      classificationContainerDOM.css({ 'background-color': 'var(--classificationTopSecretSCIBackgroundColor)', 'color': 'black' });
+      getEl('classification-container').style.backgroundColor = 'var(--classificationTopSecretSCIBackgroundColor)';
+      getEl('classification-container').style.color = 'white';
     }
   }
 };

@@ -102,6 +102,7 @@ export const loadScene = async () => {
   // Make this public
   drawManager.sceneManager = sceneManager;
   try {
+    // await tools.init();
     await sceneManager.earth.init(gl);        
     keepTrackApi.methods.drawManagerLoadScene();
     await sceneManager.sun.init();
@@ -228,6 +229,8 @@ export const drawLoop = (preciseDt: number) => {
 
   sceneManager.earth.draw(drawManager.pMatrix, mainCamera, dotsManager, drawManager.postProcessingManager.curBuffer);
 
+  // tools.draw(drawManager.pMatrix, mainCamera.camMatrix, null);
+  
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet.satData.length, satSet.orbitalSats, timeManager);
 

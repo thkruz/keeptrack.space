@@ -189,8 +189,8 @@ ul {
   background: var(--classificationColor);
 }
 
-#canvas {
-  position: absolute;
+#keeptrack-canvas {
+  /* position: absolute; */
   background: var(--colorBlack); /* Inconsistent brightness without this */
   z-index: 0;
   top: 0;

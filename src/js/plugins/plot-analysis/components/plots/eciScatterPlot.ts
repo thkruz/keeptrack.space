@@ -43,7 +43,7 @@ export const createEciScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
   });
 
   // Get the Data
-  const dataRange = data.reduce((dataRange, sat) => {
+  const dataRange = data.reduce((range, sat) => {
     const minDataX = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[0]), Infinity);
     const maxDataX = sat.value.reduce((max: number, item: EciPos) => Math.max(max, item[0]), -Infinity);
     const minDataY = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[1]), Infinity);
@@ -53,7 +53,7 @@ export const createEciScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
     const minData = Math.round(Math.min(minDataX, minDataY, minDataZ) / 1000) * 1000;
     const maxData = Math.round(Math.max(maxDataX, maxDataY, maxDataZ) / 1000) * 1000;
     const _dataRange = Math.max(maxData, Math.abs(minData));
-    return Math.max(dataRange, _dataRange);
+    return Math.max(range, _dataRange);
   }, 0);
 
   // Setup Chart

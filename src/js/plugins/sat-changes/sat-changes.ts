@@ -145,7 +145,7 @@ export const getSatChngJson = (json: any) => { // NOSONAR
     date = new Date(date.getTime() + (json[i].day % 1) * 1440 * 60000);
     json[i].date = date;
   }
-  const satChngTable = json;
+  const _satChngTable = json;
   // satChng Menu
   const tbl = <HTMLTableElement>getEl('satChng-table'); // Identify the table to update
   tbl.innerHTML = ''; // Clear the table from old object data
@@ -165,8 +165,8 @@ export const getSatChngJson = (json: any) => { // NOSONAR
   tdPer.setAttribute('style', 'text-decoration: underline');
 
   // 20 rows max
-  for (let i = 0; i < Math.min(satChngTable.length, 20); i++) {
-    const sat = satSet.getSat(satSet.getIdFromObjNum(satChngTable[i].SCC));
+  for (let i = 0; i < Math.min(_satChngTable.length, 20); i++) {
+    const sat = satSet.getSat(satSet.getIdFromObjNum(_satChngTable[i].SCC));
 
     // Skip Decays
     if (sat === null) continue;
@@ -175,7 +175,7 @@ export const getSatChngJson = (json: any) => { // NOSONAR
     tr.setAttribute('class', 'satChng-object link');
     tr.setAttribute('hiddenrow', i.toString());
     tdT = tr.insertCell();
-    const dateStr = satChngTable[i].date.toJSON();
+    const dateStr = _satChngTable[i].date.toJSON();
     let timeTextStr = '';
     for (let iText = 0; iText < 20; iText++) {
       if (iText < 10) timeTextStr += dateStr[iText];
@@ -184,14 +184,14 @@ export const getSatChngJson = (json: any) => { // NOSONAR
     }
     tdT.appendChild(document.createTextNode(timeTextStr));
     tdSat = tr.insertCell();
-    tdSat.appendChild(document.createTextNode(satChngTable[i].SCC.toString()));
+    tdSat.appendChild(document.createTextNode(_satChngTable[i].SCC.toString()));
     tdInc = tr.insertCell();
-    tdInc.appendChild(document.createTextNode(satChngTable[i].inc.toFixed(2)));
+    tdInc.appendChild(document.createTextNode(_satChngTable[i].inc.toFixed(2)));
     tdPer = tr.insertCell();
-    const deltaMeanMo = satChngTable[i].meanmo;
+    const deltaMeanMo = _satChngTable[i].meanmo;
     const origPer = 1440 / (sat.meanMotion + deltaMeanMo);
     const perDelta = 1440 / sat.meanMotion - origPer;
     tdPer.appendChild(document.createTextNode(perDelta.toFixed(2)));
   }
-  return { resp: json, satChngTable };
+  return { resp: json, satChngTable: _satChngTable };
 };

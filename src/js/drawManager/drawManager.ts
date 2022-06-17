@@ -229,8 +229,6 @@ export const drawLoop = (preciseDt: number) => {
 
   sceneManager.earth.draw(drawManager.pMatrix, mainCamera, dotsManager, drawManager.postProcessingManager.curBuffer);
 
-  // tools.draw(drawManager.pMatrix, mainCamera.camMatrix, null);
-  
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet.satData.length, satSet.orbitalSats, timeManager);
 

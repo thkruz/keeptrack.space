@@ -103,8 +103,8 @@ describe('earth.initProgram', () => {
 
 // @ponicode
 describe('earth.init', () => {
-  test('0', () => {
-    let result: any = earth.init();
+  test('0', async () => {
+    let result: any = await earth.init();
     expect(result).toMatchSnapshot();
   });
 });

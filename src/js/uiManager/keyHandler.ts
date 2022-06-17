@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { Camera } from '../api/keepTrackTypes';
 import { getEl } from '../lib/helpers';
 
 export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
@@ -53,26 +54,14 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
         evt.preventDefault();
         uiManager.searchToggle(true);
         getEl('search').focus();
-        setTimeout(() => {
-          mainCamera.isShiftPressed = false;
-          mainCamera.fpsRun = 1;
-          settingsManager.cameraMovementSpeed = 0.003;
-          settingsManager.cameraMovementSpeedMin = 0.005;
-          mainCamera.speedModifier = 1;
-        }, 100);
+        releaseShiftKey(mainCamera);
       }
       break;
     // Hide the UI
     case 'H':
       if (mainCamera.isShiftPressed) {
         uiManager.hideUi();
-        setTimeout(() => {
-          mainCamera.isShiftPressed = false;
-          mainCamera.fpsRun = 1;
-          settingsManager.cameraMovementSpeed = 0.003;
-          settingsManager.cameraMovementSpeedMin = 0.005;
-          mainCamera.speedModifier = 1;
-        }, 100);
+        releaseShiftKey(mainCamera);
       }
       break;
   }
@@ -177,3 +166,14 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
     }
   }
 };
+
+const releaseShiftKey = (mainCamera: Camera) => {
+  setTimeout(() => {
+    mainCamera.isShiftPressed = false;
+    mainCamera.fpsRun = 1;
+    settingsManager.cameraMovementSpeed = 0.003;
+    settingsManager.cameraMovementSpeedMin = 0.005;
+    mainCamera.speedModifier = 1;
+  }, 100);
+};
+

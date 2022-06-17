@@ -171,11 +171,9 @@ export const initVao = (gl: WebGL2RenderingContext) => {
  * Render Loop Code
  * ***************************************************************************/
 export const update = () => {
-  // const { earth } = keepTrackApi.programs.drawManager.sceneManager;
   skyboxSphere.mvMatrix = glm.mat4.create();
   skyboxSphere.nMatrix = glm.mat3.create();
   glm.mat4.identity(skyboxSphere.mvMatrix);
-  // glm.mat4.rotateZ(skyboxSphere.mvMatrix, skyboxSphere.mvMatrix, earth.earthEra);
   glm.mat4.rotateZ(skyboxSphere.mvMatrix, skyboxSphere.mvMatrix, -90 * DEG2RAD);
   glm.mat3.normalFromMat4(skyboxSphere.nMatrix, skyboxSphere.mvMatrix);
 };

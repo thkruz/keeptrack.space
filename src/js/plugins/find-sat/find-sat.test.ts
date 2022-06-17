@@ -190,8 +190,8 @@ describe('findSat.checkRange', () => {
 
 // @ponicode
 describe('findSat.findByLooksSubmit', () => {
-  test('0', () => {
-    let result: any = findSat.findByLooksSubmit();
+  test('0', async () => {
+    let result: any = await findSat.findByLooksSubmit();
     expect(result).toMatchSnapshot();
   });
 });

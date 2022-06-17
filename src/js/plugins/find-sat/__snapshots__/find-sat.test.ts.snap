@@ -85,7 +85,7 @@ Array [
 ]
 `;
 
-exports[`findSat.findByLooksSubmit 0 1`] = `Promise {}`;
+exports[`findSat.findByLooksSubmit 0 1`] = `undefined`;
 
 exports[`findSat.hideSideMenus 0 1`] = `undefined`;
 

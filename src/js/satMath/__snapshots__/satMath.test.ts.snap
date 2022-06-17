@@ -1,25 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`satMath.calculateDops 0 1`] = `
-Object {
-  "gdop": "2.21",
-  "hdop": "1.06",
-  "pdop": "2.00",
-  "tdop": "0.92",
-  "vdop": "1.70",
-}
-`;
-
-exports[`satMath.calculateDops 1 1`] = `
-Object {
-  "gdop": 50,
-  "hdop": 50,
-  "pdop": 50,
-  "tdop": 50,
-  "vdop": 50,
-}
-`;
-
 exports[`satMath.calculateVisMag 0 1`] = `NaN`;
 
 exports[`satMath.calculateVisMag 1 1`] = `NaN`;
@@ -29,13 +9,6 @@ exports[`satMath.calculateVisMag 2 1`] = `NaN`;
 exports[`satMath.calculateVisMag 3 1`] = `NaN`;
 
 exports[`satMath.calculateVisMag 4 1`] = `NaN`;
-
-exports[`satMath.createTle 0 1`] = `
-Object {
-  "TLE1": "1 25544U 1998-01A 20123  .00003453  00000-0  71172-4 0  9991",
-  "TLE2": "2 25544 010.0100 010.5000 0.001 001.0000 010.5000 15.15000000    10",
-}
-`;
 
 exports[`satMath.currentEpoch 0 1`] = `
 Array [
@@ -54,45 +27,6 @@ Array [
 exports[`satMath.distance 0 1`] = `"<br />Range: 0 km"`;
 
 exports[`satMath.distance 1 1`] = `"<br />Range: 0 km"`;
-
-exports[`satMath.findBestPasses 0 1`] = `undefined`;
-
-exports[`satMath.getDops 0 1`] = `
-Object {
-  "gdop": 50,
-  "hdop": 50,
-  "pdop": 50,
-  "tdop": 50,
-  "vdop": 50,
-}
-`;
-
-exports[`satMath.getOrbitByLatLon 0 1`] = `
-Array [
-  "Error",
-  "Failed to find a solution for Argument of Perigee",
-]
-`;
-
-exports[`satMath.getSunDirection 0 1`] = `
-Array [
-  148724320.43455538,
-  6189145.714033483,
-  14909516.932049064,
-]
-`;
-
-exports[`satMath.getSunDirection 1 1`] = `
-Array [
-  1306788.4922269185,
-  -120881774.59456515,
-  -88121572.7460775,
-]
-`;
-
-exports[`satMath.getSunTimes 0 1`] = `undefined`;
-
-exports[`satMath.getSunTimes 1 1`] = `undefined`;
 
 exports[`satMath.getTearData should handle isInFOV 1`] = `
 Object {
@@ -134,42 +68,6 @@ Object {
 }
 `;
 
-exports[`satMath.getlookangles 0 1`] = `Array []`;
-
-exports[`satMath.getlookangles 1 1`] = `Array []`;
-
-exports[`satMath.getlookangles 2 1`] = `
-Array [
-  Object {
-    "az": 50,
-    "el": 30,
-    "name": "COD",
-    "rng": 1000,
-    "time": "2022-01-01T00:00:00.000Z",
-  },
-]
-`;
-
-exports[`satMath.getlookanglesMultiSite 0 1`] = `undefined`;
-
-exports[`satMath.lookAngles2Ecf 0 1`] = `
-Object {
-  "x": 3399.2987560938654,
-  "y": 6013.8733407148075,
-  "z": -2379.043164190548,
-}
-`;
-
-exports[`satMath.lookAngles2Ecf 1 1`] = `
-Object {
-  "x": 3697.567569850421,
-  "y": 7959.494204847528,
-  "z": 3243.7908022872425,
-}
-`;
-
-exports[`satMath.populateMultiSiteTable 0 1`] = `undefined`;
-
 exports[`satMath.setTEARR 0 1`] = `undefined`;
 
 exports[`satMath.setobs 0 1`] = `undefined`;
@@ -185,5 +83,3 @@ exports[`satMath.setobs 4 1`] = `undefined`;
 exports[`satMath.setobs 5 1`] = `undefined`;
 
 exports[`satMath.setobs 6 1`] = `undefined`;
-
-exports[`satMath.updateDopsTable 0 1`] = `undefined`;

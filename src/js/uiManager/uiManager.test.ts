@@ -76,7 +76,7 @@ describe('uiManager.legendHoverMenuClick', () => {
   });
 
   test('14', () => {
-    let result = uiManager.legendHoverMenuClick('legend-inviewAlt-box');
+    let result = uiManager.legendHoverMenuClick('legend-inFOVAlt-box');
     expect(result).toMatchSnapshot();
   });
 
@@ -141,7 +141,7 @@ describe('uiManager.legendHoverMenuClick', () => {
   });
 
   test('27', () => {
-    let result = uiManager.legendHoverMenuClick('legend-trusat-box');
+    let result = uiManager.legendHoverMenuClick('legend-pink-box');
     expect(result).toMatchSnapshot();
   });
 
@@ -178,7 +178,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
       sensor: false,
       missile: false,
       missileInview: false,
-      trusat: false,
+      pink: false,
       inFOV: false,
       inViewAlt: false,
       starLow: false,
@@ -218,7 +218,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
       sensor: true,
       missile: true,
       missileInview: true,
-      trusat: true,
+      pink: true,
       inFOV: true,
       inViewAlt: true,
       starLow: true,
@@ -314,7 +314,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   });
 
   test('14', () => {
-    let result = uiManager.legendHoverMenuClick('legend-inviewAlt-box');
+    let result = uiManager.legendHoverMenuClick('legend-inFOVAlt-box');
     expect(result).toMatchSnapshot();
   });
 
@@ -379,7 +379,7 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
   });
 
   test('27', () => {
-    let result = uiManager.legendHoverMenuClick('legend-trusat-box');
+    let result = uiManager.legendHoverMenuClick('legend-pink-box');
     expect(result).toMatchSnapshot();
   });
 

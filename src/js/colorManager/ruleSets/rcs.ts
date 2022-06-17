@@ -23,7 +23,7 @@ export const rcsRules = (sat: SatObject): ColorInformation => { // NOSONAR
       pickable: Pickable.No,
     };
   }
-  if ((typeof rcs === 'undefined' || rcs === null || typeof sat.rcs === 'undefined' || sat.rcs === 'N/A') && colorSchemeManager.objectTypeFlags.rcsUnknown === false) {
+  if ((typeof rcs === 'undefined' || isNaN(rcs) || rcs === null || typeof sat.rcs === 'undefined' || sat.rcs === 'N/A') && colorSchemeManager.objectTypeFlags.rcsUnknown === false) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
       pickable: Pickable.No,

@@ -1,11 +1,13 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
+import satChngPng from '@app/img/icons/satchng.png';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isConstellationsMenuOpen = false;
 
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
       <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
         <div id="constellation-menu" class="side-menu">
           <ul>
@@ -21,31 +23,27 @@ export const uiManagerInit = () => {
           </ul>
         </div>
       </div>
-    `);
+      `));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
       <div id="menu-constellations" class="bmenu-item">
         <img
           alt="constellation"
           src=""
-          delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAADTUlEQVR4nO2dT08TQRiHf9OQthiKfgQP5dTAReKZnggHIxr9LHiz3vSzaBCjCeFUPBrwhD2Vgx+Ag4KRQgivBxljSrfdP7P77uz8nls77czkfXa6k5ntOwAhhBBCCCGEEEICpj2URnsojaLaM0U15AOdgdTNb7yDQf3XGTa/d80o7zYp4AYbfGPwCAAE2CtCAgXgdvAtRUgIXkBU8C15SwhawKzgW/KUEKyAuMG35CUhSAFJg2/JQ0JwAtIG3+JaQlACsgbf4lJCMAJcBd/iSkIQAlwH3+JCQs1lh8pIeyiN2gg7U4NvsJumzADrrUVsZ1k7qrSAzkDqzR94C8FG1GcE2Ds7xdOo8usmNkXwMbIRwUbzJz7c70szTR8rK2CtL3NxrvzRXTye9hMy6JjL0T08jzMS1voyl7SflRWw3zVXEHyOKrdX/vGSuZhV1/GSuZg1EgT4st81V0n7WVkBAHC0at4AeDH+fpqb56BjLuUOnk2SIAa9bw/MqzR9rLQA4LaELDOXSRKyBB8IZBoKAMuHsiVANyr4y4cik753tGpuxejfxk0NX7MEHwhIAPD3xhz1O51EwKy6khCUgGkkFeCKyt8Dyg4FKEMBylCAMhSgTOK1i6REzS60yHtWkxSOAGUoQBkKUIYClKEAZXKfBUVRttmIFhwBylCAMhSgDAUoQwHKUIAyFKAMBShDAcpQgDIUoIzaWlAUZdtByxuOAGUoQBkKUIYClKEAZUo3Cwptp4wjQBkKUIYClKEAZShAGScC0vxDvIi6fCCzgJUD6Z208CltroT/6QykfrKA7eVDeZ21Ll/IJGDlQHpi8NIA6wst7GSRMJZSZisUCakF2ODb11kkROTzCUJCKgHjwbekkTAjmVLlJSQWsNaXOanhYVR5kiRGMZMprVT5xpxq3SVOCjCbFKPVwvmk8ut5NOLWUUQSbS1SL3y1h9KYP8X7admoYLAbWT6t7Kb8fBFP4uTz8ZlMK49lTobnC5mXfsuaDtIXnKy9lzEhqi842/woW0pgX3C6+1SmpNi+4Hz7ryxp4X0hl/3XMhyM4Au5bYBrHw3iC7k+gaB5OI4v5P4IiNbxUL5QyDM4GgekkTGKPiKQEEIIIYQQQgghZeQPbZbQOqruDvAAAAAASUVORK5CYII="/> <!-- // NO-PIG -->
+          delayedsrc="${satChngPng}"
+        />
         <span class="bmenu-title">Constellations</span>
         <div class="status-icon"></div>
       </div>
-    `);
+    `));
 
-  $('#constellations-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('constellations-menu'));  
 
-  $('#constellation-menu>ul>li').on('click', function () {
+  getEl('constellation-menu').querySelectorAll('li').forEach((element) => {
+    element.addEventListener('click', function () {
     constellationMenuClick($(this).data('group'));
+    });
   });
 };
 
@@ -82,45 +80,41 @@ export const constellationMenuClick = (groupName: any) => { // NOSONAR
       break;
     case 'aehf':
       if (!groupsManager.aehf) groupsManager.aehf = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.aehf));
-      $('#loading-screen').fadeIn(1000, () => {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'aehf');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'wgs':
       // WGS also selects DSCS
       if (!groupsManager.wgs)
         groupsManager.wgs = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.wgs.concat(objectManager.satLinkManager.dscs)));
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'wgs');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'starlink':
       if (!groupsManager.starlink) groupsManager.starlink = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.starlink));
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     case 'sbirs': // SBIRS and DSP
       if (!groupsManager.sbirs) {
         groupsManager.sbirs = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.sbirs));
       }
-      $('#loading-screen').fadeIn(1000, function () {
+      showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'sbirs');
-        $('#loading-screen').fadeOut('slow');
       });
       break;
     default:
       throw new Error('Unknown group name: ' + groupName);
   }
   groupSelected(groupName);
-  uiManager.doSearch($('#search').val());
+  uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
 };
 
 export const groupSelected = (groupName: string) => {
@@ -144,8 +138,8 @@ export const groupSelected = (groupName: string) => {
 };
 
 export const hideSideMenus = (): void => {
-  $('#constellations-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-constellations').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('constellations-menu'), 1000);
+  getEl('menu-constellations').classList.remove('bmenu-item-selected');
   isConstellationsMenuOpen = false;
 };
 
@@ -159,9 +153,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#constellations-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('constellations-menu'), 1000);
       isConstellationsMenuOpen = true;
-      $('#menu-constellations').addClass('bmenu-item-selected');
+      getEl('menu-constellations').classList.add('bmenu-item-selected');
       return;
     }
   }

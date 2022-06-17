@@ -3,8 +3,9 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as exportTle from '@app/js/satSet/exportTle';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../api/apiMocks';
+import { KeepTrackPrograms } from '../api/keepTrackTypes';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 // @ponicode
 describe('exportTle.exportTle2Csv', () => {
   test('0', () => {

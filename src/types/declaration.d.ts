@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 declare module '*.css';
+declare module '*.jpg';
+declare module '*.png';
 
 interface JQuery<HTMLElement> {
   effect: any;

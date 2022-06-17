@@ -8,7 +8,7 @@ import { generateConfig } from './webpack.mjs';
 console.clear();
 console.log('Copying files...'); // NOSONAR
 
-const reqDirs = ['audio', 'css/fonts', 'analysis', 'img', 'meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle'];
+const reqDirs = ['audio', 'css/fonts', 'img', 'meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle'];
 const optDirs = [''];
 
 const reqFiles = [
@@ -27,9 +27,10 @@ const reqFiles = [
 ];
 const optFiles = ['serviceWorker.js', 'SOCRATES.html'];
 
-console.log('Copy static files...'); // NOSONAR
-
+console.log('Removing old files...'); // NOSONAR
 setupDistFolders();
+
+console.log('Copy static files...'); // NOSONAR
 copyFilesAndFolders(reqDirs, reqFiles, optDirs, optFiles, 'dist');
 copySettingsFiles('dist');
 
@@ -45,11 +46,36 @@ const isWatch = !!(typeof myArgs[1] !== 'undefined' && myArgs[1] === '--watch');
 
 const webpackConfig = generateConfig(env, isWatch);
 
-const compiler = webpack(webpackConfig);
+const compiler = webpack(webpackConfig, (watchErrors, watchStats) => {
+  const hasErrors = watchErrors || watchStats.hasErrors();
+  if (hasErrors) {
+    console.log(
+      watchStats.toString({
+        cached: false,
+        colors: true,
+        assets: false,
+        chunks: false,
+        chunkModules: false,
+        chunkOrigins: false,
+        errors: true,
+        errorDetails: true,
+        hash: false,
+        modules: false,
+        timings: false,
+        warnings: false,
+        version: false,
+        children: false,
+        reasons: false,
+        source: false,
+      })
+    );
+  }
+});
+
 if (isWatch) {
   compiler.watch({}, (watchErrors, watchStats) => {
     const hasErrors = watchErrors || watchStats.hasErrors();
-    if (hasErrors) {
+    if (hasErrors && watchStats) {
       console.log(
         watchStats.toString({
           cached: false,
@@ -74,35 +100,35 @@ if (isWatch) {
   });
 
   process.on('SIGINT', () => {
-    process.exit(0);
+    throw new Error('SIGINT');
   });
   process.on('SIGTERM', () => {
-    process.exit(0);
+    throw new Error('SIGTERM');
   });
   process.on('SIGUSR2', () => {
-    process.exit(0);
+    throw new Error('SIGUSR2');
   });
   process.on('exit', () => {
-    process.exit(0);
+    throw new Error('exit');
   });
 } else {
   compiler.run((runErrors, runStats) => {
-    console.log(
-      runStats.toString({
-        cached: false,
-        colors: true,
-        assets: true,
-        chunks: false,
-        chunkModules: false,
-        chunkOrigins: false,
-        errors: true,
-        errorDetails: true,
-        hash: false,
-        modules: false,
-        timings: false,
-        warnings: false,
-        version: false,
-      })
-    );
+    // console.log(
+    //   runStats.toString({
+    //     cached: false,
+    //     colors: true,
+    //     assets: true,
+    //     chunks: false,
+    //     chunkModules: false,
+    //     chunkOrigins: false,
+    //     errors: true,
+    //     errorDetails: true,
+    //     hash: false,
+    //     modules: false,
+    //     timings: false,
+    //     warnings: false,
+    //     version: false,
+    //   })
+    // );
   });
 }

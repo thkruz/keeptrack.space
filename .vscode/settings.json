@@ -7,6 +7,7 @@
   "npm.exclude": ["**/dist/**", "**/src/admin", "**/src/admin/*"],
   "eslint.workingDirectories": ["./"],
   "typescript.tsdk": "./node_modules/typescript/lib",
+  // "workbench.editor.labelFormat": "short",
   "[typescript]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": false,
@@ -14,6 +15,16 @@
       "source.fixAll.eslint": true,
       "source.addMissingImports": true
     }
+  },
+  "git.enableCommitSigning": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "*/dist/**": true
   },
   "[yaml]": {
     "editor.autoIndent": "advanced"

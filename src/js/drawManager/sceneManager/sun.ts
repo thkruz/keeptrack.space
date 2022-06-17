@@ -26,9 +26,9 @@ import { A } from '../../lib/external/meuusjs';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-const NUM_LAT_SEGS = 64;
-const NUM_LON_SEGS = 64;
-const RADIUS_OF_DRAW_SUN = 6000;
+const NUM_LAT_SEGS = 32;
+const NUM_LON_SEGS = 32;
+const RADIUS_OF_DRAW_SUN = 6500;
 const SUN_SCALAR_DISTANCE = 220000;
 
 /* ***************************************************************************
@@ -222,7 +222,7 @@ export const initGodraysProgram = (gl: WebGL2RenderingContext): void => {
  * ***************************************************************************/
 export const update = () => {
   const { timeManager } = keepTrackApi.programs;
-  sun.now = timeManager.calculateSimulationTime();
+  sun.now = timeManager.simulationTimeObj;
 
   sun.sunvar.j = jday(
     sun.now.getUTCFullYear(),

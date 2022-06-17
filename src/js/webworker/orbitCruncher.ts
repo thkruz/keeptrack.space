@@ -1,5 +1,5 @@
 import * as satellite from 'satellite.js';
-import { DEG2RAD, RADIUS_OF_EARTH } from '../lib/constants';
+import { DEG2RAD, RADIUS_OF_EARTH, TAU } from '../lib/constants';
 import { jday } from '../timeManager/transforms';
 import { propTime } from './positionCruncher/calculations';
 
@@ -61,6 +61,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
     // position slices, not timeslices (ugly perigees on HEOs)
 
     const satId = m.data.satId;
+    const isEcfOutput = m.data.isEcfOutput || false;
     const pointsOut = new Float32Array((NUM_SEGS + 1) * 4);
 
     const nowDate = propTime(dynamicOffsetEpoch, staticOffset, propRate);
@@ -74,31 +75,40 @@ export const onmessageProcessing = (m) => { // NOSONAR
     if (satCache[satId].missile) {
       while (i < len) {
         const missile = satCache[satId];
-        const x = Math.round(missile.altList.length * (i / NUM_SEGS));
 
-        const missileTime = propTime(dynamicOffsetEpoch, staticOffset, propRate);
-        const j =
-          jday(
-            missileTime.getUTCFullYear(),
-            missileTime.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-            missileTime.getUTCDate(),
-            missileTime.getUTCHours(),
-            missileTime.getUTCMinutes(),
-            missileTime.getUTCSeconds()
-          ) +
-          missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-        const gmst = satellite.gstime(j);
+        if (missile.latList?.length === 0) {
+          pointsOut[i * 4] = 0;
+          pointsOut[i * 4 + 1] = 0;
+          pointsOut[i * 4 + 2] = 0;
+          pointsOut[i * 4 + 3] = 0;
+          i++;  
+        } else {
+          const x = Math.round(missile.altList.length * (i / NUM_SEGS));
 
-        const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
-        const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
-        const cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
-        const sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
+          const missileTime = propTime(dynamicOffsetEpoch, staticOffset, propRate);
+          const j =
+            jday(
+              missileTime.getUTCFullYear(),
+              missileTime.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+              missileTime.getUTCDate(),
+              missileTime.getUTCHours(),
+              missileTime.getUTCMinutes(),
+              missileTime.getUTCSeconds()
+            ) +
+            missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+          const gmst = satellite.gstime(j);
 
-        pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
-        pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
-        pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
-        pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
-        i++;
+          const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
+          const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
+          const cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
+          const sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
+
+          pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
+          pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
+          pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
+          pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
+          i++;
+        }
       }
     } else {
       const period = (2 * Math.PI) / satCache[satId].no; // convert rads/min to min
@@ -106,8 +116,13 @@ export const onmessageProcessing = (m) => { // NOSONAR
 
       while (i < len) {
         const t = now + i * timeslice;
-        const p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
-        if (p.x && p.y && p.z) {
+        let p: satellite.EciVec3<number> | satellite.EcfVec3<number>;
+        p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
+        // eslint-disable-next-line no-constant-condition
+        if (isEcfOutput) {
+          p = <satellite.EcfVec3<number>>satellite.ecfToEci(p, -i * timeslice * TAU / period);
+        }
+        if (p?.x && p?.y && p?.z) {
           pointsOut[i * 4] = p.x;
           pointsOut[i * 4 + 1] = p.y;
           pointsOut[i * 4 + 2] = p.z;

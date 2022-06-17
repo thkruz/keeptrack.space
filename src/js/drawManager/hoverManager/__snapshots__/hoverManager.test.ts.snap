@@ -23,21 +23,21 @@ exports[`hoverManager.hoverBoxOnSat 8 2`] = `undefined`;
 exports[`hoverManager.hoverOverSomething should handle missiles 1`] = `
 <div
   id="sat-hoverbox"
-  style="display: block; text-align: center; position: fixed; left: 20px; top: -10px;"
+  style="display: block; left: 20px; top: -10px;"
 />
 `;
 
 exports[`hoverManager.hoverOverSomething should handle normal satellites 1`] = `
 <div
   id="sat-hoverbox"
-  style="display: block; text-align: center; position: fixed; left: 20px; top: -10px;"
+  style="display: block; left: 20px; top: -10px;"
 />
 `;
 
 exports[`hoverManager.hoverOverSomething should handle statics 1`] = `
 <div
   id="sat-hoverbox"
-  style="display: block; text-align: center; position: fixed; left: 20px; top: -10px;"
+  style="display: block; left: 20px; top: -10px;"
 />
 `;
 

@@ -4,8 +4,10 @@ import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getDayOfYear } from '../timeManager/transforms';
+import { KeepTrackPrograms } from './../api/keepTrackTypes';
 import { colorSchemeManager, isDebrisOff, isInViewOff, isPayloadOff, isRocketBodyOff } from './colorSchemeManager';
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 const RealNow = Date.now;
 
@@ -407,8 +409,8 @@ describe('colorSchemeManager.defaultRules', () => {
     expect(result).toMatchSnapshot();
   });
 
-  it('should hide rocket bodies out of FOV when told to', () => {
-    colorSchemeManager.objectTypeFlags.trusat = false;
+  it('should hide special sats out of FOV when told to', () => {
+    colorSchemeManager.objectTypeFlags.pink = false;
     const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.SPECIAL, inView: 0 } });
     expect(result).toMatchSnapshot();
   });

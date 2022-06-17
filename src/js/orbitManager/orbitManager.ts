@@ -3,15 +3,18 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
 import { Camera, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
+import { getEl } from '../lib/helpers';
 
 const NUM_SEGS = 255;
 const glBuffers = <WebGLBuffer[]>[];
 const inProgress = <boolean[]>[];
 let pathShader: any;
 let selectOrbitBuf: WebGLBuffer;
+let secondaryOrbitBuf: WebGLBuffer;
 let hoverOrbitBuf: WebGLBuffer;
 let currentHoverId = -1;
 let currentSelectId = -1;
+let secondarySelectId = -1;
 let currentInView = <number[]>[];
 let gl: WebGL2RenderingContext;
 let mainCamera: Camera;
@@ -46,9 +49,8 @@ export const init = (orbitWorker?: Worker): void => {
     } catch (error) {
       // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
       if (window.location.href.indexOf('file://') === 0) {
-        $('#loader-text').text(
-          'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
-        );
+        getEl('loader-text').innerText =
+          'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.';
       } else {
         console.error(error);
       }
@@ -84,6 +86,10 @@ export const init = (orbitWorker?: Worker): void => {
 
   selectOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+
+  secondaryOrbitBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, secondaryOrbitBuf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
 
   hoverOrbitBuf = gl.createBuffer();
@@ -128,14 +134,23 @@ orbitManager.clearOrbit = function () {
 glm.mat4.identity(glm.mat4.create());
 } */
 
-export const setSelectOrbit = (satId: number): void => {
-  currentSelectId = satId;
+export const setSelectOrbit = (satId: number, isSecondary: boolean = false): void => {
+  if (isSecondary) {
+    secondarySelectId = satId;
+  } else {
+    currentSelectId = satId;
+  }
   orbitManager.updateOrbitBuffer(satId);
 };
 
-export const clearSelectOrbit = (): void => {
-  currentSelectId = -1;
-  gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
+export const clearSelectOrbit = (isSecondary: boolean = false): void => {
+  if (isSecondary) {
+    secondarySelectId = -1;
+    gl.bindBuffer(gl.ARRAY_BUFFER, secondaryOrbitBuf);
+  } else {
+    currentSelectId = -1;
+    gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
+  }
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
 };
 
@@ -179,7 +194,6 @@ export const clearHoverOrbit = (): void => {
 };
 
 export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFramebuffer): boolean => {
-  // lol what do I do here
   if (!initialized) return false;
 
   const { satSet } = keepTrackApi.programs;
@@ -198,62 +212,72 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
   gl.uniformMatrix4fv(pathShader.uCamMatrix, false, camMatrix);
   gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
 
-  if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-  }
-
-  if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) {
-    // avoid z-fighting
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-  }
-
-  if (currentInView.length >= 1) {
-    // There might be some z-fighting
-    if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
-    } else {
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+  if (settingsManager.isDrawOrbits) {
+    if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
+      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
+      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
     }
-    currentInView.forEach((id) => {
-      writePathToGpu(id);
-    });
-  }
 
-  if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
-    // DEBUG: Planned future feature
-    // if (sensorManager.currentSensor?.lat) {
-    //   groupsManager.selectedGroup.forEach(function (id) {
-    //     let isInViewSoon = false;
-    //     for (let i = 0; i < orbitManager.inViewSoon.length; i++) {
-    //       if (id === orbitManager.inViewSoon[i]) {
-    //         isInViewSoon = true;
-    //         break;
-    //       }
-    //     }
-    //     if (isInViewSoon) {
-    //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
-    //     } else {
-    //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    //     }
+    if (secondarySelectId !== -1 && !satSet.getSatExtraOnly(secondarySelectId).static) {
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor2);
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
+      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
+      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    }
 
-    //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-    //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    //     gl.enableVertexAttribArray(pathShader.aPos);
-    //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-    //   });
-    // }
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-    groupsManager.selectedGroup.forEach((id: number) => {
-      writePathToGpu(id);
-    });
+    if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) {
+      // avoid z-fighting
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
+      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
+      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pathShader.aPos);
+      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    }
+
+    if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+      // DEBUG: Planned future feature
+      // if (sensorManager.currentSensor?.lat) {
+      //   groupsManager.selectedGroup.forEach(function (id) {
+      //     let isInViewSoon = false;
+      //     for (let i = 0; i < orbitManager.inViewSoon.length; i++) {
+      //       if (id === orbitManager.inViewSoon[i]) {
+      //         isInViewSoon = true;
+      //         break;
+      //       }
+      //     }
+      //     if (isInViewSoon) {
+      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+      //     } else {
+      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
+      //     }
+
+      //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
+      //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+      //     gl.enableVertexAttribArray(pathShader.aPos);
+      //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+      //   });
+      // }
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
+      groupsManager.selectedGroup.forEach((id: number) => {
+        writePathToGpu(id);
+      });
+    }
+
+    if (currentInView.length >= 1) {
+      // There might be some z-fighting
+      if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
+        gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
+      } else {
+        gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+      }
+      currentInView.forEach((id) => {
+        writePathToGpu(id);
+      });
+    }
   }
 
   gl.disable(gl.BLEND);
@@ -287,6 +311,7 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
       rate: timeManager.propRate,
       TLE1: TLE1,
       TLE2: TLE2,
+      isEcfOutput: settingsManager.isOrbitCruncherInEcf,
     });
   } else if (!inProgress[satId] && !sat.static) {
     if (missile) {
@@ -306,6 +331,7 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
         dynamicOffsetEpoch: timeManager.dynamicOffsetEpoch,
         staticOffset: timeManager.staticOffset,
         rate: timeManager.propRate,
+        isEcfOutput: settingsManager.isOrbitCruncherInEcf,
       });
       inProgress[satId] = true;
     }

@@ -1,8 +1,9 @@
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as sensor from './sensor';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 // @ponicode
 
 // @ponicode
@@ -10,6 +11,28 @@ describe('sensor.init', () => {
   test('0', () => {
     let result: any = sensor.init();
     expect(result).toMatchSnapshot();
+  });
+});
+
+describe('sensor.settingsRisesetChange', () => {
+  test('0', () => {
+    const callFunction: any = () => {
+      document.body.innerHTML = '<div id="left-menus"></div>';
+      sensor.uiManagerInit(); // Need the HTML to be loaded
+
+      sensor.settingsRisesetChange({ preventDefault: () => true }, false);
+      sensor.settingsRisesetChange({ preventDefault: () => true }, true);
+    };
+
+    expect(callFunction).not.toThrow();
+  });
+
+  test('1', () => {
+    const callFunction: any = () => {
+      sensor.settingsRisesetChange(null);
+    };
+
+    expect(callFunction).toThrow();
   });
 });
 

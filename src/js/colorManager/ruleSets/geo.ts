@@ -62,7 +62,7 @@ export const geoRules = (sat: SatObject): ColorInformation => { // NOSONAR
   } else {
     if (sat.inView === 1 && colorSchemeManager.objectTypeFlags.inFOV === true) {
       return {
-        color: colorSchemeManager.colorTheme.inView,
+        color: colorSchemeManager.colorTheme.inFOV,
         pickable: Pickable.Yes,
       };
     } else {

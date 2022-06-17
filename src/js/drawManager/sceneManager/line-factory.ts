@@ -318,7 +318,7 @@ export class LineFactory {
                 this.drawLineList[i].sat2.id = this.getSensorFromSensorName(this.drawLineList[i].sat2.name);
               }
               this.drawLineList[i].sat2 = keepTrackApi.programs.satSet.getSat(this.drawLineList[i].sat2.id);
-              if (!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && this.drawLineList[i].sat.inView === 0) {
+              if ((!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && this.drawLineList[i].sat.inView === 0)|| !settingsManager.isDrawInCoverageLines) {
                 this.drawLineList.splice(i, 1);
                 continue;
               }
@@ -327,7 +327,7 @@ export class LineFactory {
                   const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
                   if (sensor.name == this.drawLineList[i].sat2.name) {
                     let tearr = this.drawLineList[i].sat.getTEARR(null, [sensor]);
-                    if (!tearr.inView) {
+                    if (!tearr.inView || !settingsManager.isDrawInCoverageLines) {
                       this.drawLineList.splice(i, 1);
                     }
                   }

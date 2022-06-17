@@ -189,8 +189,8 @@ export interface OrbitManager {
   orbitWorker: any;
   removeInViewOrbit(arg0: any): void;
   draw(pMatrix: any, camMatrix: any, curBuffer: any): void;
-  clearSelectOrbit(): void;
-  setSelectOrbit(selectedSat: number): void;
+  clearSelectOrbit(isSecondary?: boolean): void;
+  setSelectOrbit(selectedSat: number, isSecondary?: boolean): void;
   updateOrbitBuffer(satId: number, force?: boolean, TLE1?: string, TLE2?: string, missileParams?: MissileParams): void;
   addInViewOrbit(i: number): void;
   setHoverOrbit(mouseSat: any): void;
@@ -199,7 +199,9 @@ export interface OrbitManager {
 }
 
 export interface Colors {
-  inViewAlt: [number, number, number, number];
+  pink: [number, number, number, number];
+  inFOV: [number, number, number, number];
+  inFOVAlt: [number, number, number, number];
   sunlight60: [number, number, number, number];
   sunlight80: [number, number, number, number];
   sunlight100: [number, number, number, number];
@@ -212,8 +214,6 @@ export interface Colors {
   sensor: [number, number, number, number];
   marker: [number, number, number, number][];
   deselected: [number, number, number, number];
-  inView: [number, number, number, number];
-  inviewAlt: [number, number, number, number];
   radarData: [number, number, number, number];
   radarDataMissile: [number, number, number, number];
   radarDataSatellite: [number, number, number, number];
@@ -317,6 +317,15 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isDrawConstellationBoundaries: any;
+  isDrawNasaConstellations: any;
+  isDrawSun: any;
+  isDrawInCoverageLines: boolean;
+  isDrawOrbits: any;
+  isEciOnHover: boolean;
+  isDrawMilkyWay: boolean;
+  isDragging: boolean;
+  isOrbitCruncherInEcf: boolean;
   lastSearch: any;
   db: any;
   isGroupOverlayDisabled: any;
@@ -462,6 +471,7 @@ export interface SettingsManager {
   orbitInViewColor: [number, number, number, number];
   orbitPlanetariumColor: [number, number, number, number];
   orbitSelectColor: [number, number, number, number];
+  orbitSelectColor2: [number, number, number, number];
   plugins: any;
   politicalImages: boolean;
   pTime: any[];
@@ -497,6 +507,9 @@ export type RocketUrl = {
 };
 
 export interface ObjectManager {
+  secondarySatObj: SatObject;
+  secondarySat: number;
+  switchPrimarySecondary: () => void;
   init: () => void;
   rocketUrls: RocketUrl[];
   satLinkManager: any;
@@ -506,6 +519,7 @@ export interface ObjectManager {
   isLaunchSiteManagerLoaded: any;
   launchSiteManager: any;
   setHoveringSat(i: number): void;
+  setSecondarySat(i: number): void;
   setLasthoveringSat(hoveringSat: number): void;
   lastSelectedSat(id?: number): number;
   extractLaunchSite(name: string): {
@@ -657,7 +671,6 @@ export interface UiInputInterface {
   getSatIdFromCoordAlt: any;
   openRmbMenu: any;
   rmbMenuActions: any;
-  getRayOrigin: any;
   canvasMouseMove: any;
   canvasTouchMove: any;
   canvasTouchEnd: any;
@@ -1088,7 +1101,7 @@ export interface CatalogManager {
   numSats: any;
   satCruncher: any;
   getSat: (id: number) => SatObject;
-  getIdFromObjNum(arg0: number): any;
+  getIdFromObjNum(objNum: number, isExtensiveSearch?: boolean): number;
   sccIndex: { [key: string]: number };
   cosparIndex: { [key: string]: number };
   orbitalSats: number;
@@ -1132,6 +1145,11 @@ export type lookanglesRow = {
 };
 
 export interface SatMath {
+  getAngleBetweenTwoSatellites(sat1: SatObject, sat2: SatObject): { az: number; el: number };
+  getLlaOfCurrentOrbit(sat: SatObject, points: number): { lat: number; lon: number; alt: number; time: number }[];
+  getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits?: number);
+  getEcfOfCurrentOrbit(sat: SatObject, points: number);
+  getEciOfCurrentOrbit(sat: SatObject, points: number): { x: number; y: number; z: number }[];
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };
   calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => boolean[];
@@ -1153,6 +1171,7 @@ export interface SatMath {
   findBestPass(sat: SatObject, sensors: SensorObject[]): lookanglesRow[];
   findBestPasses: (sats: string, sensor: SensorObject) => void;
   findCloseObjects: () => string;
+  findReentries: () => string;
   findClosestApproachTime: (
     sat1: SatObject,
     sat2: SatObject,
@@ -1181,7 +1200,7 @@ export interface SatMath {
   lookAngles2Ecf: (az: number, el: number, rng: number, lat: number, lon: number, alt: number) => { x: number; y: number; z: number };
   lookanglesInterval: number;
   lookanglesLength: number;
-  map: (sat: SatObject, i: number) => { time: string; lat: number; lon: number; inView: boolean };
+  map: (sat: SatObject, i: number, pointPerOrbit?: number) => { time: string; lat: number; lon: number; inView: boolean };
   nextNpasses: (sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) => any[];
   nextpass: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => any;
   nextpassList: (satArray: SatObject[]) => { sccNum: string; time: any }[];
@@ -1258,7 +1277,7 @@ export interface SensorFovPlugin {
 }
 export interface AdviceManager {
   adviceCount: any;
-  showAdvice(arg0: string, arg1: string, arg2: null, arg3: string);
+  showAdvice(header: string, text: string, focusDOM: HTMLElement, setLocation: string);
   adviceArray: any;
   adviceList: any;
 }
@@ -1277,6 +1296,7 @@ export interface DrawManager {
   glInit: any;
   createDotsManager: any;
   loadScene: any;
+  loadHiRes: any;
   resizeCanvas: any;
   calculatePMatrix: any;
   startWithOrbits: any;

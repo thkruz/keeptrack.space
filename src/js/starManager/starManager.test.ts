@@ -2,9 +2,10 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../api/apiMocks';
+import { KeepTrackPrograms } from './../api/keepTrackTypes';
 import * as starManager from './starManager';
 
-keepTrackApi.programs = { ...keepTrackApi.programs, ...keepTrackApiStubs.programs };
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 // @ponicode
 describe('starManager.init', () => {
   test('0', () => {

@@ -1,10 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import $ from 'jquery';
+import flagPng from '@app/img/icons/flag.png';
+import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isCountriesMenuOpen = false;
 export const hideSideMenus = (): void => {
-  $('#countries-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-countries').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('countries-menu'), 1000);
+  getEl('menu-countries').classList.remove('bmenu-item-selected');
   isCountriesMenuOpen = false;
 };
 export const init = (): void => {
@@ -38,9 +40,9 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#countries-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('countries-menu'), 1000);
       isCountriesMenuOpen = true;
-      $('#menu-countries').addClass('bmenu-item-selected');
+      getEl('menu-countries').classList.add('bmenu-item-selected');
       return;
     }
   }
@@ -48,7 +50,7 @@ export const bottomMenuClick = (iconName: string): void => {
 
 export const uiManagerInit = () => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="countries-menu" class="side-menu-parent start-hidden text-select">
           <div id="country-menu" class="side-menu">
             <ul>
@@ -66,64 +68,60 @@ export const uiManagerInit = () => {
             </ul>
           </div>
         </div>
-      `);
+        `));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="menu-countries" class="bmenu-item">
           <img
             alt="flag"
             src=""
-            delayedsrc="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAABmJLR0QA/wD/AP+gvaeTAAABc0lEQVR4nO3aT26CQBzF8QdOTO/gGdy1x+k52k1ddKW9Rf8cx523IQS6M0ZDCpMZH0O/n53kZ0J8GeQxSAAAAAAAAAAAAAAAIItqzND22Pe5T2SJTo/Vn79vfY8TwTACMIsJoFGvl1BrE2ptJL1KaozzRQsR39mdnqqPi8+H7bGXpL1pvmiTV0ArfV0f6zp9uuZLN3kFPNS3d05hrVXXeuYvjbnrmJvpK6DT8/Wxrr09dq/50sX0gEbSLtT6ls4/2Luk9cDXc8+flbgCFlXESgyAHmBGAGYpL0GNer2FlX6kkdf6vPN2Yy6JMUVsCAUtQrJLEAUtTrIAhgqUa74U6VYABS1K2j/hmRY0lzF/whQxM3qAGQGYsSNmxo6YGTtiZovaEZvb3VqW94IoXGktakdsbv5dEZsbXk0sAAEAAADAgCKWEUWsAARgRgBmBGBGAAAAADDgWVBGPAsqAAGYEYAZAZgRAAAAAAAAAAAAAAAAWKZfZIMQFE8x07MAAAAASUVORK5CYII="/> <!-- // NO-PIG -->
+            delayedsrc="${flagPng}"
+          />
           <span class="bmenu-title">Countries</span>
           <div class="status-icon"></div>
         </div>
-      `);
+      `));
 
   // NOTE: Must use function not arrow function to access 'this'
-  $('#country-menu>ul>li').on('click', function () {
-    countryMenuClick($(this).data('group'));
-  });
+  getEl('country-menu').querySelectorAll('li').forEach((element) => {
+    element.addEventListener('click', function () {
+      countryMenuClick($(this).data('group'));
+    });
+  })
 
-  $('#countries-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
+  clickAndDragWidth(getEl('countries-menu'));
 };
 
 export const countryMenuClick = (groupName: string): void => { // NOSONAR
   const { groupsManager } = keepTrackApi.programs;
   switch (groupName) {
     case 'Canada':
-      if (!groupsManager.Canada) groupsManager.Canada = groupsManager.createGroup('countryRegex', /CA/u);
+      if (!groupsManager.Canada) groupsManager.Canada = groupsManager.createGroup('countryRegex', /Canada/u);
       break;
     case 'China':
-      if (!groupsManager.China) groupsManager.China = groupsManager.createGroup('countryRegex', /PRC/u);
+      if (!groupsManager.China) groupsManager.China = groupsManager.createGroup('countryRegex', /China/u);
       break;
     case 'France':
-      if (!groupsManager.France) groupsManager.France = groupsManager.createGroup('countryRegex', /FR/u);
+      if (!groupsManager.France) groupsManager.France = groupsManager.createGroup('countryRegex', /France/u);
       break;
     case 'India':
-      if (!groupsManager.India) groupsManager.India = groupsManager.createGroup('countryRegex', /IND/u);
+      if (!groupsManager.India) groupsManager.India = groupsManager.createGroup('countryRegex', /India/u);
       break;
     case 'Israel':
-      if (!groupsManager.Israel) groupsManager.Israel = groupsManager.createGroup('countryRegex', /ISRA/u);
+      if (!groupsManager.Israel) groupsManager.Israel = groupsManager.createGroup('countryRegex', /Israel/u);
       break;
     case 'Japan':
-      if (!groupsManager.Japan) groupsManager.Japan = groupsManager.createGroup('countryRegex', /JPN/u);
+      if (!groupsManager.Japan) groupsManager.Japan = groupsManager.createGroup('countryRegex', /Japan/u);
       break;
     case 'Russia':
-      if (!groupsManager.Russia) groupsManager.Russia = groupsManager.createGroup('countryRegex', /CIS/u);
+      if (!groupsManager.Russia) groupsManager.Russia = groupsManager.createGroup('countryRegex', /Russia/u);
       break;
     case 'UnitedKingdom':
-      if (!groupsManager.UnitedKingdom) groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /UK/u);
+      if (!groupsManager.UnitedKingdom) groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /United Kingdom/u);
       break;
     case 'UnitedStates':
-      if (!groupsManager.UnitedStates) groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /US/u);
+      if (!groupsManager.UnitedStates) groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /United States/u);
       break;
     default:
       throw new Error('Unknown country group');

@@ -1,12 +1,15 @@
 import $ from 'jquery';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { TimeManager } from '../api/keepTrackTypes';
+import { getEl } from '../lib/helpers';
 import { getDayOfYear } from './transforms';
 
 export const changePropRate = (propRate: number) => {
   if (timeManager.propRate === propRate) return; // no change
 
-  timeManager.staticOffset = timeManager.simulationTimeObj.getTime() - timeManager.realTime;
+  // if (timeManager.propRate !== 1.0 || timeManager.staticOffset !== 0) {
+  timeManager.staticOffset = timeManager.simulationTimeObj.getTime() - Date.now();
+  // }
   // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
   timeManager.dynamicOffsetEpoch = Date.now();
   timeManager.propRate = propRate;
@@ -35,7 +38,6 @@ export const synchronize = () => {
 export const changeStaticOffset = (staticOffset: number) => {
   timeManager.dynamicOffsetEpoch = Date.now();
   timeManager.staticOffset = staticOffset;
-  console.debug('changeStaticOffset', staticOffset);
   synchronize();
 };
 
@@ -97,8 +99,9 @@ export const timeManager: TimeManager = {
         const simulationTime = timeManager.dynamicOffsetEpoch + timeManager.staticOffset;
         timeManager.simulationTimeObj.setTime(simulationTime);
       } else {
-        const dynamicOffset = Date.now() - timeManager.dynamicOffsetEpoch;
-        const simulationTime = timeManager.realTime + timeManager.staticOffset + dynamicOffset * timeManager.propRate;
+        timeManager.realTime = Date.now();
+        const dynamicOffset = timeManager.realTime - timeManager.dynamicOffsetEpoch;
+        const simulationTime = timeManager.dynamicOffsetEpoch + timeManager.staticOffset + dynamicOffset * timeManager.propRate;
         timeManager.simulationTimeObj.setTime(simulationTime);
       }
 
@@ -116,6 +119,7 @@ export const timeManager: TimeManager = {
       timeManager.dt = dt;
 
       timeManager.setLastTime(timeManager.simulationTimeObj);
+      // NOTE: This should be the only regular call to calculateSimulationTime!!
       timeManager.calculateSimulationTime();
       timeManager.setSelectedDate(timeManager.simulationTimeObj);
 
@@ -146,15 +150,19 @@ export const timeManager: TimeManager = {
           settingsManager.isPropRateChange = false;
         }
         // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
-        if (timeManager.dateDOM == null) timeManager.dateDOM = window.document.getElementById('datetime-text');
         if (timeManager.dateDOM == null) {
-          console.debug('Cant find datetime-text!');
-          return;
+          try {
+            timeManager.dateDOM = getEl('datetime-text');
+            if (timeManager.dateDOM == null) return; // Avoid race condition
+          } catch {
+            // Avoid race condition
+            return;
+          }
         }
         timeManager.dateDOM.textContent = timeManager.timeTextStr;
 
         // Load the current JDAY
-        const jday = timeManager.getDayOfYear(timeManager.calculateSimulationTime());
+        const jday = timeManager.getDayOfYear(timeManager.simulationTimeObj);
         $('#jday').html(jday);
       }
     };

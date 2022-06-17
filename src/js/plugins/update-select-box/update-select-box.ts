@@ -3,8 +3,7 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { cKmPerMs, DEG2RAD } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/helpers';
 
-export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
-  // NOSONAR
+export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONAR
   try {
     const { satellite, missileManager, timeManager, objectManager, sensorManager, uiManager } = keepTrackApi.programs;
 

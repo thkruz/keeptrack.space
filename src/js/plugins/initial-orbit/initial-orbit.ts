@@ -1,5 +1,6 @@
 import iodPng from '@app/img/icons/iod.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { UiManager } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { omManager } from '@app/js/plugins/initial-orbit/om-manager';
 
@@ -230,250 +231,137 @@ export const bottomMenuClick = (iconName: string): void => {
     }
   }
 };
-export const obfitFormSubmit = (e: any) => {
-  // NOSONAR
+export const obfitFormSubmit = (e: any) => { // NOSONAR
   const { uiManager, satSet, timeManager, satellite } = keepTrackApi.programs;
-  let t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v;
-  let t2v, x2v, y2v, z2v, xd2v, yd2v, zd2v;
-  let t3v, x3v, y3v, z3v, xd3v, yd3v, zd3v;
   let isOb2 = true;
   let isOb3 = true;
-  const t1 = (<HTMLInputElement>getEl('obfit-t1')).value;
-  if (t1.length > 0) {
-    t1v = parseFloat(t1);
-  } else {
-    t1v = NaN;
-  }
-  const x1 = (<HTMLInputElement>getEl('obfit-x1')).value;
-  if (x1.length > 0) {
-    x1v = parseFloat(x1);
-  } else {
-    x1v = NaN;
-  }
-  const y1 = (<HTMLInputElement>getEl('obfit-y1')).value;
-  if (y1.length > 0) {
-    y1v = parseFloat(y1);
-  } else {
-    y1v = NaN;
-  }
-  const z1 = (<HTMLInputElement>getEl('obfit-z1')).value;
-  if (z1.length > 0) {
-    z1v = parseFloat(z1);
-  } else {
-    z1v = NaN;
-  }
-  const xd1 = (<HTMLInputElement>getEl('obfit-xd1')).value;
-  if (xd1.length > 0) {
-    xd1v = parseFloat(xd1);
-  } else {
-    xd1v = NaN;
-  }
-  const yd1 = (<HTMLInputElement>getEl('obfit-yd1')).value;
-  if (yd1.length > 0) {
-    yd1v = parseFloat(yd1);
-  } else {
-    yd1v = NaN;
-  }
-  const zd1 = (<HTMLInputElement>getEl('obfit-zd1')).value;
-  if (zd1.length > 0) {
-    zd1v = parseFloat(zd1);
-  } else {
-    zd1v = NaN;
-  }
-  const t2 = (<HTMLInputElement>getEl('obfit-t2')).value;
-  if (t2.length > 0) {
-    t2v = parseFloat(t2);
-  } else {
-    isOb2 = false;
-  }
-  const x2 = (<HTMLInputElement>getEl('obfit-x2')).value;
-  if (x2.length > 0) {
-    x2v = parseFloat(x2);
-  } else {
-    isOb2 = false;
-  }
-  const y2 = (<HTMLInputElement>getEl('obfit-y2')).value;
-  if (y2.length > 0) {
-    y2v = parseFloat(y2);
-  } else {
-    isOb2 = false;
-  }
-  const z2 = (<HTMLInputElement>getEl('obfit-z2')).value;
-  if (z2.length > 0) {
-    z2v = parseFloat(z2);
-  } else {
-    isOb2 = false;
-  }
-  const xd2 = (<HTMLInputElement>getEl('obfit-xd2')).value;
-  if (xd2.length > 0) {
-    xd2v = parseFloat(xd2);
-  } else {
-    isOb2 = false;
-  }
-  const yd2 = (<HTMLInputElement>getEl('obfit-yd2')).value;
-  if (yd2.length > 0) {
-    yd2v = parseFloat(yd2);
-  } else {
-    isOb2 = false;
-  }
-  const zd2 = (<HTMLInputElement>getEl('obfit-zd2')).value;
-  if (zd2.length > 0) {
-    zd2v = parseFloat(zd2);
-  } else {
-    isOb2 = false;
-  }
-  const t3 = (<HTMLInputElement>getEl('obfit-t3')).value;
-  if (t3.length > 0) {
-    t3v = parseFloat(t3);
-  } else {
-    isOb3 = false;
-  }
-  const x3 = (<HTMLInputElement>getEl('obfit-x3')).value;
-  if (x3.length > 0) {
-    x3v = parseFloat(x3);
-  } else {
-    isOb3 = false;
-  }
-  const y3 = (<HTMLInputElement>getEl('obfit-y3')).value;
-  if (y3.length > 0) {
-    y3v = parseFloat(y3);
-  } else {
-    isOb3 = false;
-  }
-  const z3 = (<HTMLInputElement>getEl('obfit-z3')).value;
-  if (z3.length > 0) {
-    z3v = parseFloat(z3);
-  } else {
-    isOb3 = false;
-  }
-  const xd3 = (<HTMLInputElement>getEl('obfit-xd3')).value;
-  if (xd3.length > 0) {
-    xd3v = parseFloat(xd3);
-  } else {
-    isOb3 = false;
-  }
-  const yd3 = (<HTMLInputElement>getEl('obfit-yd3')).value;
-  if (yd3.length > 0) {
-    yd3v = parseFloat(yd3);
-  } else {
-    isOb3 = false;
-  }
-  const zd3 = (<HTMLInputElement>getEl('obfit-zd3')).value;
-  if (zd3.length > 0) {
-    zd3v = parseFloat(zd3);
-  } else {
-    isOb3 = false;
-  }
+  const t1v = validateObfitInput('obfit-t1');
+  const x1v = validateObfitInput('obfit-x1');
+  const y1v = validateObfitInput('obfit-y1');
+  const z1v = validateObfitInput('obfit-z1');
+  const xd1v = validateObfitInput('obfit-xd1');
+  const yd1v = validateObfitInput('obfit-yd1');
+  const zd1v = validateObfitInput('obfit-zd1');
+  const t2v = validateObfitInput('obfit-t2');
+  const x2v = validateObfitInput('obfit-x2');
+  const y2v = validateObfitInput('obfit-y2');
+  const z2v = validateObfitInput('obfit-z2');
+  const xd2v = validateObfitInput('obfit-xd2');
+  const yd2v = validateObfitInput('obfit-yd2');
+  const zd2v = validateObfitInput('obfit-zd2');
+  const t3v = validateObfitInput('obfit-t3');
+  const x3v = validateObfitInput('obfit-x3');
+  const y3v = validateObfitInput('obfit-y3');
+  const z3v = validateObfitInput('obfit-z3');
+  const xd3v = validateObfitInput('obfit-xd3');
+  const yd3v = validateObfitInput('obfit-yd3');
+  const zd3v = validateObfitInput('obfit-zd3');
 
   const svs = [];
   let sv1 = [];
-  {
-    if (isNaN(parseFloat(t1))) {
-      uiManager.toast(`Time 1 is Invalid!`, 'critical');
-      return false;
-    }
-    if (isNaN(parseFloat(x1))) {
-      uiManager.toast(`X 1 is Invalid!`, 'critical');
-      return false;
-    }
-    if (isNaN(parseFloat(y1))) {
-      uiManager.toast(`Y 1 is Invalid!`, 'critical');
-      return false;
-    }
-    if (isNaN(parseFloat(z1))) {
-      uiManager.toast(`Z 1 is Invalid!`, 'critical');
-      return false;
-    }
-    if (isNaN(parseFloat(xd1))) {
-      uiManager.toast(`X Dot 1 is Invalid!`, 'critical');
-      return false;
-    }
-    if (isNaN(parseFloat(yd1))) {
-      uiManager.toast(`Y Dot 1 is Invalid!`, 'critical');
-      return false;
-    }
-    if (isNaN(parseFloat(zd1))) {
-      uiManager.toast(`Z Dot 1 is Invalid!`, 'critical');
-      return false;
-    }
-    sv1 = [t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v];
-    svs.push(sv1);
+  if (isNaN(t1v)) {
+    uiManager.toast(`Time 1 is Invalid!`, 'critical');
+    return false;
   }
+  if (isNaN(x1v)) {
+    uiManager.toast(`X 1 is Invalid!`, 'critical');
+    return false;
+  }
+  if (isNaN(y1v)) {
+    uiManager.toast(`Y 1 is Invalid!`, 'critical');
+    return false;
+  }
+  if (isNaN(z1v)) {
+    uiManager.toast(`Z 1 is Invalid!`, 'critical');
+    return false;
+  }
+  if (isNaN(xd1v)) {
+    uiManager.toast(`X Dot 1 is Invalid!`, 'critical');
+    return false;
+  }
+  if (isNaN(yd1v)) {
+    uiManager.toast(`Y Dot 1 is Invalid!`, 'critical');
+    return false;
+  }
+  if (isNaN(zd1v)) {
+    uiManager.toast(`Z Dot 1 is Invalid!`, 'critical');
+    return false;
+  }
+  sv1 = [t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v];
+  svs.push(sv1);
 
-  let sv2 = [];
-  {
-    if (isOb2 && isNaN(parseFloat(t2))) {
-      isOb2 = false;
-      uiManager.toast(`Time 2 is Invalid!`, 'caution');
-    }
-    if (isOb2 && isNaN(parseFloat(x2))) {
-      isOb2 = false;
-      uiManager.toast(`X 2 is Invalid!`, 'caution');
-    }
-    if (isOb2 && isNaN(parseFloat(y2))) {
-      isOb2 = false;
-      uiManager.toast(`Y 2 is Invalid!`, 'caution');
-    }
-    if (isOb2 && isNaN(parseFloat(z2))) {
-      isOb2 = false;
-      uiManager.toast(`Z 2 is Invalid!`, 'caution');
-    }
-    if (isOb2 && isNaN(parseFloat(xd2))) {
-      isOb2 = false;
-      uiManager.toast(`X Dot 2 is Invalid!`, 'caution');
-    }
-    if (isOb2 && isNaN(parseFloat(yd2))) {
-      isOb2 = false;
-      uiManager.toast(`Y Dot 2 is Invalid!`, 'caution');
-    }
-    if (isOb2 && isNaN(parseFloat(zd2))) {
-      isOb2 = false;
-      uiManager.toast(`Z Dot 2 is Invalid!`, 'caution');
-    }
-    if (isOb2) {
-      sv2 = [t2v, x2v, y2v, z2v, xd2v, yd2v, zd2v];
-      svs.push(sv2);
-    }
-  }
+  const { isOb: _isOb2, sv: sv2 } = validateOb({ isOb: isOb2, t: t2v, x: x2v, y: y2v, z: z2v, xd: xd2v, yd: yd2v, zd: zd2v, uiManager });
+  isOb2 = _isOb2;
+  svs.push(sv2);
 
   isOb3 = !isOb2 ? false : isOb3;
-  let sv3 = [];
-  {
-    if (isOb3 && isNaN(parseFloat(t3))) {
-      isOb3 = false;
-      uiManager.toast(`Time 3 is Invalid!`, 'caution');
-    }
-    if (isOb3 && isNaN(parseFloat(x3))) {
-      isOb3 = false;
-      uiManager.toast(`X 3 is Invalid!`, 'caution');
-    }
-    if (isOb3 && isNaN(parseFloat(y3))) {
-      isOb3 = false;
-      uiManager.toast(`Y 3 is Invalid!`, 'caution');
-    }
-    if (isOb3 && isNaN(parseFloat(z3))) {
-      isOb3 = false;
-      uiManager.toast(`Z 3 is Invalid!`, 'caution');
-    }
-    if (isOb3 && isNaN(parseFloat(xd3))) {
-      isOb3 = false;
-      uiManager.toast(`X Dot 3 is Invalid!`, 'caution');
-    }
-    if (isOb3 && isNaN(parseFloat(yd3))) {
-      isOb3 = false;
-      uiManager.toast(`Y Dot 3 is Invalid!`, 'caution');
-    }
-    if (isOb3 && isNaN(parseFloat(zd3))) {
-      isOb3 = false;
-      uiManager.toast(`Z Dot 3 is Invalid!`, 'caution');
-    }
-    if (isOb3) {
-      sv3 = [t3v, x3v, y3v, z3v, xd3v, yd3v, zd3v];
-      svs.push(sv3);
-    }
-  }
+  const { isOb: _isOb3, sv: sv3 } = validateOb({ isOb: isOb3, t: t3v, x: x3v, y: y3v, z: z3v, xd: xd3v, yd: yd3v, zd: zd3v, uiManager });
+  isOb3 = _isOb3;
+  svs.push(sv3);
+
   console.log(svs);
   omManager.svs2analyst(svs, satSet, timeManager, satellite);
   e.preventDefault();
   return true;
+};
+
+const validateOb = ({
+  isOb,
+  t,
+  x,
+  y,
+  z,
+  xd,
+  yd,
+  zd,
+  uiManager,
+}: {
+  isOb: boolean;
+  t: number;
+  x: number;
+  y: number;
+  z: number;
+  xd: number;
+  yd: number;
+  zd: number;
+  uiManager: UiManager;
+}): { isOb: boolean; sv: number[] } => {
+  let sv = [];
+  if (isOb && isNaN(t)) {
+    isOb = false;
+    uiManager.toast(`Time 3 is Invalid!`, 'caution');
+  }
+  if (isOb && isNaN(x)) {
+    isOb = false;
+    uiManager.toast(`X 3 is Invalid!`, 'caution');
+  }
+  if (isOb && isNaN(y)) {
+    isOb = false;
+    uiManager.toast(`Y 3 is Invalid!`, 'caution');
+  }
+  if (isOb && isNaN(z)) {
+    isOb = false;
+    uiManager.toast(`Z 3 is Invalid!`, 'caution');
+  }
+  if (isOb && isNaN(xd)) {
+    isOb = false;
+    uiManager.toast(`X Dot 3 is Invalid!`, 'caution');
+  }
+  if (isOb && isNaN(yd)) {
+    isOb = false;
+    uiManager.toast(`Y Dot 3 is Invalid!`, 'caution');
+  }
+  if (isOb && isNaN(zd)) {
+    isOb = false;
+    uiManager.toast(`Z Dot 3 is Invalid!`, 'caution');
+  }
+  if (isOb) {
+    sv = [t, x, y, z, xd, yd, zd];
+  }
+  return { isOb, sv };
+};
+
+const validateObfitInput = (el: string) => {
+  const input = (<HTMLInputElement>getEl(el)).value;
+  return input.length > 0 ? parseFloat(input) : NaN;
 };

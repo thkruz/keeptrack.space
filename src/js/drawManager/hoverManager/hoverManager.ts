@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
-import { SatObject } from '../../api/keepTrackTypes';
+import { CatalogManager, DrawManager, ObjectManager, SatMath, SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { spaceObjType2Str } from '../../lib/spaceObjType2Str';
 
@@ -88,6 +88,72 @@ export const missile = (sat: SatObject) => {
   satHoverBoxNode2.textContent = '';
   satHoverBoxNode3.textContent = '';
 };
+
+const showRicOrEci = (drawManager: DrawManager, satSet: CatalogManager, objectManager: ObjectManager, sat: SatObject, satellite: SatMath) => {
+  drawManager.sat2 = satSet.getSat(objectManager.selectedSat);
+  if (typeof drawManager.sat2 !== 'undefined' && drawManager.sat2 !== null && sat !== drawManager.sat2) {
+    const ric = satellite.sat2ric(sat, drawManager.sat2);
+    satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
+    showRicDistAndVel(ric);
+  } else {
+    satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, drawManager.sat2)}`;
+    showEciDistAndVel(sat);
+  }
+}
+
+const showRicDistAndVel = (ric: { position: import("gl-matrix").vec3; velocity: import("gl-matrix").vec3; }) => {
+  satHoverBoxNode3.innerHTML =
+    `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
+    `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
+}
+
+const showEciVel = (sat: SatObject) => {
+  if (settingsManager.isEciOnHover) {
+    satHoverBoxNode3.innerHTML =
+      'X: ' +
+      sat.position.x.toFixed(2) +
+      ' Y: ' +
+      sat.position.y.toFixed(2) +
+      ' Z: ' +
+      sat.position.z.toFixed(2) +
+      '</br>X: ' +
+      sat.velocity.x.toFixed(2) +
+      ' Y: ' +
+      sat.velocity.y.toFixed(2) +
+      ' Z: ' +
+      sat.velocity.z.toFixed(2);
+  } else {
+    satHoverBoxNode3.innerHTML = '';
+  }
+}
+
+const showEciDistAndVel = (sat: SatObject) => {
+  if (settingsManager.isEciOnHover) {
+    satHoverBoxNode3.innerHTML =
+      'X: ' +
+      sat.position.x.toFixed(2) +
+      ' km' +
+      ' Y: ' +
+      sat.position.y.toFixed(2) +
+      ' km' +
+      ' Z: ' +
+      sat.position.z.toFixed(2) +
+      ' km' +
+      '</br>' +
+      'XDot: ' +
+      sat.velocity.x.toFixed(2) +
+      ' km/s' +
+      ' YDot: ' +
+      sat.velocity.y.toFixed(2) +
+      ' km/s' +
+      ' ZDot: ' +
+      sat.velocity.z.toFixed(2) +
+      ' km/s';
+  } else {
+    satHoverBoxNode3.innerHTML = '';
+  }
+}
+
 export const satObj = (sat: SatObject) => {
   if (!settingsManager.enableHoverOverlay) return;
   const { drawManager, objectManager, satellite, sensorManager, satSet } = keepTrackApi.programs;
@@ -103,40 +169,7 @@ export const satObj = (sat: SatObject) => {
       satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
     } else if (drawManager.isShowDistance) {
       satHoverBoxNode1.textContent = sat.name;
-      drawManager.sat2 = satSet.getSat(objectManager.selectedSat);
-      if (typeof drawManager.sat2 !== 'undefined' && drawManager.sat2 !== null && sat !== drawManager.sat2) {
-        const ric = satellite.sat2ric(sat, drawManager.sat2);
-        satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
-        satHoverBoxNode3.innerHTML =
-          `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
-          `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
-      } else {
-        satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, drawManager.sat2)}`;
-        if (settingsManager.isEciOnHover) {
-        satHoverBoxNode3.innerHTML =
-          'X: ' +
-          sat.position.x.toFixed(2) +
-          ' km' +
-          ' Y: ' +
-          sat.position.y.toFixed(2) +
-          ' km' +
-          ' Z: ' +
-          sat.position.z.toFixed(2) +
-          ' km' +
-          '</br>' +
-          'XDot: ' +
-          sat.velocity.x.toFixed(2) +
-          ' km/s' +
-          ' YDot: ' +
-          sat.velocity.y.toFixed(2) +
-          ' km/s' +
-          ' ZDot: ' +
-          sat.velocity.z.toFixed(2) +
-          ' km/s';
-        } else {
-          satHoverBoxNode3.innerHTML = '';
-        }
-      }
+      showRicOrEci(drawManager, satSet, objectManager, sat, satellite);
     } else if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass) {
       satHoverBoxNode1.textContent = sat.name;
       satHoverBoxNode2.textContent = sat.sccNum;
@@ -144,23 +177,7 @@ export const satObj = (sat: SatObject) => {
     } else {
       satHoverBoxNode1.textContent = sat.name;
       satHoverBoxNode2.textContent = sat.sccNum;
-      if (settingsManager.isEciOnHover) {
-        satHoverBoxNode3.innerHTML =
-        'X: ' +
-        sat.position.x.toFixed(2) +
-        ' Y: ' +
-        sat.position.y.toFixed(2) +
-        ' Z: ' +
-        sat.position.z.toFixed(2) +
-        '</br>X: ' +
-        sat.velocity.x.toFixed(2) +
-        ' Y: ' +
-        sat.velocity.y.toFixed(2) +
-        ' Z: ' +
-        sat.velocity.z.toFixed(2);
-      } else {
-        satHoverBoxNode3.innerHTML = '';
-      }
+      showEciVel(sat);
     }
   }
 };

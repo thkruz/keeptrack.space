@@ -38,8 +38,7 @@ export const makeTableHeaders = (tbl: HTMLTableElement): void => {
   tdC.setAttribute('style', 'text-decoration: underline');
 };
 
-export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => {
-  // NOSONAR
+export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => { // NOSONAR
   makeTableHeaders(tbl);
 
   for (let i = 0; i < launchList.length; i++) {
@@ -47,56 +46,39 @@ export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[])
 
     // Time Cells
     const tdT = tr.insertCell();
-    let timeText;
-    if (launchList[i].windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24) {
-      timeText = 'TBD';
-    } else {
-      timeText = dateFormat(launchList[i].windowStart, 'isoDateTime', true) + ' UTC';
-    }
+    const timeText = launchList[i].windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? 'TBD' : dateFormat(launchList[i].windowStart, 'isoDateTime', true) + ' UTC';
     tdT.appendChild(document.createTextNode(timeText));
 
     // Name Cells
     const tdN = tr.insertCell();
 
     // Mission Name Text
-    const nameText = typeof launchList[i].missionName != 'undefined' ? launchList[i].missionName : 'Unknown';
+    const nameText = launchList[i]?.missionName || 'Unknown';
     // Mission Name HTML Setup
-    let nameHTML;
-    if (typeof launchList[i].missionURL == 'undefined' || launchList[i].missionURL == '') {
-      nameHTML = `${truncateString(nameText, 15)}`;
-    } else {
-      nameHTML = `<a class='iframe' href="${launchList[i].missionURL}">${truncateString(nameText, 15)}</a>`;
-    }
+    const nameHTML =
+      !launchList[i]?.missionURL || launchList[i].missionURL === ''
+        ? `${truncateString(nameText, 15)}`
+        : `<a class='iframe' href="${launchList[i].missionURL}">${truncateString(nameText, 15)}</a>`;
 
     // Rocket Name HTML Setup
-    let rocketHTML;
-    if (typeof launchList[i].rocketURL == 'undefined') {
-      rocketHTML = `${launchList[i].rocket}`;
-    } else {
-      rocketHTML = `<a class='iframe' href="${launchList[i].rocketURL}">${launchList[i].rocket}</a>`;
-    }
+    const rocketHTML = !launchList[i]?.rocketURL ? `${launchList[i].rocket}` : `<a class='iframe' href="${launchList[i].rocketURL}">${launchList[i].rocket}</a>`;
 
     // Set Name and Rocket HTML
     tdN.innerHTML = `${nameHTML}<br />${rocketHTML}`;
 
     // Location Name HTML Setup
-    let locationHTML;
-    if (typeof launchList[i].locationURL == 'undefined' || launchList[i].locationURL == '') {
-      locationHTML = `${truncateString(launchList[i].location, 25)}`;
-    } else {
-      locationHTML = `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
-    }
+    const locationHTML =
+      !launchList[i]?.locationURL || launchList[i]?.locationURL === ''
+        ? `${truncateString(launchList[i].location, 25)}`
+        : `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
 
     const tdL = tr.insertCell();
     tdL.innerHTML = locationHTML;
 
     // Agency Name HTML Setup
-    let agencyHTML;
-    if (typeof launchList[i].agencyURL == 'undefined') {
-      agencyHTML = `${truncateString(launchList[i].agency, 30)}`;
-    } else {
-      agencyHTML = `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
-    }
+    const agencyHTML = !launchList[i]?.agencyURL
+      ? `${truncateString(launchList[i].agency, 30)}`
+      : `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
 
     const tdA = tr.insertCell();
     tdA.innerHTML = agencyHTML;
@@ -241,8 +223,7 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
       }
     }
   },
-  processData: (resp: { results: Array<any> }) => {
-    // NOSONAR
+  processData: (resp: { results: Array<any> }) => { // NOSONAR
     for (let i = 0; i < resp.results.length; i++) {
       /**
        * Info from launchlibrary.net

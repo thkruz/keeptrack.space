@@ -496,8 +496,6 @@ export const watchlistListClick = (satId: number): void => {
 };
 
 export const watchlistContentEvent = (e?: any, satId?: number) => {
-  // if (!e.target.classList.contains('watchlist-add')) return;
-
   const { satSet, sensorManager } = keepTrackApi.programs;
   satId ??= satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('watchlist-new')).value));
   let duplicate = false;

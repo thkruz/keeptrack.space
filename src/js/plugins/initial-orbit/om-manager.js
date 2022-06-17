@@ -56,7 +56,7 @@ om.sat2tle = (sat, timeManager) => {
   return om.kp2tle(kp, null, timeManager);
 };
 om.sv2kp = (sv) => {
-  const kepler = _sv2kp(1, 1, sv, 'kg', 'M_Earth', [0, 0, 0, 0, 0, 0], 'km', 'm');
+  const kepler = _sv2kp({ massPrimary: 1, massSecondary: 1, vector: sv, massPrimaryU: 'kg', massSecondaryU: 'M_Earth', vectorU: [0, 0, 0, 0, 0, 0], outputU: 'km', outputU2: 'm' });
   return kepler;
 };
 om.kp2tle = (kp, epoch, timeManager) => {
@@ -318,7 +318,7 @@ export const _jday = (year, mon, day, hr, minute, sec) => {
   );
 };
 // Converts State Vectors to Keplerian Elements
-export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => { // NOSONAR
+export const _sv2kp = ({ massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2 }) => { // NOSONAR
   let rx = vector[1] * 1000;
   let ry = vector[2] * 1000;
   let rz = vector[3] * 1000;

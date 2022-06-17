@@ -7,9 +7,7 @@ import { getDayOfYear } from './transforms';
 export const changePropRate = (propRate: number) => {
   if (timeManager.propRate === propRate) return; // no change
 
-  // if (timeManager.propRate !== 1.0 || timeManager.staticOffset !== 0) {
   timeManager.staticOffset = timeManager.simulationTimeObj.getTime() - Date.now();
-  // }
   // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
   timeManager.dynamicOffsetEpoch = Date.now();
   timeManager.propRate = propRate;

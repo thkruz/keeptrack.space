@@ -133,10 +133,9 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 
-export const getSatChngJson = (json: any) => {
+export const getSatChngJson = (json: any) => { // NOSONAR
   // TODO: This is a temporary fix for the fact that the JSON is not being parsed correctly.
-  if (!json && isThisJest()) return { resp: json, satChngTable: [] };
-  // NOSONAR
+  if (!json && isThisJest()) return { resp: json, satChngTable: [] };  
   const { satSet } = keepTrackApi.programs;
 
   for (let i = 0; i < json.length; i++) {

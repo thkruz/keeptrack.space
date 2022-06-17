@@ -401,7 +401,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
   }
 };
 
-export const onCruncherReady = async (): Promise<void> => {
+export const onCruncherReady = async (): Promise<void> => { // NOSONAR
   const { satSet, sensorManager }: { satSet: any; sensorManager: any } = keepTrackApi.programs;
   let watchlistJSON;
   try {

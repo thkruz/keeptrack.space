@@ -339,7 +339,7 @@ describe('adviceManager.showAdvice', () => {
   });
   test('7', () => {
     document.body.innerHTML = '<div id="test"></div>';
-    let result: any = adviceManager.showAdvice('test', 'test', <any>$('body'), 'bottom');
+    let result: any = adviceManager.showAdvice('test', 'test', document.querySelector('body'), 'bottom');
     adviceManager.clearAdvice();
     expect(result).toMatchSnapshot();
   });

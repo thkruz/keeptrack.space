@@ -1,8 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import { missileManager } from './missileManager';
-
-keepTrackApi.programs.missileManager = missileManager;
+import missilePng from '@app/img/icons/missile.png';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isMissileMenuOpen = false;
 let isSub = false;
@@ -16,8 +15,8 @@ export const updateLoop = (): void => {
   }
 };
 export const hideSideMenus = (): void => {
-  $('#missile-menu').effect('slide', { direction: 'left', mode: 'hide' }, 1000);
-  $('#menu-missile').removeClass('bmenu-item-selected');
+  slideOutLeft(getEl('missile-menu'), 1000);
+  getEl('menu-missile').classList.remove('bmenu-item-selected');
   isMissileMenuOpen = false;
 };
 export const bottomMenuClick = (iconName: string): void => {
@@ -30,43 +29,43 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();
-      $('#missile-menu').effect('slide', { direction: 'left', mode: 'show' }, 1000);
-      $('#menu-missile').addClass('bmenu-item-selected');
+      slideInRight(getEl('missile-menu'), 1000);
+      getEl('menu-missile').classList.add('bmenu-item-selected');
       isMissileMenuOpen = true;
       return;
     }
   }
 };
 export const missileChange = (): void => {
-  if (parseFloat(<string>$('#ms-type').val()) !== 0) {
-    $('#ms-custom-opt').hide();
+  if (parseFloat((<HTMLInputElement>getEl('ms-type')).value) !== 0) {
+    getEl('ms-custom-opt').style.display = 'none';
   } else {
-    $('#ms-custom-opt').show();
+    getEl('ms-custom-opt').style.display = 'block';
   }
 };
 export const msErrorClick = (): void => {
-  $('#ms-error').hide();
+  getEl('ms-error').style.display = 'none';
 };
 export const msTargetChange = () => {
-  if (parseInt(<string>$('#ms-target').val()) !== -1) {
-    $('#ms-tgt-holder-lat').hide();
-    $('#ms-tgt-holder-lon').hide();
+  if (parseInt((<HTMLInputElement>getEl('ms-target')).value) !== -1) {
+    getEl('ms-tgt-holder-lat').style.display = 'none';
+    getEl('ms-tgt-holder-lon').style.display = 'none';
   } else {
-    $('#ms-tgt-holder-lat').show();
-    $('#ms-tgt-holder-lon').show();
+    getEl('ms-tgt-holder-lat').style.display = 'block';
+    getEl('ms-tgt-holder-lon').style.display = 'block';
   }
 };
 export const missileSubmit = (): void => {
-  $('#loading-screen').fadeIn(1000, () => { // NOSONAR
+  showLoading(() => { // NOSONAR
     const { uiManager, satSet, timeManager } = keepTrackApi.programs;
-    $('#ms-error').hide();
-    const type = parseFloat(<string>$('#ms-type').val());
-    const attacker = parseFloat(<string>$('#ms-attacker').val());
-    let lauLat = parseFloat(<string>$('#ms-lat-lau').val());
-    let lauLon = parseFloat(<string>$('#ms-lon-lau').val());
-    const target = parseFloat(<string>$('#ms-target').val());
-    let tgtLat = parseFloat(<string>$('#ms-lat').val());
-    let tgtLon = parseFloat(<string>$('#ms-lon').val());
+    getEl('ms-error').style.display = 'none';
+    const type = parseFloat((<HTMLInputElement>getEl('ms-type')).value);
+    const attacker = parseFloat((<HTMLInputElement>getEl('ms-attacker')).value);
+    let lauLat = parseFloat((<HTMLInputElement>getEl('ms-lat-lau')).value);
+    let lauLon = parseFloat((<HTMLInputElement>getEl('ms-lon-lau')).value);
+    const target = parseFloat((<HTMLInputElement>getEl('ms-target')).value);
+    let tgtLat = parseFloat((<HTMLInputElement>getEl('ms-lat')).value);
+    let tgtLon = parseFloat((<HTMLInputElement>getEl('ms-lon')).value);
     const launchTime = timeManager.selectedDate * 1;
 
     let sim = '';
@@ -106,12 +105,12 @@ export const missileSubmit = (): void => {
         // Custom Target
         if (isNaN(tgtLat)) {
           uiManager.toast(`Invalid Target Latitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(tgtLon)) {
           uiManager.toast(`Invalid Target Longitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
       } else {
@@ -123,12 +122,12 @@ export const missileSubmit = (): void => {
       if (isSub) {
         if (isNaN(lauLat)) {
           uiManager.toast(`Invalid Launch Latitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(lauLon)) {
           uiManager.toast(`Invalid Launch Longitude!`, 'critical');
-          $('#loading-screen').hide();
+          getEl('loading-screen').style.display = 'none';
           return;
         }
       }
@@ -297,12 +296,12 @@ export const missileSubmit = (): void => {
       uiManager.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
       uiManager.doSearch('RV_');
     }
-    $('#loading-screen').hide();
+    getEl('loading-screen').style.display = 'none';
   });
 };
 export const uiManagerInit = (): void => {
   // Side Menu
-  $('#left-menus').append(keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="missile-menu" class="side-menu-parent start-hidden text-select">
           <div id="missile-content" class="side-menu">
             <div class="row">
@@ -448,7 +447,7 @@ export const uiManagerInit = (): void => {
               </form>
               <div class="row"></div>
               <div class="center-align">
-                <button class="btn btn-ui waves-effect waves-light" onclick="searchBox.doSearch('RV_');" name="search">Show All Missiles &#9658;</button>
+                <button id="searchRvBtn" class="btn btn-ui waves-effect waves-light" name="search">Show All Missiles &#9658;</button>
               </div>
             </div>
             <div id="ms-error" class="center-align menu-selectable start-hidden">
@@ -456,47 +455,51 @@ export const uiManagerInit = (): void => {
             </div>
           </div>
         </div>   
-      `);
+      `));
 
   // Bottom Icon
-  $('#bottom-icons').append(keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
         <div id="menu-missile" class="bmenu-item">
           <img
             alt="missile"
-            src="data:image/png;base64,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"/> <!-- // NO-PIG -->
+            src="" delayedsrc=${missilePng}
+          />
           <span class="bmenu-title">Missile</span>
           <div class="status-icon"></div>
         </div>
-      `);
-
-  $('#missile').on('submit', (e: Event): void => {
-    missileSubmit();
-    e.preventDefault();
-  });
-
-  $('#missile-menu').resizable({
-    handles: 'e',
-    stop: function () {
-      $(this).css('height', '');
-    },
-    maxWidth: 450,
-    minWidth: 280,
-  });
-
-  $('#ms-attacker').on('change', msAttackerChange);
-
-  $('#ms-target').on('change', msTargetChange);
-
-  $('#ms-error').on('click', msErrorClick);
-
-  $('#missile').on('change', missileChange);
+        `));
 };
+
+export const searchForRvs = () => {
+  const { uiManager } = keepTrackApi.programs;
+  uiManager.doSearch('RV_');
+};
+
+export const uiManagerFinal = (): void => {
+  clickAndDragWidth(getEl('missile-menu'));
+  getEl('missile').addEventListener('submit', (e: Event): void => {
+    e.preventDefault();
+    missileSubmit();
+  });
+  getEl('ms-attacker').addEventListener('change', msAttackerChange);
+  getEl('ms-target').addEventListener('change', msTargetChange);
+  getEl('ms-error').addEventListener('click', msErrorClick);
+  getEl('missile').addEventListener('change', missileChange);
+  getEl('searchRvBtn').addEventListener('click', searchForRvs);
+}
+
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
     cbName: 'missile',
     cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'missile',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript
@@ -523,15 +526,15 @@ export const msAttackerChange = () => {
   isSub = false;
   const subList = [100, 600, 213, 214, 215, 321, 500, 400];
   for (let i = 0; i < subList.length; i++) {
-    if (subList[i] == parseInt(<string>$('#ms-attacker').val())) {
+    if (subList[i] == parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
       isSub = true;
     }
   }
   if (!isSub) {
-    $('#ms-lau-holder-lat').hide();
-    $('#ms-lau-holder-lon').hide();
+    getEl('ms-lau-holder-lat').style.display = 'none';
+    getEl('ms-lau-holder-lon').style.display = 'none';
   } else {
-    $('#ms-lau-holder-lat').show();
-    $('#ms-lau-holder-lon').show();
+    getEl('ms-lau-holder-lat').style.display = 'block';
+    getEl('ms-lau-holder-lon').style.display = 'block';
   }
 };

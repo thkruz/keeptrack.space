@@ -1,10 +1,11 @@
 /* */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import { CatalogManager, SearchBox } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { SatGroup } from '../groupsManager/sat-group';
+import { getEl, slideOutUp } from '../lib/helpers';
+import { slideInDown } from './../lib/helpers';
 
 let hoverSatId = -1;
 let hovering = false;
@@ -27,12 +28,12 @@ export const getLastResultGroup = () => lastResultGroup;
 export const getHoverSat = () => hoverSatId;
 export const isHovering = (val?: boolean): boolean => (hovering = typeof val !== 'undefined' ? val : hovering);
 export const setHoverSat = (satId: number): number => (hoverSatId = satId);
-export const getCurrentSearch = () => (resultsOpen ? $('#search').val() : '');
+export const getCurrentSearch = () => (resultsOpen ? (<HTMLInputElement>getEl('search')).value : '');
 
 export const hideResults = () => {
   try {
     const { colorSchemeManager, groupsManager, dotsManager, satSet } = keepTrackApi.programs;
-    $('#search-results').slideUp();
+    slideOutUp(getEl('search-results'), 1000);
     groupsManager.clearSelect();
     resultsOpen = false;
 
@@ -60,12 +61,12 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
     settingsManager.lastSearch = '';
     settingsManager.lastSearchResults = [];
     dotsManager.updateSizeBuffer(satSet.satData.length);
-    $('#search').val('');
+    (<HTMLInputElement>getEl('search')).value = '';
     searchBox.hideResults();
     return [];
   }
 
-  $('#search').val(searchString);
+  (<HTMLInputElement>getEl('search')).value = searchString;
 
   // Don't search for things until at least the minimum characters
   // are typed otherwise there are just too many search results.
@@ -190,8 +191,7 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
 
 export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) => {
   let satData = satSet.satData;
-  var resultBox = $('#search-results');
-  resultBox[0].innerHTML = results.reduce((html, result) => {
+  getEl('search-results').innerHTML = results.reduce((html, result) => {
     const sat = satData[result.satId];
     html += '<div class="search-result" data-obj-id="' + sat.id + '">';
     html += '<div class="truncate-search">';
@@ -251,7 +251,7 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
     html += '</div></div>';
     return html;
   }, '');
-  resultBox.slideDown();
+  slideInDown(getEl('search-results'), 1000);
   resultsOpen = true;
   satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 };

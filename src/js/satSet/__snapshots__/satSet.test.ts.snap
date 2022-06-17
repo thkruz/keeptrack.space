@@ -44,52 +44,15 @@ Array [
 
 exports[`satSet.convertIdArrayToSatnumArray 5 1`] = `Array []`;
 
-exports[`satSet.convertSatnumArrayToIdArray 0 1`] = `
-Array [
-  1,
-  1,
-  1,
-  1,
-  1,
-]
-`;
+exports[`satSet.convertSatnumArrayToIdArray 0 1`] = `Array []`;
 
-exports[`satSet.convertSatnumArrayToIdArray 1 1`] = `
-Array [
-  1,
-  1,
-  1,
-  1,
-]
-`;
+exports[`satSet.convertSatnumArrayToIdArray 1 1`] = `Array []`;
 
-exports[`satSet.convertSatnumArrayToIdArray 2 1`] = `
-Array [
-  1,
-  1,
-  1,
-  1,
-  1,
-]
-`;
+exports[`satSet.convertSatnumArrayToIdArray 2 1`] = `Array []`;
 
-exports[`satSet.convertSatnumArrayToIdArray 3 1`] = `
-Array [
-  1,
-  1,
-  1,
-  1,
-]
-`;
+exports[`satSet.convertSatnumArrayToIdArray 3 1`] = `Array []`;
 
-exports[`satSet.convertSatnumArrayToIdArray 4 1`] = `
-Array [
-  1,
-  1,
-  1,
-  1,
-]
-`;
+exports[`satSet.convertSatnumArrayToIdArray 4 1`] = `Array []`;
 
 exports[`satSet.convertSatnumArrayToIdArray 5 1`] = `Array []`;
 

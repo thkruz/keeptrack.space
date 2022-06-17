@@ -48,6 +48,7 @@ const settingsManagerOverride = {
     orbitReferences: true,
     externalSources: true,
     analysis: true,
+    plotAnalysis: true,
     sensorFov: true,
     sensorSurv: true,
     satelliteView: true,
@@ -64,6 +65,7 @@ const settingsManagerOverride = {
     classification: true,
     soundManager: true,
     gamepad: true,
+    scenarioCreator: true,
   },
   searchLimit: 150,
 };

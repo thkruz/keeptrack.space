@@ -24,6 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { getEl, openColorbox } from '@app/js/lib/helpers';
 import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
 import $ from 'jquery';
 import { keepTrackApi } from '../../api/keepTrackApi';
@@ -66,7 +67,7 @@ const emptySensor: SensorObject = {
 };
 
 // NOTE: This doesn't account for sensorManager.selectedSensor
-export const checkSensorSelected = () => sensorManager.currentSensor[0].observerGd.lat != null;
+export const checkSensorSelected = () => sensorManager.currentSensor[0].lat !== null || sensorManager.currentSensor[0].observerGd?.lat !== null;
 
 export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   // TODO: This function is totally redundant to setSensor. There should be
@@ -212,16 +213,10 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
         // references to selectedSensor)
         sensorManager.selectedSensor = sensorList[sensor];
 
-        $('#sensor-info-title').html("<a class='iframe' href='" + sensorManager.selectedSensor.url + "'>" + sensorManager.selectedSensor.name + '</a>');
-        new Promise(() => {
-          $('a.iframe').colorbox({
-            iframe: true,
-            width: '80%',
-            height: '80%',
-            fastIframe: false,
-            closeButton: false,
-          });
-        }).catch((err) => console.warn(err));
+        getEl('sensor-info-title').innerHTML = "<a href=''>" + sensorManager.selectedSensor.name + '</a>';
+        getEl('sensor-info-title').addEventListener('click', () => {
+          openColorbox(sensorManager.selectedSensor.url)
+        });
 
         $('#sensor-type').html(spaceObjType2Str(sensorManager.selectedSensor.type));
         $('#sensor-country').html(sensorManager.selectedSensor.country);

@@ -50,13 +50,14 @@ export const drawAllConstellations = () => {
         }
         continue;
       }
-      lineManager.create('sat5', [star1, star2], 'w');
+      lineManager.create('sat5', [star1, star2], 'p');
       starManager.isConstellationVisible = true;
       starManager.isAllConstellationVisible = true;
     }
   }
 };
 export const drawConstellations = (C: string) => { // NOSONAR
+  // eslint-disable-next-line no-unreachable
   if (typeof C === 'undefined') return;
 
   const getIdFromStarName = keepTrackApi.programs.satSet.getIdFromStarName;

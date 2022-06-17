@@ -52,6 +52,7 @@ settingsManager = {
     orbitReferences: true,
     externalSources: true,
     analysis: true,
+    plotAnalysis: true,
     sensorFov: true,
     sensorSurv: true,
     satelliteFov: true,
@@ -68,6 +69,7 @@ settingsManager = {
     classification: true,
     soundManager: true,
     gamepad: true,
+    scenarioCreator: true,
   },
   colors: {
     transparent: null,
@@ -192,6 +194,8 @@ settingsManager = {
     settingsManager.disableZoomControls = true;
     // Disable Touch Move Causing Drag Errors on Desktop
     settingsManager.disableWindowTouchMove = true;
+    // Display ECI on Hover
+    settingsManager.isEciOnHover = false;
     // Allows canvas will steal focus on load
     settingsManager.startWithFocus = false;
     // Shows an overlay with object information
@@ -203,6 +207,10 @@ settingsManager = {
     settingsManager.enableConstantSelectedSatRedraw = true;
     // How much an orbit fades over time
     settingsManager.orbitFadeFactor = 0.6; // 1.0 == No Fade
+    // Toggle Drawing the Sun
+    settingsManager.isDrawSun = true;
+    // Toggle drawing the milky way
+    settingsManager.isDrawMilkyWay = true;
     // Automatically display all of the orbits
     settingsManager.startWithOrbitsDisplayed = false;
     // Maximum orbits allowed on fullsize screens
@@ -248,6 +256,15 @@ settingsManager = {
     settingsManager.timeMachineDelay = 5000;
 
     settingsManager.videoBitsPerSecond = 30000000; // 10.0Mbps
+
+    // Show orbits in ECF vs ECI
+    settingsManager.isOrbitCruncherInEcf = false;
+
+    // Draw Orbits
+    settingsManager.isDrawOrbits = true;
+
+    // Draw Lines from Sensors to Satellites When in FOV
+    settingsManager.isDrawInCoverageLines = true;
 
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
@@ -359,9 +376,9 @@ settingsManager = {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.0.4') {
+    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.1.0') {
       settingsManager.colors = {};
-      settingsManager.colors.version = '1.0.4';
+      settingsManager.colors.version = '1.1.0';
       settingsManager.colors.facility = [0.64, 0.0, 0.64, 1.0];
       settingsManager.colors.sunlight100 = [1.0, 1.0, 1.0, 1.0];
       settingsManager.colors.sunlight80 = [1.0, 1.0, 1.0, 0.85];
@@ -391,8 +408,8 @@ settingsManager = {
         [0.6, 0.5, 1.0, 1.0],
       ];
       settingsManager.colors.deselected = [1.0, 1.0, 1.0, 0];
-      settingsManager.colors.inView = [0.85, 0.5, 0.0, 1.0];
-      settingsManager.colors.inViewAlt = [0.2, 0.4, 1.0, 1];
+      settingsManager.colors.inFOV = [0.85, 0.5, 0.0, 1.0];
+      settingsManager.colors.inFOVAlt = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.radarData = [0.0, 1.0, 1.0, 1.0];
       settingsManager.colors.radarDataMissile = [1.0, 0.0, 0.0, 1.0];
       settingsManager.colors.radarDataSatellite = [0.0, 1.0, 0.0, 1.0];
@@ -400,7 +417,7 @@ settingsManager = {
       settingsManager.colors.rocketBody = [0.2, 0.4, 1.0, 1];
       settingsManager.colors.debris = [0.5, 0.5, 0.5, 1];
       settingsManager.colors.unknown = [0.5, 0.5, 0.5, 0.85];
-      settingsManager.colors.trusat = [1.0, 0.0, 0.6, 1.0];
+      settingsManager.colors.pink = [1.0, 0.0, 0.6, 1.0];
       settingsManager.colors.analyst = [1.0, 1.0, 1.0, 0.8];
       settingsManager.colors.missile = [1.0, 1.0, 0.0, 1.0];
       settingsManager.colors.missileInview = [1.0, 0.0, 0.0, 1.0];
@@ -448,6 +465,7 @@ settingsManager = {
     // Orbit Color Settings
     // //////////////////////////////////////////////////////////////////////////
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
+    settingsManager.orbitSelectColor2 = [0.0, 0.4, 1.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
     settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE
@@ -576,6 +594,7 @@ settingsManager = {
     settingsManager.isOnlyFOVChecked = false;
     settingsManager.isBottomMenuOpen = false;
     settingsManager.isForceColorScheme = false;
+    settingsManager.isDragging = false;
 
     settingsManager.isDemoModeOn = false;
     settingsManager.demoModeInterval = 3000; // in ms (3 second default)
@@ -613,6 +632,7 @@ settingsManager = {
               break;
             case 'lowperf':
               settingsManager.lowPerf = true;
+              settingsManager.isDrawMilkyWay = false;
               settingsManager.isDrawLess = true;
               settingsManager.zFar = 250000.0;
               settingsManager.noMeshManager = true;
@@ -625,8 +645,10 @@ settingsManager = {
               break;
             case 'nostars':
               settingsManager.noStars = true;
+              settingsManager.isDrawMilkyWay = false;
               break;
             case 'draw-less':
+              settingsManager.isDrawMilkyWay = false;
               settingsManager.isDrawLess = true;
               settingsManager.zFar = 250000.0;
               settingsManager.noMeshManager = true;
@@ -635,6 +657,7 @@ settingsManager = {
               settingsManager.isDrawLess = false;
               settingsManager.noMeshManager = false;
               settingsManager.smallImages = false;
+              settingsManager.isDrawMilkyWay = true;
               break;
             case 'vec':
               settingsManager.vectorImages = true;

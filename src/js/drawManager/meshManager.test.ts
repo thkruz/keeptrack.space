@@ -150,7 +150,7 @@ describe('meshManager.drawOcclusion', () => {
 describe('meshManager.enableVertexAttribArrays', () => {
   test('0', () => {
     meshManager.initShaders();
-    let result: any = meshManager.enableVertexAttribArrays(model);
+    let result: any = meshManager.enableVertexAttribArrays(<string[]>(<unknown>model));
     expect(result).toMatchSnapshot();
   });
 });
@@ -159,7 +159,7 @@ describe('meshManager.enableVertexAttribArrays', () => {
 describe('meshManager.disableVertexAttribArrays', () => {
   test('0', () => {
     meshManager.initShaders();
-    let result: any = meshManager.disableVertexAttribArrays(model, ['test', 'fail']);
+    let result: any = meshManager.disableVertexAttribArrays(<string[]>(<unknown>model));
     expect(result).toMatchSnapshot();
   });
 });

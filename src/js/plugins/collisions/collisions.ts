@@ -190,7 +190,6 @@ export const findFutureDate = (socratesObjTwo: any[][], row: number) => {
   // Find the offset from today 60 seconds before possible collision
   keepTrackApi.programs.timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime() - 1000 * 30);
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
-  keepTrackApi.programs.timeManager.simulationTimeObj;
 }; // Allows passing -1 argument to socrates function to skip these steps
 
 export const socrates = (row: number, testOverride?: any) => {

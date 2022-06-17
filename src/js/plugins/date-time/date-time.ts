@@ -30,7 +30,6 @@ export const init = (): void => {
 
 export const datetimeTextClick = (): void => {
   const { timeManager } = keepTrackApi.programs;
-  timeManager.simulationTimeObj;
   keepTrackApi.methods.updateDateTime(new Date(timeManager.simulationTimeObj));
 
   if (!settingsManager.isEditTime) {

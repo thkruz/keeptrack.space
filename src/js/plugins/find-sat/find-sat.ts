@@ -39,8 +39,7 @@ interface SearchResults extends SatObject {
   rng: number;
 }
 
-export const searchSats = (searchParams: SearchSatParams) => {
-  // NOSONAR
+export const searchSats = (searchParams: SearchSatParams) => { // NOSONAR
   let { az, el, rng, inc, azMarg, elMarg, rngMarg, incMarg, period, periodMarg, rcs, rcsMarg, objType, raan, raanMarg, argPe, argPeMarg, bus, shape, payload } = searchParams;
 
   const isValidAz = !isNaN(az) && isFinite(az);

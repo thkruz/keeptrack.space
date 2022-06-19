@@ -17,8 +17,7 @@ export const selectSatManager = {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  selectSat: (satId: number, mainCamera: Camera) => {
-    // NOSONAR
+  selectSat: (satId: number, mainCamera: Camera) => { // NOSONAR
     const { objectManager, satSet, sensorManager, uiManager } = keepTrackApi.programs;
 
     let sat: SatObject | any;

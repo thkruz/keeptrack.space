@@ -113,11 +113,8 @@ export const onEciPlotBtnClick = () => {
     isPlotAnalyisMenuOpen = true;
 
     const chartDom = getEl('plot-analysis-chart');
-    // let existInstance = echarts.getInstanceByDom(chartDom);
 
-    // if (!existInstance) {
     curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart, chartDom);
-    // }
     setTimeout(() => {
       curChart.resize();
     }, 1000);
@@ -144,11 +141,8 @@ export const onEcfPlotBtnClick = () => {
     isPlotAnalyisMenuOpen2 = true;
 
     const chartDom2 = getEl('plot-analysis-chart2');
-    // let existInstance = echarts.getInstanceByDom(chartDom2);
 
-    // if (!existInstance) {
     curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
-    // }
     setTimeout(() => {
       curChart2.resize();
     }, 1000);
@@ -181,11 +175,8 @@ export const onRicPlotBtnClick = () => {
     isPlotAnalyisMenuOpen3 = true;
 
     const chartDom3 = getEl('plot-analysis-chart3');
-    // let existInstance = echarts.getInstanceByDom(chartDom3);
 
-    // if (!existInstance) {
     curChart3 = createRicScatterPlot(getRicScatterData(), isPlotAnalyisMenuOpen3, curChart3, chartDom3);
-    // }
     setTimeout(() => {
       curChart3.resize();
     }, 1000);

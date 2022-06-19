@@ -1,22 +1,27 @@
 /* eslint-disable no-unused-vars */
 /* /////////////////////////////////////////////////////////////////////////////
-
-omManager.js Orbit Math Manager handles the conversion of state vector data,
-keplerian elements, and two line element sets as well as initial orbit fitting
-http://keeptrack.space
-
-Copyright (C) 2016-2022 Theodore Kruczek
-Copyright (C) 2020 Heather Kruczek
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-///////////////////////////////////////////////////////////////////////////// */
+ *
+ * omManager.js Orbit Math Manager handles the conversion of state vector data,
+ * keplerian elements, and two line element sets as well as initial orbit fitting
+ *
+ * http://keeptrack.space
+ *
+ * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2020-2022 Heather Kruczek
+ *
+ * KeepTrack is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * /////////////////////////////////////////////////////////////////////////////
+ */
 
 // sv - State Vectors
 // [unixTime, x, y, z, xDot, yDot, zDot]
@@ -51,7 +56,7 @@ om.sat2tle = (sat, timeManager) => {
   return om.kp2tle(kp, null, timeManager);
 };
 om.sv2kp = (sv) => {
-  const kepler = _sv2kp(1, 1, sv, 'kg', 'M_Earth', [0, 0, 0, 0, 0, 0], 'km', 'm');
+  const kepler = _sv2kp({ massPrimary: 1, massSecondary: 1, vector: sv, massPrimaryU: 'kg', massSecondaryU: 'M_Earth', vectorU: [0, 0, 0, 0, 0, 0], outputU: 'km', outputU2: 'm' });
   return kepler;
 };
 om.kp2tle = (kp, epoch, timeManager) => {
@@ -73,8 +78,7 @@ om.kp2tle = (kp, epoch, timeManager) => {
   return { tle1: tle1, tle2: tle2 };
 };
 // State Vectors to Keplerian Min/Max/Avg
-om.svs2kps = (svs) => {
-  // NOSONAR
+om.svs2kps = (svs) => { // NOSONAR
   let kpList = [];
   for (let i = 0; i < svs.length; i++) {
     kpList.push(om.sv2kp(svs[i]));
@@ -190,8 +194,7 @@ om.iod = async (svs, timeManager, satellite) => {
   }
 };
 
-om.fitTles = async (epoch, svs, kps, timeManager, satellite) => {
-  // NOSONAR
+om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
   try {
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
@@ -315,8 +318,7 @@ export const _jday = (year, mon, day, hr, minute, sec) => {
   );
 };
 // Converts State Vectors to Keplerian Elements
-export const _sv2kp = (massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2) => {
-  // NOSONAR
+export const _sv2kp = ({ massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2 }) => { // NOSONAR
   let rx = vector[1] * 1000;
   let ry = vector[2] * 1000;
   let rz = vector[3] * 1000;

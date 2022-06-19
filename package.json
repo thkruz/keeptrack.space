@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -12,7 +12,7 @@
       "name": "Heather Kruczek"
     }
   ],
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0",
   "homepage": "https://keeptrack.space",
   "bugs": {
     "url": "https://github.com/thkruz/keeptrack.space/issues",

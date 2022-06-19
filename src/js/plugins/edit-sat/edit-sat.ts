@@ -1,5 +1,6 @@
 import editPng from '@app/img/icons/edit.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { CatalogManager, ObjectManager } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tleFormater';
@@ -188,7 +189,6 @@ export const readerOnLoad = (evt: any) => {
 };
 
 export const bottomMenuClick = (iconName: string) => {
-  // NOSONAR
   const { uiManager, satSet, objectManager } = keepTrackApi.programs;
   if (iconName === 'menu-editSat') {
     if (isEditSatMenuOpen) {
@@ -202,38 +202,7 @@ export const bottomMenuClick = (iconName: string) => {
         slideInRight(getEl('editSat-menu'), 1000);
         getEl('menu-editSat').classList.add('bmenu-item-selected');
         isEditSatMenuOpen = true;
-
-        const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-        (<HTMLInputElement>getEl('es-scc')).value = sat.sccNum;
-
-        let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
-        inc = inc.split('.');
-        inc[0] = inc[0].substr(-3, 3);
-        inc[1] = inc[1].substr(0, 4);
-        inc = (inc[0] + '.' + inc[1]).toString();
-
-        (<HTMLInputElement>getEl('es-inc')).value = stringPad.pad0(inc, 8);
-        (<HTMLInputElement>getEl('es-year')).value = sat.TLE1.substr(18, 2);
-        (<HTMLInputElement>getEl('es-day')).value = sat.TLE1.substr(20, 12);
-        (<HTMLInputElement>getEl('es-meanmo')).value = sat.TLE2.substr(52, 11);
-
-        let rasc: string | string[] = (sat.raan * RAD2DEG).toPrecision(7);
-        rasc = rasc.split('.');
-        rasc[0] = rasc[0].substr(-3, 3);
-        rasc[1] = rasc[1].substr(0, 4);
-        rasc = (rasc[0] + '.' + rasc[1]).toString();
-
-        (<HTMLInputElement>getEl('es-rasc')).value = stringPad.pad0(rasc, 8);
-        (<HTMLInputElement>getEl('es-ecen')).value = sat.eccentricity.toPrecision(7).substr(2, 7);
-
-        let argPe: string | string[] = (sat.argPe * RAD2DEG).toPrecision(7);
-        argPe = argPe.split('.');
-        argPe[0] = argPe[0].substr(-3, 3);
-        argPe[1] = argPe[1].substr(0, 4);
-        argPe = (argPe[0] + '.' + argPe[1]).toString();
-
-        (<HTMLInputElement>getEl('es-argPe')).value = stringPad.pad0(argPe, 8);
-        (<HTMLInputElement>getEl('es-meana')).value = sat.TLE2.substr(44 - 1, 7 + 1);
+        populateSideMenu({ satSet, objectManager });
       } else {
         if (settingsManager.plugins?.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
@@ -242,6 +211,40 @@ export const bottomMenuClick = (iconName: string) => {
     }
     return;
   }
+};
+
+const populateSideMenu = ({ satSet, objectManager }: { satSet: CatalogManager; objectManager: ObjectManager }) => {
+  const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
+  (<HTMLInputElement>getEl('es-scc')).value = sat.sccNum;
+
+  let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
+  inc = inc.split('.');
+  inc[0] = inc[0].substr(-3, 3);
+  inc[1] = inc[1].substr(0, 4);
+  inc = (inc[0] + '.' + inc[1]).toString();
+
+  (<HTMLInputElement>getEl('es-inc')).value = stringPad.pad0(inc, 8);
+  (<HTMLInputElement>getEl('es-year')).value = sat.TLE1.substr(18, 2);
+  (<HTMLInputElement>getEl('es-day')).value = sat.TLE1.substr(20, 12);
+  (<HTMLInputElement>getEl('es-meanmo')).value = sat.TLE2.substr(52, 11);
+
+  let rasc: string | string[] = (sat.raan * RAD2DEG).toPrecision(7);
+  rasc = rasc.split('.');
+  rasc[0] = rasc[0].substr(-3, 3);
+  rasc[1] = rasc[1].substr(0, 4);
+  rasc = (rasc[0] + '.' + rasc[1]).toString();
+
+  (<HTMLInputElement>getEl('es-rasc')).value = stringPad.pad0(rasc, 8);
+  (<HTMLInputElement>getEl('es-ecen')).value = sat.eccentricity.toPrecision(7).substr(2, 7);
+
+  let argPe: string | string[] = (sat.argPe * RAD2DEG).toPrecision(7);
+  argPe = argPe.split('.');
+  argPe[0] = argPe[0].substr(-3, 3);
+  argPe[1] = argPe[1].substr(0, 4);
+  argPe = (argPe[0] + '.' + argPe[1]).toString();
+
+  (<HTMLInputElement>getEl('es-argPe')).value = stringPad.pad0(argPe, 8);
+  (<HTMLInputElement>getEl('es-meana')).value = sat.TLE2.substr(44 - 1, 7 + 1);
 };
 
 export const rmbMenuActions = (iconName: string, clickedSat: any) => {

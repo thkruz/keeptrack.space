@@ -31,6 +31,7 @@
 
 'use strict';
 
+import { CatalogManager, SatObject, TimeManager } from '@app/js/api/keepTrackTypes';
 import { searchBox } from '@app/js/uiManager/searchBox';
 
 // Constants
@@ -43,23 +44,46 @@ const TAU = 2 * PI;
 const RAD2DEG = 360 / TAU;
 
 // Make Orbit Math Manager
-let om = {};
+const om = {
+  sat2sv: null,
+  sat2kp: null,
+  sat2tle: null,
+  sv2kp: null,
+  kp2tle: null,
+  iod: null,
+  svs2analyst: null,
+  fitTles: null,
+  testIod: null,
+  svs2kps: null,
+  debug: null,
+};
 
 // Public Functions
-om.sat2sv = (sat, timeManager) => [timeManager.simulationTimeObj, sat.position.x, sat.position.y, sat.position.z, sat.velocity.x, sat.velocity.y, sat.velocity.z];
-om.sat2kp = (sat, timeManager) => {
+om.sat2sv = (sat: SatObject, timeManager: TimeManager) => [
+  timeManager.simulationTimeObj,
+  sat.position.x,
+  sat.position.y,
+  sat.position.z,
+  sat.velocity.x,
+  sat.velocity.y,
+  sat.velocity.z,
+];
+om.sat2kp = (sat: SatObject, timeManager: TimeManager) => {
   const sv = om.sat2sv(sat, timeManager);
   return om.sv2kp(sv, timeManager);
 };
-om.sat2tle = (sat, timeManager) => {
+om.sat2tle = (sat: SatObject, timeManager: TimeManager) => {
   const kp = om.sat2kp(sat, timeManager);
   return om.kp2tle(kp, null, timeManager);
 };
-om.sv2kp = (sv) => {
-  const kepler = _sv2kp({ massPrimary: 1, massSecondary: 1, vector: sv, massPrimaryU: 'kg', massSecondaryU: 'M_Earth', vectorU: [0, 0, 0, 0, 0, 0], outputU: 'km', outputU2: 'm' });
+
+type StateVector = [number, number, number, number, number, number, number];
+
+om.sv2kp = (sv: StateVector) => {
+  const kepler = _sv2kp({ massPrimary: 1, massSecondary: 1, vector: sv, massPrimaryU: 'kg', massSecondaryU: 'M_Earth', vectorU: 'km', outputU: 'km', outputU2: 'm' });
   return kepler;
 };
-om.kp2tle = (kp, epoch, timeManager) => {
+om.kp2tle = (kp, epoch, timeManager: TimeManager) => {
   const inc = kp.inclination;
   const raan = kp.raan;
   const ecc = kp.eccentricity;
@@ -68,9 +92,9 @@ om.kp2tle = (kp, epoch, timeManager) => {
   const meanmo = 1440 / kp.period;
   epoch = typeof epoch == 'undefined' || epoch == null ? new Date(timeManager.calculateSimulationTime()) : epoch;
   const yy = epoch.getUTCFullYear() - 2000; // This won't work before year 2000, but that shouldn't matter
-  let epochd = _dayOfYear(epoch.getUTCMonth(), epoch.getUTCDate(), epoch.getUTCHours(), epoch.getUTCMinutes(), epoch.getUTCSeconds());
-  epochd = epochd * 1 + epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-  const tle1 = `1 80000U 58001A   ${yy}${_pad0(parseFloat(epochd).toFixed(8), 12)} 0.00000000 +00000-0 +00000-0 0 99990`;
+  const epochd = _dayOfYear(epoch.getUTCMonth(), epoch.getUTCDate(), epoch.getUTCHours(), epoch.getUTCMinutes(), epoch.getUTCSeconds());
+  const epochd2 = parseFloat(epochd) + epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+  const tle1 = `1 80000U 58001A   ${yy}${_pad0(epochd2.toFixed(8), 12)} 0.00000000 +00000-0 +00000-0 0 99990`;
   const tle2 = `2 80000 ${_pad0(inc.toFixed(4), 8)} ${_pad0(raan.toFixed(4), 8)} ${ecc.toPrecision(7).substr(2, 7)} ${_pad0(parseFloat(argpe).toFixed(4), 8)} ${_pad0(
     meana.toFixed(4),
     8
@@ -78,52 +102,55 @@ om.kp2tle = (kp, epoch, timeManager) => {
   return { tle1: tle1, tle2: tle2 };
 };
 // State Vectors to Keplerian Min/Max/Avg
-om.svs2kps = (svs) => { // NOSONAR
+om.svs2kps = (svs: StateVector[]) => {
+  // NOSONAR
   let kpList = [];
   for (let i = 0; i < svs.length; i++) {
     kpList.push(om.sv2kp(svs[i]));
   }
 
   // Results
-  let r = {};
-  {
-    r.max = {};
-    r.max.apogee = 0;
-    r.max.argPe = 0;
-    r.max.eccentricity = 0;
-    r.max.inclination = 0;
-    r.max.mo = 0;
-    r.max.perigee = 0;
-    r.max.period = 0;
-    r.max.raan = 0;
-    r.max.semiMajorAxis = 0;
-    r.max.ta = 0;
-    r.max.tl = 0;
-    r.min = {};
-    r.min.apogee = 1000000;
-    r.min.argPe = 1000000;
-    r.min.eccentricity = 1000000;
-    r.min.inclination = 1000000;
-    r.min.mo = 1000000;
-    r.min.perigee = 1000000;
-    r.min.period = 1000000;
-    r.min.raan = 1000000;
-    r.min.semiMajorAxis = 1000000;
-    r.min.ta = 1000000;
-    r.min.tl = 1000000;
-    r.avg = {};
-    r.avg.apogee = 0;
-    r.avg.argPe = 0;
-    r.avg.eccentricity = 0;
-    r.avg.inclination = 0;
-    r.avg.mo = 0;
-    r.avg.perigee = 0;
-    r.avg.period = 0;
-    r.avg.raan = 0;
-    r.avg.semiMajorAxis = 0;
-    r.avg.ta = 0;
-    r.avg.tl = 0;
-  }
+  let r = {
+    max: {
+      apogee: 0,
+      argPe: 0,
+      eccentricity: 0,
+      inclination: 0,
+      mo: 0,
+      perigee: 0,
+      period: 0,
+      raan: 0,
+      semiMajorAxis: 0,
+      ta: 0,
+      tl: 0,
+    },
+    min: {
+      apogee: 1000000,
+      argPe: 1000000,
+      eccentricity: 1000000,
+      inclination: 1000000,
+      mo: 1000000,
+      perigee: 1000000,
+      period: 1000000,
+      raan: 1000000,
+      semiMajorAxis: 1000000,
+      ta: 1000000,
+      tl: 1000000,
+    },
+    avg: {
+      apogee: 0,
+      argPe: 0,
+      eccentricity: 0,
+      inclination: 0,
+      mo: 0,
+      perigee: 0,
+      period: 0,
+      raan: 0,
+      semiMajorAxis: 0,
+      ta: 0,
+      tl: 0,
+    },
+  };
 
   // deepcode ignore UnusedIterator: false positive
   for (let i = 0; i < kpList.length; i++) {
@@ -176,13 +203,13 @@ om.svs2kps = (svs) => { // NOSONAR
 
   return r;
 };
-om.iod = async (svs, timeManager, satellite) => {
+om.iod = async (svs: StateVector[], timeManager: TimeManager, satellite) => {
   try {
     const kps = om.svs2kps(svs);
 
     // Sort SVs by Time
     svs.sort(function (a, b) {
-      return a[0].value - b[0].value;
+      return a[0] - b[0];
     });
 
     // Change Time to Relative to the First Observation
@@ -194,7 +221,8 @@ om.iod = async (svs, timeManager, satellite) => {
   }
 };
 
-om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
+om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, satellite) => {
+  // NOSONAR
   try {
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
@@ -210,13 +238,14 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
     for (let r = -STEPS / 2; r < STEPS / 2; r++) {
       for (let a = -STEPS; a < STEPS; a++) {
         for (let m = -STEPS * 2; m < STEPS * 2; m++) {
-          const possibleKp = {};
-          possibleKp.inclination = kps.avg.inclination;
-          possibleKp.raan = kps.avg.raan + raanI * r;
-          possibleKp.eccentricity = kps.avg.eccentricity;
-          possibleKp.argPe = kps.avg.argPe + argpeI * a;
-          possibleKp.mo = kps.avg.mo + (meanaI * m) / 2;
-          possibleKp.period = kps.avg.period;
+          const possibleKp = {
+            inclination: kps.avg.inclination,
+            raan: kps.avg.raan + raanI * r,
+            eccentricity: kps.avg.eccentricity,
+            argPe: kps.avg.argPe + argpeI * a,
+            mo: kps.avg.mo + (meanaI * m) / 2,
+            period: kps.avg.period,
+          };
           const tles = om.kp2tle(possibleKp, epoch, timeManager);
           let xError = 0;
           let yError = 0;
@@ -249,19 +278,20 @@ om.fitTles = async (epoch, svs, kps, timeManager, satellite) => { // NOSONAR
     om.debug.closestApproach += bestIndicies[0];
 
     // Calculate Best TLE
-    let kp = {};
-    kp.inclination = kps.avg.inclination;
-    kp.raan = kps.avg.raan + raanI * bestIndicies[1];
-    kp.eccentricity = kps.avg.eccentricity;
-    kp.argPe = kps.avg.argPe + argpeI * bestIndicies[2];
-    kp.mo = kps.avg.mo + meanaI * bestIndicies[3];
-    kp.period = kps.avg.period;
+    const kp = {
+      inclination: kps.avg.inclination,
+      raan: kps.avg.raan + raanI * bestIndicies[1],
+      eccentricity: kps.avg.eccentricity,
+      argPe: kps.avg.argPe + argpeI * bestIndicies[2],
+      mo: kps.avg.mo + meanaI * bestIndicies[3],
+      period: kps.avg.period,
+    };
     return om.kp2tle(kp, epoch);
   } catch (e) {
     console.debug(e);
   }
 };
-om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
+om.svs2analyst = async (svs: StateVector[], satSet: CatalogManager, timeManager: TimeManager, satellite) => {
   om.iod(svs, timeManager, satellite)
     .then((tles) => {
       satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
@@ -272,7 +302,7 @@ om.svs2analyst = async (svs, satSet, timeManager, satellite) => {
     });
 };
 
-om.testIod = (satSet) => {
+om.testIod = (satSet: CatalogManager) => {
   fetch('/metObs.json')
     .then((response) => response.json())
     .then((metObs) => {
@@ -288,10 +318,11 @@ om.testIod = (satSet) => {
     });
 };
 
-om.debug = {};
-om.debug.closestApproach = 0;
+om.debug = {
+  closestApproach: 0,
+};
 
-export const _propagate = async (tle1, tle2, epoch, satellite) => {
+export const _propagate = async (tle1: string, tle2: string, epoch: Date, satellite) => {
   try {
     let satrec = satellite.twoline2satrec(tle1, tle2); // perform and store sat init calcs
     let j = _jday(
@@ -311,23 +342,71 @@ export const _propagate = async (tle1, tle2, epoch, satellite) => {
     // intentionally left blank
   }
 };
-export const _jday = (year, mon, day, hr, minute, sec) => {
+export const _jday = (year: number, mon: number, day: number, hr: number, minute: number, sec: number): number => {
   'use strict';
   return (
     367.0 * year - Math.floor(7 * (year + Math.floor((mon + 9) / 12.0)) * 0.25) + Math.floor((275 * mon) / 9.0) + day + 1721013.5 + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0 //  ut in days
   );
 };
-// Converts State Vectors to Keplerian Elements
-export const _sv2kp = ({ massPrimary, massSecondary, vector, massPrimaryU, massSecondaryU, vectorU, outputU, outputU2 }) => { // NOSONAR
-  let rx = vector[1] * 1000;
-  let ry = vector[2] * 1000;
-  let rz = vector[3] * 1000;
-  let vx = vector[4] * 1000;
-  let vy = vector[5] * 1000;
-  let vz = vector[6] * 1000;
+interface KeplerianOrbit {
+  semiMajorAxis: number;
+  eccentricity: number;
+  inclination: number;
+  raan: number;
+  argPe: number;
+  mo: number;
+  ta: any;
+  tl: any;
+  perigee: number;
+  apogee: number;
+  period: number;
+}
 
+// Converts State Vectors to Keplerian Elements
+export const _sv2kp = ({
+  massPrimary,
+  massSecondary,
+  vector,
+  massPrimaryU,
+  massSecondaryU,
+  vectorU,
+  outputU,
+  outputU2,
+}: {
+  massPrimary?: number;
+  massSecondary?: number;
+  vector: [number, number, number, number, number, number, number];
+  massPrimaryU?: string;
+  massSecondaryU?: string;
+  vectorU?: string;
+  outputU?: string;
+  outputU2?: string;
+}): KeplerianOrbit => {
+  // NOSONAR
+  if (!vector) throw new Error('vector is required');
+  if (massPrimary <= 0) throw new Error('massPrimary must be greater than 0');
+  if (massSecondary <= 0) throw new Error('massSecondary must be greater than 0');
+
+  vectorU ??= 'km';
+  if (vectorU !== 'km' && vectorU !== 'm') throw new Error('vectorU must be either "km" or "m"');
+  const vecMultiplier = vectorU === 'km' ? 1 : 1000;
+  let rx = vector[1] * vecMultiplier;
+  let ry = vector[2] * vecMultiplier;
+  let rz = vector[3] * vecMultiplier;
+  let vx = vector[4] * vecMultiplier;
+  let vy = vector[5] * vecMultiplier;
+  let vz = vector[6] * vecMultiplier;
+
+  massSecondaryU ??= 'M_Earth'; // Default is Earth
   if (massSecondaryU === 'M_Earth') {
     massSecondary = massSecondary * 5.97378250603408e24;
+  } else {
+    throw new Error('M_Earth is the only value currently supported.');
+  }
+
+  massPrimaryU ??= 'kg'; // Default is kg
+  if (massPrimaryU !== 'kg') {
+    throw new Error('kg is the only value currently supported.');
   }
 
   // Prevent divide by 0 errors
@@ -438,7 +517,7 @@ export const _sv2kp = ({ massPrimary, massSecondary, vector, massPrimaryU, massS
 };
 
 // Internal Functions
-export const _arctan2 = (y, x) => {
+export const _arctan2 = (y: number, x: number): number => {
   let u;
   if (x != 0) {
     u = Math.atan(y / x);
@@ -451,10 +530,10 @@ export const _arctan2 = (y, x) => {
   }
   return u;
 };
-export const _dayOfYear = (mon, day, hr, minute, sec) =>
+export const _dayOfYear = (mon: number, day: number, hr: number, minute: number, sec: number) =>
   // eslint-disable-next-line implicit-arrow-linebreak
   (Math.floor((275 * mon) / 9.0) + day + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0) //  ut in days
     .toFixed(5);
-export const _pad0 = (str, max) => (str?.length < max ? _pad0('0' + str, max) : str);
+export const _pad0 = (str: string, max: number): string => (str?.length < max ? _pad0('0' + str, max) : str);
 
 export const omManager = om;

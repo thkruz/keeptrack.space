@@ -185,14 +185,13 @@ export const breakupOnSubmit = (): void => { // NOSONAR
     satId = satSet.getIdFromObjNum(80000 + i);
     satSet.getSat(satId); // TODO: This may be unnecessary needs tested
     let sat = origsat;
-    let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7);
+    // Is this needed? -- let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7) ??
 
     const rascOffset = -rascVariation / 2 + rascVariation * (rascIterat / 4);
-    // const rascOffset = Math.random() * rascVariation * 2 - rascVariation;      
     const newAlt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
     let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, newAlt, rascOffset);
 
-    iTLE1 = iTLEs[0];
+    let iTLE1 = iTLEs[0];
     let iTLE2 = iTLEs[1];    
     for (; i < (rascIterat + 1) * breakupCount / 4; i++) {
 

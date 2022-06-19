@@ -42,17 +42,17 @@ describe('stereoMap.resize2DMap', () => {
 
 // @ponicode
 describe('stereoMap.updateMap', () => {
-  test('0', () => {
-    let result: any = stereoMap.updateMap();
+  test('0', async () => {
+    let result: any = await stereoMap.updateMap();
     expect(result).toMatchSnapshot();
   });
 
-  test('1', () => {
+  test('1', async () => {
     keepTrackApi.programs.objectManager.selectedSat = 1;
     keepTrackApi.programs.mapManager.isMapMenuOpen = true;
     keepTrackApi.programs.satellite.degreesLat = () => 1;
     keepTrackApi.programs.satellite.degreesLong = () => 1;
-    let result: any = stereoMap.updateMap();
+    let result: any = await stereoMap.updateMap();
     expect(result).toMatchSnapshot();
   });
 });

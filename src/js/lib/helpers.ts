@@ -38,10 +38,10 @@ export const getEl = (id: string): HTMLElement => {
   if (isThisJest()) {
     // Create an empty DIV and send that back
     // TODO - This is a hack. Tests should provide the right environment.
-    const el = document.createElement('div');
-    el.id = id;
-    document.body.appendChild(el);
-    return <HTMLElement>(<unknown>el);
+    const _el = document.createElement('div');
+    _el.id = id;
+    document.body.appendChild(_el);
+    return <HTMLElement>(<unknown>_el);
   }
   return null;
   // DEBUG: Use this code for finding bad requests

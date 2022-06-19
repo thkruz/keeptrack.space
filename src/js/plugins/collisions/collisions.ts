@@ -170,8 +170,8 @@ export const MMMtoInt = (month: string) => {
       throw new Error('Invalid Month');
   }
 };
-export const findFutureDate = (socratesObjTwo: any[][], row: number) => {
-  const socratesDate = socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
+export const findFutureDate = (_socratesObjTwo: any[][], row: number) => {
+  const socratesDate = _socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
   const socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
 
   const sYear = parseInt(socratesDate[0]); // UTC Year
@@ -190,7 +190,6 @@ export const findFutureDate = (socratesObjTwo: any[][], row: number) => {
   // Find the offset from today 60 seconds before possible collision
   keepTrackApi.programs.timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime() - 1000 * 30);
   keepTrackApi.programs.mainCamera.isCamSnapMode = false;
-  keepTrackApi.programs.timeManager.simulationTimeObj;
 }; // Allows passing -1 argument to socrates function to skip these steps
 
 export const socrates = (row: number, testOverride?: any) => {

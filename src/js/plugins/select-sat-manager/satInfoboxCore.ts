@@ -252,8 +252,7 @@ export const allObjectsLink = (): void => {
   uiManager.doSearch(searchStr);
   (<HTMLInputElement>getEl('search')).value = searchStr;
 };
-export const orbitalData = (sat: SatObject): void => {
-  // NOSONAR
+export const orbitalData = (sat: SatObject): void => { // NOSONAR
   // Only show orbital data if it is available
   if (sat === null || typeof sat === 'undefined') return;
 
@@ -544,8 +543,7 @@ export const secondaryData = (sat: SatObject): void => {
     satInfoboxCore.secondaryData.isLoaded = true;
   }
 };
-export const satMissionData = (sat: SatObject): void => {
-  // NOSONAR
+export const satMissionData = (sat: SatObject): void => { // NOSONAR
   if (sat === null || typeof sat === 'undefined') return;
 
   if (!satInfoboxCore.satMissionData.isLoaded) {
@@ -719,8 +717,7 @@ export const satMissionData = (sat: SatObject): void => {
     getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
   }
 };
-export const intelData = (sat: SatObject, satId?: number): void => {
-  // NOSONAR
+export const intelData = (sat: SatObject, satId?: number): void => { // NOSONAR
   if (satId !== -1) {
     if (!satInfoboxCore.intelData.isLoaded) {
       getEl('sat-infobox').insertAdjacentHTML(

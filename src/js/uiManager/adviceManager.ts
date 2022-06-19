@@ -470,10 +470,6 @@ export const clearAdvice = function (): void {
 };
 export const init = () => {
   helpDOM = getEl('help-screen');
-  // helpDOM.draggable({
-  //   containment: 'window',
-  //   scroll: false,
-  // });
   helpCloseDOM = getEl('help-close');
   helpHeaderDOM = getEl('help-header');
   helpTextDOM = getEl('help-text');

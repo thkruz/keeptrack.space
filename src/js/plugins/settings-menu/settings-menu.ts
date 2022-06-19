@@ -6,25 +6,21 @@ import $ from 'jquery';
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * planetarium.ts is a plugin for showing the satellites above from the perspective
- * of a view on the earth.
- *
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2020-2022 Heather Kruczek
  *
- * KeepTrack is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
+ * KeepTrack is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later version.
  *
- * KeepTrack is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License along with
- * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
  *
- * TESTING: This plugin requires php to be installed on the server. It won't work
- * with the default http npm module.
+ * You should have received a copy of the GNU Affero General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
  *
  * /////////////////////////////////////////////////////////////////////////////
  */

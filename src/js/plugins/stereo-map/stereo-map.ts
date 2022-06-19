@@ -74,7 +74,7 @@ export const init = (): void => {
   });
 };
 
-export const updateMap = async (): Promise<void> => {
+export const updateMap = async (): Promise<void> => { // NOSONAR
   try {
     const { sensorManager, satellite, mapManager, objectManager, satSet } = keepTrackApi.programs;
     if (objectManager.selectedSat === -1) return;

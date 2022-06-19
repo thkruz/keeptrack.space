@@ -2,7 +2,7 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { Camera, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
+import { Camera, CatalogManager, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
 import { getEl } from '../lib/helpers';
 
 const NUM_SEGS = 255;
@@ -213,71 +213,11 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
   gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
 
   if (settingsManager.isDrawOrbits) {
-    if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
-      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
-      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(pathShader.aPos);
-      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-    }
-
-    if (secondarySelectId !== -1 && !satSet.getSatExtraOnly(secondarySelectId).static) {
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor2);
-      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
-      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(pathShader.aPos);
-      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-    }
-
-    if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) {
-      // avoid z-fighting
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
-      gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
-      gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(pathShader.aPos);
-      gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-    }
-
-    if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
-      // DEBUG: Planned future feature
-      // if (sensorManager.currentSensor?.lat) {
-      //   groupsManager.selectedGroup.forEach(function (id) {
-      //     let isInViewSoon = false;
-      //     for (let i = 0; i < orbitManager.inViewSoon.length; i++) {
-      //       if (id === orbitManager.inViewSoon[i]) {
-      //         isInViewSoon = true;
-      //         break;
-      //       }
-      //     }
-      //     if (isInViewSoon) {
-      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
-      //     } else {
-      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-      //     }
-
-      //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-      //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-      //     gl.enableVertexAttribArray(pathShader.aPos);
-      //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
-      //   });
-      // }
-      gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-      groupsManager.selectedGroup.forEach((id: number) => {
-        writePathToGpu(id);
-      });
-    }
-
-    if (currentInView.length >= 1) {
-      // There might be some z-fighting
-      if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
-        gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
-      } else {
-        gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
-      }
-      currentInView.forEach((id) => {
-        writePathToGpu(id);
-      });
-    }
+    drawPrimaryObjectOrbit(satSet);
+    drawSecondaryObjectOrbit(satSet);
+    drawHoverObjectOrbit(satSet);
+    drawGroupObjectOrbit();
+    drawInViewObjectOrbit();
   }
 
   gl.disable(gl.BLEND);
@@ -394,4 +334,78 @@ const writePathToGpu = (id: number) => {
   gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(pathShader.aPos);
   gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+};
+const drawPrimaryObjectOrbit = (satSet: CatalogManager) => {
+  if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
+    gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
+    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(pathShader.aPos);
+    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+  }
+};
+
+const drawGroupObjectOrbit = (): void => {
+  if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+    // DEBUG: Planned future feature
+    // if (sensorManager.currentSensor?.lat) {
+    //   groupsManager.selectedGroup.forEach(function (id) {
+    //     let isInViewSoon = false;
+    //     for (let i = 0; i < orbitManager.inViewSoon.length; i++) {
+    //       if (id === orbitManager.inViewSoon[i]) {
+    //         isInViewSoon = true;
+    //         break;
+    //       }
+    //     }
+    //     if (isInViewSoon) {
+    //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+    //     } else {
+    //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
+    //     }
+    //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
+    //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+    //     gl.enableVertexAttribArray(pathShader.aPos);
+    //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    //   });
+    // }
+    gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
+    groupsManager.selectedGroup.forEach((id: number) => {
+      writePathToGpu(id);
+    });
+  }
+};
+
+const drawInViewObjectOrbit = (): void => {
+  if (currentInView.length >= 1) {
+    // There might be some z-fighting
+    if (mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitPlanetariumColor);
+    } else {
+      gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
+    }
+    currentInView.forEach((id) => {
+      writePathToGpu(id);
+    });
+  }
+};
+
+const drawHoverObjectOrbit = (satSet: CatalogManager): void => {
+  if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) {
+    // avoid z-fighting
+    gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
+    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(pathShader.aPos);
+    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+  }
+};
+
+const drawSecondaryObjectOrbit = (satSet: CatalogManager): void => {
+  if (secondarySelectId !== -1 && !satSet.getSatExtraOnly(secondarySelectId).static) {
+    gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor2);
+    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
+    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(pathShader.aPos);
+    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+  }
 };

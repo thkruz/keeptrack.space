@@ -22,11 +22,6 @@ export const initMenuController = () => {
     });
   });
 
-  // getEl('search-close').addEventListener('click', () => {
-  //   searchBox.hideResults();
-  //   getEl('menu-space-stations').classList.remove('bmenu-item-selected');
-  // });
-
   getEl('legend-hover-menu').addEventListener('click', function (e: any) {
     if (e.target.classList[1]) {
       uiManager.legendHoverMenuClick(e.target.classList[1]);

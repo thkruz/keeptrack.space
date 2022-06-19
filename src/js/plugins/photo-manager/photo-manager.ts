@@ -62,15 +62,6 @@ export const himawari8 = (): void => {
   const hour = propTime.getUTCHours().toString().padStart(2, '0');
   const min = (Math.floor(propTime.getUTCMinutes() / 10) * 10).toString().padStart(2, '0');
 
-  let imgWidth, imgHeight;
-  if (window.innerWidth < window.innerHeight) {
-    imgWidth = window.innerWidth * 0.8;
-    imgHeight = imgWidth;
-  } else {
-    imgHeight = window.innerHeight * 0.8;
-    imgWidth = imgHeight;
-  }
-
   settingsManager.isPreventColorboxClose = true;
   setTimeout(function () {
     settingsManager.isPreventColorboxClose = false;

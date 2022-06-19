@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v6.0.3
+
+>  
+
+- fix: :zap: remove jquery and fix open bugs
+- feat: :sparkles: add eci ecf ric inc2lon and time2lon plots
+- refactor: :zap: remove jquery
+- feat: :sparkles: add satellite search on control site clicked
+- style: :art: replace all camelCase files with hyphens for better git detection
+- feat: :sparkles: add scenario-creator scaffold
+- feat: :sparkles: add 2nd sat selection + update selectbox
+- test: :zap: improve jest speed and reliability
+- feat: :sparkles: add ECI plots
+- refactor: :zap: remove more jquery
+- fix: :zap: reduce complexity of legend color code
+- build: :construction_worker: add google cloud support
+- fix: :bug: fix loading + legend + add more settings
+- refactor: :zap: remove jquery from adviceManager
+- feat: :card_file_box: update catalog
+- feat: :zap: optimize milky way textures and rotate
+- test: :white_check_mark: fix all failing tests
+- fix: :zap: improve loading times
+- feat: :sparkles: add RIC frame 3D scatter plots
+- refactor: :zap: change base64 images to delayedsrc images
+- feat: :sparkles: add ecf analysis plot
+- fix: :bug: fix time not moving at correct speed
+- feat: :sparkles: add better breakup logic
+- fix: :ambulance: fix image not found on linux ending in /
+- refactor: :zap: remove jquery
+- fix: :zap: fix minor issues with stf menu
+- fix: :beers: start fixing trend analysis menu
+- fix: :bug: fix lookangles menu
+- feat: :sparkles: add find reentries function
+- feat: :triangular_flag_on_post: modify breakup options to be more realistic
+- fix: :bug: fix ray casting on earth functionality
+- feat: :sparkles: new loading screen
+- fix: :bug: fix premature filtering in findsat
+- feat: :sparkles: add ability to use ECF for satellite orbits
+- chore: :bookmark: update to version 5.4
+- fix: :bug: fix socrates
+- fix: :bug: fix countries filters
+- test: :camera_flash: update snapshots
+- fix: :bug: fix next pass time not updating
+- fix: :bug: include TBA sats as Special
+- chore: :bookmark: change to 6.0.1
+- fix: :sparkles: update SRP FOV
+- fix: :bug: fix missing top menu icons
+- fix: :bug: fix umbral not showing
+- fix: :green_heart: update docker.google instructions
+- fix: :ambulance: fix photomanager icon not loading
+- fix: :pencil2: fix capitialization issue with constellations.ts
+- test: :bug: fix settingsmenu tests
+- chore: :lock: add gpg signing
+- fix: :lock: bump async
+
 #### v6.0.2
 
 >  

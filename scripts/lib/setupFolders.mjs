@@ -13,7 +13,7 @@ export const setupDistFolders = () => {
   rmSync('./dist/plugins', { recursive: true, force: true });
   rmSync('./dist/radarData', { recursive: true, force: true });
   rmSync('./dist/res', { recursive: true, force: true });
-  rmSync('./dist/settings', { recursive: true, force: true });
+  // rmSync('./dist/settings', { recursive: true, force: true });
   rmSync('./dist/simulation', { recursive: true, force: true });
   rmSync('./dist/textures', { recursive: true, force: true });
   rmSync('./dist/tle', { recursive: true, force: true });
@@ -26,7 +26,10 @@ export const setupDistFolders = () => {
 };
 
 export const setupEmbedFolders = () => {
-  rmSync('./embed');
+  rmSync('./embed/keepTrack/js', { recursive: true, force: true });
+  rmSync('./embed/keepTrack/css', { recursive: true, force: true });
+  rmSync('./embed/keepTrack/textures', { recursive: true, force: true });
+  rmSync('./embed/keepTrack/tle', { recursive: true, force: true });
   mkdirp.sync('./embed');
 
   mkdirp.sync('./embed/keepTrack');

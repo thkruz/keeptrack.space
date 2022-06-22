@@ -351,7 +351,7 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
   drawManager = drawManagerOverride || drawManager;
   const { gl } = keepTrackApi.programs.drawManager;
 
-  if (!settingsManager.enableLimitedUI && !settingsManager.isDrawLess) {
+  if (!settingsManager.isDrawLess) {
     if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
     const { mainCamera, objectManager } = keepTrackApi.programs;
     
@@ -417,7 +417,7 @@ export const satCalculate = () => {
         lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name));
       }
-      keepTrackApi.programs.mapManager?.updateMap();
+      if (settingsManager.plugins.stereoMap) keepTrackApi.programs.mapManager?.updateMap();
     } else {
       lineManager.drawWhenSelected();
     }

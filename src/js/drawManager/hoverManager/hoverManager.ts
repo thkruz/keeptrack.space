@@ -158,9 +158,9 @@ export const satObj = (sat: SatObject) => {
   if (!settingsManager.enableHoverOverlay) return;
   const { drawManager, objectManager, satellite, sensorManager, satSet } = keepTrackApi.programs;
   // Use this as a default if no UI
-  if (settingsManager.disableUI) {
+  if (settingsManager.disableUI || settingsManager.isEPFL) {
     satHoverBoxNode1.textContent = sat.name;
-    satHoverBoxNode2.textContent = sat.sccNum;
+    satHoverBoxNode2.textContent = settingsManager.isEPFL ? `Launched: ${sat.intlDes.split('-')[0]}` : sat.sccNum;
     satHoverBoxNode3.textContent = objectManager.extractCountry(sat.country);
   } else {
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass && drawManager.isShowDistance) {

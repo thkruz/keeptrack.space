@@ -107,20 +107,20 @@ export const uiManagerInit = () => {
 };
 
 export const uiManagerFinal = () => {
-  getEl('analysis-form').addEventListener('submit', function (e: Event) {
+  getEl('analysis-form')?.addEventListener('submit', function (e: Event) {
     e.preventDefault();
     analysisFormSubmit();
   });
-  getEl('analysis-bpt').addEventListener('submit', function (e: Event) {
+  getEl('analysis-bpt')?.addEventListener('submit', function (e: Event) {
     e.preventDefault();
     analysisBptSumbit();
   });
 
-  getEl('findCsoBtn').addEventListener('click', () => {
+  getEl('findCsoBtn')?.addEventListener('click', () => {
     showLoading(findCsoBtnClick);
   });
 
-  getEl('findReentries').addEventListener('click', () => {
+  getEl('findReentries')?.addEventListener('click', () => {
     showLoading(findRaBtnClick);
   });
 

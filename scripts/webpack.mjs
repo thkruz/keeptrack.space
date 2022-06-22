@@ -73,7 +73,7 @@ export const generateConfig = (env, isWatch) => {
     webpackConfig.push(webWorkerConfig);
     webpackConfig.push(analysisConfig);
   } else {
-    const mainConfig = getMainConfig(baseConfig, dirName, 'embed/keepTrack');
+    const mainConfig = getMainConfig(baseConfig, dirName, 'embed/keepTrack', 'keepTrack/');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'embed/keepTrack/', 'keepTrack/');
 
     webpackConfig.push(mainConfig);
@@ -195,7 +195,7 @@ const getEmbedConfig = (baseConfig) => {
   return baseConfig;
 };
 
-const getMainConfig = (baseConfig, dirName, subFolder) => ({
+const getMainConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
   ...baseConfig,
   ...{
     name: 'MainFiles',
@@ -206,7 +206,7 @@ const getMainConfig = (baseConfig, dirName, subFolder) => ({
       // Add hash to the end of the file name if not embeded
       filename: `[name]${subFolder === 'dist' ? '.[contenthash]' : ''}.js`,
       path: `${dirName}/../${subFolder}/js`,
-      publicPath: './js/',
+      publicPath: `./${pubPath}js/`,
     },
   },
 });

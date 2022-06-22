@@ -321,7 +321,9 @@ export const createPickingProgram = (gl: WebGL2RenderingContext) => {
 
 export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, timeManager: TimeManager) => {
   // Don't update positions until positionCruncher finishes its first loop and creates data in position and velocity data arrays
-  if (!dotsManager.positionData || !dotsManager.velocityData) return;
+  if (!dotsManager.positionData || !dotsManager.velocityData) {
+    return;
+  }
 
   // If we have radar data -- let's update that first
   // if (satSet.radarDataManager.radarData.length > 0) {

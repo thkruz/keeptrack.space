@@ -318,13 +318,13 @@ export const init = (): void => { // NOSONAR
       canvasTouchEnd(mainCamera);
     });
 
-    getEl('nav-wrapper').addEventListener('click', function () {
+    getEl('nav-wrapper')?.addEventListener('click', function () {
       hidePopUps();
     });
-    getEl('nav-footer').addEventListener('click', function () {
+    getEl('nav-footer')?.addEventListener('click', function () {
       hidePopUps();
     });
-    getEl('ui-wrapper').addEventListener('click', function () {
+    getEl('ui-wrapper')?.addEventListener('click', function () {
       hidePopUps();
     });
 
@@ -1192,6 +1192,7 @@ export const canvasTouchStart = (evt: any) => {
   }
 };
 export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
+  if (!settingsManager.isAllowRightClick) return;
   const { uiManager, sensorManager, lineManager, satSet, mainCamera, objectManager } = keepTrackApi.programs;
   const canvasDOM = $('#keeptrack-canvas');
   const rightBtnMenuDOM = $('#right-btn-menu');

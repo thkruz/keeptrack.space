@@ -43,7 +43,9 @@ export const getEl = (id: string): HTMLElement => {
     document.body.appendChild(_el);
     return <HTMLElement>(<unknown>_el);
   }
-  return null;
+
+  // Return an empty div to avoid errors
+  return settingsManager.isUseNullForBadGetEl ? null : <HTMLElement>(<unknown>document.createElement('div'));
   // DEBUG: Use this code for finding bad requests
   // throw new Error(`Element with id ${id} not found!`);
 };

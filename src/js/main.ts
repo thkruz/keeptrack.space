@@ -47,6 +47,12 @@ export const loadAfterStart = () => {
     keepTrackApi.methods.uiManagerFinal();
     // Update MaterialUI with new menu options
     window.M.AutoInit();
+
+    try {
+      settingsManager.onLoadCb();
+    } catch (error) {
+      // Intentionally Blank
+    }
   } else {
     setTimeout(loadAfterStart, 100);
   }

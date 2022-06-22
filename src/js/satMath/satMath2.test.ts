@@ -4,7 +4,10 @@
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms } from '../api/keepTrackTypes';
+import * as calculateSensorPos from './calculateSensorPos';
+import * as findNearbyObjectsByOrbit from './findNearbyObjectsByOrbit';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
+import * as getSunDirection from './getSunDirection';
 import * as satMath from './satMath';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
@@ -66,7 +69,7 @@ describe('satMath.getEci', () => {
 // @ponicode
 describe.skip('satMath.findNearbyObjectsByOrbit', () => {
   test('0', () => {
-    let result: any = satMath.findNearbyObjectsByOrbit(defaultSat);
+    let result: any = findNearbyObjectsByOrbit.findNearbyObjectsByOrbit(defaultSat);
     expect(result).toMatchSnapshot();
   });
 });
@@ -113,12 +116,12 @@ describe('satMath.calculateDops', () => {
 // @ponicode
 describe('satMath.getSunDirection', () => {
   test('0', () => {
-    let result: any = satMath.getSunDirection(12345678);
+    let result: any = getSunDirection.getSunDirection(12345678);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satMath.getSunDirection(1234567890);
+    let result: any = getSunDirection.getSunDirection(1234567890);
     expect(result).toMatchSnapshot();
   });
 });
@@ -185,10 +188,10 @@ describe('satMath.map', () => {
 // @ponicode
 describe('satMath.calculateSensorPos', () => {
   test('0', () => {
-    satMath.calculateSensorPos([defaultSensor]);
+    calculateSensorPos.calculateSensorPos([defaultSensor]);
   });
 
   test('1', () => {
-    satMath.calculateSensorPos();
+    calculateSensorPos.calculateSensorPos();
   });
 });

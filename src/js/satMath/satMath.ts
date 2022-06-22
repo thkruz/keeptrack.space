@@ -22,21 +22,31 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DEG2RAD, DISTANCE_TO_SUN, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, PLANETARIUM_DIST, RAD2DEG, RADIUS_OF_EARTH, TAU } from '@app/js/lib/constants';
+import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, TAU } from '@app/js/lib/constants';
 import { getEl, getUnique, saveCsv, stringPad } from '@app/js/lib/helpers';
-import { ReadonlyMat3, vec3 } from 'gl-matrix';
 import $ from 'jquery';
 import numeric from 'numeric';
-import * as Ootk from 'ootk';
 import { SatRec } from 'satellite.js';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { Eci, EciArr3, lookanglesRow, SatGroupCollection, SatMath, SatObject, SensorManager, SensorObject, SunObject, TearrData } from '../api/keepTrackTypes';
+import { Eci, EciArr3, lookanglesRow, SatGroupCollection, SatMath, SatObject, SensorObject, SunObject, TearrData } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { dateFormat } from '../lib/external/dateFormat.js';
-import { mat3 } from '../lib/external/gl-matrix';
 import { jday } from '../timeManager/transforms';
+import { calculateSensorPos } from './calculateSensorPos';
+import { checkIsInView } from './checkIsInView';
+import { findNearbyObjectsByOrbit } from './findNearbyObjectsByOrbit';
+import { findReentries } from './findReentries';
+import { getAngleBetweenTwoSatellites } from './getAngleBetweenTwoSatellites';
+import { getEcfOfCurrentOrbit } from './getEcfOfCurrentOrbit';
+import { getEciOfCurrentOrbit } from './getEciOfCurrentOrbit';
 import { getOrbitByLatLon } from './getOrbitByLatLon';
-import { formatArgumentOfPerigee, formatInclination, formatMeanAnomaly, formatMeanMotion, formatRightAscension, StringifiedNubmer } from './tleFormater';
+import { getSunDirection } from './getSunDirection';
+import { sat2ric } from './transforms/sat2ric';
+import { verifySensors } from './verifySensors';
+import { createTle } from './createTle';
+import { Sgp4 } from 'ootk';
+import { ecf2eci, ecf2rae, eci2ecf, eci2lla, getDegLat, getDegLon, lla2ecf } from './transforms';
+
 
 window._numeric = numeric; // numeric break if it is not available globally
 
@@ -186,7 +196,7 @@ export const setobs = (sensors: SensorObject[]) => {
   }
 };
 export const calculateVisMag = (sat: SatObject, sensor: SensorObject, propTime: Date, sun: SunObject): number => {
-  const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   const rae = satellite.getRae(propTime, satrec, sensor);
   const distanceToSatellite = rae.rng; //This is in KM
 
@@ -208,13 +218,13 @@ export const calculateVisMag = (sat: SatObject, sensor: SensorObject, propTime: 
   return intrinsicMagnitude + term2 + term3;
 };
 export const altitudeCheck = (tle1: string, tle2: string, now: Date) => {
-  const satrec = satellite.twoline2satrec(tle1, tle2); // perform and store sat init calcs
+  const satrec = Sgp4.createSatrec(tle1, tle2); // perform and store sat init calcs
   const { m, gmst } = calculateTimeVariables(now, satrec);
-  let positionEci = satellite.sgp4(satrec, m);
+  let positionEci = Sgp4.propagate(satrec, m);
   let gpos;
 
   try {
-    gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+    gpos = eci2lla(positionEci.position, gmst);
   } catch (e) {
     return 0; // Auto fail the altitude check
   }
@@ -232,18 +242,18 @@ export const getTEARR = (sat?: SatObject, sensors?: SensorObject[], propTime?: D
   const sensor = sensors[0];
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   const now = typeof propTime !== 'undefined' ? propTime : timeManager.simulationTimeObj;
   const { m, gmst } = calculateTimeVariables(now, satrec);
-  let positionEci = satellite.sgp4(satrec, m);
+  let positionEci = Sgp4.propagate(satrec, m);
 
   try {
-    let gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+    let gpos = eci2lla(positionEci.position, gmst);
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
-    let positionEcf = satellite.eciToEcf(positionEci.position, gmst);
-    let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+    let positionEcf = eci2ecf(positionEci.position, gmst);
+    let lookAngles = ecf2rae(sensor.observerGd, positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG;
     currentTEARR.el = lookAngles.el * RAD2DEG;
     currentTEARR.rng = lookAngles.rng;
@@ -291,7 +301,7 @@ export const nextpass = (sat: SatObject, sensors?: SensorObject[], searchLength?
 
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   for (const sensor of sensors) {
     for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
       // 5second Looks
@@ -329,7 +339,7 @@ export const nextNpasses = (sat: SatObject, sensors: SensorObject[], searchLengt
   let passTimesArray = [];
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
   for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
     // 5second Looks
@@ -366,7 +376,7 @@ export const getlookangles = (sat: SatObject): TearrData[] => { // NOSONAR
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
-  let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
 
   // const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
   // Use custom interval unless doing rise/set lookangles - then use 1 second
@@ -460,7 +470,7 @@ export const getlookanglesMultiSite = (sat: SatObject) => {
   let offset = 0;
 
   // Get Satellite Info
-  let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
   const multiSiteArray = <TearrData[]>[];
@@ -493,26 +503,11 @@ const getSatPos = (offset: number, satrec: SatRec): Eci => {
     const now = new Date(); // Make a time variable
     now.setTime(Number(Date.now()) + offset); // Set the time variable to the time in the future
     const { m } = calculateTimeVariables(now, satrec);
-    return satellite.sgp4(satrec, m);
+    return Sgp4.propagate(satrec, m);
   } catch {
     return { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } };
   }
 };
-
-export const findReentries = (): string => {
-  const { satSet } = keepTrackApi.programs;  
-  const reentries = satSet.satData.filter((sat) =>
-    (sat.type === SpaceObjectType.PAYLOAD || sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS));
-
-  const reentriesStr = reentries
-    .filter((sat) => sat.perigee > 0)
-    .sort((a, b) => a.perigee - b.perigee)
-    .slice(0, 100)
-    .map((sat) => sat.sccNum).join(',');
-
-  return reentriesStr;
-};
-
 
 /* istanbul ignore next */
 export const findCloseObjects = () => { // NOSONAR
@@ -531,7 +526,7 @@ export const findCloseObjects = () => { // NOSONAR
     // Only look at satellites in LEO
     if (sat.apogee > 5556) continue;
     // Find where the satellite is right now
-    sat.satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs)
+    sat.satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs)
     sat.position = getSatPos(0, sat.satrec).position;
     // If it fails, skip it
     if (sat.position === { x: 0, y: 0, z: 0 }) continue;
@@ -675,7 +670,7 @@ export const calculateLookAngles = (sat: SatObject, sensors: SensorObject[]) => 
 
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  var satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   var lookanglesTable = []; // Iniially no rows to the table
   var tempLookanglesInterval;
 
@@ -781,7 +776,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookangle
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
-  var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  var satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   var lookanglesTable = []; // Iniially no rows to the table
 
   let looksInterval = 5;
@@ -947,7 +942,7 @@ export const calculateTimeVariables = (now: Date, satrec?: SatRec): { gmst: numb
       now.getUTCSeconds()
     ) +
     now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-  const gmst = satellite.gstime(j);
+  const gmst = Sgp4.gstime(j);
 
   const m = satrec ? (j - satrec.jdsatepoch) * MINUTES_PER_DAY : null;
 
@@ -956,11 +951,11 @@ export const calculateTimeVariables = (now: Date, satrec?: SatRec): { gmst: numb
 
 export const getRae = (now: Date, satrec: SatRec, sensor: SensorObject) => {
   const { gmst, m } = calculateTimeVariables(now, satrec);
-  let positionEci = satellite.sgp4(satrec, m);
-  let positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+  let positionEci = Sgp4.propagate(satrec, m);
+  let positionEcf = eci2ecf(positionEci.position, gmst); // positionEci.position is called positionEci originally
   sensor.observerGd ??= { lat: sensor.lat * DEG2RAD, lon: sensor.lon * DEG2RAD, alt: sensor.alt };
 
-  let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+  let lookAngles = ecf2rae(sensor.observerGd, positionEcf);
   let az = lookAngles.az * RAD2DEG;
   let el = lookAngles.el * RAD2DEG;
   let rng = lookAngles.rng;
@@ -971,47 +966,18 @@ export const eci2Rae = (now: Date, eci: EciArr3, sensor: SensorObject) => {
   now = new Date(now);
   const { gmst } = calculateTimeVariables(now);
 
-  let positionEcf = satellite.eciToEcf(eci, gmst); // positionEci.position is called positionEci originally
-  let lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+  let positionEcf = eci2ecf(eci, gmst); // positionEci.position is called positionEci originally
+  let lookAngles = ecf2rae(sensor.observerGd, positionEcf);
   let az = lookAngles.az * RAD2DEG;
   let el = lookAngles.el * RAD2DEG;
   let rng = lookAngles.rng;
   return { az: az, el: el, rng: rng };
 };
 export const getEci = (sat: SatObject, now: Date) => {
-  let satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   const { m } = calculateTimeVariables(now, satrec);
 
-  return satellite.sgp4(satrec, m);
-};
-/* istanbul ignore next */
-export const findNearbyObjectsByOrbit = (sat: SatObject) => { // NOSONAR
-  const { satData: catalog } = keepTrackApi.programs.satSet;
-
-  const maxPeriod = sat.period * 1.1;
-  const minPeriod = sat.period * 0.9;
-  const maxInclination = sat.inclination + 10 * DEG2RAD;
-  const minInclination = sat.inclination - 10 * DEG2RAD;
-  let maxRaan = sat.raan + 10 * DEG2RAD;
-  let minRaan = sat.raan - 10 * DEG2RAD;
-  if (sat.raan >= 350 * DEG2RAD) {
-    maxRaan -= 360 * DEG2RAD;
-  }
-  if (sat.raan <= 10 * DEG2RAD) {
-    minRaan += 360 * DEG2RAD;
-  }
-
-  return catalog.filter((s) => {
-    if (s.static) return false;
-    if (s.inclination < minInclination || s.inclination > maxInclination) return false;
-    if (sat.raan > 350 * DEG2RAD || sat.raan < 10 * DEG2RAD) {
-      if (s.raan > maxRaan && s.raan < minRaan) return false;
-    } else {
-      if (s.raan < minRaan || s.raan > maxRaan) return false;
-    }
-    if (s.period < minPeriod || s.period > maxPeriod) return false;
-    return true;
-  }).map((s) => s.id);
+  return Sgp4.propagate(satrec, m);
 };
 export const findClosestApproachTime = (
   sat1: SatObject,
@@ -1031,8 +997,8 @@ export const findClosestApproachTime = (
     ric: null,
   };
 
-  sat1.satrec = satellite.twoline2satrec(sat1.TLE1, sat1.TLE2); // perform and store sat init calcs
-  sat2.satrec = satellite.twoline2satrec(sat2.TLE1, sat2.TLE2); // perform and store sat init calcs
+  sat1.satrec = Sgp4.createSatrec(sat1.TLE1, sat1.TLE2); // perform and store sat init calcs
+  sat2.satrec = Sgp4.createSatrec(sat2.TLE1, sat2.TLE2); // perform and store sat init calcs
 
   for (let t = 0; t < propLength; t++) {
     offset = t * 1000; // Offset in seconds (msec * 1000)
@@ -1054,149 +1020,6 @@ export const findClosestApproachTime = (
   keepTrackApi.programs.timeManager.changeStaticOffset(result.offset);
 
   return result;
-};
-
-// TODO: Future Idea
-/*
-// satellite.createManeuverAnalyst = (satId, incVariation, meanmoVariation, rascVariation) => {
-//   const { timeManager, satSet } = keepTrackApi.programs;
-//   // TODO This needs rewrote from scratch to bypass the satcruncher
-//   var mainsat = satSet.getSat(satId);
-//   var origsat = mainsat;
-//   // Launch Points are the Satellites Current Location
-//   var TEARR = mainsat.getTEARR();
-//   var launchLat, launchLon, alt;
-//   launchLat = satellite.degreesLat(TEARR.lat);
-//   launchLon = satellite.degreesLong(TEARR.lon);
-//   alt = TEARR.alt;
-//   var upOrDown = mainsat.getDirection();
-//   var currentEpoch = satellite.currentEpoch(timeManager.simulationTimeObj);
-//   mainsat.TLE1 = mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32);
-//   var TLEs;
-//   // Ignore argument of perigee for round orbits OPTIMIZE
-//   if (mainsat.apogee - mainsat.perigee < 300) {
-//     TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.simulationTimeObj);
-//   } else {
-//     TLEs = satellite.getOrbitByLatLon(mainsat, launchLat, launchLon, upOrDown, timeManager.simulationTimeObj, alt);
-//   }
-//   var TLE1 = TLEs[0];
-//   var TLE2 = TLEs[1];
-//   //   var breakupSearchString = '';
-//   satId = satSet.getIdFromObjNum(80000);
-//   var sat = satSet.getSat(satId);
-//   sat = origsat;
-//   let iTLE1 = '1 ' + 80000 + TLE1.substr(7);
-//   let iTLEs;
-//   // Ignore argument of perigee for round orbits OPTIMIZE
-//   if (sat.apogee - sat.perigee < 300) {
-//     iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.simulationTimeObj, 0, rascVariation);
-//   } else {
-//     iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, timeManager.simulationTimeObj, alt, rascVariation);
-//   }
-//   iTLE1 = iTLEs[0];
-//   let iTLE2 = iTLEs[1];
-//   // For the first 30
-//   var inc = TLE2.substr(8, 8);
-//   inc = (parseFloat(inc) + incVariation).toPrecision(7);
-//   inc = inc.split('.');
-//   inc[0] = inc[0].substr(-3, 3);
-//   if (inc[1]) {
-//     inc[1] = inc[1].substr(0, 4);
-//   } else {
-//     inc[1] = '0000';
-//   }
-//   inc = (inc[0] + '.' + inc[1]).toString();
-//   inc = stringPad.padEmpty(inc, 8);
-//   // For the second 30
-//   var meanmo: any = iTLE2.substr(52, 10);
-//   meanmo = (parseFloat(meanmo) * meanmoVariation).toPrecision(10);
-//   // meanmo = parseFloat(meanmo - (0.005 / 10) + (0.01 * ((meanmoIterat + 1) / 10))).toPrecision(10);
-//   meanmo = meanmo.split('.');
-//   meanmo[0] = meanmo[0].substr(-2, 2);
-//   if (meanmo[1]) {
-//     meanmo[1] = meanmo[1].substr(0, 8);
-//   } else {
-//     meanmo[1] = '00000000';
-//   }
-//   meanmo = (meanmo[0] + '.' + meanmo[1]).toString();
-//   iTLE2 = '2 ' + 80000 + ' ' + inc + ' ' + iTLE2.substr(17, 35) + meanmo + iTLE2.substr(63);
-//   sat = satSet.getSat(satId);
-//   sat.TLE1 = iTLE1;
-//   sat.TLE2 = iTLE2;
-//   sat.active = true;
-//   if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.simulationTimeObj) > 1) {
-//     satSet.satCruncher.postMessage({
-//       type: 'satEdit',
-//       id: satId,
-//       TLE1: iTLE1,
-//       TLE2: iTLE2,
-//     });
-//     // TODO: This belongs in main or uiManager
-//     // orbitManager.updateOrbitBuffer(satId, true, iTLE1, iTLE2);
-//   } else {
-//     console.debug('Breakup Generator Failed');
-//     return false;
-//   }
-//   // breakupSearchString += mainsat.sccNum + ',Analyst Sat';
-//   // uiManager.doSearch(breakupSearchString);
-//   return true;
-// };
-// satellite.findChangeOrbitToDock = (sat, sat2, propOffset, propLength) => {
-//   const { satSet } = keepTrackApi.programs;
-//   let closestInc = 0;
-//   let closestRaan = 0;
-//   let closestMeanMo = 1;
-//   let minDistArray = {
-//     dist: 1000000,
-//   };
-//   for (let incTemp = -1; incTemp <= 1; incTemp++) {
-//     for (let raanTemp = -1; raanTemp <= 1; raanTemp++) {
-//       for (let meanMoTemp = 0.95; meanMoTemp <= 1.05; meanMoTemp += 0.05) {
-//         if (satellite.createManeuverAnalyst(sat.id, incTemp, meanMoTemp, raanTemp)) {
-//           let minDistArrayTemp = satellite.findClosestApproachTime(satSet.getSatFromObjNum(80000), sat2, propOffset, propLength);
-//           if (minDistArrayTemp.dist < minDistArray.dist) {
-//             minDistArray = minDistArrayTemp;
-//             // let closestInc = incTemp;
-//             // let closestRaan = raanTemp;
-//             // let closestMeanMo = meanMoTemp;
-//             // console.log(`Distance: ${minDistArray.dist}`);
-//             // console.log(`Time: ${minDistArray.time}`);
-//             // console.log(satSet.getSatFromObjNum(80000));
-//           }
-//         }
-//       }
-//     }
-//   }
-
-//   console.log(`${sat.inclination + closestInc}`);
-//   console.log(`${sat.raan + closestRaan}`);
-//   console.log(`${sat.meanMotion * closestMeanMo}`);
-//   satellite.createManeuverAnalyst(sat.id, closestInc, closestMeanMo, closestRaan);
-// };
-*/
-
-const checkIsInView = (sensor: SensorObject, rae: { rng: number; az: number; el: number }): boolean => {
-  const { az, el, rng } = rae;
-
-  if (sensor.obsminaz > sensor.obsmaxaz) {
-    if (
-      ((az >= sensor.obsminaz || az <= sensor.obsmaxaz) && el >= sensor.obsminel && el <= sensor.obsmaxel && rng <= sensor.obsmaxrange && rng >= sensor.obsminrange) ||
-      ((az >= sensor.obsminaz2 || az <= sensor.obsmaxaz2) && el >= sensor.obsminel2 && el <= sensor.obsmaxel2 && rng <= sensor.obsmaxrange2 && rng >= sensor.obsminrange2)
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    if (
-      (az >= sensor.obsminaz && az <= sensor.obsmaxaz && el >= sensor.obsminel && el <= sensor.obsmaxel && rng <= sensor.obsmaxrange && rng >= sensor.obsminrange) ||
-      (az >= sensor.obsminaz2 && az <= sensor.obsmaxaz2 && el >= sensor.obsminel2 && el <= sensor.obsmaxel2 && rng <= sensor.obsmaxrange2 && rng >= sensor.obsminrange2)
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 };
 
 export const updateDopsTable = (lat: number, lon: number, alt: number) => {
@@ -1256,7 +1079,7 @@ export const getDops = (lat: number, lon: number, alt?: number, propTime?: Date)
   let inViewList = [];
   groupsManager.GPSGroup.sats.forEach((satObj: SatGroupCollection) => {
     const sat = satSet.getSat(satObj.satId);
-    const lookAngles = satellite.ecfToLookAngles({ lon: lon, lat: lat, alt: alt }, satellite.eciToEcf(sat.position, gmst));
+    const lookAngles = ecf2rae({ lon: lon, lat: lat, alt: alt }, eci2ecf(sat.position, gmst));
     sat.az = lookAngles.az * RAD2DEG;
     sat.el = lookAngles.el * RAD2DEG;
     if (sat.el > settingsManager.gpsElevationMask) {
@@ -1308,63 +1131,6 @@ export const calculateDops = (satList: { az: number; el: number }[]): { pdop: st
   dops.tdop = (Math.round(tdop * 100) / 100).toFixed(2);
   return dops;
 };
-// TODO: Future features
-// satellite.radarMaxrng = (pW: number, aG: number, rcs: number, minSdB: number, fMhz: number): number => {
-//   // let powerInWatts = 325 * 1792;
-//   // let antennaGain = 2613000000;
-//   // let minimumDetectableSignaldB;
-//   let minSW = Math.pow(10, (minSdB - 30) / 10);
-//   // let frequencyMhz = 435;
-//   let fHz = (fMhz *= Math.pow(10, 6));
-//   let numer = pW * Math.pow(aG, 2) * rcs * Math.pow(3 * Math.pow(10, 8), 2);
-//   let denom = minSW * Math.pow(4 * Math.PI, 3) * Math.pow(fHz, 2);
-//   let rng = Math.sqrt(Math.sqrt(numer / denom));
-//   return rng;
-// };
-// satellite.radarMinSignal = (pW: number, aG: number, rcs: number, rng: number, fMhz: number): number => {
-//   // let powerInWatts = 325 * 1792;
-//   // let antennaGain = 2613000000;
-//   // let minimumDetectableSignaldB;
-//   // let frequencyMhz = 435;
-//   let fHz = (fMhz *= Math.pow(10, 6));
-//   let numer = pW * Math.pow(aG, 2) * rcs * Math.pow(3 * Math.pow(10, 8), 2);
-//   let denom = rng ** 4 * Math.pow(4 * Math.PI, 3) * Math.pow(fHz, 2);
-//   let minSW = numer / denom;
-//   let minSdB = Math.log10(minSW);
-//   return minSdB;
-// };
-export const getSunDirection = (jd: number): EciArr3 => {
-  const n = jd - 2451545;
-  let L = 280.46 + 0.9856474 * n; // mean longitude of sun
-  let g = 357.528 + 0.9856003 * n; // mean anomaly
-  L = L % 360.0;
-  g = g % 360.0;
-
-  const ecLon = L + 1.915 * Math.sin(g * DEG2RAD) + 0.02 * Math.sin(2 * g * DEG2RAD);
-
-  const t = (jd - 2451545) / 3652500;
-
-  const obliq =
-    84381.448 -
-    4680.93 * t -
-    1.55 * Math.pow(t, 2) +
-    1999.25 * Math.pow(t, 3) -
-    51.38 * Math.pow(t, 4) -
-    249.67 * Math.pow(t, 5) -
-    39.05 * Math.pow(t, 6) +
-    7.12 * Math.pow(t, 7) +
-    27.87 * Math.pow(t, 8) +
-    5.79 * Math.pow(t, 9) +
-    2.45 * Math.pow(t, 10);
-
-  const ob = obliq / 3600.0;
-
-  const x = DISTANCE_TO_SUN * Math.cos(ecLon * DEG2RAD);
-  const y = DISTANCE_TO_SUN * Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
-  const z = DISTANCE_TO_SUN * Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
-
-  return [x, y, z];
-};
 export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => { // NOSONAR
   const { timeManager, sensorManager } = keepTrackApi.programs;
 
@@ -1378,7 +1144,7 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
 
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
   let minDistanceApart = 100000000000; // Arbitrarily large number
   // var minDistTime;
   for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
@@ -1388,15 +1154,15 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
     const { m, j, gmst } = calculateTimeVariables(now, satrec);
 
     const [sunX, sunY, sunZ] = getSunDirection(j);
-    const eci = satellite.sgp4(satrec, m).position;
+    const eci = Sgp4.propagate(satrec, m).position;
 
     const distX = Math.pow(sunX - eci.x, 2);
     const distY = Math.pow(sunY - eci.y, 2);
     const distZ = Math.pow(sunZ - eci.z, 2);
     const dist = Math.sqrt(distX + distY + distZ);
 
-    const positionEcf = satellite.eciToEcf(eci, gmst);
-    const lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+    const positionEcf = eci2ecf(eci, gmst);
+    const lookAngles = ecf2rae(sensor.observerGd, positionEcf);
 
     const az = lookAngles.az * RAD2DEG;
     const el = lookAngles.el * RAD2DEG;
@@ -1431,7 +1197,7 @@ export const lookAngles2Ecf = (az: number, el: number, rng: number, lat: number,
     alt: alt,
   };
 
-  const site = satellite.geodeticToEcf(geodeticCoords);
+  const site = lla2ecf(geodeticCoords);
   const sitex = site.x;
   const sitey = site.y;
   const sitez = site.z;
@@ -1461,7 +1227,7 @@ export const eci2ll = (x: number, y: number, z: number): { lat: number; lon: num
 
   const now = timeManager.simulationTimeObj;
   const { gmst } = calculateTimeVariables(now);
-  var latLon = satellite.eciToGeodetic({ x: x, y: y, z: z }, gmst);
+  var latLon = eci2lla({ x: x, y: y, z: z }, gmst);
   latLon.lat = latLon.lat * RAD2DEG;
   latLon.lon = latLon.lon * RAD2DEG;
 
@@ -1471,77 +1237,20 @@ export const eci2ll = (x: number, y: number, z: number): { lat: number; lon: num
   return latLon;
 };
 
-/**
- * @param {SatObject} sat - Satellite Object of interest
- * @param {SatObject} reference - Satellite Object to use as reference
- * @returns { {position: vec3, velocity: vec3} } Position and velocity of the satellite in RIC
- */
-export const sat2ric = (sat: SatObject, reference: SatObject): { position: vec3; velocity: vec3 } => {
-  const { position, velocity } = sat;
-  const r = vec3.fromValues(position.x, position.y, position.z);
-  const v = vec3.fromValues(velocity.x, velocity.y, velocity.z);
-  const ru = vec3.normalize(vec3.create(), r);
-  const h = vec3.cross(vec3.create(), r, v);
-  const cu = vec3.normalize(vec3.create(), h);
-  const iu = vec3.cross(vec3.create(), cu, ru);
-  const matrix = mat3.fromValues(ru[0], iu[0], cu[0], ru[1], iu[1], cu[1], ru[2], iu[2], cu[2]);
-
-  const { position: refPosition, velocity: refVelocity } = reference;
-  const dp = vec3.sub(vec3.create(), r, [refPosition.x, refPosition.y, refPosition.z]);
-  const dv = vec3.sub(vec3.create(), v, [refVelocity.x, refVelocity.y, refVelocity.z]);
-
-  return {
-    position: vec3.transformMat3(vec3.create(), dp, <ReadonlyMat3>(<unknown>matrix)),
-    velocity: vec3.transformMat3(vec3.create(), dv, <ReadonlyMat3>(<unknown>matrix)),
-  };
-};
-
-export const getAngleBetweenTwoSatellites = (sat1: SatObject, sat2: SatObject): {az: number, el: number} => {
-  const { position: pos1, velocity: vel1 } = sat1;
-  const { position: pos2, velocity: vel2 } = sat2;
-
-  if (typeof pos1 === 'undefined') {
-    throw new Error('Sat1 position is undefined');
-  }
-  if (typeof pos2 === 'undefined') {
-    throw new Error('Sat2 position is undefined');
-  }
-  if (typeof vel1 === 'undefined') {
-    throw new Error('Sat1 velocity is undefined');
-  }
-  if (typeof vel2 === 'undefined') {
-    throw new Error('Sat2 velocity is undefined');
-  }
-
-  const r1 = vec3.fromValues(pos1.x, pos1.y, pos1.z);
-  const r2 = vec3.fromValues(pos2.x, pos2.y, pos2.z);
-  const v1 = vec3.fromValues(vel1.x, vel1.y, vel1.z);
-  const v2 = vec3.fromValues(vel2.x, vel2.y, vel2.z);
-  const r = vec3.sub(vec3.create(), r1, r2);
-  const v = vec3.sub(vec3.create(), v1, v2);
-  const rcrossv = vec3.cross(vec3.create(), r, v);
-  const rcrossvmag = vec3.length(rcrossv);  
-
-  const az = Math.atan2(rcrossv[1], rcrossv[0]) * RAD2DEG;
-  const el = Math.asin(rcrossv[2] / rcrossvmag) * RAD2DEG;
-
-  return {az, el};
-};
-
 export const getLlaTimeView = (now: Date, sat: SatObject) => {
   const { sensorManager } = keepTrackApi.programs;
-  const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
 
   const { m, gmst } = calculateTimeVariables(now, satrec);
-  const positionEci = satellite.sgp4(satrec, m);
+  const positionEci = Sgp4.propagate(satrec, m);
 
-  const gpos = satellite.eciToGeodetic(positionEci.position, gmst);
-  const lat = satellite.degreesLat(gpos.lat);
-  const lon = satellite.degreesLong(gpos.lon);
+  const gpos = eci2lla(positionEci.position, gmst);
+  const lat = getDegLat(gpos.lat);
+  const lon = getDegLon(gpos.lon);
   const time = dateFormat(now, 'isoDateTime', true);
 
-  const positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
-  const lookAngles = satellite.ecfToLookAngles(sensorManager.currentSensor[0].observerGd, positionEcf);
+  const positionEcf = eci2ecf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+  const lookAngles = ecf2rae(sensorManager.currentSensor[0].observerGd, positionEcf);
   const az = lookAngles.az * RAD2DEG;
   const el = lookAngles.el * RAD2DEG;
   const rng = lookAngles.rng;
@@ -1561,34 +1270,6 @@ export const map = (sat: SatObject, i: number, pointPerOrbit?: number): { time: 
 
   return getLlaTimeView(now, sat);
 };
-
-export const getEciOfCurrentOrbit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
-  const { timeManager } = keepTrackApi.programs;
-
-  // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.simulationTimeObj;
-  let eciPoints = [];
-  for (let i = 0; i < points; i++) {
-    let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
-    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
-    eciPoints.push(getEci(sat, now).position);
-  }
-  return eciPoints;
-}
-
-export const getEcfOfCurrentOrbit = (sat: SatObject, points: number): { x: number; y: number; z: number }[] => {
-  const { timeManager } = keepTrackApi.programs;
-
-  // Set default timing settings. These will be changed to find look angles at different times in future.
-  const simulationTime = timeManager.simulationTimeObj;
-  let ecfPoints = [];
-  for (let i = 0; i < points; i++) {
-    let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
-    const now = timeManager.getOffsetTimeObj(offset, simulationTime);
-    ecfPoints.push(satellite.ecfToEci(getEci(sat, now).position, -i * (sat.period / points) * TAU / sat.period));
-  }
-  return ecfPoints;
-}
 
 export const getRicOfCurrentOrbit = (sat: SatObject, sat2: SatObject, points: number, orbits?: number): { x: number; y: number; z: number }[] => {
   const { timeManager } = keepTrackApi.programs;
@@ -1618,88 +1299,12 @@ export const getLlaOfCurrentOrbit = (sat: SatObject, points: number): { lat: num
     const now = timeManager.getOffsetTimeObj(offset, simulationTime);
     const { gmst } = calculateTimeVariables(now);
     const eci = getEci(sat, now).position;
-    const lla = satellite.eciToGeodetic(eci, gmst);
+    const lla = eci2lla(eci, gmst);
     const llat = {...lla, ...{time: now.getTime()}};
     llaPoints.push(llat);
   }
   return llaPoints;
 }
-
-export const calculateSensorPos = (sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: number } => {
-  const { timeManager, sensorManager } = keepTrackApi.programs;
-  sensors = verifySensors(sensors, sensorManager);
-  const sensor = sensors[0];
-
-  const now = timeManager.simulationTimeObj;
-  const { gmst } = calculateTimeVariables(now);
-
-  const cosLat = Math.cos(sensor.lat * DEG2RAD);
-  const sinLat = Math.sin(sensor.lat * DEG2RAD);
-  const cosLon = Math.cos(sensor.lon * DEG2RAD + gmst);
-  const sinLon = Math.sin(sensor.lon * DEG2RAD + gmst);
-
-  return {
-    x: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon,
-    y: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * sinLon,
-    z: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat,
-    gmst: gmst,
-    lat: sensor.lat,
-    lon: sensor.lon,
-  };
-};
-
-export type TleParams = {
-  sat: SatObject;
-  inc: StringifiedNubmer;
-  meanmo: StringifiedNubmer;
-  rasc: StringifiedNubmer;
-  argPe: StringifiedNubmer;
-  meana: StringifiedNubmer;
-  ecen: string;
-  epochyr: string;
-  epochday: string;
-  intl: string;
-  scc: string;
-};
-
-export const createTle = (tleParams: TleParams): { TLE1: string; TLE2: string } => {
-  let { sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc } = tleParams;
-  const incStr = formatInclination(inc);
-  const meanmoStr = formatMeanMotion(meanmo);
-  const rascStr = formatRightAscension(rasc);
-  const argPeStr = formatArgumentOfPerigee(argPe);
-  const meanaStr = formatMeanAnomaly(meana);
-
-  const TLE1Ending = sat.TLE1.substr(32, 39);
-  const TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-  const TLE2 = '2 ' + scc + ' ' + incStr + ' ' + rascStr + ' ' + ecen + ' ' + argPeStr + ' ' + meanaStr + ' ' + meanmoStr + '    10';
-
-  return { TLE1, TLE2 };
-};
-
-const verifySensors = (sensors: SensorObject[], sensorManager: SensorManager): SensorObject[] => {
-  // If no sensor passed to function then try to use the 'currentSensor'
-  if (typeof sensors == 'undefined' || sensors == null) {
-    if (typeof sensorManager.currentSensor == 'undefined') {
-      throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
-    } else {
-      sensors = sensorManager.currentSensor;
-    }
-  }
-  // If sensor's observerGd is not set try to set it using it parameters
-  if (typeof sensors[0].observerGd == 'undefined') {
-    try {
-      sensors[0].observerGd = {
-        alt: sensors[0].alt,
-        lat: sensors[0].lat,
-        lon: sensors[0].lon,
-      };
-    } catch (e) {
-      throw new Error('observerGd is not set and could not be guessed.');
-    }
-  }
-  return sensors;
-};
 
 export const populateMultiSiteTable = (multiSiteArray: TearrData[], sat: SatObject) => {
   const { sensorManager } = keepTrackApi.programs;
@@ -1753,16 +1358,16 @@ export const populateMultiSiteTable = (multiSiteArray: TearrData[], sat: SatObje
 
 export const satellite: SatMath = {
   // Legacy API
-  sgp4: Ootk.Sgp4.propagate,
-  gstime: Ootk.Sgp4.gstime,
-  twoline2satrec: Ootk.Sgp4.createSatrec,
-  geodeticToEcf: Ootk.Transforms.lla2ecf,
-  ecfToEci: Ootk.Transforms.ecf2eci,
-  eciToEcf: Ootk.Transforms.eci2ecf,
-  eciToGeodetic: Ootk.Transforms.eci2lla,
-  degreesLat: Ootk.Transforms.getDegLat,
-  degreesLong: Ootk.Transforms.getDegLon,
-  ecfToLookAngles: Ootk.Transforms.ecf2rae,
+  sgp4: Sgp4.propagate,
+  gstime: Sgp4.gstime,
+  twoline2satrec: Sgp4.createSatrec,
+  geodeticToEcf: lla2ecf,
+  ecfToEci: ecf2eci,
+  eciToEcf: eci2ecf,
+  eciToGeodetic: eci2lla,
+  degreesLat: getDegLat,
+  degreesLong: getDegLon,
+  ecfToLookAngles: ecf2rae,
   // New API
   altitudeCheck,
   calculateDops,

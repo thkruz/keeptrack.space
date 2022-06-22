@@ -4,6 +4,7 @@
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms } from '../api/keepTrackTypes';
+import * as createTle from './createTle';
 import * as satMath from './satMath';
 import { satellite } from './satMath';
 
@@ -49,7 +50,7 @@ describe('satMath.findClosestApproachTime', () => {
 
 describe('satMath.createTle', () => {
   test('0', () => {
-    let result: any = satMath.createTle({
+    let result: any = createTle.createTle({
       sat: defaultSat,
       inc: '10.01',
       meanmo: '15.15',

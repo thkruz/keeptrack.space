@@ -5,7 +5,7 @@ import { SatRec } from 'satellite.js';
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
-import { TleParams } from '../satMath/satMath';
+import { TleParams } from '../satMath/createTle';
 import { toastMsgType } from '../uiManager/uiManager';
 import { SpaceObjectType } from './SpaceObjectType';
 

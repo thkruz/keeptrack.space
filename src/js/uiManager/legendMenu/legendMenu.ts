@@ -385,9 +385,18 @@ export const legendColorsChange = function (): void {
 
   try {
     try {
-      (<HTMLElement>document.querySelector('.legend-velocityFast-box')).style.background = rgbCss([0.75, 0.75, 0, 1]);
-      (<HTMLElement>document.querySelector('.legend-velocityMed-box')).style.background = rgbCss([0.75, 0.25, 0, 1]);
-      (<HTMLElement>document.querySelector('.legend-velocitySlow-box')).style.background = rgbCss([1, 0, 0, 1]);
+      const velocityFastClass = <HTMLElement>document.querySelector('.legend-velocityFast-box');
+      if (velocityFastClass) {
+        velocityFastClass.style.background = rgbCss([0.75, 0.75, 0, 1]);
+      }
+      const velocityMedClass = <HTMLElement>document.querySelector('.legend-velocityMed-box');
+      if (velocityMedClass) {
+        velocityMedClass.style.background = rgbCss([0.75, 0.25, 0, 1]);
+      }
+      const velocitySlowClass = <HTMLElement>document.querySelector('.legend-velocitySlow-box');
+      if (velocitySlowClass) {
+        velocitySlowClass.style.background = rgbCss([1, 0, 0, 1]);
+      }
     } catch {
       // do nothing
     }
@@ -417,7 +426,10 @@ export const legendColorsChange = function (): void {
       '.legend-satSmall-box',
     ].forEach((element) => {
       try {
-        (<HTMLElement>document.querySelector(element)).style.background = rgbCss(settingsManager.colors[element.split('-')[1]]);
+        const elementFromClass = <HTMLElement>document.querySelector(element);
+        if (elementFromClass) {
+          elementFromClass.style.background = rgbCss(settingsManager.colors[element.split('-')[1]]);
+        }
       } catch {
         // do nothing
       }

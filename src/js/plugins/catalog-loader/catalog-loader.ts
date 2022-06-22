@@ -25,8 +25,14 @@ export const catalogLoader = async (): Promise<void> => {
   try {
     let extraSats: any = [];
     if (settingsManager.offline) {
-      $.get(`${settingsManager.installDirectory}tle/extra.json`).then((resp) => {
-        extraSats = JSON.parse(resp);
+      fetch(`${settingsManager.installDirectory}tle/extra.json`).then((resp) => {
+        if (resp.ok) {
+          resp.json().then((data) => {
+            extraSats = data;
+          });
+        } else {
+          console.log('Error loading extra.json');
+        }
       });
     }
 
@@ -104,7 +110,8 @@ export const setupGetVariables = () => {
   return limitSatsArray;
 };
 
-export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[]) => { // NOSONAR
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[]) => {
+  // NOSONAR
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];
@@ -139,7 +146,9 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
       satSet.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
       satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
       resp[i].active = true;
-      tempSatData.push(resp[i]);
+      if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
+        tempSatData.push(resp[i]);
+      }
     } else {
       // If there are limited satellites
       for (let x = 0; x < limitSatsArray.length; x++) {

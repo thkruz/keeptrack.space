@@ -74,7 +74,8 @@ export const init = (): void => {
   });
 };
 
-export const updateMap = async (): Promise<void> => { // NOSONAR
+export const updateMap = async (): Promise<void> => {
+  // NOSONAR
   try {
     const { sensorManager, satellite, mapManager, objectManager, satSet } = keepTrackApi.programs;
     if (objectManager.selectedSat === -1) return;
@@ -243,7 +244,8 @@ export const drawEarthLayer = async (ctx: CanvasRenderingContext2D): Promise<voi
     ctx.drawImage(earthImg, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
     return Promise.resolve();
   } else {
-    earthImg.src = `${settingsManager.installDirectory}textures/earthmap16k.jpg`;
+    // earthImg.src = `${settingsManager.installDirectory}textures/earthmap16k.jpg`;
+    earthImg.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
     earthImg.onload = () => {
       ctx.drawImage(earthImg, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
       return Promise.resolve();

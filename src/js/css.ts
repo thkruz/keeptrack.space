@@ -2,7 +2,7 @@
 
 export const importCss = async (): Promise<void> => {
   try {
-    if (!settingsManager.disableUI) {
+    if (!settingsManager.disableCss) {
       import('../css/materialize.css').catch(() => {
         // This is intentional
       });

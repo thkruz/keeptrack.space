@@ -547,8 +547,8 @@ const init = () => { // NOSONAR
     for (const sensor in sensorList) {
       objectManager.staticSet.push({ ...{ static: true }, ...sensorList[sensor] });
     }
-    objectManager.isSensorManagerLoaded = true;
   }
+  objectManager.isSensorManagerLoaded = true;
 
   // Create Launch Sites
   if (!settingsManager.isDisableLaunchSites) {

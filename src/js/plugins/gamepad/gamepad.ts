@@ -23,7 +23,7 @@ export const init = (): void => {
   });
   window.addEventListener('gamepaddisconnected', () => {
     const { uiManager } = keepTrackApi.programs;
-    uiManager.toast('Gamepad disconnected', 'critical');
+    uiManager?.toast('Gamepad disconnected', 'critical');
     keepTrackApi.programs.gamepad = <GamepadPlugin>{
       currentState: null,
     };
@@ -31,6 +31,7 @@ export const init = (): void => {
 };
 
 export const initializeGamepad = (gamepad: Gamepad): void => {
+  console.log('Gamepad connected');
   keepTrackApi.register({
     method: 'updateLoop',
     cbName: 'gamepad',
@@ -65,29 +66,53 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
       // button state is now pressed
       buttonsPressed[index] = true;
 
+      const { mainCamera,satSet,objectManager } = keepTrackApi.programs;
+
       // Perform action
+      let satId;
       switch (index) {
         case 0:
           console.log('A');
+          satSet.selectSat(objectManager.hoveringSat);
           break;
         case 1:
           console.log('B');
+          satSet.selectSat(-1);
+          mainCamera.zoomTarget(0.8);
           break;
         case 2:
           console.log('X');
+          mainCamera.autoRotate();
           break;
         case 3:
           console.log('Y');
-          keepTrackApi.programs.uiManager.keyHandler({ key: 'C' });
+          // uiManager?.keyHandler({ key: 'C' });
           break;
         case 4:
           console.log('Left Bumper');
+          // eslint-disable-next-line no-case-declarations
+          satId = objectManager.selectedSat - 1;
+          if (satId >= 0) {
+            satSet.selectSat(satId);
+          } else {
+            satSet.selectSat(satSet.satData.length - 1);
+          }
           break;
         case 5:
           console.log('Right Bumper');
+          // eslint-disable-next-line no-case-declarations
+          satId = objectManager.selectedSat + 1;
+          if (satId <= satSet.satData.length - 1) {
+            satSet.selectSat(satId);
+          } else {
+            satSet.selectSat(0);
+          }
           break;
         case 8:
           console.log('Home');
+          mainCamera.isPanReset = true;
+      mainCamera.isLocalRotateReset = true;
+      mainCamera.ftsRotateReset = true;
           break;
         case 9:
           console.log('Start');
@@ -171,8 +196,8 @@ export const updateLeftStick = (x: number, y: number): void => {
       case mainCamera.cameraType.FixedToSat:
         mainCamera.camAngleSnappedOnSat = false;
         mainCamera.isCamSnapMode = false;
-        mainCamera.camPitchSpeed -= (y ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
-        mainCamera.camYawSpeed += (x ** 3 / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.camPitchSpeed -= (y ** 3 / 200) * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.camYawSpeed += (x ** 3 / 200) * drawManager.dt * settingsManager.cameraMovementSpeed;
         break;
       case mainCamera.cameraType.Fps:
       case mainCamera.cameraType.Satellite:
@@ -206,8 +231,8 @@ export const updateRightStick = (x: number, y: number): void => {
       case mainCamera.cameraType.Satellite:
       case mainCamera.cameraType.Planetarium:
       case mainCamera.cameraType.Astronomy:
-        mainCamera.camPitchSpeed += (y / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
-        mainCamera.camYawSpeed -= (x / 50) * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.camPitchSpeed += (y / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCamera.camYawSpeed -= (x / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
         break;
     }
   }
@@ -228,7 +253,7 @@ export const vibrate = (vibrateTime?: number, gamepad?: any): void => {
 
 export const gamepadConnected = (e: GamepadEvent) => {
   const { uiManager } = keepTrackApi.programs;
-  uiManager.toast('Gamepad connected', 'normal');
+  uiManager?.toast('Gamepad connected', 'normal');
   initializeGamepad(e.gamepad);
 };
 export const getController = (index?: number): Gamepad => {

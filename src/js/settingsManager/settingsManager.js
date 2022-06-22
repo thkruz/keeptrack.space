@@ -152,6 +152,9 @@ settingsManager = {
     // //////////////////////////////////////////////////////////////////////////
     // Most Commonly Used Settings
     // //////////////////////////////////////////////////////////////////////////
+    
+    // ASCII Catalog for offline use
+    settingsManager.isDisableAsciiCatalog = true;
 
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
@@ -184,11 +187,15 @@ settingsManager = {
     };
     // Disable main user interface. Currently an all or nothing package.
     settingsManager.disableUI = false;
+    // Disable main CSS
+    settingsManager.disableCss = false;
     // Currently only disables panning. In the future it will disable all camera
     // movement
     settingsManager.disableCameraControls = false;
     // Disable normal browser events from keyboard/mouse
     settingsManager.disableNormalEvents = false;
+    // Allow Righ Click Menu
+    settingsManager.isAllowRightClick = true;
     // Disable normal browser right click menu
     settingsManager.disableDefaultContextMenu = true;
     // Disable Scrolling the Window Object
@@ -244,6 +251,10 @@ settingsManager = {
     settingsManager.maxZoomDistance = 120000;
     settingsManager.zoomSpeed = 0.01;
     settingsManager.isZoomStopsRotation = true;
+
+    settingsManager.isUseNullForBadGetEl = true;
+
+    settingsManager.isEPFL = false;
 
     // Speed at which isScan lines are drawn (each draw will be +speed lat/lon)
     settingsManager.lineScanSpeedSat = 6; // About 6 seconds to scan earth (no source, just a guess)
@@ -319,6 +330,42 @@ settingsManager = {
     // Used for Stars
     settingsManager.satShader.blurFactor3 = '0.43';
     settingsManager.satShader.blurFactor4 = '0.25';
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Meshes
+    // //////////////////////////////////////////////////////////////////////////
+    // settingsManager.meshListOverride = [
+    //   'sat2',
+    //   's1u',
+    //   's2u',
+    //   's3u',
+    //   'starlink',
+    //   'iss',
+    //   'gps',
+    //   'aehf',
+    //   'dsp',
+    //   'flock',
+    //   'lemur',
+    //   'galileo',
+    //   'o3b',
+    //   'oneweb',
+    //   'orbcomm',
+    //   'spacebee1gen',
+    //   'spacebee2gen',
+    //   'spacebee3gen',
+    //   'iridium',
+    //   'globalstar',
+    //   'debris0',
+    //   'debris1',
+    //   'debris2',
+    //   'rocketbody',
+    //   'sbirs',
+    //   'misl',
+    //   'misl2',
+    //   'misl3',
+    //   'misl4',
+    //   'rv',
+    // ];
 
     // //////////////////////////////////////////////////////////////////////////
     // Embed Overrides - FOR TESTING ONLY

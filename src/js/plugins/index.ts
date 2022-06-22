@@ -53,7 +53,8 @@ import { addCustomSensor, clearCustomSensors, removeLastSensor } from './sensor/
 import { sensorManager } from './sensor/sensorManager';
 
 // Register all core modules
-export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => { // NOSONAR
+export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => {
+  // NOSONAR
   plugins ??= {};
   try {
     // Register Catalog Loader
@@ -150,7 +151,9 @@ export const uiManagerFinal = (plugins: any): void => {
     document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
   }
 
-  getEl('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
+  if (plugins.aboutManager) {
+    getEl('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
+  }
 
   // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
@@ -164,10 +167,14 @@ export const uiManagerFinal = (plugins: any): void => {
     dom.scrollTop = nextPos;
   };
 
-  getEl('bottom-icons-container').addEventListener('mousewheel', (event: any) => {
-    event.preventDefault();
-    wheel(event.currentTarget, event.deltaY);
-  });
+  getEl('bottom-icons-container').addEventListener(
+    'mousewheel',
+    (event: any) => {
+      event.preventDefault();
+      wheel(event.currentTarget, event.deltaY);
+    },
+    { passive: false }
+  );
 };
 
 /* istanbul ignore next */

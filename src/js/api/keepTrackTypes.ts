@@ -317,6 +317,14 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isEPFL: boolean;
+  isUseNullForBadGetEl: any;
+  isDisableUrlBar: any;
+  meshListOverride: string[];
+  isDebrisOnly: boolean;
+  disableCss: any;
+  isAllowRightClick: any;
+  onLoadCb: any;
   isDrawConstellationBoundaries: any;
   isDrawNasaConstellations: any;
   isDrawSun: any;

@@ -37,20 +37,23 @@ export const msLon180 = function (): void {
   if (parseInt((<HTMLInputElement>getEl('ms-lon')).value) > 180) (<HTMLInputElement>getEl('ms-lon')).value = '180.000';
 };
 export const initUiValidation = () => {
+  // Note: Depending on which plugins on enabled, some or all of
+  // the following event listeners may be added.
+
   getEl('editSat')
-    .querySelectorAll('input')
+    ?.querySelectorAll('input')
     .forEach((el: HTMLInputElement) => {
       el.addEventListener('keydown', validateNumOnly);
     });
-  getEl('es-ecen').addEventListener('keydown', allowPeriod);
-  getEl('es-day').addEventListener('keyup', esDay366);
-  getEl('es-inc').addEventListener('keyup', esInc180);
-  getEl('es-rasc').addEventListener('keyup', esRasc360);
-  getEl('es-meanmo').addEventListener('keyup', esMeanmo18);
-  getEl('es-argPe').addEventListener('keyup', esArgPe360);
-  getEl('es-meana').addEventListener('keyup', esMeana360);
-  getEl('ms-lat').addEventListener('keyup', msLat90);
-  getEl('ms-lon').addEventListener('keyup', msLon180);
+  getEl('es-ecen')?.addEventListener('keydown', allowPeriod);
+  getEl('es-day')?.addEventListener('keyup', esDay366);
+  getEl('es-inc')?.addEventListener('keyup', esInc180);
+  getEl('es-rasc')?.addEventListener('keyup', esRasc360);
+  getEl('es-meanmo')?.addEventListener('keyup', esMeanmo18);
+  getEl('es-argPe')?.addEventListener('keyup', esArgPe360);
+  getEl('es-meana')?.addEventListener('keyup', esMeana360);
+  getEl('ms-lat')?.addEventListener('keyup', msLat90);
+  getEl('ms-lon')?.addEventListener('keyup', msLon180);
 };
 export const validateNumOnly = (e: KeyboardEvent) => {
   if (

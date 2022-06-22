@@ -370,11 +370,11 @@ export const toast = (toastText: string, type: toastMsgType, isLong: boolean) =>
   switch (type) {
     case 'standby':
       toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
-      keepTrackApi.programs.soundManager.play('standby');
+      keepTrackApi.programs.soundManager?.play('standby');
       break;
     case 'normal':
       toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
-      keepTrackApi.programs.soundManager.play('standby');
+      keepTrackApi.programs.soundManager?.play('standby');
       break;
     case 'caution':
       toastMsg.$el[0].style.background = 'var(--statusDarkCaution)';
@@ -388,6 +388,7 @@ export const toast = (toastText: string, type: toastMsgType, isLong: boolean) =>
   }
 };
 export const updateURL = () => {
+  if (settingsManager.isDisableUrlBar) return;
   const { objectManager, satSet, timeManager } = keepTrackApi.programs;
 
   var arr = window.location.href.split('?');

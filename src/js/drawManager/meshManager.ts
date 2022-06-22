@@ -11,7 +11,7 @@ import { SpaceObjectType } from '../api/SpaceObjectType';
 import { loadStr } from '../uiManager/uiManager';
 import { aehfSccNums, dspSccNums, issSccNum } from './meshManager/modelConstants';
 
-const meshList = [
+const meshList = settingsManager.meshListOverride || [
   'sat2',
   's1u',
   's2u',

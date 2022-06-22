@@ -3,18 +3,21 @@ import { copyFilesAndFolders, copySettingsFiles } from './lib/copyFilesAndFolder
 import { setupEmbedFolders } from './lib/setupFolders.mjs';
 import { generateConfig } from './webpack.mjs';
 
-const reqDirs = [];
-const optDirs = [];
+const reqDirs = ['tle', 'css'];
+const optDirs = ['meshes'];
 const reqFiles = [
   'textures/moon-1024.jpg',
   'textures/earthmap512.jpg',
+  'textures/earthmap16k.jpg',
   'textures/earthlights512.jpg',
+  'textures/earthlights16k.jpg',
   'textures/earthbump8k.jpg',
   'textures/earthspec8k.jpg',
   'textures/earthmap4k.jpg',
   'textures/earthlights4k.jpg',
+  'textures/skybox8k.jpg',
 ];
-const optFiles = ['tle/TLEdebris.json'];
+const optFiles = [];
 
 console.clear();
 console.log('Copy static files...'); // NOSONAR

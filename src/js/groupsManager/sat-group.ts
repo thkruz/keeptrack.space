@@ -13,6 +13,8 @@ export class SatGroup {
         this.sats = [];
         satSet.satData.every((sat) => {
           if (typeof sat.sccNum !== 'undefined') {
+            // eslint-disable-next-line no-debugger
+            if (sat.id === 15843) debugger;
             this.sats.push({
               satId: sat.id,
               isIntlDes: true,

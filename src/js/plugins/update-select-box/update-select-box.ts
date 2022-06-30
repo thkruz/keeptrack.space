@@ -3,7 +3,8 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { cKmPerMs, DEG2RAD } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/helpers';
 
-export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONAR
+export const updateSelectBoxCoreCallback = async (sat: SatObject) => {
+  // NOSONAR
   try {
     const { satellite, missileManager, timeManager, objectManager, sensorManager, uiManager } = keepTrackApi.programs;
 
@@ -79,7 +80,7 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
 
     if (objectManager.secondarySat !== -1) {
       const ric = satellite.sat2ric(objectManager.secondarySatObj, sat);
-      const dist = satellite.distance(sat, objectManager.secondarySatObj).split(' ')[2];
+      const dist = satellite.distanceString(sat, objectManager.secondarySatObj).split(' ')[2];
       getEl('sat-sec-dist').innerHTML = `${dist} km`;
       getEl('sat-sec-rad').innerHTML = `${ric.position[0].toFixed(2)}km`;
       getEl('sat-sec-intrack').innerHTML = `${ric.position[1].toFixed(2)}km`;

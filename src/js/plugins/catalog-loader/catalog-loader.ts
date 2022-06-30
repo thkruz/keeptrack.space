@@ -24,7 +24,7 @@ export const catalogLoader = async (): Promise<void> => {
 
   try {
     let extraSats: any = [];
-    if (settingsManager.offline) {
+    if (settingsManager.offline && !settingsManager.isDisableExtraCatalog) {
       fetch(`${settingsManager.installDirectory}tle/extra.json`).then((resp) => {
         if (resp.ok) {
           resp.json().then((data) => {
@@ -142,11 +142,11 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
         rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
         resp[i].intlDes = year + '-' + rest;
       }
-      resp[i].id = i;
       satSet.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
       satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
       resp[i].active = true;
       if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
+        resp[i].id = tempSatData.length;
         tempSatData.push(resp[i]);
       }
     } else {

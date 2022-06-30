@@ -29,7 +29,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
 import numeric from 'numeric';
-import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject } from '../api/keepTrackTypes';
+import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject, SunStatus } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
 import { getEl, stringPad } from '../lib/helpers';
@@ -288,12 +288,13 @@ export const mergeSat = (sat: SatObject): void => {
 export const replaceSatSet = (newSatSet: any) => {
   satSet = newSatSet;
 };
+
 export const addSatExtraFunctions = (i: number) => { // NOSONAR
   const { sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
   if (typeof satSet.satData[i].isInSun == 'undefined') {
-    satSet.satData[i].isInSun = () => {
+    satSet.satData[i].isInSun = (): SunStatus => {
       // TODO: Implement enums for the return values
-      if (typeof satSet.satData[i].position == 'undefined') return -1;
+      if (typeof satSet.satData[i].position == 'undefined') return SunStatus.UNKNOWN;
 
       // Distances all in km
       // satSet.sunECI is updated by drawManager every draw frame
@@ -341,36 +342,18 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
                   Math.pow(-satSet.satData[i].position.z + sunECI.z, 2)
               ))
         ) * RAD2DEG;
-
-      // NOTE:
-      // !isSun && !isUmbral
-      if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
-        // isUmbral
-        return 0;
+      
+      if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {        
+        return SunStatus.UMBRAL;
       }
 
-      // !isPenumbral
-      if (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun) {
-        // NOTE:
-        // isPenumbral
-        return 1;
+      if ((semiDiamSun > semiDiamEarth) || 
+          (theta < semiDiamSun - semiDiamEarth) || 
+          (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun)) {
+        return SunStatus.PENUMBRAL;
       }
 
-      if (semiDiamSun > semiDiamEarth) {
-        // NOTE:
-        // isPenumbral
-        return 1;
-      }
-
-      if (theta < semiDiamSun - semiDiamEarth) {
-        // NOTE:
-        // isPenumbral
-        return 1;
-      }
-
-      // NOTE:
-      // !isUmbral && !isPenumbral && isSun
-      return 2;
+      return SunStatus.SUN;
     };
   }
   if (typeof satSet.satData[i].setRAE == 'undefined') {

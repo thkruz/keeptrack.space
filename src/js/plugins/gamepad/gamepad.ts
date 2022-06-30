@@ -43,6 +43,7 @@ export const initializeGamepad = (gamepad: Gamepad): void => {
     currentState: null,
     getController: (index: number) => getController(index),
     vibrate: vibrate,
+    buttonsPressedHistory: [],
   };
 };
 
@@ -55,16 +56,23 @@ export const updateGamepad = (index?: number): void => {
   updateZoom(controller.buttons[6].value, controller.buttons[7].value);
   updateLeftStick(controller.axes[0], controller.axes[1]);
   updateRightStick(controller.axes[2], controller.axes[3]);
-  updateButtons(controller.buttons);
+  updateButtons(controller.buttons);  
 };
 
-const buttonsPressed = <boolean[]>[];
+const buttonsPressed: boolean[] = [];
 export const updateButtons = (buttons: readonly GamepadButton[]): void => {
+  const {gamepad} = keepTrackApi.programs;
+
   buttons.forEach((button, index) => {
     // if the button is pressed and wasnt pressed before
     if (button.pressed && !buttonsPressed[index]) {
       // button state is now pressed
       buttonsPressed[index] = true;
+      gamepad.buttonsPressedHistory.push(index);
+      // Maximum of 20 in the history
+      if (gamepad.buttonsPressedHistory.length > 8) {
+        gamepad.buttonsPressedHistory.shift();
+      }
 
       const { mainCamera,satSet,objectManager } = keepTrackApi.programs;
 
@@ -72,15 +80,18 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
       let satId;
       switch (index) {
         case 0:
+          if (settingsManager.isLimitedGamepadControls) break;
           console.log('A');
           satSet.selectSat(objectManager.hoveringSat);
           break;
         case 1:
+          if (settingsManager.isLimitedGamepadControls) break;
           console.log('B');
           satSet.selectSat(-1);
           mainCamera.zoomTarget(0.8);
           break;
         case 2:
+          if (settingsManager.isLimitedGamepadControls) break;
           console.log('X');
           mainCamera.autoRotate();
           break;
@@ -89,6 +100,7 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
           // uiManager?.keyHandler({ key: 'C' });
           break;
         case 4:
+          if (settingsManager.isLimitedGamepadControls) break;
           console.log('Left Bumper');
           // eslint-disable-next-line no-case-declarations
           satId = objectManager.selectedSat - 1;
@@ -99,6 +111,7 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
           }
           break;
         case 5:
+          if (settingsManager.isLimitedGamepadControls) break;
           console.log('Right Bumper');
           // eslint-disable-next-line no-case-declarations
           satId = objectManager.selectedSat + 1;
@@ -109,6 +122,7 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
           }
           break;
         case 8:
+          if (settingsManager.isLimitedGamepadControls) break;
           console.log('Home');
           mainCamera.isPanReset = true;
       mainCamera.isLocalRotateReset = true;
@@ -190,6 +204,8 @@ export const updateLeftStick = (x: number, y: number): void => {
   const { mainCamera, drawManager } = keepTrackApi.programs;
   if (x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone || y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone) {
     mainCamera.autoRotate(false);
+    settingsManager.lastGamepadMovement = Date.now();
+
     switch (mainCamera.cameraType.current) {
       case mainCamera.cameraType.Default:
       case mainCamera.cameraType.Offset:
@@ -215,6 +231,8 @@ export const updateLeftStick = (x: number, y: number): void => {
 };
 
 export const updateRightStick = (x: number, y: number): void => {
+  if (settingsManager.isLimitedGamepadControls) return;
+
   const { mainCamera, drawManager } = keepTrackApi.programs;
   mainCamera.isLocalRotateOverride = false;
   if (y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone || x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone) {

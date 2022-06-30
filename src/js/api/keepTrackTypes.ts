@@ -5,7 +5,7 @@ import { SatRec } from 'satellite.js';
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
-import { TleParams } from '../satMath/satMath';
+import { TleParams } from '../satMath/tle/createTle';
 import { toastMsgType } from '../uiManager/uiManager';
 import { SpaceObjectType } from './SpaceObjectType';
 
@@ -317,6 +317,10 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isDisableExtraCatalog: boolean;
+  orbitSegments: number;
+  lastGamepadMovement: number;
+  isLimitedGamepadControls: any;
   isEPFL: boolean;
   isUseNullForBadGetEl: any;
   isDisableUrlBar: any;
@@ -846,6 +850,14 @@ export interface TimeManager {
   synchronize: any;
   init: any;
 }
+
+export enum SunStatus {
+  UNKNOWN = -1,
+  UMBRAL = 0,
+  PENUMBRAL = 1,
+  SUN = 2,
+}
+
 export declare interface SatObject {
   pname?: string;
   bf?: string;
@@ -858,7 +870,7 @@ export declare interface SatObject {
   configuration?: string;
   constellation?: any;
   country?: string;
-  dec: any;
+  dec: number;
   desc?: string;
   diameter?: string;
   dryMass?: string;
@@ -882,13 +894,13 @@ export declare interface SatObject {
   };
   id: number;
   inclination: number;
-  inSun?: any;
+  inSun?: number;
   inSunChange: boolean;
   intlDes?: string;
   inView: number;
   inViewChange: boolean;
   isInGroup?: boolean;
-  isInSun?: any;
+  isInSun?: () => SunStatus;
   isRadarData?: boolean;
   launchDate?: string;
   launchMass?: string;
@@ -897,7 +909,7 @@ export declare interface SatObject {
   length?: string;
   lifetime?: string | number;
   lon: number;
-  maneuver?: any;
+  maneuver?: string;
   manufacturer?: string;
   marker?: boolean;
   meanMotion: number;
@@ -906,8 +918,8 @@ export declare interface SatObject {
   mission?: string;
   motor?: string;
   name?: string;
-  NOTES?: any;
-  ORPO?: any;
+  NOTES?: string;
+  ORPO?: string;
   owner?: string;
   payload?: string;
   perigee: number;
@@ -920,17 +932,17 @@ export declare interface SatObject {
   rcs?: string;
   satrec: any;
   sccNum?: string;
-  semiMajorAxis: any;
-  semiMinorAxis: any;
+  semiMajorAxis: number;
+  semiMinorAxis: number;
   setRAE: any;
   shape?: string;
   span?: string;
   static?: boolean;
-  staticNum: any;
+  staticNum: number;
   status?: string;
   TLE1: string;
   TLE2: string;
-  TTP?: any;
+  TTP?: string;
   type: SpaceObjectType;
   user?: string;
   vmag?: number;
@@ -959,15 +971,15 @@ export interface RadarDataObject extends SatObject {
 
 export interface SensorObject {
   static?: boolean;
-  linkIridium?: any;
-  linkGalileo?: any;
-  linkStarlink?: any;
-  obsmaxel2?: any;
-  obsmaxrange2?: any;
-  obsminrange2?: any;
-  obsminel2?: any;
-  obsmaxaz2?: any;
-  obsminaz2?: any;
+  linkIridium?: boolean;
+  linkGalileo?: boolean;
+  linkStarlink?: boolean;
+  obsmaxel2?: number;
+  obsmaxrange2?: number;
+  obsminrange2?: number;
+  obsminel2?: number;
+  obsmaxaz2?: number;
+  obsminaz2?: number;
   alt: number;
   beamwidth?: number;
   changeObjectInterval?: number;
@@ -1152,7 +1164,13 @@ export type lookanglesRow = {
   passMaxEl: string;
 };
 
+export type sccPassTimes = {
+  sccNum: string;
+  time: number;
+};
+
 export interface SatMath {
+  distanceString: (hoverSat: SatObject, selectedSat: SatObject) => string;
   getAngleBetweenTwoSatellites(sat1: SatObject, sat2: SatObject): { az: number; el: number };
   getLlaOfCurrentOrbit(sat: SatObject, points: number): { lat: number; lon: number; alt: number; time: number }[];
   getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits?: number);
@@ -1160,7 +1178,7 @@ export interface SatMath {
   getEciOfCurrentOrbit(sat: SatObject, points: number): { x: number; y: number; z: number }[];
   altitudeCheck(iTLE1: string, iTLE2: any, arg2: any);
   calculateDops: (satList: { az: number; el: number }[]) => { pdop: string; hdop: string; gdop: string; vdop: string; tdop: string };
-  calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => boolean[];
+  calculateLookAngles: (sat: SatObject, sensors: SensorObject[]) => TearrData[];
   calculateSensorPos: (sensor?: SensorObject[]) => { x: number; y: number; z: number; lat: number; lon: number; gmst: number };
   calculateVisMag: (sat: SatObject, sensor: SensorObject, propTime: Date, sun: SunObject) => number;
   checkIsInView(sensor: SensorObject, aer: any): boolean;
@@ -1169,11 +1187,11 @@ export interface SatMath {
   currentTEARR: TearrData;
   degreesLat(lat: Radians): Degrees;
   degreesLong(lon: Radians): Degrees;
-  distance: (hoverSat: SatObject, selectedSat: SatObject) => string;
+  distance: (obj1: EciPos, obj2: EciPos) => number;
   ecfToEci: (ecf: { x: number; y: number; z: number }, gmst: number) => { x: number; y: number; z: number };
   ecfToLookAngles(observerGd: { lat: number; lon: number; alt: number }, positionEcf: any);
   eci2ll: (x: number, y: number, z: number) => { lat: number; lon: number; alt: number };
-  eci2Rae: (now: Date, eci: EciArr3, sensor: SensorObject) => { az: number; el: number; rng: any };
+  eci2rae: (now: Date, eci: EciArr3, sensor: SensorObject) => { az: number; el: number; rng: any };
   eciToEcf(position: any, gmst: any);
   eciToGeodetic(position: EciPos, gmst: number): { lat: Radians; lon: Radians; alt: Kilometers };
   findBestPass(sat: SatObject, sensors: SensorObject[]): lookanglesRow[];
@@ -1296,6 +1314,7 @@ export interface GamepadPlugin {
   currentState: any;
   getController: any;
   vibrate: any;
+  buttonsPressedHistory: number[];
 }
 
 export interface DrawManager {

@@ -4,8 +4,15 @@
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms } from '../api/keepTrackTypes';
-import { getOrbitByLatLon } from './getOrbitByLatLon';
-import * as satMath from './satMath';
+import * as calculateLookAngles from './calc/calculateLookAngles';
+import * as getEci from './calc/getEci';
+import { getOrbitByLatLon } from './calc/getOrbitByLatLon';
+import * as findBestPass from './find/findBestPass';
+import { findBestPasses } from './find/findBestPasses';
+import { findCloseObjects } from './find/findCloseObjects';
+import { findNearbyObjectsByOrbit } from './find/findNearbyObjectsByOrbit';
+import { eci2ll, eci2rae } from './transforms';
+import * as lookAngles2Ecf from './transforms/lookAngles2Ecf';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 const dateNow = new Date(2022, 0, 1);
@@ -14,7 +21,7 @@ dateNow.setUTCHours(0, 0, 0, 0);
 // @ponicode
 describe.skip('satMath.findCloseObjects', () => {
   test('0', () => {
-    let result: any = satMath.findCloseObjects();
+    let result: any = findCloseObjects();
     expect(result).toMatchSnapshot();
   });
 });
@@ -30,14 +37,14 @@ describe('satMath.getOrbitByLatLon', () => {
 // @ponicode
 describe('satMath.calculateLookAngles', () => {
   test('0', () => {
-    satMath.calculateLookAngles(defaultSat, [defaultSensor]);
+    calculateLookAngles.calculateLookAngles(defaultSat, [defaultSensor]);
   });
 });
 
 // @ponicode
 describe('satMath.findBestPasses', () => {
   test('0', () => {
-    let result: any = satMath.findBestPasses('25544', defaultSensor);
+    let result: any = findBestPasses('25544', defaultSensor);
     expect(result).toMatchSnapshot();
   });
 });
@@ -45,93 +52,28 @@ describe('satMath.findBestPasses', () => {
 // @ponicode
 describe('satMath.findBestPass', () => {
   test('0', () => {
-    satMath.findBestPass(defaultSat, [defaultSensor]);
+    findBestPass.findBestPass(defaultSat, [defaultSensor]);
   });
 });
 
 // @ponicode
 describe('satMath.eci2Rae', () => {
   test('0', () => {
-    satMath.eci2Rae(dateNow, [10000, 10000, 10000], defaultSensor);
+    eci2rae(dateNow, [10000, 10000, 10000], defaultSensor);
   });
 });
 
 // @ponicode
 describe('satMath.getEci', () => {
   test('0', () => {
-    satMath.getEci(defaultSat, dateNow);
+    getEci.getEci(defaultSat, dateNow);
   });
 });
 
 // @ponicode
 describe.skip('satMath.findNearbyObjectsByOrbit', () => {
   test('0', () => {
-    let result: any = satMath.findNearbyObjectsByOrbit(defaultSat);
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('satMath.updateDopsTable', () => {
-  test('0', () => {
-    document.body.innerHTML = `<table id="dops"></table>`;
-    let result: any = satMath.updateDopsTable(0, 0, 10);
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('satMath.getDops', () => {
-  test('0', () => {
-    let result: any = satMath.getDops(0, 0, 10, dateNow);
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('satMath.calculateDops', () => {
-  test('0', () => {
-    let result: any = satMath.calculateDops([
-      { az: 0, el: 20 },
-      { az: 90, el: 20 },
-      { az: 180, el: 20 },
-      { az: 270, el: 20 },
-      { az: 0, el: 90 },
-    ]);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    let result: any = satMath.calculateDops([
-      { az: 0, el: 20 },
-      { az: 90, el: 20 },
-    ]);
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('satMath.getSunDirection', () => {
-  test('0', () => {
-    let result: any = satMath.getSunDirection(12345678);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    let result: any = satMath.getSunDirection(1234567890);
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
-describe('satMath.getSunTimes', () => {
-  test('0', () => {
-    let result: any = satMath.getSunTimes(defaultSat);
-    expect(result).toMatchSnapshot();
-  });
-
-  test('1', () => {
-    let result: any = satMath.getSunTimes(defaultSat, [defaultSensor]);
+    let result: any = findNearbyObjectsByOrbit(defaultSat);
     expect(result).toMatchSnapshot();
   });
 });
@@ -139,12 +81,12 @@ describe('satMath.getSunTimes', () => {
 // @ponicode
 describe('satMath.lookAngles2Ecf', () => {
   test('0', () => {
-    let result: any = satMath.lookAngles2Ecf(47, 20, 2000, 41, -71, 0);
+    let result: any = lookAngles2Ecf.lookAngles2ecf(47, 20, 2000, 41, -71, 0);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
-    let result: any = satMath.lookAngles2Ecf(167, 20, 5000, 41, -71, 0);
+    let result: any = lookAngles2Ecf.lookAngles2ecf(167, 20, 5000, 41, -71, 0);
     expect(result).toMatchSnapshot();
   });
 });
@@ -152,43 +94,10 @@ describe('satMath.lookAngles2Ecf', () => {
 // @ponicode
 describe('satMath.eci2ll', () => {
   test('0', () => {
-    satMath.eci2ll(1000, 2000, 4000);
+    eci2ll(1000, 2000, 4000);
   });
 
   test('1', () => {
-    satMath.eci2ll(-1000, 5000, 0);
-  });
-});
-
-// @ponicode
-describe('satMath.getLlaTimeView', () => {
-  test('0', () => {
-    satMath.getLlaTimeView(dateNow, defaultSat);
-  });
-
-  test('1', () => {
-    satMath.getLlaTimeView(new Date(2022, 0, 2), defaultSat);
-  });
-});
-
-// @ponicode
-describe('satMath.map', () => {
-  test('0', () => {
-    satMath.map(defaultSat, 0);
-  });
-
-  test('1', () => {
-    satMath.map(defaultSat, 10);
-  });
-});
-
-// @ponicode
-describe('satMath.calculateSensorPos', () => {
-  test('0', () => {
-    satMath.calculateSensorPos([defaultSensor]);
-  });
-
-  test('1', () => {
-    satMath.calculateSensorPos();
+    eci2ll(-1000, 5000, 0);
   });
 });

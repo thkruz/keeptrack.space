@@ -5,7 +5,7 @@ import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH } from '../lib/constants';
 import { objectManager } from '../objectManager/objectManager';
-import { calculateTimeVariables } from '../satMath/satMath';
+import { calculateTimeVariables } from '../satMath/calc/calculateTimeVariables';
 
 export const init = (gl: WebGL2RenderingContext) => {
   // We draw the picking object bigger than the actual dot to make it easier to select objects

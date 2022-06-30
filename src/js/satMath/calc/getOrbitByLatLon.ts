@@ -1,8 +1,9 @@
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { stringPad } from '@app/js/lib/helpers';
 import { SatRec } from 'satellite.js';
-import { SatObject } from '../api/keepTrackTypes';
-import { calculateTimeVariables, satellite } from './satMath';
+import { satellite } from '../satMath';
+import { calculateTimeVariables } from './calculateTimeVariables';
 
 enum PropagationOptions {
   MeanAnomaly = 1,
@@ -25,7 +26,8 @@ export const getOrbitByLatLon = (
   now: Date,
   goalAlt?: number,
   raanOffset?: number
-): [string, string] => { // NOSONAR
+): [string, string] => {
+  // NOSONAR
   let newMeana: string = null;
   let newArgPer: string = null;
   goalAlt = goalAlt || null;

@@ -18,6 +18,7 @@ export const generateConfig = (env, isWatch) => {
 
   switch (env) {
     case 'embed':
+    case 'embedDev':
       // this is for embedding the app in a web page
       baseConfig = getEmbedConfig(baseConfig);
       break;
@@ -37,7 +38,7 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // Add source map if in these modes
-  if (env === 'development' || env === 'test' || env === 'embed2') {
+  if (env === 'development' || env === 'test' || env === 'embedDev') {
     baseConfig = {
       ...baseConfig,
       ...{
@@ -64,7 +65,7 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // split entry points main, webworkers, and possibly analysis tools
-  if (env !== 'embed') {
+  if (env !== 'embed' && env !== 'embedDev') {
     const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
     const analysisConfig = getAnalysisConfig(baseConfig, dirName);

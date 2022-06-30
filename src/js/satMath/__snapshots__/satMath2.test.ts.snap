@@ -1,36 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`satMath.calculateDops 0 1`] = `
-Object {
-  "gdop": "2.21",
-  "hdop": "1.06",
-  "pdop": "2.00",
-  "tdop": "0.92",
-  "vdop": "1.70",
-}
-`;
-
-exports[`satMath.calculateDops 1 1`] = `
-Object {
-  "gdop": 50,
-  "hdop": 50,
-  "pdop": 50,
-  "tdop": 50,
-  "vdop": 50,
-}
-`;
-
 exports[`satMath.findBestPasses 0 1`] = `undefined`;
-
-exports[`satMath.getDops 0 1`] = `
-Object {
-  "gdop": 50,
-  "hdop": 50,
-  "pdop": 50,
-  "tdop": 50,
-  "vdop": 50,
-}
-`;
 
 exports[`satMath.getOrbitByLatLon 0 1`] = `
 Array [
@@ -38,26 +8,6 @@ Array [
   "Failed to find a solution for Argument of Perigee",
 ]
 `;
-
-exports[`satMath.getSunDirection 0 1`] = `
-Array [
-  148724320.43455538,
-  6189145.714033483,
-  14909516.932049064,
-]
-`;
-
-exports[`satMath.getSunDirection 1 1`] = `
-Array [
-  1306788.4922269185,
-  -120881774.59456515,
-  -88121572.7460775,
-]
-`;
-
-exports[`satMath.getSunTimes 0 1`] = `undefined`;
-
-exports[`satMath.getSunTimes 1 1`] = `undefined`;
 
 exports[`satMath.lookAngles2Ecf 0 1`] = `
 Object {
@@ -74,5 +24,3 @@ Object {
   "z": 3243.7908022872425,
 }
 `;
-
-exports[`satMath.updateDopsTable 0 1`] = `undefined`;

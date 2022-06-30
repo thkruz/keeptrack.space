@@ -25,6 +25,7 @@
     "build": "node ./scripts/build.mjs production",
     "build:watch": "node ./scripts/build.mjs development --watch",
     "build:embed": "node ./scripts/buildEmbed.mjs embed",
+    "build:embedDev": "node ./scripts/buildEmbed.mjs embedDev",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs",
     "cypress:open": "cypress open",
     "lcov": "node ./scripts/openLcov.mjs",

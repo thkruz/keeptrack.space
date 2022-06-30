@@ -4,8 +4,12 @@
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../api/apiMocks';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { KeepTrackPrograms } from '../api/keepTrackTypes';
+import * as getTearData from './calc/getTearData';
+import { findClosestApproachTime } from './find/findClosestApproachTime';
+import * as getlookangles from './lookangles/getlookangles';
 import * as satMath from './satMath';
 import { satellite } from './satMath';
+import * as createTle from './tle/createTle';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 const dateNow = new Date(2022, 0, 1);
@@ -14,42 +18,43 @@ dateNow.setUTCHours(0, 0, 0, 0);
 // @ponicode
 describe('satMath.getlookangles', () => {
   test('0', () => {
-    let result: any = satMath.getlookangles(defaultSat);
+    let result: any = getlookangles.getlookangles(defaultSat);
     expect(result).toMatchSnapshot();
   });
 
   test('1', () => {
     document.body.innerHTML = `<table id="looks"></table>`;
     keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
-    let result: any = satMath.getlookangles(defaultSat);
+    let result: any = getlookangles.getlookangles(defaultSat);
     expect(result).toMatchSnapshot();
   });
 
   test('2', () => {
     document.body.innerHTML = `<table id="looks"></table>`;
     keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
-    jest.spyOn(satellite, 'getTearData').mockImplementationOnce(() => ({
+    console.warn(satellite);
+    jest.spyOn(getTearData, 'getTearData').mockImplementationOnce(() => ({
       time: dateNow.toISOString(),
       rng: 1000,
       az: 50,
       el: 30,
       name: 'COD',
     }));
-    let result: any = satMath.getlookangles(defaultSat);
+    let result: any = getlookangles.getlookangles(defaultSat);
     expect(result).toMatchSnapshot();
   });
 });
 
 describe('satMath.findClosestApproachTime', () => {
   test('0', () => {
-    let result: any = () => satMath.findClosestApproachTime(defaultSat, defaultSat, 5);
+    let result: any = () => findClosestApproachTime(defaultSat, defaultSat, 5);
     expect(() => result()).not.toThrow;
   });
 });
 
 describe('satMath.createTle', () => {
   test('0', () => {
-    let result: any = satMath.createTle({
+    let result: any = createTle.createTle({
       sat: defaultSat,
       inc: '10.01',
       meanmo: '15.15',
@@ -85,7 +90,7 @@ describe('satMath.populateMultiSiteTable', () => {
         name: 'COD',
       },
     ];
-    let result: any = satMath.populateMultiSiteTable(mSiteArray, defaultSat);
+    let result: any = getlookangles.populateMultiSiteTable(mSiteArray, defaultSat);
     expect(result).toMatchSnapshot();
   });
 });
@@ -93,11 +98,11 @@ describe('satMath.populateMultiSiteTable', () => {
 // @ponicode
 describe('satMath.propagate', () => {
   test('0', () => {
-    satMath.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor]);
+    getTearData.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], false);
   });
 
   test('1', () => {
-    satMath.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], true);
+    getTearData.getTearData(dateNow, satMath.satellite.twoline2satrec(defaultSat.TLE1, defaultSat.TLE2), [defaultSensor], true);
   });
 });
 
@@ -105,7 +110,7 @@ describe('satMath.propagate', () => {
 describe('satMath.getlookanglesMultiSite', () => {
   test('0', () => {
     document.body.innerHTML = `<table id="looksmultisite"></table>`;
-    let result: any = satMath.getlookanglesMultiSite(defaultSat);
+    let result: any = getlookangles.getlookanglesMultiSite(defaultSat);
     expect(result).toMatchSnapshot();
   });
 });

@@ -410,6 +410,7 @@ export const keepTrackApiStubs = {
       sgp4: () => [0, 0, 0],
       setobs: jest.fn(),
       distance: jest.fn(),
+      distanceString: jest.fn(),
       setTEARR: jest.fn(),
       eci2ll: () => ({ lat: 0, lon: 0 }),
       altitudeCheck: () => 10000,

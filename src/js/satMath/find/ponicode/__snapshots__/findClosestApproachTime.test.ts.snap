@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`findClosestApproachTime.findClosestApproachTime 0 1`] = `
+Object {
+  "dist": null,
+  "offset": null,
+  "ric": null,
+}
+`;

@@ -156,6 +156,9 @@ settingsManager = {
     // ASCII Catalog for offline use
     settingsManager.isDisableAsciiCatalog = true;
 
+    // JSON Catalog for offline use
+    settingsManager.isDisableExtraCatalog = false;
+
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
     settingsManager.maxMissiles = 500;
@@ -287,6 +290,12 @@ settingsManager = {
     // loading times
     // settingsManager.isDrawLess = true;
     // settingsManager.smallImages = true;
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Gamepad Settings
+    // //////////////////////////////////////////////////////////////////////////
+    settingsManager.isLimitedGamepadControls = false;
+    settingsManager.lastGamepadMovement = 0; // Initialize as 0
 
     // //////////////////////////////////////////////////////////////////////////
     // Mobile Settings
@@ -512,8 +521,10 @@ settingsManager = {
     }
 
     // //////////////////////////////////////////////////////////////////////////
-    // Orbit Color Settings
+    // Orbit Settings
     // //////////////////////////////////////////////////////////////////////////
+    settingsManager.orbitSegments = 255;
+    
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
     settingsManager.orbitSelectColor2 = [0.0, 0.4, 1.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];

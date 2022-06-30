@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { CatalogManager, ObjectManager } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
-import { StringifiedNubmer } from '@app/js/satMath/tleFormater';
+import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
 
 let isEditSatMenuOpen = false;
 export const init = (): void => {

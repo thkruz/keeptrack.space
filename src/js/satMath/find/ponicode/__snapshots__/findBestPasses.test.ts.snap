@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`findBestPasses.findBestPasses 0 1`] = `undefined`;
+
+exports[`findBestPasses.findBestPasses 1 1`] = `undefined`;
+
+exports[`findBestPasses.findBestPasses 2 1`] = `undefined`;
+
+exports[`findBestPasses.findBestPasses 3 1`] = `undefined`;
+
+exports[`findBestPasses.findBestPasses 4 1`] = `undefined`;

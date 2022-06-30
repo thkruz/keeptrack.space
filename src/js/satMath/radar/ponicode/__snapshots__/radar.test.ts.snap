@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`radar.radarMaxrng 0 1`] = `NaN`;
+
+exports[`radar.radarMaxrng 1 1`] = `155.4612437014322`;
+
+exports[`radar.radarMaxrng 2 1`] = `-0`;
+
+exports[`radar.radarMaxrng 3 1`] = `-0`;
+
+exports[`radar.radarMaxrng 4 1`] = `0`;
+
+exports[`radar.radarMaxrng 5 1`] = `NaN`;
+
+exports[`radar.radarMinSignal 0 1`] = `-Infinity`;
+
+exports[`radar.radarMinSignal 1 1`] = `-Infinity`;
+
+exports[`radar.radarMinSignal 2 1`] = `NaN`;
+
+exports[`radar.radarMinSignal 3 1`] = `-Infinity`;
+
+exports[`radar.radarMinSignal 4 1`] = `NaN`;
+
+exports[`radar.radarMinSignal 5 1`] = `NaN`;

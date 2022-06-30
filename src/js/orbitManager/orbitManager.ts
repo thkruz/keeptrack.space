@@ -5,7 +5,6 @@ import * as glm from 'gl-matrix';
 import { Camera, CatalogManager, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
 import { getEl } from '../lib/helpers';
 
-const NUM_SEGS = 255;
 const glBuffers = <WebGLBuffer[]>[];
 const inProgress = <boolean[]>[];
 let pathShader: any;
@@ -86,15 +85,15 @@ export const init = (orbitWorker?: Worker): void => {
 
   selectOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 
   secondaryOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, secondaryOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 
   hoverOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 
   for (let i = 0; i < satSet.missileSats; i++) {
     glBuffers.push(allocateBuffer());
@@ -103,7 +102,7 @@ export const init = (orbitWorker?: Worker): void => {
     isInit: true,
     orbitFadeFactor: settingsManager.orbitFadeFactor,
     satData: JSON.stringify(satSet.satData),
-    numSegs: NUM_SEGS,
+    numSegs: settingsManager.orbitSegments,
   });
   initialized = true;
 
@@ -151,7 +150,7 @@ export const clearSelectOrbit = (isSecondary: boolean = false): void => {
     currentSelectId = -1;
     gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
   }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 };
 
 export const addInViewOrbit = (satId: number): void => {
@@ -190,7 +189,7 @@ export const clearHoverOrbit = (): void => {
   currentHoverId = -1;
 
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 };
 
 export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFramebuffer): boolean => {
@@ -230,7 +229,7 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
 export const allocateBuffer = () => {
   let buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
   return buf;
 };
 
@@ -333,7 +332,7 @@ const writePathToGpu = (id: number) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
   gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(pathShader.aPos);
-  gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+  gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
 };
 const drawPrimaryObjectOrbit = (satSet: CatalogManager) => {
   if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
@@ -341,7 +340,7 @@ const drawPrimaryObjectOrbit = (satSet: CatalogManager) => {
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
   }
 };
 
@@ -365,7 +364,7 @@ const drawGroupObjectOrbit = (): void => {
     //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
     //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
     //     gl.enableVertexAttribArray(pathShader.aPos);
-    //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    //     gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
     //   });
     // }
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
@@ -396,7 +395,7 @@ const drawHoverObjectOrbit = (satSet: CatalogManager): void => {
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
   }
 };
 
@@ -406,6 +405,6 @@ const drawSecondaryObjectOrbit = (satSet: CatalogManager): void => {
     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
   }
 };

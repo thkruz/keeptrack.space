@@ -1,0 +1,205 @@
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
+import * as findBestPasses from '@app/js/satMath/find/findBestPasses';
+import * as SpaceObjectType from '../../../api/SpaceObjectType';
+
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
+
+// @ponicode
+describe('findBestPasses.findBestPasses', () => {
+  test('0', () => {
+    let result: any = findBestPasses.findBestPasses('Jean-Philippe,,George', {
+      static: true,
+      linkIridium: true,
+      linkGalileo: false,
+      linkStarlink: true,
+      obsmaxel2: 1,
+      obsmaxrange2: 550,
+      obsminrange2: 550,
+      obsminel2: 380,
+      obsmaxaz2: -100,
+      obsminaz2: 100,
+      alt: 3,
+      beamwidth: 800,
+      changeObjectInterval: 1,
+      country: 'FR',
+      lat: 90,
+      linkAehf: true,
+      linkWgs: false,
+      lon: 45,
+      name: 'Jean-Philippe',
+      observerGd: { lat: -45, lon: 180, alt: 1 },
+      obsmaxaz: 100,
+      obsmaxel: 1,
+      obsmaxrange: 100,
+      obsminaz: -5.48,
+      obsminel: 10.0,
+      obsminrange: 0,
+      shortName: 'http://www.example.com/route/123?foo=bar',
+      staticNum: 1,
+      sun: '4.0.0-beta1\t',
+      type: SpaceObjectType.SpaceObjectType.LAUNCH_VEHICLE_MANUFACTURER,
+      url: 'https://twitter.com/path?abc',
+      volume: true,
+      zoom: 'leo',
+    });
+    expect(result).toMatchSnapshot();
+  });
+
+  test('1', () => {
+    let result: any = findBestPasses.findBestPasses(',', {
+      static: true,
+      linkIridium: false,
+      linkGalileo: false,
+      linkStarlink: false,
+      obsmaxel2: -5.48,
+      obsmaxrange2: 4,
+      obsminrange2: 380,
+      obsminel2: 50,
+      obsmaxaz2: 100,
+      obsminaz2: 1,
+      alt: 50,
+      beamwidth: 10,
+      changeObjectInterval: -5.48,
+      country: 'United States',
+      lat: 0,
+      linkAehf: true,
+      linkWgs: true,
+      lon: -180,
+      name: 'Jean-Philippe',
+      observerGd: { lat: -45, lon: -90, alt: 1 },
+      obsmaxaz: 100,
+      obsmaxel: 100,
+      obsmaxrange: 100,
+      obsminaz: 0,
+      obsminel: 0.5,
+      obsminrange: -100,
+      shortName: 'http://base.com',
+      staticNum: 10,
+      sun: '1.0.0',
+      type: SpaceObjectType.SpaceObjectType.PAYLOAD,
+      url: 'https://',
+      volume: false,
+      zoom: 'geo',
+    });
+    expect(result).toMatchSnapshot();
+  });
+
+  test('2', () => {
+    let result: any = findBestPasses.findBestPasses('Jean-Philippe,George', {
+      static: false,
+      linkIridium: false,
+      linkGalileo: false,
+      linkStarlink: true,
+      obsmaxel2: -5.48,
+      obsmaxrange2: 400,
+      obsminrange2: 520,
+      obsminel2: 520,
+      obsmaxaz2: 1,
+      obsminaz2: -5.48,
+      alt: 50,
+      beamwidth: 16,
+      changeObjectInterval: -100,
+      country: 'United States',
+      lat: 90,
+      linkAehf: false,
+      linkWgs: false,
+      lon: 0,
+      name: 'Michael',
+      observerGd: { lat: -180, lon: -45, alt: 1 },
+      obsmaxaz: 0,
+      obsmaxel: 100,
+      obsmaxrange: 380,
+      obsminaz: 100,
+      obsminel: -0.5,
+      obsminrange: 1,
+      shortName: 'ponicode.com',
+      staticNum: 10,
+      sun: 'v1.2.4',
+      type: SpaceObjectType.SpaceObjectType.MECHANICAL,
+      url: 'http://base.com',
+      volume: true,
+      zoom: 'leo',
+    });
+    expect(result).toMatchSnapshot();
+  });
+
+  test('3', () => {
+    let result: any = findBestPasses.findBestPasses('Jean-Philippe,George', {
+      static: true,
+      linkIridium: false,
+      linkGalileo: true,
+      linkStarlink: true,
+      obsmaxel2: 0,
+      obsmaxrange2: 70,
+      obsminrange2: 1,
+      obsminel2: 1,
+      obsmaxaz2: -5.48,
+      obsminaz2: -100,
+      alt: 5,
+      beamwidth: 16,
+      changeObjectInterval: 0,
+      country: 'France',
+      lat: -45,
+      linkAehf: true,
+      linkWgs: true,
+      lon: 45,
+      name: 'Anas',
+      observerGd: { lat: 45, lon: 90, alt: 5 },
+      obsmaxaz: 0,
+      obsmaxel: 0,
+      obsmaxrange: 520,
+      obsminaz: 1,
+      obsminel: -1.0,
+      obsminrange: 100,
+      shortName: 'http://example.com/showcalendar.html?token=CKF50YzIHxCTKMAg',
+      staticNum: 10,
+      sun: '1.0.0',
+      type: SpaceObjectType.SpaceObjectType.MECHANICAL,
+      url: 'http://base.com',
+      volume: false,
+      zoom: 'leo',
+    });
+    expect(result).toMatchSnapshot();
+  });
+
+  test('4', () => {
+    let result: any = findBestPasses.findBestPasses(',Jean-Philippe', {
+      static: true,
+      linkIridium: false,
+      linkGalileo: false,
+      linkStarlink: true,
+      obsmaxel2: 1,
+      obsmaxrange2: 4,
+      obsminrange2: 50,
+      obsminel2: 380,
+      obsmaxaz2: 100,
+      obsminaz2: 1,
+      alt: 3,
+      beamwidth: 24,
+      changeObjectInterval: -100,
+      country: 'GB',
+      lat: -90,
+      linkAehf: false,
+      linkWgs: false,
+      lon: 90,
+      name: 'Edmond',
+      observerGd: { lat: -180, lon: 45, alt: 50 },
+      obsmaxaz: -100,
+      obsmaxel: 1,
+      obsmaxrange: 90,
+      obsminaz: 100,
+      obsminel: -1.0,
+      obsminrange: 100,
+      shortName: 'https://twitter.com/path?abc',
+      staticNum: 10,
+      sun: 'v4.0.0-rc.4',
+      type: SpaceObjectType.SpaceObjectType.LAUNCH_VEHICLE_MANUFACTURER,
+      url: 'http://www.example.com/route/123?foo=bar',
+      volume: true,
+      zoom: 'leo',
+    });
+    expect(result).toMatchSnapshot();
+  });
+});

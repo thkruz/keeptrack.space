@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`findBestPass.findBestPass 0 1`] = `Array []`;
+
+exports[`findBestPass.findBestPass 1 1`] = `Array []`;
+
+exports[`findBestPass.findBestPass 2 1`] = `Array []`;
+
+exports[`findBestPass.findBestPass 3 1`] = `Array []`;
+
+exports[`findBestPass.findBestPass 4 1`] = `Array []`;

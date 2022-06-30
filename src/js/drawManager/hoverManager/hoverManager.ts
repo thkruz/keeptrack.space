@@ -79,7 +79,7 @@ export const staticObj = (sat: any) => {
   } else {
     const { objectManager, satellite, satSet } = keepTrackApi.programs;
     satHoverBoxNode1.textContent = sat.name;
-    satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+    satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
     satHoverBoxNode3.textContent = '';
   }
 };
@@ -96,7 +96,7 @@ const showRicOrEci = (drawManager: DrawManager, satSet: CatalogManager, objectMa
     satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
     showRicDistAndVel(ric);
   } else {
-    satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, drawManager.sat2)}`;
+    satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distanceString(sat, drawManager.sat2)}`;
     showEciDistAndVel(sat);
   }
 }
@@ -166,7 +166,7 @@ export const satObj = (sat: SatObject) => {
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass && drawManager.isShowDistance) {
       satHoverBoxNode1.textContent = sat.name;
       satHoverBoxNode2.textContent = sat.sccNum;
-      satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+      satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
     } else if (drawManager.isShowDistance) {
       satHoverBoxNode1.textContent = sat.name;
       showRicOrEci(drawManager, satSet, objectManager, sat, satellite);
@@ -191,7 +191,7 @@ export const radarData = (sat: any) => {
   }
   if (parseInt(sat.sccNum) !== -1) satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Satellite: ' + sat.sccNum);
   if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
-    sat.rae = satellite.eci2Rae(sat.t, sat.position, sensorManager.currentSensor[0]);
+    sat.rae = satellite.eci2rae(sat.t, sat.position, sensorManager.currentSensor[0]);
     sat.setRAE(sat.rae);
   }
   if (sensorManager.currentSensor !== sensorManager.defaultSensor) {
@@ -224,13 +224,13 @@ export const launchFacility = (sat: SatObject) => {
   const { objectManager, satellite, satSet } = keepTrackApi.programs;
   let launchSite = objectManager.extractLaunchSite(sat.name);
   satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
-  satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+  satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
   satHoverBoxNode3.textContent = '';
 };
 export const controlFacility = (sat: SatObject) => {
   const { objectManager, satellite, satSet } = keepTrackApi.programs;
   satHoverBoxNode1.textContent = sat.name;
-  satHoverBoxNode2.innerHTML = sat.country + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+  satHoverBoxNode2.innerHTML = sat.country + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
   satHoverBoxNode3.textContent = '';
 };
 export const star = (sat: SatObject) => {

@@ -9,4 +9,7 @@ export const getDegLat = Transforms.getDegLat;
 export const getDegLon = Transforms.getDegLon;
 export const ecf2rae = Transforms.ecf2rae;
 // Expanded Api
+export { eci2ll } from './eci2ll';
+export { eci2rae } from './eci2rae';
+export { lookAngles2ecf } from './lookAngles2Ecf';
 export { sat2ric } from './sat2ric';

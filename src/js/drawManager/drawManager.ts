@@ -427,6 +427,7 @@ export const satCalculate = () => {
 };
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const orbitsAbove = () => { // NOSONAR
   const { mainCamera, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
 

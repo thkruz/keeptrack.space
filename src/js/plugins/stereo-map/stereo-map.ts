@@ -74,8 +74,8 @@ export const init = (): void => {
   });
 };
 
-export const updateMap = async (): Promise<void> => {
-  // NOSONAR
+// prettier-ignore
+export const updateMap = async (): Promise<void> => { // NOSONAR
   try {
     const { sensorManager, satellite, mapManager, objectManager, satSet } = keepTrackApi.programs;
     if (objectManager.selectedSat === -1) return;
@@ -253,8 +253,8 @@ export const drawEarthLayer = async (ctx: CanvasRenderingContext2D): Promise<voi
   }
 };
 
-export const bottomMenuClick = (iconName: string): void => {
-  // NOSONAR
+// prettier-ignore
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-map') {
     const { mapManager, uiManager, objectManager } = keepTrackApi.programs;
     if (mapManager.isMapMenuOpen) {

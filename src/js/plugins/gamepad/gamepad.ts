@@ -10,6 +10,7 @@ export const init = (): void => {
     currentState: null,
   };
   // NOTE: This is note a message event and sonarqube should ignore it
+  // prettier-ignore
   window.addEventListener('gamepadconnected', (evt: any) => { // NOSONAR    
     if (settingsManager.cruncherReady) {
       gamepadConnected(<GamepadEvent>event);
@@ -56,12 +57,12 @@ export const updateGamepad = (index?: number): void => {
   updateZoom(controller.buttons[6].value, controller.buttons[7].value);
   updateLeftStick(controller.axes[0], controller.axes[1]);
   updateRightStick(controller.axes[2], controller.axes[3]);
-  updateButtons(controller.buttons);  
+  updateButtons(controller.buttons);
 };
 
 const buttonsPressed: boolean[] = [];
 export const updateButtons = (buttons: readonly GamepadButton[]): void => {
-  const {gamepad} = keepTrackApi.programs;
+  const { gamepad } = keepTrackApi.programs;
 
   buttons.forEach((button, index) => {
     // if the button is pressed and wasnt pressed before
@@ -74,7 +75,7 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
         gamepad.buttonsPressedHistory.shift();
       }
 
-      const { mainCamera,satSet,objectManager } = keepTrackApi.programs;
+      const { mainCamera, satSet, objectManager } = keepTrackApi.programs;
 
       // Perform action
       let satId;
@@ -125,8 +126,8 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
           if (settingsManager.isLimitedGamepadControls) break;
           console.log('Home');
           mainCamera.isPanReset = true;
-      mainCamera.isLocalRotateReset = true;
-      mainCamera.ftsRotateReset = true;
+          mainCamera.isLocalRotateReset = true;
+          mainCamera.ftsRotateReset = true;
           break;
         case 9:
           console.log('Start');

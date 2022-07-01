@@ -231,6 +231,8 @@ export const bottomMenuClick = (iconName: string): void => {
     }
   }
 };
+
+// prettier-ignore
 export const obfitFormSubmit = (e: any) => { // NOSONAR
   const { uiManager, satSet, timeManager, satellite } = keepTrackApi.programs;
   let isOb2 = true;

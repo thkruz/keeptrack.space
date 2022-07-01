@@ -5,6 +5,7 @@ import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeMa
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const lostobjectsRules = (sat: SatObject): ColorInformation => { // NOSONAR
   const { timeManager, satellite } = keepTrackApi.programs;
 

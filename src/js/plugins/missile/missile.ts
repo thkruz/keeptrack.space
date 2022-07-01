@@ -1,7 +1,7 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { missileManager } from './missileManager';
 import missilePng from '@app/img/icons/missile.png';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { missileManager } from './missileManager';
 
 let isMissileMenuOpen = false;
 let isSub = false;
@@ -56,6 +56,7 @@ export const msTargetChange = () => {
   }
 };
 export const missileSubmit = (): void => {
+  // prettier-ignore
   showLoading(() => { // NOSONAR
     const { uiManager, satSet, timeManager } = keepTrackApi.programs;
     getEl('ms-error').style.display = 'none';
@@ -301,7 +302,9 @@ export const missileSubmit = (): void => {
 };
 export const uiManagerInit = (): void => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="missile-menu" class="side-menu-parent start-hidden text-select">
           <div id="missile-content" class="side-menu">
             <div class="row">
@@ -455,10 +458,13 @@ export const uiManagerInit = (): void => {
             </div>
           </div>
         </div>   
-      `));
+      `
+  );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-missile" class="bmenu-item">
           <img
             alt="missile"
@@ -467,7 +473,8 @@ export const uiManagerInit = (): void => {
           <span class="bmenu-title">Missile</span>
           <div class="status-icon"></div>
         </div>
-        `));
+        `
+  );
 };
 
 export const searchForRvs = () => {
@@ -486,7 +493,7 @@ export const uiManagerFinal = (): void => {
   getEl('ms-error').addEventListener('click', msErrorClick);
   getEl('missile').addEventListener('change', missileChange);
   getEl('searchRvBtn').addEventListener('click', searchForRvs);
-}
+};
 
 export const init = (): void => {
   // Add HTML

@@ -22,14 +22,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import addPng from '@app/img/add.png';
+import infoPng from '@app/img/icons/info.png';
+import watchlistPng from '@app/img/icons/watchlist.png';
+import removePng from '@app/img/remove.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
-import { shake, saveAs, slideOutLeft, slideInRight, showLoading, clickAndDragWidth, getEl } from '@app/js/lib/helpers';
-import removePng from '@app/img/remove.png';
-import addPng from '@app/img/add.png';
-import watchlistPng from '@app/img/icons/watchlist.png';
-import infoPng from '@app/img/icons/info.png';
+import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let watchlistList: any[] = [];
@@ -121,6 +121,7 @@ export const init = (): void => {
   });
 };
 
+// prettier-ignore
 export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInViewList?: any, isSkipSearch = false) => { // NOSONAR
   const settingsManager: any = window.settingsManager;
   const { satSet, uiManager }: { satSet: any; uiManager: any } = keepTrackApi.programs;
@@ -181,7 +182,9 @@ export const updateWatchlist = (updateWatchlistList?: any[], updateWatchlistInVi
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
   <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
     <div id="watchlist-content" class="side-menu">
       <div class="row">
@@ -224,10 +227,13 @@ export const uiManagerInit = (): void => {
   <div id="info-overlay-menu" class="start-hidden text-select">
     <div id="info-overlay-content"></div>
   </div>
-`));
+`
+  );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`  
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`  
   <div id="menu-watchlist" class="bmenu-item">
     <img
       alt="watchlist"
@@ -242,45 +248,47 @@ export const uiManagerInit = (): void => {
     <span class="bmenu-title">Overlay</span>
     <div class="status-icon"></div>
   </div>
-`));
+`
+  );
 };
 
 export const uiManagerFinal = (): void => {
   document.querySelector('.menu-selectable').addEventListener('click', menuSelectableClick);
   clickAndDragWidth(getEl('watchlist-menu'));
-  
+
   getEl('info-overlay-content').addEventListener('click', function (evt: Event) {
     if (!(<HTMLElement>evt.target).classList.contains('watchlist-object')) return;
     infoOverlayContentClick(evt);
   });
-  
+
   getEl('watchlist-list').addEventListener('click', function (evt: Event) {
     const satId = parseInt((<HTMLElement>evt.target).dataset.satId);
     watchlistListClick(satId);
   });
-  
+
   // Add button selected on watchlist menu
   getEl('watchlist-content').addEventListener('click', watchlistContentEvent);
-  
+
   // Enter pressed/selected on watchlist menu
   getEl('watchlist-content').addEventListener('submit', function (evt: Event) {
     evt.preventDefault();
     watchlistContentEvent(evt);
   });
-  
+
   getEl('watchlist-save').addEventListener('click', function (evt: Event) {
     watchlistSaveClick(evt);
   });
-  
+
   getEl('watchlist-open').addEventListener('click', function () {
-    getEl('watchlist-file').click()
+    getEl('watchlist-file').click();
   });
-  
+
   getEl('watchlist-file').addEventListener('change', function (evt: Event) {
     watchlistFileChange(evt);
   });
-}
+};
 
+// prettier-ignore
 export const updateLoop = () => { // NOSONAR
   const {
     satellite,
@@ -329,6 +337,7 @@ export const updateLoop = () => { // NOSONAR
   }
 };
 
+// prettier-ignore
 export const bottomMenuClick = (iconName: string) => { // NOSONAR
   const { satellite, satSet, uiManager, sensorManager, timeManager }: { satellite: any; satSet: any; uiManager: any; sensorManager: any; timeManager: any } = keepTrackApi.programs;
 
@@ -401,6 +410,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
   }
 };
 
+// prettier-ignore
 export const onCruncherReady = async (): Promise<void> => { // NOSONAR
   const { satSet, sensorManager }: { satSet: any; sensorManager: any } = keepTrackApi.programs;
   let watchlistJSON;

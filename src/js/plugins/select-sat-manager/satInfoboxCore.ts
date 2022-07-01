@@ -252,6 +252,8 @@ export const allObjectsLink = (): void => {
   uiManager.doSearch(searchStr);
   (<HTMLInputElement>getEl('search')).value = searchStr;
 };
+
+// prettier-ignore
 export const orbitalData = (sat: SatObject): void => { // NOSONAR
   // Only show orbital data if it is available
   if (sat === null || typeof sat === 'undefined') return;
@@ -543,6 +545,8 @@ export const secondaryData = (sat: SatObject): void => {
     satInfoboxCore.secondaryData.isLoaded = true;
   }
 };
+
+// prettier-ignore
 export const satMissionData = (sat: SatObject): void => { // NOSONAR
   if (sat === null || typeof sat === 'undefined') return;
 
@@ -717,6 +721,8 @@ export const satMissionData = (sat: SatObject): void => { // NOSONAR
     getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
   }
 };
+
+// prettier-ignore
 export const intelData = (sat: SatObject, satId?: number): void => { // NOSONAR
   if (satId !== -1) {
     if (!satInfoboxCore.intelData.isLoaded) {

@@ -54,6 +54,8 @@ export const cruncherExtraUpdate = (m: SatCruncherMessage) => {
   satSet.satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
   satSet.satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
 };
+
+// prettier-ignore
 export const cruncherDotsManagerInteraction = (m: SatCruncherMessage) => { // NOSONAR
   const { dotsManager, satSet } = keepTrackApi.programs;
   if (typeof dotsManager.positionData == 'undefined') {
@@ -107,7 +109,8 @@ export const getVariableSearch = (params: string[]) => {
     }
   }
 };
-export const getVariableActions = (params: string[]) => { // NOSONAR
+export const getVariableActions = (params: string[]) => {
+  // NOSONAR
   const { timeManager, objectManager, uiManager, satSet } = keepTrackApi.programs;
   for (let i = 0; i < params.length; i++) {
     const key = params[i].split('=')[0];
@@ -132,9 +135,9 @@ export const getVariableActions = (params: string[]) => { // NOSONAR
         break;
       case 'misl':
         var subVal = val.split(',');
-        (<HTMLSelectElement>getEl('ms-type')).value = (subVal[0].toString());
-        (<HTMLSelectElement>getEl('ms-attacker')).value = (subVal[1].toString());
-        (<HTMLSelectElement>getEl('ms-target')).value = (subVal[2].toString());
+        (<HTMLSelectElement>getEl('ms-type')).value = subVal[0].toString();
+        (<HTMLSelectElement>getEl('ms-attacker')).value = subVal[1].toString();
+        (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
         (<HTMLButtonElement>getEl('missile')).click();
         break;
       case 'date':

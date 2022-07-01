@@ -51,7 +51,7 @@ let forceOpen = false;
 let isFooterShown = true;
 let updateInterval = 1000;
 
-export const init = () => {    
+export const init = () => {
   // Register all UI callbacks to run at the end of the draw loop
   keepTrackApi.register({
     method: 'onDrawLoopComplete',
@@ -63,7 +63,7 @@ export const init = () => {
 
   keepTrackApi.methods.uiManagerInit();
 
-  initBottomMenuResizing();  
+  initBottomMenuResizing();
 
   // Initialize Navigation and Select Menus
   let elems;
@@ -73,7 +73,7 @@ export const init = () => {
 // This runs after the drawManager starts
 export const postStart = () => {
   initUiValidation();
-  
+
   setTimeout(() => {
     document.querySelectorAll('img').forEach((img: any) => {
       if (!img.src.includes('.png') && !img.src.includes('.jpg')) {
@@ -91,7 +91,7 @@ export const postStart = () => {
         // Intended to catch errors when the page is not loaded yet
       }
     }
-  })();    
+  })();
 
   // Enable Satbox Overlay
   if (settingsManager.enableHoverOverlay) {
@@ -151,14 +151,14 @@ export const footerToggle = function () {
     getEl('nav-footer')?.classList.add('footer-slide-trans');
     getEl('nav-footer')?.classList.remove('footer-slide-up');
     getEl('nav-footer')?.classList.add('footer-slide-down');
-    getEl('nav-footer-toggle').innerHTML = ('&#x25B2;');
+    getEl('nav-footer-toggle').innerHTML = '&#x25B2;';
   } else {
     isFooterShown = true;
     getEl('sat-infobox')?.classList.remove('sat-infobox-fullsize');
     getEl('nav-footer')?.classList.add('footer-slide-trans');
     getEl('nav-footer')?.classList.remove('footer-slide-down');
     getEl('nav-footer')?.classList.add('footer-slide-up');
-    getEl('nav-footer-toggle').innerHTML = ('&#x25BC;');
+    getEl('nav-footer-toggle').innerHTML = '&#x25BC;';
   }
   // After 1 second the transition should be complete so lets stop moving slowly
   setTimeout(() => {
@@ -169,15 +169,17 @@ export const getsensorinfo = () => {
   const { currentSensor }: { currentSensor: SensorObject[] } = keepTrackApi.programs.sensorManager;
 
   const firstSensor = currentSensor[0];
-  getEl('sensor-latitude').innerHTML = (firstSensor.lat.toString());
-  getEl('sensor-longitude').innerHTML = (firstSensor.lon.toString());
-  getEl('sensor-minazimuth').innerHTML = (firstSensor.obsminaz.toString());
-  getEl('sensor-maxazimuth').innerHTML = (firstSensor.obsmaxaz.toString());
-  getEl('sensor-minelevation').innerHTML = (firstSensor.obsminel.toString());
-  getEl('sensor-maxelevation').innerHTML = (firstSensor.obsmaxel.toString());
-  getEl('sensor-minrange').innerHTML = (firstSensor.obsminrange.toString());
-  getEl('sensor-maxrange').innerHTML = (firstSensor.obsmaxrange.toString());
+  getEl('sensor-latitude').innerHTML = firstSensor.lat.toString();
+  getEl('sensor-longitude').innerHTML = firstSensor.lon.toString();
+  getEl('sensor-minazimuth').innerHTML = firstSensor.obsminaz.toString();
+  getEl('sensor-maxazimuth').innerHTML = firstSensor.obsmaxaz.toString();
+  getEl('sensor-minelevation').innerHTML = firstSensor.obsminel.toString();
+  getEl('sensor-maxelevation').innerHTML = firstSensor.obsmaxel.toString();
+  getEl('sensor-minrange').innerHTML = firstSensor.obsminrange.toString();
+  getEl('sensor-maxrange').innerHTML = firstSensor.obsmaxrange.toString();
 };
+
+// prettier-ignore
 export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
   const { satSet, colorSchemeManager } = keepTrackApi.programs;
 
@@ -225,7 +227,7 @@ export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
 };
 export const onReady = () => {
   // Code Once index.htm is loaded
-  if (settingsManager.offline) updateInterval = 250;  
+  if (settingsManager.offline) updateInterval = 250;
 
   // Load Bottom icons
   if (!settingsManager.disableUI) {
@@ -265,7 +267,7 @@ export const onReady = () => {
   getEl('bottom-icons').addEventListener('click', function (evt: Event) {
     // Only if '.bmenu-item' class is clicked
     // if ((<HTMLDivElement>evt.target).classList.contains('bmenu-item')) {
-      uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
+    uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
     // }
   });
   uiManager.hideSideMenus = () => {
@@ -295,43 +297,43 @@ export const panToStar = (c: SatObject): void => {
 };
 export const loadStr = (str) => {
   if (str == '') {
-    getEl('loader-text').innerHTML = ('');
+    getEl('loader-text').innerHTML = '';
     return;
   }
   if (str == 'math') {
-    getEl('loader-text').innerHTML = ('Attempting to Math...');
+    getEl('loader-text').innerHTML = 'Attempting to Math...';
   }
 
   switch (str) {
     case 'science':
-      getEl('loader-text').innerHTML = ('Locating Science...');
+      getEl('loader-text').innerHTML = 'Locating Science...';
       break;
     case 'science2':
-      getEl('loader-text').innerHTML = ('Found Science...');
+      getEl('loader-text').innerHTML = 'Found Science...';
       break;
     case 'dots':
-      getEl('loader-text').innerHTML = ('Drawing Dots in Space...');
+      getEl('loader-text').innerHTML = 'Drawing Dots in Space...';
       break;
     case 'satIntel':
-      getEl('loader-text').innerHTML = ('Integrating Satellite Intel...');
+      getEl('loader-text').innerHTML = 'Integrating Satellite Intel...';
       break;
     case 'radarData':
-      getEl('loader-text').innerHTML = ('Importing Radar Data...');
+      getEl('loader-text').innerHTML = 'Importing Radar Data...';
       break;
     case 'painting':
-      getEl('loader-text').innerHTML = ('Painting the Earth...');
+      getEl('loader-text').innerHTML = 'Painting the Earth...';
       break;
     case 'coloring':
-      getEl('loader-text').innerHTML = ('Coloring Inside the Lines...');
+      getEl('loader-text').innerHTML = 'Coloring Inside the Lines...';
       break;
     case 'elsets':
-      getEl('loader-text').innerHTML = ('Locating ELSETs...');
+      getEl('loader-text').innerHTML = 'Locating ELSETs...';
       break;
     case 'models':
-      getEl('loader-text').innerHTML = ('Loading 3D Models...');
+      getEl('loader-text').innerHTML = 'Loading 3D Models...';
       break;
     case 'easterEgg':
-      getEl('loader-text').innerHTML = ('Llama Llama Llama Duck!');
+      getEl('loader-text').innerHTML = 'Llama Llama Llama Duck!';
   }
 };
 export const doSearch = (searchString: string, isPreventDropDown: boolean) => {

@@ -225,6 +225,7 @@ export const SunCalc = {
   // calculations for moon rise/set times are based on http://www.stargazing.net/kepler/moonrise.html article
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
+  // prettier-ignore
   getMoonTimes: (date, lat, lng, inUTC) => { // NOSONAR
     var t = new Date(date);
     if (inUTC) t.setUTCHours(0, 0, 0, 0);

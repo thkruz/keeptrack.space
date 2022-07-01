@@ -53,6 +53,7 @@ export class LineFactory {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
+  // prettier-ignore
   create(type: LineTypes, value: number[] | number, color?: LineColors): void { // NOSONAR
     const getSat = keepTrackApi.programs.satSet.getSat;
     let sat = null;
@@ -304,6 +305,7 @@ export class LineFactory {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
+  // prettier-ignore
   draw(): void { // NOSONAR
     if (this.drawLineList.length == 0) return;
     for (let i = 0; i < this.drawLineList.length; i++) {

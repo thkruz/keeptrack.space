@@ -95,6 +95,7 @@ settingsManager = {
   isEditTime: null,
   fieldOfView: null,
   db: null,
+  // prettier-ignore
   init: () => { // NOSONAR
     settingsManager.pTime = [];
 

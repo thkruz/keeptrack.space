@@ -1,7 +1,7 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import flagPng from '@app/img/icons/flag.png';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import $ from 'jquery';
 
 let isCountriesMenuOpen = false;
 export const hideSideMenus = (): void => {
@@ -50,7 +50,9 @@ export const bottomMenuClick = (iconName: string): void => {
 
 export const uiManagerInit = () => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="countries-menu" class="side-menu-parent start-hidden text-select">
           <div id="country-menu" class="side-menu">
             <ul>
@@ -68,10 +70,13 @@ export const uiManagerInit = () => {
             </ul>
           </div>
         </div>
-        `));
+        `
+  );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-countries" class="bmenu-item">
           <img
             alt="flag"
@@ -81,18 +86,22 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Countries</span>
           <div class="status-icon"></div>
         </div>
-      `));
+      `
+  );
 
   // NOTE: Must use function not arrow function to access 'this'
-  getEl('country-menu').querySelectorAll('li').forEach((element) => {
-    element.addEventListener('click', function () {
-      countryMenuClick($(this).data('group'));
+  getEl('country-menu')
+    .querySelectorAll('li')
+    .forEach((element) => {
+      element.addEventListener('click', function () {
+        countryMenuClick($(this).data('group'));
+      });
     });
-  })
 
   clickAndDragWidth(getEl('countries-menu'));
 };
 
+// prettier-ignore
 export const countryMenuClick = (groupName: string): void => { // NOSONAR
   const { groupsManager } = keepTrackApi.programs;
   switch (groupName) {

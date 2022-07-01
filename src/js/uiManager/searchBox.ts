@@ -53,6 +53,7 @@ export const hideResults = () => {
 
 export const doArraySearch = (array: string[]) => array.reduce((searchStr, i) => `${searchStr}${keepTrackApi.programs.satSet.satData[i].sccNum},`, '').slice(0, -1);
 
+// prettier-ignore
 export const doSearch = (searchString: string, isPreventDropDown?: boolean): number[] => { // NOSONAR
   const { satSet, dotsManager, groupsManager } = keepTrackApi.programs;
   if (satSet.satData.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');

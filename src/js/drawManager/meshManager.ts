@@ -308,6 +308,7 @@ export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: 
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
   try {
     meshManager.currentModel.id = sat?.id || -1;
@@ -370,6 +371,7 @@ export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const getSatelliteModel = (sat: SatObject) => { // NOSONAR
   const { mainCamera, timeManager } = keepTrackApi.programs;
 

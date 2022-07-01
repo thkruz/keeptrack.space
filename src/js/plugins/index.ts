@@ -53,8 +53,8 @@ import { addCustomSensor, clearCustomSensors, removeLastSensor } from './sensor/
 import { sensorManager } from './sensor/sensorManager';
 
 // Register all core modules
-export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => {
-  // NOSONAR
+// prettier-ignore
+export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: any): Promise<void> => {  // NOSONAR
   plugins ??= {};
   try {
     // Register Catalog Loader

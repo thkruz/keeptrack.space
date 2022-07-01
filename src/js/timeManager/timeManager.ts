@@ -133,8 +133,8 @@ export const timeManager: TimeManager = {
       timeManager.lastTime = now;
     };
 
-    timeManager.setSelectedDate = (selectedDate: Date) => {
-      // NOSONAR
+    // prettier-ignore
+    timeManager.setSelectedDate = (selectedDate: Date) => { // NOSONAR
       timeManager.selectedDate = selectedDate;
 
       // This function only applies when datetime plugin is enabled

@@ -4,6 +4,7 @@ import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeMa
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const leoRules = (sat: SatObject): ColorInformation => { // NOSONAR
   if (sat.static && sat.type === SpaceObjectType.STAR) {
     if (sat.vmag >= 4.7 && colorSchemeManager.objectTypeFlags.starLow) {

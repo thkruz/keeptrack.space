@@ -45,6 +45,7 @@ export const resetFpsPos = (): void => {
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const fpsMovement = (): void => { // NOSONAR
   const fpsTimeNow = Date.now();
   if (camera.fpsLastTime !== 0) {
@@ -206,6 +207,7 @@ export const camSnap = (pitch: number, yaw: number): void => {
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const snapToSat = (sat: SatObject) => { // NOSONAR
   /* camera function runs every frame that a satellite is selected.
   However, the user might have broken out of the zoom snap or angle snap.
@@ -280,6 +282,7 @@ export const fts2default = (): void => {
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const calculate = (dt: number, isSlowDown: boolean) => { // NOSONAR
   if (camera.isScreenPan || camera.isWorldPan || camera.isPanReset) {
     // If user is actively moving
@@ -605,6 +608,7 @@ export const calculate = (dt: number, isSlowDown: boolean) => { // NOSONAR
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const update = (
   target: { id: number; getAltitude: () => number; position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number }; type: SpaceObjectType },
   sensorPos: { lat: number; lon: number; gmst: number; x: number; y: number; z: number }

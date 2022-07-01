@@ -225,7 +225,8 @@ export const colorSchemeManager: ColorSchemeManager = {
   lastCalculation: 0,
 
   // This is intentionally complex to reduce object creation and GC
-// Splitting it into subfunctions would not be optimal
+  // Splitting it into subfunctions would not be optimal
+  // prettier-ignore
   calculateColorBuffers: async (isForceRecolor?: boolean): Promise<void> => { // NOSONAR
     try {
       // These two variables only need to be set once, but we want to make sure they aren't called before the satellites

@@ -85,7 +85,7 @@ export const init = (): void => {
           </div>
         `);
 
-        await import('@app/js/uiManager/adviceManager').then((mod) => {
+        await import('@app/js/uiManager/advice/adviceManager').then((mod) => {
           mod.init();
           keepTrackApi.programs.uiManager.menuController();
         });

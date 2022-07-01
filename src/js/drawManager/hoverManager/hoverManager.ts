@@ -42,9 +42,9 @@ export const hoverOverSomething = (satId: number, satX: number, satY: number) =>
     // NOTE: The radar mesurement logic breaks if you call it a SatObject
 
     const sat = <any>satSet.getSat(satId);
-    drawManager.isHoverBoxVisible = true;    
+    drawManager.isHoverBoxVisible = true;
 
-    init();    
+    init();
 
     if (sat.static || sat.isRadarData) {
       staticObj(sat);
@@ -99,13 +99,13 @@ const showRicOrEci = (drawManager: DrawManager, satSet: CatalogManager, objectMa
     satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distanceString(sat, drawManager.sat2)}`;
     showEciDistAndVel(sat);
   }
-}
+};
 
-const showRicDistAndVel = (ric: { position: import("gl-matrix").vec3; velocity: import("gl-matrix").vec3; }) => {
+const showRicDistAndVel = (ric: { position: import('gl-matrix').vec3; velocity: import('gl-matrix').vec3 }) => {
   satHoverBoxNode3.innerHTML =
     `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
     `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
-}
+};
 
 const showEciVel = (sat: SatObject) => {
   if (settingsManager.isEciOnHover) {
@@ -125,7 +125,7 @@ const showEciVel = (sat: SatObject) => {
   } else {
     satHoverBoxNode3.innerHTML = '';
   }
-}
+};
 
 const showEciDistAndVel = (sat: SatObject) => {
   if (settingsManager.isEciOnHover) {
@@ -152,7 +152,7 @@ const showEciDistAndVel = (sat: SatObject) => {
   } else {
     satHoverBoxNode3.innerHTML = '';
   }
-}
+};
 
 export const satObj = (sat: SatObject) => {
   if (!settingsManager.enableHoverOverlay) return;
@@ -256,7 +256,7 @@ export const planetariumView = (satId: number) => {
   }
   return false;
 };
-export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {  
+export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
   if (typeof satHoverBoxDOM === 'undefined' || satHoverBoxDOM === null) return;
 
   if (planetariumView(satId)) return;
@@ -269,6 +269,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
 };
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const updateHover = () => { // NOSONAR
   const { drawManager, mainCamera, orbitManager, uiManager, searchBox, satSet, timeManager } = keepTrackApi.programs;  
 

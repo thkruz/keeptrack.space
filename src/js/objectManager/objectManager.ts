@@ -62,6 +62,7 @@ const extractLiftVehicle = (LV: string): string => {
 };
 
 const extractCountry = (C: string): string => {
+  // prettier-ignore
   switch (C) { // NOSONAR
     case 'ANALSAT':
       return 'Analyst Satellite';
@@ -257,6 +258,7 @@ const extractCountry = (C: string): string => {
 };
 
 const extractLaunchSite = (LS: string): { site: string; sitec: string } => {
+  // prettier-ignore
   switch (LS) { // NOSONAR
     case 'ANALSAT':
       return {
@@ -448,7 +450,7 @@ const setSelectedSat = (id: number): void => {
   objectManager.selectedSat = id;
 };
 const setSecondarySat = (id: number): void => {
-  const {satSet} = keepTrackApi.programs;
+  const { satSet } = keepTrackApi.programs;
   objectManager.secondarySat = id;
   objectManager.secondarySatObj = satSet.getSat(id);
   if (objectManager.selectedSat !== -1) {
@@ -457,21 +459,21 @@ const setSecondarySat = (id: number): void => {
 };
 
 const switchPrimarySecondary = (): void => {
-  const {orbitManager} = keepTrackApi.programs;
+  const { orbitManager } = keepTrackApi.programs;
   const _primary = objectManager.selectedSat;
   const _secondary = objectManager.secondarySat;
-  setSecondarySat(_primary);  
+  setSecondarySat(_primary);
   if (_primary !== -1) {
     orbitManager.setSelectOrbit(_primary, true);
   } else {
     orbitManager.clearSelectOrbit(true);
   }
   setSelectedSat(_secondary);
-}
+};
 
-
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+// prettier-ignore
 const init = () => { // NOSONAR
   const sensorManager = keepTrackApi.programs.sensorManager;
   // Create a buffer of missile objects
@@ -643,5 +645,5 @@ export const objectManager: ObjectManager = {
   extractCountry,
   extractLiftVehicle,
   lastSelectedSat,
-  switchPrimarySecondary
+  switchPrimarySecondary,
 };

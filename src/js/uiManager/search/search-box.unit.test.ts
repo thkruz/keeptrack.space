@@ -1,9 +1,8 @@
 /* eslint-disable no-undefined */
-import { useMockWorkers } from '@app/js/api/apiMocks';
+import { defaultSat, keepTrackApiStubs, useMockWorkers } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { searchBox } from '@app/js/uiManager/searchBox';
-import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
-import { KeepTrackPrograms, SatObject } from '../api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject } from '@app/js/api/keepTrackTypes';
+import { searchBox } from './searchBox';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 

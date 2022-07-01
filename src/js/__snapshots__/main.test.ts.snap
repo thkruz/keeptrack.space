@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`main.importCss 0 1`] = `undefined`;
+exports[`importCss 0 1`] = `undefined`;
 
-exports[`main.showErrorCode should show the error code 1`] = `"test<br>Line: 1<br>test<br>"`;
+exports[`showErrorCode should show the error code 1`] = `"test<br>Line: 1<br>test<br>"`;

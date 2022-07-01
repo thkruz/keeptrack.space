@@ -1,4 +1,4 @@
-import { keepTrackApi } from './api/keepTrackApi';
+import { isThisJest, keepTrackApi } from './api/keepTrackApi';
 import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
 import { camera } from './camera/camera';
 import { colorSchemeManager } from './colorManager/colorSchemeManager';
@@ -17,8 +17,8 @@ import { VERSION } from './settingsManager/version.js';
 import { VERSION_DATE } from './settingsManager/versionDate.js';
 import { starManager } from './starManager/starManager';
 import { timeManager } from './timeManager/timeManager';
-import { adviceManager } from './uiManager/adviceManager';
-import { searchBox } from './uiManager/searchBox';
+import { adviceManager } from './uiManager/advice/adviceManager';
+import { searchBox } from './uiManager/search/searchBox';
 import { uiManager } from './uiManager/uiManager';
 
 export const initalizeKeepTrack = async (): Promise<void> => {
@@ -50,11 +50,13 @@ export const initalizeKeepTrack = async (): Promise<void> => {
 
     uiManager.loadStr('science');
     // Load all the plugins now that we have the API initialized
-    await import('./plugins')
-      .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
-      .catch(() => {
-        // intentionally left blank
-      });
+    if (!isThisJest()) {
+      await import('./plugins')
+        .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
+        .catch(() => {
+          // intentionally left blank
+        });
+    }
 
     uiManager.loadStr('science2');
     // Start initializing the rest of the website

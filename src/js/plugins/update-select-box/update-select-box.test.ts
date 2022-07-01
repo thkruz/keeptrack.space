@@ -1,6 +1,6 @@
 import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { KeepTrackPrograms, SatObject } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as updateSelectBoxCore from './update-select-box';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
@@ -39,29 +39,13 @@ describe('updateSelectBoxCore.updateSelectBoxCoreCallback', () => {
 
     expect(callFunction).not.toThrow();
   });
-
-  test('1', () => {
-    const callFunction: any = () => {
-      updateSelectBoxCore.updateSelectBoxCoreCallback(null);
-    };
-
-    expect(callFunction).not.toThrow();
-  });
 });
 
 // @ponicode
 describe('updateSelectBoxCore.updateSelectBoxCoreCallback', () => {
   test('0', () => {
     const callFunction: any = () => {
-      updateSelectBoxCore.updateSelectBoxCoreCallback(<SatObject>{ velocity: { x: 1000, y: 1000, z: 1000, total: 10000 }, missile: false });
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-
-  test('5', () => {
-    const callFunction: any = () => {
-      updateSelectBoxCore.updateSelectBoxCoreCallback(<SatObject>(<unknown>{ velocity: { total: Infinity }, missile: Infinity }));
+      updateSelectBoxCore.updateSelectBoxCoreCallback({ ...defaultSat, ...{ velocity: { x: 1000, y: 1000, z: 1000, total: 10000 }, missile: false } });
     };
 
     expect(callFunction).not.toThrow();

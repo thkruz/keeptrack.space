@@ -4,6 +4,7 @@ import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeMa
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const velocityRules = (sat: SatObject): ColorInformation => { // NOSONAR
   // Stars
   if (sat.static && sat.type === SpaceObjectType.STAR) {

@@ -108,6 +108,8 @@ export const getIdFromEci = (eci: { x: number; y: number; z: number }): number =
   }
   return -1;
 };
+
+// prettier-ignore
 export const getSat = (i: number): SatObject => { // NOSONAR
   const { satSet } = keepTrackApi.programs;
   if (!satSet.satData || !satSet.satData[i]) return null;

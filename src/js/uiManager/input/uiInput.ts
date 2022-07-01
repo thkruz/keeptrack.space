@@ -1,10 +1,10 @@
 import $ from 'jquery';
-import { keepTrackApi } from '../api/keepTrackApi';
-import { Camera, UiInputInterface } from '../api/keepTrackTypes';
-import { SpaceObjectType } from '../api/SpaceObjectType';
-import { RADIUS_OF_EARTH } from '../lib/constants';
-import * as glm from '../lib/external/gl-matrix.js';
-import { closeColorbox, getEl, showLoading } from '../lib/helpers';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { Camera, UiInputInterface } from '../../api/keepTrackTypes';
+import { SpaceObjectType } from '../../api/SpaceObjectType';
+import { RADIUS_OF_EARTH } from '../../lib/constants';
+import * as glm from '../../lib/external/gl-matrix.js';
+import { closeColorbox, getEl, showLoading } from '../../lib/helpers';
 
 type LatLon = {
   lat: number;
@@ -23,6 +23,7 @@ let startPinchDistance = 0;
 let touchStartTime: number;
 let latLon: LatLon;
 
+// prettier-ignore
 export const init = (): void => { // NOSONAR
   const { uiManager, mainCamera } = keepTrackApi.programs;
 
@@ -114,11 +115,11 @@ export const init = (): void => { // NOSONAR
 
   // 2020 Key listener
   // TODO: Migrate most things from UI to Here
-  // NOTE: This is note a message event and sonarqube should ignore it
+  // prettier-ignore
   window.addEventListener('keydown', (e: KeyboardEvent) => { // NOSONAR
     if (e.ctrlKey === true || e.metaKey === true) mainCamera.isCtrlPressed = true;
   });
-  // NOTE: This is note a message event and sonarqube should ignore it
+  // prettier-ignore
   window.addEventListener('keyup', (e: KeyboardEvent) => { // NOSONAR
     if (e.ctrlKey === false || e.metaKey === false) mainCamera.isCtrlPressed = false;
   });
@@ -206,7 +207,7 @@ export const init = (): void => { // NOSONAR
 
   // Needed?
   if (settingsManager.disableWindowTouchMove) {
-    // NOTE: This is note a message event and sonarqube should ignore it
+    // prettier-ignore
     window.addEventListener( // NOSONAR
       'touchmove',
       function (event) {
@@ -225,7 +226,7 @@ export const init = (): void => { // NOSONAR
   }
 
   if (!settingsManager.disableCameraControls) {
-    // NOTE: This is note a message event and sonarqube should ignore it
+    // prettier-ignore
     window.addEventListener('mousedown', (evt) => { // NOSONAR
       // Camera Manager Events
       // Middle Mouse Button MMB
@@ -256,7 +257,7 @@ export const init = (): void => { // NOSONAR
   }
 
   if (!settingsManager.disableCameraControls) {
-    // NOTE: This is note a message event and sonarqube should ignore it
+    // prettier-ignore
     window.addEventListener('mouseup', function (evt: any) { // NOSONAR
       // Camera Manager Events
       if (evt.button === 1) {
@@ -583,6 +584,7 @@ export const init = (): void => { // NOSONAR
   })();
 };
 
+// prettier-ignore
 export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
   // No Right Click Without UI
   if (settingsManager.disableUI) return;
@@ -995,7 +997,7 @@ export const getEarthScreenPoint = (x: number, y: number) => {
   const rayDir = glm.vec3.create();
   glm.vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
   glm.vec3.normalize(rayDir, rayDir);
-  
+
   const toCenterVec = glm.vec3.create();
   glm.vec3.scale(toCenterVec, rayOrigin, -1); // toCenter is just -camera pos because center is at [0,0,0]
   const dParallel = glm.vec3.dot(rayDir, toCenterVec);
@@ -1014,6 +1016,8 @@ export const getEarthScreenPoint = (x: number, y: number) => {
 
   return ptSurf;
 };
+
+// prettier-ignore
 export const canvasWheel = (evt: any): void => { // NOSONAR
   const { mainCamera, objectManager, drawManager } = keepTrackApi.programs;
 
@@ -1110,6 +1114,8 @@ export const canvasMouseDown = (evt: any) => {
   // TODO: Make uiManager.updateURL() a setting that is disabled by default
   uiManager.updateURL();
 };
+
+// prettier-ignore
 export const canvasMouseUp = (evt: any) => { // NOSONAR
   if (settingsManager.disableNormalEvents) {
     evt.preventDefault();
@@ -1191,6 +1197,8 @@ export const canvasTouchStart = (evt: any) => {
     uiManager.updateURL();
   }
 };
+
+// prettier-ignore
 export const openRmbMenu = (testmouseSat: number = -1) => { // NOSONAR
   if (!settingsManager.isAllowRightClick) return;
   const { uiManager, sensorManager, lineManager, satSet, mainCamera, objectManager } = keepTrackApi.programs;
@@ -1405,69 +1413,67 @@ export const readPixelsAsync = async (x: number, y: number, w: number, h: number
 };
 
 export const canvasMouseMove = (evt: any, mainCamera: Camera, canvasDOM: any): any => {
-    if (uiInput.mouseMoveTimeout === -1) {
-      uiInput.mouseMoveTimeout = window.setTimeout(() => {
-        canvasMouseMoveFire(mainCamera, evt, canvasDOM);
-      }, 16);
-    }
-  };
-  export const canvasMouseMoveFire = (mainCamera: Camera, evt: any, canvasDOM: any) => {
-    mainCamera.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
-    mainCamera.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
+  if (uiInput.mouseMoveTimeout === -1) {
+    uiInput.mouseMoveTimeout = window.setTimeout(() => {
+      canvasMouseMoveFire(mainCamera, evt, canvasDOM);
+    }, 16);
+  }
+};
+export const canvasMouseMoveFire = (mainCamera: Camera, evt: any, canvasDOM: any) => {
+  mainCamera.mouseX = evt.clientX - (canvasDOM.position().left - window.scrollX);
+  mainCamera.mouseY = evt.clientY - (canvasDOM.position().top - window.scrollY);
+  if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
+    dragHasMoved = true;
+    mainCamera.camAngleSnappedOnSat = false;
+    mainCamera.camZoomSnappedOnSat = false;
+  }
+  uiInput.isMouseMoving = true;
+
+  // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
+  clearTimeout(mouseTimeout);
+  mouseTimeout = window.setTimeout(function () {
+    uiInput.isMouseMoving = false;
+  }, 150);
+
+  // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
+  window.clearTimeout(uiInput.mouseMoveTimeout);
+  uiInput.mouseMoveTimeout = -1;
+};
+
+export const canvasTouchMove = (evt: any, mainCamera: Camera): any => {
+  if (settingsManager.disableNormalEvents) {
+    evt.preventDefault();
+  }
+  if (typeof evt.originalEvent == 'undefined') return;
+
+  if (isPinching && typeof evt.originalEvent.touches[0] != 'undefined' && typeof evt.originalEvent.touches[1] != 'undefined') {
+    const currentPinchDistance = Math.hypot(
+      evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
+      evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY
+    );
+    if (isNaN(currentPinchDistance)) return;
+
+    deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
+    let zoomTarget = mainCamera.zoomTarget();
+    zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
+    zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
+    mainCamera.zoomTarget(zoomTarget);
+  } else {
+    // Dont Move While Zooming
+    mainCamera.mouseX = evt.originalEvent.touches[0].clientX;
+    mainCamera.mouseY = evt.originalEvent.touches[0].clientY;
     if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
       dragHasMoved = true;
       mainCamera.camAngleSnappedOnSat = false;
       mainCamera.camZoomSnappedOnSat = false;
     }
     uiInput.isMouseMoving = true;
-  
-    // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
     clearTimeout(mouseTimeout);
     mouseTimeout = window.setTimeout(function () {
       uiInput.isMouseMoving = false;
-    }, 150);
-  
-    // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
-    window.clearTimeout(uiInput.mouseMoveTimeout);
-    uiInput.mouseMoveTimeout = -1;
+    }, 250);
   }
-
-  export const canvasTouchMove = (evt: any, mainCamera: Camera): any => {
-    if (settingsManager.disableNormalEvents) {
-      evt.preventDefault();
-    }
-    if (typeof evt.originalEvent == 'undefined')
-      return;
-
-    if (isPinching && typeof evt.originalEvent.touches[0] != 'undefined' && typeof evt.originalEvent.touches[1] != 'undefined') {
-      const currentPinchDistance = Math.hypot(
-        evt.originalEvent.touches[0].pageX - evt.originalEvent.touches[1].pageX,
-        evt.originalEvent.touches[0].pageY - evt.originalEvent.touches[1].pageY
-      );
-      if (isNaN(currentPinchDistance))
-        return;
-
-      deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
-      let zoomTarget = mainCamera.zoomTarget();
-      zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
-      zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
-      mainCamera.zoomTarget(zoomTarget);
-    } else {
-      // Dont Move While Zooming
-      mainCamera.mouseX = evt.originalEvent.touches[0].clientX;
-      mainCamera.mouseY = evt.originalEvent.touches[0].clientY;
-      if (mainCamera.isDragging && mainCamera.screenDragPoint[0] !== mainCamera.mouseX && mainCamera.screenDragPoint[1] !== mainCamera.mouseY) {
-        dragHasMoved = true;
-        mainCamera.camAngleSnappedOnSat = false;
-        mainCamera.camZoomSnappedOnSat = false;
-      }
-      uiInput.isMouseMoving = true;
-      clearTimeout(mouseTimeout);
-      mouseTimeout = window.setTimeout(function () {
-        uiInput.isMouseMoving = false;
-      }, 250);
-    }
-}
+};
 
 export const canvasTouchEnd = (mainCamera: Camera) => {
   const touchTime = Date.now() - touchStartTime;
@@ -1488,7 +1494,7 @@ export const canvasTouchEnd = (mainCamera: Camera) => {
   if (!settingsManager.disableUI) {
     mainCamera.autoRotate(false);
   }
-}
+};
 
 // *********************************************************************************************************************
 // Main Declration
@@ -1519,7 +1525,29 @@ export const uiInput: UiInputInterface = {
   getEarthScreenPoint: getEarthScreenPoint, // Raycasting in getEarthScreenPoint would provide a lot of powerful (but slow) options later
 };
 
-export const earthClicked = ({ isViewDOM, rightBtnViewDOM, numMenuItems, isCreateDOM, rightBtnCreateDOM, isDrawDOM, rightBtnDrawDOM, isEarthDOM, rightBtnEarthDOM, rightBtnSaveDOM }: { isViewDOM: boolean; rightBtnViewDOM: any; numMenuItems: number; isCreateDOM: boolean; rightBtnCreateDOM: any; isDrawDOM: boolean; rightBtnDrawDOM: any; isEarthDOM: boolean; rightBtnEarthDOM: any; rightBtnSaveDOM: any; }) => {
+export const earthClicked = ({
+  isViewDOM,
+  rightBtnViewDOM,
+  numMenuItems,
+  isCreateDOM,
+  rightBtnCreateDOM,
+  isDrawDOM,
+  rightBtnDrawDOM,
+  isEarthDOM,
+  rightBtnEarthDOM,
+  rightBtnSaveDOM,
+}: {
+  isViewDOM: boolean;
+  rightBtnViewDOM: any;
+  numMenuItems: number;
+  isCreateDOM: boolean;
+  rightBtnCreateDOM: any;
+  isDrawDOM: boolean;
+  rightBtnDrawDOM: any;
+  isEarthDOM: boolean;
+  rightBtnEarthDOM: any;
+  rightBtnSaveDOM: any;
+}) => {
   if (!isViewDOM) {
     rightBtnViewDOM.show();
     ++numMenuItems;
@@ -1552,22 +1580,14 @@ export const earthClicked = ({ isViewDOM, rightBtnViewDOM, numMenuItems, isCreat
   getEl('earth-high-no-clouds-rmb').style.display = 'block';
   getEl('earth-vec-rmb').style.display = 'block';
   getEl('earth-political-rmb').style.display = 'block';
-  if (settingsManager.nasaImages)
-    getEl('earth-nasa-rmb').style.display = 'none';
-  if (settingsManager.trusatImages)
-    getEl('earth-trusat-rmb').style.display = 'none';
-  if (settingsManager.blueImages)
-    getEl('earth-blue-rmb').style.display = 'none';
-  if (settingsManager.lowresImages)
-    getEl('earth-low-rmb').style.display = 'none';
-  if (settingsManager.hiresNoCloudsImages)
-    getEl('earth-high-no-clouds-rmb').style.display = 'none';
-  if (settingsManager.vectorImages)
-    getEl('earth-vec-rmb').style.display = 'none';
-  if (settingsManager.politicalImages)
-    getEl('earth-political-rmb').style.display = 'none';
+  if (settingsManager.nasaImages) getEl('earth-nasa-rmb').style.display = 'none';
+  if (settingsManager.trusatImages) getEl('earth-trusat-rmb').style.display = 'none';
+  if (settingsManager.blueImages) getEl('earth-blue-rmb').style.display = 'none';
+  if (settingsManager.lowresImages) getEl('earth-low-rmb').style.display = 'none';
+  if (settingsManager.hiresNoCloudsImages) getEl('earth-high-no-clouds-rmb').style.display = 'none';
+  if (settingsManager.vectorImages) getEl('earth-vec-rmb').style.display = 'none';
+  if (settingsManager.politicalImages) getEl('earth-political-rmb').style.display = 'none';
 
   rightBtnSaveDOM.hide();
   return numMenuItems;
-}
-
+};

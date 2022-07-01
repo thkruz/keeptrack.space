@@ -8,7 +8,6 @@ import * as getTearData from './calc/getTearData';
 import { findClosestApproachTime } from './find/findClosestApproachTime';
 import * as getlookangles from './lookangles/getlookangles';
 import * as satMath from './satMath';
-import { satellite } from './satMath';
 import * as createTle from './tle/createTle';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
@@ -32,7 +31,6 @@ describe('satMath.getlookangles', () => {
   test('2', () => {
     document.body.innerHTML = `<table id="looks"></table>`;
     keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
-    console.warn(satellite);
     jest.spyOn(getTearData, 'getTearData').mockImplementationOnce(() => ({
       time: dateNow.toISOString(),
       rng: 1000,

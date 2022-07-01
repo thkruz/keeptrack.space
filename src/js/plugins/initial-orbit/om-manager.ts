@@ -32,7 +32,7 @@
 'use strict';
 
 import { CatalogManager, SatObject, TimeManager } from '@app/js/api/keepTrackTypes';
-import { searchBox } from '@app/js/uiManager/searchBox';
+import { searchBox } from '@app/js/uiManager/search/searchBox';
 
 // Constants
 const RADIUS_OF_EARTH = 6371000; // Radius of Earth in meters
@@ -102,8 +102,8 @@ om.kp2tle = (kp, epoch, timeManager: TimeManager) => {
   return { tle1: tle1, tle2: tle2 };
 };
 // State Vectors to Keplerian Min/Max/Avg
-om.svs2kps = (svs: StateVector[]) => {
-  // NOSONAR
+// prettier-ignore
+om.svs2kps = (svs: StateVector[]) => { // NOSONAR
   let kpList = [];
   for (let i = 0; i < svs.length; i++) {
     kpList.push(om.sv2kp(svs[i]));
@@ -221,8 +221,8 @@ om.iod = async (svs: StateVector[], timeManager: TimeManager, satellite) => {
   }
 };
 
-om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, satellite) => {
-  // NOSONAR
+// prettier-ignore
+om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, satellite) => { // NOSONAR
   try {
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
@@ -363,6 +363,7 @@ interface KeplerianOrbit {
 }
 
 // Converts State Vectors to Keplerian Elements
+// prettier-ignore
 export const _sv2kp = ({
   massPrimary,
   massSecondary,
@@ -381,8 +382,7 @@ export const _sv2kp = ({
   vectorU?: string;
   outputU?: string;
   outputU2?: string;
-}): KeplerianOrbit => {
-  // NOSONAR
+}): KeplerianOrbit => { // NOSONAR
   if (!vector) throw new Error('vector is required');
   if (massPrimary <= 0) throw new Error('massPrimary must be greater than 0');
   if (massSecondary <= 0) throw new Error('massSecondary must be greater than 0');

@@ -1,7 +1,7 @@
+import breakupPng from '@app/img/icons/breakup.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
-import breakupPng from '@app/img/icons/breakup.png';
 
 let isBreakupMenuOpen = false;
 
@@ -35,7 +35,9 @@ export const init = (): void => {
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
         <div id="breakup-content" class="side-menu">
           <div class="row">
@@ -112,10 +114,13 @@ export const uiManagerInit = (): void => {
           </div>
         </div>
       </div>   
-    `));
+    `
+  );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="menu-breakup" class="bmenu-item bmenu-item-disabled">
         <img
           alt="breakup"
@@ -124,8 +129,8 @@ export const uiManagerInit = (): void => {
         <span class="bmenu-title">Breakup</span>
         <div class="status-icon"></div>
       </div>
-    `));
-
+    `
+  );
 
   clickAndDragWidth(getEl('breakup-menu'));
 };
@@ -137,8 +142,9 @@ export const uiManagerFinal = (): void => {
   });
 };
 
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const breakupOnSubmit = (): void => { // NOSONAR
   const { orbitManager, satellite, timeManager, uiManager, satSet } = keepTrackApi.programs;
   let satId = satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('hc-scc')).value));
@@ -239,6 +245,8 @@ export const hideSideMenus = (): void => {
   getEl('menu-breakup').classList.remove('bmenu-item-selected');
   isBreakupMenuOpen = false;
 };
+
+// prettier-ignore
 export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-breakup') {
     const { uiManager, satSet, objectManager } = keepTrackApi.programs;

@@ -1,13 +1,15 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
 import satChngPng from '@app/img/icons/satchng.png';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import $ from 'jquery';
 
 let isConstellationsMenuOpen = false;
 
 export const uiManagerInit = () => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
         <div id="constellation-menu" class="side-menu">
           <ul>
@@ -23,10 +25,13 @@ export const uiManagerInit = () => {
           </ul>
         </div>
       </div>
-      `));
+      `
+  );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="menu-constellations" class="bmenu-item">
         <img
           alt="constellation"
@@ -36,17 +41,21 @@ export const uiManagerInit = () => {
         <span class="bmenu-title">Constellations</span>
         <div class="status-icon"></div>
       </div>
-    `));
+    `
+  );
 
-  clickAndDragWidth(getEl('constellations-menu'));  
+  clickAndDragWidth(getEl('constellations-menu'));
 
-  getEl('constellation-menu').querySelectorAll('li').forEach((element) => {
-    element.addEventListener('click', function () {
-    constellationMenuClick($(this).data('group'));
+  getEl('constellation-menu')
+    .querySelectorAll('li')
+    .forEach((element) => {
+      element.addEventListener('click', function () {
+        constellationMenuClick($(this).data('group'));
+      });
     });
-  });
 };
 
+// prettier-ignore
 export const constellationMenuClick = (groupName: any) => { // NOSONAR
   const { satSet, objectManager, groupsManager, lineManager, uiManager } = keepTrackApi.programs;
 

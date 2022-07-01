@@ -1,11 +1,10 @@
 /* */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { CatalogManager, SearchBox } from '../api/keepTrackTypes';
-import { SpaceObjectType } from '../api/SpaceObjectType';
-import { SatGroup } from '../groupsManager/sat-group';
-import { getEl, slideOutUp } from '../lib/helpers';
-import { slideInDown } from './../lib/helpers';
+import { CatalogManager, SearchBox } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
+import { SatGroup } from '@app/js/groupsManager/sat-group';
+import { getEl, slideInDown, slideOutUp } from '@app/js/lib/helpers';
 
 let hoverSatId = -1;
 let hovering = false;
@@ -53,6 +52,7 @@ export const hideResults = () => {
 
 export const doArraySearch = (array: string[]) => array.reduce((searchStr, i) => `${searchStr}${keepTrackApi.programs.satSet.satData[i].sccNum},`, '').slice(0, -1);
 
+// prettier-ignore
 export const doSearch = (searchString: string, isPreventDropDown?: boolean): number[] => { // NOSONAR
   const { satSet, dotsManager, groupsManager } = keepTrackApi.programs;
   if (satSet.satData.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');

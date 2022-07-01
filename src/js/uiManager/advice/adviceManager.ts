@@ -17,9 +17,9 @@ or mirrored at any other location without the express written permission of the 
 ///////////////////////////////////////////////////////////////////////////// */
 // eslint-disable-next-line sort-imports
 import 'jquery-ui-bundle';
-import { keepTrackApi } from '../api/keepTrackApi';
-import { AdviceCounter, AdviceList } from '../api/keepTrackTypes';
-import { getEl, shake } from '../lib/helpers';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { AdviceCounter, AdviceList } from '../../api/keepTrackTypes';
+import { getEl, shake } from '../../lib/helpers';
 
 let isAdviceEnabled = true;
 let helpDOM: HTMLElement;

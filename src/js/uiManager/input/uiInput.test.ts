@@ -1,8 +1,8 @@
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import { fireEvent } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import { keepTrackApiStubs } from '../api/apiMocks';
-import { keepTrackApi } from '../api/keepTrackApi';
-import { KeepTrackPrograms } from '../api/keepTrackTypes';
 import * as uiInput from './uiInput';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });

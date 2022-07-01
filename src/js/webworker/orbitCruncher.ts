@@ -20,6 +20,8 @@ try {
   // If Jest isn't running then throw the error
   if (!process) throw e;
 }
+
+// prettier-ignore
 export const onmessageProcessing = (m) => { // NOSONAR
   if (m.data.isUpdate) {
     // Add Satellites
@@ -142,7 +144,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
   }
 };
 
-export const postMessageProcessing = (data: {pointsOut: any, satId: any}) => {
+export const postMessageProcessing = (data: { pointsOut: any; satId: any }) => {
   const { pointsOut, satId } = data;
   try {
     postMessage(
@@ -156,4 +158,4 @@ export const postMessageProcessing = (data: {pointsOut: any, satId: any}) => {
     // If Jest isn't running then throw the error
     if (!process) throw e;
   }
-}
+};

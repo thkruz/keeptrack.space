@@ -1,7 +1,8 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { Camera } from '../api/keepTrackTypes';
-import { getEl } from '../lib/helpers';
+import { Camera } from '@app/js/api/keepTrackTypes';
+import { getEl } from '@app/js/lib/helpers';
 
+// prettier-ignore
 export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
@@ -176,4 +177,3 @@ const releaseShiftKey = (mainCamera: Camera) => {
     mainCamera.speedModifier = 1;
   }, 100);
 };
-

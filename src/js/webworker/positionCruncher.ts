@@ -88,6 +88,8 @@ try {
   // If Jest isn't running then throw the error
   if (!process) throw e;
 }
+
+// prettier-ignore
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSONAR
   let satData;
   let i;
@@ -343,6 +345,7 @@ export const propagationLoop = (mockSatCache?: SatCacheObject[]) => {
   }, (globalPropagationRate * globalPropagationRateMultiplier) / divisor);
 };
 
+// prettier-ignore
 export const updateSatCache = (now: Date, j: number, gmst: number, gmstNext: number, isSunExclusion: boolean, sunEci: { x: number; y: number; z: number }) => { // NOSONAR
   // TODO: When this was created chrome was faster doing a reverse while loop - that may not be true anymore
   let i = -1;
@@ -393,6 +396,8 @@ export const updateRadarData = (i: number): boolean => {
   resetVelocity(satVel, i);
   return true;
 };
+
+// prettier-ignore
 export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONAR
   if (isResetSatOverfly && satCache[i].active === true) {
     // Let the main loop know what i we ended on
@@ -578,6 +583,8 @@ export const updateLandObject = (i: number, gmst: number): void => {
   satPos[i * 3 + 1] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + satCache[i].alt) * cosLat * sinLon;
   satPos[i * 3 + 2] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + satCache[i].alt) * sinLat;
 };
+
+// prettier-ignore
 export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number, isSunExclusion: boolean): boolean => { // NOSONAR
   let semiDiamEarth, semiDiamSun, theta;
   let positionEcf, lookangles;
@@ -723,6 +730,8 @@ export const resetInactiveMarkers = (i: number) => {
     satCache[i].active = false;
   }
 };
+
+// prettier-ignore
 export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
   let az: number, el: number, rng: number;
   let pos;

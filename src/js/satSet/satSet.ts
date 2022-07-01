@@ -58,6 +58,7 @@ import { search } from './search';
 
 // ******************** Initialization ********************
 
+// prettier-ignore
 export const init = async (satCruncherOveride?: any): Promise<number> => { // NOSONAR
   try {
     const { uiManager } = keepTrackApi.programs;
@@ -289,6 +290,7 @@ export const replaceSatSet = (newSatSet: any) => {
   satSet = newSatSet;
 };
 
+// prettier-ignore
 export const addSatExtraFunctions = (i: number) => { // NOSONAR
   const { sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
   if (typeof satSet.satData[i].isInSun == 'undefined') {

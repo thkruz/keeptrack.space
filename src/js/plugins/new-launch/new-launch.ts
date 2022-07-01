@@ -172,8 +172,8 @@ export const uiManagerFinal = () => {
   clickAndDragWidth(getEl('newLaunch-menu'));
 };
 
-export const bottomMenuClick = (iconName: string): void => {
-  // NOSONAR
+// prettier-ignore
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   const aM = keepTrackApi.programs.adviceManager;
   if (iconName === 'menu-newLaunch') {
     if (isNewLaunchMenuOpen) {

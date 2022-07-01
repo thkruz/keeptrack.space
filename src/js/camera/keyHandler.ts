@@ -2,6 +2,7 @@ import { camera } from './camera';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const keyUpHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
@@ -60,6 +61,7 @@ export const keyUpHandler = (evt: KeyboardEvent) => { // NOSONAR
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const keyDownHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;

@@ -133,6 +133,7 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 
+// prettier-ignore
 export const getSatChngJson = (json: any) => { // NOSONAR
   // TODO: This is a temporary fix for the fact that the JSON is not being parsed correctly.
   if (!json && isThisJest()) return { resp: json, satChngTable: [] };  

@@ -55,9 +55,9 @@ export const MassRaidPre = (time: number, simFile: string) => {
   });
 };
 export const clearMissiles = () => {
-  const { satSet, orbitManager } = keepTrackApi.programs;  
+  const { satSet, orbitManager } = keepTrackApi.programs;
   keepTrackApi.programs.uiManager.doSearch('');
-  const satSetLen = satSet.missileSats;  
+  const satSetLen = satSet.missileSats;
   for (let i = 0; i < 500; i++) {
     const x = satSetLen - 500 + i;
 
@@ -93,12 +93,13 @@ export const clearMissiles = () => {
         altList: [],
       });
     }
-  }  
-  missileManager.missilesInUse = 0;   
+  }
+  missileManager.missilesInUse = 0;
 };
 
 // This function stalls Jest for multiple minutes.
 /* istanbul ignore next */
+// prettier-ignore
 export const Missile = (
   CurrentLatitude: number,
   CurrentLongitude: number,
@@ -526,6 +527,8 @@ export const Missile = (
   missileManager.lastMissileError = 'Missile Named RV_' + missileObj.id + '<br>has been created.';
   return 1; // Successful Launch
 };
+
+// prettier-ignore
 export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[]) => { // NOSONAR
   const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
   
@@ -2220,6 +2223,8 @@ export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, Noz
   const Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
   return q * Ve + (Pe - Pa) * Ae; // Thrust (N)
 };
+
+// prettier-ignore
 export const _CoordinateCalculator = (
   CurrentLatitude: number,
   CurrentLongitude: number,
@@ -2320,6 +2325,8 @@ export const _CoordinateCalculator = (
 
   return [EstLatList, EstLongList, (Alpha1 * 180) / Math.PI, ArcLength, EstDistanceList, GoalDistance];
 };
+
+// prettier-ignore
 export const _IterationFun = (
   FuelArea: number,
   FuelMass: number,
@@ -2438,6 +2445,8 @@ export const _IterationFun = (
 
   return [FuelMass, RocketMass, Tatm, Patm, AirDensity, c, M, cD, Thrust, DragForce, WeightForce, dr2dt, drdt, Altitude, Distance, ArcVelocity, ArcDistance, dtheta2dt, dthetadt];
 };
+
+// prettier-ignore
 export const _Bisection = (
   FuelArea1: number,
   FuelArea2: number,
@@ -2607,6 +2616,8 @@ export const _Bisection = (
   AngleCoefficient = ACNew;
   return AngleCoefficient;
 };
+
+// prettier-ignore
 export const _QuickRun = (
   FuelArea1: any,
   FuelArea2: any,

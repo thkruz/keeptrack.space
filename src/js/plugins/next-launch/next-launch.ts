@@ -38,6 +38,7 @@ export const makeTableHeaders = (tbl: HTMLTableElement): void => {
   tdC.setAttribute('style', 'text-decoration: underline');
 };
 
+// prettier-ignore
 export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[]) => { // NOSONAR
   makeTableHeaders(tbl);
 
@@ -196,8 +197,8 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
   init: () => {
     if (settingsManager.offline) getEl('menu-nextLaunch').style.display = 'none';
   },
-  showTable: () => {
-    // NOSONAR
+  // prettier-ignore
+  showTable: () => { // NOSONAR
     if (nextLaunchManager.launchList.length === 0) {
       if (window.location.hostname !== 'localhost') {
         fetch('https://ll.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed')
@@ -223,6 +224,7 @@ export const nextLaunchManager: { launchList: Array<LaunchInfoObject>; init: () 
       }
     }
   },
+  // prettier-ignore
   processData: (resp: { results: Array<any> }) => { // NOSONAR
     for (let i = 0; i < resp.results.length; i++) {
       /**

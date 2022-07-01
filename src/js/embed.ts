@@ -43,9 +43,9 @@ import { VERSION } from '../js/settingsManager/version.js';
 import { VERSION_DATE } from '../js/settingsManager/versionDate.js';
 import { starManager } from '../js/starManager/starManager';
 import { timeManager } from '../js/timeManager/timeManager';
-import { adviceManager } from '../js/uiManager/adviceManager';
 import { uiManager } from '../js/uiManager/uiManager';
-import { searchBox } from './uiManager/searchBox';
+import { adviceManager } from './uiManager/advice/adviceManager';
+import { searchBox } from './uiManager/search/searchBox';
 
 export const initalizeKeepTrack = async (): Promise<void> => {
   try {

@@ -59,7 +59,8 @@ export const loadAfterStart = () => {
 };
 
 // Load the CSS
-importCss();
+if (!isThisJest()) importCss();
+
 // Load the main website
 import('./initalizeKeepTrack').then(({ initalizeKeepTrack }) => {
   if (!isThisJest()) {
@@ -77,6 +78,6 @@ import('./initalizeKeepTrack').then(({ initalizeKeepTrack }) => {
       https://github.com/thkruz/keeptrack.space/ or send me an email at
       theodore.kruczek at gmail dot com.
     `);
+    initalizeKeepTrack();
   }
-  initalizeKeepTrack();
 });

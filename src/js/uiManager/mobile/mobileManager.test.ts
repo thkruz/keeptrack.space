@@ -1,4 +1,4 @@
-import { mobileManager } from '@app/js/uiManager/mobileManager';
+import { mobileManager } from '@app/js/uiManager/mobile/mobileManager';
 
 test(`mobileManager Unit Tests`, () => {
   mobileManager.init();

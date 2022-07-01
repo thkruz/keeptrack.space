@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { clickAndDragWidth, getEl, saveCsv } from '@app/js/lib/helpers';
 import $ from 'jquery';
-import { SpaceObjectType } from '../api/SpaceObjectType';
 
 export const initMenuController = () => {
   const { objectManager, orbitManager, satSet, satellite, searchBox, uiManager } = keepTrackApi.programs;

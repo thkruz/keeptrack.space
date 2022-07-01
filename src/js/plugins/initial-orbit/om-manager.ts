@@ -32,7 +32,7 @@
 'use strict';
 
 import { CatalogManager, SatObject, TimeManager } from '@app/js/api/keepTrackTypes';
-import { searchBox } from '@app/js/uiManager/searchBox';
+import { searchBox } from '@app/js/uiManager/search/searchBox';
 
 // Constants
 const RADIUS_OF_EARTH = 6371000; // Radius of Earth in meters

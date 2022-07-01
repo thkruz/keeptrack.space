@@ -1,10 +1,10 @@
 import $ from 'jquery';
-import { keepTrackApi } from '../api/keepTrackApi';
-import { Camera, UiInputInterface } from '../api/keepTrackTypes';
-import { SpaceObjectType } from '../api/SpaceObjectType';
-import { RADIUS_OF_EARTH } from '../lib/constants';
-import * as glm from '../lib/external/gl-matrix.js';
-import { closeColorbox, getEl, showLoading } from '../lib/helpers';
+import { keepTrackApi } from '../../api/keepTrackApi';
+import { Camera, UiInputInterface } from '../../api/keepTrackTypes';
+import { SpaceObjectType } from '../../api/SpaceObjectType';
+import { RADIUS_OF_EARTH } from '../../lib/constants';
+import * as glm from '../../lib/external/gl-matrix.js';
+import { closeColorbox, getEl, showLoading } from '../../lib/helpers';
 
 type LatLon = {
   lat: number;

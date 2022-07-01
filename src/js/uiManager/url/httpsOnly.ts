@@ -1,7 +1,7 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { getEl } from '@app/js/lib/helpers';
 import $ from 'jquery';
-import { keepTrackApi } from '../api/keepTrackApi';
-import { SensorObject } from '../api/keepTrackTypes';
-import { getEl } from '../lib/helpers';
 
 export type GeolocationPosition = {
   coords: {

@@ -1,12 +1,12 @@
-import { mobileManager } from '@app/js/uiManager/mobileManager';
-import { searchBox } from '@app/js/uiManager/searchBox';
 import * as glm from 'gl-matrix';
 import { SatRec } from 'satellite.js';
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
 import { TleParams } from '../satMath/tle/createTle';
-import { toastMsgType } from '../uiManager/uiManager';
+import { mobileManager } from '../uiManager/mobile/mobileManager';
+import { searchBox } from '../uiManager/search/searchBox';
+import { ToastMsgType } from '../uiManager/ui/toast';
 import { SpaceObjectType } from './SpaceObjectType';
 
 export enum CameraType {
@@ -61,7 +61,7 @@ export interface UiManager {
   lastNextPassCalcSatId: number;
   lastNextPassCalcSensorId: any;
   createClockDOMOnce: boolean;
-  toast: (toastText: string, type: toastMsgType, isLong?: boolean) => void;
+  toast: (toastText: string, type: ToastMsgType, isLong?: boolean) => void;
   uiInput: UiInputInterface;
   searchBox: typeof searchBox;
   mobileManager: typeof mobileManager;

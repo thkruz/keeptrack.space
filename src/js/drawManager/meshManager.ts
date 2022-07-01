@@ -8,7 +8,7 @@ import { mat4 } from 'gl-matrix';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { Camera, SatObject, TimeManager } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
-import { loadStr } from '../uiManager/uiManager';
+import { loadStr } from '../uiManager/ui/loadStr';
 import { aehfSccNums, dspSccNums, issSccNum } from './meshManager/modelConstants';
 
 const meshList = settingsManager.meshListOverride || [

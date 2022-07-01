@@ -69,8 +69,8 @@ export const init: any = async () => {
       //   console.debug('Mesh:', mesh);
       // }
       meshManager.meshes = models;
-      meshManager.initShaders();
-      meshManager.initBuffers();
+      initShaders();
+      initBuffers();
       meshManager.isReady = true;
       // eslint-disable-next-line no-unused-vars
     }).catch(() => {
@@ -374,24 +374,24 @@ export const getSatelliteModel = (sat: SatObject) => { // NOSONAR
   const { mainCamera, timeManager } = keepTrackApi.programs;
 
   if (checkIfNameKnown(sat.name)) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     return;
   }
 
   if (sat.sccNum === issSccNum) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.iss;
     return;
   }
 
   if (aehfSccNums.findIndex((num) => sat.sccNum == num) !== -1) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.aehf;
     return;
   }
 
   if (dspSccNums.findIndex((num) => sat.sccNum == num) !== -1) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.dsp;
     return;
   }
@@ -537,12 +537,12 @@ export const drawOcclusion = (pMatrix: mat4, camMatrix: mat4, occlusionPrgm: any
 
 export const meshManager = {
   isReady: false,
-  init: init,
-  populateFileList: populateFileList,
-  initShaders: initShaders,
-  initBuffers: initBuffers,
-  lerpPosition: lerpPosition,
-  updatePosition: updatePosition,
+  init,
+  populateFileList,
+  initShaders,
+  initBuffers,
+  lerpPosition,
+  updatePosition,
   // main shader program
   fragShaderCode: `#version 300 es
       precision mediump float;
@@ -627,10 +627,10 @@ export const meshManager = {
   mvMatrix: glm.mat4.create(),
   mvMatrixStack: [],
   pMatrix: glm.mat4.create(),
-  draw: draw,
-  updateNadirYaw: updateNadirYaw,
-  update: update,
-  drawOcclusion: drawOcclusion,
+  draw,
+  updateNadirYaw,
+  update,
+  drawOcclusion,
   shaderProgram: null,
   fileList: null,
   loaded: false,

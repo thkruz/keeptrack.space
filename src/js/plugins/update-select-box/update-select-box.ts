@@ -47,12 +47,15 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
         getEl('sat-azimuth').innerHTML = satellite.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
         getEl('sat-elevation').innerHTML = satellite.currentTEARR.el.toFixed(1) + '°';
         getEl('sat-range').innerHTML = satellite.currentTEARR.rng.toFixed(2) + ' km';
+        const sun = keepTrackApi.programs.drawManager.sceneManager.sun;
+        getEl('sat-vmag').innerHTML = satellite.calculateVisMag(sat, sensorManager.currentSensor[0], timeManager.simulationTimeObj, sun).toFixed(2);
         const beamwidthString = sensorManager.currentSensor[0].beamwidth
           ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor[0].beamwidth)).toFixed(2) + ' km'
           : 'Unknown';
         getEl('sat-beamwidth').innerHTML = beamwidthString;
         getEl('sat-maxTmx').innerHTML = ((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
       } else {
+        getEl('sat-vmag').innerHTML = 'Out of FOV';
         getEl('sat-azimuth').innerHTML = 'Out of FOV';
         getEl('sat-azimuth').title = 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°';
         getEl('sat-elevation').innerHTML = 'Out of FOV';

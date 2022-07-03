@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SensorObject } from '@app/js/api/keepTrackTypes';
 import { getEl } from '@app/js/lib/helpers';
-import { SensorObject } from '../api/keepTrackTypes';
 
 export const getsensorinfo = () => {
   const { currentSensor }: { currentSensor: SensorObject[] } = keepTrackApi.programs.sensorManager;

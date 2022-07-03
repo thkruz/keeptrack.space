@@ -1,10 +1,10 @@
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import numeric from 'numeric';
-import { Sgp4 } from 'ootk';
 import { SatObject, SensorObject, SunObject } from '../../api/keepTrackTypes';
 import { satellite } from '../satMath';
 
 export const calculateVisMag = (sat: SatObject, sensor: SensorObject, propTime: Date, sun: SunObject): number => {
-  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = calcSatrec(sat);
   const rae = satellite.getRae(propTime, satrec, sensor);
   const distanceToSatellite = rae.rng; //This is in KM
 

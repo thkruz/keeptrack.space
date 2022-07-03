@@ -1,4 +1,5 @@
 import { RAD2DEG } from '@app/js/lib/constants';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import { Sgp4 } from 'ootk';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SatObject, SensorObject } from '../../api/keepTrackTypes';
@@ -21,7 +22,7 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
 
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = calcSatrec(sat);
   let minDistanceApart = 100000000000; // Arbitrarily large number
 
   // var minDistTime;

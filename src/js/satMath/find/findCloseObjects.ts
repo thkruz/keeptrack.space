@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { getUnique } from '@app/js/lib/helpers';
-import { Sgp4 } from 'ootk';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import { getEci } from '../calc/getEci';
 
 export const findCloseObjects = () => {
@@ -20,7 +20,7 @@ export const findCloseObjects = () => {
     // Only look at satellites in LEO
     if (sat.apogee > 5556) continue;
     // Find where the satellite is right now
-    sat.satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs)
+    sat.satrec = calcSatrec(sat);
     sat.position = getEci(sat, new Date()).position;
     // If it fails, skip it
     if (sat.position === { x: 0, y: 0, z: 0 }) continue;

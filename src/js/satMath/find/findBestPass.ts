@@ -1,5 +1,5 @@
 import { DEG2RAD, MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
-import { Sgp4 } from 'ootk';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import { SatRec } from 'satellite.js';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { lookanglesRow, SatObject, SensorObject } from '../../api/keepTrackTypes';
@@ -27,7 +27,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookangle
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
-  var satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  var satrec = calcSatrec(sat);
   var lookanglesTable = []; // Iniially no rows to the table
 
   let looksInterval = 5;

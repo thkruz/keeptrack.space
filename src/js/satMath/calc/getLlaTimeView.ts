@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { dateFormat } from '@app/js/lib/external/dateFormat';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import { Sgp4 } from 'ootk';
 import { checkIsInView } from '../lookangles/checkIsInView';
 import { ecf2rae, eci2ecf, eci2lla, getDegLat, getDegLon } from '../transforms';
@@ -9,7 +10,7 @@ import { calculateTimeVariables } from './calculateTimeVariables';
 
 export const getLlaTimeView = (now: Date, sat: SatObject) => {
   const { sensorManager } = keepTrackApi.programs;
-  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = calcSatrec(sat);
 
   const { m, gmst } = calculateTimeVariables(now, satrec);
   const positionEci = Sgp4.propagate(satrec, m);

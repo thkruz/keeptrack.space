@@ -1,5 +1,5 @@
 import { MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
-import { Sgp4 } from 'ootk';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SatObject, sccPassTimes, SensorObject } from '../../api/keepTrackTypes';
 import { dateFormat } from '../../lib/external/dateFormat.js';
@@ -18,7 +18,7 @@ export const nextpass = (sat: SatObject, sensors?: SensorObject[], searchLength?
 
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = calcSatrec(sat);
   for (const sensor of sensors) {
     for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
       // 5second Looks
@@ -70,7 +70,7 @@ export const nextNpasses = (sat: SatObject, sensors: SensorObject[], searchLengt
   let passTimesArray = [];
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = calcSatrec(sat);
   const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
   for (let i = 0; i < searchLength * 24 * 60 * 60; i += interval) {
     // 5second Looks

@@ -155,26 +155,25 @@ export const colorsMenuClick = (colorName: string) => {
       break;
     case 'velocity':
       uiManager.legendMenuChange('velocity');
-      satSet.setColorScheme(colorSchemeManager.velocity);
+      satSet.setColorScheme(colorSchemeManager.velocity, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'sunlight':
       uiManager.legendMenuChange('sunlight');
       satSet.setColorScheme(colorSchemeManager.sunlight, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
         isSunlightView: true,
       });
       break;
     case 'near-earth':
       uiManager.legendMenuChange('near');
-      satSet.setColorScheme(colorSchemeManager.leo);
+      satSet.setColorScheme(colorSchemeManager.leo, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'deep-space':
       uiManager.legendMenuChange('deep');
-      satSet.setColorScheme(colorSchemeManager.geo);
+      satSet.setColorScheme(colorSchemeManager.geo, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'elset-age':
@@ -188,7 +187,7 @@ export const colorsMenuClick = (colorName: string) => {
       (<HTMLInputElement>getEl('search')).value = '';
       showLoading(() => {
         settingsManager.lostSatStr = '';
-        satSet.setColorScheme(colorSchemeManager.lostobjects);
+        satSet.setColorScheme(colorSchemeManager.lostobjects, true);
         (<HTMLInputElement>getEl('search')).value = settingsManager.lostSatStr;
         uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
@@ -196,17 +195,17 @@ export const colorsMenuClick = (colorName: string) => {
       break;
     case 'rcs':
       uiManager.legendMenuChange('rcs');
-      satSet.setColorScheme(colorSchemeManager.rcs);
+      satSet.setColorScheme(colorSchemeManager.rcs, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'smallsats':
       uiManager.legendMenuChange('small');
-      satSet.setColorScheme(colorSchemeManager.smallsats);
+      satSet.setColorScheme(colorSchemeManager.smallsats, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'countries':
       uiManager.legendMenuChange('countries');
-      satSet.setColorScheme(colorSchemeManager.countries);
+      satSet.setColorScheme(colorSchemeManager.countries, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
   }

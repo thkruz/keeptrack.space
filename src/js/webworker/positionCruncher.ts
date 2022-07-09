@@ -1115,7 +1115,6 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
 export const sendDataToSatSet = () => {
   const postMessageArray = <PositionCruncherOutgoingMsg>{
     satPos: satPos,
-    satVel: satVel,
   };
   // Add In View Data if Sensor Selected
   if (sensor.observerGd !== defaultGd) {
@@ -1138,6 +1137,10 @@ export const sendDataToSatSet = () => {
 
   try {
     postMessage(postMessageArray);
+    // Send Velocity Separate to avoid CPU Overload on Main Thread
+    postMessage(<PositionCruncherOutgoingMsg>{
+      satVel: satVel,
+    });
   } catch (e) {
     if (!process) throw e;
   }

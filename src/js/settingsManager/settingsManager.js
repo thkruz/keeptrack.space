@@ -655,7 +655,6 @@ settingsManager = {
     settingsManager.isPropRateChange = false;
     settingsManager.isOnlyFOVChecked = false;
     settingsManager.isBottomMenuOpen = false;
-    settingsManager.isForceColorScheme = false;
     settingsManager.isDragging = false;
 
     settingsManager.isDemoModeOn = false;

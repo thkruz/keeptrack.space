@@ -414,7 +414,6 @@ export const settingsFormSubmit = (e: any) => {
     uiManager.searchBox.doSearch(uiManager.searchBox.getCurrentSearch());
   }
 
-  settingsManager.isForceColorScheme = true;
-  satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
   e.preventDefault();
 };

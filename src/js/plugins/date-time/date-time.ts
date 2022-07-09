@@ -94,12 +94,13 @@ export const uiManagerFinal = () => {
 };
 
 export const datetimeInputFormChange = (jestOverride?: Date) => {
-  const { timeManager, uiManager } = keepTrackApi.programs;
+  const { timeManager, uiManager, satSet } = keepTrackApi.programs;
   const selectedDate = $('#datetime-input-tb').datepicker('getDate') || jestOverride;
   const today = new Date();
   const jday = timeManager.getDayOfYear(timeManager.simulationTimeObj);
   $('#jday').html(jday);
   timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime());
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
   timeManager.calculateSimulationTime();
   // Reset last update times when going backwards in time
   settingsManager.lastBoxUpdateTime = timeManager.realTime;

@@ -427,7 +427,6 @@ export interface SettingsManager {
   isEnableConsole: boolean;
   isEnableGsCatalog: boolean;
   isEnableRadarData: boolean;
-  isForceColorScheme: boolean;
   isFOVBubbleModeOn: boolean;
   isLoadLastMap: boolean;
   isMapUpdateOverride: boolean;
@@ -894,11 +893,7 @@ export declare interface SatObject {
   };
   id: number;
   inclination: number;
-  inSun?: number;
-  inSunChange: boolean;
   intlDes?: string;
-  inView: number;
-  inViewChange: boolean;
   isInGroup?: boolean;
   isInSun?: () => SunStatus;
   isRadarData?: boolean;
@@ -1095,7 +1090,6 @@ export interface CatalogManager {
   getIdFromEci: (eci: any) => number;
   getSatInSun(): Int8Array;
   getSatInView(): Int8Array;
-  getSatInViewOnly: (i: number) => any;
   getSatVel(): Float32Array;
   mergeSat: any;
   resetSatInSun: any;

@@ -681,7 +681,6 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       uiManager.legendMenuChange('default');
       satSet.setColorScheme(colorSchemeManager.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
         isSunlightView: false,
       });
@@ -730,13 +729,15 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       (<HTMLInputElement>getEl('cs-hei')).value = '0';
       (<HTMLInputElement>getEl('cs-type')).value = 'Observer';
       $('#customSensor').trigger('submit');
-      uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(colorSchemeManager.sunlight, true);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
+      uiManager.legendMenuChange('sunlight');      
       satSet.satCruncher.postMessage({
         isSunlightView: true,
       });
+      setTimeout(() => {
+        // Need to wait for the cruncher to return the sunlight data
+        satSet.setColorScheme(colorSchemeManager.sunlight, true);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      }, keepTrackApi.programs.dotsManager.inSunData?.length > 100 ? 0 : 1000);
       break;
     case 'colors-default-rmb':
       uiManager.legendMenuChange('default');
@@ -744,27 +745,29 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-sunlight-rmb':
-      uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(colorSchemeManager.sunlight, true);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
+      uiManager.legendMenuChange('sunlight');      
       satSet.satCruncher.postMessage({
         isSunlightView: true,
       });
+      setTimeout(() => {
+        // Need to wait for the cruncher to return the sunlight data
+        satSet.setColorScheme(colorSchemeManager.sunlight, true);
+        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      }, keepTrackApi.programs.dotsManager.inSunData?.length > 100 ? 0 : 1000);
       break;
     case 'colors-country-rmb':
       uiManager.legendMenuChange('countries');
-      satSet.setColorScheme(colorSchemeManager.countries);
+      satSet.setColorScheme(colorSchemeManager.countries, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-velocity-rmb':
       uiManager.legendMenuChange('velocity');
-      satSet.setColorScheme(colorSchemeManager.velocity);
+      satSet.setColorScheme(colorSchemeManager.velocity, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-ageOfElset-rmb':
       uiManager.legendMenuChange('ageOfElset');
-      satSet.setColorScheme(colorSchemeManager.ageOfElset);
+      satSet.setColorScheme(colorSchemeManager.ageOfElset, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'earth-blue-rmb':

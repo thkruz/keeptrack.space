@@ -45,7 +45,6 @@ import {
   getSatFromObjNum,
   getSatInSun,
   getSatInView,
-  getSatInViewOnly,
   getSatPosOnly,
   getSatVel,
   getScreenCoords,
@@ -176,13 +175,15 @@ export const setHover = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(
-      gl.ARRAY_BUFFER,
-      objectManager.lasthoveringSat * 4 * 4,
-      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color)
-    );
+    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color;
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4] = newColor[0]; // R
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 1] = newColor[1]; // G
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 2] = newColor[2]; // B
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 3] = newColor[3]; // A
+
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(newColor));
   }
-  // If New Select Sat Picked Color it
+  // If New Hover Sat Picked Color it
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
     gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
   }
@@ -217,11 +218,12 @@ export const selectSat = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lastSelectedSat() !== -1) {
-    gl.bufferSubData(
-      gl.ARRAY_BUFFER,
-      objectManager.lastSelectedSat() * 4 * 4,
-      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color)
-    );
+    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color;
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4] = newColor[0]; // R
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 1] = newColor[1]; // G
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 2] = newColor[2]; // B
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 3] = newColor[3]; // A
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(newColor));
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
@@ -552,7 +554,6 @@ export let satSet: CatalogManager = {
   getSatFromObjNum,
   getSatInSun,
   getSatInView,
-  getSatInViewOnly,
   getSatPosOnly,
   getSatVel,
   getScreenCoords,

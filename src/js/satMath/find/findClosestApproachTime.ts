@@ -44,6 +44,7 @@ export const findClosestApproachTime = (
 
   // Go to closest approach time
   keepTrackApi.programs.timeManager.changeStaticOffset(result.offset);
+  keepTrackApi.programs.satSet.setColorScheme(settingsManager.currentColorScheme, true);
 
   return result;
 };

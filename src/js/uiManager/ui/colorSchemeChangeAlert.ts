@@ -16,7 +16,7 @@ export const colorSchemeChangeAlert = (newScheme: ColorScheme) => {
   if (uiManager.lastColorScheme == newScheme) return;
 
   for (const scheme in colorSchemeManager) {
-    if (newScheme == colorSchemeManager[scheme] && scheme !== 'currentColorScheme') {
+    if (newScheme == colorSchemeManager[scheme] && scheme !== 'currentColorScheme' && scheme !== 'lastColorScheme') {
       // record the new color scheme
       uiManager.lastColorScheme = newScheme;
       // Make an alert

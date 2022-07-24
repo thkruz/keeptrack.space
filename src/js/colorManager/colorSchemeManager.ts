@@ -28,6 +28,7 @@ import { countriesRules } from './ruleSets/countries';
 import { defaultRules } from './ruleSets/default';
 import { geoRules } from './ruleSets/geo';
 import { groupRules } from './ruleSets/group';
+import { groupCountriesRules } from './ruleSets/group-countries';
 import { leoRules } from './ruleSets/leo';
 import { lostobjectsRules } from './ruleSets/lostobjects';
 import { onlyFovRules } from './ruleSets/onlyFov';
@@ -103,6 +104,7 @@ export interface ColorSchemeManager {
   geo: ColorRuleSet;
   velocity: ColorRuleSet;
   group: ColorRuleSet;
+  groupCountries: ColorRuleSet;
   calculateColorBuffers: (isForceRecolor?: boolean) => Promise<void>;
   objectTypeFlags: ObjectTypeFlags;
   satSet: CatalogManager;
@@ -152,7 +154,7 @@ export interface ColorRuleParams {
   satInSun?: Int8Array;
 }
 
-export type ColorRuleSet = (sat: SatObject) => ColorInformation;
+export type ColorRuleSet = (sat: SatObject, params?: any) => ColorInformation;
 
 const DOTS_PER_CALC = 450;
 
@@ -221,6 +223,7 @@ export const colorSchemeManager: ColorSchemeManager = {
     colorSchemeManager.smallsats = smallsatsRules;
     colorSchemeManager.rcs = rcsRules;
     colorSchemeManager.countries = countriesRules;
+    colorSchemeManager.groupCountries = groupCountriesRules;
     colorSchemeManager.ageOfElset = ageOfElsetRules;
     colorSchemeManager.lostobjects = lostobjectsRules;
     colorSchemeManager.leo = leoRules;
@@ -243,7 +246,21 @@ export const colorSchemeManager: ColorSchemeManager = {
       // These two variables only need to be set once, but we want to make sure they aren't called before the satellites
       // are loaded into satSet. Don't move the buffer data creation into the constructor!
       if (!colorSchemeManager.pickableData || !colorSchemeManager.colorData) return;
-      const { gl } = keepTrackApi.programs.drawManager;        
+      const { searchBox } = keepTrackApi.programs;
+      const { gl } = keepTrackApi.programs.drawManager;
+
+
+      // Revert colorscheme if search box is empty
+      if (colorSchemeManager.currentColorScheme === colorSchemeManager.group || colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
+        if (searchBox.getCurrentSearch() === '') {
+          if (colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
+            colorSchemeManager.currentColorScheme = colorSchemeManager.countries;
+          } else {
+            colorSchemeManager.currentColorScheme = colorSchemeManager.default;
+          }
+        }
+      }
+
 
       if (!isForceRecolor) {
         switch (colorSchemeManager.currentColorScheme) {          
@@ -255,7 +272,8 @@ export const colorSchemeManager: ColorSchemeManager = {
           case colorSchemeManager.lostobjects:
           case colorSchemeManager.leo:
           case colorSchemeManager.geo:
-          case colorSchemeManager.group:            
+          case colorSchemeManager.group:    
+          case colorSchemeManager.groupCountries:        
             // These don't change over time
             return;
           case colorSchemeManager.default:
@@ -305,12 +323,24 @@ export const colorSchemeManager: ColorSchemeManager = {
 
       // Lets loop through all the satellites and color them in one by one
       let colors: ColorInformation = null;
+      let params = {
+        year: '',
+        jday: 0,
+      };
+
+      if (colorSchemeManager.currentColorScheme === colorSchemeManager.ageOfElset) {
+        const {timeManager} = keepTrackApi.programs;
+        let now = new Date();
+        params.jday = timeManager.getDayOfYear(now);
+        params.year = now.getUTCFullYear().toString().substr(2, 2);
+      }
+
       // Velocity is a special case - we need to know the velocity of each satellite
       if (colorSchemeManager.currentColorScheme === colorSchemeManager.velocity) {
         for (let i = firstDotToColor; i < lastDotToColor; i++) {                
           satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
 
-          colors = colorSchemeManager.currentColorScheme(satData[i]);
+          colors = colorSchemeManager.currentColorScheme(satData[i], params);
           colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
           colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
           colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B
@@ -319,7 +349,7 @@ export const colorSchemeManager: ColorSchemeManager = {
         }
       } else {
         for (let i = firstDotToColor; i < lastDotToColor; i++) {                
-          colors = colorSchemeManager.currentColorScheme(satData[i]);
+          colors = colorSchemeManager.currentColorScheme(satData[i], params);
           colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
           colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
           colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B
@@ -411,6 +441,7 @@ export const colorSchemeManager: ColorSchemeManager = {
   smallsats: null,
   rcs: null,
   countries: null,
+  groupCountries: null,
   ageOfElset: null,
   lostobjects: null,
   leo: null,

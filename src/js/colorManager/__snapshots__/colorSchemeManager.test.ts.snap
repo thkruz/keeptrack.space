@@ -313,10 +313,10 @@ Object {
 exports[`Test group ruleset should color satellties in this group 1`] = `
 Object {
   "color": Array [
+    0.2,
     1,
     0,
-    0,
-    1,
+    0.5,
   ],
   "pickable": 1,
 }

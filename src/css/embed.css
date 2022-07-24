@@ -36,3 +36,24 @@ body,
 #keeptrack-canvas {
   overflow: hidden;
 }
+
+.toast,
+.toast-container {
+  display: none !important;
+}
+
+#textOverlay {
+  border-radius: 2px;
+  bottom: 75px;
+  right: 150px;
+  width: auto;
+  position: absolute;
+  min-height: 48px;
+  line-height: 2.5em !important;
+  background-color: rgb(255, 255, 25) !important;
+  padding: 10px 55px !important;
+  font-size: 1.8rem !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-weight: 300;
+  color: #000000;
+}

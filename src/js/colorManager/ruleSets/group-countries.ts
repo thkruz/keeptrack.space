@@ -5,15 +5,16 @@ import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeMa
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
 // prettier-ignore
-export const countriesRules = (sat: SatObject): ColorInformation => { // NOSONAR
+export const groupCountriesRules = (sat: SatObject): ColorInformation => { // NOSONAR
   const { mainCamera } = keepTrackApi.programs;
   if (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
       pickable: Pickable.No,
     };
-  }
+  }  
 
+  if (sat.isInGroup) {
   switch (sat.country) {
     case 'United States of America':
     case 'United States':
@@ -59,7 +60,7 @@ export const countriesRules = (sat: SatObject): ColorInformation => { // NOSONAR
           pickable: Pickable.Yes,
         };
       }
-    default:
+    default:      
       if (colorSchemeManager.objectTypeFlags.countryOther === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
         return {
           color: colorSchemeManager.colorTheme.deselected,
@@ -70,5 +71,21 @@ export const countriesRules = (sat: SatObject): ColorInformation => { // NOSONAR
         color: colorSchemeManager.colorTheme.countryOther,
         pickable: Pickable.Yes,
       };
+    }
   }
+
+  // Show Markers But Don't Allow Them To Be Selected
+  if (sat.marker) {
+    return {
+      color: colorSchemeManager.colorTheme.marker[0],
+      marker: true,
+      pickable: Pickable.No,
+    };
+  }
+
+
+  return {
+    color: colorSchemeManager.colorTheme.deselected,
+    pickable: Pickable.No,
+  };
 };

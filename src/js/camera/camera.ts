@@ -502,8 +502,6 @@ export const calculate = (dt: number, isSlowDown: boolean) => { // NOSONAR
       camera.camPitch += camera.camPitchSpeed * dt * settingsManager.cameraDecayFactor;
     }
 
-    console.log(`${camera.camYaw} - ${camera.ecYaw}`);
-
     if (camera.camYaw > camera.ecYaw) {
       camera.camYaw -= camera.camYawSpeed * dt * settingsManager.cameraDecayFactor;
     } else if (camera.camYaw < camera.ecYaw) {

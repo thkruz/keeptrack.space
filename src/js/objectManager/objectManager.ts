@@ -100,7 +100,7 @@ const extractCountry = (C: string): string => {
     case 'CHLE':
       return 'Chile';
     case 'CIS':
-      return 'Commonwealth of Ind States';
+      return 'USSR/Russia';
     case 'COL':
       return 'Colombia';
     case 'CZCH':
@@ -447,9 +447,11 @@ const setLasthoveringSat = (id: number): void => {
   objectManager.lasthoveringSat = id;
 };
 const setSelectedSat = (id: number): void => {
+  if (settingsManager.isDisableSelectSat) return;
   objectManager.selectedSat = id;
 };
 const setSecondarySat = (id: number): void => {
+  if (settingsManager.isDisableSelectSat) return;
   const { satSet } = keepTrackApi.programs;
   objectManager.secondarySat = id;
   objectManager.secondarySatObj = satSet.getSat(id);

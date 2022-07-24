@@ -160,8 +160,11 @@ export const satObj = (sat: SatObject) => {
   // Use this as a default if no UI
   if (settingsManager.disableUI || settingsManager.isEPFL) {
     satHoverBoxNode1.textContent = sat.name;
-    satHoverBoxNode2.textContent = settingsManager.isEPFL ? `Launched: ${sat.intlDes.split('-')[0]}` : sat.sccNum;
-    satHoverBoxNode3.textContent = objectManager.extractCountry(sat.country);
+    let year = sat.intlDes.split('-')[0] === 'none' ? 'Unknown' : sat.intlDes.split('-')[0];
+    satHoverBoxNode2.textContent = settingsManager.isEPFL ? `Launched: ${year}` : sat.sccNum;
+    let country = objectManager.extractCountry(sat.country);
+    country = country.length > 0 ? country : 'Unknown';
+    satHoverBoxNode3.textContent = country;
   } else {
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass && drawManager.isShowDistance) {
       satHoverBoxNode1.textContent = sat.name;

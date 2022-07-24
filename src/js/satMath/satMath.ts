@@ -27,7 +27,7 @@ import { getEl } from '@app/js/lib/helpers';
 import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import $ from 'jquery';
 import numeric from 'numeric';
-import { Sgp4 } from 'ootk';
+import { EciVec3, Sgp4 } from 'ootk';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SatMath, SatObject, SensorObject, TearrData } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
@@ -150,14 +150,23 @@ export const getTEARR = (sat?: SatObject, sensors?: SensorObject[], propTime?: D
   let satrec = calcSatrec(sat);
   const now = typeof propTime !== 'undefined' ? propTime : timeManager.simulationTimeObj;
   const { m, gmst } = calculateTimeVariables(now, satrec);
-  let positionEci = Sgp4.propagate(satrec, m);
+  let positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+  if (!positionEci) {
+    console.error('No ECI position for', satrec.satnum, 'at', now);
+    currentTEARR.alt = 0;
+    currentTEARR.lon = 0;
+    currentTEARR.lat = 0;
+    currentTEARR.az = 0;
+    currentTEARR.el = 0;
+    currentTEARR.rng = 0;
+  }
 
   try {
-    let gpos = eci2lla(positionEci.position, gmst);
+    let gpos = eci2lla(positionEci, gmst);
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
-    let positionEcf = eci2ecf(positionEci.position, gmst);
+    let positionEcf = eci2ecf(positionEci, gmst);
     let lookAngles = ecf2rae(sensor.observerGd, positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG;
     currentTEARR.el = lookAngles.el * RAD2DEG;

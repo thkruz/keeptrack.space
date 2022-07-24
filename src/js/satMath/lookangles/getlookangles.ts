@@ -1,7 +1,7 @@
 import { MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/helpers';
 import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
-import { SatRec } from 'satellite.js';
+import { SatelliteRecord } from 'ootk';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SatObject, SensorObject, TearrData } from '../../api/keepTrackTypes';
 import { dateFormat } from '../../lib/external/dateFormat.js';
@@ -81,7 +81,7 @@ export const getlookangles = (sat: SatObject): TearrData[] => {
 
   return looksArray;
 };
-const propagateMultiSite = (now: Date, satrec: SatRec, sensor: SensorObject): TearrData => {
+const propagateMultiSite = (now: Date, satrec: SatelliteRecord, sensor: SensorObject): TearrData => {
   // Setup Realtime and Offset Time
   const aer = satellite.getRae(now, satrec, sensor);
 

@@ -1,10 +1,10 @@
-import { SatRec } from 'satellite.js';
+import { SatelliteRecord } from 'ootk';
 import { SensorObject, TearrData } from '../../api/keepTrackTypes';
 import { dateFormat } from '../../lib/external/dateFormat.js';
 import { checkIsInView } from '../lookangles/checkIsInView';
 import { getRae } from './getRae';
 
-export const getTearData = (now: Date, satrec: SatRec, sensors: SensorObject[], isRiseSetLookangles: boolean): TearrData => {
+export const getTearData = (now: Date, satrec: SatelliteRecord, sensors: SensorObject[], isRiseSetLookangles: boolean): TearrData => {
   // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
   const sensor = sensors[0];
 

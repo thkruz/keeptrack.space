@@ -1,15 +1,14 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { Sgp4 } from 'ootk';
-import { SatRec } from 'satellite.js';
+import { SatelliteRecord, Sgp4 } from 'ootk';
 
 /**
  * Returns the satellite record from cache or calculates it.
  * @sideeffects
  * @param {SatObject} sat The satellite object
- * @returns {SatRec} The satellite record containing description of the orbit
+ * @returns {SatelliteRecord} The satellite record containing description of the orbit
  */
-export const calcSatrec = (sat: SatObject): SatRec => {
+export const calcSatrec = (sat: SatObject): SatelliteRecord => {
   // If cached satrec exists, return it
   if (sat.satrec) {
     return sat.satrec;

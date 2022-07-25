@@ -229,5 +229,5 @@ export const legendHoverMenuClick = (legendType?: string) => { // NOSONAR
       });
     }
   }
-  satSet.setColorScheme(settingsManager.currentColorScheme, true);
+  satSet.setColorScheme(colorSchemeManager.currentColorScheme, true);
 };

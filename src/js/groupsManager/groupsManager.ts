@@ -26,20 +26,25 @@ import { SatGroup } from './sat-group';
 export const createGroup = (groupType: string, data: any): SatGroup => new SatGroup(groupType, data, keepTrackApi.programs.satSet);
 export const selectGroup = (group: SatGroup): void => {
   if (group === null || typeof group === 'undefined') return;
-  const { orbitManager } = keepTrackApi.programs;
+  const { orbitManager, satSet, colorSchemeManager } = keepTrackApi.programs;
 
   updateIsInGroup(groupsManager.selectedGroup, group);
   groupsManager.selectedGroup = group;
   group.updateOrbits(orbitManager);
-  settingsManager.setCurrentColorScheme(keepTrackApi.programs.colorSchemeManager.group);
+  if (colorSchemeManager.currentColorScheme === colorSchemeManager.countries || colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
+    satSet.setColorScheme(colorSchemeManager.groupCountries);
+  } else {
+    satSet.setColorScheme(colorSchemeManager.group);
+  }
 
   groupsManager.stopUpdatingInViewSoon = false;
 };
 export const selectGroupNoOverlay = (group: SatGroup): void => {
+  const { satSet } = keepTrackApi.programs;
   updateIsInGroup(groupsManager.selectedGroup, group);
   groupsManager.selectedGroup = group;
   settingsManager.isGroupOverlayDisabled = true;
-  settingsManager.setCurrentColorScheme(keepTrackApi.programs.colorSchemeManager.group);
+  satSet.setColorScheme(keepTrackApi.programs.colorSchemeManager.group);
 };
 export const updateIsInGroup = (oldgroup: SatGroup, newgroup: SatGroup): void => {
   const { satSet } = keepTrackApi.programs;

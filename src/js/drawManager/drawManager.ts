@@ -186,11 +186,11 @@ export const calculatePMatrix = () => {
 };
 export const startWithOrbits = async () => {
   if (settingsManager.startWithOrbitsDisplayed) {
-    const { groupsManager, orbitManager, satSet } = keepTrackApi.programs;
+    const { groupsManager, orbitManager, satSet, colorSchemeManager } = keepTrackApi.programs;
     // All Orbits
     groupsManager.debris = groupsManager.createGroup('all', '');
     groupsManager.selectGroup(groupsManager.debris);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+    satSet.setColorScheme(colorSchemeManager.currentColorScheme, true); // force color recalc
     groupsManager.debris.updateOrbits(orbitManager);
     settingsManager.isOrbitOverlayVisible = true;
   }
@@ -231,7 +231,7 @@ export const drawLoop = (preciseDt: number) => {
 
   // Update Colors
   // NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
-  satSet.setColorScheme(settingsManager.currentColorScheme); // avoid recalculating ALL colors
+  satSet.setColorScheme(colorSchemeManager.currentColorScheme); // avoid recalculating ALL colors
 
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet.satData.length, satSet.orbitalSats, timeManager);

@@ -29,6 +29,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
 import numeric from 'numeric';
+import { EciVec3 } from 'ootk';
 import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject, SunStatus } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
@@ -190,6 +191,7 @@ export const setHover = (i: number): void => {
   objectManager.setLasthoveringSat(objectManager.hoveringSat);
 };
 export const selectSat = (i: number): void => {
+  if (settingsManager.isDisableSelectSat) return;
   const { sensorManager, objectManager, uiManager, colorSchemeManager } = keepTrackApi.programs;
   const { gl } = keepTrackApi.programs.drawManager;
   if (i === objectManager.lastSelectedSat()) return;
@@ -481,14 +483,23 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
       const satrec = satellite.twoline2satrec(satSet.satData[i].TLE1, satSet.satData[i].TLE2); // perform and store sat init calcs
 
       const m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      const positionEci = satellite.sgp4(satrec, m);
+      const positionEci = <EciVec3>satellite.sgp4(satrec, m).position;
+      if (!positionEci) {
+        console.error('No ECI position for', satrec.satnum, 'at', now);
+        currentTEARR.alt = 0;
+        currentTEARR.lon = 0;
+        currentTEARR.lat = 0;
+        currentTEARR.az = 0;
+        currentTEARR.el = 0;
+        currentTEARR.rng = 0;
+      }
 
       try {
-        const gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+        const gpos = satellite.eciToGeodetic(positionEci, gmst);
         currentTEARR.alt = gpos.alt;
         currentTEARR.lon = gpos.lon;
         currentTEARR.lat = gpos.lat;
-        const positionEcf = satellite.eciToEcf(positionEci.position, gmst);
+        const positionEcf = satellite.eciToEcf(positionEci, gmst);
         const lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
         currentTEARR.az = lookAngles.az * RAD2DEG;
         currentTEARR.el = lookAngles.el * RAD2DEG;

@@ -154,7 +154,7 @@
     "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
     "http-server": "^14.1.0",
-    "husky": "^7.0.4",
+    "husky": "^8.0.1",
     "ignore-loader": "^0.1.2",
     "imports-loader": "^3.1.1",
     "jest": "^27.3.1",

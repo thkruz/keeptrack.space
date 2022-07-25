@@ -140,7 +140,7 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 export const colorsMenuClick = (colorName: string) => {
-  const { colorSchemeManager, satSet, objectManager, uiManager } = keepTrackApi.programs;
+  const { colorSchemeManager, satSet, objectManager, uiManager, groupsManager } = keepTrackApi.programs;
   objectManager.setSelectedSat(-1); // clear selected sat
   if (colorName !== 'sunlight') {
     satSet.satCruncher.postMessage({
@@ -151,63 +151,86 @@ export const colorsMenuClick = (colorName: string) => {
     case 'default':
       uiManager.legendMenuChange('default');
       satSet.setColorScheme(colorSchemeManager.default, true);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
     case 'velocity':
       uiManager.legendMenuChange('velocity');
-      satSet.setColorScheme(colorSchemeManager.velocity);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      satSet.setColorScheme(colorSchemeManager.velocity, true);
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
     case 'sunlight':
-      uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(colorSchemeManager.sunlight, true);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
         isSunlightView: true,
       });
+      uiManager.legendMenuChange('sunlight');
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.sunlight);
+      satSet.satCruncher.addEventListener(
+        'message',
+        (m) => {
+          if (m.data.satInSun) {
+            satSet.setColorScheme(colorSchemeManager.sunlight, true);
+          } else {
+            satSet.satCruncher.addEventListener(
+              'message',
+              (m) => {
+                if (m.data.satInSun) {
+                  satSet.setColorScheme(colorSchemeManager.sunlight, true);
+                } else {
+                  console.error('Should have received satInSun by now!');
+                }
+              },
+              { once: true }
+            );
+          }
+        },
+        { once: true }
+      );
       break;
     case 'near-earth':
       uiManager.legendMenuChange('near');
-      satSet.setColorScheme(colorSchemeManager.leo);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      satSet.setColorScheme(colorSchemeManager.leo, true);
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
     case 'deep-space':
       uiManager.legendMenuChange('deep');
-      satSet.setColorScheme(colorSchemeManager.geo);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      satSet.setColorScheme(colorSchemeManager.geo, true);
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
     case 'elset-age':
       showLoading(() => {
         uiManager.legendMenuChange('ageOfElset');
-        satSet.setColorScheme(colorSchemeManager.ageOfElset);
-        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        satSet.setColorScheme(colorSchemeManager.ageOfElset, true);
+        uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       });
       break;
     case 'lost-objects':
       (<HTMLInputElement>getEl('search')).value = '';
       showLoading(() => {
         settingsManager.lostSatStr = '';
-        satSet.setColorScheme(colorSchemeManager.lostobjects);
+        satSet.setColorScheme(colorSchemeManager.lostobjects, true);
         (<HTMLInputElement>getEl('search')).value = settingsManager.lostSatStr;
-        uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
         uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
       });
       break;
     case 'rcs':
       uiManager.legendMenuChange('rcs');
-      satSet.setColorScheme(colorSchemeManager.rcs);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      satSet.setColorScheme(colorSchemeManager.rcs, true);
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
     case 'smallsats':
       uiManager.legendMenuChange('small');
-      satSet.setColorScheme(colorSchemeManager.smallsats);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      satSet.setColorScheme(colorSchemeManager.smallsats, true);
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
     case 'countries':
       uiManager.legendMenuChange('countries');
-      satSet.setColorScheme(colorSchemeManager.countries);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      if (groupsManager.selectedGroup !== null) {
+        satSet.setColorScheme(colorSchemeManager.groupCountries, true);
+      } else {
+        satSet.setColorScheme(colorSchemeManager.countries, true);
+      }
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
   }
 

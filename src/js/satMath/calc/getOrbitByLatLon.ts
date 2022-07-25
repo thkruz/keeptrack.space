@@ -1,7 +1,7 @@
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { stringPad } from '@app/js/lib/helpers';
-import { SatRec } from 'satellite.js';
+import { EciVec3, SatelliteRecord } from 'ootk';
 import { satellite } from '../satMath';
 import { calculateTimeVariables } from './calculateTimeVariables';
 
@@ -57,7 +57,7 @@ export const getOrbitByLatLon = (
    * @returns {PropagationResults} This number tells the main loop what to do next
    */
   const meanaCalc = (meana: number) => {
-    let satrec = <SatRec>satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+    let satrec = <SatelliteRecord>satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
 
     meana = meana / 10;
     const meanaStr = stringPad.pad0(meana.toPrecision(7), 8);
@@ -95,7 +95,7 @@ export const getOrbitByLatLon = (
     const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raan + ' ' + ecen + ' ' + argPe + ' ' + meana + ' ' + meanmo + '    10';
 
     // Calculate the orbit
-    const satrec = <SatRec>satellite.twoline2satrec(TLE1, TLE2);
+    const satrec = <SatelliteRecord>satellite.twoline2satrec(TLE1, TLE2);
 
     // Check the orbit
     const results = getOrbitByLatLonPropagate(now, satrec, PropagationOptions.ArgumentOfPerigee);
@@ -126,7 +126,7 @@ export const getOrbitByLatLon = (
     const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
 
-    const satrec = <SatRec>satellite.twoline2satrec(TLE1, TLE2);
+    const satrec = <SatelliteRecord>satellite.twoline2satrec(TLE1, TLE2);
     const results = getOrbitByLatLonPropagate(now, satrec, PropagationOptions.RightAscensionOfAscendingNode);
 
     // If we have a good guess of the raan, we can use it, but need to apply the offset to the original raan
@@ -145,10 +145,13 @@ export const getOrbitByLatLon = (
     return results;
   };
 
-  const getOrbitByLatLonPropagate = (nowIn: Date, satrec: SatRec, type: PropagationOptions): PropagationResults => {
+  const getOrbitByLatLonPropagate = (nowIn: Date, satrec: SatelliteRecord, type: PropagationOptions): PropagationResults => {
     const { m, gmst } = calculateTimeVariables(nowIn, satrec);
-    const positionEci = satellite.sgp4(satrec, m);
-    const gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+    const positionEci = <EciVec3>satellite.sgp4(satrec, m).position;
+    if (!positionEci) {
+      return PropagationResults.Error;
+    }
+    const gpos = satellite.eciToGeodetic(positionEci, gmst);
 
     let { lat, lon, alt } = gpos;
     lat = satellite.degreesLat(lat);

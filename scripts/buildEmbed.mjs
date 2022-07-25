@@ -3,9 +3,10 @@ import { copyFilesAndFolders, copySettingsFiles } from './lib/copyFilesAndFolder
 import { setupEmbedFolders } from './lib/setupFolders.mjs';
 import { generateConfig } from './webpack.mjs';
 
-const reqDirs = ['tle', 'css'];
+const reqDirs = ['tle'];
 const optDirs = ['meshes'];
 const reqFiles = [
+  'css/embed.css',
   'textures/moon-1024.jpg',
   'textures/earthmap512.jpg',
   'textures/earthmap16k.jpg',

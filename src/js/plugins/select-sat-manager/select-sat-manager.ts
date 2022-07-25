@@ -19,6 +19,7 @@ export const selectSatManager = {
   // Splitting it into subfunctions would not be optimal
   // prettier-ignore
   selectSat: (satId: number, mainCamera: Camera) => { // NOSONAR
+    if (settingsManager.isDisableSelectSat) return;
     const { objectManager, satSet, sensorManager, uiManager } = keepTrackApi.programs;
 
     let sat: SatObject | any;

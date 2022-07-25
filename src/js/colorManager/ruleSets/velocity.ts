@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
@@ -56,7 +57,7 @@ export const velocityRules = (sat: SatObject): ColorInformation => { // NOSONAR
       pickable: Pickable.Yes,
     };
   }
-  if (sat.inView === 1) {
+  if (keepTrackApi.programs.dotsManager.inViewData[sat.id] === 1) {
     if (colorSchemeManager.objectTypeFlags.inViewAlt === false) {
       return {
         color: colorSchemeManager.colorTheme.deselected,

@@ -1,7 +1,7 @@
 import { MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/helpers';
-import { Sgp4 } from 'ootk';
-import { SatRec } from 'satellite.js';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
+import { SatelliteRecord } from 'ootk';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SatObject, SensorObject, TearrData } from '../../api/keepTrackTypes';
 import { dateFormat } from '../../lib/external/dateFormat.js';
@@ -23,7 +23,7 @@ export const getlookangles = (sat: SatObject): TearrData[] => {
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
-  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = calcSatrec(sat);
 
   // const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
   // Use custom interval unless doing rise/set lookangles - then use 1 second
@@ -81,7 +81,7 @@ export const getlookangles = (sat: SatObject): TearrData[] => {
 
   return looksArray;
 };
-const propagateMultiSite = (now: Date, satrec: SatRec, sensor: SensorObject): TearrData => {
+const propagateMultiSite = (now: Date, satrec: SatelliteRecord, sensor: SensorObject): TearrData => {
   // Setup Realtime and Offset Time
   const aer = satellite.getRae(now, satrec, sensor);
 
@@ -116,7 +116,7 @@ export const getlookanglesMultiSite = (sat: SatObject) => {
   let offset = 0;
 
   // Get Satellite Info
-  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = calcSatrec(sat);
   const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
   const multiSiteArray = <TearrData[]>[];

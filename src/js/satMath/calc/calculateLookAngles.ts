@@ -1,5 +1,5 @@
 import { DEG2RAD } from '@app/js/lib/constants';
-import { Sgp4 } from 'ootk';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SatObject, SensorObject, TearrData } from '../../api/keepTrackTypes';
 import { satellite } from '../satMath';
@@ -50,7 +50,7 @@ export const calculateLookAngles = (sat: SatObject, sensors: SensorObject[]): Te
 
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  var satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  var satrec = calcSatrec(sat);
   var lookanglesTable = []; // Iniially no rows to the table
   var tempLookanglesInterval;
 

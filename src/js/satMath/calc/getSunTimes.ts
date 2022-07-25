@@ -1,5 +1,6 @@
 import { RAD2DEG } from '@app/js/lib/constants';
-import { Sgp4 } from 'ootk';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
+import { Sgp4, EciVec3 } from 'ootk';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { SatObject, SensorObject } from '../../api/keepTrackTypes';
 import { satellite } from '../satMath';
@@ -21,7 +22,7 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
 
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
-  const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const satrec = calcSatrec(sat);
   let minDistanceApart = 100000000000; // Arbitrarily large number
 
   // var minDistTime;
@@ -32,7 +33,11 @@ export const getSunTimes = (sat: SatObject, sensors?: SensorObject[], searchLeng
     const { m, j, gmst } = calculateTimeVariables(now, satrec);
 
     const [sunX, sunY, sunZ] = getSunDirection(j);
-    const eci = Sgp4.propagate(satrec, m).position;
+    const eci = <EciVec3>Sgp4.propagate(satrec, m).position;
+    if (!eci) {
+      console.debug('No ECI position for', sat.name, 'at', now);
+      continue;
+    }
 
     const distX = Math.pow(sunX - eci.x, 2);
     const distY = Math.pow(sunY - eci.y, 2);

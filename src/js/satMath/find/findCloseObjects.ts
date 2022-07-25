@@ -1,10 +1,11 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SatObject } from '@app/js/api/keepTrackTypes';
+import { EciPos, SatObject } from '@app/js/api/keepTrackTypes';
 import { getUnique } from '@app/js/lib/helpers';
-import { Sgp4 } from 'ootk';
 import { getEci } from '../calc/getEci';
 
+let searchStrCache: string;
 export const findCloseObjects = () => {
+  if (searchStrCache) return searchStrCache;
   const { satSet } = keepTrackApi.programs;
   const searchRadius = 50; // km
 
@@ -12,17 +13,19 @@ export const findCloseObjects = () => {
   let satList = <SatObject[]>[];
 
   // Loop through all the satellites
-  for (let i = 0; i < satSet.numSats; i++) {
+  for (let i = 0; i < satSet.orbitalSats; i++) {
     // Get the satellite
     const sat = satSet.getSat(i);
     // Avoid unnecessary errors
     if (typeof sat.TLE1 == 'undefined') continue;
     // Only look at satellites in LEO
-    if (sat.apogee > 5556) continue;
+    // if (sat.apogee > 5556) continue;
     // Find where the satellite is right now
-    sat.satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs)
-    sat.position = getEci(sat, new Date()).position;
+    if (typeof sat.position === 'undefined') {
+      sat.position = <EciPos>getEci(sat, new Date()).position || { x: 0, y: 0, z: 0 };
+    }
     // If it fails, skip it
+    if (isNaN(sat.position.x) || isNaN(sat.position.y) || isNaN(sat.position.z)) continue;
     if (sat.position === { x: 0, y: 0, z: 0 }) continue;
     // Add the satellite to the list
     satList.push(sat);
@@ -31,27 +34,33 @@ export const findCloseObjects = () => {
   // Remove duplicates
   satList = getUnique(satList);
 
+  // Sort satList by position.x property
+  satList.sort((a, b) => a.position.x - b.position.x);
+
   // Loop through all the satellites with valid positions
-  for (let i = 0; i < satList.length; i++) {
-    let sat1 = satList[i];
-    let pos1 = sat1.position;
+  let i = 0;
+  const satListLen = satList.length;
+  for (i = 0; i < satListLen; i++) {
+    const sat1 = satList[i];
+    const pos1 = sat1.position;
 
     // Calculate the area around the satellite
-    let posXmin = pos1.x - searchRadius;
-    let posXmax = pos1.x + searchRadius;
-    let posYmin = pos1.y - searchRadius;
-    let posYmax = pos1.y + searchRadius;
-    let posZmin = pos1.z - searchRadius;
-    let posZmax = pos1.z + searchRadius;
+    const posXmin = pos1.x - searchRadius;
+    const posXmax = pos1.x + searchRadius;
+    const posYmin = pos1.y - searchRadius;
+    const posYmax = pos1.y + searchRadius;
+    const posZmin = pos1.z - searchRadius;
+    const posZmax = pos1.z + searchRadius;
 
     // Loop through the list again
-    for (let j = 0; j < satList.length; j++) {
-      // Get the second satellite
-      let sat2 = satList[j];
-      // Skip the same satellite
-      if (sat1 == sat2) continue;
-      // Get the second satellite's position
-      let pos2 = sat2.position;
+    let j = 0;
+    for (j = Math.max(0, i - 200); j < satListLen; j++) {
+      const sat2 = satList[j]; // Get the second satellite
+      if (sat1 == sat2) continue; // Skip the same satellite
+      const pos2 = sat2.position; // Get the second satellite's position
+
+      // Satellites are in order of x position so once we exceed the maxX, we can stop
+      if (pos2.x > posXmax) break;
       // Check to see if the second satellite is in the search area
       if (pos2.x < posXmax && pos2.x > posXmin && pos2.y < posYmax && pos2.y > posYmin && pos2.z < posZmax && pos2.z > posZmin) {
         // Add the second satellite to the list if it is close
@@ -118,5 +127,7 @@ export const findCloseObjects = () => {
     }
   }
 
+  // Dont need to do this math more than once
+  searchStrCache = searchStr;
   return searchStr; // csoListUnique;
 };

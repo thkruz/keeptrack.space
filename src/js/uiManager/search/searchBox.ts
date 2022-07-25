@@ -40,10 +40,12 @@ export const hideResults = () => {
     settingsManager.lastSearchResults = [];
     dotsManager.updateSizeBuffer(satSet.satData.length);
 
-    if (settingsManager.currentColorScheme === colorSchemeManager.group) {
+    if (colorSchemeManager.currentColorScheme === colorSchemeManager.group) {
       satSet.setColorScheme(colorSchemeManager.default, true);
+    } else if (colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
+      satSet.setColorScheme(colorSchemeManager.countries, true);
     } else {
-      satSet.setColorScheme(settingsManager.currentColorScheme, true);
+      satSet.setColorScheme(colorSchemeManager.currentColorScheme, true);
     }
   } catch (error) {
     console.warn(error);
@@ -190,6 +192,8 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
 };
 
 export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) => {
+  const { colorSchemeManager } = keepTrackApi.programs;
+
   let satData = satSet.satData;
   getEl('search-results').innerHTML = results.reduce((html, result) => {
     const sat = satData[result.satId];
@@ -253,7 +257,12 @@ export const fillResultBox = (results: SearchResult[], satSet: CatalogManager) =
   }, '');
   slideInDown(getEl('search-results'), 1000);
   resultsOpen = true;
-  satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+
+  if (colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries || colorSchemeManager.currentColorScheme === colorSchemeManager.countries) {
+    satSet.setColorScheme(colorSchemeManager.groupCountries, true);
+  } else {
+    satSet.setColorScheme(colorSchemeManager.group, true);
+  }
 };
 
 export const searchBox: SearchBox = {

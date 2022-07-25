@@ -24,47 +24,47 @@
 
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/helpers';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import $ from 'jquery';
 import numeric from 'numeric';
+import { EciVec3, Sgp4 } from 'ootk';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { SatMath, SatObject, SensorObject, TearrData } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
+import { calculateLookAngles } from './calc/calculateLookAngles';
 import { calculateSensorPos } from './calc/calculateSensorPos';
-import { findNearbyObjectsByOrbit } from './find/findNearbyObjectsByOrbit';
-import { findReentries } from './find/findReentries';
+import { calculateTimeVariables } from './calc/calculateTimeVariables';
+import { currentEpoch } from './calc/currentEpoch';
+import { distance } from './calc/distance';
+import { getAlt } from './calc/getAlt';
 import { getAngleBetweenTwoSatellites } from './calc/getAngleBetweenTwoSatellites';
 import { getEcfOfCurrentOrbit } from './calc/getEcfOfCurrentOrbit';
-import { getEciOfCurrentOrbit } from './calc/getEciOfCurrentOrbit';
-import { getOrbitByLatLon } from './calc/getOrbitByLatLon';
-import { verifySensors } from './calc/verifySensors';
-import { createTle } from './tle/createTle';
-import { Sgp4 } from 'ootk';
-import { ecf2eci, ecf2rae, eci2ecf, eci2lla, getDegLat, getDegLon, lla2ecf, lookAngles2ecf } from './transforms';
-import { calculateTimeVariables } from './calc/calculateTimeVariables';
-import { eci2ll } from './transforms/eci2ll';
-import { eci2rae } from './transforms/eci2rae';
-import { calculateVisMag } from './optical/calculateVisMag';
-import { getRae } from './calc/getRae';
-import { getLlaOfCurrentOrbit } from './calc/getLlaOfCurrentOrbit';
-import { getRicOfCurrentOrbit } from './calc/getRicOfCurrentOrbit';
-import { calculateDops, getDops, updateDopsTable } from './dops/dops';
-import { getAlt } from './calc/getAlt';
-import { sat2ric } from './transforms/sat2ric';
-import { getSunTimes } from './calc/getSunTimes';
 import { getEci } from './calc/getEci';
-import { findClosestApproachTime } from './find/findClosestApproachTime';
-import { findCloseObjects } from './find/findCloseObjects';
-import { findBestPasses } from './find/findBestPasses';
-import { findBestPass } from './find/findBestPass';
-import { checkIsInView } from './lookangles/checkIsInView';
-import { calculateLookAngles } from './calc/calculateLookAngles';
-import { distance } from './calc/distance';
-import { currentEpoch } from './calc/currentEpoch';
+import { getEciOfCurrentOrbit } from './calc/getEciOfCurrentOrbit';
+import { getLlaOfCurrentOrbit } from './calc/getLlaOfCurrentOrbit';
+import { getOrbitByLatLon } from './calc/getOrbitByLatLon';
+import { getRae } from './calc/getRae';
+import { getRicOfCurrentOrbit } from './calc/getRicOfCurrentOrbit';
+import { getSunTimes } from './calc/getSunTimes';
 import { getTearData } from './calc/getTearData';
+import { map } from './calc/map';
+import { verifySensors } from './calc/verifySensors';
+import { calculateDops, getDops, updateDopsTable } from './dops/dops';
+import { findBestPass } from './find/findBestPass';
+import { findBestPasses } from './find/findBestPasses';
+import { findCloseObjects } from './find/findCloseObjects';
+import { findClosestApproachTime } from './find/findClosestApproachTime';
+import { findNearbyObjectsByOrbit } from './find/findNearbyObjectsByOrbit';
+import { findReentries } from './find/findReentries';
+import { checkIsInView } from './lookangles/checkIsInView';
 import { getlookangles, getlookanglesMultiSite, populateMultiSiteTable } from './lookangles/getlookangles';
 import { nextNpasses, nextpass, nextpassList } from './lookangles/nextpass';
-import { map } from './calc/map';
-
+import { calculateVisMag } from './optical/calculateVisMag';
+import { createTle } from './tle/createTle';
+import { ecf2eci, ecf2rae, eci2ecf, eci2lla, getDegLat, getDegLon, lla2ecf, lookAngles2ecf } from './transforms';
+import { eci2ll } from './transforms/eci2ll';
+import { eci2rae } from './transforms/eci2rae';
+import { sat2ric } from './transforms/sat2ric';
 
 window._numeric = numeric; // numeric break if it is not available globally
 
@@ -147,17 +147,26 @@ export const getTEARR = (sat?: SatObject, sensors?: SensorObject[], propTime?: D
   const sensor = sensors[0];
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  let satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  let satrec = calcSatrec(sat);
   const now = typeof propTime !== 'undefined' ? propTime : timeManager.simulationTimeObj;
   const { m, gmst } = calculateTimeVariables(now, satrec);
-  let positionEci = Sgp4.propagate(satrec, m);
+  let positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+  if (!positionEci) {
+    console.error('No ECI position for', satrec.satnum, 'at', now);
+    currentTEARR.alt = 0;
+    currentTEARR.lon = 0;
+    currentTEARR.lat = 0;
+    currentTEARR.az = 0;
+    currentTEARR.el = 0;
+    currentTEARR.rng = 0;
+  }
 
   try {
-    let gpos = eci2lla(positionEci.position, gmst);
+    let gpos = eci2lla(positionEci, gmst);
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
-    let positionEcf = eci2ecf(positionEci.position, gmst);
+    let positionEcf = eci2ecf(positionEci, gmst);
     let lookAngles = ecf2rae(sensor.observerGd, positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG;
     currentTEARR.el = lookAngles.el * RAD2DEG;

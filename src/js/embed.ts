@@ -106,7 +106,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     keepTrackApi.programs.satCruncher = satCruncher;
 
     keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData?.length);
-    satSet.setColorScheme(colorSchemeManager.default, true);
 
     orbitManager.init();
 
@@ -117,7 +116,6 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     uiManager.init();
     keepTrackApi.programs.dotsManager.updateSizeBuffer(satSet.satData?.length);
     // await radarDataManager.init(sensorManager, satSet, satCruncher, satellite);
-    satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
     objectManager.satLinkManager.idToSatnum(satSet);
 
     uiManager.uiInput.init();

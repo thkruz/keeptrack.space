@@ -69,14 +69,6 @@ export const getIdFromObjNum = (objNum: number, isExtensiveSearch = true): numbe
   }
   return null;
 };
-export const getSatInViewOnly = (i: number): SatObject => {
-  const { dotsManager, satSet } = keepTrackApi.programs;
-  if (!satSet.satData) return null;
-  if (!satSet.satData[i]) return null;
-
-  satSet.satData[i].inView = dotsManager.inViewData[i];
-  return satSet.satData[i];
-};
 export const getSatPosOnly = (i: number): SatObject => {
   const { dotsManager, satSet } = keepTrackApi.programs;
   if (!satSet.satData) return null;
@@ -115,21 +107,7 @@ export const getSat = (i: number): SatObject => { // NOSONAR
   if (!satSet.satData || !satSet.satData[i]) return null;
   const { dotsManager } = keepTrackApi.programs;
 
-  if (satSet.gotExtraData) {
-    satSet.satData[i].inViewChange = false;
-    if (typeof dotsManager.inViewData != 'undefined' && typeof dotsManager.inViewData[i] != 'undefined') {
-      if (satSet.satData[i].inView !== dotsManager.inViewData[i]) satSet.satData[i].inViewChange = true;
-      satSet.satData[i].inView = dotsManager.inViewData[i];
-    } else {
-      satSet.satData[i].inView = 0;
-      satSet.satData[i].inViewChange = false;
-    }
-
-    if (typeof dotsManager.inSunData != 'undefined' && typeof dotsManager.inSunData[i] != 'undefined') {
-      if (satSet.satData[i].inSun !== dotsManager.inSunData[i]) satSet.satData[i].inSunChange = true;
-      satSet.satData[i].inSun = dotsManager.inSunData[i];
-    }
-
+  if (satSet.gotExtraData && dotsManager.velocityData) {
     satSet.satData[i].velocity ??= { total: 0, x: 0, y: 0, z: 0 };
 
     // TODO: This is to accomadate the old end of world .json files that used velocity = 0

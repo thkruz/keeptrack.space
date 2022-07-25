@@ -1,4 +1,4 @@
-import * as satellite from 'satellite.js';
+import * as Ootk from 'ootk';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU } from '../lib/constants';
 import { jday } from '../timeManager/transforms';
 import { propTime } from './positionCruncher/calculations';
@@ -26,7 +26,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
   if (m.data.isUpdate) {
     // Add Satellites
     if (!m.data.missile && m.data.satId < 99999) {
-      satCache[m.data.satId] = satellite.twoline2satrec(m.data.TLE1, m.data.TLE2);
+      satCache[m.data.satId] = Ootk.Sgp4.createSatrec(m.data.TLE1, m.data.TLE2);
     }
     // Add Missiles
     if (m.data.missile) {
@@ -50,7 +50,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
       if (satData[i].static || satData[i].missile) {
         satCache[i] = satData[i];
       } else {
-        satCache[i] = satellite.twoline2satrec(satData[i].TLE1, satData[i].TLE2);
+        satCache[i] = Ootk.Sgp4.createSatrec(satData[i].TLE1, satData[i].TLE2);
       }
     }
 
@@ -98,7 +98,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
               missileTime.getUTCSeconds()
             ) +
             missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-          const gmst = satellite.gstime(j);
+          const gmst = Ootk.Sgp4.gstime(j);
 
           const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
           const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
@@ -118,11 +118,11 @@ export const onmessageProcessing = (m) => { // NOSONAR
 
       while (i < len) {
         const t = now + i * timeslice;
-        let p: satellite.EciVec3<number> | satellite.EcfVec3<number>;
-        p = <satellite.EciVec3<number>>satellite.sgp4(satCache[satId], t)?.position;
+        let p: any;
+        p = Ootk.Sgp4.propagate(satCache[satId], t)?.position;
         // eslint-disable-next-line no-constant-condition
         if (isEcfOutput) {
-          p = <satellite.EcfVec3<number>>satellite.ecfToEci(p, -i * timeslice * TAU / period);
+          p = Ootk.Transforms.ecf2eci(p, -i * timeslice * TAU / period);
         }
         if (p?.x && p?.y && p?.z) {
           pointsOut[i * 4] = p.x;

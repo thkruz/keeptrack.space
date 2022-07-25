@@ -28,6 +28,7 @@ import { countriesRules } from './ruleSets/countries';
 import { defaultRules } from './ruleSets/default';
 import { geoRules } from './ruleSets/geo';
 import { groupRules } from './ruleSets/group';
+import { groupCountriesRules } from './ruleSets/group-countries';
 import { leoRules } from './ruleSets/leo';
 import { lostobjectsRules } from './ruleSets/lostobjects';
 import { onlyFovRules } from './ruleSets/onlyFov';
@@ -86,8 +87,10 @@ export interface ColorSchemeManager {
   resetObjectTypeFlags: () => void;
   reloadColors: () => void;
   currentColorScheme: ColorRuleSet;
+  lastColorScheme: ColorRuleSet;
   iSensor: number;
   lastCalculation: number;
+  lastDotColored: number;
   default: ColorRuleSet;
   onlyFOV: ColorRuleSet;
   sunlight: ColorRuleSet;
@@ -101,6 +104,7 @@ export interface ColorSchemeManager {
   geo: ColorRuleSet;
   velocity: ColorRuleSet;
   group: ColorRuleSet;
+  groupCountries: ColorRuleSet;
   calculateColorBuffers: (isForceRecolor?: boolean) => Promise<void>;
   objectTypeFlags: ObjectTypeFlags;
   satSet: CatalogManager;
@@ -145,7 +149,14 @@ export type ColorInformation = {
   pickable: Pickable;
 };
 
-export type ColorRuleSet = (sat: SatObject) => ColorInformation;
+export interface ColorRuleParams {
+  satInView?: Int8Array;
+  satInSun?: Int8Array;
+}
+
+export type ColorRuleSet = (sat: SatObject, params?: any) => ColorInformation;
+
+const DOTS_PER_CALC = 450;
 
 export const colorSchemeManager: ColorSchemeManager = {
   objectTypeFlags: {
@@ -212,6 +223,7 @@ export const colorSchemeManager: ColorSchemeManager = {
     colorSchemeManager.smallsats = smallsatsRules;
     colorSchemeManager.rcs = rcsRules;
     colorSchemeManager.countries = countriesRules;
+    colorSchemeManager.groupCountries = groupCountriesRules;
     colorSchemeManager.ageOfElset = ageOfElsetRules;
     colorSchemeManager.lostobjects = lostobjectsRules;
     colorSchemeManager.leo = leoRules;
@@ -221,8 +233,10 @@ export const colorSchemeManager: ColorSchemeManager = {
     colorSchemeManager.group = groupRules;
   },
   currentColorScheme: null,
+  lastColorScheme: null,
   iSensor: 0,
   lastCalculation: 0,
+  lastDotColored: 0,
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
@@ -232,81 +246,133 @@ export const colorSchemeManager: ColorSchemeManager = {
       // These two variables only need to be set once, but we want to make sure they aren't called before the satellites
       // are loaded into satSet. Don't move the buffer data creation into the constructor!
       if (!colorSchemeManager.pickableData || !colorSchemeManager.colorData) return;
+      const { searchBox } = keepTrackApi.programs;
       const { gl } = keepTrackApi.programs.drawManager;
 
-      // Determine what time it is so we know if its time to recolor everything
-      const now = Date.now();
 
-      // Unless we are forcing a recolor
-      // If there hasn't been enough time between the last recoloring skip it (performance boost)
-      // Unless its the first draw - otherwise we will never color in anything
-      if (!isForceRecolor && now - colorSchemeManager.lastCalculation < settingsManager.reColorMinimumTime && colorSchemeManager.lastCalculation !== 0) return;
+      // Revert colorscheme if search box is empty
+      if (colorSchemeManager.currentColorScheme === colorSchemeManager.group || colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
+        if (searchBox.getCurrentSearch() === '') {
+          if (colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
+            colorSchemeManager.currentColorScheme = colorSchemeManager.countries;
+          } else {
+            colorSchemeManager.currentColorScheme = colorSchemeManager.default;
+          }
+        }
+      }
 
-      // Record this as the last time we calculated this.colors
-      colorSchemeManager.lastCalculation = now;
+
+      if (!isForceRecolor) {
+        switch (colorSchemeManager.currentColorScheme) {          
+          case colorSchemeManager.apogee:
+          case colorSchemeManager.smallsats:
+          case colorSchemeManager.rcs:
+          case colorSchemeManager.countries:
+          case colorSchemeManager.ageOfElset:
+          case colorSchemeManager.lostobjects:
+          case colorSchemeManager.leo:
+          case colorSchemeManager.geo:
+          case colorSchemeManager.group:    
+          case colorSchemeManager.groupCountries:        
+            // These don't change over time
+            return;
+          case colorSchemeManager.default:
+          case colorSchemeManager.onlyFOV:
+          case colorSchemeManager.sunlight:
+          case colorSchemeManager.velocity:
+            // These change over time
+            break;
+          default:
+            // Reset the scheme to the default
+            colorSchemeManager.currentColorScheme = colorSchemeManager.default;
+            break;
+        }
+      }
+
+      // Figure out if we are coloring all of the dots - assume yes initially
+      let firstDotToColor = 0;
+      let lastDotToColor = settingsManager.dotsOnScreen;
+      // If this is the same color scheme then we don't need to recolor everything
+      if (!isForceRecolor && colorSchemeManager.currentColorScheme === colorSchemeManager.lastColorScheme) {
+        if (colorSchemeManager.lastDotColored < settingsManager.dotsOnScreen) {
+          firstDotToColor = colorSchemeManager.lastDotColored;
+          lastDotToColor = firstDotToColor + ((<any>window).dotsPerColor || DOTS_PER_CALC);
+          if (lastDotToColor > settingsManager.dotsOnScreen) lastDotToColor = settingsManager.dotsOnScreen;
+        } else {
+          lastDotToColor = (<any>window).dotsPerColor || DOTS_PER_CALC;
+        }
+
+        colorSchemeManager.lastDotColored = lastDotToColor;
+      } else {
+        colorSchemeManager.lastDotColored = 0;
+      }
+      // Note the colorscheme for next time
+      colorSchemeManager.lastColorScheme = colorSchemeManager.currentColorScheme;
 
       // We need to know what all the satellites currently look like - ask satSet to give that information
-      const { satData } = keepTrackApi.programs.satSet;
-
-      const satInView = colorSchemeManager.satSet.getSatInView();
+      const { satData } = keepTrackApi.programs.satSet;      
 
       // We also need the velocity data if we are trying to colorizing that
-      const satVel = colorSchemeManager.currentColorScheme === colorSchemeManager.velocity ? colorSchemeManager.satSet.getSatVel() : null;
-      // If we want to color things based on sunlight we need to get that info from satSet
-      const satInSun = colorSchemeManager.satSet.getSatInSun();
+      let satVel = null;
+      if (colorSchemeManager.currentColorScheme === colorSchemeManager.velocity) {
+        satVel = colorSchemeManager.currentColorScheme === colorSchemeManager.velocity ? colorSchemeManager.satSet.getSatVel() : null;
+      }
 
       // Reset Which Sensor we are coloring before the loop begins
       colorSchemeManager.iSensor = 0;
 
       // Lets loop through all the satellites and color them in one by one
       let colors: ColorInformation = null;
-      for (let i = 0; i < settingsManager.dotsOnScreen; i++) {
-        // In View data is stored in a separate array
-        if (satInView) {
-          satData[i].inView = satInView[i];
-        }
+      let params = {
+        year: '',
+        jday: 0,
+      };
 
-        // Sun values are stored separately from the rest of satSet so it needs to be combined
-        if (satInSun) {
-          satData[i].inSun = satInSun[i];
-        }
+      if (colorSchemeManager.currentColorScheme === colorSchemeManager.ageOfElset) {
+        const {timeManager} = keepTrackApi.programs;
+        let now = new Date();
+        params.jday = timeManager.getDayOfYear(now);
+        params.year = now.getUTCFullYear().toString().substr(2, 2);
+      }
 
-        // Velocity is stored separate from satellite details - so add in the velocity
-        if (satVel) {
+      // Velocity is a special case - we need to know the velocity of each satellite
+      if (colorSchemeManager.currentColorScheme === colorSchemeManager.velocity) {
+        for (let i = firstDotToColor; i < lastDotToColor; i++) {                
           satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
+
+          colors = colorSchemeManager.currentColorScheme(satData[i], params);
+          colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
+          colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
+          colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B
+          colorSchemeManager.colorData[i * 4 + 3] = colors.color[3]; // A
+          colorSchemeManager.pickableData[i] = colors.pickable;        
         }
-
-        // Run the colorRuleSet function we used to create this schematic
-        colors = colorSchemeManager.currentColorScheme(satData[i]);
-
-        // Don't let one bad color break the buffer
-        // if (typeof this.colors == 'undefined') continue;
-
-        // We got a Vec4 back, but we need to flatten it
-        colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
-        colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
-        colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B
-        colorSchemeManager.colorData[i * 4 + 3] = colors.color[3]; // A
-        colorSchemeManager.pickableData[i] = colors.pickable ? Pickable.Yes : Pickable.No;
-
-        // If we don't do this then everytime the color refreshes it will undo any effect being applied outside of this loop
-        if (i == keepTrackApi.programs.objectManager.selectedSat) {
-          // Selected satellites are always one color so forget whatever we just did
-          colorSchemeManager.colorData[i * 4] = settingsManager.selectedColor[0]; // R
-          colorSchemeManager.colorData[i * 4 + 1] = settingsManager.selectedColor[1]; // G
-          colorSchemeManager.colorData[i * 4 + 2] = settingsManager.selectedColor[2]; // B
-          colorSchemeManager.colorData[i * 4 + 3] = settingsManager.selectedColor[3]; // A
-        }
-
-        if (i == keepTrackApi.programs.objectManager.hoveringSat) {
-          // Hover satellites are always one color so forget whatever we just did
-          // We check this last so you can hover over the selected satellite
-          colorSchemeManager.colorData[i * 4] = settingsManager.hoverColor[0]; // R
-          colorSchemeManager.colorData[i * 4 + 1] = settingsManager.hoverColor[1]; // G
-          colorSchemeManager.colorData[i * 4 + 2] = settingsManager.hoverColor[2]; // B
-          colorSchemeManager.colorData[i * 4 + 3] = settingsManager.hoverColor[3]; // A
+      } else {
+        for (let i = firstDotToColor; i < lastDotToColor; i++) {                
+          colors = colorSchemeManager.currentColorScheme(satData[i], params);
+          colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
+          colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
+          colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B
+          colorSchemeManager.colorData[i * 4 + 3] = colors.color[3]; // A
+          colorSchemeManager.pickableData[i] = colors.pickable;        
         }
       }
+        
+      // If we don't do this then everytime the color refreshes it will undo any effect being applied outside of this loop
+      const selSat = keepTrackApi.programs.objectManager.selectedSat;
+      // Selected satellites are always one color so forget whatever we just did
+      colorSchemeManager.colorData[selSat * 4] = settingsManager.selectedColor[0]; // R
+      colorSchemeManager.colorData[selSat * 4 + 1] = settingsManager.selectedColor[1]; // G
+      colorSchemeManager.colorData[selSat * 4 + 2] = settingsManager.selectedColor[2]; // B
+      colorSchemeManager.colorData[selSat * 4 + 3] = settingsManager.selectedColor[3]; // A
+
+      const hovSat = keepTrackApi.programs.objectManager.hoveringSat;
+      // Hover satellites are always one color so forget whatever we just did
+      // We check this last so you can hover over the selected satellite
+      colorSchemeManager.colorData[hovSat * 4] = settingsManager.hoverColor[0]; // R
+      colorSchemeManager.colorData[hovSat * 4 + 1] = settingsManager.hoverColor[1]; // G
+      colorSchemeManager.colorData[hovSat * 4 + 2] = settingsManager.hoverColor[2]; // B
+      colorSchemeManager.colorData[hovSat * 4 + 3] = settingsManager.hoverColor[3]; // A
 
       // Now that we have all the information, load the color buffer
       gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
@@ -375,6 +441,7 @@ export const colorSchemeManager: ColorSchemeManager = {
   smallsats: null,
   rcs: null,
   countries: null,
+  groupCountries: null,
   ageOfElset: null,
   lostobjects: null,
   leo: null,
@@ -392,4 +459,4 @@ export const colorSchemeManager: ColorSchemeManager = {
 export const isPayloadOff = (sat: SatObject) => sat.type === 1 && colorSchemeManager.objectTypeFlags.payload === false;
 export const isRocketBodyOff = (sat: SatObject) => sat.type === 2 && colorSchemeManager.objectTypeFlags.rocketBody === false;
 export const isDebrisOff = (sat: SatObject) => sat.type === 3 && colorSchemeManager.objectTypeFlags.debris === false;
-export const isInViewOff = (sat: SatObject) => sat.inView === 1 && colorSchemeManager.objectTypeFlags.inFOV === false;
+export const isInViewOff = (sat: SatObject) => keepTrackApi.programs.dotsManager.inViewData[sat.id] === 1 && colorSchemeManager.objectTypeFlags.inFOV === false;

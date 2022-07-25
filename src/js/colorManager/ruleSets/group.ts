@@ -10,8 +10,29 @@ export const groupRules = (sat: SatObject): ColorInformation => { // NOSONAR
   // if (groupsManager.selectedGroup === null) return;
   // Show Things in the Group
   if (sat.isInGroup) {
+    let color: [number, number, number, number] = [0, 0, 0, 0];
+    switch (sat.type) {
+      case SpaceObjectType.PAYLOAD:
+        color = colorSchemeManager.colorTheme.payload;
+        break;
+      case SpaceObjectType.ROCKET_BODY:
+        color = colorSchemeManager.colorTheme.rocketBody;
+        break;
+      case SpaceObjectType.DEBRIS:
+        color = colorSchemeManager.colorTheme.debris;
+        break;
+      case SpaceObjectType.SPECIAL:
+        color = colorSchemeManager.colorTheme.payload; // Assume Payload
+        break;
+      case SpaceObjectType.UNKNOWN:
+        color = colorSchemeManager.colorTheme.debris; // Assume Debris
+        break;
+      default:
+        color = colorSchemeManager.colorTheme.payload; // Assume Payload
+        break;
+    }
     return {
-      color: colorSchemeManager.colorTheme.inGroup,
+      color: color,
       pickable: Pickable.Yes,
     };
   }

@@ -3,6 +3,7 @@ import { meshManager } from '@app/js/drawManager/meshManager';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
+import { getEl } from '@app/js/lib/helpers';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins';
 import { mat4 } from 'gl-matrix';
 import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
@@ -10,7 +11,6 @@ import { SpaceObjectType } from '../api/SpaceObjectType';
 import { demoMode } from './demoMode';
 import { hoverBoxOnSat, hoverManager, updateHover } from './hoverManager/hoverManager';
 import { screenShot, watermarkedDataUrl } from './screenShot';
-import { getEl } from '@app/js/lib/helpers';
 
 let satMiniBox: HTMLDivElement;
 let satLabelModeLastTime = 0;
@@ -32,7 +32,7 @@ export const init = () => {
 };
 export const glInit = async () => {
   // Ensure the canvas is available
-  if (drawManager.canvas === null) {    
+  if (drawManager.canvas === null) {
     throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
   }
 
@@ -103,7 +103,7 @@ export const loadScene = async () => {
   drawManager.sceneManager = sceneManager;
   try {
     // await tools.init();
-    await sceneManager.earth.init(gl);        
+    await sceneManager.earth.init(gl);
     keepTrackApi.methods.drawManagerLoadScene();
     await sceneManager.sun.init();
     await sceneManager.moon.init();
@@ -186,11 +186,11 @@ export const calculatePMatrix = () => {
 };
 export const startWithOrbits = async () => {
   if (settingsManager.startWithOrbitsDisplayed) {
-    const { groupsManager, orbitManager, satSet } = keepTrackApi.programs;
+    const { groupsManager, orbitManager, satSet, colorSchemeManager } = keepTrackApi.programs;
     // All Orbits
     groupsManager.debris = groupsManager.createGroup('all', '');
     groupsManager.selectGroup(groupsManager.debris);
-    satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+    satSet.setColorScheme(colorSchemeManager.currentColorScheme, true); // force color recalc
     groupsManager.debris.updateOrbits(orbitManager);
     settingsManager.isOrbitOverlayVisible = true;
   }
@@ -228,6 +228,10 @@ export const drawLoop = (preciseDt: number) => {
   drawManager.drawOptionalScenery();
 
   sceneManager.earth.draw(drawManager.pMatrix, mainCamera, dotsManager, drawManager.postProcessingManager.curBuffer);
+
+  // Update Colors
+  // NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
+  satSet.setColorScheme(colorSchemeManager.currentColorScheme); // avoid recalculating ALL colors
 
   // Update Draw Positions
   dotsManager.updatePositionBuffer(satSet.satData.length, satSet.orbitalSats, timeManager);
@@ -354,11 +358,11 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
   if (!settingsManager.isDrawLess) {
     if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
     const { mainCamera, objectManager } = keepTrackApi.programs;
-    
+
     if (settingsManager.isDrawSun) {
       // Draw the Sun to the Godrays Frame Buffer
       sceneManager.sun.draw(drawManager.pMatrix, mainCamera.camMatrix, sceneManager.sun.godrays.frameBuffer);
-      
+
       // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
       sceneManager.earth.drawOcclusion(drawManager.pMatrix, mainCamera.camMatrix, drawManager?.postProcessingManager?.programs?.occlusion, sceneManager?.sun?.godrays?.frameBuffer);
       if (!settingsManager.modelsOnSatelliteViewOverride && objectManager.selectedSat !== -1) {
@@ -369,8 +373,8 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
       drawManager.postProcessingManager.curBuffer = null;
       drawManager.sceneManager.sun.drawGodrays(gl, drawManager.postProcessingManager.curBuffer);
     }
-    
-    drawManager.sceneManager.skybox.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);    
+
+    drawManager.sceneManager.skybox.draw(drawManager.pMatrix, mainCamera.camMatrix, postProcessingManager.curBuffer);
 
     // Apply two pass gaussian blur to the godrays to smooth them out
     // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
@@ -389,7 +393,7 @@ export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
   keepTrackApi.programs.drawManager.postProcessingManager.curBuffer = null;
 };
 export const satCalculate = () => {
-  const { mainCamera, orbitManager, lineManager, objectManager, sensorManager, satSet, timeManager } = keepTrackApi.programs;
+  const { mainCamera, orbitManager, lineManager, objectManager, sensorManager, satSet, timeManager, dotsManager } = keepTrackApi.programs;
 
   if (objectManager.selectedSat !== -1) {
     drawManager.sat = satSet.getSat(objectManager.selectedSat);
@@ -402,7 +406,6 @@ export const satCalculate = () => {
       missile: false,
       type: SpaceObjectType.UNKNOWN,
       static: false,
-      inView: 0,
     };
   }
 
@@ -413,7 +416,7 @@ export const satCalculate = () => {
     selectSatManager.selectSat(objectManager.selectedSat, mainCamera);
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && drawManager.sat.inView === 1) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && dotsManager.inViewData[drawManager.sat.id] === 1) {
         lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name));
       }

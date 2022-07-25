@@ -244,12 +244,12 @@ describe('Test velocity ruleset', () => {
   });
   it('should color things in view differently', async () => {
     colorSchemeManager.objectTypeFlags.inViewAlt = true;
-    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ inView: 1 } });
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ id: 0 } });
     expect(result).toMatchSnapshot();
   });
   it('should hide things in view if disabled', async () => {
     colorSchemeManager.objectTypeFlags.inViewAlt = false;
-    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ inView: 1 } });
+    const result = colorSchemeManager.velocity({ ...defaultSat, ...{ id: 0 } });
     colorSchemeManager.objectTypeFlags.inViewAlt = true;
     expect(result).toMatchSnapshot();
   });
@@ -369,67 +369,69 @@ describe('colorSchemeManager.defaultRules', () => {
     expect(result).toMatchSnapshot();
   });
 
+  // NOTE: satId 0 is inView and satId 1 is Not!
+
   it('should color missiles that are out of FOV', () => {
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 0 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, id: 1 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide missiles that are out of FOV when told to', () => {
     colorSchemeManager.objectTypeFlags.missile = false;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 0 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, id: 1 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should color missiles that are in FOV', () => {
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 1 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, id: 0 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide missiles that are in FOV when told to', () => {
     colorSchemeManager.objectTypeFlags.missileInview = false;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, inView: 1 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ missile: true, id: 0 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide payloads out of FOV when told to', () => {
     colorSchemeManager.objectTypeFlags.payload = false;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 0 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, id: 1 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide rocket bodies out of FOV when told to', () => {
     colorSchemeManager.objectTypeFlags.rocketBody = false;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.ROCKET_BODY, inView: 0 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.ROCKET_BODY, id: 1 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide debris out of FOV when told to', () => {
     colorSchemeManager.objectTypeFlags.debris = false;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.DEBRIS, inView: 0 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.DEBRIS, id: 1 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide special sats out of FOV when told to', () => {
     colorSchemeManager.objectTypeFlags.pink = false;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.SPECIAL, inView: 0 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.SPECIAL, id: 1 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide things in FOV when told to', () => {
     colorSchemeManager.objectTypeFlags.inFOV = false;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 1 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, id: 0 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should hide satellites in view if we are in planetarium view', () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.PLANETARIUM;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 1 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, id: 0 } });
     expect(result).toMatchSnapshot();
   });
 
   it('should color satellites in view if we are not planetarium view', () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Default;
-    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, inView: 1 } });
+    const result = colorSchemeManager.default({ ...defaultSat, ...{ type: SpaceObjectType.PAYLOAD, id: 0 } });
     expect(result).toMatchSnapshot();
   });
 
@@ -489,14 +491,14 @@ describe('colorSchemeManager.defaultRules', () => {
   test('14', () => {
     let result: any = colorSchemeManager.default({
       missile: true,
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
 
     colorSchemeManager.objectTypeFlags.missile = false;
     result = colorSchemeManager.default({
       missile: true,
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.missile = true;
@@ -506,7 +508,7 @@ describe('colorSchemeManager.defaultRules', () => {
     colorSchemeManager.objectTypeFlags.payload = false;
     let result: any = colorSchemeManager.default({
       type: 1,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.payload = true;
@@ -516,7 +518,7 @@ describe('colorSchemeManager.defaultRules', () => {
     colorSchemeManager.objectTypeFlags.rocketBody = false;
     let result: any = colorSchemeManager.default({
       type: 2,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.rocketBody = true;
@@ -526,7 +528,7 @@ describe('colorSchemeManager.defaultRules', () => {
     colorSchemeManager.objectTypeFlags.debris = false;
     let result: any = colorSchemeManager.default({
       type: 3,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.debris = true;
@@ -536,7 +538,7 @@ describe('colorSchemeManager.defaultRules', () => {
     colorSchemeManager.objectTypeFlags.trusat = false;
     let result: any = colorSchemeManager.default({
       type: 4,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.trusat = true;
@@ -545,7 +547,7 @@ describe('colorSchemeManager.defaultRules', () => {
   test('19', () => {
     colorSchemeManager.objectTypeFlags.inFOV = false;
     let result: any = colorSchemeManager.default({
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.inFOV = true;
@@ -554,7 +556,7 @@ describe('colorSchemeManager.defaultRules', () => {
   it('should deselect dots in default ColorScheme using Planetarium View', () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Planetarium;
     let result: any = colorSchemeManager.default({
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Default;
@@ -563,7 +565,7 @@ describe('colorSchemeManager.defaultRules', () => {
   it('should deselect dots in countries ColorScheme using Planetarium View', () => {
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Planetarium;
     let result: any = colorSchemeManager.countries({
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
     keepTrackApi.programs.mainCamera.cameraType.current = keepTrackApi.programs.mainCamera.cameraType.Default;
@@ -571,7 +573,7 @@ describe('colorSchemeManager.defaultRules', () => {
 
   test('21', () => {
     let result: any = colorSchemeManager.default({
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
   });
@@ -717,7 +719,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('9', () => {
     let result: any = colorSchemeManager.sunlight({
       missile: true,
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
   });
@@ -725,7 +727,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('9', () => {
     let result: any = colorSchemeManager.sunlight({
       missile: true,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
   });
@@ -734,7 +736,7 @@ describe('colorSchemeManager.sunlightRules', () => {
     colorSchemeManager.objectTypeFlags.inFOV = false;
     let result: any = colorSchemeManager.sunlight({
       inSun: 2,
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
     colorSchemeManager.objectTypeFlags.inFOV = true;
@@ -743,7 +745,7 @@ describe('colorSchemeManager.sunlightRules', () => {
   test('11', () => {
     let result: any = colorSchemeManager.sunlight({
       inSun: 2,
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
   });
@@ -753,7 +755,7 @@ describe('colorSchemeManager.sunlightRules', () => {
     let result: any = colorSchemeManager.sunlight({
       vmag: 0,
       inSun: 2,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
   });
@@ -763,7 +765,7 @@ describe('colorSchemeManager.sunlightRules', () => {
     let result: any = colorSchemeManager.sunlight({
       vmag: 3.1,
       inSun: 2,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
   });
@@ -773,7 +775,7 @@ describe('colorSchemeManager.sunlightRules', () => {
     let result: any = colorSchemeManager.sunlight({
       vmag: 5,
       inSun: 2,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
   });
@@ -783,7 +785,7 @@ describe('colorSchemeManager.sunlightRules', () => {
     let result: any = colorSchemeManager.sunlight({
       vmag: 5,
       inSun: 1,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
   });
@@ -793,7 +795,7 @@ describe('colorSchemeManager.sunlightRules', () => {
     let result: any = colorSchemeManager.sunlight({
       vmag: 5,
       inSun: 0,
-      inView: false,
+      id: 1,
     });
     expect(result).toMatchSnapshot();
   });
@@ -1274,7 +1276,7 @@ describe('colorSchemeManager.leoRules', () => {
   test('8', () => {
     let result: any = colorSchemeManager.leo({
       apogee: 1000,
-      inView: true,
+      id: 0,
     });
     expect(result).toMatchSnapshot();
   });
@@ -1361,7 +1363,7 @@ describe('colorSchemeManager.geoRules', () => {
 
   test('7', () => {
     let result: any = colorSchemeManager.geo({
-      inView: true,
+      id: 0,
       perigee: 500000,
     });
     expect(result).toMatchSnapshot();
@@ -1412,11 +1414,11 @@ describe('colorSchemeManager objectTypeFlags checks', () => {
 
   it('should handle inview on', () => {
     colorSchemeManager.objectTypeFlags.inFOV = true;
-    expect(isInViewOff({ ...defaultSat, ...{ inView: 0 } })).toBe(false);
+    expect(isInViewOff({ ...defaultSat, ...{ id: 1 } })).toBe(false);
   });
   it('should handle inview off', () => {
     colorSchemeManager.objectTypeFlags.inFOV = false;
-    expect(isInViewOff({ ...defaultSat, ...{ inView: 1 } })).toBe(true);
+    expect(isInViewOff({ ...defaultSat, ...{ id: 0 } })).toBe(true);
   });
 });
 

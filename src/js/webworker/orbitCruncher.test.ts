@@ -1,8 +1,7 @@
-import * as satellite from 'satellite.js';
+import * as Ootk from 'ootk';
 import { defaultSensor } from '../api/apiMocks';
 import { onmessageProcessing, postMessageProcessing } from './orbitCruncher';
 
-jest.mock('satellite.js');
 class MockWorker {
   onmessage: () => void;
   constructor() {
@@ -43,7 +42,7 @@ describe('positionCruncher.onmessage', () => {
     message.data.satId = 1;
     message.data.TLE1 = 'TLE1';
     message.data.TLE2 = 'TLE2';
-    jest.spyOn(satellite, 'twoline2satrec').mockImplementation(
+    jest.spyOn(Ootk.Sgp4, 'createSatrec').mockImplementation(
       () =>
         <any>{
           jdsatepoch: 0,
@@ -91,7 +90,7 @@ describe('positionCruncher.onmessage', () => {
     message.data.orbitFadeFactor = JSON.stringify([]);
     message.data.numSegs = 10;
     message.data.satId = 0;
-    jest.spyOn(satellite, 'sgp4').mockImplementation(
+    jest.spyOn(Ootk.Sgp4, 'propagate').mockImplementation(
       () =>
         <any>{
           position: {
@@ -101,7 +100,7 @@ describe('positionCruncher.onmessage', () => {
           },
         }
     );
-    jest.spyOn(satellite, 'twoline2satrec').mockImplementation(
+    jest.spyOn(Ootk.Sgp4, 'createSatrec').mockImplementation(
       () =>
         <any>{
           jdsatepoch: 0,
@@ -118,13 +117,13 @@ describe('positionCruncher.onmessage', () => {
     message.data.orbitFadeFactor = JSON.stringify([]);
     message.data.numSegs = 10;
     message.data.satId = 0;
-    jest.spyOn(satellite, 'sgp4').mockImplementation(
+    jest.spyOn(Ootk.Sgp4, 'propagate').mockImplementation(
       () =>
         <any>{
           position: false,
         }
     );
-    jest.spyOn(satellite, 'twoline2satrec').mockImplementation(
+    jest.spyOn(Ootk.Sgp4, 'createSatrec').mockImplementation(
       () =>
         <any>{
           jdsatepoch: 0,

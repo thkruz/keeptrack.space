@@ -1,5 +1,5 @@
 import * as glm from 'gl-matrix';
-import { SatRec } from 'satellite.js';
+import { EciVec3, SatelliteRecord } from 'ootk';
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
@@ -317,6 +317,13 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  maxOribtsDisplayedDesktopAll: any;
+  orbitGroupAlpha: number;
+  loopTimeMachine: any;
+  isDisableSelectSat: any;
+  timeMachineLongToast: boolean;
+  timeMachineString(yearStr: string);
+  lastInteractionTime: number;
   isDisableExtraCatalog: boolean;
   orbitSegments: number;
   lastGamepadMovement: number;
@@ -427,7 +434,6 @@ export interface SettingsManager {
   isEnableConsole: boolean;
   isEnableGsCatalog: boolean;
   isEnableRadarData: boolean;
-  isForceColorScheme: boolean;
   isFOVBubbleModeOn: boolean;
   isLoadLastMap: boolean;
   isMapUpdateOverride: boolean;
@@ -894,11 +900,7 @@ export declare interface SatObject {
   };
   id: number;
   inclination: number;
-  inSun?: number;
-  inSunChange: boolean;
   intlDes?: string;
-  inView: number;
-  inViewChange: boolean;
   isInGroup?: boolean;
   isInSun?: () => SunStatus;
   isRadarData?: boolean;
@@ -1026,9 +1028,9 @@ export interface SensorObjectCruncher {
   lon: number;
   name: string;
   observerGd: {
-    latitude: number;
-    longitude: number;
-    height: number;
+    lat: number;
+    lon: number;
+    alt: number;
   };
   obsmaxaz: number;
   obsmaxel: number;
@@ -1095,7 +1097,6 @@ export interface CatalogManager {
   getIdFromEci: (eci: any) => number;
   getSatInSun(): Int8Array;
   getSatInView(): Int8Array;
-  getSatInViewOnly: (i: number) => any;
   getSatVel(): Float32Array;
   mergeSat: any;
   resetSatInSun: any;
@@ -1119,7 +1120,7 @@ export interface CatalogManager {
   getSatExtraOnly: (satId: any) => SatObject;
   satData: SatObject[];
   numSats: any;
-  satCruncher: any;
+  satCruncher: Worker;
   getSat: (id: number) => SatObject;
   getIdFromObjNum(objNum: number, isExtensiveSearch?: boolean): number;
   sccIndex: { [key: string]: number };
@@ -1214,7 +1215,7 @@ export interface SatMath {
   getlookangles: (sat: SatObject) => TearrData[];
   getlookanglesMultiSite: (sat: SatObject) => void;
   getOrbitByLatLon(at: SatObject, goalLat: number, goalLon: number, upOrDown: string, now: Date, goalAlt?: number, rascOffset?: number): [string, string];
-  getRae(now: Date, satrec: SatRec, sensor: SensorObject);
+  getRae(now: Date, satrec: SatelliteRecord, sensor: SensorObject);
   getSunTimes: (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => void;
   getTearData: any;
   populateMultiSiteTable: (multiSiteArray: TearrData[], sat: SatObject) => void;
@@ -1235,7 +1236,7 @@ export interface SatMath {
   sat2ric: (sat: SatObject, reference: SatObject) => { position: glm.vec3; velocity: glm.vec3 };
   setobs(sensors: SensorObject[]);
   setTEARR: (currentTEARR: any) => void;
-  sgp4(satrec: SatRec, m: number): Eci;
+  sgp4(satrec: SatelliteRecord, m: number): { position: EciVec3 | boolean; velocity: EciVec3 | boolean };
   twoline2satrec(TLE1: string, TLE2: string);
   updateDopsTable: (lat: number, lon: number, alt: number) => void;
 }

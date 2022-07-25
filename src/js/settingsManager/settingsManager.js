@@ -272,6 +272,7 @@ settingsManager = {
     settingsManager.fpsThrottle2 = 10;
 
     settingsManager.timeMachineDelay = 5000;
+    settingsManager.timeMachineString = () => false; // Placeholder for overrides
 
     settingsManager.videoBitsPerSecond = 30000000; // 10.0Mbps
 
@@ -529,6 +530,7 @@ settingsManager = {
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
     settingsManager.orbitSelectColor2 = [0.0, 0.4, 1.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
+    settingsManager.orbitGroupAlpha = 0.5; // Transparency when a group of satellites is selected
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
     settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE
     settingsManager.orbitPlanetariumColor = [1.0, 1.0, 1.0, 0.2]; // Transparent White
@@ -655,7 +657,6 @@ settingsManager = {
     settingsManager.isPropRateChange = false;
     settingsManager.isOnlyFOVChecked = false;
     settingsManager.isBottomMenuOpen = false;
-    settingsManager.isForceColorScheme = false;
     settingsManager.isDragging = false;
 
     settingsManager.isDemoModeOn = false;

@@ -146,7 +146,7 @@ describe('findSat.searchSats', () => {
 // @ponicode
 describe('findSat.checkInview', () => {
   test('0', () => {
-    let param1: any = [{ inView: 0 }, { inView: 50 }];
+    let param1: any = [{ id: 0 }, { id: 1 }];
     let result: any = findSat.checkInview(param1);
     expect(result).toMatchSnapshot();
   });

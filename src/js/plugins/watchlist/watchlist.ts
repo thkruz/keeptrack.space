@@ -448,9 +448,7 @@ export const onCruncherReady = async (): Promise<void> => { // NOSONAR
 };
 
 export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number, propTime: any, infoOverlayDOM: any[]) => {
-  if (typeof satSet?.getSatInViewOnly !== 'function') throw new Error('satSet is not proper satSet Object');
-
-  const satInView = satSet.getSatInViewOnly(satSet.getIdFromObjNum(nextPassArrayIn[s].sccNum)).inView;
+  const satInView = keepTrackApi.programs.dotsManager.inViewData[satSet.getIdFromObjNum(nextPassArrayIn[s].sccNum).id];
   // If old time and not in view, skip it
   if (nextPassArrayIn[s].time - propTime < -1000 * 60 * 5 && !satInView) return;
 

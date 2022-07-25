@@ -47,6 +47,7 @@ export const countriesRules = (sat: SatObject): ColorInformation => { // NOSONAR
     case `China, People's Republic of`:
     case `Hong Kong Special Administrative Region, China`:
     case 'China (Republic)':
+    case 'PRC':
       if (colorSchemeManager.objectTypeFlags.countryPRC === false) {
         return {
           color: colorSchemeManager.colorTheme.deselected,

@@ -37,6 +37,7 @@ export interface SearchSatParams {
 
 interface SearchResults extends SatObject {
   rng: number;
+  inView: 0 | 1;
 }
 
 // prettier-ignore
@@ -126,7 +127,7 @@ export const searchSats = (searchParams: SearchSatParams) => { // NOSONAR
   return res;
 };
 
-export const checkInview = (posAll: SearchResults[]) => posAll.filter((pos) => pos.inView);
+export const checkInview = (posAll: SearchResults[]) => posAll.filter((pos) => keepTrackApi.programs.dotsManager.inViewData[pos.id] === 1);
 export const checkObjtype = (posAll: SearchResults[], objtype: number) => posAll.filter((pos) => pos.type === objtype);
 export const checkAz = (posAll: SearchResults[], min: number, max: number) => posAll.filter((pos) => pos.az >= min && pos.az <= max);
 

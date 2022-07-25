@@ -279,6 +279,7 @@ export const init = (): void => { // NOSONAR
     uiInput.mouseMoveTimeout = -1;
     canvasDOM.on('mousemove', function(e) {
       canvasMouseMove(e, mainCamera, canvasDOM);
+      settingsManager.lastInteractionTime = Date.now();
     });
 
     if (settingsManager.disableUI) {
@@ -291,6 +292,7 @@ export const init = (): void => { // NOSONAR
     if (!settingsManager.disableUI) {
       canvasDOM.on('wheel', function (evt: any) {
         uiInput.canvasWheel(evt);
+        settingsManager.lastInteractionTime = Date.now();
       });
 
       uiInput.canvasClick = (evt: any) => {
@@ -589,7 +591,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
   // No Right Click Without UI
   if (settingsManager.disableUI) return;
 
-  const { uiManager, colorSchemeManager, starManager, sensorManager, lineManager, satSet, satellite, mainCamera, objectManager, drawManager } = keepTrackApi.programs;
+  const { uiManager, colorSchemeManager, starManager, sensorManager, lineManager, satSet, satellite, mainCamera, objectManager, drawManager, groupsManager } = keepTrackApi.programs;
   const gl = drawManager.gl;
   const M = window.M;
 
@@ -681,7 +683,6 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       uiManager.legendMenuChange('default');
       satSet.setColorScheme(colorSchemeManager.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
         isSunlightView: false,
       });
@@ -730,41 +731,87 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       (<HTMLInputElement>getEl('cs-hei')).value = '0';
       (<HTMLInputElement>getEl('cs-type')).value = 'Observer';
       $('#customSensor').trigger('submit');
-      uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(colorSchemeManager.sunlight, true);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
         isSunlightView: true,
-      });
+      });      
+      uiManager.legendMenuChange('sunlight');      
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.sunlight);
+      satSet.satCruncher.addEventListener(
+        'message',
+        (m) => {
+          if (m.data.satInSun) {
+            satSet.setColorScheme(colorSchemeManager.sunlight, true);
+          } else {
+            satSet.satCruncher.addEventListener(
+              'message',
+              (m) => {
+                if (m.data.satInSun) {
+                  satSet.setColorScheme(colorSchemeManager.sunlight, true);
+                } else {
+                  console.error('Should have received satInSun by now!');
+                }
+              },
+              { once: true }
+            );
+          }
+        },
+        { once: true }
+      );
       break;
     case 'colors-default-rmb':
       uiManager.legendMenuChange('default');
-      satSet.setColorScheme(colorSchemeManager.default, true);
+      if (groupsManager.selectedGroup !== null) {
+        satSet.setColorScheme(colorSchemeManager.group, true);
+      } else {
+        satSet.setColorScheme(colorSchemeManager.default, true);
+      }
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-sunlight-rmb':
-      uiManager.legendMenuChange('sunlight');
-      satSet.setColorScheme(colorSchemeManager.sunlight, true);
-      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-      settingsManager.isForceColorScheme = true;
       satSet.satCruncher.postMessage({
         isSunlightView: true,
-      });
+      });      
+      uiManager.legendMenuChange('sunlight');      
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.sunlight);
+      satSet.satCruncher.addEventListener(
+        'message',
+        (m) => {
+          if (m.data.satInSun) {
+            satSet.setColorScheme(colorSchemeManager.sunlight, true);
+          } else {
+            satSet.satCruncher.addEventListener(
+              'message',
+              (m) => {
+                if (m.data.satInSun) {
+                  satSet.setColorScheme(colorSchemeManager.sunlight, true);
+                } else {
+                  console.error('Should have received satInSun by now!');
+                }
+              },
+              { once: true }
+            );
+          }
+        },
+        { once: true }
+      );
       break;
     case 'colors-country-rmb':
       uiManager.legendMenuChange('countries');
-      satSet.setColorScheme(colorSchemeManager.countries);
+      if (groupsManager.selectedGroup !== null) {
+        satSet.setColorScheme(colorSchemeManager.groupCountries, true);
+      } else {
+        satSet.setColorScheme(colorSchemeManager.countries, true);
+      }
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-velocity-rmb':
       uiManager.legendMenuChange('velocity');
-      satSet.setColorScheme(colorSchemeManager.velocity);
+      satSet.setColorScheme(colorSchemeManager.velocity, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'colors-ageOfElset-rmb':
       uiManager.legendMenuChange('ageOfElset');
-      satSet.setColorScheme(colorSchemeManager.ageOfElset);
+      satSet.setColorScheme(colorSchemeManager.ageOfElset, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
     case 'earth-blue-rmb':
@@ -916,7 +963,6 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       drawManager.sceneManager.earth.loadHiResNight();
       break;
     case 'clear-screen-rmb':
-      (function clearScreenRMB() {
         uiManager.doSearch('');
         uiManager.searchToggle(false);
         uiManager.hideSideMenus();
@@ -929,8 +975,15 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
           uiManager.legendMenuChange('default');
         }
 
+        // Revert any group color scheme back to a non group scheme
+        if (colorSchemeManager.currentColorScheme === colorSchemeManager.group) {
+          satSet.setColorScheme(colorSchemeManager.default, true);
+        }
+        if (colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
+          satSet.setColorScheme(colorSchemeManager.countries, true);
+        }
+
         objectManager.setSelectedSat(-1);
-      })();
       break;
     default:
       keepTrackApi.methods.rmbMenuActions(targetId, clickedSat);

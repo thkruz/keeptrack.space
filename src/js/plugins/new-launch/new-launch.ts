@@ -41,6 +41,7 @@ export const newLaunchSubmit = () => {
   quadZTime.setUTCHours(0); // Move to UTC Hour
 
   timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
   mainCamera.isCamSnapMode = false;
 
   const simulationTimeObj = timeManager.simulationTimeObj;

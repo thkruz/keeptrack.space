@@ -1,6 +1,6 @@
 import { DEG2RAD, MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
-import { Sgp4 } from 'ootk';
-import { SatRec } from 'satellite.js';
+import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
+import { SatelliteRecord } from 'ootk';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { lookanglesRow, SatObject, SensorObject } from '../../api/keepTrackTypes';
 import { getRae } from '../calc/getRae';
@@ -27,7 +27,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookangle
   const simulationTime = timeManager.simulationTimeObj;
   let offset = 0;
 
-  var satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  var satrec = calcSatrec(sat);
   var lookanglesTable = []; // Iniially no rows to the table
 
   let looksInterval = 5;
@@ -46,7 +46,7 @@ export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookangle
 
   let orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
-  const _propagateBestPass = (now: Date, satrecIn: SatRec): lookanglesRow => {
+  const _propagateBestPass = (now: Date, satrecIn: SatelliteRecord): lookanglesRow => {
     let aer = getRae(now, satrecIn, sensor);
     let isInFOV = checkIsInView(sensor, aer);
 

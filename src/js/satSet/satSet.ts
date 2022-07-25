@@ -29,6 +29,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
 import numeric from 'numeric';
+import { EciVec3 } from 'ootk';
 import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject, SunStatus } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
@@ -45,7 +46,6 @@ import {
   getSatFromObjNum,
   getSatInSun,
   getSatInView,
-  getSatInViewOnly,
   getSatPosOnly,
   getSatVel,
   getScreenCoords,
@@ -176,19 +176,22 @@ export const setHover = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(
-      gl.ARRAY_BUFFER,
-      objectManager.lasthoveringSat * 4 * 4,
-      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color)
-    );
+    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color;
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4] = newColor[0]; // R
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 1] = newColor[1]; // G
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 2] = newColor[2]; // B
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 3] = newColor[3]; // A
+
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(newColor));
   }
-  // If New Select Sat Picked Color it
+  // If New Hover Sat Picked Color it
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
     gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
   }
   objectManager.setLasthoveringSat(objectManager.hoveringSat);
 };
 export const selectSat = (i: number): void => {
+  if (settingsManager.isDisableSelectSat) return;
   const { sensorManager, objectManager, uiManager, colorSchemeManager } = keepTrackApi.programs;
   const { gl } = keepTrackApi.programs.drawManager;
   if (i === objectManager.lastSelectedSat()) return;
@@ -217,11 +220,12 @@ export const selectSat = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lastSelectedSat() !== -1) {
-    gl.bufferSubData(
-      gl.ARRAY_BUFFER,
-      objectManager.lastSelectedSat() * 4 * 4,
-      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color)
-    );
+    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color;
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4] = newColor[0]; // R
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 1] = newColor[1]; // G
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 2] = newColor[2]; // B
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 3] = newColor[3]; // A
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(newColor));
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
@@ -479,14 +483,23 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
       const satrec = satellite.twoline2satrec(satSet.satData[i].TLE1, satSet.satData[i].TLE2); // perform and store sat init calcs
 
       const m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      const positionEci = satellite.sgp4(satrec, m);
+      const positionEci = <EciVec3>satellite.sgp4(satrec, m).position;
+      if (!positionEci) {
+        console.error('No ECI position for', satrec.satnum, 'at', now);
+        currentTEARR.alt = 0;
+        currentTEARR.lon = 0;
+        currentTEARR.lat = 0;
+        currentTEARR.az = 0;
+        currentTEARR.el = 0;
+        currentTEARR.rng = 0;
+      }
 
       try {
-        const gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+        const gpos = satellite.eciToGeodetic(positionEci, gmst);
         currentTEARR.alt = gpos.alt;
         currentTEARR.lon = gpos.lon;
         currentTEARR.lat = gpos.lat;
-        const positionEcf = satellite.eciToEcf(positionEci.position, gmst);
+        const positionEcf = satellite.eciToEcf(positionEci, gmst);
         const lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
         currentTEARR.az = lookAngles.az * RAD2DEG;
         currentTEARR.el = lookAngles.el * RAD2DEG;
@@ -552,7 +565,6 @@ export let satSet: CatalogManager = {
   getSatFromObjNum,
   getSatInSun,
   getSatInView,
-  getSatInViewOnly,
   getSatPosOnly,
   getSatVel,
   getScreenCoords,

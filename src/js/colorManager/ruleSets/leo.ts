@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
@@ -61,7 +62,7 @@ export const leoRules = (sat: SatObject): ColorInformation => { // NOSONAR
       pickable: Pickable.No,
     };
   } else {
-    if (sat.inView === 1 && colorSchemeManager.objectTypeFlags.inFOV === true) {
+    if (keepTrackApi.programs.dotsManager.inViewData[sat.id] === 1 && colorSchemeManager.objectTypeFlags.inFOV === true) {
       return {
         color: colorSchemeManager.colorTheme.inFOV,
         pickable: Pickable.Yes,

@@ -2,10 +2,10 @@
 
 exports[`Test ColorRules 0 1`] = `
 Array [
-  0.2,
-  1,
-  0,
+  0.85,
   0.5,
+  0,
+  1,
   0.2,
   1,
   0,
@@ -23,10 +23,10 @@ Array [
 
 exports[`Test ColorRules 1 1`] = `
 Array [
+  0.85,
+  0.5,
+  0,
   1,
-  1,
-  1,
-  0.1,
   1,
   1,
   1,
@@ -191,10 +191,10 @@ Array [
 
 exports[`Test ColorRules 9 1`] = `
 Array [
-  0.2,
-  1,
+  0.85,
+  0.5,
   0,
-  0.65,
+  1,
   0.2,
   1,
   0,
@@ -233,9 +233,9 @@ Array [
 
 exports[`Test ColorRules 11 1`] = `
 Array [
-  NaN,
-  NaN,
-  0,
+  0.2,
+  0.4,
+  1,
   1,
   NaN,
   NaN,
@@ -313,10 +313,10 @@ Object {
 exports[`Test group ruleset should color satellties in this group 1`] = `
 Object {
   "color": Array [
+    0.2,
     1,
     0,
-    0,
-    1,
+    0.5,
   ],
   "pickable": 1,
 }
@@ -525,42 +525,42 @@ Array [
 
 exports[`calculateColorBuffers 1 1`] = `
 Array [
+  0.85,
+  0.5,
+  0,
   1,
+  0.2,
   1,
+  0,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.85,
   1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
+  0,
+  0,
   1,
 ]
 `;
 
 exports[`calculateColorBuffers 2 1`] = `
 Array [
+  0.85,
+  0.5,
+  0,
   1,
+  0.2,
   1,
+  0,
+  0.5,
+  0.5,
+  0.5,
+  0.5,
+  0.85,
   1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
-  1,
+  0,
+  0,
   1,
 ]
 `;
@@ -844,10 +844,10 @@ Object {
 exports[`colorSchemeManager.defaultRules 14 1`] = `
 Object {
   "color": Array [
-    0.5,
-    0.5,
-    0.5,
-    0.85,
+    1,
+    0,
+    0,
+    1,
   ],
   "pickable": 1,
 }
@@ -856,10 +856,10 @@ Object {
 exports[`colorSchemeManager.defaultRules 14 2`] = `
 Object {
   "color": Array [
-    0.5,
-    0.5,
-    0.5,
-    0.85,
+    1,
+    0,
+    0,
+    1,
   ],
   "pickable": 1,
 }
@@ -868,36 +868,36 @@ Object {
 exports[`colorSchemeManager.defaultRules 15 1`] = `
 Object {
   "color": Array [
-    0.2,
+    1,
+    1,
     1,
     0,
-    0.5,
   ],
-  "pickable": 1,
+  "pickable": 0,
 }
 `;
 
 exports[`colorSchemeManager.defaultRules 16 1`] = `
 Object {
   "color": Array [
-    0.2,
-    0.4,
     1,
     1,
+    1,
+    0,
   ],
-  "pickable": 1,
+  "pickable": 0,
 }
 `;
 
 exports[`colorSchemeManager.defaultRules 17 1`] = `
 Object {
   "color": Array [
-    0.5,
-    0.5,
-    0.5,
     1,
+    1,
+    1,
+    0,
   ],
-  "pickable": 1,
+  "pickable": 0,
 }
 `;
 
@@ -916,22 +916,22 @@ Object {
 exports[`colorSchemeManager.defaultRules 19 1`] = `
 Object {
   "color": Array [
-    0.5,
-    0.5,
-    0.5,
-    0.85,
+    1,
+    1,
+    1,
+    0,
   ],
-  "pickable": 1,
+  "pickable": 0,
 }
 `;
 
 exports[`colorSchemeManager.defaultRules 21 1`] = `
 Object {
   "color": Array [
-    0.5,
-    0.5,
-    0.5,
     0.85,
+    0.5,
+    0,
+    1,
   ],
   "pickable": 1,
 }
@@ -1435,10 +1435,10 @@ Object {
 exports[`colorSchemeManager.geoRules 7 1`] = `
 Object {
   "color": Array [
-    0.2,
-    1,
+    0.85,
+    0.5,
     0,
-    0.65,
+    1,
   ],
   "pickable": 1,
 }
@@ -1569,10 +1569,10 @@ Object {
 exports[`colorSchemeManager.leoRules 8 1`] = `
 Object {
   "color": Array [
-    0.2,
-    1,
+    0.85,
+    0.5,
     0,
-    0.65,
+    1,
   ],
   "pickable": 1,
 }
@@ -1935,11 +1935,11 @@ exports[`colorSchemeManager.sunlightRules 9 1`] = `
 Object {
   "color": Array [
     1,
-    1,
-    1,
     0,
+    0,
+    1,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;
 
@@ -1948,10 +1948,10 @@ Object {
   "color": Array [
     1,
     1,
-    1,
     0,
+    1,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;
 
@@ -1985,9 +1985,9 @@ Object {
     1,
     1,
     1,
-    0,
+    0.1,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;
 
@@ -1997,9 +1997,9 @@ Object {
     1,
     1,
     1,
-    0,
+    0.1,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;
 
@@ -2009,9 +2009,9 @@ Object {
     1,
     1,
     1,
-    0,
+    0.1,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;
 
@@ -2021,9 +2021,9 @@ Object {
     1,
     1,
     1,
-    0,
+    0.1,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;
 
@@ -2033,8 +2033,8 @@ Object {
     1,
     1,
     1,
-    0,
+    0.1,
   ],
-  "pickable": 0,
+  "pickable": 1,
 }
 `;

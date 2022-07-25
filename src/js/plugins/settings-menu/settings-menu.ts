@@ -336,7 +336,7 @@ export const hideSideMenus = () => {
 };
 
 export const onColorSelected = (context: any, colorStr: string) => {
-  const { satSet, uiManager } = keepTrackApi.programs;
+  const { satSet, uiManager, colorSchemeManager } = keepTrackApi.programs;
 
   if (typeof context === 'undefined' || context === null) throw new Error('context is undefined');
   if (typeof colorStr === 'undefined' || colorStr === null) throw new Error('colorStr is undefined');
@@ -345,7 +345,7 @@ export const onColorSelected = (context: any, colorStr: string) => {
   if (isNotColorPickerInitialSetup) {
     settingsManager.colors[colorStr] = parseRgba(context.color);
     uiManager.legendColorsChange();
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
+    satSet.setColorScheme(colorSchemeManager.currentColorScheme, true);
     try {
       localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
     } catch {
@@ -414,7 +414,6 @@ export const settingsFormSubmit = (e: any) => {
     uiManager.searchBox.doSearch(uiManager.searchBox.getCurrentSearch());
   }
 
-  settingsManager.isForceColorScheme = true;
-  satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+  satSet.setColorScheme(colorSchemeManager.currentColorScheme, true);
   e.preventDefault();
 };

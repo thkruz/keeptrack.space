@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SatObject } from '../api/keepTrackTypes';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 
 export const panToStar = (c: SatObject): void => {
   const { objectManager, satSet, lineManager, mainCamera, starManager } = keepTrackApi.programs;

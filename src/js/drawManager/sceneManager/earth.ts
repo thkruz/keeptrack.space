@@ -107,13 +107,13 @@ export const initNightTexture = (gl: WebGL2RenderingContext): void => {
   earth.loadHiResNight = async () => {
     try {
       earth.nightImgHiRes = new Image();
+      earth.nightImgHiRes.onload = () => {
+        nightImgHiOnLoad(gl);
+      };
       if (!settingsManager.smallImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/earthlights4k.jpg`;
       if (settingsManager.vectorImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/dayearthvector-4096.jpg`;
       if (settingsManager.politicalImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/political8k.jpg`;
       if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/earthlights16k.jpg`;
-      earth.nightImgHiRes.onload = () => {
-        nightImgHiOnLoad(gl);
-      };
     } catch (e) {
       console.debug(e);
     }
@@ -132,6 +132,9 @@ export const initDayTexture = (gl: WebGL2RenderingContext): void => {
   earth.loadHiRes = async () => {
     try {
       earth.imgHiRes = new Image();
+      earth.imgHiRes.onload = () => {
+        dayImgHiOnLoad(gl);
+      };
       earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
       if (settingsManager.smallImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap512.jpg`;
       if (settingsManager.nasaImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/mercator-tex.jpg`;
@@ -142,9 +145,6 @@ export const initDayTexture = (gl: WebGL2RenderingContext): void => {
       if (settingsManager.hiresImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmapclouds16k.jpg`;
       if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap16k.jpg`;
       earth.isUseHiRes = true;
-      earth.imgHiRes.onload = () => {
-        dayImgHiOnLoad(gl);
-      };
     } catch (e) {
       console.debug(e);
     }

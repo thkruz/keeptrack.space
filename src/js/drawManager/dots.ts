@@ -1,11 +1,8 @@
 /* eslint-disable no-useless-escape */
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
 import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrackTypes';
-import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
-import { DEG2RAD, GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH } from '../lib/constants';
-import { objectManager } from '../objectManager/objectManager';
-import { calculateTimeVariables } from '../satMath/calc/calculateTimeVariables';
 
 export const init = (gl: WebGL2RenderingContext) => {
   // We draw the picking object bigger than the actual dot to make it easier to select objects
@@ -389,25 +386,55 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
     // Do we want to treat non-satellites different?
     dotsManager.orbitalSats3 = orbitalSats * 3;
 
+    const selSatIdx = keepTrackApi.programs.objectManager.selectedSat;
     // Interpolate position since last draw by adding the velocity
-    for (dotsManager.drawI = 0; dotsManager.drawI < dotsManager.satDataLenInDraw3; dotsManager.drawI++) {
-      dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * timeManager.drawDt;
+    // NOTE: We were using satDataLenInDraw3 but markers don't have velocity and neither do missiles (3 DOF as of 7/4/2022)
+    if (isAlternateVelocity) {
+      for (dotsManager.drawI = 0; dotsManager.drawI < Math.ceil(dotsManager.orbitalSats3 / 2); dotsManager.drawI++) {
+        dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * (timeManager.drawDt + lastDrawDt);
+      }
+      if (selSatIdx * 3 < Math.ceil(dotsManager.orbitalSats3 / 2)) {
+        dotsManager.positionData[selSatIdx * 3] -= dotsManager.velocityData[selSatIdx * 3] * (timeManager.drawDt + lastDrawDt);
+        dotsManager.positionData[selSatIdx * 3 + 1] -= dotsManager.velocityData[selSatIdx * 3 + 1] * (timeManager.drawDt + lastDrawDt);
+        dotsManager.positionData[selSatIdx * 3 + 2] -= dotsManager.velocityData[selSatIdx * 3 + 2] * (timeManager.drawDt + lastDrawDt);
+      }
+      isAlternateVelocity = false;
+      lastDrawDt = timeManager.drawDt;
+    } else {
+      for (dotsManager.drawI = Math.floor(dotsManager.orbitalSats3 / 2); dotsManager.drawI < dotsManager.orbitalSats3; dotsManager.drawI++) {
+        dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * (timeManager.drawDt + lastDrawDt);
+      }
+      if (selSatIdx * 3 >= Math.floor(dotsManager.orbitalSats3 / 2)) {
+        dotsManager.positionData[selSatIdx * 3] -= dotsManager.velocityData[selSatIdx * 3] * (timeManager.drawDt + lastDrawDt);
+        dotsManager.positionData[selSatIdx * 3 + 1] -= dotsManager.velocityData[selSatIdx * 3 + 1] * (timeManager.drawDt + lastDrawDt);
+        dotsManager.positionData[selSatIdx * 3 + 2] -= dotsManager.velocityData[selSatIdx * 3 + 2] * (timeManager.drawDt + lastDrawDt);
+      }
+      isAlternateVelocity = true;
+      lastDrawDt = timeManager.drawDt;
     }
 
-    const { gmst } = calculateTimeVariables(timeManager.simulationTimeObj);
-    objectManager.staticSet
-      .filter((object) => object.static && !object.marker && object.type !== SpaceObjectType.STAR)
-      .forEach((object) => {
-        const cosLat = Math.cos(object.lat * DEG2RAD);
-        const sinLat = Math.sin(object.lat * DEG2RAD);
-        const cosLon = Math.cos(object.lon * DEG2RAD + gmst);
-        const sinLon = Math.sin(object.lon * DEG2RAD + gmst);
-        dotsManager.positionData[object.id * 3] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * cosLon; // 6371 is radius of earth
-        dotsManager.positionData[object.id * 3 + 1] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * sinLon;
-        dotsManager.positionData[object.id * 3 + 2] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * sinLat;
-      });
+    // Always do the selected satellited so it is smooth
+    dotsManager.positionData[selSatIdx * 3] += dotsManager.velocityData[selSatIdx * 3] * timeManager.drawDt;
+    dotsManager.positionData[selSatIdx * 3 + 1] += dotsManager.velocityData[selSatIdx * 3 + 1] * timeManager.drawDt;
+    dotsManager.positionData[selSatIdx * 3 + 2] += dotsManager.velocityData[selSatIdx * 3 + 2] * timeManager.drawDt;
+
+    // TODO: WebWorker for this?
+    // const { gmst } = calculateTimeVariables(timeManager.simulationTimeObj);
+    // objectManager.staticSet
+    //   .filter((object) => object.static && !object.marker && object.type !== SpaceObjectType.STAR)
+    //   .forEach((object) => {
+    //     const cosLat = Math.cos(object.lat * DEG2RAD);
+    //     const sinLat = Math.sin(object.lat * DEG2RAD);
+    //     const cosLon = Math.cos(object.lon * DEG2RAD + gmst);
+    //     const sinLon = Math.sin(object.lon * DEG2RAD + gmst);
+    //     dotsManager.positionData[object.id * 3] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * cosLon; // 6371 is radius of earth
+    //     dotsManager.positionData[object.id * 3 + 1] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * sinLon;
+    //     dotsManager.positionData[object.id * 3 + 2] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * sinLat;
+    //   });
   }
 };
+let isAlternateVelocity = false;
+let lastDrawDt = 0;
 
 export const updateSizeBuffer = (bufferLen: number = 3) => {
   const gl = dotsManager.gl;

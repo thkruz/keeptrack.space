@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
+import { EciVec3 } from 'ootk';
 import { eci2lla } from '../transforms';
 import { calculateTimeVariables } from './calculateTimeVariables';
 import { getEci } from './getEci';
@@ -14,7 +15,11 @@ export const getLlaOfCurrentOrbit = (sat: SatObject, points: number): { lat: num
     let offset = ((i * sat.period) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
     const now = timeManager.getOffsetTimeObj(offset, simulationTime);
     const { gmst } = calculateTimeVariables(now);
-    const eci = getEci(sat, now).position;
+    const eci = <EciVec3>getEci(sat, now).position;
+    if (!eci) {
+      console.debug('No ECI position for', sat.sccNum, 'at', now);
+      continue;
+    }
     const lla = eci2lla(eci, gmst);
     const llat = { ...lla, ...{ time: now.getTime() } };
     llaPoints.push(llat);

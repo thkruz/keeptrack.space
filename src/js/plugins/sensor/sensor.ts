@@ -36,7 +36,6 @@ let isLookanglesMultiSiteMenuOpen = false;
 let customSensors = <SensorObject[]>[];
 
 export const resetSensorButtonClick = () => {
-  settingsManager.isForceColorScheme = false;
   getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
   getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');
   getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');

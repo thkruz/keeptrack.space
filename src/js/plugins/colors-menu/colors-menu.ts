@@ -1,6 +1,6 @@
 import colorsPng from '@app/img/icons/colors.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft, waitForCruncher } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 let isColorSchemeMenuOpen = false;
@@ -164,26 +164,12 @@ export const colorsMenuClick = (colorName: string) => {
       });
       uiManager.legendMenuChange('sunlight');
       uiManager.colorSchemeChangeAlert(colorSchemeManager.sunlight);
-      satSet.satCruncher.addEventListener(
-        'message',
-        (m) => {
-          if (m.data.satInSun) {
-            satSet.setColorScheme(colorSchemeManager.sunlight, true);
-          } else {
-            satSet.satCruncher.addEventListener(
-              'message',
-              (m) => {
-                if (m.data.satInSun) {
-                  satSet.setColorScheme(colorSchemeManager.sunlight, true);
-                } else {
-                  console.error('Should have received satInSun by now!');
-                }
-              },
-              { once: true }
-            );
-          }
+      waitForCruncher(
+        satSet.satCruncher,
+        () => {
+          satSet.setColorScheme(colorSchemeManager.sunlight, true);
         },
-        { once: true }
+        (data: any) => data.satInSun
       );
       break;
     case 'near-earth':

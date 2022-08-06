@@ -50,6 +50,35 @@ export const getEl = (id: string): HTMLElement => {
   // throw new Error(`Element with id ${id} not found!`);
 };
 
+export const waitForCruncher = (cruncher: Worker, cb: () => void, validationFunc: (data: any) => boolean): void => {
+  cruncher.addEventListener(
+    'message',
+    (m) => {
+      if (validationFunc(m.data)) {
+        cb();
+      } else {
+        cruncher.addEventListener(
+          'message',
+          (m) => {
+            if (validationFunc(m.data)) {
+              cb();
+            } else {
+              console.error('Cruncher failed to meet requirement after two tries!');
+            }
+          },
+          { once: true }
+        );
+      }
+    },
+    { once: true }
+  );
+};
+
+export const triggerSubmit = (el: HTMLFormElement): void => {
+  const event = new CustomEvent('submit', { cancelable: true });
+  el.dispatchEvent(event);
+};
+
 export const getClass = (id: string): HTMLElement[] => {
   const els = <HTMLElement[]>Array.from(document.getElementsByClassName(id));
   if (els.length) return els;
@@ -203,6 +232,11 @@ export const showLoading = (callback?: () => void, delay?: number): void => {
     if (callback) callback();
     fadeOut(loading, 500);
   }, delay || 100);
+};
+
+export const showLoadingSticky = (): void => {
+  const loading = document.getElementById('loading-screen');
+  fadeIn(loading, 'flex', 500);
 };
 
 export const hideLoading = () => {

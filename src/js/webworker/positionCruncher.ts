@@ -221,6 +221,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
         extraData: JSON.stringify(extraData),
         satId: m.data.id,
       });
+      isInterupted = true;
       break;
     case 'newMissile':
       satCache[m.data.id] = m.data;

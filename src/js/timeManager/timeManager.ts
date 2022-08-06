@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import { keepTrackApi } from '../api/keepTrackApi';
 import { TimeManager } from '../api/keepTrackTypes';
-import { getEl } from '../lib/helpers';
 import { getDayOfYear } from './transforms';
+import { getEl } from '../lib/helpers';
+import { keepTrackApi } from '../api/keepTrackApi';
 
 export const changePropRate = (propRate: number) => {
   if (timeManager.propRate === propRate) return; // no change
@@ -36,6 +36,7 @@ export const synchronize = () => {
 export const changeStaticOffset = (staticOffset: number) => {
   timeManager.dynamicOffsetEpoch = Date.now();
   timeManager.staticOffset = staticOffset;
+  timeManager.calculateSimulationTime();
   synchronize();
 };
 

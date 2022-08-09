@@ -1,13 +1,15 @@
 import * as glm from 'gl-matrix';
-import { EciVec3, SatelliteRecord } from 'ootk';
+
 import { ColorRuleSet, ColorSchemeManager } from '../colorManager/colorSchemeManager';
+import { EciVec3, SatelliteRecord } from 'ootk';
+
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { SatGroup } from '../groupsManager/sat-group';
+import { SpaceObjectType } from './SpaceObjectType';
 import { TleParams } from '../satMath/tle/createTle';
+import { ToastMsgType } from '../uiManager/ui/toast';
 import { mobileManager } from '../uiManager/mobile/mobileManager';
 import { searchBox } from '../uiManager/search/searchBox';
-import { ToastMsgType } from '../uiManager/ui/toast';
-import { SpaceObjectType } from './SpaceObjectType';
 
 export enum CameraType {
   current = 0,

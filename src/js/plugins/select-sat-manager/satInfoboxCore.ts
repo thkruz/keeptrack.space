@@ -3,8 +3,8 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl, openColorbox } from '@app/js/lib/helpers';
-import { SunCalc } from '@app/js/lib/suncalc.js';
 import $ from 'jquery';
+import * as Ootk from 'ootk';
 import './satInfoboxCore.css';
 
 const satInfoboxCore = {
@@ -454,7 +454,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
       getEl('sat-sun').parentElement.style.display = 'none';
     } else {
       now = new Date(keepTrackApi.programs.timeManager.dynamicOffsetEpoch + keepTrackApi.programs.timeManager.propOffset);
-      const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor[0].lat, keepTrackApi.programs.sensorManager.currentSensor[0].lon);
+      const sunTime: any = Ootk.Utils.SunMath.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor[0].lat, keepTrackApi.programs.sensorManager.currentSensor[0].lon);
 
       let satInSun = -1;
       if (typeof sat.isInSun !== 'undefined') {

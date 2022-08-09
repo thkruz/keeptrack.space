@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v6.1.0
+
+>  
+
+- refactor: :recycle: split SatMath into pieces
+- refactor: :truck: split uiManager into smaller pieces
+- docs: :page_facing_up: clear AGPL notice
+- refactor: :recycle: split satMath
+- perf: :zap: improve color calculation speed
+- fix: :lock: remove security false postives
+- fix: :rotating_light: fix sonarcube findings
+- style: :art: add more granular prettier ignore directives
+- feat: :sparkles: add better embeded support
+- refactor: :label: convert om-manager to typescript
+- refactor: :heavy_minus_sign: migrate from satellite.js to ootk for all orbital math
+- feat: :sparkles: update color scheme menus
+- perf: :zap: add caching of satrec object
+- feat: :zap: optimize find close objects code
+- fix: :rotating_light: fix minor sonarcube findings
+- feat: :sparkles: add group countries color scheme
+- feat: :sparkles: update orbit manager
+- refactor: :recycle: update embeded example
+- refactor: :zap: optimize age of elset color scheme
+- feat: :sparkles: add vismag calculations to satbox
+- docs: :memo: update changelog
+- refactor: :recycle: update sat group class
+- feat: :heavy_minus_sign: migrate from satellite.js to ootk
+- refactor: :recycle: reduce unnecessary code in meshManager
+- feat: :sparkles: update time machine
+- feat: :sparkles: update group color scheme
+- fix: :arrow_up: upgarde critical dependencies to fix build issue
+- feat: :heavy_minus_sign: migrate from satellite.js to ootk
+- test: :camera_flash: update snapshots
+- build: :arrow_up: bump dependencies
+- feat: :sparkles: update hover manager
+- fix: :sparkles: update object manager
+- fix: :adhesive_bandage: remove debugger call
+- fix: :adhesive_bandage: remove unnecessary logging
+- test: :white_check_mark: fix api mocks
+
 #### v6.0.3
 
 >  

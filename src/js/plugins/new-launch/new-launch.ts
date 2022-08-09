@@ -1,12 +1,14 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, waitForCruncher } from '@app/js/lib/helpers';
 
 let isNewLaunchMenuOpen = false;
 
 export const newLaunchSubmit = () => {
   const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
+
+  showLoadingSticky();
 
   const scc = (<HTMLInputElement>getEl('nl-scc')).value;
   const satId = satSet.getIdFromObjNum(parseInt(scc));
@@ -41,7 +43,11 @@ export const newLaunchSubmit = () => {
   quadZTime.setUTCHours(0); // Move to UTC Hour
 
   timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+
+  uiManager.toast(`Time is now relative to launch time.`, 'standby');
+
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
+
   mainCamera.isCamSnapMode = false;
 
   const simulationTimeObj = timeManager.simulationTimeObj;
@@ -63,6 +69,14 @@ export const newLaunchSubmit = () => {
   } else {
     uiManager.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
   }
+
+  waitForCruncher(
+    satSet.satCruncher,
+    () => {
+      hideLoading();
+    },
+    (data) => typeof data.satPos !== 'undefined'
+  );
 };
 export const uiManagerInit = () => {
   // Side Menu
@@ -165,7 +179,7 @@ export const uiManagerInit = () => {
 
 export const uiManagerFinal = () => {
   getEl('newLaunch').addEventListener('submit', function (e: Event) {
-    showLoading(newLaunchSubmit);
+    newLaunchSubmit();
     e.preventDefault();
   });
 

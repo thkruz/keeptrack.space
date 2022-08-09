@@ -1,10 +1,10 @@
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { Camera, UiInputInterface } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
+import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
+import * as glm from '@app/js/lib/external/gl-matrix.js';
+import { closeColorbox, getEl, showLoading, slideInRight, triggerSubmit, waitForCruncher } from '@app/js/lib/helpers';
 import $ from 'jquery';
-import { keepTrackApi } from '../../api/keepTrackApi';
-import { Camera, UiInputInterface } from '../../api/keepTrackTypes';
-import { SpaceObjectType } from '../../api/SpaceObjectType';
-import { RADIUS_OF_EARTH } from '../../lib/constants';
-import * as glm from '../../lib/external/gl-matrix.js';
-import { closeColorbox, getEl, showLoading } from '../../lib/helpers';
 
 type LatLon = {
   lat: number;
@@ -661,8 +661,8 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
         });
       }
       break;
-    case 'create-sensor-rmb':
-      (<any>$('#customSensor-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+    case 'create-sensor-rmb':      
+      slideInRight(getEl('customSensor-menu'), 1000);
       getEl('menu-customSensor').classList.add('bmenu-item-selected');
       keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
       if ($('#cs-telescope').prop('checked')) {
@@ -678,8 +678,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       (<HTMLInputElement>getEl('cs-maxel')).value = '90';
       (<HTMLInputElement>getEl('cs-minrange')).value = '0';
       (<HTMLInputElement>getEl('cs-maxrange')).value = "5556";
-      $('#customSensor').trigger('submit');
-
+      triggerSubmit(<HTMLFormElement>getEl('customSensor'));
       uiManager.legendMenuChange('default');
       satSet.setColorScheme(colorSchemeManager.default, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
@@ -720,7 +719,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       lineManager.create('sat2', [clickedSat, drawManager.sceneManager.sun.pos[0], drawManager.sceneManager.sun.pos[1], drawManager.sceneManager.sun.pos[2]], 'o');
       break;
     case 'create-observer-rmb':
-      (<any>$('#customSensor-menu')).effect('slide', { direction: 'left', mode: 'show' }, 1000);
+      slideInRight(getEl('customSensor-menu'), 1000);
       getEl('menu-customSensor').classList.add('bmenu-item-selected');
       keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen = true;
       if (!$('#cs-telescope').prop('checked')) {
@@ -730,33 +729,15 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       (<HTMLInputElement>getEl('cs-lon')).value = latLon.lon.toString();
       (<HTMLInputElement>getEl('cs-hei')).value = '0';
       (<HTMLInputElement>getEl('cs-type')).value = 'Observer';
-      $('#customSensor').trigger('submit');
+      triggerSubmit(<HTMLFormElement>getEl('customSensor'));
       satSet.satCruncher.postMessage({
         isSunlightView: true,
       });      
       uiManager.legendMenuChange('sunlight');      
       uiManager.colorSchemeChangeAlert(colorSchemeManager.sunlight);
-      satSet.satCruncher.addEventListener(
-        'message',
-        (m) => {
-          if (m.data.satInSun) {
-            satSet.setColorScheme(colorSchemeManager.sunlight, true);
-          } else {
-            satSet.satCruncher.addEventListener(
-              'message',
-              (m) => {
-                if (m.data.satInSun) {
-                  satSet.setColorScheme(colorSchemeManager.sunlight, true);
-                } else {
-                  console.error('Should have received satInSun by now!');
-                }
-              },
-              { once: true }
-            );
-          }
-        },
-        { once: true }
-      );
+      waitForCruncher(satSet.satCruncher, () => {
+        satSet.setColorScheme(colorSchemeManager.sunlight, true);
+      }, (data: any) => data.satInSun);
       break;
     case 'colors-default-rmb':
       uiManager.legendMenuChange('default');
@@ -773,27 +754,9 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       });      
       uiManager.legendMenuChange('sunlight');      
       uiManager.colorSchemeChangeAlert(colorSchemeManager.sunlight);
-      satSet.satCruncher.addEventListener(
-        'message',
-        (m) => {
-          if (m.data.satInSun) {
-            satSet.setColorScheme(colorSchemeManager.sunlight, true);
-          } else {
-            satSet.satCruncher.addEventListener(
-              'message',
-              (m) => {
-                if (m.data.satInSun) {
-                  satSet.setColorScheme(colorSchemeManager.sunlight, true);
-                } else {
-                  console.error('Should have received satInSun by now!');
-                }
-              },
-              { once: true }
-            );
-          }
-        },
-        { once: true }
-      );
+      waitForCruncher(satSet.satCruncher, () => {
+        satSet.setColorScheme(colorSchemeManager.sunlight, true);
+      }, (data: any) => data.satInSun);
       break;
     case 'colors-country-rmb':
       uiManager.legendMenuChange('countries');

@@ -1,8 +1,8 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { SunCalc } from '@app/js/lib/suncalc.js';
 import { satellite } from '@app/js/satMath/satMath';
 import * as glm from 'gl-matrix';
+import * as Ootk from 'ootk';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -149,10 +149,10 @@ export const initVao = (gl: WebGL2RenderingContext) => {
 export const update = () => {
   const { sun } = keepTrackApi.programs.drawManager.sceneManager;
   // Calculate RAE
-  moon.rae = SunCalc.getMoonPosition(sun.now, 0, 0);
+  moon.rae = Ootk.Utils.MoonMath.getMoonPosition(sun.now, 0, 0);
 
   // RAE2ECF and then ECF2ECI
-  moon.eci = satellite.ecfToEci(satellite.lookAngles2Ecf(180 + moon.rae.azimuth * RAD2DEG, moon.rae.altitude * RAD2DEG, moon.rae.distance, 0, 0, 0), sun.sunvar.gmst);
+  moon.eci = satellite.ecfToEci(satellite.lookAngles2Ecf(180 + moon.rae.az * RAD2DEG, moon.rae.el * RAD2DEG, moon.rae.rng, 0, 0, 0), sun.sunvar.gmst);
 
   const scaleFactor = SCALAR_DISTANCE / Math.max(Math.max(Math.abs(moon.eci.x), Math.abs(moon.eci.y)), Math.abs(moon.eci.z));
   moon.drawPosition[0] = moon.eci.x * scaleFactor + moon.positionModifier.x;
@@ -327,7 +327,7 @@ export const moon = {
   update: update,
   draw: draw,
   eci: { x: 0, y: 0, z: 0 },
-  rae: { azimuth: 0, altitude: 0, distance: 0 },
+  rae: { az: 0, el: 0, rng: 0, parallacticAngle: 0 },
   positionModifier: { x: 0, y: 0, z: 0 },
   drawPosition: [0, 0, 0],
   pos: [0, 0, 0],

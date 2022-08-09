@@ -6,9 +6,6 @@ import { A } from '../../lib/external/meuusjs';
 import { jday } from '../../timeManager/transforms';
 import { defaultGd, oneOrZero, RangeAzEl } from '../constants';
 
-// TODO: create a way to determine if observerGd is using old satellite.js naming or lon,lat,alt
-// so that we can import satMath.ts instead
-
 export const lookAnglesToEcf = (azDeg: number, elDeg: number, rng: number, obsLat: number, obsLong: number, obsAlt: number) => {
   // site ecef in meters
   const geodeticCoords = {

@@ -102,19 +102,17 @@ export interface Meuusjs {
   };
 }
 
-const A = <Meuusjs>(
-  (<unknown>{
-    JMod: 2400000.5,
-    J2000: 2451545,
-    J1900: 2415020,
-    B1900: 2415020.3135,
-    B1950: 2433282.4235,
-    JulianYear: 365.25,
-    JulianCentury: 36525,
-    BesselianYear: 365.2421988,
-    AU: 149597870,
-  })
-);
+const A = <Meuusjs>(<unknown>{
+  JMod: 2400000.5,
+  J2000: 2451545,
+  J1900: 2415020,
+  B1900: 2415020.3135,
+  B1950: 2433282.4235,
+  JulianYear: 365.25,
+  JulianCentury: 36525,
+  BesselianYear: 365.2421988,
+  AU: 149597870,
+});
 A.EclCoord = function (a: number, b: number, c: number): void {
   if (isNaN(a) || isNaN(b)) throw Error('Invalid EclCoord object: (' + a + ', ' + b + ')');
   this.lat = a;

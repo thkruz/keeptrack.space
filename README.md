@@ -111,8 +111,8 @@ If you are interested in helping with this project, please reference the [Contri
 
 ### Libraries
 
-- satMath.ts - My personal modifications to [@shashwata](https://github.com/shashwatak/)'s amazing library [satellite.js](https://github.com/shashwatak/satellite-js).
-- suncalc.js - [@mourner](https://github.com/mourner/suncalc)'s library used for star position calculations.
+- [ootk](https://github.com/thkruz/ootk) - My TypeScript library for working with SGP4, sensor field of view, and Astronomical calculations.
+  - Credit to [@shashwata](https://github.com/shashwatak/)'s amazing library satellite.js and [@mourner](https://github.com/mourner/suncalc)'s library suncalc for laying the ground work.
 
 ## Tests
 

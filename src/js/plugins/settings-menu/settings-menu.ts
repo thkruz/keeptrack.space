@@ -357,6 +357,23 @@ export const onColorSelected = (context: any, colorStr: string) => {
 export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
 
+  switch (e.target.id) {
+    case 'settings-drawOrbits':
+    case 'settings-drawEcf':
+    case 'settings-isDrawInCoverageLines':
+    case 'settings-drawSun':
+    case 'settings-drawBlackEarth':
+    case 'settings-drawMilkyWay':
+    case 'settings-eciOnHover':
+    case 'settings-hos':
+    case 'settings-demo-mode':
+    case 'settings-sat-label-mode':
+      keepTrackApi.programs.soundManager.play('click');
+      break;
+    default:
+      break;
+  }
+
   isDMChecked ??= (<HTMLInputElement>getEl('settings-demo-mode')).checked;
   isSLMChecked ??= (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
 

@@ -15,7 +15,8 @@ export const calculateVisMag = (sat: SatObject, sensor: SensorObject, propTime: 
   );
 
   //standard magnitude
-  if (!sat.vmag) console.debug('No standard magnitude in the database defaulting to 8');
+  // DEBUG:
+  // if (!sat.vmag) console.debug('No standard magnitude in the database defaulting to 8');
   const intrinsicMagnitude = sat.vmag || 8;
 
   const term2 = 5.0 * Math.log10(distanceToSatellite / 1000);

@@ -6,7 +6,7 @@ import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideI
 let isNewLaunchMenuOpen = false;
 
 export const newLaunchSubmit = () => {
-  const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
+  const { soundManager, timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
 
   showLoadingSticky();
 
@@ -45,6 +45,7 @@ export const newLaunchSubmit = () => {
   timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
 
   uiManager.toast(`Time is now relative to launch time.`, 'standby');
+  soundManager.play('liftoff');
 
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
 

@@ -268,7 +268,7 @@ export const uiManagerFinal = (): void => {
   });
 
   // Add button selected on watchlist menu
-  getEl('watchlist-content').addEventListener('click', watchlistContentEvent);
+  getEl('watchlist-list').addEventListener('click', watchlistContentEvent);
 
   // Enter pressed/selected on watchlist menu
   getEl('watchlist-content').addEventListener('submit', function (evt: Event) {
@@ -286,6 +286,9 @@ export const uiManagerFinal = (): void => {
 
   getEl('watchlist-file').addEventListener('change', function (evt: Event) {
     watchlistFileChange(evt);
+
+    // Reset file input
+    (<HTMLInputElement>document.getElementById('watchlist-file')).value = '';
   });
 };
 

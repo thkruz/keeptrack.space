@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 export const init = (): void => {
   // const { settingsManager } = keepTrackApi.programs;
@@ -38,7 +38,10 @@ export const init = (): void => {
           window.speechSynthesis.speak(msg);
         },
         sounds: {
-          standby: new Audio('./audio/Synth-Pop-Small-01.m4a'),
+          standby: new Audio('./audio/pop-small.ogg'),
+          error: new Audio('./audio/error.ogg'),
+          click: new Audio('./audio/click.ogg'),
+          liftoff: new Audio('./audio/liftoff.ogg'),
         },
         play: (sound: string) => {
           if (getEl('loading-screen').classList.contains('fullscreen')) return;

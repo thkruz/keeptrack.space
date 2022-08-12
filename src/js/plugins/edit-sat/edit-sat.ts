@@ -1,6 +1,7 @@
 import editPng from '@app/img/icons/edit.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { CatalogManager, ObjectManager } from '@app/js/api/keepTrackTypes';
+import { createError } from '@app/js/errorManager/errorManager';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
@@ -156,7 +157,7 @@ export const doReaderActions = (evt: Event) => {
     reader.onload = readerOnLoad;
     reader.readAsText((<any>evt.target).files[0]);
   } catch (e) {
-    // Intentionally left blank
+    createError(e, 'doReaderActions');
   }
 };
 

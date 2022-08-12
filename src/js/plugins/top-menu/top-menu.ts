@@ -2,6 +2,7 @@ import findPng from '@app/img/icons/find.png';
 import githubPng from '@app/img/icons/github.png';
 import twitterPng from '@app/img/icons/twitter.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { createError } from '@app/js/errorManager/errorManager';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -91,7 +92,7 @@ export const init = (): void => {
         });
       } catch (e) {
         /* istanbul ignore next */
-        console.debug(e);
+        createError(e, 'topMenu.init');
       }
     },
   });

@@ -1,3 +1,4 @@
+import * as Ootk from 'ootk';
 import { isThisJest, keepTrackApi } from './api/keepTrackApi';
 import { MapManager, ObjectManager, OrbitManager, SensorManager } from './api/keepTrackTypes';
 import { camera } from './camera/camera';
@@ -5,6 +6,7 @@ import { colorSchemeManager } from './colorManager/colorSchemeManager';
 import { dotsManager } from './drawManager/dots';
 import { drawManager } from './drawManager/drawManager';
 import { LineFactory } from './drawManager/sceneManager/sceneManager';
+import { createError } from './errorManager/errorManager';
 import { groupsManager } from './groupsManager/groupsManager';
 import { loadAfterStart, showErrorCode } from './main';
 import { objectManager } from './objectManager/objectManager';
@@ -27,6 +29,11 @@ export const initalizeKeepTrack = async (): Promise<void> => {
     settingsManager.versionNumber = VERSION;
     settingsManager.versionDate = VERSION_DATE;
 
+    // Error Trapping
+    window.addEventListener('error', (e: ErrorEvent) => {
+      createError(e.error, 'Global Error Trapper');
+    });
+
     // Add all of the imported programs to the API
     keepTrackApi.programs = <any>{
       adviceManager,
@@ -38,6 +45,7 @@ export const initalizeKeepTrack = async (): Promise<void> => {
       mapManager: <MapManager>(<unknown>{}),
       missileManager,
       objectManager: <ObjectManager>(<unknown>objectManager),
+      ootk: Ootk,
       orbitManager: <OrbitManager>(<unknown>orbitManager),
       satSet,
       satellite,

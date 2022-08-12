@@ -178,6 +178,9 @@ export const update = () => {
   glm.mat3.normalFromMat4(skyboxSphere.nMatrix, skyboxSphere.mvMatrix);
 };
 export const draw = function (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer?: WebGLFramebuffer) {
+  // Make sure there is something to draw
+  if (!settingsManager.isDrawMilkyWay && !settingsManager.isDrawConstellationBoundaries && !settingsManager.isDrawNasaConstellations) return;
+
   const { gl } = keepTrackApi.programs.drawManager;
   skyboxSphere.pMatrix = pMatrix;
   skyboxSphere.camMatrix = camMatrix;

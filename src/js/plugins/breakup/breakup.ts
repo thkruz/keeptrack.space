@@ -1,6 +1,7 @@
 import breakupPng from '@app/img/icons/breakup.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
+import { createError } from '@app/js/errorManager/errorManager';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 
 let isBreakupMenuOpen = false;
@@ -197,6 +198,11 @@ export const breakupOnSubmit = (): void => { // NOSONAR
     const newAlt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
     let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, newAlt, rascOffset);
 
+    if (iTLEs[0] === 'Error') {
+      createError(new Error(iTLEs[1]), 'breakup.ts');
+      return;
+    }
+
     let iTLE1 = iTLEs[0];
     let iTLE2 = iTLEs[1];    
     for (; i < (rascIterat + 1) * breakupCount / 4; i++) {
@@ -237,7 +243,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
     }
   }
 
-  uiManager.doSearch(`${mainsat.sccNum},Analyst Sat`);
+  uiManager.doSearch(`${mainsat.sccNum},Analyst`);
 };
 
 export const hideSideMenus = (): void => {

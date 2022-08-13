@@ -180,7 +180,9 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <li class="menu-selectable" data-sensor="llAll">All Sensors<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
-                <li class="menu-selectable" data-sensor="MSR">Mdata-sensorland Radar<span class="badge dark-blue-badge"
+                <li class="menu-selectable" data-sensor="CRSR">Costa Rica Space Radar<span class="badge dark-blue-badge"
+                    data-badge-caption="Comm"></span></li>
+                <li class="menu-selectable" data-sensor="MSR">Midland Space Radar<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
                 <li class="menu-selectable" data-sensor="PFISR">PFIS Radar<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
@@ -229,8 +231,16 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <h5 class="center-align">Chinese Sensors</h5>
                 <li class="divider"></li>
-                <li class="menu-selectable" data-sensor="XUA">Xuanhua<span class="badge dark-blue-badge"
+                <li class="menu-selectable" data-sensor="prcAll">All Chinese Sensors<span
+                    class="badge dark-blue-badge" data-badge-caption="PRC"></span></li>
+                <li class="menu-selectable" data-sensor="XIN">Xingjiang<span class="badge dark-blue-badge"
                     data-badge-caption="PRC"></span></li>
+                <li class="menu-selectable" data-sensor="ZHE">Zhejiang<span class="badge dark-blue-badge"
+                    data-badge-caption="PRC"></span></li>                    
+                <li class="menu-selectable" data-sensor="HEI">Heilongjiang<span class="badge dark-blue-badge"
+                    data-badge-caption="PRC"></span></li>       
+                <li class="menu-selectable" data-sensor="SHD">Shadong<span class="badge dark-blue-badge"
+                    data-badge-caption="PRC"></span></li>       
                 <li class="menu-selectable" data-sensor="PMO">Purple Mountain<span class="badge dark-blue-badge"
                     data-badge-caption="PRC"></span></li>
               </ul>
@@ -577,6 +587,9 @@ export const sensorListContentClick = (sensorClick: string) => {
       break;
     case 'rusAll':
       sensorManager.setSensor('RUS-ALL');
+      break;
+    case 'prcAll':
+      sensorManager.setSensor('PRC-ALL');
       break;
     default:
       sensorManager.setSensor(sensorManager.sensorList[`${sensorClick}`]);

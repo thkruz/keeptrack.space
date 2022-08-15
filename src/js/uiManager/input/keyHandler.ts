@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { Camera } from '@app/js/api/keepTrackTypes';
 import { getEl } from '@app/js/lib/helpers';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // prettier-ignore
 export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
@@ -30,21 +30,17 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
           break;
         case mainCamera.cameraType.Fps:
           uiManager.toast('Free Camera Mode', 'standby');
-          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
         case mainCamera.cameraType.Planetarium:
           uiManager.toast('Planetarium Camera Mode', 'standby');
           uiManager.legendMenuChange('planetarium');
-          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
         case mainCamera.cameraType.Satellite:
           uiManager.toast('Satellite Camera Mode', 'standby');
-          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
         case mainCamera.cameraType.Astronomy:
           uiManager.toast('Astronomy Camera Mode', 'standby');
           uiManager.legendMenuChange('astronomy');
-          getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
           break;
       }
       break;

@@ -1,7 +1,7 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, waitForCruncher } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, stringPad, waitForCruncher } from '@app/js/lib/helpers';
 
 let isNewLaunchMenuOpen = false;
 
@@ -206,7 +206,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
 
         const sat = keepTrackApi.programs.satSet.getSatExtraOnly(keepTrackApi.programs.objectManager.selectedSat);
         (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-        (<HTMLInputElement>getEl('nl-inc')).value = (sat.inclination * RAD2DEG).toPrecision(2);
+        (<HTMLInputElement>getEl('nl-inc')).value = stringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
       } else {
         aM.adviceList?.newLaunchDisabled();
         keepTrackApi.programs.uiManager.toast(`Select a Satellite First!`, 'caution');

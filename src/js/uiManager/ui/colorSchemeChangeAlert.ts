@@ -1,8 +1,8 @@
+import { ColorRuleSet } from '@app/js/colorManager/colorSchemeManager';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { ColorScheme } from '@app/js/colorManager/colorSchemeManager';
 import { toast } from './toast';
 
-export const colorSchemeChangeAlert = (newScheme: ColorScheme) => {
+export const colorSchemeChangeAlert = (newScheme: ColorRuleSet) => {
   const { uiManager } = keepTrackApi.programs;
   // Don't Make an alert the first time!
   if (typeof uiManager.lastColorScheme == 'undefined') {

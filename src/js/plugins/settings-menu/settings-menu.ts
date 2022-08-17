@@ -368,7 +368,14 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
     case 'settings-hos':
     case 'settings-demo-mode':
     case 'settings-sat-label-mode':
-      keepTrackApi.programs.soundManager.play('click');
+    case 'settings-snp':
+      if ((<HTMLInputElement>getEl(e.target.id)).checked) {
+        // Play sound for enabling option
+        keepTrackApi.programs.soundManager.play('toggleOn');
+      } else {
+        // Play sound for disabling option
+        keepTrackApi.programs.soundManager.play('toggleOff');
+      }
       break;
     default:
       break;
@@ -390,7 +397,9 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
+  const { soundManager, satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
+
+  soundManager.play('button');
 
   settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
   settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;

@@ -210,7 +210,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       // Inclination
       let inc = parseFloat(TLE2.substr(8, 8));
       inc = inc + Math.random() * incVariation * 2 - incVariation;
-      const incStr = stringPad.pad0(inc.toPrecision(7), 8);
+      const incStr = stringPad.pad0(inc.toFixed(4), 8);
 
       // Ecentricity
       sat.eccentricity = origEcc;
@@ -219,7 +219,8 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       // Mean Motion
       let meanmo = parseFloat(iTLE2.substr(52, 10));
       meanmo = meanmo + Math.random() * meanmoVariation * 2 - meanmoVariation;
-      const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
+      // const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
+      const meanmoStr = stringPad.pad0(meanmo.toFixed(8), 11);
 
       satId = satSet.getIdFromObjNum(80000 + i);
       iTLE1 = `1 ${80000 + i}` + iTLE1.substr(7);

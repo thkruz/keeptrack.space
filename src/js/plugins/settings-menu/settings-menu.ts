@@ -357,7 +357,7 @@ export const onColorSelected = (context: any, colorStr: string) => {
 export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
 
-  switch (e.target.id) {
+  switch (e.target?.id) {
     case 'settings-drawOrbits':
     case 'settings-drawEcf':
     case 'settings-isDrawInCoverageLines':

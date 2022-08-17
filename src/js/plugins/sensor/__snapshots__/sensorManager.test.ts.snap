@@ -12,7 +12,7 @@ exports[`sensorManager.drawFov 2 1`] = `undefined`;
 
 exports[`sensorManager.drawFov 3 1`] = `undefined`;
 
-exports[`sensorManager.sensorListLength 0 1`] = `48`;
+exports[`sensorManager.sensorListLength 0 1`] = `52`;
 
 exports[`sensorManager.setCurrentSensor 0 1`] = `undefined`;
 

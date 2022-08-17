@@ -49,6 +49,9 @@
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(new-github-issue-url))"
+    ],
     "testMatch": [
       "**/?(*.)+(spec|test).?(m)[jt]s?(x)"
     ],

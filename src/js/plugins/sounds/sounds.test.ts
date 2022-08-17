@@ -21,6 +21,9 @@ describe('sounds.init', () => {
 describe('sounds', () => {
   beforeEach(() => {
     init();
+    global.speechSynthesis = <any>{
+      getVoices: () => [],
+    };
     keepTrackApi.methods.uiManagerInit();
   });
 

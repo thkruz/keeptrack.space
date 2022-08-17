@@ -1,5 +1,6 @@
-import newGithubIssueUrl from 'new-github-issue-url';
+import { isThisJest } from '@app/js/api/keepTrackApi';
 import { toast } from '@app/js/uiManager/ui/toast';
+import newGithubIssueUrl from 'new-github-issue-url';
 
 export const createError = (e: Error, funcName: string, toastMsg?: string) => {
   toastMsg ??= e.message;
@@ -17,6 +18,9 @@ ${e.message}
 #### Stack
 ${e.stack}`,
   });
-  window.open(url, '_blank');
+
+  if (!isThisJest()) {
+    window.open(url, '_blank');
+  }
   toast(toastMsg, 'error', true);
 };

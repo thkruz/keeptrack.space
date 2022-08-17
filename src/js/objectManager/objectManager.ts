@@ -447,7 +447,7 @@ const setLasthoveringSat = (id: number): void => {
   objectManager.lasthoveringSat = id;
 };
 const setSelectedSat = (id: number): void => {
-  if (settingsManager.isDisableSelectSat) return;
+  if (settingsManager.isDisableSelectSat || id === null) return;
   objectManager.selectedSat = id;
 };
 const setSecondarySat = (id: number): void => {

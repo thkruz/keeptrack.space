@@ -42,7 +42,7 @@ export const getOrbitByLatLon = (
   const epochday = sat.TLE1.substr(20, 12);
   const meanmo = sat.TLE2.substr(52, 11);
   const inc = stringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
-  const ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
+  const ecen = sat.eccentricity.toFixed(7).substr(2, 7);
   // Disregarding the first and second derivatives of mean motion
   // Just keep whatever was in the original TLE
   const TLE1Ending = sat.TLE1.substr(32, 39);

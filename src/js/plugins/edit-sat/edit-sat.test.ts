@@ -97,7 +97,7 @@ describe('editSat.rmbMenuActions', () => {
 
   test('1', () => {
     const callFunction: any = () => {
-      editSat.rmbMenuActions('edit-sat-rmb', '1.0.0');
+      editSat.rmbMenuActions('edit-sat-rmb', 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -113,7 +113,7 @@ describe('editSat.rmbMenuActions', () => {
 
   test('3', () => {
     const callFunction: any = () => {
-      editSat.rmbMenuActions('edit-sat-rmb', true);
+      editSat.rmbMenuActions('edit-sat-rmb', 2);
     };
 
     expect(callFunction).not.toThrow();
@@ -121,7 +121,7 @@ describe('editSat.rmbMenuActions', () => {
 
   test('4', () => {
     const callFunction: any = () => {
-      editSat.rmbMenuActions('edit-sat-rmb', '4.0.0-beta1\t');
+      editSat.rmbMenuActions('edit-sat-rmb', 3);
     };
 
     expect(callFunction).not.toThrow();

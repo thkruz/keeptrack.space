@@ -46,7 +46,7 @@ export const orbitReferencesLinkClick = () => {
 
   // Add the satellites
   const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2);
-  const ecen = satrec.ecco.toPrecision(7).substr(2, 7);
+  const ecen = satrec.ecco.toFixed(7).substr(2, 7);
   const rasc = <StringifiedNubmer>(satrec.nodeo * RAD2DEG).toString();
   const argPe = <StringifiedNubmer>(satrec.argpo * RAD2DEG).toString();
   const inc = <StringifiedNubmer>sat.TLE2.substr(8, 8);
@@ -60,7 +60,7 @@ export const orbitReferencesLinkClick = () => {
 
   let j = 0;
   for (let i = 0; i < 360; i++) {
-    const meana = <StringifiedNubmer>j.toPrecision(10);
+    const meana = <StringifiedNubmer>stringPad.pad0(j.toFixed(4), 8);
     const { TLE1, TLE2 } = satellite.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: sccNum });
     searchStr += satSet.insertNewAnalystSatellite(TLE1, TLE2, satNum + i, (100000 + i).toString()).sccNum.toString() + ',';
     j += (360 / period) * 4;

@@ -1261,6 +1261,7 @@ export interface SearchBox {
   fillResultBox;
 }
 export interface SoundManager {
+  isMute: boolean;
   play(arg0: string);
   loadVoices(): void;
   voices: any[];

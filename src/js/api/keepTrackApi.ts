@@ -74,6 +74,7 @@ export const keepTrackApi: KeepTrackApi = {
   },
   methods: {
     selectSatData: (sat: any, satId: number) => {
+      keepTrackApi.programs.soundManager.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
     },
     updateSelectBox: (sat: any) => {
@@ -92,6 +93,7 @@ export const keepTrackApi: KeepTrackApi = {
       keepTrackApi.callbacks.uiManagerOnReady.forEach((cb: any) => cb.cb());
     },
     bottomMenuClick: (iconName: string) => {
+      keepTrackApi.programs.soundManager.play('genericBeep');
       keepTrackApi.callbacks.bottomMenuClick.forEach((cb: any) => cb.cb(iconName));
     },
     hideSideMenus: () => {
@@ -115,8 +117,8 @@ export const keepTrackApi: KeepTrackApi = {
     updateLoop: () => {
       keepTrackApi.callbacks.updateLoop.forEach((cb: any) => cb.cb());
     },
-    rmbMenuActions: (menuName: string) => {
-      keepTrackApi.callbacks.rmbMenuActions.forEach((cb: any) => cb.cb(menuName));
+    rmbMenuActions: (menuName: string, satnum = -1) => {
+      keepTrackApi.callbacks.rmbMenuActions.forEach((cb: any) => cb.cb(menuName, satnum));
     },
     rightBtnMenuAdd: () => {
       keepTrackApi.callbacks.rightBtnMenuAdd.forEach((cb: any) => cb.cb());

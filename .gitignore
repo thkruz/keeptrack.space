@@ -75,6 +75,7 @@ src/tle/TLEAltNemo*
 classfd.tle
 src/textures/earthmap16ak.jpg
 src/textures/earthmapclouds16k.jpg
+src/audio/samples
 
 # Jest Coverage
 coverage/

@@ -32,6 +32,7 @@
 'use strict';
 
 import { CatalogManager, SatObject, TimeManager } from '@app/js/api/keepTrackTypes';
+
 import { searchBox } from '@app/js/uiManager/search/searchBox';
 
 // Constants
@@ -95,7 +96,7 @@ om.kp2tle = (kp, epoch, timeManager: TimeManager) => {
   const epochd = _dayOfYear(epoch.getUTCMonth(), epoch.getUTCDate(), epoch.getUTCHours(), epoch.getUTCMinutes(), epoch.getUTCSeconds());
   const epochd2 = parseFloat(epochd) + epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
   const tle1 = `1 80000U 58001A   ${yy}${_pad0(epochd2.toFixed(8), 12)} 0.00000000 +00000-0 +00000-0 0 99990`;
-  const tle2 = `2 80000 ${_pad0(inc.toFixed(4), 8)} ${_pad0(raan.toFixed(4), 8)} ${ecc.toPrecision(7).substr(2, 7)} ${_pad0(parseFloat(argpe).toFixed(4), 8)} ${_pad0(
+  const tle2 = `2 80000 ${_pad0(inc.toFixed(4), 8)} ${_pad0(raan.toFixed(4), 8)} ${ecc.toFixed(7).substr(2, 7)} ${_pad0(parseFloat(argpe).toFixed(4), 8)} ${_pad0(
     meana.toFixed(4),
     8
   )} ${_pad0(meanmo.toFixed(8), 11)}000010`;
@@ -106,6 +107,7 @@ om.kp2tle = (kp, epoch, timeManager: TimeManager) => {
 om.svs2kps = (svs: StateVector[]) => { // NOSONAR
   let kpList = [];
   for (let i = 0; i < svs.length; i++) {
+    if (svs[i].length < 3) continue;
     kpList.push(om.sv2kp(svs[i]));
   }
 
@@ -480,8 +482,8 @@ export const _sv2kp = ({
   }
 
   const PlusMinus = a * e;
-  let periapsis = a - PlusMinus - RADIUS_OF_EARTH;
-  let apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
+  let periapsis = a - PlusMinus - (vectorU === 'km' ? RADIUS_OF_EARTH / 1000 : RADIUS_OF_EARTH);
+  let apoapsis = a + PlusMinus - (vectorU === 'km' ? RADIUS_OF_EARTH / 1000 : RADIUS_OF_EARTH);
   let period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
 
   outputU ??= 'm';

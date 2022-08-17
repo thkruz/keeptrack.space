@@ -1,7 +1,11 @@
 import findPng from '@app/img/icons/find.png';
 import githubPng from '@app/img/icons/github.png';
+import soundOffPng from '@app/img/icons/sound-off.png';
+import soundOnPng from '@app/img/icons/sound-on.png';
 import twitterPng from '@app/img/icons/twitter.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { createError } from '@app/js/errorManager/errorManager';
+import { getEl } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -21,8 +25,15 @@ export const init = (): void => {
                   <a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a>
                 </li>
                 <li>
+                  <a id="sound-btn" class="top-menu-btns bmenu-item-selected">
+                    <img id="sound-icon"
+                    width="25"
+                    height="25"
+                      src="" delayedsrc="${soundOnPng}" alt="" />
+                  </a>
+                </li>
+                <li>
                   <a id="legend-menu" class="top-menu-btns">
-                    <!-- <span>Legend &#x25BC;</span> -->
                     <div id="legend-icon" class="top-menu-icons">
                       <img src="img/layers-icon.png" alt="" />
                     </div>
@@ -91,8 +102,27 @@ export const init = (): void => {
         });
       } catch (e) {
         /* istanbul ignore next */
-        console.debug(e);
+        createError(e, 'topMenu.init');
       }
+    },
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'topMenu',
+    cb: async () => {
+      getEl('sound-btn').onclick = () => {
+        const soundIcon = <HTMLImageElement>getEl('sound-icon');
+        if (!keepTrackApi.programs.soundManager.isMute) {
+          keepTrackApi.programs.soundManager.isMute = true;
+          soundIcon.src = soundOffPng;
+          soundIcon.parentElement.classList.remove('bmenu-item-selected');
+        } else {
+          keepTrackApi.programs.soundManager.isMute = false;
+          soundIcon.src = soundOnPng;
+          soundIcon.parentElement.classList.add('bmenu-item-selected');
+        }
+      };
     },
   });
 };

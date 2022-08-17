@@ -283,7 +283,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
     }
   }
 
-  satSet.orbitalSats = tempSatData.length;
+  satSet.orbitalSats = tempSatData.length + settingsManager.maxAnalystSats;
   dotsManager.starIndex1 = objectManager.starIndex1 + satSet.orbitalSats;
   dotsManager.starIndex2 = objectManager.starIndex2 + satSet.orbitalSats;
 

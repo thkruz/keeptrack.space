@@ -28,6 +28,7 @@ import watchlistPng from '@app/img/icons/watchlist.png';
 import removePng from '@app/img/remove.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
+import { createError } from '@app/js/errorManager/errorManager';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
@@ -267,7 +268,7 @@ export const uiManagerFinal = (): void => {
   });
 
   // Add button selected on watchlist menu
-  getEl('watchlist-content').addEventListener('click', watchlistContentEvent);
+  getEl('watchlist-list').addEventListener('click', watchlistContentEvent);
 
   // Enter pressed/selected on watchlist menu
   getEl('watchlist-content').addEventListener('submit', function (evt: Event) {
@@ -285,6 +286,9 @@ export const uiManagerFinal = (): void => {
 
   getEl('watchlist-file').addEventListener('change', function (evt: Event) {
     watchlistFileChange(evt);
+
+    // Reset file input
+    (<HTMLInputElement>document.getElementById('watchlist-file')).value = '';
   });
 };
 
@@ -537,7 +541,7 @@ export const watchlistSaveClick = (evt: any) => {
   try {
     saveAs(blob, 'watchlist.json');
   } catch (e) {
-    keepTrackApi.programs.uiManager.toast('Error saving watchlist', 'critical');
+    createError(e, 'watchlist.ts');
   }
   evt.preventDefault();
 };

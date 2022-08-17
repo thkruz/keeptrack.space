@@ -235,8 +235,8 @@ export const bottomMenuClick = (iconName: string): void => {
 // prettier-ignore
 export const obfitFormSubmit = (e: any) => { // NOSONAR
   const { uiManager, satSet, timeManager, satellite } = keepTrackApi.programs;
-  let isOb2 = true;
-  let isOb3 = true;
+  let isOb2 = false;
+  let isOb3 = false;
   const t1v = validateObfitInput('obfit-t1');
   const x1v = validateObfitInput('obfit-x1');
   const y1v = validateObfitInput('obfit-y1');
@@ -292,12 +292,12 @@ export const obfitFormSubmit = (e: any) => { // NOSONAR
   sv1 = [t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v];
   svs.push(sv1);
 
-  const { isOb: _isOb2, sv: sv2 } = validateOb({ isOb: isOb2, t: t2v, x: x2v, y: y2v, z: z2v, xd: xd2v, yd: yd2v, zd: zd2v, uiManager });
+  const { isOb: _isOb2, sv: sv2 } = validateOb({ isOb: isOb2, obNum: 2, t: t2v, x: x2v, y: y2v, z: z2v, xd: xd2v, yd: yd2v, zd: zd2v, uiManager });
   isOb2 = _isOb2;
   svs.push(sv2);
 
   isOb3 = !isOb2 ? false : isOb3;
-  const { isOb: _isOb3, sv: sv3 } = validateOb({ isOb: isOb3, t: t3v, x: x3v, y: y3v, z: z3v, xd: xd3v, yd: yd3v, zd: zd3v, uiManager });
+  const { isOb: _isOb3, sv: sv3 } = validateOb({ isOb: isOb3, obNum: 3, t: t3v, x: x3v, y: y3v, z: z3v, xd: xd3v, yd: yd3v, zd: zd3v, uiManager });
   isOb3 = _isOb3;
   svs.push(sv3);
 
@@ -309,6 +309,7 @@ export const obfitFormSubmit = (e: any) => { // NOSONAR
 
 const validateOb = ({
   isOb,
+  obNum,
   t,
   x,
   y,
@@ -319,6 +320,7 @@ const validateOb = ({
   uiManager,
 }: {
   isOb: boolean;
+  obNum: number;
   t: number;
   x: number;
   y: number;
@@ -331,31 +333,31 @@ const validateOb = ({
   let sv = [];
   if (isOb && isNaN(t)) {
     isOb = false;
-    uiManager.toast(`Time 3 is Invalid!`, 'caution');
+    uiManager.toast(`Time ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(x)) {
     isOb = false;
-    uiManager.toast(`X 3 is Invalid!`, 'caution');
+    uiManager.toast(`X ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(y)) {
     isOb = false;
-    uiManager.toast(`Y 3 is Invalid!`, 'caution');
+    uiManager.toast(`Y ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(z)) {
     isOb = false;
-    uiManager.toast(`Z 3 is Invalid!`, 'caution');
+    uiManager.toast(`Z ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(xd)) {
     isOb = false;
-    uiManager.toast(`X Dot 3 is Invalid!`, 'caution');
+    uiManager.toast(`X Dot ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(yd)) {
     isOb = false;
-    uiManager.toast(`Y Dot 3 is Invalid!`, 'caution');
+    uiManager.toast(`Y Dot ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(zd)) {
     isOb = false;
-    uiManager.toast(`Z Dot 3 is Invalid!`, 'caution');
+    uiManager.toast(`Z Dot ${obNum} is Invalid!`, 'caution');
   }
   if (isOb) {
     sv = [t, x, y, z, xd, yd, zd];

@@ -266,7 +266,7 @@ export const stfOnObjectLinkClick = () => {
   (<HTMLInputElement>getEl('stf-el')).value = satellite.currentTEARR.el.toFixed(1);
   (<HTMLInputElement>getEl('stf-rng')).value = satellite.currentTEARR.rng.toFixed(1);
   uiManager.hideSideMenus();
-  slideOutLeft(getEl('stf-menu'), 1000);
+  slideInRight(getEl('stf-menu'), 1000);
   isStfMenuOpen = true;
   getEl('menu-stf').classList.add('bmenu-item-selected');
 };

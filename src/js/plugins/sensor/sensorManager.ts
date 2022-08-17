@@ -66,7 +66,7 @@ const emptySensor: SensorObject = {
 };
 
 // NOTE: This doesn't account for sensorManager.selectedSensor
-export const checkSensorSelected = () => sensorManager.currentSensor[0].lat !== null || sensorManager.currentSensor[0].observerGd?.lat !== null;
+export const checkSensorSelected = () => sensorManager.currentSensor[0].lat !== null && sensorManager.currentSensor[0].observerGd?.lat !== null;
 
 export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   // TODO: This function is totally redundant to setSensor. There should be
@@ -180,12 +180,26 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
         sensor == sensorManager.sensorList.PIO
     );
     sendSensorToOtherPrograms(filteredSensors);
+  } else if (selectedSensor === 'PRC-ALL') {
+    sensorManager.sensorTitle = 'All Chinese Sensors';
+    const filteredSensors = Object.values(sensorList).filter(
+      (sensor) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        sensor == sensorManager.sensorList.XIN ||
+        sensor == sensorManager.sensorList.ZHE ||
+        sensor == sensorManager.sensorList.HEI ||
+        sensor == sensorManager.sensorList.SHD
+    );
+    sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'LEO-LABS') {
     sensorManager.sensorTitle = 'All LEO Labs Sensors';
     const filteredSensors = Object.values(sensorList).filter(
       (sensor) =>
         // eslint-disable-next-line implicit-arrow-linebreak
-        sensor == sensorManager.sensorList.MSR || sensor == sensorManager.sensorList.PFISR || sensor == sensorManager.sensorList.KSR
+        sensor == sensorManager.sensorList.MSR ||
+        sensor == sensorManager.sensorList.PFISR ||
+        sensor == sensorManager.sensorList.CRSR ||
+        sensor == sensorManager.sensorList.KSR
     );
     sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'MD-ALL') {

@@ -41,8 +41,8 @@ export const getOrbitByLatLon = (
   const epochyr = sat.TLE1.substr(18, 2);
   const epochday = sat.TLE1.substr(20, 12);
   const meanmo = sat.TLE2.substr(52, 11);
-  const inc = stringPad.pad0((sat.inclination * RAD2DEG).toPrecision(7), 8);
-  const ecen = sat.eccentricity.toPrecision(7).substr(2, 7);
+  const inc = stringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
+  const ecen = sat.eccentricity.toFixed(7).substr(2, 7);
   // Disregarding the first and second derivatives of mean motion
   // Just keep whatever was in the original TLE
   const TLE1Ending = sat.TLE1.substr(32, 39);
@@ -57,14 +57,14 @@ export const getOrbitByLatLon = (
    * @returns {PropagationResults} This number tells the main loop what to do next
    */
   const meanaCalc = (meana: number) => {
-    let satrec = <SatelliteRecord>satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+    let satrec = sat.satrec || <SatelliteRecord>satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
 
     meana = meana / 10;
-    const meanaStr = stringPad.pad0(meana.toPrecision(7), 8);
+    const meanaStr = stringPad.pad0(meana.toFixed(4), 8);
 
-    const raan = stringPad.pad0((sat.raan * RAD2DEG).toPrecision(7), 8);
+    const raan = stringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
 
-    const argPe = newArgPer ? stringPad.pad0((parseFloat(newArgPer) / 10).toPrecision(7), 8) : stringPad.pad0((sat.argPe * RAD2DEG).toPrecision(7), 8);
+    const argPe = newArgPer ? stringPad.pad0((parseFloat(newArgPer) / 10).toFixed(4), 8) : stringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
 
     const _TLE1Ending = sat.TLE1.substr(32, 39);
     const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + _TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
@@ -87,8 +87,8 @@ export const getOrbitByLatLon = (
    */
   const argPerCalc = (argPe: string): PropagationResults => {
     const meana = newMeana;
-    const raan = stringPad.pad0((sat.raan * RAD2DEG).toPrecision(7), 8);
-    argPe = stringPad.pad0((parseFloat(argPe) / 10).toPrecision(7), 8);
+    const raan = stringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
+    argPe = stringPad.pad0((parseFloat(argPe) / 10).toFixed(4), 8);
 
     // Create the new TLEs
     const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending;
@@ -118,10 +118,10 @@ export const getOrbitByLatLon = (
     raan = raan / 100;
     raan = raan > 360 ? raan - 360 : raan;
 
-    const raanStr = stringPad.pad0(raan.toPrecision(7), 8);
+    const raanStr = stringPad.pad0(raan.toFixed(4), 8);
 
     // If we adjusted argPe use the new one - otherwise use the old one
-    const argPe = newArgPer ? stringPad.pad0((parseFloat(newArgPer) / 10).toPrecision(7), 8) : stringPad.pad0((sat.argPe * RAD2DEG).toPrecision(7), 8);
+    const argPe = newArgPer ? stringPad.pad0((parseFloat(newArgPer) / 10).toFixed(4), 8) : stringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
 
     const TLE1 = '1 ' + sat.sccNum + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     const TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
@@ -135,7 +135,7 @@ export const getOrbitByLatLon = (
       raan = raan > 360 ? raan - 360 : raan;
       raan = raan < 0 ? raan + 360 : raan;
 
-      const _raanStr = stringPad.pad0(raan.toPrecision(7), 8);
+      const _raanStr = stringPad.pad0(raan.toFixed(4), 8);
 
       const _TLE2 = '2 ' + sat.sccNum + ' ' + inc + ' ' + _raanStr + ' ' + ecen + ' ' + argPe + ' ' + newMeana + ' ' + meanmo + '    10';
 
@@ -148,7 +148,7 @@ export const getOrbitByLatLon = (
   const getOrbitByLatLonPropagate = (nowIn: Date, satrec: SatelliteRecord, type: PropagationOptions): PropagationResults => {
     const { m, gmst } = calculateTimeVariables(nowIn, satrec);
     const positionEci = <EciVec3>satellite.sgp4(satrec, m).position;
-    if (!positionEci) {
+    if (isNaN(positionEci.x) || isNaN(positionEci.y) || isNaN(positionEci.z)) {
       return PropagationResults.Error;
     }
     const gpos = satellite.eciToGeodetic(positionEci, gmst);

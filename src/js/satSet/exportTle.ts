@@ -1,19 +1,23 @@
 import { RAD2DEG } from '@app/js/lib/constants';
 import { saveAs } from '@app/js/lib/external/file-saver.min.js';
 import { saveCsv } from '@app/js/lib/helpers';
+import { SatObject } from '../api/keepTrackTypes';
 
-export const exportTle2Csv = (satData: any[]) => {
+export const exportTle2Csv = (satData: SatObject[], isDeleteAnalysts = true) => {
   try {
     const catalogTLE2 = [];
-    satData.sort((a: { sccNum: string }, b: { sccNum: string }) => parseInt(a.sccNum) - parseInt(b.sccNum));
-    for (let s = 0; s < satData.length; s++) {
-      const sat = satData[s];
+    const satOnlyData = <any>satData.filter((sat: SatObject) => sat.sccNum && typeof sat.TLE1 != 'undefined' && typeof sat.TLE2 != 'undefined');
+
+    satOnlyData.sort((a: { sccNum: string }, b: { sccNum: string }) => parseInt(a.sccNum) - parseInt(b.sccNum));
+    for (let s = 0; s < satOnlyData.length; s++) {
+      const sat = <SatObject>satOnlyData[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
         continue;
       }
-      if (sat.C == 'ANALSAT') continue;
+      if (isDeleteAnalysts && sat.country == 'ANALSAT') continue;
       catalogTLE2.push({
         satId: sat.sccNum,
+        name: sat.name,
         TLE1: sat.TLE1,
         TLE2: sat.TLE2,
         inclination: sat.inclination * RAD2DEG,
@@ -22,27 +26,19 @@ export const exportTle2Csv = (satData: any[]) => {
         raan: sat.raan * RAD2DEG,
         apogee: sat.apogee,
         perigee: sat.perigee,
-        site: sat.LS,
-        country: sat.C,
-        name: sat.ON,
-        mission: sat.M,
-        purpose: sat.P,
-        user: sat.U,
-        rocket: sat.LV,
-        contractor: sat.Con,
-        dryMass: sat.DM,
-        liftMass: sat.LM,
-        lifeExpected: sat.Li,
-        power: sat.Pw,
+        country: sat.country,
+        site: sat.launchSite,
+        rocket: sat.launchVehicle,
+        rcs: sat.rcs,
         visualMagnitude: sat.vmag,
-        source1: sat.S1,
-        source2: sat.S2,
-        source3: sat.S3,
-        source4: sat.S4,
-        source5: sat.S5,
-        source6: sat.S6,
-        source7: sat.S7,
-        source8: sat.URL,
+        user: sat.user,
+        mission: sat.mission,
+        purpose: sat.purpose,
+        contractor: sat.manufacturer,
+        dryMass: sat.dryMass,
+        liftMass: sat.launchMass,
+        lifeExpected: sat.lifetime,
+        power: sat.power,
       });
     }
     saveCsv(catalogTLE2, 'catalogInfo');
@@ -51,16 +47,29 @@ export const exportTle2Csv = (satData: any[]) => {
     // console.warn('Failed to Export TLEs!');
   }
 };
-export const exportTle2Txt = (satData: any[]) => {
+export const exportTle2Txt = (satData: SatObject[], numberOfLines = 2, isDeleteAnalysts = true) => {
   try {
     const catalogTLE2 = [];
-    satData.sort((a: { sccNum: string }, b: { sccNum: string }) => parseInt(a.sccNum) - parseInt(b.sccNum));
-    for (let s = 0; s < satData.length; s++) {
-      const sat = satData[s];
+    const satOnlyData = <any>satData.filter((sat: SatObject) => sat.sccNum && typeof sat.TLE1 != 'undefined' && typeof sat.TLE2 != 'undefined');
+
+    satOnlyData.sort((a: { sccNum: string }, b: { sccNum: string }) => parseInt(a.sccNum) - parseInt(b.sccNum));
+    for (let s = 0; s < satOnlyData.length; s++) {
+      const sat = satOnlyData[s];
       if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
         continue;
       }
-      if (sat.C == 'ANALSAT') continue;
+      if (isDeleteAnalysts && sat.country == 'ANALSAT') continue;
+      if (numberOfLines == 3) {
+        catalogTLE2.push(sat.name);
+      }
+
+      if (sat.TLE1.includes('NO TLE')) {
+        console.log(sat.sccNum);
+      }
+      if (sat.TLE2.includes('NO TLE')) {
+        console.log(sat.sccNum);
+      }
+
       catalogTLE2.push(sat.TLE1);
       catalogTLE2.push(sat.TLE2);
     }

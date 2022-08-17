@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import { getEl } from '../lib/helpers';
 
 export const allowPeriod = (e: KeyboardEvent) => {
@@ -55,23 +54,44 @@ export const initUiValidation = () => {
   getEl('ms-lat')?.addEventListener('keyup', msLat90);
   getEl('ms-lon')?.addEventListener('keyup', msLon180);
 };
+
+const numberCodes = [
+  'Numpad1',
+  'Numpad2',
+  'Numpad3',
+  'Numpad4',
+  'Numpad5',
+  'Numpad6',
+  'Numpad7',
+  'Numpad8',
+  'Numpad9',
+  'Numpad0',
+  'Digit1',
+  'Digit2',
+  'Digit3',
+  'Digit4',
+  'Digit5',
+  'Digit6',
+  'Digit7',
+  'Digit8',
+  'Digit9',
+  'Digit0',
+];
+
+const allowedCodes = ['Delete', 'Backspace', 'Tab', 'Escape', 'NumpadEnter', 'Enter', 'NumpadEnter', 'Period', 'Home', 'End', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
 export const validateNumOnly = (e: KeyboardEvent) => {
+  // Allow: Ctrl+A, Command+A
+  // Allow: backspace, delete, tab, escape, enter and .
+  // Allow: home, end, left, right, down, up
   if (
-    // Allow: backspace, delete, tab, escape, enter and .
-    $.inArray(e.code, ['Delete', 'Backspace', 'Tab', 'Escape', 'NumpadEnter', 'Enter', 'NumpadEnter', 'Period']) !== -1 ||
-    // Allow: Ctrl+A, Command+A
     (e.code === 'KeyA' && (e.ctrlKey === true || e.metaKey === true)) ||
-    // Allow: home, end, left, right, down, up
-    $.inArray(e.code, ['Home', 'End', 'ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown']) !== -1
+    allowedCodes.includes(e.code)
   ) {
     // let it happen, don't do anything
     return;
   }
   // Ensure that it is a number and stop the keypress
-  if (
-    $.inArray(e.code, ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0']) !== -1 ||
-    $.inArray(e.code, ['Numpad1', 'Numpad2', 'Numpad3', 'Numpad4', 'Numpad5', 'Numpad6', 'Numpad7', 'Numpad8', 'Numpad9', 'Numpad0']) !== -1
-  ) {
+  if (!numberCodes.includes(e.code)) {
     e.preventDefault();
   }
 };

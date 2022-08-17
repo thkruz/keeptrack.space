@@ -182,6 +182,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
         m.data.TLE2
       );
       satCache[m.data.id] = { ...satCache[m.data.id], ...satrec };
+      satCache[m.data.id].skip = false;
       extraData = [];
       // eslint-disable-next-line no-case-declarations
       const extra = {
@@ -204,12 +205,13 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       extra.eccentricity = satrec.ecco;
       extra.raan = satrec.nodeo; // rads
       extra.argPe = satrec.argpo; // rads
-      extra.meanMotion = (satrec.no * 60 * 24) / (2 * PI); // convert rads/minute to rev/day
+      extra.meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
 
       // fun other data
       extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, 2 / 3);
       extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
       extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH;
+      satCache[m.data.id].apogee = extra.apogee; // This has to be updated or analyst satellites will fail automatically
       extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH;
       extra.period = 1440.0 / extra.meanMotion;
       extra.TLE1 = m.data.TLE1;

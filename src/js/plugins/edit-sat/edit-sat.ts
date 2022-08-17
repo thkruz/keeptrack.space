@@ -1,6 +1,7 @@
 import editPng from '@app/img/icons/edit.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { CatalogManager, ObjectManager } from '@app/js/api/keepTrackTypes';
+import { createError } from '@app/js/errorManager/errorManager';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
@@ -30,7 +31,7 @@ export const init = (): void => {
   keepTrackApi.register({
     method: 'rmbMenuActions',
     cbName: 'editSat',
-    cb: (iconName: string, clickedSat: any): void => rmbMenuActions(iconName, clickedSat),
+    cb: (iconName: string, clickedSat: number): void => rmbMenuActions(iconName, clickedSat),
   });
 
   keepTrackApi.register({
@@ -156,7 +157,7 @@ export const doReaderActions = (evt: Event) => {
     reader.onload = readerOnLoad;
     reader.readAsText((<any>evt.target).files[0]);
   } catch (e) {
-    // Intentionally left blank
+    createError(e, 'doReaderActions');
   }
 };
 
@@ -217,44 +218,32 @@ const populateSideMenu = ({ satSet, objectManager }: { satSet: CatalogManager; o
   const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
   (<HTMLInputElement>getEl('es-scc')).value = sat.sccNum;
 
-  let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
-  inc = inc.split('.');
-  inc[0] = inc[0].substr(-3, 3);
-  inc[1] = inc[1].substr(0, 4);
-  inc = (inc[0] + '.' + inc[1]).toString();
+  const inc: string = stringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
 
   (<HTMLInputElement>getEl('es-inc')).value = stringPad.pad0(inc, 8);
   (<HTMLInputElement>getEl('es-year')).value = sat.TLE1.substr(18, 2);
   (<HTMLInputElement>getEl('es-day')).value = sat.TLE1.substr(20, 12);
   (<HTMLInputElement>getEl('es-meanmo')).value = sat.TLE2.substr(52, 11);
 
-  let rasc: string | string[] = (sat.raan * RAD2DEG).toPrecision(7);
-  rasc = rasc.split('.');
-  rasc[0] = rasc[0].substr(-3, 3);
-  rasc[1] = rasc[1].substr(0, 4);
-  rasc = (rasc[0] + '.' + rasc[1]).toString();
+  const rasc: string = stringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
 
   (<HTMLInputElement>getEl('es-rasc')).value = stringPad.pad0(rasc, 8);
-  (<HTMLInputElement>getEl('es-ecen')).value = sat.eccentricity.toPrecision(7).substr(2, 7);
+  (<HTMLInputElement>getEl('es-ecen')).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-  let argPe: string | string[] = (sat.argPe * RAD2DEG).toPrecision(7);
-  argPe = argPe.split('.');
-  argPe[0] = argPe[0].substr(-3, 3);
-  argPe[1] = argPe[1].substr(0, 4);
-  argPe = (argPe[0] + '.' + argPe[1]).toString();
+  const argPe: string = stringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
 
   (<HTMLInputElement>getEl('es-argPe')).value = stringPad.pad0(argPe, 8);
   (<HTMLInputElement>getEl('es-meana')).value = sat.TLE2.substr(44 - 1, 7 + 1);
 };
 
-export const rmbMenuActions = (iconName: string, clickedSat: any) => {
+export const rmbMenuActions = (iconName: string, clickedSat: number) => {
   const { uiManager, objectManager } = keepTrackApi.programs;
   if (iconName === 'edit-sat-rmb') {
+    if (typeof clickedSat === 'undefined' || clickedSat === null) throw new Error('clickedSat is undefined');
+
     objectManager.setSelectedSat(clickedSat);
     if (!isEditSatMenuOpen) {
-      uiManager.bottomIconPress({
-        currentTarget: { id: 'menu-editSat' },
-      });
+      uiManager.bottomIconPress({ id: 'menu-editSat' });
     }
     return;
   }
@@ -322,31 +311,19 @@ export const editSatNewTleClickFadeIn = () => {
     const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
     (<HTMLInputElement>getEl('es-scc')).value = sat.sccNum;
 
-    let inc: string | string[] = (sat.inclination * RAD2DEG).toPrecision(7);
-    inc = inc.split('.');
-    inc[0] = inc[0].substr(-3, 3);
-    inc[1] = inc[1].substr(0, 4);
-    inc = (inc[0] + '.' + inc[1]).toString();
+    const inc: string = stringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
 
     (<HTMLInputElement>getEl('es-inc')).value = stringPad.pad0(inc, 8);
     (<HTMLInputElement>getEl('es-year')).value = sat.TLE1.substr(18, 2);
     (<HTMLInputElement>getEl('es-day')).value = sat.TLE1.substr(20, 12);
     (<HTMLInputElement>getEl('es-meanmo')).value = sat.TLE2.substr(52, 11);
 
-    let rasc: string | string[] = (sat.raan * RAD2DEG).toPrecision(7);
-    rasc = rasc.split('.');
-    rasc[0] = rasc[0].substr(-3, 3);
-    rasc[1] = rasc[1].substr(0, 4);
-    rasc = (rasc[0] + '.' + rasc[1]).toString();
+    const rasc: string = stringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
 
     (<HTMLInputElement>getEl('es-rasc')).value = stringPad.pad0(rasc, 8);
-    (<HTMLInputElement>getEl('es-ecen')).value = sat.eccentricity.toPrecision(7).substr(2, 7);
+    (<HTMLInputElement>getEl('es-ecen')).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-    let argPe: string | string[] = (sat.argPe * RAD2DEG).toPrecision(7);
-    argPe = argPe.split('.');
-    argPe[0] = argPe[0].substr(-3, 3);
-    argPe[1] = argPe[1].substr(0, 4);
-    argPe = (argPe[0] + '.' + argPe[1]).toString();
+    const argPe: string = stringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
 
     (<HTMLInputElement>getEl('es-argPe')).value = stringPad.pad0(argPe, 8);
     (<HTMLInputElement>getEl('es-meana')).value = sat.TLE2.substr(44 - 1, 7 + 1);

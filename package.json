@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -49,6 +49,9 @@
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(new-github-issue-url))"
+    ],
     "testMatch": [
       "**/?(*.)+(spec|test).?(m)[jt]s?(x)"
     ],
@@ -194,9 +197,10 @@
     "jquery": "^3.6.0",
     "jquery-ui-bundle": "^1.12.1-migrate",
     "meeusjs": "^1.0.4",
+    "new-github-issue-url": "^1.0.0",
     "node-fetch": "^3.1.0",
     "numeric": "^1.2.6",
-    "ootk": "^1.5.3",
+    "ootk": "^1.6.0",
     "resizable": "^1.2.1",
     "ts-node": "^10.9.1",
     "urlon": "^3.1.0"

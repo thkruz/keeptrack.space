@@ -1,7 +1,9 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { DEG2RAD, cKmPerMs } from '@app/js/lib/constants';
+
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { cKmPerMs, DEG2RAD } from '@app/js/lib/constants';
+import { createError } from '@app/js/errorManager/errorManager';
 import { getEl } from '@app/js/lib/helpers';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // prettier-ignore
 export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONAR
@@ -114,7 +116,7 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
       getEl('sat-nextpass').parentElement.style.display = 'none';
     }
   } catch (e) {
-    console.error(e);
+    createError(e, 'updateSatInfo');
   }
 };
 

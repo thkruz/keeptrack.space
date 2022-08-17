@@ -357,6 +357,30 @@ export const onColorSelected = (context: any, colorStr: string) => {
 export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
 
+  switch (e.target?.id) {
+    case 'settings-drawOrbits':
+    case 'settings-drawEcf':
+    case 'settings-isDrawInCoverageLines':
+    case 'settings-drawSun':
+    case 'settings-drawBlackEarth':
+    case 'settings-drawMilkyWay':
+    case 'settings-eciOnHover':
+    case 'settings-hos':
+    case 'settings-demo-mode':
+    case 'settings-sat-label-mode':
+    case 'settings-snp':
+      if ((<HTMLInputElement>getEl(e.target.id)).checked) {
+        // Play sound for enabling option
+        keepTrackApi.programs.soundManager.play('toggleOn');
+      } else {
+        // Play sound for disabling option
+        keepTrackApi.programs.soundManager.play('toggleOff');
+      }
+      break;
+    default:
+      break;
+  }
+
   isDMChecked ??= (<HTMLInputElement>getEl('settings-demo-mode')).checked;
   isSLMChecked ??= (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
 
@@ -373,7 +397,9 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
+  const { soundManager, satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
+
+  soundManager.play('button');
 
   settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
   settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;

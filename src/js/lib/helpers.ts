@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { createError } from '@app/js/errorManager/errorManager';
 import { saveAs } from 'file-saver';
 import { isThisJest } from './../api/keepTrackApi';
 
@@ -28,7 +29,7 @@ export const saveVariable = (variable: any, filename?: string): void => {
     if (!saveAs) throw new Error('saveAs is unavailable!');
     saveAs(blob, filename);
   } catch (e) {
-    // Intentionally Left Blank
+    createError(e, 'saveVariable');
   }
 };
 

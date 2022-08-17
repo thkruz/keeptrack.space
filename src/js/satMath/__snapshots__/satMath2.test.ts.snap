@@ -5,7 +5,7 @@ exports[`satMath.findBestPasses 0 1`] = `undefined`;
 exports[`satMath.getOrbitByLatLon 0 1`] = `
 Array [
   "Error",
-  "Failed to find a solution for Argument of Perigee",
+  "Failed to find a solution for Mean Anomaly",
 ]
 `;
 

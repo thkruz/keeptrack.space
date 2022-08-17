@@ -131,10 +131,11 @@ export const onReady = () => {
   keepTrackApi.methods.uiManagerOnReady();
   uiManager.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
   getEl('bottom-icons').addEventListener('click', function (evt: Event) {
-    // Only if '.bmenu-item' class is clicked
-    // if ((<HTMLDivElement>evt.target).classList.contains('bmenu-item')) {
-    uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
-    // }
+    if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
+      uiManager.bottomIconPress(<HTMLElement>evt.target);
+    } else {
+      uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
+    }
   });
   uiManager.hideSideMenus = () => {
     closeColorbox();

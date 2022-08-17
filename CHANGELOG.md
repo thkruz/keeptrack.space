@@ -2,6 +2,57 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v6.2.0
+
+>  
+
+- build(deps-dev): bump @babel/plugin-proposal-private-methods from 7.16.11 to 7.18.6
+- build(deps): bump echarts from 5.3.2 to 5.3.3
+- build(deps-dev): bump mini-css-extract-plugin from 2.6.0 to 2.6.1
+- build(deps-dev): bump husky from 7.0.4 to 8.0.1
+- build(deps-dev): bump @testing-library/jest-dom from 5.16.2 to 5.16.4
+- build(deps-dev): bump @typescript-eslint/parser from 5.12.1 to 5.30.7
+- build(deps-dev): bump ponicode from 0.61.3 to 0.70.11
+- chore: :card_file_box: update TLE databases
+- refactor: :heavy_minus_sign: replace suncalc with ootk
+- feat: :sparkles: add new sensors
+- fix: :bug: fix tle exporters
+- fix: :bug: fix bug when creating sensor or observer from rmb
+- fix: :bug: fix edit sat menu
+- feat: :sparkles: add error reporting feature
+- refactor: :recycle: simplify tle formatting
+- feat: :sparkles: add basic sounds
+- test: :white_check_mark: fix failing jest tests
+- docs: update changelog
+- feat: :sparkles: add additional tle export options
+- fix: :bug: fix initial orbits menu
+- fix: :bug: fix breakup creator
+- feat: :sparkles: add mute button
+- fix: :bug: fix bug new launch time mismatch
+- feat: :sparkles: add sound effects
+- feat: :sparkles: update sounds
+- fix: :bug: update apogee when edit sat in positionCruncher
+- feat: :sparkles: add sounds to settings menu
+- fix: :bug: update default colorscheme to catch unknown types
+- fix: :goal_net: add defensive code to satCalculate
+- build: :arrow_up: update all dependencies
+- fix: :bug: fix bottom menu ui not responding when edges clicked
+- fix: :bug: fix watchlist issues
+- feat: :sparkles: update about page
+- fix: :bug: fix bug caused by depricated fov text
+- build: :arrow_up: update ootk
+- fix: :bug: fix breakup menu
+- fix: :bug: fix new launch menu
+- fix: :bug: correct tle formatting in orbitReferencesLinkClick
+- fix: :bug: fix earth becoming background
+- fix: :bug: fix TLE formatting bug in getOrbitByLatLon
+- fix: :goal_net: add defensive code to setSelectedSat
+- fix: :goal_net: add defensive code to snapToSat
+- chore: :card_file_box: update SOCRATES example
+- fix: :bug: fix typo in stfOnObjectLinkClick
+- fix: :lock: update node-fetch
+- build(deps-dev): bump @babel/plugin-proposal-private-methods
+
 #### v6.1.0
 
 >  

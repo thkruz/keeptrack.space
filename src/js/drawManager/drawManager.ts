@@ -397,6 +397,16 @@ export const satCalculate = () => {
 
   if (objectManager.selectedSat !== -1) {
     drawManager.sat = satSet.getSat(objectManager.selectedSat);
+    if (!drawManager.sat) {
+      // Reset the selected sat if it is not found
+      drawManager.sat = <SatObject>{
+        id: -1,
+        missile: false,
+        type: SpaceObjectType.UNKNOWN,
+        static: false,
+      };
+      return;
+    }
     mainCamera.snapToSat(drawManager.sat);
     if (drawManager.sat.missile) orbitManager.setSelectOrbit(drawManager.sat.id);
   } else {

@@ -320,7 +320,7 @@ export class LineFactory {
                 this.drawLineList[i].sat2.id = this.getSensorFromSensorName(this.drawLineList[i].sat2.name);
               }
               this.drawLineList[i].sat2 = keepTrackApi.programs.satSet.getSat(this.drawLineList[i].sat2.id);
-              if ((!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && this.drawLineList[i].sat.inView === 0)|| !settingsManager.isDrawInCoverageLines) {
+              if ((!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && !keepTrackApi.programs.dotsManager.inViewData[this.drawLineList[i].sat.id]) || !settingsManager.isDrawInCoverageLines) {
                 this.drawLineList.splice(i, 1);
                 continue;
               }
@@ -453,6 +453,10 @@ export class LineFactory {
       }
 
       this.drawLineList[i].line.draw(this.drawLineList[i].color);
+      if (this.drawLineList[i].isOnlyInFOV) {
+        // Delete it now
+        this.drawLineList.splice(i, 1);
+      }
     }
   }
 }

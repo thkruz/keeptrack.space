@@ -13,7 +13,7 @@ if (!isThisJest()) {
 }
 
 export const createError = (e: Error, funcName: string, toastMsg?: string) => {
-  toastMsg ??= e.message;
+  toastMsg ??= e.message || 'Unknown error';
   if (!isThisJest()) {
     const url = newGithubIssueUrl({
       user: 'thkruz',

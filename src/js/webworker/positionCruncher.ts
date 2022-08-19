@@ -855,7 +855,12 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           el = sensor.obsmaxel;
           for (az = sensor.obsminaz; az < sensor.obsmaxaz; az += q) {
             pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
-            satCache[i].active = true;
+            try {
+              satCache[i].active = true;
+            } catch (e) {
+              // DEBUG:
+              // console.log(e);
+            }
             satPos = setPosition(satPos, i, pos);
             resetVelocity(satVel, i);
             i++;

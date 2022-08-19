@@ -83,9 +83,18 @@ export const initMenuController = () => {
   });
 
   getEl('search-results').addEventListener('click', function (evt: Event) {
+    let satId: number;
     // must be '.search-result' class
-    if (!(<HTMLElement>evt.target).parentElement.classList.contains('search-result')) return;
-    const satId = parseInt((<HTMLElement>evt.target).parentElement.dataset.objId);
+    if ((<HTMLElement>evt.target).classList.contains('search-result')) {
+      satId = parseInt((<HTMLElement>evt.target).dataset.objId);
+    } else if ((<HTMLElement>evt.target).parentElement.classList.contains('search-result')) {
+      satId = parseInt((<HTMLElement>evt.target).parentElement?.dataset.objId);
+    } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
+      satId = parseInt((<HTMLElement>evt.target).parentElement.parentElement.dataset.objId);
+    } else {
+      return;
+    }
+
     const sat = satSet.getSat(satId);
     if (sat.type === SpaceObjectType.STAR) {
       uiManager.panToStar(sat);
@@ -95,8 +104,18 @@ export const initMenuController = () => {
   });
 
   getEl('search-results').addEventListener('mouseover', function (evt) {
-    if (!(<HTMLElement>evt.target).parentElement.classList.contains('search-result')) return;
-    const satId = parseInt((<HTMLElement>evt.target).parentElement.dataset.objId);
+    let satId: number;
+    // must be '.search-result' class
+    if ((<HTMLElement>evt.target).classList.contains('search-result')) {
+      satId = parseInt((<HTMLElement>evt.target).dataset.objId);
+    } else if ((<HTMLElement>evt.target).parentElement.classList.contains('search-result')) {
+      satId = parseInt((<HTMLElement>evt.target).parentElement?.dataset.objId);
+    } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
+      satId = parseInt((<HTMLElement>evt.target).parentElement.parentElement.dataset.objId);
+    } else {
+      return;
+    }
+
     searchForSat(satId);
   });
   getEl('search-results').addEventListener('mouseout', () => {

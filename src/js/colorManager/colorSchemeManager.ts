@@ -319,10 +319,11 @@ export const colorSchemeManager: ColorSchemeManager = {
       }
 
       // Reset Which Sensor we are coloring before the loop begins
-      colorSchemeManager.iSensor = 0;
+      if (firstDotToColor === 0) {
+        colorSchemeManager.iSensor = 0;
+      }
 
-      // Lets loop through all the satellites and color them in one by one
-      let colors: ColorInformation = null;
+      // Lets loop through all the satellites and color them in one by one      
       let params = {
         year: '',
         jday: 0,
@@ -337,10 +338,36 @@ export const colorSchemeManager: ColorSchemeManager = {
 
       // Velocity is a special case - we need to know the velocity of each satellite
       if (colorSchemeManager.currentColorScheme === colorSchemeManager.velocity) {
-        for (let i = firstDotToColor; i < lastDotToColor; i++) {                
+        for (let i = firstDotToColor; i < lastDotToColor; i++) {          
+          let colors: ColorInformation = null;      
           satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
 
-          colors = colorSchemeManager.currentColorScheme(satData[i], params);
+          if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || satData[i].apogee >= 6000 && satData[i].perigee < 6000)) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }          
+          colors ??= colorSchemeManager.currentColorScheme(satData[i], params);
+          
           colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
           colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
           colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B
@@ -348,8 +375,34 @@ export const colorSchemeManager: ColorSchemeManager = {
           colorSchemeManager.pickableData[i] = colors.pickable;        
         }
       } else {
-        for (let i = firstDotToColor; i < lastDotToColor; i++) {                
-          colors = colorSchemeManager.currentColorScheme(satData[i], params);
+        for (let i = firstDotToColor; i < lastDotToColor; i++) {             
+          let colors: ColorInformation = null;   
+          if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || satData[i].apogee >= 6000 && satData[i].perigee < 6000)) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }          
+          colors ??= colorSchemeManager.currentColorScheme(satData[i], params);
+
           colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
           colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
           colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B

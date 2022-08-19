@@ -319,6 +319,10 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isShowGeoSats: boolean;
+  isShowHeoSats: boolean;
+  isShowMeoSats: boolean;
+  isShowLeoSats: boolean;
   maxOribtsDisplayedDesktopAll: any;
   orbitGroupAlpha: number;
   loopTimeMachine: any;

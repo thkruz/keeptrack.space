@@ -285,6 +285,15 @@ settingsManager = {
     // Draw Lines from Sensors to Satellites When in FOV
     settingsManager.isDrawInCoverageLines = true;
 
+    // Show LEO satellites
+    settingsManager.isShowLeoSats = true;
+    // Show HEO satellites
+    settingsManager.isShowHeoSats = true;
+    // Show MEO satellites
+    settingsManager.isShowMeoSats = true;
+    // Show GEO satellites
+    settingsManager.isShowGeoSats = true;
+
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
     // Use these to default smallest resolution maps and limited "extras" like

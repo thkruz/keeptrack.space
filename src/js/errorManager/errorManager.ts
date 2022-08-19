@@ -2,7 +2,7 @@ import { isThisJest } from '@app/js/api/keepTrackApi';
 import { toast } from '@app/js/uiManager/ui/toast';
 
 let newGithubIssueUrl;
-if (!isThisJest)
+if (!isThisJest()) {
   import('new-github-issue-url')
     .then((mod) => {
       newGithubIssueUrl = mod.default;
@@ -10,6 +10,7 @@ if (!isThisJest)
     .catch(() => {
       newGithubIssueUrl = () => {};
     });
+}
 
 export const createError = (e: Error, funcName: string, toastMsg?: string) => {
   toastMsg ??= e.message;

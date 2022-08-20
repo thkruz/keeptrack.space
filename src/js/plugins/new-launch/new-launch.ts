@@ -58,6 +58,9 @@ export const newLaunchSubmit = () => {
   const TLE1 = TLEs[0];
   const TLE2 = TLEs[1];
 
+  if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
+  if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
+
   if (satellite.altitudeCheck(TLE1, TLE2, simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',

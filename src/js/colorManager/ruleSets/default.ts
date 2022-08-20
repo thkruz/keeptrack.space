@@ -56,7 +56,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
     case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
     case SpaceObjectType.PAYLOAD_MANUFACTURER:
       // If the facility flag is off then we don't want to show this
-      if (colorSchemeManager.objectTypeFlags.facility === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
+      if (!settingsManager.isShowAgencies || colorSchemeManager.objectTypeFlags.facility === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
         return {
           color: colorSchemeManager.colorTheme.deselected,
           pickable: Pickable.No,
@@ -72,7 +72,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
     case SpaceObjectType.LAUNCH_SITE:
     case SpaceObjectType.LAUNCH_POSITION:
       // If the facility flag is off then we don't want to show this
-      if (colorSchemeManager.objectTypeFlags.facility === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
+      if (!settingsManager.isShowAgencies || colorSchemeManager.objectTypeFlags.facility === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
         return {
           color: colorSchemeManager.colorTheme.deselected,
           pickable: Pickable.No,

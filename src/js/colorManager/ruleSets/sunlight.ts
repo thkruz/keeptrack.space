@@ -1,7 +1,8 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { ColorInformation, Pickable, colorSchemeManager } from '../colorSchemeManager';
+
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
@@ -27,7 +28,7 @@ export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
     case SpaceObjectType.LAUNCH_SITE:
     case SpaceObjectType.LAUNCH_POSITION:
       // If the facility flag is off then we don't want to show this
-      if (colorSchemeManager.objectTypeFlags.facility === false) {
+      if (colorSchemeManager.objectTypeFlags.facility === false || !settingsManager.isShowAgencies) {
         return {
           color: colorSchemeManager.colorTheme.deselected,
           pickable: Pickable.No,

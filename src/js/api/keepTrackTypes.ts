@@ -57,7 +57,7 @@ export interface PostProcessingManager {
 export interface UiManager {
   lastBoxUpdateTime: number;
   earthClicked: () => void;
-  updateNextPassOverlay(arg0: boolean);
+  updateNextPassOverlay(arg0: boolean, arg1?: boolean): void;
   resize2DMap();
   isAnalysisMenuOpen: any;
   lastNextPassCalcSatId: number;
@@ -319,6 +319,7 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isShowAgencies: any;
   isShowGeoSats: boolean;
   isShowHeoSats: boolean;
   isShowMeoSats: boolean;
@@ -1250,6 +1251,8 @@ export interface SatMath {
 export interface Watchlist {
   lastOverlayUpdateTime: number;
   updateWatchlist: (updateWatchlistList?: any[], updateWatchlistInViewList?: any) => void;
+  watchlistList: any[];
+  watchlistInViewList: any[];
 }
 
 export interface SearchBox {

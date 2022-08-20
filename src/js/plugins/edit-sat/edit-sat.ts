@@ -5,6 +5,7 @@ import { createError } from '@app/js/errorManager/errorManager';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
+import { toast } from '@app/js/uiManager/ui/toast';
 
 let isEditSatMenuOpen = false;
 export const init = (): void => {
@@ -184,8 +185,7 @@ export const readerOnLoad = (evt: any) => {
     orbitManager.updateOrbitBuffer(sat.id, true, object.TLE1, object.TLE2);
     sat.active = true;
   } else {
-    getEl('es-error').innerHTML = 'Failed Altitude Check</br>Try Different Parameters';
-    getEl('es-error').style.display = 'block';
+    toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.','caution', true);
   }
 };
 
@@ -206,7 +206,7 @@ export const bottomMenuClick = (iconName: string) => {
         populateSideMenu({ satSet, objectManager });
       } else {
         if (settingsManager.plugins?.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
-        uiManager.toast(`Select a Satellite First!`, 'caution');
+        toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-editSat'));
       }
     }
@@ -260,7 +260,7 @@ export const editSatNewTleClick = () => {
 };
 
 export const editSatNewTleClickFadeIn = () => {
-  const { satellite, satSet, timeManager, objectManager, orbitManager, uiManager } = keepTrackApi.programs;
+  const { satellite, satSet, timeManager, objectManager, orbitManager } = keepTrackApi.programs;
   try {
     // Update Satellite TLE so that Epoch is Now but ECI position is very very close
     const satId = satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('es-scc')).value));
@@ -294,7 +294,7 @@ export const editSatNewTleClickFadeIn = () => {
     const TLE2 = TLEs[1];
 
     if (TLE1 === 'Error') {
-      uiManager.toast(`${TLE2}`, 'critical');
+      toast(`${TLE2}`, 'critical', true);
       return;
     }
 
@@ -364,8 +364,7 @@ export const editSatSubmit = () => {
     orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
     sat.active = true;
   } else {
-    getEl('es-error').innerHTML = 'Failed Altitude Check</br>Try Different Parameters';
-    getEl('es-error').style.display = 'block';
+    toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.','caution', true);
   }
 };
 

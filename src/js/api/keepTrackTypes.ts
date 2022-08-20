@@ -1386,6 +1386,7 @@ export interface SocratesPlugin {
   socratesObjTwo: any;
 }
 export interface KeepTrackPrograms {
+  debug: any;
   satCruncher: any; // depricated
   adviceManager: AdviceManager;
   earth: EarthObject;

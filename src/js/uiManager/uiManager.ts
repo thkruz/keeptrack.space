@@ -131,6 +131,7 @@ export const onReady = () => {
   keepTrackApi.methods.uiManagerOnReady();
   uiManager.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
   getEl('bottom-icons').addEventListener('click', function (evt: Event) {
+    if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
     if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
       uiManager.bottomIconPress(<HTMLElement>evt.target);
     } else {

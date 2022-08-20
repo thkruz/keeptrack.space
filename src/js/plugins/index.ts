@@ -22,19 +22,19 @@ import * as newLaunch from '@app/js/plugins/new-launch/new-launch';
 import * as nextLaunch from '@app/js/plugins/next-launch/next-launch';
 import * as nightToggle from '@app/js/plugins/night-toggle/night-toggle';
 import * as orbitReferences from '@app/js/plugins/orbit-references/orbit-references';
-import * as photoManager from '@app/js/plugins/photo-manager/photo-manager';
 import * as photo from '@app/js/plugins/photo/photo';
+import * as photoManager from '@app/js/plugins/photo-manager/photo-manager';
 import * as planetarium from '@app/js/plugins/planetarium/planetarium';
 import * as plotAnalysis from '@app/js/plugins/plot-analysis/plot-analysis';
 import * as recorderManager from '@app/js/plugins/recorder-manager/recorder-manager';
 import * as satChanges from '@app/js/plugins/sat-changes/sat-changes';
+import * as satInfoboxCore from '@app/js/plugins/select-sat-manager/satInfoboxCore';
 import * as satelliteFov from '@app/js/plugins/satellite-fov/satellite-fov';
 import * as satelliteView from '@app/js/plugins/satellite-view/satellite-view';
 import * as scenarioCreator from '@app/js/plugins/scenario-creator/scenario-creator';
-import * as satInfoboxCore from '@app/js/plugins/select-sat-manager/satInfoboxCore';
+import * as sensor from '@app/js/plugins/sensor/sensor';
 import * as sensorFov from '@app/js/plugins/sensor-fov/sensor-fov';
 import * as sensorSurv from '@app/js/plugins/sensor-surv/sensor-surv';
-import * as sensor from '@app/js/plugins/sensor/sensor';
 import * as settingsMenu from '@app/js/plugins/settings-menu/settings-menu';
 import * as shortTermFences from '@app/js/plugins/short-term-fences/short-term-fences';
 import * as social from '@app/js/plugins/social/social';
@@ -45,11 +45,13 @@ import * as topMenu from '@app/js/plugins/top-menu/top-menu';
 import * as twitter from '@app/js/plugins/twitter/twitter';
 import * as updateSelectBoxCore from '@app/js/plugins/update-select-box/update-select-box';
 import * as watchlist from '@app/js/plugins/watchlist/watchlist';
+
+import { addCustomSensor, clearCustomSensors, removeLastSensor } from './sensor/sensor';
+import { isselectedSatNegativeOne, selectSatManager } from './select-sat-manager/select-sat-manager';
+
+import { CanvasRecorder } from './recorder-manager/canvas-recorder/canvas-recorder';
 import { getEl } from '../lib/helpers';
 import { omManager } from './initial-orbit/om-manager';
-import { CanvasRecorder } from './recorder-manager/canvas-recorder/canvas-recorder';
-import { isselectedSatNegativeOne, selectSatManager } from './select-sat-manager/select-sat-manager';
-import { addCustomSensor, clearCustomSensors, removeLastSensor } from './sensor/sensor';
 import { sensorManager } from './sensor/sensorManager';
 
 // Register all core modules
@@ -112,6 +114,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.externalSources) externalSources.init();
     if (plugins.aboutManager) aboutManager.init();
     if (plugins.settingsMenu) settingsMenu.init();
+    if (plugins.debug) debug.initMenu();
     if (plugins.soundManager) soundManager.init();
     if (plugins.gamepad) gamepad.init();
 

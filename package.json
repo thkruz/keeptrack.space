@@ -141,6 +141,8 @@
     "draggy": "^1.6.6",
     "echarts": "^5.3.2",
     "echarts-gl": "^2.0.9",
+    "eruda": "^2.5.0",
+    "eruda-fps": "^2.0.0",
     "file-saver": "^2.0.5",
     "gl-matrix": "^3.3.0",
     "gremlins.js": "^2.2.0",

@@ -1,6 +1,11 @@
-// @ts-ignore-next-line
-import { getEl } from '@app/js/lib/helpers';
 import * as gremlins from 'gremlins.js';
+
+import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+
+// @ts-ignore-next-line
+import debugPng from '@app/img/icons/debug.png';
+import eruda from 'eruda';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 /*
  * Returns a random integer between min (inclusive) and max (inclusive).
@@ -62,15 +67,122 @@ export const runGremlins = () => {
   getEl('bottom-icons').style.height = '200px';
   startGremlins();
 };
-//Global Debug Manager
+
+let isDebugMenuOpen = false;
+
 export const init = (): void => {
-  const db: any = {
+  keepTrackApi.programs.debug = {
+    isErudaVisible: false,
     gremlinsSettings: {
       nb: 100000,
       delay: 5,
     },
     gremlins: runGremlins,
   };
+};
 
-  settingsManager.db = db;
+export const initMenu = (): void => {
+  // Add HTML
+  keepTrackApi.register({
+    method: 'uiManagerInit',
+    cbName: 'debug',
+    cb: uiManagerInit,
+  });
+
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'debug',
+    cb: uiManagerFinal,
+  });
+
+  // Add JavaScript
+  keepTrackApi.register({
+    method: 'bottomMenuClick',
+    cbName: 'debug',
+    cb: (iconName: string): void => bottomMenuClick(iconName),
+  });
+
+  keepTrackApi.register({
+    method: 'hideSideMenus',
+    cbName: 'debug',
+    cb: (): void => hideSideMenus(),
+  });
+};
+
+export const uiManagerInit = (): void => {
+  // Side Menu
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
+    <div id="debug-menu" class="side-menu-parent start-hidden text-select">
+      <div id="debug-content" class="side-menu">
+        <div class="row">
+          <h5 class="center-align">Debug Menu</h5>
+          <div class="center-align row">
+            <button id="debug-console" class="btn btn-ui waves-effect waves-light" type="button">Open Debug Menu &#9658;</button>
+          </div>
+          <div class="center-align row">
+            <button id="debug-gremlins" class="btn btn-ui waves-effect waves-light" type="button">Unleash Gremlins &#9658;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    `
+  );
+
+  // Bottom Icon
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
+    <div id="menu-debug" class="bmenu-item">
+      <img
+        alt="debug"
+        src="${debugPng}"/>
+      <span class="bmenu-title">Debug</span>
+      <div class="status-icon"></div>
+    </div>
+  `
+  );
+};
+
+export const uiManagerFinal = (): void => {
+  clickAndDragWidth(getEl('debug-menu'));
+
+  getEl('debug-console').addEventListener('click', () => {
+    if (keepTrackApi.programs.debug.isErudaVisible) {
+      eruda.hide();
+      keepTrackApi.programs.debug.isErudaVisible = false;
+    } else {
+      eruda.show();
+      keepTrackApi.programs.debug.isErudaVisible = true;
+    }
+  });
+
+  getEl('debug-gremlins').addEventListener('click', () => {
+    keepTrackApi.programs.debug.gremlins();
+  });
+};
+
+export const bottomMenuClick = (iconName: string) => {
+  const { uiManager } = keepTrackApi.programs;
+  if (iconName === 'menu-debug') {
+    if (isDebugMenuOpen) {
+      isDebugMenuOpen = false;
+      uiManager.hideSideMenus();
+      return;
+    } else {
+      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
+      uiManager.hideSideMenus();
+      slideInRight(getEl('debug-menu'), 1000);
+      getEl('menu-debug').classList.add('bmenu-item-selected');
+      isDebugMenuOpen = true;
+    }
+    return;
+  }
+};
+
+export const hideSideMenus = () => {
+  slideOutLeft(getEl('debug-menu'), 1000);
+  getEl('menu-debug').classList.remove('bmenu-item-selected');
+  isDebugMenuOpen = false;
 };

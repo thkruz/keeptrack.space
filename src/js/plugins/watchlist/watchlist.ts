@@ -27,7 +27,7 @@ import infoPng from '@app/img/icons/info.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
 import removePng from '@app/img/remove.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { createError } from '@app/js/errorManager/errorManager';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
@@ -51,9 +51,13 @@ export const hideSideMenus = (): void => {
 };
 
 export const init = (): void => {
-  const { satSet, objectManager, uiManager, timeManager }: { satSet: any; objectManager: any; uiManager: any; timeManager: any } = keepTrackApi.programs;
-  keepTrackApi.programs.watchlist = <Watchlist>{};
-  keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
+  const { satSet, objectManager, uiManager, timeManager } = keepTrackApi.programs;
+  keepTrackApi.programs.watchlist = {
+    lastOverlayUpdateTime: 0,
+    updateWatchlist,
+    watchlistList,
+    watchlistInViewList,
+  };
 
   // Add HTML
   keepTrackApi.register({
@@ -68,8 +72,6 @@ export const init = (): void => {
     cb: uiManagerFinal,
   });
 
-  keepTrackApi.programs.watchlist.updateWatchlist = updateWatchlist;
-
   let infoOverlayDOM = [];
   uiManager.updateNextPassOverlay = (nextPassArrayIn: any, isForceUpdate: any) => {
     if (nextPassArrayIn.length <= 0 && !isInfoOverlayMenuOpen) return;
@@ -78,10 +80,11 @@ export const init = (): void => {
     // TODO: This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
     if (
-      (timeManager.realTime > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 &&
+      (Date.now() > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 &&
         objectManager.selectedSat === -1 &&
         !mainCamera.isDragging &&
-        mainCamera.zoomLevel === mainCamera.zoomTarget) ||
+        mainCamera.zoomLevel() < mainCamera.zoomTarget() + 0.01 &&
+        mainCamera.zoomLevel() > mainCamera.zoomTarget() - 0.01) ||
       isForceUpdate
     ) {
       const propTime = timeManager.simulationTimeObj;
@@ -302,6 +305,7 @@ export const updateLoop = () => { // NOSONAR
     uiManager,
     sensorManager,
     timeManager,
+    watchlist
   } = keepTrackApi.programs;
 
   uiManager.updateNextPassOverlay(nextPassArray);
@@ -340,7 +344,10 @@ export const updateLoop = () => { // NOSONAR
     if (watchlistInViewList[i] === true) {
       return;
     }
-  }
+  }  
+
+  watchlist.watchlistList = watchlistList;
+  watchlist.watchlistInViewList = watchlistInViewList;
 };
 
 // prettier-ignore
@@ -377,7 +384,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
           for (let x = 0; x < watchlistList.length; x++) {
             nextPassArray.push(satSet.getSatExtraOnly(watchlistList[x]));
           }
-          nextPassArray = satellite.nextpassList(nextPassArray);
+          nextPassArray = satellite.nextpassList(nextPassArray, 1, 0.5);
           nextPassArray.sort(function (a: { time: string | number | Date }, b: { time: string | number | Date }) {
             return new Date(a.time).getTime() - new Date(b.time).getTime();
           });
@@ -403,13 +410,15 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
       isWatchlistMenuOpen = false;
       getEl('menu-watchlist').classList.remove('bmenu-item-selected');
       uiManager.hideSideMenus();
+      uiManager.doSearch('');
       return;
     } else {
       if ((<any>settingsManager).isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();      
-      slideInRight(getEl('watchlist-menu'), 1000);
-      updateWatchlist();
-      isWatchlistMenuOpen = true;
+      slideInRight(getEl('watchlist-menu'), 1000, () => {
+        updateWatchlist();
+        isWatchlistMenuOpen = true;
+      });      
       getEl('menu-watchlist').classList.add('bmenu-item-selected');
       return;
     }
@@ -454,7 +463,7 @@ export const onCruncherReady = async (): Promise<void> => { // NOSONAR
 };
 
 export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number, propTime: any, infoOverlayDOM: any[]) => {
-  const satInView = keepTrackApi.programs.dotsManager.inViewData[satSet.getIdFromObjNum(nextPassArrayIn[s].sccNum).id];
+  const satInView = keepTrackApi.programs.dotsManager.inViewData[satSet.getIdFromObjNum(nextPassArrayIn[s].sccNum)];
   // If old time and not in view, skip it
   if (nextPassArrayIn[s].time - propTime < -1000 * 60 * 5 && !satInView) return;
 
@@ -469,7 +478,7 @@ export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number,
   // Blue - Time to Next Pass is between 10 minutes before and 20 minutes after the current time
   // This makes recent objects stay at the top of the list in blue
   if (nextPassArrayIn[s].time - propTime < 1000 * 60 * 10 && propTime - nextPassArrayIn[s].time < 1000 * 60 * 20) {
-    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArrayIn[s].sccNum + ': ' + time + '</h5></div>');
+    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: #0095ff">' + nextPassArrayIn[s].sccNum + ': ' + time + '</h5></div>');
     return;
   }
   // White - Any future pass not fitting the above requirements
@@ -480,7 +489,7 @@ export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number,
 
 export const infoOverlayContentClick = (evt: any) => {
   const { satSet, objectManager } = keepTrackApi.programs;
-  let objNum = evt.currentTarget.textContent.split(':');
+  let objNum = evt.target.textContent.split(':');
   objNum = objNum[0];
   const satId = satSet.getIdFromObjNum(objNum);
   if (satId !== null) {

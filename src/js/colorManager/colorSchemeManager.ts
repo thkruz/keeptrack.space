@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { getEl } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../api/keepTrackApi';
 import { CatalogManager, Colors, SatObject } from '../api/keepTrackTypes';
 import { ageOfElsetRules } from './ruleSets/ageOfElset';
@@ -246,13 +247,13 @@ export const colorSchemeManager: ColorSchemeManager = {
       // These two variables only need to be set once, but we want to make sure they aren't called before the satellites
       // are loaded into satSet. Don't move the buffer data creation into the constructor!
       if (!colorSchemeManager.pickableData || !colorSchemeManager.colorData) return;
-      const { searchBox } = keepTrackApi.programs;
+      const { searchBox, orbitManager } = keepTrackApi.programs;
       const { gl } = keepTrackApi.programs.drawManager;
 
 
       // Revert colorscheme if search box is empty
       if (colorSchemeManager.currentColorScheme === colorSchemeManager.group || colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
-        if (searchBox.getCurrentSearch() === '') {
+        if (searchBox.getCurrentSearch() === '' && getEl('watchlist-menu').style.transform !== 'translateX(0px)' && !orbitManager.isTimeMachineRunning) {
           if (colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
             colorSchemeManager.currentColorScheme = colorSchemeManager.countries;
           } else {

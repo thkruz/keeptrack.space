@@ -30,13 +30,7 @@ Starting with Version 3, a github page is automatically deployed with the most-c
 
 ### Built With
 
-- [babel](https://babeljs.io/)
-- [eslint 8](https://eslint.org/)
-- [jest 27](https://jestjs.io/)
-- [jsdom](https://github.com/jsdom/jsdom)
-- [prettier](https://prettier.io/)
-- [ponicode](https://ponicode.com/)
-- [webpack 5](https://webpack.js.org/)
+[![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)[![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)[![npm](https://img.shields.io/badge/npm-%23E5E5E5?style=for-the-badge&logo=npm&logoColor=058a5e)](https://www.npmjs.com/)[![WebGL](https://img.shields.io/badge/WebGL-990000?logo=webgl&logoColor=white&style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Web/WebGL)[![Babel](https://img.shields.io/badge/Babel-F9DC3e?style=for-the-badge&logo=babel&logoColor=black)](https://babeljs.io/)[![Webpack](https://img.shields.io/badge/webpack-%238DD6F9.svg?style=for-the-badge&logo=webpack&logoColor=black)](https://webpack.js.org/)[![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)[![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)[![cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e)](https://www.cypress.io/)[![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](http://github.com)[![GitLab](https://img.shields.io/badge/gitlab-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white)](https://gitlab.com)
 
 ### Prerequisites
 
@@ -56,11 +50,11 @@ npm start                                                 #Start the server.
 
 KeepTrack was designed to run without the need for a server. On Windows, close all open copies of chrome and then launch the included KeepTrack.bat file.
 
-NOTE: You MUST compile the code first. Opening the index.htm file in the src folder will not work. If that feels overwhelming, take a look at https://github.com/thkruz/keeptrack.space/tree/gh-pages for a built version that can be downloaded and launched.
+NOTE: You MUST compile the code first. Opening the index.html file in the src folder will not work. If that feels overwhelming, take a look at https://github.com/thkruz/keeptrack.space/tree/gh-pages for a built version that can be downloaded and launched.
 
 ## Usage
 
-The main index.htm page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.ts and orbitCruncher.ts) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
+The main index.html page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.ts and orbitCruncher.ts) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
 
 The main draw loop (drawManager.ts) has been optimized to reduce memory leaks and to keep FPS high. This is commonly done by having functions modify global variables vs returning a variable and using long functions rather than splitting them into pieces - this is definitely intentional.
 
@@ -80,7 +74,7 @@ If you are interested in helping with this project, please reference the [Contri
 
 ### Main Files
 
-- index.htm - Controls the structure of the front-end and loads all the CSS and JS files.
+- index.html - Controls the structure of the front-end and loads all the CSS and JS files.
 - main.ts - Primary TS file that bootstraps all of the other files.
 - camera.ts - cameraManager is used to create cameraManager that serves as the interface from the UI and the webgl camera.
 - colorSchemeManager.ts - Handles the creation of color schemes for the dots.

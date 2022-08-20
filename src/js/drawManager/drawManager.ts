@@ -163,7 +163,7 @@ export const resizeCanvas = () => {
     }
   } else {
     if (!settingsManager.screenshotMode) return;
-    setCanvasSize(settingsManager.hiResWidth, settingsManager.hiResHeight);
+    setCanvasSize(settingsManager.hiResHeight, settingsManager.hiResWidth);
   }
 
   gl.viewport(0, 0, drawManager.canvas.width, drawManager.canvas.height);

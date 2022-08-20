@@ -611,6 +611,61 @@ const extractCountry = (C: string): string => {
   }
 };
 
+export const getCountryCode = (country) => {
+  // prettier-ignore
+  switch (country) {
+    case 'Afghanistan': return 'AF';
+    case 'Argentina': return 'AR';
+    case 'Austria': return 'AT';
+    case 'Australia': return 'AU';
+    case 'Belgium': return 'B';
+    case 'Brazil': return 'BR';
+    case 'Canada': return 'CA';
+    case 'China': return 'CN';
+    case 'Colombia': return 'CO';
+    case 'Denmark': return 'DK';
+    case 'Egypt': return 'EG';
+    case 'Finland': return 'FI';
+    case 'France': return 'F';
+    case 'Germany': return 'D';
+    case 'Hong Kong': return 'HK';
+    case 'Hungary': return 'HU';
+    case 'India': return 'IN';
+    case 'Indonesia': return 'ID';
+    case 'Iran': return 'IR';
+    case 'Iraq': return 'IQ';
+    case 'Ireland': return 'IE';
+    case 'Italy': return 'I';
+    case 'Israel': return 'IL';
+    case 'Japan': return 'J';
+    case 'North Korea': return 'KP';
+    case 'South Korea': return 'KR';
+    case 'Mexico': return 'MX';
+    case 'Norway': return 'N';
+    case 'New Zealand': return 'NZ';
+    case 'Philippines': return 'PH';
+    case 'Poland': return 'PL';
+    case 'Portugal': return 'PT';
+    case 'Russia': return 'RU|SU|CIS';
+    case 'Saudi Arabia': return 'SA';
+    case 'Singapore': return 'SG';
+    case 'Spain': return 'E';
+    case 'Sweden': return 'S';
+    case 'Switzerland': return 'CH';
+    case 'Thailand': return 'T';
+    case 'Turkey': return 'TR';
+    case 'United Arab Emirates': return 'AE';
+    case 'United Kingdom': return 'UK';
+    case 'United States': return 'US';
+    case 'Venezuela': return 'VE';
+    case 'Vietnam': return 'VN';
+    case 'South Africa': return 'ZA';
+    default: 
+      console.debug('Unknown country: ' + country);
+      return '';
+  }
+};
+
 const extractLaunchSite = (LS: string): { site: string; sitec: string } => {
   // prettier-ignore
   switch (LS) { // NOSONAR

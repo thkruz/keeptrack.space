@@ -122,6 +122,8 @@ export const init = async (satCruncherOveride?: any): Promise<number> => { // NO
 };
 export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, sccNum?: string): any => {
   const { satellite, timeManager, orbitManager, uiManager } = keepTrackApi.programs;
+  if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
+  if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',

@@ -211,6 +211,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       let inc = parseFloat(TLE2.substr(8, 8));
       inc = inc + Math.random() * incVariation * 2 - incVariation;
       const incStr = stringPad.pad0(inc.toFixed(4), 8);
+      if (incStr.length !== 8) throw new Error(`Inclination length is not 8 - ${incStr} - ${TLE2}`);
 
       // Ecentricity
       sat.eccentricity = origEcc;
@@ -221,10 +222,15 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       meanmo = meanmo + Math.random() * meanmoVariation * 2 - meanmoVariation;
       // const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
       const meanmoStr = stringPad.pad0(meanmo.toFixed(8), 11);
+      if (meanmoStr.length !== 11) throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTLE2}`);
 
       satId = satSet.getIdFromObjNum(80000 + i);
       iTLE1 = `1 ${80000 + i}` + iTLE1.substr(7);
       iTLE2 = `2 ${80000 + i} ${incStr} ${iTLE2.substr(17, 35)}${meanmoStr}${iTLE2.substr(63)}`;
+
+      if (iTLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${iTLE1}`);
+      if (iTLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${iTLE2}`);
+
       sat = satSet.getSat(satId);
       sat.TLE1 = iTLE1;
       sat.TLE2 = iTLE2;

@@ -44,56 +44,6 @@
     "prepare": "husky install"
   },
   "chromium-args": "--enable-threaded-compositing",
-  "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!(new-github-issue-url))"
-    ],
-    "testMatch": [
-      "**/?(*.)+(spec|test).?(m)[jt]s?(x)"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "mjs",
-      "ts"
-    ],
-    "setupFiles": [
-      "jest-canvas-mock",
-      "<rootDir>/test/polyfills.js",
-      "<rootDir>/test/test-env.js",
-      "<rootDir>/test/test-env-mocks.js"
-    ],
-    "coverageDirectory": "<rootDir>/coverage",
-    "moduleDirectories": [
-      "node_modules",
-      "offline"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/offline/",
-      "<rootDir>/dist/",
-      "<rootDir>/src/admin/"
-    ],
-    "moduleNameMapper": {
-      "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
-      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/scripts/fileMock.js",
-      "@app(.*)$": "<rootDir>/src/$1"
-    },
-    "coverageReporters": [
-      "lcov",
-      "html",
-      "text"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/src/js/lib/external/",
-      "/test/",
-      "/dist/"
-    ]
-  },
   "nyc": {
     "report-dir": "coverage/integration",
     "reporter": [
@@ -153,7 +103,7 @@
     "cypress": "^9.7.0",
     "download-file": "^0.1.5",
     "eslint": "^8.20.0",
-    "eslint-plugin-jest": "^25.7.0",
+    "eslint-plugin-jest": "^26.8.4",
     "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
     "http-server": "^14.1.1",
@@ -171,7 +121,7 @@
     "prettier": "2.6.2",
     "prettier-plugin-organize-imports": "^2.3.4",
     "retire": "^3.0.7",
-    "serve": "^13.0.2",
+    "serve": "^13.0.4",
     "source-map-loader": "^3.0.0",
     "start-server-and-test": "^1.14.0",
     "style-loader": "^3.0.0",

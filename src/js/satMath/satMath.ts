@@ -358,7 +358,7 @@ export const satellite: SatMath = {
   lastMultiSiteArray: [],
   lookAngles2Ecf: lookAngles2ecf,
   lookanglesInterval: 30,
-  lookanglesLength: 7,
+  lookanglesLength: 2,
   map,
   nextNpasses,
   nextpass,

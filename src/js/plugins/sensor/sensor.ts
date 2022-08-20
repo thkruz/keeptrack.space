@@ -379,7 +379,7 @@ export const uiManagerInit = () => {
                   </label>
                 </div>
                 <div class="input-field col s6">
-                  <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated" />
+                  <input value="2" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated" />
                   <label for="lookanglesLength" class="active">Length (Days)</label>
                 </div>
                 <div class="input-field col s6">

@@ -294,6 +294,9 @@ settingsManager = {
     // Show GEO satellites
     settingsManager.isShowGeoSats = true;
 
+    // Show Launch Agency and Payload Owners/Manufacturers
+    settingsManager.isShowAgencies = true;
+
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
     // Use these to default smallest resolution maps and limited "extras" like

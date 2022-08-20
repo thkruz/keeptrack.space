@@ -453,8 +453,9 @@ export class LineFactory {
       }
 
       this.drawLineList[i].line.draw(this.drawLineList[i].color);
-      if (this.drawLineList[i].isOnlyInFOV) {
-        // Delete it now
+      
+      // When multiple sensors are selected it will keep creating new lines so we have to purge them
+      if (keepTrackApi.programs.sensorManager.currentSensorMultiSensor && this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].isDrawWhenSelected) {
         this.drawLineList.splice(i, 1);
       }
     }

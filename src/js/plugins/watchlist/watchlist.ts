@@ -297,17 +297,18 @@ export const updateLoop = () => { // NOSONAR
   const {
     satellite,
     satSet,
+    dotsManager,
     orbitManager,
     uiManager,
     sensorManager,
     timeManager,
-  }: { satellite: any; satSet: any; orbitManager: any; uiManager: any; sensorManager: any; timeManager: any } = keepTrackApi.programs;
+  } = keepTrackApi.programs;
 
   uiManager.updateNextPassOverlay(nextPassArray);
 
   if (watchlistList.length <= 0) return;
   for (let i = 0; i < watchlistList.length; i++) {
-    const sat = satSet.getSat(watchlistList[i]);
+    const sat = <SatObject>satSet.getSat(watchlistList[i]);
     if (sensorManager.currentSensorMultiSensor) {
       orbitManager.removeInViewOrbit(watchlistList[i]);
       for (let j = 0; j < sensorManager.currentSensorList.length; j++) {
@@ -319,14 +320,15 @@ export const updateLoop = () => { // NOSONAR
         keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
       }
     } else {
-      if (sat.inView === 1 && watchlistInViewList[i] === false) {
+      const inView = dotsManager.inViewData[sat.id];
+      if (inView === 1 && watchlistInViewList[i] === false) {
         // Is inview and wasn't previously
         watchlistInViewList[i] = true;
         uiManager.toast(`Satellite ${sat.sccNum} is In Field of View!`, 'normal');
         keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name)], 'g');
         orbitManager.addInViewOrbit(watchlistList[i]);
       }
-      if (sat.inView === 0 && watchlistInViewList[i] === true) {
+      if (inView === 0 && watchlistInViewList[i] === true) {
         // Isn't inview and was previously
         watchlistInViewList[i] = false;
         uiManager.toast(`Satellite ${sat.sccNum} left Field of View!`, 'standby');

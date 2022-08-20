@@ -54,6 +54,14 @@ export class SatGroup {
             satId: sat.id,
           }));
         break;
+      case 'country':
+        this.sats = satSet.satData
+          .filter((sat: SatObject) => data.split('|').includes(sat.country))
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
       case 'countryRegex':
         this.sats = country(satSet.satData, data)
           .slice(0, settingsManager.maxOribtsDisplayed)

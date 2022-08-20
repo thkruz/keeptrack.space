@@ -15,9 +15,9 @@ import { screenShot, watermarkedDataUrl } from './screenShot';
 let satMiniBox: HTMLDivElement;
 let satLabelModeLastTime = 0;
 let isSatMiniBoxInUse = false;
-let labelCount;
+let labelCount = 0;
 let hoverBoxOnSatMiniElements = null;
-let satHoverMiniDOM;
+let satHoverMiniDOM: HTMLDivElement;
 settingsManager.isShowNextPass = false;
 
 export const init = () => {
@@ -442,9 +442,9 @@ export const satCalculate = () => {
 // Splitting it into subfunctions would not be optimal
 // prettier-ignore
 export const orbitsAbove = () => { // NOSONAR
-  const { mainCamera, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
+  const { mainCamera, dotsManager, watchlist, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
 
-  if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
+  if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium || watchlist.watchlistInViewList?.length > 0) {
     drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
     if (!drawManager.isDrawOrbitsAbove) {
       // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
@@ -453,7 +453,7 @@ export const orbitsAbove = () => { // NOSONAR
       return;
     }
     // Previously called showOrbitsAbove();
-    if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
+    if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist.watchlistInViewList?.length === 0) {
       if (isSatMiniBoxInUse) {
         hoverBoxOnSatMiniElements = getEl('sat-minibox');
         hoverBoxOnSatMiniElements.innerHTML = '';
@@ -478,6 +478,7 @@ export const orbitsAbove = () => { // NOSONAR
      * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
      */
     hoverBoxOnSatMiniElements.innerHTML = '';
+    if (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
     for (let i = 0; i < satSet.orbitalSats && labelCount < settingsManager.maxLabels; i++) {
       sat = satSet.getSatPosOnly(i);
 
@@ -512,6 +513,35 @@ export const orbitsAbove = () => { // NOSONAR
       hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
       labelCount++;
     }
+  } else {
+    watchlist.watchlistList.forEach((satId: number) => {
+      sat = satSet.getSatPosOnly(satId);
+      if (dotsManager.inViewData[satId] === 0) return;
+      const satScreenPositionArray = satSet.getScreenCoords(satId, drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.curBuffer, sat.position);
+      if (satScreenPositionArray.error) return;
+      if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') return;
+      if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) return;
+
+      // Draw Sat Labels
+      // if (!settingsManager.enableHoverOverlay) continue
+      satHoverMiniDOM = document.createElement('div');
+      satHoverMiniDOM.id = 'sat-minibox-' + satId;
+      satHoverMiniDOM.textContent = sat.sccNum;
+
+      // Draw Orbits
+      if (!settingsManager.isShowSatNameNotOrbit) {
+        orbitManager.addInViewOrbit(satId);
+      }
+
+      satHoverMiniDOM.style.display = 'block';
+      satHoverMiniDOM.style.position = 'absolute';
+      satHoverMiniDOM.style.left = `${satScreenPositionArray.x + 20}px`;
+      satHoverMiniDOM.style.top = `${satScreenPositionArray.y}px`;
+
+      hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
+      labelCount++;
+    });
+  }
     isSatMiniBoxInUse = true;
     satLabelModeLastTime = timeManager.realTime;
   } else {
@@ -520,7 +550,7 @@ export const orbitsAbove = () => { // NOSONAR
   }
 
   // Hide satMiniBoxes When Not in Use
-  if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
+  if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist.watchlistInViewList?.length === 0) {
     if (isSatMiniBoxInUse) {
       satMiniBox.innerHTML = '';
     }

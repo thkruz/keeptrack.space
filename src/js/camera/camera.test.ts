@@ -1,6 +1,10 @@
 /* eslint-disable no-undefined */
 import { defaultSat, keepTrackApiStubs } from '../api/apiMocks';
-import { DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager } from '../api/keepTrackTypes';
+import { DotsManager, SatObject } from '../api/keepTrackTypes';
+import { DrawManager } from '../drawManager/drawManager';
+import { ObjectManager } from '../objectManager/objectManager';
+import { OrbitManager } from '../orbitManager/orbitManager';
+import { SensorManager } from '../plugins/sensor/sensorManager';
 import * as camera from './camera';
 import { keyDownHandler, keyUpHandler } from './keyHandler';
 import { setFtsRotateReset, setIsLocalRotateOverride, setIsLocalRotateRoll, setIsLocalRotateYaw, setIsPanReset, setIsScreenPan, setIsWorldPan } from './overrides';
@@ -361,8 +365,8 @@ describe('camera.changeCameraType', () => {
   test('0', () => {
     let callFunction: any = () => {
       camera.changeCameraType(
-        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
-        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
+        <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 1, isSensorManagerLoaded: false },
         <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
       );
@@ -374,8 +378,8 @@ describe('camera.changeCameraType', () => {
   test('1', () => {
     let callFunction: any = () => {
       camera.changeCameraType(
-        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
-        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
+        <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 0, isSensorManagerLoaded: false },
         <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
       );
@@ -387,8 +391,8 @@ describe('camera.changeCameraType', () => {
   test('2', () => {
     let callFunction: any = () => {
       camera.changeCameraType(
-        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
-        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
+        <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 29, isSensorManagerLoaded: false },
         <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
       );
@@ -400,8 +404,8 @@ describe('camera.changeCameraType', () => {
   test('3', () => {
     let callFunction: any = () => {
       camera.changeCameraType(
-        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
-        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
+        <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 29, isSensorManagerLoaded: true },
         <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
       );
@@ -413,8 +417,8 @@ describe('camera.changeCameraType', () => {
   test('4', () => {
     let callFunction: any = () => {
       camera.changeCameraType(
-        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
-        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
+        <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: -1, isSensorManagerLoaded: false },
         <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
       );
@@ -426,8 +430,8 @@ describe('camera.changeCameraType', () => {
   test('5', () => {
     let callFunction: any = () => {
       camera.changeCameraType(
-        <OrbitManager>keepTrackApiStubs.programs.orbitManager,
-        <DrawManager>keepTrackApiStubs.programs.drawManager,
+        <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
+        <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 0, isSensorManagerLoaded: true },
         <SensorManager>(<unknown>keepTrackApiStubs.programs.sensorManager)
       );

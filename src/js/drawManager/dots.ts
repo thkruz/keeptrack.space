@@ -1,8 +1,10 @@
 /* eslint-disable no-useless-escape */
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { Camera, DotsManager, DrawProgram, PickingProgram, TimeManager } from '../api/keepTrackTypes';
+import { DotsManager, DrawProgram, PickingProgram } from '../api/keepTrackTypes';
+import { Camera } from '../camera/camera';
 import { ColorSchemeManager } from '../colorManager/colorSchemeManager';
+import { TimeManager } from '../timeManager/timeManager';
 
 export const init = (gl: WebGL2RenderingContext) => {
   // We draw the picking object bigger than the actual dot to make it easier to select objects

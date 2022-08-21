@@ -6,8 +6,10 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
 import { mat4 } from 'gl-matrix';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { Camera, SatObject, TimeManager } from '../api/keepTrackTypes';
+import { SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
+import { Camera } from '../camera/camera';
+import { TimeManager } from '../timeManager/timeManager';
 import { loadStr } from '../uiManager/ui/loadStr';
 import { aehfSccNums, dspSccNums, issSccNum } from './meshManager/modelConstants';
 

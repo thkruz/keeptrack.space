@@ -1,3 +1,5 @@
+import { SatGroup } from './sat-group';
+import { SatGroupCollection } from '../api/keepTrackTypes';
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
@@ -20,8 +22,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { GroupsManager, SatGroupCollection } from '../api/keepTrackTypes';
-import { SatGroup } from './sat-group';
 
 export const createGroup = (groupType: string, data: any): SatGroup => new SatGroup(groupType, data, keepTrackApi.programs.satSet);
 export const selectGroup = (group: SatGroup): void => {
@@ -67,7 +67,8 @@ export const clearSelect = (): void => {
   groupsManager.stopUpdatingInViewSoon = true;
 };
 
-export const groupsManager: GroupsManager = {
+export type GroupsManager = typeof groupsManager;
+export const groupsManager = {
   selectedGroup: null,
   stopUpdatingInViewSoon: false,
   Canada: null,

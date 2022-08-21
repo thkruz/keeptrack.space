@@ -22,7 +22,8 @@
 
 import { getEl } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { CatalogManager, Colors, SatObject } from '../api/keepTrackTypes';
+import { Colors, SatObject } from '../api/keepTrackTypes';
+import { CatalogManager } from '../satSet/satSet';
 import { ageOfElsetRules } from './ruleSets/ageOfElset';
 import { apogeeRules } from './ruleSets/apogee';
 import { countriesRules } from './ruleSets/countries';

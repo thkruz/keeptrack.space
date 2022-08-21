@@ -5,6 +5,21 @@ import { uiManager } from './uiManager';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
+describe('uiManager misc functions', () => {
+  test('1', () => {
+    uiManager.onReady();
+    uiManager.clearRMBSubMenu();
+  });
+  test('2', () => {
+    uiManager.onReady();
+    uiManager.hideSideMenus();
+  });
+  test('3', () => {
+    uiManager.init();
+    uiManager.postStart();
+  });
+});
+
 // @ponicode
 describe('uiManager.legendHoverMenuClick', () => {
   beforeEach(() => {

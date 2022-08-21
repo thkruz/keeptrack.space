@@ -1,14 +1,16 @@
+import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { getsensorinfo } from './getsensorinfo';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { legendMenuChange } from '..';
-import { getsensorinfo } from './getsensorinfo';
 
 export const reloadLastSensor = () => {
-  let currentSensor;
+  let currentSensor: SensorObject;
   try {
     currentSensor = JSON.parse(localStorage.getItem('currentSensor'));
   } catch (e) {
     currentSensor = null;
   }
+  // istanbul ignore next
   if (currentSensor !== null) {
     try {
       const { sensorManager, mainCamera, timeManager } = keepTrackApi.programs;

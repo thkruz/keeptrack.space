@@ -1,8 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
-import { CatalogManager, DrawManager, ObjectManager, SatMath, SatObject } from '../../api/keepTrackTypes';
+import { ObjectManager } from '@app/js/objectManager/objectManager';
+import { SatMath } from '@app/js/satMath/satMath';
+import { CatalogManager } from '@app/js/satSet/satSet';
+import { SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { spaceObjType2Str } from '../../lib/spaceObjType2Str';
+import { DrawManager } from '../drawManager';
 
 let satHoverBoxNode1: HTMLDivElement;
 let satHoverBoxNode2: HTMLDivElement;

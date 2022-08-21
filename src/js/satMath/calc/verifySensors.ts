@@ -1,4 +1,5 @@
-import { SensorManager, SensorObject } from '../../api/keepTrackTypes';
+import { SensorManager } from '@app/js/plugins/sensor/sensorManager';
+import { SensorObject } from '../../api/keepTrackTypes';
 
 export const verifySensors = (sensors: SensorObject[], sensorManager: SensorManager): SensorObject[] => {
   // If no sensor passed to function then try to use the 'currentSensor'

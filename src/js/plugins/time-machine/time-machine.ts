@@ -1,8 +1,10 @@
 import timeMachinePng from '@app/img/icons/time-machine.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { CatalogManager, GroupsManager, OrbitManager } from '@app/js/api/keepTrackTypes';
 import { ColorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
+import { GroupsManager } from '@app/js/groupsManager/groupsManager';
 import { getEl } from '@app/js/lib/helpers';
+import { OrbitManager } from '@app/js/orbitManager/orbitManager';
+import { CatalogManager } from '@app/js/satSet/satSet';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -141,7 +143,7 @@ export const timeMachineRemoveSatellite = (
 ): void => {
   if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
   if (!orbitManager.isTimeMachineVisible) return;
-  settingsManager.colors.transparent = orbitManager.tempTransColor;
+  settingsManager.colors.transparent = <[number, number, number, number]>orbitManager.tempTransColor;
   orbitManager.isTimeMachineRunning = false;
   groupsManager.clearSelect();
   satSet.setColorScheme(colorSchemeManager.default, true);

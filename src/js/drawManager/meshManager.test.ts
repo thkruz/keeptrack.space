@@ -139,7 +139,7 @@ describe('meshManager.drawOcclusion', () => {
     let result: any = meshManager.drawOcclusion(
       param1,
       [0.5, 0.5, -1.0, 0.0, 10.0, 1.0, -1.0, -0.5, 0.5, -1.0, -0.5, -29.45, -0.5, -0.5, 1.0, 0.0],
-      keepTrackApi.programs.drawManager.postProcessingManager.occlusionPrgm,
+      keepTrackApi.programs.drawManager.postProcessingManager.programs.occlusion,
       null
     );
     expect(result).toMatchSnapshot();

@@ -2,7 +2,7 @@
 // This loads all of the various modules that provide objects for the screen
 
 import { keepTrackApi } from '../api/keepTrackApi';
-import { ObjectManager, SatObject } from '../api/keepTrackTypes';
+import { SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getEl } from '../lib/helpers';
 import { stars } from '../starManager/stars';
@@ -405,13 +405,13 @@ const extractCountry = (C: string): string => {
     case 'UA':
       return 'Ukraine';
     case 'UAE':
-      return 'UAE';
+      return 'United Arab Emirates';
     case 'UK':
-      return 'UK';
+      return 'United Kingdom';
     case 'UM':
       return 'Wake I.';
     case 'US':
-      return 'USA';
+      return 'United States';
     case 'UY':
       return 'Uruguay';
     case 'UZ':
@@ -451,6 +451,7 @@ const extractCountry = (C: string): string => {
     case 'BELA':
       return 'Belarus';
     case 'BERM':
+      return 'Bermuda';
     case 'BOL':
       return 'Bolivia';
     case 'BRAZ':
@@ -655,7 +656,9 @@ export const getCountryCode = (country) => {
     case 'Thailand': return 'T';
     case 'Turkey': return 'TR';
     case 'United Arab Emirates': return 'AE';
+    case 'UnitedKingdom':
     case 'United Kingdom': return 'UK';
+    case 'UnitedStates':
     case 'United States': return 'US';
     case 'Venezuela': return 'VE';
     case 'Vietnam': return 'VN';
@@ -1026,7 +1029,8 @@ const init = () => { // NOSONAR
   objectManager.satLinkManager = satLinkManager;
 };
 
-export const objectManager: ObjectManager = {
+export type ObjectManager = typeof objectManager;
+export const objectManager = {
   analSatSet: [],
   extractLaunchSite: extractLaunchSite,
   fieldOfViewSet: [],

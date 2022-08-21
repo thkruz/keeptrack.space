@@ -1,11 +1,12 @@
-import { drawManager } from '@app/js/drawManager/drawManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
-import { loadStr } from './loadStr';
 import { mobileManager } from '@app/js/uiManager/mobile/mobileManager';
+import { loadStr } from './loadStr';
 
 export const hideLoadingScreen = () => {
+  const { drawManager } = keepTrackApi.programs;
   // Don't wait if we are running Jest
-  if ((drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) || typeof process !== 'undefined') {
+  if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) {
     setTimeout(function () {
       hideLoadingScreen();
     }, 100);

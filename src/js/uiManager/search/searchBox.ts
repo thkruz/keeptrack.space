@@ -1,10 +1,11 @@
 /* */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { CatalogManager, SearchBox } from '@app/js/api/keepTrackTypes';
+import { SearchBox } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { SatGroup } from '@app/js/groupsManager/sat-group';
 import { getEl, slideInDown, slideOutUp } from '@app/js/lib/helpers';
+import { CatalogManager } from '@app/js/satSet/satSet';
 
 let hoverSatId = -1;
 let hovering = false;

@@ -317,6 +317,8 @@ const shaders = {
       `,
   },
 };
+
+export type SkyBoxSphere = typeof skyboxSphere;
 export const skyboxSphere = {
   vao: <WebGLVertexArrayObject>null,
   textureMilkyWay: {

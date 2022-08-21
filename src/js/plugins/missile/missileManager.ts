@@ -3,6 +3,7 @@ import { MissileObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { jday } from '@app/js/timeManager/transforms';
+import { ToastMsgType } from '@app/js/uiManager/ui/toast';
 import $ from 'jquery';
 
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
@@ -529,7 +530,7 @@ export const Missile = (
 };
 
 // prettier-ignore
-export const getMissileTEARR = (missile: MissileObject, sensors: SensorObject[]) => { // NOSONAR
+export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]) => { // NOSONAR
   const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
   
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
@@ -2767,12 +2768,7 @@ export const _QuickRun = (
   return Distance;
 };
 
-const missileManager: any = {};
-missileManager.isLoaded = true;
-missileManager.lastMissileErrorType = '';
-missileManager.missilesInUse = 0;
-missileManager.lastMissileError = '';
-missileManager.RussianICBM = [
+const RussianICBM = [
   52 + 30 * 0.01666667,
   82 + 45 * 0.01666667,
   'Aleysk (SS-18)',
@@ -2866,7 +2862,7 @@ missileManager.RussianICBM = [
   'Delta IV Sub (Layner)',
   12000, // Sub
 ];
-missileManager.ChinaICBM = [
+const ChinaICBM = [
   32.997534,
   112.537904,
   'Nanyang (DF-31)',
@@ -2956,7 +2952,7 @@ missileManager.ChinaICBM = [
   'Type 092 Sub (JL-2)',
   8000,
 ];
-missileManager.NorthKoreanBM = [
+const NorthKoreanBM = [
   40.0,
   128.3,
   'Sinpo Sub (Pukkŭksŏng-1)',
@@ -2974,7 +2970,7 @@ missileManager.NorthKoreanBM = [
   'Pyongyang (KN-22)',
   13000,
 ];
-missileManager.UsaICBM = [
+const UsaICBM = [
   48.420079,
   -101.33356,
   'Ohio Sub (Trident II)',
@@ -2992,7 +2988,7 @@ missileManager.UsaICBM = [
   'F.E. Warren (Minuteman III)',
   13000,
 ];
-missileManager.FraSLBM = [
+const FraSLBM = [
   47.878,
   -4.263,
   'Triomphant Sub (M51)',
@@ -3002,8 +2998,8 @@ missileManager.FraSLBM = [
   'Triomphant Sub (M51)',
   10000,
 ];
-missileManager.ukSLBM = [56.066111, -4.8175, 'Vanguard Sub (Trident II)', 12000, 56.066111, -4.8175, 'HMNB Clyde (Trident II)', 12000];
-missileManager.globalBMTargets = [
+const ukSLBM = [56.066111, -4.8175, 'Vanguard Sub (Trident II)', 12000, 56.066111, -4.8175, 'HMNB Clyde (Trident II)', 12000];
+const globalBMTargets = [
   38.951,
   -77.013,
   'Washington DC',
@@ -3077,8 +3073,7 @@ missileManager.globalBMTargets = [
   125.735244,
   'Pyongyang',
 ];
-
-missileManager.USATargets = [
+const USATargets = [
   40.679,
   -73.947, // NYC NY
   42.361,
@@ -3227,10 +3222,25 @@ missileManager.USATargets = [
   -116.231845, // Boise ID
 ];
 
-missileManager.missileArray = missileArray;
-missileManager.clearMissiles = clearMissiles;
-missileManager.Missile = Missile;
-missileManager.MassRaidPre = MassRaidPre;
-missileManager.getMissileTEARR = getMissileTEARR;
+export type MissileManager = typeof missileManager;
+const missileManager = {
+  isLoaded: true,
+  lastMissileErrorType: <ToastMsgType>'',
+  missilesInUse: 0,
+  lastMissileError: '',
+  RussianICBM,
+  ChinaICBM,
+  NorthKoreanBM,
+  UsaICBM,
+  FraSLBM,
+  ukSLBM,
+  globalBMTargets,
+  USATargets,
+  missileArray,
+  clearMissiles,
+  Missile,
+  MassRaidPre,
+  getMissileTEARR,
+};
 
 export { missileManager };

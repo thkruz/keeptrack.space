@@ -28,6 +28,7 @@ import radioTowerPng from '@app/img/icons/radio-tower.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SensorObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { toast } from '@app/js/uiManager/ui/toast';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
@@ -361,6 +362,12 @@ export const uiManagerInit = () => {
                 <div class="sensor-info-key">Max Range</div>
                 <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
               </div>
+              <div class="center-align row">
+                <button id="sensor-sun-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line to Sun &#9658;</button>
+              </div>
+              <div class="center-align row">
+                <button id="sensor-moon-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line to Moon &#9658;</button>
+              </div>
             </div>
           </div>
         </div>
@@ -491,6 +498,36 @@ export const uiManagerFinal = () => {
   getEl('lookanglesInterval').addEventListener('change', function () {
     satellite.lookanglesInterval = parseInt(<string>(<HTMLInputElement>getEl('lookanglesInterval')).value);
     refreshLookanglesData();
+  });
+
+  getEl('sensor-sun-btn').addEventListener('click', () => {
+    const { lineManager, satSet, drawManager, sensorManager } = keepTrackApi.programs;
+
+    // Draw Line to Sun from Sensor
+    const sensors = sensorManager.currentSensor;
+    if (sensors.length !== 1) {
+      toast('Please Select Only One Sensor', 'caution');
+    }
+    const sensor = sensors[0];
+    const sensorId = satSet.getSensorFromSensorName(sensor.name);
+    lineManager.create('sat2', [sensorId, drawManager.sceneManager.sun.pos[0], drawManager.sceneManager.sun.pos[1], drawManager.sceneManager.sun.pos[2]], 'o');
+  });
+
+  getEl('sensor-moon-btn').addEventListener('click', () => {
+    const { lineManager, satSet, drawManager, sensorManager } = keepTrackApi.programs;
+
+    // Draw Line to Sun from Sensor
+    const sensors = sensorManager.currentSensor;
+    if (sensors.length !== 1) {
+      toast('Please Select Only One Sensor', 'caution');
+    }
+    const sensor = sensors[0];
+    const sensorId = satSet.getSensorFromSensorName(sensor.name);
+    lineManager.create(
+      'sat2',
+      [sensorId, drawManager.sceneManager.moon.drawPosition[0], drawManager.sceneManager.moon.drawPosition[1], drawManager.sceneManager.moon.drawPosition[2]],
+      'w'
+    );
   });
 
   getEl('settings-riseset').addEventListener('change', settingsRisesetChange);

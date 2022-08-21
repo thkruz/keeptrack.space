@@ -31,8 +31,9 @@
 
 'use strict';
 
-import { CatalogManager, SatObject, TimeManager } from '@app/js/api/keepTrackTypes';
-
+import { CatalogManager } from '@app/js/satSet/satSet';
+import { SatObject } from '@app/js/api/keepTrackTypes';
+import { TimeManager } from '@app/js/timeManager/timeManager';
 import { searchBox } from '@app/js/uiManager/search/searchBox';
 
 // Constants

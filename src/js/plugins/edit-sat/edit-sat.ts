@@ -1,10 +1,11 @@
 import editPng from '@app/img/icons/edit.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { CatalogManager, ObjectManager } from '@app/js/api/keepTrackTypes';
 import { createError } from '@app/js/errorManager/errorManager';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
+import { ObjectManager } from '@app/js/objectManager/objectManager';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
+import { CatalogManager } from '@app/js/satSet/satSet';
 import { toast } from '@app/js/uiManager/ui/toast';
 
 let isEditSatMenuOpen = false;
@@ -185,7 +186,7 @@ export const readerOnLoad = (evt: any) => {
     orbitManager.updateOrbitBuffer(sat.id, true, object.TLE1, object.TLE2);
     sat.active = true;
   } else {
-    toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.','caution', true);
+    toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
   }
 };
 
@@ -364,7 +365,7 @@ export const editSatSubmit = () => {
     orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
     sat.active = true;
   } else {
-    toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.','caution', true);
+    toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
   }
 };
 

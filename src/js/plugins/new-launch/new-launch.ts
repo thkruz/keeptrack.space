@@ -14,7 +14,7 @@ export const newLaunchSubmit = () => {
   const satId = satSet.getIdFromObjNum(parseInt(scc));
   let sat = satSet.getSat(satId);
 
-  const upOrDown = (<HTMLInputElement>getEl('nl-updown')).value;
+  const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
   const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
   let launchLat, launchLon;
 

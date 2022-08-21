@@ -1,4 +1,5 @@
-import { KeepTrackApi, SatMath, SatObject, SettingsManager } from './keepTrackTypes';
+import { SatMath } from '../satMath/satMath';
+import { KeepTrackApi, SatObject, SettingsManager } from './keepTrackTypes';
 import { html } from './templateLiterals';
 
 declare global {

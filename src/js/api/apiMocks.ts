@@ -172,6 +172,7 @@ export const keepTrackApiStubs = {
       calculate: jest.fn(),
       update: jest.fn(),
       getCamDist: jest.fn(),
+      lookAtObject: jest.fn(),
       localRotateDif: {
         pitch: 0,
         yaw: 0,

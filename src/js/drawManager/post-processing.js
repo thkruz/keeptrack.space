@@ -2,7 +2,18 @@
 /* eslint-disable no-useless-escape */
 
 // Post Processing Manager
-const pPM = {};
+const pPM = {
+  init: null,
+  createProgram: null,
+  curBuffer: null,
+  programs: null,
+  setupOcclusion: null,
+  createFrameBufferInfo: null,
+  switchFrameBuffer: null,
+  getFrameBufferInfo: null,
+  clearAll: null,
+  shaderCode: null,
+};
 pPM.isInitOnce = false;
 /* istanbul ignore next */
 pPM.init = (gl) => {

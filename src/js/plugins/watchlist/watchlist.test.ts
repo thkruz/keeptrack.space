@@ -194,7 +194,7 @@ describe('watchlist.infoOverlayContentClick', () => {
   test('0', () => {
     const callFunction: any = () => {
       watchlist.infoOverlayContentClick({
-        currentTarget: {
+        target: {
           textContent: '25544:25544',
         },
       });

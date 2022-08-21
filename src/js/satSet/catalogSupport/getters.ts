@@ -34,7 +34,7 @@ export const getSensorFromSensorName = (sensorName: string): number => {
     (object: SatObject) => (object?.static && !object?.missile && object?.type !== SpaceObjectType.STAR ? object.name === sensorName : false) // Test
   );
 };
-export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: { x: number; y: number; z: number }) => {
+export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos?: { x: number; y: number; z: number }) => {
   const screenPos = { x: 0, y: 0, z: 0, error: false };
   try {
     const { satSet } = keepTrackApi.programs;

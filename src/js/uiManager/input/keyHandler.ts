@@ -1,4 +1,4 @@
-import { Camera } from '@app/js/api/keepTrackTypes';
+import { Camera } from '@app/js/camera/camera';
 import eruda from 'eruda';
 import { getEl } from '@app/js/lib/helpers';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';

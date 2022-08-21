@@ -1,4 +1,6 @@
-import { CatalogManager, MissileObject, OrbitManager, SatGroupCollection, SatObject } from '../api/keepTrackTypes';
+import { MissileObject, SatGroupCollection, SatObject } from '../api/keepTrackTypes';
+import { OrbitManager } from '../orbitManager/orbitManager';
+import { CatalogManager } from '../satSet/satSet';
 import { country } from '../satSet/search';
 
 export class SatGroup {

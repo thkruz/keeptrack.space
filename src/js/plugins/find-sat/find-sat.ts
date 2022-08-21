@@ -37,7 +37,7 @@ export interface SearchSatParams {
 
 interface SearchResults extends SatObject {
   rng: number;
-  inView: 0 | 1;
+  inView: boolean;
 }
 
 // prettier-ignore

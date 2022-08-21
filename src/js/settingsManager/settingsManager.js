@@ -99,6 +99,43 @@ settingsManager = {
   init: () => { // NOSONAR
     settingsManager.pTime = [];
 
+    // Set Background
+    setTimeout(() => {
+      const backgrounds = [
+        'astronauts',
+        'astronauts2',
+        'commandCenter',
+        'controlModule',
+        'domeInDesert',
+        'domeInHawaii',
+        'domeInMountain',
+        'domeInMountain2',
+        'domeInSnow',
+        'domeInSnow2',
+        'domesOnGrassHill',
+        'fylingdales',
+        'fylingdales2',
+        'icbm',
+        'iss',
+        'mobileTel',
+        'militaryLaunch',
+        'launchpad',
+        'launchpad2',
+        'radarDomeFall',
+        'radarOnHill',
+        'slbm',
+        'slbm2',      
+      ];
+      const image = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+      const width = window.innerWidth > 1920 ? '3840' : '1920';
+      const loadingDom = document.getElementById('loading-screen');
+
+      loadingDom.style.backgroundImage = `url('../img/wallpaper/${image}-${width}.png')`;
+      loadingDom.style.backgroundSize = 'cover';
+      loadingDom.style.backgroundPosition = 'center';
+      loadingDom.style.backgroundRepeat = 'no-repeat';
+    }, 0);
+
     // Install Folder Settings
     {
       switch (window.location.host) {

@@ -1,14 +1,14 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=flat-square) ![Codecov](https://img.shields.io/codecov/c/github/thkruz/keeptrack.space?style=flat-square&token=RKIkZS3xDN) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier) ![Vulnerabilities](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=flat-square) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square)
 
-<img src="./src/img/logo192.png" width=128 height=128 alt="KeepTrack.Space" align="right">
+<img src="./src/img/promoWLogoSm.png" width='100%' alt="KeepTrack.Space" align="center">
 
-# KeepTrack.Space
+## Astrodynamics Software for Non-Engineers
 
-> Astrodynamics Software for Non-Engineers
+KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, I try to make learning about orbital mechanics and satellite operations accessible to everyone. The software is good enough to provide a common tactical picture on a military operations floor, but simple enough a high schooler can learn about orbits on his tablet.
 
-KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, we make learning about orbital mechanics and satellite operations accessible to everyone.
+Artificial Intelligence is behind many of the features in KeepTrack. The code is designed by me, but after writing the start of a pattern the rest is written by an algorithm to speed up development. Many of the unit tests are created by [PoniCode](https://www.ponicode.com/) so that I can focus on the math while it takes care of ensuring buttons are working as expected. Recently more artwork has been incorporated into the loading screen - that too is powered by AI. [MidJourney](https://www.midjourney.com/home/) creates the inspiration and then I upscale and edit it to create the final product.
 
-The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without @jeyoder's original stuffin.space.
+The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without using @jeyoder's original stuffin.space as a starting point.
 
 ## Table of Contents
 

@@ -136,6 +136,13 @@ settingsManager = {
       loadingDom.style.backgroundSize = 'cover';
       loadingDom.style.backgroundPosition = 'center';
       loadingDom.style.backgroundRepeat = 'no-repeat';
+
+      backgrounds.forEach((image, idx) => {
+          setTimeout(() => {
+            const width = window.innerWidth > 1920 ? '3840' : '1920';
+            new Image().src = `../img/wallpaper/${image}-${width}.png`;
+          }, 5000 * idx);
+        });
     }, 0);
 
     // Install Folder Settings

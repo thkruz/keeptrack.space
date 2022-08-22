@@ -470,7 +470,9 @@ export const refreshLookanglesData = () => {
   const { satellite, objectManager, satSet } = keepTrackApi.programs;
   showLoading(() => {
     const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-    satellite.getlookangles(sat);
+    if (sat) {
+      satellite.getlookangles(sat);
+    }
   });
 };
 

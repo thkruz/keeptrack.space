@@ -8,7 +8,7 @@ import { addSatExtraFunctions } from '../satSet';
 export const getSatVel = () => (keepTrackApi.programs.dotsManager.velocityData ? keepTrackApi.programs.dotsManager.velocityData : new Float32Array());
 export const getSatInView = () => (keepTrackApi.programs.dotsManager.inViewData ? keepTrackApi.programs.dotsManager.inViewData : new Int8Array());
 export const getSatInSun = () => (keepTrackApi.programs.dotsManager.inSunData ? keepTrackApi.programs.dotsManager.inSunData : new Int8Array());
-export const getSatExtraOnly = (i: number): SatObject => {
+export const getSatExtraOnly = (i: number): SatObject | null => {
   const { satSet } = keepTrackApi.programs;
   return !satSet.satData || !satSet.satData[i] ? null : satSet.satData[i];
 };

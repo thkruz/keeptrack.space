@@ -1,5 +1,5 @@
-import { ColorRuleSet } from '@app/js/colorManager/colorSchemeManager';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { ColorRuleSet } from '@app/js/colorManager/colorSchemeManager';
 import { toast } from './toast';
 
 export const colorSchemeChangeAlert = (newScheme: ColorRuleSet) => {
@@ -49,6 +49,9 @@ export const colorSchemeChangeAlert = (newScheme: ColorRuleSet) => {
           break;
         case 'smallsats':
           toast(`Color Scheme Changed to Small Satellites`, 'normal', false);
+          break;
+        case 'lostobjects':
+          toast(`Color Scheme Changed to Lost Objects`, 'normal', false);
           break;
         default:
           toast(`Color Scheme Changed to ${scheme}`, 'normal', false);

@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { Camera, DotsManager, EarthObject } from '@app/js/api/keepTrackTypes';
+import { DotsManager } from '@app/js/api/keepTrackTypes';
+import { Camera } from '@app/js/camera/camera';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { satellite } from '@app/js/satMath/satMath';
 import { jday } from '@app/js/timeManager/transforms';
@@ -489,12 +490,12 @@ export const update = (): void => {
   earth.earthEra = satellite.gstime(earth.earthJ);
 
   updateSunCurrentDirection();
-  glm.vec3.normalize(earth.lightDirection, earth.lightDirection);
+  glm.vec3.normalize(<glm.vec3>(<unknown>earth.lightDirection), <glm.vec3>(<unknown>earth.lightDirection));
 
   mvMatrix = glm.mat4.create();
   glm.mat4.identity(mvMatrix);
   glm.mat4.rotateZ(mvMatrix, mvMatrix, earth.earthEra);
-  glm.mat4.translate(mvMatrix, mvMatrix, earth.pos);
+  glm.mat4.translate(mvMatrix, mvMatrix, <glm.ReadonlyVec3>(<unknown>earth.pos));
   // DEBUG:
   // glm.mat4.scale(mvMatrix, mvMatrix, [2,2,2]);
   nMatrix = glm.mat3.create();
@@ -545,7 +546,8 @@ export const updateSunCurrentDirection = (): void => {
 /* ***************************************************************************
  * Export Code
  * ***************************************************************************/
-export const earth: EarthObject = {
+export type EarthObject = typeof earth;
+export const earth = {
   init: init,
   draw: draw,
   program: null,

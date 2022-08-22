@@ -27,7 +27,7 @@ import { getEl, openColorbox } from '@app/js/lib/helpers';
 import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
 import $ from 'jquery';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { SensorManager, SensorObject } from '../../api/keepTrackTypes';
+import { SensorObject } from '../../api/keepTrackTypes';
 import { sensorList } from './sensorList';
 
 // Add new callbacks to the list of callbacks in keepTrackApi
@@ -83,7 +83,7 @@ export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
 export const sensorListLength = () => Object.values(sensorList).length;
 
 // prettier-ignore
-export const setSensor = (selectedSensor: SensorObject | string, staticNum: number) => { // NOSONAR
+export const setSensor = (selectedSensor: SensorObject | string, staticNum?: number) => { // NOSONAR
   try {
     localStorage.setItem('currentSensor', JSON.stringify([selectedSensor, staticNum]));
   } catch {
@@ -280,7 +280,8 @@ export const drawFov = (sensor: SensorObject) => {
   }
 };
 
-export const sensorManager: SensorManager = {
+export type SensorManager = typeof sensorManager;
+export const sensorManager = {
   sensorList: sensorList,
   setSensor: setSensor,
   checkSensorSelected: checkSensorSelected,
@@ -304,7 +305,7 @@ export const sensorManager: SensorManager = {
     sensorList.ASC,
     sensorList.CDN,
   ],
-  currentSensor: [
+  currentSensor: <SensorObject[]>[
     {
       observerGd: {
         lat: <number>null,

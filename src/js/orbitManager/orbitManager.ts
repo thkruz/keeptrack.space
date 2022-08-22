@@ -2,8 +2,11 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { Camera, CatalogManager, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
+import { MissileParams } from '../api/keepTrackTypes';
+import { Camera } from '../camera/camera';
+import { GroupsManager } from '../groupsManager/groupsManager';
 import { getEl } from '../lib/helpers';
+import { CatalogManager } from '../satSet/satSet';
 
 const glBuffers = <WebGLBuffer[]>[];
 const inProgress = <boolean[]>[];
@@ -279,7 +282,8 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
   }
 };
 
-export const orbitManager: OrbitManager = {
+export type OrbitManager = typeof orbitManager;
+export const orbitManager = {
   init: init,
   draw: draw,
   orbitWorker: null,
@@ -325,7 +329,7 @@ export const orbitManager: OrbitManager = {
   },
   isTimeMachineRunning: false,
   isTimeMachineVisible: false,
-  tempTransColor: [0, 0, 0, 0],
+  tempTransColor: <[number, number, number, number]>[0, 0, 0, 0],
   historyOfSatellitesPlay: null,
   playNextSatellite: null,
   historyOfSatellitesRunCount: 0,

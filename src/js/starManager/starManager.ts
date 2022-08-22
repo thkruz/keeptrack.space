@@ -14,8 +14,8 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { constellations } from './constellations';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { stars } from './stars';
 
 export const findStarsConstellation = (starName: string) => {
@@ -96,24 +96,19 @@ export const clearConstellations = () => {
   }
 };
 export const init = () => {
-  // Requires starManager Module
-  try {
-    starManager.isConstellationVisible = false;
-    starManager.isAllConstellationVisible = false;
-    starManager.currentConstellationName = null;
-    starManager.findStarsConstellation = findStarsConstellation;
-    starManager.drawAllConstellations = drawAllConstellations;
-    starManager.drawConstellations = drawConstellations;
-    starManager.clearConstellations = clearConstellations;
-
-    starManager.constellations = constellations;
-  } catch (e) {
-    /* istanbul ignore next */
-    console.log('starManager.constellations Plugin failed to load!');
-  }
+  // Nothing at this time
 };
 
-export const starManager: any = {
-  stars: stars,
-  init: init,
+export type StarManager = typeof starManager;
+export const starManager = {
+  stars,
+  init,
+  isConstellationVisible: false,
+  isAllConstellationVisible: false,
+  currentConstellationName: null,
+  findStarsConstellation,
+  drawAllConstellations,
+  drawConstellations,
+  clearConstellations,
+  constellations,
 };

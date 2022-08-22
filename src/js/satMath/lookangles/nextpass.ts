@@ -1,10 +1,11 @@
 import { MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
+import { SatObject, SensorObject, sccPassTimes } from '../../api/keepTrackTypes';
+
 import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
-import { keepTrackApi } from '../../api/keepTrackApi';
-import { SatObject, sccPassTimes, SensorObject } from '../../api/keepTrackTypes';
 import { dateFormat } from '../../lib/external/dateFormat.js';
-import { verifySensors } from '../calc/verifySensors';
+import { keepTrackApi } from '../../api/keepTrackApi';
 import { satellite } from '../satMath';
+import { verifySensors } from '../calc/verifySensors';
 
 export const nextpass = (sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) => {
   const { timeManager, sensorManager } = keepTrackApi.programs;
@@ -41,11 +42,11 @@ export const nextpass = (sat: SatObject, sensors?: SensorObject[], searchLength?
     return 'No Passes in ' + searchLength + ' Days';
   }
 };
-export const nextpassList = (satArray: SatObject[]): sccPassTimes[] => {
+export const nextpassList = (satArray: SatObject[], interval?: number, days = 7): sccPassTimes[] => {
   let nextPassArray = [];
   settingsManager.nextNPassesCount ??= 1;
   for (let s = 0; s < satArray.length; s++) {
-    let time = nextNpasses(satArray[s], null, 7, satellite.lookanglesInterval, settingsManager.nextNPassesCount); // Only do 1 day looks
+    let time = nextNpasses(satArray[s], null, days, interval || satellite.lookanglesInterval, settingsManager.nextNPassesCount); // Only do 1 day looks
     for (let i = 0; i < time.length; i++) {
       nextPassArray.push({
         sccNum: satArray[s].sccNum,

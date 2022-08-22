@@ -265,6 +265,7 @@ const shaders = {
       `,
   },
 };
+export type MoonObject = typeof moon;
 export const moon = {
   vao: <WebGLVertexArrayObject>null,
   textureMap: {

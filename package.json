@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "6.2.0",
+  "version": "7.0.0",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -44,56 +44,6 @@
     "prepare": "husky install"
   },
   "chromium-args": "--enable-threaded-compositing",
-  "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!(new-github-issue-url))"
-    ],
-    "testMatch": [
-      "**/?(*.)+(spec|test).?(m)[jt]s?(x)"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "mjs",
-      "ts"
-    ],
-    "setupFiles": [
-      "jest-canvas-mock",
-      "<rootDir>/test/polyfills.js",
-      "<rootDir>/test/test-env.js",
-      "<rootDir>/test/test-env-mocks.js"
-    ],
-    "coverageDirectory": "<rootDir>/coverage",
-    "moduleDirectories": [
-      "node_modules",
-      "offline"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/offline/",
-      "<rootDir>/dist/",
-      "<rootDir>/src/admin/"
-    ],
-    "moduleNameMapper": {
-      "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
-      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/scripts/fileMock.js",
-      "@app(.*)$": "<rootDir>/src/$1"
-    },
-    "coverageReporters": [
-      "lcov",
-      "html",
-      "text"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/src/js/lib/external/",
-      "/test/",
-      "/dist/"
-    ]
-  },
   "nyc": {
     "report-dir": "coverage/integration",
     "reporter": [
@@ -171,7 +121,7 @@
     "prettier": "2.6.2",
     "prettier-plugin-organize-imports": "^2.3.4",
     "retire": "^3.0.7",
-    "serve": "^13.0.2",
+    "serve": "^13.0.4",
     "source-map-loader": "^3.0.0",
     "start-server-and-test": "^1.14.0",
     "style-loader": "^3.0.0",
@@ -191,6 +141,8 @@
     "draggy": "^1.6.6",
     "echarts": "^5.3.2",
     "echarts-gl": "^2.0.9",
+    "eruda": "^2.5.0",
+    "eruda-fps": "^2.0.0",
     "file-saver": "^2.0.5",
     "gl-matrix": "^3.3.0",
     "gremlins.js": "^2.2.0",

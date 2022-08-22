@@ -23,8 +23,26 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "**/Thumbs.db": true,
-    "*/dist/**": true
+    "**/Thumbs.db": true
+    // "dist/**": true,
+    // "embed/**": true,
+    // "src/tle/**": true,
+    // "src/offline/**": true,
+    // "src/admin/**": true,
+    // "src/js/lib/**": true,
+    // "tsconfig.json": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "dist/**": true,
+    "embed/**": true,
+    "src/tle/**": true,
+    "src/offline/**": true,
+    "src/admin/**": true,
+    "src/js/lib/**": true,
+    "tsconfig.json": true
   },
   "[yaml]": {
     "editor.autoIndent": "advanced"

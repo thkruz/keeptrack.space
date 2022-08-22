@@ -1,10 +1,10 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { legendMenuChange } from '..';
+import { searchBox } from './searchBox';
 import { toast } from '../ui/toast';
 import { updateURL } from '../url/update-url';
-import { searchBox } from './searchBox';
 
-export const doSearch = (searchString: string, isPreventDropDown: boolean) => {
+export const doSearch = (searchString: string, isPreventDropDown = false) => {
   if (searchString == '') {
     searchBox.hideResults();
     return;

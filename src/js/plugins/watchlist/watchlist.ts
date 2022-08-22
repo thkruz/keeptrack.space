@@ -27,7 +27,7 @@ import infoPng from '@app/img/icons/info.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
 import removePng from '@app/img/remove.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SatObject, Watchlist } from '@app/js/api/keepTrackTypes';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { createError } from '@app/js/errorManager/errorManager';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
@@ -51,9 +51,13 @@ export const hideSideMenus = (): void => {
 };
 
 export const init = (): void => {
-  const { satSet, objectManager, uiManager, timeManager }: { satSet: any; objectManager: any; uiManager: any; timeManager: any } = keepTrackApi.programs;
-  keepTrackApi.programs.watchlist = <Watchlist>{};
-  keepTrackApi.programs.watchlist.lastOverlayUpdateTime = 0;
+  const { satSet, objectManager, uiManager, timeManager } = keepTrackApi.programs;
+  keepTrackApi.programs.watchlist = {
+    lastOverlayUpdateTime: 0,
+    updateWatchlist,
+    watchlistList,
+    watchlistInViewList,
+  };
 
   // Add HTML
   keepTrackApi.register({
@@ -68,8 +72,6 @@ export const init = (): void => {
     cb: uiManagerFinal,
   });
 
-  keepTrackApi.programs.watchlist.updateWatchlist = updateWatchlist;
-
   let infoOverlayDOM = [];
   uiManager.updateNextPassOverlay = (nextPassArrayIn: any, isForceUpdate: any) => {
     if (nextPassArrayIn.length <= 0 && !isInfoOverlayMenuOpen) return;
@@ -78,10 +80,11 @@ export const init = (): void => {
     // TODO: This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
     if (
-      (timeManager.realTime > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 &&
+      (Date.now() > keepTrackApi.programs.watchlist.lastOverlayUpdateTime * 1 + 10000 &&
         objectManager.selectedSat === -1 &&
         !mainCamera.isDragging &&
-        mainCamera.zoomLevel === mainCamera.zoomTarget) ||
+        mainCamera.zoomLevel() < mainCamera.zoomTarget() + 0.01 &&
+        mainCamera.zoomLevel() > mainCamera.zoomTarget() - 0.01) ||
       isForceUpdate
     ) {
       const propTime = timeManager.simulationTimeObj;
@@ -205,8 +208,8 @@ export const uiManagerInit = (): void => {
         <div class="row">
           <div class="input-field col s10 m10 l10">
             <form id="watchlist-submit">
-              <input placeholder="xxxxx" id="watchlist-new" type="text" />
-              <label for="watchlist-new">New Satellite</label>
+              <input placeholder="xxxxx,xxxxx,xxxxx..." id="watchlist-new" type="text" />
+              <label for="watchlist-new">New Satellite(s)</label>
             </form>
           </div>
           <div class="col s2 m2 l2 center-align add-icon">
@@ -221,6 +224,9 @@ export const uiManagerInit = (): void => {
         <div class="center-align row">
           <button id="watchlist-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
           <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
+        </div>
+        <div class="center-align row">
+          <button id="watchlist-clear" class="btn btn-ui waves-effect waves-light" type="button" name="action">Clear List &#9658;</button>
         </div>
       </div>
     </div>
@@ -280,6 +286,10 @@ export const uiManagerFinal = (): void => {
     watchlistSaveClick(evt);
   });
 
+  getEl('watchlist-clear').addEventListener('click', () => {
+    updateWatchlist([], [], true);
+  });
+
   getEl('watchlist-open').addEventListener('click', function () {
     getEl('watchlist-file').click();
   });
@@ -297,17 +307,19 @@ export const updateLoop = () => { // NOSONAR
   const {
     satellite,
     satSet,
+    dotsManager,
     orbitManager,
     uiManager,
     sensorManager,
     timeManager,
-  }: { satellite: any; satSet: any; orbitManager: any; uiManager: any; sensorManager: any; timeManager: any } = keepTrackApi.programs;
+    watchlist
+  } = keepTrackApi.programs;
 
   uiManager.updateNextPassOverlay(nextPassArray);
 
   if (watchlistList.length <= 0) return;
   for (let i = 0; i < watchlistList.length; i++) {
-    const sat = satSet.getSat(watchlistList[i]);
+    const sat = <SatObject>satSet.getSat(watchlistList[i]);
     if (sensorManager.currentSensorMultiSensor) {
       orbitManager.removeInViewOrbit(watchlistList[i]);
       for (let j = 0; j < sensorManager.currentSensorList.length; j++) {
@@ -319,14 +331,15 @@ export const updateLoop = () => { // NOSONAR
         keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensor.name)], 'g');
       }
     } else {
-      if (sat.inView === 1 && watchlistInViewList[i] === false) {
+      const inView = dotsManager.inViewData[sat.id];
+      if (inView === 1 && watchlistInViewList[i] === false) {
         // Is inview and wasn't previously
         watchlistInViewList[i] = true;
         uiManager.toast(`Satellite ${sat.sccNum} is In Field of View!`, 'normal');
         keepTrackApi.programs.lineManager.create('sat3', [sat.id, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name)], 'g');
         orbitManager.addInViewOrbit(watchlistList[i]);
       }
-      if (sat.inView === 0 && watchlistInViewList[i] === true) {
+      if (inView === 0 && watchlistInViewList[i] === true) {
         // Isn't inview and was previously
         watchlistInViewList[i] = false;
         uiManager.toast(`Satellite ${sat.sccNum} left Field of View!`, 'standby');
@@ -338,7 +351,10 @@ export const updateLoop = () => { // NOSONAR
     if (watchlistInViewList[i] === true) {
       return;
     }
-  }
+  }  
+
+  watchlist.watchlistList = watchlistList;
+  watchlist.watchlistInViewList = watchlistInViewList;
 };
 
 // prettier-ignore
@@ -375,7 +391,7 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
           for (let x = 0; x < watchlistList.length; x++) {
             nextPassArray.push(satSet.getSatExtraOnly(watchlistList[x]));
           }
-          nextPassArray = satellite.nextpassList(nextPassArray);
+          nextPassArray = satellite.nextpassList(nextPassArray, 1, 0.5);
           nextPassArray.sort(function (a: { time: string | number | Date }, b: { time: string | number | Date }) {
             return new Date(a.time).getTime() - new Date(b.time).getTime();
           });
@@ -401,13 +417,15 @@ export const bottomMenuClick = (iconName: string) => { // NOSONAR
       isWatchlistMenuOpen = false;
       getEl('menu-watchlist').classList.remove('bmenu-item-selected');
       uiManager.hideSideMenus();
+      uiManager.doSearch('');
       return;
     } else {
       if ((<any>settingsManager).isMobileModeEnabled) uiManager.searchToggle(false);
       uiManager.hideSideMenus();      
-      slideInRight(getEl('watchlist-menu'), 1000);
-      updateWatchlist();
-      isWatchlistMenuOpen = true;
+      slideInRight(getEl('watchlist-menu'), 1000, () => {
+        updateWatchlist();
+        isWatchlistMenuOpen = true;
+      });      
       getEl('menu-watchlist').classList.add('bmenu-item-selected');
       return;
     }
@@ -452,7 +470,7 @@ export const onCruncherReady = async (): Promise<void> => { // NOSONAR
 };
 
 export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number, propTime: any, infoOverlayDOM: any[]) => {
-  const satInView = keepTrackApi.programs.dotsManager.inViewData[satSet.getIdFromObjNum(nextPassArrayIn[s].sccNum).id];
+  const satInView = keepTrackApi.programs.dotsManager.inViewData[satSet.getIdFromObjNum(nextPassArrayIn[s].sccNum)];
   // If old time and not in view, skip it
   if (nextPassArrayIn[s].time - propTime < -1000 * 60 * 5 && !satInView) return;
 
@@ -467,7 +485,7 @@ export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number,
   // Blue - Time to Next Pass is between 10 minutes before and 20 minutes after the current time
   // This makes recent objects stay at the top of the list in blue
   if (nextPassArrayIn[s].time - propTime < 1000 * 60 * 10 && propTime - nextPassArrayIn[s].time < 1000 * 60 * 20) {
-    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: blue">' + nextPassArrayIn[s].sccNum + ': ' + time + '</h5></div>');
+    infoOverlayDOM.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: #0095ff">' + nextPassArrayIn[s].sccNum + ': ' + time + '</h5></div>');
     return;
   }
   // White - Any future pass not fitting the above requirements
@@ -478,7 +496,7 @@ export const pushOverlayElement = (satSet: any, nextPassArrayIn: any, s: number,
 
 export const infoOverlayContentClick = (evt: any) => {
   const { satSet, objectManager } = keepTrackApi.programs;
-  let objNum = evt.currentTarget.textContent.split(':');
+  let objNum = evt.target.textContent.split(':');
   objNum = objNum[0];
   const satId = satSet.getIdFromObjNum(objNum);
   if (satId !== null) {
@@ -509,17 +527,35 @@ export const watchlistListClick = (satId: number): void => {
 
 export const watchlistContentEvent = (e?: any, satId?: number) => {
   const { satSet, sensorManager } = keepTrackApi.programs;
-  satId ??= satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('watchlist-new')).value));
-  let duplicate = false;
-  for (let i = 0; i < watchlistList.length; i++) {
-    // No duplicates
-    if (watchlistList[i] === satId) duplicate = true;
+  if (typeof satId !== 'undefined') {
+    let duplicate = false;
+    for (let i = 0; i < watchlistList.length; i++) {
+      // No duplicates
+      if (watchlistList[i] === satId) duplicate = true;
+    }
+    if (!duplicate) {
+      watchlistList.push(satId);
+      watchlistInViewList.push(false);
+    }
   }
-  if (!duplicate) {
-    watchlistList.push(satId);
-    watchlistInViewList.push(false);
-    updateWatchlist();
-  }
+
+  const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
+  sats.forEach((satNum: string) => {
+    const satId = satSet.getIdFromObjNum(parseInt(satNum));
+    let duplicate = false;
+    for (let i = 0; i < watchlistList.length; i++) {
+      // No duplicates
+      if (watchlistList[i] === satId) duplicate = true;
+    }
+    if (!duplicate) {
+      watchlistList.push(satId);
+      watchlistInViewList.push(false);
+    }
+  });
+
+  watchlistList.sort((a: number, b: number) => parseInt(satSet.getSat(a).sccNum) - parseInt(satSet.getSat(b).sccNum));
+
+  updateWatchlist();
   if (sensorManager.checkSensorSelected()) {
     getEl('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }

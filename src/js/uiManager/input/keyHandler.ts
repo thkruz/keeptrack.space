@@ -1,4 +1,5 @@
-import { Camera } from '@app/js/api/keepTrackTypes';
+import { Camera } from '@app/js/camera/camera';
+import eruda from 'eruda';
 import { getEl } from '@app/js/lib/helpers';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
@@ -6,7 +7,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
   // Error Handling
   if (typeof evt.key == 'undefined') return;
-  const { mainCamera, timeManager, uiManager, drawManager, objectManager, orbitManager, sensorManager } = keepTrackApi.programs;
+  const { debug, mainCamera, timeManager, uiManager, drawManager, objectManager, orbitManager, sensorManager } = keepTrackApi.programs;
 
   if (uiManager.isCurrentlyTyping) return;
   switch (evt.key.toUpperCase()) {
@@ -59,6 +60,17 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
       if (mainCamera.isShiftPressed) {
         uiManager.hideUi();
         releaseShiftKey(mainCamera);
+      }
+      break;
+    case 'D':
+      if (mainCamera.isShiftPressed) {
+        if (debug.isErudaVisible) {
+          eruda.hide();
+          debug.isErudaVisible = false;
+        } else {
+          eruda.show();
+          debug.isErudaVisible = true;
+        }
       }
       break;
   }

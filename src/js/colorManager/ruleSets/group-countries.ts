@@ -1,6 +1,7 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { ColorInformation, Pickable, colorSchemeManager } from '../colorSchemeManager';
+
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
@@ -32,6 +33,8 @@ export const groupCountriesRules = (sat: SatObject): ColorInformation => { // NO
       }
     case 'Russian Federation':
     case 'CIS':
+    case 'RU':
+    case 'SU':
     case 'Russia':
       if (colorSchemeManager.objectTypeFlags.countryCIS === false) {
         return {
@@ -49,6 +52,7 @@ export const groupCountriesRules = (sat: SatObject): ColorInformation => { // NO
     case `Hong Kong Special Administrative Region, China`:
     case 'China (Republic)':
     case 'PRC':
+    case 'CN':
       if (colorSchemeManager.objectTypeFlags.countryPRC === false) {
         return {
           color: colorSchemeManager.colorTheme.deselected,
@@ -60,8 +64,8 @@ export const groupCountriesRules = (sat: SatObject): ColorInformation => { // NO
           pickable: Pickable.Yes,
         };
       }
-    default:      
-      if (colorSchemeManager.objectTypeFlags.countryOther === false || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
+    default:        
+      if (colorSchemeManager.objectTypeFlags.countryOther === false || !sat.TLE1 || mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
         return {
           color: colorSchemeManager.colorTheme.deselected,
           pickable: Pickable.No,
@@ -81,8 +85,7 @@ export const groupCountriesRules = (sat: SatObject): ColorInformation => { // NO
       marker: true,
       pickable: Pickable.No,
     };
-  }
-
+  }  
 
   return {
     color: colorSchemeManager.colorTheme.deselected,

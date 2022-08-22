@@ -1,7 +1,9 @@
 import numeric from 'numeric';
-import { CatalogManager, SatObject, SensorManager, SensorObject } from '../api/keepTrackTypes';
+import { SatObject, SensorObject } from '../api/keepTrackTypes';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { RAD2DEG } from '../lib/constants';
+import { SensorManager } from '../plugins/sensor/sensorManager';
+import { CatalogManager } from '../satSet/satSet';
 import { ControlSiteManager } from './controlSiteManager';
 
 export enum SatConstellationString {
@@ -158,7 +160,7 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
         }
       }
       for (let i = 0; i < userlist.length; i++) {
-        let id = satSet.getSensorFromSensorName(userlist[i]);
+        let id = satSet.getSensorFromSensorName(userlist[i].toString());
         let user = <SensorObject>(<unknown>satSet.getSat(id));
         let bestSat: SatObject = null;
         let bestRange = 1000000;
@@ -184,7 +186,7 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
       // Loop through all the users
       for (let i = 0; i < userlist.length; i++) {
         // Select the current user
-        let user = <SensorObject>(<unknown>satSet.getSat(satSet.getSensorFromSensorName(userlist[i])));
+        let user = <SensorObject>(<unknown>satSet.getSat(satSet.getSensorFromSensorName(userlist[i].toString())));
         // Loop through all of the satellites
         for (let j = 0; j < satlist.length; j++) {
           // Select the current satelltie

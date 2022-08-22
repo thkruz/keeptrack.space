@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { Camera, SatObject } from '@app/js/api/keepTrackTypes';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { getEl } from '@app/js/lib/helpers';
 import { satellite } from '@app/js/satMath/satMath';
@@ -18,7 +18,7 @@ export const selectSatManager = {
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
   // prettier-ignore
-  selectSat: (satId: number, mainCamera: Camera) => { // NOSONAR
+  selectSat: (satId: number, mainCamera: any) => { // NOSONAR
     if (settingsManager.isDisableSelectSat) return;
     const { objectManager, satSet, sensorManager, uiManager } = keepTrackApi.programs;
 

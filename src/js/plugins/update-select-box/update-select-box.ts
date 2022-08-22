@@ -1,9 +1,9 @@
-import { DEG2RAD, cKmPerMs } from '@app/js/lib/constants';
+import { cKmPerMs, DEG2RAD } from '@app/js/lib/constants';
 
-import { SatObject } from '@app/js/api/keepTrackTypes';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { MissileObject, SatObject } from '@app/js/api/keepTrackTypes';
 import { createError } from '@app/js/errorManager/errorManager';
 import { getEl } from '@app/js/lib/helpers';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // prettier-ignore
 export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONAR
@@ -17,7 +17,7 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
         sat.getTEARR();
       }
     } else {
-      satellite.setTEARR(missileManager.getMissileTEARR(sat));
+      satellite.setTEARR(missileManager.getMissileTEARR(<MissileObject>sat));
     }
     if (satellite.degreesLong(satellite.currentTEARR.lon) >= 0) {
       getEl('sat-longitude').innerHTML = satellite.degreesLong(satellite.currentTEARR.lon).toFixed(3) + '°E';

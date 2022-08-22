@@ -21,11 +21,19 @@
  */
 
 // This file should contain all of the webgl code for generating non .obj meshes
-import { earth } from './earth';
+import { EarthObject, earth } from './earth';
+import { MoonObject, moon } from './moon';
+import { SkyBoxSphere, skyboxSphere } from './skybox-sphere';
+import { SunObject, sun } from './sun';
+
 import { LineFactory } from './line-factory';
-import { moon } from './moon';
-import { skyboxSphere } from './skybox-sphere';
-import { sun } from './sun';
+
+export interface SceneManager {
+  earth: EarthObject;
+  moon: MoonObject;
+  sun: SunObject;
+  skybox: SkyBoxSphere;
+}
 
 const sceneManager = {
   moon,

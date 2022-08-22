@@ -1,7 +1,8 @@
+import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
+
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
@@ -45,10 +46,17 @@ export const lostobjectsRules = (sat: SatObject): ColorInformation => { // NOSON
     case SpaceObjectType.LAUNCH_AGENCY:
     case SpaceObjectType.LAUNCH_SITE:
     case SpaceObjectType.LAUNCH_POSITION:
-      return {
-        color: colorSchemeManager.colorTheme.facility,
-        pickable: Pickable.Yes,
-      };
+      if (!settingsManager.isShowAgencies) {        
+        return {
+          color: colorSchemeManager.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }else{
+        return {
+          color: colorSchemeManager.colorTheme.facility,
+          pickable: Pickable.Yes,
+        };
+      }
     default: // Since it wasn't one of those continue on
   }
 
@@ -74,11 +82,12 @@ export const lostobjectsRules = (sat: SatObject): ColorInformation => { // NOSON
   } else {
     daysold = jday - parseInt(sat.TLE1.substr(20, 3)) + parseInt(sat.TLE1.substr(17, 2)) * 365;
   }
-  if (sat.perigee > satellite.obsmaxrange || daysold < settingsManager.daysUntilObjectLost) {
+  // NOTE: This will need to be adjusted if Alpha-5 satellites become numbers instead of alphanumeric
+  if (parseInt(sat.sccNum) >= 70000 || daysold < settingsManager.daysUntilObjectLost || (satellite.obsmaxrange !== 0 && sat.perigee > satellite.obsmaxrange)) {
     return {
       color: colorSchemeManager.colorTheme.transparent,
       pickable: Pickable.No,
-    };
+    };  
   } else {
     settingsManager.lostSatStr += settingsManager.lostSatStr === '' ? sat.sccNum : `,${sat.sccNum}`;
     return {

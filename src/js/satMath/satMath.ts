@@ -29,7 +29,7 @@ import $ from 'jquery';
 import numeric from 'numeric';
 import { EciVec3, Sgp4 } from 'ootk';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { SatMath, SatObject, SensorObject, TearrData } from '../api/keepTrackTypes';
+import { SatObject, SensorObject, TearrData } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { calculateLookAngles } from './calc/calculateLookAngles';
 import { calculateSensorPos } from './calc/calculateSensorPos';
@@ -308,7 +308,8 @@ export const getTEARR = (sat?: SatObject, sensors?: SensorObject[], propTime?: D
 // };
 */
 
-export const satellite: SatMath = {
+export type SatMath = typeof satellite;
+export const satellite = {
   // Legacy API
   sgp4: Sgp4.propagate,
   gstime: Sgp4.gstime,
@@ -358,7 +359,7 @@ export const satellite: SatMath = {
   lastMultiSiteArray: [],
   lookAngles2Ecf: lookAngles2ecf,
   lookanglesInterval: 30,
-  lookanglesLength: 7,
+  lookanglesLength: 2,
   map,
   nextNpasses,
   nextpass,
@@ -370,12 +371,15 @@ export const satellite: SatMath = {
   setTEARR,
   updateDopsTable,
   populateMultiSiteTable,
-  currentTEARR: {
-    time: '',
+  currentTEARR: <TearrData>{
     az: 0,
     el: 0,
     rng: 0,
     name: '',
+    lat: 0,
+    lon: 0,
+    alt: 0,
+    inView: false,
   },
 };
 

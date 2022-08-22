@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { Camera, UiInputInterface } from '@app/js/api/keepTrackTypes';
+import { UiInputInterface } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
+import { Camera } from '@app/js/camera/camera';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { closeColorbox, getEl, showLoading, slideInRight, triggerSubmit, waitForCruncher } from '@app/js/lib/helpers';
@@ -338,15 +339,15 @@ export const init = (): void => { // NOSONAR
 
     if (!settingsManager.disableUI) {
       bodyDOM.on('keypress', (e: Event) => {
-        uiManager.keyHandler(e);
+        uiManager.keyHandler(<KeyboardEvent>e);
       }); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keydown', (e: Event) => {
         if (uiManager.isCurrentlyTyping) return;
-        mainCamera.keyDownHandler(e);
+        mainCamera.keyDownHandler(<KeyboardEvent>e);
       }); // On Key Press Event Run _keyHandler Function
       bodyDOM.on('keyup', (e: Event) => {
         if (uiManager.isCurrentlyTyping) return;
-        mainCamera.keyUpHandler(e);
+        mainCamera.keyUpHandler(<KeyboardEvent>e);
       }); // On Key Press Event Run _keyHandler Function
 
       rightBtnSaveMenuDOM.on('click', function (e: Event) {
@@ -592,7 +593,6 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
   if (settingsManager.disableUI) return;
 
   const { uiManager, colorSchemeManager, starManager, sensorManager, lineManager, satSet, satellite, mainCamera, objectManager, drawManager, groupsManager } = keepTrackApi.programs;
-  const gl = drawManager.gl;
   const M = window.M;
 
   let target = <HTMLElement>e.target;
@@ -791,7 +791,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       } catch {
         // do nothing
       }
-      drawManager.sceneManager.earth.init(gl);
+      drawManager.sceneManager.earth.init();
       drawManager.sceneManager.earth.loadHiRes();
       drawManager.sceneManager.earth.loadHiResNight();
       break;
@@ -809,7 +809,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       } catch {
         // do nothing
       }
-      drawManager.sceneManager.earth.init(gl);
+      drawManager.sceneManager.earth.init();
       drawManager.sceneManager.earth.loadHiRes();
       drawManager.sceneManager.earth.loadHiResNight();
       break;
@@ -827,7 +827,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       } catch {
         // do nothing
       }
-      drawManager.sceneManager.earth.init(gl);
+      drawManager.sceneManager.earth.init();
       drawManager.sceneManager.earth.loadHiRes();
       drawManager.sceneManager.earth.loadHiResNight();
       break;
@@ -845,7 +845,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       } catch {
         // do nothing
       }
-      drawManager.sceneManager.earth.init(gl);
+      drawManager.sceneManager.earth.init();
       drawManager.sceneManager.earth.loadHiRes();
       drawManager.sceneManager.earth.loadHiResNight();
       break;
@@ -864,7 +864,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
         } catch {
           // do nothing
         }
-        drawManager.sceneManager.earth.init(gl);
+        drawManager.sceneManager.earth.init();
         drawManager.sceneManager.earth.loadHiRes();
         drawManager.sceneManager.earth.loadHiResNight();
       });
@@ -884,7 +884,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
         } catch {
           // do nothing
         }
-        drawManager.sceneManager.earth.init(gl);
+        drawManager.sceneManager.earth.init();
         drawManager.sceneManager.earth.loadHiRes();
         drawManager.sceneManager.earth.loadHiResNight();
       });
@@ -903,7 +903,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       } catch {
         // do nothing
       }
-      drawManager.sceneManager.earth.init(gl);
+      drawManager.sceneManager.earth.init();
       drawManager.sceneManager.earth.loadHiRes();
       drawManager.sceneManager.earth.loadHiResNight();
       break;
@@ -921,7 +921,7 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       } catch {
         // do nothing
       }
-      drawManager.sceneManager.earth.init(gl);
+      drawManager.sceneManager.earth.init();
       drawManager.sceneManager.earth.loadHiRes();
       drawManager.sceneManager.earth.loadHiResNight();
       break;

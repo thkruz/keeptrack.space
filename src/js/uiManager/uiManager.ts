@@ -34,7 +34,6 @@ import '@materializecss/materialize';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragHeight, closeColorbox, getEl } from '@app/js/lib/helpers';
 import $ from 'jquery';
-import { UiManager } from '../api/keepTrackTypes';
 import { legendColorsChange, initUiValidation, uiInput, useCurrentGeolocationAsSensor, keyHandler, initMenuController } from '.';
 import { searchToggle } from './search/searchToggle';
 import { updateURL } from './url/update-url';
@@ -131,6 +130,7 @@ export const onReady = () => {
   keepTrackApi.methods.uiManagerOnReady();
   uiManager.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
   getEl('bottom-icons').addEventListener('click', function (evt: Event) {
+    if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
     if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
       uiManager.bottomIconPress(<HTMLElement>evt.target);
     } else {
@@ -187,7 +187,8 @@ export const postStart = () => {
   }
 };
 
-export const uiManager: UiManager = {
+export type UiManager = typeof uiManager;
+export const uiManager = {
   lastBoxUpdateTime: 0,
   hideUi,
   legendColorsChange,

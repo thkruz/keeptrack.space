@@ -1,5 +1,4 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SunObject } from '@app/js/api/keepTrackTypes';
 import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { satellite } from '@app/js/satMath/satMath';
 import { jday } from '@app/js/timeManager/transforms';
@@ -241,7 +240,15 @@ export const update = () => {
   sun.sunvar.coord = A.EclCoordfromWgs84(0, 0, 0);
 
   // AZ / EL Calculation
-  sun.sunvar.tp = <any>A.Solar.topocentricPosition(sun.sunvar.jdo, sun.sunvar.coord, false);
+  // TODO: Figure out the correct type of this library
+  const coords = {
+    lat: sun.sunvar.coord.lat,
+    lng: sun.sunvar.coord.lng,
+    alt: sun.sunvar.coord.h,
+    h: sun.sunvar.coord.h,
+  };
+
+  sun.sunvar.tp = <any>A.Solar.topocentricPosition(sun.sunvar.jdo, coords, false);
   sun.sunvar.azimuth = sun.sunvar.tp.hz.az * RAD2DEG + (180 % 360);
   sun.sunvar.elevation = (sun.sunvar.tp.hz.alt * RAD2DEG) % 360;
 
@@ -449,7 +456,8 @@ const shaders = {
   `,
   },
 };
-export const sun = <SunObject>{
+export type SunObject = typeof sun;
+export const sun = {
   vao: <WebGLVertexArrayObject>null,
   buffers: {
     vertCount: 0,
@@ -514,7 +522,12 @@ export const sun = <SunObject>{
   },
   sunvar: {
     gmst: 0,
-    coord: 0,
+    coord: {
+      lat: 0,
+      lng: 0,
+      h: 0,
+      alt: 0,
+    },
     j: 0,
     jdo: 0,
     tp: {

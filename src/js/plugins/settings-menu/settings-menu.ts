@@ -72,6 +72,41 @@ export const uiManagerInit = (): void => {
               </div>
               <h5 class="center-align">General Settings</h5>
               <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide LEO satellites">
+                  <input id="settings-leoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show LEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide HEO satellites">
+                  <input id="settings-heoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show HEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide MEO satellites">
+                  <input id="settings-meoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show MEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide GEO satellites">
+                  <input id="settings-geoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show GEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Agencies">
+                  <input id="settings-showAgencies" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show Agencies
+                </label>
+              </div>              
+              <div class="switch row">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable this to hide orbit lines">
                   <input id="settings-drawOrbits" type="checkbox" checked/>
                   <span class="lever"></span>
@@ -358,6 +393,11 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
 
   switch (e.target?.id) {
+    case 'settings-leoSats':
+    case 'settings-heoSats':
+    case 'settings-meoSats':
+    case 'settings-geoSats':
+    case 'settings-showAgencies':
     case 'settings-drawOrbits':
     case 'settings-drawEcf':
     case 'settings-isDrawInCoverageLines':
@@ -401,6 +441,11 @@ export const settingsFormSubmit = (e: any) => {
 
   soundManager.play('button');
 
+  settingsManager.isShowLeoSats = (<HTMLInputElement>getEl('settings-leoSats')).checked;
+  settingsManager.isShowHeoSats = (<HTMLInputElement>getEl('settings-heoSats')).checked;
+  settingsManager.isShowMeoSats = (<HTMLInputElement>getEl('settings-meoSats')).checked;
+  settingsManager.isShowGeoSats = (<HTMLInputElement>getEl('settings-geoSats')).checked;
+  settingsManager.isShowAgencies = (<HTMLInputElement>getEl('settings-showAgencies')).checked;
   settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
   settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
   settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;

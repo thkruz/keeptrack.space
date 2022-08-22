@@ -1,4 +1,6 @@
-import { CatalogManager, MissileObject, OrbitManager, SatGroupCollection, SatObject } from '../api/keepTrackTypes';
+import { MissileObject, SatGroupCollection, SatObject } from '../api/keepTrackTypes';
+import { OrbitManager } from '../orbitManager/orbitManager';
+import { CatalogManager } from '../satSet/satSet';
 import { country } from '../satSet/search';
 
 export class SatGroup {
@@ -49,6 +51,14 @@ export class SatGroup {
       case 'nameRegex':
         this.sats = satSet.search
           .name(satSet.satData, data)
+          .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((sat: SatObject) => ({
+            satId: sat.id,
+          }));
+        break;
+      case 'country':
+        this.sats = satSet.satData
+          .filter((sat: SatObject) => data.split('|').includes(sat.country))
           .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => ({
             satId: sat.id,

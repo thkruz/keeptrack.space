@@ -20,8 +20,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { getEl } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { CatalogManager, Colors, SatObject } from '../api/keepTrackTypes';
+import { Colors, SatObject } from '../api/keepTrackTypes';
+import { CatalogManager } from '../satSet/satSet';
 import { ageOfElsetRules } from './ruleSets/ageOfElset';
 import { apogeeRules } from './ruleSets/apogee';
 import { countriesRules } from './ruleSets/countries';
@@ -246,13 +248,13 @@ export const colorSchemeManager: ColorSchemeManager = {
       // These two variables only need to be set once, but we want to make sure they aren't called before the satellites
       // are loaded into satSet. Don't move the buffer data creation into the constructor!
       if (!colorSchemeManager.pickableData || !colorSchemeManager.colorData) return;
-      const { searchBox } = keepTrackApi.programs;
+      const { searchBox, orbitManager } = keepTrackApi.programs;
       const { gl } = keepTrackApi.programs.drawManager;
 
 
       // Revert colorscheme if search box is empty
       if (colorSchemeManager.currentColorScheme === colorSchemeManager.group || colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
-        if (searchBox.getCurrentSearch() === '') {
+        if (searchBox.getCurrentSearch() === '' && getEl('watchlist-menu').style.transform !== 'translateX(0px)' && !orbitManager.isTimeMachineRunning) {
           if (colorSchemeManager.currentColorScheme === colorSchemeManager.groupCountries) {
             colorSchemeManager.currentColorScheme = colorSchemeManager.countries;
           } else {
@@ -319,10 +321,11 @@ export const colorSchemeManager: ColorSchemeManager = {
       }
 
       // Reset Which Sensor we are coloring before the loop begins
-      colorSchemeManager.iSensor = 0;
+      if (firstDotToColor === 0) {
+        colorSchemeManager.iSensor = 0;
+      }
 
-      // Lets loop through all the satellites and color them in one by one
-      let colors: ColorInformation = null;
+      // Lets loop through all the satellites and color them in one by one      
       let params = {
         year: '',
         jday: 0,
@@ -337,10 +340,36 @@ export const colorSchemeManager: ColorSchemeManager = {
 
       // Velocity is a special case - we need to know the velocity of each satellite
       if (colorSchemeManager.currentColorScheme === colorSchemeManager.velocity) {
-        for (let i = firstDotToColor; i < lastDotToColor; i++) {                
+        for (let i = firstDotToColor; i < lastDotToColor; i++) {          
+          let colors: ColorInformation = null;      
           satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
 
-          colors = colorSchemeManager.currentColorScheme(satData[i], params);
+          if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || satData[i].apogee >= 6000 && satData[i].perigee < 6000)) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }          
+          colors ??= colorSchemeManager.currentColorScheme(satData[i], params);
+          
           colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
           colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
           colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B
@@ -348,8 +377,34 @@ export const colorSchemeManager: ColorSchemeManager = {
           colorSchemeManager.pickableData[i] = colors.pickable;        
         }
       } else {
-        for (let i = firstDotToColor; i < lastDotToColor; i++) {                
-          colors = colorSchemeManager.currentColorScheme(satData[i], params);
+        for (let i = firstDotToColor; i < lastDotToColor; i++) {             
+          let colors: ColorInformation = null;   
+          if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || satData[i].apogee >= 6000 && satData[i].perigee < 6000)) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }
+          if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
+            colors = {
+              color: [0, 0, 0, 0],
+              pickable: Pickable.No,
+            }
+          }          
+          colors ??= colorSchemeManager.currentColorScheme(satData[i], params);
+
           colorSchemeManager.colorData[i * 4] = colors.color[0]; // R
           colorSchemeManager.colorData[i * 4 + 1] = colors.color[1]; // G
           colorSchemeManager.colorData[i * 4 + 2] = colors.color[2]; // B

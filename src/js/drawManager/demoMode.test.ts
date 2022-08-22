@@ -17,7 +17,7 @@ describe('drawManager.demoMode', () => {
   test('1', () => {
     settingsManager.demoModeInterval = -1;
     keepTrackApi.programs.drawManager.demoModeSatellite = 0;
-    keepTrackApi.programs.satSet.getScreenCoords = () => ({ x: 0, y: 0 });
+    keepTrackApi.programs.satSet.getScreenCoords = () => ({ x: 0, y: 0, z: 0, error: false });
     keepTrackApi.programs.drawManager.hoverBoxOnSat = () => {};
     keepTrackApi.programs.satSet.satData = [defaultSat];
     let result: any = demoMode();

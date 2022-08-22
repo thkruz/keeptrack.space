@@ -11,3 +11,4 @@ dist
 src/offline/tle.js
 src/tle
 **/**/tle.js
+embed

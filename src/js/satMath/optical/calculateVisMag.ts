@@ -1,6 +1,7 @@
+import { SunObject } from '@app/js/drawManager/sceneManager/sun';
 import { calcSatrec } from '@app/js/satSet/catalogSupport/calcSatrec';
 import numeric from 'numeric';
-import { SatObject, SensorObject, SunObject } from '../../api/keepTrackTypes';
+import { SatObject, SensorObject } from '../../api/keepTrackTypes';
 import { satellite } from '../satMath';
 
 export const calculateVisMag = (sat: SatObject, sensor: SensorObject, propTime: Date, sun: SunObject): number => {

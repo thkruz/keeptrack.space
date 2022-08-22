@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import { TimeManager } from '../api/keepTrackTypes';
 import { getDayOfYear } from './transforms';
 import { getEl } from '../lib/helpers';
 import { keepTrackApi } from '../api/keepTrackApi';
@@ -40,7 +39,8 @@ export const changeStaticOffset = (staticOffset: number) => {
   synchronize();
 };
 
-export const timeManager: TimeManager = {
+export type TimeManager = typeof timeManager;
+export const timeManager = {
   dateObject: null,
   datetimeInputDOM: null,
   timeTextStr: null,

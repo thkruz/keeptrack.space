@@ -1,8 +1,8 @@
 import iodPng from '@app/img/icons/iod.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { UiManager } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { omManager } from '@app/js/plugins/initial-orbit/om-manager';
+import { UiManager } from '@app/js/uiManager/uiManager';
 
 let isObfitMenuOpen = false;
 export const init = (): void => {

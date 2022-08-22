@@ -8,7 +8,7 @@ import { addSatExtraFunctions } from '../satSet';
 export const getSatVel = () => (keepTrackApi.programs.dotsManager.velocityData ? keepTrackApi.programs.dotsManager.velocityData : new Float32Array());
 export const getSatInView = () => (keepTrackApi.programs.dotsManager.inViewData ? keepTrackApi.programs.dotsManager.inViewData : new Int8Array());
 export const getSatInSun = () => (keepTrackApi.programs.dotsManager.inSunData ? keepTrackApi.programs.dotsManager.inSunData : new Int8Array());
-export const getSatExtraOnly = (i: number): SatObject => {
+export const getSatExtraOnly = (i: number): SatObject | null => {
   const { satSet } = keepTrackApi.programs;
   return !satSet.satData || !satSet.satData[i] ? null : satSet.satData[i];
 };
@@ -34,7 +34,7 @@ export const getSensorFromSensorName = (sensorName: string): number => {
     (object: SatObject) => (object?.static && !object?.missile && object?.type !== SpaceObjectType.STAR ? object.name === sensorName : false) // Test
   );
 };
-export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: { x: number; y: number; z: number }) => {
+export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos?: { x: number; y: number; z: number }) => {
   const screenPos = { x: 0, y: 0, z: 0, error: false };
   try {
     const { satSet } = keepTrackApi.programs;

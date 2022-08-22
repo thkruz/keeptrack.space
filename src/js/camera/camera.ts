@@ -23,8 +23,12 @@
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import * as glm from 'gl-matrix';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager, ZoomValue } from '../api/keepTrackTypes';
+import { CameraType, DotsManager, SatObject, ZoomValue } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
+import { DrawManager } from '../drawManager/drawManager';
+import { ObjectManager } from '../objectManager/objectManager';
+import { OrbitManager } from '../orbitManager/orbitManager';
+import { SensorManager } from '../plugins/sensor/sensorManager';
 import { keyDownHandler, keyUpHandler } from './keyHandler';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from './transforms';
 
@@ -817,7 +821,8 @@ export const setCameraType = (val: CameraType) => {
   resetFpsPos();
 };
 
-export const camera: Camera = {
+export type Camera = typeof camera;
+export const camera = {
   _zoomLevel: 0.6925,
   _zoomTarget: 0.6925,
   alt2zoom: alt2zoom,
@@ -941,7 +946,7 @@ export const camera: Camera = {
     }
     return camera._zoomLevel;
   },
-  zoomTarget: (val: number) => {
+  zoomTarget: (val?: number) => {
     if (typeof val !== 'undefined') {
       val = val > 1 ? 1 : val;
       val = val < 0 ? 0 : val;

@@ -30,7 +30,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
 import numeric from 'numeric';
 import { EciVec3 } from 'ootk';
-import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject, SunStatus } from '../api/keepTrackTypes';
+import { InView, Lla, Rae, SatObject, SensorObject, SunStatus } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
 import { getEl, stringPad } from '../lib/helpers';
@@ -122,6 +122,8 @@ export const init = async (satCruncherOveride?: any): Promise<number> => { // NO
 };
 export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, sccNum?: string): any => {
   const { satellite, timeManager, orbitManager, uiManager } = keepTrackApi.programs;
+  if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
+  if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
@@ -370,9 +372,9 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
   if (typeof satSet.satData[i].getAltitude == 'undefined') {
     satSet.satData[i].getAltitude = () => {
       // Stars don't have an altitude
-      if (satSet.satData[i].type === SpaceObjectType.STAR) return;
+      if (satSet.satData[i].type === SpaceObjectType.STAR) return false;
       // Sensors don't have TLEs
-      if ([SpaceObjectType.PHASED_ARRAY_RADAR, SpaceObjectType.MECHANICAL, SpaceObjectType.OPTICAL].includes(satSet.satData[i].type)) return;
+      if ([SpaceObjectType.PHASED_ARRAY_RADAR, SpaceObjectType.MECHANICAL, SpaceObjectType.OPTICAL].includes(satSet.satData[i].type)) return false;
 
       if (satSet.satData[i].missile) {
         return satellite.eci2ll(satSet.satData[i].position.x, satSet.satData[i].position.y, satSet.satData[i].position.z).alt;
@@ -394,7 +396,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
       el?: number;
       inView: boolean;
     } => {
-      const currentTEARR: Lla & Rae & InView = {
+      const currentTEARR: Lla & Rae & InView & {name: string} = {
         lat: 0,
         lon: 0,
         alt: 0,
@@ -402,6 +404,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
         az: 0,
         el: 0,
         inView: false,
+        name: ''
       }; // Most current TEARR data that is set in satellite object and returned.
 
       if (typeof sensors === 'undefined' || sensors[0] === null) {
@@ -519,6 +522,8 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
         rng: currentTEARR.rng,
       });
 
+      currentTEARR.name = satSet.satData[i].name;
+
       satellite.setTEARR(currentTEARR);
       return currentTEARR;
     };
@@ -549,7 +554,8 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
   }
 };
 
-export let satSet: CatalogManager = {
+export type CatalogManager = typeof satSet;
+export let satSet = {
   convertIdArrayToSatnumArray,
   convertSatnumArrayToIdArray,
   cosparIndex: null,

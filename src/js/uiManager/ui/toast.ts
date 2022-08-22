@@ -10,7 +10,7 @@ const M = window.M;
 
 export type ToastMsgType = 'standby' | 'normal' | 'caution' | 'serious' | 'critical' | 'error';
 
-export const toast = (toastText: string, type: ToastMsgType, isLong: boolean) => {
+export const toast = (toastText: string, type: ToastMsgType, isLong = false) => {
   let toastMsg = M.toast({
     text: toastText,
   });

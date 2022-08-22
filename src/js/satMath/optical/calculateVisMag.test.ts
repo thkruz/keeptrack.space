@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SunObject } from '@app/js/drawManager/sceneManager/sun';
 import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
-import { KeepTrackPrograms, SatObject, SunObject } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import * as calculateVisMag from './calculateVisMag';
 

@@ -6,19 +6,21 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { getEl } from '@app/js/lib/helpers';
 import { isselectedSatNegativeOne, selectSatManager } from '@app/js/plugins';
 import { mat4 } from 'gl-matrix';
-import { DrawManager, PostProcessingManager, SatObject, SunObject } from '../api/keepTrackTypes';
+import { PostProcessingManager, SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { demoMode } from './demoMode';
 import { hoverBoxOnSat, hoverManager, updateHover } from './hoverManager/hoverManager';
+import { SunObject } from './sceneManager/sun';
 import { screenShot, watermarkedDataUrl } from './screenShot';
 
 let satMiniBox: HTMLDivElement;
 let satLabelModeLastTime = 0;
 let isSatMiniBoxInUse = false;
-let labelCount;
+let labelCount = 0;
 let hoverBoxOnSatMiniElements = null;
-let satHoverMiniDOM;
+let satHoverMiniDOM: HTMLDivElement;
 settingsManager.isShowNextPass = false;
+let drawLoopCallback = null;
 
 export const init = () => {
   satMiniBox = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
@@ -98,12 +100,11 @@ export const createDotsManager = (gl: WebGL2RenderingContext) => {
   return drawManager.dotsManager;
 };
 export const loadScene = async () => {
-  const { gl } = keepTrackApi.programs.drawManager;
   // Make this public
   drawManager.sceneManager = sceneManager;
   try {
     // await tools.init();
-    await sceneManager.earth.init(gl);
+    await sceneManager.earth.init();
     keepTrackApi.methods.drawManagerLoadScene();
     await sceneManager.sun.init();
     await sceneManager.moon.init();
@@ -163,7 +164,7 @@ export const resizeCanvas = () => {
     }
   } else {
     if (!settingsManager.screenshotMode) return;
-    setCanvasSize(settingsManager.hiResWidth, settingsManager.hiResHeight);
+    setCanvasSize(settingsManager.hiResHeight, settingsManager.hiResWidth);
   }
 
   gl.viewport(0, 0, drawManager.canvas.width, drawManager.canvas.height);
@@ -195,7 +196,7 @@ export const startWithOrbits = async () => {
     settingsManager.isOrbitOverlayVisible = true;
   }
 };
-export const drawLoop = (preciseDt: number) => {
+export const drawLoop = (preciseDt?: number) => {
   // Restart the draw loop when ready to draw again
   requestAnimationFrame(drawLoop);
   const { satSet, dotsManager, colorSchemeManager, mainCamera, orbitManager, lineManager, objectManager, timeManager } = keepTrackApi.programs;
@@ -319,7 +320,7 @@ export const drawLoop = (preciseDt: number) => {
   // }
   // }
 
-  keepTrackApi.methods.onDrawLoopComplete(drawManager.drawLoopCallback);
+  keepTrackApi.methods.onDrawLoopComplete(drawLoopCallback);
 
   // If Demo Mode do stuff
   if (settingsManager.isDemoModeOn) drawManager.demoMode();
@@ -348,10 +349,10 @@ export const updateLoop = () => {
 
   drawManager.orbitsAbove(); //drawManager.sensorPos is set here for the Camera Manager
 
-  mainCamera.update(drawManager.sat, drawManager.sensorPos);
+  mainCamera.update(<any>drawManager.sat, drawManager.sensorPos);
   keepTrackApi.methods.updateLoop();
 };
-export const drawOptionalScenery = (drawManagerOverride?: DrawManager) => {
+export const drawOptionalScenery = (drawManagerOverride?: any) => {
   drawManager = drawManagerOverride || drawManager;
   const { gl } = keepTrackApi.programs.drawManager;
 
@@ -442,9 +443,9 @@ export const satCalculate = () => {
 // Splitting it into subfunctions would not be optimal
 // prettier-ignore
 export const orbitsAbove = () => { // NOSONAR
-  const { mainCamera, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
+  const { mainCamera, dotsManager, watchlist, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
 
-  if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium) {
+  if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium || watchlist.watchlistInViewList?.length > 0) {
     drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
     if (!drawManager.isDrawOrbitsAbove) {
       // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
@@ -453,7 +454,7 @@ export const orbitsAbove = () => { // NOSONAR
       return;
     }
     // Previously called showOrbitsAbove();
-    if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
+    if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist.watchlistInViewList?.length === 0) {
       if (isSatMiniBoxInUse) {
         hoverBoxOnSatMiniElements = getEl('sat-minibox');
         hoverBoxOnSatMiniElements.innerHTML = '';
@@ -478,6 +479,7 @@ export const orbitsAbove = () => { // NOSONAR
      * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
      */
     hoverBoxOnSatMiniElements.innerHTML = '';
+    if (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium) {
     for (let i = 0; i < satSet.orbitalSats && labelCount < settingsManager.maxLabels; i++) {
       sat = satSet.getSatPosOnly(i);
 
@@ -488,7 +490,7 @@ export const orbitsAbove = () => { // NOSONAR
       if (sat.OT === 3 && colorSchemeManager.objectTypeFlags.debris === false) continue;
       if (sat.inView === 1 && colorSchemeManager.objectTypeFlags.inFOV === false) continue;
 
-      const satScreenPositionArray = satSet.getScreenCoords(i, drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.curBuffer, sat.position);
+      const satScreenPositionArray = satSet.getScreenCoords(i, drawManager.pMatrix, mainCamera.camMatrix, sat.position);
       if (satScreenPositionArray.error) continue;
       if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
       if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
@@ -506,12 +508,43 @@ export const orbitsAbove = () => { // NOSONAR
 
       satHoverMiniDOM.style.display = 'block';
       satHoverMiniDOM.style.position = 'absolute';
+      satHoverMiniDOM.style.textShadow = '-2px -2px 5px #000, 2px -2px 5px #000, -2px 2px 5px #000, 2px 2px 5px #000';
       satHoverMiniDOM.style.left = `${satScreenPositionArray.x + 20}px`;
       satHoverMiniDOM.style.top = `${satScreenPositionArray.y}px`;
 
       hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
       labelCount++;
     }
+  } else {
+    watchlist.watchlistList.forEach((satId: number) => {
+      sat = satSet.getSatPosOnly(satId);
+      if (dotsManager.inViewData[satId] === 0) return;
+      const satScreenPositionArray = satSet.getScreenCoords(satId, drawManager.pMatrix, mainCamera.camMatrix, sat.position);
+      if (satScreenPositionArray.error) return;
+      if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') return;
+      if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) return;
+
+      // Draw Sat Labels
+      // if (!settingsManager.enableHoverOverlay) continue
+      satHoverMiniDOM = document.createElement('div');
+      satHoverMiniDOM.id = 'sat-minibox-' + satId;
+      satHoverMiniDOM.textContent = sat.sccNum;
+
+      // Draw Orbits
+      if (!settingsManager.isShowSatNameNotOrbit) {
+        orbitManager.addInViewOrbit(satId);
+      }
+
+      satHoverMiniDOM.style.display = 'block';
+      satHoverMiniDOM.style.position = 'absolute';
+      satHoverMiniDOM.style.textShadow = '-2px -2px 5px #000, 2px -2px 5px #000, -2px 2px 5px #000, 2px 2px 5px #000';
+      satHoverMiniDOM.style.left = `${satScreenPositionArray.x + 20}px`;
+      satHoverMiniDOM.style.top = `${satScreenPositionArray.y}px`;
+
+      hoverBoxOnSatMiniElements.appendChild(satHoverMiniDOM);
+      labelCount++;
+    });
+  }
     isSatMiniBoxInUse = true;
     satLabelModeLastTime = timeManager.realTime;
   } else {
@@ -520,7 +553,7 @@ export const orbitsAbove = () => { // NOSONAR
   }
 
   // Hide satMiniBoxes When Not in Use
-  if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
+  if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist.watchlistInViewList?.length === 0) {
     if (isSatMiniBoxInUse) {
       satMiniBox.innerHTML = '';
     }
@@ -622,31 +655,32 @@ export const clearFrameBuffers = (pickFb: WebGLFramebuffer, godFb: WebGLFramebuf
   // gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
 };
 
-export let drawManager: DrawManager = {
-  init: init,
-  glInit: glInit,
-  createDotsManager: createDotsManager,
-  loadScene: loadScene,
+export type DrawManager = typeof drawManager;
+export let drawManager = {
+  init,
+  glInit,
+  createDotsManager,
+  loadScene,
   loadHiRes,
-  resizeCanvas: resizeCanvas,
-  calculatePMatrix: calculatePMatrix,
-  startWithOrbits: startWithOrbits,
-  drawLoop: drawLoop,
-  updateLoop: updateLoop,
-  demoMode: demoMode,
-  hoverBoxOnSat: hoverBoxOnSat,
-  drawOptionalScenery: drawOptionalScenery,
-  onDrawLoopComplete: onDrawLoopComplete,
-  updateHover: updateHover,
+  resizeCanvas,
+  calculatePMatrix,
+  startWithOrbits,
+  drawLoop,
+  updateLoop,
+  demoMode,
+  hoverBoxOnSat,
+  drawOptionalScenery,
+  onDrawLoopComplete,
+  updateHover,
   updateHoverI: 0,
   isDrawOrbitsAbove: false,
-  orbitsAbove: orbitsAbove,
-  screenShot: screenShot,
-  satCalculate: satCalculate,
-  watermarkedDataUrl: watermarkedDataUrl,
-  resizePostProcessingTexture: resizePostProcessingTexture,
-  clearFrameBuffers: clearFrameBuffers,
-  selectSatManager: selectSatManager,
+  orbitsAbove,
+  screenShot,
+  satCalculate,
+  watermarkedDataUrl,
+  resizePostProcessingTexture,
+  clearFrameBuffers,
+  selectSatManager, // Circular Error!!!!!
   i: 0,
   demoModeSatellite: 0,
   demoModeLastTime: 0,
@@ -654,10 +688,9 @@ export let drawManager: DrawManager = {
   dt: 0,
   t0: 0,
   isShowFPS: false,
-  drawLoopCallback: null,
   gaussianAmt: 2,
   setDrawLoopCallback: (cb: any) => {
-    drawManager.drawLoopCallback = cb;
+    drawLoopCallback = cb;
   },
   sat: <SatObject>(<unknown>{
     id: -1,

@@ -289,6 +289,10 @@ ul {
   z-index: 100000000;
 }
 
+#sat-minibox {
+  font-size: 1.3vw;
+}
+
 .search-hilight {
   font-weight: bold;
   color: var(--colorSecondary);
@@ -927,9 +931,12 @@ input:focus {
   row-gap: 0px;
   background: var(--colorTertiaryDarken2);
   padding-top: 10px;
-  cursor: pointer;
   z-index: 11;
   /* backdrop-filter: blur(3px); */
+}
+
+#bottom-icons div {
+  cursor: pointer;
 }
 
 .bmenu-item {

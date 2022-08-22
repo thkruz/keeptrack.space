@@ -99,6 +99,45 @@ settingsManager = {
   init: () => { // NOSONAR
     settingsManager.pTime = [];
 
+    // Set Background
+    setTimeout(() => {
+      const backgrounds = [
+        'astronauts',
+        'astronauts2',
+        'commandCenter',
+        'controlModule',
+        'domeInDesert',
+        'domeInHawaii',
+        'domeInMountain',
+        'domeInMountain2',
+        'domeInSnow',
+        'domeInSnow2',
+        'domesOnGrassHill',
+        'fylingdales',
+        'fylingdales2',
+        'icbm',
+        'iss',
+        'mobileTel',
+        'militaryLaunch',
+        'launchpad',
+        'launchpad2',
+        'radarDomeFall',
+        'radarOnHill',
+        'slbm',
+        'slbm2',      
+      ];
+      
+      // Randomly load a splash screen - not a vulnerability
+      const image = backgrounds[Math.floor(Math.random() * backgrounds.length)]; // NOSONAR
+      const width = window.innerWidth > 1920 ? '3840' : '1920';
+      const loadingDom = document.getElementById('loading-screen');
+
+      loadingDom.style.backgroundImage = `url('../img/wallpaper/${image}-${width}.png')`;
+      loadingDom.style.backgroundSize = 'cover';
+      loadingDom.style.backgroundPosition = 'center';
+      loadingDom.style.backgroundRepeat = 'no-repeat';
+    }, 0);
+
     // Install Folder Settings
     {
       switch (window.location.host) {
@@ -284,6 +323,18 @@ settingsManager = {
 
     // Draw Lines from Sensors to Satellites When in FOV
     settingsManager.isDrawInCoverageLines = true;
+
+    // Show LEO satellites
+    settingsManager.isShowLeoSats = true;
+    // Show HEO satellites
+    settingsManager.isShowHeoSats = true;
+    // Show MEO satellites
+    settingsManager.isShowMeoSats = true;
+    // Show GEO satellites
+    settingsManager.isShowGeoSats = true;
+
+    // Show Launch Agency and Payload Owners/Manufacturers
+    settingsManager.isShowAgencies = true;
 
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 

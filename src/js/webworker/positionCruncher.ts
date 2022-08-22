@@ -25,7 +25,7 @@
  */
 
 import numeric from 'numeric';
-import { EciVec3, SatelliteRecord, Sgp4, Transforms, Utils } from 'ootk';
+import { EciVec3, LlaVec3, SatelliteRecord, Sgp4, Transforms, Utils } from 'ootk';
 import { SensorObjectCruncher } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, PI, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN, STAR_DISTANCE, TAU } from '../lib/constants';
@@ -410,9 +410,9 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
   }
 
   let lookangles;
-  let lat, long;
+  let lat, lon;
   let pos;
-  let satSelPosEcf, satSelPos, satSelGeodetic, satHeight, satSelPosEarth, deltaLat, deltaLatInt, deltaLon, deltaLonInt;
+  let satSelPosEcf, satSelPos, satSelGeodetic: LlaVec3, satHeight, satSelPosEarth, deltaLat, deltaLatInt, deltaLon, deltaLonInt;
 
   for (let snum = 0; snum < satelliteSelected.length + 1; snum++) {
     if (snum === satelliteSelected.length) {
@@ -455,8 +455,8 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
           // //////////
           // Add Long
           // //////////
-          long = satSelGeodetic.longitude + deltaLon * DEG2RAD;
-          satSelPosEarth = createLatLonHei(lat, long, 15);
+          lon = satSelGeodetic.lon + deltaLon * DEG2RAD;
+          satSelPosEarth = createLatLonHei(lat, lon, 15);
           // Find the Az/El of the position on the earth
           lookangles = Transforms.ecf2rae(satSelPosEarth, satSelPosEcf);
 
@@ -476,8 +476,8 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
           // Minus Long
           // //////////
           if (deltaLon === 0 || deltaLon === 180) continue; // Don't Draw Two Dots On the Center Line
-          long = satSelGeodetic.longitude - deltaLon * DEG2RAD;
-          satSelPosEarth = createLatLonHei(lat, long, 15);
+          lon = satSelGeodetic.lon - deltaLon * DEG2RAD;
+          satSelPosEarth = createLatLonHei(lat, lon, 15);
           // Find the Az/El of the position on the earth
           lookangles = Transforms.ecf2rae(satSelPosEarth, satSelPosEcf);
 
@@ -855,7 +855,12 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           el = sensor.obsmaxel;
           for (az = sensor.obsminaz; az < sensor.obsmaxaz; az += q) {
             pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
-            satCache[i].active = true;
+            try {
+              satCache[i].active = true;
+            } catch (e) {
+              // DEBUG:
+              // console.log(e);
+            }
             satPos = setPosition(satPos, i, pos);
             resetVelocity(satVel, i);
             i++;

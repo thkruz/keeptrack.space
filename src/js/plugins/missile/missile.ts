@@ -158,7 +158,7 @@ export const missileSubmit = (): void => {
           30,
           2.9,
           0.07,
-          missileManager.UsaICBM[a * 4 + 3],
+          <number>missileManager.UsaICBM[a * 4 + 3],
           'United States',
           missileMinAlt
         );
@@ -184,7 +184,7 @@ export const missileSubmit = (): void => {
           30,
           2.9,
           0.07,
-          missileManager.RussianICBM[a * 4 + 3],
+          <number>missileManager.RussianICBM[a * 4 + 3],
           'Russia',
           missileMinAlt
         );
@@ -210,7 +210,7 @@ export const missileSubmit = (): void => {
           30,
           2.9,
           0.07,
-          missileManager.ChinaICBM[a * 4 + 3],
+          <number>missileManager.ChinaICBM[a * 4 + 3],
           'China',
           missileMinAlt
         );
@@ -236,7 +236,7 @@ export const missileSubmit = (): void => {
           30,
           2.9,
           0.07,
-          missileManager.NorthKoreanBM[a * 4 + 3],
+          <number>missileManager.NorthKoreanBM[a * 4 + 3],
           'North Korea',
           missileMinAlt
         );
@@ -263,7 +263,7 @@ export const missileSubmit = (): void => {
           30,
           2.9,
           0.07,
-          missileManager.FraSLBM[a * 4 + 3],
+          <number>missileManager.FraSLBM[a * 4 + 3],
           'France',
           missileMinAlt
         );
@@ -289,7 +289,7 @@ export const missileSubmit = (): void => {
           30,
           2.9,
           0.07,
-          missileManager.ukSLBM[a * 4 + 3],
+          <number>missileManager.ukSLBM[a * 4 + 3],
           'United Kigndom',
           missileMinAlt
         );

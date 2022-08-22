@@ -1,11 +1,12 @@
-import { drawManager } from '@app/js/drawManager/drawManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
 import { mobileManager } from '@app/js/uiManager/mobile/mobileManager';
 import { loadStr } from './loadStr';
 
 export const hideLoadingScreen = () => {
+  const { drawManager } = keepTrackApi.programs;
   // Don't wait if we are running Jest
-  if ((drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) || typeof process !== 'undefined') {
+  if (drawManager.sceneManager.earth.isUseHiRes && drawManager.sceneManager.earth.isHiResReady !== true) {
     setTimeout(function () {
       hideLoadingScreen();
     }, 100);
@@ -28,7 +29,6 @@ export const hideLoadingScreen = () => {
       getEl('loading-screen').classList.add('mini-loader-container');
       getEl('logo-inner-container').classList.add('mini-loader');
       getEl('logo-text').innerHTML = '';
-      getEl('loading-earth').style.display = 'none';
       getEl('logo-text-version').innerHTML = '';
       getEl('loading-screen').style.display = 'none';
       loadStr('math');

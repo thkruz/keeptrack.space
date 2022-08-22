@@ -1,7 +1,9 @@
-import flagPng from '@app/img/icons/flag.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+
 import $ from 'jquery';
+import flagPng from '@app/img/icons/flag.png';
+import { getCountryCode } from '@app/js/objectManager/objectManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 let isCountriesMenuOpen = false;
 export const hideSideMenus = (): void => {
@@ -58,15 +60,48 @@ export const uiManagerInit = () => {
             <ul>
               <h5 class="center-align">Countries</h5>
               <li class="divider"></li>
-              <li class="menu-selectable country-option" data-group="Canada">Canadian</li>
-              <li class="menu-selectable country-option" data-group="China">Chinese</li>
-              <li class="menu-selectable country-option" data-group="France">French</li>
-              <li class="menu-selectable country-option" data-group="India">Indian</li>
-              <li class="menu-selectable country-option" data-group="Israel">Israeli</li>
-              <li class="menu-selectable country-option" data-group="Japan">Japanese</li>
-              <li class="menu-selectable country-option" data-group="Russia">Russian / USSR</li>
-              <li class="menu-selectable country-option" data-group="UnitedKingdom">British</li>
-              <li class="menu-selectable country-option" data-group="UnitedStates">American</li>
+              <li class="menu-selectable country-option" data-group="Argentina">Argentina</li>
+              <li class="menu-selectable country-option" data-group="Austria">Austria</li>
+              <li class="menu-selectable country-option" data-group="Australia">Australia</li>
+              <li class="menu-selectable country-option" data-group="Belgium">Belgium</li>
+              <li class="menu-selectable country-option" data-group="Brazil">Brazil</li>
+              <li class="menu-selectable country-option" data-group="Canada">Canada</li>
+              <li class="menu-selectable country-option" data-group="China">China</li>
+              <li class="menu-selectable country-option" data-group="Colombia">Colombia</li>
+              <li class="menu-selectable country-option" data-group="Denmark">Denmark</li>
+              <li class="menu-selectable country-option" data-group="Egypt">Egypt</li>
+              <li class="menu-selectable country-option" data-group="Finland">Finland</li>
+              <li class="menu-selectable country-option" data-group="France">France</li>
+              <li class="menu-selectable country-option" data-group="Germany">Germany</li>
+              <li class="menu-selectable country-option" data-group="Hong Kong">Hong Kong</li>
+              <li class="menu-selectable country-option" data-group="Hungary">Hungary</li>
+              <li class="menu-selectable country-option" data-group="India">India</li>
+              <li class="menu-selectable country-option" data-group="Indonesia">Indonesia</li>
+              <li class="menu-selectable country-option" data-group="Iran">Iran</li>
+              <li class="menu-selectable country-option" data-group="Ireland">Ireland</li>
+              <li class="menu-selectable country-option" data-group="Italy">Italy</li>
+              <li class="menu-selectable country-option" data-group="Israel">Israel</li>
+              <li class="menu-selectable country-option" data-group="Japan">Japan</li>
+              <li class="menu-selectable country-option" data-group="North Korea">North Korea</li>
+              <li class="menu-selectable country-option" data-group="South Korea">South Korea</li>
+              <li class="menu-selectable country-option" data-group="Mexico">Mexico</li>
+              <li class="menu-selectable country-option" data-group="Norway">Norway</li>
+              <li class="menu-selectable country-option" data-group="New Zealand">New Zealand</li>
+              <li class="menu-selectable country-option" data-group="Philippines">Philippines</li>
+              <li class="menu-selectable country-option" data-group="Poland">Poland</li>
+              <li class="menu-selectable country-option" data-group="Russia">Russia</li>
+              <li class="menu-selectable country-option" data-group="Saudi Arabia">Saudi Arabia</li>
+              <li class="menu-selectable country-option" data-group="Singapore">Singapore</li>
+              <li class="menu-selectable country-option" data-group="Spain">Spain</li>
+              <li class="menu-selectable country-option" data-group="Sweden">Sweden</li>
+              <li class="menu-selectable country-option" data-group="Switzerland">Switzerland</li>
+              <li class="menu-selectable country-option" data-group="Thailand">Thailand</li>
+              <li class="menu-selectable country-option" data-group="Turkey">Turkey</li>
+              <li class="menu-selectable country-option" data-group="United Kingdom">United Kingdom</li>
+              <li class="menu-selectable country-option" data-group="United States">United States</li>
+              <li class="menu-selectable country-option" data-group="Venezuela">Venezuela</li>
+              <li class="menu-selectable country-option" data-group="Vietnam">Vietnam</li>
+              <li class="menu-selectable country-option" data-group="South Africa">South Africa</li>              
             </ul>
           </div>
         </div>
@@ -104,37 +139,9 @@ export const uiManagerInit = () => {
 // prettier-ignore
 export const countryMenuClick = (groupName: string): void => { // NOSONAR
   const { groupsManager } = keepTrackApi.programs;
-  switch (groupName) {
-    case 'Canada':
-      if (!groupsManager.Canada) groupsManager.Canada = groupsManager.createGroup('countryRegex', /Canada/u);
-      break;
-    case 'China':
-      if (!groupsManager.China) groupsManager.China = groupsManager.createGroup('countryRegex', /China/u);
-      break;
-    case 'France':
-      if (!groupsManager.France) groupsManager.France = groupsManager.createGroup('countryRegex', /France/u);
-      break;
-    case 'India':
-      if (!groupsManager.India) groupsManager.India = groupsManager.createGroup('countryRegex', /India/u);
-      break;
-    case 'Israel':
-      if (!groupsManager.Israel) groupsManager.Israel = groupsManager.createGroup('countryRegex', /Israel/u);
-      break;
-    case 'Japan':
-      if (!groupsManager.Japan) groupsManager.Japan = groupsManager.createGroup('countryRegex', /Japan/u);
-      break;
-    case 'Russia':
-      if (!groupsManager.Russia) groupsManager.Russia = groupsManager.createGroup('countryRegex', /Russia/u);
-      break;
-    case 'UnitedKingdom':
-      if (!groupsManager.UnitedKingdom) groupsManager.UnitedKingdom = groupsManager.createGroup('countryRegex', /United Kingdom/u);
-      break;
-    case 'UnitedStates':
-      if (!groupsManager.UnitedStates) groupsManager.UnitedStates = groupsManager.createGroup('countryRegex', /United States/u);
-      break;
-    default:
-      throw new Error('Unknown country group');
-  }
+  const countryCode = getCountryCode(groupName);
+  if (countryCode === '') throw new Error('Unknown country group');
+  if (!groupsManager[groupName]) groupsManager[groupName] = groupsManager.createGroup('country', countryCode);      
   groupSelected(groupName);
 };
 

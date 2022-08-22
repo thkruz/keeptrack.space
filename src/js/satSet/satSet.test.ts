@@ -594,7 +594,7 @@ describe('satSet.insertNewAnalystSatellite', () => {
   });
 
   test('0', () => {
-    satSet.insertNewAnalystSatellite('1234567890', '1234567890', 0);
+    satSet.insertNewAnalystSatellite(defaultSat.TLE1, defaultSat.TLE2, 0);
   });
 });
 

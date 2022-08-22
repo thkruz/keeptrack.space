@@ -126,7 +126,9 @@ settingsManager = {
         'slbm',
         'slbm2',      
       ];
-      const image = backgrounds[Math.floor(Math.random() * backgrounds.length)];
+      
+      // Randomly load a splash screen - not a vulnerability
+      const image = backgrounds[Math.floor(Math.random() * backgrounds.length)]; // NOSONAR
       const width = window.innerWidth > 1920 ? '3840' : '1920';
       const loadingDom = document.getElementById('loading-screen');
 

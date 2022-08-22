@@ -208,8 +208,8 @@ export const uiManagerInit = (): void => {
         <div class="row">
           <div class="input-field col s10 m10 l10">
             <form id="watchlist-submit">
-              <input placeholder="xxxxx" id="watchlist-new" type="text" />
-              <label for="watchlist-new">New Satellite</label>
+              <input placeholder="xxxxx,xxxxx,xxxxx..." id="watchlist-new" type="text" />
+              <label for="watchlist-new">New Satellite(s)</label>
             </form>
           </div>
           <div class="col s2 m2 l2 center-align add-icon">
@@ -224,6 +224,9 @@ export const uiManagerInit = (): void => {
         <div class="center-align row">
           <button id="watchlist-open" class="btn btn-ui waves-effect waves-light" type="button" name="action">Load List &#9658;</button>
           <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
+        </div>
+        <div class="center-align row">
+          <button id="watchlist-clear" class="btn btn-ui waves-effect waves-light" type="button" name="action">Clear List &#9658;</button>
         </div>
       </div>
     </div>
@@ -281,6 +284,10 @@ export const uiManagerFinal = (): void => {
 
   getEl('watchlist-save').addEventListener('click', function (evt: Event) {
     watchlistSaveClick(evt);
+  });
+
+  getEl('watchlist-clear').addEventListener('click', () => {
+    updateWatchlist([], [], true);
   });
 
   getEl('watchlist-open').addEventListener('click', function () {
@@ -520,17 +527,35 @@ export const watchlistListClick = (satId: number): void => {
 
 export const watchlistContentEvent = (e?: any, satId?: number) => {
   const { satSet, sensorManager } = keepTrackApi.programs;
-  satId ??= satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('watchlist-new')).value));
-  let duplicate = false;
-  for (let i = 0; i < watchlistList.length; i++) {
-    // No duplicates
-    if (watchlistList[i] === satId) duplicate = true;
+  if (typeof satId !== 'undefined') {
+    let duplicate = false;
+    for (let i = 0; i < watchlistList.length; i++) {
+      // No duplicates
+      if (watchlistList[i] === satId) duplicate = true;
+    }
+    if (!duplicate) {
+      watchlistList.push(satId);
+      watchlistInViewList.push(false);
+    }
   }
-  if (!duplicate) {
-    watchlistList.push(satId);
-    watchlistInViewList.push(false);
-    updateWatchlist();
-  }
+
+  const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
+  sats.forEach((satNum: string) => {
+    const satId = satSet.getIdFromObjNum(parseInt(satNum));
+    let duplicate = false;
+    for (let i = 0; i < watchlistList.length; i++) {
+      // No duplicates
+      if (watchlistList[i] === satId) duplicate = true;
+    }
+    if (!duplicate) {
+      watchlistList.push(satId);
+      watchlistInViewList.push(false);
+    }
+  });
+
+  watchlistList.sort((a: number, b: number) => parseInt(satSet.getSat(a).sccNum) - parseInt(satSet.getSat(b).sccNum));
+
+  updateWatchlist();
   if (sensorManager.checkSensorSelected()) {
     getEl('menu-info-overlay').classList.remove('bmenu-item-disabled');
   }

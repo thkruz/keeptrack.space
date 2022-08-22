@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.0.0
+
+>  
+
+- fix: :bug: fix country menu not working
+- fix: :bug: fix timeMachine showing other objects
+- refactor: :label: add better type checking
+- fix: :bug: complete country matching code
+- test: :white_check_mark: add testing for colorSchemeChangeAlerts
+- feat: :sparkles: add settings to hide agency dots
+- feat: :sparkles: add debug menu
+- feat: :sparkles: add filter settings for various orbits
+- docs: :memo: update changelog
+- feat: :sparkles: add labels to watchlist items in fov
+- feat: :sparkles: add new splash screen wallpapers
+- feat: :goal_net: add TLE validation when creating TLEs
+- fix: :bug: fix bug where search results dont respond
+- feat: :sparkles: add new logo and loading screen
+- refactor: :recycle: change default lookangles to 2 days from 7
+- fix: :bug: fix watchlist line to satellite
+- docs: :memo: update readme
+- fix: :bug: fix bug in error catching
+- fix: :bug: fix memory leak in line-factory
+- fix: :bug: fix screenshot resolution
+- build: :arrow_up: upgrade serve
+
 #### v6.2.0
 
 >  

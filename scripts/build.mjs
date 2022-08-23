@@ -1,9 +1,10 @@
-import webpack from 'webpack';
-import generateConstVersion from './lib/constVersion.mjs';
 import { copyFilesAndFolders, copySettingsFiles } from './lib/copyFilesAndFolders.mjs';
+
+import { generateConfig } from './webpack.mjs';
+import generateConstVersion from './lib/constVersion.mjs';
 import { setupDistFolders } from './lib/setupFolders.mjs';
 import { updateTime } from './lib/updateTime.mjs';
-import { generateConfig } from './webpack.mjs';
+import webpack from 'webpack';
 
 console.clear();
 console.log('Copying files...'); // NOSONAR

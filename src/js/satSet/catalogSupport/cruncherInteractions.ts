@@ -8,12 +8,9 @@ export const cruncherExtraData = (m: SatCruncherMessage) => {
 
   const satExtraData = JSON.parse(m.data.extraData);
 
+  if (typeof satSet.satData === 'undefined') throw new Error('No sat data');
+  if (typeof satExtraData === 'undefined') throw new Error('No extra data');
   for (let satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
-    if (typeof satSet.satData === 'undefined') throw new Error('No sat data');
-    if (typeof satExtraData === 'undefined') throw new Error('No extra data');
-    if (typeof satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
-    if (typeof satSet.satData[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
-
     try {
       satSet.satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
       satSet.satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
@@ -28,6 +25,8 @@ export const cruncherExtraData = (m: SatCruncherMessage) => {
       satSet.satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
       satSet.satData[satCrunchIndex].velocity = { total: 0, x: 0, y: 0, z: 0 };
     } catch (error) {
+      if (typeof satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
+      if (typeof satSet.satData[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
       // Intentionally left blank
     }
   }
@@ -54,35 +53,41 @@ export const cruncherExtraUpdate = (m: SatCruncherMessage) => {
   satSet.satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
   satSet.satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
 };
+
+// prettier-ignore
 export const cruncherDotsManagerInteraction = (m: SatCruncherMessage) => { // NOSONAR
   const { dotsManager, satSet } = keepTrackApi.programs;
-  if (typeof dotsManager.positionData == 'undefined') {
-    dotsManager.positionData = new Float32Array(m.data.satPos);
-  } else {
-    dotsManager.positionData.set(m.data.satPos, 0);
+  if (m.data.satPos) {
+    if (typeof dotsManager.positionData == 'undefined') {
+      dotsManager.positionData = new Float32Array(m.data.satPos);
+    } else {
+      dotsManager.positionData.set(m.data.satPos, 0);
+    }
   }
 
-  if (typeof dotsManager.velocityData == 'undefined') {
-    dotsManager.velocityData = new Float32Array(m.data.satVel);
-  } else {
-    dotsManager.velocityData.set(m.data.satVel, 0);
+  if (m.data.satVel) {
+    if (typeof dotsManager.velocityData == 'undefined') {
+      dotsManager.velocityData = new Float32Array(m.data.satVel);
+    } else {
+      dotsManager.velocityData.set(m.data.satVel, 0);
+    }
   }
 
-  if (typeof m.data?.satInView != 'undefined' && m.data?.satInView.length > 0) {
+  if (m.data?.satInView?.length > 0) {
     if (typeof dotsManager.inViewData == 'undefined' || dotsManager.inViewData.length !== m.data.satInView.length) {
       dotsManager.inViewData = new Int8Array(m.data.satInView);
     } else {
       dotsManager.inViewData.set(m.data.satInView, 0);
-    }
+    }    
   }
 
-  if (typeof m.data?.satInSun != 'undefined' && m.data?.satInSun.length > 0) {
+  if (m.data?.satInSun?.length > 0) {
     if (typeof dotsManager.inSunData == 'undefined' || dotsManager.inSunData.length !== m.data.satInSun.length) {
       dotsManager.inSunData = new Int8Array(m.data.satInSun);
     } else {
       dotsManager.inSunData.set(m.data.satInSun, 0);
-    }
-  }
+    }         
+  }  
 
   if (typeof m.data?.sensorMarkerArray != 'undefined' && m.data?.sensorMarkerArray?.length !== 0) {
     satSet.satSensorMarkerArray = m.data.sensorMarkerArray;
@@ -107,7 +112,8 @@ export const getVariableSearch = (params: string[]) => {
     }
   }
 };
-export const getVariableActions = (params: string[]) => { // NOSONAR
+export const getVariableActions = (params: string[]) => {
+  // NOSONAR
   const { timeManager, objectManager, uiManager, satSet } = keepTrackApi.programs;
   for (let i = 0; i < params.length; i++) {
     const key = params[i].split('=')[0];
@@ -132,9 +138,9 @@ export const getVariableActions = (params: string[]) => { // NOSONAR
         break;
       case 'misl':
         var subVal = val.split(',');
-        (<HTMLSelectElement>getEl('ms-type')).value = (subVal[0].toString());
-        (<HTMLSelectElement>getEl('ms-attacker')).value = (subVal[1].toString());
-        (<HTMLSelectElement>getEl('ms-target')).value = (subVal[2].toString());
+        (<HTMLSelectElement>getEl('ms-type')).value = subVal[0].toString();
+        (<HTMLSelectElement>getEl('ms-attacker')).value = subVal[1].toString();
+        (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
         (<HTMLButtonElement>getEl('missile')).click();
         break;
       case 'date':
@@ -170,7 +176,7 @@ export const parseGetVariables = (): void => {
   getVariableActions(params);
 };
 export const satCruncherOnMessage = (m: SatCruncherMessage) => {
-  const { mainCamera, sensorManager, objectManager, uiManager, satSet } = keepTrackApi.programs;
+  const { uiManager, satSet } = keepTrackApi.programs;
   // store extra data that comes from crunching
   // Only do this once
   if (!satSet.gotExtraData && m.data?.extraData) {
@@ -187,15 +193,6 @@ export const satCruncherOnMessage = (m: SatCruncherMessage) => {
 
   // Run any callbacks for a normal position cruncher message
   keepTrackApi.methods.onCruncherMessage();
-
-  // Don't force color recalc if default colors and no sensor for inview color
-  if ((objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) || settingsManager.isForceColorScheme) {
-    // Don't change colors while dragging
-    if (!mainCamera.isDragging) {
-      // TODO: SLOW!
-      satSet.setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
-    }
-  }
 
   // Only do this once after satSet.satData is ready
   if (!settingsManager.cruncherReady && typeof satSet.satData !== 'undefined') {

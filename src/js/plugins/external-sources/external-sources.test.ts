@@ -89,7 +89,7 @@ describe('externalSources.searchN2yoOnLoad', () => {
       externalSources.searchN2yoOnLoad({ status: 200, response: '<div id="tle"><pre>\n3  25544\n2  25544' }, 12345);
     };
 
-    expect(callFunction).toThrow();
+    expect(callFunction).not.toThrow();
   });
 
   test('0', () => {
@@ -97,7 +97,7 @@ describe('externalSources.searchN2yoOnLoad', () => {
       externalSources.searchN2yoOnLoad({ status: 200, response: '<div id="tle"><pre>\n1  25544\n3  25544' }, 12345);
     };
 
-    expect(callFunction).toThrow();
+    expect(callFunction).not.toThrow();
   });
 });
 

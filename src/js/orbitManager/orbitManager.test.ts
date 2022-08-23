@@ -175,6 +175,7 @@ describe('orbitManager.draw', () => {
   });
   test('0', () => {
     orbitManager.addInViewOrbit(1);
+    orbitManager.setHoverOrbit(-1);
     let result: any = orbitManager.draw([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], null);
     expect(result).toMatchSnapshot();
   });
@@ -185,6 +186,7 @@ describe('orbitManager.draw', () => {
         static: false,
       };
     orbitManager.setSelectOrbit(1);
+    orbitManager.setHoverOrbit(-1);
     let result: any = orbitManager.draw([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], null);
     expect(result).toMatchSnapshot();
   });

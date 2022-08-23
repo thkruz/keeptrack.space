@@ -3,6 +3,7 @@ import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeMa
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const rcsRules = (sat: SatObject): ColorInformation => { // NOSONAR
   const rcs: number = parseFloat(sat.rcs);
   if (rcs < 0.1 && colorSchemeManager.objectTypeFlags.rcsSmall === false) {

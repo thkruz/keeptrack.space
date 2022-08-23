@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { getEl, shake } from '@app/js/lib/helpers';
+import { toast } from '@app/js/uiManager/ui/toast';
 import { MediaRecorderOptions } from '@app/types/types';
 
 export class CanvasRecorder {
@@ -44,9 +45,7 @@ export class CanvasRecorder {
           CanvasRecorder.isVideoRecording = false;
           getEl('menu-record').classList.remove('bmenu-item-selected');
           getEl('menu-record').classList.add('bmenu-item-disabled');
-          M.toast({
-            html: `Compatibility Error with Recording`,
-          });
+          toast('Compatibility Error with Recording', 'serious', false);
           shake(getEl('menu-record'));
           return false;
         }
@@ -55,9 +54,7 @@ export class CanvasRecorder {
         CanvasRecorder.isVideoRecording = false;
         getEl('menu-record').classList.remove('bmenu-item-selected');
         getEl('menu-record').classList.add('bmenu-item-disabled');
-        M.toast({
-          html: `Recording Only Available with HTTPS`,
-        });
+        toast('Recording Only Available with HTTPS', 'serious', false);
         shake(getEl('menu-record'));
         return false;
       }

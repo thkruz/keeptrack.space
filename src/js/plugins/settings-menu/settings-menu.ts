@@ -72,6 +72,41 @@ export const uiManagerInit = (): void => {
               </div>
               <h5 class="center-align">General Settings</h5>
               <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide LEO satellites">
+                  <input id="settings-leoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show LEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide HEO satellites">
+                  <input id="settings-heoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show HEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide MEO satellites">
+                  <input id="settings-meoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show MEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide GEO satellites">
+                  <input id="settings-geoSats" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show GEO Satellites
+                </label>
+              </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Agencies">
+                  <input id="settings-showAgencies" type="checkbox" checked/>
+                  <span class="lever"></span>
+                  Show Agencies
+                </label>
+              </div>              
+              <div class="switch row">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable this to hide orbit lines">
                   <input id="settings-drawOrbits" type="checkbox" checked/>
                   <span class="lever"></span>
@@ -336,7 +371,7 @@ export const hideSideMenus = () => {
 };
 
 export const onColorSelected = (context: any, colorStr: string) => {
-  const { satSet, uiManager } = keepTrackApi.programs;
+  const { satSet, uiManager, colorSchemeManager } = keepTrackApi.programs;
 
   if (typeof context === 'undefined' || context === null) throw new Error('context is undefined');
   if (typeof colorStr === 'undefined' || colorStr === null) throw new Error('colorStr is undefined');
@@ -345,7 +380,7 @@ export const onColorSelected = (context: any, colorStr: string) => {
   if (isNotColorPickerInitialSetup) {
     settingsManager.colors[colorStr] = parseRgba(context.color);
     uiManager.legendColorsChange();
-    satSet.setColorScheme(settingsManager.currentColorScheme, true);
+    satSet.setColorScheme(colorSchemeManager.currentColorScheme, true);
     try {
       localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
     } catch {
@@ -356,6 +391,35 @@ export const onColorSelected = (context: any, colorStr: string) => {
 
 export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?: boolean) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
+
+  switch (e.target?.id) {
+    case 'settings-leoSats':
+    case 'settings-heoSats':
+    case 'settings-meoSats':
+    case 'settings-geoSats':
+    case 'settings-showAgencies':
+    case 'settings-drawOrbits':
+    case 'settings-drawEcf':
+    case 'settings-isDrawInCoverageLines':
+    case 'settings-drawSun':
+    case 'settings-drawBlackEarth':
+    case 'settings-drawMilkyWay':
+    case 'settings-eciOnHover':
+    case 'settings-hos':
+    case 'settings-demo-mode':
+    case 'settings-sat-label-mode':
+    case 'settings-snp':
+      if ((<HTMLInputElement>getEl(e.target.id)).checked) {
+        // Play sound for enabling option
+        keepTrackApi.programs.soundManager.play('toggleOn');
+      } else {
+        // Play sound for disabling option
+        keepTrackApi.programs.soundManager.play('toggleOff');
+      }
+      break;
+    default:
+      break;
+  }
 
   isDMChecked ??= (<HTMLInputElement>getEl('settings-demo-mode')).checked;
   isSLMChecked ??= (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
@@ -373,8 +437,15 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
+  const { soundManager, satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
 
+  soundManager.play('button');
+
+  settingsManager.isShowLeoSats = (<HTMLInputElement>getEl('settings-leoSats')).checked;
+  settingsManager.isShowHeoSats = (<HTMLInputElement>getEl('settings-heoSats')).checked;
+  settingsManager.isShowMeoSats = (<HTMLInputElement>getEl('settings-meoSats')).checked;
+  settingsManager.isShowGeoSats = (<HTMLInputElement>getEl('settings-geoSats')).checked;
+  settingsManager.isShowAgencies = (<HTMLInputElement>getEl('settings-showAgencies')).checked;
   settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
   settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
   settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
@@ -414,7 +485,6 @@ export const settingsFormSubmit = (e: any) => {
     uiManager.searchBox.doSearch(uiManager.searchBox.getCurrentSearch());
   }
 
-  settingsManager.isForceColorScheme = true;
-  satSet.setColorScheme(settingsManager.currentColorScheme); // force color recalc
+  satSet.setColorScheme(colorSchemeManager.currentColorScheme, true);
   e.preventDefault();
 };

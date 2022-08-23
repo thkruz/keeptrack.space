@@ -25,6 +25,7 @@
 
 import externalPng from '@app/img/icons/external.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { createError } from '@app/js/errorManager/errorManager';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 let isExternalMenuOpen = false;
@@ -176,13 +177,17 @@ export const searchN2yoOnLoad = (request: { status: number; response: string }, 
 
   if (request.status >= 200 && request.status < 400) {
     // Success!
-    const tles = request.response.split('<div id="tle">')[1].split('<pre>')[1].split('\n');
-    const TLE1 = tles[1];
-    const TLE2 = tles[2];
-    if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
-    if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
-    const sat = satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-    uiManager.doSearch(sat.sccNum.toString());
+    try {
+      const tles = request.response.split('<div id="tle">')[1].split('<pre>')[1].split('\n');
+      const TLE1 = tles[1];
+      const TLE2 = tles[2];
+      if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
+      if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
+      const sat = satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+      uiManager.doSearch(sat.sccNum.toString());
+    } catch (e) {
+      createError(e, 'external-sources.ts');
+    }
   } else {
     // We reached our target server, but it returned an error
     // console.debug('N2YO request returned an error!');

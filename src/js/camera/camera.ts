@@ -23,8 +23,12 @@
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import * as glm from 'gl-matrix';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { Camera, CameraType, DotsManager, DrawManager, ObjectManager, OrbitManager, SatObject, SensorManager, ZoomValue } from '../api/keepTrackTypes';
+import { CameraType, DotsManager, SatObject, ZoomValue } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
+import { DrawManager } from '../drawManager/drawManager';
+import { ObjectManager } from '../objectManager/objectManager';
+import { OrbitManager } from '../orbitManager/orbitManager';
+import { SensorManager } from '../plugins/sensor/sensorManager';
 import { keyDownHandler, keyUpHandler } from './keyHandler';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from './transforms';
 
@@ -45,6 +49,7 @@ export const resetFpsPos = (): void => {
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const fpsMovement = (): void => { // NOSONAR
   const fpsTimeNow = Date.now();
   if (camera.fpsLastTime !== 0) {
@@ -206,12 +211,13 @@ export const camSnap = (pitch: number, yaw: number): void => {
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const snapToSat = (sat: SatObject) => { // NOSONAR
   /* camera function runs every frame that a satellite is selected.
   However, the user might have broken out of the zoom snap or angle snap.
   If so, don't change those targets. */
 
-  if (typeof sat === 'undefined' || sat.static) return;
+  if (typeof sat === 'undefined' || sat === null || sat.static) return;
 
   if (camera.camAngleSnappedOnSat) {
     camera.camSnapToSat.pos = sat.position;
@@ -280,6 +286,7 @@ export const fts2default = (): void => {
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const calculate = (dt: number, isSlowDown: boolean) => { // NOSONAR
   if (camera.isScreenPan || camera.isWorldPan || camera.isPanReset) {
     // If user is actively moving
@@ -499,8 +506,6 @@ export const calculate = (dt: number, isSlowDown: boolean) => { // NOSONAR
       camera.camPitch += camera.camPitchSpeed * dt * settingsManager.cameraDecayFactor;
     }
 
-    console.log(`${camera.camYaw} - ${camera.ecYaw}`);
-
     if (camera.camYaw > camera.ecYaw) {
       camera.camYaw -= camera.camYawSpeed * dt * settingsManager.cameraDecayFactor;
     } else if (camera.camYaw < camera.ecYaw) {
@@ -605,6 +610,7 @@ export const calculate = (dt: number, isSlowDown: boolean) => { // NOSONAR
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const update = (
   target: { id: number; getAltitude: () => number; position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number }; type: SpaceObjectType },
   sensorPos: { lat: number; lon: number; gmst: number; x: number; y: number; z: number }
@@ -815,7 +821,8 @@ export const setCameraType = (val: CameraType) => {
   resetFpsPos();
 };
 
-export const camera: Camera = {
+export type Camera = typeof camera;
+export const camera = {
   _zoomLevel: 0.6925,
   _zoomTarget: 0.6925,
   alt2zoom: alt2zoom,
@@ -939,7 +946,7 @@ export const camera: Camera = {
     }
     return camera._zoomLevel;
   },
-  zoomTarget: (val: number) => {
+  zoomTarget: (val?: number) => {
     if (typeof val !== 'undefined') {
       val = val > 1 ? 1 : val;
       val = val < 0 ? 0 : val;

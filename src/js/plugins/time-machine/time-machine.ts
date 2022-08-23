@@ -1,8 +1,10 @@
 import timeMachinePng from '@app/img/icons/time-machine.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { CatalogManager, GroupsManager, OrbitManager } from '@app/js/api/keepTrackTypes';
 import { ColorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
+import { GroupsManager } from '@app/js/groupsManager/groupsManager';
 import { getEl } from '@app/js/lib/helpers';
+import { OrbitManager } from '@app/js/orbitManager/orbitManager';
+import { CatalogManager } from '@app/js/satSet/satSet';
 import $ from 'jquery';
 
 export const init = (): void => {
@@ -76,19 +78,27 @@ export const orbitManagerInit = (): void => {
     if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
     const yearGroup = groupsManager.createGroup('yearOrLess', year);
     groupsManager.selectGroup(yearGroup);
-    yearGroup.updateOrbits(orbitManager, orbitManager);
+    yearGroup.updateOrbits(orbitManager);
     satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
     if (year >= 59 && year < 100) {
-      keepTrackApi.programs.uiManager.toast(`Time Machine In Year 19${year}!`, 'normal');
+      const timeMachineString = settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`;
+      keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
     } else {
       const yearStr = year < 10 ? `0${year}` : `${year}`;
-      keepTrackApi.programs.uiManager.toast(`Time Machine In Year 20${yearStr}!`, 'normal');
+      const timeMachineString = settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`;
+      keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
     }
 
     if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
-      setTimeout(function () {
-        timeMachineRemoveSatellite(runCount, orbitManager, groupsManager, satSet, colorSchemeManager);
-      }, 10000); // Linger for 10 seconds
+      if (settingsManager.loopTimeMachine) {
+        setTimeout(() => {
+          orbitManager.historyOfSatellitesPlay();
+        }, settingsManager.timeMachineDelay);
+      } else {
+        setTimeout(function () {
+          timeMachineRemoveSatellite(runCount, orbitManager, groupsManager, satSet, colorSchemeManager);
+        }, 10000); // Linger for 10 seconds
+      }
     }
   };
 
@@ -110,7 +120,8 @@ export const orbitManagerInit = (): void => {
         settingsManager.timeMachineDelay * yy,
         orbitManager.historyOfSatellitesRunCount
       );
-      if (year == 20) break;
+      // TODO: year should be dynamically calculated
+      if (year == 22) break;
     }
   };
 };
@@ -132,7 +143,7 @@ export const timeMachineRemoveSatellite = (
 ): void => {
   if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
   if (!orbitManager.isTimeMachineVisible) return;
-  settingsManager.colors.transparent = orbitManager.tempTransColor;
+  settingsManager.colors.transparent = <[number, number, number, number]>orbitManager.tempTransColor;
   orbitManager.isTimeMachineRunning = false;
   groupsManager.clearSelect();
   satSet.setColorScheme(colorSchemeManager.default, true);

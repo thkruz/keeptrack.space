@@ -1,13 +1,26 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { ColorInformation, Pickable, colorSchemeManager } from '../colorSchemeManager';
+
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
-export const ageOfElsetRules = (sat: SatObject): ColorInformation => { // NOSONAR
-  const { timeManager } = keepTrackApi.programs;
-
+// prettier-ignore
+export const ageOfElsetRules = (sat: SatObject, params: any): ColorInformation => { // NOSONAR
+  // Hover and Select code might not pass params, so we will handle that here
+  // TODO: Hover and select code should be refactored to pass params
+  if (!params) {
+    const {timeManager} = keepTrackApi.programs;
+    const now = new Date();
+    params = {
+      jday: timeManager.getDayOfYear(now),
+      year: now.getUTCFullYear().toString().substr(2, 2),
+    };
+  }
+  const jday = params?.jday || 0;
+  const year = params?.year || '';
+  
   // Objects beyond sensor coverage are hidden
   if (sat.static && sat.type === SpaceObjectType.STAR) {
     if (sat.vmag >= 4.7 && colorSchemeManager.objectTypeFlags.starLow) {
@@ -44,10 +57,17 @@ export const ageOfElsetRules = (sat: SatObject): ColorInformation => { // NOSONA
     case SpaceObjectType.LAUNCH_AGENCY:
     case SpaceObjectType.LAUNCH_SITE:
     case SpaceObjectType.LAUNCH_POSITION:
-      return {
-        color: colorSchemeManager.colorTheme.facility,
-        pickable: Pickable.Yes,
-      };
+      if (!settingsManager.isShowAgencies) {        
+        return {
+          color: colorSchemeManager.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }else{
+        return {
+          color: colorSchemeManager.colorTheme.facility,
+          pickable: Pickable.Yes,
+        };
+      }
     default: // Since it wasn't one of those continue on
   }
 
@@ -63,10 +83,7 @@ export const ageOfElsetRules = (sat: SatObject): ColorInformation => { // NOSONA
       pickable: Pickable.No,
     };
   }
-
-  let now = new Date();
-  const jday = timeManager.getDayOfYear(now);
-  const year = now.getUTCFullYear().toString().substr(2, 2);
+  
   let daysold;
   if (sat.TLE1.substr(18, 2) === year) {
     daysold = jday - parseInt(sat.TLE1.substr(20, 3));

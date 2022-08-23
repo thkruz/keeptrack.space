@@ -2,10 +2,12 @@
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { Camera, CatalogManager, GroupsManager, MissileParams, OrbitManager } from '../api/keepTrackTypes';
+import { MissileParams } from '../api/keepTrackTypes';
+import { Camera } from '../camera/camera';
+import { GroupsManager } from '../groupsManager/groupsManager';
 import { getEl } from '../lib/helpers';
+import { CatalogManager } from '../satSet/satSet';
 
-const NUM_SEGS = 255;
 const glBuffers = <WebGLBuffer[]>[];
 const inProgress = <boolean[]>[];
 let pathShader: any;
@@ -86,15 +88,15 @@ export const init = (orbitWorker?: Worker): void => {
 
   selectOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 
   secondaryOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, secondaryOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 
   hoverOrbitBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 
   for (let i = 0; i < satSet.missileSats; i++) {
     glBuffers.push(allocateBuffer());
@@ -103,7 +105,7 @@ export const init = (orbitWorker?: Worker): void => {
     isInit: true,
     orbitFadeFactor: settingsManager.orbitFadeFactor,
     satData: JSON.stringify(satSet.satData),
-    numSegs: NUM_SEGS,
+    numSegs: settingsManager.orbitSegments,
   });
   initialized = true;
 
@@ -151,7 +153,7 @@ export const clearSelectOrbit = (isSecondary: boolean = false): void => {
     currentSelectId = -1;
     gl.bindBuffer(gl.ARRAY_BUFFER, selectOrbitBuf);
   }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 };
 
 export const addInViewOrbit = (satId: number): void => {
@@ -181,6 +183,8 @@ export const clearInViewOrbit = (): void => {
 
 export const setHoverOrbit = (satId: number): void => {
   if (satId === currentHoverId) return;
+
+  // set new hover object
   currentHoverId = satId;
   orbitManager.updateOrbitBuffer(satId);
 };
@@ -190,7 +194,7 @@ export const clearHoverOrbit = (): void => {
   currentHoverId = -1;
 
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 };
 
 export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFramebuffer): boolean => {
@@ -213,11 +217,11 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
   gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
 
   if (settingsManager.isDrawOrbits) {
+    drawGroupObjectOrbit();
+    drawInViewObjectOrbit();
     drawPrimaryObjectOrbit(satSet);
     drawSecondaryObjectOrbit(satSet);
     drawHoverObjectOrbit(satSet);
-    drawGroupObjectOrbit();
-    drawInViewObjectOrbit();
   }
 
   gl.disable(gl.BLEND);
@@ -230,7 +234,7 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
 export const allocateBuffer = () => {
   let buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((NUM_SEGS + 1) * 4), gl.DYNAMIC_DRAW);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
   return buf;
 };
 
@@ -278,7 +282,8 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
   }
 };
 
-export const orbitManager: OrbitManager = {
+export type OrbitManager = typeof orbitManager;
+export const orbitManager = {
   init: init,
   draw: draw,
   orbitWorker: null,
@@ -324,29 +329,29 @@ export const orbitManager: OrbitManager = {
   },
   isTimeMachineRunning: false,
   isTimeMachineVisible: false,
-  tempTransColor: [0, 0, 0, 0],
+  tempTransColor: <[number, number, number, number]>[0, 0, 0, 0],
   historyOfSatellitesPlay: null,
   playNextSatellite: null,
   historyOfSatellitesRunCount: 0,
 };
 const writePathToGpu = (id: number) => {
+  if (id === -1) return; // no hover object
+  if (typeof glBuffers[id] === 'undefined') throw new Error(`orbit buffer ${id} not allocated`);
   gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
   gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(pathShader.aPos);
-  gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+  gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
 };
 const drawPrimaryObjectOrbit = (satSet: CatalogManager) => {
   if (currentSelectId !== -1 && !satSet.getSatExtraOnly(currentSelectId).static) {
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentSelectId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    writePathToGpu(currentSelectId);
   }
 };
 
 const drawGroupObjectOrbit = (): void => {
   if (groupsManager.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+    const { colorSchemeManager } = keepTrackApi.programs;
     // DEBUG: Planned future feature
     // if (sensorManager.currentSensor?.lat) {
     //   groupsManager.selectedGroup.forEach(function (id) {
@@ -365,11 +370,37 @@ const drawGroupObjectOrbit = (): void => {
     //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
     //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
     //     gl.enableVertexAttribArray(pathShader.aPos);
-    //     gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    //     gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
     //   });
     // }
-    gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
+    // gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
     groupsManager.selectedGroup.forEach((id: number) => {
+      if (id === currentHoverId || id === currentSelectId) return; // Skip hover and select objects
+      if (typeof colorSchemeManager.colorData[id * 4] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
+      if (typeof colorSchemeManager.colorData[id * 4 + 1] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
+      if (typeof colorSchemeManager.colorData[id * 4 + 2] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
+      if (typeof colorSchemeManager.colorData[id * 4 + 3] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
+      if (keepTrackApi.programs.objectManager.selectedSat !== id) {
+        // if color is black, we probably have old data, so recalculate color buffers
+        if (colorSchemeManager.colorData[id * 4] <= 0 && colorSchemeManager.colorData[id * 4 + 1] <= 0 && colorSchemeManager.colorData[id * 4 + 2] <= 0) {
+          colorSchemeManager.calculateColorBuffers(true);
+          // Fix: Crued workaround to getting dots to show up when loading with search parameter
+          setTimeout(() => {
+            colorSchemeManager.calculateColorBuffers(true);
+          }, 500);
+        }
+        if (colorSchemeManager.colorData[id * 4 + 3] <= 0) {
+          return; // Skip transparent objects
+          // Debug: This is useful when all objects are supposed to be visible but groups can filter out objects
+          // throw new Error(`color buffer for ${id} isn't visible`);
+        }
+      }
+      gl.uniform4fv(pathShader.uColor, [
+        colorSchemeManager.colorData[id * 4],
+        colorSchemeManager.colorData[id * 4 + 1],
+        colorSchemeManager.colorData[id * 4 + 2],
+        colorSchemeManager.colorData[id * 4 + 3] * settingsManager.orbitGroupAlpha,
+      ]);
       writePathToGpu(id);
     });
   }
@@ -391,21 +422,20 @@ const drawInViewObjectOrbit = (): void => {
 
 const drawHoverObjectOrbit = (satSet: CatalogManager): void => {
   if (currentHoverId !== -1 && currentHoverId !== currentSelectId && !satSet.getSatExtraOnly(currentHoverId).static) {
+    const { colorSchemeManager } = keepTrackApi.programs;
     // avoid z-fighting
+    if (typeof colorSchemeManager.colorData[currentHoverId * 4] === 'undefined') throw new Error(`color buffer for ${currentHoverId} not valid`);
+    if (typeof colorSchemeManager.colorData[currentHoverId * 4 + 1] === 'undefined') throw new Error(`color buffer for ${currentHoverId} not valid`);
+    if (typeof colorSchemeManager.colorData[currentHoverId * 4 + 2] === 'undefined') throw new Error(`color buffer for ${currentHoverId} not valid`);
+    if (typeof colorSchemeManager.colorData[currentHoverId * 4 + 3] === 'undefined') throw new Error(`color buffer for ${currentHoverId} not valid`);
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitHoverColor);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[currentHoverId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    writePathToGpu(currentHoverId);
   }
 };
 
 const drawSecondaryObjectOrbit = (satSet: CatalogManager): void => {
   if (secondarySelectId !== -1 && !satSet.getSatExtraOnly(secondarySelectId).static) {
     gl.uniform4fv(pathShader.uColor, settingsManager.orbitSelectColor2);
-    gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[secondarySelectId]);
-    gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(pathShader.aPos);
-    gl.drawArrays(gl.LINE_STRIP, 0, NUM_SEGS + 1);
+    writePathToGpu(secondarySelectId);
   }
 };

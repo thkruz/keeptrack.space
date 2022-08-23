@@ -1,12 +1,14 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { ColorInformation, Pickable, colorSchemeManager } from '../colorSchemeManager';
+
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
-  const { satSet } = keepTrackApi.programs;
+  const { satSet, dotsManager } = keepTrackApi.programs;
 
   if (sat.static && (sat.type === SpaceObjectType.LAUNCH_FACILITY || sat.type === SpaceObjectType.CONTROL_FACILITY) && colorSchemeManager.objectTypeFlags.facility === false) {
     return {
@@ -26,7 +28,7 @@ export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
     case SpaceObjectType.LAUNCH_SITE:
     case SpaceObjectType.LAUNCH_POSITION:
       // If the facility flag is off then we don't want to show this
-      if (colorSchemeManager.objectTypeFlags.facility === false) {
+      if (colorSchemeManager.objectTypeFlags.facility === false || !settingsManager.isShowAgencies) {
         return {
           color: colorSchemeManager.colorTheme.deselected,
           pickable: Pickable.No,
@@ -100,20 +102,20 @@ export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
       pickable: Pickable.Yes,
     };
   }
-  if (sat.missile && sat.inView === 0) {
+  if (sat.missile && dotsManager.inViewData[sat.id] === 0) {
     return {
       color: colorSchemeManager.colorTheme.missile,
       pickable: Pickable.Yes,
     };
   }
-  if (sat.missile && sat.inView === 1) {
+  if (sat.missile && dotsManager.inViewData[sat.id] === 1) {
     return {
       color: colorSchemeManager.colorTheme.missileInview,
       pickable: Pickable.Yes,
     };
   }
 
-  if (sat.inView === 1 && sat.inSun > 0 && colorSchemeManager.objectTypeFlags.inFOV === true) {
+  if (dotsManager.inViewData[sat.id] === 1 && dotsManager.inSunData[sat.id] > 0 && colorSchemeManager.objectTypeFlags.inFOV === true) {
     if (typeof sat.vmag == 'undefined') {
       return {
         color: colorSchemeManager.colorTheme.deselected,
@@ -126,8 +128,8 @@ export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
     };
   }
 
-  if (sat.inView === 0 && typeof sat.vmag !== 'undefined') {
-    if (sat.inSun == 2 && colorSchemeManager.objectTypeFlags.satHi === true) {
+  if (dotsManager.inViewData[sat.id] === 0 && typeof sat.vmag !== 'undefined') {
+    if (dotsManager.inSunData[sat.id] == 2 && colorSchemeManager.objectTypeFlags.satHi === true) {
       // If vmag is undefined color it like a star
       if (sat.vmag < 3) {
         return {
@@ -149,14 +151,14 @@ export const sunlightRules = (sat: SatObject): ColorInformation => { // NOSONAR
       }
     }
 
-    if (sat.inSun == 1 && colorSchemeManager.objectTypeFlags.satMed === true) {
+    if (dotsManager.inSunData[sat.id] == 1 && colorSchemeManager.objectTypeFlags.satMed === true) {
       return {
         color: colorSchemeManager.colorTheme.penumbral,
         pickable: Pickable.Yes,
       };
     }
 
-    if (sat.inSun == 0 && colorSchemeManager.objectTypeFlags.satLow === true) {
+    if (dotsManager.inSunData[sat.id] == 0 && colorSchemeManager.objectTypeFlags.satLow === true) {
       return {
         color: colorSchemeManager.colorTheme.umbral,
         pickable: Pickable.Yes,

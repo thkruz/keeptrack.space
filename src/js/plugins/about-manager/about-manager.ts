@@ -1,6 +1,7 @@
+import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+
 import aboutPng from '@app/img/icons/about.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 
 export const init = (): void => {
   // Reset Flag
@@ -58,7 +59,8 @@ export const init = (): void => {
               <div class="row">
                 <h5 class="center-align">Featured Users</h5>
                 <div class="col s12">
-                  Used at the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Joint Space Operations Center</a><br>
+                  Used at the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Combined Space Operations Center</a><br>
+                  Displayed in <a style="color: #48f3e3 !important;" href="https://espace.epfl.ch/event/cosmos-archaeology/" target="_blank">Cosmos Archaeology</a> at the University of Lausanne<br>
                   Powering the ESA sponsored <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1 Website</a><br>
                   Used in Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a><br>
                   Shown on <a style="color: #48f3e3 !important;" href="https://www.youtube.com/watch?v=gRhOkDapSGM" target="_blank">HBO's Vice Season 6 Episode 13</a><br>

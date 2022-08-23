@@ -6,12 +6,14 @@ import * as glm from '@app/js/lib/external/gl-matrix.js';
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
 import { mat4 } from 'gl-matrix';
 import { keepTrackApi } from '../api/keepTrackApi';
-import { Camera, SatObject, TimeManager } from '../api/keepTrackTypes';
+import { SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
-import { loadStr } from '../uiManager/uiManager';
+import { Camera } from '../camera/camera';
+import { TimeManager } from '../timeManager/timeManager';
+import { loadStr } from '../uiManager/ui/loadStr';
 import { aehfSccNums, dspSccNums, issSccNum } from './meshManager/modelConstants';
 
-const meshList = [
+const meshList = settingsManager.meshListOverride || [
   'sat2',
   's1u',
   's2u',
@@ -69,8 +71,8 @@ export const init: any = async () => {
       //   console.debug('Mesh:', mesh);
       // }
       meshManager.meshes = models;
-      meshManager.initShaders();
-      meshManager.initBuffers();
+      initShaders();
+      initBuffers();
       meshManager.isReady = true;
       // eslint-disable-next-line no-unused-vars
     }).catch(() => {
@@ -308,6 +310,7 @@ export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: 
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
   try {
     meshManager.currentModel.id = sat?.id || -1;
@@ -370,28 +373,29 @@ export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const getSatelliteModel = (sat: SatObject) => { // NOSONAR
   const { mainCamera, timeManager } = keepTrackApi.programs;
 
   if (checkIfNameKnown(sat.name)) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     return;
   }
 
   if (sat.sccNum === issSccNum) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.iss;
     return;
   }
 
   if (aehfSccNums.findIndex((num) => sat.sccNum == num) !== -1) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.aehf;
     return;
   }
 
   if (dspSccNums.findIndex((num) => sat.sccNum == num) !== -1) {
-    meshManager.updateNadirYaw(mainCamera, sat, timeManager);
+    updateNadirYaw(mainCamera, sat, timeManager);
     meshManager.currentModel.model = meshManager.models.dsp;
     return;
   }
@@ -537,12 +541,12 @@ export const drawOcclusion = (pMatrix: mat4, camMatrix: mat4, occlusionPrgm: any
 
 export const meshManager = {
   isReady: false,
-  init: init,
-  populateFileList: populateFileList,
-  initShaders: initShaders,
-  initBuffers: initBuffers,
-  lerpPosition: lerpPosition,
-  updatePosition: updatePosition,
+  init,
+  populateFileList,
+  initShaders,
+  initBuffers,
+  lerpPosition,
+  updatePosition,
   // main shader program
   fragShaderCode: `#version 300 es
       precision mediump float;
@@ -627,10 +631,10 @@ export const meshManager = {
   mvMatrix: glm.mat4.create(),
   mvMatrixStack: [],
   pMatrix: glm.mat4.create(),
-  draw: draw,
-  updateNadirYaw: updateNadirYaw,
-  update: update,
-  drawOcclusion: drawOcclusion,
+  draw,
+  updateNadirYaw,
+  update,
+  drawOcclusion,
   shaderProgram: null,
   fileList: null,
   loaded: false,

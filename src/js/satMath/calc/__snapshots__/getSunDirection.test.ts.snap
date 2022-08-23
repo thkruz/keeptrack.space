@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`satMath.getSunDirection 0 1`] = `
+Array [
+  148724320.43455538,
+  6189145.714033483,
+  14909516.932049064,
+]
+`;
+
+exports[`satMath.getSunDirection 1 1`] = `
+Array [
+  1306788.4922269185,
+  -120881774.59456515,
+  -88121572.7460775,
+]
+`;

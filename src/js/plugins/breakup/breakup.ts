@@ -1,7 +1,8 @@
+import breakupPng from '@app/img/icons/breakup.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
+import { createError } from '@app/js/errorManager/errorManager';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
-import breakupPng from '@app/img/icons/breakup.png';
 
 let isBreakupMenuOpen = false;
 
@@ -35,7 +36,9 @@ export const init = (): void => {
 
 export const uiManagerInit = (): void => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
         <div id="breakup-content" class="side-menu">
           <div class="row">
@@ -112,10 +115,13 @@ export const uiManagerInit = (): void => {
           </div>
         </div>
       </div>   
-    `));
+    `
+  );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
       <div id="menu-breakup" class="bmenu-item bmenu-item-disabled">
         <img
           alt="breakup"
@@ -124,8 +130,8 @@ export const uiManagerInit = (): void => {
         <span class="bmenu-title">Breakup</span>
         <div class="status-icon"></div>
       </div>
-    `));
-
+    `
+  );
 
   clickAndDragWidth(getEl('breakup-menu'));
 };
@@ -137,8 +143,9 @@ export const uiManagerFinal = (): void => {
   });
 };
 
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const breakupOnSubmit = (): void => { // NOSONAR
   const { orbitManager, satellite, timeManager, uiManager, satSet } = keepTrackApi.programs;
   let satId = satSet.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('hc-scc')).value));
@@ -191,6 +198,11 @@ export const breakupOnSubmit = (): void => { // NOSONAR
     const newAlt = mainsat.apogee - mainsat.perigee < 300 ? 0 : TEARR.alt; // Ignore argument of perigee for round orbits OPTIMIZE
     let iTLEs = satellite.getOrbitByLatLon(sat, launchLat, launchLon, upOrDown, simulationTimeObj, newAlt, rascOffset);
 
+    if (iTLEs[0] === 'Error') {
+      createError(new Error(iTLEs[1]), 'breakup.ts');
+      return;
+    }
+
     let iTLE1 = iTLEs[0];
     let iTLE2 = iTLEs[1];    
     for (; i < (rascIterat + 1) * breakupCount / 4; i++) {
@@ -198,7 +210,8 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       // Inclination
       let inc = parseFloat(TLE2.substr(8, 8));
       inc = inc + Math.random() * incVariation * 2 - incVariation;
-      const incStr = stringPad.pad0(inc.toPrecision(7), 8);
+      const incStr = stringPad.pad0(inc.toFixed(4), 8);
+      if (incStr.length !== 8) throw new Error(`Inclination length is not 8 - ${incStr} - ${TLE2}`);
 
       // Ecentricity
       sat.eccentricity = origEcc;
@@ -207,11 +220,17 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       // Mean Motion
       let meanmo = parseFloat(iTLE2.substr(52, 10));
       meanmo = meanmo + Math.random() * meanmoVariation * 2 - meanmoVariation;
-      const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
+      // const meanmoStr = stringPad.pad0(meanmo.toPrecision(10), 8);
+      const meanmoStr = stringPad.pad0(meanmo.toFixed(8), 11);
+      if (meanmoStr.length !== 11) throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTLE2}`);
 
       satId = satSet.getIdFromObjNum(80000 + i);
       iTLE1 = `1 ${80000 + i}` + iTLE1.substr(7);
       iTLE2 = `2 ${80000 + i} ${incStr} ${iTLE2.substr(17, 35)}${meanmoStr}${iTLE2.substr(63)}`;
+
+      if (iTLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${iTLE1}`);
+      if (iTLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${iTLE2}`);
+
       sat = satSet.getSat(satId);
       sat.TLE1 = iTLE1;
       sat.TLE2 = iTLE2;
@@ -231,7 +250,7 @@ export const breakupOnSubmit = (): void => { // NOSONAR
     }
   }
 
-  uiManager.doSearch(`${mainsat.sccNum},Analyst Sat`);
+  uiManager.doSearch(`${mainsat.sccNum},Analyst`);
 };
 
 export const hideSideMenus = (): void => {
@@ -239,6 +258,8 @@ export const hideSideMenus = (): void => {
   getEl('menu-breakup').classList.remove('bmenu-item-selected');
   isBreakupMenuOpen = false;
 };
+
+// prettier-ignore
 export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-breakup') {
     const { uiManager, satSet, objectManager } = keepTrackApi.programs;

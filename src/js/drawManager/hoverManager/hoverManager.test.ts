@@ -293,6 +293,7 @@ describe('hoverManager.updateHover', () => {
     settingsManager.lowPerf = false;
     keepTrackApi.programs.searchBox.isResultBoxOpen = () => true;
     keepTrackApi.programs.mainCamera.isDragging = false;
+    keepTrackApi.programs.uiManager.uiInput.mouseSat = 0;
     settingsManager.isMobileModeEnabled = false;
     keepTrackApi.programs.satSet.satData[0] = { ...defaultSat, type: SpaceObjectType.STAR };
     hoverManager.updateHover();

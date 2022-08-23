@@ -24,9 +24,15 @@ export const catalogLoader = async (): Promise<void> => {
 
   try {
     let extraSats: any = [];
-    if (settingsManager.offline) {
-      $.get(`${settingsManager.installDirectory}tle/extra.json`).then((resp) => {
-        extraSats = JSON.parse(resp);
+    if (settingsManager.offline && !settingsManager.isDisableExtraCatalog) {
+      fetch(`${settingsManager.installDirectory}tle/extra.json`).then((resp) => {
+        if (resp.ok) {
+          resp.json().then((data) => {
+            extraSats = data;
+          });
+        } else {
+          console.log('Error loading extra.json');
+        }
       });
     }
 
@@ -104,6 +110,7 @@ export const setupGetVariables = () => {
   return limitSatsArray;
 };
 
+// prettier-ignore
 export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[]) => { // NOSONAR
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
@@ -135,11 +142,13 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
         rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
         resp[i].intlDes = year + '-' + rest;
       }
-      resp[i].id = i;
       satSet.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
       satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
       resp[i].active = true;
-      tempSatData.push(resp[i]);
+      if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
+        resp[i].id = tempSatData.length;
+        tempSatData.push(resp[i]);
+      }
     } else {
       // If there are limited satellites
       for (let x = 0; x < limitSatsArray.length; x++) {
@@ -274,7 +283,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
     }
   }
 
-  satSet.orbitalSats = tempSatData.length;
+  satSet.orbitalSats = tempSatData.length + settingsManager.maxAnalystSats;
   dotsManager.starIndex1 = objectManager.starIndex1 + satSet.orbitalSats;
   dotsManager.starIndex2 = objectManager.starIndex2 + satSet.orbitalSats;
 

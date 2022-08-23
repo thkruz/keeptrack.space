@@ -1,15 +1,16 @@
-import * as satellite from 'satellite.js';
+import * as Ootk from 'ootk';
 import { SensorObjectCruncher } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 
 // //////////////////////////////////////////////////////////////////////////////
 // Typing
 // //////////////////////////////////////////////////////////////////////////////
-export interface SatCacheObject extends satellite.SatRec {
+
+export interface SatCacheObject extends Ootk.SatelliteRecord {
   dec: number;
   ra: number;
   id?: number;
-  isimp: boolean;
+  isimp: number;
   apogee: number;
   isRadarData: any;
   static: boolean;
@@ -40,16 +41,16 @@ export type oneOrZero = 0 | 1;
 // Code
 // //////////////////////////////////////////////////////////////////////////////
 export const defaultGd = {
-  latitude: <number | null>null,
-  longitude: 0,
-  height: 0,
+  lat: <number | null>null,
+  lon: 0,
+  alt: 0,
 };
 
 export const emptySensor: SensorObjectCruncher = {
   observerGd: {
-    latitude: null,
-    longitude: 0,
-    height: 0,
+    lat: null,
+    lon: 0,
+    alt: 0,
   },
   alt: null,
   country: '',
@@ -69,10 +70,12 @@ export const emptySensor: SensorObjectCruncher = {
   zoom: '',
 };
 
+type Radians = number;
+
 export type RangeAzEl = {
-  azimuth: satellite.Radians;
-  elevation: satellite.Radians;
-  rangeSat: number;
+  az: Radians;
+  el: Radians;
+  rng: number;
 };
 
 export interface PositionCruncherIncomingMsg {

@@ -1,4 +1,4 @@
-import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
+import { KeepTrackPrograms, SensorObject } from '@app/js/api/keepTrackTypes';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as sensor from './sensor';
@@ -132,7 +132,7 @@ describe('sensor.bottomMenuClick', () => {
   });
 
   test('4', () => {
-    keepTrackApi.programs.sensorManager.selectedSensor = {
+    keepTrackApi.programs.sensorManager.selectedSensor = <SensorObject>{
       lat: 0,
       lon: 0,
       alt: 0,

@@ -66,7 +66,7 @@ describe('ObjectManager Unit Tests', () => {
     expect(objectManager.extractCountry('CA')).toBe('Canada');
     expect(objectManager.extractCountry('CHBZ')).toBe('China/Brazil');
     expect(objectManager.extractCountry('CHLE')).toBe('Chile');
-    expect(objectManager.extractCountry('CIS')).toBe('Commonwealth of Ind States');
+    expect(objectManager.extractCountry('CIS')).toBe('USSR/Russia');
     expect(objectManager.extractCountry('COL')).toBe('Colombia');
     expect(objectManager.extractCountry('CZCH')).toBe('Czechoslovakia');
     expect(objectManager.extractCountry('DEN')).toBe('Denmark');

@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "6.0.3",
+  "version": "7.0.0",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -25,6 +25,7 @@
     "build": "node ./scripts/build.mjs production",
     "build:watch": "node ./scripts/build.mjs development --watch",
     "build:embed": "node ./scripts/buildEmbed.mjs embed",
+    "build:embedDev": "node ./scripts/buildEmbed.mjs embedDev",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs",
     "cypress:open": "cypress open",
     "lcov": "node ./scripts/openLcov.mjs",
@@ -32,7 +33,7 @@
     "start": "npx serve ./dist -l 8080",
     "start:ci": "npx serve ./dist -l 8080",
     "start:ci2": "http-server --entry-file=dist/index.html",
-    "start:embed": "npx serve ./embedded -l 8080",
+    "start:embed": "npx serve ./embed -l 8080",
     "test": "jest --coverage",
     "test:unit": "jest --coverage --forceExit",
     "test:e2e-ci": "cypress run",
@@ -43,53 +44,6 @@
     "prepare": "husky install"
   },
   "chromium-args": "--enable-threaded-compositing",
-  "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.[t|j]sx?$": "babel-jest"
-    },
-    "testMatch": [
-      "**/?(*.)+(spec|test).?(m)[jt]s?(x)"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "mjs",
-      "ts"
-    ],
-    "setupFiles": [
-      "jest-canvas-mock",
-      "<rootDir>/test/polyfills.js",
-      "<rootDir>/test/test-env.js",
-      "<rootDir>/test/test-env-mocks.js"
-    ],
-    "coverageDirectory": "<rootDir>/coverage",
-    "moduleDirectories": [
-      "node_modules",
-      "offline"
-    ],
-    "modulePathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/offline/",
-      "<rootDir>/dist/",
-      "<rootDir>/src/admin/"
-    ],
-    "moduleNameMapper": {
-      "\\.(css|less|sass|scss)$": "<rootDir>/scripts/styleMock.js",
-      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/scripts/fileMock.js",
-      "@app(.*)$": "<rootDir>/src/$1"
-    },
-    "coverageReporters": [
-      "lcov",
-      "html",
-      "text"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/src/js/lib/external/",
-      "/test/",
-      "/dist/"
-    ]
-  },
   "nyc": {
     "report-dir": "coverage/integration",
     "reporter": [
@@ -121,23 +75,23 @@
     "@babel/plugin-proposal-private-methods": "^7.16.5",
     "@babel/plugin-transform-modules-commonjs": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
-    "@babel/preset-typescript": "^7.16.5",
+    "@babel/preset-typescript": "^7.18.6",
     "@testing-library/dom": "^8.11.3",
     "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/user-event": "^13.5.0",
     "@types/agent-base": "^4.2.2",
-    "@types/jest": "^27.4.1",
-    "@types/jquery": "^3.5.10",
+    "@types/jest": "^27.5.2",
+    "@types/jquery": "^3.5.14",
     "@types/jquery.colorbox": "^1.4.32",
     "@types/jqueryui": "^1.12.16",
     "@types/materialize-css": "^1.0.11",
     "@types/node": "^17.0.21",
     "@types/numeric": "^1.2.2",
     "@types/webgl2": "^0.0.6",
-    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.12.1",
     "auto-changelog-thkruz": "^1.0.0",
-    "babel-loader": "^8.2.2",
+    "babel-loader": "^8.2.5",
     "babel-plugin-istanbul": "^6.0.0",
     "child_process": "^1.0.2",
     "clean-terminal-webpack-plugin": "^3.0.0",
@@ -145,40 +99,40 @@
     "copy-dir": "^1.3.0",
     "coverage-istanbul-loader": "^3.0.5",
     "cross-env": "^7.0.3",
-    "css-loader": "^6.2.0",
-    "cypress": "^9.5.0",
+    "css-loader": "^6.7.1",
+    "cypress": "^9.7.0",
     "download-file": "^0.1.5",
-    "eslint": "^8.5.0",
+    "eslint": "^8.20.0",
     "eslint-plugin-jest": "^25.7.0",
     "gh-pages": "^3.1.0",
     "html-webpack-plugin": "^5.3.1",
-    "http-server": "^14.1.0",
-    "husky": "^7.0.4",
+    "http-server": "^14.1.1",
+    "husky": "^8.0.1",
     "ignore-loader": "^0.1.2",
-    "imports-loader": "^3.0.0",
-    "jest": "^27.3.1",
+    "imports-loader": "^3.1.1",
+    "jest": "^27.5.1",
     "jest-canvas-mock": "^2.3.1",
     "jsdom": "^19.0.0",
     "jsdom-worker": "^0.2.1",
     "mini-css-extract-plugin": "^2.6.0",
     "mkdirp": "^1.0.4",
     "opener": "^1.5.2",
-    "ponicode": "^0.61.3",
+    "ponicode": "^0.70.11",
     "prettier": "2.6.2",
     "prettier-plugin-organize-imports": "^2.3.4",
-    "retire": "^3.0.3",
-    "serve": "^13.0.2",
+    "retire": "^3.0.7",
+    "serve": "^13.0.4",
     "source-map-loader": "^3.0.0",
     "start-server-and-test": "^1.14.0",
     "style-loader": "^3.0.0",
-    "ts-loader": "^9.2.3",
-    "typescript": "^4.5.4",
+    "ts-loader": "^9.3.1",
+    "typescript": "^4.7.4",
     "webgl-mock": "^0.1.7",
-    "webpack": "^5.11.0",
-    "webpack-cli": "^4.2.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.7.4",
-    "webpackbar": "^5.0.0-3",
-    "worker-loader": "^3.0.7"
+    "webpackbar": "^5.0.2",
+    "worker-loader": "^3.0.8"
   },
   "dependencies": {
     "@materializecss/materialize": "^1.1.0-alpha",
@@ -187,18 +141,20 @@
     "draggy": "^1.6.6",
     "echarts": "^5.3.2",
     "echarts-gl": "^2.0.9",
+    "eruda": "^2.5.0",
+    "eruda-fps": "^2.0.0",
     "file-saver": "^2.0.5",
     "gl-matrix": "^3.3.0",
     "gremlins.js": "^2.2.0",
     "jquery": "^3.6.0",
     "jquery-ui-bundle": "^1.12.1-migrate",
     "meeusjs": "^1.0.4",
+    "new-github-issue-url": "^1.0.0",
     "node-fetch": "^3.1.0",
     "numeric": "^1.2.6",
-    "ootk": "^1.0.4",
+    "ootk": "^1.6.0",
     "resizable": "^1.2.1",
-    "satellite.js": "^4.1.3",
-    "ts-node": "^10.4.0",
+    "ts-node": "^10.9.1",
     "urlon": "^3.1.0"
   }
 }

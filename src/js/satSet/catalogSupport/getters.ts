@@ -8,7 +8,7 @@ import { addSatExtraFunctions } from '../satSet';
 export const getSatVel = () => (keepTrackApi.programs.dotsManager.velocityData ? keepTrackApi.programs.dotsManager.velocityData : new Float32Array());
 export const getSatInView = () => (keepTrackApi.programs.dotsManager.inViewData ? keepTrackApi.programs.dotsManager.inViewData : new Int8Array());
 export const getSatInSun = () => (keepTrackApi.programs.dotsManager.inSunData ? keepTrackApi.programs.dotsManager.inSunData : new Int8Array());
-export const getSatExtraOnly = (i: number): SatObject => {
+export const getSatExtraOnly = (i: number): SatObject | null => {
   const { satSet } = keepTrackApi.programs;
   return !satSet.satData || !satSet.satData[i] ? null : satSet.satData[i];
 };
@@ -34,7 +34,7 @@ export const getSensorFromSensorName = (sensorName: string): number => {
     (object: SatObject) => (object?.static && !object?.missile && object?.type !== SpaceObjectType.STAR ? object.name === sensorName : false) // Test
   );
 };
-export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos: { x: number; y: number; z: number }) => {
+export const getScreenCoords = (i: number, pMatrix: mat4, camMatrix: mat4, pos?: { x: number; y: number; z: number }) => {
   const screenPos = { x: 0, y: 0, z: 0, error: false };
   try {
     const { satSet } = keepTrackApi.programs;
@@ -69,14 +69,6 @@ export const getIdFromObjNum = (objNum: number, isExtensiveSearch = true): numbe
   }
   return null;
 };
-export const getSatInViewOnly = (i: number): SatObject => {
-  const { dotsManager, satSet } = keepTrackApi.programs;
-  if (!satSet.satData) return null;
-  if (!satSet.satData[i]) return null;
-
-  satSet.satData[i].inView = dotsManager.inViewData[i];
-  return satSet.satData[i];
-};
 export const getSatPosOnly = (i: number): SatObject => {
   const { dotsManager, satSet } = keepTrackApi.programs;
   if (!satSet.satData) return null;
@@ -108,26 +100,14 @@ export const getIdFromEci = (eci: { x: number; y: number; z: number }): number =
   }
   return -1;
 };
+
+// prettier-ignore
 export const getSat = (i: number): SatObject => { // NOSONAR
   const { satSet } = keepTrackApi.programs;
   if (!satSet.satData || !satSet.satData[i]) return null;
   const { dotsManager } = keepTrackApi.programs;
 
-  if (satSet.gotExtraData) {
-    satSet.satData[i].inViewChange = false;
-    if (typeof dotsManager.inViewData != 'undefined' && typeof dotsManager.inViewData[i] != 'undefined') {
-      if (satSet.satData[i].inView !== dotsManager.inViewData[i]) satSet.satData[i].inViewChange = true;
-      satSet.satData[i].inView = dotsManager.inViewData[i];
-    } else {
-      satSet.satData[i].inView = 0;
-      satSet.satData[i].inViewChange = false;
-    }
-
-    if (typeof dotsManager.inSunData != 'undefined' && typeof dotsManager.inSunData[i] != 'undefined') {
-      if (satSet.satData[i].inSun !== dotsManager.inSunData[i]) satSet.satData[i].inSunChange = true;
-      satSet.satData[i].inSun = dotsManager.inSunData[i];
-    }
-
+  if (satSet.gotExtraData && dotsManager.velocityData) {
     satSet.satData[i].velocity ??= { total: 0, x: 0, y: 0, z: 0 };
 
     // TODO: This is to accomadate the old end of world .json files that used velocity = 0

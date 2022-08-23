@@ -1,7 +1,7 @@
 import 'jquery-ui-bundle';
 import { defaultSat, defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { KeepTrackPrograms, SatObject } from '../../api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject, SunStatus } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import * as satInfoboxCore from './satInfoboxCore';
 
@@ -75,7 +75,7 @@ describe('satInfoboxCore.orbitalData', () => {
         type: SpaceObjectType.MECHANICAL,
       },
     };
-    let result: any = satInfoboxCore.orbitalData({ isInSun: () => true, ...defaultSat });
+    let result: any = satInfoboxCore.orbitalData({ isInSun: () => SunStatus.UMBRAL, ...defaultSat });
     expect(result).toMatchSnapshot();
   });
 
@@ -88,7 +88,7 @@ describe('satInfoboxCore.orbitalData', () => {
         type: SpaceObjectType.OPTICAL,
       },
     };
-    let result: any = satInfoboxCore.orbitalData({ isInSun: () => true, ...defaultSat });
+    let result: any = satInfoboxCore.orbitalData({ isInSun: () => SunStatus.SUN, ...defaultSat });
     expect(result).toMatchSnapshot();
   });
 });

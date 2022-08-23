@@ -194,7 +194,7 @@ describe('watchlist.infoOverlayContentClick', () => {
   test('0', () => {
     const callFunction: any = () => {
       watchlist.infoOverlayContentClick({
-        currentTarget: {
+        target: {
           textContent: '25544:25544',
         },
       });
@@ -217,6 +217,7 @@ describe('watchlist.watchlistListClick', () => {
 describe('watchlist.watchlistContentEvent', () => {
   test('0', () => {
     const callFunction: any = () => {
+      document.body.innerHTML = '<input id="watchlist-new" value="25544:25544" />';
       watchlist.watchlistContentEvent(new Event('submit'), 25544);
     };
 
@@ -443,7 +444,7 @@ describe('watchlist.watchlistListClick', () => {
 
   test('3', () => {
     const callFunction: any = () => {
-      watchlist.watchlistListClick(12345);
+      watchlist.watchlistListClick(11);
     };
 
     expect(callFunction).not.toThrow();
@@ -451,7 +452,7 @@ describe('watchlist.watchlistListClick', () => {
 
   test('4', () => {
     const callFunction: any = () => {
-      watchlist.watchlistListClick(987650);
+      watchlist.watchlistListClick(5);
     };
 
     expect(callFunction).not.toThrow();
@@ -459,7 +460,7 @@ describe('watchlist.watchlistListClick', () => {
 
   test('5', () => {
     const callFunction: any = () => {
-      watchlist.watchlistListClick(-Infinity);
+      watchlist.watchlistListClick(25544);
     };
 
     expect(callFunction).not.toThrow();

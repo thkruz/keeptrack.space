@@ -1,10 +1,14 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
 export const updateDateTime = (date: Date) => {
   const { timeManager } = keepTrackApi.programs;
-  $('#datetime-input-tb').datepicker('setDate', date);
+  const dateTimeInputTbDOM = $('#datetime-input-tb');
+  // TODO: remove this check when jest is fixed
+  if (dateTimeInputTbDOM && !isThisJest()) {
+    dateTimeInputTbDOM.datepicker('setDate', date);
+  }
   timeManager.synchronize();
 };
 export const init = (): void => {
@@ -94,12 +98,19 @@ export const uiManagerFinal = () => {
 };
 
 export const datetimeInputFormChange = (jestOverride?: Date) => {
-  const { timeManager, uiManager } = keepTrackApi.programs;
-  const selectedDate = $('#datetime-input-tb').datepicker('getDate') || jestOverride;
+  const { timeManager, uiManager, satSet } = keepTrackApi.programs;
+  let selectedDate: Date;
+
+  if (!jestOverride) {
+    selectedDate = $('#datetime-input-tb').datepicker('getDate');
+  } else {
+    selectedDate = jestOverride;
+  }
   const today = new Date();
   const jday = timeManager.getDayOfYear(timeManager.simulationTimeObj);
   $('#jday').html(jday);
   timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime());
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
   timeManager.calculateSimulationTime();
   // Reset last update times when going backwards in time
   settingsManager.lastBoxUpdateTime = timeManager.realTime;

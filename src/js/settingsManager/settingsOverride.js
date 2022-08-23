@@ -24,6 +24,7 @@ const settingsManagerOverride = {
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
   plugins: {
+    debug: true,
     satInfoboxCore: true,
     updateSelectBoxCore: true,
     aboutManager: true,

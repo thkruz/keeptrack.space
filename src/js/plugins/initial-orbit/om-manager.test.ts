@@ -1,7 +1,7 @@
 /* eslint-disable no-undefined */
-import { keepTrackApiStubs } from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/keepTrackApi';
-import { KeepTrackPrograms } from '../../api/keepTrackTypes';
+import { defaultSat, keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import { omManager, _arctan2, _dayOfYear, _jday, _pad0, _propagate, _sv2kp } from './om-manager';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
@@ -18,7 +18,7 @@ describe('omManager._jday', () => {
 
   test('1', () => {
     let callFunction = () => {
-      _jday(10, 0.0, 0, 10, 'December', -10);
+      _jday(10, 0.0, 0, 10, 10, -10);
     };
 
     expect(callFunction).not.toThrow();
@@ -26,7 +26,7 @@ describe('omManager._jday', () => {
 
   test('2', () => {
     let callFunction = () => {
-      _jday(1, 1, 29, 0, 'December', 0.0);
+      _jday(1, 1, 29, 0, 10, 0.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -120,7 +120,7 @@ describe('omManager._dayOfYear', () => {
 
   test('1', () => {
     let callFunction = () => {
-      _dayOfYear(-1, 28, 0, 'December', 10.0);
+      _dayOfYear(-1, 28, 0, 10, 10.0);
     };
 
     expect(callFunction).not.toThrow();
@@ -136,7 +136,7 @@ describe('omManager._dayOfYear', () => {
 
   test('3', () => {
     let callFunction = () => {
-      _dayOfYear(0, 0, 0.0, 'July', 10);
+      _dayOfYear(0, 0, 0.0, 10, 10);
     };
 
     expect(callFunction).not.toThrow();
@@ -163,7 +163,7 @@ describe('omManager._dayOfYear', () => {
 describe('omManager._pad0', () => {
   test('0', () => {
     let callFunction = () => {
-      _pad0({ length: 10 }, -1);
+      _pad0('5', 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -171,7 +171,7 @@ describe('omManager._pad0', () => {
 
   test('1', () => {
     let callFunction = () => {
-      _pad0({ length: 0 }, 1);
+      _pad0('6', 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -179,7 +179,7 @@ describe('omManager._pad0', () => {
 
   test('2', () => {
     let callFunction = () => {
-      _pad0({ length: 64 }, 100);
+      _pad0('8', 100);
     };
 
     expect(callFunction).not.toThrow();
@@ -187,7 +187,7 @@ describe('omManager._pad0', () => {
 
   test('3', () => {
     let callFunction = () => {
-      _pad0({ length: 256 }, 1);
+      _pad0('25', 1);
     };
 
     expect(callFunction).not.toThrow();
@@ -195,7 +195,7 @@ describe('omManager._pad0', () => {
 
   test('4', () => {
     let callFunction = () => {
-      _pad0({ length: 64 }, 0);
+      _pad0('12', 0);
     };
 
     expect(callFunction).not.toThrow();
@@ -277,92 +277,15 @@ describe('omManager._sv2kp', () => {
 // @ponicode
 describe('omManager._propagate', () => {
   test('0', async () => {
-    await _propagate(
-      410,
-      100,
-      {
-        getUTCMonth: () => 1,
-        getUTCMilliseconds: () => 520,
-        getUTCFullYear: () => true,
-        getUTCDate: () => '01-13-2020',
-        getUTCHours: () => 56784,
-        getUTCMinutes: () => 75,
-        getUTCSeconds: () => 243,
-      },
-      { twoline2satrec: () => 'Nile Crocodile', sgp4: () => 100 }
-    );
+    await _propagate(defaultSat.TLE1, defaultSat.TLE2, new Date(2022, 0, 1), { twoline2satrec: () => 'Nile Crocodile', sgp4: () => 100 });
   });
 
   test('1', async () => {
-    await _propagate(
-      380,
-      1,
-      {
-        getUTCMonth: () => 28,
-        getUTCMilliseconds: () => 380,
-        getUTCFullYear: () => false,
-        getUTCDate: () => '32-01-2020',
-        getUTCHours: () => 'fakeData',
-        getUTCMinutes: () => 75,
-        getUTCSeconds: () => 161,
-      },
-      { twoline2satrec: () => 'Spectacled Caiman', sgp4: () => -100 }
-    );
+    await _propagate(defaultSat.TLE1, defaultSat.TLE2, new Date(2022, 0, 1), { twoline2satrec: () => 'Spectacled Caiman', sgp4: () => -100 });
   });
 
   test('2', async () => {
-    await _propagate(
-      100,
-      -5.48,
-      {
-        getUTCMonth: () => 0,
-        getUTCMilliseconds: () => 410,
-        getUTCFullYear: () => false,
-        getUTCDate: () => '01-13-2020',
-        getUTCHours: () => 987650,
-        getUTCMinutes: () => 5,
-        getUTCSeconds: () => 161,
-      },
-      { twoline2satrec: () => 'Saltwater Crocodile', sgp4: () => 0 }
-    );
-  });
-
-  test('3', async () => {
-    await _propagate(
-      320,
-      -5.48,
-      {
-        getUTCMonth: () => 3,
-        getUTCMilliseconds: () => 30,
-        getUTCFullYear: () => true,
-        getUTCDate: () => '01-01-2030',
-        getUTCHours: () => 'fakeData',
-        getUTCMinutes: () => 25,
-        getUTCSeconds: () => 241,
-      },
-      { twoline2satrec: () => 'Nile Crocodile', sgp4: () => -5.48 }
-    );
-  });
-
-  test('4', async () => {
-    await _propagate(
-      100,
-      -100,
-      {
-        getUTCMonth: () => 0,
-        getUTCMilliseconds: () => 320,
-        getUTCFullYear: () => false,
-        getUTCDate: () => '32-01-2020',
-        getUTCHours: () => 'fakeData',
-        getUTCMinutes: () => 75,
-        getUTCSeconds: () => 127,
-      },
-      { twoline2satrec: () => 'Saltwater Crocodile', sgp4: () => -100 }
-    );
-  });
-
-  test('5', async () => {
-    await _propagate(-Infinity, -Infinity, {}, undefined);
+    await _propagate(defaultSat.TLE1, defaultSat.TLE2, new Date(2022, 0, 1), { twoline2satrec: () => 'Saltwater Crocodile', sgp4: () => 0 });
   });
 });
 

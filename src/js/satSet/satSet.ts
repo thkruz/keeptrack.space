@@ -29,7 +29,8 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
 import numeric from 'numeric';
-import { CatalogManager, InView, Lla, Rae, SatObject, SensorObject } from '../api/keepTrackTypes';
+import { EciVec3 } from 'ootk';
+import { InView, Lla, Rae, SatObject, SensorObject, SunStatus } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
 import { getEl, stringPad } from '../lib/helpers';
@@ -45,7 +46,6 @@ import {
   getSatFromObjNum,
   getSatInSun,
   getSatInView,
-  getSatInViewOnly,
   getSatPosOnly,
   getSatVel,
   getScreenCoords,
@@ -58,6 +58,7 @@ import { search } from './search';
 
 // ******************** Initialization ********************
 
+// prettier-ignore
 export const init = async (satCruncherOveride?: any): Promise<number> => { // NOSONAR
   try {
     const { uiManager } = keepTrackApi.programs;
@@ -121,6 +122,8 @@ export const init = async (satCruncherOveride?: any): Promise<number> => { // NO
 };
 export const insertNewAnalystSatellite = (TLE1: string, TLE2: string, id: number, sccNum?: string): any => {
   const { satellite, timeManager, orbitManager, uiManager } = keepTrackApi.programs;
+  if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
+  if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
   if (satellite.altitudeCheck(TLE1, TLE2, timeManager.simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',
@@ -175,19 +178,22 @@ export const setHover = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lasthoveringSat !== -1 && objectManager.lasthoveringSat !== objectManager.selectedSat) {
-    gl.bufferSubData(
-      gl.ARRAY_BUFFER,
-      objectManager.lasthoveringSat * 4 * 4,
-      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color)
-    );
+    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lasthoveringSat)).color;
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4] = newColor[0]; // R
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 1] = newColor[1]; // G
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 2] = newColor[2]; // B
+    colorSchemeManager.colorData[objectManager.lasthoveringSat * 4 + 3] = newColor[3]; // A
+
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lasthoveringSat * 4 * 4, new Float32Array(newColor));
   }
-  // If New Select Sat Picked Color it
+  // If New Hover Sat Picked Color it
   if (objectManager.hoveringSat !== -1 && objectManager.hoveringSat !== objectManager.selectedSat) {
     gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
   }
   objectManager.setLasthoveringSat(objectManager.hoveringSat);
 };
 export const selectSat = (i: number): void => {
+  if (settingsManager.isDisableSelectSat) return;
   const { sensorManager, objectManager, uiManager, colorSchemeManager } = keepTrackApi.programs;
   const { gl } = keepTrackApi.programs.drawManager;
   if (i === objectManager.lastSelectedSat()) return;
@@ -216,11 +222,12 @@ export const selectSat = (i: number): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
   if (objectManager.lastSelectedSat() !== -1) {
-    gl.bufferSubData(
-      gl.ARRAY_BUFFER,
-      objectManager.lastSelectedSat() * 4 * 4,
-      new Float32Array(colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color)
-    );
+    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color;
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4] = newColor[0]; // R
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 1] = newColor[1]; // G
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 2] = newColor[2]; // B
+    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 3] = newColor[3]; // A
+    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(newColor));
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
@@ -288,12 +295,14 @@ export const mergeSat = (sat: SatObject): void => {
 export const replaceSatSet = (newSatSet: any) => {
   satSet = newSatSet;
 };
+
+// prettier-ignore
 export const addSatExtraFunctions = (i: number) => { // NOSONAR
   const { sensorManager, satellite, timeManager, objectManager } = keepTrackApi.programs;
   if (typeof satSet.satData[i].isInSun == 'undefined') {
-    satSet.satData[i].isInSun = () => {
+    satSet.satData[i].isInSun = (): SunStatus => {
       // TODO: Implement enums for the return values
-      if (typeof satSet.satData[i].position == 'undefined') return -1;
+      if (typeof satSet.satData[i].position == 'undefined') return SunStatus.UNKNOWN;
 
       // Distances all in km
       // satSet.sunECI is updated by drawManager every draw frame
@@ -341,36 +350,18 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
                   Math.pow(-satSet.satData[i].position.z + sunECI.z, 2)
               ))
         ) * RAD2DEG;
-
-      // NOTE:
-      // !isSun && !isUmbral
-      if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
-        // isUmbral
-        return 0;
+      
+      if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {        
+        return SunStatus.UMBRAL;
       }
 
-      // !isPenumbral
-      if (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun) {
-        // NOTE:
-        // isPenumbral
-        return 1;
+      if ((semiDiamSun > semiDiamEarth) || 
+          (theta < semiDiamSun - semiDiamEarth) || 
+          (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun)) {
+        return SunStatus.PENUMBRAL;
       }
 
-      if (semiDiamSun > semiDiamEarth) {
-        // NOTE:
-        // isPenumbral
-        return 1;
-      }
-
-      if (theta < semiDiamSun - semiDiamEarth) {
-        // NOTE:
-        // isPenumbral
-        return 1;
-      }
-
-      // NOTE:
-      // !isUmbral && !isPenumbral && isSun
-      return 2;
+      return SunStatus.SUN;
     };
   }
   if (typeof satSet.satData[i].setRAE == 'undefined') {
@@ -381,9 +372,9 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
   if (typeof satSet.satData[i].getAltitude == 'undefined') {
     satSet.satData[i].getAltitude = () => {
       // Stars don't have an altitude
-      if (satSet.satData[i].type === SpaceObjectType.STAR) return;
+      if (satSet.satData[i].type === SpaceObjectType.STAR) return false;
       // Sensors don't have TLEs
-      if ([SpaceObjectType.PHASED_ARRAY_RADAR, SpaceObjectType.MECHANICAL, SpaceObjectType.OPTICAL].includes(satSet.satData[i].type)) return;
+      if ([SpaceObjectType.PHASED_ARRAY_RADAR, SpaceObjectType.MECHANICAL, SpaceObjectType.OPTICAL].includes(satSet.satData[i].type)) return false;
 
       if (satSet.satData[i].missile) {
         return satellite.eci2ll(satSet.satData[i].position.x, satSet.satData[i].position.y, satSet.satData[i].position.z).alt;
@@ -405,7 +396,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
       el?: number;
       inView: boolean;
     } => {
-      const currentTEARR: Lla & Rae & InView = {
+      const currentTEARR: Lla & Rae & InView & {name: string} = {
         lat: 0,
         lon: 0,
         alt: 0,
@@ -413,6 +404,7 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
         az: 0,
         el: 0,
         inView: false,
+        name: ''
       }; // Most current TEARR data that is set in satellite object and returned.
 
       if (typeof sensors === 'undefined' || sensors[0] === null) {
@@ -494,14 +486,23 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
       const satrec = satellite.twoline2satrec(satSet.satData[i].TLE1, satSet.satData[i].TLE2); // perform and store sat init calcs
 
       const m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-      const positionEci = satellite.sgp4(satrec, m);
+      const positionEci = <EciVec3>satellite.sgp4(satrec, m).position;
+      if (!positionEci) {
+        console.error('No ECI position for', satrec.satnum, 'at', now);
+        currentTEARR.alt = 0;
+        currentTEARR.lon = 0;
+        currentTEARR.lat = 0;
+        currentTEARR.az = 0;
+        currentTEARR.el = 0;
+        currentTEARR.rng = 0;
+      }
 
       try {
-        const gpos = satellite.eciToGeodetic(positionEci.position, gmst);
+        const gpos = satellite.eciToGeodetic(positionEci, gmst);
         currentTEARR.alt = gpos.alt;
         currentTEARR.lon = gpos.lon;
         currentTEARR.lat = gpos.lat;
-        const positionEcf = satellite.eciToEcf(positionEci.position, gmst);
+        const positionEcf = satellite.eciToEcf(positionEci, gmst);
         const lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
         currentTEARR.az = lookAngles.az * RAD2DEG;
         currentTEARR.el = lookAngles.el * RAD2DEG;
@@ -520,6 +521,8 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
         el: currentTEARR.el,
         rng: currentTEARR.rng,
       });
+
+      currentTEARR.name = satSet.satData[i].name;
 
       satellite.setTEARR(currentTEARR);
       return currentTEARR;
@@ -551,7 +554,8 @@ export const addSatExtraFunctions = (i: number) => { // NOSONAR
   }
 };
 
-export let satSet: CatalogManager = {
+export type CatalogManager = typeof satSet;
+export let satSet = {
   convertIdArrayToSatnumArray,
   convertSatnumArrayToIdArray,
   cosparIndex: null,
@@ -567,7 +571,6 @@ export let satSet: CatalogManager = {
   getSatFromObjNum,
   getSatInSun,
   getSatInView,
-  getSatInViewOnly,
   getSatPosOnly,
   getSatVel,
   getScreenCoords,

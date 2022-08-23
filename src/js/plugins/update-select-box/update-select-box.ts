@@ -1,8 +1,11 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SatObject } from '@app/js/api/keepTrackTypes';
 import { cKmPerMs, DEG2RAD } from '@app/js/lib/constants';
+
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { MissileObject, SatObject } from '@app/js/api/keepTrackTypes';
+import { createError } from '@app/js/errorManager/errorManager';
 import { getEl } from '@app/js/lib/helpers';
 
+// prettier-ignore
 export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONAR
   try {
     const { satellite, missileManager, timeManager, objectManager, sensorManager, uiManager } = keepTrackApi.programs;
@@ -14,7 +17,7 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
         sat.getTEARR();
       }
     } else {
-      satellite.setTEARR(missileManager.getMissileTEARR(sat));
+      satellite.setTEARR(missileManager.getMissileTEARR(<MissileObject>sat));
     }
     if (satellite.degreesLong(satellite.currentTEARR.lon) >= 0) {
       getEl('sat-longitude').innerHTML = satellite.degreesLong(satellite.currentTEARR.lon).toFixed(3) + '°E';
@@ -46,12 +49,15 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
         getEl('sat-azimuth').innerHTML = satellite.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
         getEl('sat-elevation').innerHTML = satellite.currentTEARR.el.toFixed(1) + '°';
         getEl('sat-range').innerHTML = satellite.currentTEARR.rng.toFixed(2) + ' km';
+        const sun = keepTrackApi.programs.drawManager.sceneManager.sun;
+        getEl('sat-vmag').innerHTML = satellite.calculateVisMag(sat, sensorManager.currentSensor[0], timeManager.simulationTimeObj, sun).toFixed(2);
         const beamwidthString = sensorManager.currentSensor[0].beamwidth
           ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor[0].beamwidth)).toFixed(2) + ' km'
           : 'Unknown';
         getEl('sat-beamwidth').innerHTML = beamwidthString;
         getEl('sat-maxTmx').innerHTML = ((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
       } else {
+        getEl('sat-vmag').innerHTML = 'Out of FOV';
         getEl('sat-azimuth').innerHTML = 'Out of FOV';
         getEl('sat-azimuth').title = 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°';
         getEl('sat-elevation').innerHTML = 'Out of FOV';
@@ -79,7 +85,7 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
 
     if (objectManager.secondarySat !== -1) {
       const ric = satellite.sat2ric(objectManager.secondarySatObj, sat);
-      const dist = satellite.distance(sat, objectManager.secondarySatObj).split(' ')[2];
+      const dist = satellite.distanceString(sat, objectManager.secondarySatObj).split(' ')[2];
       getEl('sat-sec-dist').innerHTML = `${dist} km`;
       getEl('sat-sec-rad').innerHTML = `${ric.position[0].toFixed(2)}km`;
       getEl('sat-sec-intrack').innerHTML = `${ric.position[1].toFixed(2)}km`;
@@ -110,7 +116,7 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
       getEl('sat-nextpass').parentElement.style.display = 'none';
     }
   } catch (e) {
-    console.error(e);
+    createError(e, 'updateSatInfo');
   }
 };
 

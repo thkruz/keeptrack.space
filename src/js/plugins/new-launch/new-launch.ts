@@ -1,18 +1,20 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, stringPad, waitForCruncher } from '@app/js/lib/helpers';
 
 let isNewLaunchMenuOpen = false;
 
 export const newLaunchSubmit = () => {
-  const { timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
+  const { soundManager, timeManager, mainCamera, satellite, satSet, orbitManager, uiManager, objectManager } = keepTrackApi.programs;
+
+  showLoadingSticky();
 
   const scc = (<HTMLInputElement>getEl('nl-scc')).value;
   const satId = satSet.getIdFromObjNum(parseInt(scc));
   let sat = satSet.getSat(satId);
 
-  const upOrDown = (<HTMLInputElement>getEl('nl-updown')).value;
+  const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
   const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
   let launchLat, launchLon;
 
@@ -41,6 +43,12 @@ export const newLaunchSubmit = () => {
   quadZTime.setUTCHours(0); // Move to UTC Hour
 
   timeManager.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+
+  uiManager.toast(`Time is now relative to launch time.`, 'standby');
+  soundManager.play('liftoff');
+
+  satSet.setColorScheme(settingsManager.currentColorScheme, true);
+
   mainCamera.isCamSnapMode = false;
 
   const simulationTimeObj = timeManager.simulationTimeObj;
@@ -49,6 +57,9 @@ export const newLaunchSubmit = () => {
 
   const TLE1 = TLEs[0];
   const TLE2 = TLEs[1];
+
+  if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
+  if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
 
   if (satellite.altitudeCheck(TLE1, TLE2, simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
@@ -62,6 +73,14 @@ export const newLaunchSubmit = () => {
   } else {
     uiManager.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
   }
+
+  waitForCruncher(
+    satSet.satCruncher,
+    () => {
+      hideLoading();
+    },
+    (data) => typeof data.satPos !== 'undefined'
+  );
 };
 export const uiManagerInit = () => {
   // Side Menu
@@ -164,7 +183,7 @@ export const uiManagerInit = () => {
 
 export const uiManagerFinal = () => {
   getEl('newLaunch').addEventListener('submit', function (e: Event) {
-    showLoading(newLaunchSubmit);
+    newLaunchSubmit();
     e.preventDefault();
   });
 
@@ -172,8 +191,8 @@ export const uiManagerFinal = () => {
   clickAndDragWidth(getEl('newLaunch-menu'));
 };
 
-export const bottomMenuClick = (iconName: string): void => {
-  // NOSONAR
+// prettier-ignore
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   const aM = keepTrackApi.programs.adviceManager;
   if (iconName === 'menu-newLaunch') {
     if (isNewLaunchMenuOpen) {
@@ -190,7 +209,7 @@ export const bottomMenuClick = (iconName: string): void => {
 
         const sat = keepTrackApi.programs.satSet.getSatExtraOnly(keepTrackApi.programs.objectManager.selectedSat);
         (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-        (<HTMLInputElement>getEl('nl-inc')).value = (sat.inclination * RAD2DEG).toPrecision(2);
+        (<HTMLInputElement>getEl('nl-inc')).value = stringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
       } else {
         aM.adviceList?.newLaunchDisabled();
         keepTrackApi.programs.uiManager.toast(`Select a Satellite First!`, 'caution');

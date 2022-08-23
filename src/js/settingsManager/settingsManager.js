@@ -95,8 +95,55 @@ settingsManager = {
   isEditTime: null,
   fieldOfView: null,
   db: null,
+  // prettier-ignore
   init: () => { // NOSONAR
     settingsManager.pTime = [];
+
+    // Set Background
+    setTimeout(() => {
+      const backgrounds = [
+        'astronauts',
+        'astronauts2',
+        'commandCenter',
+        'controlModule',
+        'domeInDesert',
+        'domeInHawaii',
+        'domeInMountain',
+        'domeInMountain2',
+        'domeInSnow',
+        'domeInSnow2',
+        'domesOnGrassHill',
+        'fylingdales',
+        'fylingdales2',
+        'icbm',
+        'iss',
+        'mobileTel',
+        'militaryLaunch',
+        'launchpad',
+        'launchpad2',
+        'radarDomeFall',
+        'radarOnHill',
+        'slbm',
+        'slbm2',      
+      ];
+      
+      // Randomly load a splash screen - not a vulnerability
+      const image = backgrounds[Math.floor(Math.random() * backgrounds.length)]; // NOSONAR
+      const width = window.innerWidth > 1920 ? '3840' : '1920';
+      const loadingDom = document.getElementById('loading-screen');
+
+      loadingDom.style.backgroundImage = `url('../img/wallpaper/${image}-${width}.png')`;
+      loadingDom.style.backgroundSize = 'cover';
+      loadingDom.style.backgroundPosition = 'center';
+      loadingDom.style.backgroundRepeat = 'no-repeat';
+
+      backgrounds.forEach((image, idx) => {
+          setTimeout(() => {
+            const width = window.innerWidth > 1920 ? '3840' : '1920';
+            new Image().src = `../img/wallpaper/${image}-${width}.png`;
+          }, 5000 * idx);
+        });
+    }, 0);
 
     // Install Folder Settings
     {
@@ -152,6 +199,12 @@ settingsManager = {
     // //////////////////////////////////////////////////////////////////////////
     // Most Commonly Used Settings
     // //////////////////////////////////////////////////////////////////////////
+    
+    // ASCII Catalog for offline use
+    settingsManager.isDisableAsciiCatalog = true;
+
+    // JSON Catalog for offline use
+    settingsManager.isDisableExtraCatalog = false;
 
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
@@ -184,11 +237,15 @@ settingsManager = {
     };
     // Disable main user interface. Currently an all or nothing package.
     settingsManager.disableUI = false;
+    // Disable main CSS
+    settingsManager.disableCss = false;
     // Currently only disables panning. In the future it will disable all camera
     // movement
     settingsManager.disableCameraControls = false;
     // Disable normal browser events from keyboard/mouse
     settingsManager.disableNormalEvents = false;
+    // Allow Righ Click Menu
+    settingsManager.isAllowRightClick = true;
     // Disable normal browser right click menu
     settingsManager.disableDefaultContextMenu = true;
     // Disable Scrolling the Window Object
@@ -245,6 +302,10 @@ settingsManager = {
     settingsManager.zoomSpeed = 0.01;
     settingsManager.isZoomStopsRotation = true;
 
+    settingsManager.isUseNullForBadGetEl = true;
+
+    settingsManager.isEPFL = false;
+
     // Speed at which isScan lines are drawn (each draw will be +speed lat/lon)
     settingsManager.lineScanSpeedSat = 6; // About 6 seconds to scan earth (no source, just a guess)
     settingsManager.lineScanSpeedRadar = 0.25; // About 30 seconds to scan earth (arbitrary)
@@ -257,6 +318,7 @@ settingsManager = {
     settingsManager.fpsThrottle2 = 10;
 
     settingsManager.timeMachineDelay = 5000;
+    settingsManager.timeMachineString = () => false; // Placeholder for overrides
 
     settingsManager.videoBitsPerSecond = 30000000; // 10.0Mbps
 
@@ -269,6 +331,18 @@ settingsManager = {
     // Draw Lines from Sensors to Satellites When in FOV
     settingsManager.isDrawInCoverageLines = true;
 
+    // Show LEO satellites
+    settingsManager.isShowLeoSats = true;
+    // Show HEO satellites
+    settingsManager.isShowHeoSats = true;
+    // Show MEO satellites
+    settingsManager.isShowMeoSats = true;
+    // Show GEO satellites
+    settingsManager.isShowGeoSats = true;
+
+    // Show Launch Agency and Payload Owners/Manufacturers
+    settingsManager.isShowAgencies = true;
+
     // settingsManager.earthPanningBufferDistance = 100 // Needs work in main.js
 
     // Use these to default smallest resolution maps and limited "extras" like
@@ -276,6 +350,12 @@ settingsManager = {
     // loading times
     // settingsManager.isDrawLess = true;
     // settingsManager.smallImages = true;
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Gamepad Settings
+    // //////////////////////////////////////////////////////////////////////////
+    settingsManager.isLimitedGamepadControls = false;
+    settingsManager.lastGamepadMovement = 0; // Initialize as 0
 
     // //////////////////////////////////////////////////////////////////////////
     // Mobile Settings
@@ -319,6 +399,42 @@ settingsManager = {
     // Used for Stars
     settingsManager.satShader.blurFactor3 = '0.43';
     settingsManager.satShader.blurFactor4 = '0.25';
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Meshes
+    // //////////////////////////////////////////////////////////////////////////
+    // settingsManager.meshListOverride = [
+    //   'sat2',
+    //   's1u',
+    //   's2u',
+    //   's3u',
+    //   'starlink',
+    //   'iss',
+    //   'gps',
+    //   'aehf',
+    //   'dsp',
+    //   'flock',
+    //   'lemur',
+    //   'galileo',
+    //   'o3b',
+    //   'oneweb',
+    //   'orbcomm',
+    //   'spacebee1gen',
+    //   'spacebee2gen',
+    //   'spacebee3gen',
+    //   'iridium',
+    //   'globalstar',
+    //   'debris0',
+    //   'debris1',
+    //   'debris2',
+    //   'rocketbody',
+    //   'sbirs',
+    //   'misl',
+    //   'misl2',
+    //   'misl3',
+    //   'misl4',
+    //   'rv',
+    // ];
 
     // //////////////////////////////////////////////////////////////////////////
     // Embed Overrides - FOR TESTING ONLY
@@ -465,11 +581,14 @@ settingsManager = {
     }
 
     // //////////////////////////////////////////////////////////////////////////
-    // Orbit Color Settings
+    // Orbit Settings
     // //////////////////////////////////////////////////////////////////////////
+    settingsManager.orbitSegments = 255;
+    
     settingsManager.orbitSelectColor = [1.0, 0.0, 0.0, 0.9];
     settingsManager.orbitSelectColor2 = [0.0, 0.4, 1.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
+    settingsManager.orbitGroupAlpha = 0.5; // Transparency when a group of satellites is selected
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
     settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE
     settingsManager.orbitPlanetariumColor = [1.0, 1.0, 1.0, 0.2]; // Transparent White
@@ -596,7 +715,6 @@ settingsManager = {
     settingsManager.isPropRateChange = false;
     settingsManager.isOnlyFOVChecked = false;
     settingsManager.isBottomMenuOpen = false;
-    settingsManager.isForceColorScheme = false;
     settingsManager.isDragging = false;
 
     settingsManager.isDemoModeOn = false;

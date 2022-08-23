@@ -1,9 +1,10 @@
 import '@app/js/settingsManager/settingsManager';
-import fs from 'fs';
+import 'webgl-mock';
+
 import $ from 'jquery';
 import { JSDOM } from 'jsdom';
+import fs from 'fs';
 import path from 'path';
-import 'webgl-mock';
 
 // This allows consistent testing in the CI environment
 // eslint-disable-next-line no-process-env

@@ -1,7 +1,9 @@
 import numeric from 'numeric';
-import { CatalogManager, SatObject, SensorManager, SensorObject } from '../api/keepTrackTypes';
+import { SatObject, SensorObject } from '../api/keepTrackTypes';
 import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { RAD2DEG } from '../lib/constants';
+import { SensorManager } from '../plugins/sensor/sensorManager';
+import { CatalogManager } from '../satSet/satSet';
 import { ControlSiteManager } from './controlSiteManager';
 
 export enum SatConstellationString {
@@ -20,6 +22,7 @@ export enum LinkType {
   Both = 3, // Show the users connected to the satellites and the satellites connected to each other
 }
 
+// prettier-ignore
 export const init = (sensorManager: SensorManager, controlSiteManager: ControlSiteManager) => { // NOSONAR
   try {
     for (let controlSite in controlSiteManager.controlSiteList) {
@@ -62,6 +65,7 @@ export const init = (sensorManager: SensorManager, controlSiteManager: ControlSi
   }
 };
 
+// prettier-ignore
 export const showLinks = async function (lineManager: LineFactory, satSet: CatalogManager, group: SatConstellationString) { // NOSONAR
   let satlist: number[];
   let userlist: number[];
@@ -156,7 +160,7 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
         }
       }
       for (let i = 0; i < userlist.length; i++) {
-        let id = satSet.getSensorFromSensorName(userlist[i]);
+        let id = satSet.getSensorFromSensorName(userlist[i].toString());
         let user = <SensorObject>(<unknown>satSet.getSat(id));
         let bestSat: SatObject = null;
         let bestRange = 1000000;
@@ -182,7 +186,7 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
       // Loop through all the users
       for (let i = 0; i < userlist.length; i++) {
         // Select the current user
-        let user = <SensorObject>(<unknown>satSet.getSat(satSet.getSensorFromSensorName(userlist[i])));
+        let user = <SensorObject>(<unknown>satSet.getSat(satSet.getSensorFromSensorName(userlist[i].toString())));
         // Loop through all of the satellites
         for (let j = 0; j < satlist.length; j++) {
           // Select the current satelltie

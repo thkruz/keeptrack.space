@@ -1,14 +1,14 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=flat-square) ![Codecov](https://img.shields.io/codecov/c/github/thkruz/keeptrack.space?style=flat-square&token=RKIkZS3xDN) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier) ![Vulnerabilities](https://img.shields.io/github/workflow/status/thkruz/keeptrack.space/Test%20site%20for%20publicly%20known%20js%20vulnerabilities?label=vulnerabilities&style=flat-square) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square)
 
-<img src="./src/img/logo192.png" width=128 height=128 alt="KeepTrack.Space" align="right">
+<img src="./src/img/promoWLogoSm.png" width='100%' alt="KeepTrack.Space" align="center">
 
-# KeepTrack.Space
+## Astrodynamics Software for Non-Engineers
 
-> Astrodynamics Software for Non-Engineers
+KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, I try to make learning about orbital mechanics and satellite operations accessible to everyone. The software is good enough to provide a common tactical picture on a military operations floor, but simple enough a high schooler can learn about orbits on his tablet.
 
-KeepTrack aims to provide orbital analysis tools to the average user. By providing features that are usually only found in expensive toolkits, we make learning about orbital mechanics and satellite operations accessible to everyone.
+Artificial Intelligence is behind many of the features in KeepTrack. The code is designed by me, but after writing the start of a pattern the rest is written by an algorithm to speed up development. Many of the unit tests are created by [PoniCode](https://www.ponicode.com/) so that I can focus on the math while it takes care of ensuring buttons are working as expected. Recently more artwork has been incorporated into the loading screen - that too is powered by AI. [MidJourney](https://www.midjourney.com/home/) creates the inspiration and then I upscale and edit it to create the final product.
 
-The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without @jeyoder's original stuffin.space.
+The code has been rewrote multiple times and now barely resembles the original, but none of this would have been possible without using @jeyoder's original stuffin.space as a starting point.
 
 ## Table of Contents
 
@@ -30,13 +30,7 @@ Starting with Version 3, a github page is automatically deployed with the most-c
 
 ### Built With
 
-- [babel](https://babeljs.io/)
-- [eslint 8](https://eslint.org/)
-- [jest 27](https://jestjs.io/)
-- [jsdom](https://github.com/jsdom/jsdom)
-- [prettier](https://prettier.io/)
-- [ponicode](https://ponicode.com/)
-- [webpack 5](https://webpack.js.org/)
+[![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)[![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)[![npm](https://img.shields.io/badge/npm-%23E5E5E5?style=for-the-badge&logo=npm&logoColor=058a5e)](https://www.npmjs.com/)[![WebGL](https://img.shields.io/badge/WebGL-990000?logo=webgl&logoColor=white&style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Web/WebGL)[![Babel](https://img.shields.io/badge/Babel-F9DC3e?style=for-the-badge&logo=babel&logoColor=black)](https://babeljs.io/)[![Webpack](https://img.shields.io/badge/webpack-%238DD6F9.svg?style=for-the-badge&logo=webpack&logoColor=black)](https://webpack.js.org/)[![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)[![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)[![cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e)](https://www.cypress.io/)[![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](http://github.com)[![GitLab](https://img.shields.io/badge/gitlab-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white)](https://gitlab.com)
 
 ### Prerequisites
 
@@ -56,11 +50,11 @@ npm start                                                 #Start the server.
 
 KeepTrack was designed to run without the need for a server. On Windows, close all open copies of chrome and then launch the included KeepTrack.bat file.
 
-NOTE: You MUST compile the code first. Opening the index.htm file in the src folder will not work. If that feels overwhelming, take a look at https://github.com/thkruz/keeptrack.space/tree/gh-pages for a built version that can be downloaded and launched.
+NOTE: You MUST compile the code first. Opening the index.html file in the src folder will not work. If that feels overwhelming, take a look at https://github.com/thkruz/keeptrack.space/tree/gh-pages for a built version that can be downloaded and launched.
 
 ## Usage
 
-The main index.htm page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.ts and orbitCruncher.ts) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
+The main index.html page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.ts and orbitCruncher.ts) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
 
 The main draw loop (drawManager.ts) has been optimized to reduce memory leaks and to keep FPS high. This is commonly done by having functions modify global variables vs returning a variable and using long functions rather than splitting them into pieces - this is definitely intentional.
 
@@ -80,7 +74,7 @@ If you are interested in helping with this project, please reference the [Contri
 
 ### Main Files
 
-- index.htm - Controls the structure of the front-end and loads all the CSS and JS files.
+- index.html - Controls the structure of the front-end and loads all the CSS and JS files.
 - main.ts - Primary TS file that bootstraps all of the other files.
 - camera.ts - cameraManager is used to create cameraManager that serves as the interface from the UI and the webgl camera.
 - colorSchemeManager.ts - Handles the creation of color schemes for the dots.
@@ -111,8 +105,8 @@ If you are interested in helping with this project, please reference the [Contri
 
 ### Libraries
 
-- satMath.ts - My personal modifications to [@shashwata](https://github.com/shashwatak/)'s amazing library [satellite.js](https://github.com/shashwatak/satellite-js).
-- suncalc.js - [@mourner](https://github.com/mourner/suncalc)'s library used for star position calculations.
+- [ootk](https://github.com/thkruz/ootk) - My TypeScript library for working with SGP4, sensor field of view, and Astronomical calculations.
+  - Credit to [@shashwata](https://github.com/shashwatak/)'s amazing library satellite.js and [@mourner](https://github.com/mourner/suncalc)'s library suncalc for laying the ground work.
 
 ## Tests
 

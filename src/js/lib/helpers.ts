@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { createError } from '@app/js/errorManager/errorManager';
 import { saveAs } from 'file-saver';
 import { isThisJest } from './../api/keepTrackApi';
 
@@ -28,7 +29,7 @@ export const saveVariable = (variable: any, filename?: string): void => {
     if (!saveAs) throw new Error('saveAs is unavailable!');
     saveAs(blob, filename);
   } catch (e) {
-    // Intentionally Left Blank
+    createError(e, 'saveVariable');
   }
 };
 
@@ -43,9 +44,40 @@ export const getEl = (id: string): HTMLElement => {
     document.body.appendChild(_el);
     return <HTMLElement>(<unknown>_el);
   }
-  return null;
+
+  // Return an empty div to avoid errors
+  return settingsManager.isUseNullForBadGetEl ? null : <HTMLElement>(<unknown>document.createElement('div'));
   // DEBUG: Use this code for finding bad requests
   // throw new Error(`Element with id ${id} not found!`);
+};
+
+export const waitForCruncher = (cruncher: Worker, cb: () => void, validationFunc: (data: any) => boolean): void => {
+  cruncher.addEventListener(
+    'message',
+    (m) => {
+      if (validationFunc(m.data)) {
+        cb();
+      } else {
+        cruncher.addEventListener(
+          'message',
+          (m) => {
+            if (validationFunc(m.data)) {
+              cb();
+            } else {
+              console.error('Cruncher failed to meet requirement after two tries!');
+            }
+          },
+          { once: true }
+        );
+      }
+    },
+    { once: true }
+  );
+};
+
+export const triggerSubmit = (el: HTMLFormElement): void => {
+  const event = new CustomEvent('submit', { cancelable: true });
+  el.dispatchEvent(event);
 };
 
 export const getClass = (id: string): HTMLElement[] => {
@@ -201,6 +233,11 @@ export const showLoading = (callback?: () => void, delay?: number): void => {
     if (callback) callback();
     fadeOut(loading, 500);
   }, delay || 100);
+};
+
+export const showLoadingSticky = (): void => {
+  const loading = document.getElementById('loading-screen');
+  fadeIn(loading, 'flex', 500);
 };
 
 export const hideLoading = () => {

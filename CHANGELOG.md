@@ -2,6 +2,123 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.0.0
+
+>  
+
+- fix: :bug: fix country menu not working
+- fix: :bug: fix timeMachine showing other objects
+- refactor: :label: add better type checking
+- fix: :bug: complete country matching code
+- test: :white_check_mark: add testing for colorSchemeChangeAlerts
+- feat: :sparkles: add settings to hide agency dots
+- feat: :sparkles: add debug menu
+- feat: :sparkles: add filter settings for various orbits
+- docs: :memo: update changelog
+- feat: :sparkles: add labels to watchlist items in fov
+- feat: :sparkles: add new splash screen wallpapers
+- feat: :goal_net: add TLE validation when creating TLEs
+- fix: :bug: fix bug where search results dont respond
+- feat: :sparkles: add new logo and loading screen
+- refactor: :recycle: change default lookangles to 2 days from 7
+- fix: :bug: fix watchlist line to satellite
+- docs: :memo: update readme
+- fix: :bug: fix bug in error catching
+- fix: :bug: fix memory leak in line-factory
+- fix: :bug: fix screenshot resolution
+- build: :arrow_up: upgrade serve
+
+#### v6.2.0
+
+>  
+
+- build(deps-dev): bump @babel/plugin-proposal-private-methods from 7.16.11 to 7.18.6
+- build(deps): bump echarts from 5.3.2 to 5.3.3
+- build(deps-dev): bump mini-css-extract-plugin from 2.6.0 to 2.6.1
+- build(deps-dev): bump husky from 7.0.4 to 8.0.1
+- build(deps-dev): bump @testing-library/jest-dom from 5.16.2 to 5.16.4
+- build(deps-dev): bump @typescript-eslint/parser from 5.12.1 to 5.30.7
+- build(deps-dev): bump ponicode from 0.61.3 to 0.70.11
+- chore: :card_file_box: update TLE databases
+- refactor: :heavy_minus_sign: replace suncalc with ootk
+- feat: :sparkles: add new sensors
+- fix: :bug: fix tle exporters
+- fix: :bug: fix bug when creating sensor or observer from rmb
+- fix: :bug: fix edit sat menu
+- feat: :sparkles: add error reporting feature
+- refactor: :recycle: simplify tle formatting
+- feat: :sparkles: add basic sounds
+- test: :white_check_mark: fix failing jest tests
+- docs: update changelog
+- feat: :sparkles: add additional tle export options
+- fix: :bug: fix initial orbits menu
+- fix: :bug: fix breakup creator
+- feat: :sparkles: add mute button
+- fix: :bug: fix bug new launch time mismatch
+- feat: :sparkles: add sound effects
+- feat: :sparkles: update sounds
+- fix: :bug: update apogee when edit sat in positionCruncher
+- feat: :sparkles: add sounds to settings menu
+- fix: :bug: update default colorscheme to catch unknown types
+- fix: :goal_net: add defensive code to satCalculate
+- build: :arrow_up: update all dependencies
+- fix: :bug: fix bottom menu ui not responding when edges clicked
+- fix: :bug: fix watchlist issues
+- feat: :sparkles: update about page
+- fix: :bug: fix bug caused by depricated fov text
+- build: :arrow_up: update ootk
+- fix: :bug: fix breakup menu
+- fix: :bug: fix new launch menu
+- fix: :bug: correct tle formatting in orbitReferencesLinkClick
+- fix: :bug: fix earth becoming background
+- fix: :bug: fix TLE formatting bug in getOrbitByLatLon
+- fix: :goal_net: add defensive code to setSelectedSat
+- fix: :goal_net: add defensive code to snapToSat
+- chore: :card_file_box: update SOCRATES example
+- fix: :bug: fix typo in stfOnObjectLinkClick
+- fix: :lock: update node-fetch
+- build(deps-dev): bump @babel/plugin-proposal-private-methods
+
+#### v6.1.0
+
+>  
+
+- refactor: :recycle: split SatMath into pieces
+- refactor: :truck: split uiManager into smaller pieces
+- docs: :page_facing_up: clear AGPL notice
+- refactor: :recycle: split satMath
+- perf: :zap: improve color calculation speed
+- fix: :lock: remove security false postives
+- fix: :rotating_light: fix sonarcube findings
+- style: :art: add more granular prettier ignore directives
+- feat: :sparkles: add better embeded support
+- refactor: :label: convert om-manager to typescript
+- refactor: :heavy_minus_sign: migrate from satellite.js to ootk for all orbital math
+- feat: :sparkles: update color scheme menus
+- perf: :zap: add caching of satrec object
+- feat: :zap: optimize find close objects code
+- fix: :rotating_light: fix minor sonarcube findings
+- feat: :sparkles: add group countries color scheme
+- feat: :sparkles: update orbit manager
+- refactor: :recycle: update embeded example
+- refactor: :zap: optimize age of elset color scheme
+- feat: :sparkles: add vismag calculations to satbox
+- docs: :memo: update changelog
+- refactor: :recycle: update sat group class
+- feat: :heavy_minus_sign: migrate from satellite.js to ootk
+- refactor: :recycle: reduce unnecessary code in meshManager
+- feat: :sparkles: update time machine
+- feat: :sparkles: update group color scheme
+- fix: :arrow_up: upgarde critical dependencies to fix build issue
+- feat: :heavy_minus_sign: migrate from satellite.js to ootk
+- test: :camera_flash: update snapshots
+- build: :arrow_up: bump dependencies
+- feat: :sparkles: update hover manager
+- fix: :sparkles: update object manager
+- fix: :adhesive_bandage: remove debugger call
+- fix: :adhesive_bandage: remove unnecessary logging
+- test: :white_check_mark: fix api mocks
+
 #### v6.0.3
 
 >  

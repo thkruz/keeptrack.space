@@ -1,8 +1,7 @@
 import $ from 'jquery';
-import { keepTrackApi } from '../api/keepTrackApi';
-import { TimeManager } from '../api/keepTrackTypes';
-import { getEl } from '../lib/helpers';
 import { getDayOfYear } from './transforms';
+import { getEl } from '../lib/helpers';
+import { keepTrackApi } from '../api/keepTrackApi';
 
 export const changePropRate = (propRate: number) => {
   if (timeManager.propRate === propRate) return; // no change
@@ -36,10 +35,12 @@ export const synchronize = () => {
 export const changeStaticOffset = (staticOffset: number) => {
   timeManager.dynamicOffsetEpoch = Date.now();
   timeManager.staticOffset = staticOffset;
+  timeManager.calculateSimulationTime();
   synchronize();
 };
 
-export const timeManager: TimeManager = {
+export type TimeManager = typeof timeManager;
+export const timeManager = {
   dateObject: null,
   datetimeInputDOM: null,
   timeTextStr: null,
@@ -133,6 +134,7 @@ export const timeManager: TimeManager = {
       timeManager.lastTime = now;
     };
 
+    // prettier-ignore
     timeManager.setSelectedDate = (selectedDate: Date) => { // NOSONAR
       timeManager.selectedDate = selectedDate;
 

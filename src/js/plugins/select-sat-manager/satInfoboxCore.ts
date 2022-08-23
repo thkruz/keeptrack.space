@@ -3,8 +3,8 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl, openColorbox } from '@app/js/lib/helpers';
-import { SunCalc } from '@app/js/lib/suncalc.js';
 import $ from 'jquery';
+import * as Ootk from 'ootk';
 import './satInfoboxCore.css';
 
 const satInfoboxCore = {
@@ -79,6 +79,13 @@ export const sensorInfo = (sat: SatObject): void => {
             </div>
             <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
           </div>
+          <div class="sat-info-row sat-only-info">
+              <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+                data-tooltip="Visual Magnitude (Lower numbers are brighter)">
+                Vis Mag
+              </div>
+              <div class="sat-info-value" id="sat-vmag">xx.x</div>
+            </div>
           <div id="sat-info-nextpass-row" class="sat-info-row sat-only-info">
             <div id="sat-info-nextpass" class="sat-info-key  tooltipped" data-position="left" data-delay="50"
               data-tooltip="Next Time in Coverage">
@@ -145,10 +152,22 @@ export const launchData = (sat: SatObject): void => {
             NO DATA
           </div>
         </div>
-          <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key">RCS</div>
-            <div class="sat-info-value" id="sat-rcs">NO DATA</div>
-          </div>  
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Radar Cross Section - How reflective the object is to a radar">
+            RCS
+          </div>
+          <div class="sat-info-value" id="sat-rcs">NO DATA</div>
+        </div>  
+        <div class="sat-info-row sat-only-info">
+          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
+            data-tooltip="Visual Magnitude - Smaller Numbers Are Brighter">
+            Standard Mag
+          </div>
+          <div class="sat-info-value" id="sat-stdmag">
+            NO DATA
+          </div>
+        </div>
         `
     );
     satInfoboxCore.launchData.isLoaded = true;
@@ -252,6 +271,8 @@ export const allObjectsLink = (): void => {
   uiManager.doSearch(searchStr);
   (<HTMLInputElement>getEl('search')).value = searchStr;
 };
+
+// prettier-ignore
 export const orbitalData = (sat: SatObject): void => { // NOSONAR
   // Only show orbital data if it is available
   if (sat === null || typeof sat === 'undefined') return;
@@ -358,7 +379,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
                 Velocity
               </div>
               <div class="sat-info-value" id="sat-velocity">xxx km/s</div>
-            </div>
+            </div>            
             <div class="sat-info-row sat-only-info">
               <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
                 data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
@@ -402,7 +423,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     getEl('sat-inclination').innerHTML = (sat.inclination * RAD2DEG).toFixed(2) + '°';
     getEl('sat-eccentricity').innerHTML = sat.eccentricity.toFixed(3);
     getEl('sat-raan').innerHTML = (sat.raan * RAD2DEG).toFixed(2) + '°';
-    getEl('sat-argPe').innerHTML = (sat.argPe * RAD2DEG).toFixed(2) + '°';
+    getEl('sat-argPe').innerHTML = (sat.argPe * RAD2DEG).toFixed(2) + '°';    
 
     getEl('sat-period').innerHTML = sat.period.toFixed(2) + ' min';
     $('#sat-period').tooltip({
@@ -433,7 +454,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
       getEl('sat-sun').parentElement.style.display = 'none';
     } else {
       now = new Date(keepTrackApi.programs.timeManager.dynamicOffsetEpoch + keepTrackApi.programs.timeManager.propOffset);
-      const sunTime: any = SunCalc.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor[0].lat, keepTrackApi.programs.sensorManager.currentSensor[0].lon);
+      const sunTime: any = Ootk.Utils.SunMath.getTimes(now, keepTrackApi.programs.sensorManager.currentSensor[0].lat, keepTrackApi.programs.sensorManager.currentSensor[0].lon);
 
       let satInSun = -1;
       if (typeof sat.isInSun !== 'undefined') {
@@ -543,6 +564,8 @@ export const secondaryData = (sat: SatObject): void => {
     satInfoboxCore.secondaryData.isLoaded = true;
   }
 };
+
+// prettier-ignore
 export const satMissionData = (sat: SatObject): void => { // NOSONAR
   if (sat === null || typeof sat === 'undefined') return;
 
@@ -550,16 +573,7 @@ export const satMissionData = (sat: SatObject): void => { // NOSONAR
     getEl('sat-infobox').insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-      <div class="sat-info-section-header">Mission</div>
-        <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
-            data-tooltip="Visual Magnitude - Smaller Numbers Are Brighter">
-            Visual Mag
-          </div>
-          <div class="sat-info-value" id="sat-vmag">
-            NO DATA
-          </div>
-        </div>
+      <div class="sat-info-section-header">Mission</div>        
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key  tooltipped" data-position="left" data-delay="50"
             data-tooltip="Primary User of the Satellite">
@@ -705,7 +719,7 @@ export const satMissionData = (sat: SatObject): void => { // NOSONAR
     getEl('sat-dryMass').innerHTML = sat?.dryMass && sat?.dryMass !== '' ? sat?.dryMass + ' kg' : 'Unknown';
     getEl('sat-lifetime').innerHTML = sat?.lifetime && sat?.lifetime !== '' ? sat?.lifetime + ' yrs' : 'Unknown';
     getEl('sat-power').innerHTML = sat?.power && sat?.power !== '' ? sat?.power + ' w' : 'Unknown';
-    getEl('sat-vmag').innerHTML = sat?.vmag && sat?.vmag?.toString() !== '' ? sat?.vmag?.toString() : 'Unknown';
+    getEl('sat-stdmag').innerHTML = sat?.vmag && sat?.vmag?.toString() !== '' ? sat?.vmag?.toString() : 'Unknown';
     getEl('sat-bus').innerHTML = sat?.bus && sat?.bus !== '' ? sat?.bus : 'Unknown';
     getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
     getEl('sat-payload').innerHTML = sat?.payload && sat?.payload !== '' ? sat?.payload : 'Unknown';
@@ -717,6 +731,8 @@ export const satMissionData = (sat: SatObject): void => { // NOSONAR
     getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
   }
 };
+
+// prettier-ignore
 export const intelData = (sat: SatObject, satId?: number): void => { // NOSONAR
   if (satId !== -1) {
     if (!satInfoboxCore.intelData.isLoaded) {

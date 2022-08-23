@@ -1,9 +1,12 @@
+import { ColorInformation, Pickable, colorSchemeManager } from '../colorSchemeManager';
+
 import { SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
-import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const velocityRules = (sat: SatObject): ColorInformation => { // NOSONAR
   // Stars
   if (sat.static && sat.type === SpaceObjectType.STAR) {
@@ -41,10 +44,17 @@ export const velocityRules = (sat: SatObject): ColorInformation => { // NOSONAR
     case SpaceObjectType.LAUNCH_AGENCY:
     case SpaceObjectType.LAUNCH_SITE:
     case SpaceObjectType.LAUNCH_POSITION:
-      return {
-        color: colorSchemeManager.colorTheme.facility,
-        pickable: Pickable.Yes,
-      };
+      if (!settingsManager.isShowAgencies) {        
+        return {
+          color: colorSchemeManager.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }else{
+        return {
+          color: colorSchemeManager.colorTheme.facility,
+          pickable: Pickable.Yes,
+        };
+      }
     default: // Since it wasn't one of those continue on
   }
 
@@ -55,7 +65,7 @@ export const velocityRules = (sat: SatObject): ColorInformation => { // NOSONAR
       pickable: Pickable.Yes,
     };
   }
-  if (sat.inView === 1) {
+  if (keepTrackApi.programs.dotsManager.inViewData[sat.id] === 1) {
     if (colorSchemeManager.objectTypeFlags.inViewAlt === false) {
       return {
         color: colorSchemeManager.colorTheme.deselected,

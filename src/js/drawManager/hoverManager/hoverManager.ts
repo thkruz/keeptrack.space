@@ -1,8 +1,12 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
-import { CatalogManager, DrawManager, ObjectManager, SatMath, SatObject } from '../../api/keepTrackTypes';
+import { ObjectManager } from '@app/js/objectManager/objectManager';
+import { SatMath } from '@app/js/satMath/satMath';
+import { CatalogManager } from '@app/js/satSet/satSet';
+import { SatObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import { spaceObjType2Str } from '../../lib/spaceObjType2Str';
+import { DrawManager } from '../drawManager';
 
 let satHoverBoxNode1: HTMLDivElement;
 let satHoverBoxNode2: HTMLDivElement;
@@ -42,9 +46,9 @@ export const hoverOverSomething = (satId: number, satX: number, satY: number) =>
     // NOTE: The radar mesurement logic breaks if you call it a SatObject
 
     const sat = <any>satSet.getSat(satId);
-    drawManager.isHoverBoxVisible = true;    
+    drawManager.isHoverBoxVisible = true;
 
-    init();    
+    init();
 
     if (sat.static || sat.isRadarData) {
       staticObj(sat);
@@ -79,7 +83,7 @@ export const staticObj = (sat: any) => {
   } else {
     const { objectManager, satellite, satSet } = keepTrackApi.programs;
     satHoverBoxNode1.textContent = sat.name;
-    satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+    satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
     satHoverBoxNode3.textContent = '';
   }
 };
@@ -96,16 +100,16 @@ const showRicOrEci = (drawManager: DrawManager, satSet: CatalogManager, objectMa
     satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
     showRicDistAndVel(ric);
   } else {
-    satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distance(sat, drawManager.sat2)}`;
+    satHoverBoxNode2.innerHTML = `${sat.sccNum}${satellite.distanceString(sat, drawManager.sat2)}`;
     showEciDistAndVel(sat);
   }
-}
+};
 
-const showRicDistAndVel = (ric: { position: import("gl-matrix").vec3; velocity: import("gl-matrix").vec3; }) => {
+const showRicDistAndVel = (ric: { position: import('gl-matrix').vec3; velocity: import('gl-matrix').vec3 }) => {
   satHoverBoxNode3.innerHTML =
     `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
     `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
-}
+};
 
 const showEciVel = (sat: SatObject) => {
   if (settingsManager.isEciOnHover) {
@@ -125,7 +129,7 @@ const showEciVel = (sat: SatObject) => {
   } else {
     satHoverBoxNode3.innerHTML = '';
   }
-}
+};
 
 const showEciDistAndVel = (sat: SatObject) => {
   if (settingsManager.isEciOnHover) {
@@ -152,21 +156,24 @@ const showEciDistAndVel = (sat: SatObject) => {
   } else {
     satHoverBoxNode3.innerHTML = '';
   }
-}
+};
 
 export const satObj = (sat: SatObject) => {
   if (!settingsManager.enableHoverOverlay) return;
   const { drawManager, objectManager, satellite, sensorManager, satSet } = keepTrackApi.programs;
   // Use this as a default if no UI
-  if (settingsManager.disableUI) {
+  if (settingsManager.disableUI || settingsManager.isEPFL) {
     satHoverBoxNode1.textContent = sat.name;
-    satHoverBoxNode2.textContent = sat.sccNum;
-    satHoverBoxNode3.textContent = objectManager.extractCountry(sat.country);
+    let year = sat.intlDes.split('-')[0] === 'none' ? 'Unknown' : sat.intlDes.split('-')[0];
+    satHoverBoxNode2.textContent = settingsManager.isEPFL ? `Launched: ${year}` : sat.sccNum;
+    let country = objectManager.extractCountry(sat.country);
+    country = country.length > 0 ? country : 'Unknown';
+    satHoverBoxNode3.textContent = country;
   } else {
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && settingsManager.isShowNextPass && drawManager.isShowDistance) {
       satHoverBoxNode1.textContent = sat.name;
       satHoverBoxNode2.textContent = sat.sccNum;
-      satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+      satHoverBoxNode3.innerHTML = satellite.nextpass(sat) + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
     } else if (drawManager.isShowDistance) {
       satHoverBoxNode1.textContent = sat.name;
       showRicOrEci(drawManager, satSet, objectManager, sat, satellite);
@@ -191,7 +198,7 @@ export const radarData = (sat: any) => {
   }
   if (parseInt(sat.sccNum) !== -1) satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Satellite: ' + sat.sccNum);
   if (typeof sat.rae == 'undefined' && sensorManager.currentSensor !== sensorManager.defaultSensor) {
-    sat.rae = satellite.eci2Rae(sat.t, sat.position, sensorManager.currentSensor[0]);
+    sat.rae = satellite.eci2rae(sat.t, sat.position, sensorManager.currentSensor[0]);
     sat.setRAE(sat.rae);
   }
   if (sensorManager.currentSensor !== sensorManager.defaultSensor) {
@@ -224,13 +231,13 @@ export const launchFacility = (sat: SatObject) => {
   const { objectManager, satellite, satSet } = keepTrackApi.programs;
   let launchSite = objectManager.extractLaunchSite(sat.name);
   satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
-  satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+  satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
   satHoverBoxNode3.textContent = '';
 };
 export const controlFacility = (sat: SatObject) => {
   const { objectManager, satellite, satSet } = keepTrackApi.programs;
   satHoverBoxNode1.textContent = sat.name;
-  satHoverBoxNode2.innerHTML = sat.country + satellite.distance(sat, satSet.getSat(objectManager.selectedSat)) + '';
+  satHoverBoxNode2.innerHTML = sat.country + satellite.distanceString(sat, satSet.getSat(objectManager.selectedSat)) + '';
   satHoverBoxNode3.textContent = '';
 };
 export const star = (sat: SatObject) => {
@@ -256,7 +263,7 @@ export const planetariumView = (satId: number) => {
   }
   return false;
 };
-export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {  
+export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
   if (typeof satHoverBoxDOM === 'undefined' || satHoverBoxDOM === null) return;
 
   if (planetariumView(satId)) return;
@@ -269,6 +276,7 @@ export const hoverBoxOnSat = (satId: number, satX: number, satY: number) => {
 };
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
+// prettier-ignore
 export const updateHover = () => { // NOSONAR
   const { drawManager, mainCamera, orbitManager, uiManager, searchBox, satSet, timeManager } = keepTrackApi.programs;  
 

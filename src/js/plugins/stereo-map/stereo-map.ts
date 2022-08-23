@@ -74,6 +74,7 @@ export const init = (): void => {
   });
 };
 
+// prettier-ignore
 export const updateMap = async (): Promise<void> => { // NOSONAR
   try {
     const { sensorManager, satellite, mapManager, objectManager, satSet } = keepTrackApi.programs;
@@ -243,7 +244,8 @@ export const drawEarthLayer = async (ctx: CanvasRenderingContext2D): Promise<voi
     ctx.drawImage(earthImg, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
     return Promise.resolve();
   } else {
-    earthImg.src = `${settingsManager.installDirectory}textures/earthmap16k.jpg`;
+    // earthImg.src = `${settingsManager.installDirectory}textures/earthmap16k.jpg`;
+    earthImg.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
     earthImg.onload = () => {
       ctx.drawImage(earthImg, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
       return Promise.resolve();
@@ -251,8 +253,8 @@ export const drawEarthLayer = async (ctx: CanvasRenderingContext2D): Promise<voi
   }
 };
 
-export const bottomMenuClick = (iconName: string): void => {
-  // NOSONAR
+// prettier-ignore
+export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-map') {
     const { mapManager, uiManager, objectManager } = keepTrackApi.programs;
     if (mapManager.isMapMenuOpen) {

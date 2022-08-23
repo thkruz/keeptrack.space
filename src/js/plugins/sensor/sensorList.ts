@@ -573,7 +573,7 @@ const sensorList: SensorList = {
     url: 'https://platform.leolabs.space/sites/msr',
     country: 'United States',
     sun: 'No Impact',
-    volume: false,
+    volume: true,
   },
 
   PFISR: {
@@ -594,7 +594,7 @@ const sensorList: SensorList = {
     url: 'https://platform.leolabs.space/sites/pfisr',
     country: 'United States',
     sun: 'No Impact',
-    volume: false,
+    volume: true,
   },
 
   KSR: {
@@ -621,7 +621,34 @@ const sensorList: SensorList = {
     url: 'https://platform.leolabs.space/sites/ksr',
     country: 'United States',
     sun: 'No Impact',
-    volume: false,
+    volume: true,
+  },
+
+  CRSR: {
+    name: 'Costa Rica Space Radar, Costa Rica',
+    shortName: 'CRSR',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
+    lat: 10.611782670733335, // https://www.radartutorial.eu/19.kartei/02.surv/karte087.en.html
+    lon: -85.52869380341954,
+    alt: 0.0,
+    obsminaz: 209,
+    obsmaxaz: 211,
+    obsminel: 20,
+    obsmaxel: 180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    obsminrange: 100,
+    obsmaxrange: 3000,
+    obsminaz2: 119,
+    obsmaxaz2: 121,
+    obsminel2: 20,
+    obsmaxel2: 180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    obsminrange2: 100,
+    obsmaxrange2: 3000,
+    zoom: 'leo',
+    changeObjectInterval: 1000,
+    url: 'https://platform.leolabs.space/sites/crsr',
+    country: 'United States',
+    sun: 'No Impact',
+    volume: true,
   },
 
   // //////////////////////
@@ -890,19 +917,96 @@ const sensorList: SensorList = {
     sun: 'No Impact',
     volume: false,
   },
-  XUA: {
-    name: 'Xuanhua, China',
-    shortName: 'XUA',
+  // XUA: { // Not operational anymore
+  //   name: 'Xuanhua, China',
+  //   shortName: 'XUA',
+  //   type: SpaceObjectType.PHASED_ARRAY_RADAR,
+  //   lat: 40.446944,
+  //   lon: 115.116389,
+  //   alt: 1.6,
+  //   obsminaz: 300, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+  //   obsmaxaz: 60, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+  //   obsminel: 2, // Information via globalsecurity.org
+  //   obsmaxel: 80, // Information via globalsecurity.org
+  //   obsminrange: 300,
+  //   obsmaxrange: 3000, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+  //   zoom: 'leo',
+  //   changeObjectInterval: 1000,
+  //   country: 'China',
+  //   sun: 'No Impact',
+  //   volume: false,
+  // },
+  XIN: {
+    name: 'Xingjiang, China', // Korla
+    shortName: 'XIN',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
-    lat: 40.446944,
-    lon: 115.116389,
-    alt: 1.6,
-    obsminaz: 300, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-    obsmaxaz: 60, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-    obsminel: 2, // Information via globalsecurity.org
-    obsmaxel: 80, // Information via globalsecurity.org
+    lat: 41.64131987863126, // https://hfasia.blogspot.com/2017/02/blog-post_50.html
+    lon: 86.23695312232473,
+    alt: 0.993, // https://www.freemaptools.com/elevation-finder.htm
+    obsminaz: 0, // https://www.globalsecurity.org/space/world/china/images/xinjiang-radar-image-2018-1-s.jpg
+    obsmaxaz: 360, // It is on a rotatable platform
+    obsminel: 3, // Assumed same characteristics as AN/FPS-115
+    obsmaxel: 85,
+    obsminrange: 200, // Assumed same characteristics as AN/FPS-115
+    obsmaxrange: 5556, // Assumed same characteristics as AN/FPS-115
+    zoom: 'leo',
+    changeObjectInterval: 1000,
+    country: 'China',
+    sun: 'No Impact',
+    volume: false,
+  },
+  ZHE: {
+    name: 'Zhejiang, China',
+    shortName: 'ZHE',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
+    lat: 30.28661248844618, // https://hfasia.blogspot.com/2017/02/blog-post_50.html
+    lon: 119.12859385017512,
+    alt: 1.342, // https://www.freemaptools.com/elevation-finder.htm
+    obsminaz: 60,
+    obsmaxaz: 300,
+    obsminel: 2,
+    obsmaxel: 80,
     obsminrange: 300,
-    obsmaxrange: 3000, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+    obsmaxrange: 3000,
+    zoom: 'leo',
+    changeObjectInterval: 1000,
+    country: 'China',
+    sun: 'No Impact',
+    volume: false,
+  },
+  HEI: {
+    name: 'Heilongjiang, China',
+    shortName: 'HEI',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR, // https://www.globalsecurity.org/wmd/world/china/lpar-x.htm
+    lat: 46.528164,
+    lon: 130.755235,
+    alt: 0.241, // https://www.freemaptools.com/elevation-finder.htm
+    obsminaz: 135, // X-Band https://www.globalsecurity.org/wmd/world/china/lpar-x.htm
+    obsmaxaz: 225, // Assumed +/- 45 degrees
+    obsminel: 3,
+    obsmaxel: 65,
+    obsminrange: 200,
+    obsmaxrange: 3000,
+    zoom: 'leo',
+    changeObjectInterval: 1000,
+    country: 'China',
+    sun: 'No Impact',
+    volume: false,
+  },
+  SHD: {
+    name: 'Shandong, China', // P-Band (225 Mhz - 390 Mhz)
+    shortName: 'SHD',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR, // https://www.globalsecurity.org/wmd/world/china/lpar-p.htm
+    lat: 36.023072,
+    lon: 118.093115,
+    alt: 0.694, // https://www.freemaptools.com/elevation-finder.htm
+    obsminaz: 343.9, // Two Faces Boresight ~163.9 and ~103.9 degrees
+    // https://www.omnicalculator.com/other/azimuth (163.9 degrees if aimed at Taipei)
+    obsmaxaz: 223.9, // https://www.defensenews.com/global/asia-pacific/2022/04/18/new-chinese-radar-looks-towards-japan-satellite-image-shows/
+    obsminel: 3,
+    obsmaxel: 85,
+    obsminrange: 200,
+    obsmaxrange: 5500, // ~10,000 Transceivers
     zoom: 'leo',
     changeObjectInterval: 1000,
     country: 'China',

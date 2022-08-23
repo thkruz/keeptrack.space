@@ -2,7 +2,7 @@
 // This loads all of the various modules that provide objects for the screen
 
 import { keepTrackApi } from '../api/keepTrackApi';
-import { ObjectManager, SatObject } from '../api/keepTrackTypes';
+import { SatObject } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { getEl } from '../lib/helpers';
 import { stars } from '../starManager/stars';
@@ -62,9 +62,373 @@ const extractLiftVehicle = (LV: string): string => {
 };
 
 const extractCountry = (C: string): string => {
+  // prettier-ignore
   switch (C) { // NOSONAR
+    case 'AAT':
+      return 'AAT';
+    case 'ADG':
+      return 'Adygea';
+    case 'AF':
+      return 'Afganistan';
+    case 'AG':
+      return 'Antigua';
+    case 'AGUK':
+      return 'Antigua';
+    case 'AM':
+      return 'Armenia';
+    case 'ANTN':
+      return 'Neth. Antilles';
+    case 'AO':
+      return 'Angola';
+    case 'AQ':
+      return 'Antarctica';
+    case 'AR':
+      return 'Argentina';
+    case 'ARV':
+      return 'Arg. Antarctic';
+    case 'AT':
+      return 'Austria';
+    case 'AU':
+      return 'Australia';
+    case 'AZ':
+      return 'Azerbaijan';
+    case 'B':
+      return 'Belgium';
+    case 'BASH':
+      return 'Bashkiria';
+    case 'BAT':
+      return 'BAT';
+    case 'BB':
+      return 'Barbados';
+    case 'BBUK':
+      return 'Barbados';
+    case 'BD':
+      return 'Bangladesh';
+    case 'BG':
+      return 'Bulgaria';
+    case 'BGN':
+      return 'PR Bulgaria';
+    case 'BM':
+      return 'Bermuda';
+    case 'BO':
+      return 'Bolivia';
+    case 'BR':
+      return 'Brazil';
+    case 'BS':
+      return 'Bahamas';
+    case 'BT':
+      return 'Bhutan';
+    case 'BY':
+      return 'Belarus';
+    case 'CA':
+      return 'Canada';
+    case 'CD':
+      return 'DR Congo';
+    case 'CH':
+      return 'Switzerland';
+    case 'CI':
+      return 'Ivory Coast';
+    case 'CK':
+      return 'Cook Islands';
+    case 'CL':
+      return 'Chile';
+    case 'CM':
+      return 'Cameroon';
+    case 'CN':
+      return 'China';
+    case 'CO':
+      return 'Colombia';
+    case 'COLP':
+      return 'Congo';
+    case 'CR':
+      return 'Costa Rica';
+    case 'CSFR':
+      return 'Czechoslovakia';
+    case 'CSSR':
+      return 'Czechoslovakia';
+    case 'CU':
+      return 'Cuba';
+    case 'CYM':
+      return 'Cayman Is.';
+    case 'CYMRU':
+      return 'Wales';
+    case 'CZ':
+      return 'Czech Republic';
+    case 'D':
+      return 'Germany';
+    case 'DAG':
+      return 'Dagestan';
+    case 'DD':
+      return 'East Germany';
+    case 'DK':
+      return 'Denmark';
+    case 'DML':
+      return 'Queen Maud Land';
+    case 'DR':
+      return 'Germany (Reich)';
+    case 'DX':
+      return 'Germany (occ.)';
+    case 'DZ':
+      return 'Algeria';
+    case 'E':
+      return 'Spain';
+    case 'EC':
+      return 'Ecuador';
+    case 'EE':
+      return 'Estonia';
+    case 'EG':
+      return 'Egypt';
+    case 'ENG':
+      return 'England';
+    case 'ESCN':
+      return 'Canary Is';
+    case 'ET':
+      return 'Ethiopia';
+    case 'F':
+      return 'France';
+    case 'FI':
+      return 'Finland';
+    case 'GE':
+      return 'Georgia';
+    case 'GH':
+      return 'Ghana';
+    case 'GI':
+      return 'Gibraltar';
+    case 'GL':
+      return 'Greenland';
+    case 'GR':
+      return 'Greece';
+    case '':
+      return 'GRD  Grenada';
+    case 'GT':
+      return 'Guatemala';
+    case 'GU':
+      return 'Guam';
+    case 'GUF':
+      return 'French Guiana';
+    case 'HK':
+      return 'China(Hong Kong)';
+    case 'HKUK':
+      return 'Hong Kong';
+    case 'HU':
+      return 'Hungary';
+    case 'I':
+      return 'Italy';
+    case 'I-ARAB':
+      return 'Arabsat';
+    case 'I-CSC1':
+      return 'COSPAS-SARSAT';
+    case 'I-ELDO':
+      return 'European Launcher Development Organization';
+    case 'I-ESRO':
+      return 'European Space Research Organization';
+    case 'I-EUM':
+      return 'EUMETSAT';
+    case 'I-EU':
+      return 'EU';
+    case 'I-EUT':
+      return 'EUTELSAT';
+    case 'I-INM':
+      return 'INMARSAT';
+    case 'I-INT':
+      return 'INTELSAT';
+    case 'I-ISS':
+      return 'ISS';
+    case 'I-NATO':
+      return 'North Atlantic Treaty Organization';
+    case 'I-RASC':
+      return 'RASCOM';
+    case 'ID':
+      return 'Indonesia';
+    case 'IE':
+      return 'Ireland';
+    case 'IL':
+      return 'Israel';
+    case 'IN':
+      return 'India';
+    case 'IQ':
+      return 'Iraq';
+    case 'IR':
+      return 'Iran';
+    case 'IS':
+      return 'Iceland';
+    case 'J':
+      return 'Japan';
+    case 'JO':
+      return 'Jordan';
+    case 'KE':
+      return 'Kenya';
+    case 'KI':
+      return 'Kiribati';
+    case 'KG':
+      return 'Kyrgyzstan';
+    case 'KGSR':
+      return 'Kyrgyz SSR';
+    case 'KH':
+      return 'Cambodia';
+    case 'KORS':
+      return 'Neth. Antilles';
+    case 'KORSA':
+      return 'Neth. Antilles';
+    case 'KP':
+      return 'North Korea';
+    case 'KR':
+      return 'South Korea';
+    case 'KW':
+      return 'Kuwait';
+    case 'KZ':
+      return 'Kazakhstan';
+    case 'L':
+      return 'Luxembourg';
+    case 'LA':
+      return 'Laos';
+    case 'LB':
+      return 'Lebanon';
+    case 'LK':
+      return 'Sri Lanka';
+    case 'LT':
+      return 'Lithuania';
+    case 'LV':
+      return 'Latvia';
+    case 'LY':
+      return 'Libya';
+    case 'MA':
+      return 'Morocco';
+    case 'MC':
+      return 'Monaco';
+    case 'MD':
+      return 'Moldova';
+    case 'MH':
+      return 'Marshall Is.';
+    case 'MN':
+      return 'Mongolia';
+    case 'MR':
+      return 'Mauritania';
+    case 'MU':
+      return 'Mauritius';
+    case 'MV':
+      return 'Maldives';
+    case 'MX':
+      return 'Mexico';
+    case 'MY':
+      return 'Malaysia';
+    case 'MYM':
+      return 'Myanmar';
+    case 'N':
+      return 'Norway';
+    case 'NG':
+      return 'Nigeria';
+    case 'NL':
+      return 'Netherlands';
+    case 'NP':
+      return 'Nepal';
+    case 'NZ':
+      return 'New Zealand';
+    case 'NZRD':
+      return 'Ross Dep.';
+    case 'P':
+      return 'Portugal';
+    case 'PAR':
+      return 'Panama';
+    case 'PCZ':
+      return 'Canal Zone';
+    case 'PE':
+      return 'Peru';
+    case 'PG':
+      return 'Papua New Guinea';
+    case 'PK':
+      return 'Pakistan';
+    case 'PH':
+      return 'Phillipines';
+    case 'PL':
+      return 'Poland';
+    case 'PLRL':
+      return 'Poland';
+    case 'PR':
+      return 'Puerto Rico';
+    case 'PT':
+      return 'Portugal';
+    case 'PY':
+      return 'Paraguay';
+    case 'QA':
+      return 'Qatar';
+    case 'RO':
+      return 'Romania';
+    case 'RU':
+      return 'Russia';
+    case 'RW':
+      return 'Rwanda';
+    case 'S':
+      return 'Sweden';
+    case 'SA':
+      return 'Saudi Arabia';
+    case 'SCOT':
+      return 'Scotland';
+    case 'SD':
+      return 'Sudan';
+    case 'SG':
+      return 'Singapore';
+    case 'SH':
+      return 'St Helena';
+    case 'SI':
+      return 'Slovenia';
+    case 'SK':
+      return 'Slovakia';
+    case 'SR':
+      return 'Suriname';
+    case 'SU':
+      return 'USSR';
+    case 'SY':
+      return 'Syria';
+    case 'T':
+      return 'Thailand';
+    case 'TC':
+      return 'Turks and Caicos';
+    case 'TF':
+      return 'French SAL';
+    case 'TJ':
+      return 'Tajikistan';
+    case 'TM':
+      return 'Turkmenistan';
+    case 'TN':
+      return 'Tunisia';
+    case 'TO':
+      return 'Tonga';
+    case 'TR':
+      return 'Turkey';
+    case 'TTPI':
+      return 'TTPI';
+    case 'TUVA':
+      return 'Tuva';
+    case 'TW':
+      return 'Taiwan';
+    case 'UA':
+      return 'Ukraine';
+    case 'UAE':
+      return 'United Arab Emirates';
+    case 'UK':
+      return 'United Kingdom';
+    case 'UM':
+      return 'Wake I.';
+    case 'US':
+      return 'United States';
+    case 'UY':
+      return 'Uruguay';
+    case 'UZ':
+      return 'Uzbekistan';
+    case 'VE':
+      return 'Venezuela';
+    case 'VN':
+      return 'Vietnam';
+    case 'YE':
+      return 'Yemen';
+    case 'ZA':
+      return 'South Africa';
+    case 'ZR':
+      return 'Zaire';
     case 'ANALSAT':
       return 'Analyst Satellite';
+    case 'SAUD':
     case 'AB':
       // Headquartered in Riyadh, Saudi Arabia
       return 'Saudi Arabia';
@@ -92,14 +456,12 @@ const extractCountry = (C: string): string => {
       return 'Bolivia';
     case 'BRAZ':
       return 'Brazil';
-    case 'CA':
-      return 'Canada';
     case 'CHBZ':
       return 'China/Brazil';
     case 'CHLE':
       return 'Chile';
     case 'CIS':
-      return 'Commonwealth of Ind States';
+      return 'USSR/Russia';
     case 'COL':
       return 'Colombia';
     case 'CZCH':
@@ -111,10 +473,8 @@ const extractCountry = (C: string): string => {
     case 'EGYP':
       return 'Egypt';
     case 'ESA':
+    case 'I-ESA':
       return 'European Space Agency';
-    // case 'ESA':
-    //   return'European Space Research Org';
-    // }
     case 'EST':
       return 'Estonia';
     case 'EUME':
@@ -203,13 +563,12 @@ const extractCountry = (C: string): string => {
       // Headquartered in Mauritius
       return 'Mauritius';
     case 'ROC':
+    case 'Taiwan':
       return 'Taiwan';
     case 'ROM':
       return 'Romania';
     case 'SAFR':
       return 'South Africa';
-    case 'SAUD':
-      return 'Saudi Arabia';
     case 'SEAL':
       // Primary Shareholder Russian
       return 'Russia';
@@ -235,15 +594,11 @@ const extractCountry = (C: string): string => {
       return 'Turkmenistan/Monaco';
     case 'TURK':
       return 'Turkey';
-    case 'UAE':
-      return 'United Arab Emirates';
-    case 'UK':
-      return 'United Kingdom';
     case 'UKR':
       return 'Ukraine';
     case 'URY':
       return 'Uruguay';
-    case 'US':
+    case 'USA':
       return 'United States';
     case 'USBZ':
       return 'United States/Brazil';
@@ -251,12 +606,71 @@ const extractCountry = (C: string): string => {
       return 'Venezuela';
     case 'VTNM':
       return 'Vietnam';
+    case 'TBD':
     default:
       return 'Unknown';
   }
 };
 
+export const getCountryCode = (country) => {
+  // prettier-ignore
+  switch (country) {
+    case 'Afghanistan': return 'AF';
+    case 'Argentina': return 'AR';
+    case 'Austria': return 'AT';
+    case 'Australia': return 'AU';
+    case 'Belgium': return 'B';
+    case 'Brazil': return 'BR';
+    case 'Canada': return 'CA';
+    case 'China': return 'CN';
+    case 'Colombia': return 'CO';
+    case 'Denmark': return 'DK';
+    case 'Egypt': return 'EG';
+    case 'Finland': return 'FI';
+    case 'France': return 'F';
+    case 'Germany': return 'D';
+    case 'Hong Kong': return 'HK';
+    case 'Hungary': return 'HU';
+    case 'India': return 'IN';
+    case 'Indonesia': return 'ID';
+    case 'Iran': return 'IR';
+    case 'Iraq': return 'IQ';
+    case 'Ireland': return 'IE';
+    case 'Italy': return 'I';
+    case 'Israel': return 'IL';
+    case 'Japan': return 'J';
+    case 'North Korea': return 'KP';
+    case 'South Korea': return 'KR';
+    case 'Mexico': return 'MX';
+    case 'Norway': return 'N';
+    case 'New Zealand': return 'NZ';
+    case 'Philippines': return 'PH';
+    case 'Poland': return 'PL';
+    case 'Portugal': return 'PT';
+    case 'Russia': return 'RU|SU|CIS';
+    case 'Saudi Arabia': return 'SA';
+    case 'Singapore': return 'SG';
+    case 'Spain': return 'E';
+    case 'Sweden': return 'S';
+    case 'Switzerland': return 'CH';
+    case 'Thailand': return 'T';
+    case 'Turkey': return 'TR';
+    case 'United Arab Emirates': return 'AE';
+    case 'UnitedKingdom':
+    case 'United Kingdom': return 'UK';
+    case 'UnitedStates':
+    case 'United States': return 'US';
+    case 'Venezuela': return 'VE';
+    case 'Vietnam': return 'VN';
+    case 'South Africa': return 'ZA';
+    default: 
+      console.debug('Unknown country: ' + country);
+      return '';
+  }
+};
+
 const extractLaunchSite = (LS: string): { site: string; sitec: string } => {
+  // prettier-ignore
   switch (LS) { // NOSONAR
     case 'ANALSAT':
       return {
@@ -445,10 +859,12 @@ const setLasthoveringSat = (id: number): void => {
   objectManager.lasthoveringSat = id;
 };
 const setSelectedSat = (id: number): void => {
+  if (settingsManager.isDisableSelectSat || id === null) return;
   objectManager.selectedSat = id;
 };
 const setSecondarySat = (id: number): void => {
-  const {satSet} = keepTrackApi.programs;
+  if (settingsManager.isDisableSelectSat) return;
+  const { satSet } = keepTrackApi.programs;
   objectManager.secondarySat = id;
   objectManager.secondarySatObj = satSet.getSat(id);
   if (objectManager.selectedSat !== -1) {
@@ -457,21 +873,21 @@ const setSecondarySat = (id: number): void => {
 };
 
 const switchPrimarySecondary = (): void => {
-  const {orbitManager} = keepTrackApi.programs;
+  const { orbitManager } = keepTrackApi.programs;
   const _primary = objectManager.selectedSat;
   const _secondary = objectManager.secondarySat;
-  setSecondarySat(_primary);  
+  setSecondarySat(_primary);
   if (_primary !== -1) {
     orbitManager.setSelectOrbit(_primary, true);
   } else {
     orbitManager.clearSelectOrbit(true);
   }
   setSelectedSat(_secondary);
-}
+};
 
-
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
+// This is intentionally complex to reduce object creation and GC
+// Splitting it into subfunctions would not be optimal
+// prettier-ignore
 const init = () => { // NOSONAR
   const sensorManager = keepTrackApi.programs.sensorManager;
   // Create a buffer of missile objects
@@ -547,8 +963,8 @@ const init = () => { // NOSONAR
     for (const sensor in sensorList) {
       objectManager.staticSet.push({ ...{ static: true }, ...sensorList[sensor] });
     }
-    objectManager.isSensorManagerLoaded = true;
   }
+  objectManager.isSensorManagerLoaded = true;
 
   // Create Launch Sites
   if (!settingsManager.isDisableLaunchSites) {
@@ -613,7 +1029,8 @@ const init = () => { // NOSONAR
   objectManager.satLinkManager = satLinkManager;
 };
 
-export const objectManager: ObjectManager = {
+export type ObjectManager = typeof objectManager;
+export const objectManager = {
   analSatSet: [],
   extractLaunchSite: extractLaunchSite,
   fieldOfViewSet: [],
@@ -643,5 +1060,5 @@ export const objectManager: ObjectManager = {
   extractCountry,
   extractLiftVehicle,
   lastSelectedSat,
-  switchPrimarySecondary
+  switchPrimarySecondary,
 };

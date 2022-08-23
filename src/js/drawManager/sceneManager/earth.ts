@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { Camera, DotsManager, EarthObject } from '@app/js/api/keepTrackTypes';
+import { DotsManager } from '@app/js/api/keepTrackTypes';
+import { Camera } from '@app/js/camera/camera';
 import { DEG2RAD, MILLISECONDS_PER_DAY, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { satellite } from '@app/js/satMath/satMath';
 import { jday } from '@app/js/timeManager/transforms';
@@ -107,13 +108,13 @@ export const initNightTexture = (gl: WebGL2RenderingContext): void => {
   earth.loadHiResNight = async () => {
     try {
       earth.nightImgHiRes = new Image();
+      earth.nightImgHiRes.onload = () => {
+        nightImgHiOnLoad(gl);
+      };
       if (!settingsManager.smallImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/earthlights4k.jpg`;
       if (settingsManager.vectorImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/dayearthvector-4096.jpg`;
       if (settingsManager.politicalImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/political8k.jpg`;
       if (settingsManager.hiresImages || settingsManager.hiresNoCloudsImages) earth.nightImgHiRes.src = `${settingsManager.installDirectory}textures/earthlights16k.jpg`;
-      earth.nightImgHiRes.onload = () => {
-        nightImgHiOnLoad(gl);
-      };
     } catch (e) {
       console.debug(e);
     }
@@ -132,6 +133,9 @@ export const initDayTexture = (gl: WebGL2RenderingContext): void => {
   earth.loadHiRes = async () => {
     try {
       earth.imgHiRes = new Image();
+      earth.imgHiRes.onload = () => {
+        dayImgHiOnLoad(gl);
+      };
       earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
       if (settingsManager.smallImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap512.jpg`;
       if (settingsManager.nasaImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/mercator-tex.jpg`;
@@ -142,9 +146,6 @@ export const initDayTexture = (gl: WebGL2RenderingContext): void => {
       if (settingsManager.hiresImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmapclouds16k.jpg`;
       if (settingsManager.hiresNoCloudsImages) earth.imgHiRes.src = `${settingsManager.installDirectory}textures/earthmap16k.jpg`;
       earth.isUseHiRes = true;
-      earth.imgHiRes.onload = () => {
-        dayImgHiOnLoad(gl);
-      };
     } catch (e) {
       console.debug(e);
     }
@@ -489,12 +490,12 @@ export const update = (): void => {
   earth.earthEra = satellite.gstime(earth.earthJ);
 
   updateSunCurrentDirection();
-  glm.vec3.normalize(earth.lightDirection, earth.lightDirection);
+  glm.vec3.normalize(<glm.vec3>(<unknown>earth.lightDirection), <glm.vec3>(<unknown>earth.lightDirection));
 
   mvMatrix = glm.mat4.create();
   glm.mat4.identity(mvMatrix);
   glm.mat4.rotateZ(mvMatrix, mvMatrix, earth.earthEra);
-  glm.mat4.translate(mvMatrix, mvMatrix, earth.pos);
+  glm.mat4.translate(mvMatrix, mvMatrix, <glm.ReadonlyVec3>(<unknown>earth.pos));
   // DEBUG:
   // glm.mat4.scale(mvMatrix, mvMatrix, [2,2,2]);
   nMatrix = glm.mat3.create();
@@ -545,7 +546,8 @@ export const updateSunCurrentDirection = (): void => {
 /* ***************************************************************************
  * Export Code
  * ***************************************************************************/
-export const earth: EarthObject = {
+export type EarthObject = typeof earth;
+export const earth = {
   init: init,
   draw: draw,
   program: null,

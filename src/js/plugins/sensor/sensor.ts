@@ -20,14 +20,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SensorObject } from '@app/js/api/keepTrackTypes';
-import radioTowerPng from '@app/img/icons/radio-tower.png';
-import radarPng from '@app/img/icons/radar.png';
 import customPng from '@app/img/icons/custom.png';
 import lookanglesPng from '@app/img/icons/lookangles.png';
 import multiSitePng from '@app/img/icons/multi-site.png';
+import radarPng from '@app/img/icons/radar.png';
+import radioTowerPng from '@app/img/icons/radio-tower.png';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SensorObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { toast } from '@app/js/uiManager/ui/toast';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
@@ -36,7 +37,6 @@ let isLookanglesMultiSiteMenuOpen = false;
 let customSensors = <SensorObject[]>[];
 
 export const resetSensorButtonClick = () => {
-  settingsManager.isForceColorScheme = false;
   getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
   getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');
   getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
@@ -60,10 +60,10 @@ export const removeLastSensor = () => {
   } else {
     clearCustomSensors();
   }
-}
+};
 
 export const csTelescopeClick = () => {
-  const { sensorManager } = keepTrackApi.programs;  
+  const { sensorManager } = keepTrackApi.programs;
   // If it is checked
   if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
     getEl('cs-minaz-div').style.display = 'none';
@@ -96,12 +96,17 @@ export const csTelescopeClick = () => {
   }
 };
 export const uiManagerInit = () => {
-  getEl('nav-mobile').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('nav-mobile').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
     <div id="sensor-selected"></div>
-  `));
+  `
+  );
 
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('left-menus').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
           <div id="sensor-list-content" class="side-menu">                  
             <div class="row">
@@ -176,7 +181,9 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <li class="menu-selectable" data-sensor="llAll">All Sensors<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
-                <li class="menu-selectable" data-sensor="MSR">Mdata-sensorland Radar<span class="badge dark-blue-badge"
+                <li class="menu-selectable" data-sensor="CRSR">Costa Rica Space Radar<span class="badge dark-blue-badge"
+                    data-badge-caption="Comm"></span></li>
+                <li class="menu-selectable" data-sensor="MSR">Midland Space Radar<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
                 <li class="menu-selectable" data-sensor="PFISR">PFIS Radar<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
@@ -225,8 +232,16 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <h5 class="center-align">Chinese Sensors</h5>
                 <li class="divider"></li>
-                <li class="menu-selectable" data-sensor="XUA">Xuanhua<span class="badge dark-blue-badge"
+                <li class="menu-selectable" data-sensor="prcAll">All Chinese Sensors<span
+                    class="badge dark-blue-badge" data-badge-caption="PRC"></span></li>
+                <li class="menu-selectable" data-sensor="XIN">Xingjiang<span class="badge dark-blue-badge"
                     data-badge-caption="PRC"></span></li>
+                <li class="menu-selectable" data-sensor="ZHE">Zhejiang<span class="badge dark-blue-badge"
+                    data-badge-caption="PRC"></span></li>                    
+                <li class="menu-selectable" data-sensor="HEI">Heilongjiang<span class="badge dark-blue-badge"
+                    data-badge-caption="PRC"></span></li>       
+                <li class="menu-selectable" data-sensor="SHD">Shadong<span class="badge dark-blue-badge"
+                    data-badge-caption="PRC"></span></li>       
                 <li class="menu-selectable" data-sensor="PMO">Purple Mountain<span class="badge dark-blue-badge"
                     data-badge-caption="PRC"></span></li>
               </ul>
@@ -347,6 +362,12 @@ export const uiManagerInit = () => {
                 <div class="sensor-info-key">Max Range</div>
                 <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
               </div>
+              <div class="center-align row">
+                <button id="sensor-sun-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line to Sun &#9658;</button>
+              </div>
+              <div class="center-align row">
+                <button id="sensor-moon-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line to Moon &#9658;</button>
+              </div>
             </div>
           </div>
         </div>
@@ -365,7 +386,7 @@ export const uiManagerInit = () => {
                   </label>
                 </div>
                 <div class="input-field col s6">
-                  <input value="7" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated" />
+                  <input value="2" id="lookanglesLength" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Lookangles Should be Calculated" />
                   <label for="lookanglesLength" class="active">Length (Days)</label>
                 </div>
                 <div class="input-field col s6">
@@ -394,10 +415,13 @@ export const uiManagerInit = () => {
             </div>
           </div>
         </div>
-      `));
+      `
+  );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+  getEl('bottom-icons').insertAdjacentHTML(
+    'beforeend',
+    keepTrackApi.html`
         <div id="menu-sensor-list" class="bmenu-item">
           <img
             alt="radar"
@@ -438,14 +462,17 @@ export const uiManagerInit = () => {
           <span class="bmenu-title">Multi-Site Looks</span>
           <div class="status-icon"></div>
         </div>
-      `));  
+      `
+  );
 };
 
 export const refreshLookanglesData = () => {
   const { satellite, objectManager, satSet } = keepTrackApi.programs;
-  showLoading(() => {      
+  showLoading(() => {
     const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-    satellite.getlookangles(sat);
+    if (sat) {
+      satellite.getlookangles(sat);
+    }
   });
 };
 
@@ -475,25 +502,54 @@ export const uiManagerFinal = () => {
     refreshLookanglesData();
   });
 
+  getEl('sensor-sun-btn').addEventListener('click', () => {
+    const { lineManager, satSet, drawManager, sensorManager } = keepTrackApi.programs;
+
+    // Draw Line to Sun from Sensor
+    const sensors = sensorManager.currentSensor;
+    if (sensors.length !== 1) {
+      toast('Please Select Only One Sensor', 'caution');
+    }
+    const sensor = sensors[0];
+    const sensorId = satSet.getSensorFromSensorName(sensor.name);
+    lineManager.create('sat2', [sensorId, drawManager.sceneManager.sun.pos[0], drawManager.sceneManager.sun.pos[1], drawManager.sceneManager.sun.pos[2]], 'o');
+  });
+
+  getEl('sensor-moon-btn').addEventListener('click', () => {
+    const { lineManager, satSet, drawManager, sensorManager } = keepTrackApi.programs;
+
+    // Draw Line to Sun from Sensor
+    const sensors = sensorManager.currentSensor;
+    if (sensors.length !== 1) {
+      toast('Please Select Only One Sensor', 'caution');
+    }
+    const sensor = sensors[0];
+    const sensorId = satSet.getSensorFromSensorName(sensor.name);
+    lineManager.create(
+      'sat2',
+      [sensorId, drawManager.sceneManager.moon.drawPosition[0], drawManager.sceneManager.moon.drawPosition[1], drawManager.sceneManager.moon.drawPosition[2]],
+      'w'
+    );
+  });
+
   getEl('settings-riseset').addEventListener('change', settingsRisesetChange);
 
   getEl('sensor-list-content').addEventListener('click', (e: any) => {
-    if (!e.target.classList.contains('menu-selectable')) return
+    if (!e.target.classList.contains('menu-selectable')) return;
     if (e.target.id === 'reset-sensor-button') return;
     const sensorClick = e.target.dataset.sensor;
     sensorListContentClick(sensorClick);
   });
 
-
   getEl('customSensor').addEventListener('submit', (e: Event) => {
     e.preventDefault();
   });
 
-  clickAndDragWidth(getEl('sensor-list-menu'), {minWidth: 280, maxWidth: 450});
-  clickAndDragWidth(getEl('sensor-info-menu'), {minWidth: 280, maxWidth: 450});
-  clickAndDragWidth(getEl('customSensor-menu'), {minWidth: 280, maxWidth: 450});
-  clickAndDragWidth(getEl('lookangles-menu'), {minWidth: 280, maxWidth: 450});
-  clickAndDragWidth(getEl('lookanglesmultisite-menu'), {minWidth: 280, maxWidth: 450});
+  clickAndDragWidth(getEl('sensor-list-menu'), { minWidth: 280, maxWidth: 450 });
+  clickAndDragWidth(getEl('sensor-info-menu'), { minWidth: 280, maxWidth: 450 });
+  clickAndDragWidth(getEl('customSensor-menu'), { minWidth: 280, maxWidth: 450 });
+  clickAndDragWidth(getEl('lookangles-menu'), { minWidth: 280, maxWidth: 450 });
+  clickAndDragWidth(getEl('lookanglesmultisite-menu'), { minWidth: 280, maxWidth: 450 });
 
   getEl('reset-sensor-button').addEventListener('click', resetSensorButtonClick);
   getEl('cs-telescope').addEventListener('click', csTelescopeClick);
@@ -571,6 +627,9 @@ export const sensorListContentClick = (sensorClick: string) => {
     case 'rusAll':
       sensorManager.setSensor('RUS-ALL');
       break;
+    case 'prcAll':
+      sensorManager.setSensor('PRC-ALL');
+      break;
     default:
       sensorManager.setSensor(sensorManager.sensorList[`${sensorClick}`]);
       break;
@@ -589,6 +648,7 @@ export const sensorListContentClick = (sensorClick: string) => {
   }
 };
 
+// prettier-ignore
 export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   const { uiManager, sensorManager, satSet, objectManager, satellite } = keepTrackApi.programs;
   switch (iconName) {
@@ -735,15 +795,18 @@ export const init = (): void => {
     method: 'hideSideMenus',
     cbName: 'sensor',
     cb: hideSideMenus,
-  });  
+  });
 };
 
 export const selectSatData = () => {
   const { satSet } = keepTrackApi.programs;
   if (!sensorLinks) {
-    getEl('sat-info-top-links').insertAdjacentHTML('beforeend', (keepTrackApi.html`
+    getEl('sat-info-top-links').insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
         <div id="sensors-in-fov-link" class="link sat-infobox-links">Show All Sensors with FOV...</div>
-      `));
+      `
+    );
     getEl('sensors-in-fov-link').addEventListener('click', () => {
       Object.keys(keepTrackApi.programs.sensorManager.sensorList).forEach((key) => {
         const sensor = keepTrackApi.programs.sensorManager.sensorList[key];
@@ -789,9 +852,9 @@ export const customSensorSubmit = (): void => {
   getEl('menu-surveillance')?.classList.remove('bmenu-item-disabled');
   getEl('menu-planetarium')?.classList.remove('bmenu-item-disabled');
   getEl('menu-astronomy')?.classList.remove('bmenu-item-disabled');
-  (<HTMLInputElement>getEl('sensor-type')).value = ((<HTMLInputElement>getEl('cs-type')).value).replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
-  getEl('sensor-info-title').innerHTML = ('Custom Sensor');
-  getEl('sensor-country').innerHTML = ('Custom Sensor');
+  (<HTMLInputElement>getEl('sensor-type')).value = (<HTMLInputElement>getEl('cs-type')).value.replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
+  getEl('sensor-info-title').innerHTML = 'Custom Sensor';
+  getEl('sensor-country').innerHTML = 'Custom Sensor';
 
   const lon = parseFloat(<string>(<HTMLInputElement>getEl('cs-lon')).value);
   const lat = parseFloat(<string>(<HTMLInputElement>getEl('cs-lat')).value);
@@ -804,18 +867,18 @@ export const customSensorSubmit = (): void => {
   const minrange = (<HTMLInputElement>getEl('cs-minrange')).value;
   const maxrange = (<HTMLInputElement>getEl('cs-maxrange')).value;
 
-  addCustomSensor(<SensorObject><unknown>{
-      lat,
-      lon,
-      alt: parseFloat(<string>alt),
-      obsminaz: parseFloat(<string>minaz),
-      obsmaxaz: parseFloat(<string>maxaz),
-      obsminel: parseFloat(<string>minel),
-      obsmaxel: parseFloat(<string>maxel),
-      obsminrange: parseFloat(<string>minrange),
-      obsmaxrange: parseFloat(<string>maxrange),
-      type: sensorType,
-    });
+  addCustomSensor(<SensorObject>(<unknown>{
+    lat,
+    lon,
+    alt: parseFloat(<string>alt),
+    obsminaz: parseFloat(<string>minaz),
+    obsmaxaz: parseFloat(<string>maxaz),
+    obsminel: parseFloat(<string>minel),
+    obsmaxel: parseFloat(<string>maxel),
+    obsminrange: parseFloat(<string>minrange),
+    obsmaxrange: parseFloat(<string>maxrange),
+    type: sensorType,
+  }));
 
   updateCruncherOnCustomSensors();
 
@@ -842,5 +905,4 @@ export const updateCruncherOnCustomSensors = () => {
   satellite.setobs(customSensors);
   objectManager.setSelectedSat(-1);
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
-}
-
+};

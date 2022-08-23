@@ -27,7 +27,7 @@ import { getEl, openColorbox } from '@app/js/lib/helpers';
 import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
 import $ from 'jquery';
 import { keepTrackApi } from '../../api/keepTrackApi';
-import { SensorManager, SensorObject } from '../../api/keepTrackTypes';
+import { SensorObject } from '../../api/keepTrackTypes';
 import { sensorList } from './sensorList';
 
 // Add new callbacks to the list of callbacks in keepTrackApi
@@ -66,7 +66,7 @@ const emptySensor: SensorObject = {
 };
 
 // NOTE: This doesn't account for sensorManager.selectedSensor
-export const checkSensorSelected = () => sensorManager.currentSensor[0].lat !== null || sensorManager.currentSensor[0].observerGd?.lat !== null;
+export const checkSensorSelected = () => sensorManager.currentSensor[0].lat !== null && sensorManager.currentSensor[0].observerGd?.lat !== null;
 
 export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   // TODO: This function is totally redundant to setSensor. There should be
@@ -82,7 +82,8 @@ export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
 
 export const sensorListLength = () => Object.values(sensorList).length;
 
-export const setSensor = (selectedSensor: SensorObject | string, staticNum: number) => { // NOSONAR
+// prettier-ignore
+export const setSensor = (selectedSensor: SensorObject | string, staticNum?: number) => { // NOSONAR
   try {
     localStorage.setItem('currentSensor', JSON.stringify([selectedSensor, staticNum]));
   } catch {
@@ -179,12 +180,26 @@ export const setSensor = (selectedSensor: SensorObject | string, staticNum: numb
         sensor == sensorManager.sensorList.PIO
     );
     sendSensorToOtherPrograms(filteredSensors);
+  } else if (selectedSensor === 'PRC-ALL') {
+    sensorManager.sensorTitle = 'All Chinese Sensors';
+    const filteredSensors = Object.values(sensorList).filter(
+      (sensor) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        sensor == sensorManager.sensorList.XIN ||
+        sensor == sensorManager.sensorList.ZHE ||
+        sensor == sensorManager.sensorList.HEI ||
+        sensor == sensorManager.sensorList.SHD
+    );
+    sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'LEO-LABS') {
     sensorManager.sensorTitle = 'All LEO Labs Sensors';
     const filteredSensors = Object.values(sensorList).filter(
       (sensor) =>
         // eslint-disable-next-line implicit-arrow-linebreak
-        sensor == sensorManager.sensorList.MSR || sensor == sensorManager.sensorList.PFISR || sensor == sensorManager.sensorList.KSR
+        sensor == sensorManager.sensorList.MSR ||
+        sensor == sensorManager.sensorList.PFISR ||
+        sensor == sensorManager.sensorList.CRSR ||
+        sensor == sensorManager.sensorList.KSR
     );
     sendSensorToOtherPrograms(filteredSensors);
   } else if (selectedSensor === 'MD-ALL') {
@@ -265,7 +280,8 @@ export const drawFov = (sensor: SensorObject) => {
   }
 };
 
-export const sensorManager: SensorManager = {
+export type SensorManager = typeof sensorManager;
+export const sensorManager = {
   sensorList: sensorList,
   setSensor: setSensor,
   checkSensorSelected: checkSensorSelected,
@@ -289,7 +305,7 @@ export const sensorManager: SensorManager = {
     sensorList.ASC,
     sensorList.CDN,
   ],
-  currentSensor: [
+  currentSensor: <SensorObject[]>[
     {
       observerGd: {
         lat: <number>null,

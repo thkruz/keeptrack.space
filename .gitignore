@@ -103,6 +103,11 @@ key.pem
 .dcignore
 .cache/server.pem
 
+# Gitlab Specific
+src/SOCRATES.html
+src/serviceWorker.js
+src/analysis
+.github
 # TLE History
 src/analysis/sathist/*.json
 

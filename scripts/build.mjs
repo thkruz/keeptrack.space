@@ -20,14 +20,12 @@ const reqFiles = [
   'favicon.ico',
   'index.html',
   'manifest.webmanifest',
-  'serviceWorker.js',
-  'SOCRATES.html',
   'css/loading-screen.css',
   'css/fonts.css',
   'css/materialize.css',
   'css/materialize-local.css',
 ];
-const optFiles = [];
+const optFiles = ['serviceWorker.js', 'SOCRATES.html'];
 
 console.log('Removing old files...'); // NOSONAR
 setupDistFolders();

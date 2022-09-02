@@ -108,3 +108,6 @@ src/analysis/sathist/*.json
 
 # Custom Builds
 custom-builds
+
+# Library Build
+lib

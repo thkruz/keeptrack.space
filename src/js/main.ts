@@ -75,6 +75,8 @@ export const loadAfterStart = () => {
     } catch (error) {
       // Intentionally Blank
     }
+
+    keepTrackApi.programs.uiManager.menuController();
   } else {
     setTimeout(loadAfterStart, 100);
   }

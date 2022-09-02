@@ -97,53 +97,7 @@ settingsManager = {
   db: null,
   // prettier-ignore
   init: () => { // NOSONAR
-    settingsManager.pTime = [];
-
-    // Set Background
-    setTimeout(() => {
-      const backgrounds = [
-        'astronauts',
-        'astronauts2',
-        'commandCenter',
-        'controlModule',
-        'domeInDesert',
-        'domeInHawaii',
-        'domeInMountain',
-        'domeInMountain2',
-        'domeInSnow',
-        'domeInSnow2',
-        'domesOnGrassHill',
-        'fylingdales',
-        'fylingdales2',
-        'icbm',
-        'iss',
-        'mobileTel',
-        'militaryLaunch',
-        'launchpad',
-        'launchpad2',
-        'radarDomeFall',
-        'radarOnHill',
-        'slbm',
-        'slbm2',      
-      ];
-      
-      // Randomly load a splash screen - not a vulnerability
-      const image = backgrounds[Math.floor(Math.random() * backgrounds.length)]; // NOSONAR
-      const width = window.innerWidth > 1920 ? '3840' : '1920';
-      const loadingDom = document.getElementById('loading-screen');
-
-      loadingDom.style.backgroundImage = `url('../img/wallpaper/${image}-${width}.png')`;
-      loadingDom.style.backgroundSize = 'cover';
-      loadingDom.style.backgroundPosition = 'center';
-      loadingDom.style.backgroundRepeat = 'no-repeat';
-
-      backgrounds.forEach((image, idx) => {
-          setTimeout(() => {
-            const width = window.innerWidth > 1920 ? '3840' : '1920';
-            new Image().src = `../img/wallpaper/${image}-${width}.png`;
-          }, 5000 * idx);
-        });
-    }, 0);
+    settingsManager.pTime = [];   
 
     // Install Folder Settings
     {
@@ -650,6 +604,55 @@ settingsManager = {
     settingsManager.camDistBuffer = 75;
     settingsManager.zNear = 1.0;
     settingsManager.zFar = 450000.0;
+
+    // //////////////////////////////////////////////////////////////////////////
+    // Load Wallpaper
+    // //////////////////////////////////////////////////////////////////////////
+     // Set Background
+     setTimeout(() => {
+      const backgrounds = [
+        'astronauts',
+        'astronauts2',
+        'commandCenter',
+        'controlModule',
+        'domeInDesert',
+        'domeInHawaii',
+        'domeInMountain',
+        'domeInMountain2',
+        'domeInSnow',
+        'domeInSnow2',
+        'domesOnGrassHill',
+        'fylingdales',
+        'fylingdales2',
+        'icbm',
+        'iss',
+        'mobileTel',
+        'militaryLaunch',
+        'launchpad',
+        'launchpad2',
+        'radarDomeFall',
+        'radarOnHill',
+        'slbm',
+        'slbm2',      
+      ];
+      
+      // Randomly load a splash screen - not a vulnerability
+      const image = backgrounds[Math.floor(Math.random() * backgrounds.length)]; // NOSONAR
+      const width = window.innerWidth > 1920 ? '3840' : '1920';
+      const loadingDom = document.getElementById('loading-screen');
+
+      loadingDom.style.backgroundImage = `url('${settingsManager.installDirectory}img/wallpaper/${image}-${width}.png')`;
+      loadingDom.style.backgroundSize = 'cover';
+      loadingDom.style.backgroundPosition = 'center';
+      loadingDom.style.backgroundRepeat = 'no-repeat';
+
+      backgrounds.forEach((image, idx) => {
+          setTimeout(() => {
+            const width = window.innerWidth > 1920 ? '3840' : '1920';
+            new Image().src = `'${settingsManager.installDirectory}img/wallpaper/${image}-${width}.png`;
+          }, 5000 * idx);
+        });
+    }, 0);
 
     // //////////////////////////////////////////////////////////////////////////
     // Load Overrides

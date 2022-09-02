@@ -98,7 +98,6 @@ export const init = (): void => {
 
         await import('@app/js/uiManager/advice/adviceManager').then((mod) => {
           mod.init();
-          keepTrackApi.programs.uiManager.menuController();
         });
       } catch (e) {
         /* istanbul ignore next */

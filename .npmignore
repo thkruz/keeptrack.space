@@ -1,0 +1,113 @@
+### Git ###
+# Created by git for backups. To disable backups in Git:
+# $ git config --global mergetool.keepBackup false
+*.orig
+
+# Created by git when using merge tools for conflicts
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
+
+### Node ###
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Package Lock
+# package-lock.json
+
+# Optional eslint cache
+.eslintcache
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+### vscode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Prettier
+.prettierignore
+
+
+# Large Production Files
+src/social
+src/social/*
+src/textures-extra
+src/radarData/radar*
+src/admin
+src/tle/2006*
+src/tle/TLE.json.bak
+src/tle/mw*
+src/tle/retr*
+src/tle/trus*
+src/tle/TLEAltNemo*
+.notes.js
+classfd.tle
+src/textures/earthmap16ak.jpg
+src/textures/earthmapclouds16k.jpg
+src/audio/samples
+
+# Jest Coverage
+coverage/
+
+# Offline Only
+src/offline
+
+# Build Folder
+dist
+embed
+
+# Work In Progress
+src/js/wip/
+src/js/satSet/radarDataManager.js
+
+# nyc Output
+.nyc_output
+
+#ssl
+cert.pem
+key.pem
+
+# dccache
+.dccache
+.dcignore
+.cache/server.pem
+
+# TLE History
+src/analysis/sathist/*.json
+
+# Custom Builds
+custom-builds
+
+# Library Build
+lib

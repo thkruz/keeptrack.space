@@ -1,6 +1,6 @@
 /* */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
 import { MissileParams } from '../api/keepTrackTypes';
 import { Camera } from '../camera/camera';
@@ -32,7 +32,7 @@ export const workerOnMessage: any = (m: any) => {
 };
 export const init = (orbitWorker?: Worker): void => {
   // See if we are running jest right now for testing
-  if (typeof process !== 'undefined') {
+  if (isThisJest()) {
     if (typeof orbitWorker !== 'undefined') {
       orbitManager.orbitWorker = orbitWorker;
     } else {

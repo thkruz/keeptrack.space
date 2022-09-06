@@ -156,6 +156,7 @@ export const timeManager = {
             if (timeManager.dateDOM == null) return; // Avoid race condition
           } catch {
             // Avoid race condition
+            console.log('errors...')
             return;
           }
         }

@@ -5,6 +5,7 @@ import $ from 'jquery';
 import { JSDOM } from 'jsdom';
 import fs from 'fs';
 import path from 'path';
+import { settingsManager } from './../src/js/settingsManager/settingsManager';
 
 // This allows consistent testing in the CI environment
 // eslint-disable-next-line no-process-env
@@ -27,6 +28,10 @@ if (typeof global !== 'undefined') {
   global.document = dom.window.document;
   global.docBody = docBody;
 }
+
+settingsManager.init();
+
+global.settingsManager = settingsManager;
 
 global.document.url = 'https://keeptrack.space';
 global.document.includeNodeLocations = true;

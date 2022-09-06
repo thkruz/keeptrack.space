@@ -260,7 +260,8 @@ export const uiManagerInit = (): void => {
 };
 
 export const uiManagerFinal = (): void => {
-  document.querySelector('.menu-selectable').addEventListener('click', menuSelectableClick);
+  const MenuSelectableDOM = document.querySelector('.menu-selectable');
+  MenuSelectableDOM && MenuSelectableDOM.addEventListener('click', menuSelectableClick);
   clickAndDragWidth(getEl('watchlist-menu'));
 
   getEl('info-overlay-content').addEventListener('click', function (evt: Event) {

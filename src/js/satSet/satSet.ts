@@ -26,7 +26,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import { DEG2RAD, MILLISECONDS_PER_DAY, MINUTES_PER_DAY, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '@app/js/lib/constants';
 import numeric from 'numeric';
 import { EciVec3 } from 'ootk';
@@ -66,7 +66,7 @@ export const init = async (satCruncherOveride?: any): Promise<number> => { // NO
 
     uiManager.loadStr('elsets');
     // See if we are running jest right now for testing
-    if (typeof process !== 'undefined') {
+    if (isThisJest()) {
       if (satCruncherOveride) {
         satCruncher = satCruncherOveride;
         satSet.satCruncher = satCruncher;

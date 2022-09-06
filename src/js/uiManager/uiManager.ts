@@ -129,14 +129,16 @@ export const onReady = () => {
   // Run any plugins code
   keepTrackApi.methods.uiManagerOnReady();
   uiManager.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
-  getEl('bottom-icons').addEventListener('click', function (evt: Event) {
-    if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
-    if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
-      uiManager.bottomIconPress(<HTMLElement>evt.target);
-    } else {
-      uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
-    }
-  });
+  const BottomIcons = getEl('bottom-icons');
+  BottomIcons &&
+    BottomIcons.addEventListener('click', function (evt: Event) {
+      if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
+      if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
+        uiManager.bottomIconPress(<HTMLElement>evt.target);
+      } else {
+        uiManager.bottomIconPress((<HTMLElement>evt.target).parentElement);
+      }
+    });
   uiManager.hideSideMenus = () => {
     closeColorbox();
     keepTrackApi.methods.hideSideMenus();
@@ -149,7 +151,7 @@ export const postStart = () => {
 
   setTimeout(() => {
     document.querySelectorAll('img').forEach((img: any) => {
-      if (!img.src.includes('.png') && !img.src.includes('.jpg')) {
+      if (img.src && !img.src.includes('.png') && !img.src.includes('.jpg')) {
         img.src = img.attributes.delayedsrc?.value;
       }
     });

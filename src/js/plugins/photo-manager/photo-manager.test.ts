@@ -6,7 +6,6 @@ import { expect } from '@jest/globals';
 /* eslint-disable camelcase */
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
-settingsManager = window.settingsManager;
 // @ponicode
 describe('photoManager.init', () => {
   test('0', () => {

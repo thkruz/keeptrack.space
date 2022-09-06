@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi, isThisJest } from '@app/js/api/keepTrackApi';
 import { meshManager } from '@app/js/drawManager/meshManager';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
@@ -19,7 +19,6 @@ let isSatMiniBoxInUse = false;
 let labelCount = 0;
 let hoverBoxOnSatMiniElements = null;
 let satHoverMiniDOM: HTMLDivElement;
-settingsManager.isShowNextPass = false;
 let drawLoopCallback = null;
 
 export const init = () => {
@@ -34,7 +33,9 @@ export const init = () => {
 };
 export const glInit = async () => {
   // Ensure the canvas is available
-  if (drawManager.canvas === null) {
+  drawManager.canvas ??= isThisJest() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas')
+
+  if (!drawManager.canvas) {
     throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
   }
 
@@ -49,7 +50,7 @@ export const glInit = async () => {
   });
 
   let gl: WebGL2RenderingContext;
-  if (typeof process !== 'undefined') {
+  if (isThisJest()) {
     gl = <WebGL2RenderingContext>drawManager.canvas.getContext('webgl', {
       alpha: false,
       premultipliedAlpha: false,
@@ -445,7 +446,7 @@ export const satCalculate = () => {
 export const orbitsAbove = () => { // NOSONAR
   const { mainCamera, dotsManager, watchlist, orbitManager, sensorManager, satellite, colorSchemeManager, satSet, timeManager } = keepTrackApi.programs;
 
-  if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium || watchlist.watchlistInViewList?.length > 0) {
+  if (mainCamera.cameraType.current == mainCamera.cameraType.Astronomy || mainCamera.cameraType.current == mainCamera.cameraType.Planetarium || watchlist?.watchlistInViewList?.length > 0) {
     drawManager.sensorPos = satellite.calculateSensorPos(sensorManager.currentSensor);
     if (!drawManager.isDrawOrbitsAbove) {
       // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
@@ -454,7 +455,7 @@ export const orbitsAbove = () => { // NOSONAR
       return;
     }
     // Previously called showOrbitsAbove();
-    if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist.watchlistInViewList?.length === 0) {
+    if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist?.watchlistInViewList?.length === 0) {
       if (isSatMiniBoxInUse) {
         hoverBoxOnSatMiniElements = getEl('sat-minibox');
         hoverBoxOnSatMiniElements.innerHTML = '';
@@ -553,7 +554,7 @@ export const orbitsAbove = () => { // NOSONAR
   }
 
   // Hide satMiniBoxes When Not in Use
-  if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist.watchlistInViewList?.length === 0) {
+  if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist?.watchlistInViewList?.length === 0) {
     if (isSatMiniBoxInUse) {
       satMiniBox.innerHTML = '';
     }
@@ -701,7 +702,7 @@ export let drawManager = {
     satId: -1,
   }),
   // Canvas needs to account for jest
-  canvas: typeof process !== 'undefined' ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas'),
+  canvas: null,
   sceneManager: null,
   gl: <WebGL2RenderingContext>null,
   isNeedPostProcessing: false,

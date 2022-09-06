@@ -1,7 +1,4 @@
-/* eslint-disable no-unused-vars */
-declare module '*.css';
-declare module '*.jpg';
-declare module '*.png';
+import { SettingsManager } from '@app/js/api/keepTrackTypes';
 
 interface JQuery<HTMLElement> {
   effect: any;
@@ -20,6 +17,23 @@ interface HTMLDivElement {
   show: any;
   effect: any;
   is: any;
+}
+
+declare global {
+  module '*.css';
+  module '*.jpg';
+  module '*.png';
+  declare module '*.mp3';
+  interface Window {
+    settingsManager: SettingsManager;
+    settingsOverride: any;
+  }
+  let settingsManager: SettingsManager;
+
+  interface JQuery<HTMLElement> {
+    datapicker: any;
+    datepicker: any;
+  }
 }
 
 interface JQueryStatic {

@@ -1,11 +1,10 @@
+import { ColorRuleSet } from '@app/js/colorManager/colorSchemeManager';
 import { defaultSensor, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { KeepTrackPrograms, SensorObject } from '../../api/keepTrackTypes';
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import * as sensorManager from './sensorManager';
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
-
-declare const settingsManager;
 
 describe('sensorManager.checkSensorSelected', () => {
   test('0', () => {
@@ -222,7 +221,7 @@ describe('sensorManager.setSensor', () => {
   beforeAll(() => {
     settingsManager.currentColorScheme = {
       calculateColorBuffers: () => {},
-    };
+    } as unknown as ColorRuleSet;
   });
   test('0', () => {
     let result: any = sensorManager.setSensor(

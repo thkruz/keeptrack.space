@@ -18,7 +18,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-const settingsManagerOverride = {
+const settingsOverride = {
   // /////////////////////////////////////////////////////////////////////////////
   // NOTE: Tweak these settings for your own needs.
   //       All colors are in RGBA format and must be between 0.0 and 1.0
@@ -144,7 +144,9 @@ const settingsManagerOverride = {
     soundManager: false,
     gamepad: false,
   },
+  isDisableCss: true,
+  isPreventDefaultHtml: true,
 };
 
 // Expose these to the console
-window.settingsManagerOverride = settingsManagerOverride;
+window.settingsOverride = settingsOverride;

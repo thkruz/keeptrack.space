@@ -45,9 +45,11 @@ export const datetimeTextClick = (): void => {
 
 export const uiManagerInit = () => {
   // Bottom Icon
-  getEl('nav-wrapper').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
+  const NavWrapper = getEl('nav-wrapper');
+  NavWrapper &&
+    NavWrapper.insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
         <ul id="nav-mobile">
           <li id="jday"></li>
           <div id="datetime" class="tooltipped" data-position="top" data-delay="50" data-tooltip="Time Menu">
@@ -60,7 +62,7 @@ export const uiManagerInit = () => {
           </div>
         </ul>
         `
-  );
+    );
 };
 
 export const uiManagerFinal = () => {
@@ -108,7 +110,7 @@ export const datetimeInputFormChange = (jestOverride?: Date) => {
   }
   const today = new Date();
   const jday = timeManager.getDayOfYear(timeManager.simulationTimeObj);
-  $('#jday').html(jday);
+  $('#jday').html(jday.toString());
   timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime());
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
   timeManager.calculateSimulationTime();

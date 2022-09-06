@@ -77,7 +77,7 @@ export const AnalysisSideMenu = keepTrackApi.html`
 <div id="analysis-menu" class="side-menu-parent start-hidden text-select">
   <div id="analysis-inner-menu" class="side-menu">
     ${AnalysisMenuHeader}
-    ${settingsManager.isOfficialWebsite || !settingsManager.unofficial ? TrendAnalysis : ''}
+    ${TrendAnalysis}
     ${ExportTleButton}
     ${Export3leButton}
     ${ExportTleAllButton}

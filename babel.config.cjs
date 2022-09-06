@@ -25,6 +25,7 @@ module.exports = (api) => {
           targets: {
             esmodules: true,
           },
+          modules: "umd",
         },
       ],
       '@babel/preset-typescript',

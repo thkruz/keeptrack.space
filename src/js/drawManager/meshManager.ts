@@ -13,45 +13,45 @@ import { TimeManager } from '../timeManager/timeManager';
 import { loadStr } from '../uiManager/ui/loadStr';
 import { aehfSccNums, dspSccNums, issSccNum } from './meshManager/modelConstants';
 
-const meshList = settingsManager.meshListOverride || [
-  'sat2',
-  's1u',
-  's2u',
-  's3u',
-  'starlink',
-  'iss',
-  'gps',
-  'aehf',
-  'dsp',
-  'flock',
-  'lemur',
-  'galileo',
-  'o3b',
-  'oneweb',
-  'orbcomm',
-  'spacebee1gen',
-  'spacebee2gen',
-  'spacebee3gen',
-  'iridium',
-  'globalstar',
-  'debris0',
-  'debris1',
-  'debris2',
-  'rocketbody',
-  'sbirs',
-  'misl',
-  'misl2',
-  'misl3',
-  'misl4',
-  'rv',
-];
-
-let mvMatrix;
-let nMatrix;
-
 export const init: any = async () => {
   try {
     if (settingsManager.disableUI || settingsManager.isDrawLess) return;
+
+    meshManager.meshList =
+      settingsManager.meshListOverride.length > 0
+        ? settingsManager.meshListOverride
+        : [
+            'sat2',
+            's1u',
+            's2u',
+            's3u',
+            'starlink',
+            'iss',
+            'gps',
+            'aehf',
+            'dsp',
+            'flock',
+            'lemur',
+            'galileo',
+            'o3b',
+            'oneweb',
+            'orbcomm',
+            'spacebee1gen',
+            'spacebee2gen',
+            'spacebee3gen',
+            'iridium',
+            'globalstar',
+            'debris0',
+            'debris1',
+            'debris2',
+            'rocketbody',
+            'sbirs',
+            'misl',
+            'misl2',
+            'misl3',
+            'misl4',
+            'rv',
+          ];
 
     settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
 
@@ -87,10 +87,10 @@ export const init: any = async () => {
 
 export const populateFileList = () => {
   try {
-    for (var i = 0; i < meshList.length; i++) {
+    for (var i = 0; i < meshManager.meshList.length; i++) {
       let meshFiles = {
-        obj: `${settingsManager.installDirectory}meshes/${meshList[i]}.obj`,
-        mtl: `${settingsManager.installDirectory}meshes/${meshList[i]}.mtl`,
+        obj: `${settingsManager.installDirectory}meshes/${meshManager.meshList[i]}.obj`,
+        mtl: `${settingsManager.installDirectory}meshes/${meshManager.meshList[i]}.mtl`,
       };
       meshManager.fileList.push(meshFiles);
     }
@@ -251,13 +251,19 @@ export const draw = (pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) => 
   // Meshes aren't finished loading
   if (settingsManager.disableUI || settingsManager.isDrawLess) return;
   if (!meshManager.loaded) return;
-  if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;
+  if (
+    typeof meshManager.currentModel.id == 'undefined' ||
+    typeof meshManager.currentModel.model == 'undefined' ||
+    meshManager.currentModel.id == -1 ||
+    meshManager.currentModel.static
+  )
+    return;
 
   const { gl } = keepTrackApi.programs.drawManager;
   const { earth } = keepTrackApi.programs.drawManager.sceneManager;
 
   // Move the mesh to its location in world space
-  mvMatrix = glm.mat4.create();
+  const mvMatrix = glm.mat4.create();
   glm.mat4.identity(mvMatrix);
   glm.mat4.translate(mvMatrix, mvMatrix, glm.vec3.fromValues(meshManager.currentModel.position.x, meshManager.currentModel.position.y, meshManager.currentModel.position.z));
 
@@ -272,7 +278,7 @@ export const draw = (pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) => 
   glm.mat4.rotateZ(mvMatrix, mvMatrix, settingsManager.meshRotation.z * DEG2RAD);
 
   // Assign the normal matrix the opposite of the mvMatrix
-  nMatrix = glm.mat3.create();
+  const nMatrix = glm.mat3.create();
   glm.mat3.normalFromMat4(nMatrix, mvMatrix);
 
   gl.enable(gl.BLEND);
@@ -506,7 +512,7 @@ export const drawOcclusion = (pMatrix: mat4, camMatrix: mat4, occlusionPrgm: any
 
   try {
     // Move the mesh to its location in world space
-    mvMatrix = glm.mat4.create();
+    const mvMatrix = glm.mat4.create();
     glm.mat4.identity(mvMatrix);
     glm.mat4.translate(mvMatrix, mvMatrix, glm.vec3.fromValues(meshManager.currentModel.position.x, meshManager.currentModel.position.y, meshManager.currentModel.position.z));
 
@@ -542,6 +548,7 @@ export const drawOcclusion = (pMatrix: mat4, camMatrix: mat4, occlusionPrgm: any
 export const meshManager = {
   isReady: false,
   init,
+  meshList: [],
   populateFileList,
   initShaders,
   initBuffers,

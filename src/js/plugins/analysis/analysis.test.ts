@@ -8,7 +8,6 @@ import { init } from './analysis';
 /* eslint-disable no-undefined */
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
-settingsManager = window.settingsManager;
 
 test('Load Analysis Plugin', () => {
   window.M = {

@@ -50,7 +50,8 @@
     "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
     "baseUrl": "." /* Base directory to resolve non-absolute module names. */,
     "paths": {
-      "@app/*": ["src/*"]
+      "@app/*": ["src/*"],
+      "@css/*": ["src/css/*"]
     } /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": ["src/types", "src/js/api"] /* List of folders to include type definitions from. */,
@@ -78,7 +79,7 @@
     "suppressImplicitAnyIndexErrors": false /* suppresses the errors about accessing any as a type */,
     "resolveJsonModule": true /* Allows a module id to be a json file. */
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx", "src/**/*.png", "src/**/*.jpg", "node_modules/ootk/dist/ootk.d.ts"],
-  "exclude": ["node_modules/**/*", "dist/**/*", "src/admin/**/*", "embed/**/*", "coverage/**/*", "tsconfig.json"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx", "src/**/*.png", "src/**/*.mp3", "src/**/*.jpg", "node_modules/ootk/dist/ootk.d.ts"],
+  "exclude": ["node_modules/**/*", "dist/**/*", "src/admin/**/*", "embed/**/*", "lib/**/*", "coverage/**/*", "tsconfig.json"],
   "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.png", "src/**/*.jpg", "!**/node_modules/**"]
 }

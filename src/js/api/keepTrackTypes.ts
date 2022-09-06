@@ -217,6 +217,10 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isShowSplashScreen: boolean;
+  isGlobalErrorTrapOn: boolean;
+  isDisableAsciiCatalog: boolean;
+  settingsManager: {};
   isShowAgencies: any;
   isShowGeoSats: boolean;
   isShowHeoSats: boolean;
@@ -238,7 +242,7 @@ export interface SettingsManager {
   isDisableUrlBar: any;
   meshListOverride: string[];
   isDebrisOnly: boolean;
-  disableCss: any;
+  isDisableCss: boolean;
   isAllowRightClick: any;
   onLoadCb: any;
   isDrawConstellationBoundaries: any;
@@ -324,7 +328,7 @@ export interface SettingsManager {
   hiresImages: boolean;
   hiresNoCloudsImages: boolean;
   hoverColor: [number, number, number, number];
-  init(): void;
+  init(settingsOverride?: any): void;
   installDirectory: string;
   isAlwaysHidePropRate: boolean;
   isAutoResizeCanvas: boolean;
@@ -912,6 +916,7 @@ export interface KeepTrackPrograms {
 }
 
 export interface KeepTrackApi {
+  initializeKeepTrack: () => Promise<void>;
   html: (strings: TemplateStringsArray, ...placeholders: any[]) => string;
   register: (params: { method: string; cbName: string; cb: any }) => void;
   unregister: (params: { method: string; cbName: string }) => void;

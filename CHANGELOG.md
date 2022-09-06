@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.0.1
+
+>  
+
+- fix: :bug: fix satellite fov not showing up
+- fix: :bug: fix lostobjects colorscheme hanging
+- fix: :bug: fix bug in getlookangles with null for satellite
+- refactor: :recycle: refactor to allow use as a react component
+- build: :see_no_evil: add npmignore for lib builds
+- fix: :bug: fix search issues
+- feat: :sparkles: add bulk add/remove to watchlist
+- docs: :memo: update changelog
+- test: :white_check_mark: fix broken watchlist tests
+- docs: :memo: update readme
+- feat: :sparkles: add prefetching of splash screens on initial run
+
 #### v7.0.0
 
 >  

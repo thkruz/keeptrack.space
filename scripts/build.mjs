@@ -27,7 +27,7 @@ const reqFiles = [
   'img/logo192.png',
   'img/logo512.png',
 ];
-const optFiles = [];
+const optFiles = ['serviceWorker.js', 'SOCRATES.html'];
 
 console.log('Removing old files...'); // NOSONAR
 setupDistFolders();

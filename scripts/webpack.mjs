@@ -75,11 +75,11 @@ export const generateConfig = (env, isWatch) => {
   } else if (env !== 'embed' && env !== 'embedDev') {
     const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
-    const analysisConfig = getAnalysisConfig(baseConfig, dirName);
+    // const analysisConfig = getAnalysisConfig(baseConfig, dirName);
 
     webpackConfig.push(mainConfig);
     webpackConfig.push(webWorkerConfig);
-    webpackConfig.push(analysisConfig);
+    // webpackConfig.push(analysisConfig);
   } else {
     const mainConfig = getMainConfig(baseConfig, dirName, 'embed/keepTrack', 'keepTrack/');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'embed/keepTrack/', 'keepTrack/');

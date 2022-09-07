@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   watch: 'dist',
-  port: 8080,
+  port: 7000,
   root: 'dist',
   open: 'index.html',
   browser: 'chrome',

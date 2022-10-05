@@ -1,8 +1,8 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
+import '@app/js/settingsManager/settings';
 import { searchBox } from '@app/js/uiManager/search/searchBox';
-import '../../settingsManager/settingsManager';
 import { updateURL } from './update-url';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });

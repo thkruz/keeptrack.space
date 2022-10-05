@@ -20,11 +20,7 @@ exports[`createGroup 2 1`] = `
 SatGroup {
   "forEach": [Function],
   "hasSat": [Function],
-  "sats": Array [
-    Object {
-      "satId": 1,
-    },
-  ],
+  "sats": Array [],
   "updateOrbits": [Function],
 }
 `;
@@ -33,11 +29,7 @@ exports[`createGroup 3 1`] = `
 SatGroup {
   "forEach": [Function],
   "hasSat": [Function],
-  "sats": Array [
-    Object {
-      "satId": 1,
-    },
-  ],
+  "sats": Array [],
   "updateOrbits": [Function],
 }
 `;
@@ -46,12 +38,7 @@ exports[`createGroup 4 1`] = `
 SatGroup {
   "forEach": [Function],
   "hasSat": [Function],
-  "sats": Array [
-    Object {
-      "isIntlDes": true,
-      "satId": undefined,
-    },
-  ],
+  "sats": Array [],
   "updateOrbits": [Function],
 }
 `;
@@ -60,11 +47,7 @@ exports[`createGroup 5 1`] = `
 SatGroup {
   "forEach": [Function],
   "hasSat": [Function],
-  "sats": Array [
-    Object {
-      "satId": 1,
-    },
-  ],
+  "sats": Array [],
   "updateOrbits": [Function],
 }
 `;
@@ -82,16 +65,7 @@ exports[`createGroup 7 1`] = `
 SatGroup {
   "forEach": [Function],
   "hasSat": [Function],
-  "sats": Array [
-    Object {
-      "isObjnum": true,
-      "satId": 0,
-    },
-    Object {
-      "isObjnum": true,
-      "satId": 0,
-    },
-  ],
+  "sats": Array [],
   "updateOrbits": [Function],
 }
 `;
@@ -100,22 +74,12 @@ exports[`createGroup 8 1`] = `
 SatGroup {
   "forEach": [Function],
   "hasSat": [Function],
-  "sats": Array [
-    Object {
-      "satId": 0,
-    },
-    Object {
-      "satId": 1,
-    },
-    Object {
-      "satId": 2,
-    },
-  ],
+  "sats": Array [],
   "updateOrbits": [Function],
 }
 `;
 
-exports[`satGroup Tests 0 1`] = `true`;
+exports[`satGroup Tests 0 1`] = `false`;
 
 exports[`satGroup Tests 1 1`] = `undefined`;
 

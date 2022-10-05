@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
@@ -25,7 +25,8 @@
     "build": "node ./scripts/build.mjs production",
     "build:watch": "node ./scripts/build.mjs development --watch",
     "build:embed": "node ./scripts/buildEmbed.mjs embed",
-    "build:embedDev": "node ./scripts/buildEmbed.mjs embedDev",
+    "build:embedDev": "node ./scripts/buildEmbed.mjs embedDev --watch",
+    "build:lib": "node ./scripts/buildLib.mjs lib",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs",
     "cypress:open": "cypress open",
     "lcov": "node ./scripts/openLcov.mjs",

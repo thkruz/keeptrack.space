@@ -5,8 +5,6 @@ import { KeepTrackPrograms, SatObject, SunStatus } from '../../api/keepTrackType
 import { SpaceObjectType } from '../../api/SpaceObjectType';
 import * as satInfoboxCore from './satInfoboxCore';
 
-declare const settingsManager;
-
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
 // @ponicode

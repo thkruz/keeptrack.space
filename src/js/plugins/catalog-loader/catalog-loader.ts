@@ -38,16 +38,15 @@ export const catalogLoader = async (): Promise<void> => {
 
     const asciiCatalog: { SCC: string; TLE1: any; TLE2: any }[] = [];
     if (!settingsManager.isDisableAsciiCatalog) {
-      $.get(`${settingsManager.installDirectory}tle/TLE.txt`).then((resp) => {
-        const content = resp.split('\n');
-        for (let i = 0; i < content.length; i = i + 2) {
-          asciiCatalog.push({
-            SCC: stringPad.pad0(content[i].substr(2, 5).trim(), 5),
-            TLE1: content[i],
-            TLE2: content[i + 1],
-          });
-        }
-      });
+      const resp = await (await fetch(`${settingsManager.installDirectory}tle/TLE.txt`)).text();
+      const content = resp.split('\n');
+      for (let i = 0; i < content.length; i = i + 2) {
+        asciiCatalog.push({
+          SCC: stringPad.pad0(content[i].substr(2, 5).trim(), 5),
+          TLE1: content[i],
+          TLE2: content[i + 1],
+        });
+      }
     }
 
     if (settingsManager.isUseDebrisCatalog) {
@@ -142,8 +141,8 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
         rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
         resp[i].intlDes = year + '-' + rest;
       }
-      satSet.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
-      satSet.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
+      satSet.sccIndex[`${resp[i].sccNum}`] = i;
+      satSet.cosparIndex[`${resp[i].intlDes}`] = i;
       resp[i].active = true;
       if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
         resp[i].id = tempSatData.length;

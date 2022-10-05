@@ -43,11 +43,15 @@ export const unregister = (params: { method: string; cbName: string }) => {
     throw new Error(`Invalid callback "${params.method}"!`);
   }
 };
-export const isThisJest = () => typeof process !== 'undefined';
+export const isThisJest = () => {
+  const nodeName = (typeof process !== 'undefined' && process?.release?.name) || false;
+  return !!nodeName;
+};
 
 export const keepTrackApi: KeepTrackApi = {
   html: html,
   register: register,
+  initializeKeepTrack: null,
   unregister: unregister,
   callbacks: {
     selectSatData: [],

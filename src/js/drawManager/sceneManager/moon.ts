@@ -16,6 +16,8 @@ const SCALAR_DISTANCE = 200000;
 export const init = async () => {
   const { gl } = keepTrackApi.programs.drawManager;
 
+  moon.textureMap.src = `${settingsManager.installDirectory}textures/moon-1024.jpg`;
+
   initProgram(gl);
   initTextures(gl);
   initBuffers(gl);
@@ -271,7 +273,7 @@ export const moon = {
   textureMap: {
     isReady: false,
     img: <HTMLImageElement>null,
-    src: `${settingsManager.installDirectory}textures/moon-1024.jpg`,
+    src: null,
     texture: <WebGLTexture>null,
   },
   buffers: {

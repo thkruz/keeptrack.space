@@ -1,8 +1,12 @@
+import fullscreenIconPng from '@app/img/fullscreen-icon.png';
+import helpPng from '@app/img/help.png';
 import findPng from '@app/img/icons/find.png';
 import githubPng from '@app/img/icons/github.png';
 import soundOffPng from '@app/img/icons/sound-off.png';
 import soundOnPng from '@app/img/icons/sound-on.png';
 import twitterPng from '@app/img/icons/twitter.png';
+import layersIconPng from '@app/img/layers-icon.png';
+import sharePng from '@app/img/share-icon.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { createError } from '@app/js/errorManager/errorManager';
 import { getEl } from '@app/js/lib/helpers';
@@ -19,7 +23,7 @@ export const init = (): void => {
         (<any>$('#header')).append(keepTrackApi.html`
           <nav>
             <div id="nav-wrapper" class="nav-wrapper">
-              <a id="share-icon" class="top-menu-icons"><img src="img/share-icon.png" alt="" /></a>
+              <a id="share-icon" class="top-menu-icons"><img src=${sharePng} alt="" /></a>
               <ul id="nav-mobile2" class="right">
                 <li>
                   <a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a>
@@ -35,19 +39,19 @@ export const init = (): void => {
                 <li>
                   <a id="legend-menu" class="top-menu-btns">
                     <div id="legend-icon" class="top-menu-icons">
-                      <img src="img/layers-icon.png" alt="" />
+                      <img src=${layersIconPng} alt="" />
                     </div>
                   </a>
                 </li>
                 <li>
                   <a id="tutorial-btn" class="top-menu-btns">
                     <div id="tutorial-icon" class="top-menu-icons">
-                      <img src="img/help.png" alt="" />
+                      <img src=${helpPng} alt="" />
                     </div>
                   </a>
                 </li>
                 <li>
-                  <a id="fullscreen-icon" class="top-menu-icons"><img src="img/fullscreen-icon.png" alt="" /></a>
+                  <a id="fullscreen-icon" class="top-menu-icons"><img src=${fullscreenIconPng} alt="" /></a>
                 </li>
                 <li>
                   <a id="search-icon" class="top-menu-icons">
@@ -98,7 +102,6 @@ export const init = (): void => {
 
         await import('@app/js/uiManager/advice/adviceManager').then((mod) => {
           mod.init();
-          keepTrackApi.programs.uiManager.menuController();
         });
       } catch (e) {
         /* istanbul ignore next */

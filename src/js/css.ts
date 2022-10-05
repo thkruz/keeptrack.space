@@ -2,28 +2,28 @@
 
 export const importCss = async (): Promise<void> => {
   try {
-    if (!settingsManager.disableCss) {
-      import('../css/materialize.css').catch(() => {
+    if (!settingsManager.isDisableCss) {
+      import(/* webpackMode: "eager" */ '@css/materialize.css').catch(() => {
         // This is intentional
       });
-      import('../css/astroux/css/astro.css').catch(() => {
+      import(/* webpackMode: "eager" */ '@css/astroux/css/astro.css').catch(() => {
         // This is intentional
       });
-      import('../css/materialize-local.css').catch(() => {
+      import(/* webpackMode: "eager" */ '@css/materialize-local.css').catch(() => {
         // This is intentional
       });
-      import('../js/lib/external/colorPick.css').catch(() => {
+      import(/* webpackMode: "eager" */ '@app/js/lib/external/colorPick.css').catch(() => {
         // This is intentional
       });
-      import('../css/jquery-ui.min.css').catch(() => {
+      import(/* webpackMode: "eager" */ '@css/jquery-ui.min.css').catch(() => {
         // This is intentional
       });
-      import('../css/jquery-ui-timepicker-addon.css').catch(() => {
+      import(/* webpackMode: "eager" */ '@css/jquery-ui-timepicker-addon.css').catch(() => {
         // This is intentional
       });
-      import('../css/style.css')
+      import(/* webpackMode: "eager" */ '@css/style.css')
         .then(
-          await import('../css/responsive.css').catch(() => {
+          await import(/* webpackMode: "eager" */ '@css/responsive.css').catch(() => {
             // This is intentional
           })
         )
@@ -31,7 +31,7 @@ export const importCss = async (): Promise<void> => {
           // This is intentional
         });
     } else if (settingsManager.enableLimitedUI) {
-      import('../css/limitedUI.css').catch(() => {
+      import(/* webpackMode: "eager" */ '@css/limitedUI.css').catch(() => {
         // This is intentional
       });
     }

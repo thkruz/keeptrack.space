@@ -1,7 +1,7 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
-import '../../settingsManager/settingsManager';
+import '@app/js/settingsManager/settings';
 import * as httpsOnly from './httpsOnly';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });

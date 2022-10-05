@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 // Post Processing Manager
-const pPM = {
+export const pPM = {
   init: null,
   createProgram: null,
   curBuffer: null,
@@ -2460,5 +2460,3 @@ pPM.shaderCode = {
     `,
   },
 };
-
-export { pPM };

@@ -1,4 +1,4 @@
-import '@app/js/settingsManager/settingsManager';
+import '@app/js/settingsManager/settings';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
@@ -8,7 +8,6 @@ import { init } from './analysis';
 /* eslint-disable no-undefined */
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
-settingsManager = window.settingsManager;
 
 test('Load Analysis Plugin', () => {
   window.M = {

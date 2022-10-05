@@ -1,5 +1,5 @@
 import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
-import '@app/js/settingsManager/settingsManager';
+import '@app/js/settingsManager/settings';
 import { expect } from '@jest/globals';
 import { defaultSat, keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';

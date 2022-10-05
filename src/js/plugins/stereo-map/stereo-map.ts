@@ -25,6 +25,10 @@
 */
 
 import mapPng from '@app/img/icons/map.png';
+import radar1 from '@app/img/radar-1.png';
+import redSquare from '@app/img/red-square.png';
+import satellite2 from '@app/img/satellite-2.png';
+import yellowSquare from '@app/img/yellow-square.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { MapManager } from '@app/js/api/keepTrackTypes';
 import { getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
@@ -125,8 +129,8 @@ export const updateMap = async (): Promise<void> => { // NOSONAR
 
       if (i % selectableInterval === 0) {
         // If inview then make yellow
-        // If not inview then make red
-        (<HTMLImageElement>getEl(`map-look${selectableIdx}`)).src = map.inView ? 'img/yellow-square.png' : 'img/red-square.png';
+        // If not inview then make red        
+        (<HTMLImageElement>getEl(`map-look${selectableIdx}`)).src = map.inView ? yellowSquare : redSquare;
 
         (<HTMLImageElement>getEl(`map-look${selectableIdx}`)).style.left = `${groundTracePoints[i - 1].x - 4}px`;
         (<HTMLImageElement>getEl(`map-look${selectableIdx}`)).style.top = `${groundTracePoints[i - 1].y - 4}px`;
@@ -286,59 +290,59 @@ export const uiManagerInit = (): void => {
     keepTrackApi.html`
         <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
           <canvas id="map-2d"></canvas>
-          <img id="map-sat" class="map-item map-look" src="img/satellite-2.png" width="20px" height="20px">
-          <img id="map-sensor" class="map-item map-look start-hidden" src="img/radar-1.png" width="20px"
+          <img id="map-sat" class="map-item map-look" src=${satellite2} width="20px" height="20px">
+          <img id="map-sensor" class="map-item map-look start-hidden" src=${radar1} width="20px"
             height="20px">
-          <img id="map-look1" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look2" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look3" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look4" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look5" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look6" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look7" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look8" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look9" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look10" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look11" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look12" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look13" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look14" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look15" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look16" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look17" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look18" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look19" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look20" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look21" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look22" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look23" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look24" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look25" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look26" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look27" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look28" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look29" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look30" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look31" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look32" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look33" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look34" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look35" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look36" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look37" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look38" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look39" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look40" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look41" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look42" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look43" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look44" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look45" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look46" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look47" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look48" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look49" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
-          <img id="map-look50" class="map-item map-look" src="img/red-square.png" width="8px" height="8px">
+          <img id="map-look1" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look2" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look3" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look4" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look5" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look6" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look7" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look8" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look9" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look10" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look11" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look12" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look13" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look14" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look15" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look16" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look17" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look18" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look19" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look20" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look21" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look22" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look23" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look24" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look25" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look26" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look27" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look28" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look29" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look30" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look31" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look32" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look33" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look34" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look35" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look36" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look37" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look38" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look39" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look40" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look41" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look42" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look43" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look44" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look45" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look46" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look47" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look48" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look49" class="map-item map-look" width="8px" height="8px">
+          <img id="map-look50" class="map-item map-look" width="8px" height="8px">
         </div>
         `
   );

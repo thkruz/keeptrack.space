@@ -19,7 +19,7 @@
  */
 
 // Settings Manager Overrides
-const settingsManagerOverride = {
+const settingsOverride = {
   // Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
@@ -72,7 +72,9 @@ const settingsManagerOverride = {
     scenarioCreator: true,
   },
   searchLimit: 150,
+  isDisableCss: false,
+  isShowSplashScreen: true,
 };
 
 // Expose these to the console
-window.settingsManagerOverride = settingsManagerOverride;
+window.settingsOverride = settingsOverride;

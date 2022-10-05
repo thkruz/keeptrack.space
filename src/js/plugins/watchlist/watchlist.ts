@@ -260,7 +260,8 @@ export const uiManagerInit = (): void => {
 };
 
 export const uiManagerFinal = (): void => {
-  document.querySelector('.menu-selectable').addEventListener('click', menuSelectableClick);
+  const MenuSelectableDOM = document.querySelector('.menu-selectable');
+  MenuSelectableDOM && MenuSelectableDOM.addEventListener('click', menuSelectableClick);
   clickAndDragWidth(getEl('watchlist-menu'));
 
   getEl('info-overlay-content').addEventListener('click', function (evt: Event) {
@@ -553,7 +554,7 @@ export const watchlistContentEvent = (e?: any, satId?: number) => {
     }
   });
 
-  watchlistList.sort((a: number, b: number) => parseInt(satSet.getSat(a).sccNum) - parseInt(satSet.getSat(b).sccNum));
+  watchlistList.sort((a: number, b: number) => parseInt(satSet.getSat(a)?.sccNum) - parseInt(satSet.getSat(b)?.sccNum));
 
   updateWatchlist();
   if (sensorManager.checkSensorSelected()) {

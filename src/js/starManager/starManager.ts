@@ -14,8 +14,9 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
+
 import { constellations } from './constellations';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { stars } from './stars';
 
 export const findStarsConstellation = (starName: string) => {
@@ -45,7 +46,7 @@ export const drawAllConstellations = () => {
       } catch (e) {
         // IF this isn't Jest testing, then throw a warning
         /* istanbul ignore next */
-        if (typeof process === 'undefined') {
+        if (isThisJest()) {
           console.warn(`Constellation/Star error - i: ${i} - s: ${s}`);
         }
         continue;

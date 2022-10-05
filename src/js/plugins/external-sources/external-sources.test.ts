@@ -4,7 +4,6 @@ import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as externalSources from './external-sources';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
-settingsManager = window.settingsManager;
 
 // @ponicode
 describe('externalSources.init', () => {

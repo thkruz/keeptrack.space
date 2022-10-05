@@ -5,8 +5,6 @@ import { screenShot, watermarkedDataUrl } from './screenShot';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
-declare const settingsManager;
-
 describe('Screenshot Package', () => {
   beforeAll(() => {
     const mockEleement = {
@@ -45,7 +43,7 @@ describe('Screenshot Package', () => {
       expect(result).toMatchSnapshot();
     });
     test('if queued screenshot triggers a screenshot', () => {
-      settingsManager.queuedScreenShot = true;
+      settingsManager.queuedScreenshot = true;
       keepTrackApi.programs.drawManager.gl = <WebGL2RenderingContext>(<unknown>{
         viewport: () => {},
         drawingBufferWidth: 0,

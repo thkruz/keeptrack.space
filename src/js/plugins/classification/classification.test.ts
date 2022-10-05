@@ -1,4 +1,4 @@
-import '@app/js/settingsManager/settingsManager';
+import '@app/js/settingsManager/settings';
 import { expect } from '@jest/globals';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';

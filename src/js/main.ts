@@ -27,79 +27,73 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import '@css/loading-screen.css';
+
 import { isThisJest, keepTrackApi } from './api/keepTrackApi';
 
-import eruda from 'eruda';
-import erudaFps from 'eruda-fps';
-import { importCss } from './css';
-import { getEl } from './lib/helpers';
-
-export const showErrorCode = (error: Error & { lineNumber: number }): void => {
-  let errorHtml = '';
-  errorHtml += error?.message ? `${error.message}<br>` : '';
-  errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
-  errorHtml += error?.stack ? `${error.stack}<br>` : '';
-  getEl('loader-text').innerHTML = errorHtml;
-  // istanbul ignore next
-  if (!isThisJest()) console.warn(error);
-};
-
-export const loadAfterStart = () => {
-  if (settingsManager.cruncherReady) {
-    // Create Container Div
-    // NOTE: This needs to be done before uiManagerFinal
-    getEl('ui-wrapper').innerHTML += '<div id="eruda"></div>';
-
-    // Update any CSS now that we know what is loaded
-    keepTrackApi.methods.uiManagerFinal();
-    // Update MaterialUI with new menu options
-    window.M.AutoInit();
-
-    eruda.init({
-      autoScale: false,
-      container: getEl('eruda'),
-      useShadowDom: false,
-      tool: ['console', 'elements'],
-    });
-    eruda.add(erudaFps);
-
-    // Hide Eruda
-    (<HTMLDivElement>(<unknown>document.getElementsByClassName('eruda-entry-btn')[0])).style.display = 'none';
-    (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.top = 'var(--top-menu-height)';
-    (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.height = '80%';
-    (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.width = '60%';
-    (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.left = '20%';
-
-    try {
-      settingsManager.onLoadCb();
-    } catch (error) {
-      // Intentionally Blank
-    }
-  } else {
-    setTimeout(loadAfterStart, 100);
-  }
-};
-
-// Load the CSS
-if (!isThisJest()) importCss();
+import { loadSplashScreen } from './loadSplashScreen';
+import { startKeepTrack } from './start';
 
 // Load the main website
-import('./initalizeKeepTrack').then(({ initalizeKeepTrack }) => {
-  if (!isThisJest()) {
-    console.log(`
-      _  __            _______             _       _____                       
-      | |/ /           |__   __|           | |     / ____|                     
-      | ' / ___  ___ _ __ | |_ __ __ _  ___| | __ | (___  _ __   __ _  ___ ___ 
-      |  < / _ \\/ _ | '_ \\| | '__/ _\` |/ __| |/ /  \\___ \\| '_ \\ / _\` |/ __/ _ \\ 
-      | . |  __|  __| |_) | | | | (_| | (__|   < _ ____) | |_) | (_| | (_|  __/
-      |_|\\_\\___|\\___| .__/|_|_|  \\__,_|\\___|_|\\_(_|_____/| .__/ \\__,_|\\___\\___|
-                    | |                                  | |                   
-                    |_|                                  |_|                   
-      #########################################################################
-      Trying to figure out how the code works? Check out 
-      https://github.com/thkruz/keeptrack.space/ or send me an email at
-      theodore.kruczek at gmail dot com.
-    `);
-    initalizeKeepTrack();
-  }
-});
+const settingsOverride = window.settingsOverride || {};
+
+if (!settingsOverride.isPreventDefaultHtml) {
+  const bodyDOM = document.getElementsByTagName('body')[0];
+  bodyDOM.innerHTML = keepTrackApi.html`
+  <div id="loading-screen" class="valign-wrapper full-loader">
+      <div id="logo-inner-container" class="valign">
+        <div style="display: flex;">
+          <span id="logo-text" class="logo-font">KEEP TRACK</span>
+          <span id="logo-text-version" class="logo-font">7</span>
+        </div>
+        <span id="loader-text">Downloading Science...</span>
+      </div>
+    </div>
+    <div id="main-container">
+      <header>
+        <div id="header"></div>
+      </header>
+      <main>
+        <div id="rmb-wrapper"></div>
+
+        <div id="canvas-holder">
+          <canvas id="keeptrack-canvas"></canvas>
+          <div id="ui-wrapper">
+            <div id="search-results"></div>
+
+            <div id="sat-hoverbox">
+              <span id="sat-hoverbox1"></span>
+              <br />
+              <span id="sat-hoverbox2"></span>
+              <br />
+              <span id="sat-hoverbox3"></span>
+            </div>
+            <div id="sat-minibox"></div>
+
+            <div id="legend-hover-menu" class="start-hidden"></div>
+            <aside id="left-menus"></aside>
+          </div>
+        </div>
+        <figcaption id="info-overlays">
+          <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
+          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
+          <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
+          <div id="license-watermark" class="logo-font start-hidden">Unlicensed Software - Contact
+            theodore.kruczek@gmail.com to Renew!</div>
+        </figcaption>
+      </main>
+      <footer id="nav-footer" class="page-footer resizable">
+        <div id="footer-handle" class="ui-resizable-handle ui-resizable-n"></div>
+        <div id="footer-toggle-wrapper">
+          <div id="nav-footer-toggle">&#x25BC;</div>
+        </div>
+        <div id="bottom-icons-container">
+          <div id="bottom-icons"></div>
+        </div>
+      </footer>
+    </div>
+    `;
+
+  if (!isThisJest() && settingsOverride.isShowSplashScreen) loadSplashScreen();
+}
+startKeepTrack(settingsOverride);

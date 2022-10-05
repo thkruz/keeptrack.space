@@ -5,8 +5,6 @@ import { demoMode } from './demoMode';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
 
-declare const settingsManager;
-
 // @ponicode
 describe('drawManager.demoMode', () => {
   test('0', () => {

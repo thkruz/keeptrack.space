@@ -35,18 +35,21 @@ export const initMenuController = () => {
       settingsManager.legendMenuOpen = false;
     } else {
       getEl('legend-hover-menu').style.display = 'block';
-      getEl('legend-icon').classList.add('bmenu-item-selected');
+      const LegendIcon = getEl('legend-icon');
+      LegendIcon && LegendIcon.classList.add('bmenu-item-selected');
       searchBox.hideResults();
       settingsManager.legendMenuOpen = true;
     }
   });
 
-  document.querySelector('.menu-selectable').addEventListener('click', () => {
-    if (objectManager.selectedSat !== -1) {
-      getEl('menu-lookangles').classList.remove('bmenu-item-disabled');
-      getEl('menu-satview').classList.remove('bmenu-item-disabled');
-    }
-  });
+  const MenuSelectable = document.querySelector('.menu-selectable');
+  MenuSelectable &&
+    MenuSelectable.addEventListener('click', () => {
+      if (objectManager.selectedSat !== -1) {
+        getEl('menu-lookangles').classList.remove('bmenu-item-disabled');
+        getEl('menu-satview').classList.remove('bmenu-item-disabled');
+      }
+    });
 
   // Resizing Listener
   window.addEventListener('resize', () => {

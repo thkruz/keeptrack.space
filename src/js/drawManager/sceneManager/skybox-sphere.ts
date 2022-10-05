@@ -13,6 +13,10 @@ const DRAW_RADIUS = 260000;
 export const init = async () => {
   const { gl } = keepTrackApi.programs.drawManager;
 
+  skyboxSphere.textureMilkyWay.src = `${settingsManager.installDirectory}textures/skybox8k.jpg`;
+  skyboxSphere.textureBoundaries.src = `${settingsManager.installDirectory}textures/skyboxBoundaries8k.jpg`;
+  skyboxSphere.textureConstellations.src = `${settingsManager.installDirectory}textures/skyboxConstellations8k.jpg`;
+
   initProgram(gl);
   initTextures(gl);
   initBuffers(gl);
@@ -323,21 +327,21 @@ export const skyboxSphere = {
   vao: <WebGLVertexArrayObject>null,
   textureMilkyWay: {
     img: <HTMLImageElement>null,
-    src: `${settingsManager.installDirectory}textures/skybox8k.jpg`,
+    src: null,
     texture: <WebGLTexture>null,
     loaded: false,
   },
   textureBoundaries: {
     isReady: false,
     img: <HTMLImageElement>null,
-    src: `${settingsManager.installDirectory}textures/skyboxBoundaries8k.jpg`,
+    src: null,
     texture: <WebGLTexture>null,
     loaded: false,
   },
   textureConstellations: {
     isReady: false,
     img: <HTMLImageElement>null,
-    src: `${settingsManager.installDirectory}textures/skyboxConstellations8k.jpg`,
+    src: null,
     texture: <WebGLTexture>null,
     loaded: false,
   },

@@ -1,14 +1,15 @@
-import webpack from 'webpack';
-import generateConstVersion from './lib/constVersion.mjs';
 import { copyFilesAndFolders, copySettingsFiles } from './lib/copyFilesAndFolders.mjs';
+
+import { generateConfig } from './webpack.mjs';
+import generateConstVersion from './lib/constVersion.mjs';
 import { setupDistFolders } from './lib/setupFolders.mjs';
 import { updateTime } from './lib/updateTime.mjs';
-import { generateConfig } from './webpack.mjs';
+import webpack from 'webpack';
 
 console.clear();
 console.log('Copying files...'); // NOSONAR
 
-const reqDirs = ['audio', 'css/fonts', 'img', 'meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle'];
+const reqDirs = ['meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle'];
 const optDirs = [''];
 
 const reqFiles = [
@@ -22,10 +23,9 @@ const reqFiles = [
   'manifest.webmanifest',
   'serviceWorker.js',
   'SOCRATES.html',
-  'css/loading-screen.css',
-  'css/fonts.css',
-  'css/materialize.css',
-  'css/materialize-local.css',
+  'img/logo128.png',
+  'img/logo192.png',
+  'img/logo512.png',
 ];
 const optFiles = [];
 

@@ -1,10 +1,9 @@
-import { rmSync } from 'fs';
 import mkdirp from 'mkdirp';
+import { rmSync } from 'fs';
 
 export const setupDistFolders = () => {
   rmSync('./dist/admin', { recursive: true, force: true });
   rmSync('./dist/audio', { recursive: true, force: true });
-  rmSync('./dist/css', { recursive: true, force: true });
   rmSync('./dist/img', { recursive: true, force: true });
   rmSync('./dist/js', { recursive: true, force: true });
   rmSync('./dist/meshes', { recursive: true, force: true });
@@ -22,12 +21,11 @@ export const setupDistFolders = () => {
 
   mkdirp.sync('./dist/plugins');
   mkdirp.sync('./dist/settings');
-  mkdirp.sync('./dist/css');
+  mkdirp.sync('./dist/img');
 };
 
 export const setupEmbedFolders = () => {
   rmSync('./embed/keepTrack/js', { recursive: true, force: true });
-  rmSync('./embed/keepTrack/css', { recursive: true, force: true });
   rmSync('./embed/keepTrack/textures', { recursive: true, force: true });
   rmSync('./embed/keepTrack/tle', { recursive: true, force: true });
   mkdirp.sync('./embed');
@@ -38,4 +36,17 @@ export const setupEmbedFolders = () => {
   mkdirp.sync('./embed/keepTrack/css');
   mkdirp.sync('./embed/keepTrack/textures');
   mkdirp.sync('./embed/keepTrack/tle');
+};
+
+export const setupLibFolders = () => {
+  rmSync('./lib/keepTrack/js', { recursive: true, force: true });
+  rmSync('./lib/keepTrack/textures', { recursive: true, force: true });
+  rmSync('./lib/keepTrack/tle', { recursive: true, force: true });
+  mkdirp.sync('./lib');
+
+  mkdirp.sync('./lib/keepTrack');
+  mkdirp.sync('./lib/keepTrack/js');
+  mkdirp.sync('./lib/keepTrack/settings');
+  mkdirp.sync('./lib/keepTrack/textures');
+  mkdirp.sync('./lib/keepTrack/tle');
 };

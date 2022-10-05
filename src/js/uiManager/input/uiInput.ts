@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import { UiInputInterface } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { Camera } from '@app/js/camera/camera';
@@ -990,7 +990,7 @@ export const getSatIdFromCoord = (x: number, y: number): number => {
 
   // NOTE: gl.readPixels is a huge bottleneck
   gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManager.pickingFrameBuffer);
-  if (typeof process === 'undefined' && uiInput.isAsyncWorking) {
+  if (!isThisJest() && uiInput.isAsyncWorking) {
     uiInput.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManager.pickReadPixelBuffer);
   }
   if (!uiInput.isAsyncWorking) {

@@ -1,10 +1,10 @@
 /* eslint-disable no-process-env */
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import WebpackBar from 'webpackbar';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
-import WebpackBar from 'webpackbar';
 
 export const generateConfig = (env, isWatch) => {
   const fileName = fileURLToPath(import.meta.url);
@@ -19,6 +19,7 @@ export const generateConfig = (env, isWatch) => {
   switch (env) {
     case 'embed':
     case 'embedDev':
+    case 'lib':
       // this is for embedding the app in a web page
       baseConfig = getEmbedConfig(baseConfig);
       break;
@@ -38,13 +39,13 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // Add source map if in these modes
-  if (env === 'development' || env === 'test' || env === 'embedDev') {
+  if (env === 'development' || env === 'test' || env === 'embedDev' || env === 'lib') {
     baseConfig = {
       ...baseConfig,
       ...{
         cache: true,
-        // devtool: 'inline-source-map',
         devtool: 'source-map',
+        // devtool: 'eval-source-map',
         optimization: {
           minimize: false,
         },
@@ -65,7 +66,13 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // split entry points main, webworkers, and possibly analysis tools
-  if (env !== 'embed' && env !== 'embedDev') {
+  if (env === 'lib') {
+    const mainConfig = getLibConfig(baseConfig, dirName, 'lib/keepTrack', 'keepTrack/');
+    const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'lib/keepTrack/', 'keepTrack/');
+
+    webpackConfig.push(mainConfig);
+    webpackConfig.push(webWorkerConfig);
+  } else if (env !== 'embed' && env !== 'embedDev') {
     const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
     const analysisConfig = getAnalysisConfig(baseConfig, dirName);
@@ -89,6 +96,7 @@ const getBaseConfig = (dirName) => ({
     extensions: ['.ts', '.js'],
     alias: {
       '@app': `${dirName}/../src`,
+      '@css': `${dirName}/../src/css`,
     },
   },
   module: {
@@ -98,11 +106,35 @@ const getBaseConfig = (dirName) => ({
         test: /\.(png|svg|jpg|jpeg|gif)$/iu,
         include: [/src/u],
         type: 'asset/resource',
+        generator: {
+          filename: '../img/[name][ext]',
+        },
+      },
+      {
+        // eslint-disable-next-line prefer-named-capture-group
+        test: /\.(mp3)$/iu,
+        include: [/src/u],
+        type: 'asset/resource',
+        generator: {
+          filename: '../audio/[name][ext]',
+        },
+      },
+      {
+        // eslint-disable-next-line prefer-named-capture-group
+        test: /\.(woff2|woff|ttf|eot)$/iu,
+        include: [/src/u],
+        type: 'asset/resource',
+        generator: {
+          filename: '../fonts/[name][ext]',
+        },
       },
       {
         test: /\.css$/iu,
         include: [/src/u],
         use: ['style-loader', 'css-loader'],
+        generator: {
+          filename: './css/[name][ext]',
+        },
       },
       {
         test: /\.worker\.js$/iu,
@@ -208,6 +240,25 @@ const getMainConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
       filename: `[name]${subFolder === 'dist' ? '.[contenthash]' : ''}.js`,
       path: `${dirName}/../${subFolder}/js`,
       publicPath: `./${pubPath}js/`,
+    },
+  },
+});
+
+const getLibConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
+  ...baseConfig,
+  ...{
+    name: 'KeepTrackLibrary',
+    entry: {
+      start: ['./src/js/start.ts'],
+    },
+    output: {
+      filename: `[name].js`,
+      path: `${dirName}/../${subFolder}/js`,
+      library: {
+        name: 'KeepTrackCode',
+        type: 'window',
+        export: ['startKeepTrack'],
+      },
     },
   },
 });

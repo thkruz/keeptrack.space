@@ -85,6 +85,8 @@ let len: number;
 let mSensor = <SensorObjectCruncher[]>[];
 let sensor = emptySensor;
 
+const isThisJest = typeof process !== 'undefined' && process?.release?.name;
+
 // Handles Incomming Messages to sat-cruncher from main thread
 try {
   onmessage = (m) => onmessageProcessing(m);
@@ -216,8 +218,8 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       extra.period = 1440.0 / extra.meanMotion;
       extra.TLE1 = m.data.TLE1;
       extra.TLE2 = m.data.TLE2;
-      extraData.push(extra);
-      if (typeof process !== 'undefined') return;
+      extraData.push(extra);      
+      if (isThisJest) return;
       // istanbul ignore next
       postMessage({
         extraUpdate: true,

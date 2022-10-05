@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import { ColorRuleSet } from '@app/js/colorManager/colorSchemeManager';
 import { setColorScheme } from '@app/js/satSet/satSet';
-import '../../settingsManager/settingsManager';
+import '@app/js/settingsManager/settings';
 import { colorSchemeChangeAlert } from './colorSchemeChangeAlert';
 
 keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });

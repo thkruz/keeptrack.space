@@ -361,7 +361,6 @@ export const uiManagerInit = (): void => {
 };
 
 export const uiManagerFinal = () => {
-  const { uiManager } = keepTrackApi.programs;
   resize2DMap();
 
   window.addEventListener('resize', () => {
@@ -369,7 +368,7 @@ export const uiManagerFinal = () => {
   });
 
   getEl('fullscreen-icon').addEventListener('click', () => {
-    uiManager.resize2DMap();
+    resize2DMap();
   });
 
   getEl('map-menu').addEventListener('click', (evt: Event) => {

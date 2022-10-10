@@ -476,13 +476,13 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
       ) {
         getEl('sat-sun').innerHTML = 'No Effect';
         // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
-      } else if (sunTime.dawn.getTime() - now.getTime() > 0 || sunTime.dusk.getTime() - now.getTime() < 0) {
+      } else if (sunTime.sunriseStart.getTime() - now.getTime() > 0 || sunTime.sunsetEnd.getTime() - now.getTime() < 0) {
         if (satInSun == 0) getEl('sat-sun').innerHTML = 'No Sunlight';
         if (satInSun == 1) getEl('sat-sun').innerHTML = 'Limited Sunlight';
         if (satInSun == 2) getEl('sat-sun').innerHTML = 'Direct Sunlight';
         // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
         // high latitude and we need to figure that out
-      } else if (sunTime.night != 'Invalid Date' && (sunTime.dawn == 'Invalid Date' || sunTime.dusk == 'Invalid Date')) {
+      } else if (sunTime.nadir != 'Invalid Date' && (sunTime.sunriseStart == 'Invalid Date' || sunTime.sunsetEnd == 'Invalid Date')) {
         // TODO: Figure out how to calculate this
         console.debug('No Dawn or Dusk');
         if (satInSun == 0) getEl('sat-sun').innerHTML = 'No Sunlight';

@@ -226,7 +226,6 @@ export const uiManager = {
   createClockDOMOnce: false,
   lastNextPassCalcSatId: 0,
   lastNextPassCalcSensorId: null,
-  resize2DMap: null,
   isAnalysisMenuOpen: false,
   updateNextPassOverlay: null,
   earthClicked: null,

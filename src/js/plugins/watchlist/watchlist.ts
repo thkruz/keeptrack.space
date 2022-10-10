@@ -554,7 +554,12 @@ export const watchlistContentEvent = (e?: any, satId?: number) => {
     }
   });
 
-  watchlistList.sort((a: number, b: number) => parseInt(satSet.getSat(a)?.sccNum) - parseInt(satSet.getSat(b)?.sccNum));
+  watchlistList.sort((a: number, b: number) => {
+    const satA = satSet.getSat(a);
+    const satB = satSet.getSat(b);
+    if (satA === null || satB === null) return 0;
+    return parseInt(satA.sccNum) - parseInt(satB.sccNum);
+  });
 
   updateWatchlist();
   if (sensorManager.checkSensorSelected()) {

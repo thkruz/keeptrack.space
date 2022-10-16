@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { getEl } from '@app/js/lib/helpers';
+import { fadeIn, fadeOut, getEl } from '@app/js/lib/helpers';
 import { satellite } from '@app/js/satMath/satMath';
 import $ from 'jquery';
 
@@ -75,7 +75,7 @@ export const selectSatManager = {
       mainCamera.fts2default();
       isselectedSatNegativeOne = true;
 
-      $('#sat-infobox').fadeOut();
+      fadeOut(getEl('sat-infobox'));
 
       // Add Grey Out
       getEl('menu-lookanglesmultisite')?.classList.add('bmenu-item-disabled');
@@ -150,7 +150,7 @@ export const selectSatManager = {
         getEl('menu-plot-analysis3')?.classList.remove('bmenu-item-disabled');
       }
 
-      $('#sat-infobox').fadeIn();
+      fadeIn(getEl('sat-infobox'));
 
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
         if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {

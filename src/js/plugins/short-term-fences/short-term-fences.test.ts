@@ -1,6 +1,6 @@
 import { keepTrackApiStubs } from '@app/js/api/apiMocks';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject } from '@app/js/api/keepTrackTypes';
 import * as shortTermFences from '@app/js/plugins/short-term-fences/short-term-fences';
 import { expect } from '@jest/globals';
 /* eslint-disable no-undefined */
@@ -83,7 +83,7 @@ describe('shortTermFences.hideSideMenus', () => {
 describe('shortTermFences.selectSatData', () => {
   test('0', () => {
     const callFunction: any = () => {
-      shortTermFences.selectSatData(true);
+      shortTermFences.selectSatData({} as SatObject);
     };
 
     expect(callFunction).not.toThrow();
@@ -91,7 +91,8 @@ describe('shortTermFences.selectSatData', () => {
 
   test('1', () => {
     const callFunction: any = () => {
-      shortTermFences.selectSatData(false);
+      shortTermFences.selectSatData({} as SatObject);
+      shortTermFences.selectSatData({} as SatObject); // It should skip this one
     };
 
     expect(callFunction).not.toThrow();

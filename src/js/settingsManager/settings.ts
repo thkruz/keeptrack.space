@@ -19,7 +19,7 @@
  */
 
 import { isThisJest } from '@app/js/api/keepTrackApi';
-import { SettingsManager } from '../api/keepTrackTypes';
+import { SettingsManager } from '@app/js/api/keepTrackTypes';
 
 // Actual Setup
 export let settingsManager: SettingsManager = {
@@ -261,6 +261,7 @@ export let settingsManager: SettingsManager = {
     settingsManager.zoomSpeed = 0.01;
     settingsManager.isZoomStopsRotation = true;
 
+    // This is for debugging and should be false during production to avoid errors
     settingsManager.isUseNullForBadGetEl = true;
 
     settingsManager.isEPFL = false;

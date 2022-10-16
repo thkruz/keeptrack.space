@@ -1,4 +1,4 @@
-import { KeepTrackPrograms, SensorObject } from '@app/js/api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as sensor from './sensor';
@@ -47,7 +47,7 @@ describe('sensor.hideSideMenus', () => {
 // @ponicode
 describe('sensor.selectSatData', () => {
   test('0', () => {
-    let result: any = sensor.selectSatData();
+    let result: any = sensor.selectSatData({} as SatObject);
     expect(result).toMatchSnapshot();
   });
 });

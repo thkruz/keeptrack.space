@@ -26,7 +26,7 @@ import multiSitePng from '@app/img/icons/multi-site.png';
 import radarPng from '@app/img/icons/radar.png';
 import radioTowerPng from '@app/img/icons/radio-tower.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { toast } from '@app/js/uiManager/ui/toast';
 
@@ -798,7 +798,12 @@ export const init = (): void => {
   });
 };
 
-export const selectSatData = () => {
+export const selectSatData = (sat: SatObject) => {
+  // Skip this if there is no satellite object because the menu isn't open
+  if (sat === null || typeof sat === 'undefined') {
+    return;
+  }
+
   const { satSet } = keepTrackApi.programs;
   if (!sensorLinks) {
     getEl('sat-info-top-links').insertAdjacentHTML(

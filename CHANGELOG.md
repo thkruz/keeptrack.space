@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.0.2
+
+>  
+
+- fix: :bug: fix sorting issue with null satellites
+- fix: :bug: fix issue with sun calculations
+- fix: :bug: remove old reference to uiManager.resize2DMap
+- fix: :bug: fix testing bugs
+- refactor: remove jquery get request
+- chore: :memo: update version number
+- fix: :lock: remove vulnerability
+
 #### v7.0.1
 
 >  

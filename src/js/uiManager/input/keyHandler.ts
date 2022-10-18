@@ -1,4 +1,4 @@
-import { Camera } from '@app/js/camera/camera';
+import { Camera, changeCameraType } from '@app/js/camera/camera';
 import eruda from 'eruda';
 import { getEl } from '@app/js/lib/helpers';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
@@ -19,7 +19,7 @@ export const keyHandler = (evt: KeyboardEvent) => { // NOSONAR
       objectManager.switchPrimarySecondary();
     break;
     case 'C':
-      mainCamera.changeCameraType(orbitManager, drawManager, objectManager, sensorManager);
+      changeCameraType(mainCamera, orbitManager, drawManager, objectManager, sensorManager);
 
       switch (mainCamera.cameraType.current) {
         case mainCamera.cameraType.Default:

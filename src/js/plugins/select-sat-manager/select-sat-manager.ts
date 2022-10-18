@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
+import { Camera } from '@app/js/camera/camera';
 import { fadeIn, fadeOut, getEl } from '@app/js/lib/helpers';
 import { satellite } from '@app/js/satMath/satMath';
 import $ from 'jquery';
@@ -18,7 +19,7 @@ export const selectSatManager = {
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
   // prettier-ignore
-  selectSat: (satId: number, mainCamera: any) => { // NOSONAR
+  selectSat: (satId: number, mainCamera: Camera) => { // NOSONAR
     if (settingsManager.isDisableSelectSat) return;
     const { objectManager, satSet, sensorManager, uiManager } = keepTrackApi.programs;
 
@@ -36,8 +37,9 @@ export const selectSatManager = {
           const searchStr = satSet.satData
             .filter((_sat) => _sat.owner === sat.Code || _sat.manufacturer === sat.Code)
             .map((_sat) => _sat.sccNum)
-            .join(', ');
+            .join(',');
           uiManager.searchBox.doSearch(searchStr);
+          mainCamera.changeZoom(0.9);
         }
         return;
       }

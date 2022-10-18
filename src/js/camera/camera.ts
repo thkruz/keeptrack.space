@@ -141,7 +141,7 @@ export const changeZoom = (zoom: ZoomValue | number): void => {
   camera._zoomTarget = zoom;
 };
 
-export const changeCameraType = (orbitManager: OrbitManager, drawManager: DrawManager, objectManager: ObjectManager, sensorManager: SensorManager) => {
+export const changeCameraType = (camera: Camera, orbitManager: OrbitManager, drawManager: DrawManager, objectManager: ObjectManager, sensorManager: SensorManager) => {
   let curCam = camera.cameraType.current;
   if (curCam === camera.cameraType.Planetarium) {
     orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
@@ -864,7 +864,6 @@ export const camera = {
     Astronomy: 6,
     set: setCameraType,
   },
-  changeCameraType: changeCameraType,
   changeZoom: changeZoom,
   chaseSpeed: 0.0035,
   dragStartPitch: 0,

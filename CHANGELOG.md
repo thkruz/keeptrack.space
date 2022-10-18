@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.0.3
+
+>  
+
+- fix: :bug: fix issue caused by clicking a non-satellite first
+- refactor: :label: update camera typing
+- fix: :bug: add error trapping for uniformMatrix4fv failure
+
 #### v7.0.2
 
 >  

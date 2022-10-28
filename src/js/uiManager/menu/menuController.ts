@@ -169,11 +169,11 @@ export const initMenuController = () => {
   clickAndDragWidth(getEl('settings-menu'));
   clickAndDragWidth(getEl('about-menu'));
 
-  getEl('export-lookangles').addEventListener('click', () => {
+  getEl('export-lookangles')?.addEventListener('click', () => {
     saveCsv(satellite.lastlooksArray, 'lookAngles');
   });
 
-  getEl('export-multiSiteArray').addEventListener('click', () => {
+  getEl('export-multiSiteArray')?.addEventListener('click', () => {
     saveCsv(satellite.lastMultiSiteArray, 'multiSiteLooks');
   });
 };

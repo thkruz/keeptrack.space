@@ -143,7 +143,7 @@ export const uiManagerInit = (): void => {
         <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
           <div id="findByLooks-content" class="side-menu">
             <div class="row">
-              <h5 class="center-align">Find By Looks</h5>
+              <h5 class="center-align">Find Satellite</h5>
               <form id="findByLooks-form">
                 <div class="row">
                   <div class="input-field col s12">

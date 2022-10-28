@@ -46,6 +46,7 @@ export const timeManager = {
   timeTextStr: null,
   timeTextStrEmpty: null,
   propRate: null,
+  lastPropRate: null,
   dt: null,
   drawDt: null,
   setNow: null,

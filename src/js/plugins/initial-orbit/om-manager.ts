@@ -277,7 +277,7 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, sa
       }
     }
     // debug
-    console.log(`Closest Approach: ${bestIndicies[0]}`);
+    // console.log(`Closest Approach: ${bestIndicies[0]}`);
     om.debug.closestApproach += bestIndicies[0];
 
     // Calculate Best TLE
@@ -296,9 +296,9 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, sa
 };
 om.svs2analyst = async (svs: StateVector[], satSet: CatalogManager, timeManager: TimeManager, satellite) => {
   om.iod(svs, timeManager, satellite)
-    .then((tles) => {
+    .then((tles: { tle1: string; tle2: string }) => {
       satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
-      searchBox.doSearch('100500', true);
+      searchBox.doSearch('100500', false);
     })
     .catch((error) => {
       console.debug(error);
@@ -392,7 +392,7 @@ export const _sv2kp = ({
 
   vectorU ??= 'km';
   if (vectorU !== 'km' && vectorU !== 'm') throw new Error('vectorU must be either "km" or "m"');
-  const vecMultiplier = vectorU === 'km' ? 1 : 1000;
+  const vecMultiplier = vectorU === 'km' ? 1000 : 1;
   let rx = vector[1] * vecMultiplier;
   let ry = vector[2] * vecMultiplier;
   let rz = vector[3] * vecMultiplier;

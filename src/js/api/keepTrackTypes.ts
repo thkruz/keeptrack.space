@@ -11,6 +11,7 @@ import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { MissileManager } from '../plugins/missile/missileManager';
 import { ObjectManager } from '../objectManager/objectManager';
 import { OrbitManager } from '../orbitManager/orbitManager';
+import { PlanetariumManager } from '../plugins/planetarium/planetarium';
 import { SatMath } from '../satMath/satMath';
 import { SensorManager } from '../plugins/sensor/sensorManager';
 import { SpaceObjectType } from './SpaceObjectType';
@@ -899,7 +900,7 @@ export interface KeepTrackPrograms {
   drawManager: DrawManager;
   // starManager: StarManager;
   astronomy: any;
-  planetarium: any;
+  planetarium: PlanetariumManager;
   objectManager: ObjectManager;
   lineManager: LineFactory;
   dotsManager: DotsManager;

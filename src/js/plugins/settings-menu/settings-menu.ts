@@ -114,6 +114,13 @@ export const uiManagerInit = (): void => {
                 </label>
               </div>
               <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Enable this to show where a satellite was instead of where it is going">
+                  <input id="settings-drawTrailingOrbits" type="checkbox"/>
+                  <span class="lever"></span>
+                  Draw Trailing Orbits
+                </label>
+              </div>
+              <div class="switch row">
                 <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
                   <input id="settings-drawEcf" type="checkbox" />
                   <span class="lever"></span>
@@ -176,6 +183,13 @@ export const uiManagerInit = (): void => {
                   Enable Satellite Label Mode
                 </label>
               </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Time will freeze as you rotate the camera.">
+                  <input id="settings-freeze-drag" type="checkbox" />
+                  <span class="lever"></span>
+                  Enable Freeze Time on Click
+                </label>
+              </div>
             </div>
             <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
             <div id="settings-colors">
@@ -219,7 +233,7 @@ export const uiManagerInit = (): void => {
               <div class="input-field col s6">
                 <center>
                   <p>Special Sats</p>
-                  <button id="settings-color-trusat" class="btn waves-effect waves-light"></button>
+                  <button id="settings-color-special" class="btn waves-effect waves-light"></button>
                 </center>
               </div>
             </div>
@@ -271,6 +285,11 @@ export const uiManagerInit = (): void => {
     </div>
   `
   );
+};
+
+export const uiManagerFinal = () => {
+  getEl('settings-form').addEventListener('change', settingsFormChange);
+  getEl('settings-form').addEventListener('submit', settingsFormSubmit);
 
   (() => {
     const colorPalette = [
@@ -330,20 +349,15 @@ export const uiManagerInit = (): void => {
         onColorSelected(this, 'missileInview');
       },
     });
-    (<any>$('#settings-color-trusat')).colorPick({
+    (<any>$('#settings-color-special')).colorPick({
       initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
       palette: colorPalette,
       onColorSelected: function () {
-        onColorSelected(this, 'trusat');
+        onColorSelected(this, 'pink');
       },
     });
     isNotColorPickerInitialSetup = true;
   })();
-};
-
-export const uiManagerFinal = () => {
-  getEl('settings-form').addEventListener('change', settingsFormChange);
-  getEl('settings-form').addEventListener('submit', settingsFormSubmit);
 };
 
 export const bottomMenuClick = (iconName: string) => {
@@ -399,6 +413,7 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
     case 'settings-geoSats':
     case 'settings-showAgencies':
     case 'settings-drawOrbits':
+    case 'settings-drawTrailingOrbits':
     case 'settings-drawEcf':
     case 'settings-isDrawInCoverageLines':
     case 'settings-drawSun':
@@ -408,6 +423,7 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
     case 'settings-hos':
     case 'settings-demo-mode':
     case 'settings-sat-label-mode':
+    case 'settings-freeze-drag':
     case 'settings-snp':
       if ((<HTMLInputElement>getEl(e.target.id)).checked) {
         // Play sound for enabling option
@@ -437,7 +453,7 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { soundManager, satSet, colorSchemeManager, uiManager, drawManager } = keepTrackApi.programs;
+  const { soundManager, satSet, colorSchemeManager, uiManager, drawManager, orbitManager } = keepTrackApi.programs;
 
   soundManager.play('button');
 
@@ -455,6 +471,16 @@ export const settingsFormSubmit = (e: any) => {
     drawManager.sceneManager.earth.init();
   }
   settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
+  settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;
+  if (settingsManager.isDrawTrailingOrbits) {
+    orbitManager.orbitWorker.postMessage({
+      orbitType: 2,
+    });
+  } else {
+    orbitManager.orbitWorker.postMessage({ orbitType: 1 });
+  }
+  // Must come after the above checks
+
   settingsManager.isDrawMilkyWay = (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
   settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
   const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;
@@ -462,6 +488,7 @@ export const settingsFormSubmit = (e: any) => {
   settingsManager.isDemoModeOn = (<HTMLInputElement>getEl('settings-demo-mode')).checked;
   settingsManager.isSatLabelModeOn = (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
   settingsManager.isShowNextPass = (<HTMLInputElement>getEl('settings-snp')).checked;
+  settingsManager.isFreezePropRateOnDrag = (<HTMLInputElement>getEl('settings-freeze-drag')).checked;
 
   colorSchemeManager.reloadColors();
 

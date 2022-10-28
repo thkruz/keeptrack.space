@@ -301,7 +301,7 @@ export const obfitFormSubmit = (e: any) => { // NOSONAR
   isOb3 = _isOb3;
   svs.push(sv3);
 
-  console.log(svs);
+  // console.log(svs);
   omManager.svs2analyst(svs, satSet, timeManager, satellite);
   e.preventDefault();
   return true;

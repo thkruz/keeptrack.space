@@ -128,6 +128,9 @@ export const useMockWorkers = (): void => {
 
 export const keepTrackApiStubs = {
   programs: {
+    planetarium: {
+      isPlanetariumView: false,
+    },
     adviceManager: {
       adviceList: {
         satViewDisabled: jest.fn(),

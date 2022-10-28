@@ -46,35 +46,35 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
 
     if (objectManager.isSensorManagerLoaded) {
       if (satellite.currentTEARR.inView) {
-        getEl('sat-azimuth').innerHTML = satellite.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
-        getEl('sat-elevation').innerHTML = satellite.currentTEARR.el.toFixed(1) + '°';
-        getEl('sat-range').innerHTML = satellite.currentTEARR.rng.toFixed(2) + ' km';
+        if(getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = satellite.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
+        if(getEl('sat-elevation')) getEl('sat-elevation').innerHTML = satellite.currentTEARR.el.toFixed(1) + '°';
+        if(getEl('sat-range')) getEl('sat-range').innerHTML = satellite.currentTEARR.rng.toFixed(2) + ' km';
         const sun = keepTrackApi.programs.drawManager.sceneManager.sun;
-        getEl('sat-vmag').innerHTML = satellite.calculateVisMag(sat, sensorManager.currentSensor[0], timeManager.simulationTimeObj, sun).toFixed(2);
+        if(getEl('sat-vmag')) getEl('sat-vmag').innerHTML = satellite.calculateVisMag(sat, sensorManager.currentSensor[0], timeManager.simulationTimeObj, sun).toFixed(2);
         const beamwidthString = sensorManager.currentSensor[0].beamwidth
           ? (satellite.currentTEARR.rng * Math.sin(DEG2RAD * sensorManager.currentSensor[0].beamwidth)).toFixed(2) + ' km'
           : 'Unknown';
-        getEl('sat-beamwidth').innerHTML = beamwidthString;
-        getEl('sat-maxTmx').innerHTML = ((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
+        if(getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = beamwidthString;
+        if(getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = ((satellite.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
       } else {
-        getEl('sat-vmag').innerHTML = 'Out of FOV';
-        getEl('sat-azimuth').innerHTML = 'Out of FOV';
-        getEl('sat-azimuth').title = 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°';
-        getEl('sat-elevation').innerHTML = 'Out of FOV';
-        getEl('sat-elevation').title = 'Elevation: ' + satellite.currentTEARR.el.toFixed(1) + '°';
-        getEl('sat-range').innerHTML = 'Out of FOV';
-        getEl('sat-range').title = 'Range: ' + satellite.currentTEARR.rng.toFixed(2) + ' km';
+        if (getEl('sat-vmag')) getEl('sat-vmag').innerHTML = 'Out of FOV';
+        if(getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = 'Out of FOV';
+        if(getEl('sat-azimuth')) getEl('sat-azimuth').title = 'Azimuth: ' + satellite.currentTEARR.az.toFixed(0) + '°';
+        if(getEl('sat-elevation')) getEl('sat-elevation').innerHTML = 'Out of FOV';
+        if(getEl('sat-elevation')) getEl('sat-elevation').title = 'Elevation: ' + satellite.currentTEARR.el.toFixed(1) + '°';
+        if(getEl('sat-range')) getEl('sat-range').innerHTML = 'Out of FOV';
+        if(getEl('sat-range')) getEl('sat-range').title = 'Range: ' + satellite.currentTEARR.rng.toFixed(2) + ' km';
         const beamwidthString = sensorManager.currentSensor[0].beamwidth ? sensorManager.currentSensor[0].beamwidth + '°' : 'Unknown';
-        getEl('sat-beamwidth').innerHTML = 'Out of FOV';
-        getEl('sat-beamwidth').title = beamwidthString;
-        getEl('sat-maxTmx').innerHTML = 'Out of FOV';
+        if(getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = 'Out of FOV';
+        if(getEl('sat-beamwidth')) getEl('sat-beamwidth').title = beamwidthString;
+        if(getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = 'Out of FOV';
       }
     } else {
-      getEl('sat-azimuth').parentElement.style.display = 'none';
-      getEl('sat-elevation').parentElement.style.display = 'none';
-      getEl('sat-range').parentElement.style.display = 'none';
-      getEl('sat-beamwidth').parentElement.style.display = 'none';
-      getEl('sat-maxTmx').parentElement.style.display = 'none';
+      if(getEl('sat-azimuth')) getEl('sat-azimuth').parentElement.style.display = 'none';
+      if(getEl('sat-elevation')) getEl('sat-elevation').parentElement.style.display = 'none';
+      if(getEl('sat-range')) getEl('sat-range').parentElement.style.display = 'none';
+      if(getEl('sat-beamwidth')) getEl('sat-beamwidth').parentElement.style.display = 'none';
+      if(getEl('sat-maxTmx')) getEl('sat-maxTmx').parentElement.style.display = 'none';
     }
 
     if (objectManager.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
@@ -98,9 +98,9 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
         // TODO: Make new logic for this to allow it to be updated while selected
         if ((objectManager.selectedSat !== uiManager.lastNextPassCalcSatId || sensorManager.currentSensor[0].shortName !== uiManager.lastNextPassCalcSensorId) && !sat.missile) {
           if (sat.perigee > sensorManager.currentSensor[0].obsmaxrange) {
-            getEl('sat-nextpass').innerHTML = 'Beyond Max Range';
+            if(getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = 'Beyond Max Range';
           } else {
-            getEl('sat-nextpass').innerHTML = satellite.nextpass(sat, sensorManager.currentSensor, 2, 5);
+            if(getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = satellite.nextpass(sat, sensorManager.currentSensor, 2, 5);
           }
 
           // IDEA: Code isInSun()
@@ -110,10 +110,10 @@ export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONA
         uiManager.lastNextPassCalcSatId = objectManager.selectedSat;
         uiManager.lastNextPassCalcSensorId = sensorManager.currentSensor[0].shortName;
       } else {
-        getEl('sat-nextpass').innerHTML = 'Unavailable';
+        if(getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = 'Unavailable';
       }
     } else {
-      getEl('sat-nextpass').parentElement.style.display = 'none';
+      if(getEl('sat-nextpass')) getEl('sat-nextpass').parentElement.style.display = 'none';
     }
   } catch (e) {
     createError(e, 'updateSatInfo');

@@ -19,6 +19,12 @@ export const init = (): void => {
     cb: uiManagerInit,
   });
 
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'countries',
+    cb: uiManagerFinal,
+  });
+
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
@@ -123,7 +129,9 @@ export const uiManagerInit = () => {
         </div>
       `
   );
+};
 
+export const uiManagerFinal = () => {
   // NOTE: Must use function not arrow function to access 'this'
   getEl('country-menu')
     .querySelectorAll('li')
@@ -153,8 +161,12 @@ export const groupSelected = (groupName: string): void => {
   groupsManager.selectGroup(groupsManager[groupName]);
 
   // Populate searchDOM with a search string separated by commas - minus the last one
-  searchDOM.val(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1));
-  searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
+  if (groupsManager[groupName].sats.length < settingsManager.searchLimit) {
+    searchBox.doSearch(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1));
+  } else {
+    searchDOM.val(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1));
+    searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
+  }
   objectManager.setSelectedSat(-1); // Clear selected sat
 
   // Close Menus

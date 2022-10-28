@@ -106,6 +106,9 @@ key.pem
 # TLE History
 src/analysis/sathist/*.json
 
+# Extended TLE
+src/tle/tle4.js
+
 # Custom Builds
 custom-builds
 

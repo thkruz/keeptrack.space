@@ -51,14 +51,73 @@ export class LineFactory {
     return starFound;
   }
 
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
-  // prettier-ignore
-  create(type: LineTypes, value: number[] | number, color?: LineColors): void { // NOSONAR
-    const getSat = keepTrackApi.programs.satSet.getSat;
-    let sat = null;
-    let sat2 = null;
+  createGrid(type: 'x' | 'y' | 'z', inputColor?: LineColors, scalar?: number): void {
+    if (type !== 'x' && type !== 'y' && type !== 'z') {
+      throw new Error('Invalid type');
+    }
 
+    const color = LineFactory.getColor(inputColor);
+
+    scalar ??= 1;
+
+    const num1 = 10000 / scalar;
+    const num2 = num1 * 7 * scalar;
+    const min = -7 * scalar;
+    const max = 7 * scalar;
+
+    switch (type) {
+      case 'x':
+        for (let i = min; i <= max; i++) {
+          this.drawLineList.push({
+            line: new Line(this.gl, this.shader),
+            ref: [num2, i * num1, 0],
+            ref2: [-num2, i * num1, 0],
+            color: color,
+          });
+          this.drawLineList.push({
+            line: new Line(this.gl, this.shader),
+            ref: [i * num1, num2, 0],
+            ref2: [i * num1, -num2, 0],
+            color: color,
+          });
+        }
+        break;
+      case 'y':
+        for (let i = min; i <= max; i++) {
+          this.drawLineList.push({
+            line: new Line(this.gl, this.shader),
+            ref: [num2, 0, i * num1],
+            ref2: [-num2, 0, i * num1],
+            color: color,
+          });
+          this.drawLineList.push({
+            line: new Line(this.gl, this.shader),
+            ref: [i * num1, 0, num2],
+            ref2: [i * num1, 0, -num2],
+            color: color,
+          });
+        }
+        break;
+      case 'z':
+        for (let i = min; i <= max; i++) {
+          this.drawLineList.push({
+            line: new Line(this.gl, this.shader),
+            ref: [0, num2, i * num1],
+            ref2: [0, -num2, i * num1],
+            color: color,
+          });
+          this.drawLineList.push({
+            line: new Line(this.gl, this.shader),
+            ref: [0, i * num1, num2],
+            ref2: [0, i * num1, -num2],
+            color: color,
+          });
+        }
+        break;
+    }
+  }
+
+  static getColor(color?: LineColors): number[] {
     if (typeof color == 'undefined') color = [1.0, 0, 1.0, 1.0];
     switch (color) {
       case 'r':
@@ -90,6 +149,20 @@ export class LineFactory {
         if (color.length !== 4) throw new Error('Color must be a 4 element array or a valid string!');
         break;
     }
+
+    return color;
+  }
+
+  // This is intentionally complex to reduce object creation and GC
+  // Splitting it into subfunctions would not be optimal
+  // prettier-ignore
+  create(type: LineTypes, value: number[] | number, inputColor?: LineColors): void { // NOSONAR
+    const getSat = keepTrackApi.programs.satSet.getSat;
+    let sat = null;
+    let sat2 = null;
+
+    const color = LineFactory.getColor(inputColor);
+    
     // Center of the Earth to the Satellite
     if (type == 'sat') {
       let satForLine = getSat(<number>value);

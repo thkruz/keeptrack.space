@@ -13,6 +13,21 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
   const { mainCamera, sensorManager, objectManager, satSet, dotsManager } = keepTrackApi.programs;
   let color;
 
+  if (sat.type === SpaceObjectType.NOTIONAL) {
+    // @ts-ignore
+    if (window.noNotional) {
+      return {
+        color: [1, 1, 0, 0.0],
+        pickable: Pickable.No,
+      };
+    } else {
+      return {
+        color: [1, 1, 0, 0.8],
+        pickable: Pickable.Yes,
+      };
+    }
+  }
+
   // Always show stars unless they are disabled
   if (sat.static && sat.type === SpaceObjectType.STAR) {
     if (sat.vmag >= 4.7 && colorSchemeManager.objectTypeFlags.starLow) {

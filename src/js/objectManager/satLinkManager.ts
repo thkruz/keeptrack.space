@@ -187,6 +187,7 @@ export const showLinks = async function (lineManager: LineFactory, satSet: Catal
       for (let i = 0; i < userlist.length; i++) {
         // Select the current user
         let user = <SensorObject>(<unknown>satSet.getSat(satSet.getSensorFromSensorName(userlist[i].toString())));
+        if (!user) continue;
         // Loop through all of the satellites
         for (let j = 0; j < satlist.length; j++) {
           // Select the current satelltie

@@ -364,9 +364,15 @@ export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
         return;
       case SpaceObjectType.DEBRIS:
         // TODO: Add more debris models
-        if (parseInt(sat.sccNum) <= 20000) meshManager.currentModel.model = meshManager.models.debris0;
-        if (parseInt(sat.sccNum) <= 35000) meshManager.currentModel.model = meshManager.models.debris1;
-        if (parseInt(sat.sccNum) > 35000) meshManager.currentModel.model = meshManager.models.debris2;
+        if (parseInt(sat.sccNum) <= 20000) {
+          meshManager.currentModel.model = meshManager.models.debris0;
+        } else if (parseInt(sat.sccNum) <= 35000) {
+          meshManager.currentModel.model = meshManager.models.debris1;
+        } else if (parseInt(sat.sccNum) > 35000) {
+          meshManager.currentModel.model = meshManager.models.debris2;
+        } else {
+          meshManager.currentModel.model = meshManager.models.debris0;
+        }
         return;
       default:
         // Generic Model

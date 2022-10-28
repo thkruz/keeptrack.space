@@ -163,6 +163,7 @@ export const keepTrackApiStubs = {
         Planetarium: 4,
         Satellite: 5,
         Astronomy: 6,
+        set: jest.fn(),
       },
       camSnap: jest.fn(),
       changeCameraType: jest.fn(),

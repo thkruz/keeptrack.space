@@ -217,6 +217,10 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isFreezePropRateOnDrag: any;
+  isNotionalDebris: boolean;
+  isUseExtendedCatalog: boolean;
+  isDrawTrailingOrbits: boolean;
   isShowSplashScreen: boolean;
   isGlobalErrorTrapOn: boolean;
   isDisableAsciiCatalog: boolean;
@@ -283,7 +287,6 @@ export interface SettingsManager {
   autoPanSpeed: { x: number; y: number };
   autoRotateSpeed: number;
   blueImages: boolean;
-  breakTheLaw: boolean;
   camDistBuffer: number;
   cameraDecayFactor: number;
   cameraMovementSpeed: number;
@@ -572,6 +575,8 @@ export enum SunStatus {
 }
 
 export declare interface SatObject {
+  source: string;
+  altId: string;
   pname?: string;
   bf?: string;
   active: boolean;

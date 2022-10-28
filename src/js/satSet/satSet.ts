@@ -237,19 +237,19 @@ export const selectSat = (i: number): void => {
   objectManager.setSelectedSat(i);
 
   if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
-    getEl('menu-lookangles').classList.remove('bmenu-item-disabled');
+    getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
   }
-  getEl('menu-lookanglesmultisite').classList.remove('bmenu-item-disabled');
-  getEl('menu-satview').classList.remove('bmenu-item-disabled');
-  getEl('menu-map').classList.remove('bmenu-item-disabled');
-  getEl('menu-editSat').classList.remove('bmenu-item-disabled');
-  getEl('menu-sat-fov').classList.remove('bmenu-item-disabled');
-  getEl('menu-newLaunch').classList.remove('bmenu-item-disabled');
-  getEl('menu-breakup').classList.remove('bmenu-item-disabled');
-  getEl('menu-plot-analysis').classList.remove('bmenu-item-disabled');
-  getEl('menu-plot-analysis2').classList.remove('bmenu-item-disabled');
+  getEl('menu-lookanglesmultisite')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-satview')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-map')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-editSat')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-sat-fov')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-newLaunch')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-breakup')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-plot-analysis')?.classList.remove('bmenu-item-disabled');
+  getEl('menu-plot-analysis2')?.classList.remove('bmenu-item-disabled');
   if (objectManager.secondarySat !== -1) {
-    getEl('menu-plot-analysis3').classList.remove('bmenu-item-disabled');
+    getEl('menu-plot-analysis3')?.classList.remove('bmenu-item-disabled');
   }
 };
 export const convertIdArrayToSatnumArray = (satIdArray: number[]) => satIdArray.map((id) => (satSet.getSat(id)?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');

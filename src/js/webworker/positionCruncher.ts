@@ -1013,58 +1013,59 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
     // Floor of FOV
     // //////////////////////////////////
     q = 0.25;
-    for (rng = sensor.obsmaxrange; rng === sensor.obsmaxrange; rng += 1) {
-      for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
-        if (sensor.obsminaz > sensor.obsmaxaz) {
-          if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
-            // Intentional
-          } else {
-            continue;
-          }
+    
+    // Calculate minimum range circle
+    rng = sensor.obsmaxrange
+    for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+      if (sensor.obsminaz > sensor.obsmaxaz) {
+        if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
+          // Intentional
         } else {
-          if (az >= sensor.obsminaz && az <= sensor.obsmaxaz) {
-            // Intentional
-          } else {
-            continue;
-          }
+          continue;
         }
-        pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
-        if (i === len) {
-          
-          break;
+      } else {
+        if (az >= sensor.obsminaz && az <= sensor.obsmaxaz) {
+          // Intentional
+        } else {
+          continue;
         }
-        satCache[i].active = true;
-        satPos = setPosition(satPos, i, pos);
-        resetVelocity(satVel, i);
-        i++;
       }
+      pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
+      if (i === len) {
+        
+        break;
+      }
+      satCache[i].active = true;
+      satPos = setPosition(satPos, i, pos);
+      resetVelocity(satVel, i);
+      i++;
     }
 
-    for (rng = sensor.obsminrange; rng === sensor.obsminrange; rng += 1) {
-      for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
-        if (sensor.obsminaz > sensor.obsmaxaz) {
-          if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
-            // Intentional
-          } else {
-            continue;
-          }
+    // Calculate maximum range cirlce
+    rng = sensor.obsminrange;
+    for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+      if (sensor.obsminaz > sensor.obsmaxaz) {
+        if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
+          // Intentional
         } else {
-          if (az >= sensor.obsminaz && az <= sensor.obsmaxaz) {
-            // Intentional
-          } else {
-            continue;
-          }
+          continue;
         }
-        pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
-        if (i === len) {
-          
-          break;
+      } else {
+        if (az >= sensor.obsminaz && az <= sensor.obsmaxaz) {
+          // Intentional
+        } else {
+          continue;
         }
-        satCache[i].active = true;
-        satPos = setPosition(satPos, i, pos);
-        resetVelocity(satVel, i);
-        i++;
       }
+      pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
+      if (i === len) {
+        
+        break;
+      }
+      satCache[i].active = true;
+      satPos = setPosition(satPos, i, pos);
+      resetVelocity(satVel, i);
+      i++;
     }
 
     if (sensor.obsmaxrange - sensor.obsminrange < 720) {
@@ -1097,6 +1098,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
     }
 
     if (sensor.obsminaz !== sensor.obsmaxaz && sensor.obsminaz !== sensor.obsmaxaz - 360) {
+      q = (sensor.obsmaxrange - sensor.obsminrange) / 5555; // Space the left and right edge out equally between LEO and GEO sensors
       for (az = sensor.obsmaxaz; az === sensor.obsmaxaz; az += 1) {
         for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
           pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);

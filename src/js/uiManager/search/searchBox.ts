@@ -1,7 +1,7 @@
 /* */
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SearchBox } from '@app/js/api/keepTrackTypes';
+import { SatObject, SearchBox } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { SatGroup } from '@app/js/groupsManager/sat-group';
 import { getEl, slideInDown, slideOutUp } from '@app/js/lib/helpers';
@@ -93,10 +93,11 @@ export const doSearch = (searchString: string, isPreventDropDown?: boolean): num
   settingsManager.lastSearch = searchList;
 
   // Initialize search results
-  const satData = satSet.satData;
+  const satData = satSet.satData as SatObject[];
   let results = [];
   searchList.forEach((searchStringIn) => {
     satData.every((sat, i) => {
+      if (results.length >= settingsManager.searchLimit) return false;
       if (i > satSet.missileSats) return false;
       const len = searchStringIn.length;
       if (sat.static && sat.type !== SpaceObjectType.STAR) return true; // Skip static dots (Maybe these should be searchable?)

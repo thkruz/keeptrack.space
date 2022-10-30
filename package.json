@@ -36,7 +36,7 @@
     "start:ci2": "http-server --entry-file=dist/index.html",
     "start:embed": "npx serve ./embed -l 8080",
     "test": "jest --coverage",
-    "test:unit": "jest --coverage --forceExit",
+    "test:unit": "jest --coverage",
     "test:e2e-ci": "cypress run",
     "test:watch": "jest --coverage --watchAll",
     "version:major": "npm version major && npm run changelog",

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.1.0
+
+>  
+
+- feat: :card_file_box: update catalog
+- feat: :sparkles: add code for extended catalog
+- feat: :sparkles: add new optional settings
+- fix: :bug: fix contries and constellations menus
+- feat: :label: update types
+- feat: :wrench: update default settings
+- docs: :memo: update changelog
+- fix: :children_crossing: delay error sound to prevent constant repeats
+- fix: :bug: fix bug on mobile
+- feat: :sparkles: add faster searching
+
 #### v7.0.3
 
 >  

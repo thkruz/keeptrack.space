@@ -24,7 +24,9 @@ describe('astronomy.bottomMenuClick', () => {
       astronomy.bottomMenuClick('menu-astronomy');
       astronomy.bottomMenuClick('menu-astronomy');
       keepTrackApi.programs.sensorManager.checkSensorSelected = () => true;
-      keepTrackApi.programs.planetarium = {};
+      keepTrackApi.programs.planetarium = {
+        isPlanetariumView: false,
+      };
       astronomy.bottomMenuClick('menu-astronomy');
       astronomy.bottomMenuClick('menu-astronomy');
     };

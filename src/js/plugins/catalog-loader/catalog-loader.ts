@@ -272,8 +272,10 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
       satSet.cosparIndex[`${resp[i].intlDes}`] = i;
       resp[i].active = true;
       if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
+        // if (resp[i].type === 1) {
         resp[i].id = tempSatData.length;
         tempSatData.push(resp[i]);
+        // }
       }
 
       if (settingsManager.isNotionalDebris && (settingsManager.isUseExtendedCatalog && resp[i].type === 3)) {
@@ -329,21 +331,12 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
       if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
       if (typeof satSet.sccIndex[`${extraSats[s].SCC}`] !== 'undefined') {
         i = satSet.sccIndex[`${extraSats[s].SCC}`];
-        if (typeof extraSats[s].ON != 'undefined') tempSatData[i].ON = extraSats[s].ON;
-        if (typeof extraSats[s].OT != 'undefined') tempSatData[i].OT = extraSats[s].OT;
+        if (typeof tempSatData[i] === 'undefined') continue;
         tempSatData[i].TLE1 = extraSats[s].TLE1;
         tempSatData[i].TLE2 = extraSats[s].TLE2;
       } else {
-        if (typeof extraSats[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
         settingsManager.isExtraSatellitesAdded = true;
 
-        if (typeof extraSats[s].ON == 'undefined') {
-          extraSats[s].ON = 'Unknown';
-        }
-        if (typeof extraSats[s].OT == 'undefined') {
-          extraSats[s].OT = SpaceObjectType.SPECIAL;
-        }
         year = extraSats[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
         prefix = parseInt(year) > 50 ? '19' : '20';
         year = prefix + year;
@@ -352,8 +345,8 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
           static: false,
           missile: false,
           active: true,
-          name: extraSats[s].ON,
-          type: extraSats[s].OT,
+          name: extraSats[s].ON ? extraSats[s].ON : 'Unknown',
+          type: extraSats[s].OT ? extraSats[s].OT : SpaceObjectType.SPECIAL,
           country: 'Unknown',
           rocket: 'Unknown',
           site: 'Unknown',

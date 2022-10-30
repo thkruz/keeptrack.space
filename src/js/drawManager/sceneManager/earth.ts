@@ -339,7 +339,14 @@ export const bumpImgOnLoad = (gl: WebGL2RenderingContext): void => {
  * ***************************************************************************/
 export const draw = (pMatrix: glm.mat4, mainCamera: Camera, dotsManager: DotsManager, tgtBuffer: WebGLFramebuffer): boolean => {
   if (!earth.loaded) return false;
-  const { gl } = keepTrackApi.programs.drawManager;
+  const { gl, calculatePMatrix } = keepTrackApi.programs.drawManager;
+  // Validation
+  if (!pMatrix) {
+    console.error('pMatrix is undefined - retrying');
+    calculatePMatrix();
+    return false;
+  }
+
   // //////////////////////////////////////////////////////////////////////
   // Draw Colored Earth First
   // //////////////////////////////////////////////////////////////////////

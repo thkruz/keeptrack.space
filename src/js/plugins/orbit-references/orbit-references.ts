@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { getEl, stringPad } from '@app/js/lib/helpers';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
@@ -23,7 +24,12 @@ export const uiManagerInit = (): void => {
   });
 };
 
-export const selectSatData = () => {
+export const selectSatData = (sat: SatObject) => {
+  // Skip this if there is no satellite object because the menu isn't open
+  if (sat === null || typeof sat === 'undefined') {
+    return;
+  }
+
   if (!doOnce) {
     getEl('sat-info-top-links').insertAdjacentHTML(
       'beforeend',

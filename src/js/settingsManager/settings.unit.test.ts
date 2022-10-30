@@ -91,13 +91,11 @@
 //     // NOSONAR
 //     expect(settingsManager.installDirectory).toBe('/');
 //     expect(settingsManager.isOfficialWebsite).toBe(true);
-//     expect(settingsManager.breakTheLaw).toBe(false);
 //   });
 
 //   test('http://www.keeptrack.space', () => {
 //     // NOSONAR
 //     expect(settingsManager.installDirectory).toBe('/');
-//     expect(settingsManager.breakTheLaw).toBe(false);
 //   });
 
 //   test('http://localhost', () => {
@@ -114,7 +112,6 @@
 //   test('Unknown Host - ""', () => {
 //     expect(settingsManager.installDirectory).toBe('./');
 //     expect(settingsManager.offline).toBe(true);
-//     expect(settingsManager.breakTheLaw).toBe(true);
 //   });
 
 //   test('Unknown Host - http://random.com', () => {

@@ -70,6 +70,9 @@ export const init = (): void => { // NOSONAR
       <div id="draw-rmb-menu" class="right-btn-menu">
         <ul class='dropdown-contents'>
           <li id="line-eci-axis-rmb"><a href="#">Earth Centered Inertial Axes</a></li>
+          <li id="line-eci-xgrid-rmb"><a href="#">X Axes Grid</a></li>
+          <li id="line-eci-ygrid-rmb"><a href="#">Y Axes Grid</a></li>
+          <li id="line-eci-zgrid-rmb"><a href="#">Z Axes Grid</a></li>
           <li id="line-earth-sat-rmb"><a href="#">Earth to Satellite</a></li>
           <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
           <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
@@ -705,6 +708,15 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       lineManager.create('ref', [0, 10000, 0], 'g');
       lineManager.create('ref', [0, 0, 10000], 'b');
       break;
+    case 'line-eci-xgrid-rmb':
+      keepTrackApi.programs.lineManager.createGrid('x',[0.6,0.2,0.2,1], 1)
+      break;
+    case 'line-eci-ygrid-rmb':
+      keepTrackApi.programs.lineManager.createGrid('y',[0.2,0.6,0.2,1], 1)
+      break;
+    case 'line-eci-zgrid-rmb':
+      keepTrackApi.programs.lineManager.createGrid('z',[0.2,0.2,0.6,1], 1)
+      break;
     case 'line-earth-sat-rmb':
       lineManager.create('sat', clickedSat, 'p');
       break;
@@ -1100,7 +1112,7 @@ export const canvasMouseDown = (evt: any) => {
   if (settingsManager.disableNormalEvents) {
     evt.preventDefault();
   }
-  const { mainCamera, uiManager, satellite } = keepTrackApi.programs;
+  const { mainCamera, uiManager, satellite, timeManager } = keepTrackApi.programs;
   const rightBtnMenuDOM = $('#right-btn-menu');
 
   uiInput.isStartedOnCanvas = true;
@@ -1119,6 +1131,13 @@ export const canvasMouseDown = (evt: any) => {
   mainCamera.dragStartYaw = mainCamera.camYaw;
   if (evt.button === 0) {
     mainCamera.isDragging = true;
+
+    if (settingsManager.isFreezePropRateOnDrag) {
+      timeManager.calculateSimulationTime();
+      timeManager.lastPropRate = timeManager.propRate * 1;
+      timeManager.changePropRate(0);
+      settingsManager.isPropRateChange = true;
+    }
   }
   mainCamera.isCamSnapMode = false;
   if (!settingsManager.disableUI) {
@@ -1136,7 +1155,7 @@ export const canvasMouseUp = (evt: any) => { // NOSONAR
   if (settingsManager.disableNormalEvents) {
     evt.preventDefault();
   }
-  const { mainCamera, satSet, objectManager } = keepTrackApi.programs;
+  const { mainCamera, satSet, objectManager, timeManager } = keepTrackApi.programs;
 
   if (!uiInput.isStartedOnCanvas) {
     return;
@@ -1170,6 +1189,13 @@ export const canvasMouseUp = (evt: any) => { // NOSONAR
   // Force the serach bar to get repainted because it gets overwrote a lot
   dragHasMoved = false;
   mainCamera.isDragging = false;
+  
+  if (settingsManager.isFreezePropRateOnDrag) {
+    timeManager.calculateSimulationTime();
+    timeManager.changePropRate(timeManager.lastPropRate);
+    settingsManager.isPropRateChange = true;
+  }
+
   if (!settingsManager.disableUI) {
     mainCamera.autoRotate(false);
   }

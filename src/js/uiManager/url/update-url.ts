@@ -5,17 +5,14 @@ export const updateURL = () => {
   if (settingsManager.isDisableUrlBar) return;
   const { objectManager, satSet, timeManager } = keepTrackApi.programs;
 
-  var arr = window.location.href.split('?');
-  var url = arr[0];
-  var paramSlices = [];
+  const arr = window.location.href.split('?');
+  let url = arr[0];
+  const paramSlices = [];
 
-  if (settingsManager.trusatMode) {
-    paramSlices.push('trusat');
-  }
   if (objectManager.selectedSat !== -1 && typeof satSet.getSatExtraOnly(objectManager.selectedSat).sccNum != 'undefined') {
     paramSlices.push('sat=' + satSet.getSatExtraOnly(objectManager.selectedSat).sccNum);
   }
-  var currentSearch = searchBox.getCurrentSearch();
+  const currentSearch = searchBox.getCurrentSearch();
   if (currentSearch !== '') {
     paramSlices.push('search=' + currentSearch);
   }

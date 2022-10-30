@@ -3,7 +3,6 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { AnalysisBottomIcon } from './components/AnalysisBottomIcon';
 import { AnalysisSideMenu } from './components/AnalysisSideMenu';
-import { OrbitOptionGroup, RaeOptionGroup } from './components/TrendAnalysis';
 
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
@@ -31,7 +30,7 @@ import { OrbitOptionGroup, RaeOptionGroup } from './components/TrendAnalysis';
  */
 
 export const init = (): void => {
-  const { sensorManager, objectManager, satSet, uiManager } = keepTrackApi.programs;
+  const { objectManager, satSet, uiManager } = keepTrackApi.programs;
   let isAnalysisMenuOpen = false;
   // Add HTML
   keepTrackApi.register({
@@ -64,11 +63,14 @@ export const init = (): void => {
             const sat: SatObject = satSet.getSat(objectManager.selectedSat);
             (<HTMLInputElement>getEl('anal-sat')).value = sat.sccNum;
           }
-          if (sensorManager.checkSensorSelected()) {
-            getEl('anal-type').innerHTML = `${OrbitOptionGroup}${RaeOptionGroup}`;
-          } else {
-            getEl('anal-type').innerHTML = `${OrbitOptionGroup}`;
-          }
+
+          // TODO: Fix analysis trends
+          // if (sensorManager.checkSensorSelected()) {
+          //   getEl('anal-type').innerHTML = `${OrbitOptionGroup}${RaeOptionGroup}`;
+          // } else {
+          //   getEl('anal-type').innerHTML = `${OrbitOptionGroup}`;
+          // }
+
           // Reinitialize the Material CSS Code
           const elems = document.querySelectorAll('select');
           (<any>window.M).FormSelect.init(elems);

@@ -1,5 +1,7 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
+import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl, stringPad } from '@app/js/lib/helpers';
 import $ from 'jquery';
 
@@ -49,18 +51,133 @@ export const catalogLoader = async (): Promise<void> => {
       }
     }
 
+    const jsCatalog: {
+      source: string;
+      altId: string;
+      NoradId: string;
+      SCC: string;
+      TLE1: string;
+      TLE2: string;
+      OrbitType: string;
+      Name: string;
+      Country: string;
+      BirthDate: string;
+      Operator: string;
+      Users: string;
+      Purpose: string;
+      DetailedPurpose: string;
+      LaunchMass: string;
+      DryMass: string;
+      Power: string;
+      Lifetime: string;
+      Contractor: string;
+      LaunchSite: string;
+      LaunchVehicle: string;
+    }[] = [];
+    // eslint-disable-next-line no-constant-condition
+    if (true) {
+      try {
+        const resp = await (await fetch(`${settingsManager.installDirectory}tle/tle4.js`)).text();
+        const content = resp.split('`')[3].split('\n');
+        for (let i = 1; i < content.length; i++) {
+          const data = content[i].split('\t');
+
+          if (data[0] === '0') continue; // SKIP USSF
+
+          const inc = parseFloat(data[6]) * RAD2DEG;
+          const raan = parseFloat(data[7]) * RAD2DEG;
+          const ecc = parseFloat(data[5]);
+          const argpe = parseFloat(data[8]) * RAD2DEG;
+          const meana = parseFloat(data[9]) * RAD2DEG;
+
+          const G = 6.6725985e-11;
+          const massEarth = 5.97378250603408e24;
+          const TAU = 2 * Math.PI;
+          const a = parseFloat(data[4]);
+          // const PlusMinus = a * ecc;
+          // let periapsis = a - PlusMinus - RADIUS_OF_EARTH;
+          // let apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
+          let period = TAU * Math.sqrt((a * a * a) / (G * (1 + massEarth)));
+          period = period / 60; // Convert to minutes
+
+          let epoch = new Date(data[3]);
+          const meanmo = 1440 / period;
+          const yy = epoch.getUTCFullYear() - 2000; // This won't work before year 2000, but that shouldn't matter
+          const epochd = _dayOfYear(epoch.getUTCMonth(), epoch.getUTCDate(), epoch.getUTCHours(), epoch.getUTCMinutes(), epoch.getUTCSeconds());
+          const epochd2 = parseFloat(epochd) + epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
+
+          let sccNum = stringPad.pad0(data[2], 5);
+          if (sccNum === '00000') {
+            sccNum = 'Y' + stringPad.pad0(data[1].slice(-4), 4);
+          }
+
+          const tle1 = `1 ${sccNum}U 58001A   ${yy}${stringPad.pad0(epochd2.toFixed(8), 12)} 0.00000000 +00000-0 +00000-0 0 99990`;
+          const tle2 = `2 ${sccNum} ${stringPad.pad0(inc.toFixed(4), 8)} ${stringPad.pad0(raan.toFixed(4), 8)} ${ecc.toFixed(7).substr(2, 7)} ${stringPad.pad0(
+            argpe.toFixed(4),
+            8
+          )} ${stringPad.pad0(meana.toFixed(4), 8)} ${stringPad.pad0(meanmo.toFixed(8), 11)}000010`;
+
+          // Make sure no nan values are passed to the catalog
+          if (isNaN(inc) || isNaN(raan) || isNaN(ecc) || isNaN(argpe) || isNaN(meana) || isNaN(meanmo)) {
+            continue;
+          }
+
+          // 1 Planet
+          // 3 JSC Vimpel
+          // 4 SeeSat-L
+          // 7 UCS`
+          let source = 'Unknown';
+          if (data[0] === '1') source = 'Planet';
+          if (data[0] === '3') source = 'JSC Vimpel';
+          if (data[0] === '4') source = 'SeeSat-L';
+          if (data[0] === '7') source = 'UCS';
+
+          jsCatalog.push({
+            source: source,
+            altId: data[1],
+            NoradId: data[2],
+            SCC: sccNum,
+            TLE1: tle1,
+            TLE2: tle2,
+            OrbitType: data[10],
+            Name: data[11],
+            Country: data[12],
+            BirthDate: data[13],
+            Operator: data[14],
+            Users: data[15],
+            Purpose: data[16],
+            DetailedPurpose: data[17],
+            LaunchMass: data[18],
+            DryMass: data[19],
+            Power: data[20],
+            Lifetime: data[21],
+            Contractor: data[22],
+            LaunchSite: data[23],
+            LaunchVehicle: data[24],
+          });
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
     if (settingsManager.isUseDebrisCatalog) {
-      await $.get(`${settingsManager.installDirectory}tle/TLEdebris.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+      await $.get(`${settingsManager.installDirectory}tle/TLEdebris.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog, jsCatalog));
     } else {
-      await $.get(`${settingsManager.installDirectory}tle/TLE2.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog));
+      await $.get(`${settingsManager.installDirectory}tle/TLE2.json`).then((resp) => parseCatalog(resp, extraSats, asciiCatalog, jsCatalog));
     }
   } catch (e) {
     // Intentionally left blank
   }
 };
 
+export const _dayOfYear = (mon: number, day: number, hr: number, minute: number, sec: number) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  (Math.floor((275 * mon) / 9.0) + day + ((sec / 60.0 + minute) / 60.0 + hr) / 24.0) //  ut in days
+    .toFixed(5);
+
 // Parse the Catalog from satSet.loadCatalog and then return it back -- they are chained together!
-export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => {
+export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any, jsCatalog?: any) => {
   const { satSet, objectManager } = keepTrackApi.programs;
   const settingsManager: any = window.settingsManager;
 
@@ -69,7 +186,7 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any) => 
   // Filter TLEs
   // SatCruncher will use this when it returns so we need to expose it now
   if (typeof resp === 'string') resp = JSON.parse(resp);
-  satSet.satData = filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog);
+  satSet.satData = filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog, jsCatalog);
   satSet.numSats = satSet.satData.length;
 
   /** Send satDataString to satCruncher to begin propagation loop */
@@ -110,7 +227,7 @@ export const setupGetVariables = () => {
 };
 
 // prettier-ignore
-export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[]) => { // NOSONAR
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[], jsCatalog?: any[]) => { // NOSONAR
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];
@@ -126,6 +243,16 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
   let year: string;
   let prefix: string;
   let rest: string;
+
+  let notionalSatNum = 400000;
+  const makeDebris = (notionalDebris: any, meanMo: number) => {
+    const debris = {...notionalDebris};
+    debris.id = tempSatData.length;
+    debris.sccNum = notionalSatNum.toString();
+    notionalSatNum++;
+    debris.TLE2 = debris.TLE2.substr(0, 43) + stringPad.pad0((parseFloat(debris.TLE2.substr(43, 51)) + meanMo).toFixed(4), 8) + debris.TLE2.substr(51);
+    tempSatData.push(debris);
+  };
 
   let i = 0;
   for (i; i < resp.length; i++) {
@@ -145,9 +272,34 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
       satSet.cosparIndex[`${resp[i].intlDes}`] = i;
       resp[i].active = true;
       if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
+        // if (resp[i].type === 1) {
         resp[i].id = tempSatData.length;
         tempSatData.push(resp[i]);
+        // }
       }
+
+      if (settingsManager.isNotionalDebris && (settingsManager.isUseExtendedCatalog && resp[i].type === 3)) {
+        let notionalDebris = {...resp[i]};
+        notionalDebris.name =`${resp[i].name} (1cm Notional)`;
+        notionalDebris.type = SpaceObjectType.NOTIONAL;
+        notionalDebris.source = 'Notional';
+
+        for (let i = 0; i < 2; i++) {
+          makeDebris(notionalDebris, 30 + Math.random() * 30);
+          makeDebris(notionalDebris, -30 - Math.random() * 30);
+          makeDebris(notionalDebris, 60 + Math.random() * 30);
+          makeDebris(notionalDebris, -60 - Math.random() * 30);
+          makeDebris(notionalDebris, 90 + Math.random() * 30);
+          makeDebris(notionalDebris, -90 - Math.random() * 30);
+          makeDebris(notionalDebris, 120 + Math.random() * 30);
+          makeDebris(notionalDebris, -120 - Math.random() * 30);
+          makeDebris(notionalDebris, 150 + Math.random() * 30);
+          makeDebris(notionalDebris, -150 - Math.random() * 30);
+          makeDebris(notionalDebris, 180 + Math.random() * 30);
+          makeDebris(notionalDebris, -180 - Math.random() * 30);
+        }
+      }
+
     } else {
       // If there are limited satellites
       for (let x = 0; x < limitSatsArray.length; x++) {
@@ -179,21 +331,12 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
       if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
       if (typeof satSet.sccIndex[`${extraSats[s].SCC}`] !== 'undefined') {
         i = satSet.sccIndex[`${extraSats[s].SCC}`];
-        if (typeof extraSats[s].ON != 'undefined') tempSatData[i].ON = extraSats[s].ON;
-        if (typeof extraSats[s].OT != 'undefined') tempSatData[i].OT = extraSats[s].OT;
+        if (typeof tempSatData[i] === 'undefined') continue;
         tempSatData[i].TLE1 = extraSats[s].TLE1;
         tempSatData[i].TLE2 = extraSats[s].TLE2;
       } else {
-        if (typeof extraSats[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
         settingsManager.isExtraSatellitesAdded = true;
 
-        if (typeof extraSats[s].ON == 'undefined') {
-          extraSats[s].ON = 'Unknown';
-        }
-        if (typeof extraSats[s].OT == 'undefined') {
-          extraSats[s].OT = 4;
-        }
         year = extraSats[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
         prefix = parseInt(year) > 50 ? '19' : '20';
         year = prefix + year;
@@ -202,14 +345,15 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
           static: false,
           missile: false,
           active: true,
-          name: extraSats[s].ON,
-          type: extraSats[s].OT,
+          name: extraSats[s].ON ? extraSats[s].ON : 'Unknown',
+          type: extraSats[s].OT ? extraSats[s].OT : SpaceObjectType.SPECIAL,
           country: 'Unknown',
           rocket: 'Unknown',
           site: 'Unknown',
           sccNum: extraSats[s].SCC.toString(),
           TLE1: extraSats[s].TLE1,
           TLE2: extraSats[s].TLE2,
+          source: 'USSF', // ASSUME USSF
           intlDes: year + '-' + rest,
           typ: 'sat',
           id: tempSatData.length,
@@ -241,7 +385,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
           asciiCatalog[s].ON = 'Unknown';
         }
         if (typeof asciiCatalog[s].OT == 'undefined') {
-          asciiCatalog[s].OT = 4;
+          asciiCatalog[s].OT = SpaceObjectType.SPECIAL;
         }
         year = asciiCatalog[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
         prefix = parseInt(year) > 50 ? '19' : '20';
@@ -259,6 +403,7 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
           sccNum: asciiCatalog[s].SCC.toString(),
           TLE1: asciiCatalog[s].TLE1,
           TLE2: asciiCatalog[s].TLE2,
+          source: 'USSF', // ASSUME USSF
           intlDes: year + '-' + rest,
           typ: 'sat',
           id: tempSatData.length,
@@ -266,6 +411,72 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
         satSet.sccIndex[`${asciiCatalog[s].SCC.toString()}`] = tempSatData.length;
         satSet.cosparIndex[`${year}-${rest}`] = tempSatData.length;
         tempSatData.push(asciiSatInfo);
+      }
+    }
+  }
+
+  let jsSatInfo;
+  if (jsCatalog?.length > 0 && settingsManager.isUseExtendedCatalog) {
+    console.debug('Processing js Catalog');
+    // If jsCatalog catalogue
+    for (let s = 0; s < jsCatalog.length; s++) {
+      if (typeof jsCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+      if (typeof jsCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+      if (typeof satSet.sccIndex[`${jsCatalog[s].SCC}`] !== 'undefined') {
+        // console.warn('Duplicate Satellite Found in jsCatalog');
+        // NOTE: We don't trust the jsCatalog, so we don't update the TLEs
+
+        // i = satSet.sccIndex[`${jsCatalog[s].SCC}`];
+        // tempSatData[i].TLE1 = jsCatalog[s].TLE1;
+        // tempSatData[i].TLE2 = jsCatalog[s].TLE2;
+      } else {
+        if (typeof jsCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof jsCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+        settingsManager.isExtraSatellitesAdded = true;
+
+        year = jsCatalog[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+        prefix = parseInt(year) > 50 ? '19' : '20';
+        year = prefix + year;
+        rest = jsCatalog[s].TLE1.substr(9, 8).trim().substring(2);
+        jsSatInfo = {
+          static: false,
+          missile: false,
+          active: true,
+          name: `${jsCatalog[s].source} ${jsCatalog[s].altId}`,
+          type: SpaceObjectType.DEBRIS,
+          country: 'Unknown',
+          rocket: 'Unknown',
+          site: 'Unknown',
+          sccNum: jsCatalog[s].SCC.toString(),
+          TLE1: jsCatalog[s].TLE1,
+          TLE2: jsCatalog[s].TLE2,
+          source: jsCatalog[s].source,
+          altId: jsCatalog[s].altId,
+          intlDes: year + '-' + rest,
+          id: tempSatData.length,
+        };
+        satSet.sccIndex[`${jsCatalog[s].SCC.toString()}`] = tempSatData.length;
+        satSet.cosparIndex[`${year}-${rest}`] = tempSatData.length;
+        tempSatData.push(jsSatInfo);
+        const notionalDebris = {...jsSatInfo};
+        notionalDebris.type = SpaceObjectType.NOTIONAL;
+        notionalDebris.name =`${jsSatInfo.name} (1cm Notional)`;
+        notionalDebris.source = 'Notional';
+
+        for (let i = 0; i < 2; i++) {
+          makeDebris(notionalDebris, 30 + Math.random() * 30);
+          makeDebris(notionalDebris, -30 - Math.random() * 30);
+          makeDebris(notionalDebris, 60 + Math.random() * 30);
+          makeDebris(notionalDebris, -60 - Math.random() * 30);
+          makeDebris(notionalDebris, 90 + Math.random() * 30);
+          makeDebris(notionalDebris, -90 - Math.random() * 30);
+          makeDebris(notionalDebris, 120 + Math.random() * 30);
+          makeDebris(notionalDebris, -120 - Math.random() * 30);
+          makeDebris(notionalDebris, 150 + Math.random() * 30);
+          makeDebris(notionalDebris, -150 - Math.random() * 30);
+          makeDebris(notionalDebris, 180 + Math.random() * 30);
+          makeDebris(notionalDebris, -180 - Math.random() * 30);        
+        }
       }
     }
   }

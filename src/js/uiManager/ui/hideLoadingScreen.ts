@@ -1,7 +1,7 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl } from '@app/js/lib/helpers';
-import { mobileManager } from '@app/js/uiManager/mobile/mobileManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { loadStr } from './loadStr';
+import { mobileManager } from '@app/js/uiManager/mobile/mobileManager';
 
 export const hideLoadingScreen = () => {
   const { drawManager } = keepTrackApi.programs;
@@ -21,7 +21,6 @@ export const hideLoadingScreen = () => {
   if (settingsManager.isMobileModeEnabled) {
     loadStr('math');
     getEl('loading-screen').style.display = 'none';
-    getEl('loading-earth').style.display = 'none';
   } else {
     // Loading Screen Resized and Hidden
     setTimeout(function () {

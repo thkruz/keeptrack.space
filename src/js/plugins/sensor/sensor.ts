@@ -26,7 +26,7 @@ import multiSitePng from '@app/img/icons/multi-site.png';
 import radarPng from '@app/img/icons/radar.png';
 import radioTowerPng from '@app/img/icons/radio-tower.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { toast } from '@app/js/uiManager/ui/toast';
 
@@ -42,6 +42,20 @@ export const resetSensorButtonClick = () => {
   getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
   getEl('menu-planetarium')?.classList.add('bmenu-item-disabled');
   getEl('menu-astronomy')?.classList.add('bmenu-item-disabled');
+  if (keepTrackApi.programs.mainCamera.cameraType.current === keepTrackApi.programs.mainCamera.cameraType.Planetarium) {
+    const { drawManager, mainCamera, uiManager, orbitManager } = keepTrackApi.programs;
+    keepTrackApi.programs.planetarium.isPlanetariumView = false;
+    mainCamera.isPanReset = true;
+    mainCamera.isLocalRotateReset = true;
+    settingsManager.fieldOfView = 0.6;
+    drawManager.glInit();
+    uiManager.hideSideMenus();
+    orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
+    mainCamera.cameraType.current = mainCamera.cameraType.Default; // Back to normal Camera Mode
+    // TODO: implement fov information
+    // getEl('fov-text').innerHTML = ('');
+    getEl('menu-planetarium').classList.remove('bmenu-item-selected');
+  }
   resetSensorSelected();
 };
 
@@ -117,9 +131,9 @@ export const uiManagerInit = () => {
               <ul>
                 <h5 class="center-align">CSpOC Sensors</h5>
                 <li class="divider"></li>
-                <li class="menu-selectable" data-sensor="cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge"
+                <li id="cspocAllSensor" class="menu-selectable" data-sensor="cspocAll">All CSpOC Sensors<span class="badge dark-blue-badge"
                     data-badge-caption="Coalition"></span></li>
-                <li class="menu-selectable" data-sensor="mwAll">All MW Sensors<span class="badge dark-blue-badge"
+                <li id="mwAllSensor" class="menu-selectable" data-sensor="mwAll">All MW Sensors<span class="badge dark-blue-badge"
                     data-badge-caption="Coalition"></span></li>
                 <li class="menu-selectable" data-sensor="BLE">Beale<span class="badge dark-blue-badge"
                     data-badge-caption="USSF"></span></li>
@@ -160,7 +174,7 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <h5 class="center-align">MDA Sensors</h5>
                 <li class="divider"></li>
-                <li class="menu-selectable" data-sensor="mdAll">All Sensors<span class="badge dark-blue-badge"
+                <li id="mdAllSensor" class="menu-selectable" data-sensor="mdAll">All Sensors<span class="badge dark-blue-badge"
                     data-badge-caption="Coalition"></span></li>
                 <li class="menu-selectable" data-sensor="HAR">Har Keren<span class="badge dark-blue-badge"
                     data-badge-caption="ISR"></span></li>
@@ -179,7 +193,7 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <h5 class="center-align">LeoLabs Sensors</h5>
                 <li class="divider"></li>
-                <li class="menu-selectable" data-sensor="llAll">All Sensors<span class="badge dark-blue-badge"
+                <li id="llAllSensor" class="menu-selectable" data-sensor="llAll">All Sensors<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
                 <li class="menu-selectable" data-sensor="CRSR">Costa Rica Space Radar<span class="badge dark-blue-badge"
                     data-badge-caption="Comm"></span></li>
@@ -211,7 +225,7 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <h5 class="center-align">Russian Sensors</h5>
                 <li class="divider"></li>
-                <li class="menu-selectable" data-sensor="rusAll">All Russian Sensors<span
+                <li id="rusAllSensor" class="menu-selectable" data-sensor="rusAll">All Russian Sensors<span
                     class="badge dark-blue-badge" data-badge-caption="RUS"></span></li>
                 <li class="menu-selectable" data-sensor="ARM">Armavir<span class="badge dark-blue-badge"
                     data-badge-caption="RUS"></span></li>
@@ -232,7 +246,7 @@ export const uiManagerInit = () => {
                 <li class="divider"></li>
                 <h5 class="center-align">Chinese Sensors</h5>
                 <li class="divider"></li>
-                <li class="menu-selectable" data-sensor="prcAll">All Chinese Sensors<span
+                <li id="prcAllSensor" class="menu-selectable" data-sensor="prcAll">All Chinese Sensors<span
                     class="badge dark-blue-badge" data-badge-caption="PRC"></span></li>
                 <li class="menu-selectable" data-sensor="XIN">Xingjiang<span class="badge dark-blue-badge"
                     data-badge-caption="PRC"></span></li>
@@ -650,7 +664,7 @@ export const sensorListContentClick = (sensorClick: string) => {
 
 // prettier-ignore
 export const bottomMenuClick = (iconName: string): void => { // NOSONAR
-  const { uiManager, sensorManager, satSet, objectManager, satellite } = keepTrackApi.programs;
+  const { planetarium, uiManager, sensorManager, satSet, objectManager, satellite } = keepTrackApi.programs;
   switch (iconName) {
     case 'menu-sensor-list': // No Keyboard Commands
       if (isSensorListMenuOpen) {
@@ -660,6 +674,21 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       } else {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
+        if (planetarium.isPlanetariumView) {
+          getEl('cspocAllSensor').style.display = 'none';
+          getEl('mwAllSensor').style.display = 'none';
+          getEl('mdAllSensor').style.display = 'none';
+          getEl('llAllSensor').style.display = 'none';
+          getEl('rusAllSensor').style.display = 'none';
+          getEl('prcAllSensor').style.display = 'none';
+        } else {
+          getEl('cspocAllSensor').style.display = 'block';
+          getEl('mwAllSensor').style.display = 'block';
+          getEl('mdAllSensor').style.display = 'block';
+          getEl('llAllSensor').style.display = 'block';
+          getEl('rusAllSensor').style.display = 'block';
+          getEl('prcAllSensor').style.display = 'block';
+        }
         slideInRight(getEl('sensor-list-menu'), 1000);
         isSensorListMenuOpen = true;
         getEl('menu-sensor-list')?.classList.add('bmenu-item-selected');
@@ -798,7 +827,12 @@ export const init = (): void => {
   });
 };
 
-export const selectSatData = () => {
+export const selectSatData = (sat: SatObject) => {
+  // Skip this if there is no satellite object because the menu isn't open
+  if (sat === null || typeof sat === 'undefined') {
+    return;
+  }
+
   const { satSet } = keepTrackApi.programs;
   if (!sensorLinks) {
     getEl('sat-info-top-links').insertAdjacentHTML(

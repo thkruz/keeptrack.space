@@ -1,6 +1,6 @@
 import searchPng from '@app/img/icons/search.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SensorObject } from '@app/js/api/keepTrackTypes';
+import { SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { addCustomSensor, clearCustomSensors, removeLastSensor } from './../sensor/sensor';
 
@@ -118,10 +118,7 @@ export const uiManagerInit = (): void => {
   keepTrackApi.register({
     method: 'selectSatData',
     cbName: 'stfInfoTopLinks',
-    cb: () => {
-      selectSatData(stfInfoLinks);
-      stfInfoLinks = true;
-    },
+    cb: selectSatData,
   });
 };
 
@@ -168,8 +165,13 @@ export const hideSideMenus = () => {
   isStfMenuOpen = false;
 };
 
-export const selectSatData = (isShowStfLink: boolean) => {
-  if (!isShowStfLink) {
+export const selectSatData = (sat: SatObject) => {
+  // Skip this if there is no satellite object because the menu isn't open
+  if (sat === null || typeof sat === 'undefined') {
+    return;
+  }
+
+  if (!stfInfoLinks) {
     getEl('sat-info-top-links').insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
@@ -177,6 +179,7 @@ export const selectSatData = (isShowStfLink: boolean) => {
         `
     );
     getEl('stf-on-object-link').addEventListener('click', stfOnObjectLinkClick);
+    stfInfoLinks = true;
   }
 };
 

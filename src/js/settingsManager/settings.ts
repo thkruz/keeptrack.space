@@ -19,7 +19,7 @@
  */
 
 import { isThisJest } from '@app/js/api/keepTrackApi';
-import { SettingsManager } from '../api/keepTrackTypes';
+import { SettingsManager } from '@app/js/api/keepTrackTypes';
 
 // Actual Setup
 export let settingsManager: SettingsManager = {
@@ -40,7 +40,7 @@ export let settingsManager: SettingsManager = {
     nightToggle: true,
     photoManager: true,
     recorderManager: true,
-    satChanges: true,
+    satChanges: false,
     stereoMap: true,
     timeMachine: true,
     twitter: true,
@@ -72,7 +72,7 @@ export let settingsManager: SettingsManager = {
     classification: true,
     soundManager: true,
     gamepad: true,
-    scenarioCreator: true,
+    scenarioCreator: false,
   },
   colors: null,
   timeMachineDelay: null,
@@ -95,6 +95,9 @@ export let settingsManager: SettingsManager = {
   db: null,
   isGlobalErrorTrapOn: true,
   isShowSplashScreen: true,
+  isUseExtendedCatalog: false,
+  isNotionalDebris: false,
+  isFreezePropRateOnDrag: false,
   // prettier-ignore
   init: (settingsOverride?: any) => {
     settingsManager.pTime = [];
@@ -116,8 +119,7 @@ export let settingsManager: SettingsManager = {
             // Comment Out the Next Two Lines if you are testing on a local server
             // and have the keeptrack files installed in a subdirectory
             settingsManager.installDirectory = '/';
-            settingsManager.offline = true;
-            settingsManager.breakTheLaw = true;
+            // settingsManager.offline = true;
           }
           break;
         case 'darts.staging.dso.mil':
@@ -129,7 +131,6 @@ export let settingsManager: SettingsManager = {
           break;
         case '':
           settingsManager.offline = true;
-          settingsManager.breakTheLaw = true;
           settingsManager.installDirectory = './';
           break;
         default:
@@ -188,6 +189,7 @@ export let settingsManager: SettingsManager = {
     settingsManager.isEnableRadarData = false;
     settingsManager.maxRadarData = 1; // 70000;
 
+
     // Adjust to change camera speed of auto rotate around earth
     settingsManager.autoRotateSpeed = 1.0 * 0.000075;
     // Adjust to change camera speed of auto pan around earth
@@ -226,6 +228,7 @@ export let settingsManager: SettingsManager = {
     // How much an orbit fades over time
     settingsManager.orbitFadeFactor = 0.6; // 1.0 == No Fade
 
+
     // Toggle Drawing the Sun
     settingsManager.isDrawSun = true;
     // Toggle drawing the milky way
@@ -261,6 +264,7 @@ export let settingsManager: SettingsManager = {
     settingsManager.zoomSpeed = 0.01;
     settingsManager.isZoomStopsRotation = true;
 
+    // This is for debugging and should be false during production to avoid errors
     settingsManager.isUseNullForBadGetEl = true;
 
     settingsManager.isEPFL = false;
@@ -268,6 +272,7 @@ export let settingsManager: SettingsManager = {
     // Speed at which isScan lines are drawn (each draw will be +speed lat/lon)
     settingsManager.lineScanSpeedSat = 6; // About 6 seconds to scan earth (no source, just a guess)
     settingsManager.lineScanSpeedRadar = 0.25; // About 30 seconds to scan earth (arbitrary)
+
 
     // Minimum elevation to draw a line scan
     settingsManager.lineScanMinEl = 5;
@@ -288,6 +293,9 @@ export let settingsManager: SettingsManager = {
 
     // Draw Orbits
     settingsManager.isDrawOrbits = true;
+
+    // Draw Trailing Orbits
+    settingsManager.isDrawTrailingOrbits = true;
 
     // Draw Lines from Sensors to Satellites When in FOV
     settingsManager.isDrawInCoverageLines = true;
@@ -553,6 +561,7 @@ export let settingsManager: SettingsManager = {
     settingsManager.orbitSelectColor2 = [0.0, 0.4, 1.0, 0.9];
     settingsManager.orbitHoverColor = [1.0, 1.0, 0.0, 0.9];
     settingsManager.orbitGroupAlpha = 0.5; // Transparency when a group of satellites is selected
+
 
     // settingsManager.orbitHoverColor = [0.5, 0.5, 1.0, 1.0]
     settingsManager.orbitInViewColor = [1.0, 1.0, 1.0, 0.7]; // WHITE
@@ -902,7 +911,6 @@ export let settingsManager: SettingsManager = {
   },
   autoRotateSpeed: 0,
   blueImages: false,
-  breakTheLaw: false,
   camDistBuffer: 0,
   cameraDecayFactor: 0,
   cameraMovementSpeed: 0,
@@ -1036,4 +1044,5 @@ export let settingsManager: SettingsManager = {
   zFar: 0,
   zNear: 0,
   zoomSpeed: 0,
+  isDrawTrailingOrbits: false,
 };

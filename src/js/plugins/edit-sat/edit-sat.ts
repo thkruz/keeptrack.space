@@ -74,10 +74,6 @@ export const uiManagerInit = (): void => {
               <label for="es-rasc" class="active">Right Ascension</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="es-meanmo" type="text" maxlength="11" />
-              <label for="es-meanmo" class="active">Mean Motion</label>
-            </div>
-            <div class="input-field col s12">
               <input placeholder="AA.AAAAAAAA" id="es-ecen" type="text" maxlength="7" />
               <label for="es-ecen" class="active">Eccentricity</label>
             </div>
@@ -88,6 +84,10 @@ export const uiManagerInit = (): void => {
             <div class="input-field col s12">
               <input placeholder="AAA.AAAA" id="es-meana" type="text" maxlength="8" />
               <label for="es-meana" class="active">Mean Anomaly</label>
+            </div>
+            <div class="input-field col s12">
+              <input placeholder="AAA.AAAA" id="es-meanmo" type="text" maxlength="11" />
+              <label for="es-meanmo" class="active">Mean Motion</label>
             </div>
             <div class="center-align row">
               <button id="editSat-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>

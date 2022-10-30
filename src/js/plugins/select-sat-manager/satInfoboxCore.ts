@@ -302,6 +302,14 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
               <div class="sat-info-key">NORAD</div>
               <div class="sat-info-value" id="sat-objnum">99999</div>
             </div>          
+            <div class="sat-info-row sat-only-info">
+              <div class="sat-info-key">Alt ID</div>
+              <div class="sat-info-value" id="sat-altid">99999</div>
+            </div>          
+            <div class="sat-info-row sat-only-info">
+              <div class="sat-info-key">Source</div>
+              <div class="sat-info-value" id="sat-source">USSF</div>
+            </div>          
             <div class="sat-info-section-header">Orbit Data</div>
             <div class="sat-info-row sat-only-info">
               <div class="sat-info-key tooltipped" data-position="left" data-delay="50"
@@ -443,7 +451,13 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     } else {
       daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
     }
-    getEl('sat-elset-age').innerHTML = daysold + ' Days';
+
+    const elsetAgeDom = getEl('sat-elset-age');
+
+    if (elsetAgeDom) {
+      elsetAgeDom.innerHTML = daysold + ' Days';
+    }
+    
     $('#sat-elset-age').tooltip({
       // delay: 50,
       html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(),
@@ -462,37 +476,39 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
       }
 
       // If No Sensor, then Ignore Sun Exclusion
+      const satSunDom = getEl('sat-sun');
       if (keepTrackApi.programs.sensorManager.currentSensor[0].lat === null) {
-        getEl('sat-sun').style.display = 'none';
+        if (satSunDom) satSunDom.style.display = 'none';
         return;
       } else {
-        getEl('sat-sun').style.display = 'block';
+        if (satSunDom) satSunDom.style.display = 'block';
       }
 
       // If Radar Selected, then Say the Sun Doesn't Matter
       if (
         keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OPTICAL &&
-        keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OBSERVER
+        keepTrackApi.programs.sensorManager.currentSensor[0].type !== SpaceObjectType.OBSERVER &&
+        satSunDom
       ) {
-        getEl('sat-sun').innerHTML = 'No Effect';
+        satSunDom.innerHTML = 'No Effect';
         // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
-      } else if (sunTime.sunriseStart.getTime() - now.getTime() > 0 || sunTime.sunsetEnd.getTime() - now.getTime() < 0) {
-        if (satInSun == 0) getEl('sat-sun').innerHTML = 'No Sunlight';
-        if (satInSun == 1) getEl('sat-sun').innerHTML = 'Limited Sunlight';
-        if (satInSun == 2) getEl('sat-sun').innerHTML = 'Direct Sunlight';
+      } else if (sunTime.sunriseStart.getTime() - now.getTime() > 0 || sunTime.sunsetEnd.getTime() - now.getTime() < 0 && satSunDom) {
+        if (satInSun == 0) satSunDom.innerHTML = 'No Sunlight';
+        if (satInSun == 1) satSunDom.innerHTML = 'Limited Sunlight';
+        if (satInSun == 2) satSunDom.innerHTML = 'Direct Sunlight';
         // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
         // high latitude and we need to figure that out
-      } else if (sunTime.nadir != 'Invalid Date' && (sunTime.sunriseStart == 'Invalid Date' || sunTime.sunsetEnd == 'Invalid Date')) {
+      } else if (sunTime.nadir != 'Invalid Date' && (sunTime.sunriseStart == 'Invalid Date' || sunTime.sunsetEnd == 'Invalid Date') && satSunDom) {
         // TODO: Figure out how to calculate this
         console.debug('No Dawn or Dusk');
-        if (satInSun == 0) getEl('sat-sun').innerHTML = 'No Sunlight';
-        if (satInSun == 1) getEl('sat-sun').innerHTML = 'Limited Sunlight';
-        if (satInSun == 2) getEl('sat-sun').innerHTML = 'Direct Sunlight';
+        if (satInSun == 0) satSunDom.innerHTML = 'No Sunlight';
+        if (satInSun == 1) satSunDom.innerHTML = 'Limited Sunlight';
+        if (satInSun == 2) satSunDom.innerHTML = 'Direct Sunlight';
       } else {
         // Unless you are in sun exclusion
-        getEl('sat-sun').innerHTML = 'Sun Exclusion';
+        if (satSunDom) satSunDom.innerHTML = 'Sun Exclusion';
       }
-      if (satInSun == -1) getEl('sat-sun').innerHTML = 'Unable to Calculate';
+      if (satInSun == -1 && satSunDom) satSunDom.innerHTML = 'Unable to Calculate';
     }
   }
 
@@ -894,12 +910,17 @@ export const objectData = (sat: SatObject): void => {
   // TODO:
   // getEl('edit-satinfo-link').innerHTML = "<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>";
 
-  getEl('sat-intl-des').innerHTML = sat.intlDes;
-  if (sat.type > 4) {
+  getEl('sat-intl-des').innerHTML = sat.intlDes === 'none' ? 'N/A' : sat.intlDes;
+  if (sat.source && sat.source !== 'USSF') {
+    getEl('sat-objnum').innerHTML = 'N/A';
+  } else if (sat.type > 4) {
     getEl('sat-objnum').innerHTML = 1 + sat.TLE2.substr(2, 7).toString();
   } else {
     getEl('sat-objnum').innerHTML = sat.sccNum;
   }
+
+  getEl('sat-altid').innerHTML = sat.altId || 'N/A';
+  getEl('sat-source').innerHTML = sat.source || 'USSF';
 
   // /////////////////////////////////////////////////////////////////////////
   // RCS Correlation Table

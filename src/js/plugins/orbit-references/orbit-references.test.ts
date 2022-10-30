@@ -1,4 +1,4 @@
-import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
+import { KeepTrackPrograms, SatObject } from '@app/js/api/keepTrackTypes';
 import { keepTrackApiStubs } from '../../api/apiMocks';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import * as orbitReferences from './orbit-references';
@@ -24,7 +24,7 @@ describe('orbitReferences.uiManagerInit', () => {
 // @ponicode
 describe('orbitReferences.selectSatData', () => {
   test('0', () => {
-    let result: any = orbitReferences.selectSatData();
+    let result: any = orbitReferences.selectSatData({} as SatObject);
     expect(result).toMatchSnapshot();
   });
 });

@@ -1,7 +1,8 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { getEl } from '@app/js/lib/helpers';
+import { Camera } from '@app/js/camera/camera';
+import { fadeIn, fadeOut, getEl } from '@app/js/lib/helpers';
 import { satellite } from '@app/js/satMath/satMath';
 import $ from 'jquery';
 
@@ -18,7 +19,7 @@ export const selectSatManager = {
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
   // prettier-ignore
-  selectSat: (satId: number, mainCamera: any) => { // NOSONAR
+  selectSat: (satId: number, mainCamera: Camera) => { // NOSONAR
     if (settingsManager.isDisableSelectSat) return;
     const { objectManager, satSet, sensorManager, uiManager } = keepTrackApi.programs;
 
@@ -36,8 +37,9 @@ export const selectSatManager = {
           const searchStr = satSet.satData
             .filter((_sat) => _sat.owner === sat.Code || _sat.manufacturer === sat.Code)
             .map((_sat) => _sat.sccNum)
-            .join(', ');
+            .join(',');
           uiManager.searchBox.doSearch(searchStr);
+          mainCamera.changeZoom(0.9);
         }
         return;
       }
@@ -75,7 +77,7 @@ export const selectSatManager = {
       mainCamera.fts2default();
       isselectedSatNegativeOne = true;
 
-      $('#sat-infobox').fadeOut();
+      fadeOut(getEl('sat-infobox'));
 
       // Add Grey Out
       getEl('menu-lookanglesmultisite')?.classList.add('bmenu-item-disabled');
@@ -150,7 +152,7 @@ export const selectSatManager = {
         getEl('menu-plot-analysis3')?.classList.remove('bmenu-item-disabled');
       }
 
-      $('#sat-infobox').fadeIn();
+      fadeIn(getEl('sat-infobox'));
 
       if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
         if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {

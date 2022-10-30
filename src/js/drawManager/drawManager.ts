@@ -1,4 +1,4 @@
-import { keepTrackApi, isThisJest } from '@app/js/api/keepTrackApi';
+import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import { meshManager } from '@app/js/drawManager/meshManager';
 import { pPM as postProcessingManager } from '@app/js/drawManager/post-processing.js';
 import { sceneManager } from '@app/js/drawManager/sceneManager/sceneManager';
@@ -33,7 +33,7 @@ export const init = () => {
 };
 export const glInit = async () => {
   // Ensure the canvas is available
-  drawManager.canvas ??= isThisJest() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas')
+  drawManager.canvas ??= isThisJest() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas');
 
   if (!drawManager.canvas) {
     throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
@@ -556,6 +556,7 @@ export const orbitsAbove = () => { // NOSONAR
   // Hide satMiniBoxes When Not in Use
   if (!settingsManager.isSatLabelModeOn || mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium && watchlist?.watchlistInViewList?.length === 0) {
     if (isSatMiniBoxInUse) {
+      satMiniBox = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
       satMiniBox.innerHTML = '';
     }
     isSatMiniBoxInUse = false;

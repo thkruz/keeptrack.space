@@ -86,7 +86,7 @@ export const initTable = (tbl: HTMLTableElement, launchList: LaunchInfoObject[])
 
     // Country Cell
     const tdC = tr.insertCell();
-    tdC.innerHTML = `<span class="badge dark-blue-badge" data-badge-caption="${launchList[i].country}"></span>`;
+    tdC.innerHTML = `<span class="badge dark-gray-badge" data-badge-caption="${launchList[i].country}"></span>`;
   }
 };
 

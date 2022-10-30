@@ -28,4 +28,5 @@ export enum SpaceObjectType {
   COUNTRY = 26,
   LAUNCH_VEHICLE_MANUFACTURER = 27,
   ENGINE_MANUFACTURER = 28,
+  NOTIONAL = 29,
 }

@@ -20,6 +20,8 @@ import whoosh6Mp3 from '@app/audio/whoosh6.mp3';
 import whoosh7Mp3 from '@app/audio/whoosh7.mp3';
 import whoosh8Mp3 from '@app/audio/whoosh8.mp3';
 
+let lastLongAudioTimne = 0;
+
 export const init = (): void => {
   // const { settingsManager } = keepTrackApi.programs;
   // Add HTML
@@ -92,6 +94,11 @@ export const init = (): void => {
             case 'whoosh':
               random = Math.floor(Math.random() * 8) + 1;
               keepTrackApi.programs.soundManager.sounds[`whoosh${random}`].play();
+              return;
+            case 'error':
+              if (lastLongAudioTimne + 1200000 > Date.now()) return; // Don't play if played in last 30 second
+              lastLongAudioTimne = Date.now();
+              keepTrackApi.programs.soundManager.sounds.error.play();
               return;
             default:
               keepTrackApi.programs.soundManager.sounds[sound].play();

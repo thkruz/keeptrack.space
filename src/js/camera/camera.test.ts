@@ -5,7 +5,7 @@ import { DrawManager } from '../drawManager/drawManager';
 import { ObjectManager } from '../objectManager/objectManager';
 import { OrbitManager } from '../orbitManager/orbitManager';
 import { SensorManager } from '../plugins/sensor/sensorManager';
-import * as camera from './camera';
+import { camera, Camera, changeCameraType } from './camera';
 import { keyDownHandler, keyUpHandler } from './keyHandler';
 import { setFtsRotateReset, setIsLocalRotateOverride, setIsLocalRotateRoll, setIsLocalRotateYaw, setIsPanReset, setIsScreenPan, setIsWorldPan } from './overrides';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from './transforms';
@@ -364,7 +364,8 @@ describe('camera.changeZoom', () => {
 describe('camera.changeCameraType', () => {
   test('0', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(
+      changeCameraType(
+        <Camera>(<unknown>keepTrackApiStubs.programs.mainCamera),
         <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
         <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 1, isSensorManagerLoaded: false },
@@ -377,7 +378,8 @@ describe('camera.changeCameraType', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(
+      changeCameraType(
+        <Camera>(<unknown>keepTrackApiStubs.programs.mainCamera),
         <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
         <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 0, isSensorManagerLoaded: false },
@@ -390,7 +392,8 @@ describe('camera.changeCameraType', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(
+      changeCameraType(
+        <Camera>(<unknown>keepTrackApiStubs.programs.mainCamera),
         <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
         <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 29, isSensorManagerLoaded: false },
@@ -403,7 +406,8 @@ describe('camera.changeCameraType', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(
+      changeCameraType(
+        <Camera>(<unknown>keepTrackApiStubs.programs.mainCamera),
         <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
         <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 29, isSensorManagerLoaded: true },
@@ -416,7 +420,8 @@ describe('camera.changeCameraType', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(
+      changeCameraType(
+        <Camera>(<unknown>keepTrackApiStubs.programs.mainCamera),
         <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
         <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: -1, isSensorManagerLoaded: false },
@@ -429,7 +434,8 @@ describe('camera.changeCameraType', () => {
 
   test('5', () => {
     let callFunction: any = () => {
-      camera.changeCameraType(
+      changeCameraType(
+        <Camera>(<unknown>keepTrackApiStubs.programs.mainCamera),
         <OrbitManager>(<unknown>keepTrackApiStubs.programs.orbitManager),
         <DrawManager>(<unknown>keepTrackApiStubs.programs.drawManager),
         <ObjectManager>{ selectedSat: 0, isSensorManagerLoaded: true },
@@ -606,7 +612,7 @@ describe('camera.calculate', () => {
     let callFunction: any = () => {
       setFtsRotateReset(true);
       camera.calculate(1, false);
-      camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
+      camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
       camera.calculate(1, false);
     };
 
@@ -724,7 +730,7 @@ describe('camera.update', () => {
   test('7', () => {
     let callFunction: any = () => {
       // eslint-disable-next-line no-import-assign
-      camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Offset);
+      camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Offset);
       camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
         lat: 100,
         lon: 100,
@@ -733,7 +739,7 @@ describe('camera.update', () => {
         y: 70,
         z: 1,
       });
-      camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.FixedToSat);
+      camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.FixedToSat);
       camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
         lat: 100,
         lon: 100,
@@ -742,7 +748,7 @@ describe('camera.update', () => {
         y: 70,
         z: 1,
       });
-      camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
+      camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
       camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
         lat: 100,
         lon: 100,
@@ -751,7 +757,7 @@ describe('camera.update', () => {
         y: 70,
         z: 1,
       });
-      camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Planetarium);
+      camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Planetarium);
       camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
         lat: 100,
         lon: 100,
@@ -760,7 +766,7 @@ describe('camera.update', () => {
         y: 70,
         z: 1,
       });
-      camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Satellite);
+      camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Satellite);
       camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
         lat: 100,
         lon: 100,
@@ -769,7 +775,7 @@ describe('camera.update', () => {
         y: 70,
         z: 1,
       });
-      camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Astronomy);
+      camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Astronomy);
       camera.update(<any>{ id: 63, getAltitude: () => 350, position: { x: 350, y: 4, z: 520 }, velocity: { x: 90, y: 320, z: 50 } }, {
         lat: 100,
         lon: 100,
@@ -869,11 +875,11 @@ describe('camera.earthHitTest', () => {
 });
 
 // @ponicode
-describe('camera.setCameraType', () => {
+describe('camera.cameraType.set', () => {
   const cameraType = keepTrackApiStubs.programs.mainCamera.cameraType;
   test('0', () => {
     let callFunction: any = () => {
-      camera.setCameraType(cameraType.Default);
+      camera.cameraType.set(cameraType.Default);
     };
 
     expect(callFunction).not.toThrow();
@@ -881,7 +887,7 @@ describe('camera.setCameraType', () => {
 
   test('1', () => {
     let callFunction: any = () => {
-      camera.setCameraType(cameraType.Satellite);
+      camera.cameraType.set(cameraType.Satellite);
     };
 
     expect(callFunction).not.toThrow();
@@ -889,7 +895,7 @@ describe('camera.setCameraType', () => {
 
   test('2', () => {
     let callFunction: any = () => {
-      camera.setCameraType(cameraType.Offset);
+      camera.cameraType.set(cameraType.Offset);
     };
 
     expect(callFunction).not.toThrow();
@@ -897,7 +903,7 @@ describe('camera.setCameraType', () => {
 
   test('3', () => {
     let callFunction: any = () => {
-      camera.setCameraType(cameraType.Planetarium);
+      camera.cameraType.set(cameraType.Planetarium);
     };
 
     expect(callFunction).not.toThrow();
@@ -905,7 +911,7 @@ describe('camera.setCameraType', () => {
 
   test('4', () => {
     let callFunction: any = () => {
-      camera.setCameraType(cameraType.current);
+      camera.cameraType.set(cameraType.current);
     };
 
     expect(callFunction).not.toThrow();
@@ -938,7 +944,7 @@ describe('keyUpHandler', () => {
   describe('keyDownHandler', () => {
     test('0', () => {
       let callFunction: any = () => {
-        camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
+        camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
         keyDownHandler(<KeyboardEvent>{});
         keyDownHandler(generateKeyboardEvent('w'));
         keyDownHandler(generateKeyboardEvent('a'));
@@ -952,10 +958,10 @@ describe('keyUpHandler', () => {
         keyDownHandler(generateKeyboardEvent('k'));
         keyDownHandler(generateKeyboardEvent('shift'));
         keyDownHandler(generateKeyboardEvent('ShiftRight'));
-        camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Satellite);
+        camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Satellite);
         keyDownHandler(generateKeyboardEvent('q'));
         keyDownHandler(generateKeyboardEvent('e'));
-        camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Astronomy);
+        camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Astronomy);
         keyDownHandler(generateKeyboardEvent('j'));
         keyDownHandler(generateKeyboardEvent('l'));
       };
@@ -981,7 +987,7 @@ describe('keyUpHandler', () => {
         camera.fpsMovement();
         keyDownHandler(generateKeyboardEvent('q'));
         camera.fpsMovement();
-        camera.setCameraType(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
+        camera.cameraType.set(keepTrackApiStubs.programs.mainCamera.cameraType.Fps);
         camera.fpsMovement();
       };
 

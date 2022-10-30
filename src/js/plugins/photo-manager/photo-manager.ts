@@ -1,6 +1,7 @@
-import photoManagerPng from '@app/img/icons/photoManager.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl, openColorbox, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import photoManagerPng from '@app/img/icons/photoManager.png';
 
 let isSatPhotoMenuOpen = false;
 
@@ -36,12 +37,12 @@ export const meteosat11 = (): void => {
   colorbox(`https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg`);
 };
 export const meteosat8 = (): void => {
-  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(27509).id, keepTrackApi.programs.mainCamera);
+  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(10489).id, keepTrackApi.programs.mainCamera);
   keepTrackApi.programs.mainCamera.changeZoom(0.7);
   colorbox(`https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg`);
 };
 export const goes1 = (): void => {
-  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(41866).id, keepTrackApi.programs.mainCamera);
+  keepTrackApi.programs.drawManager.selectSatManager.selectSat(keepTrackApi.programs.satSet.getSatFromObjNum(8366).id, keepTrackApi.programs.mainCamera);
   keepTrackApi.programs.mainCamera.changeZoom(0.7);
   colorbox(`https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg`);
 };

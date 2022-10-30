@@ -17,7 +17,7 @@ export const uiManagerInit = () => {
             <li class="divider"></li>
             <li class="menu-selectable" data-group="aehf">Milstar and AEHF</li>
             <li class="menu-selectable" data-group="wgs">DSCS and WGS</li>
-            <li class="menu-selectable" data-group="starlink">Starlink</li>
+            <!-- <li class="menu-selectable" data-group="starlink">Starlink</li> -->
             <li class="menu-selectable" data-group="GPSGroup">GPS Satellites</li>
             <li class="menu-selectable" data-group="GalileoGroup">Galileo Satellites</li>
             <li class="menu-selectable" data-group="GlonassGroup">Glonass Satellites</li>
@@ -43,7 +43,9 @@ export const uiManagerInit = () => {
       </div>
     `
   );
+};
 
+export const uiManagerFinal = () => {
   clickAndDragWidth(getEl('constellations-menu'));
 
   getEl('constellation-menu')
@@ -104,7 +106,7 @@ export const constellationMenuClick = (groupName: any) => { // NOSONAR
       });
       break;
     case 'starlink':
-      if (!groupsManager.starlink) groupsManager.starlink = groupsManager.createGroup('objNum', satSet.convertIdArrayToSatnumArray(objectManager.satLinkManager.starlink));
+      if (!groupsManager.starlink) groupsManager.starlink = groupsManager.createGroup('nameRegex', /STARLINK/u);
       showLoading(() => {
         lineManager.clear();
         objectManager.satLinkManager.showLinks(lineManager, satSet, 'starlink');
@@ -176,6 +178,13 @@ export const init = (): void => {
     method: 'uiManagerInit',
     cbName: 'constellations',
     cb: uiManagerInit,
+  });
+
+  // Add event listeners
+  keepTrackApi.register({
+    method: 'uiManagerFinal',
+    cbName: 'constellations',
+    cb: uiManagerFinal,
   });
 
   // Add JavaScript

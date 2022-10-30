@@ -11,6 +11,7 @@ import { LineFactory } from '../drawManager/sceneManager/line-factory';
 import { MissileManager } from '../plugins/missile/missileManager';
 import { ObjectManager } from '../objectManager/objectManager';
 import { OrbitManager } from '../orbitManager/orbitManager';
+import { PlanetariumManager } from '../plugins/planetarium/planetarium';
 import { SatMath } from '../satMath/satMath';
 import { SensorManager } from '../plugins/sensor/sensorManager';
 import { SpaceObjectType } from './SpaceObjectType';
@@ -217,6 +218,10 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isFreezePropRateOnDrag: any;
+  isNotionalDebris: boolean;
+  isUseExtendedCatalog: boolean;
+  isDrawTrailingOrbits: boolean;
   isShowSplashScreen: boolean;
   isGlobalErrorTrapOn: boolean;
   isDisableAsciiCatalog: boolean;
@@ -283,7 +288,6 @@ export interface SettingsManager {
   autoPanSpeed: { x: number; y: number };
   autoRotateSpeed: number;
   blueImages: boolean;
-  breakTheLaw: boolean;
   camDistBuffer: number;
   cameraDecayFactor: number;
   cameraMovementSpeed: number;
@@ -572,6 +576,8 @@ export enum SunStatus {
 }
 
 export declare interface SatObject {
+  source: string;
+  altId: string;
   pname?: string;
   bf?: string;
   active: boolean;
@@ -894,7 +900,7 @@ export interface KeepTrackPrograms {
   drawManager: DrawManager;
   // starManager: StarManager;
   astronomy: any;
-  planetarium: any;
+  planetarium: PlanetariumManager;
   objectManager: ObjectManager;
   lineManager: LineFactory;
   dotsManager: DotsManager;

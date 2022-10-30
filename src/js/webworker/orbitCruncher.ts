@@ -11,6 +11,7 @@ let propRate = 1.0;
 
 const satCache = [];
 let NUM_SEGS: number;
+let orbitType = 1;
 let orbitFadeFactor = 1.0;
 
 // Handles Incomming Messages to sat-cruncher from main thread
@@ -22,7 +23,25 @@ try {
 }
 
 // prettier-ignore
-export const onmessageProcessing = (m) => { // NOSONAR
+export const onmessageProcessing = (m: {
+  data: {
+    missile?: any;
+    satSet?: any;
+    satId?: number;
+    isUpdate?: boolean;
+    orbitType?: number;
+    dynamicOffsetEpoch?: number;
+    staticOffset?: number;
+    propRate?: number;
+    isInit?: boolean;
+    satData?: string;
+    TLE1?: string;
+    TLE2?: string;
+    isEcfOutput?: boolean;
+    numSegs: number;
+    orbitFadeFactor?: string;
+  };
+}) => { // NOSONAR
   if (m.data.isUpdate) {
     // Add Satellites
     if (!m.data.missile && m.data.satId < 99999) {
@@ -33,6 +52,10 @@ export const onmessageProcessing = (m) => { // NOSONAR
       satCache[m.data.satId] = m.data;
     }
     // Don't Add Anything Else
+  }
+
+  if (m.data.orbitType) {
+    orbitType = m.data.orbitType;
   }
 
   dynamicOffsetEpoch = typeof m.data.dynamicOffsetEpoch !== 'undefined' ? m.data.dynamicOffsetEpoch : dynamicOffsetEpoch;
@@ -74,6 +97,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
 
     const len = NUM_SEGS + 1;
     let i = 0;
+    // Calculate Missile Orbits
     if (satCache[satId].missile) {
       while (i < len) {
         const missile = satCache[satId];
@@ -83,7 +107,7 @@ export const onmessageProcessing = (m) => { // NOSONAR
           pointsOut[i * 4 + 1] = 0;
           pointsOut[i * 4 + 2] = 0;
           pointsOut[i * 4 + 3] = 0;
-          i++;  
+          i++;
         } else {
           const x = Math.round(missile.altList.length * (i / NUM_SEGS));
 
@@ -113,34 +137,58 @@ export const onmessageProcessing = (m) => { // NOSONAR
         }
       }
     } else {
+      // Calculate Satellite Orbits
       const period = (2 * Math.PI) / satCache[satId].no; // convert rads/min to min
       const timeslice = period / NUM_SEGS;
+      let p: any;
 
-      while (i < len) {
-        const t = now + i * timeslice;
-        let p: any;
-        p = Ootk.Sgp4.propagate(satCache[satId], t)?.position;
-        // eslint-disable-next-line no-constant-condition
-        if (isEcfOutput) {
-          p = Ootk.Transforms.ecf2eci(p, -i * timeslice * TAU / period);
+      if (orbitType === 1) {
+        while (i < len) {
+          const t = now + i * timeslice;
+          p = Ootk.Sgp4.propagate(satCache[satId], t)?.position;
+          // eslint-disable-next-line no-constant-condition
+          if (isEcfOutput) {
+            p = Ootk.Transforms.ecf2eci(p, (-i * timeslice * TAU) / period);
+          }
+          if (p?.x && p?.y && p?.z) {
+            pointsOut[i * 4] = p.x;
+            pointsOut[i * 4 + 1] = p.y;
+            pointsOut[i * 4 + 2] = p.z;
+            pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
+          } else {
+            pointsOut[i * 4] = 0;
+            pointsOut[i * 4 + 1] = 0;
+            pointsOut[i * 4 + 2] = 0;
+            pointsOut[i * 4 + 3] = 0;
+          }
+          i++;
         }
-        if (p?.x && p?.y && p?.z) {
-          pointsOut[i * 4] = p.x;
-          pointsOut[i * 4 + 1] = p.y;
-          pointsOut[i * 4 + 2] = p.z;
-          pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
-        } else {
-          pointsOut[i * 4] = 0;
-          pointsOut[i * 4 + 1] = 0;
-          pointsOut[i * 4 + 2] = 0;
-          pointsOut[i * 4 + 3] = 0;
+      } else if (orbitType === 2) {
+        while (i < len) {          
+          const t = now - i * timeslice;
+          p = Ootk.Sgp4.propagate(satCache[satId], t)?.position;
+          // eslint-disable-next-line no-constant-condition
+          if (isEcfOutput) {
+            p = Ootk.Transforms.ecf2eci(p, (-i * timeslice * TAU) / period);
+          }
+          if (p?.x && p?.y && p?.z) {
+            pointsOut[i * 4] = p.x;
+            pointsOut[i * 4 + 1] = p.y;
+            pointsOut[i * 4 + 2] = p.z;
+            pointsOut[i * 4 + 3] = (i < len / 40) ? Math.min(orbitFadeFactor * ((len / 40) / (2 * (i + 1))), 1.0) : 0.0;
+          } else {
+            pointsOut[i * 4] = 0;
+            pointsOut[i * 4 + 1] = 0;
+            pointsOut[i * 4 + 2] = 0;
+            pointsOut[i * 4 + 3] = 0;
+          }
+          i++;
         }
-        i++;
       }
     }
 
     // TODO: figure out how this transferable buffer works
-    postMessageProcessing({pointsOut, satId});
+    postMessageProcessing({ pointsOut, satId });
   }
 };
 

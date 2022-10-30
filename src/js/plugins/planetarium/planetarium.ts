@@ -23,9 +23,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { getEl, shake } from '@app/js/lib/helpers';
+
 import planetariumPng from '@app/img/icons/planetarium.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { getEl, shake } from '@app/js/lib/helpers';
+
+export interface PlanetariumManager {
+  isPlanetariumView: boolean;
+}
 
 export const uiManagerInit = () => {
   // Bottom Icon
@@ -52,8 +57,9 @@ export const init = (): void => {
     cb: uiManagerInit,
   });
 
-  keepTrackApi.programs.planetarium = {};
-  keepTrackApi.programs.planetarium.isPlanetariumView = false;
+  keepTrackApi.programs.planetarium = {
+    isPlanetariumView: false,
+  };
 
   // Add JavaScript
   keepTrackApi.register({
@@ -84,6 +90,15 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
     } else {
       if (sensorManager.checkSensorSelected()) {
         mainCamera.cameraType.current = mainCamera.cameraType.Planetarium; // Activate Planetarium Camera Mode
+
+        // Assume Sensor plugin is on because we are in planetarium view
+        getEl('cspocAllSensor').style.display = 'none';
+        getEl('mwAllSensor').style.display = 'none';
+        getEl('mdAllSensor').style.display = 'none';
+        getEl('llAllSensor').style.display = 'none';
+        getEl('rusAllSensor').style.display = 'none';
+        getEl('prcAllSensor').style.display = 'none';
+
         // TODO: implement fov information
         // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
         uiManager.legendMenuChange('planetarium');

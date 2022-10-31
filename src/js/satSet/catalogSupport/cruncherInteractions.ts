@@ -129,12 +129,18 @@ export const getVariableActions = (params: string[]) => {
         }
         break;
       case 'sat':
-        urlSatId = satSet.getIdFromObjNum(parseInt(val));
-        if (urlSatId !== null) {
-          objectManager.setSelectedSat(urlSatId);
-        } else {
-          uiManager.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
-        }
+        keepTrackApi.register({
+          method: 'onKeepTrackReady',
+          cbName: 'getVariableSat',
+          cb: () => {
+            urlSatId = satSet.getIdFromObjNum(parseInt(val));
+            if (urlSatId !== null) {
+              objectManager.setSelectedSat(urlSatId);
+            } else {
+              uiManager.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
+            }
+          },
+        });
         break;
       case 'misl':
         var subVal = val.split(',');

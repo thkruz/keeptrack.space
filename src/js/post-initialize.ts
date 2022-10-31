@@ -38,6 +38,8 @@ export const postInitialize = () => {
     }
 
     keepTrackApi.programs.uiManager.menuController();
+    keepTrackApi.isInitialized = true;
+    keepTrackApi.methods.onKeepTrackReady();
   } else {
     setTimeout(postInitialize, 100);
   }

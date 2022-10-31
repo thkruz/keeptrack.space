@@ -7,6 +7,9 @@ import { getEl } from '@app/js/lib/helpers';
 
 // prettier-ignore
 export const updateSelectBoxCoreCallback = async (sat: SatObject) => { // NOSONAR
+  // Don't try until KeepTrack is fully loaded
+  if (!keepTrackApi.isInitialized) return;
+
   try {
     const { satellite, missileManager, timeManager, objectManager, sensorManager, uiManager } = keepTrackApi.programs;
 

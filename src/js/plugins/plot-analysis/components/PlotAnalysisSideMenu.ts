@@ -1,5 +1,6 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import './PlotAnalysisSideMenu.css';
+
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 export const PlotAnalysisSideMenu = keepTrackApi.html`
       <div id="plot-analysis-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
@@ -25,6 +26,11 @@ export const PlotAnalysisSideMenu = keepTrackApi.html`
       <div id="plot-analysis-menu5" class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized">
         <div id="plot-analysis-content5" class="side-menu">
           <div id="plot-analysis-chart5" class="plot-analysis-chart"></div>
+        </div>
+      </div>
+      <div id="plot-analysis-menu6" class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized">
+        <div id="plot-analysis-content6" class="side-menu">
+          <div id="plot-analysis-chart6" class="plot-analysis-chart"></div>
         </div>
       </div>
     `;

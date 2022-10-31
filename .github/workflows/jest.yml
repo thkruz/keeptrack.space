@@ -10,6 +10,8 @@ jobs:
       # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v2
+        with:
+          node-version: "17"
       # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -21,6 +23,7 @@ jobs:
         env:
           cache-name: cache-node-modules
         with:
+          node-version: "17"
           path: ~/.npm
           key: ${{ runner.os }}-build-
             ${{ env.cache-name }}-
@@ -36,6 +39,7 @@ jobs:
       - name: Set Timezone
         uses: szenius/set-timezone@v1.0
         with:
+          node-version: "17"
           timezoneLinux: "America/New_York"
       # Unit Tests for Code Coverage
       - name: Test

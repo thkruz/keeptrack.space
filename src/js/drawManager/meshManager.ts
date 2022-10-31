@@ -319,7 +319,7 @@ export const updateNadirYaw = (mainCamera: Camera, sat: SatObject, timeManager: 
 // prettier-ignore
 export const update = (timeManager: TimeManager, sat: SatObject) => { // NOSONAR
   try {
-    meshManager.currentModel.id = sat?.id || -1;
+    meshManager.currentModel.id = (typeof sat?.id !== 'undefined') ? sat.id : -1;
     meshManager.currentModel.static = sat?.static || false;
 
     if (typeof meshManager.currentModel.id == 'undefined' || meshManager.currentModel.id == -1 || meshManager.currentModel.static) return;

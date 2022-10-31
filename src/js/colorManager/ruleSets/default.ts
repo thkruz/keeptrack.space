@@ -17,12 +17,12 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
     // @ts-ignore
     if (window.noNotional) {
       return {
-        color: [1, 1, 0, 0.0],
+        color: [1, 0, 0, 0.0],
         pickable: Pickable.No,
       };
     } else {
       return {
-        color: [1, 1, 0, 0.8],
+        color: [1, 0, 0, 0.8],
         pickable: Pickable.Yes,
       };
     }

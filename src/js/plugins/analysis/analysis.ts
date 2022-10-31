@@ -61,7 +61,8 @@ export const init = (): void => {
           isAnalysisMenuOpen = true;
           if (objectManager.selectedSat != -1) {
             const sat: SatObject = satSet.getSat(objectManager.selectedSat);
-            (<HTMLInputElement>getEl('anal-sat')).value = sat.sccNum;
+            const analSatDom = <HTMLInputElement>getEl('anal-sat');
+            if (analSatDom) analSatDom.value = sat.sccNum;
           }
 
           // TODO: Fix analysis trends

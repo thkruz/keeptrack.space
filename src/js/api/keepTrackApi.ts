@@ -53,7 +53,9 @@ export const keepTrackApi: KeepTrackApi = {
   register: register,
   initializeKeepTrack: null,
   unregister: unregister,
+  isInitialized: false,
   callbacks: {
+    onKeepTrackReady: [],
     selectSatData: [],
     updateSelectBox: [],
     onCruncherReady: [],
@@ -81,6 +83,9 @@ export const keepTrackApi: KeepTrackApi = {
     selectSatData: (sat: any, satId: number) => {
       keepTrackApi.programs.soundManager.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
+    },
+    onKeepTrackReady: () => {
+      keepTrackApi.callbacks.onKeepTrackReady.forEach((cb: any) => cb.cb());
     },
     updateSelectBox: (sat: any) => {
       keepTrackApi.callbacks.updateSelectBox.forEach((cb: any) => cb.cb(sat));

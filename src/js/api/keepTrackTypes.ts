@@ -922,6 +922,7 @@ export interface KeepTrackPrograms {
 }
 
 export interface KeepTrackApi {
+  isInitialized: boolean;
   initializeKeepTrack: () => Promise<void>;
   html: (strings: TemplateStringsArray, ...placeholders: any[]) => string;
   register: (params: { method: string; cbName: string; cb: any }) => void;

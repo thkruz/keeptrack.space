@@ -32,3 +32,9 @@ export const formatMeanAnomaly = (meana: StringifiedNubmer): string => {
   if (meana0.length !== 8) throw new Error('meana length is not 8');
   return meana0;
 };
+
+export const formatEccentricity = (ecen: string): string => {
+  const ecen0 = stringPad.trail0(ecen, 7);
+  if (ecen0.length !== 7) throw new Error('ecen length is not 7');
+  return ecen0;
+};

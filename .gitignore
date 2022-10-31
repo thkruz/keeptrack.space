@@ -113,4 +113,5 @@ src/tle/tle4.js
 custom-builds
 
 # Library Build
-lib
+lib/keepTrack
+lib/example*

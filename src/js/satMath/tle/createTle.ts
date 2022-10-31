@@ -1,9 +1,12 @@
 import { StringifiedNubmer, formatArgumentOfPerigee, formatEccentricity, formatInclination, formatMeanAnomaly, formatMeanMotion, formatRightAscension } from './tleFormater';
 
 import { SatObject } from '../../api/keepTrackTypes';
+import { stringPad } from '@app/js/lib/helpers';
 
 export const createTle = (tleParams: TleParams): { TLE1: string; TLE2: string } => {
   let { sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc } = tleParams;
+  const epochYrStr = stringPad.pad0(epochyr, 2);
+  const epochdayStr = stringPad.pad0(parseFloat(epochday).toFixed(8), 12);
   const incStr = formatInclination(inc);
   const meanmoStr = formatMeanMotion(meanmo);
   const rascStr = formatRightAscension(rasc);
@@ -19,8 +22,8 @@ export const createTle = (tleParams: TleParams): { TLE1: string; TLE2: string } 
   TLE1Ending = TLE1Ending[21] === ' ' ? setCharAt(TLE1Ending, 21, '+') : TLE1Ending;
   TLE1Ending = TLE1Ending[32] === ' ' ? setCharAt(TLE1Ending, 32, '0') : TLE1Ending;
 
-  const TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-  const TLE2 = '2 ' + scc + ' ' + incStr + ' ' + rascStr + ' ' + ecenStr + ' ' + argPeStr + ' ' + meanaStr + ' ' + meanmoStr + '000010';
+  const TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochYrStr + epochdayStr + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+  const TLE2 = '2 ' + scc + ' ' + incStr + ' ' + rascStr + ' ' + ecenStr + ' ' + argPeStr + ' ' + meanaStr + ' ' + meanmoStr + ' 00010';
 
   return { TLE1, TLE2 };
 };

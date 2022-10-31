@@ -11,11 +11,23 @@ export const createTle = (tleParams: TleParams): { TLE1: string; TLE2: string } 
   const meanaStr = formatMeanAnomaly(meana);
   const ecenStr = formatEccentricity(ecen);
 
-  const TLE1Ending = sat.TLE1.substr(32, 39);
+  let TLE1Ending = sat.TLE1.substr(32, 39);
+  // Add explicit positive/negative signs
+
+  TLE1Ending = TLE1Ending[1] === ' ' ? setCharAt(TLE1Ending, 1, '+') : TLE1Ending;
+  TLE1Ending = TLE1Ending[12] === ' ' ? setCharAt(TLE1Ending, 12, '+') : TLE1Ending;
+  TLE1Ending = TLE1Ending[21] === ' ' ? setCharAt(TLE1Ending, 21, '+') : TLE1Ending;
+  TLE1Ending = TLE1Ending[32] === ' ' ? setCharAt(TLE1Ending, 32, '0') : TLE1Ending;
+
   const TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochyr + epochday + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-  const TLE2 = '2 ' + scc + ' ' + incStr + ' ' + rascStr + ' ' + ecenStr + ' ' + argPeStr + ' ' + meanaStr + ' ' + meanmoStr + '    10';
+  const TLE2 = '2 ' + scc + ' ' + incStr + ' ' + rascStr + ' ' + ecenStr + ' ' + argPeStr + ' ' + meanaStr + ' ' + meanmoStr + '000010';
 
   return { TLE1, TLE2 };
+};
+
+const setCharAt = (str: string, index: number, chr: string) => {
+  if (index > str.length - 1) return str;
+  return str.substring(0, index) + chr + str.substring(index + 1);
 };
 
 export type TleParams = {

@@ -1,26 +1,32 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SatObject } from '@app/js/api/keepTrackTypes';
-import { clickAndDragWidth, getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
-import * as echarts from 'echarts';
 import 'echarts-gl';
-import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
-import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
+
+import * as echarts from 'echarts';
+
+import { clickAndDragWidth, getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { createEcfScatterPlot, getEcfScatterData } from './components/plots/ecfScatterPlot';
 import { createEciScatterPlot, getEciScatterData } from './components/plots/eciScatterPlot';
+import { createInc2AltScatterPlot, getInc2AltScatterData } from './components/plots/inc2AltScatterPlot';
 import { createInc2LonScatterPlot, getInc2LonScatterData } from './components/plots/inc2LonScatterPlot';
 import { createRicScatterPlot, getRicScatterData } from './components/plots/ricScatterPlot';
 import { createTime2LonScatterPlot, getTime2LonScatterData } from './components/plots/time2LonScatterPlot';
+
+import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
+import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
+import { SatObject } from '@app/js/api/keepTrackTypes';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 export let isPlotAnalyisMenuOpen = false;
 export let isPlotAnalyisMenuOpen2 = false;
 export let isPlotAnalyisMenuOpen3 = false;
 export let isPlotAnalyisMenuOpen4 = false;
 export let isPlotAnalyisMenuOpen5 = false;
+export let isPlotAnalyisMenuOpen6 = false;
 export let curChart: echarts.ECharts;
 export let curChart2: echarts.ECharts;
 export let curChart3: echarts.ECharts;
 export let curChart4: echarts.ECharts;
 export let curChart5: echarts.ECharts;
+export let curChart6: echarts.ECharts;
 
 export const init = (): void => {
   // Add HTML
@@ -89,6 +95,9 @@ export const bottomMenuClick = (iconName: string): void => {
       break;
     case 'menu-plot-analysis5':
       onTime2LonPlotBtnClick();
+      break;
+    case 'menu-plot-analysis6':
+      onInc2AltPlotBtnClick();
       break;
     default:
       break;
@@ -210,6 +219,31 @@ export const onInc2LonPlotBtnClick = () => {
   }
 };
 
+export const onInc2AltPlotBtnClick = () => {
+  const { uiManager } = keepTrackApi.programs;
+  if (isPlotAnalyisMenuOpen6) {
+    uiManager.hideSideMenus();
+    isPlotAnalyisMenuOpen6 = false;
+    return;
+  } else {
+    uiManager.hideSideMenus();
+    slideInRight(getEl('plot-analysis-menu6'), 1000);
+    isPlotAnalyisMenuOpen6 = true;
+
+    const chartDom6 = getEl('plot-analysis-chart6');
+    let existInstance = echarts.getInstanceByDom(chartDom6);
+
+    if (!existInstance) {
+      curChart6 = createInc2AltScatterPlot(getInc2AltScatterData(), isPlotAnalyisMenuOpen6, curChart6, chartDom6);
+    }
+    setTimeout(() => {
+      curChart6.resize();
+    }, 1000);
+    getEl('menu-plot-analysis6').classList.add('bmenu-item-selected');
+    return;
+  }
+};
+
 export const onTime2LonPlotBtnClick = () => {
   const { uiManager } = keepTrackApi.programs;
   if (isPlotAnalyisMenuOpen5) {
@@ -255,6 +289,9 @@ export const hideSideMenus = (): void => {
   slideOutLeft(getEl('plot-analysis-menu5'), 1000);
   getEl('menu-plot-analysis5').classList.remove('bmenu-item-selected');
   isPlotAnalyisMenuOpen5 = false;
+  slideOutLeft(getEl('plot-analysis-menu6'), 1000);
+  getEl('menu-plot-analysis6').classList.remove('bmenu-item-selected');
+  isPlotAnalyisMenuOpen6 = false;
 };
 
 /**

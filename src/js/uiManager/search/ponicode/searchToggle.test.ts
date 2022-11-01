@@ -1,4 +1,10 @@
+import { keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import * as searchToggle from '@app/js/uiManager/search/searchToggle';
+
+keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
+
 // @ponicode
 describe('searchToggle.searchToggle', () => {
   test('0', () => {

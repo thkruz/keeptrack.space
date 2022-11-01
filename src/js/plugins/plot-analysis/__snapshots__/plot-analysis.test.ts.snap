@@ -1868,6 +1868,30 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       </div>
       
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized"
+        id="plot-analysis-menu6"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content6"
+        >
+          
+          
+          <div
+            class="plot-analysis-chart"
+            id="plot-analysis-chart6"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
     
       
       
@@ -1986,6 +2010,30 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
           <div
             class="plot-analysis-chart"
             id="plot-analysis-chart5"
+          />
+          
+        
+        </div>
+        
+      
+      </div>
+      
+      
+      <div
+        class="side-menu-parent start-hidden text-select plot-analysis-menu-maximized"
+        id="plot-analysis-menu6"
+      >
+        
+        
+        <div
+          class="side-menu"
+          id="plot-analysis-content6"
+        >
+          
+          
+          <div
+            class="plot-analysis-chart"
+            id="plot-analysis-chart6"
           />
           
         
@@ -2142,6 +2190,34 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
       
       </div>
       
+      
+      <div
+        class="bmenu-item"
+        id="menu-plot-analysis6"
+      >
+        
+        
+        <img
+          alt="Inc v Alt Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          Inc v Alt Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
     
       
       
@@ -2274,6 +2350,34 @@ exports[`plotAnalysis.uiManagerInit 0 2`] = `
           class="bmenu-title"
         >
           Time v Lon Plots
+        </span>
+        
+        
+        <div
+          class="status-icon"
+        />
+        
+      
+      </div>
+      
+      
+      <div
+        class="bmenu-item"
+        id="menu-plot-analysis6"
+      >
+        
+        
+        <img
+          alt="Inc v Alt Plots"
+          delayedsrc="/"
+          src=""
+        />
+        
+        
+        <span
+          class="bmenu-title"
+        >
+          Inc v Alt Plots
         </span>
         
         

@@ -37,7 +37,22 @@ export const init = (): void => {
     cbName: 'countries',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'countries',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isCountriesMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Countries Menu', 'help', null, null);
+    return true;
+  }
+  return false;
+};
+
 export const bottomMenuClick = (iconName: string): void => {
   const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-countries') {

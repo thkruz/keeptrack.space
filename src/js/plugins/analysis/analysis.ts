@@ -29,9 +29,10 @@ import { AnalysisSideMenu } from './components/AnalysisSideMenu';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+let isAnalysisMenuOpen = false;
+
 export const init = (): void => {
   const { objectManager, satSet, uiManager } = keepTrackApi.programs;
-  let isAnalysisMenuOpen = false;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -103,7 +104,22 @@ export const init = (): void => {
       isAnalysisMenuOpen = false;
     },
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'analysis',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isAnalysisMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Analysis Menu', 'help', null, null);
+    return true;
+  }
+  return false;
+};
+
 export const uiManagerInit = () => {
   getEl('left-menus').insertAdjacentHTML('beforeend', AnalysisSideMenu);
   getEl('bottom-icons').insertAdjacentHTML('beforeend', AnalysisBottomIcon);

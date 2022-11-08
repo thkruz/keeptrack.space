@@ -50,9 +50,24 @@ export const init = (): void => {
 
   keepTrackApi.register({
     method: 'hideSideMenus',
-    cbName: 'sensor',
+    cbName: 'settingsMenu',
     cb: (): void => hideSideMenus(),
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'settingsMenu',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isSettingsMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Settings Menu', 'help', null, null);
+    return true;
+  }
+
+  return false;
 };
 
 export const uiManagerInit = (): void => {

@@ -110,7 +110,7 @@ export const datetimeInputFormChange = (jestOverride?: Date) => {
   }
   const today = new Date();
   const jday = timeManager.getDayOfYear(timeManager.simulationTimeObj);
-  $('#jday').html(jday.toString());
+  getEl('jday').innerHTML = jday.toString();
   timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime());
   satSet.setColorScheme(settingsManager.currentColorScheme, true);
   timeManager.calculateSimulationTime();

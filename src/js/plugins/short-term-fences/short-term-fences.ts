@@ -45,6 +45,21 @@ export const init = (): void => {
     cbName: 'shortTermFences',
     cb: (): void => hideSideMenus(),
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'shortTermFences',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isStfMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Short Term Fences Menu', 'help', null, null);
+    return true;
+  }
+
+  return false;
 };
 
 export const uiManagerInit = (): void => {

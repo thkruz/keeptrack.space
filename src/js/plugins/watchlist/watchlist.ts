@@ -123,6 +123,21 @@ export const init = (): void => {
     cbName: 'watchlist',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'watchlist',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isWatchlistMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Watchlist Menu', 'help', null, null);
+    return true;
+  }
+
+  return false;
 };
 
 // prettier-ignore

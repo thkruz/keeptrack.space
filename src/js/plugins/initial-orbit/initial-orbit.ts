@@ -31,6 +31,20 @@ export const init = (): void => {
     cbName: 'initialOrbit',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'initialOrbit',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isObfitMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Initial Orbit Menu', 'help', null, null);
+    return true;
+  }
+  return false;
 };
 
 export const hideSideMenus = (): void => {

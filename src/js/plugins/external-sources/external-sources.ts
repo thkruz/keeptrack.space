@@ -138,6 +138,20 @@ export const init = (): void => {
     cbName: 'externalSources',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'externalSources',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isExternalMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('External Sources Menu', 'help', null, null);
+    return true;
+  }
+  return false;
 };
 
 export const n2yoFormSubmit = () => {

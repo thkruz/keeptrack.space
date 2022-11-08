@@ -433,12 +433,11 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     getEl('sat-raan').innerHTML = (sat.raan * RAD2DEG).toFixed(2) + '°';
     getEl('sat-argPe').innerHTML = (sat.argPe * RAD2DEG).toFixed(2) + '°';    
 
-    getEl('sat-period').innerHTML = sat.period.toFixed(2) + ' min';
-    $('#sat-period').tooltip({
-      // delay: 50,
-      html: 'Mean Motion: ' + (MINUTES_PER_DAY / sat.period).toFixed(2),
-      position: 'left',
-    });
+    const periodDom = getEl('sat-period');
+    periodDom.innerHTML = sat.period.toFixed(2) + ' min';
+    periodDom.dataset.position = 'left';
+    periodDom.dataset.delay = '50';
+    periodDom.dataset.tooltip = 'Mean Motion: ' + (MINUTES_PER_DAY / sat.period).toFixed(2);
 
     // TODO: Error checking on Iframe
     let now: Date | number | string = new Date();
@@ -457,12 +456,10 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     if (elsetAgeDom) {
       elsetAgeDom.innerHTML = daysold + ' Days';
     }
-    
-    $('#sat-elset-age').tooltip({
-      // delay: 50,
-      html: 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString(),
-      position: 'left',
-    });
+            
+    elsetAgeDom.dataset.position = 'left';
+    elsetAgeDom.dataset.delay = '50';
+    elsetAgeDom.dataset.tooltip = 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString();
 
     if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
       getEl('sat-sun').parentElement.style.display = 'none';

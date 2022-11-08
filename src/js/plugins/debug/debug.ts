@@ -79,6 +79,20 @@ export const init = (): void => {
     },
     gremlins: runGremlins,
   };
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'debugMenu',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isDebugMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Debug Menu', 'help', null, null);
+    return true;
+  }
+  return false;
 };
 
 export const initMenu = (): void => {

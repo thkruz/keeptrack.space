@@ -159,7 +159,22 @@ export const init = (): void => {
     himawari8: himawari8,
     discovr: discovr,
   };
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'photoManager',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isSatPhotoMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Satellite Photo Menu', 'help', null, null);
+    return true;
+  }
+  return false;
+};
+
 export const discovr = (): void => {
   const request = new XMLHttpRequest();
   request.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);

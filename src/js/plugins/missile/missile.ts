@@ -528,7 +528,22 @@ export const init = (): void => {
     cbName: 'updateMissileOrbits',
     cb: updateLoop,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'missile',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isMissileMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Missile Menu', 'help', null, null);
+    return true;
+  }
+  return false;
+};
+
 export const msAttackerChange = () => {
   isSub = false;
   const subList = [100, 600, 213, 214, 215, 321, 500, 400];

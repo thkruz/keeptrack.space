@@ -20,12 +20,13 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import sat3Png from '@app/img/icons/sat3.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl, shake } from '@app/js/lib/helpers';
 
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import sat3Png from '@app/img/icons/sat3.png';
+
 export const init = (): void => {
-  const { adviceManager, objectManager, uiManager } = keepTrackApi.programs;
+  const { objectManager, uiManager } = keepTrackApi.programs;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -68,7 +69,6 @@ export const init = (): void => {
             getEl('menu-satview').classList.add('bmenu-item-selected');
           } else {
             uiManager.toast(`Select a Satellite First!`, 'caution');
-            if (settingsManager.plugins.topMenu) adviceManager.adviceList.satViewDisabled();
             shake(getEl('menu-satview'));
           }
           return;

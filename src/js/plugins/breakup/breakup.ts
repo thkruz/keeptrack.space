@@ -32,6 +32,20 @@ export const init = (): void => {
     cbName: 'breakup',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'breakup',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isBreakupMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Breakup Menu', 'help', null, null);
+    return true;
+  }
+  return false;
 };
 
 export const uiManagerInit = (): void => {
@@ -278,7 +292,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         const sat: SatObject = satSet.getSatExtraOnly(objectManager.selectedSat);
         (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
       } else {
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.breakupDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-breakup'));
       }

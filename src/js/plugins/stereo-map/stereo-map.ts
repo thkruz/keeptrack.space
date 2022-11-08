@@ -76,6 +76,21 @@ export const init = (): void => {
     cbName: 'stereoMap',
     cb: onCruncherMessage,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'stereoMap',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (keepTrackApi.programs.mapManager.isMapMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Stereographic Map', 'help', null, null);
+    return true;
+  }
+
+  return false;
 };
 
 // prettier-ignore
@@ -268,7 +283,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
     } else {
       if (objectManager.selectedSat === -1) {
         // No Satellite Selected
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.mapDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-map'));
         return;

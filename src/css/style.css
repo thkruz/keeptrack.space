@@ -1147,17 +1147,26 @@ input:focus {
 }
 
 #help-screen {
-  display: none;
+  display: block;
   position: absolute;
+  inset: 15%;
   z-index: 99;
   border: 5px solid var(--colorTertiaryDarken3);
-  min-width: 200px;
-  max-width: 350px;
-  margin: 30px 10px;
   text-align: center;
   padding: 10px;
   overflow: hidden;
   background: var(--colorTertiaryDarken2);
+}
+
+#help-outer-container {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.75);
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 99;
 }
 
 #help-inner-container {
@@ -1187,7 +1196,8 @@ input:focus {
 
 #help-text {
   display: block;
-  line-height: 30px;
+  line-height: 20px;
+  text-align: left;
 }
 
 .top-menu-icons-search-on {

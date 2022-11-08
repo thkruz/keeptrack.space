@@ -49,7 +49,22 @@ export const init = (): void => {
     cbName: 'colorsMenu',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'colorsMenu',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isColorSchemeMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Color Scheme Menu', 'help', null, null);
+    return true;
+  }
+  return false;
+};
+
 export const uiManagerInit = () => {
   getEl('rmb-wrapper').insertAdjacentHTML(
     'beforeend',

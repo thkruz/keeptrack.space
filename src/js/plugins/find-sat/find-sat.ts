@@ -385,7 +385,21 @@ export const init = (): void => {
     cbName: 'findSat',
     cb: hideSideMenus,
   });
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'findSats',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isFindByLooksMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Find Satellite Menu', 'help', null, null);
+    return true;
+  }
+  return false;
+};
+
 export const findByLooksSubmit = async () => {
   const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
   const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);

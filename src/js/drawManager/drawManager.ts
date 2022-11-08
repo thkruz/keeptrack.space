@@ -19,7 +19,6 @@ let isSatMiniBoxInUse = false;
 let labelCount = 0;
 let hoverBoxOnSatMiniElements = null;
 let satHoverMiniDOM: HTMLDivElement;
-let drawLoopCallback = null;
 
 export const init = () => {
   satMiniBox = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
@@ -321,7 +320,7 @@ export const drawLoop = (preciseDt?: number) => {
   // }
   // }
 
-  keepTrackApi.methods.onDrawLoopComplete(drawLoopCallback);
+  keepTrackApi.methods.onDrawLoopComplete();
 
   // If Demo Mode do stuff
   if (settingsManager.isDemoModeOn) drawManager.demoMode();
@@ -691,9 +690,6 @@ export let drawManager = {
   t0: 0,
   isShowFPS: false,
   gaussianAmt: 2,
-  setDrawLoopCallback: (cb: any) => {
-    drawLoopCallback = cb;
-  },
   sat: <SatObject>(<unknown>{
     id: -1,
     missile: false,

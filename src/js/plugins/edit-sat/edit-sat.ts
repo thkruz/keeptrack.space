@@ -41,6 +41,20 @@ export const init = (): void => {
     cbName: 'editSat',
     cb: (): void => hideSideMenus(),
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'editSat',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isEditSatMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Edit Satellite Menu', 'help', null, null);
+    return true;
+  }
+  return false;
 };
 
 export const uiManagerInit = (): void => {
@@ -206,7 +220,6 @@ export const bottomMenuClick = (iconName: string) => {
         isEditSatMenuOpen = true;
         populateSideMenu({ satSet, objectManager });
       } else {
-        if (settingsManager.plugins?.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
         toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-editSat'));
       }

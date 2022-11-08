@@ -63,7 +63,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-sat-fov') {
     if (objectManager.selectedSat === -1 && (<HTMLInputElement>getEl('search')).value === '') {
       // No Sat Selected and No Search Present
-      if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satFovDisabled();
       uiManager.toast(`Select a Satellite First!`, 'caution');
       shake(getEl('menu-sat-fov'));
       return;

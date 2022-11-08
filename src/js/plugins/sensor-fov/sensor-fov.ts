@@ -20,9 +20,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { getEl, shake } from '@app/js/lib/helpers';
+
 import fovPng from '@app/img/icons/fov.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { getEl, shake } from '@app/js/lib/helpers';
 
 export const uiManagerInit = () => {
   // Bottom Icon
@@ -85,7 +86,6 @@ export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-fov-bubble') {
     if (!sensorManager.checkSensorSelected()) {
       // No Sensor Selected
-      if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.bubbleDisabled();
       uiManager.toast(`Select a Sensor First!`, 'caution');
       shake(getEl('menu-fov-bubble'));
       return;

@@ -54,6 +54,46 @@ export const init = (): void => {
     cbName: 'plotAnalysis',
     cb: selectSatData,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'plotAnalysis',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isPlotAnalyisMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('ECI Plot', 'help', null, null);
+    return true;
+  }
+
+  if (isPlotAnalyisMenuOpen2) {
+    keepTrackApi.programs.adviceManager.showAdvice('ECF Plot', 'help', null, null);
+    return true;
+  }
+
+  if (isPlotAnalyisMenuOpen3) {
+    keepTrackApi.programs.adviceManager.showAdvice('RIC Plot', 'help', null, null);
+    return true;
+  }
+
+  if (isPlotAnalyisMenuOpen4) {
+    keepTrackApi.programs.adviceManager.showAdvice('Inc vs Lon Plot', 'help', null, null);
+    return true;
+  }
+
+  if (isPlotAnalyisMenuOpen5) {
+    keepTrackApi.programs.adviceManager.showAdvice('Time vs Lon Plot', 'help', null, null);
+    return true;
+  }
+
+  if (isPlotAnalyisMenuOpen6) {
+    keepTrackApi.programs.adviceManager.showAdvice('Inc vs Alt Plot', 'help', null, null);
+    return true;
+  }
+
+  return false;
 };
 
 export const uiManagerInit = (): void => {

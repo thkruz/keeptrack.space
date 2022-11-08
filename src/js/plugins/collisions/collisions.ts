@@ -53,24 +53,6 @@ export const uiManagerFinal = () => {
   clickAndDragWidth(getEl('socrates-menu'), { minWidth: 280, maxWidth: 450 });
 };
 
-export const adviceReady = () => {
-  const aM = keepTrackApi.programs.adviceManager;
-  aM.adviceCount.socrates = 0;
-
-  aM.adviceList.socrates = () => {
-    // Only Do this Twice
-    if (aM.adviceCount.socrates >= 3) return;
-    aM.adviceCount.socrates += 1;
-
-    aM.showAdvice(
-      'SOCRATES Near Conjunction List',
-      'Did you know that objects frequently come close to colliding? Using data from Center for Space Standards and Innovation you can find upcoming possible collisions.',
-      getEl('menu-satellite-collision'),
-      'bottom'
-    );
-  };
-  aM.adviceArray.push(aM.adviceList.socrates);
-};
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-satellite-collision') {
     if (isSocratesMenuOpen) {
@@ -113,13 +95,6 @@ export const init = (): void => {
     cb: uiManagerFinal,
   });
 
-  // Add Advice Info
-  keepTrackApi.register({
-    method: 'adviceReady',
-    cbName: 'Collisions',
-    cb: adviceReady,
-  });
-
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
@@ -138,6 +113,20 @@ export const init = (): void => {
     cbName: 'collisions',
     cb: onCruncherMessage,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'collisions',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isSocratesMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Collisions Menu', 'help', null, null);
+    return true;
+  }
+  return false;
 };
 
 export const MMMtoInt = (month: string) => {

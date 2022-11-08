@@ -25,8 +25,8 @@
 
 import { getEl, shake } from '@app/js/lib/helpers';
 
-import planetariumPng from '@app/img/icons/planetarium.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import planetariumPng from '@app/img/icons/planetarium.png';
 
 export interface PlanetariumManager {
   isPlanetariumView: boolean;
@@ -113,7 +113,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         keepTrackApi.programs.planetarium.isPlanetariumView = true;
         getEl('menu-planetarium').classList.add('bmenu-item-selected');
       } else {
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.planetariumDisabled();
         uiManager.toast(`Select a Sensor First!`, 'caution');
         shake(getEl('menu-planetarium'));
       }

@@ -169,6 +169,19 @@ export const init = (): void => {
       nextLaunchManager.init();
     },
   });
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'nextLaunch',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isNextLaunchMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice('Next Launch Menu', 'help', null, null);
+    return true;
+  }
+  return false;
 };
 
 export const bottomMenuClick = (iconName: string): void => {

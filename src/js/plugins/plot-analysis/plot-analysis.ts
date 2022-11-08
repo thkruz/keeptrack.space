@@ -10,10 +10,10 @@ import { createInc2LonScatterPlot, getInc2LonScatterData } from './components/pl
 import { createRicScatterPlot, getRicScatterData } from './components/plots/ricScatterPlot';
 import { createTime2LonScatterPlot, getTime2LonScatterData } from './components/plots/time2LonScatterPlot';
 
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { SatObject } from '@app/js/api/keepTrackTypes';
 import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
 import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
-import { SatObject } from '@app/js/api/keepTrackTypes';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 export let isPlotAnalyisMenuOpen = false;
 export let isPlotAnalyisMenuOpen2 = false;
@@ -245,7 +245,7 @@ export const onInc2LonPlotBtnClick = () => {
     slideInRight(getEl('plot-analysis-menu4'), 1000);
     isPlotAnalyisMenuOpen4 = true;
 
-    const chartDom4 = getEl('plot-analysis-chart4');
+    const chartDom4 = <HTMLCanvasElement>(<unknown>getEl('plot-analysis-chart4'));
     let existInstance = echarts.getInstanceByDom(chartDom4);
 
     if (!existInstance) {
@@ -270,7 +270,7 @@ export const onInc2AltPlotBtnClick = () => {
     slideInRight(getEl('plot-analysis-menu6'), 1000);
     isPlotAnalyisMenuOpen6 = true;
 
-    const chartDom6 = getEl('plot-analysis-chart6');
+    const chartDom6 = <HTMLCanvasElement>(<unknown>getEl('plot-analysis-chart6'));
     let existInstance = echarts.getInstanceByDom(chartDom6);
 
     if (!existInstance) {
@@ -295,7 +295,7 @@ export const onTime2LonPlotBtnClick = () => {
     slideInRight(getEl('plot-analysis-menu5'), 1000);
     isPlotAnalyisMenuOpen5 = true;
 
-    const chartDom5 = getEl('plot-analysis-chart5');
+    const chartDom5 = <HTMLCanvasElement>(<unknown>getEl('plot-analysis-chart5'));
     let existInstance = echarts.getInstanceByDom(chartDom5);
 
     if (!existInstance) {

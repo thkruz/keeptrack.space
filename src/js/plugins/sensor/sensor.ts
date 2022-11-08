@@ -29,6 +29,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { toast } from '@app/js/uiManager/ui/toast';
+import { helpBodyTextSensors, helpTitleTextSensors } from './help';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
@@ -829,7 +830,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isSensorListMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Sensors Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSensors, helpBodyTextSensors, null, null);
     return true;
   }
 

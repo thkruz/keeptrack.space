@@ -49,17 +49,6 @@ describe('newLaunch.hideSideMenus', () => {
   });
 });
 
-// @ponicode
-describe('newLaunch.adviceReady', () => {
-  test('0', () => {
-    const callFunction: any = () => {
-      newLaunch.adviceReady();
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-});
-
 describe('newLaunch.bottomMenuClick', () => {
   test('0', () => {
     const callFunction: any = () => {

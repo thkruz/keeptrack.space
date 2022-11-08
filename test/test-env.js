@@ -94,7 +94,7 @@ $.fn.datepicker = jest.fn();
 $.fn.colorPick = jest.fn();
 $.fn.effect = jest.fn();
 $.fn.resizable = jest.fn();
-$.fn.tooltip = jest.fn();
+// $.fn.tooltip = jest.fn();
 $.fn.fadeIn = jest.fn((time, cb) => {
   if (typeof cb !== 'undefined') {
     cb();

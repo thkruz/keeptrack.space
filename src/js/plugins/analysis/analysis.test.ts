@@ -1,8 +1,8 @@
+import { defaultSat, keepTrackApiStubs } from '@app/js/api/apiMocks';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPrograms } from '@app/js/api/keepTrackTypes';
 import '@app/js/settingsManager/settings';
 import { expect } from '@jest/globals';
-import { keepTrackApiStubs } from '../../api/apiMocks';
-import { keepTrackApi } from '../../api/keepTrackApi';
-import { KeepTrackPrograms } from '../../api/keepTrackTypes';
 import * as analysis from './analysis';
 import { init } from './analysis';
 /* eslint-disable no-undefined */
@@ -19,13 +19,13 @@ test('Load Analysis Plugin', () => {
   init();
   keepTrackApi.methods.uiManagerInit();
   keepTrackApi.methods.bottomMenuClick('menu-analysis');
-  keepTrackApi.methods.selectSatData();
+  keepTrackApi.methods.selectSatData(defaultSat, 0);
   keepTrackApi.methods.bottomMenuClick('menu-analysis');
   window.keepTrackApi.programs.sensorManager.checkSensorSelected = () => false;
   keepTrackApi.methods.bottomMenuClick('menu-analysis');
   keepTrackApi.methods.bottomMenuClick('NOTmenu-analysis');
   keepTrackApi.methods.hideSideMenus();
-  keepTrackApi.methods.selectSatData();
+  keepTrackApi.methods.selectSatData(defaultSat, 0);
 });
 
 test('Load Analysis Plugin', () => {
@@ -38,13 +38,13 @@ test('Load Analysis Plugin', () => {
   init();
   keepTrackApi.methods.uiManagerInit();
   keepTrackApi.methods.bottomMenuClick('menu-analysis');
-  keepTrackApi.methods.selectSatData();
+  keepTrackApi.methods.selectSatData(defaultSat, 0);
   keepTrackApi.methods.bottomMenuClick('menu-analysis');
   window.keepTrackApi.programs.sensorManager.checkSensorSelected = () => false;
   keepTrackApi.methods.bottomMenuClick('menu-analysis');
   keepTrackApi.methods.bottomMenuClick('NOTmenu-analysis');
   keepTrackApi.methods.hideSideMenus();
-  keepTrackApi.methods.selectSatData();
+  keepTrackApi.methods.selectSatData(defaultSat, 0);
 });
 
 // @ponicode

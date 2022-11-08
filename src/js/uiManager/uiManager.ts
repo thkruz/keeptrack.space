@@ -108,7 +108,7 @@ export const onReady = () => {
   }
 
   (function _menuInit() {
-    $('.tooltipped').tooltip(<any>{ delay: 50 });
+    // $('.tooltipped').tooltip(<any>{ delay: 50 });
 
     // Setup Legend Colors
     legendColorsChange();

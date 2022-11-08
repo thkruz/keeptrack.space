@@ -1,20 +1,6 @@
 import * as adviceManager from './adviceManager';
 
 // @ponicode
-describe('adviceManager.onReady', () => {
-  test('0', () => {
-    adviceManager.init();
-    let result: any = adviceManager.onReady();
-    expect(result).toMatchSnapshot();
-  });
-  test('1', () => {
-    adviceManager.init();
-    let result: any = adviceManager.onReady(true);
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
 describe('adviceManager.welcome', () => {
   test('0', () => {
     adviceManager.init();

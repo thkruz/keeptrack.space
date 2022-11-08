@@ -37,20 +37,6 @@ describe('dops.uiManagerInit', () => {
   });
 });
 
-describe('dops.adviceReady', () => {
-  test('0', () => {
-    const callFunction: any = () => {
-      dops.adviceReady();
-      keepTrackApi.programs.adviceManager.adviceList.socrates();
-      keepTrackApi.programs.adviceManager.adviceList.socrates();
-      keepTrackApi.programs.adviceManager.adviceList.socrates();
-      keepTrackApi.programs.adviceManager.adviceList.socrates();
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-});
-
 // @ponicode
 describe('dops.loadingScreenFadeIn', () => {
   test('0', () => {
@@ -93,17 +79,6 @@ describe('dops.hideSideMenus', () => {
   test('0', () => {
     const callFunction: any = () => {
       dops.hideSideMenus();
-    };
-
-    expect(callFunction).not.toThrow();
-  });
-});
-
-// @ponicode
-describe('dops.adviceReady', () => {
-  test('0', () => {
-    const callFunction: any = () => {
-      dops.adviceReady();
     };
 
     expect(callFunction).not.toThrow();

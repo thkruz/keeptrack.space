@@ -8,6 +8,7 @@ import {
   defaultDiv,
   defaultSensorDiv,
   nearDiv,
+  neighborsDiv,
   planetariumDiv,
   rcsDiv,
   smallDiv,
@@ -23,6 +24,9 @@ export const legendMenuChange = (menu: string) => {
   switch (menu) {
     case 'rcs':
       legendHoverDom.innerHTML = rcsDiv;
+      break;
+    case 'neighbors':
+      legendHoverDom.innerHTML = neighborsDiv;
       break;
     case 'small':
       legendHoverDom.innerHTML = smallDiv;
@@ -105,6 +109,11 @@ export const legendMenuChange = (menu: string) => {
       '.legend-ageOld-box',
       '.legend-ageLost-box',
       '.legend-satSmall-box',
+      '.legend-densityPayload-box',
+      '.legend-densityHi-box',
+      '.legend-densityMed-box',
+      '.legend-densityLow-box',
+      '.legend-densityOther-box',
     ].forEach((selector) => {
       const element = <HTMLElement>document.querySelector(selector);
       if (element) {
@@ -171,6 +180,11 @@ export const legendColorsChange = function (): void {
       '.legend-ageOld-box',
       '.legend-ageLost-box',
       '.legend-satSmall-box',
+      '.legend-densityPayload-box',
+      '.legend-densityHi-box',
+      '.legend-densityMed-box',
+      '.legend-densityLow-box',
+      '.legend-densityOther-box',
     ].forEach((element) => {
       try {
         const elementFromClass = <HTMLElement>document.querySelector(element);

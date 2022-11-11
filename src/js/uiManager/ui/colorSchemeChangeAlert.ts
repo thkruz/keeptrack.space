@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { ColorRuleSet } from '@app/js/colorManager/colorSchemeManager';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { toast } from './toast';
 
 export const colorSchemeChangeAlert = (newScheme: ColorRuleSet) => {
@@ -52,6 +52,9 @@ export const colorSchemeChangeAlert = (newScheme: ColorRuleSet) => {
           break;
         case 'lostobjects':
           toast(`Color Scheme Changed to Lost Objects`, 'normal', false);
+          break;
+        case 'neighbors':
+          toast(`Color Scheme Changed to Orbit Density`, 'normal', false);
           break;
         default:
           toast(`Color Scheme Changed to ${scheme}`, 'normal', false);

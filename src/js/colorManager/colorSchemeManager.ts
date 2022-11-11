@@ -76,6 +76,11 @@ export interface ObjectTypeFlags {
   countryPRC: boolean;
   countryCIS: boolean;
   countryOther: boolean;
+  densityPayload: boolean;
+  densityHi: boolean;
+  densityMed: boolean;
+  densityLow: boolean;
+  densityOther: boolean;
 }
 
 export interface ColorSchemeManager {
@@ -199,6 +204,11 @@ export const colorSchemeManager: ColorSchemeManager = {
     countryPRC: true,
     countryCIS: true,
     countryOther: true,
+    densityPayload: true,
+    densityHi: true,
+    densityMed: true,
+    densityLow: true,
+    densityOther: true,
   },
   init: () => {
     const { satSet } = keepTrackApi.programs;

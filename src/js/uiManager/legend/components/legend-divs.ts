@@ -174,6 +174,31 @@ export const rcsDiv = keepTrackApi.html`
   </li>
 </ul>
 `.trim();
+export const neighborsDiv = keepTrackApi.html`
+<ul id="legend-list-default-sensor">
+  <li>
+    <div class="Square-Box legend-densityPayload-box"></div>
+    Payload
+  </li>
+  <li>
+    <div class="Square-Box legend-densityHi-box"></div>
+    High Orbit Density
+  </li>
+  <li>
+    <div class="Square-Box legend-densityMed-box"></div>
+    Med Orbit Density
+  </li>
+  <li>
+    <div class="Square-Box legend-densityLow-box"></div>
+    Low Orbit Density
+  </li>
+  <li>
+    <div class="Square-Box legend-densityOther-box"></div>
+    Other Debris
+  </li>
+</ul>
+`.trim();
+
 export const ageOfElsetDiv = keepTrackApi.html`
 <ul id="legend-list-ageOfElset">
   <li>

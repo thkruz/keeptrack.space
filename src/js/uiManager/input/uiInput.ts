@@ -784,6 +784,16 @@ export const rmbMenuActions = (e: MouseEvent) => { // NOSONAR
       satSet.setColorScheme(colorSchemeManager.velocity, true);
       uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
       break;
+    case 'colors-rcs-rmb':
+      uiManager.legendMenuChange('rcs');
+      satSet.setColorScheme(colorSchemeManager.rcs, true);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
+    case 'colors-density-rmb':
+      uiManager.legendMenuChange('neighbors');
+      satSet.setColorScheme(colorSchemeManager.neighbors, true);
+      uiManager.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      break;
     case 'colors-ageOfElset-rmb':
       uiManager.legendMenuChange('ageOfElset');
       satSet.setColorScheme(colorSchemeManager.ageOfElset, true);

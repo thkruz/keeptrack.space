@@ -82,35 +82,48 @@ export const neighborsRules = (sat: SatObject, params: any): ColorInformation =>
   }
 
   if (sat.type === SpaceObjectType.PAYLOAD) {
-    return {
-      color: settingsManager.colors.densityPayload,
-      pickable: Pickable.Yes,
-    };
+    if (colorSchemeManager.objectTypeFlags.densityPayload) {
+      return {
+        color: settingsManager.colors.densityPayload,
+        pickable: Pickable.Yes,
+      };
+    } else {
+      // Deselected
+      return {
+        color: colorSchemeManager.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
   }
 
   const orbitDensity = params.orbitDensity[Math.round(sat.inclination)][Math.round(sat.period)];
   const density = (orbitDensity / params.orbitDensityMax);
 
-  if (density > 0.9) {
+  if (colorSchemeManager.objectTypeFlags.densityHi && density > 0.9) {
     return {
       color: settingsManager.colors.densityHi,
       pickable: Pickable.Yes,
     };  
-  } else if (density > 0.55) {
+  } else if (colorSchemeManager.objectTypeFlags.densityMed && density > 0.55) {
     return {
       color: settingsManager.colors.densityMed,
       pickable: Pickable.Yes,
     };  
-  } else if (density > 0.35) {
+  } else if (colorSchemeManager.objectTypeFlags.densityLow && density > 0.35) {
     return {
       color: settingsManager.colors.densityLow,
       pickable: Pickable.Yes,
     };  
-  } else {
+  } else if (colorSchemeManager.objectTypeFlags.densityOther) {
     return {
       color: settingsManager.colors.densityOther,
       pickable: Pickable.Yes,
     };  
   }
 
+  // Deselected
+  return {
+    color: colorSchemeManager.colorTheme.deselected,
+    pickable: Pickable.No,
+  };
 };

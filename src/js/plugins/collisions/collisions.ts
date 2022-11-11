@@ -2,6 +2,7 @@ import socratesPng from '@app/img/icons/socrates.png';
 import $ from 'jquery';
 import { isThisJest, keepTrackApi } from '../../api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft, stringPad } from '../../lib/helpers';
+import { helpBodyTextCollisions, helpTitleTextCollisions } from './help';
 
 let isSocratesMenuOpen = false;
 let socratesOnSatCruncher: number | null = null;
@@ -123,7 +124,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isSocratesMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Collisions Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextCollisions, helpBodyTextCollisions);
     return true;
   }
   return false;

@@ -47,12 +47,11 @@ export const off = () => {
   helpOuterDOM.style.display = 'none';
   tutIconDOM.classList.remove('bmenu-item-selected');
 };
-export const showAdvice = (header: string, text: string, focusDOM?: HTMLElement, setLocation?: string) => {
+export const showAdvice = (header: string, text: string) => {
   if (!isAdviceEnabled) return;
 
   isAdviceOpen = true;
 
-  console.log(setLocation, focusDOM);
   adviceManager.clearAdvice();
 
   helpOuterDOM.style.display = 'block';

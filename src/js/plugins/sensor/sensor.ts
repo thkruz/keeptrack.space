@@ -29,7 +29,18 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { toast } from '@app/js/uiManager/ui/toast';
-import { helpBodyTextSensors, helpTitleTextSensors } from './help';
+import {
+  helpBodyTextCustomSensor,
+  helpBodyTextLookAngles,
+  helpBodyTextMultiLookAngles,
+  helpBodyTextSensorInfo,
+  helpBodyTextSensors,
+  helpTitleTextCustomSensor,
+  helpTitleTextLookAngles,
+  helpTitleTextMultiLookAngles,
+  helpTitleTextSensorInfo,
+  helpTitleTextSensors,
+} from './help';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
@@ -830,27 +841,27 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isSensorListMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSensors, helpBodyTextSensors, null, null);
-    return true;
-  }
-
-  if (isSensorInfoMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Sensor Info', 'help', null, null);
-    return true;
-  }
-
-  if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Lookangles Menu', 'help', null, null);
-    return true;
-  }
-
-  if (isLookanglesMultiSiteMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Multi-site Lookangles Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSensors, helpBodyTextSensors);
     return true;
   }
 
   if (keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Custom Sensor Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextCustomSensor, helpBodyTextCustomSensor);
+    return true;
+  }
+
+  if (isSensorInfoMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSensorInfo, helpBodyTextSensorInfo);
+    return true;
+  }
+
+  if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextLookAngles, helpBodyTextLookAngles);
+    return true;
+  }
+
+  if (isLookanglesMultiSiteMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextMultiLookAngles, helpBodyTextMultiLookAngles);
     return true;
   }
 

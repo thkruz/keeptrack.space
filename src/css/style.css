@@ -1173,6 +1173,7 @@ input:focus {
 
 #help-inner-container {
   margin: auto;
+  width: 100%;
 }
 
 #help-header {

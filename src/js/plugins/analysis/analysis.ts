@@ -3,6 +3,7 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { AnalysisBottomIcon } from './components/AnalysisBottomIcon';
 import { AnalysisSideMenu } from './components/AnalysisSideMenu';
+import { helpBodyTextAnalysis, helpTitleTextAnalysis } from './help';
 
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
@@ -114,7 +115,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isAnalysisMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Analysis Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextAnalysis, helpBodyTextAnalysis);
     return true;
   }
   return false;

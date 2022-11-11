@@ -32,6 +32,7 @@ import { createError } from '@app/js/errorManager/errorManager';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import { helpBodyTextWatchlist, helpTitleTextWatchlist } from './help';
 
 let watchlistList: any[] = [];
 let watchlistInViewList: boolean[] = [];
@@ -133,7 +134,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isWatchlistMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Watchlist Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextWatchlist, helpBodyTextWatchlist);
     return true;
   }
 

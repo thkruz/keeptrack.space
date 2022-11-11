@@ -151,6 +151,11 @@ export interface Colors {
   countryUS: [number, number, number, number];
   countryCIS: [number, number, number, number];
   countryOther: [number, number, number, number];
+  densityPayload: [number, number, number, number];
+  densityHi: [number, number, number, number];
+  densityMed: [number, number, number, number];
+  densityLow: [number, number, number, number];
+  densityOther: [number, number, number, number];
 }
 
 export interface DrawProgram extends WebGLProgram {
@@ -811,7 +816,7 @@ export interface SensorFovPlugin {
   enableFovView: any;
 }
 export interface AdviceManager {
-  showAdvice(header: string, text: string, focusDOM: HTMLElement, setLocation: string);
+  showAdvice(header: string, text: string);
 }
 
 export interface GamepadPlugin {

@@ -1,4 +1,5 @@
 import { SatMath } from '../satMath/satMath';
+import { helpBodyText, helpTitleText } from './help';
 import { KeepTrackPrograms, SatObject, SettingsManager } from './keepTrackTypes';
 import { html } from './templateLiterals';
 
@@ -86,7 +87,7 @@ export const keepTrackApi = {
       if (keepTrackApi.callbacks.onHelpMenuClick.some((cb: { cb: () => boolean }) => cb.cb())) {
         return;
       }
-      keepTrackApi.programs.adviceManager.showAdvice('Generic Help', 'help', null, null);
+      keepTrackApi.programs.adviceManager.showAdvice(helpTitleText, helpBodyText);
     },
     selectSatData: (sat: SatObject, satId: number) => {
       keepTrackApi.programs.soundManager.play('whoosh');

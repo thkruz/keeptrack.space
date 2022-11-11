@@ -1147,8 +1147,10 @@ input:focus {
 }
 
 #help-screen {
-  display: block;
-  position: absolute;
+  display: flex;
+  max-width: 70%;
+  flex-shrink: 1;
+  position: relative;
   inset: 15%;
   z-index: 99;
   border: 5px solid var(--colorTertiaryDarken3);

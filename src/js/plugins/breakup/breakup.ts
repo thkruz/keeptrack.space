@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { createError } from '@app/js/errorManager/errorManager';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
+import { helpBodyTextBreakup, helpTitleTextBreakup } from './help';
 
 let isBreakupMenuOpen = false;
 
@@ -42,7 +43,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isBreakupMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Breakup Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextBreakup, helpBodyTextBreakup);
     return true;
   }
   return false;

@@ -51,37 +51,7 @@ describe('adviceManager.showAdvice', () => {
     adviceManager.on();
   });
   test('0', () => {
-    let result: any = adviceManager.showAdvice('test', 'test', null, 'top-left');
-    expect(result).toMatchSnapshot();
-  });
-  test('1', () => {
-    let result: any = adviceManager.showAdvice('test', 'test', null, 'left');
-    expect(result).toMatchSnapshot();
-  });
-  test('2', () => {
-    let result: any = adviceManager.showAdvice('test', 'test', null, 'bottom-left');
-    expect(result).toMatchSnapshot();
-  });
-  test('3', () => {
-    let result: any = adviceManager.showAdvice('test', 'test', null, 'top-right');
-    expect(result).toMatchSnapshot();
-  });
-  test('4', () => {
-    let result: any = adviceManager.showAdvice('test', 'test', null, 'right');
-    expect(result).toMatchSnapshot();
-  });
-  test('5', () => {
-    let result: any = adviceManager.showAdvice('test', 'test', null, 'bottom-right');
-    expect(result).toMatchSnapshot();
-  });
-  test('6', () => {
-    let result: any = adviceManager.showAdvice('test', 'test', null, 'bottom');
-    expect(result).toMatchSnapshot();
-  });
-  test('7', () => {
-    document.body.innerHTML = '<div id="test"></div>';
-    let result: any = adviceManager.showAdvice('test', 'test', document.querySelector('body'), 'bottom');
-    adviceManager.clearAdvice();
+    let result: any = adviceManager.showAdvice('test', 'test');
     expect(result).toMatchSnapshot();
   });
 });

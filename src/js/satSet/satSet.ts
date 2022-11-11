@@ -553,6 +553,8 @@ export let satSet = {
   convertSatnumArrayToIdArray,
   cosparIndex: null,
   exportTle2Csv,
+  orbitDensity: [],
+  orbitDensityMax: 0,
   exportTle2Txt,
   getIdFromEci,
   getIdFromIntlDes,

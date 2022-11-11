@@ -135,7 +135,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isAboutMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleText, helpBodyText, null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleText, helpBodyText);
     return true;
   }
   return false;

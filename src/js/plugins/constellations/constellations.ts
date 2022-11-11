@@ -1,7 +1,9 @@
-import satChngPng from '@app/img/icons/satchng.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextConstellations, helpTitleTextConstellations } from './help';
+
 import $ from 'jquery';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import satChngPng from '@app/img/icons/satchng.png';
 
 let isConstellationsMenuOpen = false;
 
@@ -125,7 +127,9 @@ export const constellationMenuClick = (groupName: any) => { // NOSONAR
       throw new Error('Unknown group name: ' + groupName);
   }
   groupSelected(groupName);
-  uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
+
+  const searchStr = groupsManager[groupName].sats.reduce((str: string, sat: {satId: number, isObjnum: boolean}) => str + satSet.getSat(sat.satId).sccNum + ',','').slice(0, -1);  
+  uiManager.doSearch(searchStr);
 };
 
 export const groupSelected = (groupName: string) => {
@@ -209,7 +213,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isConstellationsMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Constellations Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextConstellations, helpBodyTextConstellations);
     return true;
   }
   return false;

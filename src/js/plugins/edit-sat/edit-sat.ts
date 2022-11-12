@@ -7,6 +7,7 @@ import { ObjectManager } from '@app/js/objectManager/objectManager';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
 import { CatalogManager } from '@app/js/satSet/satSet';
 import { toast } from '@app/js/uiManager/ui/toast';
+import { helpBodyTextEdit, helpTitleTextEdit } from './help';
 
 let isEditSatMenuOpen = false;
 export const init = (): void => {
@@ -51,7 +52,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isEditSatMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Edit Satellite Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextEdit, helpBodyTextEdit);
     return true;
   }
   return false;

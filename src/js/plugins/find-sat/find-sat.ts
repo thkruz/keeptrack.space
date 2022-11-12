@@ -3,6 +3,7 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { getEl, getUnique, hideLoading, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
+import { helpBodyTextFind, helpTitleTextFind } from './help';
 
 let isFindByLooksMenuOpen = false;
 export const checkInc = (possibles: any[], min: number, max: number) =>
@@ -394,7 +395,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isFindByLooksMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Find Satellite Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextFind, helpBodyTextFind);
     return true;
   }
   return false;

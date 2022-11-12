@@ -1,4 +1,5 @@
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextCountries, helpTitleTextCountries } from './help';
 
 import $ from 'jquery';
 import flagPng from '@app/img/icons/flag.png';
@@ -47,7 +48,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isCountriesMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Countries Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextCountries, helpBodyTextCountries);
     return true;
   }
   return false;

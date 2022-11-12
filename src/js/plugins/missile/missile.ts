@@ -1,6 +1,7 @@
 import missilePng from '@app/img/icons/missile.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextMissile, helpTitleTextMissile } from './help';
 import { missileManager } from './missileManager';
 
 let isMissileMenuOpen = false;
@@ -538,7 +539,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isMissileMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Missile Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextMissile, helpBodyTextMissile);
     return true;
   }
   return false;

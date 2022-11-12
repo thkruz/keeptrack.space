@@ -1,6 +1,7 @@
 import * as gremlins from 'gremlins.js';
 
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextDebug, helpTitleTextDebug } from './help';
 
 // @ts-ignore-next-line
 import debugPng from '@app/img/icons/debug.png';
@@ -89,7 +90,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isDebugMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Debug Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextDebug, helpBodyTextDebug);
     return true;
   }
   return false;

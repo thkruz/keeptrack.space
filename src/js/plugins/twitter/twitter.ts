@@ -1,6 +1,7 @@
 import './components/twitter.css';
 
 import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextTwitter, helpTitleTextTwitter } from './help';
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { twitterBottomIcon } from './components/twitter-bottom-icon';
@@ -69,7 +70,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isTwitterMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Twitter Feed', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextTwitter, helpBodyTextTwitter);
     return true;
   }
 

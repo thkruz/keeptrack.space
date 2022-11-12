@@ -1,4 +1,5 @@
 import { getEl, openColorbox, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextPhotoMan, helpTitleTextPhotoMan } from './help';
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import photoManagerPng from '@app/img/icons/photoManager.png';
@@ -169,7 +170,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isSatPhotoMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Satellite Photo Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextPhotoMan, helpBodyTextPhotoMan);
     return true;
   }
   return false;

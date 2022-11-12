@@ -2,6 +2,7 @@ import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, stringPad, waitForCruncher } from '@app/js/lib/helpers';
+import { helpBodyTextNewLaunch, helpTitleTextNewLaunch } from './help';
 
 let isNewLaunchMenuOpen = false;
 
@@ -259,7 +260,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isNewLaunchMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('New Launch Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextNewLaunch, helpBodyTextNewLaunch);
     return true;
   }
   return false;

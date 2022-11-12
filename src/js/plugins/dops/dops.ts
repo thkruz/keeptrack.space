@@ -1,6 +1,7 @@
 import gpsPng from '@app/img/icons/gps.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextDop, helpTitleTextDop } from './help';
 
 let isDOPMenuOpen = false;
 export const dopsFormSubmit = (): void => {
@@ -141,7 +142,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isDOPMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('DOPs Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextDop, helpBodyTextDop);
     return true;
   }
   return false;

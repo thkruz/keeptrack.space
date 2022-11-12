@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { addCustomSensor, clearCustomSensors, removeLastSensor } from './../sensor/sensor';
+import { helpBodyTextStf, helpTitleTextStf } from './help';
 
 let isStfMenuOpen = false;
 let stfInfoLinks = false;
@@ -55,7 +56,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isStfMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Short Term Fences Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextStf, helpBodyTextStf);
     return true;
   }
 

@@ -33,6 +33,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { MapManager } from '@app/js/api/keepTrackTypes';
 import { getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import './components/stereo-map.css';
+import { helpBodyTextMap, helpTitleTextMap } from './help';
 
 const earthImg = new Image();
 
@@ -86,7 +87,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (keepTrackApi.programs.mapManager.isMapMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Stereographic Map', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextMap, helpBodyTextMap);
     return true;
   }
 

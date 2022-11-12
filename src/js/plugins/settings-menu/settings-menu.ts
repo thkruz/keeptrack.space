@@ -2,6 +2,7 @@ import settingsPng from '@app/img/icons/settings.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl, parseRgba, rgbCss, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import { helpBodyTextSettings, helpTitleTextSettings } from './help';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -63,7 +64,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isSettingsMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Settings Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSettings, helpBodyTextSettings);
     return true;
   }
 

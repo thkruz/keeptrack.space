@@ -4,6 +4,7 @@ import { LaunchInfoObject } from '@app/js/api/keepTrackTypes';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { clickAndDragWidth, getEl, openColorbox, saveCsv, slideInRight, slideOutLeft, truncateString } from '@app/js/lib/helpers';
 import { uiManager } from '@app/js/uiManager/uiManager';
+import { helpBodyTextNextLaunch, helpTitleTextNextLaunch } from './help';
 /* */
 
 let isNextLaunchMenuOpen = false;
@@ -178,7 +179,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isNextLaunchMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice('Next Launch Menu', 'help', null, null);
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextNextLaunch, helpBodyTextNextLaunch);
     return true;
   }
   return false;

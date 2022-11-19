@@ -149,7 +149,7 @@ export const getVariableActions = (params: string[]) => {
     switch (key) {
       case 'intldes':
         urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-        if (urlSatId !== null) {
+        if (urlSatId !== null && satSet.getSat(urlSatId).active) {
           objectManager.setSelectedSat(urlSatId);
         } else {
           uiManager.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);

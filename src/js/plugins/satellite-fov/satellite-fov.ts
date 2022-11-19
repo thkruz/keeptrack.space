@@ -76,8 +76,11 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       });
       return;
     } else {
-      getEl('menu-fov-bubble').classList.remove('bmenu-item-selected');
-      getEl('menu-surveillance').classList.remove('bmenu-item-selected');
+      const fovDom = getEl('menu-fov-bubble');
+      if (fovDom) fovDom.classList.remove('bmenu-item-selected');
+
+      const survDom = getEl('menu-surveillance');
+      if (survDom) survDom.classList.remove('bmenu-item-selected');
       settingsManager.isShowSurvFence = false;
       settingsManager.isFOVBubbleModeOn = false;
 

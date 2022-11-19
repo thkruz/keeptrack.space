@@ -119,7 +119,8 @@ export const onReady = () => {
     getEl('view-rmb-menu').style.display = 'none';
     getEl('edit-rmb-menu').style.display = 'none';
     getEl('create-rmb-menu').style.display = 'none';
-    getEl('colors-rmb-menu').style.display = 'none';
+    const colorsDom = getEl('colors-rmb-menu');
+    if (colorsDom) colorsDom.style.display = 'none';
     getEl('draw-rmb-menu').style.display = 'none';
     getEl('earth-rmb-menu').style.display = 'none';
   };

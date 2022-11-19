@@ -485,6 +485,8 @@ export const settingsFormSubmit = (e: any) => {
   settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
   if (isBlackEarthChanged) {
     drawManager.sceneManager.earth.init();
+    drawManager.sceneManager.earth.loadHiRes();
+    drawManager.sceneManager.earth.loadHiResNight();
   }
   settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
   settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;

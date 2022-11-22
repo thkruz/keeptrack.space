@@ -33,6 +33,7 @@ import { groupRules } from './ruleSets/group';
 import { groupCountriesRules } from './ruleSets/group-countries';
 import { leoRules } from './ruleSets/leo';
 import { lostobjectsRules } from './ruleSets/lostobjects';
+import { neighborsRules } from './ruleSets/neighbors';
 import { onlyFovRules } from './ruleSets/onlyFov';
 import { rcsRules } from './ruleSets/rcs';
 import { smallsatsRules } from './ruleSets/smallsat';
@@ -75,6 +76,11 @@ export interface ObjectTypeFlags {
   countryPRC: boolean;
   countryCIS: boolean;
   countryOther: boolean;
+  densityPayload: boolean;
+  densityHi: boolean;
+  densityMed: boolean;
+  densityLow: boolean;
+  densityOther: boolean;
 }
 
 export interface ColorSchemeManager {
@@ -101,6 +107,7 @@ export interface ColorSchemeManager {
   rcs: ColorRuleSet;
   countries: ColorRuleSet;
   ageOfElset: ColorRuleSet;
+  neighbors: ColorRuleSet;
   lostobjects: ColorRuleSet;
   leo: ColorRuleSet;
   geo: ColorRuleSet;
@@ -197,6 +204,11 @@ export const colorSchemeManager: ColorSchemeManager = {
     countryPRC: true,
     countryCIS: true,
     countryOther: true,
+    densityPayload: true,
+    densityHi: true,
+    densityMed: true,
+    densityLow: true,
+    densityOther: true,
   },
   init: () => {
     const { satSet } = keepTrackApi.programs;
@@ -227,6 +239,7 @@ export const colorSchemeManager: ColorSchemeManager = {
     colorSchemeManager.countries = countriesRules;
     colorSchemeManager.groupCountries = groupCountriesRules;
     colorSchemeManager.ageOfElset = ageOfElsetRules;
+    colorSchemeManager.neighbors = neighborsRules;
     colorSchemeManager.lostobjects = lostobjectsRules;
     colorSchemeManager.leo = leoRules;
     colorSchemeManager.geo = geoRules;
@@ -271,6 +284,7 @@ export const colorSchemeManager: ColorSchemeManager = {
           case colorSchemeManager.rcs:
           case colorSchemeManager.countries:
           case colorSchemeManager.ageOfElset:
+          case colorSchemeManager.neighbors:
           case colorSchemeManager.lostobjects:
           case colorSchemeManager.leo:
           case colorSchemeManager.geo:
@@ -329,6 +343,8 @@ export const colorSchemeManager: ColorSchemeManager = {
       let params = {
         year: '',
         jday: 0,
+        orbitDensity: [],
+        orbitDensityMax: 0,
       };
 
       if (colorSchemeManager.currentColorScheme === colorSchemeManager.ageOfElset) {
@@ -336,6 +352,12 @@ export const colorSchemeManager: ColorSchemeManager = {
         let now = new Date();
         params.jday = timeManager.getDayOfYear(now);
         params.year = now.getUTCFullYear().toString().substr(2, 2);
+      }
+
+      if (colorSchemeManager.currentColorScheme === colorSchemeManager.neighbors) {
+        const { satSet } = keepTrackApi.programs;
+        params.orbitDensity = satSet.orbitDensity;
+        params.orbitDensityMax = satSet.orbitDensityMax;
       }
 
       // Velocity is a special case - we need to know the velocity of each satellite
@@ -495,6 +517,7 @@ export const colorSchemeManager: ColorSchemeManager = {
   apogee: null,
   smallsats: null,
   rcs: null,
+  neighbors: null,
   countries: null,
   groupCountries: null,
   ageOfElset: null,

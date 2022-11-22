@@ -2,6 +2,7 @@ import colorsPng from '@app/img/icons/colors.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft, waitForCruncher } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import { helpBodyTextColor, helpTitleTextColor } from './help';
 
 let isColorSchemeMenuOpen = false;
 export const hideSideMenus = (): void => {
@@ -49,7 +50,22 @@ export const init = (): void => {
     cbName: 'colorsMenu',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'colorsMenu',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isColorSchemeMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextColor, helpBodyTextColor);
+    return true;
+  }
+  return false;
+};
+
 export const uiManagerInit = () => {
   getEl('rmb-wrapper').insertAdjacentHTML(
     'beforeend',
@@ -57,6 +73,8 @@ export const uiManagerInit = () => {
     <div id="colors-rmb-menu" class="right-btn-menu">
       <ul class='dropdown-contents'>
         <li id="colors-default-rmb"><a href="#">Object Types</a></li>
+        <li id="colors-rcs-rmb"><a href="#">Radar Cross Section</a></li>
+        <li id="colors-density-rmb"><a href="#">Orbit Density</a></li>
         <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
         <li id="colors-country-rmb"><a href="#">Country</a></li>
         <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
@@ -78,6 +96,7 @@ export const uiManagerInit = () => {
               <li class="menu-selectable" data-color="default">Object Type</li>
               <li class="menu-selectable" data-color="sunlight">Sunlight</li>
               <li class="menu-selectable" data-color="velocity">Velocity</li>
+              <li class="menu-selectable" data-color="neighbors">Orbit Density</li>
               <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
               <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
               <li class="menu-selectable" data-color="countries">Countries</li>
@@ -207,6 +226,11 @@ export const colorsMenuClick = (colorName: string) => {
     case 'smallsats':
       uiManager.legendMenuChange('small');
       satSet.setColorScheme(colorSchemeManager.smallsats, true);
+      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
+      break;
+    case 'neighbors':
+      uiManager.legendMenuChange('neighbors');
+      satSet.setColorScheme(colorSchemeManager.neighbors, true);
       uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
       break;
     case 'countries':

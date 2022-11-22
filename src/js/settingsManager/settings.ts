@@ -465,9 +465,9 @@ export let settingsManager: SettingsManager = {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.1.0') {
+    if (settingsManager.colors == null || settingsManager.colors.length === 0 || settingsManager.colors.version !== '1.2.0') {
       settingsManager.colors = {
-        version: '1.1.0',
+        version: '1.2.0',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 1.0],
@@ -544,6 +544,11 @@ export let settingsManager: SettingsManager = {
         countryUS: [0.2, 0.4, 1.0, 1],
         countryCIS: [1.0, 1.0, 1.0, 1.0],
         countryOther: [0, 1.0, 0, 0.6],
+        densityPayload: [0.15, 0.7, 0.8, 1.0],
+        densityHi: [1, 0, 0, 1],
+        densityMed: [1, 0.4, 0, 1],
+        densityLow: [1, 1, 0, 0.9],
+        densityOther: [0.8, 0.8, 0.8, 0.3],
       };
       try {
         localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));

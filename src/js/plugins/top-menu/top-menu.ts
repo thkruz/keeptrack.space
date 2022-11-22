@@ -89,13 +89,14 @@ export const init = (): void => {
         `);
 
         (<any>$('#main-container')).append(keepTrackApi.html`
-          <div id="help-screen" class="valign-wrapper">
-            <div id="help-inner-container" class="valign">
-              <p>
-                <span id="help-header" class="logo-font">TITLE</span>
-                <span id="help-close">X</span>
-              </p>
-              <span id="help-text">ADVICE</span>
+          <div id="help-outer-container" class="valign">
+            <div id="help-screen" class="valign-wrapper">
+              <div id="help-inner-container" class="valign">
+                <p>
+                  <span id="help-header" class="logo-font">TITLE</span>
+                </p>
+                <span id="help-text">ADVICE</span>
+              </div>
             </div>
           </div>
         `);

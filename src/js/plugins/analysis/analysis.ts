@@ -3,6 +3,7 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { AnalysisBottomIcon } from './components/AnalysisBottomIcon';
 import { AnalysisSideMenu } from './components/AnalysisSideMenu';
+import { helpBodyTextAnalysis, helpTitleTextAnalysis } from './help';
 
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
@@ -29,9 +30,10 @@ import { AnalysisSideMenu } from './components/AnalysisSideMenu';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+let isAnalysisMenuOpen = false;
+
 export const init = (): void => {
   const { objectManager, satSet, uiManager } = keepTrackApi.programs;
-  let isAnalysisMenuOpen = false;
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -103,7 +105,22 @@ export const init = (): void => {
       isAnalysisMenuOpen = false;
     },
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'analysis',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isAnalysisMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextAnalysis, helpBodyTextAnalysis);
+    return true;
+  }
+  return false;
+};
+
 export const uiManagerInit = () => {
   getEl('left-menus').insertAdjacentHTML('beforeend', AnalysisSideMenu);
   getEl('bottom-icons').insertAdjacentHTML('beforeend', AnalysisBottomIcon);

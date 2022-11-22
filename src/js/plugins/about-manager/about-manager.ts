@@ -1,11 +1,12 @@
 import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyText, helpTitleText } from './help';
 
 import aboutPng from '@app/img/icons/about.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
+let isAboutMenuOpen = false;
+
 export const init = (): void => {
-  // Reset Flag
-  let isAboutSelected = false;
   // Load HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -32,12 +33,29 @@ export const init = (): void => {
                 </div>
               </div>
               <div class="row">
+                <h5 class="center-align">Version</h5>
+                <div id="versionNumber-text" class="col s12">
+                </div>
+              </div>
+              <div class="row">
                 <h5 class="center-align">Author</h5>
                 <div class="col s12">
                   Created by <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/" target="_blank">Theodore Kruczek</a>
                   to help visualize orbital calculations for application to Ground Based Radars and Optical
                   Telescopes. Substantial help with the user interface was provided by <a style="color: #48f3e3 !important;" href="https://www.linkedin.com/in/leroiclaassen-webdev/" target="_blank">Le-Roi Claassen</a>.
                   Based on the original work of <a style="color: #48f3e3 !important;" href="https://github.com/jeyoder/" target="_blank">James Yoder</a>
+                </div>
+              </div>
+              <div class="row">
+                <h5 class="center-align">Featured Users</h5>
+                <div class="col s12">
+                  Used at the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Combined Space Operations Center</a><br>
+                  Displayed in <a style="color: #48f3e3 !important;" href="https://espace.epfl.ch/event/cosmos-archaeology/" target="_blank">Cosmos Archaeology</a> at the University of Lausanne<br>
+                  Powering the ESA sponsored <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1 Website</a><br>
+                  Used in Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a><br>
+                  Shown on <a style="color: #48f3e3 !important;" href="https://www.youtube.com/watch?v=gRhOkDapSGM" target="_blank">HBO's Vice Season 6 Episode 13</a><br>
+                  <br>
+                  Is my code aiding your project? <a style="color: #48f3e3 !important;" href="mailto: theodore.kruczek@gmail.com" target="_blank">Let me know!</a>
                 </div>
               </div>
               <div class="row">
@@ -54,23 +72,6 @@ export const init = (): void => {
                   TLEs found on public websites. Payload information is compiled from various
                   public sources. US Sensor data was derived from MDA reports on enviromental impacts and
                   congressional budget reports.
-                </div>
-              </div>
-              <div class="row">
-                <h5 class="center-align">Featured Users</h5>
-                <div class="col s12">
-                  Used at the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Combined Space Operations Center</a><br>
-                  Displayed in <a style="color: #48f3e3 !important;" href="https://espace.epfl.ch/event/cosmos-archaeology/" target="_blank">Cosmos Archaeology</a> at the University of Lausanne<br>
-                  Powering the ESA sponsored <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1 Website</a><br>
-                  Used in Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a><br>
-                  Shown on <a style="color: #48f3e3 !important;" href="https://www.youtube.com/watch?v=gRhOkDapSGM" target="_blank">HBO's Vice Season 6 Episode 13</a><br>
-                  <br>
-                  Is my code aiding your project? <a style="color: #48f3e3 !important;" href="mailto: theodore.kruczek@gmail.com" target="_blank">Let me know!</a>
-                </div>
-              </div>
-              <div class="row">
-                <h5 class="center-align">Version</h5>
-                <div id="versionNumber-text" class="col s12">
                 </div>
               </div>
             </div>
@@ -100,14 +101,14 @@ export const init = (): void => {
     cb: (iconName: string): void => {
       if (iconName === 'menu-about') {
         // No Keyboard Shortcut
-        if (isAboutSelected) {
-          isAboutSelected = false;
+        if (isAboutMenuOpen) {
+          isAboutMenuOpen = false;
           keepTrackApi.programs.uiManager.hideSideMenus();
           return;
         } else {
           keepTrackApi.programs.uiManager.hideSideMenus();
           slideInRight(getEl('about-menu'), 1000);
-          isAboutSelected = true;
+          isAboutMenuOpen = true;
           getEl('menu-about').classList.add('bmenu-item-selected');
           return;
         }
@@ -121,7 +122,21 @@ export const init = (): void => {
     cb: (): void => {
       slideOutLeft(getEl('about-menu'), 1000);
       getEl('menu-about').classList.remove('bmenu-item-selected');
-      isAboutSelected = false;
+      isAboutMenuOpen = false;
     },
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'about',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isAboutMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleText, helpBodyText);
+    return true;
+  }
+  return false;
 };

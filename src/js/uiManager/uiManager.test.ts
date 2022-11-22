@@ -220,6 +220,11 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
       countryCIS: false,
       countryPRC: false,
       countryOther: false,
+      densityPayload: false,
+      densityHi: false,
+      densityMed: false,
+      densityLow: false,
+      densityOther: false,
     };
   });
 
@@ -260,6 +265,11 @@ describe('uiManager.legendHoverMenuClick-flagsOff', () => {
       countryCIS: true,
       countryPRC: true,
       countryOther: true,
+      densityPayload: true,
+      densityHi: true,
+      densityMed: true,
+      densityLow: true,
+      densityOther: true,
     };
   });
 

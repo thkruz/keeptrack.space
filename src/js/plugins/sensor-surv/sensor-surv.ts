@@ -60,7 +60,6 @@ export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-surveillance') {
     if (!sensorManager.checkSensorSelected()) {
       // No Sensor Selected
-      if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.survFenceDisabled();
       uiManager.toast(`Select a Sensor First!`, 'caution');
       shake(getEl('menu-surveillance'));
       return;

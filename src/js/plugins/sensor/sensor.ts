@@ -29,6 +29,18 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject, SensorObject } from '@app/js/api/keepTrackTypes';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { toast } from '@app/js/uiManager/ui/toast';
+import {
+  helpBodyTextCustomSensor,
+  helpBodyTextLookAngles,
+  helpBodyTextMultiLookAngles,
+  helpBodyTextSensorInfo,
+  helpBodyTextSensors,
+  helpTitleTextCustomSensor,
+  helpTitleTextLookAngles,
+  helpTitleTextMultiLookAngles,
+  helpTitleTextSensorInfo,
+  helpTitleTextSensors,
+} from './help';
 
 let sensorLinks = false;
 let isSensorListMenuOpen = false;
@@ -615,8 +627,7 @@ export const resetSensorSelected = () => {
 };
 
 export const sensorListContentClick = (sensorClick: string) => {
-  const { adviceManager, sensorManager, uiManager, colorSchemeManager, mainCamera, timeManager } = keepTrackApi.programs;
-  if (settingsManager.plugins.topMenu) adviceManager.adviceList.sensor();
+  const { sensorManager, uiManager, colorSchemeManager, mainCamera, timeManager } = keepTrackApi.programs;
 
   if (typeof sensorClick == 'undefined') {
     console.warn('The menu item was clicked but the menu was not defined.');
@@ -625,11 +636,9 @@ export const sensorListContentClick = (sensorClick: string) => {
 
   switch (sensorClick) {
     case 'cspocAll':
-      if (settingsManager.plugins.topMenu) adviceManager.adviceList.cspocSensors();
       sensorManager.setSensor('SSN');
       break;
     case 'mwAll':
-      if (settingsManager.plugins.topMenu) adviceManager.adviceList.mwSensors();
       sensorManager.setSensor('NATO-MW');
       break;
     case 'mdAll':
@@ -697,7 +706,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
     case 'menu-sensor-info': // No Keyboard Commands
       if (!sensorManager.checkSensorSelected()) {
         // No Sensor Selected
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensorInfoDisabled();
         uiManager.toast(`Select a Sensor First!`, 'caution');
         shake(getEl('menu-sensor-info'));
         break;
@@ -724,7 +732,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
         if (!sensorManager.checkSensorSelected() || sat == null || sat.static || sat.missile || objectManager.selectedSat === -1) {
           // No Sensor or Satellite Selected
-          if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.lookanglesDisabled();
           uiManager.toast(`Select a Satellite First!`, 'caution');
           shake(getEl('menu-lookangles'));
           break;
@@ -747,7 +754,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       } else {
         if (objectManager.selectedSat === -1) {
           // No Satellite Selected
-          if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.ssnLookanglesDisabled();
           uiManager.toast(`Select a Satellite First!`, 'caution');
           shake(getEl('menu-lookanglesmultisite'));
           break;
@@ -825,6 +831,41 @@ export const init = (): void => {
     cbName: 'sensor',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'sensor',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isSensorListMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSensors, helpBodyTextSensors);
+    return true;
+  }
+
+  if (keepTrackApi.programs.sensorManager.isCustomSensorMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextCustomSensor, helpBodyTextCustomSensor);
+    return true;
+  }
+
+  if (isSensorInfoMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSensorInfo, helpBodyTextSensorInfo);
+    return true;
+  }
+
+  if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextLookAngles, helpBodyTextLookAngles);
+    return true;
+  }
+
+  if (isLookanglesMultiSiteMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextMultiLookAngles, helpBodyTextMultiLookAngles);
+    return true;
+  }
+
+  return false;
 };
 
 export const selectSatData = (sat: SatObject) => {

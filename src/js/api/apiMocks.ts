@@ -515,6 +515,15 @@ export const keepTrackApiStubs = {
       numSats: 1,
       onCruncherReady: jest.fn(),
       missileSats: 10000,
+      orbitDensity: [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+      ],
+      orbitDensityMax: 1,
       search: {
         year: () => [defaultSat],
         yearOrLess: () => [defaultSat],

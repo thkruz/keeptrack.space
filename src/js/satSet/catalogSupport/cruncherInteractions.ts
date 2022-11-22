@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatCruncherMessage } from '@app/js/api/keepTrackTypes';
+import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
 import { getEl } from '@app/js/lib/helpers';
 
 export const cruncherExtraData = (m: SatCruncherMessage) => {
@@ -10,6 +11,14 @@ export const cruncherExtraData = (m: SatCruncherMessage) => {
 
   if (typeof satSet.satData === 'undefined') throw new Error('No sat data');
   if (typeof satExtraData === 'undefined') throw new Error('No extra data');
+
+  for (let i = 0; i < 180; i++) {
+    satSet.orbitDensity[i] = [];
+    for (let p = 90; p < 1500; p++) {
+      satSet.orbitDensity[i][p] = 0;
+    }
+  }
+
   for (let satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
     try {
       satSet.satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
@@ -23,11 +32,25 @@ export const cruncherExtraData = (m: SatCruncherMessage) => {
       satSet.satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
       satSet.satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
       satSet.satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
+
+      if (satSet.satData[satCrunchIndex].type !== SpaceObjectType.PAYLOAD) {
+        const inc = Math.round(satExtraData[satCrunchIndex].inclination);
+        const per = Math.round(satExtraData[satCrunchIndex].period);
+        satSet.orbitDensity[inc][per] += 1;
+      }
+
       satSet.satData[satCrunchIndex].velocity = { total: 0, x: 0, y: 0, z: 0 };
     } catch (error) {
       if (typeof satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
       if (typeof satSet.satData[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
       // Intentionally left blank
+    }
+  }
+
+  satSet.orbitDensityMax = 0;
+  for (let i = 0; i < 180; i++) {
+    for (let p = 90; p < 1500; p++) {
+      if (satSet.orbitDensity[i][p] > satSet.orbitDensityMax) satSet.orbitDensityMax = satSet.orbitDensity[i][p];
     }
   }
 
@@ -100,9 +123,13 @@ export const getVariableSearch = (params: string[]) => {
   const { uiManager, searchBox } = keepTrackApi.programs;
   for (let i = 0; i < params.length; i++) {
     const key = params[i].split('=')[0];
-    const val = params[i].split('=')[1];
+    let val = params[i].split('=')[1];
     if (key == 'search') {
       if (!settingsManager.disableUI) {
+        if (val) {
+          val = val.replace(/%20/gu, ' ');
+        }
+
         uiManager.doSearch(val);
         if (settingsManager.lastSearchResults.length == 0) {
           uiManager.toast(`Search for "${val}" found nothing!`, 'caution', true);
@@ -122,7 +149,7 @@ export const getVariableActions = (params: string[]) => {
     switch (key) {
       case 'intldes':
         urlSatId = satSet.getIdFromIntlDes(val.toUpperCase());
-        if (urlSatId !== null) {
+        if (urlSatId !== null && satSet.getSat(urlSatId).active) {
           objectManager.setSelectedSat(urlSatId);
         } else {
           uiManager.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);

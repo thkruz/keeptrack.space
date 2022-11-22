@@ -63,7 +63,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
   if (iconName === 'menu-sat-fov') {
     if (objectManager.selectedSat === -1 && (<HTMLInputElement>getEl('search')).value === '') {
       // No Sat Selected and No Search Present
-      if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satFovDisabled();
       uiManager.toast(`Select a Satellite First!`, 'caution');
       shake(getEl('menu-sat-fov'));
       return;
@@ -77,8 +76,11 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       });
       return;
     } else {
-      getEl('menu-fov-bubble').classList.remove('bmenu-item-selected');
-      getEl('menu-surveillance').classList.remove('bmenu-item-selected');
+      const fovDom = getEl('menu-fov-bubble');
+      if (fovDom) fovDom.classList.remove('bmenu-item-selected');
+
+      const survDom = getEl('menu-surveillance');
+      if (survDom) survDom.classList.remove('bmenu-item-selected');
       settingsManager.isShowSurvFence = false;
       settingsManager.isFOVBubbleModeOn = false;
 

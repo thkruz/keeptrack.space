@@ -1,4 +1,5 @@
 import { getEl, openColorbox, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextPhotoMan, helpTitleTextPhotoMan } from './help';
 
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import photoManagerPng from '@app/img/icons/photoManager.png';
@@ -159,7 +160,22 @@ export const init = (): void => {
     himawari8: himawari8,
     discovr: discovr,
   };
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'photoManager',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isSatPhotoMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextPhotoMan, helpBodyTextPhotoMan);
+    return true;
+  }
+  return false;
+};
+
 export const discovr = (): void => {
   const request = new XMLHttpRequest();
   request.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);

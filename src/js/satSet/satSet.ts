@@ -206,13 +206,6 @@ export const selectSat = (i: number): void => {
     return;
   }
 
-  const sat = satSet.getSat(i);
-  if (sat !== null && sat.static && typeof sat.staticNum !== 'undefined') {
-    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.sensor();
-  } else {
-    if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.satelliteSelected();
-  }
-
   satSet.satCruncher.postMessage({
     typ: 'satelliteSelected',
     satelliteSelected: [i],
@@ -560,6 +553,8 @@ export let satSet = {
   convertSatnumArrayToIdArray,
   cosparIndex: null,
   exportTle2Csv,
+  orbitDensity: [],
+  orbitDensityMax: 0,
   exportTle2Txt,
   getIdFromEci,
   getIdFromIntlDes,

@@ -8,7 +8,18 @@ keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs,
 // @ponicode
 describe('updateSelectBox.updateSelectBox', () => {
   test('0', () => {
-    let result: any = updateSelectBox.updateSelectBox();
-    expect(result).toMatchSnapshot();
+    const result: any = () => {
+      keepTrackApi.isInitialized = true;
+      updateSelectBox.updateSelectBox();
+    };
+    expect(result()).toMatchSnapshot();
+  });
+
+  test('1', () => {
+    const result: any = () => {
+      keepTrackApi.isInitialized = true;
+      updateSelectBox.updateSelectBox();
+    };
+    expect(result()).toMatchSnapshot();
   });
 });

@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { createError } from '@app/js/errorManager/errorManager';
 import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
+import { helpBodyTextBreakup, helpTitleTextBreakup } from './help';
 
 let isBreakupMenuOpen = false;
 
@@ -32,6 +33,20 @@ export const init = (): void => {
     cbName: 'breakup',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'breakup',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isBreakupMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextBreakup, helpBodyTextBreakup);
+    return true;
+  }
+  return false;
 };
 
 export const uiManagerInit = (): void => {
@@ -278,7 +293,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         const sat: SatObject = satSet.getSatExtraOnly(objectManager.selectedSat);
         (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
       } else {
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.breakupDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-breakup'));
       }

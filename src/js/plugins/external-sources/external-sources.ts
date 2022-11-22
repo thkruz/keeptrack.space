@@ -27,6 +27,7 @@ import externalPng from '@app/img/icons/external.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { createError } from '@app/js/errorManager/errorManager';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextExternal, helpTitleTextExternal } from './help';
 
 let isExternalMenuOpen = false;
 
@@ -138,6 +139,20 @@ export const init = (): void => {
     cbName: 'externalSources',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'externalSources',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isExternalMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextExternal, helpBodyTextExternal);
+    return true;
+  }
+  return false;
 };
 
 export const n2yoFormSubmit = () => {

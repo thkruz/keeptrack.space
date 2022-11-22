@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { omManager } from '@app/js/plugins/initial-orbit/om-manager';
 import { UiManager } from '@app/js/uiManager/uiManager';
+import { helpBodyTextInitOrbit, helpTitleTextInitOrbit } from './help';
 
 let isObfitMenuOpen = false;
 export const init = (): void => {
@@ -31,6 +32,20 @@ export const init = (): void => {
     cbName: 'initialOrbit',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'initialOrbit',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isObfitMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextInitOrbit, helpBodyTextInitOrbit);
+    return true;
+  }
+  return false;
 };
 
 export const hideSideMenus = (): void => {

@@ -32,6 +32,7 @@ import { createError } from '@app/js/errorManager/errorManager';
 import { dateFormat } from '@app/js/lib/external/dateFormat.js';
 import { clickAndDragWidth, getEl, saveAs, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import { helpBodyTextWatchlist, helpTitleTextWatchlist } from './help';
 
 let watchlistList: any[] = [];
 let watchlistInViewList: boolean[] = [];
@@ -123,6 +124,21 @@ export const init = (): void => {
     cbName: 'watchlist',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'watchlist',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isWatchlistMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextWatchlist, helpBodyTextWatchlist);
+    return true;
+  }
+
+  return false;
 };
 
 // prettier-ignore

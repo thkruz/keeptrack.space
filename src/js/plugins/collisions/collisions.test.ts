@@ -25,14 +25,6 @@ describe('collisions.uiManagerInit', () => {
 });
 
 // @ponicode
-describe('collisions.adviceReady', () => {
-  test('0', () => {
-    let result: any = collisions.adviceReady();
-    expect(result).toMatchSnapshot();
-  });
-});
-
-// @ponicode
 describe('collisions.hideSideMenus', () => {
   test('0', () => {
     let result: any = collisions.hideSideMenus();

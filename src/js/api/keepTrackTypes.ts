@@ -151,6 +151,11 @@ export interface Colors {
   countryUS: [number, number, number, number];
   countryCIS: [number, number, number, number];
   countryOther: [number, number, number, number];
+  densityPayload: [number, number, number, number];
+  densityHi: [number, number, number, number];
+  densityMed: [number, number, number, number];
+  densityLow: [number, number, number, number];
+  densityOther: [number, number, number, number];
 }
 
 export interface DrawProgram extends WebGLProgram {
@@ -466,63 +471,6 @@ export interface MediaRecorderOptions {
 
 export type LineTypes = 'sat' | 'sat2' | 'sat3' | 'sat4' | 'sat5' | 'sat6' | 'scan' | 'scan2' | 'misl' | 'ref' | 'ref2';
 export type LineColors = 'r' | 'o' | 'y' | 'g' | 'b' | 'c' | 'p' | 'w' | [number, number, number, number];
-
-export interface AdviceList {
-  welcome: any;
-  useLegend: any;
-  showSensors: any;
-  findIss: any;
-  missileMenu: any;
-  toggleNight: any;
-  colorScheme: any;
-  customSensors: any;
-  countries: any;
-  breakupDisabled?: () => void;
-  bubbleDisabled?: () => void;
-  cspocSensors?: () => void;
-  editSatDisabled?: () => void;
-  lookanglesDisabled?: () => void;
-  mapDisabled?: () => void;
-  mwSensors?: () => void;
-  planetariumDisabled?: () => void;
-  satelliteSelected?: () => void;
-  satFovDisabled?: () => void;
-  satViewDisabled?: () => void;
-  sensor?: () => void;
-  sensorInfoDisabled?: () => void;
-  ssnLookanglesDisabled?: () => void;
-  survFenceDisabled?: () => void;
-}
-export interface AdviceCounter {
-  welcome: any;
-  findIss: any;
-  showSensors: any;
-  useLegend: any;
-  toggleNight: any;
-  missileMenu: any;
-  satelliteView: any;
-  newLaunch?: any;
-  breakup: any;
-  editSat: any;
-  colorScheme: any;
-  countries: any;
-  cspocSensors: any;
-  mwSensors: any;
-  customSensors: any;
-  planetariumDisabled: any;
-  satViewDisabled: any;
-  mapDisabled: any;
-  lookanglesDisabled: any;
-  ssnLookanglesDisabled: any;
-  survFenceDisabled: any;
-  bubbleDisabled: any;
-  sensorInfoDisabled: any;
-  editSatDisabled: any;
-  breakupDisabled: any;
-  satFovDisabled: any;
-  sensorFOV: any;
-  sensorSurv: any;
-}
 
 export interface UiInputInterface {
   isMouseMoving: boolean;
@@ -868,10 +816,7 @@ export interface SensorFovPlugin {
   enableFovView: any;
 }
 export interface AdviceManager {
-  adviceCount: any;
-  showAdvice(header: string, text: string, focusDOM: HTMLElement, setLocation: string);
-  adviceArray: any;
-  adviceList: any;
+  showAdvice(header: string, text: string);
 }
 
 export interface GamepadPlugin {
@@ -919,15 +864,4 @@ export interface KeepTrackPrograms {
   mapManager: MapManager;
   gamepad: GamepadPlugin;
   socrates: SocratesPlugin;
-}
-
-export interface KeepTrackApi {
-  isInitialized: boolean;
-  initializeKeepTrack: () => Promise<void>;
-  html: (strings: TemplateStringsArray, ...placeholders: any[]) => string;
-  register: (params: { method: string; cbName: string; cb: any }) => void;
-  unregister: (params: { method: string; cbName: string }) => void;
-  callbacks: any;
-  methods: any;
-  programs: KeepTrackPrograms;
 }

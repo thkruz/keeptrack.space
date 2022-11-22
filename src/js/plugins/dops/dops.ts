@@ -1,6 +1,7 @@
 import gpsPng from '@app/img/icons/gps.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextDop, helpTitleTextDop } from './help';
 
 let isDOPMenuOpen = false;
 export const dopsFormSubmit = (): void => {
@@ -65,24 +66,6 @@ export const uiManagerInit = () => {
       `
   );
 };
-export const adviceReady = () => {
-  const aM = keepTrackApi.programs.adviceManager;
-  aM.adviceCount.socrates = 0;
-
-  aM.adviceList.socrates = () => {
-    // Only Do this Twice
-    if (aM.adviceCount.socrates >= 3) return;
-    aM.adviceCount.socrates += 1;
-
-    aM.showAdvice(
-      'SOCRATES Near Conjunction List',
-      'Did you know that objects frequently come close to colliding? Using data from Center for Space Standars and Innovation you can find upcomming possible collisions.',
-      getEl('menu-satellite-collision'),
-      'bottom'
-    );
-  };
-  aM.adviceArray.push(aM.adviceList.socrates);
-};
 
 export const uiManagerFinal = () => {
   getEl('dops-form').addEventListener('submit', function (e: Event) {
@@ -137,13 +120,6 @@ export const init = (): void => {
     cb: uiManagerFinal,
   });
 
-  // Add Advice Info
-  keepTrackApi.register({
-    method: 'adviceReady',
-    cbName: 'dops',
-    cb: adviceReady,
-  });
-
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
@@ -156,4 +132,18 @@ export const init = (): void => {
     cbName: 'dops',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'dops',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isDOPMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextDop, helpBodyTextDop);
+    return true;
+  }
+  return false;
 };

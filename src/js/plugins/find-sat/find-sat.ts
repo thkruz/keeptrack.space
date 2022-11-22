@@ -3,6 +3,7 @@ import { SatObject } from '@app/js/api/keepTrackTypes';
 import { getEl, getUnique, hideLoading, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../../api/keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
+import { helpBodyTextFind, helpTitleTextFind } from './help';
 
 let isFindByLooksMenuOpen = false;
 export const checkInc = (possibles: any[], min: number, max: number) =>
@@ -385,7 +386,21 @@ export const init = (): void => {
     cbName: 'findSat',
     cb: hideSideMenus,
   });
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'findSats',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isFindByLooksMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextFind, helpBodyTextFind);
+    return true;
+  }
+  return false;
+};
+
 export const findByLooksSubmit = async () => {
   const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
   const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);

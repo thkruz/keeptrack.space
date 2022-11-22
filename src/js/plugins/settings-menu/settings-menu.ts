@@ -2,6 +2,7 @@ import settingsPng from '@app/img/icons/settings.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl, parseRgba, rgbCss, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import $ from 'jquery';
+import { helpBodyTextSettings, helpTitleTextSettings } from './help';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -50,9 +51,24 @@ export const init = (): void => {
 
   keepTrackApi.register({
     method: 'hideSideMenus',
-    cbName: 'sensor',
+    cbName: 'settingsMenu',
     cb: (): void => hideSideMenus(),
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'settingsMenu',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isSettingsMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextSettings, helpBodyTextSettings);
+    return true;
+  }
+
+  return false;
 };
 
 export const uiManagerInit = (): void => {
@@ -469,6 +485,8 @@ export const settingsFormSubmit = (e: any) => {
   settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
   if (isBlackEarthChanged) {
     drawManager.sceneManager.earth.init();
+    drawManager.sceneManager.earth.loadHiRes();
+    drawManager.sceneManager.earth.loadHiResNight();
   }
   settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
   settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;

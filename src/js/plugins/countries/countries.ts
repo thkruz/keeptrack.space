@@ -1,4 +1,5 @@
 import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextCountries, helpTitleTextCountries } from './help';
 
 import $ from 'jquery';
 import flagPng from '@app/img/icons/flag.png';
@@ -37,7 +38,22 @@ export const init = (): void => {
     cbName: 'countries',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'countries',
+    cb: onHelpMenuClick,
+  });
 };
+
+export const onHelpMenuClick = (): boolean => {
+  if (isCountriesMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextCountries, helpBodyTextCountries);
+    return true;
+  }
+  return false;
+};
+
 export const bottomMenuClick = (iconName: string): void => {
   const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-countries') {

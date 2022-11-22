@@ -1,12 +1,15 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
-import { twitterBottomIcon } from './components/twitter-bottom-icon';
-import { twitterSideMenu } from './components/twitter-side-menu';
 import './components/twitter.css';
 
-export const init = (): void => {
-  let isTwitterMenuOpen = false;
+import { getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextTwitter, helpTitleTextTwitter } from './help';
 
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { twitterBottomIcon } from './components/twitter-bottom-icon';
+import { twitterSideMenu } from './components/twitter-side-menu';
+
+let isTwitterMenuOpen = false;
+
+export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
     method: 'uiManagerInit',
@@ -57,4 +60,19 @@ export const init = (): void => {
       isTwitterMenuOpen = false;
     },
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'twitter',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isTwitterMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextTwitter, helpBodyTextTwitter);
+    return true;
+  }
+
+  return false;
 };

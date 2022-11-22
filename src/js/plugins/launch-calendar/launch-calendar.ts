@@ -1,8 +1,9 @@
 /* */
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { getEl, openColorbox } from '@app/js/lib/helpers';
+
 import { LaunchCalendarButton } from './components/launch-calendar-button';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
 
 let isLaunchMenuOpen = false;
 

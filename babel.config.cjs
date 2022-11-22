@@ -25,7 +25,7 @@ module.exports = (api) => {
           targets: {
             esmodules: true,
           },
-          modules: "umd",
+          // modules: "umd", -- THIS IS FOR DOING THE LIB VERSION OF KEEPTRACK
         },
       ],
       '@babel/preset-typescript',

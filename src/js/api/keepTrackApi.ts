@@ -1,5 +1,6 @@
 import { SatMath } from '../satMath/satMath';
-import { KeepTrackApi, SatObject, SettingsManager } from './keepTrackTypes';
+import { helpBodyText, helpTitleText } from './help';
+import { KeepTrackPrograms, SatObject, SettingsManager } from './keepTrackTypes';
 import { html } from './templateLiterals';
 
 declare global {
@@ -48,7 +49,9 @@ export const isThisJest = () => {
   return !!nodeName;
 };
 
-export const keepTrackApi: KeepTrackApi = {
+export type KeepTrackApi = typeof keepTrackApi;
+
+export const keepTrackApi = {
   html: html,
   register: register,
   initializeKeepTrack: null,
@@ -60,13 +63,13 @@ export const keepTrackApi: KeepTrackApi = {
     updateSelectBox: [],
     onCruncherReady: [],
     onCruncherMessage: [],
+    onHelpMenuClick: [],
     uiManagerInit: [],
     uiManagerOnReady: [],
     bottomMenuClick: [],
     hideSideMenus: [],
     nightToggle: [],
     orbitManagerInit: [],
-    adviceReady: [],
     drawManagerLoadScene: [],
     drawOptionalScenery: [],
     updateLoop: [],
@@ -80,7 +83,13 @@ export const keepTrackApi: KeepTrackApi = {
     onDrawLoopComplete: [],
   },
   methods: {
-    selectSatData: (sat: any, satId: number) => {
+    onHelpMenuClick: () => {
+      if (keepTrackApi.callbacks.onHelpMenuClick.some((cb: { cb: () => boolean }) => cb.cb())) {
+        return;
+      }
+      keepTrackApi.programs.adviceManager.showAdvice(helpTitleText, helpBodyText);
+    },
+    selectSatData: (sat: SatObject, satId: number) => {
       keepTrackApi.programs.soundManager.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
     },
@@ -109,14 +118,11 @@ export const keepTrackApi: KeepTrackApi = {
     hideSideMenus: () => {
       keepTrackApi.callbacks.hideSideMenus.forEach((cb: any) => cb.cb());
     },
-    nightToggle: (gl: any, nightTexture: any, texture: any) => {
+    nightToggle: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => {
       keepTrackApi.callbacks.nightToggle.forEach((cb: any) => cb.cb(gl, nightTexture, texture));
     },
     orbitManagerInit: () => {
       keepTrackApi.callbacks.orbitManagerInit.forEach((cb: any) => cb.cb());
-    },
-    adviceReady: () => {
-      keepTrackApi.callbacks.adviceReady.forEach((cb: any) => cb.cb());
     },
     drawManagerLoadScene: () => {
       keepTrackApi.callbacks.drawManagerLoadScene.forEach((cb: any) => cb.cb());
@@ -150,7 +156,7 @@ export const keepTrackApi: KeepTrackApi = {
       keepTrackApi.callbacks.onDrawLoopComplete.forEach((cb: any) => cb.cb());
     },
   },
-  programs: <any>{},
+  programs: <KeepTrackPrograms>{},
 };
 
 // First time we call this module we should make it available to the rest of the application

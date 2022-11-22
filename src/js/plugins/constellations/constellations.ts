@@ -1,7 +1,9 @@
-import satChngPng from '@app/img/icons/satchng.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { helpBodyTextConstellations, helpTitleTextConstellations } from './help';
+
 import $ from 'jquery';
+import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import satChngPng from '@app/img/icons/satchng.png';
 
 let isConstellationsMenuOpen = false;
 
@@ -125,7 +127,9 @@ export const constellationMenuClick = (groupName: any) => { // NOSONAR
       throw new Error('Unknown group name: ' + groupName);
   }
   groupSelected(groupName);
-  uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
+
+  const searchStr = groupsManager[groupName].sats.reduce((str: string, sat: {satId: number, isObjnum: boolean}) => str + satSet.getSat(sat.satId).sccNum + ',','').slice(0, -1);  
+  uiManager.doSearch(searchStr);
 };
 
 export const groupSelected = (groupName: string) => {
@@ -134,11 +138,11 @@ export const groupSelected = (groupName: string) => {
   const { groupsManager, searchBox, uiManager, satSet, objectManager } = keepTrackApi.programs;
   if (typeof groupsManager[groupName] == 'undefined') throw new Error('Unknown group name: ' + groupName);
 
-  const searchDOM = $('#search');
+  const searchDOM = getEl('search');
   groupsManager.selectGroup(groupsManager[groupName]);
 
   // Populate searchDOM with a search string separated by commas - minus the last one
-  searchDOM.val(groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1));
+  searchDOM.innerHTML = groupsManager[groupName].sats.reduce((acc: string, obj: { satId: number }) => `${acc}${satSet.getSat(obj.satId).sccNum},`, '').slice(0, -1);
 
   searchBox.fillResultBox(groupsManager[groupName].sats, satSet);
   objectManager.setSelectedSat(-1); // Clear selected sat
@@ -199,4 +203,18 @@ export const init = (): void => {
     cbName: 'constellations',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'constellations',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isConstellationsMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextConstellations, helpBodyTextConstellations);
+    return true;
+  }
+  return false;
 };

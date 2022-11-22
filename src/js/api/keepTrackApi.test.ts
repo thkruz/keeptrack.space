@@ -1,5 +1,5 @@
 import { expect } from '@jest/globals';
-import { keepTrackApiStubs } from './apiMocks';
+import { defaultSat, keepTrackApiStubs } from './apiMocks';
 import { isThisJest, keepTrackApi } from './keepTrackApi';
 import { KeepTrackPrograms, SatObject } from './keepTrackTypes';
 
@@ -85,12 +85,6 @@ test(`keepTrackApi Unit Testing`, () => {
   });
 
   keepTrackApi.register({
-    method: 'adviceReady',
-    cbName: 'test',
-    cb: () => console.log('test'),
-  });
-
-  keepTrackApi.register({
     method: 'drawManagerLoadScene',
     cbName: 'test',
     cb: () => console.log('test'),
@@ -145,17 +139,18 @@ test(`keepTrackApi Unit Testing`, () => {
   keepTrackApi.methods.uiManagerOnReady();
   keepTrackApi.methods.bottomMenuClick('test');
   keepTrackApi.methods.hideSideMenus();
-  keepTrackApi.methods.nightToggle();
+
+  let emptyTexture: WebGLTexture;
+  keepTrackApi.methods.nightToggle(keepTrackApi.programs.drawManager.gl, emptyTexture, emptyTexture);
   keepTrackApi.methods.orbitManagerInit();
-  keepTrackApi.methods.adviceReady();
   keepTrackApi.methods.drawManagerLoadScene();
   keepTrackApi.methods.drawOptionalScenery();
   keepTrackApi.methods.updateLoop();
   keepTrackApi.methods.rmbMenuActions('test');
-  keepTrackApi.methods.updateDateTime('test');
+  keepTrackApi.methods.updateDateTime(new Date());
   keepTrackApi.methods.uiManagerFinal();
   keepTrackApi.methods.rightBtnMenuAdd();
-  keepTrackApi.methods.selectSatData('test', 'test');
+  keepTrackApi.methods.selectSatData(defaultSat, 0);
 });
 
 describe(`keepTrackApi.html`, () => {

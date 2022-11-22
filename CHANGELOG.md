@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.1.1
+
+>  
+
+- fix: :bug: fix error with TLE when editing satellite
+- fix: fix error setting value of null in analysis menu
+- fix: :bug: fix error in updateSatInfo
+- feat: :sparkles: add inc vs alt plots
+- test: :white_check_mark: add manual jest inline testing for debugging on github
+- build: :lock: fix security issue
+- fix: :bug: fix tests
+- fix: :bug: fix ecentricity formatting
+- test: :white_check_mark: update how jest is run
+
 #### v7.1.0
 
 >  

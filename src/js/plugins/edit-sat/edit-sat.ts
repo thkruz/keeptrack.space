@@ -7,6 +7,7 @@ import { ObjectManager } from '@app/js/objectManager/objectManager';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
 import { CatalogManager } from '@app/js/satSet/satSet';
 import { toast } from '@app/js/uiManager/ui/toast';
+import { helpBodyTextEdit, helpTitleTextEdit } from './help';
 
 let isEditSatMenuOpen = false;
 export const init = (): void => {
@@ -41,6 +42,20 @@ export const init = (): void => {
     cbName: 'editSat',
     cb: (): void => hideSideMenus(),
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'editSat',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isEditSatMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextEdit, helpBodyTextEdit);
+    return true;
+  }
+  return false;
 };
 
 export const uiManagerInit = (): void => {
@@ -206,7 +221,6 @@ export const bottomMenuClick = (iconName: string) => {
         isEditSatMenuOpen = true;
         populateSideMenu({ satSet, objectManager });
       } else {
-        if (settingsManager.plugins?.topMenu) keepTrackApi.programs.adviceManager.adviceList.editSatDisabled();
         toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-editSat'));
       }

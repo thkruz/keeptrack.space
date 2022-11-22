@@ -33,6 +33,7 @@ import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { MapManager } from '@app/js/api/keepTrackTypes';
 import { getEl, shake, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
 import './components/stereo-map.css';
+import { helpBodyTextMap, helpTitleTextMap } from './help';
 
 const earthImg = new Image();
 
@@ -76,6 +77,21 @@ export const init = (): void => {
     cbName: 'stereoMap',
     cb: onCruncherMessage,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'stereoMap',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (keepTrackApi.programs.mapManager.isMapMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextMap, helpBodyTextMap);
+    return true;
+  }
+
+  return false;
 };
 
 // prettier-ignore
@@ -268,7 +284,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
     } else {
       if (objectManager.selectedSat === -1) {
         // No Satellite Selected
-        if (settingsManager.plugins.topMenu) keepTrackApi.programs.adviceManager.adviceList.mapDisabled();
         uiManager.toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-map'));
         return;

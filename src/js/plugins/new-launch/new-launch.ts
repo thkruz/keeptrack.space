@@ -2,6 +2,7 @@ import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, stringPad, waitForCruncher } from '@app/js/lib/helpers';
+import { helpBodyTextNewLaunch, helpTitleTextNewLaunch } from './help';
 
 let isNewLaunchMenuOpen = false;
 
@@ -199,7 +200,6 @@ export const uiManagerFinal = () => {
 
 // prettier-ignore
 export const bottomMenuClick = (iconName: string): void => { // NOSONAR
-  const aM = keepTrackApi.programs.adviceManager;
   if (iconName === 'menu-newLaunch') {
     if (isNewLaunchMenuOpen) {
       isNewLaunchMenuOpen = false;
@@ -217,7 +217,6 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
         (<HTMLInputElement>getEl('nl-inc')).value = stringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
       } else {
-        aM.adviceList?.newLaunchDisabled();
         keepTrackApi.programs.uiManager.toast(`Select a Satellite First!`, 'caution');
         shake(getEl('menu-newLaunch'));
       }
@@ -239,13 +238,6 @@ export const init = (): void => {
     cb: uiManagerFinal,
   });
 
-  // Add Advice Info
-  keepTrackApi.register({
-    method: 'adviceReady',
-    cbName: 'newLaunch',
-    cb: adviceReady,
-  });
-
   // Add JavaScript
   keepTrackApi.register({
     method: 'bottomMenuClick',
@@ -258,31 +250,24 @@ export const init = (): void => {
     cbName: 'newLaunch',
     cb: hideSideMenus,
   });
+
+  keepTrackApi.register({
+    method: 'onHelpMenuClick',
+    cbName: 'newLaunch',
+    cb: onHelpMenuClick,
+  });
+};
+
+export const onHelpMenuClick = (): boolean => {
+  if (isNewLaunchMenuOpen) {
+    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextNewLaunch, helpBodyTextNewLaunch);
+    return true;
+  }
+  return false;
 };
 
 export const hideSideMenus = (): void => {
   slideOutLeft(getEl('newLaunch-menu'), 1000);
   getEl('menu-newLaunch').classList.remove('bmenu-item-selected');
   isNewLaunchMenuOpen = false;
-};
-
-export const adviceReady = () => {
-  const aM = keepTrackApi.programs.adviceManager;
-  aM.adviceCount.newLaunch = 0;
-  aM.adviceCount.newLaunchDisabled = 0;
-
-  aM.adviceList.newLaunchDisabled = function () {
-    // Only Do this Twice
-    if (aM.adviceCount.newLaunchDisabled >= 3) return;
-    aM.adviceCount.newLaunchDisabled += 1;
-
-    aM.showAdvice(
-      'Create Launch Nominal',
-      'Creating a Launch Nominal requres a satellite to be selected first. Pick a satellite whose orbit is close to your upcomming launch!',
-      null,
-      'bottom-right'
-    );
-  };
-
-  aM.adviceArray.push(aM.adviceList.socrates);
 };

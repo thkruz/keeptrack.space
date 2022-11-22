@@ -1147,20 +1147,33 @@ input:focus {
 }
 
 #help-screen {
-  position: absolute;
+  display: flex;
+  max-width: 70%;
+  flex-shrink: 1;
+  position: relative;
+  inset: 15%;
   z-index: 99;
   border: 5px solid var(--colorTertiaryDarken3);
-  min-width: 200px;
-  max-width: 350px;
-  margin: 30px 10px;
   text-align: center;
   padding: 10px;
   overflow: hidden;
   background: var(--colorTertiaryDarken2);
 }
 
+#help-outer-container {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.75);
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 99;
+}
+
 #help-inner-container {
   margin: auto;
+  width: 100%;
 }
 
 #help-header {
@@ -1186,7 +1199,8 @@ input:focus {
 
 #help-text {
   display: block;
-  line-height: 30px;
+  line-height: 20px;
+  text-align: left;
 }
 
 .top-menu-icons-search-on {

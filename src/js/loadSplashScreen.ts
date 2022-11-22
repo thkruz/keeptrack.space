@@ -1,36 +1,34 @@
-import astronauts1920Png from '@app/img/wallpaper/astronauts-1920.png';
+import asat1920Png from '@app/img/wallpaper/asat-1920.png';
+import asat3840Png from '@app/img/wallpaper/asat-3840.png';
+import asat21920Png from '@app/img/wallpaper/asat2-1920.png';
+import asat23840Png from '@app/img/wallpaper/asat2-3840.png';
 import astronauts21920Png from '@app/img/wallpaper/astronauts2-1920.png';
 import astronauts23840Png from '@app/img/wallpaper/astronauts2-3840.png';
-import astronauts3840Png from '@app/img/wallpaper/astronauts-3840.png';
 import commandCenter1920Png from '@app/img/wallpaper/commandCenter-1920.png';
 import commandCenter3840Png from '@app/img/wallpaper/commandCenter-3840.png';
 import controlModule1920Png from '@app/img/wallpaper/controlModule-1920.png';
 import controlModule3840Png from '@app/img/wallpaper/controlModule-3840.png';
-import domeInDesert1920Png from '@app/img/wallpaper/domeInDesert-1920.png';
-import domeInDesert3840Png from '@app/img/wallpaper/domeInDesert-3840.png';
+import debris1920Png from '@app/img/wallpaper/debris-1920.png';
+import debris3840Png from '@app/img/wallpaper/debris-3840.png';
 import domeInHawaii1920Png from '@app/img/wallpaper/domeInHawaii-1920.png';
 import domeInHawaii3840Png from '@app/img/wallpaper/domeInHawaii-3840.png';
 import domeInMountain1920Png from '@app/img/wallpaper/domeInMountain-1920.png';
+import domeInMountain3840Png from '@app/img/wallpaper/domeInMountain-3840.png';
 import domeInMountain21920Png from '@app/img/wallpaper/domeInMountain2-1920.png';
 import domeInMountain23840Png from '@app/img/wallpaper/domeInMountain2-3840.png';
-import domeInMountain3840Png from '@app/img/wallpaper/domeInMountain-3840.png';
-import domeInSnow1920Png from '@app/img/wallpaper/domeInSnow-1920.png';
-import domeInSnow21920Png from '@app/img/wallpaper/domeInSnow2-1920.png';
-import domeInSnow23840Png from '@app/img/wallpaper/domeInSnow2-3840.png';
-import domeInSnow3840Png from '@app/img/wallpaper/domeInSnow-3840.png';
 import domesOnGrassHill1920Png from '@app/img/wallpaper/domesOnGrassHill-1920.png';
 import domesOnGrassHill3840Png from '@app/img/wallpaper/domesOnGrassHill-3840.png';
 import fylingdales1920Png from '@app/img/wallpaper/fylingdales-1920.png';
-import fylingdales21920Png from '@app/img/wallpaper/fylingdales2-1920.png';
-import fylingdales23840Png from '@app/img/wallpaper/fylingdales2-3840.png';
 import fylingdales3840Png from '@app/img/wallpaper/fylingdales-3840.png';
-import icbm1920Png from '@app/img/wallpaper/icbm-1920.png';
-import icbm3840Png from '@app/img/wallpaper/icbm-3840.png';
 import iss1920Png from '@app/img/wallpaper/iss-1920.png';
 import iss3840Png from '@app/img/wallpaper/iss-3840.png';
+import iss21920Png from '@app/img/wallpaper/iss2-1920.png';
+import iss23840Png from '@app/img/wallpaper/iss2-3840.png';
+import laser11920Png from '@app/img/wallpaper/laser1-1920.png';
+import laser13840Png from '@app/img/wallpaper/laser1-3840.png';
+import laser21920Png from '@app/img/wallpaper/laser2-1920.png';
+import laser23840Png from '@app/img/wallpaper/laser2-3840.png';
 import launchpad1920Png from '@app/img/wallpaper/launchpad-1920.png';
-import launchpad21920Png from '@app/img/wallpaper/launchpad2-1920.png';
-import launchpad23840Png from '@app/img/wallpaper/launchpad2-3840.png';
 import launchpad3840Png from '@app/img/wallpaper/launchpad-3840.png';
 import militaryLaunch1920Png from '@app/img/wallpaper/militaryLaunch-1920.png';
 import militaryLaunch3840Png from '@app/img/wallpaper/militaryLaunch-3840.png';
@@ -40,10 +38,18 @@ import radarDomeFall1920Png from '@app/img/wallpaper/radarDomeFall-1920.png';
 import radarDomeFall3840Png from '@app/img/wallpaper/radarDomeFall-3840.png';
 import radarOnHill1920Png from '@app/img/wallpaper/radarOnHill-1920.png';
 import radarOnHill3840Png from '@app/img/wallpaper/radarOnHill-3840.png';
+import sat1920Png from '@app/img/wallpaper/sat-1920.png';
+import sat3840Png from '@app/img/wallpaper/sat-3840.png';
+import sat21920Png from '@app/img/wallpaper/sat2-1920.png';
+import sat23840Png from '@app/img/wallpaper/sat2-3840.png';
+import sat31920Png from '@app/img/wallpaper/sat3-1920.png';
+import sat33840Png from '@app/img/wallpaper/sat3-3840.png';
 import slbm1920Png from '@app/img/wallpaper/slbm-1920.png';
+import slbm3840Png from '@app/img/wallpaper/slbm-3840.png';
 import slbm21920Png from '@app/img/wallpaper/slbm2-1920.png';
 import slbm23840Png from '@app/img/wallpaper/slbm2-3840.png';
-import slbm3840Png from '@app/img/wallpaper/slbm-3840.png';
+import starlink1920Png from '@app/img/wallpaper/starlink-1920.png';
+import starlink3840Png from '@app/img/wallpaper/starlink-3840.png';
 
 export const loadSplashScreen = (): void => {
   // //////////////////////////////////////////////////////////////////////////
@@ -51,34 +57,22 @@ export const loadSplashScreen = (): void => {
   // //////////////////////////////////////////////////////////////////////////
   // Set Background
   const backgrounds = [
-    astronauts1920Png,
-    astronauts3840Png,
     astronauts21920Png,
     astronauts23840Png,
     commandCenter1920Png,
     commandCenter3840Png,
     controlModule1920Png,
     controlModule3840Png,
-    domeInDesert1920Png,
-    domeInDesert3840Png,
     domeInHawaii1920Png,
     domeInHawaii3840Png,
     domeInMountain1920Png,
     domeInMountain3840Png,
     domeInMountain21920Png,
     domeInMountain23840Png,
-    domeInSnow1920Png,
-    domeInSnow3840Png,
-    domeInSnow21920Png,
-    domeInSnow23840Png,
     domesOnGrassHill1920Png,
     domesOnGrassHill3840Png,
     fylingdales1920Png,
     fylingdales3840Png,
-    fylingdales21920Png,
-    fylingdales23840Png,
-    icbm1920Png,
-    icbm3840Png,
     iss1920Png,
     iss3840Png,
     mobileTel1920Png,
@@ -87,8 +81,6 @@ export const loadSplashScreen = (): void => {
     militaryLaunch3840Png,
     launchpad1920Png,
     launchpad3840Png,
-    launchpad21920Png,
-    launchpad23840Png,
     radarDomeFall1920Png,
     radarDomeFall3840Png,
     radarOnHill1920Png,
@@ -97,6 +89,26 @@ export const loadSplashScreen = (): void => {
     slbm3840Png,
     slbm21920Png,
     slbm23840Png,
+    starlink1920Png,
+    starlink3840Png,
+    laser11920Png,
+    laser13840Png,
+    laser21920Png,
+    laser23840Png,
+    asat1920Png,
+    asat3840Png,
+    debris1920Png,
+    debris3840Png,
+    asat21920Png,
+    asat23840Png,
+    sat1920Png,
+    sat3840Png,
+    sat21920Png,
+    sat23840Png,
+    iss21920Png,
+    iss23840Png,
+    sat31920Png,
+    sat33840Png,
   ];
 
   // Randomly load a splash screen - not a vulnerability

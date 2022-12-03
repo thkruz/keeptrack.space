@@ -816,7 +816,7 @@ export interface SensorFovPlugin {
   enableFovView: any;
 }
 export interface AdviceManager {
-  showAdvice(header: string, text: string);
+  showAdvice(header: string, text: string): void;
 }
 
 export interface GamepadPlugin {

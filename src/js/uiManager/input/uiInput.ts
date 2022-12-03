@@ -1507,7 +1507,7 @@ export const canvasTouchMove = (evt: any, mainCamera: Camera): any => {
 
     deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
     let zoomTarget = mainCamera.zoomTarget();
-    zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
+    zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 50);
     zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
     mainCamera.zoomTarget(zoomTarget);
   } else {

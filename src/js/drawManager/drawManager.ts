@@ -154,7 +154,7 @@ export const resizeCanvas = () => {
       // but make sure we have set this at least once to trigger
       const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
 
-      if (!settingsManager.isMobileModeEnabled || isKeyboardOut || drawManager.isRotationEvent || typeof drawManager.pMatrix == 'undefined') {
+      if (!settingsManager.isMobileModeEnabled || isKeyboardOut || drawManager.isRotationEvent || !drawManager.pMatrix) {
         setCanvasSize(vh, vw);
         drawManager.isRotationEvent = false;
       } else {

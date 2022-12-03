@@ -683,7 +683,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       } else {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
-        if (planetarium.isPlanetariumView) {
+        if (planetarium?.isPlanetariumView) {
           getEl('cspocAllSensor').style.display = 'none';
           getEl('mwAllSensor').style.display = 'none';
           getEl('mdAllSensor').style.display = 'none';

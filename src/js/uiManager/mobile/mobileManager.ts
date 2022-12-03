@@ -1,23 +1,9 @@
 // Wrap everything in an init to make sure the loading order is respected
 export const fullscreenToggle = function () {
-  const doc = <any>document;
-
-  if ((doc.fullScreenElement && doc.fullScreenElement !== null) || (!doc.mozFullScreen && !doc.webkitIsFullScreen)) {
-    if (doc.docElement?.requestFullScreen) {
-      doc.docElement.requestFullScreen();
-    } else if (doc.docElement?.mozRequestFullScreen) {
-      doc.docElement.mozRequestFullScreen();
-    } else if (doc.docElement?.webkitRequestFullScreen) {
-      doc.docElement.webkitRequestFullScreen((<any>Element).ALLOW_KEYBOARD_INPUT);
-    }
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
   } else {
-    if (doc.cancelFullScreen) {
-      doc.cancelFullScreen();
-    } else if (doc.mozCancelFullScreen) {
-      doc.mozCancelFullScreen();
-    } else if (doc.webkitCancelFullScreen) {
-      doc.webkitCancelFullScreen();
-    }
+    document.exitFullscreen();
   }
 };
 
@@ -35,6 +21,26 @@ export const checkMobileMode = async () => {
         settingsManager.fieldOfView = 0.6;
       }
       settingsManager.maxLabels = settingsManager.mobileMaxLabels;
+
+      // Disable desktop only plugins
+      settingsManager.plugins.debug = false;
+      settingsManager.plugins.dops = false;
+      settingsManager.plugins.recorderManager = false;
+      settingsManager.plugins.satChanges = false;
+      settingsManager.plugins.initialOrbit = false;
+      settingsManager.plugins.editSat = false;
+      settingsManager.plugins.shortTermFences = false;
+      settingsManager.plugins.orbitReferences = false;
+      settingsManager.plugins.externalSources = false;
+      settingsManager.plugins.analysis = false;
+      settingsManager.plugins.plotAnalysis = false;
+      settingsManager.plugins.planetarium = false;
+      settingsManager.plugins.astronomy = false;
+      settingsManager.plugins.watchlist = false;
+      settingsManager.plugins.social = false;
+      settingsManager.plugins.classification = false;
+      settingsManager.plugins.gamepad = false;
+      settingsManager.plugins.scenarioCreator = false;
     } else {
       settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;
       if (typeof settingsManager.enableHoverOverlay == 'undefined') {

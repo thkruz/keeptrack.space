@@ -919,6 +919,9 @@ const init = () => { // NOSONAR
   }
 
   // Create a buffer of analyst satellite objects
+  if (settingsManager.isMobileModeEnabled) {
+    settingsManager.maxAnalystSats = 2000
+  }
   for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
     const sccNum = (80000 + i).toString();
     objectManager.analSatSet.push(<SatObject>{
@@ -939,7 +942,7 @@ const init = () => { // NOSONAR
   }
 
   // Create Stars
-  if (!settingsManager.lowPerf && !settingsManager.noStars) {
+  if (!settingsManager.lowPerf && !settingsManager.noStars && !settingsManager.isMobileModeEnabled) {    
     objectManager.starIndex1 = objectManager.staticSet.length;
     stars.forEach((star) => {
       objectManager.staticSet.push({
@@ -967,7 +970,7 @@ const init = () => { // NOSONAR
   objectManager.isSensorManagerLoaded = true;
 
   // Create Launch Sites
-  if (!settingsManager.isDisableLaunchSites) {
+  if (!settingsManager.isDisableLaunchSites && !settingsManager.isMobileModeEnabled) {
     for (const launchSiteName in launchSiteManager.launchSiteList) {
       const launchSite = launchSiteManager.launchSiteList[launchSiteName];
       objectManager.staticSet.push({
@@ -986,7 +989,7 @@ const init = () => { // NOSONAR
   }
 
   // Try Loading the Control Site Module
-  if (!settingsManager.isDisableControlSites) {
+  if (!settingsManager.isDisableControlSites && !settingsManager.isMobileModeEnabled) {
     const { controlSiteList } = controlSiteManager;
     controlSiteList
       // Remove any control sites that are closed
@@ -1007,7 +1010,7 @@ const init = () => { // NOSONAR
 
   objectManager.starIndex2 = objectManager.staticSet.length - 1;
 
-  if (typeof settingsManager.maxFieldOfViewMarkers !== 'undefined') {
+  if (typeof settingsManager.maxFieldOfViewMarkers !== 'undefined') {    
     for (let i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
       const fieldOfViewMarker = {
         static: true,

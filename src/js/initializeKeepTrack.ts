@@ -23,6 +23,7 @@ import { showErrorCode } from './showErrorCode';
 import { starManager } from './starManager/starManager';
 import { timeManager } from './timeManager/timeManager';
 import { adviceManager } from './uiManager/advice/adviceManager';
+import { mobileManager } from './uiManager/mobile/mobileManager';
 import { searchBox } from './uiManager/search/searchBox';
 import { uiManager } from './uiManager/uiManager';
 
@@ -63,6 +64,9 @@ export const initializeKeepTrack = async (): Promise<void> => {
     };
 
     uiManager.loadStr('science');
+
+    mobileManager.checkMobileMode();
+
     // Load all the plugins now that we have the API initialized
     if (!isThisJest()) {
       await import('./plugins')

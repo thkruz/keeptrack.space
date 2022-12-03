@@ -13,7 +13,12 @@ const DRAW_RADIUS = 260000;
 export const init = async () => {
   const { gl } = keepTrackApi.programs.drawManager;
 
-  skyboxSphere.textureMilkyWay.src = `${settingsManager.installDirectory}textures/skybox8k.jpg`;
+  if (settingsManager.isMobileModeEnabled) {
+    skyboxSphere.textureMilkyWay.src = `${settingsManager.installDirectory}textures/skybox4k.jpg`;
+  } else {
+    skyboxSphere.textureMilkyWay.src = `${settingsManager.installDirectory}textures/skybox8k.jpg`;
+  }
+
   skyboxSphere.textureBoundaries.src = `${settingsManager.installDirectory}textures/skyboxBoundaries8k.jpg`;
   skyboxSphere.textureConstellations.src = `${settingsManager.installDirectory}textures/skyboxConstellations8k.jpg`;
 

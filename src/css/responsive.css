@@ -390,12 +390,16 @@
     height: 50px;
   }
 
+  #datetime-text {
+    top: -13px;
+  }
+
   #datetime {
     top: 15px;
     height: 26px;
     position: fixed;
     z-index: 11;
-    left: 120px;
+    left: 45px;
     width: 110px;
     background: transparent;
     overflow: hidden;
@@ -449,6 +453,11 @@
     /* margin-right: 175px; */
     /* position: absolute; */
   }
+
+  .top-menu-icons-search-on {
+    display: none !important;
+  }
+
   .top-menu-icons img {
     width: 35px;
     height: 35px;
@@ -578,18 +587,27 @@
 
 /* Large Cellphones */
 @media (max-width: 694px) {
+  :root {
+    --bottom-icon-width: 100px;
+  }
+
   .material-tooltip {
     display: none !important;
   }
 
   #datetime {
-    left: 40px;
+    left: 1px;
+    top: 6px;
+    height: 40px;
+    width: 130px;
   }
 
   #datetime-text {
     width: 111px;
     padding: 0px;
     border-width: 0px;
+    height: 40px;
+    top: -4px;
   }
 
   #jday {

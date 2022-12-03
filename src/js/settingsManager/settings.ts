@@ -334,8 +334,8 @@ export let settingsManager: SettingsManager = {
       settingsManager.disableWindowTouchMove = false;
       settingsManager.isMobileModeEnabled = true;
       settingsManager.maxFieldOfViewMarkers = 20000;
-      settingsManager.isDrawLess = true;
-      settingsManager.noMeshManager = true;
+      // settingsManager.isDrawLess = true;
+      // settingsManager.noMeshManager = true;
       settingsManager.camDistBuffer = 100;
     }
 

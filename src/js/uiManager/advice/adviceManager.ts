@@ -47,7 +47,7 @@ export const off = () => {
   helpOuterDOM.style.display = 'none';
   tutIconDOM.classList.remove('bmenu-item-selected');
 };
-export const showAdvice = (header: string, text: string) => {
+export const showAdvice = (header: string, text: string): void => {
   if (!isAdviceEnabled) return;
 
   isAdviceOpen = true;

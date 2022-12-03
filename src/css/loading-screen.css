@@ -126,10 +126,10 @@ body {
 
 @media (max-width: 800px) {
   #logo-text {
-    font-size: 4em;
+    font-size: 3em;
   }
   #logo-text-version {
-    font-size: 4em;
+    font-size: 3em;
   }
 }
 

@@ -136,7 +136,7 @@ export const selectSatManager = {
       mainCamera.camZoomSnappedOnSat = true;
       mainCamera.camAngleSnappedOnSat = true;
 
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
         getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
       }
 
@@ -152,7 +152,7 @@ export const selectSatManager = {
         getEl('menu-plot-analysis3')?.classList.remove('bmenu-item-disabled');
       }
       
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
         if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
           satellite.getlookangles(sat);
         }

@@ -229,7 +229,7 @@ export const selectSat = (i: number): void => {
 
   objectManager.setSelectedSat(i);
 
-  if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
+  if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
     getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
   }
   getEl('menu-lookanglesmultisite')?.classList.remove('bmenu-item-disabled');

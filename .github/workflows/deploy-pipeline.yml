@@ -97,7 +97,7 @@ jobs:
           FOLDER: dist
           # Automatically remove deleted files from the deploy branch
           CLEAN: true
-          
+
   live-server:
     needs: gh-pages
     environment: Production

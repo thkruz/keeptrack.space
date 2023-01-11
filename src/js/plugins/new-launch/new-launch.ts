@@ -68,6 +68,9 @@ export const newLaunchSubmit = () => {
     return;
   }
 
+  // Prevent caching of old TLEs
+  sat.satrec = null;
+
   if (satellite.altitudeCheck(TLE1, TLE2, simulationTimeObj) > 1) {
     satSet.satCruncher.postMessage({
       typ: 'satEdit',

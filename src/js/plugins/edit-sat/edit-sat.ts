@@ -378,6 +378,9 @@ export const editSatSubmit = () => {
     });
     orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
     sat.active = true;
+
+    // Prevent caching of old TLEs
+    sat.satrec = null;
   } else {
     toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
   }

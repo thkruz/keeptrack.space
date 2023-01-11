@@ -75,7 +75,7 @@ export const catalogLoader = async (): Promise<void> => {
       LaunchVehicle: string;
     }[] = [];
     // eslint-disable-next-line no-constant-condition
-    if (true) {
+    if (settingsManager.isEnableExtendedCatalog) {
       try {
         const resp = await (await fetch(`${settingsManager.installDirectory}tle/tle4.js`)).text();
         const content = resp.split('`')[3].split('\n');

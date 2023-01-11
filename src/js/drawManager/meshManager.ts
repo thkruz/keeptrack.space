@@ -147,6 +147,7 @@ export const initShaders = () => {
   meshManager.shaderProgram.disableVertexAttribArrays = disableVertexAttribArrays;
 };
 
+let numOfWarnings = 0;
 export const enableVertexAttribArrays = (attrs: string[]) => {
   const { gl } = keepTrackApi.programs.drawManager;
   for (const attrName in attrs) {
@@ -156,8 +157,9 @@ export const enableVertexAttribArrays = (attrs: string[]) => {
     meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
     if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
       gl.enableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
-    } else {
+    } else if (numOfWarnings < 10) {
       console.warn('Shader attribute "' + attrName + '" not found in shader. Is it undeclared or unused in the shader code?');
+      numOfWarnings++;
     }
   }
 };
@@ -171,8 +173,9 @@ export const disableVertexAttribArrays = (attrs: string[]) => {
     meshManager.shaderProgram.attrIndices[attrName] = gl.getAttribLocation(meshManager.shaderProgram, attrName);
     if (meshManager.shaderProgram.attrIndices[attrName] != -1) {
       gl.disableVertexAttribArray(meshManager.shaderProgram.attrIndices[attrName]);
-    } else {
+    } else if (numOfWarnings < 10) {
       console.warn('Shader attribute "' + attrName + '" not found in shader. Is it undeclared or unused in the shader code?');
+      numOfWarnings++;
     }
   }
 };

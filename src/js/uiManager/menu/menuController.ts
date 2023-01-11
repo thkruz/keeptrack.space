@@ -132,23 +132,6 @@ export const initMenuController = () => {
     uiManager.doSearch(searchStr);
   });
 
-  var isSocialOpen = false;
-  getEl('share-icon').addEventListener('click', () => {
-    if (!isSocialOpen) {
-      isSocialOpen = true;
-      getEl('github-share').classList.remove('share-up');
-      getEl('twitter-share').classList.remove('share-up');
-      getEl('github-share').classList.add('github-share-down');
-      getEl('twitter-share').classList.add('twitter-share-down');
-    } else {
-      isSocialOpen = false;
-      getEl('github-share').classList.add('share-up');
-      getEl('twitter-share').classList.add('share-up');
-      getEl('github-share').classList.remove('github-share-down');
-      getEl('twitter-share').classList.remove('twitter-share-down');
-    }
-  });
-
   getEl('fullscreen-icon').addEventListener('click', () => {
     uiManager.mobileManager.fullscreenToggle();
   });

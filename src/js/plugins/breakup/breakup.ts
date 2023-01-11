@@ -250,6 +250,10 @@ export const breakupOnSubmit = (): void => { // NOSONAR
       sat.TLE1 = iTLE1;
       sat.TLE2 = iTLE2;
       sat.active = true;
+
+      // Prevent caching of old TLEs
+      sat.satrec = null;
+      
       if (satellite.altitudeCheck(iTLE1, iTLE2, timeManager.simulationTimeObj) > 1) {
         satSet.satCruncher.postMessage({
           typ: 'satEdit',

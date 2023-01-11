@@ -194,7 +194,7 @@ export const setHover = (i: number): void => {
 };
 export const selectSat = (i: number): void => {
   if (settingsManager.isDisableSelectSat) return;
-  const { sensorManager, objectManager, uiManager, colorSchemeManager } = keepTrackApi.programs;
+  const { sensorManager, dotsManager, objectManager, uiManager, colorSchemeManager } = keepTrackApi.programs;
   const { gl } = keepTrackApi.programs.drawManager;
   if (i === objectManager.lastSelectedSat()) return;
   if (!colorSchemeManager.colorBufferOneTime) {
@@ -214,22 +214,33 @@ export const selectSat = (i: number): void => {
 
   gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManager.colorBuffer);
   // If Old Select Sat Picked Color it Correct Color
-  if (objectManager.lastSelectedSat() !== -1) {
-    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(objectManager.lastSelectedSat())).color;
-    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4] = newColor[0]; // R
-    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 1] = newColor[1]; // G
-    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 2] = newColor[2]; // B
-    colorSchemeManager.colorData[objectManager.lastSelectedSat() * 4 + 3] = newColor[3]; // A
-    gl.bufferSubData(gl.ARRAY_BUFFER, objectManager.lastSelectedSat() * 4 * 4, new Float32Array(newColor));
+  const lastObject = objectManager.lastSelectedSat();
+  if (lastObject !== -1) {
+    const newColor = colorSchemeManager.currentColorScheme(satSet.getSat(lastObject)).color;
+    colorSchemeManager.colorData[lastObject * 4] = newColor[0]; // R
+    colorSchemeManager.colorData[lastObject * 4 + 1] = newColor[1]; // G
+    colorSchemeManager.colorData[lastObject * 4 + 2] = newColor[2]; // B
+    colorSchemeManager.colorData[lastObject * 4 + 3] = newColor[3]; // A
+    gl.bufferSubData(gl.ARRAY_BUFFER, lastObject * 4 * 4, new Float32Array(newColor));
+
+    if (!settingsManager.lastSearchResults.includes(lastObject)) {
+      dotsManager.sizeData[lastObject] = 0.0;
+      gl.bindBuffer(gl.ARRAY_BUFFER, dotsManager.sizeBuffer);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManager.sizeData);
+    }
   }
   // If New Select Sat Picked Color it
   if (i !== -1) {
     gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
+
+    dotsManager.sizeData[i] = 1.0;
+    gl.bindBuffer(gl.ARRAY_BUFFER, dotsManager.sizeBuffer);
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManager.sizeData);
   }
 
   objectManager.setSelectedSat(i);
 
-  if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
+  if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
     getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
   }
   getEl('menu-lookanglesmultisite')?.classList.remove('bmenu-item-disabled');

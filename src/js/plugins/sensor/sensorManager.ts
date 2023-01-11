@@ -66,7 +66,11 @@ const emptySensor: SensorObject = {
 };
 
 // NOTE: This doesn't account for sensorManager.selectedSensor
-export const checkSensorSelected = () => sensorManager.currentSensor[0].lat !== null && sensorManager.currentSensor[0].observerGd?.lat !== null;
+export const checkSensorSelected = () =>
+  sensorManager.currentSensor[0].name &&
+  sensorManager.currentSensor[0].name !== '' &&
+  sensorManager.currentSensor[0].lat !== null &&
+  sensorManager.currentSensor[0].observerGd?.lat !== null;
 
 export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   // TODO: This function is totally redundant to setSensor. There should be

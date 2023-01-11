@@ -163,6 +163,9 @@ export let settingsManager: SettingsManager = {
     // JSON Catalog for offline use
     settingsManager.isDisableExtraCatalog = false;
 
+    // New Extended Catalog
+    settingsManager.isEnableExtendedCatalog = false;
+
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
     settingsManager.maxMissiles = 500;
@@ -334,8 +337,8 @@ export let settingsManager: SettingsManager = {
       settingsManager.disableWindowTouchMove = false;
       settingsManager.isMobileModeEnabled = true;
       settingsManager.maxFieldOfViewMarkers = 20000;
-      settingsManager.isDrawLess = true;
-      settingsManager.noMeshManager = true;
+      // settingsManager.isDrawLess = true;
+      // settingsManager.noMeshManager = true;
       settingsManager.camDistBuffer = 100;
     }
 
@@ -457,6 +460,7 @@ export let settingsManager: SettingsManager = {
 
     settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
     settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
+    settingsManager.selectedColorFallback = settingsManager.selectedColor;
 
     settingsManager.reColorMinimumTime = 1000;
     settingsManager.colors = null;
@@ -1050,4 +1054,6 @@ export let settingsManager: SettingsManager = {
   zNear: 0,
   zoomSpeed: 0,
   isDrawTrailingOrbits: false,
+  isEnableExtendedCatalog: false,
+  selectedColorFallback: [0, 0, 0, 0],
 };

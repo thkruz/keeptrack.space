@@ -520,12 +520,12 @@ export class LineFactory {
           // Arbitrary Lines
           this.drawLineList[i].line.set(this.drawLineList[i].ref, this.drawLineList[i].ref2);
         }
+      
+        this.drawLineList[i].line.draw(this.drawLineList[i].color);
       } catch (error) {
         // DEBUG:
         // console.warn(error);
       }
-
-      this.drawLineList[i].line.draw(this.drawLineList[i].color);
       
       // When multiple sensors are selected it will keep creating new lines so we have to purge them
       if (keepTrackApi.programs.sensorManager.currentSensorMultiSensor && this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].isDrawWhenSelected) {

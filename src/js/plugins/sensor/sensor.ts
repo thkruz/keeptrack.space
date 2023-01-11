@@ -683,7 +683,7 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
       } else {
         if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
         uiManager.hideSideMenus();
-        if (planetarium.isPlanetariumView) {
+        if (planetarium?.isPlanetariumView) {
           getEl('cspocAllSensor').style.display = 'none';
           getEl('mwAllSensor').style.display = 'none';
           getEl('mdAllSensor').style.display = 'none';
@@ -730,8 +730,13 @@ export const bottomMenuClick = (iconName: string): void => { // NOSONAR
         break;
       } else {
         const sat = satSet.getSatExtraOnly(objectManager.selectedSat);
-        if (!sensorManager.checkSensorSelected() || sat == null || sat.static || sat.missile || objectManager.selectedSat === -1) {
-          // No Sensor or Satellite Selected
+        if (!sensorManager.checkSensorSelected()) {
+          // No Sensor Selected
+          uiManager.toast(`Select a Sensor First!`, 'caution');
+          shake(getEl('menu-lookangles'));
+          break;
+        } else if (sat == null || sat.static || sat.missile || objectManager.selectedSat === -1) {
+          // No Satellite Selected
           uiManager.toast(`Select a Satellite First!`, 'caution');
           shake(getEl('menu-lookangles'));
           break;

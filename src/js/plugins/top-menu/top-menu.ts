@@ -6,7 +6,6 @@ import soundOffPng from '@app/img/icons/sound-off.png';
 import soundOnPng from '@app/img/icons/sound-on.png';
 import twitterPng from '@app/img/icons/twitter.png';
 import layersIconPng from '@app/img/layers-icon.png';
-import sharePng from '@app/img/share-icon.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { createError } from '@app/js/errorManager/errorManager';
 import { getEl } from '@app/js/lib/helpers';
@@ -23,17 +22,18 @@ export const init = (): void => {
         (<any>$('#header')).append(keepTrackApi.html`
           <nav>
             <div id="nav-wrapper" class="nav-wrapper">
-              <a id="share-icon" class="top-menu-icons"><img src=${sharePng} alt="" /></a>
               <ul id="nav-mobile2" class="right">
                 <li>
                   <a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a>
                 </li>
                 <li>
                   <a id="sound-btn" class="top-menu-btns bmenu-item-selected">
-                    <img id="sound-icon"
-                    width="25"
-                    height="25"
+                    <div class="top-menu-icons">
+                      <img id="sound-icon"                    
+                      width="25"
+                      height="25"
                       src="" delayedsrc="${soundOnPng}" alt="" />
+                    </div>
                   </a>
                 </li>
                 <li>

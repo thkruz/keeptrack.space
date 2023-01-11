@@ -1148,15 +1148,16 @@ input:focus {
 
 #help-screen {
   display: flex;
-  max-width: 70%;
+  max-width: 80%;
+  max-height: 80%;
   flex-shrink: 1;
   position: relative;
-  inset: 15%;
+  inset: 10%;
   z-index: 99;
   border: 5px solid var(--colorTertiaryDarken3);
   text-align: center;
   padding: 10px;
-  overflow: hidden;
+  overflow: auto;
   background: var(--colorTertiaryDarken2);
 }
 
@@ -1205,7 +1206,7 @@ input:focus {
 
 .top-menu-icons-search-on {
   transition: 1s;
-  /* display: none; */
+  /* display: none !important; */
 }
 
 .ui-widget-content {

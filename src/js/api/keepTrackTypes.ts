@@ -223,6 +223,8 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  selectedColorFallback: [number, number, number, number];
+  isEnableExtendedCatalog: boolean;
   isFreezePropRateOnDrag: any;
   isNotionalDebris: boolean;
   isUseExtendedCatalog: boolean;
@@ -816,7 +818,7 @@ export interface SensorFovPlugin {
   enableFovView: any;
 }
 export interface AdviceManager {
-  showAdvice(header: string, text: string);
+  showAdvice(header: string, text: string): void;
 }
 
 export interface GamepadPlugin {

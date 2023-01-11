@@ -2,6 +2,60 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.1.2
+
+>  
+
+- feat: :sparkles: add func to show selected object as large red dot
+- fix: :bug: fixes #630
+- feat: :sparkles: add skeleton for new help menus
+- test: :white_check_mark: update tests
+- feat: :sparkles: fix issues on mobile devices
+- test: :adhesive_bandage: fix testing issue causing jest to fail on github
+- feat: :sparkles: add neighbors color scheme for orbit density
+- feat: :sparkles: add sensors help menu
+- feat: :sparkles: enable legend functions for orbit density scheme
+- feat: :sparkles: new splash screens
+- feat: :sparkles: add orbit density color scheme
+- test: :camera_flash: update snapshots for testing
+- feat: :sparkles: add help to plot menus
+- feat: :sparkles: add main help menu
+- feat: :sparkles: add help to edit sat menu
+- feat: :sparkles: add meanmo to period conversions on edit sat
+- feat: :sparkles: add help to constellations menu and fix constellation search code
+- feat: :sparkles: add sensors help
+- feat: :sparkles: add help for breakup menu
+- feat: :sparkles: add help menu to colors menu
+- fix: :bug: fix bug where lookangles enabled with no sensor
+- feat: :sparkles: add analysis help menu
+- fix: :bug: fix incorrect lookangles caused by caching satrec
+- feat: :sparkles: add help to new launch menu
+- feat: :sparkles: add help to missile menu
+- feat: :sparkles: add help to dop menu
+- feat: :sparkles: add watchlist help menu
+- feat: :sparkles: add help to initial orbit menu
+- feat: :sparkles: add help to find sat menu
+- feat: :sparkles: add help to debug menu
+- feat: :sparkles: add help to stf menu
+- feat: :sparkles: add help to satellite photo menu
+- feat: :sparkles: add help for collisions menu
+- fix: :bug: add error logging for possible bug #635
+- test: :clown_face: add missing mock data to tests
+- feat: :sparkles: add help to twitter menu
+- feat: :sparkles: add help to next launch menu
+- feat: :sparkles: add help to external source
+- feat: :sparkles: add help to countries menu
+- feat: :sparkles: add help to map menu
+- feat: :sparkles: add help to settings menu
+- fix: :bug: fix error on loading related to tle4.js
+- fix: :bug: fix bug in sat-fov menu when plugins disabled
+- fix: :bug: fix bug with color menu plugin being disabled
+- refactor: :recycle: simplify help menu code
+- fix: :bug: fix bug with sat url param not being found
+- fix: :bug: fix texture issue after undoing black earth
+- feat: :sparkles: add about page help menu
+- fix: :lock: fix security issue
+
 #### v7.1.1
 
 >  

@@ -104,6 +104,10 @@ export const uiManagerInit = (): void => {
               <input placeholder="AAA.AAAA" id="es-meanmo" type="text" maxlength="11" />
               <label for="es-meanmo" class="active">Mean Motion</label>
             </div>
+            <div class="input-field col s12">
+              <input placeholder="" id="es-per" type="text" maxlength="11" />
+              <label for="es-per" class="active">Period</label>
+            </div>
             <div class="center-align row">
               <button id="editSat-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
             </div>
@@ -149,6 +153,20 @@ export const uiManagerFinal = (): void => {
   getEl('editSat').addEventListener('submit', function (e: Event) {
     e.preventDefault();
     editSatSubmit();
+  });
+
+  getEl('es-per').addEventListener('change', function () {
+    const per = (<HTMLInputElement>getEl('es-per')).value;
+    if (per === '') return;
+    const meanmo = 1440 / parseFloat(per);
+    (<HTMLInputElement>getEl('es-meanmo')).value = meanmo.toFixed(8);
+  });
+
+  getEl('es-meanmo').addEventListener('change', function () {
+    const meanmo = (<HTMLInputElement>getEl('es-meanmo')).value;
+    if (meanmo === '') return;
+    const per = (1440 / parseFloat(meanmo)).toFixed(8);
+    (<HTMLInputElement>getEl('es-per')).value = per;
   });
 
   getEl('editSat-save').addEventListener('click', editSatSaveClick);
@@ -239,6 +257,7 @@ const populateSideMenu = ({ satSet, objectManager }: { satSet: CatalogManager; o
   (<HTMLInputElement>getEl('es-year')).value = sat.TLE1.substr(18, 2);
   (<HTMLInputElement>getEl('es-day')).value = sat.TLE1.substr(20, 12);
   (<HTMLInputElement>getEl('es-meanmo')).value = sat.TLE2.substr(52, 11);
+  (<HTMLInputElement>getEl('es-per')).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
 
   const rasc: string = stringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
 
@@ -332,6 +351,7 @@ export const editSatNewTleClickFadeIn = () => {
     (<HTMLInputElement>getEl('es-year')).value = sat.TLE1.substr(18, 2);
     (<HTMLInputElement>getEl('es-day')).value = sat.TLE1.substr(20, 12);
     (<HTMLInputElement>getEl('es-meanmo')).value = sat.TLE2.substr(52, 11);
+    (<HTMLInputElement>getEl('es-per')).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
 
     const rasc: string = stringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
 
@@ -378,6 +398,9 @@ export const editSatSubmit = () => {
     });
     orbitManager.updateOrbitBuffer(satId, true, TLE1, TLE2);
     sat.active = true;
+
+    // Prevent caching of old TLEs
+    sat.satrec = null;
   } else {
     toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
   }

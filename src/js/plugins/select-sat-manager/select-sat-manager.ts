@@ -11,7 +11,7 @@ export const selectSatManager = {
   init: () => {
     keepTrackApi.register({
       method: 'updateLoop',
-      cbName: 'gamepad',
+      cbName: 'selectSatManager',
       cb: checkIfSelectSatVisible,
     });
   },
@@ -136,7 +136,7 @@ export const selectSatManager = {
       mainCamera.camZoomSnappedOnSat = true;
       mainCamera.camAngleSnappedOnSat = true;
 
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
         getEl('menu-lookangles')?.classList.remove('bmenu-item-disabled');
       }
 
@@ -151,16 +151,17 @@ export const selectSatManager = {
       if (objectManager.secondarySat !== -1) {
         getEl('menu-plot-analysis3')?.classList.remove('bmenu-item-disabled');
       }
-
-      fadeIn(getEl('sat-infobox'));
-
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null) {
+      
+      if (objectManager.isSensorManagerLoaded && sensorManager.checkSensorSelected()) {
         if (keepTrackApi.programs.sensorManager.isLookanglesMenuOpen) {
           satellite.getlookangles(sat);
         }
       }
-
+      
       keepTrackApi.methods.selectSatData(sat, satId);
+
+      // NOTE: This has to come after keepTrackApi.methods.selectSatData!
+      fadeIn(getEl('sat-infobox'));
     }
 
     objectManager.setSelectedSat(satId);

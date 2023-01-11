@@ -141,7 +141,11 @@ export const uiManagerFinal = (plugins: any): void => {
   if (plugins.topMenu) {
     let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--top-menu-height').replace('px', ''));
     if (isNaN(topMenuHeight)) topMenuHeight = 0;
-    document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + 22 + 'px');
+    if (settingsManager.isMobileModeEnabled) {
+      document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + 17 + 'px');
+    } else {
+      document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + 22 + 'px');
+    }
   }
 
   if (getEl('bottom-icons') && getEl('bottom-icons').innerText == '') {

@@ -439,11 +439,14 @@ let isAlternateVelocity = false;
 let lastDrawDt = 0;
 
 export const updateSizeBuffer = (bufferLen: number = 3) => {
-  const gl = dotsManager.gl;
+  const { gl } = dotsManager;
+  const { objectManager } = keepTrackApi.programs;
+
   if (!dotsManager.sizeBufferOneTime) {
     dotsManager.sizeData = new Float32Array(bufferLen);
   }
 
+  // This has to happen first because it resets things to 0
   for (let i = 0; i < bufferLen; i++) {
     // Stars are always bigger
     if (i >= dotsManager.starIndex1 && i <= dotsManager.starIndex2) {
@@ -452,6 +455,11 @@ export const updateSizeBuffer = (bufferLen: number = 3) => {
       dotsManager.sizeData[i] = 0.0;
     }
   }
+
+  if (objectManager.selectedSat !== -1) {
+    dotsManager.sizeData[objectManager.selectedSat] = 1.0;
+  }
+
   // Pretend Satellites that are currently being searched are stars
   // The shaders will display these "stars" like close satellites
   // because the distance from the center of the earth is too close to

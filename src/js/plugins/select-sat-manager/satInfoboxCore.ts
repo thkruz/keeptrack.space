@@ -400,13 +400,15 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     );
 
     // Create a Sat Info Box Initializing Script
-    $('#sat-infobox').draggable({
-      containment: 'window',
-      drag: () => {
-        getEl('sat-infobox').style.height = '600px';
-        getEl('sat-infobox').classList.remove('satinfo-fixed');
-      },
-    });
+    if (!settingsManager.isMobileModeEnabled) {
+      $('#sat-infobox').draggable({
+        containment: 'window',
+        drag: () => {
+          getEl('sat-infobox').style.height = '600px';
+          getEl('sat-infobox').classList.remove('satinfo-fixed');
+        },
+      });
+    }
 
     // If right click kill and reinit
     $('#sat-infobox').on('mousedown', (e: any) => {

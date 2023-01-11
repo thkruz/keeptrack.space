@@ -1087,11 +1087,13 @@ export const canvasWheel = (evt: any): void => { // NOSONAR
     mainCamera.camZoomSnappedOnSat = false;
   } else {
     if (settingsManager.camDistBuffer < 300 || settingsManager.nearZoomLevel == -1) {
+      settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
       settingsManager.camDistBuffer += delta / 7.5; // delta is +/- 100
       settingsManager.camDistBuffer = Math.min(Math.max(settingsManager.camDistBuffer, 30), 300);
       settingsManager.nearZoomLevel = mainCamera.zoomLevel();
     }
     if (settingsManager.camDistBuffer >= 300) {
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
       let zoomTarget = mainCamera.zoomTarget();
       zoomTarget += delta / 100 / 50 / mainCamera.speedModifier; // delta is +/- 100
       zoomTarget = Math.min(Math.max(zoomTarget, 0.001), 1); // Force between 0 and 1
@@ -1507,7 +1509,7 @@ export const canvasTouchMove = (evt: any, mainCamera: Camera): any => {
 
     deltaPinchDistance = (startPinchDistance - currentPinchDistance) / maxPinchSize;
     let zoomTarget = mainCamera.zoomTarget();
-    zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 20);
+    zoomTarget += deltaPinchDistance * (settingsManager.cameraMovementSpeed * 50);
     zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
     mainCamera.zoomTarget(zoomTarget);
   } else {

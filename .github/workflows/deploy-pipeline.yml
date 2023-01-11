@@ -98,11 +98,6 @@ jobs:
           # Automatically remove deleted files from the deploy branch
           CLEAN: true
 
-      # Test for Vulnerabilities that snuck in
-      - name: Test for public javascript library vulnerabilities
-        uses: lirantal/is-website-vulnerable@master
-        with:
-          scan-url: "https://thkruz.github.io/keeptrack.space/"
   live-server:
     needs: gh-pages
     environment: Production

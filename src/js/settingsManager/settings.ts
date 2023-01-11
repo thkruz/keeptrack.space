@@ -460,6 +460,7 @@ export let settingsManager: SettingsManager = {
 
     settingsManager.hoverColor = [1.0, 1.0, 0.0, 1.0]; // Yellow
     settingsManager.selectedColor = [1.0, 0.0, 0.0, 1.0]; // Red
+    settingsManager.selectedColorFallback = settingsManager.selectedColor;
 
     settingsManager.reColorMinimumTime = 1000;
     settingsManager.colors = null;
@@ -1054,4 +1055,5 @@ export let settingsManager: SettingsManager = {
   zoomSpeed: 0,
   isDrawTrailingOrbits: false,
   isEnableExtendedCatalog: false,
+  selectedColorFallback: [0, 0, 0, 0],
 };

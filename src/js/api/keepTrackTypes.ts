@@ -223,6 +223,7 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  selectedColorFallback: [number, number, number, number];
   isEnableExtendedCatalog: boolean;
   isFreezePropRateOnDrag: any;
   isNotionalDebris: boolean;

@@ -223,6 +223,7 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isEnableExtendedCatalog: boolean;
   isFreezePropRateOnDrag: any;
   isNotionalDebris: boolean;
   isUseExtendedCatalog: boolean;

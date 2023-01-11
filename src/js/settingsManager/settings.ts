@@ -163,6 +163,9 @@ export let settingsManager: SettingsManager = {
     // JSON Catalog for offline use
     settingsManager.isDisableExtraCatalog = false;
 
+    // New Extended Catalog
+    settingsManager.isEnableExtendedCatalog = false;
+
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
     settingsManager.maxMissiles = 500;
@@ -1050,4 +1053,5 @@ export let settingsManager: SettingsManager = {
   zNear: 0,
   zoomSpeed: 0,
   isDrawTrailingOrbits: false,
+  isEnableExtendedCatalog: false,
 };

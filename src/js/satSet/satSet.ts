@@ -593,7 +593,7 @@ export let satSet = {
   resetSatInSun,
   resetSatInView,
   satCruncher: null,
-  satData: null,
+  satData: null as SatObject[],
   satExtraData: null,
   satSensorMarkerArray: null,
   sccIndex: null,

@@ -308,7 +308,7 @@ export const keepTrackApiStubs = {
       updateSizeBuffer: jest.fn(),
       updatePMvCamMatrix: jest.fn(),
       sizeBufferOneTime: null,
-      sizeData: null,
+      sizeData: new Float32Array([1, 0, 0]),
       starIndex2: null,
       pickingColorData: null,
       pickingFrameBuffer: null,

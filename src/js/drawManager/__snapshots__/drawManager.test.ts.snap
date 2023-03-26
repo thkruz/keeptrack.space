@@ -8,19 +8,6 @@ exports[`drawManager.drawOptionalScenery 0 1`] = `undefined`;
 
 exports[`drawManager.drawOptionalScenery 1 1`] = `undefined`;
 
-exports[`drawManager.glInit  0 1`] = `
-WebGLRenderingContext {
-  "canvas": HTMLCanvasElement {
-    "addEventListener": [Function],
-    "height": 0,
-    "style": Object {},
-    "width": 1920,
-  },
-  "drawingBufferHeight": 0,
-  "drawingBufferWidth": 1920,
-}
-`;
-
 exports[`drawManager.init  0 1`] = `undefined`;
 
 exports[`drawManager.loadScene 0 1`] = `undefined`;

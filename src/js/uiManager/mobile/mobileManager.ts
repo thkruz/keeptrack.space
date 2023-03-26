@@ -1,7 +1,11 @@
 // Wrap everything in an init to make sure the loading order is respected
 export const fullscreenToggle = function () {
   if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
+    try {
+      document.documentElement.requestFullscreen();
+    } catch {
+      // Might fail on some browsers
+    }
   } else {
     document.exitFullscreen();
   }

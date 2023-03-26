@@ -18,7 +18,7 @@ describe('drawManager.init ', () => {
 // @ponicode
 describe('drawManager.drawLoop ', () => {
   beforeAll(() => {
-    drawManager.glInit();
+    drawManager.glInit(keepTrackApi.programs.drawManager.gl);
   });
   test('0', () => {
     let result = drawManager.drawLoop(15);
@@ -49,7 +49,7 @@ describe('drawManager.startWithOrbits  ', () => {
 // @ponicode
 describe('drawManager.drawOptionalScenery', () => {
   test('0', () => {
-    let result: any = drawManager.drawOptionalScenery();
+    let result: any = drawManager.drawOptionalScenery(keepTrackApi.programs.drawManager);
     expect(result).toMatchSnapshot();
   });
 

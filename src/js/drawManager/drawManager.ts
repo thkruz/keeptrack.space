@@ -30,7 +30,7 @@ export const init = () => {
     drawManager.isRotationEvent = true;
   });
 };
-export const glInit = async () => {
+export const glInit = async (glOverride?: WebGL2RenderingContext) => {
   // Ensure the canvas is available
   drawManager.canvas ??= isThisJest() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas');
 
@@ -49,16 +49,8 @@ export const glInit = async () => {
   });
 
   let gl: WebGL2RenderingContext;
-  if (isThisJest()) {
-    gl = <WebGL2RenderingContext>drawManager.canvas.getContext('webgl', {
-      alpha: false,
-      premultipliedAlpha: false,
-      desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-      antialias: true,
-      powerPreference: 'high-performance',
-      preserveDrawingBuffer: true,
-      stencil: false,
-    });
+  if (glOverride) {
+    gl = glOverride;
   } else {
     gl = drawManager.canvas.getContext('webgl2', {
       alpha: false,
@@ -353,8 +345,8 @@ export const updateLoop = () => {
   keepTrackApi.methods.updateLoop();
 };
 export const drawOptionalScenery = (drawManagerOverride?: any) => {
-  drawManager = drawManagerOverride || drawManager;
-  const { gl } = keepTrackApi.programs.drawManager;
+  drawManager = drawManagerOverride || keepTrackApi.programs.drawManager;
+  const { gl } = drawManager;
 
   if (!settingsManager.isDrawLess) {
     if (drawManager.isPostProcessingResizeNeeded) drawManager.resizePostProcessingTexture(drawManager.gl, sceneManager.sun, drawManager.postProcessingManager);
@@ -427,7 +419,7 @@ export const satCalculate = () => {
     selectSatManager.selectSat(objectManager.selectedSat, mainCamera);
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && dotsManager.inViewData[drawManager.sat.id] === 1) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && dotsManager.inViewData?.[drawManager.sat.id] === 1) {
         lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name));
       }

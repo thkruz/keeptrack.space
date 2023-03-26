@@ -66,17 +66,25 @@ const emptySensor: SensorObject = {
 };
 
 // NOTE: This doesn't account for sensorManager.selectedSensor
-export const checkSensorSelected = () =>
-  sensorManager.currentSensor[0].name &&
-  sensorManager.currentSensor[0].name !== '' &&
-  sensorManager.currentSensor[0].lat !== null &&
-  sensorManager.currentSensor[0].observerGd?.lat !== null;
+export const checkSensorSelected = (): boolean => {
+  if (
+    sensorManager.currentSensor[0].name &&
+    sensorManager.currentSensor[0].name !== '' &&
+    sensorManager.currentSensor[0].lat !== null &&
+    sensorManager.currentSensor[0].observerGd?.lat !== null
+  ) {
+    return true;
+  }
+  // Note: sometimes this would return '' instead of false, so this is a workaround.
+  return false;
+};
 
 export const setCurrentSensor = (sensor: SensorObject[] | null): void => {
   // TODO: This function is totally redundant to setSensor. There should be
   // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
   if (sensor === null) {
     sensorManager.currentSensor[0] = emptySensor;
+    console.warn(sensorManager.currentSensor[0]);
   } else if (sensor[0] != null) {
     sensorManager.currentSensor = sensor;
   } else if (sensor != null) {

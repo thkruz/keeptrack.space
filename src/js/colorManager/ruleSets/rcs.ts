@@ -1,5 +1,6 @@
+import { ColorInformation, Pickable, colorSchemeManager } from '../colorSchemeManager';
+
 import { SatObject } from '@app/js/api/keepTrackTypes';
-import { ColorInformation, colorSchemeManager, Pickable } from '../colorSchemeManager';
 
 // This is intentionally complex to reduce object creation and GC
 // Splitting it into subfunctions would not be optimal
@@ -30,7 +31,19 @@ export const rcsRules = (sat: SatObject): ColorInformation => { // NOSONAR
       pickable: Pickable.No,
     };
   }
-  if (rcs < 0.1) {
+  if (rcs < 0.01) {
+    return {
+      color: colorSchemeManager.colorTheme.rcsXXSmall,
+      pickable: Pickable.Yes,
+    };
+  }
+  if (rcs >= 0.01 && rcs <= 0.05) {
+    return {
+      color: colorSchemeManager.colorTheme.rcsXSmall,
+      pickable: Pickable.Yes,
+    };
+  }
+  if (rcs >= 0.05 && rcs <= 0.1) {
     return {
       color: colorSchemeManager.colorTheme.rcsSmall,
       pickable: Pickable.Yes,

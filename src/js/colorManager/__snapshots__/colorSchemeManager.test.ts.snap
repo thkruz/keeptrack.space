@@ -1714,8 +1714,8 @@ exports[`colorSchemeManager.rcsRules 1 1`] = `
 Object {
   "color": Array [
     1,
-    0,
-    0,
+    0.56,
+    0.01,
     0.6,
   ],
   "pickable": 1,

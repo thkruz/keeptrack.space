@@ -167,7 +167,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
       pickable: Pickable.Yes,
     };
   }
-  if (sat.missile && dotsManager.inViewData[sat.id] === 0) {
+  if (sat.missile && dotsManager.inViewData?.[sat.id] === 0) {
     if (sat.missile && colorSchemeManager.objectTypeFlags.missile === false) {
       return {
         color: colorSchemeManager.colorTheme.deselected,
@@ -180,7 +180,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
       };
     }
   }
-  if (sat.missile && dotsManager.inViewData[sat.id] === 1) {
+  if (sat.missile && dotsManager.inViewData?.[sat.id] === 1) {
     if (sat.missile && colorSchemeManager.objectTypeFlags.missileInview === false) {
       return {
         color: colorSchemeManager.colorTheme.deselected,
@@ -195,7 +195,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
   }
 
   if (
-    (dotsManager.inViewData[sat.id] === 0 && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false) ||
+    (dotsManager.inViewData?.[sat.id] === 0 && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.PAYLOAD && colorSchemeManager.objectTypeFlags.payload === false) ||
     (objectManager.isSensorManagerLoaded &&
       sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
@@ -209,7 +209,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
     };
   }
   if (
-    (dotsManager.inViewData[sat.id] === 0 && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
+    (dotsManager.inViewData?.[sat.id] === 0 && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.ROCKET_BODY && colorSchemeManager.objectTypeFlags.rocketBody === false) ||
     (objectManager.isSensorManagerLoaded &&
       sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
@@ -223,7 +223,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
     };
   }
   if (
-    (dotsManager.inViewData[sat.id] === 0 && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false) ||
+    (dotsManager.inViewData?.[sat.id] === 0 && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && sat.type === SpaceObjectType.DEBRIS && colorSchemeManager.objectTypeFlags.debris === false) ||
     (objectManager.isSensorManagerLoaded &&
       sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
@@ -239,7 +239,7 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
 
   // NOTE: Treat TBA Satellites as SPECIAL if SCC NUM is less than 70000 (ie a real satellite)
   if (
-    (dotsManager.inViewData[sat.id] === 0 && (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) && colorSchemeManager.objectTypeFlags.pink === false) ||
+    (dotsManager.inViewData?.[sat.id] === 0 && (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) && colorSchemeManager.objectTypeFlags.pink === false) ||
     (mainCamera.cameraType.current === mainCamera.cameraType.Planetarium && (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) && colorSchemeManager.objectTypeFlags.pink === false) ||
     (objectManager.isSensorManagerLoaded &&
       sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER &&
@@ -253,14 +253,14 @@ export const defaultRules = (sat: SatObject): ColorInformation => { // NOSONAR
     };
   }
 
-  if (dotsManager.inViewData[sat.id] === 1 && colorSchemeManager.objectTypeFlags.inFOV === false && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
+  if (dotsManager.inViewData?.[sat.id] === 1 && colorSchemeManager.objectTypeFlags.inFOV === false && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
     return {
       color: colorSchemeManager.colorTheme.deselected,
       pickable: Pickable.No,
     };
   }
 
-  if (dotsManager.inViewData[sat.id] === 1 && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
+  if (dotsManager.inViewData?.[sat.id] === 1 && mainCamera.cameraType.current !== mainCamera.cameraType.Planetarium) {
     if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined') {
       // Intentional
     } else {

@@ -21,6 +21,8 @@ export const cruncherExtraData = (m: SatCruncherMessage) => {
 
   for (let satCrunchIndex = 0; satCrunchIndex < satSet.numSats; satCrunchIndex++) {
     try {
+      // Static objects lack these values and including them increase the JS heap a lot
+      if (satSet.satData[satCrunchIndex].static) continue;
       satSet.satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
       satSet.satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
       satSet.satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
@@ -77,8 +79,11 @@ export const cruncherExtraUpdate = (m: SatCruncherMessage) => {
   satSet.satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
 };
 
+let wait5 = 0;
 // prettier-ignore
 export const cruncherDotsManagerInteraction = (m: SatCruncherMessage) => { // NOSONAR
+  wait5++;
+  if (wait5 <= 5) return;
   const { dotsManager, satSet } = keepTrackApi.programs;
   if (m.data.satPos) {
     if (typeof dotsManager.positionData == 'undefined') {
@@ -209,7 +214,7 @@ export const parseGetVariables = (): void => {
   getVariableActions(params);
 };
 export const satCruncherOnMessage = (m: SatCruncherMessage) => {
-  const { uiManager, satSet } = keepTrackApi.programs;
+  const { uiManager, satSet, dotsManager } = keepTrackApi.programs;
   // store extra data that comes from crunching
   // Only do this once
   if (!satSet.gotExtraData && m.data?.extraData) {
@@ -228,7 +233,7 @@ export const satCruncherOnMessage = (m: SatCruncherMessage) => {
   keepTrackApi.methods.onCruncherMessage();
 
   // Only do this once after satSet.satData is ready
-  if (!settingsManager.cruncherReady && typeof satSet.satData !== 'undefined') {
+  if (!settingsManager.cruncherReady && typeof satSet.satData !== 'undefined' && typeof dotsManager.positionData !== 'undefined') {
     satSet.onCruncherReady();
     if (!settingsManager.disableUI) {
       uiManager.reloadLastSensor();

@@ -27,7 +27,22 @@ import { mobileManager } from './uiManager/mobile/mobileManager';
 import { searchBox } from './uiManager/search/searchBox';
 import { uiManager } from './uiManager/uiManager';
 
+// let memoryUsage = 0;
+// let lastMemoryUsage = 0;
+// const MEMORYISSUE = (memoryUsage: number) => {
+//   console.warn(`Memory Usage: ${memoryUsage}%`);
+// };
+
 export const initializeKeepTrack = async (): Promise<void> => {
+  // window.setInterval(() => {
+  //   // @ts-ignore
+  //   memoryUsage = parseFloat(((window.performance.memory.totalJSHeapSize / window.performance.memory.jsHeapSizeLimit) * 100).toFixed(2));
+  //   if (memoryUsage > lastMemoryUsage + 2) {
+  //     MEMORYISSUE(memoryUsage);
+  //   }
+
+  //   lastMemoryUsage = memoryUsage;
+  // }, 16);
   try {
     preInitialize();
 
@@ -109,7 +124,9 @@ export const initializeKeepTrack = async (): Promise<void> => {
 
     keepTrackApi.programs.dotsManager.setupPickingBuffer(satSet.satData?.length);
 
-    orbitManager.init();
+    if (settingsManager.isDrawOrbits) {
+      orbitManager.init();
+    }
 
     const lineManager = new LineFactory();
     // eslint-disable-next-line require-atomic-updates

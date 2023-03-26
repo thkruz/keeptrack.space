@@ -405,20 +405,25 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
         containment: 'window',
         drag: () => {
           getEl('sat-infobox').style.height = '600px';
+          const rootElement = (document.querySelector(':root') as HTMLElement);
+          rootElement.style.setProperty('--search-box-bottom', `0px`);
           getEl('sat-infobox').classList.remove('satinfo-fixed');
         },
-      });
+      });      
     }
 
     // If right click kill and reinit
     $('#sat-infobox').on('mousedown', (e: any) => {
-      if (e.button === 2) {
+      if (e.button === 2) {        
         $('#sat-infobox').removeClass().removeAttr('style');
         getEl('sat-infobox').classList.add('satinfo-fixed');
+        const rootElement = (document.querySelector(':root') as HTMLElement);
+        const searchBoxHeight = getEl('sat-infobox').clientHeight;
+        rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
       }
     });
 
-    satInfoboxCore.orbitalData.isLoaded = true;
+    satInfoboxCore.orbitalData.isLoaded = true;    
 
     // Give the DOM time load and then redo
     setTimeout(() => {

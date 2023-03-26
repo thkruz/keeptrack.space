@@ -166,20 +166,20 @@ export const getInc2AltScatterData = () => {
     const gmst = satellite.gstime(j);
     sat = { ...sat, ...satellite.eciToGeodetic(sat.position, gmst) };
 
-    if (sat.alt < 80) return; // TODO: USE THIS FOR FINDING DECAYS!
+    if (sat.getAltitude() < 80) return; // TODO: USE THIS FOR FINDING DECAYS!
 
     switch (sat.country) {
       case 'United States of America':
       case 'United States':
       case 'US':
-        usa.push([sat.alt, sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        usa.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
       case 'Russian Federation':
       case 'CIS':
       case 'RU':
       case 'SU':
       case 'Russia':
-        russia.push([sat.alt, sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        russia.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
       case 'China':
       case `China, People's Republic of`:
@@ -187,10 +187,10 @@ export const getInc2AltScatterData = () => {
       case 'China (Republic)':
       case 'PRC':
       case 'CN':
-        china.push([sat.alt, sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        china.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
       default:
-        other.push([sat.alt, sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        other.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
     }
   });

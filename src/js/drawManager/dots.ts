@@ -392,9 +392,11 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
     // Interpolate position since last draw by adding the velocity
     // NOTE: We were using satDataLenInDraw3 but markers don't have velocity and neither do missiles (3 DOF as of 7/4/2022)
     if (isAlternateVelocity) {
+      // Update half of the positions based on velocity
       for (dotsManager.drawI = 0; dotsManager.drawI < Math.ceil(dotsManager.orbitalSats3 / 2); dotsManager.drawI++) {
         dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * (timeManager.drawDt + lastDrawDt);
       }
+      // If you updated the selected sat, undo it
       if (selSatIdx * 3 < Math.ceil(dotsManager.orbitalSats3 / 2)) {
         dotsManager.positionData[selSatIdx * 3] -= dotsManager.velocityData[selSatIdx * 3] * (timeManager.drawDt + lastDrawDt);
         dotsManager.positionData[selSatIdx * 3 + 1] -= dotsManager.velocityData[selSatIdx * 3 + 1] * (timeManager.drawDt + lastDrawDt);
@@ -403,9 +405,11 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
       isAlternateVelocity = false;
       lastDrawDt = timeManager.drawDt;
     } else {
+      // Update half of the positions based on velocity
       for (dotsManager.drawI = Math.floor(dotsManager.orbitalSats3 / 2); dotsManager.drawI < dotsManager.orbitalSats3; dotsManager.drawI++) {
         dotsManager.positionData[dotsManager.drawI] += dotsManager.velocityData[dotsManager.drawI] * (timeManager.drawDt + lastDrawDt);
       }
+      // If you updated the selected sat, undo it
       if (selSatIdx * 3 >= Math.floor(dotsManager.orbitalSats3 / 2)) {
         dotsManager.positionData[selSatIdx * 3] -= dotsManager.velocityData[selSatIdx * 3] * (timeManager.drawDt + lastDrawDt);
         dotsManager.positionData[selSatIdx * 3 + 1] -= dotsManager.velocityData[selSatIdx * 3 + 1] * (timeManager.drawDt + lastDrawDt);
@@ -415,7 +419,7 @@ export const updatePositionBuffer = (satSetLen: number, orbitalSats: number, tim
       lastDrawDt = timeManager.drawDt;
     }
 
-    // Always do the selected satellited so it is smooth
+    // Always do the selected satellite in the most accurate way
     dotsManager.positionData[selSatIdx * 3] += dotsManager.velocityData[selSatIdx * 3] * timeManager.drawDt;
     dotsManager.positionData[selSatIdx * 3 + 1] += dotsManager.velocityData[selSatIdx * 3 + 1] * timeManager.drawDt;
     dotsManager.positionData[selSatIdx * 3 + 2] += dotsManager.velocityData[selSatIdx * 3 + 2] * timeManager.drawDt;

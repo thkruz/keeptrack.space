@@ -95,7 +95,7 @@
     z-index: 1;
     top: var(--top-menu-height);
     bottom: var(--bottom-menu-top);
-    max-height: calc(100% - var(--bottom-menu-height));
+    max-height: calc(100% - var(--top-menu-height) - max(var(--bottom-menu-top), var(--search-box-bottom)) + 3px);
     border-width: 0px 0px 5px 5px;
     border-style: solid;
     border-color: var(--colorTertiaryDarken3);

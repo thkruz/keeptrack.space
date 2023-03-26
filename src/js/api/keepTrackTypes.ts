@@ -100,6 +100,8 @@ export interface MissileParams {
 }
 
 export interface Colors {
+  rcsXXSmall: [number, number, number, number];
+  rcsXSmall: [number, number, number, number];
   pink: [number, number, number, number];
   inFOV: [number, number, number, number];
   inFOVAlt: [number, number, number, number];

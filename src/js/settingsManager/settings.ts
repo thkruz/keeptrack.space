@@ -27,7 +27,7 @@ export let settingsManager: SettingsManager = {
   classificationStr: '',
   // This controls which of the built-in plugins are loaded
   plugins: {
-    debug: true,
+    debug: false,
     satInfoboxCore: true,
     updateSelectBoxCore: true,
     aboutManager: true,
@@ -532,7 +532,9 @@ export let settingsManager: SettingsManager = {
         // apogeeGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0]
         // velGradient = [1.0 - settingsManager.colors.gradientAmt, settingsManager.colors.gradientAmt, 0.0, 1.0]
         satSmall: [0.2, 1.0, 0.0, 0.65],
-        rcsSmall: [1.0, 0, 0, 0.6],
+        rcsXXSmall: [1.0, 0, 0, 0.6],
+        rcsXSmall: [1.0, 0.56, 0.01, 0.6],
+        rcsSmall: [1.0, 1.0, 0, 0.6],
         rcsMed: [0.2, 0.4, 1.0, 1],
         rcsLarge: [0, 1.0, 0, 0.6],
         rcsUnknown: [1.0, 1.0, 0, 0.6],
@@ -727,6 +729,15 @@ export let settingsManager: SettingsManager = {
         for (const param of params) {
           const key = param.split('=')[0];
           switch (key) {
+            case 'debug':
+              settingsManager.plugins.debug = true;
+              break;
+            case 'nomarkers':
+              settingsManager.maxFieldOfViewMarkers = 1;
+              break;
+            case 'noorbits':
+              settingsManager.isDrawOrbits = false;
+              break;
             case 'console':
               settingsManager.isEnableConsole = true;
               break;

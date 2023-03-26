@@ -16,6 +16,7 @@
   --bottom-icon-height: 75px;
   --bottom-icon-img-size: 40px;
   --top-menu-height: 0px;
+  --search-box-bottom: 0px;
 }
 
 /*Min Scrollbar for Webkit Browsers */

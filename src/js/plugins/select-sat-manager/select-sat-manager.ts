@@ -77,6 +77,8 @@ export const selectSatManager = {
       mainCamera.fts2default();
       isselectedSatNegativeOne = true;
 
+      const rootElement = (document.querySelector(':root') as HTMLElement);
+      rootElement.style.setProperty('--search-box-bottom', `0px`);
       fadeOut(getEl('sat-infobox'));
 
       // Add Grey Out
@@ -161,6 +163,9 @@ export const selectSatManager = {
       keepTrackApi.methods.selectSatData(sat, satId);
 
       // NOTE: This has to come after keepTrackApi.methods.selectSatData!
+      const rootElement = (document.querySelector(':root') as HTMLElement);
+      const searchBoxHeight = getEl('sat-infobox').clientHeight;
+      rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
       fadeIn(getEl('sat-infobox'));
     }
 

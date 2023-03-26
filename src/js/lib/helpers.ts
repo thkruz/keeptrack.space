@@ -257,6 +257,7 @@ export const fadeIn = (el: HTMLElement, type?: string, duration?: number, callba
   el.style.transition = `all ${duration / 1e3}s ease-in-out`;
   el.style.display = type;
   setTimeout(() => {
+    el.style.transition = 'none';
     if (callback) callback();
   }, duration);
 };

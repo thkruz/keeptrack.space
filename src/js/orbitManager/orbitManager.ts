@@ -2,7 +2,7 @@
 
 import { isThisJest, keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as glm from 'gl-matrix';
-import { MissileParams } from '../api/keepTrackTypes';
+import { MissileParams, SatObject } from '../api/keepTrackTypes';
 import { Camera } from '../camera/camera';
 import { GroupsManager } from '../groupsManager/groupsManager';
 import { getEl } from '../lib/helpers';
@@ -98,13 +98,17 @@ export const init = (orbitWorker?: Worker): void => {
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 
+  // Allocate one buffer for every satellite
   for (let i = 0; i < satSet.missileSats; i++) {
     glBuffers.push(allocateBuffer());
   }
+
+  const satDataString = getSatDataString(satSet.satData);
+
   orbitManager.orbitWorker.postMessage({
     isInit: true,
     orbitFadeFactor: settingsManager.orbitFadeFactor,
-    satData: JSON.stringify(satSet.satData),
+    satData: satDataString,
     numSegs: settingsManager.orbitSegments,
   });
   initialized = true;
@@ -112,6 +116,17 @@ export const init = (orbitWorker?: Worker): void => {
   orbitManager.shader = pathShader;
   keepTrackApi.methods.orbitManagerInit();
 };
+
+export const getSatDataString = (satData: SatObject[]) =>
+  JSON.stringify(
+    satData.map((sat) => ({
+      static: sat.static,
+      missile: sat.missile,
+      isRadarData: sat.isRadarData,
+      TLE1: sat.TLE1,
+      TLE2: sat.TLE2,
+    }))
+  );
 
 /* export const setOrbit = function (satId: number) {
 let sat = satSet.getSat(satId: number);
@@ -193,6 +208,8 @@ export const clearHoverOrbit = (): void => {
   if (currentHoverId === -1) return;
   currentHoverId = -1;
 
+  if (!settingsManager.isDrawOrbits) return;
+
   gl.bindBuffer(gl.ARRAY_BUFFER, hoverOrbitBuf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
 };
@@ -205,18 +222,18 @@ export const draw = (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer: WebGLFra
   gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
   gl.useProgram(pathShader);
 
-  gl.enable(gl.BLEND);
-  if (settingsManager.showOrbitThroughEarth) {
-    gl.disable(gl.DEPTH_TEST);
-  } else {
-    gl.enable(gl.DEPTH_TEST);
-  }
-
-  gl.uniformMatrix4fv(pathShader.uMvMatrix, false, glm.mat4.create());
-  gl.uniformMatrix4fv(pathShader.uCamMatrix, false, camMatrix);
-  gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
-
   if (settingsManager.isDrawOrbits) {
+    gl.enable(gl.BLEND);
+    if (settingsManager.showOrbitThroughEarth) {
+      gl.disable(gl.DEPTH_TEST);
+    } else {
+      gl.enable(gl.DEPTH_TEST);
+    }
+
+    gl.uniformMatrix4fv(pathShader.uMvMatrix, false, glm.mat4.create());
+    gl.uniformMatrix4fv(pathShader.uCamMatrix, false, camMatrix);
+    gl.uniformMatrix4fv(pathShader.uPMatrix, false, pMatrix);
+
     drawGroupObjectOrbit();
     drawInViewObjectOrbit();
     drawPrimaryObjectOrbit(satSet);
@@ -243,6 +260,7 @@ export const updateOrbitBuffer = (satId: number, force?: boolean, TLE1?: string,
   const { missile, latList, lonList, altList } = missileParams;
   const sat = satSet.getSat(satId);
   if (typeof sat === 'undefined') return;
+  if (!settingsManager.isDrawOrbits) return;
 
   force ??= false;
   if (force) {

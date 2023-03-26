@@ -33,6 +33,14 @@ import { defaultGd, emptySensor, PositionCruncherIncomingMsg, PositionCruncherOu
 import { createLatLonHei, isInFov, isInValidElevation, isSensorDeepSpace, lookAnglesToEcf, setupTimeVariables } from './positionCruncher/calculations';
 import { resetPosition, resetVelocity, setPosition } from './positionCruncher/satCache';
 
+interface CruncherSat {
+  static: any;
+  missile: any;
+  isRadarData: any;
+  TLE1: string;
+  TLE2: string;
+}
+
 const SunMath = Utils.SunMath;
 
 const EMPTY_FLOAT32_ARRAY = new Float32Array(0);
@@ -97,7 +105,7 @@ try {
 
 // prettier-ignore
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSONAR
-  let satData;
+  let satData: CruncherSat[];
   let i;
   let extraData = [];
   let satrec: SatCacheObject;
@@ -133,7 +141,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
         };
         satrec = null;
         if (satData[i].static || satData[i].missile || satData[i].isRadarData) {
-          satrec = satData[i];
+          satrec = satData[i] as any;
           delete satrec['id'];
           extraData.push(extraRec);
           satCache.push(satrec);
@@ -165,9 +173,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       }
 
       satPos = new Float32Array(len * 3);
-      satVel = new Float32Array(len * 3);
-      satInView = new Int8Array(len);
-      satInSun = new Int8Array(len);
+      satVel = new Float32Array(len * 3);            
 
       try {
         postMessage({
@@ -336,6 +342,22 @@ export const propagationLoop = (mockSatCache?: SatCacheObject[]) => {
 
   const { now, j, gmst, gmstNext, isSunExclusion, sunEci } = setupTimeVariables(dynamicOffsetEpoch, staticOffset, propRate, isSunlightView, isMultiSensor, sensor);
   len = isMarkersNeeded() ? satCache.length - 1 - fieldOfViewSetLength : satCache.length - 1;
+
+  if (sensor.observerGd?.lat !== null) {
+    if (!satInView || satInView === EMPTY_INT8_ARRAY) {
+      satInView = new Int8Array(satCache.length);
+    }
+  } else {
+    satInView = EMPTY_INT8_ARRAY;
+  }
+
+  if (isSunlightView) {
+    if (!satInSun || satInSun === EMPTY_INT8_ARRAY) {
+      satInSun = new Int8Array(satCache.length);
+    }
+  } else {
+    satInSun = EMPTY_INT8_ARRAY;
+  }
 
   updateSatCache(now, j, gmst, gmstNext, isSunExclusion, sunEci);
   if (isResetFOVBubble) {
@@ -651,7 +673,7 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
     }
 
     // Skip Calculating Lookangles if No Sensor is Selected
-    if (sensor.observerGd !== defaultGd && !isMultiSensor) {
+    if (sensor.observerGd?.lat !== null && !isMultiSensor) {
       lookangles = Transforms.ecf2rae(sensor.observerGd, Transforms.eci2ecf(pv.position, gmst));
     }
   } catch (e) {
@@ -667,12 +689,10 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
 
     positionEcf = 0;
     lookangles = 0;
-  }
-
-  satInView[i] = 0; // 0 = FALSE - Default in case no sensor selected
-  satInSun[i] = 2; // Default in case
-
+  }  
+  
   if (isSunlightView) {
+    satInSun[i] = 2; // Default in case
     semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2))) * RAD2DEG;
     semiDiamSun =
       Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satPos[i * 3] + sunEci.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunEci.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunEci.z, 2))) *
@@ -702,7 +722,8 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
     }
   }
 
-  if (sensor.observerGd !== defaultGd && !isSunExclusion) {
+  if (sensor.observerGd?.lat !== null && !isSunExclusion) {
+    satInView[i] = 0; // 0 = FALSE - Default in case no sensor selected
     if (isMultiSensor) {
       for (let s = 0; s < mSensor.length; s++) {
         // Skip satellites in the sun if you are an optical sensor
@@ -750,7 +771,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
   let az: number, el: number, rng: number;
   let pos;
   let q: number, q2: number;
-  if (!isMultiSensor && sensor.observerGd !== defaultGd) {
+  if (!isMultiSensor && sensor.observerGd?.lat !== null) {
     mSensor[0] = sensor;
     mSensor.length = 1;
   }
@@ -1137,7 +1158,7 @@ export const sendDataToSatSet = () => {
     satPos: satPos,
   };
   // Add In View Data if Sensor Selected
-  if (sensor.observerGd !== defaultGd) {
+  if (sensor.observerGd?.lat !== null) {
     postMessageArray.satInView = satInView;
   } else {
     postMessageArray.satInView = EMPTY_INT8_ARRAY;

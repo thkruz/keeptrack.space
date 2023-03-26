@@ -186,17 +186,31 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any, jsC
   // Filter TLEs
   // SatCruncher will use this when it returns so we need to expose it now
   if (typeof resp === 'string') resp = JSON.parse(resp);
-  satSet.satData = filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog, jsCatalog);
+  // Sets satSet.satData internally to reduce memory usage
+  filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog, jsCatalog);
   satSet.numSats = satSet.satData.length;
+
+  const satDataString = getSatDataString(satSet.satData);
 
   /** Send satDataString to satCruncher to begin propagation loop */
   satSet.satCruncher.postMessage({
     typ: 'satdata',
-    dat: JSON.stringify(satSet.satData),
+    dat: satDataString,
     fieldOfViewSetLength: objectManager.fieldOfViewSet.length,
     isLowPerf: settingsManager.lowPerf,
   });
 };
+
+export const getSatDataString = (satData: SatObject[]) =>
+  JSON.stringify(
+    satData.map((sat) => ({
+      static: sat.static,
+      missile: sat.missile,
+      isRadarData: sat.isRadarData,
+      TLE1: sat.TLE1,
+      TLE2: sat.TLE2,
+    }))
+  );
 
 export const setupGetVariables = () => {
   const { timeManager } = keepTrackApi.programs;
@@ -227,7 +241,7 @@ export const setupGetVariables = () => {
 };
 
 // prettier-ignore
-export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[], jsCatalog?: any[]) => { // NOSONAR
+export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[], jsCatalog?: any[]): void => { // NOSONAR
   const { dotsManager, objectManager, satSet } = keepTrackApi.programs;
 
   const tempSatData = [];
@@ -245,18 +259,40 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
   let rest: string;
 
   let notionalSatNum = 400000;
-  const makeDebris = (notionalDebris: any, meanMo: number) => {
+  const makeDebris = (notionalDebris: any, meanAnom: number) => {
     const debris = {...notionalDebris};
     debris.id = tempSatData.length;
     debris.sccNum = notionalSatNum.toString();
+
+    if (notionalSatNum < 1300000) {
+      // Random number between 0.01 and 0.1
+      debris.rcs = 0.01 + Math.random() * 0.09;
+    } else {
+      // Random number between 0.001 and 0.01
+      debris.rcs = 0.001 + Math.random() * 0.009;
+    }
+
     notionalSatNum++;
-    debris.TLE2 = debris.TLE2.substr(0, 43) + stringPad.pad0((parseFloat(debris.TLE2.substr(43, 51)) + meanMo).toFixed(4), 8) + debris.TLE2.substr(51);
+
+    meanAnom = parseFloat(debris.TLE2.substr(43, 51)) + meanAnom;
+    if (meanAnom > 360) meanAnom -= 360;
+    if (meanAnom < 0) meanAnom += 360;
+
+    debris.TLE2 = debris.TLE2.substr(0, 17) + // Columns 1-18
+      stringPad.pad0((Math.random() * 360).toFixed(4), 8) + // New RAAN
+      debris.TLE2.substr(25, 18) + // Columns 25-44
+      stringPad.pad0(meanAnom.toFixed(4), 8) + // New Mean Anomaly
+      debris.TLE2.substr(51); // Columns 51-69
     tempSatData.push(debris);
   };
 
   let i = 0;
   for (i; i < resp.length; i++) {
     resp[i].sccNum = stringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
+
+    // Check if first digit is a letter
+    resp[i].sccNum = convertA5to6Digit(resp[i].sccNum);
+
     if (settingsManager.limitSats === '') {
       // If there are no limits then just process like normal
       year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
@@ -272,31 +308,48 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
       satSet.cosparIndex[`${resp[i].intlDes}`] = i;
       resp[i].active = true;
       if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
-        // if (resp[i].type === 1) {
-        resp[i].id = tempSatData.length;
+        resp[i].id = tempSatData.length;        
         tempSatData.push(resp[i]);
-        // }
       }
 
       if (settingsManager.isNotionalDebris && (settingsManager.isUseExtendedCatalog && resp[i].type === 3)) {
-        let notionalDebris = {...resp[i]};
-        notionalDebris.name =`${resp[i].name} (1cm Notional)`;
-        notionalDebris.type = SpaceObjectType.NOTIONAL;
-        notionalDebris.source = 'Notional';
+        let notionalDebris = {
+          id: 0,
+          name: `${resp[i].name} (1cm Notional)`,
+          TLE1: resp[i].TLE1,
+          TLE2: resp[i].TLE2,
+          sccNum: '',          
+          type: SpaceObjectType.NOTIONAL,
+          source: 'Notional',
+          active: true,
+        };                
 
-        for (let i = 0; i < 2; i++) {
-          makeDebris(notionalDebris, 30 + Math.random() * 30);
-          makeDebris(notionalDebris, -30 - Math.random() * 30);
-          makeDebris(notionalDebris, 60 + Math.random() * 30);
-          makeDebris(notionalDebris, -60 - Math.random() * 30);
-          makeDebris(notionalDebris, 90 + Math.random() * 30);
-          makeDebris(notionalDebris, -90 - Math.random() * 30);
-          makeDebris(notionalDebris, 120 + Math.random() * 30);
-          makeDebris(notionalDebris, -120 - Math.random() * 30);
-          makeDebris(notionalDebris, 150 + Math.random() * 30);
-          makeDebris(notionalDebris, -150 - Math.random() * 30);
-          makeDebris(notionalDebris, 180 + Math.random() * 30);
-          makeDebris(notionalDebris, -180 - Math.random() * 30);
+        for (let i = 0; i < 8; i++) {
+          if (tempSatData.length > 100000) break; // Max 1 million satellites
+          makeDebris(notionalDebris, 15 + Math.random() * 15);
+          makeDebris(notionalDebris, -15 - Math.random() * 15);
+          makeDebris(notionalDebris, 30 + Math.random() * 15);
+          makeDebris(notionalDebris, -30 - Math.random() * 15);
+          makeDebris(notionalDebris, 45 + Math.random() * 15);
+          makeDebris(notionalDebris, -45 - Math.random() * 15);
+          makeDebris(notionalDebris, 60 + Math.random() * 15);
+          makeDebris(notionalDebris, -60 - Math.random() * 15);
+          makeDebris(notionalDebris, 75 + Math.random() * 15);
+          makeDebris(notionalDebris, -75 - Math.random() * 15);
+          makeDebris(notionalDebris, 90 + Math.random() * 15);
+          makeDebris(notionalDebris, -90 - Math.random() * 15);
+          makeDebris(notionalDebris, 105 + Math.random() * 15);
+          makeDebris(notionalDebris, -105 - Math.random() * 15);
+          makeDebris(notionalDebris, 120 + Math.random() * 15);
+          makeDebris(notionalDebris, -120 - Math.random() * 15);
+          makeDebris(notionalDebris, 135 + Math.random() * 15);
+          makeDebris(notionalDebris, -135 - Math.random() * 15);
+          makeDebris(notionalDebris, 150 + Math.random() * 15);
+          makeDebris(notionalDebris, -150 - Math.random() * 15);
+          makeDebris(notionalDebris, 165 + Math.random() * 15);
+          makeDebris(notionalDebris, -165 - Math.random() * 15);
+          makeDebris(notionalDebris, 180 + Math.random() * 15);
+          makeDebris(notionalDebris, -180 - Math.random() * 15);
         }
       }
 
@@ -458,24 +511,43 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
         satSet.sccIndex[`${jsCatalog[s].SCC.toString()}`] = tempSatData.length;
         satSet.cosparIndex[`${year}-${rest}`] = tempSatData.length;
         tempSatData.push(jsSatInfo);
-        const notionalDebris = {...jsSatInfo};
-        notionalDebris.type = SpaceObjectType.NOTIONAL;
-        notionalDebris.name =`${jsSatInfo.name} (1cm Notional)`;
-        notionalDebris.source = 'Notional';
 
-        for (let i = 0; i < 2; i++) {
-          makeDebris(notionalDebris, 30 + Math.random() * 30);
-          makeDebris(notionalDebris, -30 - Math.random() * 30);
-          makeDebris(notionalDebris, 60 + Math.random() * 30);
-          makeDebris(notionalDebris, -60 - Math.random() * 30);
-          makeDebris(notionalDebris, 90 + Math.random() * 30);
-          makeDebris(notionalDebris, -90 - Math.random() * 30);
-          makeDebris(notionalDebris, 120 + Math.random() * 30);
-          makeDebris(notionalDebris, -120 - Math.random() * 30);
-          makeDebris(notionalDebris, 150 + Math.random() * 30);
-          makeDebris(notionalDebris, -150 - Math.random() * 30);
-          makeDebris(notionalDebris, 180 + Math.random() * 30);
-          makeDebris(notionalDebris, -180 - Math.random() * 30);        
+        let notionalDebris = {
+          id: 0,
+          name: `${jsSatInfo.name} (1cm Notional)`,
+          TLE1: jsSatInfo.TLE1,
+          TLE2: jsSatInfo.TLE2,
+          sccNum: '',
+          type: SpaceObjectType.NOTIONAL,
+          source: 'Notional',
+          active: true,
+        };  
+
+        for (let i = 0; i < 6; i++) {
+          makeDebris(notionalDebris, 15 + Math.random() * 15);
+          makeDebris(notionalDebris, -15 - Math.random() * 15);
+          makeDebris(notionalDebris, 30 + Math.random() * 15);
+          makeDebris(notionalDebris, -30 - Math.random() * 15);
+          makeDebris(notionalDebris, 45 + Math.random() * 15);
+          makeDebris(notionalDebris, -45 - Math.random() * 15);
+          makeDebris(notionalDebris, 60 + Math.random() * 15);
+          makeDebris(notionalDebris, -60 - Math.random() * 15);
+          makeDebris(notionalDebris, 75 + Math.random() * 15);
+          makeDebris(notionalDebris, -75 - Math.random() * 15);
+          makeDebris(notionalDebris, 90 + Math.random() * 15);
+          makeDebris(notionalDebris, -90 - Math.random() * 15);
+          makeDebris(notionalDebris, 105 + Math.random() * 15);
+          makeDebris(notionalDebris, -105 - Math.random() * 15);
+          makeDebris(notionalDebris, 120 + Math.random() * 15);
+          makeDebris(notionalDebris, -120 - Math.random() * 15);
+          makeDebris(notionalDebris, 135 + Math.random() * 15);
+          makeDebris(notionalDebris, -135 - Math.random() * 15);
+          makeDebris(notionalDebris, 150 + Math.random() * 15);
+          makeDebris(notionalDebris, -150 - Math.random() * 15);
+          makeDebris(notionalDebris, 165 + Math.random() * 15);
+          makeDebris(notionalDebris, -165 - Math.random() * 15);
+          makeDebris(notionalDebris, 180 + Math.random() * 15);
+          makeDebris(notionalDebris, -180 - Math.random() * 15);       
         }
       }
     }
@@ -517,14 +589,32 @@ export const filterTLEDatabase = (resp: SatObject[], limitSatsArray?: any[], ext
     tempSatData.push(objectManager.missileSet[i]);
   }
 
-  satSet.missileSats = tempSatData.length;
+  satSet.missileSats = tempSatData.length; // This is the start of the missiles index
 
   for (i = 0; i < objectManager.fieldOfViewSet.length; i++) {
     objectManager.fieldOfViewSet[i].id = tempSatData.length;
     tempSatData.push(objectManager.fieldOfViewSet[i]);
   }
 
-  return tempSatData;
+  satSet.satData = tempSatData;  
+};
+
+export const convertA5to6Digit = (sccNum: string): string => {
+  if (sccNum[0].match(/[a-z]/iu)) {
+    // Extract the trailing 4 digits
+    const rest = sccNum.slice(1, 5);
+
+    // Convert the first letter to a two digit number. Skip I and O as they look too similar to 1 and 0
+    // A=10, B=11, C=12, D=13, E=14, F=15, G=16, H=17, J=18, K=19, L=20, M=21, N=22, P=23, Q=24, R=25, S=26, T=27, U=28, V=29, W=30, X=31, Y=32, Z=33
+    let first = sccNum[0].toUpperCase().charCodeAt(0) - 55;
+    const iPlus = first >= 18 ? 1 : 0;
+    const tPlus = first >= 24 ? 1 : 0;
+    first = first - iPlus - tPlus;
+
+    return `${first}${rest}`;
+  } else {
+    return sccNum;
+  }
 };
 
 export const init = (): void => {

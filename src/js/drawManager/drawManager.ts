@@ -427,7 +427,7 @@ export const satCalculate = () => {
     selectSatManager.selectSat(objectManager.selectedSat, mainCamera);
     if (objectManager.selectedSat !== -1) {
       orbitManager.setSelectOrbit(objectManager.selectedSat);
-      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && dotsManager.inViewData[drawManager.sat.id] === 1) {
+      if (objectManager.isSensorManagerLoaded && sensorManager.currentSensor[0].lat != null && dotsManager.inViewData?.[drawManager.sat.id] === 1) {
         lineManager.drawWhenSelected();
         lineManager.updateLineToSat(objectManager.selectedSat, satSet.getSensorFromSensorName(sensorManager.currentSensor[0].name));
       }

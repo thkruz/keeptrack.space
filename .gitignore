@@ -108,6 +108,7 @@ src/analysis/sathist/*.json
 
 # Extended TLE
 src/tle/tle4.js
+src/tle/TLE2.json.bak
 
 # Custom Builds
 custom-builds

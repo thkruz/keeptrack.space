@@ -2,6 +2,102 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v7.2.0
+
+>  
+
+- Main
+- test: :adhesive_bandage: fix testing issue causing jest to fail on gi…
+- Update
+- Update
+- minor bug fixes
+- Version 7.1
+- Update to 7.0
+- Update
+- Update
+- Upgrade dependencies
+- Develop
+- Develop
+- Develop
+- refactor: :label: convert om-manager to typescript
+- Develop
+- Develop3
+- feat: :card_file_box: update catalog
+- fix: :green_heart: update docker.google instructions
+- Develop
+- feat: :zap: optimize milky way textures and rotate
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :ambulance: fix photomanager icon not loading
+- fix: :ambulance: fix image not found on linux ending in /
+- Develop
+- Develop
+- build: :arrow_up: upgrade dependencies
+- Develop
+- chore: :card_file_box: update database
+- fix: :zap: remove jquery and fix open bugs
+- feat: :sparkles: add eci ecf ric inc2lon and time2lon plots
+- refactor: :zap: remove jquery
+- feat: :sparkles: add satellite search on control site clicked
+- style: :art: replace all camelCase files with hyphens for better git detection
+- feat: :sparkles: add scenario-creator scaffold
+- docs: :page_facing_up: clear AGPL notice
+- feat: :sparkles: add 2nd sat selection + update selectbox
+- fix: :rotating_light: fix sonarcube findings
+- feat: :sparkles: add ECI plots
+- refactor: :zap: remove more jquery
+- fix: :zap: reduce complexity of legend color code
+- feat: :zap: optimize cruncher loops
+- build: :construction_worker: add google cloud support
+- fix: :bug: fix loading + legend + add more settings
+- refactor: :zap: remove jquery from adviceManager
+- test: :white_check_mark: fix all failing tests
+- fix: :zap: improve loading times
+- fix: :bug: safeguard functions against bad values
+- feat: :sparkles: add RIC frame 3D scatter plots
+- refactor: :zap: change base64 images to delayedsrc images
+- feat: :sparkles: add ecf analysis plot
+- fix: :bug: fix time not moving at correct speed
+- feat: :sparkles: add better breakup logic
+- fix: :rotating_light: fix minor sonarcube findings
+- fix: :rotating_light: fix minor sonarcube findings
+- refactor: :zap: remove jquery
+- refactor: :label: add more typing to colorSchemeManager
+- fix: :zap: fix minor issues with stf menu
+- docs: :memo: update changelog
+- docs: :memo: update changelog
+- fix: :beers: start fixing trend analysis menu
+- fix: :bug: fix lookangles menu
+- feat: :sparkles: add find reentries function
+- feat: :triangular_flag_on_post: modify breakup options to be more realistic
+- fix: :bug: fix ray casting on earth functionality
+- fix: :sparkles: add color scheme for notional debris
+- feat: :sparkles: new loading screen
+- fix: :bug: fix premature filtering in findsat
+- feat: :sparkles: add ability to use ECF for satellite orbits
+- chore: :bookmark: update to version 5.4
+- fix: :bug: fix socrates
+- fix: :lipstick: fix bug with sat-infobox being sluggish
+- fix: :bug: fix countries filters
+- fix: :label: better typing
+- test: :camera_flash: update snapshots
+- docs: :memo: add better notes on how dot interpolation works
+- fix: :bug: fix next pass time not updating
+- fix: :bug: include TBA sats as Special
+- fix deploy
+- chore: :bookmark: change to 6.0.1
+- fix: :sparkles: update SRP FOV
+- fix: :bug: fix missing top menu icons
+- fix: :bug: fix umbral not showing
+- Update deploy-pipeline.yml
+- fix: :pencil2: fix capitialization issue with constellations.ts
+- test: :bug: fix settingsmenu tests
+- chore: :lock: add gpg signing
+- build: :lock: update npm packages
+- fix: :lock: bump async
+
 #### v7.1.2
 
 >  

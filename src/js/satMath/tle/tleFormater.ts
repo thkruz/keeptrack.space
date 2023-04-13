@@ -1,4 +1,4 @@
-import { stringPad } from '@app/js/lib/helpers';
+import { stringPad } from '../../../js/lib/stringPad';
 
 export type StringifiedNubmer = `${number}.${number}`;
 

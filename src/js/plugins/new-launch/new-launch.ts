@@ -1,7 +1,8 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, stringPad, waitForCruncher } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, hideLoading, shake, showLoadingSticky, slideInRight, slideOutLeft, waitForCruncher } from '@app/js/lib/helpers';
+import { stringPad } from '@app/js/lib/stringPad';
 import { helpBodyTextNewLaunch, helpTitleTextNewLaunch } from './help';
 
 let isNewLaunchMenuOpen = false;

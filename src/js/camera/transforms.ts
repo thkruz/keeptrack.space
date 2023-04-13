@@ -1,4 +1,5 @@
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '../lib/constants';
+
 import { getDayOfYear } from '../timeManager/transforms';
 
 export const normalizeAngle = (angle: number): number => {

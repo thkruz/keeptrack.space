@@ -1,6 +1,6 @@
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { stringPad } from '@app/js/lib/helpers';
+import { stringPad } from '@app/js/lib/stringPad';
 import { EciVec3, SatelliteRecord } from 'ootk';
 import { satellite } from '../satMath';
 import { calculateTimeVariables } from './calculateTimeVariables';

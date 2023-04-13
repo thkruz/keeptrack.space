@@ -2,7 +2,8 @@ import breakupPng from '@app/img/icons/breakup.png';
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { createError } from '@app/js/errorManager/errorManager';
-import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft, stringPad } from '@app/js/lib/helpers';
+import { clickAndDragWidth, getEl, shake, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { stringPad } from '@app/js/lib/stringPad';
 import { helpBodyTextBreakup, helpTitleTextBreakup } from './help';
 
 let isBreakupMenuOpen = false;

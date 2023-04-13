@@ -1,5 +1,5 @@
-import { stringPad } from '@app/js/lib/helpers';
 import { keepTrackApi } from '../../api/keepTrackApi';
+import { stringPad } from '@app/js/lib/stringPad';
 
 export const currentEpoch = (currentDate: Date): [string, string] => {
   const { timeManager } = keepTrackApi.programs;

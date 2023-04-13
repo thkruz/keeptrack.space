@@ -225,6 +225,7 @@ export interface DotsManager {
 }
 
 export interface SettingsManager {
+  isDisableTimeMachineToasts: any;
   selectedColorFallback: [number, number, number, number];
   isEnableExtendedCatalog: boolean;
   isFreezePropRateOnDrag: any;

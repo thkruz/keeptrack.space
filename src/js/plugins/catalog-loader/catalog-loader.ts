@@ -203,12 +203,18 @@ export const parseCatalog = (resp: any, extraSats?: any, asciiCatalog?: any, jsC
   });
 };
 
-export const getSatDataString = (satData: SatObject[]) =>
+export const getSatDataString = (satData: any[]) =>
   JSON.stringify(
     satData.map((sat) => ({
       static: sat.static,
       missile: sat.missile,
       isRadarData: sat.isRadarData,
+      lat: sat.lat,
+      lon: sat.lon,
+      alt: sat.alt,
+      latList: sat.latList,
+      lonList: sat.lonList,
+      altList: sat.altList,
       TLE1: sat.TLE1,
       TLE2: sat.TLE2,
     }))

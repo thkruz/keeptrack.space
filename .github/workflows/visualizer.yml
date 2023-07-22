@@ -14,4 +14,4 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Visualizer
-        uses: githubocto/repo-visualizer
+        uses: githubocto/repo-visualizer@0.9.1

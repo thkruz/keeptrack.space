@@ -1,0 +1,17 @@
+name: Visualizer
+on:
+    workflow_dispatch:
+    push:
+      branches:
+        - main
+jobs:
+  update-visualizer:
+    name: Update Visualizer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Code
+        uses: actions/checkout
+
+      - name: Run Visualizer
+        uses: githubocto/repo-visualizer

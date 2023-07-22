@@ -21,6 +21,7 @@
  */
 
 // This file should contain all of the webgl code for generating non .obj meshes
+import { ConeObject, cone } from './cone';
 import { EarthObject, earth } from './earth';
 import { MoonObject, moon } from './moon';
 import { SkyBoxSphere, skyboxSphere } from './skybox-sphere';
@@ -31,6 +32,7 @@ import { LineFactory } from './line-factory';
 export interface SceneManager {
   earth: EarthObject;
   moon: MoonObject;
+  cone: ConeObject;
   sun: SunObject;
   skybox: SkyBoxSphere;
 }
@@ -38,6 +40,7 @@ export interface SceneManager {
 const sceneManager = {
   moon,
   earth,
+  cone,
   sun,
   skybox: skyboxSphere,
 };

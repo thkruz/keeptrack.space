@@ -1,4 +1,6 @@
-import { hex2RgbA, parseRgba, rgbCss, saveCsv, saveVariable, stringPad } from '../lib/helpers';
+import { hex2RgbA, parseRgba, rgbCss, saveCsv, saveVariable } from '../lib/helpers';
+
+import { stringPad } from '../lib/stringPad';
 
 test('helpers Unit Tests', () => {
   console.warn = jest.fn();

@@ -320,7 +320,7 @@ export const updateHover = () => { // NOSONAR
     }
 
     if (settingsManager.enableHoverOrbits) {
-      if (uiManager.uiInput.mouseSat !== -1 && keepTrackApi.programs.satSet.satData[uiManager.uiInput.mouseSat].type !== SpaceObjectType.STAR) {
+      if (uiManager.uiInput.mouseSat !== -1 && keepTrackApi.programs.satSet.satData[uiManager.uiInput.mouseSat]?.type !== SpaceObjectType.STAR) {
         orbitManager.setHoverOrbit(uiManager.uiInput.mouseSat);
       } else {
         orbitManager.clearHoverOrbit();

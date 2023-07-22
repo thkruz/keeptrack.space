@@ -166,6 +166,9 @@ export let settingsManager: SettingsManager = {
     // New Extended Catalog
     settingsManager.isEnableExtendedCatalog = false;
 
+    // No Toasts During Time Machine
+    settingsManager.isDisableTimeMachineToasts = false;
+
     // This needed to be increased to support large number of CSpOC sensors
     settingsManager.maxFieldOfViewMarkers = 500000;
     settingsManager.maxMissiles = 500;
@@ -728,7 +731,7 @@ export let settingsManager: SettingsManager = {
       (function initParseFromGETVariables() {
         for (const param of params) {
           const key = param.split('=')[0];
-          switch (key) {
+          switch (key) {            
             case 'debug':
               settingsManager.plugins.debug = true;
               break;
@@ -789,6 +792,9 @@ export let settingsManager: SettingsManager = {
               break;
             case 'offline':
               settingsManager.offline = true;
+              break;
+            case 'notmtoast':
+              settingsManager.isDisableTimeMachineToasts = true;
               break;
             case 'cpo':
               settingsManager.copyrightOveride = true;
@@ -897,6 +903,7 @@ export let settingsManager: SettingsManager = {
   isDisableCss: null,
   isAllowRightClick: null,
   onLoadCb: null,
+  isDisableTimeMachineToasts: null,
   isDrawConstellationBoundaries: null,
   isDrawNasaConstellations: null,
   isDrawSun: null,

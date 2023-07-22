@@ -80,13 +80,16 @@ export const orbitManagerInit = (): void => {
     groupsManager.selectGroup(yearGroup);
     yearGroup.updateOrbits(orbitManager);
     satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
-    if (year >= 59 && year < 100) {
-      const timeMachineString = settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`;
-      keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
-    } else {
-      const yearStr = year < 10 ? `0${year}` : `${year}`;
-      const timeMachineString = settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`;
-      keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
+
+    if (!settingsManager.isDisableTimeMachineToasts) {
+      if (year >= 59 && year < 100) {
+        const timeMachineString = settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`;
+        keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
+      } else {
+        const yearStr = year < 10 ? `0${year}` : `${year}`;
+        const timeMachineString = settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`;
+        keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
+      }
     }
 
     if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
@@ -120,8 +123,9 @@ export const orbitManagerInit = (): void => {
         settingsManager.timeMachineDelay * yy,
         orbitManager.historyOfSatellitesRunCount
       );
-      // TODO: year should be dynamically calculated
-      if (year == 22) break;
+
+      const currentYear = parseInt(new Date().getUTCFullYear().toString().slice(2, 4));
+      if (year === currentYear) break;
     }
   };
 };

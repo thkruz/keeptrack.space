@@ -1,7 +1,8 @@
 import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import { SatObject } from '@app/js/api/keepTrackTypes';
 import { RAD2DEG } from '@app/js/lib/constants';
-import { getEl, stringPad } from '@app/js/lib/helpers';
+import { getEl } from '@app/js/lib/helpers';
+import { stringPad } from '@app/js/lib/stringPad';
 import { StringifiedNubmer } from '@app/js/satMath/tle/tleFormater';
 
 let doOnce = false;

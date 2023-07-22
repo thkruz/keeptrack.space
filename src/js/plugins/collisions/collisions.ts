@@ -1,7 +1,8 @@
 import socratesPng from '@app/img/icons/socrates.png';
 import $ from 'jquery';
 import { isThisJest, keepTrackApi } from '../../api/keepTrackApi';
-import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft, stringPad } from '../../lib/helpers';
+import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '../../lib/helpers';
+import { stringPad } from '../../lib/stringPad';
 import { helpBodyTextCollisions, helpTitleTextCollisions } from './help';
 
 let isSocratesMenuOpen = false;

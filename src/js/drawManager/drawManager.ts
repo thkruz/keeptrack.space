@@ -101,6 +101,7 @@ export const loadScene = async () => {
     await sceneManager.sun.init();
     await sceneManager.moon.init();
     await sceneManager.skybox.init();
+    // await sceneManager.cone.init();
   } catch (error) {
     console.debug(error);
   }
@@ -238,6 +239,9 @@ export const drawLoop = (preciseDt?: number) => {
   dotsManager.drawGpuPickingFrameBuffer(mainCamera, colorSchemeManager);
 
   orbitManager.draw(drawManager.pMatrix, mainCamera.camMatrix, drawManager.postProcessingManager.curBuffer);
+
+  // Draw a cone
+  // drawManager.sceneManager.cone.draw(drawManager.pMatrix, mainCamera.camMatrix);
 
   lineManager.draw();
 
@@ -383,6 +387,7 @@ export const drawOptionalScenery = (drawManagerOverride?: any) => {
 
     keepTrackApi.methods.drawOptionalScenery();
   }
+
   keepTrackApi.programs.drawManager.postProcessingManager.curBuffer = null;
 };
 export const satCalculate = () => {

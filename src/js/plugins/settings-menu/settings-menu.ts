@@ -206,6 +206,13 @@ export const uiManagerInit = (): void => {
                   Enable Freeze Time on Click
                 </label>
               </div>
+              <div class="switch row">
+                <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Time Machine stop showing toast messages.">
+                  <input id="settings-time-machine-toasts" type="checkbox" />
+                  <span class="lever"></span>
+                  Disable Time Machine Toasts
+                </label>
+              </div>
             </div>
             <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
             <div id="settings-colors">
@@ -440,6 +447,7 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
     case 'settings-demo-mode':
     case 'settings-sat-label-mode':
     case 'settings-freeze-drag':
+    case 'settings-time-machine-toasts':
     case 'settings-snp':
       if ((<HTMLInputElement>getEl(e.target.id)).checked) {
         // Play sound for enabling option
@@ -469,7 +477,7 @@ export const settingsFormChange = (e: any, isDMChecked?: boolean, isSLMChecked?:
 
 export const settingsFormSubmit = (e: any) => {
   if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
-  const { soundManager, satSet, colorSchemeManager, uiManager, drawManager, orbitManager } = keepTrackApi.programs;
+  const { groupsManager, soundManager, satSet, colorSchemeManager, uiManager, drawManager, orbitManager } = keepTrackApi.programs;
 
   soundManager.play('button');
 
@@ -507,6 +515,18 @@ export const settingsFormSubmit = (e: any) => {
   settingsManager.isSatLabelModeOn = (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
   settingsManager.isShowNextPass = (<HTMLInputElement>getEl('settings-snp')).checked;
   settingsManager.isFreezePropRateOnDrag = (<HTMLInputElement>getEl('settings-freeze-drag')).checked;
+
+  settingsManager.isDisableTimeMachineToasts = (<HTMLInputElement>getEl('settings-time-machine-toasts')).checked;
+  // TODO: These settings buttons should be inside the plugins themselves
+  // Stop Time Machine
+  orbitManager.isTimeMachineRunning = false;
+  orbitManager.isTimeMachineVisible = false;
+
+  settingsManager.colors.transparent = orbitManager.tempTransColor;
+  groupsManager.clearSelect();
+  satSet.setColorScheme(colorSchemeManager.default, true); // force color recalc
+
+  getEl('menu-time-machine').classList.remove('bmenu-item-selected');
 
   colorSchemeManager.reloadColors();
 

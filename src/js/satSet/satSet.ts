@@ -33,7 +33,8 @@ import { EciVec3 } from 'ootk';
 import { InView, Lla, Rae, SatObject, SensorObject, SunStatus } from '../api/keepTrackTypes';
 import { SpaceObjectType } from '../api/SpaceObjectType';
 import { ColorInformation } from '../colorManager/colorSchemeManager';
-import { getEl, stringPad } from '../lib/helpers';
+import { getEl } from '../lib/helpers';
+import { stringPad } from '../lib/stringPad';
 import { jday } from '../timeManager/transforms';
 import { onCruncherReady, satCruncherOnMessage } from './catalogSupport/cruncherInteractions';
 import {

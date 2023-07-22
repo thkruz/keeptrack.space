@@ -468,7 +468,7 @@ export const orbitalData = (sat: SatObject): void => { // NOSONAR
     elsetAgeDom.dataset.delay = '50';
     elsetAgeDom.dataset.tooltip = 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString();
 
-    if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded) {
+    if (!keepTrackApi.programs.objectManager.isSensorManagerLoaded || !keepTrackApi.programs.sensorManager.currentSensor[0].lat) {
       getEl('sat-sun').parentElement.style.display = 'none';
     } else {
       now = new Date(keepTrackApi.programs.timeManager.dynamicOffsetEpoch + keepTrackApi.programs.timeManager.propOffset);

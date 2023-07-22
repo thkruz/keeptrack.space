@@ -1,7 +1,7 @@
 import { StringifiedNubmer, formatArgumentOfPerigee, formatEccentricity, formatInclination, formatMeanAnomaly, formatMeanMotion, formatRightAscension } from './tleFormater';
 
 import { SatObject } from '../../api/keepTrackTypes';
-import { stringPad } from '@app/js/lib/helpers';
+import { stringPad } from '../../lib/stringPad';
 
 export const createTle = (tleParams: TleParams): { TLE1: string; TLE2: string } => {
   let { sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc } = tleParams;
@@ -14,7 +14,7 @@ export const createTle = (tleParams: TleParams): { TLE1: string; TLE2: string } 
   const meanaStr = formatMeanAnomaly(meana);
   const ecenStr = formatEccentricity(ecen);
 
-  let TLE1Ending = sat.TLE1.substr(32, 39);
+  let TLE1Ending = sat ? sat.TLE1.substr(32, 39) : ' +.00000000 +00000+0 +00000-0 0  9990';
   // Add explicit positive/negative signs
 
   TLE1Ending = TLE1Ending[1] === ' ' ? setCharAt(TLE1Ending, 1, '+') : TLE1Ending;
@@ -34,7 +34,7 @@ const setCharAt = (str: string, index: number, chr: string) => {
 };
 
 export type TleParams = {
-  sat: SatObject;
+  sat?: SatObject;
   inc: StringifiedNubmer;
   meanmo: StringifiedNubmer;
   rasc: StringifiedNubmer;

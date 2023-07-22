@@ -1,9 +1,11 @@
+---
 name: Visualizer
 on:
     workflow_dispatch:
     push:
       branches:
         - main
+
 jobs:
   update-visualizer:
     name: Update Visualizer
@@ -11,7 +13,7 @@ jobs:
 
     steps:
       - name: Get Code
-        uses: actions/checkout
+        uses: actions/checkout@v2
 
       - name: Repo Visualizer
         uses: githubocto/repo-visualizer@0.9.1

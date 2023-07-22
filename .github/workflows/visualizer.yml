@@ -13,5 +13,8 @@ jobs:
       - name: Get Code
         uses: actions/checkout
 
-      - name: Run Visualizer
-        uses: githubocto/repo-visualizer
+      - name: Repo Visualizer
+        uses: githubocto/repo-visualizer@0.9.1
+        with:
+          output_file: "diagram.svg"
+          excluded_paths: "dist,node_modules"

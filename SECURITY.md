@@ -6,7 +6,7 @@ We take the security of our project seriously. If you believe you've found a sec
 
 #### Guidelines for Reporting
 
-1. **Private Disclosure**: Please do not report security vulnerabilities through public GitHub issues. Instead, contact us directly through [SECURITY_EMAIL].
+1. **Private Disclosure**: Please do not report security vulnerabilities through public GitHub issues. Instead, open the security menu and select `Report a Vulnerability`.
 
 2. **Provide Details**: Please provide as much detail as possible, including:
    - Steps to reproduce the vulnerability.
@@ -24,5 +24,3 @@ We take the security of our project seriously. If you believe you've found a sec
 3. **Notification**: We will provide an estimated time for the vulnerability fix and notify you when the issue is resolved.
 
 We appreciate responsible disclosure and will acknowledge your contribution once the vulnerability is confirmed and resolved.
-
-[SECURITY_EMAIL]: mailto:theodore.kruczek@gmail.com

@@ -6,7 +6,7 @@ We take the security of our project seriously. If you believe you've found a sec
 
 #### Guidelines for Reporting
 
-1. **Private Disclosure**: Please do not report security vulnerabilities through public GitHub issues. Instead, open the security menu and select `Report a Vulnerability`.
+1. **Private Disclosure**: Please do not report security vulnerabilities through public GitHub issues. Instead, use the `Report a Vulnerability` option listed under the Issues tab.
 
 2. **Provide Details**: Please provide as much detail as possible, including:
    - Steps to reproduce the vulnerability.

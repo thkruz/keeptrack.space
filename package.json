@@ -105,7 +105,7 @@
     "download-file": "^0.1.5",
     "eslint": "^8.26.0",
     "eslint-plugin-jest": "^25.7.0",
-    "gh-pages": "^3.1.0",
+    "gh-pages": "^6.0.0",
     "html-webpack-plugin": "^5.3.1",
     "http-server": "^14.1.1",
     "husky": "^8.0.1",

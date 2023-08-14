@@ -124,7 +124,7 @@
     "retire": "^3.0.7",
     "serve": "^14.2.0",
     "source-map-loader": "^3.0.0",
-    "start-server-and-test": "^1.14.0",
+    "start-server-and-test": "^2.0.0",
     "style-loader": "^3.0.0",
     "ts-loader": "^9.3.1",
     "typescript": "^4.7.4",

@@ -1,5 +1,5 @@
 ---
-name: Visualizer
+name: Create Visualizer Svg
 on:
   workflow_dispatch:
   push:

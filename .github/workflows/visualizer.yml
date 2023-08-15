@@ -1,9 +1,11 @@
+---
 name: Visualizer
 on:
     workflow_dispatch:
     push:
       branches:
         - develop
+
 jobs:
   update-visualizer:
     name: Update Visualizer
@@ -13,5 +15,8 @@ jobs:
       - name: Get Code
         uses: actions/checkout@v2
 
-      - name: Run Visualizer
+      - name: Repo Visualizer
         uses: githubocto/repo-visualizer@0.9.1
+        with:
+          output_file: "diagram.svg"
+          excluded_paths: "dist,node_modules"

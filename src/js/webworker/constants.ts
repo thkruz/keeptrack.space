@@ -1,26 +1,27 @@
 import * as Ootk from 'ootk';
-import { SensorObjectCruncher } from '../api/keepTrackTypes';
-import { SpaceObjectType } from '../api/SpaceObjectType';
+import { Degrees, Kilometers, Radians } from 'ootk';
+import { SensorObjectCruncher } from '../interfaces';
+import { SpaceObjectType } from '../lib/space-object-type';
 
 // //////////////////////////////////////////////////////////////////////////////
 // Typing
 // //////////////////////////////////////////////////////////////////////////////
 
 export interface SatCacheObject extends Ootk.SatelliteRecord {
-  dec: number;
-  ra: number;
+  dec: Radians;
+  ra: Radians;
   id?: number;
   isimp: number;
-  apogee: number;
+  apogee: Kilometers;
   isRadarData: any;
   static: boolean;
   marker: any;
   type: SpaceObjectType;
-  lat: number;
-  lon: number;
-  alt: number;
+  lat: Degrees;
+  lon: Degrees;
+  alt: Kilometers;
   missile: any;
-  active: any;
+  active: boolean;
   altList: any;
   startTime: number;
   lastTime: any;
@@ -41,36 +42,34 @@ export type oneOrZero = 0 | 1;
 // Code
 // //////////////////////////////////////////////////////////////////////////////
 export const defaultGd = {
-  lat: <number | null>null,
-  lon: 0,
-  alt: 0,
+  lat: <Radians>null,
+  lon: <Radians>0,
+  alt: <Kilometers>0,
 };
 
 export const emptySensor: SensorObjectCruncher = {
   observerGd: {
-    lat: null,
-    lon: 0,
-    alt: 0,
+    lat: <Radians>null,
+    lon: <Radians>0,
+    alt: <Kilometers>0,
   },
   alt: null,
   country: '',
   lat: null,
   lon: null,
   name: '',
-  obsmaxaz: 0,
-  obsmaxel: 0,
-  obsmaxrange: 0,
-  obsminaz: 0,
-  obsminel: 0,
-  obsminrange: 0,
+  obsmaxaz: <Degrees>0,
+  obsmaxel: <Degrees>0,
+  obsmaxrange: <Kilometers>0,
+  obsminaz: <Degrees>0,
+  obsminel: <Degrees>0,
+  obsminrange: <Kilometers>0,
   shortName: '',
   staticNum: 0,
   sun: '',
   volume: false,
   zoom: '',
 };
-
-type Radians = number;
 
 export type RangeAzEl = {
   az: Radians;
@@ -79,5 +78,27 @@ export type RangeAzEl = {
 };
 
 export interface PositionCruncherIncomingMsg {
-  data: any;
+  data: {
+    TLE2: string;
+    TLE1: string;
+    dat: string; // JSON string
+    typ: any;
+    staticOffset?: number;
+    dynamicOffsetEpoch?: number;
+    propRate?: number;
+    id?: number;
+    satelliteSelected?: number[];
+    multiSensor?: boolean;
+    setlatlong?: any;
+    resetObserverGd?: any;
+    selectedSatFOV?: any;
+    isShowSatOverfly?: string;
+    isSunlightView?: any;
+    isSlowCPUModeEnabled?: any;
+    isLowPerf?: any;
+    fieldOfViewSetLength?: number;
+    isShowFOVBubble?: string;
+    isShowSurvFence?: string;
+    sensor?: SensorObjectCruncher[];
+  };
 }

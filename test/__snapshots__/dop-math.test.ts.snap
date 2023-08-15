@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`calculateDops_method test_four_gps_satellites 1`] = `"33.61"`;
+
+exports[`calculateDops_method test_four_gps_satellites 2`] = `"13.03"`;
+
+exports[`calculateDops_method test_four_gps_satellites 3`] = `"39.96"`;
+
+exports[`calculateDops_method test_four_gps_satellites 4`] = `"30.98"`;
+
+exports[`calculateDops_method test_four_gps_satellites 5`] = `"21.60"`;
+
+exports[`calculateDops_method test_less_than_four_gps_satellites 1`] = `"50.00"`;
+
+exports[`calculateDops_method test_less_than_four_gps_satellites 2`] = `"50.00"`;
+
+exports[`calculateDops_method test_less_than_four_gps_satellites 3`] = `"50.00"`;
+
+exports[`calculateDops_method test_less_than_four_gps_satellites 4`] = `"50.00"`;
+
+exports[`calculateDops_method test_less_than_four_gps_satellites 5`] = `"50.00"`;
+
+exports[`calculateDops_method test_more_than_four_gps_satellites 1`] = `"1.12"`;
+
+exports[`calculateDops_method test_more_than_four_gps_satellites 2`] = `"0.61"`;
+
+exports[`calculateDops_method test_more_than_four_gps_satellites 3`] = `"1.29"`;
+
+exports[`calculateDops_method test_more_than_four_gps_satellites 4`] = `"0.94"`;
+
+exports[`calculateDops_method test_more_than_four_gps_satellites 5`] = `"0.65"`;

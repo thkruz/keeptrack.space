@@ -1,285 +1,181 @@
-import socratesPng from '@app/img/icons/socrates.png';
-import $ from 'jquery';
-import { isThisJest, keepTrackApi } from '../../api/keepTrackApi';
-import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '../../lib/helpers';
-import { stringPad } from '../../lib/stringPad';
-import { helpBodyTextCollisions, helpTitleTextCollisions } from './help';
+import collissionsPng from '@app/img/icons/socrates.png';
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, Singletons } from '@app/js/interfaces';
+import { mainCameraInstance } from '@app/js/singletons/camera';
+import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
-let isSocratesMenuOpen = false;
-let socratesOnSatCruncher: number | null = null;
-let socratesObjOne = []; // Array for tr containing CATNR1
-let socratesObjTwo = []; // Array for tr containing CATNR2
+import { getEl } from '@app/js/lib/get-el';
+import { showLoading } from '@app/js/lib/showLoading';
+import { keepTrackApi } from '../../keepTrackApi';
+import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
-export const uiManagerInit = () => {
-  // Side Menu
-  getEl('left-menus').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
-          <div id="socrates-content" class="side-menu">
-            <div class="row">
-              <h5 class="center-align">Possible collisions</h5>
-              <table id="socrates-table" class="center-align"></table>
-            </div>
-          </div>
-        </div>
-      `
-  );
+interface CollisionEvent {
+  sat1: string;
+  sat2: string;
+  toca: Date;
+  minRng: number;
+  maxProb: number;
+  relSpeed: number;
+}
 
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="menu-satellite-collision" class="bmenu-item">
-          <img alt="socrates" src="" delayedsrc="${socratesPng}" />
-          <span class="bmenu-title">Collisions</span>
-          <div class="status-icon"></div>
-        </div>
-      `
-  );
-};
+export class CollissionsPlugin extends KeepTrackPlugin {
+  bottomIconElementName: string = 'menu-satellite-collision';
+  bottomIconImg = collissionsPng;
+  bottomIconLabel: string = 'Collisions';
+  sideMenuElementName: string = 'socrates-menu';
+  sideMenuElementHtml = keepTrackApi.html`
+  <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
+    <div id="socrates-content" class="side-menu">
+      <div class="row">
+        <h5 class="center-align">Possible collisions</h5>
+        <table id="socrates-table" class="center-align"></table>
+      </div>
+    </div>
+  </div>`;
 
-export const uiManagerFinal = () => {
-  getEl('socrates-menu').addEventListener('click', (evt: any) => {
-    showLoading(() => {
-      const el = <HTMLElement>evt.target.parentElement;
-      if (!el.classList.contains('socrates-object')) return;
-      // Might be better code for this.
-      const hiddenRow = (<any>el.attributes).hiddenrow.value;
-      if (hiddenRow !== null) {
-        socrates(hiddenRow);
-      }
+  helpTitle = `Collisions Menu`;
+  helpBody = keepTrackApi.html`The Collisions Menu shows satellites with a high probability of collision.
+  <br><br>
+  Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision.`;
+
+  private socratesOnSatCruncher: number | null = null;
+  collisionList = <CollisionEvent[]>[];
+  dragOptions: clickDragOptions = {
+    isDraggable: true,
+    minWidth: 350,
+    maxWidth: 500,
+  };
+
+  static PLUGIN_NAME = 'collisions';
+  constructor() {
+    super(CollissionsPlugin.PLUGIN_NAME);
+  }
+
+  bottomIconCallback: () => void = () => {
+    if (this.isMenuButtonEnabled) {
+      this.parseCollisionData_();
+    }
+  };
+
+  private uiManagerFinal() {
+    getEl('socrates-menu').addEventListener('click', (evt: any) => {
+      showLoading(() => {
+        const el = <HTMLElement>evt.target.parentElement;
+        if (!el.classList.contains('socrates-object')) return;
+        // Might be better code for this.
+        const hiddenRow = (<any>el.attributes).hiddenrow.value;
+        if (hiddenRow !== null) {
+          this.eventClicked_(hiddenRow);
+        }
+      });
     });
-  });
+  }
 
-  clickAndDragWidth(getEl('socrates-menu'), { minWidth: 280, maxWidth: 450 });
-};
+  public addJs(): void {
+    super.addJs();
 
-export const bottomMenuClick = (iconName: string): void => {
-  if (iconName === 'menu-satellite-collision') {
-    if (isSocratesMenuOpen) {
-      isSocratesMenuOpen = false;
-      keepTrackApi.programs.uiManager.hideSideMenus();
-      return;
-    } else {
-      if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
-      keepTrackApi.programs.uiManager.hideSideMenus();
-      slideInRight(getEl('socrates-menu'), 1000);
-      isSocratesMenuOpen = true;
-      socrates(-1);
-      getEl('menu-satellite-collision').classList.add('bmenu-item-selected');
-      return;
+    keepTrackApi.register({
+      method: 'uiManagerFinal',
+      cbName: 'collisions',
+      cb: this.uiManagerFinal.bind(this),
+    });
+
+    keepTrackApi.register({
+      method: 'onCruncherMessage',
+      cbName: 'collisions',
+      cb: () => {
+        if (this.socratesOnSatCruncher !== null) {
+          keepTrackApi.getCatalogManager().setSelectedSat(this.socratesOnSatCruncher);
+          this.socratesOnSatCruncher = null;
+        }
+      },
+    });
+  }
+
+  private parseCollisionData_() {
+    if (this.collisionList.length === 0) {
+      // Only generate the table if receiving the -1 argument for the first time
+      fetch('./SOCRATES.html').then((response) => {
+        response.text().then((text) => {
+          const parser = new DOMParser();
+          const socratesHTM = parser.parseFromString(text, 'text/html');
+          this.processSocratesHtm(socratesHTM);
+
+          if (this.collisionList.length === 0) {
+            errorManagerInstance.warn('No collisions data found!');
+          }
+        });
+      });
     }
   }
-};
-export const hideSideMenus = (): void => {
-  slideOutLeft(getEl('socrates-menu'), 1000);
-  getEl('menu-satellite-collision').classList.remove('bmenu-item-selected');
-  isSocratesMenuOpen = false;
-};
-export const onCruncherMessage = (): void => {
-  if (socratesOnSatCruncher !== null) {
-    keepTrackApi.programs.objectManager.setSelectedSat(socratesOnSatCruncher);
-    socratesOnSatCruncher = null;
-  }
-};
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'collisions',
-    cb: uiManagerInit,
-  });
 
-  keepTrackApi.register({
-    method: 'uiManagerFinal',
-    cbName: 'collisions',
-    cb: uiManagerFinal,
-  });
+  private eventClicked_(row: number) {
+    const now = new Date();
+    keepTrackApi.getTimeManager().changeStaticOffset(this.collisionList[row].toca.getTime() - now.getTime() - 1000 * 30);
+    mainCameraInstance.isCamSnapMode = false;
 
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'collisions',
-    cb: bottomMenuClick,
-  });
-
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'collisions',
-    cb: hideSideMenus,
-  });
-
-  keepTrackApi.register({
-    method: 'onCruncherMessage',
-    cbName: 'collisions',
-    cb: onCruncherMessage,
-  });
-
-  keepTrackApi.register({
-    method: 'onHelpMenuClick',
-    cbName: 'collisions',
-    cb: onHelpMenuClick,
-  });
-};
-
-export const onHelpMenuClick = (): boolean => {
-  if (isSocratesMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextCollisions, helpBodyTextCollisions);
-    return true;
-  }
-  return false;
-};
-
-export const MMMtoInt = (month: string) => {
-  switch (month) {
-    case 'Jan':
-      return 0;
-    case 'Feb':
-      return 1;
-    case 'Mar':
-      return 2;
-    case 'Apr':
-      return 3;
-    case 'May':
-      return 4;
-    case 'Jun':
-      return 5;
-    case 'Jul':
-      return 6;
-    case 'Aug':
-      return 7;
-    case 'Sep':
-      return 8;
-    case 'Oct':
-      return 9;
-    case 'Nov':
-      return 10;
-    case 'Dec':
-      return 11;
-    default:
-      throw new Error('Invalid Month');
-  }
-};
-export const findFutureDate = (_socratesObjTwo: any[][], row: number) => {
-  const socratesDate = _socratesObjTwo[row][4].split(' '); // Date/time is on the second line 5th column
-  const socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
-
-  const sYear = parseInt(socratesDate[0]); // UTC Year
-  const sMon = MMMtoInt(socratesDate[1]); // UTC Month in MMM prior to converting
-  const sDay = parseInt(socratesDate[2]); // UTC Day
-  const sHour = parseInt(socratesTime[0]); // UTC Hour
-  const sMin = parseInt(socratesTime[1]); // UTC Min
-  const sSec = parseInt(socratesTime[2]); // UTC Sec - This is a decimal, but when we convert to int we drop those
-
-  const selectedDate = new Date(sYear, sMon, sDay, sHour, sMin, sSec); // New Date object of the future collision
-  // Date object defaults to local time.
-  selectedDate.setUTCDate(sDay); // Move to UTC day.
-  selectedDate.setUTCHours(sHour); // Move to UTC Hour
-
-  const today = new Date();
-  // Find the offset from today 60 seconds before possible collision
-  keepTrackApi.programs.timeManager.changeStaticOffset(selectedDate.getTime() - today.getTime() - 1000 * 30);
-  keepTrackApi.programs.mainCamera.isCamSnapMode = false;
-}; // Allows passing -1 argument to socrates function to skip these steps
-
-export const socrates = (row: number, testOverride?: any) => {
-  if (isNaN(row)) throw new Error('SOCRATES: Row is not a number');
-
-  if (isThisJest() && (socratesObjOne?.length === 0 || socratesObjTwo?.length === 0)) {
-    socratesObjOne = testOverride.socratesObjOne;
-    socratesObjTwo = testOverride.socratesObjTwo;
+    keepTrackApi.getUiManager().doSearch(`${this.collisionList[row].sat1},${this.collisionList[row].sat2}`);
+    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    this.socratesOnSatCruncher = catalogManagerInstance.getIdFromObjNum(parseInt(this.collisionList[row].sat1));
   }
 
-  /* SOCRATES.html is a 20 row .pl script pulled from celestrak.com/cgi-bin/searchSOCRATES.pl
-    If it ever becomes unavailable a similar, but less accurate (maybe?) cron job could be
-    created using satCruncer.
+  private processSocratesHtm(socratesHTM: Document): void {
+    try {
+      // Find a table whose class is "center outline" using pure javascript
+      const table = socratesHTM.getElementsByClassName('center outline')[0];
+      // Filter out all tr elements that have a class of "header" using pure javascript
+      const tableRows = Array.from(table.getElementsByTagName('tr')).filter((tr) => !tr.classList.contains('header'));
 
-    The variable row determines which set of objects on SOCRATES.htm we are using. First
-    row is 0 and last one is 19. */
-  if (row === -1 && socratesObjOne.length === 0 && socratesObjTwo.length === 0) {
-    // Only generate the table if receiving the -1 argument for the first time
-    $.get('/SOCRATES.html', (socratesHTM: Document) => processSocratesHtm(socratesHTM));
+      // Split the td elements into an array of arrays using pure javascript
+      const tableData = tableRows.map((tr) => Array.from(tr.getElementsByTagName('td'))).map((tds) => tds.map((td) => td.innerText));
+
+      for (let row = 0; row < tableData.length; row = row + 2) {
+        const event: CollisionEvent = {
+          sat1: tableData[row][1],
+          sat2: tableData[row + 1][1],
+          toca: new Date(tableData[row][4]),
+          minRng: parseFloat(tableData[row][5]),
+          maxProb: parseFloat(tableData[row + 1][5]),
+          relSpeed: parseFloat(tableData[row][6]),
+        };
+        this.collisionList.push(event);
+      }
+
+      // SOCRATES Menu
+      const tbl = <HTMLTableElement>getEl('socrates-table'); // Identify the table to update
+      tbl.innerHTML = ''; // Clear the table from old object data
+      let tr = tbl.insertRow();
+      let tdToca = tr.insertCell();
+      tdToca.appendChild(document.createTextNode('TOCA'));
+      tdToca.setAttribute('style', 'text-decoration: underline');
+      let tdSat1 = tr.insertCell();
+      tdSat1.appendChild(document.createTextNode('#1'));
+      tdSat1.setAttribute('style', 'text-decoration: underline');
+      let tdSat2 = tr.insertCell();
+      tdSat2.appendChild(document.createTextNode('#2'));
+      tdSat2.setAttribute('style', 'text-decoration: underline');
+      let tdDist = tr.insertCell();
+      tdDist.appendChild(document.createTextNode('Probability'));
+      tdDist.setAttribute('style', 'text-decoration: underline');
+
+      for (let i = 0; i < this.collisionList.length; i++) {
+        tr = tbl.insertRow();
+        tr.setAttribute('class', 'socrates-object link');
+        tr.setAttribute('hiddenrow', i.toString());
+        tdToca = tr.insertCell();
+        // Add the time in the format "YYYY-MM-DD HH:MM:SS"
+        tdToca.appendChild(document.createTextNode(this.collisionList[i].toca.toISOString().slice(0, 19).replace('T', ' ')));
+        tdSat1 = tr.insertCell();
+        tdSat1.appendChild(document.createTextNode(this.collisionList[i].sat1));
+        tdSat2 = tr.insertCell();
+        tdSat2.appendChild(document.createTextNode(this.collisionList[i].sat2));
+        tdDist = tr.insertCell();
+        tdDist.appendChild(document.createTextNode(this.collisionList[i].minRng.toString()));
+      }
+    } catch (e) {
+      errorManagerInstance.warn('Error parsing SOCRATES data!');
+    }
   }
-  if (row !== -1) {
-    // If an object was selected from the menu
-    findFutureDate(socratesObjTwo, row); // Jump to the date/time of the collision
+}
 
-    keepTrackApi.programs.uiManager.doSearch(socratesObjOne[row][1] + ',' + socratesObjTwo[row][0]); // Actually perform the search of the two objects
-    socratesOnSatCruncher = keepTrackApi.programs.satSet.getIdFromObjNum(socratesObjOne[row][1]);
-  } // If a row was selected
-};
-export const processSocratesHtm = (socratesHTM: Document): void => {
-  // Load SOCRATES.html so we can use it instead of index.html
-  const tableRowOne = $("[name='CATNR1']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR1
-  const tableRowTwo = $("[name='CATNR2']", socratesHTM).closest('tr'); // Find the row(s) containing the hidden input named CATNR2
-
-  // eslint-disable-next-line no-unused-vars
-  tableRowOne.each(function (_rowIndex: number, _r: number) {
-    const cols: any[] = [];
-    $(this)
-      .find('td')
-      .each(function (_colIndex: number, c: any) {
-        cols.push(c.textContent);
-      });
-    socratesObjOne.push(cols);
-  });
-  // eslint-disable-next-line no-unused-vars
-  tableRowTwo.each(function (_rowIndex: number, _r: number) {
-    const cols: any[] = [];
-    $(this)
-      .find('td')
-      .each(function (_colIndex: number, c: any) {
-        cols.push(c.textContent);
-      });
-    socratesObjTwo.push(cols);
-  });
-  // SOCRATES Menu
-  const tbl = <HTMLTableElement>getEl('socrates-table'); // Identify the table to update
-  tbl.innerHTML = ''; // Clear the table from old object data
-  let tr = tbl.insertRow();
-  let tdT = tr.insertCell();
-  tdT.appendChild(document.createTextNode('Time'));
-  tdT.setAttribute('style', 'text-decoration: underline');
-  let tdS1 = tr.insertCell();
-  tdS1.appendChild(document.createTextNode('#1'));
-  tdS1.setAttribute('style', 'text-decoration: underline');
-  let tdS2 = tr.insertCell();
-  tdS2.appendChild(document.createTextNode('#2'));
-  tdS2.setAttribute('style', 'text-decoration: underline');
-
-  for (let i = 0; i < 20; i++) {
-    if (typeof socratesObjTwo[i] == 'undefined') break;
-    // 20 rows
-    if (typeof socratesObjTwo[i][4] == 'undefined') continue;
-    tr = tbl.insertRow();
-    tr.setAttribute('class', 'socrates-object link');
-    tr.setAttribute('hiddenrow', i.toString());
-    tdT = tr.insertCell();
-    const socratesDate = socratesObjTwo[i][4].split(' '); // Date/time is on the second line 5th column
-    const socratesTime = socratesDate[3].split(':'); // Split time from date for easier management
-    const socratesTimeS = socratesTime[2].split('.'); // Split time from date for easier management
-    tdT.appendChild(
-      document.createTextNode(
-        socratesDate[2] +
-          ' ' +
-          socratesDate[1] +
-          ' ' +
-          socratesDate[0] +
-          ' - ' +
-          stringPad.pad0(socratesTime[0], 2) +
-          ':' +
-          stringPad.pad0(socratesTime[1], 2) +
-          ':' +
-          stringPad.pad0(socratesTimeS[0], 2) +
-          'Z'
-      )
-    );
-    tdS1 = tr.insertCell();
-    tdS1.appendChild(document.createTextNode(socratesObjOne[i][1]));
-    tdS2 = tr.insertCell();
-    tdS2.appendChild(document.createTextNode(socratesObjTwo[i][0]));
-  }
-
-  keepTrackApi.programs.socrates = { socratesObjOne, socratesObjTwo };
-};
+export const collissionsPlugin = new CollissionsPlugin();

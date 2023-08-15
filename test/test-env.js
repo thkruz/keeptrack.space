@@ -1,10 +1,10 @@
 import 'webgl-mock';
 
+import { settingsManager } from '@app/js/settings/settings';
+import fs from 'fs';
 import $ from 'jquery';
 import { JSDOM } from 'jsdom';
-import fs from 'fs';
 import path from 'path';
-import { settingsManager } from '@app/js/settingsManager/settings';
 
 // This allows consistent testing in the CI environment
 // eslint-disable-next-line no-process-env
@@ -38,6 +38,14 @@ if (typeof global.window == 'undefined') {
   global.window = global.document.parentWindow;
 }
 
+global.speechSynthesis = {
+  speak: jest.fn(),
+  cancel: jest.fn(),
+  paused: jest.fn(),
+  resume: jest.fn(),
+  getVoices: jest.fn(),
+}
+
 global.document.canvas = new HTMLCanvasElement(1920, 1080);
 global.document.canvas.style = {};
 
@@ -51,6 +59,21 @@ global.window.resizeTo = (width, height) => {
 };
 
 window.resizeTo(1920, 1080);
+
+window.matchMedia = jest.fn().mockImplementation((query) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: jest.fn(), // Deprecated
+  removeListener: jest.fn(), // Deprecated
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  dispatchEvent: jest.fn(),
+}));
+
+window.M = {
+  AutoInit: jest.fn(),
+}
 
 global.requestAnimationFrame = function (cb) {
   return setTimeout(cb, 0);
@@ -102,3 +125,8 @@ $.fn.fadeIn = jest.fn((time, cb) => {
 });
 
 global.document.canvas.addEventListener = () => true;
+
+/** Setup catalog, webgl, and other standard environment */
+import('./environment/standard-env').then((module) => {
+  module.setupStandardEnvironment();
+});

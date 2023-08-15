@@ -92,7 +92,7 @@
           );
           j += nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
 
-          gmst = satellite.gstime(j);
+          gmst = Sgp4.gstime(j);
 
           // Update Radar Marker Position
           radarDataECF = satellite.lookAngles2Ecf(

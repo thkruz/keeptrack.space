@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const helpTitleTextEciPlot = `ECI Plot Menu`;
 export const helpBodyTextEciPlot = keepTrackApi.html`The ECI Plot Menu is used for plotting the ECI position of a satellite over time.

@@ -15,12 +15,13 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import Chart from 'chart.js/auto';
 import * as $ from 'jquery';
-import { dateFormat } from '../../js/lib/external/dateFormat.js';
-import { sensorList } from '../../js/plugins/sensor/sensorList';
-import { satellite } from '../../js/satMath/satMath';
-import { jday } from '../../js/timeManager/transforms';
+
+import Chart from 'chart.js/auto';
+import { sensorList } from '../../js/catalogs/sensors';
+import { dateFormat } from '../../js/lib/dateFormat';
+import { jday } from '../../js/lib/transforms';
+import { satellite } from '../../js/static/sat-math';
 
 var requestInfo = {};
 var isDrawApogee = false;
@@ -41,7 +42,8 @@ var millisecondsPerDay = 1.15741e-8;
 var raeType = 1;
 
 satellite.lookanglesInterval = 60;
-satellite.calculateLookAngles = (sat, sensor, tableType) => { // NOSONAR
+satellite.calculateLookAngles = (sat, sensor, tableType) => {
+  // NOSONAR
   var propOffset;
   (function _inputValidation() {
     // Check if there is a sensor
@@ -111,13 +113,13 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => { // NOSONAR
       now.getUTCSeconds()
     ); // Converts time to jday (TLEs use epoch year/day)
     j += now.getUTCMilliseconds() * millisecondsPerDay;
-    var gmst = satellite.gstime(j);
+    var gmst = Sgp4.gstime(j);
 
     var m = (j - satrec.jdsatepoch) * minutesPerDay;
     var positionEci = satellite.sgp4(satrec, m);
     var positionEcf, lookAngles, azimuth, elevation, range;
 
-    positionEcf = satellite.eciToEcf(positionEci.position, gmst); // positionEci.position is called positionEci originally
+    positionEcf = satellite.eci2ecf(positionEci.position, gmst); // positionEci.position is called positionEci originally
     const lla = {
       lat: sensor.observerGd.lat,
       lon: sensor.observerGd.lon,
@@ -189,7 +191,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => { // NOSONAR
           now1.getUTCSeconds()
         ); // Converts time to jday (TLEs use epoch year/day)
         j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
-        var gmst1 = satellite.gstime(j1);
+        var gmst1 = Sgp4.gstime(j1);
 
         var m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
         var positionEci1 = satellite.sgp4(satrec, m1);
@@ -200,7 +202,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => { // NOSONAR
           lon: sensor.observerGd.lon,
           alt: sensor.observerGd.height,
         };
-        positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
+        positionEcf1 = satellite.eci2ecf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
         lookAngles1 = satellite.ecfToLookAngles(lla, positionEcf1);
         azimuth1 = lookAngles1.az * RAD2DEG;
         elevation1 = lookAngles1.el * RAD2DEG;
@@ -237,7 +239,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => { // NOSONAR
             now1.getUTCSeconds()
           ); // Converts time to jday (TLEs use epoch year/day)
           j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
-          gmst1 = satellite.gstime(j1);
+          gmst1 = Sgp4.gstime(j1);
 
           m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
           positionEci1 = satellite.sgp4(satrec, m1);
@@ -247,7 +249,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => { // NOSONAR
             lon: sensor.observerGd.lon,
             alt: sensor.observerGd.height,
           };
-          positionEcf1 = satellite.eciToEcf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
+          positionEcf1 = satellite.eci2ecf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
           lookAngles1 = satellite.ecfToLookAngles(lla, positionEcf1);
           azimuth1 = lookAngles1.az * RAD2DEG;
           elevation1 = lookAngles1.el * RAD2DEG;
@@ -390,7 +392,8 @@ var drawChart = (data) => {
       satData[i] = extra;
     }
   })();
-  (function setupDataInfo() { // NOSONAR
+  (function setupDataInfo() {
+    // NOSONAR
     if (typeof sensor == 'undefined' || isDrawInc || isDrawApogee || isDrawEcc || isDrawInc || isDrawPerigee || isDrawPeriod || isDrawRAAN) {
       for (let i = 0; i < satData.length; i++) {
         labelInfo.push(`${satData[i].year} ${satData[i].jday}`);
@@ -605,7 +608,8 @@ var loadJSON = () => {
     });
 };
 
-(function initParseFromGETVariables() { // NOSONAR
+(function initParseFromGETVariables() {
+  // NOSONAR
   // This is an initial parse of the GET variables
   // A satSet focused one happens later.
 

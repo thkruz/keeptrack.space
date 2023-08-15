@@ -1,10 +1,13 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { MissileObject, SensorObject } from '@app/js/api/keepTrackTypes';
-import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { jday } from '@app/js/timeManager/transforms';
-import { ToastMsgType } from '@app/js/uiManager/ui/toast';
-import $ from 'jquery';
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, MissileObject, OrbitManager, SensorManager, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { DEG2RAD, MILLISECONDS2DAYS, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
+import { SpaceObjectType } from '@app/js/lib/space-object-type';
+
+import { jday } from '@app/js/lib/transforms';
+import { TimeManager } from '@app/js/singletons/time-manager';
+import { Kilometers, Radians, Sgp4, Transforms } from 'ootk';
+import { UpdateSatManager } from '../update-select-box/update-select-box';
 
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
 const missileArray: any[] = [];
@@ -13,64 +16,70 @@ const missileArray: any[] = [];
 
 // This function stalls Jest for multiple minutes.
 /* istanbul ignore next */
-export const MassRaidPre = (time: number, simFile: string) => {
-  const { satSet, orbitManager } = keepTrackApi.programs;
+export const MassRaidPre = async (time: number, simFile: string) => {
   missileManager.clearMissiles();
-  $.get(simFile, function (newMissileArray) {
-    const satSetLen = satSet.missileSats;
-    missileManager.missilesInUse = satSetLen;
-    for (let i = 0; i < newMissileArray.length; i++) {
-      const x = satSetLen - 500 + i;
-      newMissileArray[i].startTime = time;
-      newMissileArray[i].name = newMissileArray[i].ON;
-      newMissileArray[i].country = newMissileArray[i].C;
-      satSet.setSat(x, newMissileArray[i]);
-      const missileObj = <MissileObject>satSet.getSat(x);
-      if (missileObj) {
-        missileObj.id = satSetLen - 500 + i;
-        keepTrackApi.programs.satSet.satCruncher.postMessage({
-          id: missileObj.id,
-          typ: 'newMissile',
-          name: 'M00' + missileObj.id,
-          satId: missileObj.id,
-          static: missileObj.static,
-          missile: missileObj.missile,
-          active: missileObj.active,
-          type: missileObj.type,
-          latList: missileObj.latList,
-          lonList: missileObj.lonList,
-          altList: missileObj.altList,
-          startTime: missileObj.startTime,
-        });
-        orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, {
-          missile: true,
-          latList: missileObj.latList,
-          lonList: missileObj.lonList,
-          altList: missileObj.altList,
-        });
+  await fetch(simFile)
+    .then((response) => response.json())
+    .then((newMissileArray) => {
+      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const satSetLen = catalogManagerInstance.missileSats;
+      missileManager.missilesInUse = satSetLen;
+      for (let i = 0; i < newMissileArray.length; i++) {
+        const x = satSetLen - 500 + i;
+        newMissileArray[i].startTime = time;
+        newMissileArray[i].name = newMissileArray[i].ON;
+        newMissileArray[i].country = newMissileArray[i].C;
+        catalogManagerInstance.setSat(x, newMissileArray[i]);
+        const missileObj = <MissileObject>catalogManagerInstance.getSat(x);
+        if (missileObj) {
+          missileObj.id = satSetLen - 500 + i;
+          catalogManagerInstance.satCruncher.postMessage({
+            id: missileObj.id,
+            typ: 'newMissile',
+            name: 'M00' + missileObj.id,
+            satId: missileObj.id,
+            static: missileObj.static,
+            missile: missileObj.missile,
+            active: missileObj.active,
+            type: missileObj.type,
+            latList: missileObj.latList,
+            lonList: missileObj.lonList,
+            altList: missileObj.altList,
+            startTime: missileObj.startTime,
+          });
+          const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+          orbitManagerInstance.updateOrbitBuffer(missileObj.id, {
+            missile: true,
+            latList: missileObj.latList,
+            lonList: missileObj.lonList,
+            altList: missileObj.altList,
+          });
+        }
       }
-    }
-    missileManager.missileArray = newMissileArray;
-  }).done(() => {
-    keepTrackApi.programs.uiManager.doSearch('RV_');
-  });
+      missileManager.missileArray = newMissileArray;
+    });
+
+  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  uiManagerInstance.doSearch('RV_');
 };
 export const clearMissiles = () => {
-  const { satSet, orbitManager } = keepTrackApi.programs;
-  keepTrackApi.programs.uiManager.doSearch('');
-  const satSetLen = satSet.missileSats;
+  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+
+  uiManagerInstance.doSearch('');
+  const satSetLen = catalogManagerInstance.missileSats;
   for (let i = 0; i < 500; i++) {
     const x = satSetLen - 500 + i;
 
-    const missileObj: MissileObject = <MissileObject>satSet.getSat(x);
+    const missileObj: MissileObject = <MissileObject>catalogManagerInstance.getSat(x);
     missileObj.active = false;
     missileObj.latList = [];
     missileObj.lonList = [];
     missileObj.name = '';
     missileObj.startTime = 0;
-    satSet.setSat(x, missileObj);
+    catalogManagerInstance.setSat(x, missileObj);
 
-    keepTrackApi.programs.satSet.satCruncher.postMessage({
+    catalogManagerInstance.satCruncher.postMessage({
       id: missileObj.id,
       typ: 'newMissile',
       ON: 'RV_' + missileObj.id,
@@ -87,7 +96,8 @@ export const clearMissiles = () => {
     });
 
     if (missileObj.id) {
-      orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, {
+      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+      orbitManagerInstance.updateOrbitBuffer(missileObj.id, {
         missile: true,
         latList: [],
         lonList: [],
@@ -152,8 +162,8 @@ export const Missile = (
   // reaches an altitude of zero meters it ends the iterations. Using all the information gathers it
   // presents them in the form of print statements and also plots.
 
-  const { satSet, orbitManager } = keepTrackApi.programs;
-  const missileObj: MissileObject = <MissileObject>satSet.getSat(MissileObjectNum);
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const missileObj: MissileObject = <MissileObject>catalogManagerInstance.getSat(MissileObjectNum);
 
   // Dimensions of the rocket
   Length = Length || 17; // (m)
@@ -317,7 +327,7 @@ export const Missile = (
     }
     hList.push(h + hListSum);
   }
-  
+
 
   while (FuelMass / FuelDensity / FuelVolume > 0.19 && Altitude >= 0) {
     const iterationFunOutput = _IterationFun(
@@ -344,8 +354,8 @@ export const Missile = (
     NozzleAltitude3 = Altitude;
 
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
-    
-    
+
+
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
@@ -353,15 +363,15 @@ export const Missile = (
         break;
       }
     }
-    
-    
+
+
     let hListSum = 0;
     for (let i = 0; i < hList.length; i++) {
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
   }
-  
+
 
   while (FuelMass / FuelDensity / FuelVolume > 0 && Altitude >= 0) {
     const iterationFunOutput = _IterationFun(
@@ -386,7 +396,7 @@ export const Missile = (
     dthetadt = iterationFunOutput[18];
 
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
-    
+
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
@@ -394,14 +404,14 @@ export const Missile = (
         break;
       }
     }
-    
+
     let hListSum = 0;
     for (let i = 0; i < hList.length; i++) {
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
   }
-  
+
 
   while (Altitude > 0) {
     FuelMass = 0;
@@ -499,10 +509,11 @@ export const Missile = (
 
     if (MissileDesc) missileObj.desc = MissileDesc;
     missileArray.push(missileObj);
-    keepTrackApi.programs.satSet.satCruncher.postMessage({
+    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    catalogManagerInstance.satCruncher.postMessage({
       id: missileObj.id,
       typ: 'newMissile',
-      ON: 'RV_' + missileObj.id, // Don't think satSet.satCruncher needs this
+      ON: 'RV_' + missileObj.id, // Don't think catalogManagerInstance.satCruncher needs this
       satId: missileObj.id,
       static: missileObj.static,
       missile: missileObj.missile,
@@ -514,7 +525,8 @@ export const Missile = (
       altList: missileObj.altList,
       startTime: missileObj.startTime,
     });
-    orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, {
+    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    orbitManagerInstance.updateOrbitBuffer(MissileObjectNum, {
       missile: true,
       latList: missileObj.latList,
       lonList: missileObj.lonList,
@@ -531,10 +543,10 @@ export const Missile = (
 
 // prettier-ignore
 export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]) => { // NOSONAR
-  const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
-  
+  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
-  const now = timeManager.simulationTimeObj;
+  const now = timeManagerInstance.simulationTimeObj;
   let j = jday(
     now.getUTCFullYear(),
     now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -543,15 +555,16 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
     now.getUTCMinutes(),
     now.getUTCSeconds()
   ); // Converts time to jday (TLEs use epoch year/day)
-  j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-  const gmst = satellite.gstime(j);
+  j += now.getUTCMilliseconds() * MILLISECONDS2DAYS;
+  const gmst = Sgp4.gstime(j);
 
   // If no sensor passed to function then try to use the 'currentSensor'
   if (typeof sensors == 'undefined') {
-    if (typeof sensorManager.currentSensor == 'undefined') {
+    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    if (typeof sensorManagerInstance.currentSensors == 'undefined') {
       throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
     } else {
-      sensors = sensorManager.currentSensor;
+      sensors = sensorManagerInstance.currentSensors;
     }
   }
   // If sensor's observerGd is not set try to set it using it parameters
@@ -559,8 +572,8 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
     try {
       sensors[0].observerGd = {
         alt: sensors[0].alt,
-        lat: sensors[0].lat,
-        lon: sensors[0].lon,
+        lat: <Radians>(sensors[0].lat * DEG2RAD),
+        lon: <Radians>(sensors[0].lon * DEG2RAD),
       };
     } catch (e) {
       throw new Error('observerGd is not set and could not be guessed.');
@@ -583,18 +596,18 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
   const cosLon = Math.cos(missile.lonList[curMissileTime] * DEG2RAD + gmst);
   const sinLon = Math.sin(missile.lonList[curMissileTime] * DEG2RAD + gmst);
 
-  const x = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon;
-  const y = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon;
-  const z = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat;
+  const x = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon);
+  const y = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon);
+  const z = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat);
 
   let positionEcf, lookAngles;
   try {
-    const gpos = satellite.eciToGeodetic({ x, y, z }, gmst);
+    const gpos = Transforms.eci2lla({ x, y, z }, gmst);
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
-    positionEcf = satellite.eciToEcf({ x, y, z }, gmst);
-    lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+    positionEcf = Transforms.eci2ecf({ x, y, z }, gmst);
+    lookAngles = Transforms.ecf2rae(sensor.observerGd, positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG;
     currentTEARR.el = lookAngles.el * RAD2DEG;
     currentTEARR.rng = lookAngles.rng;
@@ -645,7 +658,12 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
       currentTEARR.inView = false;
     }
   }
-  satellite.setTEARR(currentTEARR);
+
+  const updateSelectBoxPlugin = <UpdateSatManager>keepTrackApi.getPlugin(UpdateSatManager);
+  if (updateSelectBoxPlugin) {
+    updateSelectBoxPlugin.currentTEARR = currentTEARR;
+  }
+
   return currentTEARR;
 };
 
@@ -682,7 +700,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            satSet.satData.length - b,
+            catalogManagerInstance.satData.length - b,
             launchTime,
             missileManager.RussianICBM[a * 4 + 2],
             30,
@@ -729,7 +747,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            satSet.satData.length - b,
+            catalogManagerInstance.satData.length - b,
             launchTime,
             missileManager.ChinaICBM[a * 4 + 2],
             30,
@@ -773,7 +791,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            satSet.satData.length - b,
+            catalogManagerInstance.satData.length - b,
             launchTime,
             missileManager.NorthKoreanBM[a * 4 + 2],
             30,
@@ -819,7 +837,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.RussianICBM[i * 4],
               missileManager.RussianICBM[i * 4 + 1],
               3,
-              satSet.satData.length - b,
+              catalogManagerInstance.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -854,7 +872,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.ChinaICBM[i * 4],
               missileManager.ChinaICBM[i * 4 + 1],
               3,
-              satSet.satData.length - b,
+              catalogManagerInstance.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -889,7 +907,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.NorthKoreanBM[i * 4],
               missileManager.NorthKoreanBM[i * 4 + 1],
               3,
-              satSet.satData.length - b,
+              catalogManagerInstance.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -930,7 +948,7 @@ missileManager.minMaxSimulation = function (launchTime, lat, lon, missileDesc, m
         lat,
         lon,
         3, // Does this matter?
-        satSet.missileSats - (500 - missilesLaunched),
+        catalogManagerInstance.missileSats - (500 - missilesLaunched),
         launchTime,
         missileDesc,
         30,
@@ -971,7 +989,7 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
   // CurrentTime = startTime;
   let propOffset = timeManager.getOffsetTimeObj(timeInFlight * 1000, startTime);
   console.log(propOffset);
-  let satTEARR2 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
+  let satTEARR2 = satellite.getTEARR(sat, SensorManager.sensors.COD, propOffset);
   let satAlt2 = satTEARR2.alt;
   console.log(satTEARR2.lat * RAD2DEG);
   console.log(satTEARR2.lon * RAD2DEG);
@@ -1003,7 +1021,7 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
 
   propOffset = timeManager.getOffsetTimeObj(timeInFlight2 * 1000, startTime);
   console.log(propOffset);
-  let satTEARR3 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
+  let satTEARR3 = satellite.getTEARR(sat, SensorManager.sensors.COD, propOffset);
   let satAlt3 = satTEARR3.alt;
   console.log(satTEARR3.lat * RAD2DEG);
   console.log(satTEARR3.lon * RAD2DEG);
@@ -1507,10 +1525,10 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   //     if (MissileDesc) MissileObject.desc = MissileDesc;
   //     // console.log(MissileObject);
   //     missileArray.push(MissileObject);
-  //     satSet.satCruncher.postMessage({
+  //     catalogManagerInstance.satCruncher.postMessage({
   //       id: MissileObject.id,
   //       typ: 'newMissile',
-  //       ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
+  //       ON: 'RV_' + MissileObject.id, // Don't think catalogManagerInstance.satCruncher needs this
   //       satId: MissileObject.id,
   //       static: MissileObject.static,
   //       missile: MissileObject.missile,
@@ -1522,7 +1540,7 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   //       altList: MissileObject.altList,
   //       startTime: MissileObject.startTime,
   //     });
-  //     updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+  //     updateOrbitBuffer(MissileObjectNum, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
 
   //     missileManager.missileArray = missileArray;
 
@@ -2085,10 +2103,10 @@ missileManager.asatFlight = function (
     if (MissileDesc) MissileObject.desc = MissileDesc;
     // console.log(MissileObject);
     missileArray.push(MissileObject);
-    satSet.satCruncher.postMessage({
+    catalogManagerInstance.satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
-      ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
+      ON: 'RV_' + MissileObject.id, // Don't think catalogManagerInstance.satCruncher needs this
       satId: MissileObject.id,
       static: MissileObject.static,
       missile: MissileObject.missile,
@@ -2100,7 +2118,7 @@ missileManager.asatFlight = function (
       altList: MissileObject.altList,
       startTime: MissileObject.startTime,
     });
-    updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+    updateOrbitBuffer(MissileObjectNum, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
 
     missileManager.missileArray = missileArray;
 
@@ -2387,11 +2405,11 @@ export const _IterationFun = (
     ThrustAngle =
       (90 -
         AngleCoefficient *
-          (1.5336118956 +
-            0.00443173537387 * Altitude -
-            9.30373890848 * Math.pow(10, -8) * Math.pow(Altitude, 2) +
-            8.37838197732 * Math.pow(10, -13) * Math.pow(Altitude, 3) -
-            2.71228576626 * Math.pow(10, -18) * Math.pow(Altitude, 4))) *
+        (1.5336118956 +
+          0.00443173537387 * Altitude -
+          9.30373890848 * Math.pow(10, -8) * Math.pow(Altitude, 2) +
+          8.37838197732 * Math.pow(10, -13) * Math.pow(Altitude, 3) -
+          2.71228576626 * Math.pow(10, -18) * Math.pow(Altitude, 4))) *
       0.0174533;
   // (Degrees)
   else ThrustAngle = 30;
@@ -2587,7 +2605,7 @@ export const _Bisection = (
             MassIn,
             ACNew
           )) /
-          GoalDistance
+        GoalDistance
       ) * 100;
     if (
       _QuickRun(

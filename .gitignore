@@ -116,3 +116,6 @@ custom-builds
 # Library Build
 lib/keepTrack
 lib/example*
+
+# Tools
+src/tools

@@ -6,7 +6,7 @@
  * astronomy.ts is a plugin for showing the stars above from the perspective
  * of a view on the earth.
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2022 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
@@ -23,89 +23,82 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { OrbitManager, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
+import { getEl } from '@app/js/lib/get-el';
+import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+
 import constellationPng from '@app/img/icons/constellation.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { getEl, shake } from '@app/js/lib/helpers';
+import { keepTrackContainer } from '@app/js/container';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { DrawManager } from '@app/js/singletons/draw-manager';
+import { LegendManager } from '@app/js/static/legend-manager';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { Planetarium } from '../planetarium/planetarium';
 
-export const uiManagerInit = () => {
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="menu-astronomy" class="bmenu-item bmenu-item-disabled">
-          <img
-            alt="telescope"
-            src=""
-            delayedsrc="${constellationPng}"
-          />
-          <span class="bmenu-title">Astronomy View</span>
-          <div class="status-icon"></div>
-        </div>
-      `
-  );
-};
+export class Astronomy extends KeepTrackPlugin {
+  bottomIconElementName = 'menu-astronomy';
+  bottomIconLabel = 'Astronomy View';
+  bottomIconImg = constellationPng;
+  isIconDisabledOnLoad = true;
+  isIconDisabled = true;
+  bottomIconCallback = (): void => {
+    const { starManager } = keepTrackApi.programs;
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    if (this.isMenuButtonEnabled) {
+      if (!this.verifySensorSelected()) return;
 
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'astronomy',
-    cb: uiManagerInit,
-  });
+      if (catalogManagerInstance.isStarManagerLoaded) {
+        // TODO: This takes way too long trying to find the star's
+        // satellite id from its name. The ids should be predetermined.
+        starManager.drawAllConstellations();
+      }
+      orbitManagerInstance.clearInViewOrbit();
+      mainCameraInstance.cameraType = CameraType.ASTRONOMY; // Activate Astronomy Camera Mode
+      // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+      LegendManager.change('astronomy');
 
-  keepTrackApi.programs.astronomy = {};
-  keepTrackApi.programs.astronomy.isAstronomyView = false;
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'astronomy',
-    cb: bottomMenuClick,
-  });
-};
-
-// prettier-ignore
-export const bottomMenuClick = (iconName: string): void => { // NOSONAR
-  const { drawManager, starManager, objectManager, uiManager, orbitManager, sensorManager } = keepTrackApi.programs;
-  if (iconName === 'menu-astronomy') {
-    const mainCamera = keepTrackApi.programs.mainCamera;
-    if (keepTrackApi.programs.astronomy.isAstronomyView) {
-      keepTrackApi.programs.astronomy.isAstronomyView = false;
-      mainCamera.isPanReset = true;
-      mainCamera.isLocalRotateReset = true;
+      keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+    } else {
+      mainCameraInstance.isPanReset = true;
+      mainCameraInstance.isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
-      drawManager.glInit();
-      uiManager.hideSideMenus();
-      mainCamera.cameraType.current = mainCamera.cameraType.Default; // Back to normal Camera Mode
-      uiManager.legendMenuChange('default');
-      if (objectManager.isStarManagerLoaded) {
+      drawManagerInstance.glInit();
+      uiManagerInstance.hideSideMenus();
+      mainCameraInstance.cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
+      LegendManager.change('default');
+      if (catalogManagerInstance.isStarManagerLoaded) {
         starManager.clearConstellations();
       }
-      getEl('fov-text').innerHTML = ('');
-      getEl('menu-astronomy').classList.remove('bmenu-item-selected');
-      return;
-    } else {
-      if (sensorManager.checkSensorSelected()) {
-        if (objectManager.isStarManagerLoaded) {
-          // TODO: This takes way too long trying to find the star's
-          // satellite id from its name. The ids should be predetermined.
-          starManager.drawAllConstellations();
-        }
-        orbitManager.clearInViewOrbit();
-        mainCamera.cameraType.current = mainCamera.cameraType.Astronomy; // Activate Astronomy Camera Mode
-        getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-        uiManager.legendMenuChange('astronomy');
-        if (typeof keepTrackApi.programs.planetarium !== 'undefined') {
-          keepTrackApi.programs.planetarium.isPlanetariumView = false;
-          getEl('menu-planetarium').classList.remove('bmenu-item-selected');
-        }
-        keepTrackApi.programs.astronomy.isAstronomyView = true;
-        getEl('menu-astronomy').classList.add('bmenu-item-selected');
-      } else {
-        uiManager.toast(`Select a Sensor First!`, 'caution');
-        shake(getEl('menu-astronomy'));
-      }
-      return;
+      // getEl('fov-text').innerHTML = ('');
+      getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
     }
+  };
+
+  static PLUGIN_NAME = 'Astronomy';
+
+  constructor() {
+    super(Astronomy.PLUGIN_NAME);
   }
-};
+
+  addJs(): void {
+    super.addJs();
+    keepTrackApi.register({
+      method: 'setSensor',
+      cbName: this.PLUGIN_NAME,
+      cb: (sensor: SensorObject): void => {
+        if (sensor) {
+          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+          this.isIconDisabled = false;
+        } else {
+          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+          this.isIconDisabled = true;
+        }
+      },
+    });
+  }
+}
+
+export const astronomyPlugin = new Astronomy();

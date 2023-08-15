@@ -60,7 +60,10 @@ a:hover,
 
 html body {
   margin: 0;
+  position: absolute;
+  width: 100%;
   height: 100%;
+  z-index: 0;
   overflow: hidden;
   touch-action: none;
   -webkit-overflow-scrolling: none;
@@ -203,7 +206,8 @@ ul {
 
 #keeptrack-canvas {
   /* position: absolute; */
-  background: var(--colorBlack); /* Inconsistent brightness without this */
+  background: var(--colorBlack);
+  /* Inconsistent brightness without this */
   z-index: 0;
   top: 0;
   left: 0;
@@ -258,7 +262,8 @@ ul {
   width: 165px;
   border-radius: 0px;
   border: 5px solid var(--colorTertiaryDarken3);
-  z-index: 10; /*Prevent fighting with the slide down button on mobile */
+  z-index: 10;
+  /*Prevent fighting with the slide down button on mobile */
 }
 
 .right-btn-menu ul {
@@ -267,6 +272,7 @@ ul {
 
 .right-btn-menu ul li {
   padding: 5px;
+  height: 25px;
   cursor: pointer;
 }
 
@@ -648,12 +654,29 @@ ul {
   color: white;
 }
 
+.btn-green {
+  background-color: rgb(86, 240, 0) !important;
+}
+
+.btn-red {
+  background-color: rgb(255, 56, 56) !important;
+}
+
+.btn-red:hover {
+  background-color: rgb(255, 0, 0) !important;
+}
+
+.btn-red:active {
+  background-color: rgb(255, 0, 0) !important;
+}
+
+
 #looks {
   margin: 0 auto;
 }
 
 #socrates-menu {
-  width: 290px;
+  width: 350px;
 }
 
 #socrates-table {
@@ -723,7 +746,7 @@ input[type='checkbox'].css-checkbox {
   border: 0;
 }
 
-input[type='checkbox'].css-checkbox + label.css-label {
+input[type='checkbox'].css-checkbox+label.css-label {
   padding-left: 25px;
   height: 20px;
   display: inline-block;
@@ -735,7 +758,7 @@ input[type='checkbox'].css-checkbox + label.css-label {
   cursor: pointer;
 }
 
-input[type='checkbox'].css-checkbox:checked + label.css-label {
+input[type='checkbox'].css-checkbox:checked+label.css-label {
   background-position: 0px -20px;
 }
 
@@ -903,6 +926,7 @@ input:focus {
   font-size: 20px;
   padding: 0px 0px 0px 5px;
   width: 110px;
+  cursor: pointer;
   overflow: hidden;
   top: 0px;
   border-width: 0px 0px 0px 1px;
@@ -919,6 +943,7 @@ input:focus {
 
 #sensor-selected {
   display: none;
+  cursor: pointer;
 }
 
 .ui-datepicker-calendar tbody tr td a {
@@ -937,8 +962,7 @@ input:focus {
 #bottom-icons {
   display: grid;
   grid-template-columns:
-    minmax(var(--bottom-icon-width), max-content)
-    repeat(auto-fill, var(--bottom-icon-width));
+    minmax(var(--bottom-icon-width), max-content) repeat(auto-fill, var(--bottom-icon-width));
   justify-content: center;
   row-gap: 0px;
   background: var(--colorTertiaryDarken2);
@@ -1033,6 +1057,7 @@ input:focus {
 .bmenu-item-membersonly img {
   filter: invert(52%) sepia(130%) saturate(7323%) hue-rotate(353deg) brightness(100%) contrast(86%);
 }
+
 .bmenu-item-membersonly .status-icon {
   background-position-x: -90px;
 }
@@ -1276,6 +1301,7 @@ input:focus {
   0% {
     filter: brightness(1.5);
   }
+
   10%,
   90% {
     transform: translate3d(-1px, 0, 0);
@@ -1296,6 +1322,7 @@ input:focus {
   60% {
     transform: translate3d(4px, 0, 0);
   }
+
   100% {
     filter: '';
   }

@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`dateToLocalInIso_function test_date_object_with_timezone_ahead_of_utc_returns_iso_with_local_time 1`] = `"2022-01-01 05:00:00 "`;
+
+exports[`dateToLocalInIso_function test_date_object_with_timezone_behind_utc_returns_iso_with_local_time 1`] = `"2022-01-01 09:00:00 "`;
+
+exports[`dateToLocalInIso_function test_valid_date_object_returns_iso_with_local_time 1`] = `"2021-12-31 19:00:00 "`;
+
+exports[`lon2yaw_function test_longitude_180_degrees 1`] = `0.21877702173748914`;
+
+exports[`lon2yaw_function test_longitude_minus_180_degrees 1`] = `0.21877702173748848`;
+
+exports[`lon2yaw_function test_valid_longitude_and_date 1`] = `-2.137417468454856`;
+
+exports[`lon2yaw_function test_valid_longitude_and_date_one_hour_ahead_of_UTC 1`] = `-1.8756180806557063`;
+
+exports[`lon2yaw_function test_valid_longitude_and_date_one_hour_behind_UTC 1`] = `-2.399216856254005`;

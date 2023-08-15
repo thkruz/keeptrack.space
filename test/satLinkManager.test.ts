@@ -1,0 +1,20 @@
+import { SatConstellationString, SatLinkManager } from '@app/js/singletons/catalog-manager/satLinkManager';
+import { LineManager } from '@app/js/singletons/draw-manager/line-manager';
+import { TimeManager } from '@app/js/singletons/time-manager';
+
+describe('SatLinkManager', () => {
+  let satLinkManager: SatLinkManager;
+  beforeEach(() => {
+    satLinkManager = new SatLinkManager();
+  });
+
+  it('should be process showLinks for all SatConstellationString', () => {
+    expect(() => satLinkManager.showLinks(new LineManager(), SatConstellationString.Aehf, new TimeManager())).not.toThrow();
+    expect(() => satLinkManager.showLinks(new LineManager(), SatConstellationString.Dscs, new TimeManager())).not.toThrow();
+    expect(() => satLinkManager.showLinks(new LineManager(), SatConstellationString.Galileo, new TimeManager())).not.toThrow();
+    expect(() => satLinkManager.showLinks(new LineManager(), SatConstellationString.Iridium, new TimeManager())).not.toThrow();
+    expect(() => satLinkManager.showLinks(new LineManager(), SatConstellationString.Sbirs, new TimeManager())).not.toThrow();
+    expect(() => satLinkManager.showLinks(new LineManager(), SatConstellationString.Starlink, new TimeManager())).not.toThrow();
+    expect(() => satLinkManager.showLinks(new LineManager(), SatConstellationString.Wgs, new TimeManager())).not.toThrow();
+  });
+});

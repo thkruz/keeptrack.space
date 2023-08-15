@@ -3,8 +3,8 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -21,89 +21,124 @@
  */
 
 import sat2Png from '@app/img/icons/sat2.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { getEl, shake } from '@app/js/lib/helpers';
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, Singletons, UiManager } from '@app/js/interfaces';
+import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { getEl } from '@app/js/lib/get-el';
+import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
+import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-export const uiManagerInit = () => {
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-    <!-- ########################## HTML ########################## -->
-    <div id="menu-sat-fov" class="bmenu-item bmenu-item-disabled">
-      <img
-        alt="sat2"
-        src="" delayedsrc="${sat2Png}" />
-      <span class="bmenu-title">Satellite FOV</span>
-      <div class="status-icon"></div>
-    </div>
-    <!-- ########################## HTML ########################## -->
-  `
-  );
-};
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'satelliteFov',
-    cb: uiManagerInit,
-  });
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'satelliteFov',
-    cb: bottomMenuClick,
-  });
-};
-
-// prettier-ignore
-export const bottomMenuClick = (iconName: string): void => { // NOSONAR
-  const { satSet, objectManager, uiManager } = keepTrackApi.programs;
-  if (iconName === 'menu-sat-fov') {
-    if (objectManager.selectedSat === -1 && (<HTMLInputElement>getEl('search')).value === '') {
-      // No Sat Selected and No Search Present
-      uiManager.toast(`Select a Satellite First!`, 'caution');
-      shake(getEl('menu-sat-fov'));
-      return;
-    }
-    if (settingsManager.isSatOverflyModeOn) {
-      settingsManager.isSatOverflyModeOn = false;
-      getEl('menu-sat-fov').classList.remove('bmenu-item-selected');
-      satSet.satCruncher.postMessage({
-        typ: 'isShowSatOverfly',
-        isShowSatOverfly: 'reset',
-      });
-      return;
-    } else {
-      const fovDom = getEl('menu-fov-bubble');
-      if (fovDom) fovDom.classList.remove('bmenu-item-selected');
-
-      const survDom = getEl('menu-surveillance');
-      if (survDom) survDom.classList.remove('bmenu-item-selected');
-      settingsManager.isShowSurvFence = false;
-      settingsManager.isFOVBubbleModeOn = false;
-
-      settingsManager.isSatOverflyModeOn = true;
-
-      if ((<HTMLInputElement>getEl('search')).value !== '') {
-        // If Group Selected
-        uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
-      }
-
-      const satFieldOfView = parseFloat(<string>(<HTMLInputElement>getEl('satFieldOfView')).value);
-      getEl('menu-sat-fov').classList.add('bmenu-item-selected');
-      satSet.satCruncher.postMessage({
-        isShowFOVBubble: 'reset',
-        isShowSurvFence: 'disable',
-      });
-      satSet.satCruncher.postMessage({
-        typ: 'isShowSatOverfly',
-        isShowSatOverfly: 'enable',
-        selectedSatFOV: satFieldOfView,
-      });
-      satSet.setColorScheme(settingsManager.currentColorScheme, true);
-      return;
-    }
+declare module '@app/js/interfaces' {
+  interface UserSettings {
+    isSatOverflyModeOn: boolean;
+    isShowSurvFence: boolean;
+    isFOVBubbleModeOn: boolean;
   }
-};
+}
+
+export class SatelliteFov extends KeepTrackPlugin {
+  bottomIconCallback = () => {
+    if (this.isMenuButtonEnabled) {
+      this.enableFovView_();
+      settingsManager.isSatOverflyModeOn = true;
+    } else {
+      this.disableFovView_();
+      settingsManager.isSatOverflyModeOn = false;
+    }
+  };
+
+  isRequireSatelliteSelected: boolean = true;
+
+  bottomIconElementName = 'menu-sat-fov';
+  bottomIconLabel = 'Satellite FOV';
+  bottomIconImg = sat2Png;
+  isIconDisabledOnLoad = true;
+  isIconDisabled = true;
+
+  constructor() {
+    const PLUGIN_NAME = 'Satellite Field of View';
+    super(PLUGIN_NAME);
+  }
+
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.changeSensorMarkers,
+      cbName: this.PLUGIN_NAME,
+      cb: (caller: string): void => {
+        if (caller !== this.PLUGIN_NAME) {
+          getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+        }
+      },
+    });
+  }
+
+  private disableFovView_() {
+    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+
+    settingsManager.isSatOverflyModeOn = false;
+    this.setBottomIconToUnselected();
+
+    catalogManagerInstance.satCruncher.postMessage({
+      typ: 'isShowSatOverfly',
+      isShowSatOverfly: 'reset',
+    });
+  }
+
+  static getSatFieldOfView_(): number {
+    const fovStr = <HTMLInputElement>getEl('satFieldOfView', true);
+
+    if (!fovStr) {
+      // There is no settings menu, but this is optional.
+      return 30;
+    }
+
+    if (fovStr.value === '') {
+      errorManagerInstance.warn('No Satellite FOV value entered. Using default value of 30 degrees.');
+      return 30;
+    }
+
+    const fov = parseFloat(fovStr.value);
+    if (isNaN(fov) || fov < 0 || fov > 180) {
+      errorManagerInstance.warn('Invalid Satellite FOV value. Using default value of 30 degrees.');
+      return 30;
+    }
+
+    return fov;
+  }
+
+  private enableFovView_() {
+    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+
+    keepTrackApi.methods.changeSensorMarkers(this.PLUGIN_NAME);
+
+    settingsManager.isShowSurvFence = false;
+    settingsManager.isFOVBubbleModeOn = false;
+    settingsManager.isSatOverflyModeOn = true;
+
+    this.setBottomIconToSelected();
+
+    if ((<HTMLInputElement>getEl('search')).value !== '') {
+      // If Group Selected
+      uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
+    }
+
+    const satFieldOfView = SatelliteFov.getSatFieldOfView_();
+    catalogManagerInstance.satCruncher.postMessage({
+      isShowFOVBubble: 'reset',
+      isShowSurvFence: 'disable',
+    });
+    catalogManagerInstance.satCruncher.postMessage({
+      typ: 'isShowSatOverfly',
+      isShowSatOverfly: 'enable',
+      selectedSatFOV: satFieldOfView,
+    });
+    colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+  }
+}
+
+export const satelliteFovPlugin = new SatelliteFov();

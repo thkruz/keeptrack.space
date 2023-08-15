@@ -1,10 +1,10 @@
 import { copyFilesAndFolders, copySettingsFiles } from './lib/copyFilesAndFolders.mjs';
 
-import { generateConfig } from './webpack.mjs';
+import webpack from 'webpack';
 import generateConstVersion from './lib/constVersion.mjs';
 import { setupDistFolders } from './lib/setupFolders.mjs';
 import { updateTime } from './lib/updateTime.mjs';
-import webpack from 'webpack';
+import { generateConfig } from './webpack.mjs';
 
 console.clear();
 console.log('Copying files...'); // NOSONAR
@@ -37,7 +37,7 @@ copyFilesAndFolders(reqDirs, reqFiles, optDirs, optFiles, 'dist');
 copySettingsFiles('dist');
 
 console.log('Updating version number...'); // NOSONAR
-generateConstVersion('./package.json', 'src/js/settingsManager/version.js');
+generateConstVersion('./package.json', 'src/js/settings/version.js');
 
 console.log('Updating last update time...'); // NOSONAR
 updateTime();

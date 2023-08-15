@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 
-import copySync from './copySync.mjs';
 import copydir from 'copy-dir';
+import copySync from './copySync.mjs';
 
 export const copyFilesAndFolders = (reqDirs, reqFiles, optDirs, optFiles, dest) => {
   const opts = {
@@ -47,7 +47,7 @@ const writeFile = (dest, data) => {
 };
 
 export const copySettingsFiles = (dest) => {
-  const settingsOverrideData = readFileSync(`./src/js/settingsManager/settingsOverride.js`);
+  const settingsOverrideData = readFileSync(`./src/js/settings/settingsOverride.js`);
   writeFile(`./${dest}/settings/settingsOverride.js`, settingsOverrideData);
 };
 

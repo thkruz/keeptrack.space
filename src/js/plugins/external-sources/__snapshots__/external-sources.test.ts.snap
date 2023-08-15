@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`externalSources.searchCelestrackOnLoad 11 1`] = `undefined`;
-
-exports[`externalSources.uiManagerInit 0 1`] = `undefined`;

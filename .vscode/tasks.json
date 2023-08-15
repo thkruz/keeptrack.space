@@ -1,31 +1,89 @@
 {
   "version": "2.0.0",
   "tasks": [
-    // {
-    //   // The name that shows up in terminal tab
-    //   "label": "Build and Watch",
-    //   // The task will launch a shell
-    //   "type": "shell",
-    //   "command": "npm run build:watch",
-    //   "isBackground": true,
-    //   "presentation": {
-    //     "group": "my-group"
-    //   },
-    //   "runOptions": {
-    //     "runOn": "folderOpen"
-    //   }
-    // },
-    // {
-    //   "label": "Start Server",
-    //   "type": "shell",
-    //   "command": "npm run start",
-    //   "isBackground": true,
-    //   "presentation": {
-    //     "group": "my-group"
-    //   },
-    //   "runOptions": {
-    //     "runOn": "folderOpen"
-    //   }
-    // }
-  ]
+    {
+      "label": "Test with Jest",
+      "command": "npm test",
+      "type": "shell",
+      "args": [],
+      "isBackground": true,
+      "problemMatcher": [],
+      "icon": {
+        "id": "go-to-file",
+        "color": "terminal.ansiGreen"
+      }
+    },
+    {
+      "label": "Create Empty Test File",
+      "command": "npm run createtest",
+      "type": "shell",
+      "args": [],
+      "isBackground": true,
+      "problemMatcher": [],
+      "icon": {
+        "id": "beaker",
+        "color": "terminal.ansiGreen"
+      }
+    },
+    {
+      "label": "Build in Webpack",
+      "command": "npm run build:watch",
+      "type": "shell",
+      "args": [],
+      "isBackground": true,
+      "problemMatcher": [],
+      "icon": {
+        "id": "symbol-method",
+        "color": "terminal.ansiBlue"
+      }
+    },
+    {
+      "label": "Open Test Coverage",
+      "command": "npm run lcov",
+      "type": "shell",
+      "args": [],
+      "isBackground": true,
+      "problemMatcher": [],
+      "icon": {
+        "id": "file-code",
+        "color": "terminal.ansiYellow"
+      }
+    },
+    {
+      "label": "Start KeepTrack",
+      "command": "npm run start",
+      "type": "shell",
+      "args": [],
+      "isBackground": true,
+      "problemMatcher": [],
+      "icon": {
+        "id": "play-circle",
+        "color": "terminal.ansiGreen"
+      }
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "prettier.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "steoates.autoimport",
+      "vivaxy.vscode-conventional-commits",
+      "usernamehw.errorlens",
+      "Orta.vscode-jest",
+      "firsttris.vscode-jest-runner",
+      "sburg.vscode-javascript-booster",
+      "VisualStudioExptTeam.vscodeintellicode",
+      "usernamehw.remove-empty-lines",
+      "aljazsim.tsco"
+    ]
+  },
+  "folders": [
+    {
+      "path": ".."
+    }
+  ],
+  "settings": {
+    "jest.disabledWorkspaceFolders": [".vscode", ".git", "node_modules"],
+    "typescript.tsdk": "node_modules/typescript/lib"
+  }
 }

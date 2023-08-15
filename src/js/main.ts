@@ -6,7 +6,7 @@
  * interaction with the application.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2022 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
@@ -27,73 +27,17 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import '@css/loading-screen.css';
+import { KeepTrack } from './keeptrack';
 
-import { isThisJest, keepTrackApi } from './api/keepTrackApi';
-
-import { loadSplashScreen } from './loadSplashScreen';
-import { startKeepTrack } from './start';
+declare global {
+  interface Window {
+    keepTrack: KeepTrack;
+  }
+}
 
 // Load the main website
-const settingsOverride = window.settingsOverride || {};
-
-if (!settingsOverride.isPreventDefaultHtml) {
-  const bodyDOM = document.getElementsByTagName('body')[0];
-  bodyDOM.innerHTML = keepTrackApi.html`
-  <div id="loading-screen" class="valign-wrapper full-loader">
-      <div id="logo-inner-container" class="valign">
-        <div style="display: flex;">
-          <span id="logo-text" class="logo-font">KEEP TRACK</span>
-          <span id="logo-text-version" class="logo-font">7</span>
-        </div>
-        <span id="loader-text">Downloading Science...</span>
-      </div>
-    </div>
-    <div id="main-container">
-      <header>
-        <div id="header"></div>
-      </header>
-      <main>
-        <div id="rmb-wrapper"></div>
-
-        <div id="canvas-holder">
-          <canvas id="keeptrack-canvas"></canvas>
-          <div id="ui-wrapper">
-            <div id="search-results"></div>
-
-            <div id="sat-hoverbox">
-              <span id="sat-hoverbox1"></span>
-              <br />
-              <span id="sat-hoverbox2"></span>
-              <br />
-              <span id="sat-hoverbox3"></span>
-            </div>
-            <div id="sat-minibox"></div>
-
-            <div id="legend-hover-menu" class="start-hidden"></div>
-            <aside id="left-menus"></aside>
-          </div>
-        </div>
-        <figcaption id="info-overlays">
-          <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
-          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
-          <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
-          <div id="license-watermark" class="logo-font start-hidden">Unlicensed Software - Contact
-            theodore.kruczek@gmail.com to Renew!</div>
-        </figcaption>
-      </main>
-      <footer id="nav-footer" class="page-footer resizable">
-        <div id="footer-handle" class="ui-resizable-handle ui-resizable-n"></div>
-        <div id="footer-toggle-wrapper">
-          <div id="nav-footer-toggle">&#x25BC;</div>
-        </div>
-        <div id="bottom-icons-container">
-          <div id="bottom-icons"></div>
-        </div>
-      </footer>
-    </div>
-    `;
-
-  if (!isThisJest() && settingsOverride.isShowSplashScreen) loadSplashScreen();
-}
-startKeepTrack(settingsOverride);
+const keepTrack = new KeepTrack(window.settingsOverride);
+window.keepTrack = keepTrack;
+KeepTrack.initCss().then(() => {
+  keepTrack.init();
+});

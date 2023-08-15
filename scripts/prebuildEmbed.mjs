@@ -42,7 +42,5 @@ files.forEach((file) => {
   copySync(`./src/${file}`, `./embed/keepTrack/${file}`);
 });
 
-// console.log(`Copying settings...`);
-// copySync(`./src/js/settingsManager/settingsManager.js`, `./embed/keepTrack/js/settings.js`);
 console.log(`Copying settingsOverride...`);
-copySync(`./src/js/settingsManager/settingsOverrideEmbed.js`, `./embed/keepTrack/settingsOverride.js`);
+copySync(`./src/js/settings/settingsOverrideEmbed.js`, `./embed/keepTrack/settingsOverride.js`);

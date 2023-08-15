@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const helpTitleTextDebug = `Debug Menu`;
 

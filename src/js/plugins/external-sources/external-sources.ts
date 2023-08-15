@@ -6,7 +6,7 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2022 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
@@ -23,10 +23,26 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+// ////////////////////////////////////////////////////////////////////////////
+// TODO: This is currently obsolete. It should be replaced with an update to
+// the edit satellite plugin allowing for a user to paste a full two line
+// element set in to replace an active satellite.
+// ////////////////////////////////////////////////////////////////////////////
+
+/* istanbul ignore file */
+
 import externalPng from '@app/img/icons/external.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { createError } from '@app/js/errorManager/errorManager';
-import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, Singletons, UiManager } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
+import { getEl } from '@app/js/lib/get-el';
+import { showLoading } from '@app/js/lib/showLoading';
+import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
+import { errorManagerInstance } from '@app/js/singletons/errorManager';
+
+import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
+
 import { helpBodyTextExternal, helpTitleTextExternal } from './help';
 
 let isExternalMenuOpen = false;
@@ -149,7 +165,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isExternalMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextExternal, helpBodyTextExternal);
+    adviceManagerInstance.showAdvice(helpTitleTextExternal, helpBodyTextExternal);
     return true;
   }
   return false;
@@ -163,8 +179,8 @@ export const n2yoFormSubmit = () => {
 };
 
 export const searchN2yo = (satNum: any, analsat?: number) => {
-  const { satSet } = keepTrackApi.programs;
-  const { satData } = keepTrackApi.programs.satSet;
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const { satData } = catalogManagerInstance;
 
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
@@ -176,7 +192,7 @@ export const searchN2yo = (satNum: any, analsat?: number) => {
     }
   } else {
     // Satnum to Id
-    analsat = satSet.getIdFromObjNum(analsat);
+    analsat = catalogManagerInstance.getIdFromObjNum(analsat);
   }
 
   const request = new XMLHttpRequest();
@@ -188,37 +204,36 @@ export const searchN2yo = (satNum: any, analsat?: number) => {
 };
 
 export const searchN2yoOnLoad = (request: { status: number; response: string }, analsat: number): any => {
-  const { satSet, uiManager } = keepTrackApi.programs;
-
   if (request.status >= 200 && request.status < 400) {
     // Success!
     try {
+      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
       const tles = request.response.split('<div id="tle">')[1].split('<pre>')[1].split('\n');
       const TLE1 = tles[1];
       const TLE2 = tles[2];
       if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
       if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
-      const sat = satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-      uiManager.doSearch(sat.sccNum.toString());
+      const sat = catalogManagerInstance.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      uiManagerInstance.doSearch(sat.sccNum.toString());
     } catch (e) {
-      createError(e, 'external-sources.ts');
+      errorManagerInstance.error(e, 'external-sources.ts', 'Error in Loading N2YO TLE');
     }
   } else {
-    // We reached our target server, but it returned an error
-    // console.debug('N2YO request returned an error!');
+    errorManagerInstance.warn('Unable to Load N2YO TLE');
   }
 };
 
 export const bottomMenuClick = (iconName: string): void => {
-  const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-external') {
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
     if (isExternalMenuOpen) {
       isExternalMenuOpen = false;
       getEl('menu-external').classList.remove('bmenu-item-selected');
-      uiManager.hideSideMenus();
+      uiManagerInstance.hideSideMenus();
       return;
     } else {
-      uiManager.hideSideMenus();
+      uiManagerInstance.hideSideMenus();
       slideInRight(getEl('external-menu'), 1000);
       keepTrackApi.programs.watchlist.updateWatchlist();
       isExternalMenuOpen = true;
@@ -228,25 +243,28 @@ export const bottomMenuClick = (iconName: string): void => {
   }
 };
 export const searchCelestrackOnLoad = (request: any, analsat: number): any => {
-  const { satSet, uiManager } = keepTrackApi.programs;
   if (request.status >= 200 && request.status < 400) {
-    // Success!
-    const tles = JSON.parse(request.response).split('\n');
-    const TLE1 = tles[1];
-    const TLE2 = tles[2];
-    if (TLE1.substr(0, 2) !== '1 ') throw new Error(`N2YO TLE 1 is not a valid TLE -- ${TLE1.substr(0, 2)}`);
-    if (TLE2.substr(0, 2) !== '2 ') throw new Error(`N2YO TLE 2 is not a valid TLE -- ${TLE2.substr(0, 2)}`);
-    const sat = satSet.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-    uiManager.doSearch(sat.sccNum.toString());
+    try {
+      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const tles = JSON.parse(request.response).split('\n');
+      const TLE1 = tles[1];
+      const TLE2 = tles[2];
+      if (TLE1.substr(0, 2) !== '1 ') throw new Error(`Celestrak TLE 1 is not a valid TLE -- ${TLE1.substr(0, 2)}`);
+      if (TLE2.substr(0, 2) !== '2 ') throw new Error(`Celestrak TLE 2 is not a valid TLE -- ${TLE2.substr(0, 2)}`);
+      const sat = catalogManagerInstance.insertNewAnalystSatellite(TLE1, TLE2, analsat);
+      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      uiManagerInstance.doSearch(sat.sccNum.toString());
+    } catch (e) {
+      errorManagerInstance.error(e, 'external-sources.ts', 'Error in Loading Celestrak TLE');
+    }
   } else {
-    // We reached our target server, but it returned an error
-    // console.debug('Celestrack request returned an error!');
+    errorManagerInstance.warn('Unable to Load Celestrak TLE');
   }
 };
 
 export const searchCelestrak = (satNum: any, analsat?: number) => {
-  const { satSet } = keepTrackApi.programs;
-  const satData = keepTrackApi.programs.satSet.satData;
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const { satData } = catalogManagerInstance;
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
     for (let i = 15000; i < satData.length; i++) {
@@ -257,7 +275,7 @@ export const searchCelestrak = (satNum: any, analsat?: number) => {
     }
   } else {
     // Satnum to Id
-    analsat = satSet.getIdFromObjNum(analsat);
+    analsat = catalogManagerInstance.getIdFromObjNum(analsat);
   }
 
   const request = new XMLHttpRequest();

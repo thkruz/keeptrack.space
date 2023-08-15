@@ -1,6 +1,6 @@
 {
-  "jest.jestCommandLine": "npm run test --",
-  "ponicode.testSettings.testLocation.locationType": "Same folder as source file",
+  "jest.jestCommandLine": "",
+  "conventionalCommits.promptScopes": false,
   // "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.formatOnSave": true,
   "typescript.validate.enable": true,
@@ -46,5 +46,24 @@
   },
   "[yaml]": {
     "editor.autoIndent": "advanced"
-  }
+  },
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+    "source.fixAll.eslint": true
+  },
+  "files.eol": "\n",
+  "terminal.integrated.profiles.windows": {
+    "Testing": {
+      "path": ["D:\\Program Files\\Git\\bin\\bash.exe"],
+      "icon": "beaker",
+      "color": "terminal.ansiGreen"
+    },
+    "Build": {
+      "path": ["D:\\Program Files\\Git\\bin\\bash.exe"],
+      "icon": "symbol-method",
+      "color": "terminal.ansiBlue"
+    }
+  },
+  "jestrunner.codeLens": ["run", "debug", "coverage"]
 }

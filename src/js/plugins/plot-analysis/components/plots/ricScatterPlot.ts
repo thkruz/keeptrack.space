@@ -1,5 +1,9 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as echarts from 'echarts';
+
+import { CatalogManager, EChartsData, Singletons } from '@app/js/interfaces';
+
+import { keepTrackContainer } from '@app/js/container';
+import { SatMathApi } from '@app/js/singletons/sat-math-api';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -114,16 +118,15 @@ export const createRicScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
 
 export const getRicScatterData = () => {
   const NUMBER_OF_POINTS = 500;
-  const { satSet, objectManager, satellite } = keepTrackApi.programs;
+  const data = [] as EChartsData;
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
-  const data = [];
+  if (catalogManagerInstance.selectedSat === -1 || catalogManagerInstance.secondarySat === -1) return [];
 
-  if (objectManager.selectedSat === -1 || objectManager.secondarySat === -1) return [];
-
-  const satP = satSet.getSat(objectManager.selectedSat);
-  const satS = objectManager.secondarySatObj;
+  const satP = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+  const satS = catalogManagerInstance.secondarySatObj;
   data.push({ name: satP.name, value: [[0, 0, 0]] });
-  data.push({ name: satS.name, value: satellite.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, 5) });
+  data.push({ name: satS.name, value: SatMathApi.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, 5).map((point) => [point.x, point.y, point.z]) });
 
   return data;
 };

@@ -1,17 +1,27 @@
 import missilePng from '@app/img/icons/missile.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, OrbitManager, Singletons, UiManager } from '@app/js/interfaces';
+import { showLoading } from '@app/js/lib/showLoading';
+import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
+import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
+import { getEl } from '@app/js/lib/get-el';
+import { TimeManager } from '@app/js/singletons/time-manager';
+
+import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
+
 import { helpBodyTextMissile, helpTitleTextMissile } from './help';
 import { missileManager } from './missileManager';
 
 let isMissileMenuOpen = false;
 let isSub = false;
+let i = 0;
 
 export const updateLoop = (): void => {
   if (typeof missileManager != 'undefined' && missileManager.missileArray.length > 0) {
-    const { drawManager, orbitManager } = keepTrackApi.programs;
-    for (drawManager.i = 0; drawManager.i < missileManager.missileArray.length; drawManager.i++) {
-      orbitManager.updateOrbitBuffer(missileManager.missileArray[drawManager.i].id);
+    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    for (i = 0; i < missileManager.missileArray.length; i++) {
+      orbitManagerInstance.updateOrbitBuffer(missileManager.missileArray[i].id);
     }
   }
 };
@@ -22,14 +32,14 @@ export const hideSideMenus = (): void => {
 };
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-missile') {
-    const { uiManager } = keepTrackApi.programs;
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
     if (isMissileMenuOpen) {
       isMissileMenuOpen = false;
-      uiManager.hideSideMenus();
+      uiManagerInstance.hideSideMenus();
       return;
     } else {
-      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-      uiManager.hideSideMenus();
+      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(false);
+      uiManagerInstance.hideSideMenus();
       slideInRight(getEl('missile-menu'), 1000);
       getEl('menu-missile').classList.add('bmenu-item-selected');
       isMissileMenuOpen = true;
@@ -57,9 +67,10 @@ export const msTargetChange = () => {
   }
 };
 export const missileSubmit = (): void => {
-  // prettier-ignore
-  showLoading(() => { // NOSONAR
-    const { uiManager, satSet, timeManager } = keepTrackApi.programs;
+  showLoading(() => {
+    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+
     getEl('ms-error').style.display = 'none';
     const type = parseFloat((<HTMLInputElement>getEl('ms-type')).value);
     const attacker = parseFloat((<HTMLInputElement>getEl('ms-attacker')).value);
@@ -68,7 +79,7 @@ export const missileSubmit = (): void => {
     const target = parseFloat((<HTMLInputElement>getEl('ms-target')).value);
     let tgtLat = parseFloat((<HTMLInputElement>getEl('ms-lat')).value);
     let tgtLon = parseFloat((<HTMLInputElement>getEl('ms-lon')).value);
-    const launchTime = timeManager.selectedDate * 1;
+    const launchTime = timeManagerInstance.selectedDate.getTime();
 
     let sim = '';
     if (type === 1) {
@@ -100,18 +111,18 @@ export const missileSubmit = (): void => {
       missileManager.MassRaidPre(launchTime, sim);
     }
     if (type !== 0) {
-      uiManager.toast(`${sim} Loaded`, 'standby', true);
+      uiManagerInstance.toast(`${sim} Loaded`, 'standby', true);
     }
     if (type === 0) {
       if (target === -1) {
         // Custom Target
         if (isNaN(tgtLat)) {
-          uiManager.toast(`Invalid Target Latitude!`, 'critical');
+          uiManagerInstance.toast(`Invalid Target Latitude!`, 'critical');
           getEl('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(tgtLon)) {
-          uiManager.toast(`Invalid Target Longitude!`, 'critical');
+          uiManagerInstance.toast(`Invalid Target Longitude!`, 'critical');
           getEl('loading-screen').style.display = 'none';
           return;
         }
@@ -123,18 +134,20 @@ export const missileSubmit = (): void => {
 
       if (isSub) {
         if (isNaN(lauLat)) {
-          uiManager.toast(`Invalid Launch Latitude!`, 'critical');
+          uiManagerInstance.toast(`Invalid Launch Latitude!`, 'critical');
           getEl('loading-screen').style.display = 'none';
           return;
         }
         if (isNaN(lauLon)) {
-          uiManager.toast(`Invalid Launch Longitude!`, 'critical');
+          uiManagerInstance.toast(`Invalid Launch Longitude!`, 'critical');
           getEl('loading-screen').style.display = 'none';
           return;
         }
       }
 
-      let a, b; //, attackerName;
+      let a: number;
+      let b: number;
+      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
       if (attacker < 200) {
         // USA
@@ -153,7 +166,7 @@ export const missileSubmit = (): void => {
           tgtLat,
           tgtLon,
           3,
-          satSet.missileSats - b,
+          catalogManagerInstance.missileSats - b,
           launchTime,
           missileManager.UsaICBM[a * 4 + 2],
           30,
@@ -179,7 +192,7 @@ export const missileSubmit = (): void => {
           tgtLat,
           tgtLon,
           3,
-          satSet.missileSats - b,
+          catalogManagerInstance.missileSats - b,
           launchTime,
           missileManager.RussianICBM[a * 4 + 2],
           30,
@@ -205,7 +218,7 @@ export const missileSubmit = (): void => {
           tgtLat,
           tgtLon,
           3,
-          satSet.missileSats - b,
+          catalogManagerInstance.missileSats - b,
           launchTime,
           missileManager.ChinaICBM[a * 4 + 2],
           30,
@@ -231,7 +244,7 @@ export const missileSubmit = (): void => {
           tgtLat,
           tgtLon,
           3,
-          satSet.missileSats - b,
+          catalogManagerInstance.missileSats - b,
           launchTime,
           missileManager.NorthKoreanBM[a * 4 + 2],
           30,
@@ -258,7 +271,7 @@ export const missileSubmit = (): void => {
           tgtLat,
           tgtLon,
           3,
-          satSet.missileSats - b,
+          catalogManagerInstance.missileSats - b,
           launchTime,
           missileManager.FraSLBM[a * 4 + 2],
           30,
@@ -284,7 +297,7 @@ export const missileSubmit = (): void => {
           tgtLat,
           tgtLon,
           3,
-          satSet.missileSats - b,
+          catalogManagerInstance.missileSats - b,
           launchTime,
           missileManager.ukSLBM[a * 4 + 2],
           30,
@@ -295,8 +308,8 @@ export const missileSubmit = (): void => {
           missileMinAlt
         );
       }
-      uiManager.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
-      uiManager.doSearch('RV_');
+      uiManagerInstance.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
+      uiManagerInstance.doSearch('RV_');
     }
     getEl('loading-screen').style.display = 'none';
   });
@@ -458,7 +471,7 @@ export const uiManagerInit = (): void => {
               <h6 class="center-align">Error</h6>
             </div>
           </div>
-        </div>   
+        </div>
       `
   );
 
@@ -479,8 +492,8 @@ export const uiManagerInit = (): void => {
 };
 
 export const searchForRvs = () => {
-  const { uiManager } = keepTrackApi.programs;
-  uiManager.doSearch('RV_');
+  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  uiManagerInstance.doSearch('RV_');
 };
 
 export const uiManagerFinal = (): void => {
@@ -539,7 +552,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isMissileMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextMissile, helpBodyTextMissile);
+    adviceManagerInstance.showAdvice(helpTitleTextMissile, helpBodyTextMissile);
     return true;
   }
   return false;

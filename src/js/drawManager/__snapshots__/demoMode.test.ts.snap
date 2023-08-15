@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`drawManager.demoMode 0 1`] = `undefined`;
-
-exports[`drawManager.demoMode 1 1`] = `undefined`;

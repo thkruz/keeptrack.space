@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import linePlotPng from '@app/img/icons/line-plot.png';
 import scatterPlotPng from '@app/img/icons/scatter-plot.png';
 import scatterPlotPng2 from '@app/img/icons/scatter-plot2.png';

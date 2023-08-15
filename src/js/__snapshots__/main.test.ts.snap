@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`showErrorCode should show the error code 1`] = `"test<br>Line: 1<br>test<br>"`;

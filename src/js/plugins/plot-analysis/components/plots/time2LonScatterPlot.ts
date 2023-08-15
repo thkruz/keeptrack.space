@@ -1,7 +1,12 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { RAD2DEG } from '@app/js/lib/constants';
 import * as echarts from 'echarts';
+
+import { CatalogManager, GetSatType, Singletons } from '@app/js/interfaces';
+
+import { keepTrackContainer } from '@app/js/container';
+import { RAD2DEG } from '@app/js/lib/constants';
+import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { SatMathApi } from '@app/js/singletons/sat-math-api';
+import { TimeManager } from '@app/js/singletons/time-manager';
 
 export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, chartDom) => {
   // Dont Load Anything if the Chart is Closed
@@ -14,7 +19,8 @@ export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart,
     curChart = echarts.init(chartDom);
     curChart.on('click', (event) => {
       if (event.data?.id) {
-        keepTrackApi.programs.satSet.selectSat(event.data.id);
+        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        catalogManagerInstance.selectSat(event.data.id);
       }
     });
   } else {
@@ -133,11 +139,13 @@ export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart,
 };
 
 export const getTime2LonScatterData = () => {
-  const { satSet, satellite, timeManager } = keepTrackApi.programs;
-  const now = timeManager.simulationTimeObj.getTime();
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+
+  const now = timeManagerInstance.simulationTimeObj.getTime();
 
   const data = [];
-  satSet.satData.forEach((sat) => {
+  catalogManagerInstance.satData.forEach((sat) => {
     if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
     if (sat.eccentricity > 0.1) return;
     if (sat.period < 1240) return;
@@ -157,8 +165,8 @@ export const getTime2LonScatterData = () => {
       default:
         return;
     }
-    sat = satSet.getSatPosOnly(sat.id);
-    const plotPoints = satellite.getLlaOfCurrentOrbit(sat, 24);
+    sat = catalogManagerInstance.getSat(sat.id, GetSatType.POSITION_ONLY);
+    const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
     const plotData = [];
     plotPoints.forEach((point) => {
       const pointTime = (point.time - now) / 1000 / 60;

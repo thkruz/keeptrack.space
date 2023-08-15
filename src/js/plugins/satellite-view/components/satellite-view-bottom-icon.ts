@@ -1,5 +1,5 @@
 import scatterPlotPng2 from '@app/img/icons/scatter-plot2.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const scenarioCreatorBottomIcon = keepTrackApi.html`
       <div id="menu-scenario-creator" class="bmenu-item bmenu-item-disabled">

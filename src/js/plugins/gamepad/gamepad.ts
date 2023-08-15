@@ -1,5 +1,11 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { GamepadPlugin } from '@app/js/api/keepTrackTypes';
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, GamepadPlugin, Singletons, UiManager } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { DrawManager } from '@app/js/singletons/draw-manager';
+
+import { hoverManagerInstance } from '@app/js/singletons/hover-manager';
+import { Radians } from 'ootk';
 
 const gamepadSettings = {
   deadzone: 0.15,
@@ -11,7 +17,7 @@ export const init = (): void => {
   };
   // NOTE: This is note a message event and sonarqube should ignore it
   // prettier-ignore
-  window.addEventListener('gamepadconnected', (evt: any) => { // NOSONAR    
+  window.addEventListener('gamepadconnected', (evt: any) => { // NOSONAR
     if (settingsManager.cruncherReady) {
       gamepadConnected(<GamepadEvent>event);
     } else {
@@ -23,8 +29,8 @@ export const init = (): void => {
     }
   });
   window.addEventListener('gamepaddisconnected', () => {
-    const { uiManager } = keepTrackApi.programs;
-    uiManager?.toast('Gamepad disconnected', 'critical');
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    uiManagerInstance.toast('Gamepad disconnected', 'critical');
     keepTrackApi.programs.gamepad = <GamepadPlugin>{
       currentState: null,
     };
@@ -32,7 +38,8 @@ export const init = (): void => {
 };
 
 export const initializeGamepad = (gamepad: Gamepad): void => {
-  console.log('Gamepad connected');
+  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  uiManagerInstance.toast('Gamepad connected', 'normal');
   keepTrackApi.register({
     method: 'updateLoop',
     cbName: 'gamepad',
@@ -63,6 +70,7 @@ export const updateGamepad = (index?: number): void => {
 const buttonsPressed: boolean[] = [];
 export const updateButtons = (buttons: readonly GamepadButton[]): void => {
   const { gamepad } = keepTrackApi.programs;
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
   buttons.forEach((button, index) => {
     // if the button is pressed and wasnt pressed before
@@ -75,26 +83,24 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
         gamepad.buttonsPressedHistory.shift();
       }
 
-      const { mainCamera, satSet, objectManager } = keepTrackApi.programs;
-
       // Perform action
       let satId;
       switch (index) {
         case 0:
           if (settingsManager.isLimitedGamepadControls) break;
           console.log('A');
-          satSet.selectSat(objectManager.hoveringSat);
+          catalogManagerInstance.selectSat(hoverManagerInstance.hoveringSat);
           break;
         case 1:
           if (settingsManager.isLimitedGamepadControls) break;
           console.log('B');
-          satSet.selectSat(-1);
-          mainCamera.zoomTarget(0.8);
+          catalogManagerInstance.selectSat(-1);
+          mainCameraInstance.zoomTarget = 0.8;
           break;
         case 2:
           if (settingsManager.isLimitedGamepadControls) break;
           console.log('X');
-          mainCamera.autoRotate();
+          mainCameraInstance.autoRotate();
           break;
         case 3:
           console.log('Y');
@@ -104,30 +110,30 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
           if (settingsManager.isLimitedGamepadControls) break;
           console.log('Left Bumper');
           // eslint-disable-next-line no-case-declarations
-          satId = objectManager.selectedSat - 1;
+          satId = catalogManagerInstance.selectedSat - 1;
           if (satId >= 0) {
-            satSet.selectSat(satId);
+            catalogManagerInstance.selectSat(satId);
           } else {
-            satSet.selectSat(satSet.satData.length - 1);
+            catalogManagerInstance.selectSat(catalogManagerInstance.satData.length - 1);
           }
           break;
         case 5:
           if (settingsManager.isLimitedGamepadControls) break;
           console.log('Right Bumper');
           // eslint-disable-next-line no-case-declarations
-          satId = objectManager.selectedSat + 1;
-          if (satId <= satSet.satData.length - 1) {
-            satSet.selectSat(satId);
+          satId = catalogManagerInstance.selectedSat + 1;
+          if (satId <= catalogManagerInstance.satData.length - 1) {
+            catalogManagerInstance.selectSat(satId);
           } else {
-            satSet.selectSat(0);
+            catalogManagerInstance.selectSat(0);
           }
           break;
         case 8:
           if (settingsManager.isLimitedGamepadControls) break;
           console.log('Home');
-          mainCamera.isPanReset = true;
-          mainCamera.isLocalRotateReset = true;
-          mainCamera.ftsRotateReset = true;
+          mainCameraInstance.isPanReset = true;
+          mainCameraInstance.isLocalRotateReset = true;
+          mainCameraInstance.ftsRotateReset = true;
           break;
         case 9:
           console.log('Start');
@@ -168,63 +174,63 @@ export const updateButtons = (buttons: readonly GamepadButton[]): void => {
 
 export const updateZoom = (zoomOut: number, zoomIn: number): void => {
   if (zoomOut === 0 && zoomIn === 0) return; // Not Zooming
+  const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
 
-  const { mainCamera, drawManager } = keepTrackApi.programs;
-  let zoomTarget = mainCamera.zoomLevel();
-  switch (mainCamera.cameraType.current) {
-    case mainCamera.cameraType.Default:
-    case mainCamera.cameraType.Offset:
-    case mainCamera.cameraType.FixedToSat:
-      zoomTarget += (zoomOut / 500) * drawManager.dt;
-      zoomTarget -= (zoomIn / 500) * drawManager.dt;
-      mainCamera.zoomTarget(zoomTarget);
-      mainCamera.camZoomSnappedOnSat = false;
-      mainCamera.isCamSnapMode = false;
+  let zoomTarget = mainCameraInstance.zoomLevel();
+  switch (mainCameraInstance.cameraType) {
+    case CameraType.DEFAULT:
+    case CameraType.OFFSET:
+    case CameraType.FIXED_TO_SAT:
+      zoomTarget += (zoomOut / 500) * drawManagerInstance.dt;
+      zoomTarget -= (zoomIn / 500) * drawManagerInstance.dt;
+      mainCameraInstance.zoomTarget = zoomTarget;
+      mainCameraInstance.camZoomSnappedOnSat = false;
+      mainCameraInstance.isCamSnapMode = false;
 
-      if (zoomTarget < mainCamera.zoomLevel()) {
-        mainCamera.isZoomIn = true;
+      if (zoomTarget < mainCameraInstance.zoomLevel()) {
+        mainCameraInstance.isZoomIn = true;
       } else {
-        mainCamera.isZoomIn = false;
+        mainCameraInstance.isZoomIn = false;
       }
       break;
-    case mainCamera.cameraType.Fps:
-    case mainCamera.cameraType.Satellite:
-    case mainCamera.cameraType.Planetarium:
-    case mainCamera.cameraType.Astronomy:
+    case CameraType.FPS:
+    case CameraType.SATELLITE:
+    case CameraType.PLANETARIUM:
+    case CameraType.ASTRONOMY:
       if (zoomOut !== 0) {
-        mainCamera.fpsVertSpeed += (zoomOut * 2) ** 3 * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCameraInstance.fpsVertSpeed += (zoomOut * 2) ** 3 * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
       }
       if (zoomIn !== 0) {
-        mainCamera.fpsVertSpeed -= (zoomIn * 2) ** 3 * drawManager.dt * settingsManager.cameraMovementSpeed;
+        mainCameraInstance.fpsVertSpeed -= (zoomIn * 2) ** 3 * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
       }
       break;
   }
 };
 
 export const updateLeftStick = (x: number, y: number): void => {
-  const { mainCamera, drawManager } = keepTrackApi.programs;
   if (x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone || y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone) {
-    mainCamera.autoRotate(false);
+    mainCameraInstance.autoRotate(false);
+    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
     settingsManager.lastGamepadMovement = Date.now();
 
-    switch (mainCamera.cameraType.current) {
-      case mainCamera.cameraType.Default:
-      case mainCamera.cameraType.Offset:
-      case mainCamera.cameraType.FixedToSat:
-        mainCamera.camAngleSnappedOnSat = false;
-        mainCamera.isCamSnapMode = false;
-        mainCamera.camPitchSpeed -= (y ** 3 / 200) * drawManager.dt * settingsManager.cameraMovementSpeed;
-        mainCamera.camYawSpeed += (x ** 3 / 200) * drawManager.dt * settingsManager.cameraMovementSpeed;
+    switch (mainCameraInstance.cameraType) {
+      case CameraType.DEFAULT:
+      case CameraType.OFFSET:
+      case CameraType.FIXED_TO_SAT:
+        mainCameraInstance.camAngleSnappedOnSat = false;
+        mainCameraInstance.isCamSnapMode = false;
+        mainCameraInstance.camPitchSpeed -= (y ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+        mainCameraInstance.camYawSpeed += (x ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
         break;
-      case mainCamera.cameraType.Fps:
-      case mainCamera.cameraType.Satellite:
-      case mainCamera.cameraType.Planetarium:
-      case mainCamera.cameraType.Astronomy:
+      case CameraType.FPS:
+      case CameraType.SATELLITE:
+      case CameraType.PLANETARIUM:
+      case CameraType.ASTRONOMY:
         if (y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone) {
-          mainCamera.fpsForwardSpeed = -(y ** 3) * drawManager.dt;
+          mainCameraInstance.fpsForwardSpeed = -(y ** 3) * drawManagerInstance.dt;
         }
         if (x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone) {
-          mainCamera.fpsSideSpeed = x ** 3 * drawManager.dt;
+          mainCameraInstance.fpsSideSpeed = x ** 3 * drawManagerInstance.dt;
         }
         break;
     }
@@ -233,25 +239,25 @@ export const updateLeftStick = (x: number, y: number): void => {
 
 export const updateRightStick = (x: number, y: number): void => {
   if (settingsManager.isLimitedGamepadControls) return;
+  const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
 
-  const { mainCamera, drawManager } = keepTrackApi.programs;
-  mainCamera.isLocalRotateOverride = false;
+  mainCameraInstance.isLocalRotateOverride = false;
   if (y > gamepadSettings.deadzone || y < -gamepadSettings.deadzone || x > gamepadSettings.deadzone || x < -gamepadSettings.deadzone) {
-    mainCamera.autoRotate(false);
-    switch (mainCamera.cameraType.current) {
-      case mainCamera.cameraType.Default:
-      case mainCamera.cameraType.Offset:
-      case mainCamera.cameraType.FixedToSat:
-        mainCamera.isLocalRotateOverride = true;
-        mainCamera.localRotateDif.pitch = -y * 200;
-        mainCamera.localRotateDif.yaw = -x * 200;
+    mainCameraInstance.autoRotate(false);
+    switch (mainCameraInstance.cameraType) {
+      case CameraType.DEFAULT:
+      case CameraType.OFFSET:
+      case CameraType.FIXED_TO_SAT:
+        mainCameraInstance.isLocalRotateOverride = true;
+        mainCameraInstance.localRotateDif.pitch = <Radians>(-y * 200);
+        mainCameraInstance.localRotateDif.yaw = <Radians>(-x * 200);
         break;
-      case mainCamera.cameraType.Fps:
-      case mainCamera.cameraType.Satellite:
-      case mainCamera.cameraType.Planetarium:
-      case mainCamera.cameraType.Astronomy:
-        mainCamera.camPitchSpeed += (y / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
-        mainCamera.camYawSpeed -= (x / 100) * drawManager.dt * settingsManager.cameraMovementSpeed;
+      case CameraType.FPS:
+      case CameraType.SATELLITE:
+      case CameraType.PLANETARIUM:
+      case CameraType.ASTRONOMY:
+        mainCameraInstance.camPitchSpeed += (y / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+        mainCameraInstance.camYawSpeed -= (x / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
         break;
     }
   }
@@ -271,8 +277,8 @@ export const vibrate = (vibrateTime?: number, gamepad?: any): void => {
 };
 
 export const gamepadConnected = (e: GamepadEvent) => {
-  const { uiManager } = keepTrackApi.programs;
-  uiManager?.toast('Gamepad connected', 'normal');
+  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  uiManagerInstance.toast('Gamepad connected', 'normal');
   initializeGamepad(e.gamepad);
 };
 export const getController = (index?: number): Gamepad => {

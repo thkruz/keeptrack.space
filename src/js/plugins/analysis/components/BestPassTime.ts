@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const BestPassTime = keepTrackApi.html`
 <h5 class="center-align">Best Pass Times</h5>

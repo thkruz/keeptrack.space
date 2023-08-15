@@ -6,7 +6,7 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2022 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
@@ -23,100 +23,90 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { getEl, shake } from '@app/js/lib/helpers';
+import { CatalogManager, OrbitManager, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
+import { getEl } from '@app/js/lib/get-el';
+import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import planetariumPng from '@app/img/icons/planetarium.png';
+import { keepTrackContainer } from '@app/js/container';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { DrawManager } from '@app/js/singletons/draw-manager';
+import { LegendManager } from '@app/js/static/legend-manager';
+import { Astronomy } from '../astronomy/astronomy';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-export interface PlanetariumManager {
-  isPlanetariumView: boolean;
-}
+export class Planetarium extends KeepTrackPlugin {
+  bottomIconElementName = 'menu-planetarium';
+  bottomIconLabel = 'Planetarium View';
+  bottomIconImg = planetariumPng;
+  isIconDisabledOnLoad = true;
+  isIconDisabled = true;
+  bottomIconCallback = (): void => {
+    const { starManager } = keepTrackApi.programs;
+    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    if (this.isMenuButtonEnabled) {
+      if (!this.verifySensorSelected()) return;
 
-export const uiManagerInit = () => {
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="menu-planetarium" class="bmenu-item bmenu-item-disabled">
-          <img
-            alt="planetarium"
-            src=""
-            delayedsrc="${planetariumPng}"
-          />
-          <span class="bmenu-title">Planetarium View</span>
-          <div class="status-icon"></div>
-        </div>
-        `
-  );
-};
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'planetarium',
-    cb: uiManagerInit,
-  });
+      mainCameraInstance.cameraType = CameraType.PLANETARIUM; // Activate Planetarium Camera Mode
 
-  keepTrackApi.programs.planetarium = {
-    isPlanetariumView: false,
-  };
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'planetarium',
-    cb: bottomMenuClick,
-  });
-};
-
-// prettier-ignore
-export const bottomMenuClick = (iconName: string): void => { // NOSONAR
-  const { drawManager, starManager, objectManager, uiManager, orbitManager, sensorManager } = keepTrackApi.programs;
-  if (iconName === 'menu-planetarium') {
-    const mainCamera = keepTrackApi.programs.mainCamera;
-    if (keepTrackApi.programs.planetarium.isPlanetariumView) {
-      keepTrackApi.programs.planetarium.isPlanetariumView = false;
-      mainCamera.isPanReset = true;
-      mainCamera.isLocalRotateReset = true;
-      settingsManager.fieldOfView = 0.6;
-      drawManager.glInit();
-      uiManager.hideSideMenus();
-      orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      mainCamera.cameraType.current = mainCamera.cameraType.Default; // Back to normal Camera Mode
-      // TODO: implement fov information
-      // getEl('fov-text').innerHTML = ('');
-      getEl('menu-planetarium').classList.remove('bmenu-item-selected');
-      return;
-    } else {
-      if (sensorManager.checkSensorSelected()) {
-        mainCamera.cameraType.current = mainCamera.cameraType.Planetarium; // Activate Planetarium Camera Mode
-
-        // Assume Sensor plugin is on because we are in planetarium view
+      // Assume Sensor plugin is on because we are in planetarium view
+      // TODO: This should explicitly check for the sensor plugin
+      try {
         getEl('cspocAllSensor').style.display = 'none';
         getEl('mwAllSensor').style.display = 'none';
         getEl('mdAllSensor').style.display = 'none';
         getEl('llAllSensor').style.display = 'none';
         getEl('rusAllSensor').style.display = 'none';
         getEl('prcAllSensor').style.display = 'none';
-
-        // TODO: implement fov information
-        // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-        uiManager.legendMenuChange('planetarium');
-        if (objectManager.isStarManagerLoaded) {
-          starManager.clearConstellations();
-        }
-        // If astronomy plugin is available then set it to false
-        if (typeof keepTrackApi.programs.astronomy !== 'undefined') {
-          keepTrackApi.programs.astronomy.isAstronomyView = false;
-          getEl('menu-astronomy')?.classList.remove('bmenu-item-selected');
-        }
-        keepTrackApi.programs.planetarium.isPlanetariumView = true;
-        getEl('menu-planetarium').classList.add('bmenu-item-selected');
-      } else {
-        uiManager.toast(`Select a Sensor First!`, 'caution');
-        shake(getEl('menu-planetarium'));
+      } catch {
+        // Do nothing
       }
-      return;
+
+      // TODO: implement fov information
+      // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+      LegendManager.change('planetarium');
+      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      if (catalogManagerInstance.isStarManagerLoaded) {
+        starManager.clearConstellations();
+      }
+
+      keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    } else {
+      mainCameraInstance.isPanReset = true;
+      mainCameraInstance.isLocalRotateReset = true;
+      settingsManager.fieldOfView = 0.6;
+      drawManagerInstance.glInit();
+      uiManagerInstance.hideSideMenus();
+      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+      orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
+      mainCameraInstance.cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
+      // TODO: implement fov information
+      // getEl('fov-text').innerHTML = ('');
     }
+  };
+
+  constructor() {
+    const PLUGIN_NAME = 'Astronomy';
+    super(PLUGIN_NAME);
   }
-};
+
+  addJs(): void {
+    super.addJs();
+    keepTrackApi.register({
+      method: 'setSensor',
+      cbName: this.PLUGIN_NAME,
+      cb: (sensor: SensorObject): void => {
+        if (sensor) {
+          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+          this.isIconDisabled = false;
+        } else {
+          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+          this.isIconDisabled = true;
+        }
+      },
+    });
+  }
+}
+
+export const planetariumPlugin = new Planetarium();

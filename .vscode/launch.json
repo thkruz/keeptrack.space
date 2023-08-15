@@ -5,21 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-chrome",
-      "request": "launch",
-      "name": "Launch Chrome against localhost",
-      "url": "http://localhost:80",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "Current TS File",
+      "name": "Jest file",
       "type": "node",
       "request": "launch",
-      "args": ["${relativeFile}", "-p", ".\\src\\admin\\node\\node.tsconfig.json"],
-      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
-      "sourceMaps": true,
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/jest",
+      "args": ["${fileBasenameNoExtension}", "--runInBand", "--coverage=false", "--no-cache"],
       "cwd": "${workspaceRoot}",
-      "protocol": "inspector"
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "sourceMaps": true,
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      }
     }
   ]
 }

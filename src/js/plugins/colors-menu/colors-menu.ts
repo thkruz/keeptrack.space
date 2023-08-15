@@ -1,250 +1,217 @@
 import colorsPng from '@app/img/icons/colors.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { clickAndDragWidth, getEl, showLoading, slideInRight, slideOutLeft, waitForCruncher } from '@app/js/lib/helpers';
-import $ from 'jquery';
-import { helpBodyTextColor, helpTitleTextColor } from './help';
+import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { getEl } from '@app/js/lib/get-el';
+import { showLoading } from '@app/js/lib/showLoading';
+import { waitForCruncher } from '@app/js/lib/waitForCruncher';
+import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
+import { LegendManager } from '@app/js/static/legend-manager';
+import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
-let isColorSchemeMenuOpen = false;
-export const hideSideMenus = (): void => {
-  slideOutLeft(getEl('color-scheme-menu'), 1000);
-  getEl('menu-color-scheme').classList.remove('bmenu-item-selected');
-  isColorSchemeMenuOpen = false;
-};
-export const rightBtnMenuAdd = () => {
-  getEl('right-btn-menu-ul').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`   
-        <li class="rmb-menu-item" id="colors-rmb"><a href="#">Colors &#x27A4;</a></li>
-        `
-  );
-};
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'colorsMenu',
-    cb: uiManagerInit,
-  });
-
-  keepTrackApi.register({
-    method: 'uiManagerFinal',
-    cbName: 'colorsMenu',
-    cb: uiManagerFinal,
-  });
-
-  keepTrackApi.register({
-    method: 'rightBtnMenuAdd',
-    cbName: 'photo',
-    cb: rightBtnMenuAdd,
-  });
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'colorsMenu',
-    cb: bottomMenuClick,
-  });
-
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'colorsMenu',
-    cb: hideSideMenus,
-  });
-
-  keepTrackApi.register({
-    method: 'onHelpMenuClick',
-    cbName: 'colorsMenu',
-    cb: onHelpMenuClick,
-  });
-};
-
-export const onHelpMenuClick = (): boolean => {
-  if (isColorSchemeMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextColor, helpBodyTextColor);
-    return true;
-  }
-  return false;
-};
-
-export const uiManagerInit = () => {
-  getEl('rmb-wrapper').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-    <div id="colors-rmb-menu" class="right-btn-menu">
-      <ul class='dropdown-contents'>
-        <li id="colors-default-rmb"><a href="#">Object Types</a></li>
-        <li id="colors-rcs-rmb"><a href="#">Radar Cross Section</a></li>
-        <li id="colors-density-rmb"><a href="#">Orbit Density</a></li>
-        <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
-        <li id="colors-country-rmb"><a href="#">Country</a></li>
-        <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
-        <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
+export class ColorMenu extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Color Menu';
+  bottomIconImg = colorsPng;
+  bottomIconElementName: string = 'menu-color-scheme';
+  bottomIconLabel: string = 'Color Schemes';
+  sideMenuElementName: string = 'color-scheme-menu';
+  sideMenuElementHtml: string = keepTrackApi.html`
+  <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
+    <div id="colors-menu" class="side-menu">
+      <ul>
+        <h5 class="center-align">Color Schemes</h5>
+        <li class="divider"></li>
+        <li class="menu-selectable" data-color="default">Object Type</li>
+        <li class="menu-selectable" data-color="sunlight">Sunlight</li>
+        <li class="menu-selectable" data-color="velocity">Velocity</li>
+        <li class="menu-selectable" data-color="neighbors">Orbit Density</li>
+        <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
+        <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
+        <li class="menu-selectable" data-color="countries">Countries</li>
+        <li class="menu-selectable" data-color="near-earth">Near Earth</li>
+        <li class="menu-selectable" data-color="deep-space">Deep Space</li>
+        <li class="menu-selectable" data-color="elset-age">Elset Age</li>
+        <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
       </ul>
     </div>
-    `
-  );
+  </div>`;
 
-  // Side Menu
-  getEl('left-menus').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
-          <div id="colors-menu" class="side-menu">
-            <ul>
-              <h5 class="center-align">Color Schemes</h5>
-              <li class="divider"></li>
-              <li class="menu-selectable" data-color="default">Object Type</li>
-              <li class="menu-selectable" data-color="sunlight">Sunlight</li>
-              <li class="menu-selectable" data-color="velocity">Velocity</li>
-              <li class="menu-selectable" data-color="neighbors">Orbit Density</li>
-              <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
-              <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
-              <li class="menu-selectable" data-color="countries">Countries</li>
-              <li class="menu-selectable" data-color="near-earth">Near Earth</li>
-              <li class="menu-selectable" data-color="deep-space">Deep Space</li>
-              <li class="menu-selectable" data-color="elset-age">Elset Age</li>
-              <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
-            </ul>
-          </div>
-        </div>
-        `
-  );
+  helpTitle = `Colors Menu`;
 
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="menu-color-scheme" class="bmenu-item">
-          <img
-            alt="colors"
-            src=""
-            delayedsrc="${colorsPng}"
-          />
-          <span class="bmenu-title">Color Schemes</span>
-          <div class="status-icon"></div>
-        </div>
-        `
-  );
-};
+  helpBody = keepTrackApi.html`The Colors Menu is a place to change the color theme used to render the objects.
+<br><br>
+The various themes can change the colors based on the objects' orbits, objects' characteristics, or the objects' relation to sun and/or earth.
+`;
 
-export const uiManagerFinal = () => {
-  document
-    .getElementById('colors-menu')
-    .querySelectorAll('li')
-    .forEach((element) => {
-      element.addEventListener('click', function () {
-        const colorName = $(this).data('color');
-        colorsMenuClick(colorName);
-      });
-    });
+  rmbL1ElementName = 'colors-rmb';
+  rmbL1Html = keepTrackApi.html`
+  <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Color Scheme &#x27A4;</a></li>`;
 
-  clickAndDragWidth(getEl('color-scheme-menu'));
-};
+  isRmbOnEarth = true;
+  isRmbOffEarth = true;
+  rmbMenuOrder = 50;
 
-export const bottomMenuClick = (iconName: string): void => {
-  const { uiManager } = keepTrackApi.programs;
-  if (iconName === 'menu-color-scheme') {
-    if (isColorSchemeMenuOpen) {
-      uiManager.hideSideMenus();
-      isColorSchemeMenuOpen = false;
-      return;
-    } else {
-      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-      uiManager.hideSideMenus();
-      slideInRight(getEl('color-scheme-menu'), 1000);
-      isColorSchemeMenuOpen = true;
-      getEl('menu-color-scheme').classList.add('bmenu-item-selected');
-      return;
+  rmbL2ElementName = 'colors-rmb-menu';
+  rmbL2Html = keepTrackApi.html`
+  <ul class='dropdown-contents'>
+    <li id="colors-default-rmb"><a href="#">Object Types</a></li>
+    <li id="colors-rcs-rmb"><a href="#">Radar Cross Section</a></li>
+    <li id="colors-density-rmb"><a href="#">Orbit Density</a></li>
+    <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
+    <li id="colors-country-rmb"><a href="#">Country</a></li>
+    <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
+    <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
+  </ul>`;
+
+  rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
+    try {
+      super.rmbCallback(targetId);
+    } catch {
+      // do nothing
     }
-  }
-};
-export const colorsMenuClick = (colorName: string) => {
-  const { colorSchemeManager, satSet, objectManager, uiManager, groupsManager } = keepTrackApi.programs;
-  objectManager.setSelectedSat(-1); // clear selected sat
-  if (colorName !== 'sunlight') {
-    satSet.satCruncher.postMessage({
-      isSunlightView: false,
-    });
-  }
-  switch (colorName) {
-    case 'default':
-      uiManager.legendMenuChange('default');
-      satSet.setColorScheme(colorSchemeManager.default, true);
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
-    case 'velocity':
-      uiManager.legendMenuChange('velocity');
-      satSet.setColorScheme(colorSchemeManager.velocity, true);
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
-    case 'sunlight':
-      satSet.satCruncher.postMessage({
-        isSunlightView: true,
-      });
-      uiManager.legendMenuChange('sunlight');
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.sunlight);
-      waitForCruncher(
-        satSet.satCruncher,
-        () => {
-          satSet.setColorScheme(colorSchemeManager.sunlight, true);
-        },
-        (data: any) => data.satInSun
-      );
-      break;
-    case 'near-earth':
-      uiManager.legendMenuChange('near');
-      satSet.setColorScheme(colorSchemeManager.leo, true);
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
-    case 'deep-space':
-      uiManager.legendMenuChange('deep');
-      satSet.setColorScheme(colorSchemeManager.geo, true);
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
-    case 'elset-age':
-      showLoading(() => {
-        uiManager.legendMenuChange('ageOfElset');
-        satSet.setColorScheme(colorSchemeManager.ageOfElset, true);
-        uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      });
-      break;
-    case 'lost-objects':
-      (<HTMLInputElement>getEl('search')).value = '';
-      showLoading(() => {
-        settingsManager.lostSatStr = '';
-        satSet.setColorScheme(colorSchemeManager.lostobjects, true);
-        (<HTMLInputElement>getEl('search')).value = settingsManager.lostSatStr;
-        uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-        uiManager.doSearch((<HTMLInputElement>getEl('search')).value);
-      });
-      break;
-    case 'rcs':
-      uiManager.legendMenuChange('rcs');
-      satSet.setColorScheme(colorSchemeManager.rcs, true);
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
-    case 'smallsats':
-      uiManager.legendMenuChange('small');
-      satSet.setColorScheme(colorSchemeManager.smallsats, true);
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
-    case 'neighbors':
-      uiManager.legendMenuChange('neighbors');
-      satSet.setColorScheme(colorSchemeManager.neighbors, true);
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
-    case 'countries':
-      uiManager.legendMenuChange('countries');
-      if (groupsManager.selectedGroup !== null) {
-        satSet.setColorScheme(colorSchemeManager.groupCountries, true);
-      } else {
-        satSet.setColorScheme(colorSchemeManager.countries, true);
-      }
-      uiManager.colorSchemeChangeAlert(colorSchemeManager.currentColorScheme);
-      break;
+
+    switch (targetId) {
+      case 'colors-default-rmb':
+        ColorMenu.colorsMenuClick('default');
+        break;
+      case 'colors-rcs-rmb':
+        ColorMenu.colorsMenuClick('rcs');
+        break;
+      case 'colors-density-rmb':
+        ColorMenu.colorsMenuClick('neighbors');
+        break;
+      case 'colors-sunlight-rmb':
+        ColorMenu.colorsMenuClick('sunlight');
+        break;
+      case 'colors-country-rmb':
+        ColorMenu.colorsMenuClick('countries');
+        break;
+      case 'colors-velocity-rmb':
+        ColorMenu.colorsMenuClick('velocity');
+        break;
+      case 'colors-ageOfElset-rmb':
+        ColorMenu.colorsMenuClick('elset-age');
+        break;
+    }
+  };
+
+  dragOptions: clickDragOptions = {
+    isDraggable: true,
+  };
+
+  constructor() {
+    super(ColorMenu.PLUGIN_NAME);
   }
 
-  // Close Open Menus
-  if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-  uiManager.hideSideMenus();
-};
+  addHtml(): void {
+    super.addHtml();
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        document
+          .getElementById('colors-menu')
+          .querySelectorAll('li')
+          .forEach((element) => {
+            element.addEventListener('click', function () {
+              const colorName = this.dataset.color;
+              ColorMenu.colorsMenuClick(colorName);
+            });
+          });
+      },
+    });
+  }
+
+  static colorsMenuClick = (colorName: string) => {
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    // TODO: Update ColorScheme interface
+    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+    const uiManagerInstance = keepTrackApi.getUiManager();
+
+    catalogManagerInstance.setSelectedSat(-1); // clear selected sat
+    if (colorName !== 'sunlight') {
+      catalogManagerInstance.satCruncher.postMessage({
+        isSunlightView: false,
+      });
+    }
+    switch (colorName) {
+      case 'default':
+        LegendManager.change('default');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'velocity':
+        LegendManager.change('velocity');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.velocity, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'sunlight':
+        catalogManagerInstance.satCruncher.postMessage({
+          isSunlightView: true,
+        });
+        LegendManager.change('sunlight');
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);
+        waitForCruncher(
+          catalogManagerInstance.satCruncher,
+          () => {
+            colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
+          },
+          (data: any) => data.satInSun
+        );
+        break;
+      case 'near-earth':
+        LegendManager.change('near');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.leo, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'deep-space':
+        LegendManager.change('deep');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.geo, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'elset-age':
+        showLoading(() => {
+          LegendManager.change('ageOfElset');
+          colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.ageOfElset, true);
+          uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        });
+        break;
+      case 'lost-objects':
+        (<HTMLInputElement>getEl('search')).value = '';
+        showLoading(() => {
+          settingsManager.lostSatStr = '';
+          colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.lostobjects, true);
+          (<HTMLInputElement>getEl('search')).value = settingsManager.lostSatStr;
+          uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+          uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
+        });
+        break;
+      case 'rcs':
+        LegendManager.change('rcs');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.rcs, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'smallsats':
+        LegendManager.change('small');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.smallsats, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'neighbors':
+        LegendManager.change('neighbors');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.neighbors, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'countries':
+        LegendManager.change('countries');
+        if (keepTrackApi.getGroupsManager().selectedGroup !== null) {
+          colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.groupCountries, true);
+        } else {
+          colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.countries, true);
+        }
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+    }
+
+    keepTrackApi.getUiManager().hideSideMenus();
+  };
+}
+
+export const colorMenuPlugin = new ColorMenu();

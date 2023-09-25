@@ -122,16 +122,27 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       method: KeepTrackApiMethods.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (!this.isMenuButtonEnabled && (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected())) {
+        if (this.isMenuButtonEnabled && (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected())) {
           this.setBottomIconToDisabled();
-          this.hideSideMenus();
+          this.closeSideMenu();
           return;
         } else {
           this.setBottomIconToEnabled();
-          if (this.isMenuButtonEnabled) {
+          if (this.isMenuButtonEnabled && sat) {
             this.getlookangles(sat);
           }
         }
+      },
+    });
+  }
+
+  addJs(): void {
+    super.addJs();
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.staticOffsetChange,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        this.refreshSideMenuData();
       },
     });
   }

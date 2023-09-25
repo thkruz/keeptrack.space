@@ -88,9 +88,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       method: KeepTrackApiMethods.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (!this.isMenuButtonEnabled && (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected())) {
+        if (this.isMenuButtonEnabled && (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected())) {
           this.setBottomIconToDisabled();
-          this.hideSideMenus();
+          this.closeSideMenu();
           return;
         } else {
           this.setBottomIconToEnabled();
@@ -102,6 +102,19 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     });
   }
 
+  addJs(): void {
+    super.addJs();
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.staticOffsetChange,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        this.refreshSideMenuData();
+      },
+    });
+  }
+
+  disabledSensors: SensorObject[] = [];
+
   refreshSideMenuData() {
     if (this.isMenuButtonEnabled) {
       if (keepTrackApi.getCatalogManager().selectedSat !== -1) {
@@ -112,10 +125,10 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
           sensorListDom.innerHTML = ''; // TODO: This should be a class property that persists between refreshes
 
           const allSensors = [];
-          const disabledSensors = [];
           for (const sensor of keepTrackApi.getSensorManager().sensorListUS) {
             const sensorButton = document.createElement('button');
             sensorButton.classList.add('btn', 'btn-ui', 'waves-effect', 'waves-light');
+            if (this.disabledSensors.includes(sensor)) sensorButton.classList.add('btn-red');
 
             allSensors.push(sensor);
 
@@ -123,16 +136,16 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
             sensorButton.addEventListener('click', () => {
               if (sensorButton.classList.contains('btn-red')) {
                 sensorButton.classList.remove('btn-red');
-                disabledSensors.splice(disabledSensors.indexOf(sensor), 1);
+                this.disabledSensors.splice(this.disabledSensors.indexOf(sensor), 1);
               } else {
                 sensorButton.classList.add('btn-red');
-                disabledSensors.push(sensor);
+                this.disabledSensors.push(sensor);
               }
 
               const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY);
               this.getlookanglesMultiSite(
                 sat,
-                allSensors.filter((s) => !disabledSensors.includes(s))
+                allSensors.filter((s) => !this.disabledSensors.includes(s))
               );
             });
             sensorListDom.appendChild(sensorButton);
@@ -142,7 +155,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
           const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY);
           this.getlookanglesMultiSite(
             sat,
-            allSensors.filter((s) => !disabledSensors.includes(s))
+            allSensors.filter((s) => !this.disabledSensors.includes(s))
           );
         });
       }

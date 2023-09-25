@@ -94,7 +94,6 @@ const settingsOverride = {
   disableZoomControls: false,
   disableWindowTouchMove: false,
   isAutoResizeCanvas: false,
-  isEnableGsCatalog: false,
   isDisableAsciiCatalog: true,
   isLoadLastMap: false,
 

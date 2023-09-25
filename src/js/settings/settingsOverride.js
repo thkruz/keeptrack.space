@@ -49,7 +49,7 @@ const settingsOverride = {
     colorsMenu: true,
     shortTermFences: true,
     orbitReferences: true,
-    externalSources: true,
+    externalSources: false,
     analysis: true,
     plotAnalysis: true,
     sensorFov: true,

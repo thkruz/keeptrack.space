@@ -1000,10 +1000,11 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       }
     }
 
+    const satOnlyInfoDom = document.querySelector<HTMLElement>('.sat-only-info');
     if (!sat.missile) {
-      (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'block';
+      satOnlyInfoDom.style.display = 'block';
     } else {
-      (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'none';
+      satOnlyInfoDom.style.display = 'none';
     }
 
     if (!catalogManagerInstance.isSensorManagerLoaded || !sensorManagerInstance.currentSensors[0].lat) {
@@ -1011,41 +1012,50 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     } else {
       const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
       const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);
-      const sunTime: any = Ootk.Utils.SunMath.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
 
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-      let satInSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.eci);
+      let satInSun = -1;
+      let sunTime;
+      try {
+        sunTime = Ootk.Utils.SunMath.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
+        const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+        satInSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.eci);
+      } catch {
+        satInSun = -1;
+      }
 
       // If No Sensor, then Ignore Sun Exclusion
       const satSunDom = getEl('sat-sun');
       if (sensorManagerInstance.currentSensors[0].lat === null) {
         if (satSunDom) satSunDom.style.display = 'none';
         return;
-      } else {
-        if (satSunDom) satSunDom.style.display = 'block';
+      } else if (satSunDom) {
+        satSunDom.style.display = 'block';
       }
 
       // If Radar Selected, then Say the Sun Doesn't Matter
       if (sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OPTICAL && sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OBSERVER && satSunDom) {
         satSunDom.innerHTML = 'No Effect';
         // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
-      } else if (sunTime.sunriseStart.getTime() - now.getTime() > 0 || (sunTime.sunsetEnd.getTime() - now.getTime() < 0 && satSunDom)) {
+      } else if (sunTime?.sunriseStart.getTime() - now.getTime() > 0 || (sunTime?.sunsetEnd.getTime() - now.getTime() < 0 && satSunDom)) {
         if (satInSun == 0) satSunDom.innerHTML = 'No Sunlight';
         if (satInSun == 1) satSunDom.innerHTML = 'Limited Sunlight';
         if (satInSun == 2) satSunDom.innerHTML = 'Direct Sunlight';
         // If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
         // high latitude and we need to figure that out
-      } else if (sunTime.nadir != 'Invalid Date' && (sunTime.sunriseStart == 'Invalid Date' || sunTime.sunsetEnd == 'Invalid Date') && satSunDom) {
+      } else if (sunTime?.nadir != 'Invalid Date' && (sunTime?.sunriseStart == 'Invalid Date' || sunTime?.sunsetEnd == 'Invalid Date') && satSunDom) {
         // TODO: Figure out how to calculate this
         console.debug('No Dawn or Dusk');
         if (satInSun == 0) satSunDom.innerHTML = 'No Sunlight';
         if (satInSun == 1) satSunDom.innerHTML = 'Limited Sunlight';
         if (satInSun == 2) satSunDom.innerHTML = 'Direct Sunlight';
-      } else {
-        // Unless you are in sun exclusion
-        if (satSunDom) satSunDom.innerHTML = 'Sun Exclusion';
+      } else if (satSunDom) {
+        if (satInSun == -1) {
+          satSunDom.innerHTML = 'Unable to Calculate';
+        } else {
+          // Unless you are in sun exclusion
+          satSunDom.innerHTML = 'Sun Exclusion';
+        }
       }
-      if (satInSun == -1 && satSunDom) satSunDom.innerHTML = 'Unable to Calculate';
     }
   }
 

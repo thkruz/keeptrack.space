@@ -105,6 +105,7 @@ export class TimeManager {
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();
+    keepTrackApi.methods.staticOffsetChange(this.staticOffset);
   }
 
   getOffsetTimeObj(offset: number) {

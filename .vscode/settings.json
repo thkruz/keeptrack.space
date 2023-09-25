@@ -8,14 +8,6 @@
   "eslint.workingDirectories": ["./"],
   "typescript.tsdk": "./node_modules/typescript/lib",
   // "workbench.editor.labelFormat": "short",
-  "[typescript]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll": false,
-      "source.organizeImports": false,
-      "source.fixAll.eslint": true,
-      "source.addMissingImports": true
-    }
-  },
   "git.enableCommitSigning": true,
   "files.exclude": {
     "**/.git": true,
@@ -45,13 +37,20 @@
     "tsconfig.json": true
   },
   "[yaml]": {
-    "editor.autoIndent": "advanced"
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true,
-    "source.fixAll.eslint": true,
-    "source.removeUnusedImports": true
+    "source.fixAll.eslint": "true",
+    "source.organizeImports": "always",
+    "source.addMissingImports": "true",
+    "source.removeUnusedImports": "true"
   },
   "files.eol": "\n",
   "terminal.integrated.profiles.windows": {

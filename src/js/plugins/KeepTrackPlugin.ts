@@ -521,6 +521,10 @@ export class KeepTrackPlugin {
     slideInRight(getEl(this.sideMenuElementName), 1000);
   }
 
+  closeSideMenu() {
+    slideOutLeft(getEl(this.sideMenuElementName), 1000);
+  }
+
   registerSubmitButtonClicked(callback: () => void = null) {
     keepTrackApi.register({
       method: KeepTrackApiMethods.uiManagerFinal,

@@ -19,10 +19,17 @@ export class Breakup extends KeepTrackPlugin {
   bottomIconElementName = 'menu-breakup';
   bottomIconLabel = 'Create Breakup';
   bottomIconImg = breakupPng;
+  private readonly maxDifApogeeVsPerigee_ = 1000;
+
   bottomIconCallback = (): void => {
-    if (!this.isMenuButtonEnabled) return;
     const sat: SatObject = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
-    (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
+    if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
+      errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
+      this.closeSideMenu();
+      this.setBottomIconToDisabled();
+      return;
+    }
+    this.updateSccNumInMenu_();
   };
 
   static PLUGIN_NAME = 'Breakup';
@@ -30,8 +37,6 @@ export class Breakup extends KeepTrackPlugin {
   constructor() {
     super(Breakup.PLUGIN_NAME);
   }
-
-  isRequireSatelliteSelected: boolean = true;
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
@@ -129,6 +134,12 @@ export class Breakup extends KeepTrackPlugin {
   </ul>
   The larger the variation the bigger the spread in the simulated breakup. The default variations are sufficient to simulate a breakup with a reasonable spread.`;
 
+  private updateSccNumInMenu_() {
+    if (!this.isMenuButtonEnabled) return;
+    const sat: SatObject = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+    (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
+  }
+
   addHtml(): void {
     super.addHtml();
 
@@ -136,15 +147,41 @@ export class Breakup extends KeepTrackPlugin {
       method: KeepTrackApiMethods.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl('breakup').addEventListener('submit', function (e: Event) {
+        getEl('breakup').addEventListener('submit', (e: Event) => {
           e.preventDefault();
-          showLoading(() => Breakup.onSubmit());
+          showLoading(() => this.onSubmit());
         });
+      },
+    });
+
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.selectSatData,
+      cbName: this.PLUGIN_NAME,
+      cb: (sat: SatObject) => {
+        if (!sat?.sccNum) {
+          if (this.isMenuButtonEnabled) {
+            this.closeSideMenu();
+          }
+          this.setBottomIconToUnselected();
+          this.setBottomIconToDisabled();
+        } else if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
+          if (this.isMenuButtonEnabled) {
+            this.closeSideMenu();
+            errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
+          }
+          this.setBottomIconToUnselected();
+          this.setBottomIconToDisabled();
+        } else {
+          this.setBottomIconToEnabled();
+          if (this.isMenuButtonEnabled) {
+            this.updateSccNumInMenu_();
+          }
+        }
       },
     });
   }
 
-  static onSubmit(): void {
+  onSubmit(): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
@@ -168,6 +205,11 @@ export class Breakup extends KeepTrackPlugin {
     mainsat.TLE1 = (mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32)) as TleLine1;
 
     mainCameraInstance.isCamSnapMode = false;
+
+    if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
+      errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
+      return;
+    }
 
     const alt = mainsat.apogee - mainsat.perigee < 300 ? 0 : lla.alt; // Ignore argument of perigee for round orbits OPTIMIZE
     let TLEs = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt).rotateOrbitToLatLon();

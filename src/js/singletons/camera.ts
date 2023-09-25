@@ -20,7 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { CatalogManager, OrbitManager, SatObject, SatShader, SensorManager, Singletons, UiManager, UserSettings } from '@app/js/interfaces';
+import { CatalogManager, OrbitManager, SatObject, SatShader, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { Degrees, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
@@ -34,6 +34,7 @@ import { DrawManager } from './draw-manager';
 import { errorManagerInstance } from './errorManager';
 import { InputManager } from './input-manager';
 import { TimeManager } from './time-manager';
+import { SettingsManager } from '../settings/settings';
 
 declare module '@app/js/interfaces' {
   interface SatShader {
@@ -212,7 +213,7 @@ export class Camera {
 
   public position = <vec3>[0, 0, 0];
   public screenDragPoint = [0, 0];
-  public settings_: UserSettings;
+  public settings_: SettingsManager;
   public speedModifier = 1;
   public startMouseX = 0;
   public startMouseY = 0;
@@ -242,7 +243,7 @@ export class Camera {
         maxSize: 0.1,
       } as SatShader,
       zoomSpeed: 0.0005,
-    } as UserSettings;
+    } as SettingsManager;
   }
 
   public get zoomTarget(): number {
@@ -357,23 +358,25 @@ export class Camera {
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
       this.ecLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
-    } else {
-      if (this.camDistBuffer < this.thresholdForCloseCamera || this.zoomLevel_ == -1) {
-        settingsManager.selectedColor = [0, 0, 0, 0];
-        this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 15); // delta is +/- 100
-        this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.minDistanceFromSatellite), this.thresholdForCloseCamera);
-      } else if (this.camDistBuffer >= this.thresholdForCloseCamera) {
-        settingsManager.selectedColor = settingsManager.selectedColorFallback;
-        this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
-        this.ecLastZoom = this.zoomTarget;
-        this.camZoomSnappedOnSat = false;
-        if (this.zoomTarget < this.zoomLevel_) {
-          this.camZoomSnappedOnSat = true;
-          this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.thresholdForCloseCamera), this.minDistanceFromSatellite);
-        }
+    } else if (this.camDistBuffer < this.thresholdForCloseCamera || this.zoomLevel_ == -1) {
+      settingsManager.selectedColor = [0, 0, 0, 0];
+      this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 15); // delta is +/- 100
+      this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.minDistanceFromSatellite), this.thresholdForCloseCamera);
+    } else if (this.camDistBuffer >= this.thresholdForCloseCamera) {
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
+      this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
+      this.ecLastZoom = this.zoomTarget;
+      this.camZoomSnappedOnSat = false;
+      if (this.zoomTarget < this.zoomLevel_) {
+        this.camZoomSnappedOnSat = true;
+        this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.thresholdForCloseCamera), this.minDistanceFromSatellite);
       }
     }
 
+    this.zoomWheelFov_(delta);
+  }
+
+  private zoomWheelFov_(delta: number) {
     if (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
       settingsManager.fieldOfView += delta * 0.0002;
       // getEl('fov-text').innerHTML = 'FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg';
@@ -517,7 +520,7 @@ export class Camera {
     return forward;
   }
 
-  public init(settings: UserSettings) {
+  public init(settings: SettingsManager) {
     this.settings_ = settings;
 
     const inputManager = keepTrackContainer.get<InputManager>(Singletons.InputManager);
@@ -688,6 +691,7 @@ export class Camera {
     this.fpsPitchRate = 0;
   }
 
+  // Intentionally the same as keyUpI_
   public keyUpK_() {
     this.fpsPitchRate = 0;
   }
@@ -700,6 +704,7 @@ export class Camera {
     }
   }
 
+  // Intentionally the same as keyUpJ_
   public keyUpL_() {
     if (this.cameraType === CameraType.ASTRONOMY) {
       this.fpsRotateRate = 0;

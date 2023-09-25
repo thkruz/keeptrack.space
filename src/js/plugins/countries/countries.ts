@@ -71,9 +71,9 @@ export class CountriesMenu extends KeepTrackPlugin {
   helpTitle = `Countries Menu`;
   helpBody = keepTrackApi.html`The Countries Menu allows you to filter the satellites by country of origin.`;
 
+  static PLUGIN_NAME = 'Countries Menu';
   constructor() {
-    const PLUGIN_NAME = 'Countries Menu';
-    super(PLUGIN_NAME);
+    super(CountriesMenu.PLUGIN_NAME);
   }
 
   addJs() {

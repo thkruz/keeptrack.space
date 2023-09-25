@@ -76,11 +76,11 @@ export class TimeMachine extends KeepTrackPlugin {
 
     if (!settingsManager.isDisableTimeMachineToasts) {
       if (year >= 59 && year < 100) {
-        const timeMachineString = settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`;
+        const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`);
         keepTrackApi.getUiManager().toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
       } else {
         const yearStr = year < 10 ? `0${year}` : `${year}`;
-        const timeMachineString = settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`;
+        const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`);
         keepTrackApi.getUiManager().toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
       }
     }

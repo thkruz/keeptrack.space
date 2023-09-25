@@ -8,6 +8,7 @@ import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { DotsManager } from '@app/js/singletons/dots-manager';
 import { TimeManager } from '@app/js/singletons/time-manager';
+import { SettingsManager } from '../settings/settings';
 
 export class CatalogLoader {
   /**
@@ -27,7 +28,7 @@ export class CatalogLoader {
    *  If all files are missing, the function will return an error.
    */
   static async load(): Promise<void> {
-    const settingsManager: any = window.settingsManager;
+    const settingsManager: SettingsManager = window.settingsManager;
 
     try {
       let extraSats: any = [];
@@ -99,9 +100,6 @@ export class CatalogLoader {
             const massEarth = 5.97378250603408e24;
             const TAU = 2 * Math.PI;
             const a = parseFloat(data[4]);
-            // const PlusMinus = a * ecc;
-            // let periapsis = a - PlusMinus - RADIUS_OF_EARTH;
-            // let apoapsis = a + PlusMinus - RADIUS_OF_EARTH;
             let period = TAU * Math.sqrt((a * a * a) / (G * (1 + massEarth)));
             period = period / 60; // Convert to minutes
 
@@ -250,7 +248,7 @@ export class CatalogLoader {
         case 'limitSats':
           settingsManager.limitSats = val;
           (<HTMLInputElement>getEl('limitSats')).value = val;
-          (<HTMLElement>getEl('limitSats-Label')).classList.add('active');
+          getEl('limitSats-Label').classList.add('active');
           limitSatsArray = val.split(',');
           break;
         case 'future use':
@@ -377,8 +375,8 @@ export class CatalogLoader {
         }
       } else {
         // If there are limited satellites
-        for (let x = 0; x < limitSatsArray.length; x++) {
-          if (resp[i].sccNum === limitSatsArray[x].sccNum) {
+        for (const element of limitSatsArray) {
+          if (resp[i].sccNum === element.sccNum) {
             year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
             if (year === '') {
               resp[i].intlDes = 'none';
@@ -400,41 +398,41 @@ export class CatalogLoader {
     let extrasSatInfo;
     if (typeof extraSats !== 'undefined' && settingsManager.offline) {
       // If extra catalogue
-      for (let s = 0; s < extraSats.length; s++) {
-        if (typeof extraSats[s].SCC == 'undefined') continue;
-        if (typeof extraSats[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof extraSats[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof catalogManagerInstance.sccIndex[`${extraSats[s].SCC}`] !== 'undefined') {
-          i = catalogManagerInstance.sccIndex[`${extraSats[s].SCC}`];
+      for (const element of extraSats) {
+        if (typeof element.SCC == 'undefined') continue;
+        if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof element.TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
+          i = catalogManagerInstance.sccIndex[`${element.SCC}`];
           if (typeof tempSatData[i] === 'undefined') continue;
-          tempSatData[i].TLE1 = extraSats[s].TLE1;
-          tempSatData[i].TLE2 = extraSats[s].TLE2;
+          tempSatData[i].TLE1 = element.TLE1;
+          tempSatData[i].TLE2 = element.TLE2;
         } else {
           settingsManager.isExtraSatellitesAdded = true;
 
-          year = extraSats[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+          year = element.TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
           prefix = parseInt(year) > 50 ? '19' : '20';
           year = prefix + year;
-          rest = extraSats[s].TLE1.substr(9, 8).trim().substring(2);
+          rest = element.TLE1.substr(9, 8).trim().substring(2);
           extrasSatInfo = {
             static: false,
             missile: false,
             active: true,
-            name: extraSats[s].ON ? extraSats[s].ON : 'Unknown',
-            type: extraSats[s].OT ? extraSats[s].OT : SpaceObjectType.SPECIAL,
+            name: element.ON ? element.ON : 'Unknown',
+            type: element.OT ? element.OT : SpaceObjectType.SPECIAL,
             country: 'Unknown',
             rocket: 'Unknown',
             site: 'Unknown',
-            sccNum: extraSats[s].SCC.toString(),
-            TLE1: extraSats[s].TLE1,
-            TLE2: extraSats[s].TLE2,
+            sccNum: element.SCC.toString(),
+            TLE1: element.TLE1,
+            TLE2: element.TLE2,
             source: 'USSF', // ASSUME USSF
             intlDes: year + '-' + rest,
             typ: 'sat',
             id: tempSatData.length,
-            vmag: extraSats[s].vmag,
+            vmag: element.vmag,
           };
-          catalogManagerInstance.sccIndex[`${extraSats[s].SCC.toString()}`] = tempSatData.length;
+          catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
           catalogManagerInstance.cosparIndex[`${year}-${rest}`] = tempSatData.length;
           tempSatData.push(extrasSatInfo);
         }
@@ -444,46 +442,46 @@ export class CatalogLoader {
     if (asciiCatalog?.length > 0 && settingsManager.offline) {
       errorManagerInstance.debug('Processing ASCII Catalog');
       // If asciiCatalog catalogue
-      for (let s = 0; s < asciiCatalog.length; s++) {
-        if (typeof asciiCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof asciiCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof catalogManagerInstance.sccIndex[`${asciiCatalog[s].SCC}`] !== 'undefined') {
-          i = catalogManagerInstance.sccIndex[`${asciiCatalog[s].SCC}`];
-          tempSatData[i].TLE1 = asciiCatalog[s].TLE1;
-          tempSatData[i].TLE2 = asciiCatalog[s].TLE2;
+      for (const element of asciiCatalog) {
+        if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof element.TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
+          i = catalogManagerInstance.sccIndex[`${element.SCC}`];
+          tempSatData[i].TLE1 = element.TLE1;
+          tempSatData[i].TLE2 = element.TLE2;
         } else {
-          if (typeof asciiCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-          if (typeof asciiCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+          if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+          if (typeof element.TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
           settingsManager.isExtraSatellitesAdded = true;
 
-          if (typeof asciiCatalog[s].ON == 'undefined') {
-            asciiCatalog[s].ON = 'Unknown';
+          if (typeof element.ON == 'undefined') {
+            element.ON = 'Unknown';
           }
-          if (typeof asciiCatalog[s].OT == 'undefined') {
-            asciiCatalog[s].OT = SpaceObjectType.SPECIAL;
+          if (typeof element.OT == 'undefined') {
+            element.OT = SpaceObjectType.SPECIAL;
           }
-          year = asciiCatalog[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+          year = element.TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
           prefix = parseInt(year) > 50 ? '19' : '20';
           year = prefix + year;
-          rest = asciiCatalog[s].TLE1.substr(9, 8).trim().substring(2);
+          rest = element.TLE1.substr(9, 8).trim().substring(2);
           asciiSatInfo = {
             static: false,
             missile: false,
             active: true,
-            name: asciiCatalog[s].ON,
-            type: asciiCatalog[s].OT,
+            name: element.ON,
+            type: element.OT,
             country: 'Unknown',
             rocket: 'Unknown',
             site: 'Unknown',
-            sccNum: asciiCatalog[s].SCC.toString(),
-            TLE1: asciiCatalog[s].TLE1,
-            TLE2: asciiCatalog[s].TLE2,
+            sccNum: element.SCC.toString(),
+            TLE1: element.TLE1,
+            TLE2: element.TLE2,
             source: 'USSF', // ASSUME USSF
             intlDes: year + '-' + rest,
             typ: 'sat',
             id: tempSatData.length,
           };
-          catalogManagerInstance.sccIndex[`${asciiCatalog[s].SCC.toString()}`] = tempSatData.length;
+          catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
           catalogManagerInstance.cosparIndex[`${year}-${rest}`] = tempSatData.length;
           tempSatData.push(asciiSatInfo);
         }
@@ -494,42 +492,42 @@ export class CatalogLoader {
     if (jsCatalog?.length > 0 && settingsManager.isUseExtendedCatalog) {
       errorManagerInstance.debug('Processing js Catalog');
       // If jsCatalog catalogue
-      for (let s = 0; s < jsCatalog.length; s++) {
-        if (typeof jsCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof jsCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
-        if (typeof catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC}`] !== 'undefined') {
+      for (const element of jsCatalog) {
+        if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof element.TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+        if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
           // console.warn('Duplicate Satellite Found in jsCatalog');
           // NOTE: We don't trust the jsCatalog, so we don't update the TLEs
           // i = catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC}`];
           // tempSatData[i].TLE1 = jsCatalog[s].TLE1;
           // tempSatData[i].TLE2 = jsCatalog[s].TLE2;
         } else {
-          if (typeof jsCatalog[s].TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
-          if (typeof jsCatalog[s].TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+          if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
+          if (typeof element.TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
           settingsManager.isExtraSatellitesAdded = true;
 
-          year = jsCatalog[s].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
+          year = element.TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
           prefix = parseInt(year) > 50 ? '19' : '20';
           year = prefix + year;
-          rest = jsCatalog[s].TLE1.substr(9, 8).trim().substring(2);
+          rest = element.TLE1.substr(9, 8).trim().substring(2);
           jsSatInfo = {
             static: false,
             missile: false,
             active: true,
-            name: `${jsCatalog[s].source} ${jsCatalog[s].altId}`,
+            name: `${element.source} ${element.altId}`,
             type: SpaceObjectType.DEBRIS,
             country: 'Unknown',
             rocket: 'Unknown',
             site: 'Unknown',
-            sccNum: jsCatalog[s].SCC.toString(),
-            TLE1: jsCatalog[s].TLE1,
-            TLE2: jsCatalog[s].TLE2,
-            source: jsCatalog[s].source,
-            altId: jsCatalog[s].altId,
+            sccNum: element.SCC.toString(),
+            TLE1: element.TLE1,
+            TLE2: element.TLE2,
+            source: element.source,
+            altId: element.altId,
             intlDes: year + '-' + rest,
             id: tempSatData.length,
           };
-          catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC.toString()}`] = tempSatData.length;
+          catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
           catalogManagerInstance.cosparIndex[`${year}-${rest}`] = tempSatData.length;
           tempSatData.push(jsSatInfo);
 
@@ -576,7 +574,7 @@ export class CatalogLoader {
 
     if (settingsManager.isExtraSatellitesAdded) {
       try {
-        (<HTMLElement>document.querySelector('.legend-pink-box')).style.display = 'block';
+        document.querySelector<HTMLElement>('.legend-pink-box').style.display = 'block';
         document.querySelectorAll('.legend-pink-box').forEach((element) => {
           element.parentElement.style.display = 'none';
           element.parentElement.innerHTML = `<div class="Square-Box legend-pink-box"></div>${settingsManager.nameOfSpecialSats}`;
@@ -622,7 +620,7 @@ export class CatalogLoader {
   }
 
   static convert6DigitToA5(sccNum: string): string {
-    if (sccNum[0].match(/[a-z]/iu)) {
+    if (RegExp(/[a-z]/iu, 'u').exec(sccNum[0])) {
       return sccNum;
     } else {
       // Extract the trailing 4 digits
@@ -640,7 +638,7 @@ export class CatalogLoader {
   }
 
   static convertA5to6Digit(sccNum: string): string {
-    if (sccNum[0].match(/[a-z]/iu)) {
+    if (RegExp(/[a-z]/iu, 'u').exec(sccNum[0])) {
       // Extract the trailing 4 digits
       const rest = sccNum.slice(1, 5);
 

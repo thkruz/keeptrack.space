@@ -13,7 +13,6 @@ import {
   Singletons,
   SoundManager,
   UiManager,
-  UserSettings,
 } from './interfaces';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import { DotsManager } from './singletons/dots-manager';
@@ -23,11 +22,12 @@ import { InputManager } from './singletons/input-manager';
 import { TimeManager } from './singletons/time-manager';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
+import { SettingsManager } from './settings/settings';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
   interface Window {
-    settingsManager: UserSettings;
+    settingsManager: SettingsManager;
     jQuery: unknown;
     $: unknown;
     gremlins: any;
@@ -65,6 +65,10 @@ export const unregister = (params: { method: string; cbName: string }) => {
     throw new Error(`Invalid callback "${params.method}"!`);
   }
 };
+/**
+ * Checks if the current environment is Node.js.
+ * @returns {boolean} Returns true if the current environment is Node.js, false otherwise.
+ */
 export const isThisNode = () => {
   const nodeName = (typeof process !== 'undefined' && process?.release?.name) || false;
   return !!nodeName;
@@ -153,13 +157,14 @@ export const keepTrackApi = {
     changeSensorMarkers: [],
     altCanvasResize: [],
     endOfDraw: [],
+    onWatchlistUpdated: [],
+    staticOffsetChange: [],
   },
   methods: {
     onHelpMenuClick: () => {
       if (keepTrackApi.callbacks.onHelpMenuClick.some((cb: { cb: () => boolean }) => cb.cb())) {
         return;
       }
-      // adviceManagerInstance.showAdvice(helpTitleText, helpBodyText);
     },
     selectSatData: (sat: SatObject, satId: number) => {
       keepTrackApi.getSoundManager()?.play('whoosh');
@@ -235,6 +240,12 @@ export const keepTrackApi = {
     endOfDraw: (dt?: Milliseconds) => {
       keepTrackApi.callbacks.endOfDraw.forEach((cb: any) => cb.cb(dt));
     },
+    onWatchlistUpdated: (watchlist: number[]) => {
+      keepTrackApi.callbacks.onWatchlistUpdated.forEach((cb: any) => cb.cb(watchlist));
+    },
+    staticOffsetChange: (staticOffset: number) => {
+      keepTrackApi.callbacks.staticOffsetChange.forEach((cb: any) => cb.cb(staticOffset));
+    },
   },
   programs: <KeepTrackPrograms>{},
   loadedPlugins: <KeepTrackPlugin[]>[],
@@ -290,4 +301,12 @@ export enum KeepTrackApiMethods {
   changeSensorMarkers = 'changeSensorMarkers',
   altCanvasResize = 'altCanvasResize',
   endOfDraw = 'endOfDraw',
+  /**
+   * Run in the updateWatchlist method of CatalogManager instance with parameters (watchlist: number[])
+   */
+  onWatchlistUpdated = 'onWatchlistUpdated',
+  /**
+   * Run in the staticOffset setter of TimeManager instance with parameters (staticOffset: number)
+   */
+  staticOffsetChange = 'staticOffsetChange',
 }

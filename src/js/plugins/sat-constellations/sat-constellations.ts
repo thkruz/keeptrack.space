@@ -1,9 +1,7 @@
-import { CatalogManager, GroupsManager, Singletons, UiManager } from '@app/js/interfaces';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 
 import satChngPng from '@app/img/icons/satchng.png';
-import { keepTrackContainer } from '@app/js/container';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { SatConstellationString } from '@app/js/singletons/catalog-manager/satLinkManager';
 import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
@@ -145,8 +143,8 @@ export class SatConstellations extends KeepTrackPlugin {
 
   static groupSelected(groupName: string) {
     if (typeof groupName == 'undefined') return;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
 
     if (typeof groupManagerInstance.groupList[groupName] == 'undefined') throw new Error('Unknown group name: ' + groupName);
 
@@ -160,7 +158,7 @@ export class SatConstellations extends KeepTrackPlugin {
 
     catalogManagerInstance.setSelectedSat(-1); // Clear selected sat
 
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].objects.map((id: number) => catalogManagerInstance.getSat(id).sccNum).join(','));
 
     // Close Menus

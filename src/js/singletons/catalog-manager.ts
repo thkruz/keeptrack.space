@@ -307,7 +307,7 @@ export class StandardCatalogManager implements CatalogManager {
    */
   public getSat(i: number | null, type: GetSatType = GetSatType.DEFAULT): SatObject | null {
     if (i == -1 || !this.satData || !this.satData[i]) {
-      console.warn('Satellite not found');
+      if (!isThisNode()) console.warn(`Satellite ${i} not found`);
       return null;
     }
 

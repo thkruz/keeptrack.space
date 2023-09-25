@@ -172,7 +172,7 @@ export class StandardDrawManager implements DrawManager {
     }
     // Clear the godrays Frame Buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, godFb);
-    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Switch back to the canvas
@@ -266,7 +266,9 @@ export class StandardDrawManager implements DrawManager {
       throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
     }
 
-    window.addEventListener('resize', this.resizeCanvas.bind(this), false);
+    window.addEventListener('resize', () => {
+      this.resizeCanvas();
+    });
 
     // Try to prevent crashes
     if (this.canvas.addEventListener) {
@@ -376,7 +378,7 @@ export class StandardDrawManager implements DrawManager {
       }
 
       if (sensorManagerInstance?.currentSensors[0]?.lat === null) return;
-      if (timeManagerInstance.realTime - this.satLabelModeLastTime_ < settingsManager.satLabelInterval) return;
+      if (timeManagerInstance.realTime - this.satLabelModeLastTime_ < settingsManager.minTimeBetweenSatLabels) return;
 
       const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
       orbitManagerInstance.clearInViewOrbit();
@@ -538,6 +540,10 @@ export class StandardDrawManager implements DrawManager {
         }
       }
     } else if (isForcedResize) {
+      if (!settingsManager.hiResHeight || !settingsManager.hiResWidth) {
+        settingsManager.hiResHeight = vh;
+        settingsManager.hiResWidth = vw;
+      }
       this.setCanvasSize(settingsManager.hiResHeight, settingsManager.hiResWidth);
     }
 

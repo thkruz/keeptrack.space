@@ -1,4 +1,4 @@
-import { UserSettings } from '@app/js/interfaces';
+import { SettingsManager } from '@app/js/settings/settings';
 
 interface JQuery<HTMLElement> {
   effect: any;
@@ -25,14 +25,14 @@ declare global {
   module '*.png';
   declare module '*.mp3';
   interface Window {
-    settingsManager: UserSettings;
+    settingsManager: SettingsManager;
     settingsOverride: any;
   }
   interface Global {
-    settingsManager: UserSettings;
+    settingsManager: SettingsManager;
     settingsOverride: any;
   }
-  let settingsManager: UserSettings;
+  let settingsManager: SettingsManager;
 
   interface JQuery<HTMLElement> {
     datapicker: any;

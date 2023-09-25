@@ -2,7 +2,7 @@ import * as analysis from '@app/js/plugins/analysis/analysis';
 import { countriesMenuPlugin } from '@app/js/plugins/countries/countries';
 import * as gamepad from '@app/js/plugins/gamepad/gamepad';
 import * as initialOrbit from '@app/js/plugins/initial-orbit/initial-orbit';
-import * as missile from '@app/js/plugins/missile/missile';
+import * as missile from '@app/js/plugins/missile/missilePlugin';
 import * as plotAnalysis from '@app/js/plugins/plot-analysis/plot-analysis';
 import { satelliteViewPlugin } from '@app/js/plugins/satellite-view/satellite-view';
 import { soundManagerPlugin } from '@app/js/plugins/sounds/sound-manager';
@@ -53,6 +53,7 @@ import { stereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { updateSatManagerPlugin } from './update-select-box/update-select-box';
 import { watchlistPlugin } from './watchlist/watchlist';
+import { watchlistOverlayPlugin } from './watchlist/watchlist-overlay';
 
 export type KeepTrackPlugins = {
   debrisScreening?: boolean;
@@ -141,7 +142,10 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
       lookAnglesPlugin.init();
       multiSiteLookAnglesPlugin.init();
     }
-    if (plugins.watchlist) watchlistPlugin.init();
+    if (plugins.watchlist) {
+      watchlistPlugin.init();
+      watchlistOverlayPlugin.init();
+    }
     if (plugins.nextLaunch) nextLaunchesPlugin.init();
     if (plugins.findSat) findSatPlugin.init();
     if (plugins.shortTermFences) shortTermFencesPlugin.init();

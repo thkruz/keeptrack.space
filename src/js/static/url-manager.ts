@@ -49,7 +49,7 @@ export abstract class UrlManager {
       url += '?' + paramSlices.join('&');
     }
 
-    window.history.replaceState(null, 'Keeptrack', url);
+    window.history.replaceState(null, '', url);
   }
 
   /**

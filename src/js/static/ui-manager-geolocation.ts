@@ -74,11 +74,11 @@ export class UiGeolocation {
       const csLat = <HTMLInputElement>getEl('cs-lat');
       const csLon = <HTMLInputElement>getEl('cs-lon');
       const csHei = <HTMLInputElement>getEl('cs-hei');
-      csLat.value = settingsManager.geolocation.lat;
+      csLat.value = settingsManager.geolocation.lat.toString();
       csLat.dispatchEvent(new Event('change'));
-      csLon.value = settingsManager.geolocation.lon;
+      csLon.value = settingsManager.geolocation.lon.toString();
       csLon.dispatchEvent(new Event('change'));
-      csHei.value = settingsManager.geolocation.alt;
+      csHei.value = settingsManager.geolocation.alt.toString();
       csHei.dispatchEvent(new Event('change'));
 
       (<HTMLInputElement>getEl('cs-telescope')).checked = true;

@@ -21,8 +21,7 @@
  */
 
 import fencePng from '@app/img/icons/fence.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SensorObject, Singletons } from '@app/js/interfaces';
+import { CatalogManager, SensorObject } from '@app/js/interfaces';
 import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -36,14 +35,9 @@ declare module '@app/js/interfaces' {
 
 export class SensorSurvFence extends KeepTrackPlugin {
   bottomIconCallback = () => {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-
     if (!this.isMenuButtonEnabled) return;
 
-    if (!this.verifySensorSelected()) {
-      return;
-    }
-
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     if (settingsManager.isShowSurvFence) {
       this.disableSurvView_(catalogManagerInstance);
     } else {
@@ -57,15 +51,18 @@ export class SensorSurvFence extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
+  isRequireSensorSelected = true;
+
   static PLUGIN_NAME = 'Sensor Surveillance Fence';
 
   constructor() {
     super(SensorSurvFence.PLUGIN_NAME);
+    settingsManager.isShowSurvFence = false;
   }
 
   private disableSurvView_(catalogManagerInstance: CatalogManager) {
     settingsManager.isShowSurvFence = false;
-    getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+    getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
     catalogManagerInstance.satCruncher.postMessage({
       isShowSurvFence: 'disable',
       isShowFOVBubble: 'reset',
@@ -78,7 +75,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     settingsManager.isShowSurvFence = true;
     settingsManager.isSatOverflyModeOn = false;
 
-    getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
+    getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconSelectedClassString);
 
     catalogManagerInstance.satCruncher.postMessage({
       isShowFOVBubble: 'enable',

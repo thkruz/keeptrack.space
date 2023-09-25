@@ -1,3 +1,5 @@
+import { keepTrackApi } from '../keepTrackApi';
+
 export const postProcessingShaderCode = {
   hdr: {
     frag: `#version 300 es
@@ -121,7 +123,7 @@ export const postProcessingShaderCode = {
     `,
   },
   occlusion: {
-    vert: `#version 300 es
+    vert: keepTrackApi.glsl`#version 300 es
                 in vec3 a_position;
 
                 uniform mat4 uCamMatrix;
@@ -129,12 +131,12 @@ export const postProcessingShaderCode = {
                 uniform mat4 uPMatrix;
 
                 void main(void) {
-                  float scale = 0.95;
+                  float scale = 0.99;
                   mat4 scaleMatrix = mat4(vec4(scale, 0.0, 0.0, 0.0),vec4(0.0, scale, 0.0, 0.0),vec4(0.0, 0.0, scale, 0.0),vec4(0.0, 0.0, 0.0, 1.0));
                   gl_Position = uPMatrix * uCamMatrix *  uMvMatrix * scaleMatrix * vec4(a_position, 1.0);
                 }
             `,
-    frag: `#version 300 es
+    frag: keepTrackApi.glsl`#version 300 es
                 precision mediump float;
 
                 out vec4 fragColor;

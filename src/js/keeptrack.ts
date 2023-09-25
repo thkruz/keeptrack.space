@@ -460,7 +460,6 @@ theodore.kruczek at gmail dot com.
 
       dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer);
 
-      // await radarDataManager.init(sensorManager, catalogManager, satCruncher, satellite);
       catalogManagerInstance?.satLinkManager?.idToSatnum();
 
       this.inputManager.init();

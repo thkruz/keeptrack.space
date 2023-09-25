@@ -104,7 +104,6 @@ export abstract class DopMath {
 
     let tbl = <HTMLTableElement>getEl('dops'); // Identify the table to update
     if (!tbl) throw new Error('Table not found!');
-    console.warn(tbl);
     tbl.innerHTML = ''; // Clear the table from old object data
 
     let tr = tbl.insertRow();

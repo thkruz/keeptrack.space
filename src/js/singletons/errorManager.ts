@@ -32,8 +32,6 @@ export class ErrorManager {
 
   public error(e: Error, funcName: string, toastMsg?: string) {
     console.error(e);
-    // eslint-disable-next-line no-debugger
-    debugger;
 
     toastMsg ??= e.message || 'Unknown error';
     const url = this.getErrorUrl(e, funcName);

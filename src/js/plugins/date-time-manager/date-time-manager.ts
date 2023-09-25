@@ -9,6 +9,7 @@ import { UrlManager } from '@app/js/static/url-manager';
 import $ from 'jquery';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
+import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 
 export class DateTimeManager extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Top Menu';
@@ -49,7 +50,6 @@ export class DateTimeManager extends KeepTrackPlugin {
     if (dateTimeInputTbDOM && !isThisNode()) {
       dateTimeInputTbDOM.datepicker('setDate', date);
     }
-    console.log(date);
     timeManagerInstance.synchronize();
     UrlManager.updateURL();
   }
@@ -149,7 +149,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     // TODO: Migrate to watchlist.ts
     try {
-      keepTrackApi.programs.watchlist.lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
+      (<WatchlistOverlay>keepTrackApi.getPlugin(WatchlistOverlay)).lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
       const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
       uiManagerInstance.updateNextPassOverlay(true);
     } catch {

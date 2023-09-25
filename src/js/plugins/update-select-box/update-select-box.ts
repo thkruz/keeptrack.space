@@ -14,6 +14,7 @@ import { SatInfoBoxCore } from '../select-sat-manager/satInfoboxCore';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMapPlugin } from '../stereo-map/stereo-map';
 import { TopMenu } from '../top-menu/top-menu';
+import { missileManager } from '../missile/missileManager';
 
 /**
  * This is the class that manages the updating of selected objects.
@@ -47,7 +48,6 @@ export class UpdateSatManager extends KeepTrackPlugin {
         if (!keepTrackApi.isInitialized) return;
 
         // try {
-        const { missileManager } = keepTrackApi.programs;
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const timeManagerInstance = keepTrackApi.getTimeManager();
         const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -179,8 +179,8 @@ export class UpdateSatManager extends KeepTrackPlugin {
             ) {
               if (sat.perigee > sensorManagerInstance.currentSensors[0].obsmaxrange) {
                 if (getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = 'Beyond Max Range';
-              } else {
-                if (getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = SensorMath.nextpass(sat, sensorManagerInstance.currentSensors, 2, 5);
+              } else if (getEl('sat-nextpass')) {
+                getEl('sat-nextpass').innerHTML = SensorMath.nextpass(sat, sensorManagerInstance.currentSensors, 2, 5);
               }
 
               // IDEA: Code isInSun()
@@ -189,11 +189,11 @@ export class UpdateSatManager extends KeepTrackPlugin {
             }
             uiManagerInstance.lastNextPassCalcSatId = catalogManagerInstance.selectedSat;
             uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0].shortName;
-          } else {
-            if (getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = 'Unavailable';
+          } else if (getEl('sat-nextpass')) {
+            getEl('sat-nextpass').innerHTML = 'Unavailable';
           }
-        } else {
-          if (getEl('sat-nextpass')) getEl('sat-nextpass').parentElement.style.display = 'none';
+        } else if (getEl('sat-nextpass')) {
+          getEl('sat-nextpass').parentElement.style.display = 'none';
         }
         // } catch (e) {
         //   console.warn(e);

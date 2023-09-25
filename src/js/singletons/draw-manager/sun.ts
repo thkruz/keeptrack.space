@@ -32,12 +32,16 @@ import { Degrees, Kilometers, Radians } from 'ootk';
  */
 
 export class Sun {
-  // #region Properties (19)
-
-  private readonly DRAW_RADIUS = 6500;
+  private readonly DRAW_RADIUS = 1500;
   private readonly NUM_LAT_SEGS = 32;
   private readonly NUM_LON_SEGS = 32;
   private readonly SCALAR_DISTANCE = 220000;
+
+  private attribs_ = {
+    a_position: 0,
+    a_texCoord: 0,
+    a_normal: 0,
+  };
 
   private buffers_ = {
     vertCount: 0,
@@ -50,149 +54,7 @@ export class Sun {
   private mvMatrix_: mat4;
   private nMatrix_ = mat3.create();
   private positionModifier_ = [0, 0, 0];
-  private attribs_ = {
-    a_position: 0,
-    a_texCoord: 0,
-    a_normal: 0,
-  };
-
-  private uniforms_ = {
-    u_nMatrix: <WebGLUniformLocation>null,
-    u_pMatrix: <WebGLUniformLocation>null,
-    u_camMatrix: <WebGLUniformLocation>null,
-    u_mvMatrix: <WebGLUniformLocation>null,
-    u_lightDir: <WebGLUniformLocation>null,
-    u_sunDistance: <WebGLUniformLocation>null,
-    u_sunPos: <WebGLUniformLocation>null,
-    u_drawPosition: <WebGLUniformLocation>null,
-  };
-
   private program_: WebGLProgram;
-  private shaders_ = {
-    sun: {
-      frag: keepTrackApi.glsl`#version 300 es
-        precision highp float;
-        uniform vec3 u_lightDir;
-
-        in vec3 v_normal;
-        in float v_dist2;
-
-        out vec4 fragColor;
-
-        void main(void) {
-            // Hide the Back Side of the Sphere to prevent duplicate suns
-            float a = max(dot(v_normal, -u_lightDir), 0.1);
-            // Set colors
-            float r = 1.0 * a;
-            float g = 1.0 * a;
-            float b = 0.9 * a;
-
-            if (v_dist2 > 1.0) {
-            discard;
-            }
-
-            fragColor = vec4(vec3(r,g,b), a);
-        }
-        `,
-      vert: keepTrackApi.glsl`#version 300 es
-        in vec3 a_position;
-        in vec3 a_normal;
-
-        uniform mat4 u_pMatrix;
-        uniform mat4 u_camMatrix;
-        uniform mat4 u_mvMatrix;
-        uniform mat3 u_nMatrix;
-        uniform float u_sunDistance;
-
-        out vec3 v_normal;
-        out float v_dist2;
-
-        void main(void) {
-            vec4 position = u_mvMatrix * vec4(a_position / 1.6, 1.0);
-            gl_Position = u_pMatrix * u_camMatrix * position;
-            v_dist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
-            v_normal = u_nMatrix * a_normal;
-        }
-      `,
-    },
-    godrays: {
-      frag: keepTrackApi.glsl`#version 300 es
-      precision highp float;
-
-      // our texture
-      uniform sampler2D u_sampler;
-
-      uniform vec2 u_sunPosition;
-
-      // the texCoords passed in from the vertex shader.
-      in vec2 v_texCoord;
-
-      out vec4 fragColor;
-
-      void main() {
-        float decay=1.0;
-        float exposure=1.0;
-        float density=0.99;
-        float weight=0.025;
-        vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);
-        vec2 texCoord = v_texCoord;
-
-        /// samples will describe the rays quality, you can play with
-        const int samples = 100;
-
-        vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
-        deltaTexCoord *= 1.0 / float(samples) * density;
-        float illuminationDecay = 1.0;
-        vec4 color = texture(u_sampler, texCoord.xy);
-
-        for(int i= 0; i <= samples ; i++)
-        {
-          // Calcualte the current sampling coord
-          texCoord -= deltaTexCoord;
-          // Sample the color from the texture at this texCoord
-          vec4 newColor = texture(u_sampler, texCoord);
-
-          // Apply the illumination decay factor
-          newColor *= illuminationDecay * weight;
-
-          // Accumulate the color
-          color += newColor;
-
-          // Update the illumination decay factor
-          illuminationDecay *= decay;
-        }
-
-        fragColor = color * exposure;
-      }
-    `,
-      vert: keepTrackApi.glsl`#version 300 es
-      in vec2 a_position;
-      in vec2 a_texCoord;
-
-      uniform vec2 u_resolution;
-
-      out vec2 v_texCoord;
-
-      void main() {
-        // convert the rectangle from pixels to 0.0 to 1.0
-        vec2 zeroToOne = a_position / u_resolution;
-
-        // convert from 0->1 to 0->2
-        vec2 zeroToTwo = zeroToOne * 2.0;
-
-        // convert from 0->2 to -1->+1 (clipspace)
-        vec2 clipSpace = zeroToTwo - 1.0;
-
-        gl_Position = vec4(clipSpace, 0, 1);
-
-        // pass the texCoord to the fragment shader
-        // The GPU will interpolate this value between points.
-        v_texCoord = a_texCoord;
-      }
-    `,
-    },
-  };
-
   private sunvar_ = {
     jdo: 0,
     coord: {
@@ -211,6 +73,17 @@ export class Sun {
     g: 0,
     R: 0,
     range: <Kilometers>0,
+  };
+
+  private uniforms_ = {
+    u_nMatrix: <WebGLUniformLocation>null,
+    u_pMatrix: <WebGLUniformLocation>null,
+    u_camMatrix: <WebGLUniformLocation>null,
+    u_mvMatrix: <WebGLUniformLocation>null,
+    u_lightDir: <WebGLUniformLocation>null,
+    u_sunDistance: <WebGLUniformLocation>null,
+    u_sunPos: <WebGLUniformLocation>null,
+    u_drawPosition: <WebGLUniformLocation>null,
   };
 
   private vao: WebGLVertexArrayObject;
@@ -243,10 +116,6 @@ export class Sun {
   };
 
   public screenPosition: vec2;
-
-  // #endregion Properties (19)
-
-  // #region Public Methods (9)
 
   public draw(earthLightDirection: vec3, pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     if (!this.isLoaded_) return;
@@ -398,10 +267,6 @@ export class Sun {
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
   }
 
-  // #endregion Public Methods (9)
-
-  // #region Private Methods (5)
-
   private getScreenCoords_(pMatrix: mat4, camMatrix: mat4): vec2 {
     const posVec4 = vec4.fromValues(this.drawPosition[0], this.drawPosition[1], this.drawPosition[2], 1);
 
@@ -465,5 +330,129 @@ export class Sun {
     gl.bindVertexArray(null);
   }
 
-  // #endregion Private Methods (5)
+  private shaders_ = {
+    sun: {
+      frag: keepTrackApi.glsl`#version 300 es
+        precision highp float;
+        uniform vec3 u_lightDir;
+
+        in vec3 v_normal;
+        in float v_dist2;
+
+        out vec4 fragColor;
+
+        void main(void) {
+            // Hide the Back Side of the Sphere to prevent duplicate suns
+            if (v_dist2 > 1.0) {
+            discard;
+            }
+
+            float a = max(dot(v_normal, -u_lightDir), 0.1);
+            // Set colors
+            float r = 1.0 * a;
+            float g = 1.0 * a;
+            float b = 0.9 * a;
+            fragColor = vec4(vec3(r,g,b), a);
+        }
+        `,
+      vert: keepTrackApi.glsl`#version 300 es
+        in vec3 a_position;
+        in vec3 a_normal;
+
+        uniform mat4 u_pMatrix;
+        uniform mat4 u_camMatrix;
+        uniform mat4 u_mvMatrix;
+        uniform mat3 u_nMatrix;
+        uniform float u_sunDistance;
+
+        out vec3 v_normal;
+        out float v_dist2;
+
+        void main(void) {
+            vec4 position = u_mvMatrix * vec4(a_position / 1.6, 1.0);
+            gl_Position = u_pMatrix * u_camMatrix * position;
+            v_dist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
+            v_normal = u_nMatrix * a_normal;
+        }
+      `,
+    },
+    godrays: {
+      frag: keepTrackApi.glsl`#version 300 es
+      precision highp float;
+
+      // our texture
+      uniform sampler2D u_sampler;
+
+      uniform vec2 u_sunPosition;
+
+      // the texCoords passed in from the vertex shader.
+      in vec2 v_texCoord;
+
+      out vec4 fragColor;
+
+      void main() {
+        float decay=1.0;
+        float exposure=0.95;
+        float density=0.99;
+        float weight=0.035;
+        float illuminationDecay = 1.0;
+        vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);
+        vec2 texCoord = v_texCoord;
+
+        /// samples will describe the rays quality, you can play with
+        const int samples = 75;
+
+        vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
+        deltaTexCoord *= 1.0 / float(samples) * density;
+        vec4 color = texture(u_sampler, texCoord.xy);
+
+        for(int i= 0; i <= samples ; i++)
+        {
+          // Calcualte the current sampling coord
+          texCoord -= deltaTexCoord;
+          // Sample the color from the texture at this texCoord
+          vec4 newColor = texture(u_sampler, texCoord);
+
+          // Apply the illumination decay factor
+          newColor *= illuminationDecay * weight;
+
+          // Accumulate the color
+          color += newColor;
+
+          // Update the illumination decay factor
+          illuminationDecay *= decay;        
+        }
+        color = color * exposure;
+
+        // Mix the color with the original texture
+        fragColor = mix(color, vec4(0.0,0.0,0.0,1.0), 0.5);
+      }
+    `,
+      vert: keepTrackApi.glsl`#version 300 es
+      in vec2 a_position;
+      in vec2 a_texCoord;
+
+      uniform vec2 u_resolution;
+
+      out vec2 v_texCoord;
+
+      void main() {
+        // convert the rectangle from pixels to 0.0 to 1.0
+        vec2 zeroToOne = a_position / u_resolution;
+
+        // convert from 0->1 to 0->2
+        vec2 zeroToTwo = zeroToOne * 2.0;
+
+        // convert from 0->2 to -1->+1 (clipspace)
+        vec2 clipSpace = zeroToTwo - 1.0;
+
+        gl_Position = vec4(clipSpace, 0, 1);
+
+        // pass the texCoord to the fragment shader
+        // The GPU will interpolate this value between points.
+        v_texCoord = a_texCoord;
+      }
+    `,
+    },
+  };
 }

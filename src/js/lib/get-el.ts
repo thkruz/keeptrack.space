@@ -23,7 +23,7 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement => {
 
   // Return an empty div to avoid errors
   if (isThisNode() && !isExpectedMissing) {
-    console.warn(document.body.innerHTML);
+    // console.warn(document.body.innerHTML);
     throw new Error(`Element with id ${id} not found!`);
   }
   return null;

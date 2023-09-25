@@ -186,7 +186,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
     });
   }
 
-  static elementPrefix: string = 'es-';
+  static elementPrefix: string = 'es';
 
   rmbL1ElementName: string = `edit-rmb`;
   rmbL1Html: string = keepTrackApi.html`
@@ -201,7 +201,6 @@ export class EditSatPlugin extends KeepTrackPlugin {
     if (!this.isMenuButtonEnabled) {
       uiManagerInstance.bottomIconPress(<HTMLElement>{ id: 'menu-editSat' });
     }
-    return;
   };
 
   rmbL2ElementName: string = 'edit-rmb-menu';

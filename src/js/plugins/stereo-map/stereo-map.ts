@@ -44,7 +44,8 @@ const earthImg = new Image();
 
 export class StereoMapPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Stereo Map';
-  satCrunchNow: number;
+  satCrunchNow = 0;
+  isMapUpdateOverride = false;
   constructor() {
     super(StereoMapPlugin.PLUGIN_NAME);
   }
@@ -139,7 +140,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
 
         getEl('map-menu').addEventListener('click', (evt: Event) => {
           if (!(<HTMLElement>evt.target).classList.contains('map-look')) return;
-          StereoMapPlugin.mapMenuClick(evt);
+          this.mapMenuClick(evt);
         });
       },
     });
@@ -337,21 +338,21 @@ export class StereoMapPlugin extends KeepTrackPlugin {
   }
 
   onCruncherMessage(): void {
-    if (this.isMenuButtonEnabled || settingsManager.isMapUpdateOverride) {
+    if (this.isMenuButtonEnabled || this.isMapUpdateOverride) {
       this.satCrunchNow = Date.now();
-      if (this.satCrunchNow > settingsManager.lastMapUpdateTime + 30000 || settingsManager.isMapUpdateOverride) {
+      if (this.satCrunchNow > settingsManager.lastMapUpdateTime + 30000 || this.isMapUpdateOverride) {
         this.updateMap();
         settingsManager.lastMapUpdateTime = this.satCrunchNow;
-        settingsManager.isMapUpdateOverride = false;
+        this.isMapUpdateOverride = false;
       }
     }
   }
 
-  static mapMenuClick(evt: any) {
+  mapMenuClick(evt: any) {
     const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
 
-    settingsManager.isMapUpdateOverride = true;
-    if (!evt.target || !evt.target.dataset.time) return;
+    this.isMapUpdateOverride = true;
+    if (!evt.target?.dataset.time) return;
     let time = evt.target.dataset.time;
     if (time !== null) {
       time = time.split(' ');

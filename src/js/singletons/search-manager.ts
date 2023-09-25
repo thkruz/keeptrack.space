@@ -360,6 +360,11 @@ export class SearchManager {
       getEl('tutorial-icon').classList.add('top-menu-icons-search-on');
       getEl('legend-icon').classList.add('top-menu-icons-search-on');
       getEl('sound-icon').classList.add('top-menu-icons-search-on');
+
+      const curSearch = (<HTMLInputElement>getEl('search')).value;
+      if (curSearch.length > settingsManager.minimumSearchCharacters) {
+        this.doSearch(curSearch, true);
+      }
     } else {
       this.isSearchOpen = false;
       getEl('search-holder').classList.remove('search-slide-down');

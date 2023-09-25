@@ -363,7 +363,7 @@ export class SearchManager {
 
       const curSearch = (<HTMLInputElement>getEl('search')).value;
       if (curSearch.length > settingsManager.minimumSearchCharacters) {
-        this.doSearch(curSearch, true);
+        this.doSearch(curSearch);
       }
     } else {
       this.isSearchOpen = false;

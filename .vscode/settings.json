@@ -50,7 +50,8 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "editor.codeActionsOnSave": {
     "source.organizeImports": true,
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": true,
+    "source.removeUnusedImports": true
   },
   "files.eol": "\n",
   "terminal.integrated.profiles.windows": {
@@ -65,5 +66,9 @@
       "color": "terminal.ansiBlue"
     }
   },
-  "jestrunner.codeLens": ["run", "debug", "coverage"]
+  "jestrunner.codeLens": ["run", "debug", "coverage"],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "thkruz",
+    "projectKey": "thkruz_keeptrack.space"
+  }
 }

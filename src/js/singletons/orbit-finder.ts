@@ -42,12 +42,12 @@ export class OrbitFinder {
   argPerCalcResults: PropagationResults;
   meanACalcResults: PropagationResults;
   raanCalcResults: PropagationResults;
+  argPer: string;
 
   constructor(sat: SatObject, goalLat: number, goalLon: number, goalDirection: 'N' | 'S', now: Date, goalAlt?: number, raanOffset?: number) {
     this.sat = sat;
     this.now = now;
     this.goalLat = goalLat;
-    this.goalAlt = goalLat;
     this.goalLon = goalLon;
     this.goalDirection = goalDirection;
     this.newMeana = null;
@@ -98,7 +98,12 @@ export class OrbitFinder {
   private argPerCalcLoop(): PropagationResults {
     this.meanACalcResults = PropagationResults.Near;
     for (let i = 0; i < 360 * 10; i += 1) {
-      this.argPerCalcResults = this.argPerCalc(i.toString(), this.now);
+      // Start with this.argPer - 10 degrees
+      let j = parseFloat(this.argPer) * 10 - 100 + i;
+      if (j > 360 * 10) {
+        j = j - 360 * 10;
+      }
+      this.argPerCalcResults = this.argPerCalc(j.toString(), this.now);
 
       // Found it
       if (this.argPerCalcResults === PropagationResults.Success) {
@@ -111,7 +116,7 @@ export class OrbitFinder {
 
       // Really far away
       if (this.argPerCalcResults === PropagationResults.Far) {
-        i += 5 * 10;
+        i += 49;
       }
 
       // Broke
@@ -161,6 +166,7 @@ export class OrbitFinder {
     this.epochyr = this.sat.TLE1.substring(18, 20);
     this.epochday = this.sat.TLE1.substring(20, 32);
     this.meanmo = this.sat.TLE2.substring(52, 63);
+    this.argPer = StringPad.pad0((this.sat.argPe * RAD2DEG).toFixed(4), 8);
     this.inc = StringPad.pad0((this.sat.inclination * RAD2DEG).toFixed(4), 8);
     this.ecen = this.sat.eccentricity.toFixed(7).substring(2, 9);
     // Disregarding the first and second derivatives of mean motion

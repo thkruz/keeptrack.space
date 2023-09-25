@@ -22,7 +22,7 @@ import { TimeMachine } from './../plugins/time-machine/time-machine';
  */
 
 import { keepTrackContainer } from '../container';
-import { CatalogManager, ColorInformation, ColorRuleSet, Colors, Pickable, rgbaArray, SatObject, SensorManager, Singletons, UiManager } from '../interfaces';
+import { CatalogManager, ColorInformation, ColorRuleSet, Colors, Pickable, rgbaArray, SatObject, Singletons, UiManager } from '../interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
@@ -47,7 +47,6 @@ export class StandardColorSchemeManager {
   public currentColorScheme = <ColorRuleSet>null;
   public iSensor = 0;
   public isReady = false;
-  public lastCalculation = 0;
   public lastColorScheme = <ColorRuleSet>null;
   public lastDotColored = 0;
   public objectTypeFlags = {
@@ -243,6 +242,29 @@ export class StandardColorSchemeManager {
     const checkFacility = this.checkFacility_(sat);
     if (checkFacility) return checkFacility;
 
+    if (sat.type === SpaceObjectType.PAYLOAD) {
+      if (!settingsManager.isShowPayloads) {
+        return {
+          color: this.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }
+    } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
+      if (!settingsManager.isShowRocketBodies) {
+        return {
+          color: this.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }
+    } else if (sat.type === SpaceObjectType.DEBRIS) {
+      if (!settingsManager.isShowDebris) {
+        return {
+          color: this.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }
+    }
+
     return this.checkCountry_(sat);
   }
 
@@ -320,10 +342,32 @@ export class StandardColorSchemeManager {
 
     if (sat.missile) return this.missileColor_(sat);
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    if (sat.type === SpaceObjectType.PAYLOAD) {
+      if (!settingsManager.isShowPayloads) {
+        return {
+          color: this.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }
+    } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
+      if (!settingsManager.isShowRocketBodies) {
+        return {
+          color: this.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }
+    } else if (sat.type === SpaceObjectType.DEBRIS) {
+      if (!settingsManager.isShowDebris) {
+        return {
+          color: this.colorTheme.deselected,
+          pickable: Pickable.No,
+        };
+      }
+    }
 
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     if (
       (dotsManagerInstance.inViewData?.[sat.id] === 0 && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
       (mainCameraInstance.cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
@@ -472,6 +516,8 @@ export class StandardColorSchemeManager {
   public group(sat: SatObject): ColorInformation {
     // Show Things in the Group
     if (sat.isInGroup) {
+      if (sat.missile) return this.missileColor_(sat);
+
       let color: [number, number, number, number] = [0, 0, 0, 0];
       switch (sat.type) {
         case SpaceObjectType.PAYLOAD:
@@ -1402,7 +1448,7 @@ export class StandardColorSchemeManager {
         };
       }
     } else {
-      if (this.objectTypeFlags.missileInview === false) {
+      if (this.objectTypeFlags.missileInview === false || !sat.active) {
         return {
           color: this.colorTheme.deselected,
           pickable: Pickable.No,

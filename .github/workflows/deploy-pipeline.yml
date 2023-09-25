@@ -15,12 +15,12 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Setup Node
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
         uses: actions/cache@v2
@@ -28,9 +28,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-
-            ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -42,7 +40,7 @@ jobs:
       - name: Set Timezone
         uses: szenius/set-timezone@v1.0
         with:
-          timezoneLinux: "America/New_York"
+          timezoneLinux: 'America/New_York'
       # Unit Tests for Code Coverage
       - name: Test
         run: npm test
@@ -59,12 +57,12 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Setup Node
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
         uses: actions/cache@v2
@@ -72,9 +70,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-
-            ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -107,12 +103,12 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Setup Node
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
         uses: actions/cache@v2
@@ -120,9 +116,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-
-            ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-

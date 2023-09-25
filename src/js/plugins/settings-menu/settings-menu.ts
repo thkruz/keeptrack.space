@@ -94,8 +94,29 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
             <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Payloads">
+                <input id="settings-showPayloads" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Payloads
+              </label>
+            </div>
+            <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Rocket Bodies">
+                <input id="settings-showRocketBodies" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Rocket Bodies
+              </label>
+            </div>
+            <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Debris">
+                <input id="settings-showDebris" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Debris
+              </label>
+            </div>
+            <div class="switch row">
               <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Agencies">
-                <input id="settings-showAgencies" type="checkbox" checked/>
+                <input id="settings-showAgencies" type="checkbox"/>
                 <span class="lever"></span>
                 Show Agencies
               </label>
@@ -140,6 +161,27 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
                 <input id="settings-drawBlackEarth" type="checkbox"/>
                 <span class="lever"></span>
                 Draw Black Earth
+              </label>
+            </div>
+            <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide the Atmosphere">
+                <input id="settings-drawAtmosphere" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Atmosphere
+              </label>
+            </div>
+            <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide the Aurora">
+                <input id="settings-drawAurora" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Aurora
+              </label>
+            </div>
+            <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Change the Skybox to Gray">
+                <input id="settings-graySkybox" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Gray Background
               </label>
             </div>
             <div class="switch row">
@@ -381,6 +423,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-heoSats':
       case 'settings-meoSats':
       case 'settings-geoSats':
+      case 'settings-showPayloads':
+      case 'settings-showRocketBodies':
+      case 'settings-showDebris':
       case 'settings-showAgencies':
       case 'settings-drawOrbits':
       case 'settings-drawTrailingOrbits':
@@ -388,7 +433,10 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-isDrawInCoverageLines':
       case 'settings-drawSun':
       case 'settings-drawBlackEarth':
+      case 'settings-drawAtmosphere':
+      case 'settings-drawAurora':
       case 'settings-drawMilkyWay':
+      case 'settings-graySkybox':
       case 'settings-eciOnHover':
       case 'settings-hos':
       case 'settings-demo-mode':
@@ -435,13 +483,20 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isShowHeoSats = (<HTMLInputElement>getEl('settings-heoSats')).checked;
     settingsManager.isShowMeoSats = (<HTMLInputElement>getEl('settings-meoSats')).checked;
     settingsManager.isShowGeoSats = (<HTMLInputElement>getEl('settings-geoSats')).checked;
+    settingsManager.isShowPayloads = (<HTMLInputElement>getEl('settings-showPayloads')).checked;
+    settingsManager.isShowRocketBodies = (<HTMLInputElement>getEl('settings-showRocketBodies')).checked;
+    settingsManager.isShowDebris = (<HTMLInputElement>getEl('settings-showDebris')).checked;
     settingsManager.isShowAgencies = (<HTMLInputElement>getEl('settings-showAgencies')).checked;
     settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
     settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
     let isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
+    let isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
+    let isDrawAuroraChanged = settingsManager.isDrawAurora !== (<HTMLInputElement>getEl('settings-drawAurora')).checked;
     settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
-    if (isBlackEarthChanged) {
+    settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
+    settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
+    if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
       const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
       drawManagerInstance.sceneManager.earth.init(settingsManager, drawManagerInstance.gl);
       drawManagerInstance.sceneManager.earth.loadHiRes();
@@ -458,7 +513,16 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     // Must come after the above checks
 
+    let isDrawMilkyWayChanged = settingsManager.isDrawMilkyWay !== (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
+    let isGraySkyboxChanged = settingsManager.isGraySkybox !== (<HTMLInputElement>getEl('settings-graySkybox')).checked;
     settingsManager.isDrawMilkyWay = (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
+    settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
+
+    if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
+      const drawManagerInstance = keepTrackApi.getDrawManager();
+      drawManagerInstance.sceneManager.skybox.init(settingsManager, drawManagerInstance.gl);
+    }
+
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
     const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;
     settingsManager.colors.transparent = isHOSChecked ? [1.0, 1.0, 1.0, 0] : [1.0, 1.0, 1.0, 0.1];

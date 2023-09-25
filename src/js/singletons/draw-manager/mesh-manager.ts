@@ -352,6 +352,13 @@ export class MeshManager {
         mat4.rotateZ(mvMatrix, mvMatrix, this.currentMeshObject.nadirYaw);
       }
 
+      // Scale the mvMatrix to 1/5 (models are too big)
+      if (this.currentMeshObject.sccNum !== '25544') {
+        mat4.scale(mvMatrix, mvMatrix, vec3.fromValues(0.2, 0.2, 0.2));
+      } else {
+        mat4.scale(mvMatrix, mvMatrix, vec3.fromValues(0.05, 0.05, 0.05));
+      }
+
       // Allow Manual Rotation of Meshes
       mat4.rotateX(mvMatrix, mvMatrix, settingsManager.meshRotation.x * DEG2RAD);
       mat4.rotateY(mvMatrix, mvMatrix, settingsManager.meshRotation.y * DEG2RAD);

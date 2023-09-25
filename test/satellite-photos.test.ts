@@ -41,10 +41,9 @@ describe('SatellitePhotos_test_links', () => {
     setupStandardEnvironment();
     satellitePhotosPlugin = new SatellitePhotos();
     websiteInit(satellitePhotosPlugin);
-    keepTrackApi.getSelectSatManager = jest.fn().mockReturnValue({
-      selectSat: jest.fn(),
-    });
+    document.body.innerHTML += '<div id="colorbox-div"></div>';
     keepTrackApi.getCatalogManager = jest.fn().mockReturnValue({
+      selectSat: jest.fn(),
       getSatFromObjNum: jest.fn().mockReturnValue({
         id: 1,
       }),

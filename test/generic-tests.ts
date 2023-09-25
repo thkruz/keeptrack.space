@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { KeepTrackPlugin } from '@app/js/plugins/KeepTrackPlugin';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
+import { SettingsManager } from '@app/js/settings/settings';
 
 export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {
   pluginName ??= Plugin.name;
@@ -71,9 +72,10 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 };
 
 export const websiteInit = (plugin: KeepTrackPlugin) => {
+  const settingsManager = new SettingsManager();
   settingsManager.init();
-  window.settingsManager = { ...settingsManager };
-  (global as any).settingsManager = { ...settingsManager };
+  window.settingsManager = settingsManager;
+  (global as any).settingsManager = settingsManager;
   // clearAllCallbacks();
   plugin.init();
   keepTrackApi.methods.uiManagerInit();

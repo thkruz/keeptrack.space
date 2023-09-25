@@ -1,8 +1,9 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { SatConstellations } from '@app/js/plugins/sat-constellations/sat-constellations';
-import { setupDefaultHtml } from './environment/standard-env';
+import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { GroupType } from '@app/js/singletons/object-group';
 
 describe('SatConstellations_class', () => {
   let satConstellationsPlugin: SatConstellations;
@@ -18,6 +19,8 @@ describe('SatConstellations_class', () => {
   standardPluginMenuButtonTests(SatConstellations, 'SatConstellations');
 });
 
+// TODO: This test needs satLinkManager to be initialized in catalogManager to properly
+// test the menu items.
 describe('SatConstellations_test_all_links', () => {
   let links = [];
   const tempSatConstellationsPlugin = new SatConstellations();
@@ -32,19 +35,22 @@ describe('SatConstellations_test_all_links', () => {
   let satConstellationsPlugin: SatConstellations;
 
   beforeEach(() => {
-    setupDefaultHtml();
+    setupStandardEnvironment();
     window.M = {
       AutoInit: () => {},
     };
     satConstellationsPlugin = new SatConstellations();
     websiteInit(satConstellationsPlugin);
 
-    let groupList = [];
+    let groupList = {};
     keepTrackApi.getGroupsManager = () =>
       ({
-        createGroup: (id: string) => {
-          groupList.push(id);
+        createGroup: (_type: GroupType, _listOfSats: number[], name: string) => {
+          groupList[name] = {
+            objects: [0],
+          };
         },
+        selectGroup: () => {},
         groupList: groupList,
       } as any);
   });

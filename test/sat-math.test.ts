@@ -8,6 +8,7 @@ import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 import { SatMath, SunStatus } from '@app/js/static/sat-math';
 import { EciVec3, SatelliteRecord, Sgp4 } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
+import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';
 
 describe('altitudeCheck_method', () => {
   // Tests that valid input TLE strings and date return a valid altitude value.
@@ -163,7 +164,9 @@ describe('getDirection_method', () => {
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: 0 });
     // @ts-ignore
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: 0 }).mockReturnValueOnce({ lat: 0 });
+    disableConsoleErrors();
     const direction = SatMath.getDirection(sat, simulationTime);
+    enableConsoleErrors();
     expect(direction).toBe('Error');
   });
 
@@ -177,7 +180,9 @@ describe('getDirection_method', () => {
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: 0 });
     // @ts-ignore
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: 0 }).mockReturnValueOnce({ lat: null });
+    disableConsoleErrors();
     const direction = SatMath.getDirection(sat, simulationTime);
+    enableConsoleErrors();
     expect(direction).toBe('Error');
   });
 

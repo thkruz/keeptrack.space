@@ -16,11 +16,13 @@ import { StandardColorSchemeManager } from '../../src/js/singletons/color-scheme
 import { StandardDrawManager } from '../../src/js/singletons/draw-manager';
 import { StandardOrbitManager } from '../../src/js/singletons/orbitManager';
 import { defaultSat } from './apiMocks';
+import { SettingsManager } from '@app/js/settings/settings';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
+  const settingsManager = new SettingsManager();
   settingsManager.init();
-  window.settingsManager = { ...settingsManager };
-  (global as any).settingsManager = { ...settingsManager };
+  window.settingsManager = settingsManager;
+  (global as any).settingsManager = settingsManager;
   setupDefaultHtml();
 
   clearAllCallbacks();
@@ -100,6 +102,26 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
       keepTrackContainer.registerSingleton(instance.singletonValue, instance);
     }
   });
+};
+
+let backupConsoleError = {
+  error: console.error,
+  warn: console.warn,
+  info: console.info,
+  log: console.log,
+};
+export const disableConsoleErrors = () => {
+  console.error = jest.fn();
+  console.warn = jest.fn();
+  console.info = jest.fn();
+  console.log = jest.fn();
+};
+
+export const enableConsoleErrors = () => {
+  console.error = backupConsoleError.error;
+  console.warn = backupConsoleError.warn;
+  console.info = backupConsoleError.info;
+  console.log = backupConsoleError.log;
 };
 
 export const standardSelectSat = () => {

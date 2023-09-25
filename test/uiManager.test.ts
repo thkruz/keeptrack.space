@@ -4,7 +4,7 @@ import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-mana
 import { StandardUiManager } from '@app/js/singletons/uiManager';
 import { UiGeolocation } from '@app/js/static/ui-manager-geolocation';
 import { defaultSensor } from './environment/apiMocks';
-import { setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
+import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
 
 describe('uiManager', () => {
   // Should process fullscreenToggle
@@ -71,6 +71,7 @@ describe('uiManager', () => {
     expect((<HTMLInputElement>document.getElementById('cs-hei')).value).toBe('0.022');
 
     document.body.innerHTML = ``;
+    disableConsoleErrors();
     expect(() =>
       UiGeolocation.updateSensorPosition({
         coords: {
@@ -80,6 +81,7 @@ describe('uiManager', () => {
         },
       })
     ).not.toThrow();
+    enableConsoleErrors();
   });
 
   // Should process colorSchemeChangeAlert
@@ -162,6 +164,8 @@ describe('uiManager', () => {
     setupStandardEnvironment();
     document.body.innerHTML += `
     <div id="editSat"></div>
+    <div id="cs-geolocation"></div>
+    <div id="geolocation-btn"></div>
     <div id="es-ecen"></div>
     <div id="es-day"></div>
     <div id="es-inc"></div>

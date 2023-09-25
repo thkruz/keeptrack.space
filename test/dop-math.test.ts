@@ -1,6 +1,7 @@
 import { DopList, DopMath } from '@app/js/static/dop-math';
 import { AzEl, Degrees, Kilometers } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
+import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';
 
 const goodAzElList = [
   { az: 91.88445529075437, el: 19.368844568187534 },
@@ -67,7 +68,7 @@ describe('updateDopsTable_method', () => {
       { time: new Date(), dops: { pdop: '1', hdop: '2', gdop: '3' } },
       { time: new Date(), dops: { pdop: '4', hdop: '5', gdop: '6' } },
     ] as DopList;
-    document.body.innerHTML = '<table id="dops"></table>';
+    document.body.innerHTML += '<table id="dops"></table>';
     DopMath.updateDopsTable(dopsResults);
     const table = document.getElementById('dops') as HTMLTableElement;
     expect(table.rows.length).toBe(3);
@@ -89,7 +90,9 @@ describe('updateDopsTable_method', () => {
   it('test_missing_table', () => {
     const temp = document.body.innerHTML;
     document.body.innerHTML = '';
+    disableConsoleErrors();
     expect(() => DopMath.updateDopsTable([defaultSat as any])).toThrow();
+    enableConsoleErrors();
     document.body.innerHTML = temp;
   });
 

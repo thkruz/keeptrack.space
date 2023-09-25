@@ -8,6 +8,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 describe('Breakup_class', () => {
   beforeEach(() => {
     setupStandardEnvironment();
+    keepTrackApi.getCatalogManager().selectedSat = 1;
     window.M.AutoInit = jest.fn();
   });
 
@@ -34,7 +35,7 @@ describe('Breakup_class', () => {
             rotateOrbitToLatLon: () => [defaultSat.TLE1, defaultSat.TLE2],
           } as any)
       );
-      expect(() => Breakup.onSubmit()).not.toThrow();
+      expect(() => breakupPlugin.onSubmit()).not.toThrow();
     });
   });
 });

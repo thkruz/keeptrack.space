@@ -3,6 +3,7 @@ import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { Milliseconds } from 'ootk';
 
 describe('TimeMachine_class', () => {
   let timeMachinePlugin: TimeMachine;
@@ -19,8 +20,9 @@ describe('TimeMachine_class', () => {
     websiteInit(timeMachinePlugin);
     keepTrackApi.getCatalogManager().getSat = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
     keepTrackApi.getCatalogManager().satData = Array(50).fill({ ...defaultSat, isInGroup: true });
+    document.body.innerHTML += '<div id="search-results"></div>';
 
-    settingsManager.timeMachineDelay = 0;
+    settingsManager.timeMachineDelay = <Milliseconds>0;
     keepTrackApi.methods.bottomMenuClick(timeMachinePlugin.bottomIconElementName);
     jest.advanceTimersByTime(1000);
     expect(timeMachinePlugin.isMenuButtonEnabled).toBe(true);

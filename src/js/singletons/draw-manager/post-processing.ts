@@ -130,7 +130,7 @@ export class PostProcessingManager {
       uCamMatrix: gl.getUniformLocation(this.programs.occlusion.program, 'uCamMatrix'),
       uMvMatrix: gl.getUniformLocation(this.programs.occlusion.program, 'uMvMatrix'),
     };
-    this.programs.occlusion.attrSetup = (combinedBuf: WebGLBuffer, stride = Float32Array.BYTES_PER_ELEMENT): void => {
+    this.programs.occlusion.attrSetup = (combinedBuf: WebGLBuffer, stride = Float32Array.BYTES_PER_ELEMENT * 8): void => {
       gl.bindBuffer(gl.ARRAY_BUFFER, combinedBuf);
       gl.enableVertexAttribArray(this.programs.occlusion.attr.position);
       gl.vertexAttribPointer(this.programs.occlusion.attr.position, 3, gl.FLOAT, false, stride, 0);

@@ -11,6 +11,7 @@ import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
 import { StandardColorSchemeManager } from './color-scheme-manager';
 import { DrawManager } from './draw-manager';
+import { errorManagerInstance } from './errorManager';
 import { StandardOrbitManager } from './orbitManager';
 
 export class HoverManager {
@@ -376,6 +377,11 @@ export class HoverManager {
   }
 
   public setHover(i: number): void {
+    if (!i) {
+      errorManagerInstance.debug('setHover called with no id');
+      return;
+    }
+
     const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
     const gl = keepTrackContainer.get<DrawManager>(Singletons.DrawManager).gl;

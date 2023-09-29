@@ -449,7 +449,7 @@ export class MouseInput {
         .map(({ elementIdL2 }) => getEl(elementIdL2))
         .concat([rightBtnViewMenuDOM, rightBtnEditMenuDOM, rightBtnCreateMenuDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
-          el.addEventListener('click', (e: MouseEvent) => {
+          el?.addEventListener('click', (e: MouseEvent) => {
             this.rmbMenuActions(e);
           });
         });
@@ -458,62 +458,62 @@ export class MouseInput {
         const el1 = getEl(elementIdL1);
         const el2 = getEl(elementIdL2);
 
-        el1.addEventListener('mouseenter', () => {
+        el1?.addEventListener('mouseenter', () => {
           InputManager.clearRMBSubMenu();
           InputManager.showDropdownSubMenu(rightBtnMenuDOM, el2, canvasDOM, el1);
         });
-        el2.addEventListener('mouseleave', () => {
+        el2?.addEventListener('mouseleave', () => {
           el2.style.display = 'none';
         });
       });
 
-      rightBtnViewDOM.addEventListener('mouseenter', () => {
+      rightBtnViewDOM?.addEventListener('mouseenter', () => {
         rightBtnViewDOMDropdown();
       });
-      rightBtnViewDOM.addEventListener('click', () => {
+      rightBtnViewDOM?.addEventListener('click', () => {
         rightBtnViewDOMDropdown();
       });
-      rightBtnViewMenuDOM.addEventListener('mouseleave', () => {
+      rightBtnViewMenuDOM?.addEventListener('mouseleave', () => {
         rightBtnViewMenuDOM.style.display = 'none';
       });
 
-      rightBtnEditDOM.addEventListener('mouseenter', () => {
+      rightBtnEditDOM?.addEventListener('mouseenter', () => {
         rightBtnEditDOMDropdown();
       });
-      rightBtnEditDOM.addEventListener('click', () => {
+      rightBtnEditDOM?.addEventListener('click', () => {
         rightBtnEditDOMDropdown();
       });
-      rightBtnEditMenuDOM.addEventListener('mouseleave', () => {
+      rightBtnEditMenuDOM?.addEventListener('mouseleave', () => {
         rightBtnEditMenuDOM.style.display = 'none';
       });
 
-      rightBtnCreateDOM.addEventListener('mouseenter', () => {
+      rightBtnCreateDOM?.addEventListener('mouseenter', () => {
         rightBtnCreateDOMDropdown();
       });
-      rightBtnCreateDOM.addEventListener('click', () => {
+      rightBtnCreateDOM?.addEventListener('click', () => {
         rightBtnCreateDOMDropdown();
       });
-      rightBtnCreateMenuDOM.addEventListener('mouseleave', () => {
+      rightBtnCreateMenuDOM?.addEventListener('mouseleave', () => {
         rightBtnCreateMenuDOM.style.display = 'none';
       });
 
-      rightBtnDrawDOM.addEventListener('mouseenter', () => {
+      rightBtnDrawDOM?.addEventListener('mouseenter', () => {
         rightBtnDrawDOMDropdown();
       });
-      rightBtnDrawDOM.addEventListener('click', () => {
+      rightBtnDrawDOM?.addEventListener('click', () => {
         rightBtnDrawDOMDropdown();
       });
-      rightBtnDrawMenuDOM.addEventListener('mouseleave', () => {
+      rightBtnDrawMenuDOM?.addEventListener('mouseleave', () => {
         rightBtnDrawMenuDOM.style.display = 'none';
       });
 
-      rightBtnEarthDOM.addEventListener('mouseenter', () => {
+      rightBtnEarthDOM?.addEventListener('mouseenter', () => {
         rightBtnEarthDOMDropdown();
       });
-      rightBtnEarthDOM.addEventListener('click', () => {
+      rightBtnEarthDOM?.addEventListener('click', () => {
         rightBtnEarthDOMDropdown();
       });
-      rightBtnEarthMenuDOM.addEventListener('mouseleave', () => {
+      rightBtnEarthMenuDOM?.addEventListener('mouseleave', () => {
         rightBtnEarthMenuDOM.style.display = 'none';
       });
     }

@@ -4,6 +4,8 @@ interface clickDragOptions {
 }
 
 export const clickAndDragWidth = (el: HTMLElement, options: clickDragOptions = {}): void => {
+  if (!el) return;
+
   const minWidth = options.minWidth || 280;
   const maxWidth = options.maxWidth || 450;
 

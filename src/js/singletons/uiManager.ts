@@ -26,32 +26,32 @@
  */
 
 // organize-imports-ignore
-import 'jquery-ui-bundle';
+import '@app/js/lib/external/colorPick.js';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
-import '@app/js/lib/external/colorPick.js';
 import '@materializecss/materialize';
+import 'jquery-ui-bundle';
 // eslint-disable-next-line sort-imports
+import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
+import { Milliseconds } from 'ootk';
+import { keepTrackContainer } from '../container';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
 import { closeColorbox } from '../lib/colorbox';
-import { rgbCss } from '../lib/rgbCss';
+import { MILLISECONDS_PER_SECOND } from '../lib/constants';
 import { getClass } from '../lib/get-class';
 import { getEl } from '../lib/get-el';
-import { MobileManager } from './mobileManager';
-import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
-import { mainCameraInstance } from './camera';
-import { SearchManager } from './search-manager';
+import { rgbCss } from '../lib/rgbCss';
 import { SpaceObjectType } from '../lib/space-object-type';
-import { MILLISECONDS_PER_SECOND } from '../lib/constants';
 import { StandardSensorManager } from '../plugins/sensor/sensorManager';
-import { StandardColorSchemeManager } from './color-scheme-manager';
-import { hoverManagerInstance } from './hover-manager';
-import { keepTrackContainer } from '../container';
-import { TimeManager } from './time-manager';
 import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
-import { Milliseconds } from 'ootk';
+import { mainCameraInstance } from './camera';
+import { StandardColorSchemeManager } from './color-scheme-manager';
+import { hoverManagerInstance } from './hover-manager';
+import { MobileManager } from './mobileManager';
+import { SearchManager } from './search-manager';
+import { TimeManager } from './time-manager';
 
 export class StandardUiManager implements UiManager {
   private static LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
@@ -350,7 +350,7 @@ export class StandardUiManager implements UiManager {
       }
     });
 
-    getEl('legend-menu').addEventListener('click', () => {
+    getEl('legend-menu')?.addEventListener('click', () => {
       if (settingsManager.legendMenuOpen) {
         getEl('legend-hover-menu').style.display = 'none';
         getEl('legend-icon').classList.remove('bmenu-item-selected');
@@ -396,11 +396,11 @@ export class StandardUiManager implements UiManager {
 
     this.addSearchEventListeners_();
 
-    getEl('fullscreen-icon').addEventListener('click', () => {
+    getEl('fullscreen-icon')?.addEventListener('click', () => {
       StandardUiManager.fullscreenToggle();
     });
 
-    getEl('nav-footer-toggle').addEventListener('click', () => {
+    getEl('nav-footer-toggle')?.addEventListener('click', () => {
       this.footerToggle();
       if (parseInt(window.getComputedStyle(getEl('nav-footer')).bottom.replace('px', '')) < 0) {
         setTimeout(() => {
@@ -418,25 +418,25 @@ export class StandardUiManager implements UiManager {
   }
 
   private addSearchEventListeners_() {
-    getEl('search-icon').addEventListener('click', () => {
+    getEl('search-icon')?.addEventListener('click', () => {
       this.searchManager.searchToggle();
     });
 
-    getEl('search').addEventListener('focus', () => {
+    getEl('search')?.addEventListener('focus', () => {
       this.isCurrentlyTyping = true;
     });
-    getEl('ui-wrapper').addEventListener('focusin', () => {
+    getEl('ui-wrapper')?.addEventListener('focusin', () => {
       this.isCurrentlyTyping = true;
     });
 
-    getEl('search').addEventListener('blur', () => {
+    getEl('search')?.addEventListener('blur', () => {
       this.isCurrentlyTyping = false;
     });
-    getEl('ui-wrapper').addEventListener('focusout', () => {
+    getEl('ui-wrapper')?.addEventListener('focusout', () => {
       this.isCurrentlyTyping = false;
     });
 
-    getEl('search-results').addEventListener('click', function (evt: Event) {
+    getEl('search-results')?.addEventListener('click', function (evt: Event) {
       let satId: number;
       // must be '.search-result' class
       if ((<HTMLElement>evt.target).classList.contains('search-result')) {
@@ -458,7 +458,7 @@ export class StandardUiManager implements UiManager {
       }
     });
 
-    getEl('search-results').addEventListener('mouseover', (evt) => {
+    getEl('search-results')?.addEventListener('mouseover', (evt) => {
       let satId: number;
       // must be '.search-result' class
       if ((<HTMLElement>evt.target).classList.contains('search-result')) {
@@ -474,12 +474,12 @@ export class StandardUiManager implements UiManager {
       hoverManagerInstance.setHoverId(satId);
       this.hoverSatId = satId;
     });
-    getEl('search-results').addEventListener('mouseout', () => {
+    getEl('search-results')?.addEventListener('mouseout', () => {
       hoverManagerInstance.setHoverId(-1);
       this.hoverSatId = -1;
     });
 
-    getEl('search').addEventListener('input', () => {
+    getEl('search')?.addEventListener('input', () => {
       const searchStr = <string>(<HTMLInputElement>getEl('search')).value;
       this.doSearch(searchStr);
     });
@@ -543,15 +543,14 @@ export class StandardUiManager implements UiManager {
     keepTrackApi.methods.uiManagerOnReady();
     this.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
     const BottomIcons = getEl('bottom-icons');
-    BottomIcons &&
-      BottomIcons.addEventListener('click', (evt: Event) => {
-        if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
-        if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
-          this.bottomIconPress(<HTMLElement>evt.target);
-        } else {
-          this.bottomIconPress((<HTMLElement>evt.target).parentElement);
-        }
-      });
+    BottomIcons?.addEventListener('click', (evt: Event) => {
+      if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
+      if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
+        this.bottomIconPress(<HTMLElement>evt.target);
+      } else {
+        this.bottomIconPress((<HTMLElement>evt.target).parentElement);
+      }
+    });
     this.hideSideMenus = () => {
       closeColorbox();
       keepTrackApi.methods.hideSideMenus();

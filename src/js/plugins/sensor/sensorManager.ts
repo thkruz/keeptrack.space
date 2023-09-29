@@ -458,7 +458,10 @@ export class StandardSensorManager implements SensorManager {
   static updateSensorUiStyling(sensors: SensorObject[]) {
     try {
       if (typeof sensors == 'undefined' || sensors == null) {
-        getEl('reset-sensor-text', true).style.display = 'none';
+        const resetSensorTextDOM = getEl('reset-sensor-text', true);
+        if (resetSensorTextDOM) {
+          resetSensorTextDOM.style.display = 'none';
+        }
         return;
       }
 
@@ -467,7 +470,10 @@ export class StandardSensorManager implements SensorManager {
       getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
       getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
       getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
-      getEl('reset-sensor-text', true).style.display = 'block';
+      const resetSensorTextDOM = getEl('reset-sensor-text', true);
+      if (resetSensorTextDOM) {
+        resetSensorTextDOM.style.display = 'block';
+      }
     } catch (error) {
       errorManagerInstance.warn('Error updating sensor UI styling');
     }

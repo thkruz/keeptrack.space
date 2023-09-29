@@ -97,7 +97,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
       if (
         colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group ||
-        (typeof (<HTMLInputElement>getEl('search')).value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
+        (typeof (<HTMLInputElement>getEl('search'))?.value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
       ) {
         // If group selected
         getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
@@ -200,7 +200,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (satId !== -1) {
       // NOTE: This has to come after keepTrackApi.methods.selectSatData in catalogManagerInstance.setSelectedSat.
       const rootElement = document.querySelector(':root') as HTMLElement;
-      const searchBoxHeight = getEl('sat-infobox').clientHeight;
+      const searchBoxHeight = getEl('sat-infobox')?.clientHeight;
       rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
       fadeIn(getEl('sat-infobox'));
     }

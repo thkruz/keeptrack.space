@@ -20,7 +20,7 @@ describe('ColorMenu_class', () => {
     const menu = new ColorMenu();
     websiteInit(menu);
     // Create a list of elements based on the li elements with data-color attributes
-    const elements = <HTMLElement[]>Array.from(document.querySelectorAll('li[data-color]'));
+    const elements = Array.from(document.querySelectorAll<HTMLElement>('li[data-color]'));
     // Click each element and make sure the menu is closed
     elements.forEach((element) => {
       expect(() => {

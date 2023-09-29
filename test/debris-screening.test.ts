@@ -3,13 +3,13 @@ import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('DebrisScreening_class', () => {
-  let debrisScreeningPlugin: DebrisScreening;
+  // let debrisScreeningPlugin: DebrisScreening;
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
       AutoInit: () => {},
     };
-    debrisScreeningPlugin = new DebrisScreening();
+    // debrisScreeningPlugin = new DebrisScreening();
   });
 
   standardPluginSuite(DebrisScreening, 'DebrisScreening');

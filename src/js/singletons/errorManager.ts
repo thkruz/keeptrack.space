@@ -4,8 +4,8 @@ import { Singletons, UiManager } from '../interfaces';
 import { isThisNode } from '../keepTrackApi';
 
 export class ErrorManager {
-  private readonly ALLOW_DEBUG = true;
-  private readonly ALLOW_LOG = true;
+  private readonly ALLOW_DEBUG = window.location.hostname === 'localhost';
+  private readonly ALLOW_LOG = window.location.hostname === 'localhost';
   private readonly ALLOW_INFO = true;
   private readonly ALLOW_WARN = true;
   isDebug = false;
@@ -99,6 +99,8 @@ ${e.stack}`,
     if (this.ALLOW_DEBUG) {
       const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
       uiManagerInstance.toast(msg, 'standby', true);
+      // eslint-disable-next-line no-debugger
+      debugger;
     }
     if (this.isDebug) {
       console.debug(msg);

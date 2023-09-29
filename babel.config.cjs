@@ -1,8 +1,7 @@
 // eslint-disable-next-line no-undef
 module.exports = (api) => {
-  const testPlugins = ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-private-methods'];
-
-  const normPlugins = ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-private-methods'];
+  const testPlugins = [];
+  const normPlugins = [];
 
   return {
     env: {

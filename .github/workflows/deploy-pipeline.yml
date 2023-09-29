@@ -27,7 +27,8 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -50,9 +51,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # Download Artifacts
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3.0.2
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          npm run build
 
       # Deploy to GitHub Pages
       - name: Deploy 🚀
@@ -67,7 +72,7 @@ jobs:
           clean: true
 
   staging:
-    needs: development
+    needs: build
     environment: Development
     name: Deploy to dev.keeptrack.space
     runs-on: ubuntu-latest
@@ -76,6 +81,9 @@ jobs:
       # Download Artifacts
       - name: Download Artifacts
         uses: actions/download-artifact@v3.0.2
+        with:
+          name: build
+          path: dist
       # Deploy
       - name: FTP Deployer
         uses: sand4rt/ftp-deployer@v1.7
@@ -99,6 +107,9 @@ jobs:
       # Download Artifacts
       - name: Download Artifacts
         uses: actions/download-artifact@v3.0.2
+        with:
+          name: build
+          path: dist
       # Deploy
       - name: FTP Deployer
         uses: sand4rt/ftp-deployer@v1.7

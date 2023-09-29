@@ -2,7 +2,7 @@ import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getDayOfYear } from '@app/js/lib/transforms';
 import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
 import { keepTrackContainer } from '../container';
-import { CatalogManager, SatObject, SensorManager, Singletons } from '../interfaces';
+import { CatalogManager, RadarDataObject, SatObject, SensorManager, Singletons } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { spaceObjType2Str } from '../lib/spaceObjType2Str';
@@ -159,7 +159,7 @@ export class HoverManager {
   }
 
   /** TODO: Implement a RadarDataObject to replace SatObject */
-  private radarData_(sat: SatObject & any) {
+  private radarData_(sat: RadarDataObject) {
     const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
 
     this.satHoverBoxNode1.innerHTML = 'Measurement: ' + sat.mId + '</br>Track: ' + sat.trackId + '</br>Object: ' + sat.objectId;
@@ -338,12 +338,12 @@ export class HoverManager {
     }
   }
 
-  private staticObj_(sat: SatObject) {
+  private staticObj_(sat: SatObject | RadarDataObject) {
     if (sat.type === SpaceObjectType.LAUNCH_FACILITY) {
       this.launchFacility_(sat);
     } else if (sat.type === SpaceObjectType.RADAR_MEASUREMENT) {
       // TODO: This is a broken mess but only used offline
-      this.radarData_(sat);
+      this.radarData_(sat as RadarDataObject);
     } else if (sat.type === SpaceObjectType.CONTROL_FACILITY) {
       this.controlFacility_(sat);
     } else if (sat.type === SpaceObjectType.STAR) {
@@ -353,7 +353,8 @@ export class HoverManager {
 
       this.satHoverBoxNode1.textContent = sat.name;
       if (catalogManagerInstance.selectedSat !== -1) {
-        this.satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + SensorMath.distanceString(sat, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
+        this.satHoverBoxNode2.innerHTML =
+          spaceObjType2Str(sat.type) + SensorMath.distanceString(sat as SatObject, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
       } else {
         this.satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + '';
       }

@@ -10,10 +10,9 @@ on:
 jobs:
   build:
     name: Build for Deployment
-    environment: Development
     runs-on: ubuntu-latest
     steps:
-    # Checkout code
+      # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v4
       # Setup Node
@@ -28,8 +27,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -50,12 +48,11 @@ jobs:
   development:
     name: Deploy to GitHub Pages
     needs: build
-    environment: Development
     runs-on: ubuntu-latest
     steps:
-      # Checkout Artifacts
-      - name: Checkout Artifacts
-        uses: actions/checkout@v4
+      # Download Artifacts
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3.0.2
 
       # Deploy to GitHub Pages
       - name: Deploy 🚀
@@ -76,9 +73,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout Artifacts
-      - name: Checkout Artifacts
-        uses: actions/checkout@v4
+      # Download Artifacts
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3.0.2
       # Deploy
       - name: FTP Deployer
         uses: sand4rt/ftp-deployer@v1.7
@@ -99,9 +96,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout Artifacts
-      - name: Checkout Artifacts
-        uses: actions/checkout@v4
+      # Download Artifacts
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3.0.2
       # Deploy
       - name: FTP Deployer
         uses: sand4rt/ftp-deployer@v1.7

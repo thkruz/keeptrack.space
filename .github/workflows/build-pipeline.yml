@@ -99,7 +99,7 @@ jobs:
         run: npm ci --ignore-scripts
       # Set Timezone to match snapshots
       - name: Set Timezone
-        uses: szenius/set-timezone@v1.0
+        uses: szenius/set-timezone@v1.2
         with:
           timezoneLinux: 'America/New_York'
       # Unit Tests
@@ -143,7 +143,7 @@ jobs:
         run: npm run build
 
       - name: Save build folder
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: build
           if-no-files-found: error

@@ -1,10 +1,10 @@
 ---
-name: Visualizer
+name: Create Visualizer Svg
 on:
-    workflow_dispatch:
-    push:
-      branches:
-        - main
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   update-visualizer:
@@ -18,5 +18,5 @@ jobs:
       - name: Repo Visualizer
         uses: githubocto/repo-visualizer@0.9.1
         with:
-          output_file: "diagram.svg"
-          excluded_paths: "dist,node_modules"
+          output_file: 'diagram.svg'
+          excluded_paths: 'dist,node_modules'

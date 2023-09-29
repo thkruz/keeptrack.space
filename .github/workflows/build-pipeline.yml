@@ -14,10 +14,10 @@ jobs:
     steps:
       # Checkout Code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Lint Yaml Code
       - name: YAML Lint
-        uses: ibiqlik/action-yamllint@v3.1.0
+        uses: ibiqlik/action-yamllint@v3.1.1
         with:
           file_or_dir: ${{ github.workspace }}/
             .github/workflows/build-pipeline.yml
@@ -28,10 +28,10 @@ jobs:
     steps:
       # Checkout Code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Audit Package.json
       - name: NPM Audit Action
-        uses: oke-py/npm-audit-action@v1.8.2
+        uses: oke-py/npm-audit-action@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
   eslint:
@@ -42,22 +42,21 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Setup Node
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-
-            ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
+              ${{hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -76,22 +75,21 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Setup Node
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-
-            ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
+              ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -103,7 +101,7 @@ jobs:
       - name: Set Timezone
         uses: szenius/set-timezone@v1.0
         with:
-          timezoneLinux: "America/New_York"
+          timezoneLinux: 'America/New_York'
       # Unit Tests
       - name: Test
         run: npm test
@@ -118,22 +116,21 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # Setup Node
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-
-            ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
+              ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -157,7 +154,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: trufflehog-actions-scan
@@ -169,18 +166,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # CodeQL
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
+        uses: github/codeql-action/init@v2
         with:
           languages: javascript
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v1
+        uses: github/codeql-action/autobuild@v2
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v1
+        uses: github/codeql-action/analyze@v2
   analyze:
     needs: build
     name: SonarQube
@@ -189,7 +186,7 @@ jobs:
     steps:
       # Checkout code
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       # SonarQube
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v1.6
@@ -203,7 +200,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Download the build folders
         uses: actions/download-artifact@v2
@@ -215,8 +212,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           start: npm run start:ci2
-          wait-on: "http://127.0.0.1:8080"
-          wait-on-timeout: "120"
+          wait-on: 'http://127.0.0.1:8080'
+          wait-on-timeout: '120'
           record: false
           spec: cypress/integration/*
         env:

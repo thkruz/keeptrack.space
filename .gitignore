@@ -5,7 +5,7 @@
 
 # Created by git when using merge tools for conflicts
 *.BACKUP.*
-*.BASE.*
+./.git/*.BASE.*
 *.LOCAL.*
 *.REMOTE.*
 *_BACKUP_*.txt
@@ -116,3 +116,6 @@ custom-builds
 # Library Build
 lib/keepTrack
 lib/example*
+
+# Tools
+src/tools

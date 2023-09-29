@@ -1,8 +1,13 @@
 import iodPng from '@app/img/icons/iod.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { keepTrackContainer } from '@app/js/container';
+import { Singletons, UiManager } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { getEl } from '@app/js/lib/get-el';
+import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
 import { omManager } from '@app/js/plugins/initial-orbit/om-manager';
-import { UiManager } from '@app/js/uiManager/uiManager';
+import { TimeManager } from '@app/js/singletons/time-manager';
+
+import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 import { helpBodyTextInitOrbit, helpTitleTextInitOrbit } from './help';
 
 let isObfitMenuOpen = false;
@@ -42,7 +47,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isObfitMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextInitOrbit, helpBodyTextInitOrbit);
+    adviceManagerInstance.showAdvice(helpTitleTextInitOrbit, helpBodyTextInitOrbit);
     return true;
   }
   return false;
@@ -198,7 +203,7 @@ export const uiManagerInit = () => {
           <table id="obfit" class="center-align striped-light centered"></table>
         </div>
       </div>
-    </div>     
+    </div>
   `
   );
 
@@ -219,26 +224,22 @@ export const uiManagerInit = () => {
 };
 
 export const uiManagerFinal = (): void => {
-  clickAndDragWidth(getEl('external-menu'), {
-    maxWidth: 650,
-    minWidth: 400,
-  });
-
   getEl('obfit-form').addEventListener('submit', function (e: Event) {
     obfitFormSubmit(e);
   });
 };
 
 export const bottomMenuClick = (iconName: string): void => {
-  const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-obfit') {
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+
     if (isObfitMenuOpen) {
       isObfitMenuOpen = false;
-      uiManager.hideSideMenus();
+      uiManagerInstance.hideSideMenus();
       return;
     } else {
-      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-      uiManager.hideSideMenus();
+      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(false);
+      uiManagerInstance.hideSideMenus();
       slideInRight(getEl('obfit-menu'), 1000);
       isObfitMenuOpen = true;
       getEl('menu-obfit').classList.add('bmenu-item-selected');
@@ -249,7 +250,10 @@ export const bottomMenuClick = (iconName: string): void => {
 
 // prettier-ignore
 export const obfitFormSubmit = (e: any) => { // NOSONAR
-  const { uiManager, satSet, timeManager, satellite } = keepTrackApi.programs;
+  const { satellite } = keepTrackApi.programs;
+  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+
   let isOb2 = false;
   let isOb3 = false;
   const t1v = validateObfitInput('obfit-t1');
@@ -277,47 +281,46 @@ export const obfitFormSubmit = (e: any) => { // NOSONAR
   const svs = [];
   let sv1 = [];
   if (isNaN(t1v)) {
-    uiManager.toast(`Time 1 is Invalid!`, 'critical');
+    uiManagerInstance.toast(`Time 1 is Invalid!`, 'critical');
     return false;
   }
   if (isNaN(x1v)) {
-    uiManager.toast(`X 1 is Invalid!`, 'critical');
+    uiManagerInstance.toast(`X 1 is Invalid!`, 'critical');
     return false;
   }
   if (isNaN(y1v)) {
-    uiManager.toast(`Y 1 is Invalid!`, 'critical');
+    uiManagerInstance.toast(`Y 1 is Invalid!`, 'critical');
     return false;
   }
   if (isNaN(z1v)) {
-    uiManager.toast(`Z 1 is Invalid!`, 'critical');
+    uiManagerInstance.toast(`Z 1 is Invalid!`, 'critical');
     return false;
   }
   if (isNaN(xd1v)) {
-    uiManager.toast(`X Dot 1 is Invalid!`, 'critical');
+    uiManagerInstance.toast(`X Dot 1 is Invalid!`, 'critical');
     return false;
   }
   if (isNaN(yd1v)) {
-    uiManager.toast(`Y Dot 1 is Invalid!`, 'critical');
+    uiManagerInstance.toast(`Y Dot 1 is Invalid!`, 'critical');
     return false;
   }
   if (isNaN(zd1v)) {
-    uiManager.toast(`Z Dot 1 is Invalid!`, 'critical');
+    uiManagerInstance.toast(`Z Dot 1 is Invalid!`, 'critical');
     return false;
   }
   sv1 = [t1v, x1v, y1v, z1v, xd1v, yd1v, zd1v];
   svs.push(sv1);
 
-  const { isOb: _isOb2, sv: sv2 } = validateOb({ isOb: isOb2, obNum: 2, t: t2v, x: x2v, y: y2v, z: z2v, xd: xd2v, yd: yd2v, zd: zd2v, uiManager });
+  const { isOb: _isOb2, sv: sv2 } = validateOb({ isOb: isOb2, obNum: 2, t: t2v, x: x2v, y: y2v, z: z2v, xd: xd2v, yd: yd2v, zd: zd2v, uiManagerInstance });
   isOb2 = _isOb2;
   svs.push(sv2);
 
   isOb3 = !isOb2 ? false : isOb3;
-  const { isOb: _isOb3, sv: sv3 } = validateOb({ isOb: isOb3, obNum: 3, t: t3v, x: x3v, y: y3v, z: z3v, xd: xd3v, yd: yd3v, zd: zd3v, uiManager });
+  const { isOb: _isOb3, sv: sv3 } = validateOb({ isOb: isOb3, obNum: 3, t: t3v, x: x3v, y: y3v, z: z3v, xd: xd3v, yd: yd3v, zd: zd3v, uiManagerInstance });
   isOb3 = _isOb3;
   svs.push(sv3);
 
-  // console.log(svs);
-  omManager.svs2analyst(svs, satSet, timeManager, satellite);
+  omManager.svs2analyst(svs, timeManagerInstance, satellite);
   e.preventDefault();
   return true;
 };
@@ -332,7 +335,7 @@ const validateOb = ({
   xd,
   yd,
   zd,
-  uiManager,
+  uiManagerInstance,
 }: {
   isOb: boolean;
   obNum: number;
@@ -343,36 +346,36 @@ const validateOb = ({
   xd: number;
   yd: number;
   zd: number;
-  uiManager: UiManager;
+  uiManagerInstance: UiManager;
 }): { isOb: boolean; sv: number[] } => {
   let sv = [];
   if (isOb && isNaN(t)) {
     isOb = false;
-    uiManager.toast(`Time ${obNum} is Invalid!`, 'caution');
+    uiManagerInstance.toast(`Time ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(x)) {
     isOb = false;
-    uiManager.toast(`X ${obNum} is Invalid!`, 'caution');
+    uiManagerInstance.toast(`X ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(y)) {
     isOb = false;
-    uiManager.toast(`Y ${obNum} is Invalid!`, 'caution');
+    uiManagerInstance.toast(`Y ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(z)) {
     isOb = false;
-    uiManager.toast(`Z ${obNum} is Invalid!`, 'caution');
+    uiManagerInstance.toast(`Z ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(xd)) {
     isOb = false;
-    uiManager.toast(`X Dot ${obNum} is Invalid!`, 'caution');
+    uiManagerInstance.toast(`X Dot ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(yd)) {
     isOb = false;
-    uiManager.toast(`Y Dot ${obNum} is Invalid!`, 'caution');
+    uiManagerInstance.toast(`Y Dot ${obNum} is Invalid!`, 'caution');
   }
   if (isOb && isNaN(zd)) {
     isOb = false;
-    uiManager.toast(`Z Dot ${obNum} is Invalid!`, 'caution');
+    uiManagerInstance.toast(`Z Dot ${obNum} is Invalid!`, 'caution');
   }
   if (isOb) {
     sv = [t, x, y, z, xd, yd, zd];

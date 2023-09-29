@@ -1,6 +1,6 @@
 {
-  "jest.jestCommandLine": "npm run test --",
-  "ponicode.testSettings.testLocation.locationType": "Same folder as source file",
+  "jest.jestCommandLine": "",
+  "conventionalCommits.promptScopes": false,
   // "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.formatOnSave": true,
   "typescript.validate.enable": true,
@@ -8,14 +8,6 @@
   "eslint.workingDirectories": ["./"],
   "typescript.tsdk": "./node_modules/typescript/lib",
   // "workbench.editor.labelFormat": "short",
-  "[typescript]": {
-    "editor.codeActionsOnSave": {
-      "source.fixAll": false,
-      "source.organizeImports": false,
-      "source.fixAll.eslint": true,
-      "source.addMissingImports": true
-    }
-  },
   "git.enableCommitSigning": true,
   "files.exclude": {
     "**/.git": true,
@@ -45,6 +37,37 @@
     "tsconfig.json": true
   },
   "[yaml]": {
-    "editor.autoIndent": "advanced"
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "true",
+    "source.organizeImports": "always",
+    "source.addMissingImports": "true",
+    "source.removeUnusedImports": "true"
+  },
+  "files.eol": "\n",
+  "terminal.integrated.profiles.windows": {
+    "Testing": {
+      "path": ["D:\\Program Files\\Git\\bin\\bash.exe"],
+      "icon": "beaker",
+      "color": "terminal.ansiGreen"
+    },
+    "Build": {
+      "path": ["D:\\Program Files\\Git\\bin\\bash.exe"],
+      "icon": "symbol-method",
+      "color": "terminal.ansiBlue"
+    }
+  },
+  "jestrunner.codeLens": ["run", "debug", "coverage"],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "thkruz",
+    "projectKey": "thkruz_keeptrack.space"
   }
 }

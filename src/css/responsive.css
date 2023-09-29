@@ -45,11 +45,11 @@
     background: rgba(255, 255, 255, 0.2);
   }
   #sensor-selected {
-    display: block !important;
+    display: block;
     top: 1px;
     z-index: 11;
     left: 167px;
-    width: 440px;
+    max-width: 440px;
     height: 25px;
     background: transparent;
     overflow: hidden;
@@ -174,8 +174,15 @@
   #about-menu {
     width: 375px;
   }
-  #lookanglesmultisite-menu {
+  #multi-site-look-angles-menu {
     width: 450px;
+  }
+  #multi-site-look-angles-sensor-list {
+    display: grid;
+    grid-template-columns: minmax(70px, max-content) repeat(auto-fill, 70px);
+    justify-content: space-evenly;
+    justify-items: stretch;
+    grid-row-gap: 5px;
   }
   #findByLooks .row {
     margin: 0px;
@@ -185,7 +192,7 @@
     margin: 0px;
   }
   #dops-menu {
-    width: 375px;
+    width: 400px;
   }
   #menu-satellite-collision,
   #menu-find-sat {
@@ -309,7 +316,7 @@
     width: 450px;
   }
   #dops-menu {
-    width: 375px;
+    width: 400px;
   }
   #menu-satellite-collision,
   #menu-find-sat {
@@ -400,7 +407,7 @@
     position: fixed;
     z-index: 11;
     left: 45px;
-    width: 110px;
+    width: 120px;
     background: transparent;
     overflow: hidden;
   }

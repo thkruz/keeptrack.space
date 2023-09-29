@@ -284,7 +284,7 @@
     "template-curly-spacing": ["error", "never"],
     "template-tag-spacing": "error",
     "unicode-bom": ["error", "never"],
-    "valid-jsdoc": "error",
+    "valid-jsdoc": "off",
     "vars-on-top": "off",
     "wrap-regex": "off",
     "yield-star-spacing": "error",

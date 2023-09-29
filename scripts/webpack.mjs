@@ -1,10 +1,10 @@
 /* eslint-disable no-process-env */
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import WebpackBar from 'webpackbar';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
+import WebpackBar from 'webpackbar';
 
 export const generateConfig = (env, isWatch) => {
   const fileName = fileURLToPath(import.meta.url);
@@ -147,13 +147,14 @@ const getBaseConfig = (dirName) => ({
         exclude: [/node_modules/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
         options: {
           transpileOnly: false,
+          configFile: "tsconfig.build.json"
         },
       },
       {
         test: /\.m?js$/u,
         include: [/src/u],
         // eslint-disable-next-line prefer-named-capture-group
-        exclude: [/(node_modules|bower_components)/u, /\dist/u, /\coverage/u, /\settingsManager\.js/iu, /\.test\.jsx?$/u],
+        exclude: [/(node_modules|bower_components)/u, /\dist/u, /\coverage/u, /\settings\.js/iu, /\.test\.jsx?$/u],
         use: {
           loader: 'babel-loader',
         },

@@ -3,8 +3,8 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -20,87 +20,108 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { getEl, shake } from '@app/js/lib/helpers';
-
 import fovPng from '@app/img/icons/fov.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, SensorObject, Singletons } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { getEl } from '@app/js/lib/get-el';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-export const uiManagerInit = () => {
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="menu-fov-bubble" class="bmenu-item bmenu-item-disabled">
-          <img
-            alt="fov"
-            src=""
-            delayedsrc="${fovPng}" 
-          />
-          <span class="bmenu-title">Sensor FOV</span>
-          <div class="status-icon"></div>
-        </div>
-      `
-  );
-};
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'sensorFov',
-    cb: uiManagerInit,
-  });
-
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'sensorFov',
-    cb: bottomMenuClick,
-  });
-
-  keepTrackApi.programs.sensorFov = {
-    enableFovView,
-  };
-};
-
-export const enableFovView = () => {
-  const { satSet } = keepTrackApi.programs;
-  // Disable Satellite Overfly
-  settingsManager.isSatOverflyModeOn = false;
-  getEl('menu-sat-fov').classList.remove('bmenu-item-selected');
-
-  settingsManager.isFOVBubbleModeOn = true;
-  settingsManager.isShowSurvFence = false;
-  getEl('menu-fov-bubble').classList.add('bmenu-item-selected');
-  getEl('menu-surveillance').classList.remove('bmenu-item-selected');
-  satSet.satCruncher.postMessage({
-    isShowFOVBubble: 'enable',
-    isShowSurvFence: 'disable',
-  });
-  satSet.satCruncher.postMessage({
-    typ: 'isShowSatOverfly',
-    isShowSatOverfly: 'reset',
-  });
-};
-
-export const bottomMenuClick = (iconName: string): void => {
-  const { sensorManager, satSet, uiManager } = keepTrackApi.programs;
-  if (iconName === 'menu-fov-bubble') {
-    if (!sensorManager.checkSensorSelected()) {
-      // No Sensor Selected
-      uiManager.toast(`Select a Sensor First!`, 'caution');
-      shake(getEl('menu-fov-bubble'));
-      return;
-    }
-    if (settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence) {
-      settingsManager.isFOVBubbleModeOn = false;
-      getEl('menu-fov-bubble').classList.remove('bmenu-item-selected');
-      satSet.satCruncher.postMessage({
-        isShowFOVBubble: 'reset',
-        isShowSurvFence: 'disable',
-      });
-      return;
-    } else {
-      enableFovView();
-      return;
-    }
+declare module '@app/js/interfaces' {
+  interface UserSettings {
+    isSatOverflyModeOn: boolean;
+    isShowSurvFence: boolean;
+    isFOVBubbleModeOn: boolean;
   }
-};
+}
+
+export class SensorFov extends KeepTrackPlugin {
+  bottomIconCallback = () => {
+    if (!this.isMenuButtonEnabled) return;
+
+    if (!this.verifySensorSelected()) {
+      return;
+    }
+
+    if (settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence) {
+      this.disableFovView_();
+    } else if (!settingsManager.isFOVBubbleModeOn) {
+      this.enableFovView();
+    }
+  };
+
+  bottomIconElementName = 'menu-sensor-fov';
+  bottomIconLabel = 'Sensor FOV';
+  bottomIconImg = fovPng;
+  isIconDisabledOnLoad = true;
+  isIconDisabled = true;
+
+  constructor() {
+    const PLUGIN_NAME = 'Sensor Field of View';
+    super(PLUGIN_NAME);
+  }
+
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.register({
+      method: 'setSensor',
+      cbName: this.PLUGIN_NAME,
+      cb: (sensor: SensorObject): void => {
+        if (sensor) {
+          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+          this.isIconDisabled = false;
+        } else {
+          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+          this.isIconDisabled = true;
+        }
+      },
+    });
+
+    keepTrackApi.register({
+      method: 'changeSensorMarkers',
+      cbName: this.PLUGIN_NAME,
+      cb: (caller: string): void => {
+        if (caller !== this.PLUGIN_NAME) {
+          getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+        }
+      },
+    });
+  }
+
+  private disableFovView_() {
+    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+
+    settingsManager.isFOVBubbleModeOn = false;
+    this.setBottomIconToUnselected();
+
+    catalogManagerInstance.satCruncher.postMessage({
+      isShowFOVBubble: 'reset',
+      isShowSurvFence: 'disable',
+    });
+  }
+
+  public enableFovView() {
+    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+
+    keepTrackApi.methods.changeSensorMarkers(this.PLUGIN_NAME);
+
+    settingsManager.isFOVBubbleModeOn = true;
+    settingsManager.isSatOverflyModeOn = false;
+    settingsManager.isShowSurvFence = false;
+
+    this.setBottomIconToSelected();
+
+    catalogManagerInstance.satCruncher.postMessage({
+      isShowFOVBubble: 'enable',
+      isShowSurvFence: 'disable',
+    });
+
+    catalogManagerInstance.satCruncher.postMessage({
+      typ: 'isShowSatOverfly',
+      isShowSatOverfly: 'reset',
+    });
+  }
+}
+
+export const sensorFovPlugin = new SensorFov();

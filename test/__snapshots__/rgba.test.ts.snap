@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`hex2rgba_function test_invalid_3_digit_hex_code 1`] = `
+[
+  0.06666666666666667,
+  0.13333333333333333,
+  0.2,
+  1,
+]
+`;
+
+exports[`hex2rgba_function test_lowercase_hex_code 1`] = `
+[
+  0.6705882352941176,
+  0.803921568627451,
+  0.9372549019607843,
+  1,
+]
+`;
+
+exports[`hex2rgba_function test_uppercase_hex_code 1`] = `
+[
+  0.6705882352941176,
+  0.803921568627451,
+  0.9372549019607843,
+  1,
+]
+`;
+
+exports[`hex2rgba_function test_valid_6_digit_hex_code 1`] = `
+[
+  0.07058823529411765,
+  0.20392156862745098,
+  0.33725490196078434,
+  1,
+]
+`;

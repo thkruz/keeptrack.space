@@ -1,5 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`satMath.distance 0 1`] = `"<br />Range: 0 km"`;
-
-exports[`satMath.distance 1 1`] = `"<br />Range: 0 km"`;

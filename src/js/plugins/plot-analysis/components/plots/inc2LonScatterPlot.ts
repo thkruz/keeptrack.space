@@ -1,7 +1,12 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { RAD2DEG } from '@app/js/lib/constants';
 import * as echarts from 'echarts';
+
+import { CatalogManager, GetSatType, Singletons } from '@app/js/interfaces';
+
+import { keepTrackContainer } from '@app/js/container';
+import { RAD2DEG } from '@app/js/lib/constants';
+import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { TimeManager } from '@app/js/singletons/time-manager';
+import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 
 export const createInc2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, chartDom) => {
   // Dont Load Anything if the Chart is Closed
@@ -14,7 +19,8 @@ export const createInc2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
     curChart = echarts.init(chartDom);
     curChart.on('click', (event) => {
       if (event.data?.id) {
-        keepTrackApi.programs.satSet.selectSat(event.data.id);
+        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        catalogManagerInstance.selectSat(event.data.id);
       }
     });
   } else {
@@ -139,21 +145,22 @@ export const createInc2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
 };
 
 export const getInc2LonScatterData = () => {
-  const { satSet, satellite } = keepTrackApi.programs;
+  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
   const china = [];
   const usa = [];
   const russia = [];
   const other = [];
 
-  satSet.satData.forEach((sat) => {
+  catalogManagerInstance.satData.forEach((sat) => {
     if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
     if (sat.eccentricity > 0.1) return;
     if (sat.period < 1240) return;
     if (sat.period > 1640) return;
     if (sat.inclination * RAD2DEG > 17) return;
-    sat = satSet.getSatPosOnly(sat.id);
-    sat = { ...sat, ...satellite.eci2ll(sat.position.x, sat.position.y, sat.position.z) };
+    sat = catalogManagerInstance.getSat(sat.id, GetSatType.POSITION_ONLY);
+    sat = { ...sat, ...CoordinateTransforms.eci2lla(sat.position, timeManagerInstance.simulationTimeObj) };
     switch (sat.country) {
       case 'United States of America':
       case 'United States':

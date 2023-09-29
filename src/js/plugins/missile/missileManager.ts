@@ -1,10 +1,12 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { MissileObject, SensorObject } from '@app/js/api/keepTrackTypes';
-import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { DEG2RAD, MILLISECONDS_PER_DAY, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { jday } from '@app/js/timeManager/transforms';
-import { ToastMsgType } from '@app/js/uiManager/ui/toast';
-import $ from 'jquery';
+import { RussianICBM, USATargets, globalBMTargets, ChinaICBM, NorthKoreanBM, UsaICBM, FraSLBM, ukSLBM } from './missileData';
+import { MissileObject, SensorObject, ToastMsgType } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { DEG2RAD, MILLISECONDS2DAYS, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
+import { SpaceObjectType } from '@app/js/lib/space-object-type';
+
+import { jday } from '@app/js/lib/transforms';
+import { Kilometers, Radians, Sgp4, Transforms } from 'ootk';
+import { UpdateSatManager } from '../update-select-box/update-select-box';
 
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
 const missileArray: any[] = [];
@@ -13,64 +15,70 @@ const missileArray: any[] = [];
 
 // This function stalls Jest for multiple minutes.
 /* istanbul ignore next */
-export const MassRaidPre = (time: number, simFile: string) => {
-  const { satSet, orbitManager } = keepTrackApi.programs;
+export const MassRaidPre = async (time: number, simFile: string) => {
   missileManager.clearMissiles();
-  $.get(simFile, function (newMissileArray) {
-    const satSetLen = satSet.missileSats;
-    missileManager.missilesInUse = satSetLen;
-    for (let i = 0; i < newMissileArray.length; i++) {
-      const x = satSetLen - 500 + i;
-      newMissileArray[i].startTime = time;
-      newMissileArray[i].name = newMissileArray[i].ON;
-      newMissileArray[i].country = newMissileArray[i].C;
-      satSet.setSat(x, newMissileArray[i]);
-      const missileObj = <MissileObject>satSet.getSat(x);
-      if (missileObj) {
-        missileObj.id = satSetLen - 500 + i;
-        keepTrackApi.programs.satSet.satCruncher.postMessage({
-          id: missileObj.id,
-          typ: 'newMissile',
-          name: 'M00' + missileObj.id,
-          satId: missileObj.id,
-          static: missileObj.static,
-          missile: missileObj.missile,
-          active: missileObj.active,
-          type: missileObj.type,
-          latList: missileObj.latList,
-          lonList: missileObj.lonList,
-          altList: missileObj.altList,
-          startTime: missileObj.startTime,
-        });
-        orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, {
-          missile: true,
-          latList: missileObj.latList,
-          lonList: missileObj.lonList,
-          altList: missileObj.altList,
-        });
+  await fetch(simFile)
+    .then((response) => response.json())
+    .then((newMissileArray) => {
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const satSetLen = catalogManagerInstance.missileSats;
+      missileManager.missilesInUse = satSetLen;
+      for (let i = 0; i < newMissileArray.length; i++) {
+        const x = satSetLen - 500 + i;
+        newMissileArray[i].startTime = time;
+        newMissileArray[i].name = newMissileArray[i].ON;
+        newMissileArray[i].country = newMissileArray[i].C;
+        catalogManagerInstance.setSat(x, newMissileArray[i]);
+        const missileObj = <MissileObject>catalogManagerInstance.getSat(x);
+        if (missileObj) {
+          missileObj.id = satSetLen - 500 + i;
+          catalogManagerInstance.satCruncher.postMessage({
+            id: missileObj.id,
+            typ: 'newMissile',
+            name: 'M00' + missileObj.id,
+            satId: missileObj.id,
+            static: missileObj.static,
+            missile: missileObj.missile,
+            active: missileObj.active,
+            type: missileObj.type,
+            latList: missileObj.latList,
+            lonList: missileObj.lonList,
+            altList: missileObj.altList,
+            startTime: missileObj.startTime,
+          });
+          const orbitManagerInstance = keepTrackApi.getOrbitManager();
+          orbitManagerInstance.updateOrbitBuffer(missileObj.id, {
+            missile: true,
+            latList: missileObj.latList,
+            lonList: missileObj.lonList,
+            altList: missileObj.altList,
+          });
+        }
       }
-    }
-    missileManager.missileArray = newMissileArray;
-  }).done(() => {
-    keepTrackApi.programs.uiManager.doSearch('RV_');
-  });
+      missileManager.missileArray = newMissileArray;
+    });
+
+  const uiManagerInstance = keepTrackApi.getUiManager();
+  uiManagerInstance.doSearch('RV_');
 };
 export const clearMissiles = () => {
-  const { satSet, orbitManager } = keepTrackApi.programs;
-  keepTrackApi.programs.uiManager.doSearch('');
-  const satSetLen = satSet.missileSats;
+  const uiManagerInstance = keepTrackApi.getUiManager();
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
+  uiManagerInstance.doSearch('');
+  const satSetLen = catalogManagerInstance.missileSats;
   for (let i = 0; i < 500; i++) {
     const x = satSetLen - 500 + i;
 
-    const missileObj: MissileObject = <MissileObject>satSet.getSat(x);
+    const missileObj: MissileObject = <MissileObject>catalogManagerInstance.getSat(x);
     missileObj.active = false;
     missileObj.latList = [];
     missileObj.lonList = [];
     missileObj.name = '';
     missileObj.startTime = 0;
-    satSet.setSat(x, missileObj);
+    catalogManagerInstance.setSat(x, missileObj);
 
-    keepTrackApi.programs.satSet.satCruncher.postMessage({
+    catalogManagerInstance.satCruncher.postMessage({
       id: missileObj.id,
       typ: 'newMissile',
       ON: 'RV_' + missileObj.id,
@@ -87,7 +95,8 @@ export const clearMissiles = () => {
     });
 
     if (missileObj.id) {
-      orbitManager.updateOrbitBuffer(missileObj.id, null, null, null, {
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      orbitManagerInstance.updateOrbitBuffer(missileObj.id, {
         missile: true,
         latList: [],
         lonList: [],
@@ -98,9 +107,56 @@ export const clearMissiles = () => {
   missileManager.missilesInUse = 0;
 };
 
-// This function stalls Jest for multiple minutes.
-/* istanbul ignore next */
-// prettier-ignore
+/**
+ * @warning This function stalls Jest for multiple minutes.
+ *
+ * Calculates and designs the flight path of an intercontinental ballistic missile (ICBM).
+ * This function calls upon many sub-functions to help it iteratively calculate many of the
+ * changing variables as the rocket makes its path around the world. Changing variables that had to be taken into
+ * account include:
+ * - Air density vs altitude
+ * - Air pressure vs altitude
+ * - Air temperature vs altitude
+ * - Drag coefficient vs mach number
+ * - Speed of sound vs altitude
+ * - Drag force vs time
+ * - Gravitational attraction vs altitude
+ * - Fuel mass vs time
+ * - Thrust vs time
+ * - Vertical velocity vs time
+ * - Angular velocity vs time
+ * - Vertical acceleration vs time
+ * - Angular acceleration vs time
+ * - Angular distance rocket travels vs time
+ * - Total distance rocket travels vs time
+ *
+ * The coordinates are to be inputed as degrees and NumberWarheads must be an integer. The first thing the
+ * program does is calculate everything regarding the path the rocket will take to minimize
+ * distance needed to travel. It uses the CoordinateCalculator function to accomplish this.
+ * It then calculates everything regarding the casing and fuel of the rocket. After calculating all
+ * the necessary constants it starts its iterative calculation of the rockets actual path and collects
+ * information into lists as it moves through its times steps. It changes its iterative approach once
+ * the rocket runs out of fuel by dropping out everything used to calculate the trust. Once the rocket
+ * reaches an altitude of zero meters it ends the iterations.
+ *
+ * Many of these variables are dependent on each other. The inputs of this function are:
+ * @param CurrentLatitude - Latitude of the starting position
+ * @param CurrentLongitude - Longitude of the starting position
+ * @param TargetLatitude - Latitude of the ending position
+ * @param TargetLongitude - Longitude of the ending position
+ * @param NumberWarheads - Number of warhead loaded onto the missile
+ * @param MissileObjectNum - The missile object number
+ * @param CurrentTime - The current time
+ * @param MissileDesc - The missile description
+ * @param Length - The length of the missile (m)
+ * @param Diameter - The diameter of the missile (m)
+ * @param NewBurnRate - The new burn rate
+ * @param MaxMissileRange - The maximum missile range (km)
+ * @param country - The country
+ * @param minAltitude - The minimum altitude
+ *
+ * @returns 0 if there is an error, otherwise returns the calculated path of the missile
+ */
 export const Missile = (
   CurrentLatitude: number,
   CurrentLongitude: number,
@@ -116,44 +172,8 @@ export const Missile = (
   MaxMissileRange: number,
   country: any,
   minAltitude: number
-) => { // NOSONAR
-  // This is the main function for this program. It calculates and designs the flight path of an intercontinental
-  // ballistic missile (ICBM). This function calls upon many sub-functions to help it iteratively calculate many of the
-  // changing variables as the rocket makes its path around the world. Changing variables that had to be taken into
-  // account include:
-  // Air density vs altitude
-  // Air pressure vs altitude
-  // Air temperature vs altitude
-  // Drag coefficient vs mach number
-  // Speed of sound vs altitude
-  // Drag force vs time
-  // Gravitational attraction vs altitude
-  // Fuel mass vs time
-  // Thrust vs time
-  // Vertical velocity vs time
-  // Angular velocity vs time
-  // Vertical acceleration vs time
-  // Angular acceleration vs time
-  // Angular distance rocket travels vs time
-  // Total distance rocket travels vs time
-  // Many of these variables are dependent on each other. The inputs of this function are:
-  // Currentlat:  Latitude of the starting position
-  // Currentlon: Longitude of the starting position
-  // Targetlat:   Latitude of the ending position
-  // Targetlon:  Longitude of the ending position
-  // NumberWarheads:   Number of warhead loaded onto the missile
-  // The coordinates are to be inputed as degrees and NumberWarheads must be an intagure. The first thing the
-  // program does is calculate everything regarding the path the rocket will take to minimize
-  // distance needed to travel. It uses the CoordinateCalculator function to accomplish this.
-  // It then calculates everything regarding the casing and fuel of the rocket. After calculating all
-  // the necessary constants it starts its iterative calculation of the rockets actual path and collects
-  // information into lists as it moves through its times steps. It changes its iterative approach once
-  // the rocket runs out of fuel by dropping out everything used to calculate the trust. Once the rocket
-  // reaches an altitude of zero meters it ends the iterations. Using all the information gathers it
-  // presents them in the form of print statements and also plots.
-
-  const { satSet, orbitManager } = keepTrackApi.programs;
-  const missileObj: MissileObject = <MissileObject>satSet.getSat(MissileObjectNum);
+) => {
+  const missileObj: MissileObject = <MissileObject>keepTrackApi.getCatalogManager().getSat(MissileObjectNum);
 
   // Dimensions of the rocket
   Length = Length || 17; // (m)
@@ -193,7 +213,7 @@ export const Missile = (
   const LatList = [];
   const LongList = [];
 
-  const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = _CoordinateCalculator(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
+  const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = calculateCoordinates_(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
   if (ArcLength < 320000) {
     missileManager.lastMissileErrorType = 'critical';
@@ -210,10 +230,8 @@ export const Missile = (
   // Calculate Notional Altitude
   const minAltitudeTrue = minAltitude * (Math.min(3, MaxMissileRange / (ArcLength / 1000)) / 2);
 
-
   // Calculations for the warheads
   WarheadMass = 500 * NumberWarheads; // (Kg)
-
 
   // Calculations for the casing
   const Thickness = 0.050389573 * Diameter; // (m)
@@ -247,14 +265,13 @@ export const Missile = (
 
   // Here are the definitions for all the lists
 
-
   const AltitudeList = [];
 
   const hList = [];
 
   let NozzleAltitude2, NozzleAltitude3;
 
-  const AngleCoefficient = _Bisection(
+  const AngleCoefficient = calculateAngle_(
     FuelArea1,
     FuelArea2,
     FuelMass,
@@ -275,7 +292,7 @@ export const Missile = (
   );
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
-    const iterationFunOutput = _IterationFun(
+    const iterationFunOutput = launchDetailed_(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -298,9 +315,7 @@ export const Missile = (
     dthetadt = iterationFunOutput[18];
     NozzleAltitude2 = Altitude;
 
-
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
-
 
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
@@ -310,17 +325,15 @@ export const Missile = (
       }
     }
 
-
     let hListSum = 0;
     for (let i = 0; i < hList.length; i++) {
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
   }
-  
 
   while (FuelMass / FuelDensity / FuelVolume > 0.19 && Altitude >= 0) {
-    const iterationFunOutput = _IterationFun(
+    const iterationFunOutput = launchDetailed_(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -344,8 +357,7 @@ export const Missile = (
     NozzleAltitude3 = Altitude;
 
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
-    
-    
+
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
@@ -353,18 +365,16 @@ export const Missile = (
         break;
       }
     }
-    
-    
+
     let hListSum = 0;
     for (let i = 0; i < hList.length; i++) {
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
   }
-  
 
   while (FuelMass / FuelDensity / FuelVolume > 0 && Altitude >= 0) {
-    const iterationFunOutput = _IterationFun(
+    const iterationFunOutput = launchDetailed_(
       FuelArea2,
       FuelMass,
       RocketArea,
@@ -386,7 +396,7 @@ export const Missile = (
     dthetadt = iterationFunOutput[18];
 
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
-    
+
     for (let i = 0; i < EstDistanceList.length; i++) {
       if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
@@ -394,18 +404,17 @@ export const Missile = (
         break;
       }
     }
-    
+
     let hListSum = 0;
     for (let i = 0; i < hList.length; i++) {
       hListSum += hList[i];
     }
     hList.push(h + hListSum);
   }
-  
 
   while (Altitude > 0) {
     FuelMass = 0;
-    const iterationFunOutput = _IterationFun(
+    const iterationFunOutput = launchDetailed_(
       FuelArea2,
       FuelMass,
       RocketArea,
@@ -499,10 +508,11 @@ export const Missile = (
 
     if (MissileDesc) missileObj.desc = MissileDesc;
     missileArray.push(missileObj);
-    keepTrackApi.programs.satSet.satCruncher.postMessage({
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    catalogManagerInstance.satCruncher.postMessage({
       id: missileObj.id,
       typ: 'newMissile',
-      ON: 'RV_' + missileObj.id, // Don't think satSet.satCruncher needs this
+      ON: 'RV_' + missileObj.id, // Don't think catalogManagerInstance.satCruncher needs this
       satId: missileObj.id,
       static: missileObj.static,
       missile: missileObj.missile,
@@ -514,7 +524,8 @@ export const Missile = (
       altList: missileObj.altList,
       startTime: missileObj.startTime,
     });
-    orbitManager.updateOrbitBuffer(MissileObjectNum, null, null, null, {
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    orbitManagerInstance.updateOrbitBuffer(MissileObjectNum, {
       missile: true,
       latList: missileObj.latList,
       lonList: missileObj.lonList,
@@ -529,12 +540,17 @@ export const Missile = (
   return 1; // Successful Launch
 };
 
-// prettier-ignore
-export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]) => { // NOSONAR
-  const { satellite, sensorManager, timeManager } = keepTrackApi.programs;
-  
+/**
+ * Calculates the current TEARR (Target Elevation, Azimuth, Range, and Range Rate) data for a given missile object and sensor(s).
+ * @param missile - The missile object for which to calculate the TEARR data.
+ * @param sensors - An optional array of sensor objects to use for the calculation. If not provided, the current sensor(s) will be used.
+ * @returns An object containing the current TEARR data for the missile.
+ */
+export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]) => {
+  const timeManagerInstance = keepTrackApi.getTimeManager();
+
   const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
-  const now = timeManager.simulationTimeObj;
+  const now = timeManagerInstance.simulationTimeObj;
   let j = jday(
     now.getUTCFullYear(),
     now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -543,15 +559,16 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
     now.getUTCMinutes(),
     now.getUTCSeconds()
   ); // Converts time to jday (TLEs use epoch year/day)
-  j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-  const gmst = satellite.gstime(j);
+  j += now.getUTCMilliseconds() * MILLISECONDS2DAYS;
+  const gmst = Sgp4.gstime(j);
 
   // If no sensor passed to function then try to use the 'currentSensor'
   if (typeof sensors == 'undefined') {
-    if (typeof sensorManager.currentSensor == 'undefined') {
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    if (typeof sensorManagerInstance.currentSensors == 'undefined') {
       throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
     } else {
-      sensors = sensorManager.currentSensor;
+      sensors = sensorManagerInstance.currentSensors;
     }
   }
   // If sensor's observerGd is not set try to set it using it parameters
@@ -559,8 +576,8 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
     try {
       sensors[0].observerGd = {
         alt: sensors[0].alt,
-        lat: sensors[0].lat,
-        lon: sensors[0].lon,
+        lat: <Radians>(sensors[0].lat * DEG2RAD),
+        lon: <Radians>(sensors[0].lon * DEG2RAD),
       };
     } catch (e) {
       throw new Error('observerGd is not set and could not be guessed.');
@@ -583,18 +600,18 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
   const cosLon = Math.cos(missile.lonList[curMissileTime] * DEG2RAD + gmst);
   const sinLon = Math.sin(missile.lonList[curMissileTime] * DEG2RAD + gmst);
 
-  const x = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon;
-  const y = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon;
-  const z = (RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat;
+  const x = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon);
+  const y = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon);
+  const z = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat);
 
   let positionEcf, lookAngles;
   try {
-    const gpos = satellite.eciToGeodetic({ x, y, z }, gmst);
+    const gpos = Transforms.eci2lla({ x, y, z }, gmst);
     currentTEARR.alt = gpos.alt;
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
-    positionEcf = satellite.eciToEcf({ x, y, z }, gmst);
-    lookAngles = satellite.ecfToLookAngles(sensor.observerGd, positionEcf);
+    positionEcf = Transforms.eci2ecf({ x, y, z }, gmst);
+    lookAngles = Transforms.ecf2rae(sensor.observerGd, positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG;
     currentTEARR.el = lookAngles.el * RAD2DEG;
     currentTEARR.rng = lookAngles.rng;
@@ -645,7 +662,12 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
       currentTEARR.inView = false;
     }
   }
-  satellite.setTEARR(currentTEARR);
+
+  const updateSelectBoxPlugin = <UpdateSatManager>keepTrackApi.getPlugin(UpdateSatManager);
+  if (updateSelectBoxPlugin) {
+    updateSelectBoxPlugin.currentTEARR = currentTEARR;
+  }
+
   return currentTEARR;
 };
 
@@ -682,7 +704,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            satSet.satData.length - b,
+            catalogManagerInstance.satData.length - b,
             launchTime,
             missileManager.RussianICBM[a * 4 + 2],
             30,
@@ -729,7 +751,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            satSet.satData.length - b,
+            catalogManagerInstance.satData.length - b,
             launchTime,
             missileManager.ChinaICBM[a * 4 + 2],
             30,
@@ -773,7 +795,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
             USATargets[i * 2],
             USATargets[i * 2 + 1],
             3,
-            satSet.satData.length - b,
+            catalogManagerInstance.satData.length - b,
             launchTime,
             missileManager.NorthKoreanBM[a * 4 + 2],
             30,
@@ -819,7 +841,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.RussianICBM[i * 4],
               missileManager.RussianICBM[i * 4 + 1],
               3,
-              satSet.satData.length - b,
+              catalogManagerInstance.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -854,7 +876,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.ChinaICBM[i * 4],
               missileManager.ChinaICBM[i * 4 + 1],
               3,
-              satSet.satData.length - b,
+              catalogManagerInstance.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -889,7 +911,7 @@ missileManager.MassRaid = function (time, BurnRate, RaidType) {
               missileManager.NorthKoreanBM[i * 4],
               missileManager.NorthKoreanBM[i * 4 + 1],
               3,
-              satSet.satData.length - b,
+              catalogManagerInstance.satData.length - b,
               launchTime,
               missileManager.UsaICBM[a * 4 + 2],
               30,
@@ -930,7 +952,7 @@ missileManager.minMaxSimulation = function (launchTime, lat, lon, missileDesc, m
         lat,
         lon,
         3, // Does this matter?
-        satSet.missileSats - (500 - missilesLaunched),
+        catalogManagerInstance.missileSats - (500 - missilesLaunched),
         launchTime,
         missileDesc,
         30,
@@ -971,7 +993,7 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
   // CurrentTime = startTime;
   let propOffset = timeManager.getOffsetTimeObj(timeInFlight * 1000, startTime);
   console.log(propOffset);
-  let satTEARR2 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
+  let satTEARR2 = satellite.getTEARR(sat, SensorManager.sensors.COD, propOffset);
   let satAlt2 = satTEARR2.alt;
   console.log(satTEARR2.lat * RAD2DEG);
   console.log(satTEARR2.lon * RAD2DEG);
@@ -1003,7 +1025,7 @@ missileManager.asat = (CurrentLatitude, CurrentLongitude, satId, MissileObjectNu
 
   propOffset = timeManager.getOffsetTimeObj(timeInFlight2 * 1000, startTime);
   console.log(propOffset);
-  let satTEARR3 = satellite.getTEARR(sat, sensorManager.sensorList.COD, propOffset);
+  let satTEARR3 = satellite.getTEARR(sat, SensorManager.sensors.COD, propOffset);
   let satAlt3 = satTEARR3.alt;
   console.log(satTEARR3.lat * RAD2DEG);
   console.log(satTEARR3.lon * RAD2DEG);
@@ -1507,10 +1529,10 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   //     if (MissileDesc) MissileObject.desc = MissileDesc;
   //     // console.log(MissileObject);
   //     missileArray.push(MissileObject);
-  //     satSet.satCruncher.postMessage({
+  //     catalogManagerInstance.satCruncher.postMessage({
   //       id: MissileObject.id,
   //       typ: 'newMissile',
-  //       ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
+  //       ON: 'RV_' + MissileObject.id, // Don't think catalogManagerInstance.satCruncher needs this
   //       satId: MissileObject.id,
   //       static: MissileObject.static,
   //       missile: MissileObject.missile,
@@ -1522,7 +1544,7 @@ missileManager.asatPreFlight = (CurrentLatitude, CurrentLongitude, TargetLatitud
   //       altList: MissileObject.altList,
   //       startTime: MissileObject.startTime,
   //     });
-  //     updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+  //     updateOrbitBuffer(MissileObjectNum, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
 
   //     missileManager.missileArray = missileArray;
 
@@ -2085,10 +2107,10 @@ missileManager.asatFlight = function (
     if (MissileDesc) MissileObject.desc = MissileDesc;
     // console.log(MissileObject);
     missileArray.push(MissileObject);
-    satSet.satCruncher.postMessage({
+    catalogManagerInstance.satCruncher.postMessage({
       id: MissileObject.id,
       typ: 'newMissile',
-      ON: 'RV_' + MissileObject.id, // Don't think satSet.satCruncher needs this
+      ON: 'RV_' + MissileObject.id, // Don't think catalogManagerInstance.satCruncher needs this
       satId: MissileObject.id,
       static: MissileObject.static,
       missile: MissileObject.missile,
@@ -2100,7 +2122,7 @@ missileManager.asatFlight = function (
       altList: MissileObject.altList,
       startTime: MissileObject.startTime,
     });
-    updateOrbitBuffer(MissileObjectNum, null, null, null, true, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
+    updateOrbitBuffer(MissileObjectNum, MissileObject.latList, MissileObject.lonList, MissileObject.altList, MissileObject.startTime);
 
     missileManager.missileArray = missileArray;
 
@@ -2117,7 +2139,7 @@ missileManager.asatFlight = function (
 */
 
 // Internal Functions
-export const _Pressure = (Altitude: number) => {
+export const calculatePressure_ = (Altitude: number) => {
   // This function calculates the atmospheric pressure. The only iMathut is the
   // Altitude. The constiables in the function are:
 
@@ -2136,7 +2158,7 @@ export const _Pressure = (Altitude: number) => {
   const g = 9.81; // (m/s^2)
   return Po * Math.exp((-mol * g * Altitude) / (_R * Tsea)); // (Pa)
 };
-export const _Temperature = (Altitude: number) => {
+export const calculateTemperature_ = (Altitude: number) => {
   // This function calculates the atmospheric temperature at any given altitude.
   // The function has one iMathut for altitude. Because atmospheric temperature can not
   // be represented as one equation, this function is made up of a series of curve fits
@@ -2158,7 +2180,7 @@ export const _Temperature = (Altitude: number) => {
   // Catch All
   return -894.0 + 10.6 * 120; // (K)
 };
-export const _CD = (M: number) => {
+export const calculateDrag_ = (M: number) => {
   // This function calculates the drag coefficient of the rocket. This function is based
   // off of a plot that relates the drag coefficient with the mach number of the rocket.
   // Because the plot can not be represented with one equation it is broken up into multiple
@@ -2173,7 +2195,7 @@ export const _CD = (M: number) => {
   // Catch All
   return 0.25;
 };
-export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) => {
+export const calculateThrust_ = (MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) => {
   // This function calculates the thrust force of the rocket by maximizing the efficiency
   // through designing the correct shaped nozzle for the given rocket scenario. For this
   // function is gives the option for stages of the rocket to be introduced. Theoretically
@@ -2212,8 +2234,8 @@ export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, Noz
   const Pc = 25 * Math.pow(10, 6); // Chamber Pressure (Pa)
   const Mw = 22; // Molecular Weight
   const q = MassOut; // Mass Flow Rate (kg/s)
-  const Pa = _Pressure(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
-  const Pe = _Pressure(Altitude); // Actual Atmospheric Pressure (Pa)
+  const Pa = calculatePressure_(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
+  const Pe = calculatePressure_(Altitude); // Actual Atmospheric Pressure (Pa)
   const Pt = Math.pow(Pc * (1 + (k - 1) / 2), -k / (k - 1)); // Throat Pressure (Pa)
   const Tt = Tc / (1 + (k - 1) / 2); // Throat Temperature (k)
   const At = (q / Pt) * Math.sqrt((Ru * Tt) / (Mw * k)); // Throat Area (m^2)
@@ -2226,7 +2248,7 @@ export const _ThrustFun = (MassOut: number, Altitude: any, FuelArea: number, Noz
 };
 
 // prettier-ignore
-export const _CoordinateCalculator = (
+export const calculateCoordinates_ = (
   CurrentLatitude: number,
   CurrentLongitude: number,
   TargetLatitude: number,
@@ -2288,13 +2310,13 @@ export const _CoordinateCalculator = (
   const Lambda01 = Math.atan2(Math.sin(Alphao) * Math.sin(DeltaSigma01), Math.cos(DeltaSigma01)); // (Rad)
   const Lambdao = Lambda1 - Lambda01; // (Rad)
   const EstLatList = [];
-  const LatList1 = [];
-  const LatList2 = [];
-  const LatList3 = [];
+  const latList1 = [];
+  const latList2 = [];
+  const latList3 = [];
   const EstLongList = [];
-  const LongList1 = [];
-  const LongList2 = [];
-  const LongList3 = [];
+  const lonList1 = [];
+  const lonList2 = [];
+  const lonList3 = [];
   const EstDistanceList: number[] = [];
   let GoalDistance;
   for (let i = 0; i <= 2400; i++) {
@@ -2304,31 +2326,31 @@ export const _CoordinateCalculator = (
     if (i === 2000) GoalDistance = (Sigma - DeltaSigma01) * r;
     EstDistanceList.push(((Sigma - DeltaSigma01) * r) / 1000);
     if (Lambda >= -180 && Lambda <= 180) {
-      LongList1.push(Lambda); // (Degrees)
-      LatList1.push(Phi); // (Degrees)
+      lonList1.push(Lambda); // (Degrees)
+      latList1.push(Phi); // (Degrees)
     } else if (Lambda < -180) {
-      LongList3.push(Lambda + 360); // (Degrees)
-      LatList3.push(Phi); // (Degrees)
+      lonList3.push(Lambda + 360); // (Degrees)
+      latList3.push(Phi); // (Degrees)
     } else if (Lambda > 180) {
-      LongList2.push(Lambda - 360); // (Degrees)
-      LatList2.push(Phi); // (Degrees)
+      lonList2.push(Lambda - 360); // (Degrees)
+      latList2.push(Phi); // (Degrees)
     } else {
       // Do nothing
     }
   }
 
-  for (let i = 0; i < LatList1.length; i++) EstLatList.push(LatList1[i]);
-  for (let i = 0; i < LatList2.length; i++) EstLatList.push(LatList2[i]);
-  for (let i = 0; i < LatList3.length; i++) EstLatList.push(LatList3[i]);
-  for (let i = 0; i < LongList1.length; i++) EstLongList.push(LongList1[i]);
-  for (let i = 0; i < LongList2.length; i++) EstLongList.push(LongList2[i]);
-  for (let i = 0; i < LongList3.length; i++) EstLongList.push(LongList3[i]);
+  for (const lat of latList1) EstLatList.push(lat);
+  for (const lat of latList2) EstLatList.push(lat);
+  for (const lat of latList3) EstLatList.push(lat);
+  for (const lon of lonList1) EstLongList.push(lon);
+  for (const lon of lonList2) EstLongList.push(lon);
+  for (const lon of lonList3) EstLongList.push(lon);
 
   return [EstLatList, EstLongList, (Alpha1 * 180) / Math.PI, ArcLength, EstDistanceList, GoalDistance];
 };
 
 // prettier-ignore
-export const _IterationFun = (
+export const launchDetailed_ = (
   FuelArea: number,
   FuelMass: number,
   RocketArea: number,
@@ -2387,11 +2409,11 @@ export const _IterationFun = (
     ThrustAngle =
       (90 -
         AngleCoefficient *
-          (1.5336118956 +
-            0.00443173537387 * Altitude -
-            9.30373890848 * Math.pow(10, -8) * Math.pow(Altitude, 2) +
-            8.37838197732 * Math.pow(10, -13) * Math.pow(Altitude, 3) -
-            2.71228576626 * Math.pow(10, -18) * Math.pow(Altitude, 4))) *
+        (1.5336118956 +
+          0.00443173537387 * Altitude -
+          9.30373890848 * Math.pow(10, -8) * Math.pow(Altitude, 2) +
+          8.37838197732 * Math.pow(10, -13) * Math.pow(Altitude, 3) -
+          2.71228576626 * Math.pow(10, -18) * Math.pow(Altitude, 4))) *
       0.0174533;
   // (Degrees)
   else ThrustAngle = 30;
@@ -2412,18 +2434,18 @@ export const _IterationFun = (
   }
 
   const RocketMass = FuelMass + RocketCasingMass + WarheadMass; // (Kg)
-  const Tatm = _Temperature(Altitude); // (K)
-  const Patm = _Pressure(Altitude); // (pa)
+  const Tatm = calculateTemperature_(Altitude); // (K)
+  const Patm = calculatePressure_(Altitude); // (pa)
   const AirDensity = Patm / (R * Tatm); // (kg/m^3)
 
   // This calculates the drag coeficiant
   const c = Math.pow(1.4 * R * Tatm, 1 / 2); // (m/s)
   const M = Math.sqrt(Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) / c; // (Unitless)
-  const cD = _CD(Math.abs(M)); // (Unitless)
+  const cD = calculateDrag_(Math.abs(M)); // (Unitless)
 
   // This calculates all the forces acting upon the missile
   let Thrust = 0;
-  if (FuelMass > 0) Thrust = _ThrustFun(MassOut, Altitude, FuelArea, NozzleAltitude); // (N)
+  if (FuelMass > 0) Thrust = calculateThrust_(MassOut, Altitude, FuelArea, NozzleAltitude); // (N)
 
   const DragForce = (1 / 2) * AirDensity * (Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) * RocketArea * cD; // (N)
   const WeightForce = (G * EarthMass * RocketMass) / Math.pow(Radius, 2); // (N)
@@ -2448,7 +2470,7 @@ export const _IterationFun = (
 };
 
 // prettier-ignore
-export const _Bisection = (
+export const calculateAngle_ = (
   FuelArea1: number,
   FuelArea2: number,
   FuelMass: number,
@@ -2504,7 +2526,7 @@ export const _Bisection = (
   for (let i = 0; i < Steps; i++) {
     AngleCoefficient = (i * 1) / Steps / 2 + 0.5;
     DistanceSteps.push(
-      _QuickRun(
+      launchSimple_(
         FuelArea1,
         FuelArea2,
         FuelMass,
@@ -2545,7 +2567,7 @@ export const _Bisection = (
   AC1 = (DistanceClosePossition - 2) / Steps / 2 + 0.5;
   AC2 = (DistanceClosePossition + 2) / Steps / 2 + 0.5;
   let ACNew: number = (AC1 + AC2) / 2;
-  const qRunACNew = _QuickRun(
+  const qRunACNew = launchSimple_(
     FuelArea1,
     FuelArea2,
     FuelMass,
@@ -2569,7 +2591,7 @@ export const _Bisection = (
     error =
       Math.abs(
         (GoalDistance -
-          _QuickRun(
+          launchSimple_(
             FuelArea1,
             FuelArea2,
             FuelMass,
@@ -2587,10 +2609,10 @@ export const _Bisection = (
             MassIn,
             ACNew
           )) /
-          GoalDistance
+        GoalDistance
       ) * 100;
     if (
-      _QuickRun(
+      launchSimple_(
         FuelArea1,
         FuelArea2,
         FuelMass,
@@ -2619,7 +2641,7 @@ export const _Bisection = (
 };
 
 // prettier-ignore
-export const _QuickRun = (
+export const launchSimple_ = (
   FuelArea1: any,
   FuelArea2: any,
   FuelMass: number,
@@ -2637,7 +2659,7 @@ export const _QuickRun = (
   MassIn: any,
   AngleCoefficient: number
 ) => { // NOSONAR
-  // This function calculates the entire simularion of the missiles tragectory without
+  // This function calculates the entire simulation of the missiles tragectory without
   // collecting any information along the way. It's purpose is for the angle cooefficeint
   // optimizer to have a quick way to run the simulation and retreive the final distance
   // the missile traveled along the surface of the earth. The functions inputs are:
@@ -2665,7 +2687,7 @@ export const _QuickRun = (
   const MaxAltitude = [];
 
   while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
-    iterationFunOutput = _IterationFun(
+    iterationFunOutput = launchDetailed_(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -2689,7 +2711,7 @@ export const _QuickRun = (
     NozzleAltitude2 = Altitude;
   }
   while (FuelMass / FuelDensity / FuelVolume > 0.19 && Altitude >= 0) {
-    iterationFunOutput = _IterationFun(
+    iterationFunOutput = launchDetailed_(
       FuelArea1,
       FuelMass,
       RocketArea,
@@ -2713,7 +2735,7 @@ export const _QuickRun = (
     NozzleAltitude3 = Altitude;
   }
   while (FuelMass / FuelDensity / FuelVolume > 0 && Altitude >= 0) {
-    iterationFunOutput = _IterationFun(
+    iterationFunOutput = launchDetailed_(
       FuelArea2,
       FuelMass,
       RocketArea,
@@ -2737,7 +2759,7 @@ export const _QuickRun = (
   }
   while (Altitude > 0) {
     FuelMass = 0;
-    iterationFunOutput = _IterationFun(
+    iterationFunOutput = launchDetailed_(
       FuelArea2,
       FuelMass,
       RocketArea,
@@ -2767,460 +2789,6 @@ export const _QuickRun = (
 
   return Distance;
 };
-
-const RussianICBM = [
-  52 + 30 * 0.01666667,
-  82 + 45 * 0.01666667,
-  'Aleysk (SS-18)',
-  16000,
-  50 + 45 * 0.01666667,
-  59 + 30 * 0.01666667,
-  'Dombarovskiy (SS-18)',
-  16000,
-  55 + 20 * 0.01666667,
-  89 + 48 * 0.01666667,
-  'Uzhur (SS-18)',
-  16000,
-  53 + 58 * 0.01666667,
-  57 + 50 * 0.01666667,
-  'Kartaly (SS-18)',
-  16000,
-  52 + 19 * 0.01666667,
-  104 + 14 * 0.01666667,
-  'Irkutsk (SS-25)',
-  10500,
-  56 + 22 * 0.01666667,
-  95 + 28 * 0.01666667,
-  'Kansk (SS-25)',
-  10500,
-  54 + 2 * 0.01666667,
-  35 + 46 * 0.01666667,
-  'Kozel`sk (SS-19)',
-  10000,
-  56 + 22 * 0.01666667,
-  92 + 25 * 0.01666667,
-  'Krasnoyarsk (SS-25)',
-  10500,
-  58 + 4 * 0.01666667,
-  60 + 33 * 0.01666667,
-  'Nizhniy Tagil (SS-25)',
-  10500,
-  55 + 20 * 0.01666667,
-  83 + 0 * 0.01666667,
-  'Novosibirsk (SS-25)',
-  10500,
-  51 + 40 * 0.01666667,
-  45 + 34 * 0.01666667,
-  'Tatishchevo (SS-19)',
-  10000,
-  51 + 40 * 0.01666667,
-  45 + 34 * 0.01666667,
-  'Tatishchevo (SS-27)',
-  10500,
-  56 + 51 * 0.01666667,
-  40 + 32 * 0.01666667,
-  'Teykovo (SS-25)',
-  10500,
-  56 + 38 * 0.01666667,
-  47 + 51 * 0.01666667,
-  'Yoshkar Ola (SS-25)',
-  10500,
-  72.039545,
-  42.696683,
-  'Verkhoturye (SS-N-23A)',
-  8300,
-  73.902056,
-  3.133463,
-  'Ekaterinburg (SS-N-23A)',
-  8300,
-  76.502284,
-  -158.871984,
-  'Tula (SS-N-23A)',
-  8300,
-  82.25681,
-  -10.161045,
-  'Bryansk (SS-N-23A)',
-  8300,
-  81.564646,
-  32.553796,
-  'Karelia (SS-N-23A)',
-  8300,
-  74.67366,
-  6.538173,
-  'Novomoskovsk (SS-N-23A)',
-  8300,
-  71.920763,
-  41.039876,
-  'Borei Sub (Bulava)',
-  9300, // Sub
-  71.920763,
-  41.039876,
-  'Delta IV Sub (Sineva)',
-  8300, // Sub
-  71.920763,
-  41.039876,
-  'Delta IV Sub (Layner)',
-  12000, // Sub
-];
-const ChinaICBM = [
-  32.997534,
-  112.537904,
-  'Nanyang (DF-31)',
-  8000,
-  36.621398,
-  101.773908,
-  'Xining (DF-31)',
-  8000,
-  37.797257,
-  97.079547,
-  'Delingha (DF-31A)',
-  11000,
-  37.07045,
-  100.805779,
-  'Haiyan (DF-31A)',
-  11000,
-  40.079969,
-  113.29994,
-  'Datong (DF-31A)',
-  11000,
-  34.583156,
-  105.724525,
-  'Tainshui (DF-31A)',
-  11000,
-  38.552936,
-  106.020538,
-  'Xixia (DF-31A)',
-  11000,
-  27.242253,
-  111.465223,
-  'Shaoyang (DF-31A)',
-  11000,
-  24.34658,
-  102.527838,
-  'Yuxi (DF-31A)',
-  11000,
-  34.345845,
-  111.491062,
-  'Luoyang (DF-5A/B)',
-  13000,
-  38.917086,
-  111.847057,
-  'Wuzhai (DF-5A/B)',
-  13000,
-  40.615707,
-  115.107604,
-  'Xuanhua (DF-5A/B)',
-  13000,
-  26.163848,
-  109.790408,
-  'Tongdao (DF-5A/B)',
-  13000,
-  34.061291,
-  111.054379,
-  'Lushi (DF-5A/B)',
-  13000,
-  30.691542,
-  118.437169,
-  'Jingxian (DF-5A/B)',
-  13000,
-  37.707532,
-  116.271994,
-  'Jingxian (DF-5A/B)',
-  13000,
-  27.415932,
-  111.792471,
-  'Hunan (DF-5A/B)',
-  13000,
-  46.585153,
-  125.104037,
-  'Daqing City (DF-41)',
-  13500,
-  32.154153,
-  114.099875,
-  'Xinyang City (DF-41)',
-  13500,
-  40.4417,
-  85.530745,
-  'Xinjiang Province (DF-41)',
-  13500,
-  31.271257,
-  88.699152,
-  'Tibet Province (DF-41)',
-  13500,
-  29.573548,
-  122.923151,
-  'Type 092 Sub (JL-2)',
-  8000,
-];
-const NorthKoreanBM = [
-  40.0,
-  128.3,
-  'Sinpo Sub (Pukkŭksŏng-1)',
-  2500,
-  40.019,
-  128.193,
-  'Sinpo (KN-14)',
-  8000,
-  39.365,
-  126.165,
-  'P`yong`an (KN-20)',
-  10000,
-  39.046,
-  125.667,
-  'Pyongyang (KN-22)',
-  13000,
-];
-const UsaICBM = [
-  48.420079,
-  -101.33356,
-  'Ohio Sub (Trident II)',
-  12000,
-  48.420079,
-  -101.33356,
-  'Minot (Minuteman III)',
-  13000,
-  47.505958,
-  -111.181776,
-  'Malmstrom (Minuteman III)',
-  13000,
-  41.149931,
-  -104.860645,
-  'F.E. Warren (Minuteman III)',
-  13000,
-];
-const FraSLBM = [
-  47.878,
-  -4.263,
-  'Triomphant Sub (M51)',
-  10000, // Custom Lat/Lon Replaced
-  47.878,
-  -4.263,
-  'Triomphant Sub (M51)',
-  10000,
-];
-const ukSLBM = [56.066111, -4.8175, 'Vanguard Sub (Trident II)', 12000, 56.066111, -4.8175, 'HMNB Clyde (Trident II)', 12000];
-const globalBMTargets = [
-  38.951,
-  -77.013,
-  'Washington DC',
-  40.679,
-  -73.947,
-  'New York City',
-  34.073,
-  -118.248,
-  'Los Angeles',
-  41.877,
-  -87.622,
-  'Chicago',
-  42.361,
-  -71.058,
-  'Boston',
-  47.749,
-  -122.317,
-  'Seattle',
-  25.784,
-  -80.196,
-  'Miami',
-  32.828,
-  -96.759,
-  'Dallas',
-  38.765,
-  -104.837,
-  'Colorado Springs',
-  41.33,
-  -96.054,
-  'Omaha',
-  19.832,
-  -155.491,
-  'Hawaii',
-  13.588,
-  144.922,
-  'Guam',
-  51.50634,
-  -0.097485,
-  'London',
-  48.874195,
-  2.378987,
-  'Paris',
-  24.503,
-  -66.127,
-  'French Caribean',
-  40.449889,
-  -3.717309,
-  'Madrid',
-  41.931955,
-  12.520198,
-  'Rome',
-  52.501746,
-  13.416486,
-  'Berlin',
-  43.706946,
-  -79.423854,
-  'Toronto',
-  55.750246,
-  37.691525,
-  'Moscow',
-  59.887535,
-  30.38409,
-  'St. Petersburg',
-  55.017165,
-  82.965879,
-  'Novosibirsk',
-  39.974338,
-  116.396057,
-  'Beijing',
-  39.044051,
-  125.735244,
-  'Pyongyang',
-];
-const USATargets = [
-  40.679,
-  -73.947, // NYC NY
-  42.361,
-  -71.058, // Boston MA
-  41.755,
-  -70.539, // Cape Cod MA
-  41.763,
-  -72.684, // Hartford CT
-  42.101,
-  -72.59, // Springfield MA
-  39.408,
-  -74.441, // Atlantic City NJ
-  39.191,
-  -75.534, // Dover DE
-  39.331,
-  -76.671, // Baltimore MD
-  38.951,
-  -77.013, // Washington DC
-  37.608,
-  -77.378, // Richmond VA (10)
-  42.36,
-  -83.048, // Detriot MI
-  39.844,
-  -86.172, // Indianapolis IN
-  40.008,
-  -83.0, // Columbus OH
-  40.538,
-  -79.934, // Pittsburgh PA
-  40.034,
-  -75.131, // Philadelphia PA
-  47.749,
-  -122.317, // Seattle WA
-  45.7,
-  -122.581, // Portland OR
-  47.732,
-  -117.389, // Spokane WA
-  37.889,
-  -122.562, // San Francisco CA
-  36.257,
-  -115.159, // Las Vegas NV (20)
-  48.034,
-  -101.295, // Minot ND
-  49.134,
-  -101.495, // Minot ND
-  48.234,
-  -100.295, // Minot ND
-  48.334,
-  -101.095, // Minot ND
-  48.434,
-  -101.295, // Minot ND
-  47.948,
-  -97.027, // Grand Forks ND
-  45.107,
-  -93.306, // Minneapolis MN
-  47.092,
-  -110.334, // Grand Falls MO
-  47.292,
-  -111.834, // Grand Falls MO
-  47.592,
-  -111.934, // Grand Falls MO (30)
-  46.792,
-  -111.334, // Grand Falls MO
-  47.992,
-  -111.534, // Grand Falls MO
-  47.792,
-  -110.734, // Grand Falls MO
-  48.592,
-  -111.534, // Grand Falls MO
-  47.292,
-  -111.334, // Grand Falls MO
-  46.092,
-  -111.134, // Grand Falls MO
-  47.592,
-  -110.034, // Grand Falls MO
-  40.21,
-  -104.811, // Cheyene WY
-  41.51,
-  -105.811, // Cheyene WY
-  41.21,
-  -104.211, // Cheyene WY (40)
-  40.51,
-  -104.211, // Cheyene WY
-  41.21,
-  -105.611, // Cheyene WY
-  41.51,
-  -104.611, // Cheyene WY
-  41.21,
-  -103.011, // Cheyene WY
-  42.21,
-  -104.011, // Cheyene WY
-  41.91,
-  -104.811, // Cheyene WY
-  41.91,
-  -104.811, // Cheyene WY
-  34.048,
-  -118.28, // Las Angeles CA
-  19.832,
-  -155.491, // Hawaii
-  13.588,
-  144.922, // Guam (50)
-  36.318,
-  -86.718, // Nashville TN
-  32.782,
-  -97.343, // Forth Worth TX
-  32.584,
-  -99.707, // Abilene TX
-  35.208,
-  -101.837, // Amarillo TX
-  35.188,
-  -106.595, // Albuquerque NM
-  33.603,
-  -111.965, // Phoenix AZ
-  38.765,
-  -104.837, // Colorado Springs CO
-  38.737,
-  -104.883, // Cheyenne Moutain CO
-  39.847,
-  -104.902, // Denver CO
-  40.684,
-  -105.059, // Fort Collins CO (60)
-  40.852,
-  -111.827, // Salt Lake City UT
-  61.343,
-  -150.187, // Anchorage AK
-  64.94,
-  -147.881, // Fairbanks AK
-  58.488,
-  -134.238, // Juneau AK
-  30.46,
-  -86.549, // Eglin AFB FL
-  41.33,
-  -96.054, // Omaha NE
-  39.113276,
-  -121.356137, // Beale AFB
-  64.303735,
-  -149.148768, // Clear AFS
-  76.534322,
-  -68.718288, // Thule AFB
-  41.875523,
-  -87.634038, // Chicago IL
-  35.145865,
-  -89.979153, // Memphis TN
-  43.663448,
-  -70.278127, // Portland MA
-  43.612156,
-  -116.231845, // Boise ID
-];
 
 export type MissileManager = typeof missileManager;
 const missileManager = {

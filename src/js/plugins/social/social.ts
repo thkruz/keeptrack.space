@@ -1,36 +1,39 @@
 import githubPng from '@app/img/icons/github.png';
-import twitterPng from '@app/img/icons/twitter.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import $ from 'jquery';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { getEl } from '@app/js/lib/get-el';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerFinal',
-    cbName: 'social',
-    cb: () => {
-      // Bottom Icon
-      (<any>$('#nav-mobile2')).prepend(keepTrackApi.html`
-        <li>
+export class SocialMedia extends KeepTrackPlugin {
+  dependencies = ['Top Menu'];
+  constructor() {
+    const PLUGIN_NAME = 'Social Media';
+    super(PLUGIN_NAME);
+  }
+
+  addHtml() {
+    super.addHtml();
+    keepTrackApi.register({
+      method: 'uiManagerFinal',
+      cbName: this.PLUGIN_NAME,
+      cb: SocialMedia.uiManagerFinal_,
+    });
+  }
+
+  private static uiManagerFinal_(): void {
+    // Bottom Icon
+    const githubShareElement = document.createElement('li');
+    githubShareElement.innerHTML = keepTrackApi.html`
           <a id="github-share1" class="top-menu-btns" rel="noreferrer" href="https://github.com/thkruz/keeptrack.space/" target="_blank">
             <img
             width="22"
             height="22"
             style="margin-top: 1px;"
-            src="${githubPng}" 
+            src="${githubPng}"
             />
           </a>
-        </li>
-        <li>
-          <a id="twitter-share1" class="top-menu-btns" rel="noreferrer" href="https://twitter.com/intent/tweet?text=http://keeptrack.space" target="_blank">
-            <img
-            width="25"
-            height="25"
-            src="${twitterPng}" 
-            />
-          </a>
-        </li>
-      `);
-    },
-  });
-};
+          `;
+    getEl('nav-mobile2').insertBefore(githubShareElement, getEl('nav-mobile2').firstChild);
+  }
+}
+
+export const socialMediaPlugin = new SocialMedia();

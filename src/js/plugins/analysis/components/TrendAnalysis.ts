@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const OrbitOptionGroup = keepTrackApi.html`
   <optgroup label="Orbital Parameters">
@@ -19,7 +19,7 @@ export const RaeOptionGroup = keepTrackApi.html`
     <option value='rae'>All</option>
   </optgroup>`;
 
-export const TrendAnalysis = keepTrackApi.html`    
+export const TrendAnalysis = keepTrackApi.html`
   <form id="analysis-form">
     <div class="row">
       <div class="input-field col s12">

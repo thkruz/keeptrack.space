@@ -1,6 +1,6 @@
 import './PlotAnalysisSideMenu.css';
 
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const PlotAnalysisSideMenu = keepTrackApi.html`
       <div id="plot-analysis-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">

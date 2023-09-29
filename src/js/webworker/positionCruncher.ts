@@ -3,7 +3,7 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2022 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
@@ -25,20 +25,30 @@
  */
 
 import numeric from 'numeric';
-import { EciVec3, LlaVec3, SatelliteRecord, Sgp4, Transforms, Utils } from 'ootk';
-import { SensorObjectCruncher } from '../api/keepTrackTypes';
-import { SpaceObjectType } from '../api/SpaceObjectType';
+import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, LlaVec3, Minutes, Radians, SatelliteRecord, Sgp4, Transforms, Utils } from 'ootk';
+import { SensorObjectCruncher } from '../interfaces';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, PI, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN, STAR_DISTANCE, TAU } from '../lib/constants';
-import { defaultGd, emptySensor, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg, SatCacheObject } from './constants';
-import { createLatLonHei, isInFov, isInValidElevation, isSensorDeepSpace, lookAnglesToEcf, setupTimeVariables } from './positionCruncher/calculations';
+import { SpaceObjectType } from '../lib/space-object-type';
+import { PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg, SatCacheObject, defaultGd, emptySensor } from './constants';
+import { createLatLonAlt, isInFov, isInValidElevation, isSensorDeepSpace, lookAnglesToEcf, setupTimeVariables } from './positionCruncher/calculations';
 import { resetPosition, resetVelocity, setPosition } from './positionCruncher/satCache';
 
 interface CruncherSat {
-  static: any;
-  missile: any;
-  isRadarData: any;
+  static: boolean;
+  missile: boolean;
+  lat?: number;
+  lon?: number;
+  isRadarData: boolean;
   TLE1: string;
   TLE2: string;
+}
+
+// Ensure this matches SatMath.ts but don't import it because of dependencies
+enum SunStatus {
+  UNKNOWN = -1,
+  UMBRAL = 0,
+  PENUMBRAL = 1,
+  SUN = 2,
 }
 
 const SunMath = Utils.SunMath;
@@ -49,8 +59,8 @@ const EMPTY_INT8_ARRAY = new Int8Array(0);
 /** ARRAYS */
 let satCache = <SatCacheObject[]>[]; // Cache of Satellite Data from TLE.json and Static Data from variable.js
 
-let cruncherStarLat = 0;
-let cruncherStarLon = 188; // TODO: This is a hack.
+let cruncherStarLat = <Degrees>0;
+let cruncherStarLon = <Degrees>188; // TODO: This is a hack.
 
 let satPos = EMPTY_FLOAT32_ARRAY; // Array of current Satellite and Static Positions
 let satVel = EMPTY_FLOAT32_ARRAY; // Array of current Satellite and Static Velocities
@@ -106,7 +116,7 @@ try {
 // prettier-ignore
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSONAR
   let satData: CruncherSat[];
-  let i;
+  let i = 0;
   let extraData = [];
   let satrec: SatCacheObject;
 
@@ -128,16 +138,16 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       while (i < len) {
         const extraRec = {
           lowAlt: <number>null,
-          inclination: <number>null,
+          inclination: <Radians>null,
           eccentricity: <number>null,
-          raan: <number>null,
-          argPe: <number>null,
+          raan: <Radians>null,
+          argPe: <Radians>null,
           meanMotion: <number>null,
           semiMajorAxis: <number>null,
           semiMinorAxis: <number>null,
-          apogee: <number>null,
-          perigee: <number>null,
-          period: <number>null,
+          apogee: <Kilometers>null,
+          perigee: <Kilometers>null,
+          period: <Minutes>null,
         };
         satrec = null;
         if (satData[i].static || satData[i].missile || satData[i].isRadarData) {
@@ -153,17 +163,17 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
             satData[i].TLE2
           );
           extraRec.lowAlt = satrec.isimp;
-          extraRec.inclination = satrec.inclo; // rads
+          extraRec.inclination = <Radians>(satrec.inclo);
           extraRec.eccentricity = satrec.ecco;
-          extraRec.raan = satrec.nodeo; // rads
-          extraRec.argPe = satrec.argpo; // rads
+          extraRec.raan = <Radians>(satrec.nodeo);
+          extraRec.argPe = <Radians>(satrec.argpo);
           extraRec.meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
           extraRec.semiMajorAxis = Math.pow(8681663.653 / extraRec.meanMotion, 2 / 3);
           extraRec.semiMinorAxis = extraRec.semiMajorAxis * Math.sqrt(1 - Math.pow(extraRec.eccentricity, 2));
-          extraRec.apogee = extraRec.semiMajorAxis * (1 + extraRec.eccentricity) - RADIUS_OF_EARTH;
+          extraRec.apogee = <Kilometers>(extraRec.semiMajorAxis * (1 + extraRec.eccentricity) - RADIUS_OF_EARTH);
           satrec.apogee = extraRec.apogee;
-          extraRec.perigee = extraRec.semiMajorAxis * (1 - extraRec.eccentricity) - RADIUS_OF_EARTH;
-          extraRec.period = 1440.0 / extraRec.meanMotion;
+          extraRec.perigee = <Kilometers>(extraRec.semiMajorAxis * (1 - extraRec.eccentricity) - RADIUS_OF_EARTH);
+          extraRec.period = <Minutes>(1440.0 / extraRec.meanMotion);
 
           extraData.push(extraRec);
           delete satrec['id'];
@@ -173,7 +183,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       }
 
       satPos = new Float32Array(len * 3);
-      satVel = new Float32Array(len * 3);            
+      satVel = new Float32Array(len * 3);
 
       try {
         postMessage({
@@ -205,8 +215,8 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
         apogee: <number>null,
         perigee: <number>null,
         period: <number>null,
-        TLE1: <number>null,
-        TLE2: <number>null,
+        TLE1: <string>null,
+        TLE2: <string>null,
       };
       // keplerian elements
       extra.inclination = satrec.inclo; // rads
@@ -219,12 +229,12 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, 2 / 3);
       extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
       extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH;
-      satCache[m.data.id].apogee = extra.apogee; // This has to be updated or analyst satellites will fail automatically
+      satCache[m.data.id].apogee = <Kilometers>(extra.apogee); // This has to be updated or analyst satellites will fail automatically
       extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH;
       extra.period = 1440.0 / extra.meanMotion;
       extra.TLE1 = m.data.TLE1;
       extra.TLE2 = m.data.TLE2;
-      extraData.push(extra);      
+      extraData.push(extra);
       if (isThisJest) return;
       // istanbul ignore next
       postMessage({
@@ -235,7 +245,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       isInterupted = true;
       break;
     case 'newMissile':
-      satCache[m.data.id] = m.data;
+      satCache[m.data.id] = <SatCacheObject><unknown>(m.data);
       break;
     case 'satelliteSelected':
       satelliteSelected = m.data.satelliteSelected;
@@ -248,7 +258,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
       if (m.data.multiSensor) {
         isMultiSensor = true;
         mSensor = m.data.sensor;
-        sensor = m.data.sensor;
+        sensor = <SensorObjectCruncher><unknown>m.data.sensor;
         globalPropagationRateMultiplier = 2;
         if (!isResetInView) isResetInView = true;
       } else if (m.data.sensor) {
@@ -262,9 +272,9 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
           } else {
             globalPropagationRateMultiplier = 2;
             sensor.observerGd = {
-              lon: m.data.sensor[0].lon * DEG2RAD,
-              lat: m.data.sensor[0].lat * DEG2RAD,
-              alt: parseFloat(m.data.sensor[0].alt),
+              lon: <Radians>(m.data.sensor[0].lon * DEG2RAD),
+              lat: <Radians>(m.data.sensor[0].lat * DEG2RAD),
+              alt: <Kilometers>parseFloat(<string><unknown>m.data.sensor[0].alt),
             };
             if (!isResetInView) isResetInView = true;
           }
@@ -369,13 +379,16 @@ export const propagationLoop = (mockSatCache?: SatCacheObject[]) => {
   isInterupted = false;
 
   // The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(() => {
-    propagationLoop();
-  }, (globalPropagationRate * globalPropagationRateMultiplier) / divisor);
+  setTimeout(
+    () => {
+      propagationLoop();
+    },
+    (globalPropagationRate * globalPropagationRateMultiplier) / divisor
+  );
 };
 
 // prettier-ignore
-export const updateSatCache = (now: Date, j: number, gmst: number, gmstNext: number, isSunExclusion: boolean, sunEci: { x: number; y: number; z: number }) => { // NOSONAR
+export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSiderealTime, gmstNext: number, isSunExclusion: boolean, sunEci: { x: number; y: number; z: number }) => { // NOSONAR
   // TODO: When this was created chrome was faster doing a reverse while loop - that may not be true anymore
   let i = -1;
   while (i < len) {
@@ -427,7 +440,7 @@ export const updateRadarData = (i: number): boolean => {
 };
 
 // prettier-ignore
-export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONAR
+export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): number => { // NOSONAR
   if (isResetSatOverfly && satCache[i].active === true) {
     // Let the main loop know what i we ended on
     return i;
@@ -456,7 +469,7 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
       // Find the Lat/Long of the Selected Satellite
       satSelGeodetic = Transforms.eci2lla(satSelPos, gmst); // pv.position is called positionEci originally
       satHeight = satSelGeodetic.alt;
-      satSelPosEarth = createLatLonHei(satSelGeodetic.lat, satSelGeodetic.lon, 1);
+      satSelPosEarth = createLatLonAlt(satSelGeodetic.lat, satSelGeodetic.lon, <Kilometers>1);
 
       deltaLatInt = 1;
       if (satHeight < 2500 && selectedSatFOV <= 60) deltaLatInt = 0.5;
@@ -480,7 +493,7 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
           // Add Long
           // //////////
           lon = satSelGeodetic.lon + deltaLon * DEG2RAD;
-          satSelPosEarth = createLatLonHei(lat, lon, 15);
+          satSelPosEarth = createLatLonAlt(lat, lon, <Kilometers>15);
           // Find the Az/El of the position on the earth
           lookangles = Transforms.ecf2rae(satSelPosEarth, satSelPosEcf);
 
@@ -501,7 +514,7 @@ export const updateSatOverfly = (i: number, gmst: number): number => { // NOSONA
           // //////////
           if (deltaLon === 0 || deltaLon === 180) continue; // Don't Draw Two Dots On the Center Line
           lon = satSelGeodetic.lon - deltaLon * DEG2RAD;
-          satSelPosEarth = createLatLonHei(lat, lon, 15);
+          satSelPosEarth = createLatLonAlt(lat, lon, <Kilometers>15);
           // Find the Az/El of the position on the earth
           lookangles = Transforms.ecf2rae(satSelPosEarth, satSelPosEcf);
 
@@ -531,7 +544,7 @@ export const updateStar = (i: number, now: Date): void => {
   // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
   // WARNING: 180 and 0 really matter...unclear why
   const starPosition = SunMath.getStarAzEl(now, cruncherStarLat, cruncherStarLon, satCache[i].ra, satCache[i].dec);
-  const pos = lookAnglesToEcf(starPosition.az * RAD2DEG, starPosition.el * RAD2DEG, STAR_DISTANCE, 0, 0, 0);
+  const pos = lookAnglesToEcf(<Degrees>(starPosition.az * RAD2DEG), <Degrees>(starPosition.el * RAD2DEG), STAR_DISTANCE, <Radians>0, <Radians>0, <Kilometers>0);
 
   // Reduce Random Jitter by Requiring New Positions to be Similar to Old
   // THIS MIGHT BE A HORRIBLE
@@ -542,7 +555,7 @@ export const updateStar = (i: number, now: Date): void => {
   // if (satPos[i * 3 + 1] === 0 || (satPos[i * 3 + 1] - pos.y < 0.1 && satPos[i * 3 + 1] - pos.y > -0.1)) satPos[i * 3 + 1] = pos.y;
   // if (satPos[i * 3 + 2] === 0 || (satPos[i * 3 + 2] - pos.z < 0.1 && satPos[i * 3 + 2] - pos.z > -0.1)) satPos[i * 3 + 2] = pos.z;
 };
-export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: number): boolean => {
+export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: GreenwichMeanSiderealTime): boolean => {
   if (!satCache[i].active) {
     satPos[i * 3] = 0;
     satPos[i * 3 + 1] = 0;
@@ -593,9 +606,9 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: numb
 
   satCache[i].lastTime = curMissivarTime;
 
-  const x = satPos[i * 3];
-  const y = satPos[i * 3 + 1];
-  const z = satPos[i * 3 + 2];
+  const x = <Kilometers>satPos[i * 3];
+  const y = <Kilometers>satPos[i * 3 + 1];
+  const z = <Kilometers>satPos[i * 3 + 2];
 
   const positionEcf = Transforms.eci2ecf({ x, y, z }, gmst);
   if (Transforms.eci2lla({ x, y, z }, gmst).alt <= 150 && satCache[i].missile === false) {
@@ -607,7 +620,7 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: numb
   satInView[i] = isInFov(rae, sensor);
   return true;
 };
-export const updateLandObject = (i: number, gmst: number): void => {
+export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): void => {
   const cosLat = Math.cos(satCache[i].lat * DEG2RAD);
   const sinLat = Math.sin(satCache[i].lat * DEG2RAD);
   const cosLon = Math.cos(satCache[i].lon * DEG2RAD + gmst);
@@ -618,14 +631,14 @@ export const updateLandObject = (i: number, gmst: number): void => {
 };
 
 // prettier-ignore
-export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number, isSunExclusion: boolean): boolean => { // NOSONAR
+export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunEci: any, j: number, isSunExclusion: boolean): boolean => { // NOSONAR
   let semiDiamEarth, semiDiamSun, theta;
   let positionEcf, lookangles;
 
   // Skip reentries
   if (satCache[i].skip) return false;
   const m = (j - satCache[i].jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-  const pv = Sgp4.propagate(<any>satCache[i], m) as {position:EciVec3, velocity: EciVec3};
+  const pv = Sgp4.propagate(<any>satCache[i], m) as { position: EciVec3, velocity: EciVec3 };
 
   try {
     satPos[i * 3] = pv.position.x;
@@ -689,10 +702,10 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
 
     positionEcf = 0;
     lookangles = 0;
-  }  
-  
+  }
+
   if (isSunlightView) {
-    satInSun[i] = 2; // Default in case
+    satInSun[i] = SunStatus.SUN;
     semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2))) * RAD2DEG;
     semiDiamSun =
       Math.asin(RADIUS_OF_SUN / Math.sqrt(Math.pow(-satPos[i * 3] + sunEci.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunEci.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunEci.z, 2))) *
@@ -702,23 +715,23 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
     theta =
       Math.acos(
         <number>numeric.dot([-satPos[i * 3], -satPos[i * 3 + 1], -satPos[i * 3 + 2]], [-satPos[i * 3] + sunEci.x, -satPos[i * 3 + 1] + sunEci.y, -satPos[i * 3 + 2] + sunEci.z]) /
-          (Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2)) *
-            Math.sqrt(Math.pow(-satPos[i * 3] + sunEci.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunEci.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunEci.z, 2)))
+        (Math.sqrt(Math.pow(-satPos[i * 3], 2) + Math.pow(-satPos[i * 3 + 1], 2) + Math.pow(-satPos[i * 3 + 2], 2)) *
+          Math.sqrt(Math.pow(-satPos[i * 3] + sunEci.x, 2) + Math.pow(-satPos[i * 3 + 1] + sunEci.y, 2) + Math.pow(-satPos[i * 3 + 2] + sunEci.z, 2)))
       ) * RAD2DEG;
     if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
-      satInSun[i] = 0; // Umbral
+      satInSun[i] = SunStatus.UMBRAL;
     }
 
     if (Math.abs(semiDiamEarth - semiDiamSun) < theta && theta < semiDiamEarth + semiDiamSun) {
-      satInSun[i] = 1; // Penumbral
+      satInSun[i] = SunStatus.PENUMBRAL;
     }
 
     if (semiDiamSun > semiDiamEarth) {
-      satInSun[i] = 1; // Penumbral
+      satInSun[i] = SunStatus.PENUMBRAL;
     }
 
     if (theta < semiDiamSun - semiDiamEarth) {
-      satInSun[i] = 1; // Penumbral
+      satInSun[i] = SunStatus.PENUMBRAL;
     }
   }
 
@@ -726,14 +739,14 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
     satInView[i] = 0; // 0 = FALSE - Default in case no sensor selected
     if (isMultiSensor) {
       for (let s = 0; s < mSensor.length; s++) {
-        // Skip satellites in the sun if you are an optical sensor
-        if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === 0)) {
+        // Skip satellites in the dark if you are an optical sensor
+        if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
           if (satInView[i]) break;
           sensor = mSensor[s];
           sensor.observerGd = {
-            lon: sensor.lon * DEG2RAD,
-            lat: sensor.lat * DEG2RAD,
-            alt: sensor.alt * 1, // Convert from string
+            lon: <Radians>(sensor.lon * DEG2RAD),
+            lat: <Radians>(sensor.lat * DEG2RAD),
+            alt: <Kilometers>(sensor.alt * 1), // Convert from string
           };
           try {
             positionEcf = Transforms.eci2ecf(<EciVec3>pv.position, gmst); // pv.position is called positionEci originally
@@ -745,7 +758,7 @@ export const updateSatellite = (i: number, gmst: number, sunEci: any, j: number,
         }
       }
     } else {
-      if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === 0)) {
+      if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
         satInView[i] = isInFov(lookangles, sensor);
       }
     }
@@ -767,8 +780,8 @@ export const resetInactiveMarkers = (i: number) => {
 };
 
 // prettier-ignore
-export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
-  let az: number, el: number, rng: number;
+export const updateMarkerFov = (i: number, gmst: GreenwichMeanSiderealTime): number => { // NOSONAR
+  let az: Degrees, el: Degrees, rng: Kilometers;
   let pos;
   let q: number, q2: number;
   if (!isMultiSensor && sensor.observerGd?.lat !== null) {
@@ -781,7 +794,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
     // We intentionally go past the last sensor so we can record the last marker's id
     if (s === mSensor.length) break;
     sensor = mSensor[s];
-    sensor.observerGd = createLatLonHei(sensor.lat * DEG2RAD, sensor.lon * DEG2RAD, sensor.alt);
+    sensor.observerGd = createLatLonAlt(<Radians>(sensor.lat * DEG2RAD), <Radians>(sensor.lon * DEG2RAD), sensor.alt);
     resetPosition(satPos, i);
     resetVelocity(satVel, i);
 
@@ -803,9 +816,9 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         // //////////////////////////////////
         // Min AZ FOV
         // //////////////////////////////////
-        for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+        for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
           az = sensor.obsminaz;
-          for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
+          for (el = sensor.obsminel; el < sensor.obsmaxel; el = <Degrees>(el + q)) {
             pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
             try {
               satCache[i].active = true;
@@ -822,9 +835,9 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         // //////////////////////////////////
         // Max AZ FOV
         // //////////////////////////////////
-        for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+        for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
           az = sensor.obsmaxaz;
-          for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
+          for (el = sensor.obsminel; el < sensor.obsmaxel; el = <Degrees>(el + q)) {
             pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
             try {
               satCache[i].active = true;
@@ -846,9 +859,9 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           // //////////////////////////////////
           // Min AZ 2 FOV
           // //////////////////////////////////
-          for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+          for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
             az = sensor.obsminaz2;
-            for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
+            for (el = sensor.obsminel2; el < sensor.obsmaxel2; el = <Degrees>(el + q)) {
               pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
               satCache[i].active = true;
               satPos = setPosition(satPos, i, pos);
@@ -860,9 +873,9 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           // //////////////////////////////////
           // Max AZ 2 FOV
           // //////////////////////////////////
-          for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+          for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
             az = sensor.obsmaxaz2;
-            for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
+            for (el = sensor.obsminel2; el < sensor.obsmaxel2; el = <Degrees>(el + q)) {
               pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
               satCache[i].active = true;
               satPos = setPosition(satPos, i, pos);
@@ -874,9 +887,9 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
 
         // Only on 360 FOV
       } else {
-        for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
+        for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
           el = sensor.obsmaxel;
-          for (az = sensor.obsminaz; az < sensor.obsmaxaz; az += q) {
+          for (az = sensor.obsminaz; az < sensor.obsmaxaz; el = <Degrees>(el + q)) {
             pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
             try {
               satCache[i].active = true;
@@ -895,8 +908,8 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
     // Top of FOV for Small FOV
     // //////////////////////////////////
     if (sensor.obsmaxel - sensor.obsminel < 20) {
-      for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
-        for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+      for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
+        for (az = <Degrees>0; az < Math.max(360, sensor.obsmaxaz); az = <Degrees>(az + q)) {
           if (sensor.obsminaz > sensor.obsmaxaz) {
             if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
               // Intentional
@@ -931,8 +944,8 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
       // Floor of FOV
       // //////////////////////////////////
       q = 2;
-      for (rng = Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng += Math.min(sensor.obsmaxrange2, 60000) / q2) {
-        for (az = 0; az < 360; az += 1 * q) {
+      for (rng = <Kilometers>Math.max(sensor.obsminrange2, 100); rng < Math.min(sensor.obsmaxrange2, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange2, 60000) / q2)) {
+        for (az = <Degrees>0; az < 360; az = <Degrees>(az + (1 * q))) {
           if (sensor.obsminaz2 > sensor.obsmaxaz2) {
             if (az >= sensor.obsminaz2 || az <= sensor.obsmaxaz2) {
               // Intentional
@@ -948,7 +961,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           }
           pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel2, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
           if (i === len) {
-            
+
             break;
           }
           satCache[i].active = true;
@@ -965,8 +978,8 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
       // //////////////////////////////////
       // Outside Edge of FOV
       // //////////////////////////////////
-      rng = Math.min(sensor.obsmaxrange, 60000);
-      for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+      rng = <Kilometers>Math.min(sensor.obsmaxrange, 60000);
+      for (az = <Degrees>0; az < Math.max(360, sensor.obsmaxaz); az = <Degrees>(az + q)) {
         if (sensor.obsminaz > sensor.obsmaxaz) {
           if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
             // Intentional
@@ -980,10 +993,10 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
             continue;
           }
         }
-        for (el = sensor.obsminel; el < sensor.obsmaxel; el += q) {
+        for (el = sensor.obsminel; el < sensor.obsmaxel; el = <Degrees>(el + q)) {
           pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
           if (i === len) {
-            
+
             break;
           }
           satCache[i].active = true;
@@ -1000,8 +1013,8 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         // //////////////////////////////////
         // Outside of FOV
         // //////////////////////////////////
-        rng = Math.min(sensor.obsmaxrange2, 60000);
-        for (az = 0; az < Math.max(360, sensor.obsmaxaz2); az += q) {
+        rng = <Kilometers>Math.min(sensor.obsmaxrange2, 60000);
+        for (az = <Degrees>0; az < Math.max(360, sensor.obsmaxaz2); az = <Degrees>(az + q)) {
           if (sensor.obsminaz2 > sensor.obsmaxaz2) {
             if (az >= sensor.obsminaz2 || az <= sensor.obsmaxaz2) {
               // Intentional
@@ -1015,10 +1028,10 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
               continue;
             }
           }
-          for (el = sensor.obsminel2; el < sensor.obsmaxel2; el += q) {
+          for (el = sensor.obsminel2; el < sensor.obsmaxel2; el = <Degrees>(el + q)) {
             pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
             if (i === len) {
-              
+
               break;
             }
             satCache[i].active = true;
@@ -1034,10 +1047,10 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
     // Floor of FOV
     // //////////////////////////////////
     q = 0.25;
-    
+
     // Calculate minimum range circle
     rng = sensor.obsmaxrange
-    for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+    for (az = <Degrees>0; az < Math.max(360, sensor.obsmaxaz); az = <Degrees>(az + q)) {
       if (sensor.obsminaz > sensor.obsmaxaz) {
         if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
           // Intentional
@@ -1053,7 +1066,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
       }
       pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
       if (i === len) {
-        
+
         break;
       }
       satCache[i].active = true;
@@ -1064,7 +1077,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
 
     // Calculate maximum range cirlce
     rng = sensor.obsminrange;
-    for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+    for (az = <Degrees>0; az < Math.max(360, sensor.obsmaxaz); az = <Degrees>(az + q)) {
       if (sensor.obsminaz > sensor.obsmaxaz) {
         if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
           // Intentional
@@ -1080,7 +1093,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
       }
       pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
       if (i === len) {
-        
+
         break;
       }
       satCache[i].active = true;
@@ -1090,8 +1103,8 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
     }
 
     if (sensor.obsmaxrange - sensor.obsminrange < 720) {
-      for (rng = Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng += Math.min(sensor.obsmaxrange, 60000) / q2) {
-        for (az = 0; az < Math.max(360, sensor.obsmaxaz); az += q) {
+      for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
+        for (az = <Degrees>0; az < Math.max(360, sensor.obsmaxaz); az = <Degrees>(az + q)) {
           if (sensor.obsminaz > sensor.obsmaxaz) {
             if (az >= sensor.obsminaz || az <= sensor.obsmaxaz) {
               // Intentional
@@ -1107,7 +1120,7 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
           }
           pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
           if (i === len) {
-            
+
             break;
           }
           satCache[i].active = true;
@@ -1120,11 +1133,11 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
 
     if (sensor.obsminaz !== sensor.obsmaxaz && sensor.obsminaz !== sensor.obsmaxaz - 360) {
       q = (sensor.obsmaxrange - sensor.obsminrange) / 5555; // Space the left and right edge out equally between LEO and GEO sensors
-      for (az = sensor.obsmaxaz; az === sensor.obsmaxaz; az += 1) {
-        for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
+      for (az = sensor.obsmaxaz; az === sensor.obsmaxaz; az = <Degrees>(az + 1)) {
+        for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng = <Kilometers>(rng + q)) {
           pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
           if (i === len) {
-            
+
             break;
           }
           satCache[i].active = true;
@@ -1134,11 +1147,11 @@ export const updateMarkerFov = (i: number, gmst: number): number => { // NOSONAR
         }
       }
 
-      for (az = sensor.obsminaz; az === sensor.obsminaz; az += 1) {
-        for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng += q) {
+      for (az = sensor.obsminaz; az === sensor.obsminaz; az = <Degrees>(az + 1)) {
+        for (rng = sensor.obsminrange; rng < sensor.obsmaxrange; rng = <Kilometers>(rng + q)) {
           pos = Transforms.ecf2eci(lookAnglesToEcf(az, sensor.obsminel, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
           if (i === len) {
-            
+
             break;
           }
           satCache[i].active = true;

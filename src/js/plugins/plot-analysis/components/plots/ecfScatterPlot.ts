@@ -1,5 +1,8 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
 import * as echarts from 'echarts';
+
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, Singletons } from '@app/js/interfaces';
+import { SatMathApi } from '@app/js/singletons/sat-math-api';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -101,15 +104,15 @@ export const createEcfScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
 
 export const getEcfScatterData = () => {
   const NUMBER_OF_POINTS = 100;
-  const { satSet, objectManager, satellite } = keepTrackApi.programs;
-
   const data = [];
-  let sat = satSet.getSat(objectManager.selectedSat);
-  data.push({ name: sat.name, value: satellite.getEcfOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
-  const lastSat = objectManager.lastSelectedSat();
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+
+  let sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+  data.push({ name: sat.name, value: SatMathApi.getEcfOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+  const lastSat = catalogManagerInstance.lastSelectedSat();
   if (lastSat !== -1) {
-    sat = satSet.getSat(lastSat);
-    data.push({ name: sat.name, value: satellite.getEcfOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+    sat = catalogManagerInstance.getSat(lastSat);
+    data.push({ name: sat.name, value: SatMathApi.getEcfOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
   }
 
   return data;

@@ -1,6 +1,6 @@
 import * as Ootk from 'ootk';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU } from '../lib/constants';
-import { jday } from '../timeManager/transforms';
+import { jday } from '../lib/transforms';
 import { propTime } from './positionCruncher/calculations';
 
 let dynamicOffsetEpoch: number;
@@ -26,7 +26,7 @@ try {
 export const onmessageProcessing = (m: {
   data: {
     missile?: any;
-    satSet?: any;
+    catalogManagerInstance?: any;
     satId?: number;
     isUpdate?: boolean;
     orbitType?: number;
@@ -164,7 +164,7 @@ export const onmessageProcessing = (m: {
           i++;
         }
       } else if (orbitType === 2) {
-        while (i < len) {          
+        while (i < len) {
           const t = now - i * timeslice;
           p = Ootk.Sgp4.propagate(satCache[satId], t)?.position;
           // eslint-disable-next-line no-constant-condition

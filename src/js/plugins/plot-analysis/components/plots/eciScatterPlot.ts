@@ -1,6 +1,9 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { EciPos } from '@app/js/api/keepTrackTypes';
 import * as echarts from 'echarts';
+
+import { keepTrackContainer } from '@app/js/container';
+import { CatalogManager, Singletons } from '@app/js/interfaces';
+import { EciVec3 } from 'ootk';
+import { SatMathApi } from '@app/js/singletons/sat-math-api';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -44,12 +47,12 @@ export const createEciScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
 
   // Get the Data
   const dataRange = data.reduce((range, sat) => {
-    const minDataX = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[0]), Infinity);
-    const maxDataX = sat.value.reduce((max: number, item: EciPos) => Math.max(max, item[0]), -Infinity);
-    const minDataY = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[1]), Infinity);
-    const maxDataY = sat.value.reduce((max: number, item: EciPos) => Math.max(max, item[1]), -Infinity);
-    const minDataZ = sat.value.reduce((min: number, item: EciPos) => Math.min(min, item[2]), Infinity);
-    const maxDataZ = sat.value.reduce((max: number, item: EciPos) => Math.max(max, item[2]), -Infinity);
+    const minDataX = sat.value.reduce((min: number, item: EciVec3) => Math.min(min, item[0]), Infinity);
+    const maxDataX = sat.value.reduce((max: number, item: EciVec3) => Math.max(max, item[0]), -Infinity);
+    const minDataY = sat.value.reduce((min: number, item: EciVec3) => Math.min(min, item[1]), Infinity);
+    const maxDataY = sat.value.reduce((max: number, item: EciVec3) => Math.max(max, item[1]), -Infinity);
+    const minDataZ = sat.value.reduce((min: number, item: EciVec3) => Math.min(min, item[2]), Infinity);
+    const maxDataZ = sat.value.reduce((max: number, item: EciVec3) => Math.max(max, item[2]), -Infinity);
     const minData = Math.round(Math.min(minDataX, minDataY, minDataZ) / 1000) * 1000;
     const maxData = Math.round(Math.max(maxDataX, maxDataY, maxDataZ) / 1000) * 1000;
     const _dataRange = Math.max(maxData, Math.abs(minData));
@@ -123,15 +126,15 @@ export const createEciScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
 
 export const getEciScatterData = () => {
   const NUMBER_OF_POINTS = 100;
-  const { satSet, objectManager, satellite } = keepTrackApi.programs;
-
   const data = [];
-  let sat = satSet.getSat(objectManager.selectedSat);
-  data.push({ name: sat.name, value: satellite.getEciOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
-  const lastSat = objectManager.lastSelectedSat();
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+
+  let sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+  data.push({ name: sat.name, value: SatMathApi.getEciOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+  const lastSat = catalogManagerInstance.lastSelectedSat();
   if (lastSat !== -1) {
-    sat = satSet.getSat(lastSat);
-    data.push({ name: sat.name, value: satellite.getEciOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+    sat = catalogManagerInstance.getSat(lastSat);
+    data.push({ name: sat.name, value: SatMathApi.getEciOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
   }
 
   return data;

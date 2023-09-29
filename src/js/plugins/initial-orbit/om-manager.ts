@@ -6,7 +6,7 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2022 Theodore Kruczek
+ * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2022 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
@@ -31,14 +31,15 @@
 
 'use strict';
 
-import { CatalogManager } from '@app/js/satSet/satSet';
-import { SatObject } from '@app/js/api/keepTrackTypes';
-import { TimeManager } from '@app/js/timeManager/timeManager';
-import { searchBox } from '@app/js/uiManager/search/searchBox';
+import { keepTrackContainer } from '@app/js/container';
+import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { CatalogManager, SatObject, Singletons } from '@app/js/interfaces';
+import { EARTHS_GRAV_CONST } from '@app/js/lib/constants';
+import { StandardCatalogManager } from '@app/js/singletons/catalog-manager';
+import { TimeManager } from '@app/js/singletons/time-manager';
 
 // Constants
 const RADIUS_OF_EARTH = 6371000; // Radius of Earth in meters
-const G = 6.6725985e-11;
 const MILLISECONDS_PER_DAY = 1.15741e-8;
 const MINUTES_PER_DAY = 1440;
 const PI = Math.PI;
@@ -220,7 +221,7 @@ om.iod = async (svs: StateVector[], timeManager: TimeManager, satellite) => {
 
     return om.fitTles(epoch, svs, kps, timeManager, satellite);
   } catch (e) {
-    console.debug(e);
+    errorManagerInstance.info(e);
   }
 };
 
@@ -263,8 +264,7 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, sa
               zError += Math.abs(eci.position.z - svs[svI][3]);
               posErrorAvg += Math.sqrt(xError ** 2 + yError ** 2 + zError ** 2);
             } catch (error) {
-              // DEBUG:
-              // console.warn(eci);
+              errorManagerInstance.info(error);
             }
           }
           posErrorAvg /= svs.length;
@@ -277,7 +277,7 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, sa
       }
     }
     // debug
-    // console.log(`Closest Approach: ${bestIndicies[0]}`);
+    errorManagerInstance.debug(`Closest Approach: ${bestIndicies[0]}`);
     om.debug.closestApproach += bestIndicies[0];
 
     // Calculate Best TLE
@@ -291,33 +291,34 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, sa
     };
     return om.kp2tle(kp, epoch);
   } catch (e) {
-    console.debug(e);
+    errorManagerInstance.debug(e);
   }
 };
-om.svs2analyst = async (svs: StateVector[], satSet: CatalogManager, timeManager: TimeManager, satellite) => {
+om.svs2analyst = async (svs: StateVector[], timeManager: TimeManager, satellite) => {
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
   om.iod(svs, timeManager, satellite)
     .then((tles: { tle1: string; tle2: string }) => {
-      satSet.insertNewAnalystSatellite(tles.tle1, tles.tle2, satSet.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
-      searchBox.doSearch('100500', false);
+      catalogManagerInstance.insertNewAnalystSatellite(tles.tle1, tles.tle2, catalogManagerInstance.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
+      // searchBox.doSearch('100500', false);
     })
     .catch((error) => {
-      console.debug(error);
+      errorManagerInstance.debug(error);
     });
 };
 
-om.testIod = (satSet: CatalogManager) => {
+om.testIod = (catalogManagerInstance: StandardCatalogManager) => {
   fetch('/metObs.json')
     .then((response) => response.json())
     .then((metObs) => {
       for (let i = 0; i < metObs.length; i++) {
         let svs = metObs[i];
-        om.svs2analyst(svs, satSet);
+        om.svs2analyst(svs, catalogManagerInstance);
       }
       om.debug.closestApproach /= metObs.length;
-      console.log(`Average Approach: ${om.debug.closestApproach}`);
+      errorManagerInstance.log(`Average Approach: ${om.debug.closestApproach}`);
     })
     .catch((error) => {
-      console.debug(error);
+      errorManagerInstance.debug(error);
     });
 };
 
@@ -432,11 +433,11 @@ export const _sv2kp = ({
     vz = 0.000000000000001;
   }
 
-  let mu = G * (massPrimary + massSecondary);
+  let mu = EARTHS_GRAV_CONST * (massPrimary + massSecondary);
 
   let r = Math.sqrt(rx * rx + ry * ry + rz * rz);
   let v = Math.sqrt(vx * vx + vy * vy + vz * vz);
-  let a = 1 / (2 / r - (v * v) / mu); //  semi-major axis
+  let semiMajorAxis = 1 / (2 / r - (v * v) / mu); //  semi-major axis
 
   let hx = ry * vz - rz * vy;
   let hy = rz * vx - rx * vz;
@@ -446,75 +447,75 @@ export const _sv2kp = ({
   let p = (h * h) / mu;
   let q = rx * vx + ry * vy + rz * vz; // dot product of r*v
 
-  let e = Math.sqrt(1 - p / a); // eccentricity
+  let eccentricity = Math.sqrt(1 - p / semiMajorAxis); // eccentricity
 
-  let ex = 1 - r / a;
-  let ey = q / Math.sqrt(a * mu);
+  let ex = 1 - r / semiMajorAxis;
+  let ey = q / Math.sqrt(semiMajorAxis * mu);
 
-  let i = Math.acos(hz / h);
-  let lan = 0;
-  if (i != 0) {
-    lan = _arctan2(hx, -hy);
+  let inclination = Math.acos(hz / h);
+  let raan = 0;
+  if (inclination != 0) {
+    raan = _arctan2(hx, -hy);
   }
 
   let tax = (h * h) / (r * mu) - 1;
   let tay = (h * q) / (r * mu);
   let ta = _arctan2(tay, tax);
-  let cw = (rx * Math.cos(lan) + ry * Math.sin(lan)) / r;
+  let cw = (rx * Math.cos(raan) + ry * Math.sin(raan)) / r;
 
   let sw = 0;
-  if (i === 0 || i === PI) {
-    sw = (ry * Math.cos(lan) - rx * Math.sin(lan)) / r;
+  if (inclination === 0 || inclination === PI) {
+    sw = (ry * Math.cos(raan) - rx * Math.sin(raan)) / r;
   } else {
-    sw = rz / (r * Math.sin(i));
+    sw = rz / (r * Math.sin(inclination));
   }
 
-  let w = _arctan2(sw, cw) - ta;
-  if (w < 0) {
-    w = TAU + w;
+  let argPe = _arctan2(sw, cw) - ta;
+  if (argPe < 0) {
+    argPe = TAU + argPe;
   }
 
   let u = _arctan2(ey, ex); // eccentric anomoly
-  let m = u - e * Math.sin(u); // Mean anomoly
-  let tl = w + ta + lan; // True longitude
+  let meanAnomaly = u - eccentricity * Math.sin(u); // Mean anomoly
+  let tl = argPe + ta + raan; // True longitude
 
   while (tl >= TAU) {
     tl = tl - TAU;
   }
 
-  const PlusMinus = a * e;
-  let periapsis = a - PlusMinus - (vectorU === 'km' ? RADIUS_OF_EARTH / 1000 : RADIUS_OF_EARTH);
-  let apoapsis = a + PlusMinus - (vectorU === 'km' ? RADIUS_OF_EARTH / 1000 : RADIUS_OF_EARTH);
-  let period = TAU * Math.sqrt((a * a * a) / (G * (massPrimary + massSecondary)));
+  const PlusMinus = semiMajorAxis * eccentricity;
+  let perigee = semiMajorAxis - PlusMinus - (vectorU === 'km' ? RADIUS_OF_EARTH / 1000 : RADIUS_OF_EARTH);
+  let apogee = semiMajorAxis + PlusMinus - (vectorU === 'km' ? RADIUS_OF_EARTH / 1000 : RADIUS_OF_EARTH);
+  let period = TAU * Math.sqrt((semiMajorAxis * semiMajorAxis * semiMajorAxis) / (EARTHS_GRAV_CONST * (massPrimary + massSecondary)));
 
   outputU ??= 'm';
   // We typically use km
-  a = outputU === 'km' ? a / 1000 : a;
-  apoapsis = outputU === 'km' ? apoapsis / 1000 : apoapsis;
-  periapsis = outputU === 'km' ? periapsis / 1000 : periapsis;
+  semiMajorAxis = outputU === 'km' ? semiMajorAxis / 1000 : semiMajorAxis;
+  apogee = outputU === 'km' ? apogee / 1000 : apogee;
+  perigee = outputU === 'km' ? perigee / 1000 : perigee;
 
   outputU2 ??= 's';
   period = outputU2 === 'm' ? period / 60 : period;
 
   // toDegrees
-  i = RAD2DEG * i;
-  lan = RAD2DEG * lan;
-  w = RAD2DEG * w;
-  m = RAD2DEG * m;
+  inclination = RAD2DEG * inclination;
+  raan = RAD2DEG * raan;
+  argPe = RAD2DEG * argPe;
+  meanAnomaly = RAD2DEG * meanAnomaly;
   ta = RAD2DEG * ta;
   tl = RAD2DEG * tl;
 
   return {
-    semiMajorAxis: a,
-    eccentricity: e,
-    inclination: i,
-    raan: lan,
-    argPe: w,
-    mo: m,
+    semiMajorAxis,
+    eccentricity,
+    inclination,
+    raan,
+    argPe,
+    mo: meanAnomaly,
     ta,
     tl,
-    perigee: periapsis,
-    apogee: apoapsis,
+    perigee,
+    apogee,
     period,
   };
 };

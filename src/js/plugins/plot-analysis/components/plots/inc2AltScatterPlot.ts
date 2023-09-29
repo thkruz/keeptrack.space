@@ -1,10 +1,14 @@
 import * as echarts from 'echarts';
 
-import { MILLISECONDS_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
+import { CatalogManager, GetSatType, Singletons } from '@app/js/interfaces';
+import { MILLISECONDS2DAYS, RAD2DEG } from '@app/js/lib/constants';
 
-import { SpaceObjectType } from '@app/js/api/SpaceObjectType';
-import { jday } from '@app/js/timeManager/transforms';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackContainer } from '@app/js/container';
+import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { jday } from '@app/js/lib/transforms';
+import { TimeManager } from '@app/js/singletons/time-manager';
+import { SatMath } from '@app/js/static/sat-math';
+import { Sgp4, Transforms } from 'ootk';
 
 export const createInc2AltScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, chartDom) => {
   // Dont Load Anything if the Chart is Closed
@@ -17,7 +21,8 @@ export const createInc2AltScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
     curChart = echarts.init(chartDom);
     curChart.on('click', (event) => {
       if (event.data?.id) {
-        keepTrackApi.programs.satSet.selectSat(event.data.id);
+        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        catalogManagerInstance.selectSat(event.data.id);
       }
     });
   } else {
@@ -142,18 +147,19 @@ export const createInc2AltScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
 };
 
 export const getInc2AltScatterData = () => {
-  const { satSet, satellite, timeManager } = keepTrackApi.programs;
+  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
   const china = [];
   const usa = [];
   const russia = [];
   const other = [];
 
-  satSet.satData.forEach((sat) => {
+  catalogManagerInstance.satData.forEach((sat) => {
     if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
     if (sat.period > 250) return;
-    sat = satSet.getSatPosOnly(sat.id);
-    const now = timeManager.simulationTimeObj;
+    sat = catalogManagerInstance.getSat(sat.id, GetSatType.POSITION_ONLY);
+    const now = timeManagerInstance.simulationTimeObj;
     let j = jday(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -162,24 +168,24 @@ export const getInc2AltScatterData = () => {
       now.getUTCMinutes(),
       now.getUTCSeconds()
     ); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-    const gmst = satellite.gstime(j);
-    sat = { ...sat, ...satellite.eciToGeodetic(sat.position, gmst) };
+    j += now.getUTCMilliseconds() * MILLISECONDS2DAYS;
+    const gmst = Sgp4.gstime(j);
+    sat = { ...sat, ...Transforms.eci2lla(sat.position, gmst) };
 
-    if (sat.getAltitude() < 80) return; // TODO: USE THIS FOR FINDING DECAYS!
+    if (SatMath.getAlt(sat.position, gmst) < 80) return; // TODO: USE THIS FOR FINDING DECAYS!
 
     switch (sat.country) {
       case 'United States of America':
       case 'United States':
       case 'US':
-        usa.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        usa.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
       case 'Russian Federation':
       case 'CIS':
       case 'RU':
       case 'SU':
       case 'Russia':
-        russia.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        russia.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
       case 'China':
       case `China, People's Republic of`:
@@ -187,10 +193,10 @@ export const getInc2AltScatterData = () => {
       case 'China (Republic)':
       case 'PRC':
       case 'CN':
-        china.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        china.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
       default:
-        other.push([sat.getAltitude(), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+        other.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
         return;
     }
   });

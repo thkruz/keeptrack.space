@@ -1,154 +1,115 @@
 import timeMachinePng from '@app/img/icons/time-machine.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { ColorSchemeManager } from '@app/js/colorManager/colorSchemeManager';
-import { GroupsManager } from '@app/js/groupsManager/groupsManager';
-import { getEl } from '@app/js/lib/helpers';
-import { OrbitManager } from '@app/js/orbitManager/orbitManager';
-import { CatalogManager } from '@app/js/satSet/satSet';
-import $ from 'jquery';
+import { keepTrackContainer } from '@app/js/container';
+import { GroupsManager, OrbitManager, Singletons } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { getEl } from '@app/js/lib/get-el';
+import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
+import { GroupType } from '@app/js/singletons/object-group';
+import { LegendManager } from '@app/js/static/legend-manager';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'timeMachine',
-    cb: uiManagerInit,
-  });
+export class TimeMachine extends KeepTrackPlugin {
+  static readonly TIME_BETWEEN_SATELLITES = 10000;
 
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'timeMachine',
-    cb: bottomMenuClick,
-  });
+  static PLUGIN_NAME = 'Time Machine';
 
-  keepTrackApi.register({
-    method: 'orbitManagerInit',
-    cbName: 'timeMachine',
-    cb: orbitManagerInit,
-  });
-};
+  bottomIconCallback = () => {
+    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
 
-export const uiManagerInit = (): any => {
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-        <div id="menu-time-machine" class="bmenu-item">
-          <img alt="time-machine" src="" delayedsrc="${timeMachinePng}" />
-          <span class="bmenu-title">Time Machine</span>
-          <div class="status-icon"></div>
-        </div>
-      `
-  );
-
-  getEl('menu-time-machine').addEventListener('click', timeMachineIconClick);
-};
-
-export const bottomMenuClick = (iconName: string): void => {
-  const { orbitManager, groupsManager, satSet, colorSchemeManager } = keepTrackApi.programs;
-  if (iconName === 'menu-time-machine') {
-    if (orbitManager.isTimeMachineRunning) {
-      // Merge to one variable?
-      orbitManager.isTimeMachineRunning = false;
-      orbitManager.isTimeMachineVisible = false;
-
-      settingsManager.colors.transparent = orbitManager.tempTransColor;
-      groupsManager.clearSelect();
-      satSet.setColorScheme(colorSchemeManager.default, true); // force color recalc
+    if (this.isMenuButtonEnabled) {
+      LegendManager.change('timeMachine');
+      keepTrackApi.getUiManager().searchManager.hideResults();
+      getEl('menu-time-machine').classList.add('bmenu-item-selected');
+      this.historyOfSatellitesPlay();
+    } else {
+      LegendManager.change('clear');
+      settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
+      groupManagerInstance.clearSelect();
+      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true); // force color recalc
 
       getEl('menu-time-machine').classList.remove('bmenu-item-selected');
-      return;
-    } else {
-      // Merge to one variable?
-      orbitManager.isTimeMachineRunning = true;
-      orbitManager.isTimeMachineVisible = true;
-      getEl('menu-time-machine').classList.add('bmenu-item-selected');
-      orbitManager.historyOfSatellitesPlay();
-      return;
+    }
+  };
+
+  bottomIconElementName = 'menu-time-machine';
+  bottomIconImg = timeMachinePng;
+  bottomIconLabel = 'Time Machine';
+  historyOfSatellitesRunCount = 0;
+
+  constructor() {
+    super(TimeMachine.PLUGIN_NAME);
+  }
+
+  historyOfSatellitesPlay() {
+    this.historyOfSatellitesRunCount++;
+    keepTrackApi.getOrbitManager().tempTransColor = settingsManager.colors.transparent;
+    settingsManager.colors.transparent = [0, 0, 0, 0];
+    for (let yy = 0; yy <= 200; yy++) {
+      let year = 59 + yy;
+      if (year >= 100) year = year - 100;
+      setTimeout(
+        (runCount) => {
+          this.playNextSatellite(runCount, year);
+        },
+        settingsManager.timeMachineDelay * yy,
+        this.historyOfSatellitesRunCount
+      );
+
+      const currentYear = parseInt(new Date().getUTCFullYear().toString().slice(2, 4));
+      if (year === currentYear) break;
     }
   }
-};
 
-export const orbitManagerInit = (): void => {
-  const { orbitManager, satSet, colorSchemeManager, groupsManager } = keepTrackApi.programs;
-  orbitManager.playNextSatellite = (runCount: number, year: number) => {
-    if (!keepTrackApi.programs.orbitManager.isTimeMachineVisible) return;
+  playNextSatellite(runCount: number, year: number) {
+    if (!this.isMenuButtonEnabled) return;
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+
     // Kill all old async calls if run count updates
-    if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-    const yearGroup = groupsManager.createGroup('yearOrLess', year);
-    groupsManager.selectGroup(yearGroup);
-    yearGroup.updateOrbits(orbitManager);
-    satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
+    if (runCount !== this.historyOfSatellitesRunCount) return;
+    const yearGroup = groupManagerInstance.createGroup(GroupType.YEAR_OR_LESS, year);
+    groupManagerInstance.selectGroup(yearGroup);
+    yearGroup.updateOrbits();
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group, true); // force color recalc
 
     if (!settingsManager.isDisableTimeMachineToasts) {
       if (year >= 59 && year < 100) {
-        const timeMachineString = settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`;
-        keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
+        const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`);
+        keepTrackApi.getUiManager().toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
       } else {
         const yearStr = year < 10 ? `0${year}` : `${year}`;
-        const timeMachineString = settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`;
-        keepTrackApi.programs.uiManager.toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
+        const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`);
+        keepTrackApi.getUiManager().toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
       }
     }
 
     if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
       if (settingsManager.loopTimeMachine) {
         setTimeout(() => {
-          orbitManager.historyOfSatellitesPlay();
+          this.historyOfSatellitesPlay();
         }, settingsManager.timeMachineDelay);
       } else {
-        setTimeout(function () {
-          timeMachineRemoveSatellite(runCount, orbitManager, groupsManager, satSet, colorSchemeManager);
-        }, 10000); // Linger for 10 seconds
+        setTimeout(() => {
+          this.removeSatellite(runCount, colorSchemeManagerInstance);
+        }, TimeMachine.TIME_BETWEEN_SATELLITES); // Linger for 10 seconds
       }
     }
-  };
-
-  // Used to kill old async calls
-  orbitManager.historyOfSatellitesRunCount = 0;
-  orbitManager.historyOfSatellitesPlay = () => {
-    orbitManager.historyOfSatellitesRunCount++;
-    orbitManager.isTimeMachineRunning = true;
-    orbitManager.tempTransColor = settingsManager.colors.transparent;
-    settingsManager.colors.transparent = [0, 0, 0, 0];
-    for (let yy = 0; yy <= 200; yy++) {
-      let year = 59 + yy;
-      if (year >= 100) year = year - 100;
-      setTimeout(
-        // eslint-disable-next-line no-loop-func
-        function (runCount) {
-          orbitManager.playNextSatellite(runCount, year);
-        },
-        settingsManager.timeMachineDelay * yy,
-        orbitManager.historyOfSatellitesRunCount
-      );
-
-      const currentYear = parseInt(new Date().getUTCFullYear().toString().slice(2, 4));
-      if (year === currentYear) break;
-    }
-  };
-};
-export const timeMachineIconClick = () => {
-  const { searchBox, uiManager } = keepTrackApi.programs;
-  if ($('#time-machine-menu').css('display') === 'block') {
-    uiManager.legendMenuChange('clear');
-  } else {
-    uiManager.legendMenuChange('timeMachine');
-    searchBox.hideResults();
   }
-};
-export const timeMachineRemoveSatellite = (
-  runCount: number,
-  orbitManager: OrbitManager,
-  groupsManager: GroupsManager,
-  satSet: CatalogManager,
-  colorSchemeManager: ColorSchemeManager
-): void => {
-  if (runCount !== orbitManager.historyOfSatellitesRunCount) return;
-  if (!orbitManager.isTimeMachineVisible) return;
-  settingsManager.colors.transparent = <[number, number, number, number]>orbitManager.tempTransColor;
-  orbitManager.isTimeMachineRunning = false;
-  groupsManager.clearSelect();
-  satSet.setColorScheme(colorSchemeManager.default, true);
-};
+
+  removeSatellite(runCount: number, colorSchemeManager: StandardColorSchemeManager): void {
+    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+
+    if (runCount !== this.historyOfSatellitesRunCount) return;
+    if (!this.isMenuButtonEnabled) return;
+    settingsManager.colors.transparent = <[number, number, number, number]>orbitManagerInstance.tempTransColor;
+    this.isMenuButtonEnabled = false;
+    groupManagerInstance.clearSelect();
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManager.default, true);
+  }
+}
+
+export const timeMachinePlugin = new TimeMachine();

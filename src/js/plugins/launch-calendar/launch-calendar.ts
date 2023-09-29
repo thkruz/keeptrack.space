@@ -1,71 +1,65 @@
-/* */
+/**
+ * /*! /////////////////////////////////////////////////////////////////////////////
+ *
+ * launch-calendar.ts is a plugin for viewing the launch calendar on Gunter's Space Page.
+ *
+ * http://keeptrack.space
+ *
+ * @Copyright (C) 2016-2023 Theodore Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
+ *
+ * KeepTrack is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Affero General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * KeepTrack is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along with
+ * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * /////////////////////////////////////////////////////////////////////////////
+ */
 
-import { getEl, openColorbox } from '@app/js/lib/helpers';
+import { openColorbox } from '@app/js/lib/colorbox';
+import { getEl } from '@app/js/lib/get-el';
 
-import { LaunchCalendarButton } from './components/launch-calendar-button';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-let isLaunchMenuOpen = false;
+import calendarPng from '@app/img/icons/calendar.png';
 
-export const init = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'launchCalendar',
-    cb: uiManagerInit,
-  });
+export class LaunchCalendar extends KeepTrackPlugin {
+  bottomIconElementName = 'menu-launches';
+  bottomIconImg = calendarPng;
+  bottomIconLabel = 'Launch Calendar';
 
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'launchCalendar',
-    cb: bottomMenuClick,
-  });
-
-  // Might be unnecessary
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'launchCalendar',
-    cb: hideSideMenus,
-  });
-};
-
-export const bottomMenuClick = (iconName: string): void => {
-  if (iconName === 'menu-launches') {
-    console.log('launches clicked');
-    if (isLaunchMenuOpen) {
-      isLaunchMenuOpen = false;
-      keepTrackApi.programs.uiManager.hideSideMenus();
-      return;
-    } else {
-      if (settingsManager.isMobileModeEnabled) keepTrackApi.programs.uiManager.searchToggle(false);
+  bottomIconCallback = () => {
+    if (this.isMenuButtonEnabled) {
       settingsManager.isPreventColorboxClose = true;
       setTimeout(function () {
         settingsManager.isPreventColorboxClose = false;
       }, 2000);
-      keepTrackApi.programs.uiManager.hideSideMenus();
       const year = new Date().getFullYear();
       openColorbox(`https://space.skyrocket.de/doc_chr/lau${year}.htm`, {
-        callback: cboxClosed,
+        callback: this.closeColorbox_.bind(this),
       });
-      isLaunchMenuOpen = true;
-      getEl('menu-launches').classList.add('bmenu-item-selected');
-      return;
+    }
+  };
+
+  isForceHideSideMenus = true;
+
+  constructor() {
+    const PLUGIN_NAME = 'Launch Menu';
+    super(PLUGIN_NAME);
+  }
+
+  private closeColorbox_() {
+    if (this.isMenuButtonEnabled) {
+      this.isMenuButtonEnabled = false;
+      getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
     }
   }
-};
+}
 
-export const hideSideMenus = (): void => {
-  getEl('menu-launches').classList.remove('bmenu-item-selected');
-};
-
-export const cboxClosed = (): void => {
-  if (isLaunchMenuOpen) {
-    isLaunchMenuOpen = false;
-    getEl('menu-launches').classList.remove('bmenu-item-selected');
-  }
-};
-export const uiManagerInit = (): any => {
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML('beforeend', LaunchCalendarButton);
-};
+export const launchCalendarPlugin = new LaunchCalendar();

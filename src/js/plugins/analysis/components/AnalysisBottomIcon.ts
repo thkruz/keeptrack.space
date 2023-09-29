@@ -1,5 +1,5 @@
 import analysisPng from '@app/img/icons/analysis.png';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const AnalysisBottomIcon = keepTrackApi.html`
         <div id="menu-analysis" class="bmenu-item">

@@ -1,12 +1,25 @@
 import * as gremlins from 'gremlins.js';
 
-import { clickAndDragWidth, getEl, slideInRight, slideOutLeft } from '@app/js/lib/helpers';
+import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
+import { getEl } from '@app/js/lib/get-el';
+import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
 import { helpBodyTextDebug, helpTitleTextDebug } from './help';
 
+import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 // @ts-ignore-next-line
 import debugPng from '@app/img/icons/debug.png';
+import { keepTrackApi } from '@app/js/keepTrackApi';
+
+import { keepTrackContainer } from '@app/js/container';
+import { Singletons, UiManager } from '@app/js/interfaces';
 import eruda from 'eruda';
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
+
+// ////////////////////////////////////////////////////////////////////////////
+// TODO: This is currently obsolete and needs to be updated to the new Plugin
+// Framework. It is for debugging only so it is low priority.
+// ////////////////////////////////////////////////////////////////////////////
+
+/* istanbul ignore file */
 
 /*
  * Returns a random integer between min (inclusive) and max (inclusive).
@@ -90,7 +103,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isDebugMenuOpen) {
-    keepTrackApi.programs.adviceManager.showAdvice(helpTitleTextDebug, helpBodyTextDebug);
+    adviceManagerInstance.showAdvice(helpTitleTextDebug, helpBodyTextDebug);
     return true;
   }
   return false;
@@ -179,15 +192,15 @@ export const uiManagerFinal = (): void => {
 };
 
 export const bottomMenuClick = (iconName: string) => {
-  const { uiManager } = keepTrackApi.programs;
   if (iconName === 'menu-debug') {
+    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
     if (isDebugMenuOpen) {
       isDebugMenuOpen = false;
-      uiManager.hideSideMenus();
+      uiManagerInstance.hideSideMenus();
       return;
     } else {
-      if (settingsManager.isMobileModeEnabled) uiManager.searchToggle(false);
-      uiManager.hideSideMenus();
+      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(false);
+      uiManagerInstance.hideSideMenus();
       slideInRight(getEl('debug-menu'), 1000);
       getEl('menu-debug').classList.add('bmenu-item-selected');
       isDebugMenuOpen = true;

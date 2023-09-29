@@ -1,5 +1,5 @@
-import mkdirp from 'mkdirp';
 import { rmSync } from 'fs';
+import { mkdirp } from 'mkdirp';
 
 export const setupDistFolders = () => {
   rmSync('./dist/admin', { recursive: true, force: true });

@@ -1,4 +1,4 @@
-import { SettingsManager } from '@app/js/api/keepTrackTypes';
+import { SettingsManager } from '@app/js/settings/settings';
 
 interface JQuery<HTMLElement> {
   effect: any;
@@ -25,6 +25,10 @@ declare global {
   module '*.png';
   declare module '*.mp3';
   interface Window {
+    settingsManager: SettingsManager;
+    settingsOverride: any;
+  }
+  interface Global {
     settingsManager: SettingsManager;
     settingsOverride: any;
   }

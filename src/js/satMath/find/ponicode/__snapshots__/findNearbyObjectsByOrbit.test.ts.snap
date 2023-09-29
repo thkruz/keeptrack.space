@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`findNearbyObjectsByOrbit.findNearbyObjectsByOrbit 0 1`] = `
-Array [
-  0,
-  1,
-  2,
-]
-`;

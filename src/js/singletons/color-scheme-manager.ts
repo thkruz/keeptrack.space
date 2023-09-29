@@ -1179,6 +1179,7 @@ export class StandardColorSchemeManager {
         if (lastDotToColor > settingsManager.dotsOnScreen) lastDotToColor = settingsManager.dotsOnScreen;
       } else {
         lastDotToColor = (<any>window).dotsPerColor || this.DOTS_PER_CALC;
+        lastDotToColor = Math.min(lastDotToColor, settingsManager.dotsOnScreen);
       }
 
       this.lastDotColored = lastDotToColor;

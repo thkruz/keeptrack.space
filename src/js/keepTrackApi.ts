@@ -15,14 +15,15 @@ import {
   UiManager,
 } from './interfaces';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
+import { SettingsManager } from './settings/settings';
 import { DotsManager } from './singletons/dots-manager';
 import { DrawManager } from './singletons/draw-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
+import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
 import { TimeManager } from './singletons/time-manager';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
-import { SettingsManager } from './settings/settings';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -268,6 +269,7 @@ export const keepTrackApi = {
   getDotsManager: () => keepTrackContainer.get<DotsManager>(Singletons.DotsManager),
   getSensorMath: () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath),
   getLineManager: () => keepTrackContainer.get<LineManager>(Singletons.LineManager),
+  getHoverManager: () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager),
 };
 
 export enum KeepTrackApiMethods {

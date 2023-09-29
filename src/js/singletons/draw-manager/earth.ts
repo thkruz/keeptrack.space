@@ -1,13 +1,13 @@
 import { UserSettings } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD, RADIUS_OF_EARTH } from '@app/js/lib/constants';
+import { SettingsManager } from '@app/js/settings/settings';
 import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
 import { GlUtils } from '@app/js/static/gl-utils';
 import { SplashScreen } from '@app/js/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime } from 'ootk';
 import { OcclusionProgram } from './post-processing';
-import { SettingsManager } from '@app/js/settings/settings';
 
 declare module '@app/js/interfaces' {
   interface UserSettings {
@@ -448,9 +448,13 @@ export class Earth {
     this.textureBump_ = this.gl_.createTexture();
     const img = new Image();
     img.onload = () => {
-      if (!this.settings_.isBlackEarth && !this.settings_.politicalImages) {
+      if (this.settings_.isDrawBumpMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
         GlUtils.bindImageToTexture(this.gl_, this.textureBump_, img);
+      } else {
+        // Bind a blank texture
+        this.gl_.bindTexture(this.gl_.TEXTURE_2D, this.textureSpec_);
       }
+
       this.isReadyBump_ = true;
       this.onImageLoaded_();
     };
@@ -494,8 +498,11 @@ export class Earth {
     this.textureSpec_ = this.gl_.createTexture();
     const img = new Image();
     img.onload = () => {
-      if (!this.settings_.isBlackEarth && !this.settings_.politicalImages) {
+      if (this.settings_.isDrawSpecMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
         GlUtils.bindImageToTexture(this.gl_, this.textureSpec_, img);
+      } else {
+        // Bind a blank texture
+        this.gl_.bindTexture(this.gl_.TEXTURE_2D, this.textureSpec_);
       }
 
       this.isReadySpec_ = true;
@@ -540,14 +547,27 @@ export class Earth {
     }
 
     // Bump Map
-    gl.uniform1i(this.uniforms_.uBumpMap, 2);
-    gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, this.textureBump_);
+    if (this.settings_.isDrawBumpMap) {
+      gl.uniform1i(this.uniforms_.uBumpMap, 2);
+      gl.activeTexture(gl.TEXTURE2);
+      gl.bindTexture(gl.TEXTURE_2D, this.textureBump_);
+    } else {
+      gl.uniform1i(this.uniforms_.uBumpMap, 2);
+      gl.activeTexture(gl.TEXTURE2);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
 
     // Specular Map
-    gl.uniform1i(this.uniforms_.uSpecMap, 3);
-    gl.activeTexture(gl.TEXTURE3);
-    gl.bindTexture(gl.TEXTURE_2D, this.textureSpec_);
+    if (this.settings_.isDrawSpecMap) {
+      gl.uniform1i(this.uniforms_.uSpecMap, 3);
+      gl.activeTexture(gl.TEXTURE3);
+      gl.bindTexture(gl.TEXTURE_2D, this.textureSpec_);
+    } else {
+      // Bind a blank texture
+      gl.uniform1i(this.uniforms_.uSpecMap, 3);
+      gl.activeTexture(gl.TEXTURE3);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
   }
 
   private updateSunCurrentDirection_(j: number): void {

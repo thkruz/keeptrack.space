@@ -16,11 +16,6 @@ export enum GroupType {
   ID_LIST = 10,
 }
 
-const settingsManager = {
-  maxOribtsDisplayed: 100000,
-  maxOribtsDisplayedDesktopAll: 1000,
-};
-
 export class ObjectGroup {
   objects: number[] = [];
 
@@ -83,8 +78,8 @@ export class ObjectGroup {
       case GroupType.SCC_NUM:
         this.objects = data
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((id: number) => catalogManagerInstance.getIdFromObjNum(id))
-          .filter((sccNUm: number | null) => sccNUm !== null);
+          .map((sccNum: number) => catalogManagerInstance.getIdFromObjNum(sccNum))
+          .filter((id: number | null) => id !== null);
         break;
       case GroupType.ID_LIST:
         this.objects = data.slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => id);

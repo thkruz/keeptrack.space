@@ -18,11 +18,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { isThisNode } from '@app/js/keepTrackApi';
+import { SensorGeolocation } from '@app/js/interfaces';
+import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { ClassificationString } from '../static/classification';
-import { SensorGeolocation } from '@app/js/interfaces';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
@@ -89,6 +89,10 @@ export class SettingsManager {
    * Initial resolution of the map height to increase performance
    */
   mapHeight = 600;
+  /**
+   * Flag for loading the last sensor used by user
+   */
+  isLoadLastSensor = true;
   /**
    * Disable main user interface. Currently an all or nothing package.
    */
@@ -176,7 +180,11 @@ export class SettingsManager {
    * Determines whether or not debris is shown.
    */
   isShowDebris = true;
-  maxOribtsDisplayedDesktopAll = null;
+  /**
+   * @deprecated
+   * Maximum number of orbits to display when selecting "all" satellites
+   */
+  maxOribtsDisplayedDesktopAll = 1000;
   /**
    * Transparency when a group of satellites is selected
    */
@@ -272,7 +280,7 @@ export class SettingsManager {
   isDayNightToggle = false;
   isUseHigherFOVonMobile = null;
   lostSatStr = '';
-  maxOribtsDisplayed = null;
+  maxOribtsDisplayed = 100000;
   isOrbitOverlayVisible = false;
   isShowSatNameNotOrbit = null;
   /**
@@ -493,6 +501,14 @@ export class SettingsManager {
    */
   isBlackEarth = false;
   /**
+   * Determines whether or not to load the specularity map for the Earth.
+   */
+  isDrawSpecMap = true;
+  /**
+   * Determines whether or not to load the bump map for the Earth.
+   */
+  isDrawBumpMap = true;
+  /**
    * Determines whether the atmosphere should be drawn or not.
    */
   isDrawAtmosphere = true;
@@ -697,7 +713,7 @@ export class SettingsManager {
    */
   nextNPassesCount = 5;
   noMeshManager = false;
-  noStars = false;
+  isDisableStars = false;
   offline = false;
   /**
    * The offset in the x direction for the offset camera mode.
@@ -1070,6 +1086,12 @@ export class SettingsManager {
     return params;
   }
 
+  private disableAllPlugins() {
+    Object.keys(this.plugins).forEach((key) => {
+      this.plugins[key] = false;
+    });
+  }
+
   /**
    * This is an initial parse of the GET variables to determine
    * critical settings. Other variables are checked later during catalogManagerInstance.init
@@ -1079,6 +1101,109 @@ export class SettingsManager {
       for (const param of params) {
         const key = param.split('=')[0];
         switch (key) {
+          case 'preset':
+            switch (param.split('=')[1]) {
+              case 'ops-center':
+                this.politicalImages = true;
+                this.isDrawSun = false;
+                this.isDisableStars = true;
+                this.isDrawAtmosphere = false;
+                this.isDrawAurora = false;
+                this.isShowRocketBodies = false;
+                this.isShowDebris = false;
+                this.isDrawBumpMap = false;
+                this.isDrawSpecMap = false;
+                this.isDrawMilkyWay = false;
+                this.isGraySkybox = false;
+                this.isLoadLastMap = false;
+                break;
+              case 'education':
+                this.isShowSplashScreen = true;
+                this.isEPFL = true;
+                this.disableAllPlugins();
+                this.plugins.gamepad = true;
+                this.isLoadLastMap = false;
+                this.isShowRocketBodies = true;
+                this.isShowDebris = true;
+                this.isShowPayloads = true;
+                this.isShowAgencies = false;
+                this.lowresImages = true;
+                this.isAllowRightClick = false;
+                this.isDisableSelectSat = true;
+                this.isDisableSensors = true;
+                this.isDisableControlSites = true;
+                this.isDisableLaunchSites = true;
+                this.isLoadLastSensor = false;
+                this.colors.rocketBody = [0.5, 0.5, 0.5, 1];
+                this.colors.unknown = [0.5, 0.5, 0.5, 1];
+                this.colors.pink = [0.5, 0.5, 0.5, 1];
+                break;
+              case 'outreach':
+                this.satShader.minSize = 30.0;
+                this.limitSats = '25544';
+                this.disableAllPlugins();
+                this.isDisableStars = true;
+                this.maxAnalystSats = 1;
+                this.maxMissiles = 1;
+                this.maxFieldOfViewMarkers = 1;
+                this.noMeshManager = false;
+                this.isLoadLastMap = false;
+                this.isShowRocketBodies = true;
+                this.isShowDebris = true;
+                this.isShowPayloads = true;
+                this.isShowAgencies = false;
+                this.nasaImages = true;
+                this.isAllowRightClick = false;
+                this.isDisableSelectSat = false;
+                this.isDisableSensors = true;
+                this.isDisableControlSites = true;
+                this.isDisableLaunchSites = true;
+                this.isLoadLastSensor = false;
+                this.onLoadCb = () => {
+                  const groupManagerInstance = keepTrackApi.getGroupsManager();
+                  const sccNumGroup = groupManagerInstance.createGroup(9, [25544]);
+                  groupManagerInstance.selectGroup(sccNumGroup);
+                  sccNumGroup.updateOrbits();
+                  keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+                };
+                break;
+              case 'debris':
+                this.disableAllPlugins();
+                this.isDisableStars = true;
+                this.maxAnalystSats = 1;
+                this.maxMissiles = 1;
+                this.maxFieldOfViewMarkers = 1;
+                this.noMeshManager = true;
+                this.isLoadLastMap = false;
+                this.isShowRocketBodies = true;
+                this.isShowDebris = true;
+                this.isShowPayloads = false;
+                this.isShowAgencies = false;
+                this.lowresImages = true;
+                this.isAllowRightClick = false;
+                this.isDisableSelectSat = false;
+                this.isDisableSensors = true;
+                this.isDisableControlSites = true;
+                this.isDisableLaunchSites = true;
+                this.isLoadLastSensor = false;
+                this.colors.rocketBody = [0.5, 0.5, 0.5, 1];
+                this.colors.unknown = [0.5, 0.5, 0.5, 1];
+                this.colors.pink = [0.5, 0.5, 0.5, 1];
+                this.maxOribtsDisplayedDesktopAll = 100000;
+                this.maxOribtsDisplayed = 100000;
+                this.searchLimit = 100000;
+                this.onLoadCb = () => {
+                  const groupManagerInstance = keepTrackApi.getGroupsManager();
+                  const allSats = groupManagerInstance.createGroup(0, null);
+                  groupManagerInstance.selectGroup(allSats);
+                  allSats.updateOrbits();
+                  keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+                };
+                break;
+              default:
+                break;
+            }
+            break;
           case 'debug':
             this.plugins.debug = true;
             break;
@@ -1099,7 +1224,8 @@ export class SettingsManager {
             this.smallImages = true;
             break;
           case 'lowperf':
-            this.lowPerf = true;
+            // this.lowPerf = true;
+            this.isShowSplashScreen = false;
             this.isDrawMilkyWay = false;
             this.isDrawLess = true;
             this.zFar = 250000.0;
@@ -1112,7 +1238,7 @@ export class SettingsManager {
             this.earthNumLonSegs = 128;
             break;
           case 'nostars':
-            this.noStars = true;
+            this.isDisableStars = true;
             this.isDrawMilkyWay = false;
             break;
           case 'draw-less':
@@ -1132,11 +1258,6 @@ export class SettingsManager {
             break;
           case 'political':
             this.politicalImages = true;
-            this.isDrawSun = false;
-            this.isDrawAtmosphere = false;
-            this.isDrawAurora = false;
-            this.isShowRocketBodies = false;
-            this.isShowDebris = false;
             break;
           case 'retro':
             this.retro = true;

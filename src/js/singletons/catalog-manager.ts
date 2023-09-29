@@ -451,7 +451,7 @@ export class StandardCatalogManager implements CatalogManager {
     }
 
     // Create Stars
-    if (!settingsManager.lowPerf && !settingsManager.noStars && !settingsManager.isMobileModeEnabled) {
+    if (!settingsManager.lowPerf && !settingsManager.isDisableStars && !settingsManager.isMobileModeEnabled) {
       this.starIndex1 = this.staticSet.length;
       stars.forEach((star) => {
         this.staticSet.push({
@@ -580,7 +580,7 @@ export class StandardCatalogManager implements CatalogManager {
   }
 
   public lastSelectedSat(id?: number): number {
-    this.lastSelectedSat_ = id ? id : this.lastSelectedSat_;
+    this.lastSelectedSat_ = id >= 0 ? id : this.lastSelectedSat_;
     return this.lastSelectedSat_;
   }
 
@@ -609,7 +609,7 @@ export class StandardCatalogManager implements CatalogManager {
 
       UrlManager.parseGetVariables();
 
-      if (!settingsManager.disableUI) {
+      if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
         StandardUiManager.reloadLastSensor();
       }
 
@@ -639,17 +639,17 @@ export class StandardCatalogManager implements CatalogManager {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color
-    const lastObject = this.lastSelectedSat();
-    if (lastObject !== -1) {
-      const newColor = colorSchemeManagerInstance.currentColorScheme(this.getSat(lastObject)).color;
-      colorSchemeManagerInstance.colorData[lastObject * 4] = newColor[0]; // R
-      colorSchemeManagerInstance.colorData[lastObject * 4 + 1] = newColor[1]; // G
-      colorSchemeManagerInstance.colorData[lastObject * 4 + 2] = newColor[2]; // B
-      colorSchemeManagerInstance.colorData[lastObject * 4 + 3] = newColor[3]; // A
-      gl.bufferSubData(gl.ARRAY_BUFFER, lastObject * 4 * 4, new Float32Array(newColor));
+    const lastSelectedObject = this.lastSelectedSat();
+    if (lastSelectedObject !== -1) {
+      const newColor = colorSchemeManagerInstance.currentColorScheme(this.getSat(lastSelectedObject)).color;
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 1] = newColor[1]; // G
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 2] = newColor[2]; // B
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 3] = newColor[3]; // A
+      gl.bufferSubData(gl.ARRAY_BUFFER, lastSelectedObject * 4 * 4, new Float32Array(newColor));
 
-      if (!settingsManager.lastSearchResults.includes(lastObject)) {
-        dotsManagerInstance.sizeData[lastObject] = 0.0;
+      if (!settingsManager.lastSearchResults.includes(lastSelectedObject)) {
+        dotsManagerInstance.sizeData[lastSelectedObject] = 0.0;
         gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManagerInstance.sizeData);
       }

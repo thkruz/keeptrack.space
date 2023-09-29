@@ -17,10 +17,9 @@ jobs:
         uses: actions/checkout@v4
       # Lint Yaml Code
       - name: YAML Lint
-        uses: ibiqlik/action-yamllint@v3.1.0
+        uses: ibiqlik/action-yamllint@v3.1.1
         with:
-          file_or_dir: ${{ github.workspace }}/
-            .github/workflows/build-pipeline.yml
+          file_or_dir: ${{ github.workspace }}/ .github/workflows/build-pipeline.yml
   compliance:
     needs: lint-yml
     name: NPM Audit Report
@@ -55,8 +54,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-            ${{hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -88,8 +86,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -129,8 +126,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-

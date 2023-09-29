@@ -7,7 +7,7 @@ import { StringPad } from '@app/js/lib/stringPad';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { DotsManager } from '@app/js/singletons/dots-manager';
-import { TimeManager } from '@app/js/singletons/time-manager';
+import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 
 export class CatalogLoader {
@@ -193,7 +193,10 @@ export class CatalogLoader {
   static parse(resp: any, extraSats?: any, asciiCatalog?: any, jsCatalog?: any) {
     const settingsManager: any = window.settingsManager;
 
-    const limitSatsArray = CatalogLoader.setupGetVariables();
+    const limitSatsArray = !settingsManager.limitSats ? CatalogLoader.setupGetVariables() : settingsManager.limitSats.split(',');
+
+    // Make sure everyone agrees on what time it is
+    keepTrackApi.getTimeManager().synchronize();
 
     // Filter TLEs
     // SatCruncher will use this when it returns so we need to expose it now
@@ -234,8 +237,6 @@ export class CatalogLoader {
   }
 
   static setupGetVariables() {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-
     let limitSatsArray: string[] = [];
     /** Parses GET variables for SatCruncher initialization */
     // This should be somewhere else!!
@@ -256,13 +257,10 @@ export class CatalogLoader {
       }
     }
 
-    // Make sure everyone agrees on what time it is
-    timeManagerInstance.synchronize();
-
     return limitSatsArray;
   }
 
-  static filterTLEDatabase(resp: SatObject[], limitSatsArray?: any[], extraSats?: any[], asciiCatalog?: any[], jsCatalog?: any[]): void {
+  static filterTLEDatabase(resp: SatObject[], limitSatsArray?: string[], extraSats?: any[], asciiCatalog?: any[], jsCatalog?: any[]): void {
     const tempSatData = [];
     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
@@ -375,8 +373,9 @@ export class CatalogLoader {
         }
       } else {
         // If there are limited satellites
+        let newId = 0;
         for (const element of limitSatsArray) {
-          if (resp[i].sccNum === element.sccNum) {
+          if (resp[i].sccNum === element) {
             year = resp[i].TLE1.substr(9, 8).trim().substring(0, 2); // clean up intl des for display
             if (year === '') {
               resp[i].intlDes = 'none';
@@ -386,7 +385,8 @@ export class CatalogLoader {
               rest = resp[i].TLE1.substr(9, 8).trim().substring(2);
               resp[i].intlDes = year + '-' + rest;
             }
-            resp[i].id = i;
+            resp[i].id = newId;
+            newId++;
             catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
             catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
             resp[i].active = true;

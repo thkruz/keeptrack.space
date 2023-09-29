@@ -27,11 +27,10 @@
 
 // organize-imports-ignore
 import '@app/js/lib/external/colorPick.js';
+import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
 import '@materializecss/materialize';
-import 'jquery-ui-bundle';
-// eslint-disable-next-line sort-imports
 import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { Milliseconds } from 'ootk';

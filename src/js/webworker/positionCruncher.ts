@@ -29,7 +29,7 @@ import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, LlaVec3, Minut
 import { SensorObjectCruncher } from '../interfaces';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, PI, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN, STAR_DISTANCE, TAU } from '../lib/constants';
 import { SpaceObjectType } from '../lib/space-object-type';
-import { defaultGd, emptySensor, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg, SatCacheObject } from './constants';
+import { PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg, SatCacheObject, defaultGd, emptySensor } from './constants';
 import { createLatLonAlt, isInFov, isInValidElevation, isSensorDeepSpace, lookAnglesToEcf, setupTimeVariables } from './positionCruncher/calculations';
 import { resetPosition, resetVelocity, setPosition } from './positionCruncher/satCache';
 
@@ -379,9 +379,12 @@ export const propagationLoop = (mockSatCache?: SatCacheObject[]) => {
   isInterupted = false;
 
   // The longer the delay the more jitter at higher speeds of propagation
-  setTimeout(() => {
-    propagationLoop();
-  }, (globalPropagationRate * globalPropagationRateMultiplier) / divisor);
+  setTimeout(
+    () => {
+      propagationLoop();
+    },
+    (globalPropagationRate * globalPropagationRateMultiplier) / divisor
+  );
 };
 
 // prettier-ignore

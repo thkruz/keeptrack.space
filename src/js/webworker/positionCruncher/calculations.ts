@@ -5,7 +5,7 @@ import { DEG2RAD, MILLISECONDS2DAYS, PI, RAD2DEG } from '../../lib/constants';
 import { A } from '../../lib/external/meuusjs';
 import { SpaceObjectType } from '../../lib/space-object-type';
 import { jday } from '../../lib/transforms';
-import { defaultGd, oneOrZero, RangeAzEl } from '../constants';
+import { RangeAzEl, defaultGd, oneOrZero } from '../constants';
 
 export const lookAnglesToEcf = (azDeg: Degrees, elDeg: Degrees, rng: Kilometers, obsLat: Radians, obsLong: Radians, obsAlt: Kilometers): EcfVec3 => {
   // site ecef in meters
@@ -117,7 +117,7 @@ export const setupTimeVariables = (dynamicOffsetEpoch, staticOffset, propRate, i
 
   let isSunExclusion = false;
   let sunEci = { x: 0, y: 0, z: 0 };
-  if (isSunlightView && !isMultiSensor) {
+  if (sensor?.observerGd?.lat && isSunlightView && !isMultiSensor) {
     [isSunExclusion, sunEci] = checkSunExclusion(sensor, j, gmst, now);
   }
 

@@ -280,6 +280,17 @@ export interface MissileObject extends SatObject {
 }
 
 export interface RadarDataObject {
+  mId: string;
+  trackId: string;
+  objectId: string;
+  missileObject: string;
+  sccNum: string;
+  rae: any;
+  t: Date;
+  position: EciArr3;
+  rcs: string;
+  azError: any;
+  elError: any;
   active: boolean;
   missile: false;
   missileComplex?: number;

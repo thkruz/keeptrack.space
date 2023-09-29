@@ -111,7 +111,7 @@ export class KeepTrack {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
 
-      if (!isThisNode() && settingsOverride.isShowSplashScreen) KeepTrack.loadSplashScreen_();
+      if (!isThisNode() && settingsManager.isShowSplashScreen) KeepTrack.loadSplashScreen_();
     }
 
     const orbitManagerInstance = new StandardOrbitManager();

@@ -708,7 +708,6 @@ export interface SensorManager {
 }
 
 export interface UiManager {
-  M: any;
   bottomIconPress: (el: HTMLElement) => void;
   hideSideMenus: () => void;
   isAnalysisMenuOpen: boolean;

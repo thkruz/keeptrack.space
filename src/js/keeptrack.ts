@@ -212,8 +212,6 @@ export class KeepTrack {
               <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
               <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
               <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
-              <div id="license-watermark" class="logo-font start-hidden">Unlicensed Software - Contact
-                theodore.kruczek@gmail.com to Renew!</div>
             </figcaption>
           </main>
           <footer id="nav-footer" class="page-footer resizable">

@@ -254,6 +254,7 @@ export class CatalogLoader {
           break;
         case 'future use':
         default:
+          break;
       }
     }
 

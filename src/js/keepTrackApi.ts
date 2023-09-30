@@ -15,6 +15,7 @@ import {
   UiManager,
 } from './interfaces';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
+import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from './settings/settings';
 import { DotsManager } from './singletons/dots-manager';
 import { DrawManager } from './singletons/draw-manager';
@@ -270,6 +271,7 @@ export const keepTrackApi = {
   getSensorMath: () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath),
   getLineManager: () => keepTrackContainer.get<LineManager>(Singletons.LineManager),
   getHoverManager: () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager),
+  getSelectSatManager: () => keepTrackContainer.get<SelectSatManager>(Singletons.SelectSatManager),
 };
 
 export enum KeepTrackApiMethods {

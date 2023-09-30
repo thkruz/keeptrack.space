@@ -1202,39 +1202,7 @@ export class SettingsManager {
                 };
                 break;
               case 'facsat2':
-                this.maxAnalystSats = 1;
-                this.maxMissiles = 1;
-                this.maxFieldOfViewMarkers = 1;
-                this.isShowSplashScreen = true;
-                this.isEPFL = true;
-                this.disableAllPlugins();
-                this.isLoadLastMap = false;
-                this.isShowRocketBodies = true;
-                this.isShowDebris = true;
-                this.isShowPayloads = true;
-                this.isShowAgencies = false;
-                this.lowresImages = true;
-                this.isAllowRightClick = false;
-                this.isDisableSensors = true;
-                this.isDisableControlSites = true;
-                this.isDisableLaunchSites = true;
-                this.isLoadLastSensor = false;
-                this.colors.payload = [0.2, 1.0, 0.0, 0.1];
-                this.colors.rocketBody = [0.5, 0.5, 0.5, 0.1];
-                this.colors.debris = [0.5, 0.5, 0.5, 0.1];
-                this.colors.unknown = [0.5, 0.5, 0.5, 0.1];
-                this.colors.pink = [0.5, 0.5, 0.5, 0.1];
-                keepTrackApi.register({
-                  method: KeepTrackApiMethods.onCruncherReady,
-                  cbName: 'satFromSettings',
-                  cb: () => {
-                    keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
-                    setTimeout(() => {
-                      keepTrackApi.getSelectSatManager().selectSat(keepTrackApi.getCatalogManager().getIdFromObjNum(43721));
-                      this.isDisableSelectSat = true;
-                    }, 5000);
-                  },
-                });
+                this.facsat2();
                 break;
               default:
                 break;
@@ -1329,6 +1297,42 @@ export class SettingsManager {
         }
       }
     }
+  }
+
+  private facsat2() {
+    this.maxAnalystSats = 1;
+    this.maxMissiles = 1;
+    this.maxFieldOfViewMarkers = 1;
+    this.isShowSplashScreen = true;
+    this.isEPFL = true;
+    this.disableAllPlugins();
+    this.isLoadLastMap = false;
+    this.isShowRocketBodies = true;
+    this.isShowDebris = true;
+    this.isShowPayloads = true;
+    this.isShowAgencies = false;
+    this.lowresImages = true;
+    this.isAllowRightClick = false;
+    this.isDisableSensors = true;
+    this.isDisableControlSites = true;
+    this.isDisableLaunchSites = true;
+    this.isLoadLastSensor = false;
+    this.colors.payload = [0.2, 1.0, 0.0, 0.1];
+    this.colors.rocketBody = [0.5, 0.5, 0.5, 0.1];
+    this.colors.debris = [0.5, 0.5, 0.5, 0.1];
+    this.colors.unknown = [0.5, 0.5, 0.5, 0.1];
+    this.colors.pink = [0.5, 0.5, 0.5, 0.1];
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.onCruncherReady,
+      cbName: 'satFromSettings',
+      cb: () => {
+        keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
+        setTimeout(() => {
+          keepTrackApi.getSelectSatManager().selectSat(keepTrackApi.getCatalogManager().getIdFromObjNum(43721));
+          this.isDisableSelectSat = true;
+        }, 5000);
+      },
+    });
   }
 
   /**
@@ -1472,7 +1476,8 @@ export class SettingsManager {
         this.offline = true;
         this.installDirectory = './';
         break;
-      case 'poderespacial.fac.mil.co/':
+      case 'poderespacial.fac.mil.co':
+        this.facsat2();
         break;
       default:
         this.installDirectory = '/';

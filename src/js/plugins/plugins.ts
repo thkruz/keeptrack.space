@@ -49,6 +49,7 @@ import { sensorListPlugin } from './sensor/sensor-list-plugin';
 import { settingsMenuPlugin } from './settings-menu/settings-menu';
 import { shortTermFencesPlugin } from './short-term-fences/short-term-fences';
 import { socialMediaPlugin } from './social/social';
+import { startAnalytics } from './startAnalytics';
 import { stereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { updateSatManagerPlugin } from './update-select-box/update-select-box';
@@ -231,7 +232,7 @@ export const uiManagerFinal = (plugins: any): void => {
 
   // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
-    startGoogleAnalytics();
+    startAnalytics();
   }
 
   const wheel = (dom: any, deltaY: number) => {
@@ -251,22 +252,5 @@ export const uiManagerFinal = (plugins: any): void => {
   );
 };
 
-/* istanbul ignore next */
-export const startGoogleAnalytics = (): void => {
-  const newScript = document.createElement('script');
-  newScript.type = 'text/javascript';
-  newScript.setAttribute('async', 'true');
-  newScript.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7');
-  document.documentElement.firstChild.appendChild(newScript);
-  window.dataLayer = window.dataLayer || [];
-  // eslint-disable-next-line no-unused-vars
-  const gtag = function (_a?: string, _b?: any): void {
-    // eslint-disable-next-line prefer-rest-params
-    window.dataLayer.push(arguments);
-  };
-  gtag('js', new Date());
-  gtag('config', 'G-ENHWK6L0X7');
-};
-
 // Create common import for all plugins
-export { initialOrbit, missile, analysis, plotAnalysis, gamepad, catalogLoader, omManager, StreamManager as CanvasRecorder };
+export { StreamManager as CanvasRecorder, analysis, catalogLoader, gamepad, initialOrbit, missile, omManager, plotAnalysis };

@@ -1,4 +1,6 @@
-./tle/
-./analysis/
-./settings/settingsOverride.js
-./.lftp_ignore
+tle
+tle/**/*
+analysis
+analysis/**/*
+settings/settingsOverride.js
+.lftp_ignore

@@ -27,8 +27,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -95,6 +94,7 @@ jobs:
           remote_folder: ${{ secrets.FTP_REMOTE_FOLDER }}
           local_folder: dist
           cleanup: false
+          exclude: dist/tle
 
   production:
     needs: staging
@@ -121,3 +121,4 @@ jobs:
           remote_folder: ${{ secrets.FTP_REMOTE_FOLDER }}
           local_folder: dist
           cleanup: false
+          exclude: dist/tle

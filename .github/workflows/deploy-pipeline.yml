@@ -97,6 +97,7 @@ jobs:
           exclude: |
             dist/tle
             dist/analysis
+            dist/settings/settingsOverride.js
 
   production:
     needs: staging
@@ -125,3 +126,4 @@ jobs:
           exclude: |
             dist/tle
             dist/analysis
+            dist/settings/settingsOverride.js

@@ -63,7 +63,6 @@ jobs:
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:
-          token: ${{ secrets.GH_PAGES_TOKEN }}
           # The branch the action should deploy to.
           branch: gh-pages
           # The folder the action should deploy.

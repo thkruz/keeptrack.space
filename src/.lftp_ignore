@@ -1,0 +1,4 @@
+./dist/tle/
+./dist/analysis/
+./dist/settings/settingsOverride.js
+./dist/.lftp_ignore

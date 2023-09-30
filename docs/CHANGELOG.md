@@ -2,6 +2,132 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v8.0.0
+
+>  
+
+- feat: :sparkles: add preset functions to settings
+- ci: :construction_worker: add dev site to ci/cd pipeline
+- fix: :bug: fix errors when plugins disabled
+- build: :construction_worker: update dependencies
+- ci: :construction_worker: use new sftp deployer
+- feat: :sparkles: replace google analytics
+- fix: :bug: move analytics to html
+- feat: :sparkles: update readme
+- ci: :construction_worker: use new sftp deployer
+- ci: :pencil2: fix typo in ci/cd pipeline
+- ci: :construction_worker: update ci/cd pipeline
+- fix: :label: fix type issue
+- ci: :construction_worker: fix sftp ignore list
+- fix: :bug: fix limitsat functionality
+- fix: :bug: fix issue with sun colorscheme
+- ci: :construction_worker: fix ci/cd directory names
+- fix: :bug: fix illegal return
+- feat: :sparkles: update readme
+- ci: :rotating_light: fix formatting on ci/cd pipe
+- ci: :construction_worker: expand ignore list for deploy
+- feat: :fire: remove old license text
+- ci: :construction_worker: fix ignore list for sftp
+- ci: :construction_worker: fix ignore list for sftp
+- ci: :construction_worker: fix sftp typo
+- ci: :construction_worker: update dependabot
+- ci: :pencil2: sftp to ftps
+- ci: :rotating_light: fix minor linter error
+- feat: :sparkles: improve errorManager logic for easier offline testing
+- fix: :bug: catch setHover errors where index is null
+- test: :white_check_mark: improve tests
+- ci: :construction_worker: update ci/cd pipeline
+- test: :white_check_mark: fix dependency errors on tests
+- ci: :construction_worker: fix sftp settings
+- ci: :construction_worker: fix ci/cd sftp
+- fix: :bug: fix bug in settings for new url
+- ci: :construction_worker: update ci dependencies
+- feat: :sparkles: add getHoverManager to keepTrackApi
+- ci: :construction_worker: reduce unnecessary visaulizer runs
+- fix: :bug: fix splash screen not showing up
+- ci: :construction_worker: fix ci/cd increase timeout
+- fix: :bug: dont overwrite dist/settings/settingsOverride.js
+- ci: :pencil2: fix typo in ci/cd
+- fix: :adhesive_bandage: fix build script
+- ci: :construction_worker: rebuild on PR from dependabot
+- ci: :bug: fix gh-pages deployment
+- fix: :bug: fix colorscheme when limitedsats in effect
+- Delete .github/workflows/build.workflow
+- Create build.workflow
+
+#### v8.0.0-0
+
+>  
+
+- Update
+- v7.2
+- Add .circleci/config.yml
+- New version
+- feat: :sparkles: give user option to hide toasts
+- fix: :bug: fixed error when sensor not selected
+- feat: :sparkles: add 2030 catalog tools and 3d cone draft
+- feat: :fire: Convert to class based system for code part 1
+- ci: :sparkles: add visualizer workflow
+- refactor: :recycle: split missileManager.ts and convert to classes
+- feat: :technologist: convert settingsManager to a class
+- refactor: :recycle: split watchlist plugin and convert to classes for better modularity
+- refactor: :recycle: convert dots to classes and implement vao
+- feat: :sparkles: add new gray political map and color scheme
+- style: :art: fix minor formatting and linter errors
+- test: :white_check_mark: improve test coverage
+- style: :art: format saveVariable.ts
+- chore: :technologist: update changelog
+- build: :green_heart: add missing tsconfig file
+- build: :construction_worker: update github pipeline to use modern node versions
+- feat: :sparkles: enable toggles for orbital regime independent of color scheme
+- feat: :lipstick: warn/prevent user trying non-circular orbits for breakups
+- ci: :arrow_up: update ci/cd pipeline dependencies
+- build: :construction_worker: clean up build pipeline
+- fix: :bug: trap bug when satInSun cant be calculated
+- Create SECURITY.md
+- feat: :sparkles: maintain sensor filter and rerun on satellite change for multisite lookangles
+- build: :lock: update all unsecure dependencies
+- feat: :sparkles: update lookangles on time change
+- refactor: :recycle: migrate setting to stereo-map plugin
+- style: :art: remove trailing spaces
+- style: :art: remove trailing spaces
+- fix: :bug: fix error calculating meanA in non-circular orbits
+- build: :art: fix yaml formatting
+- build: :wrench: update vscode settings
+- ci: :bug: update yml
+- ci: :construction_worker: update sonarcloud and CodeQL
+- ci: :green_heart: fix yaml formatting caused by github
+- fix: :bug: fix missing ground objects
+- feat: :sparkles: resize mesh models to support pizza box 3D model
+- feat: :sparkles: add close side menu to KeepTrackPlugin class
+- ci: :rotating_light: fix linter issue
+- feat: :sparkles: rerun search when opening search bar
+- ci: :green_heart: remove watch from npm test
+- Update SECURITY.md
+- ci: :bug: update yml
+- ci: :bug: update yml
+- build: :lock: fix npm security issues
+- fix: :pencil2: fix bug in test due to typo
+- chore: fixing tags
+- fix: :bug: fix search dropdown not showing when search icon clicked
+- build: :arrow_up: upgrade Orbital Object Toolkit (ootk)
+- ci: :adhesive_bandage: fix typo in yaml
+- Update visualizer.yml
+- ci: :green_heart: reduce unnecessary automatic PRs
+- Repo visualizer: update diagram
+- Repo visualizer: update diagram
+- Repo visualizer: update diagram
+- Repo visualizer: update diagram
+- Repo visualizer: update diagram
+- Repo visualizer: update diagram
+- Update SECURITY.md
+- Repo visualizer: update diagram
+- Repo visualizer: update diagram
+- Update visualizer.yml
+- Update visualizer.yml
+- feat: :sparkles: add staticOffsetChange keepTrackApi callback
+- Repo visualizer: update diagram
+
 #### v7.2.0
 
 >  

@@ -94,7 +94,7 @@ jobs:
           remote_folder: ${{ secrets.FTP_REMOTE_FOLDER }}
           local_folder: dist
           cleanup: false
-          exclude: dist/tle
+          exclude: '[dist/tle/**]'
 
   production:
     needs: staging
@@ -121,4 +121,4 @@ jobs:
           remote_folder: ${{ secrets.FTP_REMOTE_FOLDER }}
           local_folder: dist
           cleanup: false
-          exclude: dist/tle
+          exclude: '[dist/tle/**]'

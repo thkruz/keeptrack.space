@@ -99,7 +99,7 @@ jobs:
           onlyNewer: true
           settings: 'sftp:auto-confirm=yes'
           # Mirror command options
-          localDir: '.'
+          localDir: './dist'
           remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
           reverse: true
           ignoreFile: '.lftp_ignore'
@@ -135,7 +135,7 @@ jobs:
           onlyNewer: true
           settings: 'sftp:auto-confirm=yes'
           # Mirror command options
-          localDir: '.'
+          localDir: './dist'
           remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
           reverse: true
           ignoreFile: '.lftp_ignore'

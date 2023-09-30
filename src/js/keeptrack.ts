@@ -211,7 +211,11 @@ export class KeepTrack {
             <figcaption id="info-overlays">
               <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
               <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
-              <div id="demo-logo" class="logo-font start-hidden">Keeptrack.space</div>
+              <div id="demo-logo" class="logo-font start-hidden">
+                <a href="https://keeptrack.space" target="_blank" style="color: white !important;">
+                Powered by KeepTrack.space
+                </a>
+              </div>
             </figcaption>
           </main>
           <footer id="nav-footer" class="page-footer resizable">

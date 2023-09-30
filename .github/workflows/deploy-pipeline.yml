@@ -76,10 +76,7 @@ jobs:
     name: Deploy to dev.keeptrack.space
     runs-on: ubuntu-latest
 
-    steps:
-      # Checkout code
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    steps:      
       # Download Artifacts
       - name: Download Artifacts
         uses: actions/download-artifact@v3.0.2
@@ -102,7 +99,7 @@ jobs:
           localDir: './dist'
           remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
           reverse: true
-          ignoreFile: '.lftp_ignore'
+          ignoreFile: './dist.lftp_ignore'
           options: '--verbose'
 
 
@@ -112,10 +109,7 @@ jobs:
     name: Deploy to keeptrack.space
     runs-on: ubuntu-latest
 
-    steps:
-      # Checkout code
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    steps:      
       # Download Artifacts
       - name: Download Artifacts
         uses: actions/download-artifact@v3.0.2
@@ -138,5 +132,5 @@ jobs:
           localDir: './dist'
           remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
           reverse: true
-          ignoreFile: '.lftp_ignore'
+          ignoreFile: './dist.lftp_ignore'
           options: '--verbose'

@@ -2,9 +2,6 @@
 name: Create Visualizer Svg
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   update-visualizer:

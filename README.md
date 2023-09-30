@@ -34,7 +34,19 @@ Our feature set rivals those of expensive toolkits, such as AGI's STK, and inclu
 
 # Screenshots
 
-[Replace this section with actual screenshots of the application.]
+<!-- white border -->
+<div style="border: 1px solid white;">
+    <img src="./docs/education-preview.png" align="center" style="object-fit: cover; width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
+    <img src="./docs/main-preview.jpg" align="center" style="object-fit: cover; width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
+    <img src="./docs/ops-center-preview.png" align="center" style="object-fit: cover; width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
+    <img src="./docs/outreach-preview.png" align="center" style="object-fit: cover; width: 100%; height: 400px;">
+</div>
 
 # Installation
 

@@ -12,6 +12,9 @@
     background: transparent;
     overflow: hidden;
   }
+  #demo-logo {
+    font-size: 3vh;
+  }
   #datetime-input {
     position: absolute;
     bottom: 10px;
@@ -390,6 +393,10 @@
 
 /* Non-Desktops */
 @media (max-width: 1300px) {
+  #demo-logo {
+    font-size: 5vh;
+  }
+
   #social-alt {
     display: block;
     position: absolute;

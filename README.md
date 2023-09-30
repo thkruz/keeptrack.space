@@ -15,30 +15,60 @@
 
 # Project Overview
 
-Welcome to KeepTrack, an ambitious project aiming to make orbital analysis tools accessible to all. We believe in the power of democratizing information and fostering knowledge about orbital mechanics and satellite operations. Our software is sophisticated enough to provide a tactical common picture on a military operations floor yet intuitive enough for a high schooler to explore and learn about orbits on a tablet.
+Welcome to KeepTrack, an ambitious project aiming to make orbital analysis tools accessible to all. Keep Track is the only astrodynamics tool designed for non-engineers. It provides a simplified and streamlined experience for learning and interacting with satellites and space debris. Keep Track is built from the ground up with custom WebGL shaders and a high-performance render loop. It can simulate 2.5 million pieces of debris at 60fps. The core app is only 7 Mb and loads in 2 seconds. It's free, open source, and works on any modern browser.
 
-## Who Should Use KeepTrack?
+## Who is KeepTrack for?
 
-KeepTrack is designed for anyone interested in satellites, space operations, and radars. Our software is built to be a comprehensive yet easy-to-use toolkit for experts in the field, as well as an engaging and informative platform for novices eager to learn more about the fascinating world of space operations.
+Keep Track is used in operations centers, classrooms, and outreach programs. Here are some examples of how different groups use Keep Track:
+
+### Operations Centers
+
+- Get popup alerts when a satellite will pass through a sensor
+- Find when sensors can see a priority satellite in seconds
+- Easily simulate new launches for mission planning
+
+### Education
+
+- Learn through hands-on interaction, making learning engaging
+- Use Xbox controllers for classroom demonstrations
+- Experience AAA video game quality graphics
+
+### Outreach
+
+- Embed Keep Track on your website for free
+- Show your satellite design in orbit before launch
+- Explain space sustainability and the problem of debris
 
 ## Features
 
-Our feature set rivals those of expensive toolkits, such as AGI's STK, and includes the ability to:
+The feature set rivals those of expensive toolkits, such as AGI's STK, and includes the ability to:
 
 - View comprehensive satellite data
 - Perform advanced field of view calculations
 - Create notional maneuvers
 - Model satellite breakups
 - Simulate new satellite launches
-- And many more
+- And much more
 
 # Screenshots
 
-[Replace this section with actual screenshots of the application.]
+<!-- white border -->
+<div style="border: 1px solid white;">
+    <img src="./docs/1.jpg" align="center" style="width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
+    <img src="./docs/2.jpg" align="center" style="width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
+    <img src="./docs/3.jpg" align="center" style="width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
+    <img src="./docs/4.jpg" align="center" style="width: 100%; height: 400px;">
+</div>
 
 # Installation
 
-Starting with Version 3, a github page is automatically deployed with the most-current version of the main branch to https://thkruz.github.io/keeptrack.space/. Periodically the most stable version will be pushed to https://keeptrack.space from the CI/CD pipeline.
+A github page is automatically deployed with the most-current version of the main branch to https://thkruz.github.io/keeptrack.space/. Periodically the most stable version will be pushed to https://keeptrack.space from the CI/CD pipeline.
 
 ## Prerequisites
 
@@ -49,7 +79,7 @@ KeepTrack.Space is built using ES6+ modules and assembled with Webpack. If you w
 ```bash
 git clone https://github.com/thkruz/keeptrack.space       #Clone the github files.
 cd ./keeptrack.space/                                     #Switch into the directory.
-npm ci                                                    #Install the dependencies.
+npm i                                                     #Install the dependencies.
 npm run build                                             #Build the project.
 npm start                                                 #Start the server.
 ```

@@ -93,6 +93,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_REMOTE_FOLDER }}
+          timeout: 300000 # 5 minutes
           local-dir: ./dist/
           exclude: |
             ./dist/tle/
@@ -122,6 +123,7 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_REMOTE_FOLDER }}
+          timeout: 300000 # 5 minutes
           local-dir: ./dist/
           exclude: |
             ./dist/tle/

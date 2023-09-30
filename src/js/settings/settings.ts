@@ -1300,6 +1300,7 @@ export class SettingsManager {
   }
 
   private facsat2() {
+    this.isShowLogo = true;
     this.isShowSplashScreen = false;
     this.maxAnalystSats = 1;
     this.maxMissiles = 1;

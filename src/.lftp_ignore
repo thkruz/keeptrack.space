@@ -1,6 +1,15 @@
 tle
 tle/**/*
 analysis
+analysis/*
 analysis/**/*
 settings/settingsOverride.js
 .lftp_ignore
+.htaccess
+'Chrome With Local Files.lnk'
+config.html
+embed.html
+KeepTrack.bat
+KeepTrack.lnk
+radarData
+types

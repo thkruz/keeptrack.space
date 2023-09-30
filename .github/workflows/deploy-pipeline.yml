@@ -77,6 +77,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
       # Download Artifacts
       - name: Download Artifacts
         uses: actions/download-artifact@v3.0.2
@@ -84,21 +87,24 @@ jobs:
           name: build
           path: dist
       # Deploy
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Deploy files via SFTP
+        uses: pressidium/lftp-mirror-action@v1
         with:
-          server: ${{ secrets.FTP_HOST }}
+          # SFTP credentials
+          host: ${{ secrets.FTP_HOST }}
           port: 22
-          protocol: ftps
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_REMOTE_FOLDER }}
-          timeout: 300000 # 5 minutes
-          local-dir: ./dist/
-          exclude: |
-            ./dist/tle/
-            ./dist/analysis/
-            ./dist/settings/settingsOverride.js
+          user: ${{ secrets.FTP_USERNAME }}
+          pass: ${{ secrets.FTP_PASSWORD }}
+          # lftp settings
+          onlyNewer: true
+          settings: 'sftp:auto-confirm=yes'
+          # Mirror command options
+          localDir: '.'
+          remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
+          reverse: true
+          ignoreFile: '.lftp_ignore'
+          options: '--verbose'
+
 
   production:
     needs: staging
@@ -107,6 +113,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
       # Download Artifacts
       - name: Download Artifacts
         uses: actions/download-artifact@v3.0.2
@@ -114,18 +123,20 @@ jobs:
           name: build
           path: dist
       # Deploy
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Deploy files via SFTP
+        uses: pressidium/lftp-mirror-action@v1
         with:
-          server: ${{ secrets.FTP_HOST }}
+          # SFTP credentials
+          host: ${{ secrets.FTP_HOST }}
           port: 22
-          protocol: ftps
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_REMOTE_FOLDER }}
-          timeout: 300000 # 5 minutes
-          local-dir: ./dist/
-          exclude: |
-            ./dist/tle/
-            ./dist/analysis/
-            ./dist/settings/settingsOverride.js
+          user: ${{ secrets.FTP_USERNAME }}
+          pass: ${{ secrets.FTP_PASSWORD }}
+          # lftp settings
+          onlyNewer: true
+          settings: 'sftp:auto-confirm=yes'
+          # Mirror command options
+          localDir: '.'
+          remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
+          reverse: true
+          ignoreFile: '.lftp_ignore'
+          options: '--verbose'

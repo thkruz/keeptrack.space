@@ -1102,14 +1102,6 @@ input:focus {
   height: auto !important;
 }
 
-#license-watermark {
-  position: absolute;
-  bottom: 125px;
-  left: 25px;
-  font-size: 35px;
-  height: auto !important;
-}
-
 #reset-sensor-text {
   display: none;
 }

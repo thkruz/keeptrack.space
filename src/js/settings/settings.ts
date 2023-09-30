@@ -917,10 +917,15 @@ export class SettingsManager {
    * Flag if the keyboard should be disabled
    */
   isDisableKeyboard = false;
+  /**
+   * Flag for if the user is running inside an iframe
+   */
+  isInIframe = false;
 
   init(settingsOverride?: any) {
     this.pTime = [];
 
+    this.checkIfIframe();
     this.setInstallDirectory_();
     this.setMobileSettings();
     this.setEmbedOverrides();
@@ -953,6 +958,13 @@ export class SettingsManager {
     window.settingsManager = this;
     // Expose these to node if running in node
     if (global) (<any>global).settingsManager = this;
+  }
+
+  private checkIfIframe() {
+    if (window.self !== window.top) {
+      this.isInIframe = true;
+      this.isShowLogo = true;
+    }
   }
 
   /**

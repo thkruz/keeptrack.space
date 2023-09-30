@@ -913,6 +913,10 @@ export class SettingsManager {
    */
   isEnableExtendedCatalog = false;
   selectedColorFallback = <[number, number, number, number]>[0, 0, 0, 0];
+  /**
+   * Flag if the keyboard should be disabled
+   */
+  isDisableKeyboard = false;
 
   init(settingsOverride?: any) {
     this.pTime = [];
@@ -1300,6 +1304,7 @@ export class SettingsManager {
   }
 
   private facsat2() {
+    this.isDisableKeyboard = true;
     this.isShowLogo = true;
     this.isShowSplashScreen = false;
     this.maxAnalystSats = 1;

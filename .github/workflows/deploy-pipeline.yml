@@ -93,11 +93,11 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_REMOTE_FOLDER }}
-          local-dir: dist
+          local-dir: ./dist/
           exclude: |
-            dist/tle
-            dist/analysis
-            dist/settings/settingsOverride.js
+            ./dist/tle/
+            ./dist/analysis/
+            ./dist/settings/settingsOverride.js
 
   production:
     needs: staging
@@ -122,8 +122,8 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ${{ secrets.FTP_REMOTE_FOLDER }}
-          local-dir: dist
+          local-dir: ./dist/
           exclude: |
-            dist/tle
-            dist/analysis
-            dist/settings/settingsOverride.js
+            ./dist/tle/
+            ./dist/analysis/
+            ./dist/settings/settingsOverride.js

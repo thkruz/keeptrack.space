@@ -95,8 +95,8 @@ export class MeshManager {
       float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
 
       vec3 ambientColor = vDiffuse * 0.1;
-      vec3 dirColor = vDiffuse * vAmbient * lightAmt * min(vInSun,1.0);
-      vec3 specColor = vSpecular * lightAmt * min(vInSun,1.0);
+      vec3 dirColor = vDiffuse * vAmbient * lightAmt * (min(vInSun,1.0) * 0.2);
+      vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.2);
 
       vec3 color = ambientColor + dirColor + specColor;
 

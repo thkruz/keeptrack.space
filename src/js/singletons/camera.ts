@@ -27,6 +27,7 @@ import { Degrees, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians }
 import { keepTrackContainer } from '../container';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
+import { SettingsManager } from '../settings/settings';
 import { CoordinateTransforms } from '../static/coordinate-transforms';
 import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
@@ -34,7 +35,6 @@ import { DrawManager } from './draw-manager';
 import { errorManagerInstance } from './errorManager';
 import { InputManager } from './input-manager';
 import { TimeManager } from './time-manager';
-import { SettingsManager } from '../settings/settings';
 
 declare module '@app/js/interfaces' {
   interface SatShader {
@@ -86,7 +86,6 @@ export class Camera {
   private fpsLastTime_ = <Milliseconds>0;
   private fpsPos_ = <vec3>[0, 25000, 0];
   private ftsYaw_ = <Radians>0;
-  private isAutoPan_ = false;
   private isAutoRotate_ = true;
   private isFPSForwardSpeedLock_ = false;
   private isFPSSideSpeedLock_ = false;
@@ -220,11 +219,8 @@ export class Camera {
   camDistBuffer = <Kilometers>0;
 
   constructor() {
-    this.settings_ = {
-      autoPanSpeed: {
-        x: 0.5,
-        y: 0.5,
-      },
+    this.settings_ = <SettingsManager>(<unknown>{
+      autoPanSpeed: 1,
       autoRotateSpeed: 0.0075,
       cameraDecayFactor: 0.0005,
       cameraMovementSpeed: 0.003,
@@ -243,7 +239,7 @@ export class Camera {
         maxSize: 0.1,
       } as SatShader,
       zoomSpeed: 0.0005,
-    } as SettingsManager;
+    });
   }
 
   public get zoomTarget(): number {
@@ -265,17 +261,6 @@ export class Camera {
     gl.bindFramebuffer(gl.FRAMEBUFFER, pickingFrameBuffer);
     gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickReadPixelBuffer);
     return pickReadPixelBuffer[0] === 0 && pickReadPixelBuffer[1] === 0 && pickReadPixelBuffer[2] === 0;
-  }
-
-  public autoPan(val?: boolean): void {
-    if (this.settings_.autoPanSpeed.x === 0) {
-      this.settings_.autoPanSpeed.x = 1; // Can't autopan if speed is 0
-    }
-    if (typeof val == 'undefined') {
-      this.isAutoPan_ = !this.isAutoPan_;
-      return;
-    }
-    this.isAutoPan_ = val;
   }
 
   public autoRotate(val?: boolean): void {
@@ -339,8 +324,8 @@ export class Camera {
     }
   }
 
-  public thresholdForCloseCamera = <Kilometers>400;
-  public minDistanceFromSatellite = <Kilometers>30;
+  public thresholdForCloseCamera = <Kilometers>500;
+  public minDistanceFromSatellite = <Kilometers>15;
 
   public zoomWheel(delta: number): void {
     if (delta < 0) {
@@ -810,7 +795,7 @@ export class Camera {
       }
     }
 
-    if (this.camZoomSnappedOnSat) {
+    if (this.camZoomSnappedOnSat && !this.settings_.isAutoZoomIn && !this.settings_.isAutoZoomOut) {
       if (!sat.static && sat.active) {
         // if this is a satellite not a missile
         const { gmst } = SatMath.calculateTimeVariables(simulationTime);
@@ -863,7 +848,18 @@ export class Camera {
     }
 
     if (this.isAutoRotate_) {
-      this.camYaw = <Radians>(this.camYaw - this.settings_.autoRotateSpeed * dt);
+      if (this.settings_.isAutoRotateL) {
+        this.camYaw = <Radians>(this.camYaw - this.settings_.autoRotateSpeed * dt);
+      }
+      if (this.settings_.isAutoRotateR) {
+        this.camYaw = <Radians>(this.camYaw + this.settings_.autoRotateSpeed * dt);
+      }
+      if (this.settings_.isAutoRotateU) {
+        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt);
+      }
+      if (this.settings_.isAutoRotateD) {
+        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt);
+      }
     }
 
     this.updateZoom_(dt);
@@ -1292,9 +1288,11 @@ export class Camera {
         }
       }
     }
-    if (this.isAutoPan_) {
-      this.panCurrent.z -= this.settings_.autoPanSpeed.y * dt;
-      this.panCurrent.x -= this.settings_.autoPanSpeed.x * dt;
+    if (this.settings_.isAutoPanD || this.settings_.isAutoPanU || this.settings_.isAutoPanL || this.settings_.isAutoPanR) {
+      if (this.settings_.isAutoPanD) this.panCurrent.z += this.settings_.autoPanSpeed * dt;
+      if (this.settings_.isAutoPanU) this.panCurrent.z -= this.settings_.autoPanSpeed * dt;
+      if (this.settings_.isAutoPanL) this.panCurrent.x += this.settings_.autoPanSpeed * dt;
+      if (this.settings_.isAutoPanR) this.panCurrent.x -= this.settings_.autoPanSpeed * dt;
     }
   }
 
@@ -1366,6 +1364,16 @@ export class Camera {
         this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize / 3;
       } else {
         this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize;
+      }
+    }
+
+    if (this.settings_.isAutoZoomIn || this.settings_.isAutoZoomOut) {
+      this.isCamSnapMode;
+      if (this.settings_.isAutoZoomIn) {
+        this.zoomTarget_ -= dt * this.settings_.autoZoomSpeed;
+      }
+      if (this.settings_.isAutoZoomOut) {
+        this.zoomTarget_ += dt * this.settings_.autoZoomSpeed;
       }
     }
 

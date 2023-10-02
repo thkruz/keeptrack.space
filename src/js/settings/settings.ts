@@ -74,6 +74,7 @@ export class SettingsManager {
     gamepad: true,
     scenarioCreator: false,
     debrisScreening: true,
+    videoDirector: true,
   };
 
   colors = null;
@@ -314,10 +315,7 @@ export class SettingsManager {
   /**
    * Adjust to change camera speed of auto pan around earth
    */
-  autoPanSpeed = {
-    x: 1,
-    y: 0,
-  };
+  autoPanSpeed = 1;
 
   /**
    * Adjust to change camera speed of auto rotate around earth
@@ -921,6 +919,17 @@ export class SettingsManager {
    * Flag for if the user is running inside an iframe
    */
   isInIframe = false;
+  isAutoRotateL = true;
+  isAutoRotateR = false;
+  isAutoRotateU = false;
+  isAutoRotateD = false;
+  isAutoPanL = false;
+  isAutoPanR = false;
+  isAutoPanU = false;
+  isAutoPanD = false;
+  isAutoZoomIn = false;
+  isAutoZoomOut = false;
+  autoZoomSpeed = 0.0005;
 
   init(settingsOverride?: any) {
     this.pTime = [];

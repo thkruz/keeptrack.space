@@ -53,10 +53,12 @@ import { startAnalytics } from './startAnalytics';
 import { stereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { updateSatManagerPlugin } from './update-select-box/update-select-box';
+import { videoDirectorPlugin } from './video-director/video-director';
 import { watchlistPlugin } from './watchlist/watchlist';
 import { watchlistOverlayPlugin } from './watchlist/watchlist-overlay';
 
 export type KeepTrackPlugins = {
+  videoDirector?: boolean;
   debrisScreening?: boolean;
   satInfoboxCore?: boolean;
   updateSelectBoxCore?: boolean;
@@ -185,6 +187,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     // if (plugins.debug) debug.initMenu();
     if (plugins.soundManager) soundManagerPlugin.init();
     if (plugins.gamepad) gamepad.init();
+    if (plugins.videoDirector) videoDirectorPlugin.init();
 
     keepTrackApi.register({
       method: 'uiManagerFinal',

@@ -2,12 +2,13 @@ import { keepTrackContainer } from '@app/js/container';
 import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { mat4, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
-import { CatalogManager, GetSatType, GroupsManager, SatObject, SensorManager, Singletons, UserSettings } from '../interfaces';
+import { CatalogManager, GetSatType, GroupsManager, SatObject, SensorManager, Singletons } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { SelectSatManager } from '../plugins/select-sat-manager/select-sat-manager';
 import { StereoMapPlugin } from '../plugins/stereo-map/stereo-map';
 import { watchlistPlugin } from '../plugins/watchlist/watchlist';
+import { SettingsManager } from '../settings/settings';
 import { GlUtils } from '../static/gl-utils';
 import { SatMath } from '../static/sat-math';
 import { Camera, CameraType, mainCameraInstance } from './camera';
@@ -66,7 +67,7 @@ export interface DrawManager {
   draw(dotsManager: DotsManager): void;
   drawOptionalScenery(mainCameraInstance: Camera): void;
   glInit(): Promise<WebGL2RenderingContext>;
-  init(settings: UserSettings): Promise<void>;
+  init(settings: SettingsManager): Promise<void>;
   loadHiRes(): Promise<void>;
   loadScene(): Promise<void>;
   orbitsAbove(): void;
@@ -93,7 +94,7 @@ export class StandardDrawManager implements DrawManager {
   private satHoverMiniDOM_: HTMLDivElement;
   private satLabelModeLastTime_ = 0;
   private satMiniBox_: HTMLDivElement;
-  private settings_: UserSettings;
+  private settings_: SettingsManager;
 
   public canvas: HTMLCanvasElement;
   public demoModeSatellite: any;
@@ -314,7 +315,7 @@ export class StandardDrawManager implements DrawManager {
     return gl;
   }
 
-  public async init(settings: UserSettings): Promise<void> {
+  public async init(settings: SettingsManager): Promise<void> {
     this.settings_ = settings;
 
     this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));

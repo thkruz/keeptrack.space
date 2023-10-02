@@ -1,12 +1,13 @@
-import { SatCruncherMessageData, SatObject, UserSettings } from '../interfaces';
+import { SatCruncherMessageData, SatObject } from '../interfaces';
 import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { mat4 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
+import { keepTrackApi } from '../keepTrackApi';
+import { SettingsManager } from '../settings/settings';
 import { CameraType, mainCameraInstance } from './camera';
 import { DrawManager } from './draw-manager';
-import { keepTrackApi } from '../keepTrackApi';
 
 declare module '@app/js/interfaces' {
   interface SatShader {
@@ -36,7 +37,7 @@ export class DotsManager {
   private pickingDotSize_ = '16.0';
   private positionBufferOneTime_ = false;
   private satDataLenInDraw_: number;
-  private settings_: UserSettings;
+  private settings_: SettingsManager;
   // Array for which colors go to which ids
   private sizeBufferOneTime: any;
 
@@ -262,7 +263,7 @@ export class DotsManager {
    * Initializes the dots manager with the given user settings.
    * @param settings - The user settings to use for initialization.
    */
-  init(settings: UserSettings) {
+  init(settings: SettingsManager) {
     const drawManagerInstance = keepTrackApi.getDrawManager();
     this.settings_ = settings;
 

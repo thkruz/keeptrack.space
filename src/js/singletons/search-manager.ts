@@ -190,6 +190,9 @@ export class SearchManager {
         }
 
         if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
+          // Ignore Notional Satellites unless all 6 characters are entered
+          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) return true;
+
           results.push({
             strIndex: sat.sccNum.indexOf(searchStringIn),
             isSccNum: true,
@@ -200,6 +203,9 @@ export class SearchManager {
         }
 
         if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
+          // Ignore Notional Satellites
+          if (sat.name.includes(' Notional)')) return true;
+
           results.push({
             strIndex: sat.intlDes.indexOf(searchStringIn),
             isIntlDes: true,

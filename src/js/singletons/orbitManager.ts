@@ -77,11 +77,14 @@ export class StandardOrbitManager implements OrbitManager {
     const gl = this.gl_;
     if (isSecondary) {
       this.secondarySelectId_ = -1;
+      if (!this.secondaryOrbitBuf_) return;
       gl.bindBuffer(gl.ARRAY_BUFFER, this.secondaryOrbitBuf_);
     } else {
       this.currentSelectId_ = -1;
+      if (!this.selectOrbitBuf_) return;
       gl.bindBuffer(gl.ARRAY_BUFFER, this.selectOrbitBuf_);
     }
+
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
   }
 
@@ -133,6 +136,7 @@ export class StandardOrbitManager implements OrbitManager {
 
   init(lineManagerInstance: LineManager, gl: WebGL2RenderingContext, orbitWorker?: Worker): void {
     if (!settingsManager.isDrawOrbits) return;
+
     this.tempTransColor = settingsManager.colors.transparent;
 
     this.lineManagerInstance_ = lineManagerInstance;
@@ -188,6 +192,7 @@ export class StandardOrbitManager implements OrbitManager {
 
     const satDataString = StandardOrbitManager.getSatDataString(catalogManagerInstance.satData);
 
+    if (!this.orbitWorker) return;
     this.orbitWorker.postMessage({
       isInit: true,
       orbitFadeFactor: settingsManager.orbitFadeFactor,
@@ -239,6 +244,7 @@ export class StandardOrbitManager implements OrbitManager {
   changeOrbitBufferData(satId: number, TLE1: string, TLE2: string): void {
     const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
 
+    if (!this.orbitWorker) return;
     this.orbitWorker.postMessage({
       isInit: false,
       isUpdate: true,
@@ -271,6 +277,7 @@ export class StandardOrbitManager implements OrbitManager {
     if (!this.inProgress_[satId] && !sat.static) {
       const { missile, latList, lonList, altList } = missileParams;
       if (missile) {
+        if (!this.orbitWorker) return;
         this.orbitWorker.postMessage({
           isInit: false,
           isUpdate: true,
@@ -281,6 +288,7 @@ export class StandardOrbitManager implements OrbitManager {
           altList: altList,
         });
       } else {
+        if (!this.orbitWorker) return;
         this.orbitWorker.postMessage({
           isInit: false,
           satId: satId,

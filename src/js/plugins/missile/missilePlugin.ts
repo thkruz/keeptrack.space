@@ -1,11 +1,11 @@
 import missilePng from '@app/img/icons/missile.png';
-import { keepTrackApi } from '@app/js/keepTrackApi';
 import { keepTrackContainer } from '@app/js/container';
 import { CatalogManager, OrbitManager, Singletons, UiManager } from '@app/js/interfaces';
-import { showLoading } from '@app/js/lib/showLoading';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
-import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
 import { getEl } from '@app/js/lib/get-el';
+import { showLoading } from '@app/js/lib/showLoading';
+import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
 import { TimeManager } from '@app/js/singletons/time-manager';
 
 import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
@@ -340,16 +340,6 @@ export const uiManagerInit = (): void => {
                 <div id="ms-custom-opt">
                   <div class="input-field col s12">
                     <select id="ms-attacker">
-                      <optgroup label="United States">
-                        <option value="100">Ohio Sub (Trident II)</option>
-                        <option value="101">Minot</option>
-                        <option value="102">Malmstrom</option>
-                        <option value="103">F.E. Warren</option>
-                      </optgroup>
-                      <optgroup label="United Kingdom">
-                        <option value="600">Vanguard Sub (Trident II)</option>
-                        <option value="601">HMNB Clyde (Trident II)</option>
-                      </optgroup>
                       <optgroup label="Russia">
                         <option value="200">Aleysk</option>
                         <option value="201">Dombarovskiy</option>
@@ -389,8 +379,18 @@ export const uiManagerInit = (): void => {
                         <option value="316">Hunan</option>
                         <option value="317">Daqing City</option>
                         <option value="318">Xinyang City</option>
-                        <option value="319">Xinjiang Province</option> <!-- // NO-PIG -->
+                        <option value="319">Xinjiang Province</option>
                         <option value="320">Tibet Province</option>
+                      </optgroup>
+                      <optgroup label="United States">
+                        <option value="101">Minot</option>
+                        <option value="102">Malmstrom</option>
+                        <option value="103">F.E. Warren</option>
+                        <option value="100">Ohio Sub (Trident II)</option>
+                      </optgroup>
+                      <optgroup label="United Kingdom">
+                        <option value="600">Vanguard Sub (Trident II)</option>
+                        <option value="601">HMNB Clyde (Trident II)</option>
                       </optgroup>
                       <optgroup label="France">
                         <option value="500">Triomphant Sub (M51)</option>
@@ -415,7 +415,6 @@ export const uiManagerInit = (): void => {
                   </div>
                   <div class="input-field col s12">
                     <select id="ms-target">
-                      <option value="-1">Custom Impact</option>
                       <optgroup label="United States">
                         <option value="0">Washington DC</option>
                         <option value="1">New York City</option>
@@ -430,6 +429,7 @@ export const uiManagerInit = (): void => {
                         <option value="10">Hawaii</option>
                         <option value="11">Guam</option>
                       </optgroup>
+                      <option value="-1">Custom Impact</option>
                       <optgroup label="NATO Countries">
                         <option value="12">London</option>
                         <option value="13">Paris</option>
@@ -507,6 +507,9 @@ export const uiManagerFinal = (): void => {
   getEl('ms-error').addEventListener('click', msErrorClick);
   getEl('missile').addEventListener('change', missileChange);
   getEl('searchRvBtn').addEventListener('click', searchForRvs);
+
+  msAttackerChange();
+  msTargetChange();
 };
 
 export const init = (): void => {

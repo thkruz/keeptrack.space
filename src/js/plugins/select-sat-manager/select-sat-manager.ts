@@ -1,6 +1,6 @@
 import { keepTrackContainer } from '@app/js/container';
 import { CatalogManager, GetSatType, SatObject, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { isSatObject, keepTrackApi } from '@app/js/keepTrackApi';
 import { fadeIn, fadeOut } from '@app/js/lib/fade';
 import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
@@ -197,6 +197,14 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     catalogManagerInstance.setSelectedSat(satId);
 
+    if (sat) {
+      if (isSatObject(sat)) {
+        SelectSatManager.setSatInfoBoxSatellite_();
+      } else {
+        SelectSatManager.setSatInfoBoxMissile_();
+      }
+    }
+
     if (satId !== -1) {
       // NOTE: This has to come after keepTrackApi.methods.selectSatData in catalogManagerInstance.setSelectedSat.
       const rootElement = document.querySelector(':root') as HTMLElement;
@@ -204,5 +212,37 @@ export class SelectSatManager extends KeepTrackPlugin {
       rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
       fadeIn(getEl('sat-infobox'));
     }
+  }
+
+  private static setSatInfoBoxMissile_() {
+    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
+      (id) => {
+        const el = getEl(id);
+        if (!el) return;
+        el.parentElement.style.display = 'none';
+      }
+    );
+
+    const satMissionData = getEl('sat-mission-data');
+    if (satMissionData) satMissionData.style.display = 'none';
+
+    const satIdentifierData = getEl('sat-identifier-data');
+    if (satIdentifierData) satIdentifierData.style.display = 'none';
+  }
+
+  private static setSatInfoBoxSatellite_() {
+    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
+      (id) => {
+        const el = getEl(id);
+        if (!el) return;
+        el.parentElement.style.display = 'block';
+      }
+    );
+
+    const satMissionData = getEl('sat-mission-data');
+    if (satMissionData) satMissionData.style.display = 'block';
+
+    const satIdentifierData = getEl('sat-identifier-data');
+    if (satIdentifierData) satIdentifierData.style.display = 'block';
   }
 }

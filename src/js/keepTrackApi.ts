@@ -6,6 +6,7 @@ import {
   Constructor,
   GroupsManager,
   KeepTrackPrograms,
+  MissileObject,
   OrbitManager,
   SatObject,
   SensorManager,
@@ -314,3 +315,12 @@ export enum KeepTrackApiMethods {
    */
   staticOffsetChange = 'staticOffsetChange',
 }
+
+export const isSensorObject = (sat: SatObject | MissileObject | SensorObject): boolean =>
+  !!((<SensorObject>sat).observerGd?.lat || (<SensorObject>sat).observerGd?.lon || (<SensorObject>sat).observerGd?.alt);
+export const isMissileObject = (sat: SatObject | MissileObject | SensorObject): boolean => !!(<MissileObject>sat).missile;
+export const isSatObject = (sat: SatObject | MissileObject | SensorObject): boolean => {
+  if (!sat) return false;
+
+  return !!((<SatObject>sat).sccNum || (<SatObject>sat).intlDes);
+};

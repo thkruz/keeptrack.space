@@ -1,9 +1,9 @@
 import { MissileObject } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { missileManager } from './missileManager';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
+import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { Kilometers, Meters } from 'ootk';
+import { missileManager } from './missileManager';
 
 export class Missile {
   static EarthMass = 5.9726 * Math.pow(10, 24); // (kg)

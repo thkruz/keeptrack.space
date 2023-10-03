@@ -139,7 +139,6 @@ export class SettingsManager {
    * Determines whether or not the splash screen should be displayed.
    */
   isShowSplashScreen = true;
-  isUseExtendedCatalog = false;
   isNotionalDebris = false;
   isFreezePropRateOnDrag = false;
   /**
@@ -276,7 +275,10 @@ export class SettingsManager {
   isOrbitCruncherInEcf = false;
   lastSearch = null;
   isGroupOverlayDisabled = null;
-  nearZoomLevel = 0;
+  /**
+   * Distance from satellite when we switch to close camera mode
+   */
+  nearZoomLevel = <Kilometers>5000;
   isPreventColorboxClose = false;
   isDayNightToggle = false;
   isUseHigherFOVonMobile = null;
@@ -930,6 +932,8 @@ export class SettingsManager {
   isAutoZoomIn = false;
   isAutoZoomOut = false;
   autoZoomSpeed = 0.0005;
+  maxNotionalDebris = 100000;
+  dotsPerColor: number;
 
   init(settingsOverride?: any) {
     this.pTime = [];
@@ -1077,6 +1081,7 @@ export class SettingsManager {
         densityMed: [1, 0.4, 0, 1],
         densityLow: [1, 1, 0, 0.9],
         densityOther: [0.8, 0.8, 0.8, 0.3],
+        notional: [1, 0, 0, 0.8],
       };
       try {
         localStorage.setItem('this-colors', JSON.stringify(this.colors));
@@ -1228,6 +1233,81 @@ export class SettingsManager {
                 break;
               case 'facsat2':
                 this.facsat2();
+                break;
+              case 'altitudes':
+                this.maxAnalystSats = 1;
+                this.maxMissiles = 1;
+                this.maxFieldOfViewMarkers = 1;
+                // this.isNotionalDebris = true;
+                // this.isEnableExtendedCatalog = true;
+                this.isShowAgencies = false;
+                this.isDisableLaunchSites = true;
+                this.isDisableControlSites = true;
+                this.isDisableSensors = true;
+                this.colors.transparent = [1, 1, 1, 0.4];
+                this.colors.rocketBody = [0.5, 0.5, 0.5, 1];
+                this.colors.unknown = [0.5, 0.5, 0.5, 1];
+                this.colors.pink = [0.5, 0.5, 0.5, 1];
+                this.colors.notional = [0.5, 0.5, 0.5, 1];
+                this.colors.deselected = [1, 1, 1, 0.4];
+                this.selectedColor = [0, 0, 0, 0];
+                this.selectedColorFallback = [0, 0, 0, 0];
+                this.maxNotionalDebris = 0.5 * 1000000; // 2.5 million
+                this.isDrawOrbits = false;
+                this.searchLimit = 100000;
+                this.isEPFL = true;
+                this.isDisableExtraCatalog = false;
+                this.offline = true;
+                this.timeMachineDelay = <Milliseconds>1000;
+                this.satShader.minSize = 8.0;
+                this.isDisableAsciiCatalog = true;
+
+                this.timeMachineString = (yearStr) => {
+                  window.M.Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
+                  const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
+                  const english = `In ${yearPrefix}${yearStr}`;
+                  // const french = `En ${yearPrefix}${yearStr}`;
+                  // const german = `Im ${yearPrefix}${yearStr}`;
+
+                  const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
+                  const debrisSpan = `<span style="color: rgb(150, 150, 150);">Debris </span>`;
+                  document.getElementById('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+                  return `${english}`;
+                };
+                this.onLoadCb = () => {
+                  // Create div for textOverlay
+                  const textOverlay = document.createElement('div');
+                  textOverlay.id = 'textOverlay';
+                  document.body.appendChild(textOverlay);
+
+                  // Update CSS
+                  const toastCss = `
+                    .toast,
+                    .toast-container {
+                      display: none !important;
+                    }
+                  `;
+                  const style = document.createElement('style');
+                  style.type = 'text/css';
+                  style.appendChild(document.createTextNode(toastCss));
+                  document.head.appendChild(style);
+
+                  document.getElementById('textOverlay').style.cssText = `
+                    border-radius: 2px;
+                    bottom: 75px;
+                    right: 150px;
+                    width: auto;
+                    position: absolute;
+                    min-height: 48px;
+                    line-height: 2.5em !important;
+                    background-color: rgb(0, 0, 0) !important;
+                    padding: 10px 55px !important;
+                    font-size: 1.8rem !important;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+                    font-weight: 300;
+                    color: white;
+                  }`;
+                };
                 break;
               default:
                 break;
@@ -1521,7 +1601,7 @@ export class SettingsManager {
    * Placeholder for overrides
    */
   // eslint-disable-next-line class-methods-use-this
-  timeMachineString(_yearStr: string) {
+  timeMachineString(_yearStr: string): string | boolean {
     return false;
   }
 

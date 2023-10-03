@@ -25,6 +25,7 @@ import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { Degrees, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { keepTrackContainer } from '../container';
+import { keepTrackApi } from '../keepTrackApi';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';
@@ -338,21 +339,29 @@ export class Camera {
       this.autoRotate(false);
     }
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     if (settingsManager.isZoomStopsSnappedOnSat || catalogManagerInstance.selectedSat == -1) {
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
       this.ecLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
     } else if (this.camDistBuffer < this.thresholdForCloseCamera || this.zoomLevel_ == -1) {
+      // Zooming Out
       settingsManager.selectedColor = [0, 0, 0, 0];
       this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 15); // delta is +/- 100
       this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.minDistanceFromSatellite), this.thresholdForCloseCamera);
     } else if (this.camDistBuffer >= this.thresholdForCloseCamera) {
+      // Zooming In
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
       this.ecLastZoom = this.zoomTarget;
       this.camZoomSnappedOnSat = false;
-      if (this.zoomTarget < this.zoomLevel_) {
+
+      // calculate camera distance from target
+      const target = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+      const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
+      const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.minDistanceFromSatellite);
+
+      if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
         this.camZoomSnappedOnSat = true;
         this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.thresholdForCloseCamera), this.minDistanceFromSatellite);
       }
@@ -816,6 +825,7 @@ export class Camera {
         (this.camSnapToSat.camDistTarget - this.settings_.minZoomDistance) / (this.settings_.maxZoomDistance - this.settings_.minZoomDistance),
         1 / ZOOM_EXP
       );
+      settingsManager.selectedColor = [0, 0, 0, 0];
       // errorManagerInstance.debug(`Zoom Target: ${this.zoomTarget_}`);
       this.ecLastZoom = this.zoomTarget_ + 0.1;
 

@@ -1,6 +1,6 @@
-import { SpaceObjectType } from '../lib/space-object-type';
 import { ControlSiteObject } from '../catalogs/control-sites';
 import { countryCodeList, countryMapList, launchSiteMap } from '../catalogs/countries';
+import { SpaceObjectType } from '../lib/space-object-type';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export abstract class StringExtractor {
@@ -59,7 +59,7 @@ export abstract class StringExtractor {
       if (rocketUrl.length > 0) {
         return `<a class="iframe" href="${rocketUrl[0].url}">${LV}</a>`;
       } else {
-        return 'Unknown';
+        return `${LV}`;
       }
     }
   }
@@ -68,7 +68,7 @@ export abstract class StringExtractor {
     if (!country || country == '') return '';
 
     // Fix known typo in external data
-    country = country === "UnitedKingdom" ? "United Kingdom" : country;
+    country = country === 'UnitedKingdom' ? 'United Kingdom' : country;
     const countryCode = countryCodeList[country];
 
     if (!countryCode) {

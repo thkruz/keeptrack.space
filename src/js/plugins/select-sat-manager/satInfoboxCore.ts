@@ -1012,7 +1012,8 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     }
 
     if (!catalogManagerInstance.isSensorManagerLoaded || !sensorManagerInstance.currentSensors[0].lat) {
-      getEl('sat-sun').parentElement.style.display = 'none';
+      const satSunDom = getEl('sat-sun');
+      if (satSunDom) satSunDom.style.display = 'none';
     } else {
       const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
       const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);

@@ -934,6 +934,10 @@ export class SettingsManager {
   autoZoomSpeed = 0.0005;
   maxNotionalDebris = 100000;
   dotsPerColor: number;
+  /**
+   * Minimum distance from satellite when we switch to close camera mode
+   */
+  minDistanceFromSatellite = <Kilometers>15;
 
   init(settingsOverride?: any) {
     this.pTime = [];
@@ -1535,7 +1539,7 @@ export class SettingsManager {
     this.isMobileModeEnabled = false;
     if (window.innerWidth <= this.desktopMinimumWidth) {
       this.disableWindowTouchMove = false;
-      this.isMobileModeEnabled = true;
+      // this.isMobileModeEnabled = true;
       this.maxFieldOfViewMarkers = 20000;
       // this.isDrawLess = true;
       // this.noMeshManager = true;

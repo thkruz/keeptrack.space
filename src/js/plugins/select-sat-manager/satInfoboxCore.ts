@@ -655,7 +655,6 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         .map((sat_) => sat_.rcs)
         .filter((rcs) => parseFloat(rcs) > 0);
       if (historicRcs.length > 0) {
-        console.log(historicRcs);
         const rcs = historicRcs.map((rcs_) => parseFloat(rcs_)).reduce((a, b) => a + b, 0) / historicRcs.length;
         satRcsEl.innerHTML = `H-Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(rcs).toFixed(2) + ' dBsm (Historical Estimate)');
@@ -980,9 +979,9 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   sensorInfo(sat: SatObject): void {
-    if (sat === null || typeof sat === 'undefined') return;
+    if (sat === null || typeof sat === 'undefined' || !settingsManager.plugins.sensor) return;
 
-    if (!this.issensorInfoLoaded && settingsManager.plugins.sensor) {
+    if (!this.issensorInfoLoaded) {
       SatInfoBoxCore.createSensorInfo();
       this.issensorInfoLoaded = true;
     }

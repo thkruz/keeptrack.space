@@ -135,7 +135,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         mainCameraInstance.ecLastZoom = mainCameraInstance.zoomLevel();
         if (!sat.static) {
           mainCameraInstance.cameraType = CameraType.FIXED_TO_SAT;
-        } else if (typeof sat.staticNum !== 'undefined') {
+        } else if (typeof sat.staticNum !== 'undefined' && !settingsManager.isMobileModeEnabled) {
+          // No sensor manager on mobile
           sensorManagerInstance.setSensor(null, sat.staticNum);
 
           if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
@@ -159,7 +160,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (sat.static) {
         if (typeof sat.staticNum == 'undefined') return;
         sat = catalogManagerInstance.getSat(satId);
-        if (catalogManagerInstance.isSensorManagerLoaded) sensorManagerInstance.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
+        // if (catalogManagerInstance.isSensorManagerLoaded) sensorManagerInstance.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
 
         // Todo: Needs to run uiManager.getsensorinfo();
 
@@ -176,7 +177,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         return;
       }
       mainCameraInstance.camZoomSnappedOnSat = true;
-      mainCameraInstance.camDistBuffer = mainCameraInstance.minDistanceFromSatellite;
+      mainCameraInstance.camDistBuffer = settingsManager.minDistanceFromSatellite;
       mainCameraInstance.camAngleSnappedOnSat = true;
 
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.isSensorSelected()) {

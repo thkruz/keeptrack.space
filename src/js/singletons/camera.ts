@@ -326,7 +326,6 @@ export class Camera {
   }
 
   public thresholdForCloseCamera = <Kilometers>500;
-  public minDistanceFromSatellite = <Kilometers>15;
 
   public zoomWheel(delta: number): void {
     if (delta < 0) {
@@ -346,12 +345,12 @@ export class Camera {
       this.camZoomSnappedOnSat = false;
     } else if (this.camDistBuffer < this.thresholdForCloseCamera || this.zoomLevel_ == -1) {
       // Zooming Out
-      settingsManager.selectedColor = [0, 0, 0, 0];
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
       this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 15); // delta is +/- 100
-      this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.minDistanceFromSatellite), this.thresholdForCloseCamera);
+      this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.settings_.minDistanceFromSatellite), this.thresholdForCloseCamera);
     } else if (this.camDistBuffer >= this.thresholdForCloseCamera) {
       // Zooming In
-      settingsManager.selectedColor = settingsManager.selectedColorFallback;
+      settingsManager.selectedColor = [0, 0, 0, 0];
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
       this.ecLastZoom = this.zoomTarget;
       this.camZoomSnappedOnSat = false;
@@ -359,11 +358,11 @@ export class Camera {
       // calculate camera distance from target
       const target = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
       const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
-      const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.minDistanceFromSatellite);
+      const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
 
       if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
         this.camZoomSnappedOnSat = true;
-        this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.thresholdForCloseCamera), this.minDistanceFromSatellite);
+        this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.thresholdForCloseCamera), this.settings_.minDistanceFromSatellite);
       }
     }
 
@@ -422,8 +421,8 @@ export class Camera {
         this.cameraType = CameraType.DEFAULT;
       } else {
         const satAlt = SatMath.getAlt(target.position, gmst);
-        if (this.getCamDist() < satAlt + RADIUS_OF_EARTH + this.minDistanceFromSatellite) {
-          this.zoomTarget = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.minDistanceFromSatellite);
+        if (this.getCamDist() < satAlt + RADIUS_OF_EARTH + this.settings_.minDistanceFromSatellite) {
+          this.zoomTarget = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
           // errorManagerInstance.debug('Zooming in to ' + this.zoomTarget_ + ' to because we are too close to the satellite');
           this.zoomLevel_ = this.zoomTarget_;
         }

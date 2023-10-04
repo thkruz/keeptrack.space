@@ -1,6 +1,6 @@
 import { keepTrackContainer } from '@app/js/container';
 import { CatalogManager, GetSatType, SatObject, SensorManager, Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { openColorbox } from '@app/js/lib/colorbox';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
@@ -105,7 +105,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   private static nearObjectsLinkClick(distance: number = 100): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (catalogManagerInstance.selectedSat === -1) {
       return;
@@ -463,24 +463,26 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
                 <div id="sec-angle-link" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
                 data-tooltip="Visualize Angle to Secondary Satellite">Draw sat to second sat line...</div>
               </div>
-              <div class="sat-info-section-header">Identifiers</div>
-              <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
-                data-tooltip="International Designator - Launch Year, Launch Number, and Piece Designator">COSPAR</div>
-                <div class="sat-info-value" id="sat-intl-des">xxxx-xxxA</div>
-              </div>
-              <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key" tooltipped" data-position="top" data-delay="50"
-                data-tooltip="USSF Catalog Number - Originally North American Air Defense (NORAD)">NORAD</div>
-                <div class="sat-info-value" id="sat-objnum">99999</div>
-              </div>
-              <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key">Alt ID</div>
-                <div class="sat-info-value" id="sat-altid">99999</div>
-              </div>
-              <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key">Source</div>
-                <div class="sat-info-value" id="sat-source">USSF</div>
+              <div id="sat-identifier-data">
+                <div class="sat-info-section-header">Identifiers</div>
+                <div class="sat-info-row sat-only-info">
+                  <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                  data-tooltip="International Designator - Launch Year, Launch Number, and Piece Designator">COSPAR</div>
+                  <div class="sat-info-value" id="sat-intl-des">xxxx-xxxA</div>
+                </div>
+                <div class="sat-info-row sat-only-info">
+                  <div class="sat-info-key" tooltipped" data-position="top" data-delay="50"
+                  data-tooltip="USSF Catalog Number - Originally North American Air Defense (NORAD)">NORAD</div>
+                  <div class="sat-info-value" id="sat-objnum">99999</div>
+                </div>
+                <div class="sat-info-row sat-only-info">
+                  <div class="sat-info-key">Alt ID</div>
+                  <div class="sat-info-value" id="sat-altid">99999</div>
+                </div>
+                <div class="sat-info-row sat-only-info">
+                  <div class="sat-info-key">Source</div>
+                  <div class="sat-info-value" id="sat-source">USSF</div>
+                </div>
               </div>
               <div class="sat-info-section-header">Orbit Data</div>
               <div class="sat-info-row sat-only-info">
@@ -653,7 +655,6 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         .map((sat_) => sat_.rcs)
         .filter((rcs) => parseFloat(rcs) > 0);
       if (historicRcs.length > 0) {
-        console.log(historicRcs);
         const rcs = historicRcs.map((rcs_) => parseFloat(rcs_)).reduce((a, b) => a + b, 0) / historicRcs.length;
         satRcsEl.innerHTML = `H-Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(rcs).toFixed(2) + ' dBsm (Historical Estimate)');
@@ -712,7 +713,8 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     getEl('sat-infobox').insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-        <div class="sat-info-section-header">Mission</div>
+        <div id="sat-mission-data">
+          <div class="sat-info-section-header">Mission</div>
           <div class="sat-info-row sat-only-info">
             <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
               data-tooltip="Primary User of the Satellite">
@@ -838,7 +840,8 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
               NO DATA
             </div>
           </div>
-          `
+        </div>
+        `
     );
   }
 
@@ -976,9 +979,9 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   sensorInfo(sat: SatObject): void {
-    if (sat === null || typeof sat === 'undefined') return;
+    if (sat === null || typeof sat === 'undefined' || !settingsManager.plugins.sensor) return;
 
-    if (!this.issensorInfoLoaded && settingsManager.plugins.sensor) {
+    if (!this.issensorInfoLoaded) {
       SatInfoBoxCore.createSensorInfo();
       this.issensorInfoLoaded = true;
     }
@@ -1008,7 +1011,8 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     }
 
     if (!catalogManagerInstance.isSensorManagerLoaded || !sensorManagerInstance.currentSensors[0].lat) {
-      getEl('sat-sun').parentElement.style.display = 'none';
+      const satSunDom = getEl('sat-sun');
+      if (satSunDom) satSunDom.style.display = 'none';
     } else {
       const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
       const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);

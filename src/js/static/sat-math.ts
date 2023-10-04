@@ -211,7 +211,7 @@ export abstract class SatMath {
    * @returns The visual magnitude of the satellite.
    */
   static calculateVisMag(sat: SatObject, sensor: SensorObject, propTime: Date, sun: Sun): number {
-    let rae = null as {
+    let rae: {
       az: Degrees;
       el: Degrees;
       rng: Kilometers;

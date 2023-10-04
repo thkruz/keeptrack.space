@@ -59,6 +59,8 @@ export const updateGamepad = (index?: number): void => {
   index ??= 0;
   const controller = getController(index);
 
+  if (controller === null) return; // No controller anymore - give up
+
   keepTrackApi.programs.gamepad.currentState = controller;
 
   updateZoom(controller.buttons[6].value, controller.buttons[7].value);

@@ -378,7 +378,7 @@ export class HoverManager {
   }
 
   public setHover(i: number): void {
-    if (!i) {
+    if (typeof i === 'undefined' || i === null || isNaN(i)) {
       errorManagerInstance.debug('setHover called with no id');
       return;
     }

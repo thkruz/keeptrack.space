@@ -69,6 +69,8 @@ const settingsOverride = {
     soundManager: true,
     gamepad: true,
     scenarioCreator: false,
+    debrisScreening: true,
+    videoDirector: false,
   },
   searchLimit: 150,
   isDisableCss: false,

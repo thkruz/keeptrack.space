@@ -1,6 +1,5 @@
 import * as analysis from '@app/js/plugins/analysis/analysis';
 import { countriesMenuPlugin } from '@app/js/plugins/countries/countries';
-import * as gamepad from '@app/js/plugins/gamepad/gamepad';
 import * as initialOrbit from '@app/js/plugins/initial-orbit/initial-orbit';
 import * as missile from '@app/js/plugins/missile/missilePlugin';
 import * as plotAnalysis from '@app/js/plugins/plot-analysis/plot-analysis';
@@ -24,6 +23,7 @@ import { debrisScreeningPlugin } from './debris-screening/debris-screening';
 import { dopsPlugin } from './dops/dops';
 import { editSatPlugin } from './edit-sat/edit-sat';
 import { findSatPlugin } from './find-sat/find-sat';
+import { gamepadPluginInstance } from './gamepad/gamepad';
 import { omManager } from './initial-orbit/om-manager';
 import { launchCalendarPlugin } from './launch-calendar/launch-calendar';
 import { newLaunchPlugin } from './new-launch/new-launch';
@@ -49,14 +49,15 @@ import { sensorListPlugin } from './sensor/sensor-list-plugin';
 import { settingsMenuPlugin } from './settings-menu/settings-menu';
 import { shortTermFencesPlugin } from './short-term-fences/short-term-fences';
 import { socialMediaPlugin } from './social/social';
-import { startAnalytics } from './startAnalytics';
 import { stereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { updateSatManagerPlugin } from './update-select-box/update-select-box';
+import { videoDirectorPlugin } from './video-director/video-director';
 import { watchlistPlugin } from './watchlist/watchlist';
 import { watchlistOverlayPlugin } from './watchlist/watchlist-overlay';
 
 export type KeepTrackPlugins = {
+  videoDirector?: boolean;
   debrisScreening?: boolean;
   satInfoboxCore?: boolean;
   updateSelectBoxCore?: boolean;
@@ -184,7 +185,8 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.settingsMenu) settingsMenuPlugin.init();
     // if (plugins.debug) debug.initMenu();
     if (plugins.soundManager) soundManagerPlugin.init();
-    if (plugins.gamepad) gamepad.init();
+    if (plugins.gamepad) gamepadPluginInstance.init();
+    if (plugins.videoDirector) videoDirectorPlugin.init();
 
     keepTrackApi.register({
       method: 'uiManagerFinal',
@@ -230,11 +232,6 @@ export const uiManagerFinal = (plugins: any): void => {
     getEl('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
   }
 
-  // Only turn on analytics if on keeptrack.space ()
-  if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
-    startAnalytics();
-  }
-
   const wheel = (dom: any, deltaY: number) => {
     const step = 0.15;
     const pos = dom.scrollTop;
@@ -253,4 +250,4 @@ export const uiManagerFinal = (plugins: any): void => {
 };
 
 // Create common import for all plugins
-export { StreamManager as CanvasRecorder, analysis, catalogLoader, gamepad, initialOrbit, missile, omManager, plotAnalysis };
+export { StreamManager as CanvasRecorder, analysis, catalogLoader, initialOrbit, missile, omManager, plotAnalysis };

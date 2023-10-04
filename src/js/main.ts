@@ -28,12 +28,15 @@
  */
 
 import { KeepTrack } from './keeptrack';
+import { startAnalytics } from './plugins/startAnalytics';
 
 declare global {
   interface Window {
     keepTrack: KeepTrack;
   }
 }
+
+startAnalytics();
 
 // Load the main website
 const keepTrack = new KeepTrack(window.settingsOverride);

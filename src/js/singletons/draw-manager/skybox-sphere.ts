@@ -1,4 +1,3 @@
-import { UserSettings } from '@app/js/interfaces';
 import { DEG2RAD } from '@app/js/lib/constants';
 import { SettingsManager } from '@app/js/settings/settings';
 import { GlUtils } from '@app/js/static/gl-utils';
@@ -123,7 +122,7 @@ export class SkyBoxSphere {
 
   // #region Public Static Methods (3)
 
-  public static getSrcBoundaries(settings: UserSettings): string {
+  public static getSrcBoundaries(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
 
     let src = `${settings.installDirectory}textures/skyboxBoundaries8k.jpg`;
@@ -131,7 +130,7 @@ export class SkyBoxSphere {
     return src;
   }
 
-  public static getSrcConstellations(settings: UserSettings): string {
+  public static getSrcConstellations(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
 
     let src = `${settings.installDirectory}textures/skyboxConstellations8k.jpg`;
@@ -139,7 +138,7 @@ export class SkyBoxSphere {
     return src;
   }
 
-  public static getSrcGraySkybox(settings: UserSettings): string {
+  public static getSrcGraySkybox(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
 
     let src = `${settings.installDirectory}textures/skybox1k-gray.jpg`;
@@ -147,7 +146,7 @@ export class SkyBoxSphere {
     return src;
   }
 
-  public static getSrcMilkyWay(settings: UserSettings): string {
+  public static getSrcMilkyWay(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
 
     let src = `${settings.installDirectory}textures/skybox8k.jpg`;

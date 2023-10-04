@@ -32,7 +32,8 @@
     "coverage/**/*",
     "tsconfig.json",
     "src/tools/**/*",
-    "test/**/*"
+    "test/**/*",
+    "src/js/plugins/startAnalytics.js"
   ],
   "filesGlob": [
     "src/**/*.ts",

@@ -504,12 +504,15 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
     settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;
-    if (settingsManager.isDrawTrailingOrbits) {
-      keepTrackApi.getOrbitManager().orbitWorker.postMessage({
-        orbitType: 2,
-      });
-    } else {
-      keepTrackApi.getOrbitManager().orbitWorker.postMessage({ orbitType: 1 });
+
+    if (keepTrackApi.getOrbitManager().orbitWorker) {
+      if (settingsManager.isDrawTrailingOrbits) {
+        keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+          orbitType: 2,
+        });
+      } else {
+        keepTrackApi.getOrbitManager().orbitWorker.postMessage({ orbitType: 1 });
+      }
     }
     // Must come after the above checks
 

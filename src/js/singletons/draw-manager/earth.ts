@@ -1,4 +1,3 @@
-import { UserSettings } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SettingsManager } from '@app/js/settings/settings';
@@ -8,24 +7,6 @@ import { SplashScreen } from '@app/js/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime } from 'ootk';
 import { OcclusionProgram } from './post-processing';
-
-declare module '@app/js/interfaces' {
-  interface UserSettings {
-    blueImages: boolean;
-    earthNumLatSegs: number;
-    earthNumLonSegs: number;
-    hiresImages: boolean;
-    hiresNoCloudsImages: boolean;
-    installDirectory: string;
-    isBlackEarth: boolean;
-    isMobileModeEnabled: boolean;
-    nasaImages: boolean;
-    politicalImages: boolean;
-    smallImages: boolean;
-    trusatImages: boolean;
-    vectorImages: boolean;
-  }
-}
 
 // TODO: #316 Implement VAO for earth
 export class Earth {
@@ -99,7 +80,7 @@ export class Earth {
   /**
    * Determines the url to the bump map based on the settings.
    */
-  public static getSrcBump(settings: UserSettings): string {
+  public static getSrcBump(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
 
     let src = `${settings.installDirectory}textures/earthbump8k.jpg`;
@@ -112,7 +93,7 @@ export class Earth {
   /**
    * Determines the url to the day texture based on the settings.
    */
-  public static getSrcDay(settings: UserSettings): string {
+  public static getSrcDay(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
 
     let src = `${settings.installDirectory}textures/earthmap512.jpg`;
@@ -123,7 +104,7 @@ export class Earth {
   /**
    * Determines the url to the high resolution day texture based on the settings.
    */
-  public static getSrcHiResDay(settings: UserSettings): string {
+  public static getSrcHiResDay(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
     let src = `${settings.installDirectory}textures/earthmap4k.jpg`;
     if (settings.smallImages) src = `${settings.installDirectory}textures/earthmap512.jpg`;
@@ -140,7 +121,7 @@ export class Earth {
   /**
    * Determines the url to the high resolution night texture based on the settings.
    */
-  public static getSrcHiResNight(settings: UserSettings): string {
+  public static getSrcHiResNight(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
 
     let src = `${settings.installDirectory}textures/earthlights4k.jpg`;
@@ -154,7 +135,7 @@ export class Earth {
   /**
    * Determines the url to the night texture based on the settings.
    */
-  public static getSrcNight(settings: UserSettings): string {
+  public static getSrcNight(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
 
     let src = `${settings.installDirectory}textures/earthlights512.jpg`;
@@ -165,7 +146,7 @@ export class Earth {
   /**
    * Determines the url to the specular map based on the settings.
    */
-  public static getSrcSpec(settings: UserSettings): string {
+  public static getSrcSpec(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
 
     let src = `${settings.installDirectory}textures/earthspec8k.jpg`;

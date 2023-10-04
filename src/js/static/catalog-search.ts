@@ -208,10 +208,10 @@ export class CatalogSearch {
   static yearOrLess(satData: SatObject[], yr: number) {
     return satData.filter((sat) => {
       const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
-      if (yr >= 59 && yr < 100) {
-        return parseInt(tleYear) <= yr && parseInt(tleYear) >= 59;
+      if (yr >= 57 && yr < 100) {
+        return parseInt(tleYear) <= yr && parseInt(tleYear) >= 57;
       } else {
-        return parseInt(tleYear) <= yr || parseInt(tleYear) >= 59;
+        return parseInt(tleYear) <= yr || parseInt(tleYear) >= 57;
       }
     });
   }

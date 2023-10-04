@@ -80,7 +80,6 @@ export class CatalogLoader {
         LaunchSite: string;
         LaunchVehicle: string;
       }[] = [];
-      // eslint-disable-next-line no-constant-condition
       if (settingsManager.isEnableExtendedCatalog) {
         try {
           const resp = await (await fetch(`${settingsManager.installDirectory}tle/tle4.js`)).text();
@@ -277,17 +276,19 @@ export class CatalogLoader {
     let prefix: string;
     let rest: string;
 
-    let notionalSatNum = 400000;
+    let notionalSatNum = 400000; // Start at 400,000 to avoid conflicts with real satellites
     const makeDebris = (notionalDebris: any, meanAnom: number) => {
       const debris = { ...notionalDebris };
       debris.id = tempSatData.length;
       debris.sccNum = notionalSatNum.toString();
 
       if (notionalSatNum < 1300000) {
+        // ESA estimates 1300000 objects larger than 1cm
         // Random number between 0.01 and 0.1
         debris.rcs = 0.01 + Math.random() * 0.09;
       } else {
         // Random number between 0.001 and 0.01
+        debris.name = `${notionalDebris.name} (1mm Notional)`; // 1mm
         debris.rcs = 0.001 + Math.random() * 0.009;
       }
 
@@ -332,7 +333,7 @@ export class CatalogLoader {
           tempSatData.push(resp[i]);
         }
 
-        if (settingsManager.isNotionalDebris && settingsManager.isUseExtendedCatalog && resp[i].type === 3) {
+        if (settingsManager.isNotionalDebris && resp[i].type === 3) {
           let notionalDebris = {
             id: 0,
             name: `${resp[i].name} (1cm Notional)`,
@@ -345,7 +346,7 @@ export class CatalogLoader {
           };
 
           for (let i = 0; i < 8; i++) {
-            if (tempSatData.length > 100000) break; // Max 1 million satellites
+            if (tempSatData.length > settingsManager.maxNotionalDebris) break;
             makeDebris(notionalDebris, 15 + Math.random() * 15);
             makeDebris(notionalDebris, -15 - Math.random() * 15);
             makeDebris(notionalDebris, 30 + Math.random() * 15);
@@ -441,7 +442,7 @@ export class CatalogLoader {
     }
     let asciiSatInfo;
     if (asciiCatalog?.length > 0 && settingsManager.offline) {
-      errorManagerInstance.debug('Processing ASCII Catalog');
+      errorManagerInstance.info('Processing ASCII Catalog');
       // If asciiCatalog catalogue
       for (const element of asciiCatalog) {
         if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
@@ -490,8 +491,8 @@ export class CatalogLoader {
     }
 
     let jsSatInfo;
-    if (jsCatalog?.length > 0 && settingsManager.isUseExtendedCatalog) {
-      errorManagerInstance.debug('Processing js Catalog');
+    if (jsCatalog?.length > 0 && settingsManager.isEnableExtendedCatalog) {
+      errorManagerInstance.info('Processing js Catalog');
       // If jsCatalog catalogue
       for (const element of jsCatalog) {
         if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
@@ -532,43 +533,43 @@ export class CatalogLoader {
           catalogManagerInstance.cosparIndex[`${year}-${rest}`] = tempSatData.length;
           tempSatData.push(jsSatInfo);
 
-          let notionalDebris = {
-            id: 0,
-            name: `${jsSatInfo.name} (1cm Notional)`,
-            TLE1: jsSatInfo.TLE1,
-            TLE2: jsSatInfo.TLE2,
-            sccNum: '',
-            type: SpaceObjectType.NOTIONAL,
-            source: 'Notional',
-            active: true,
-          };
+          // let notionalDebris = {
+          //   id: 0,
+          //   name: `${jsSatInfo.name} (1cm Notional)`,
+          //   TLE1: jsSatInfo.TLE1,
+          //   TLE2: jsSatInfo.TLE2,
+          //   sccNum: '',
+          //   type: SpaceObjectType.NOTIONAL,
+          //   source: 'Notional',
+          //   active: true,
+          // };
 
-          for (let i = 0; i < 6; i++) {
-            makeDebris(notionalDebris, 15 + Math.random() * 15);
-            makeDebris(notionalDebris, -15 - Math.random() * 15);
-            makeDebris(notionalDebris, 30 + Math.random() * 15);
-            makeDebris(notionalDebris, -30 - Math.random() * 15);
-            makeDebris(notionalDebris, 45 + Math.random() * 15);
-            makeDebris(notionalDebris, -45 - Math.random() * 15);
-            makeDebris(notionalDebris, 60 + Math.random() * 15);
-            makeDebris(notionalDebris, -60 - Math.random() * 15);
-            makeDebris(notionalDebris, 75 + Math.random() * 15);
-            makeDebris(notionalDebris, -75 - Math.random() * 15);
-            makeDebris(notionalDebris, 90 + Math.random() * 15);
-            makeDebris(notionalDebris, -90 - Math.random() * 15);
-            makeDebris(notionalDebris, 105 + Math.random() * 15);
-            makeDebris(notionalDebris, -105 - Math.random() * 15);
-            makeDebris(notionalDebris, 120 + Math.random() * 15);
-            makeDebris(notionalDebris, -120 - Math.random() * 15);
-            makeDebris(notionalDebris, 135 + Math.random() * 15);
-            makeDebris(notionalDebris, -135 - Math.random() * 15);
-            makeDebris(notionalDebris, 150 + Math.random() * 15);
-            makeDebris(notionalDebris, -150 - Math.random() * 15);
-            makeDebris(notionalDebris, 165 + Math.random() * 15);
-            makeDebris(notionalDebris, -165 - Math.random() * 15);
-            makeDebris(notionalDebris, 180 + Math.random() * 15);
-            makeDebris(notionalDebris, -180 - Math.random() * 15);
-          }
+          // for (let i = 0; i < 6; i++) {
+          //   makeDebris(notionalDebris, 15 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -15 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 30 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -30 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 45 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -45 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 60 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -60 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 75 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -75 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 90 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -90 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 105 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -105 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 120 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -120 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 135 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -135 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 150 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -150 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 165 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -165 - Math.random() * 15);
+          //   makeDebris(notionalDebris, 180 + Math.random() * 15);
+          //   makeDebris(notionalDebris, -180 - Math.random() * 15);
+          // }
         }
       }
     }

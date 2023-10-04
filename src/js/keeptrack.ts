@@ -379,7 +379,11 @@ theodore.kruczek at gmail dot com.
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
       orbitManagerInstance.updateAllVisibleOrbits(uiManagerInstance);
       this.inputManager.update(dt);
-      hoverManagerInstance.setHoverId(this.inputManager.Mouse.mouseSat, mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+
+      // Only update hover if we are not on mobile
+      if (!settingsManager.isMobileModeEnabled) {
+        hoverManagerInstance.setHoverId(this.inputManager.Mouse.mouseSat, mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+      }
     }
 
     // If Demo Mode do stuff
@@ -425,6 +429,7 @@ theodore.kruczek at gmail dot com.
       };
 
       SplashScreen.loadStr(SplashScreen.msg.science);
+      MobileManager.checkMobileMode();
 
       // Load all the plugins now that we have the API initialized
       await import('./plugins/plugins')
@@ -439,7 +444,7 @@ theodore.kruczek at gmail dot com.
       uiManagerInstance.onReady();
 
       SplashScreen.loadStr(SplashScreen.msg.dots);
-      MobileManager.checkMobileMode();
+      // MobileManager.checkMobileMode();
       // We need to know if we are on a small screen before starting webgl
       await drawManagerInstance.glInit();
 

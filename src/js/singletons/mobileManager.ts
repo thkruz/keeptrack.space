@@ -1,10 +1,18 @@
+import { Kilometers } from 'ootk';
+import { keepTrackApi } from '../keepTrackApi';
+
 export class MobileManager {
   public static async checkMobileMode() {
     try {
-      if (MobileManager.checkIfMobileDevice()) {
+      // Don't become mobile after initialization
+      if (!keepTrackApi.isInitialized && MobileManager.checkIfMobileDevice()) {
+        if (!settingsManager.isMobileModeEnabled) {
+          keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.', 'normal');
+        }
+        settingsManager.isMobileModeEnabled = true;
+
         settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
         settingsManager.enableHoverOverlay = false;
-        settingsManager.isMobileModeEnabled = true;
         settingsManager.cameraMovementSpeed = 0.0001;
         settingsManager.cameraMovementSpeedMin = 0.0001;
         if (settingsManager.isUseHigherFOVonMobile) {
@@ -15,24 +23,19 @@ export class MobileManager {
         settingsManager.maxLabels = settingsManager.mobileMaxLabels;
 
         // Disable desktop only plugins
-        settingsManager.plugins.debug = false;
-        settingsManager.plugins.dops = false;
-        settingsManager.plugins.screenRecorder = false;
-        settingsManager.plugins.satChanges = false;
-        settingsManager.plugins.initialOrbit = false;
-        settingsManager.plugins.editSat = false;
-        settingsManager.plugins.shortTermFences = false;
-        settingsManager.plugins.orbitReferences = false;
-        settingsManager.plugins.externalSources = false;
-        settingsManager.plugins.analysis = false;
-        settingsManager.plugins.plotAnalysis = false;
-        settingsManager.plugins.planetarium = false;
-        settingsManager.plugins.astronomy = false;
-        settingsManager.plugins.watchlist = false;
-        settingsManager.plugins.social = false;
-        settingsManager.plugins.classificationBar = false;
-        settingsManager.plugins.gamepad = false;
-        settingsManager.plugins.scenarioCreator = false;
+        Object.keys(settingsManager.plugins).forEach((key) => {
+          settingsManager.plugins[key] = false;
+        });
+        settingsManager.plugins.satInfoboxCore = true;
+        settingsManager.plugins.updateSelectBoxCore = true;
+        settingsManager.plugins.topMenu = true;
+        settingsManager.plugins.datetime = true;
+
+        settingsManager.maxAnalystSats = 1;
+        settingsManager.maxFieldOfViewMarkers = 1;
+        settingsManager.maxMissiles = 1;
+        settingsManager.minDistanceFromSatellite = <Kilometers>50;
+        settingsManager.isLoadLastSensor = false;
       } else {
         settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;
         if (typeof settingsManager.enableHoverOverlay == 'undefined') {

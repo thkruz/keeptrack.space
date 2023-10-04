@@ -1,6 +1,6 @@
 import { keepTrackContainer } from '@app/js/container';
 import { CatalogManager, GetSatType, SatObject, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { isSatObject, keepTrackApi } from '@app/js/keepTrackApi';
 import { fadeIn, fadeOut } from '@app/js/lib/fade';
 import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
@@ -135,7 +135,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         mainCameraInstance.ecLastZoom = mainCameraInstance.zoomLevel();
         if (!sat.static) {
           mainCameraInstance.cameraType = CameraType.FIXED_TO_SAT;
-        } else if (typeof sat.staticNum !== 'undefined') {
+        } else if (typeof sat.staticNum !== 'undefined' && !settingsManager.isMobileModeEnabled) {
+          // No sensor manager on mobile
           sensorManagerInstance.setSensor(null, sat.staticNum);
 
           if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
@@ -159,7 +160,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (sat.static) {
         if (typeof sat.staticNum == 'undefined') return;
         sat = catalogManagerInstance.getSat(satId);
-        if (catalogManagerInstance.isSensorManagerLoaded) sensorManagerInstance.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
+        // if (catalogManagerInstance.isSensorManagerLoaded) sensorManagerInstance.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
 
         // Todo: Needs to run uiManager.getsensorinfo();
 
@@ -176,7 +177,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         return;
       }
       mainCameraInstance.camZoomSnappedOnSat = true;
-      mainCameraInstance.camDistBuffer = mainCameraInstance.minDistanceFromSatellite;
+      mainCameraInstance.camDistBuffer = settingsManager.minDistanceFromSatellite;
       mainCameraInstance.camAngleSnappedOnSat = true;
 
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.isSensorSelected()) {
@@ -197,6 +198,14 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     catalogManagerInstance.setSelectedSat(satId);
 
+    if (sat) {
+      if (isSatObject(sat)) {
+        SelectSatManager.setSatInfoBoxSatellite_();
+      } else {
+        SelectSatManager.setSatInfoBoxMissile_();
+      }
+    }
+
     if (satId !== -1) {
       // NOTE: This has to come after keepTrackApi.methods.selectSatData in catalogManagerInstance.setSelectedSat.
       const rootElement = document.querySelector(':root') as HTMLElement;
@@ -204,5 +213,39 @@ export class SelectSatManager extends KeepTrackPlugin {
       rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
       fadeIn(getEl('sat-infobox'));
     }
+  }
+
+  private static setSatInfoBoxMissile_() {
+    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
+    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
+      (id) => {
+        const el = getEl(id, true);
+        if (!el) return;
+        el.parentElement.style.display = 'none';
+      }
+    );
+
+    const satMissionData = getEl('sat-mission-data', true);
+    if (satMissionData) satMissionData.style.display = 'none';
+
+    const satIdentifierData = getEl('sat-identifier-data', true);
+    if (satIdentifierData) satIdentifierData.style.display = 'none';
+  }
+
+  private static setSatInfoBoxSatellite_() {
+    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
+    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
+      (id) => {
+        const el = getEl(id, true);
+        if (!el) return;
+        el.parentElement.style.display = 'block';
+      }
+    );
+
+    const satMissionData = getEl('sat-mission-data', true);
+    if (satMissionData) satMissionData.style.display = 'block';
+
+    const satIdentifierData = getEl('sat-identifier-data', true);
+    if (satIdentifierData) satIdentifierData.style.display = 'block';
   }
 }

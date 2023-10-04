@@ -26,13 +26,13 @@
  */
 
 // organize-imports-ignore
+import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import '@app/js/lib/external/colorPick.js';
 import 'jquery-ui-bundle';
 import '@app/js/lib/external/jquery-ui-slideraccess.js';
 import '@app/js/lib/external/jquery-ui-timepicker.js';
 import '@materializecss/materialize';
-import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from '../container';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
@@ -47,6 +47,7 @@ import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
 import { mainCameraInstance } from './camera';
 import { StandardColorSchemeManager } from './color-scheme-manager';
+import { errorManagerInstance } from './errorManager';
 import { hoverManagerInstance } from './hover-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
@@ -351,10 +352,19 @@ export class StandardUiManager implements UiManager {
 
     getEl('legend-menu')?.addEventListener('click', () => {
       if (settingsManager.legendMenuOpen) {
+        // Closing Legend Menu
         getEl('legend-hover-menu').style.display = 'none';
         getEl('legend-icon').classList.remove('bmenu-item-selected');
         settingsManager.legendMenuOpen = false;
       } else {
+        // Opening Legend Menu
+
+        if (getEl('legend-hover-menu').innerHTML.length === 0) {
+          // TODO: Figure out why it is empty sometimes
+          errorManagerInstance.debug('Legend Menu is Empty');
+          LegendManager.change('default');
+        }
+
         getEl('legend-hover-menu').style.display = 'block';
         const LegendIcon = getEl('legend-icon');
         LegendIcon && LegendIcon.classList.add('bmenu-item-selected');

@@ -40,7 +40,6 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   isRotateR = false;
   isRotateU = false;
   isRotateD = false;
-  static lastSelectedColor: [number, number, number, number];
   constructor() {
     super(VideoDirectorPlugin.PLUGIN_NAME);
   }
@@ -206,11 +205,11 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
         break;
     }
 
-    if ((<HTMLInputElement>getEl('video-director-selectedColor')).checked && settingsManager.selectedColor !== this.lastSelectedColor) {
-      this.lastSelectedColor = settingsManager.selectedColor;
+    if ((<HTMLInputElement>getEl('video-director-selectedColor')).checked && settingsManager.selectedColor[3] !== 0) {
+      settingsManager.selectedColorFallback = settingsManager.selectedColor;
       settingsManager.selectedColor = [0, 0, 0, 0];
     } else {
-      settingsManager.selectedColor = this.lastSelectedColor;
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
     }
 
     settingsManager.autoRotateSpeed = parseFloat((<HTMLInputElement>getEl('video-director-rotateSpeed')).value);

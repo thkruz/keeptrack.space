@@ -670,9 +670,7 @@ export class StandardCatalogManager implements CatalogManager {
 
     this.setSelectedSat(i);
 
-    // TODO Update this section to use the new KeepTrackApi getPlugin concept vs optional chaining
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    if (this.isSensorManagerLoaded && sensorManagerInstance.isSensorSelected()) {
+    if (this.isSensorManagerLoaded && keepTrackApi.getSensorManager().isSensorSelected()) {
       getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
     }
     getEl('menu-lookanglesmultisite', true)?.classList.remove('bmenu-item-disabled');

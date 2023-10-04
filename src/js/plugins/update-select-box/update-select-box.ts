@@ -214,7 +214,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
             getEl('sat-nextpass').parentElement.style.display = 'none';
           }
         } catch (e) {
-          errorManagerInstance.warn('Error updating satellite info!');
+          errorManagerInstance.debug('Error updating satellite info!');
         }
       },
     });

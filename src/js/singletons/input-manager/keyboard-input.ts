@@ -17,7 +17,7 @@ export class KeyboardInput {
 
     const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
 
-    const bodyDOM = document.body;
+    const bodyDOM = document;
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.ctrlKey === true || e.metaKey === true) this.isCtrlPressed = true;

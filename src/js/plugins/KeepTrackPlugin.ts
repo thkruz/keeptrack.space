@@ -1,7 +1,7 @@
 import { SatObject, SensorObject, Singletons } from '@app/js/interfaces';
 import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 import Module from 'module';
-import { keepTrackApi, KeepTrackApiMethods } from '../keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '../keepTrackApi';
 import { clickAndDragWidth } from '../lib/click-and-drag';
 import { getEl } from '../lib/get-el';
 import { shake } from '../lib/shake';

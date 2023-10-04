@@ -4,6 +4,7 @@ import { SpaceObjectType } from '../lib/space-object-type';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export abstract class StringExtractor {
+  // TODO: Add URLs for all rockets
   private static rocketUrls = [];
 
   /** Use this to adjust which type of objects are loaded

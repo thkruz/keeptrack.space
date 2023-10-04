@@ -628,12 +628,16 @@
     display: none !important;
   }
 
+  .sat-infobox-links {
+    display: none;
+  }
+
   #sat-infobox {
     display: none;
     background: var(--colorTertiaryDarken2);
     cursor: default;
     position: absolute;
-    top: 60%;
+    top: 75%;
     bottom: 0px;
     margin-top: 25px;
     padding: 0 10px 0px 10px;

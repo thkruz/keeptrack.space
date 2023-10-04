@@ -369,7 +369,9 @@ export class StandardColorSchemeManager {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     if (
-      (dotsManagerInstance.inViewData?.[sat.id] === 0 && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
+      ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
+        sat.type === SpaceObjectType.PAYLOAD &&
+        this.objectTypeFlags.payload === false) ||
       (mainCameraInstance.cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
@@ -383,7 +385,9 @@ export class StandardColorSchemeManager {
       };
     }
     if (
-      (dotsManagerInstance.inViewData?.[sat.id] === 0 && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
+      ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
+        sat.type === SpaceObjectType.ROCKET_BODY &&
+        this.objectTypeFlags.rocketBody === false) ||
       (mainCameraInstance.cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
@@ -397,7 +401,9 @@ export class StandardColorSchemeManager {
       };
     }
     if (
-      (dotsManagerInstance.inViewData?.[sat.id] === 0 && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
+      ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
+        sat.type === SpaceObjectType.DEBRIS &&
+        this.objectTypeFlags.debris === false) ||
       (mainCameraInstance.cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
@@ -413,7 +419,9 @@ export class StandardColorSchemeManager {
 
     // NOTE: Treat TBA Satellites as SPECIAL if SCC NUM is less than 70000 (ie a real satellite)
     if (
-      (dotsManagerInstance.inViewData?.[sat.id] === 0 && (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) && this.objectTypeFlags.pink === false) ||
+      ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
+        this.objectTypeFlags.pink === false) ||
       (mainCameraInstance.cameraType === CameraType.PLANETARIUM &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
         this.objectTypeFlags.pink === false) ||

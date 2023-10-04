@@ -1536,7 +1536,7 @@ export class SettingsManager {
    * mobile mode is enabled and certain settings are adjusted accordingly.
    */
   private setMobileSettings() {
-    this.isMobileModeEnabled = false;
+    // this.isMobileModeEnabled = false;
     if (window.innerWidth <= this.desktopMinimumWidth) {
       this.disableWindowTouchMove = false;
       // this.isMobileModeEnabled = true;

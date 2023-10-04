@@ -215,34 +215,36 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private static setSatInfoBoxMissile_() {
+    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
     ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
       (id) => {
-        const el = getEl(id);
+        const el = getEl(id, true);
         if (!el) return;
         el.parentElement.style.display = 'none';
       }
     );
 
-    const satMissionData = getEl('sat-mission-data');
+    const satMissionData = getEl('sat-mission-data', true);
     if (satMissionData) satMissionData.style.display = 'none';
 
-    const satIdentifierData = getEl('sat-identifier-data');
+    const satIdentifierData = getEl('sat-identifier-data', true);
     if (satIdentifierData) satIdentifierData.style.display = 'none';
   }
 
   private static setSatInfoBoxSatellite_() {
+    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
     ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
       (id) => {
-        const el = getEl(id);
+        const el = getEl(id, true);
         if (!el) return;
         el.parentElement.style.display = 'block';
       }
     );
 
-    const satMissionData = getEl('sat-mission-data');
+    const satMissionData = getEl('sat-mission-data', true);
     if (satMissionData) satMissionData.style.display = 'block';
 
-    const satIdentifierData = getEl('sat-identifier-data');
+    const satIdentifierData = getEl('sat-identifier-data', true);
     if (satIdentifierData) satIdentifierData.style.display = 'block';
   }
 }

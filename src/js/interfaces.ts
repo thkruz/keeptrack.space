@@ -62,6 +62,7 @@ export type EChartsData = {
 export type rgbaArray = [number, number, number, number];
 
 export interface Colors {
+  notional: rgbaArray;
   ageLost: rgbaArray;
   ageMed: rgbaArray;
   ageNew: rgbaArray;

@@ -275,12 +275,12 @@ export class StandardColorSchemeManager {
       // @ts-ignore
       if (window.noNotional) {
         return {
-          color: [1, 0, 0, 0.0],
+          color: this.colorTheme.deselected,
           pickable: Pickable.No,
         };
       } else {
         return {
-          color: [1, 0, 0, 0.8],
+          color: this.colorTheme.notional,
           pickable: Pickable.Yes,
         };
       }
@@ -1175,10 +1175,10 @@ export class StandardColorSchemeManager {
     if (!isForceRecolor && this.currentColorScheme === this.lastColorScheme) {
       if (this.lastDotColored < settingsManager.dotsOnScreen) {
         firstDotToColor = this.lastDotColored;
-        lastDotToColor = firstDotToColor + ((<any>window).dotsPerColor || this.DOTS_PER_CALC);
+        lastDotToColor = firstDotToColor + (settingsManager.dotsPerColor || this.DOTS_PER_CALC);
         if (lastDotToColor > settingsManager.dotsOnScreen) lastDotToColor = settingsManager.dotsOnScreen;
       } else {
-        lastDotToColor = (<any>window).dotsPerColor || this.DOTS_PER_CALC;
+        lastDotToColor = settingsManager.dotsPerColor || this.DOTS_PER_CALC;
         lastDotToColor = Math.min(lastDotToColor, settingsManager.dotsOnScreen);
       }
 

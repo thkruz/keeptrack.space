@@ -26,7 +26,7 @@ import { CatalogManager, ColorInformation, ColorRuleSet, Colors, Pickable, rgbaA
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
-import { CameraType, mainCameraInstance } from './camera';
+import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
 import { getDayOfYear } from '../lib/transforms';
@@ -232,7 +232,7 @@ export class StandardColorSchemeManager {
   }
 
   public countries(sat: SatObject): ColorInformation {
-    if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -289,7 +289,7 @@ export class StandardColorSchemeManager {
     if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
 
     // If we are in astronomy mode, hide everything that isn't a star (above)
-    if (mainCameraInstance.cameraType === CameraType.ASTRONOMY) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -327,7 +327,7 @@ export class StandardColorSchemeManager {
       };
     }
 
-    if (sat.static && (this.objectTypeFlags.sensor === false || mainCameraInstance.cameraType === CameraType.PLANETARIUM)) {
+    if (sat.static && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -372,7 +372,7 @@ export class StandardColorSchemeManager {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.PAYLOAD &&
         this.objectTypeFlags.payload === false) ||
-      (mainCameraInstance.cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
         typeof sat.vmag == 'undefined' &&
@@ -388,7 +388,7 @@ export class StandardColorSchemeManager {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.rocketBody === false) ||
-      (mainCameraInstance.cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
         typeof sat.vmag == 'undefined' &&
@@ -404,7 +404,7 @@ export class StandardColorSchemeManager {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.DEBRIS &&
         this.objectTypeFlags.debris === false) ||
-      (mainCameraInstance.cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
         typeof sat.vmag == 'undefined' &&
@@ -422,7 +422,7 @@ export class StandardColorSchemeManager {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
         this.objectTypeFlags.pink === false) ||
-      (mainCameraInstance.cameraType === CameraType.PLANETARIUM &&
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
         this.objectTypeFlags.pink === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
@@ -437,14 +437,14 @@ export class StandardColorSchemeManager {
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === false && mainCameraInstance.cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === false && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && mainCameraInstance.cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag == 'undefined') {
         // Intentional
       } else {
@@ -565,7 +565,7 @@ export class StandardColorSchemeManager {
   }
 
   public groupCountries(sat: SatObject): ColorInformation {
-    if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -1379,7 +1379,7 @@ export class StandardColorSchemeManager {
       case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
       case SpaceObjectType.PAYLOAD_MANUFACTURER:
         // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,
@@ -1395,7 +1395,7 @@ export class StandardColorSchemeManager {
       case SpaceObjectType.LAUNCH_SITE:
       case SpaceObjectType.LAUNCH_POSITION:
         // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,
@@ -1475,10 +1475,14 @@ export class StandardColorSchemeManager {
     if (this.currentColorScheme === this.group || this.currentColorScheme === this.groupCountries) {
       const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
 
+      const watchlistMenu = getEl('watchlist-menu');
+      const watchlistTransform = watchlistMenu?.style.transform || '';
+
       if (
         uiManagerInstance.searchManager.getCurrentSearch() === '' &&
-        getEl('watchlist-menu').style.transform !== 'translateX(0px)' &&
-        !keepTrackApi.getPlugin(TimeMachine).isMenuButtonEnabled
+        watchlistTransform !== 'translateX(0px)' &&
+        !keepTrackApi.getPlugin(TimeMachine).isMenuButtonEnabled &&
+        !(<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning
       ) {
         if (this.currentColorScheme === this.groupCountries) {
           this.updateColorScheme(this.countries);

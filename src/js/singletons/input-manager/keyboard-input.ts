@@ -2,7 +2,7 @@ import { keepTrackContainer } from '@app/js/container';
 import { Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
-import { Camera, mainCameraInstance } from '@app/js/singletons/camera';
+import { Camera } from '@app/js/singletons/camera';
 import eruda from 'eruda';
 import { KeyEvent } from '../input-manager';
 import { TimeManager } from '../time-manager';
@@ -103,14 +103,14 @@ export class KeyboardInput {
           evt.preventDefault();
           uiManagerInstance.searchManager.searchToggle(true);
           getEl('search').focus();
-          this.releaseShiftKey(mainCameraInstance);
+          this.releaseShiftKey(keepTrackApi.getMainCamera());
         }
         break;
       // Hide the UI
       case 'H':
         if (this.isShiftPressed) {
           uiManagerInstance.hideUi();
-          this.releaseShiftKey(mainCameraInstance);
+          this.releaseShiftKey(keepTrackApi.getMainCamera());
         }
         break;
       case 'D':

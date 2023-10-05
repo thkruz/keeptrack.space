@@ -1,15 +1,15 @@
 import radarPng from '@app/img/icons/radar.png';
 import { keepTrackContainer } from '@app/js/container';
 import { OrbitManager, SatObject, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
-import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { CameraType } from '@app/js/singletons/camera';
 import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { SensorMath } from '@app/js/static/sensor-math';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -337,12 +337,14 @@ export class SensorListPlugin extends KeepTrackPlugin {
     keepTrackApi.getCatalogManager().setSelectedSat(-1);
 
     try {
-      mainCameraInstance.lookAtLatLon(
-        sensorManagerInstance.currentSensors[0].lat,
-        sensorManagerInstance.currentSensors[0].lon,
-        sensorManagerInstance.currentSensors[0].zoom,
-        keepTrackApi.getTimeManager().selectedDate
-      );
+      keepTrackApi
+        .getMainCamera()
+        .lookAtLatLon(
+          sensorManagerInstance.currentSensors[0].lat,
+          sensorManagerInstance.currentSensors[0].lon,
+          sensorManagerInstance.currentSensors[0].zoom,
+          keepTrackApi.getTimeManager().selectedDate
+        );
     } catch (e) {
       // TODO: More intentional conditional statement
       errorManagerInstance.warn('Error in sensorListContentClick: ' + e);
@@ -361,17 +363,17 @@ export class SensorListPlugin extends KeepTrackPlugin {
     getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
     getEl('menu-planetarium')?.classList.add('bmenu-item-disabled');
     getEl('menu-astronomy')?.classList.add('bmenu-item-disabled');
-    if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-      mainCameraInstance.isPanReset = true;
-      mainCameraInstance.isLocalRotateReset = true;
+      keepTrackApi.getMainCamera().isPanReset = true;
+      keepTrackApi.getMainCamera().isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
       keepTrackApi.getDrawManager().glInit();
       const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
       uiManagerInstance.hideSideMenus();
       const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
       orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      mainCameraInstance.cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
+      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       // TODO: implement fov information
       // getEl('fov-text').innerHTML = ('');
       getEl('menu-planetarium').classList.remove('bmenu-item-selected');

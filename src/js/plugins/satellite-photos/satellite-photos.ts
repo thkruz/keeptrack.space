@@ -6,7 +6,6 @@ import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
 import photoManagerPng from '@app/img/icons/photoManager.png';
 import { keepTrackContainer } from '@app/js/container';
 import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
-import { mainCameraInstance } from '@app/js/singletons/camera';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatellitePhotos extends KeepTrackPlugin {
@@ -98,8 +97,8 @@ export class SatellitePhotos extends KeepTrackPlugin {
       // Hours are in EST? Daylight savings time might make this break
       const dateObj = new Date(Date.UTC(year, month - 1, day, hour - 4, min, sec));
 
-      mainCameraInstance.camSnap(lat2pitch(response[0].centroid_coordinates.lat), lon2yaw(response[0].centroid_coordinates.lon, dateObj));
-      mainCameraInstance.changeZoom(0.7);
+      keepTrackApi.getMainCamera().camSnap(lat2pitch(response[0].centroid_coordinates.lat), lon2yaw(response[0].centroid_coordinates.lon, dateObj));
+      keepTrackApi.getMainCamera().changeZoom(0.7);
 
       SatellitePhotos.colorbox(`https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageUrl}.png`);
     }
@@ -116,13 +115,13 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   static loadPic(satId: number, url: string): void {
     keepTrackApi.getCatalogManager().selectSat(keepTrackApi.getCatalogManager().getSatFromObjNum(satId).id);
-    mainCameraInstance.changeZoom(0.7);
+    keepTrackApi.getMainCamera().changeZoom(0.7);
     SatellitePhotos.colorbox(url);
   }
 
   static himawari8(): void {
     keepTrackApi.getCatalogManager().selectSat(keepTrackApi.getCatalogManager().getSatFromObjNum(40267).id);
-    mainCameraInstance.changeZoom(0.7);
+    keepTrackApi.getMainCamera().changeZoom(0.7);
 
     // Propagation time minus 30 minutes so that the pictures have time to become available
     let propTime = keepTrackApi.getTimeManager().simulationTimeObj;

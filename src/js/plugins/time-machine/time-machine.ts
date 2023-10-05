@@ -37,17 +37,19 @@ export class TimeMachine extends KeepTrackPlugin {
   bottomIconImg = timeMachinePng;
   bottomIconLabel = 'Time Machine';
   historyOfSatellitesRunCount = 0;
+  isTimeMachineRunning = false;
 
   constructor() {
     super(TimeMachine.PLUGIN_NAME);
   }
 
   historyOfSatellitesPlay() {
+    this.isTimeMachineRunning = true;
     this.historyOfSatellitesRunCount++;
     keepTrackApi.getOrbitManager().tempTransColor = settingsManager.colors.transparent;
     settingsManager.colors.transparent = [0, 0, 0, 0];
     for (let yy = 0; yy <= 200; yy++) {
-      let year = 59 + yy;
+      let year = 57 + yy;
       if (year >= 100) year = year - 100;
       setTimeout(
         (runCount) => {
@@ -63,7 +65,7 @@ export class TimeMachine extends KeepTrackPlugin {
   }
 
   playNextSatellite(runCount: number, year: number) {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonEnabled && !this.isTimeMachineRunning) return;
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
 
@@ -75,7 +77,7 @@ export class TimeMachine extends KeepTrackPlugin {
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group, true); // force color recalc
 
     if (!settingsManager.isDisableTimeMachineToasts) {
-      if (year >= 59 && year < 100) {
+      if (year >= 57 && year < 100) {
         const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`);
         keepTrackApi.getUiManager().toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
       } else {
@@ -107,6 +109,7 @@ export class TimeMachine extends KeepTrackPlugin {
     if (!this.isMenuButtonEnabled) return;
     settingsManager.colors.transparent = <[number, number, number, number]>orbitManagerInstance.tempTransColor;
     this.isMenuButtonEnabled = false;
+    this.isTimeMachineRunning = false;
     groupManagerInstance.clearSelect();
     colorSchemeManagerInstance.setColorScheme(colorSchemeManager.default, true);
   }

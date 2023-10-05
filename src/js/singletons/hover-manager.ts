@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getDayOfYear } from '@app/js/lib/transforms';
-import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { CameraType } from '@app/js/singletons/camera';
 import { keepTrackContainer } from '../container';
 import { CatalogManager, RadarDataObject, SatObject, SensorManager, Singletons } from '../interfaces';
 import { getEl } from '../lib/get-el';
@@ -78,7 +78,7 @@ export class HoverManager {
   }
 
   private hoverOverSomething_(id: number, screenX?: number, screenY?: number) {
-    if (!mainCameraInstance.isDragging && settingsManager.enableHoverOverlay) {
+    if (!keepTrackApi.getMainCamera().isDragging && settingsManager.enableHoverOverlay) {
       // NOTE: The radar mesurement logic breaks if you call it a SatObject
 
       const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
@@ -144,7 +144,7 @@ export class HoverManager {
   }
 
   private planetariumView_(satId: number) {
-    if (mainCameraInstance.cameraType === CameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
       this.satHoverBoxDOM.style.display = 'none';
 
       const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);

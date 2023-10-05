@@ -4,7 +4,6 @@ import { RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 import { StringPad } from '@app/js/lib/stringPad';
-import { mainCameraInstance } from '@app/js/singletons/camera';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { saveAs } from 'file-saver';
 
@@ -310,7 +309,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
       const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
       mainsat.TLE1 = (mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32)) as TleLine1;
 
-      mainCameraInstance.isCamSnapMode = false;
+      keepTrackApi.getMainCamera().isCamSnapMode = false;
 
       let TLEs;
       // Ignore argument of perigee for round orbits OPTIMIZE

@@ -9,6 +9,7 @@ import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStand
 describe('uiManager', () => {
   // Should process fullscreenToggle
   it('process_fullscreen_toggle', () => {
+    document.documentElement.requestFullscreen = jest.fn().mockImplementation(() => Promise.resolve());
     expect(() => StandardUiManager.fullscreenToggle()).not.toThrow();
   });
 

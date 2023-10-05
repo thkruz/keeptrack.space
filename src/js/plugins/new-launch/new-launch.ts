@@ -1,20 +1,19 @@
 import rocketPng from '@app/img/icons/rocket.png';
 import { keepTrackContainer } from '@app/js/container';
 import { GetSatType, OrbitManager, SatObject, Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/js/lib/showLoading';
 import { StringPad } from '@app/js/lib/stringPad';
 import { waitForCruncher } from '@app/js/lib/waitForCruncher';
-import { mainCameraInstance } from '@app/js/singletons/camera';
 
 import { SatMath } from '@app/js/static/sat-math';
 
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { OrbitFinder } from '@app/js/singletons/orbit-finder';
 import { SatelliteRecord, Sgp4 } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 
 export class NewLaunch extends KeepTrackPlugin {
   bottomIconCallback = () => {
@@ -182,7 +181,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
 
-    mainCameraInstance.isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isCamSnapMode = false;
 
     const simulationTimeObj = timeManagerInstance.simulationTimeObj;
 

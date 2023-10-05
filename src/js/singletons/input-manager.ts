@@ -3,7 +3,6 @@ import { CatalogManager, SensorManager, Singletons, UiManager } from '@app/js/in
 import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { mainCameraInstance } from '@app/js/singletons/camera';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { keepTrackContainer } from '../container';
@@ -95,7 +94,7 @@ export class InputManager {
     if (isNaN(x) || isNaN(y)) throw new Error('x and y must be numbers');
 
     // Where is the camera
-    const rayOrigin = mainCameraInstance.getForwardVector();
+    const rayOrigin = keepTrackApi.getMainCamera().getForwardVector();
     // What did we click on
     const ptThru = InputManager.unProject(x, y);
 
@@ -179,7 +178,7 @@ export class InputManager {
     const screenVec = <vec4>[glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
     const comboPMat = mat4.create();
-    mat4.mul(comboPMat, drawManagerInstance.pMatrix, mainCameraInstance.camMatrix);
+    mat4.mul(comboPMat, drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix);
     const invMat = mat4.create();
     mat4.invert(invMat, comboPMat);
     const worldVec = <[number, number, number, number]>(<unknown>vec4.create());
@@ -449,6 +448,7 @@ export class InputManager {
 
     // Offset size is based on size in style.css
     // TODO: Make this dynamic
+    const mainCameraInstance = keepTrackApi.getMainCamera();
     const offsetX = mainCameraInstance.mouseX < canvasDOM.clientWidth / 2 ? 0 : -1 * 165;
     const offsetY = mainCameraInstance.mouseY < canvasDOM.clientHeight / 2 ? 0 : numMenuItems * -25;
     rightBtnMenuDOM.style.display = 'block';
@@ -496,7 +496,7 @@ export class InputManager {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     }
 
-    if (mainCameraInstance.isDragging || settingsManager.isMobileModeEnabled) return;
+    if (keepTrackApi.getMainCamera().isDragging || settingsManager.isMobileModeEnabled) return;
 
     if (++this.updateHoverDelay >= this.updateHoverDelayLimit) {
       this.updateHoverDelay = 0;
@@ -506,6 +506,7 @@ export class InputManager {
       if (uiManagerInstance.hoverSatId > 0) {
         this.Mouse.mouseSat = uiManagerInstance.hoverSatId;
       } else {
+        const mainCameraInstance = keepTrackApi.getMainCamera();
         this.Mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
       }
     }

@@ -1,18 +1,17 @@
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import infoPng from '@app/img/icons/info.png';
-import { WatchlistPlugin, watchlistPlugin } from './watchlist';
-import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants';
-import { Sgp4 } from 'ootk';
-import { SatMath } from '@app/js/static/sat-math';
-import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
-import { shake } from '@app/js/lib/shake';
-import { getEl } from '@app/js/lib/get-el';
-import { dateFormat } from '@app/js/lib/dateFormat';
-import { SensorMath } from '@app/js/static/sensor-math';
-import { mainCameraInstance } from '@app/js/singletons/camera';
 import { GetSatType, SatObject } from '@app/js/interfaces';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants';
+import { dateFormat } from '@app/js/lib/dateFormat';
+import { getEl } from '@app/js/lib/get-el';
+import { shake } from '@app/js/lib/shake';
 import { showLoading } from '@app/js/lib/showLoading';
+import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { SatMath } from '@app/js/static/sat-math';
+import { SensorMath } from '@app/js/static/sensor-math';
+import { Sgp4 } from 'ootk';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { WatchlistPlugin, watchlistPlugin } from './watchlist';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
   private readonly OVERLAY_CALC_LENGTH_IN_DAYS = 0.5;
@@ -251,6 +250,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     if (this.nextPassArray.length <= 0 && !this.isMenuButtonEnabled) return;
     // TODO: This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
+    const mainCameraInstance = keepTrackApi.getMainCamera();
     if (
       (Date.now() > this.lastOverlayUpdateTime * 1 + 10000 &&
         keepTrackApi.getCatalogManager().selectedSat === -1 &&

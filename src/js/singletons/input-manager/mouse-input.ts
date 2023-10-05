@@ -1,6 +1,6 @@
 import { CatalogManager, GetSatType, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import { Camera, CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { Camera, CameraType } from '@app/js/singletons/camera';
 import { UrlManager } from '@app/js/static/url-manager';
 import { Kilometers } from 'ootk';
 import { keepTrackContainer } from '../../container';
@@ -51,20 +51,20 @@ export class MouseInput {
 
     this.isStartedOnCanvas = true;
 
-    if (mainCameraInstance.speedModifier === 1) {
+    if (keepTrackApi.getMainCamera().speedModifier === 1) {
       settingsManager.cameraMovementSpeed = 0.003;
       settingsManager.cameraMovementSpeedMin = 0.005;
     }
 
     if (evt.button === 2) {
-      this.dragPosition = InputManager.getEarthScreenPoint(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+      this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
       this.latLon = CoordinateTransforms.eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, timeManagerInstance.simulationTimeObj);
     }
-    mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
-    mainCameraInstance.dragStartPitch = mainCameraInstance.camPitch;
-    mainCameraInstance.dragStartYaw = mainCameraInstance.camYaw;
+    keepTrackApi.getMainCamera().screenDragPoint = [keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY];
+    keepTrackApi.getMainCamera().dragStartPitch = keepTrackApi.getMainCamera().camPitch;
+    keepTrackApi.getMainCamera().dragStartYaw = keepTrackApi.getMainCamera().camYaw;
     if (evt.button === 0) {
-      mainCameraInstance.isDragging = true;
+      keepTrackApi.getMainCamera().isDragging = true;
 
       if (settingsManager.isFreezePropRateOnDrag) {
         timeManagerInstance.calculateSimulationTime();
@@ -73,9 +73,9 @@ export class MouseInput {
         settingsManager.isPropRateChange = true;
       }
     }
-    mainCameraInstance.isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isCamSnapMode = false;
     if (!settingsManager.disableUI) {
-      mainCameraInstance.autoRotate(false);
+      keepTrackApi.getMainCamera().autoRotate(false);
     }
 
     keepTrackApi.getInputManager().hidePopUps();
@@ -200,16 +200,16 @@ export class MouseInput {
 
     if (!this.dragHasMoved) {
       if (settingsManager.isMobileModeEnabled) {
-        mainCameraInstance.mouseX = isNaN(mainCameraInstance.mouseX) ? 0 : mainCameraInstance.mouseX;
-        mainCameraInstance.mouseY = isNaN(mainCameraInstance.mouseY) ? 0 : mainCameraInstance.mouseY;
-        this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+        keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
+        keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
+        this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
       }
       this.clickedSat = this.mouseSat;
       if (evt.button === 0) {
         const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
         // Left Mouse Button Clicked
-        if (mainCameraInstance.cameraType === CameraType.SATELLITE) {
+        if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
           if (this.clickedSat !== -1 && !catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY).static) {
             catalogManagerInstance.setSelectedSat(this.clickedSat);
           }
@@ -226,7 +226,7 @@ export class MouseInput {
     }
     // Force the serach bar to get repainted because it gets overwrote a lot
     this.dragHasMoved = false;
-    mainCameraInstance.isDragging = false;
+    keepTrackApi.getMainCamera().isDragging = false;
 
     if (settingsManager.isFreezePropRateOnDrag) {
       timeManagerInstance.calculateSimulationTime();
@@ -235,7 +235,7 @@ export class MouseInput {
     }
 
     if (!settingsManager.disableUI) {
-      mainCameraInstance.autoRotate(false);
+      keepTrackApi.getMainCamera().autoRotate(false);
     }
   }
 
@@ -310,24 +310,24 @@ export class MouseInput {
       // _pinchStart(evt)
     } else {
       // Single Finger Touch
-      mainCameraInstance.startMouseX = evt.touches[0].clientX;
-      mainCameraInstance.startMouseY = evt.touches[0].clientY;
-      mainCameraInstance.mouseX = evt.touches[0].clientX;
-      mainCameraInstance.mouseY = evt.touches[0].clientY;
-      this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
-      settingsManager.cameraMovementSpeed = Math.max(0.005 * mainCameraInstance.zoomLevel(), settingsManager.cameraMovementSpeedMin);
-      mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
+      keepTrackApi.getMainCamera().startMouseX = evt.touches[0].clientX;
+      keepTrackApi.getMainCamera().startMouseY = evt.touches[0].clientY;
+      keepTrackApi.getMainCamera().mouseX = evt.touches[0].clientX;
+      keepTrackApi.getMainCamera().mouseY = evt.touches[0].clientY;
+      this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+      settingsManager.cameraMovementSpeed = Math.max(0.005 * keepTrackApi.getMainCamera().zoomLevel(), settingsManager.cameraMovementSpeedMin);
+      keepTrackApi.getMainCamera().screenDragPoint = [keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY];
       // dragPoint = getEarthScreenPoint(x, y)
-      // dragPoint = mainCameraInstance.screenDragPoint; // Ignore the earth on mobile
-      mainCameraInstance.dragStartPitch = mainCameraInstance.camPitch;
-      mainCameraInstance.dragStartYaw = mainCameraInstance.camYaw;
-      mainCameraInstance.isDragging = true;
+      // dragPoint = keepTrackApi.getMainCamera().screenDragPoint; // Ignore the earth on mobile
+      keepTrackApi.getMainCamera().dragStartPitch = keepTrackApi.getMainCamera().camPitch;
+      keepTrackApi.getMainCamera().dragStartYaw = keepTrackApi.getMainCamera().camYaw;
+      keepTrackApi.getMainCamera().isDragging = true;
       this.touchStartTime = Date.now();
       // If you hit the canvas hide any popups
       keepTrackApi.getInputManager().hidePopUps();
-      mainCameraInstance.isCamSnapMode = false;
+      keepTrackApi.getMainCamera().isCamSnapMode = false;
       if (!settingsManager.disableUI) {
-        mainCameraInstance.autoRotate(false);
+        keepTrackApi.getMainCamera().autoRotate(false);
       }
 
       // TODO: Make updateUrl() a setting that is disabled by default
@@ -345,7 +345,7 @@ export class MouseInput {
       delta *= 33.3333333;
     }
 
-    mainCameraInstance.zoomWheel(delta);
+    keepTrackApi.getMainCamera().zoomWheel(delta);
   }
 
   init(canvasDOM: HTMLCanvasElement) {
@@ -366,7 +366,7 @@ export class MouseInput {
     const rightBtnEarthDOM = getEl('earth-rmb');
 
     canvasDOM.addEventListener('touchmove', (e) => {
-      this.canvasTouchMove(e, mainCameraInstance);
+      this.canvasTouchMove(e, keepTrackApi.getMainCamera());
     });
 
     if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
@@ -393,7 +393,7 @@ export class MouseInput {
 
     this.mouseMoveTimeout = -1;
     canvasDOM.addEventListener('mousemove', (e) => {
-      this.canvasMouseMove(e, mainCameraInstance, canvasDOM);
+      this.canvasMouseMove(e, keepTrackApi.getMainCamera(), canvasDOM);
       settingsManager.lastInteractionTime = Date.now();
     });
 
@@ -519,7 +519,7 @@ export class MouseInput {
     }
 
     canvasDOM.addEventListener('touchend', () => {
-      this.canvasTouchEnd(mainCameraInstance);
+      this.canvasTouchEnd(keepTrackApi.getMainCamera());
     });
 
     if (!settingsManager.disableCameraControls) {
@@ -528,26 +528,26 @@ export class MouseInput {
                 // Camera Manager Events
                 // Middle Mouse Button MMB
                 if (evt.button === 1) {
-                    mainCameraInstance.localRotateStartPosition = mainCameraInstance.localRotateCurrent;
+                    keepTrackApi.getMainCamera().localRotateStartPosition = keepTrackApi.getMainCamera().localRotateCurrent;
                     if (this.keyboard_.isShiftPressed) {
-                        mainCameraInstance.isLocalRotateRoll = true;
-                        mainCameraInstance.isLocalRotateYaw = false;
+                        keepTrackApi.getMainCamera().isLocalRotateRoll = true;
+                        keepTrackApi.getMainCamera().isLocalRotateYaw = false;
                     } else {
-                        mainCameraInstance.isLocalRotateRoll = false;
-                        mainCameraInstance.isLocalRotateYaw = true;
+                        keepTrackApi.getMainCamera().isLocalRotateRoll = false;
+                        keepTrackApi.getMainCamera().isLocalRotateYaw = true;
                     }
                     evt.preventDefault();
                 }
 
                 // Right Mouse Button RMB
                 if (evt.button === 2 && (this.keyboard_.isShiftPressed || this.keyboard_.isCtrlPressed)) {
-                    mainCameraInstance.panStartPosition = mainCameraInstance.panCurrent;
+                    keepTrackApi.getMainCamera().panStartPosition = keepTrackApi.getMainCamera().panCurrent;
                     if (this.keyboard_.isShiftPressed) {
-                        mainCameraInstance.isScreenPan = false;
-                        mainCameraInstance.isWorldPan = true;
+                        keepTrackApi.getMainCamera().isScreenPan = false;
+                        keepTrackApi.getMainCamera().isWorldPan = true;
                     } else {
-                        mainCameraInstance.isScreenPan = true;
-                        mainCameraInstance.isWorldPan = false;
+                        keepTrackApi.getMainCamera().isScreenPan = true;
+                        keepTrackApi.getMainCamera().isWorldPan = false;
                     }
                 }
             });
@@ -557,12 +557,12 @@ export class MouseInput {
       window.addEventListener('mouseup', (evt: MouseEvent) => {
         // Camera Manager Events
         if (evt.button === 1) {
-          mainCameraInstance.isLocalRotateRoll = false;
-          mainCameraInstance.isLocalRotateYaw = false;
+          keepTrackApi.getMainCamera().isLocalRotateRoll = false;
+          keepTrackApi.getMainCamera().isLocalRotateYaw = false;
         }
         if (evt.button === 2) {
-          mainCameraInstance.isScreenPan = false;
-          mainCameraInstance.isWorldPan = false;
+          keepTrackApi.getMainCamera().isScreenPan = false;
+          keepTrackApi.getMainCamera().isWorldPan = false;
         }
       });
     }
@@ -654,9 +654,9 @@ export class MouseInput {
         catalogManagerInstance.setSecondarySat(this.clickedSat);
         break;
       case 'reset-camera-rmb':
-        mainCameraInstance.isPanReset = true;
-        mainCameraInstance.isLocalRotateReset = true;
-        mainCameraInstance.ftsRotateReset = true;
+        keepTrackApi.getMainCamera().isPanReset = true;
+        keepTrackApi.getMainCamera().isLocalRotateReset = true;
+        keepTrackApi.getMainCamera().ftsRotateReset = true;
         break;
       case 'clear-lines-rmb':
         lineManagerInstance.clear();

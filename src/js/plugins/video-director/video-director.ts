@@ -2,7 +2,6 @@ import settingsPng from '@app/img/icons/settings.png';
 import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 
-import { mainCameraInstance } from '@app/js/singletons/camera';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 /**
@@ -173,7 +172,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
         getEl('video-director-form').addEventListener('submit', VideoDirectorPlugin.onSubmit);
         getEl('video-director-rotate').addEventListener('click', () => {
           keepTrackApi.getSoundManager()?.play('button');
-          mainCameraInstance.autoRotate(true);
+          keepTrackApi.getMainCamera().autoRotate(true);
         });
       },
     });

@@ -45,7 +45,6 @@ import { SpaceObjectType } from '../lib/space-object-type';
 import { StandardSensorManager } from '../plugins/sensor/sensorManager';
 import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
-import { mainCameraInstance } from './camera';
 import { StandardColorSchemeManager } from './color-scheme-manager';
 import { errorManagerInstance } from './errorManager';
 import { hoverManagerInstance } from './hover-manager';
@@ -79,11 +78,10 @@ export class StandardUiManager implements UiManager {
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
-      try {
-        document.documentElement.requestFullscreen();
-      } catch {
+      document.documentElement?.requestFullscreen().catch((err) => {
         // Might fail on some browsers
-      }
+        errorManagerInstance.debug(err);
+      });
     } else {
       document.exitFullscreen();
     }
@@ -156,13 +154,13 @@ export class StandardUiManager implements UiManager {
             sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
             LegendManager.change('default');
             const curSensor = sensorManagerInstance.currentSensors[0];
-            mainCameraInstance.lookAtLatLon(curSensor.lat, curSensor.lon, curSensor.zoom, timeManagerInstance.selectedDate);
+            keepTrackApi.getMainCamera().lookAtLatLon(curSensor.lat, curSensor.lon, curSensor.zoom, timeManagerInstance.selectedDate);
           } else {
             // Seems to be a single sensor without a staticnum, load that
             sensorManagerInstance.setSensor(sensorManagerInstance.sensors[currentSensor[0].shortName], currentSensor[1]);
             LegendManager.change('default');
             const curSensor = sensorManagerInstance.currentSensors[0];
-            mainCameraInstance.lookAtLatLon(curSensor.lat, curSensor.lon, curSensor.zoom, timeManagerInstance.selectedDate);
+            keepTrackApi.getMainCamera().lookAtLatLon(curSensor.lat, curSensor.lon, curSensor.zoom, timeManagerInstance.selectedDate);
           }
         }
       } catch (e) {
@@ -177,13 +175,15 @@ export class StandardUiManager implements UiManager {
     }
   }
 
-  private dismassAllToasts_() {
+  dismissAllToasts() {
     this.activeToastList_.forEach((toast: any) => {
       toast.dismiss();
     });
   }
 
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
+    if (settingsManager.isDisableToasts) return;
+
     let toastMsg = window.M.toast({
       unsafeHTML: toastText,
     });
@@ -194,7 +194,7 @@ export class StandardUiManager implements UiManager {
     });
 
     toastMsg.$el[0].addEventListener('contextmenu', () => {
-      this.dismassAllToasts_();
+      this.dismissAllToasts();
     });
 
     type = type || 'standby';

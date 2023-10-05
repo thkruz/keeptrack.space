@@ -1,11 +1,10 @@
 import breakupPng from '@app/img/icons/breakup.png';
 import { keepTrackContainer } from '@app/js/container';
 import { GetSatType, OrbitManager, SatObject, Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 import { StringPad } from '@app/js/lib/stringPad';
-import { mainCameraInstance } from '@app/js/singletons/camera';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { OrbitFinder } from '@app/js/singletons/orbit-finder';
@@ -13,7 +12,7 @@ import { TimeManager } from '@app/js/singletons/time-manager';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 import { SatMath } from '@app/js/static/sat-math';
 import { SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 
 export class Breakup extends KeepTrackPlugin {
   bottomIconElementName = 'menu-breakup';
@@ -204,7 +203,7 @@ export class Breakup extends KeepTrackPlugin {
     const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
     mainsat.TLE1 = (mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32)) as TleLine1;
 
-    mainCameraInstance.isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isCamSnapMode = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');

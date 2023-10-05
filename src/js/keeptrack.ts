@@ -29,6 +29,7 @@
 /* eslint-disable no-unreachable */
 
 import rocket1920Jpg from '@app/img/wallpaper/rocket.jpg';
+import rocket21920Jpg from '@app/img/wallpaper/rocket2.jpg';
 import telescope1920Jpg from '@app/img/wallpaper/telescope.jpg';
 import thule1920Jpg from '@app/img/wallpaper/thule.jpg';
 
@@ -47,7 +48,7 @@ import { StandardSensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager } from './settings/settings';
 import { VERSION } from './settings/version.js';
 import { VERSION_DATE } from './settings/versionDate.js';
-import { Camera, mainCameraInstance } from './singletons/camera';
+import { Camera } from './singletons/camera';
 import { StandardCatalogManager } from './singletons/catalog-manager';
 import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
 import { DemoManager } from './singletons/demo-mode';
@@ -70,7 +71,7 @@ import { SplashScreen } from './static/splash-screen';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
-  private static splashScreenImgList_ = [thule1920Jpg, thule1920Jpg, rocket1920Jpg, rocket1920Jpg, telescope1920Jpg, telescope1920Jpg];
+  private static splashScreenImgList_ = [thule1920Jpg, thule1920Jpg, rocket1920Jpg, rocket1920Jpg, rocket21920Jpg, rocket21920Jpg, telescope1920Jpg, telescope1920Jpg];
 
   private isShowFPS = false;
   public isReady = false;
@@ -136,6 +137,8 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
     const sensorMathInstance = new SensorMath();
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
+    const mainCameraInstance = new Camera();
+    keepTrackContainer.registerSingleton(Singletons.MainCamera, mainCameraInstance);
 
     this.mainCameraInstance = mainCameraInstance;
     this.errorManager = errorManagerInstance;
@@ -346,7 +349,7 @@ theodore.kruczek at gmail dot com.
     const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
     const colorSchemeManagerInstance = keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager);
 
-    mainCameraInstance.draw(drawManagerInstance.sat, drawManagerInstance.sensorPos);
+    keepTrackApi.getMainCamera().draw(drawManagerInstance.sat, drawManagerInstance.sensorPos);
 
     drawManagerInstance.draw(dotsManagerInstance);
 
@@ -355,25 +358,25 @@ theodore.kruczek at gmail dot com.
 
     orbitManagerInstance.draw(
       drawManagerInstance.pMatrix,
-      mainCameraInstance.camMatrix,
+      keepTrackApi.getMainCamera().camMatrix,
       drawManagerInstance.postProcessingManager.curBuffer,
       hoverManagerInstance,
       colorSchemeManagerInstance,
-      mainCameraInstance
+      keepTrackApi.getMainCamera()
     );
 
     // Draw a cone
     // this.sceneManager.cone.draw(this.pMatrix, mainCamera.camMatrix);
 
-    lineManagerInstance.draw(drawManagerInstance, dotsManagerInstance.inViewData, mainCameraInstance.camMatrix, null);
+    lineManagerInstance.draw(drawManagerInstance, dotsManagerInstance.inViewData, keepTrackApi.getMainCamera().camMatrix, null);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if (catalogManagerInstance.selectedSat !== -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride) {
-        drawManagerInstance.meshManager.draw(drawManagerInstance.pMatrix, mainCameraInstance.camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
+        drawManagerInstance.meshManager.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
       }
 
-      drawManagerInstance.sceneManager.searchBox.draw(drawManagerInstance.pMatrix, mainCameraInstance.camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
+      drawManagerInstance.sceneManager.searchBox.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
     }
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
@@ -382,7 +385,7 @@ theodore.kruczek at gmail dot com.
 
       // Only update hover if we are not on mobile
       if (!settingsManager.isMobileModeEnabled) {
-        hoverManagerInstance.setHoverId(this.inputManager.Mouse.mouseSat, mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+        hoverManagerInstance.setHoverId(this.inputManager.Mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
       }
     }
 
@@ -417,7 +420,7 @@ theodore.kruczek at gmail dot com.
         errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
       });
 
-      mainCameraInstance.init(settingsManager);
+      keepTrackApi.getMainCamera().init(settingsManager);
 
       // Add all of the imported programs to the API
       keepTrackApi.programs = <any>{

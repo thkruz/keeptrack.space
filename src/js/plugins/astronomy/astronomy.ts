@@ -25,7 +25,7 @@
 
 import { OrbitManager, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
 import { getEl } from '@app/js/lib/get-el';
-import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { CameraType } from '@app/js/singletons/camera';
 
 import constellationPng from '@app/img/icons/constellation.png';
 import { keepTrackContainer } from '@app/js/container';
@@ -56,18 +56,18 @@ export class Astronomy extends KeepTrackPlugin {
         starManager.drawAllConstellations();
       }
       orbitManagerInstance.clearInViewOrbit();
-      mainCameraInstance.cameraType = CameraType.ASTRONOMY; // Activate Astronomy Camera Mode
+      keepTrackApi.getMainCamera().cameraType = CameraType.ASTRONOMY; // Activate Astronomy Camera Mode
       // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
       LegendManager.change('astronomy');
 
       keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
     } else {
-      mainCameraInstance.isPanReset = true;
-      mainCameraInstance.isLocalRotateReset = true;
+      keepTrackApi.getMainCamera().isPanReset = true;
+      keepTrackApi.getMainCamera().isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
       drawManagerInstance.glInit();
       uiManagerInstance.hideSideMenus();
-      mainCameraInstance.cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
+      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       LegendManager.change('default');
       if (catalogManagerInstance.isStarManagerLoaded) {
         starManager.clearConstellations();

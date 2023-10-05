@@ -939,6 +939,11 @@ export class SettingsManager {
    */
   minDistanceFromSatellite = <Kilometers>15;
 
+  /**
+   * Disable toast messages
+   */
+  isDisableToasts = false;
+
   init(settingsOverride?: any) {
     this.pTime = [];
 
@@ -972,7 +977,7 @@ export class SettingsManager {
     this.loadLastMapTexture();
 
     // Export settingsManager to everyone else
-    window.settingsManager = this;
+    // window.settingsManager = this;
     // Expose these to node if running in node
     if (global) (<any>global).settingsManager = this;
   }
@@ -1120,7 +1125,7 @@ export class SettingsManager {
     return params;
   }
 
-  private disableAllPlugins() {
+  disableAllPlugins() {
     Object.keys(this.plugins).forEach((key) => {
       this.plugins[key] = false;
     });
@@ -1234,6 +1239,12 @@ export class SettingsManager {
                   allSats.updateOrbits();
                   keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
                 };
+                break;
+              case 'dark-clouds':
+                // load ./darkClouds.ts and then run it
+                import('./darkClouds').then((module) => {
+                  module.darkClouds();
+                });
                 break;
               case 'facsat2':
                 this.facsat2();

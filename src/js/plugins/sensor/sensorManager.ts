@@ -29,7 +29,6 @@ import { openColorbox } from '@app/js/lib/colorbox';
 import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
-import { mainCameraInstance } from '@app/js/singletons/camera';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
@@ -529,11 +528,11 @@ export class StandardSensorManager implements SensorManager {
     const primarySensor = this.currentSensors[0];
 
     if (primarySensor.obsmaxrange > 6000) {
-      mainCameraInstance.changeZoom('geo');
+      keepTrackApi.getMainCamera().changeZoom('geo');
     } else {
-      mainCameraInstance.changeZoom('leo');
+      keepTrackApi.getMainCamera().changeZoom('leo');
     }
-    mainCameraInstance.camSnap(lat2pitch(primarySensor.lat), lon2yaw(primarySensor.lon, timeManagerInstance.selectedDate));
+    keepTrackApi.getMainCamera().camSnap(lat2pitch(primarySensor.lat), lon2yaw(primarySensor.lon, timeManagerInstance.selectedDate));
   }
 
   private updatePositionCruncher_(): void {

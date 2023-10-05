@@ -40,7 +40,7 @@ import { SatMath } from '../static/sat-math';
 import { SplashScreen } from '../static/splash-screen';
 import { StringExtractor } from '../static/string-extractor';
 import { UrlManager } from '../static/url-manager';
-import { CameraType, mainCameraInstance } from './camera';
+import { CameraType } from './camera';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
 import { StandardColorSchemeManager } from './color-scheme-manager';
 import { DotsManager } from './dots-manager';
@@ -731,8 +731,8 @@ export class StandardCatalogManager implements CatalogManager {
     }
 
     lineManagerInstance.create('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
-    mainCameraInstance.cameraType = CameraType.OFFSET;
-    mainCameraInstance.lookAtObject(sat, false, timeManagerInstance.selectedDate);
+    keepTrackApi.getMainCamera().cameraType = CameraType.OFFSET;
+    keepTrackApi.getMainCamera().lookAtObject(sat, false, timeManagerInstance.selectedDate);
   }
 
   public switchPrimarySecondary(): void {

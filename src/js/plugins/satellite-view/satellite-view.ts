@@ -23,9 +23,10 @@
 import sat3Png from '@app/img/icons/sat3.png';
 import { keepTrackContainer } from '@app/js/container';
 import { CatalogManager, Singletons, UiManager } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { shake } from '@app/js/lib/shake';
-import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { CameraType } from '@app/js/singletons/camera';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
@@ -34,23 +35,21 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   bottomIconImg = sat3Png;
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
-    if (mainCameraInstance.cameraType === CameraType.SATELLITE) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
       const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
       uiManagerInstance.hideSideMenus();
-      mainCameraInstance.cameraType = CameraType.FIXED_TO_SAT; // Back to normal Camera Mode
+      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT; // Back to normal Camera Mode
       getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
-      return;
     } else {
       const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
       if (catalogManagerInstance.selectedSat !== -1) {
-        mainCameraInstance.cameraType = CameraType.SATELLITE; // Activate Satellite Camera Mode
+        keepTrackApi.getMainCamera().cameraType = CameraType.SATELLITE; // Activate Satellite Camera Mode
         getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
       } else {
         const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
         uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
         shake(getEl(this.bottomIconElementName));
       }
-      return;
     }
   };
 

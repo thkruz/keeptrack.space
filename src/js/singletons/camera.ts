@@ -1412,5 +1412,3 @@ export class Camera {
     }
   }
 }
-
-export const mainCameraInstance = new Camera();

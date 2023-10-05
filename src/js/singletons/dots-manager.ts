@@ -6,7 +6,7 @@ import { mat4 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
-import { CameraType, mainCameraInstance } from './camera';
+import { CameraType } from './camera';
 import { DrawManager } from './draw-manager';
 
 declare module '@app/js/interfaces' {
@@ -117,7 +117,7 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
 
-    if (mainCameraInstance.cameraType == CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().cameraType == CameraType.PLANETARIUM) {
       gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSizePlanetarium);
       gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSizePlanetarium);
     } else {
@@ -153,7 +153,7 @@ export class DotsManager {
     gl.disable(gl.BLEND);
 
     // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-    this.drawGpuPickingFrameBuffer(pMvCamMatrix, mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+    this.drawGpuPickingFrameBuffer(pMvCamMatrix, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
   }
 
   /**

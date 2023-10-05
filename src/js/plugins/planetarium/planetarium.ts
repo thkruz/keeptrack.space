@@ -25,15 +25,15 @@
 
 import { CatalogManager, OrbitManager, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
 import { getEl } from '@app/js/lib/get-el';
-import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { CameraType } from '@app/js/singletons/camera';
 
 import planetariumPng from '@app/img/icons/planetarium.png';
 import { keepTrackContainer } from '@app/js/container';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { DrawManager } from '@app/js/singletons/draw-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
-import { Astronomy } from '../astronomy/astronomy';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { Astronomy } from '../astronomy/astronomy';
 
 export class Planetarium extends KeepTrackPlugin {
   bottomIconElementName = 'menu-planetarium';
@@ -48,7 +48,7 @@ export class Planetarium extends KeepTrackPlugin {
     if (this.isMenuButtonEnabled) {
       if (!this.verifySensorSelected()) return;
 
-      mainCameraInstance.cameraType = CameraType.PLANETARIUM; // Activate Planetarium Camera Mode
+      keepTrackApi.getMainCamera().cameraType = CameraType.PLANETARIUM; // Activate Planetarium Camera Mode
 
       // Assume Sensor plugin is on because we are in planetarium view
       // TODO: This should explicitly check for the sensor plugin
@@ -73,14 +73,14 @@ export class Planetarium extends KeepTrackPlugin {
 
       keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
     } else {
-      mainCameraInstance.isPanReset = true;
-      mainCameraInstance.isLocalRotateReset = true;
+      keepTrackApi.getMainCamera().isPanReset = true;
+      keepTrackApi.getMainCamera().isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
       drawManagerInstance.glInit();
       uiManagerInstance.hideSideMenus();
       const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
       orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      mainCameraInstance.cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
+      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       // TODO: implement fov information
       // getEl('fov-text').innerHTML = ('');
     }

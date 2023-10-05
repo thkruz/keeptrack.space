@@ -4,7 +4,7 @@ import { isSatObject, keepTrackApi } from '@app/js/keepTrackApi';
 import { fadeIn, fadeOut } from '@app/js/lib/fade';
 import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { CameraType } from '@app/js/singletons/camera';
 import { TimeManager } from '@app/js/singletons/time-manager';
 
 import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
@@ -73,20 +73,20 @@ export class SelectSatManager extends KeepTrackPlugin {
             .join(',');
           const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
           uiManagerInstance.searchManager.doSearch(searchStr);
-          mainCameraInstance.changeZoom(0.9);
+          keepTrackApi.getMainCamera().changeZoom(0.9);
         }
         return;
       }
       // stop rotation if it is on
-      mainCameraInstance.autoRotate(false);
-      mainCameraInstance.panCurrent = {
+      keepTrackApi.getMainCamera().autoRotate(false);
+      keepTrackApi.getMainCamera().panCurrent = {
         x: 0,
         y: 0,
         z: 0,
       };
     }
 
-    mainCameraInstance.isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isCamSnapMode = false;
     // Don't select -1 twice
     if (!(satId === -1 && this.isselectedSatNegativeOne)) {
       catalogManagerInstance.selectSat(satId);
@@ -114,7 +114,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // If we deselect an object but had previously selected one then disable/hide stuff
     if (satId === -1 && !this.isselectedSatNegativeOne) {
-      mainCameraInstance.fts2default();
+      keepTrackApi.getMainCamera().fts2default();
       this.isselectedSatNegativeOne = true;
 
       const rootElement = document.querySelector(':root') as HTMLElement;
@@ -131,22 +131,24 @@ export class SelectSatManager extends KeepTrackPlugin {
       getEl('menu-plot-analysis2', true)?.classList.add('bmenu-item-disabled');
       getEl('menu-plot-analysis3', true)?.classList.add('bmenu-item-disabled');
     } else if (satId !== -1) {
-      if (mainCameraInstance.cameraType == CameraType.DEFAULT) {
-        mainCameraInstance.ecLastZoom = mainCameraInstance.zoomLevel();
+      if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
+        keepTrackApi.getMainCamera().ecLastZoom = keepTrackApi.getMainCamera().zoomLevel();
         if (!sat.static) {
-          mainCameraInstance.cameraType = CameraType.FIXED_TO_SAT;
+          keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
         } else if (typeof sat.staticNum !== 'undefined' && !settingsManager.isMobileModeEnabled) {
           // No sensor manager on mobile
           sensorManagerInstance.setSensor(null, sat.staticNum);
 
           if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
           const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-          mainCameraInstance.lookAtLatLon(
-            sensorManagerInstance.currentSensors[0].lat,
-            sensorManagerInstance.currentSensors[0].lon,
-            sensorManagerInstance.currentSensors[0].zoom,
-            timeManagerInstance.selectedDate
-          );
+          keepTrackApi
+            .getMainCamera()
+            .lookAtLatLon(
+              sensorManagerInstance.currentSensors[0].lat,
+              sensorManagerInstance.currentSensors[0].lon,
+              sensorManagerInstance.currentSensors[0].zoom,
+              timeManagerInstance.selectedDate
+            );
         }
       }
       this.isselectedSatNegativeOne = false;
@@ -176,9 +178,9 @@ export class SelectSatManager extends KeepTrackPlugin {
         }
         return;
       }
-      mainCameraInstance.camZoomSnappedOnSat = true;
-      mainCameraInstance.camDistBuffer = settingsManager.minDistanceFromSatellite;
-      mainCameraInstance.camAngleSnappedOnSat = true;
+      keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
+      keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
+      keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
 
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.isSensorSelected()) {
         getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');

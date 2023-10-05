@@ -18,6 +18,7 @@ import {
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from './settings/settings';
+import { Camera } from './singletons/camera';
 import { DotsManager } from './singletons/dots-manager';
 import { DrawManager } from './singletons/draw-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
@@ -273,6 +274,7 @@ export const keepTrackApi = {
   getLineManager: () => keepTrackContainer.get<LineManager>(Singletons.LineManager),
   getHoverManager: () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager),
   getSelectSatManager: () => keepTrackContainer.get<SelectSatManager>(Singletons.SelectSatManager),
+  getMainCamera: () => keepTrackContainer.get<Camera>(Singletons.MainCamera),
 };
 
 export enum KeepTrackApiMethods {

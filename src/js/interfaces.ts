@@ -722,6 +722,7 @@ export interface SensorManager {
 export interface UiManager {
   bottomIconPress: (el: HTMLElement) => void;
   hideSideMenus: () => void;
+  dismissAllToasts: () => void;
   isAnalysisMenuOpen: boolean;
   isCurrentlyTyping: boolean;
   isUiVisible: boolean;
@@ -755,7 +756,6 @@ export enum Singletons {
   ColorSchemeManager = 'ColorScheme',
   HoverManager = 'HoverManager',
   LineManager = 'LineManager',
-  CameraManager = 'CameraManager',
   StarManager = 'StarManager',
   TimeManager = 'TimeManager',
   DrawManager = 'DrawManager',
@@ -765,4 +765,5 @@ export enum Singletons {
   InputManager = 'InputManager',
   SoundManager = 'SoundManager',
   SensorMath = 'SensorMathManager',
+  MainCamera = 'MainCamera',
 }

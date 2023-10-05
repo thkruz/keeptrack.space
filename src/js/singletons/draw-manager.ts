@@ -11,7 +11,7 @@ import { watchlistPlugin } from '../plugins/watchlist/watchlist';
 import { SettingsManager } from '../settings/settings';
 import { GlUtils } from '../static/gl-utils';
 import { SatMath } from '../static/sat-math';
-import { Camera, CameraType, mainCameraInstance } from './camera';
+import { Camera, CameraType } from './camera';
 import { StandardColorSchemeManager } from './color-scheme-manager';
 import { DotsManager } from './dots-manager';
 import { Box as SearchBox } from './draw-manager/cube';
@@ -202,13 +202,13 @@ export class StandardDrawManager implements DrawManager {
       this.isAltCanvasSize_ = false;
     }
 
-    this.pMvCamMatrix = GlUtils.createPMvCamMatrix(mat4.create(), this.pMatrix, mainCameraInstance.camMatrix);
+    this.pMvCamMatrix = GlUtils.createPMvCamMatrix(mat4.create(), this.pMatrix, keepTrackApi.getMainCamera().camMatrix);
 
     // Actually draw things now that math is done
     this.clearFrameBuffers(dotsManager.pickingFrameBuffer, this.sceneManager.sun.godrays.frameBuffer);
 
     // Sun, and Moon
-    this.drawOptionalScenery(mainCameraInstance);
+    this.drawOptionalScenery(keepTrackApi.getMainCamera());
 
     this.sceneManager.earth.draw(this.pMatrix, this.postProcessingManager.curBuffer, keepTrackApi.callbacks.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null);
   }
@@ -360,7 +360,11 @@ export class StandardDrawManager implements DrawManager {
     const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
     const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
 
-    if (mainCameraInstance.cameraType == CameraType.ASTRONOMY || mainCameraInstance.cameraType == CameraType.PLANETARIUM || watchlistPlugin?.watchlistInViewList?.length > 0) {
+    if (
+      keepTrackApi.getMainCamera().cameraType == CameraType.ASTRONOMY ||
+      keepTrackApi.getMainCamera().cameraType == CameraType.PLANETARIUM ||
+      watchlistPlugin?.watchlistInViewList?.length > 0
+    ) {
       this.sensorPos = sensorManagerInstance.calculateSensorPos(timeManagerInstance.simulationTimeObj, sensorManagerInstance.currentSensors);
       if (!this.isDrawOrbitsAbove) {
         // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
@@ -369,7 +373,7 @@ export class StandardDrawManager implements DrawManager {
         return;
       }
       // Previously called showOrbitsAbove();
-      if (!settingsManager.isSatLabelModeOn || (mainCameraInstance.cameraType !== CameraType.PLANETARIUM && watchlistPlugin?.watchlistInViewList?.length === 0)) {
+      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPlugin?.watchlistInViewList?.length === 0)) {
         if (this.isSatMiniBoxInUse_) {
           this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
           this.hoverBoxOnSatMiniElements_.innerHTML = '';
@@ -394,7 +398,7 @@ export class StandardDrawManager implements DrawManager {
        * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
        */
       this.hoverBoxOnSatMiniElements_.innerHTML = '';
-      if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+      if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
         const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
         for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
@@ -475,7 +479,7 @@ export class StandardDrawManager implements DrawManager {
     }
 
     // Hide satMiniBoxes When Not in Use
-    if (!settingsManager.isSatLabelModeOn || (mainCameraInstance.cameraType !== CameraType.PLANETARIUM && watchlistPlugin?.watchlistInViewList?.length === 0)) {
+    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPlugin?.watchlistInViewList?.length === 0)) {
       if (this.isSatMiniBoxInUse_) {
         this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
         this.satMiniBox_.innerHTML = '';
@@ -491,7 +495,7 @@ export class StandardDrawManager implements DrawManager {
     error: boolean;
   } {
     const pMatrix = this.pMatrix;
-    const camMatrix = mainCameraInstance.camMatrix;
+    const camMatrix = keepTrackApi.getMainCamera().camMatrix;
     const screenPos = { x: 0, y: 0, z: 0, error: false };
     try {
       let pos = sat.position;
@@ -591,7 +595,7 @@ export class StandardDrawManager implements DrawManager {
         return;
       }
       this.meshManager.update(timeManagerInstance.selectedDate, this.sat);
-      mainCameraInstance.snapToSat(this.sat, timeManagerInstance.simulationTimeObj);
+      keepTrackApi.getMainCamera().snapToSat(this.sat, timeManagerInstance.simulationTimeObj);
       if (this.sat.missile) orbitManagerInstance.setSelectOrbit(this.sat.id);
 
       this.sceneManager.searchBox.update(this.sat, timeManagerInstance.selectedDate);
@@ -657,10 +661,10 @@ export class StandardDrawManager implements DrawManager {
     this.satCalculate();
 
     // Calculate camera changes needed since last draw
-    mainCameraInstance.update(this.dt);
+    keepTrackApi.getMainCamera().update(this.dt);
 
     // If in satellite view the orbit buffer needs to be updated every time
-    if (mainCameraInstance.cameraType == CameraType.SATELLITE && catalogManagerInstance.selectedSat !== -1) {
+    if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE && catalogManagerInstance.selectedSat !== -1) {
       const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
       orbitManagerInstance.updateOrbitBuffer(catalogManagerInstance.lastSelectedSat());
     }
@@ -690,7 +694,7 @@ export class StandardDrawManager implements DrawManager {
 // export const checkIfPostProcessingRequired = (postProcessingManagerOverride?) => {
 //   if (postProcessingManagerOverride) drawManager.postProcessingManager = postProcessingManagerOverride;
 
-//   // if (mainCameraInstance.camPitchAccel > 0.0002 || mainCameraInstance.camPitchAccel < -0.0002 || mainCameraInstance.camYawAccel > 0.0002 || mainCameraInstance.camYawAccel < -0.0002) {
+//   // if (keepTrackApi.getMainCamera().camPitchAccel > 0.0002 || keepTrackApi.getMainCamera().camPitchAccel < -0.0002 || keepTrackApi.getMainCamera().camYawAccel > 0.0002 || keepTrackApi.getMainCamera().camYawAccel < -0.0002) {
 //   //   // drawManager.gaussianAmt += this.dt * 2;
 //   //   // drawManager.gaussianAmt = Math.min(500, Math.max(drawManager.gaussianAmt, 0));
 //   //   drawManager.gaussianAmt = 500;

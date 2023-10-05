@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SettingsManager } from '@app/js/settings/settings';
-import { CameraType, mainCameraInstance } from '@app/js/singletons/camera';
+import { CameraType } from '@app/js/singletons/camera';
 import { GlUtils } from '@app/js/static/gl-utils';
 import { SplashScreen } from '@app/js/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
@@ -279,7 +279,7 @@ export class Earth {
     // we're only going to read one
     if (!this.settings_.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
-      gl.scissor(mainCameraInstance.mouseX, gl.drawingBufferHeight - mainCameraInstance.mouseY, 1, 1);
+      gl.scissor(keepTrackApi.getMainCamera().mouseX, gl.drawingBufferHeight - keepTrackApi.getMainCamera().mouseY, 1, 1);
     }
 
     // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers_.vertIndexBuf);
@@ -308,8 +308,11 @@ export class Earth {
 
     // Set the uniforms
     const uZoomModifier =
-      mainCameraInstance.cameraType === CameraType.FIXED_TO_SAT || mainCameraInstance.panCurrent.x !== 0 || mainCameraInstance.panCurrent.y !== 0 || mainCameraInstance.panCurrent.z
-        ? mainCameraInstance.zoomLevel()
+      keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT ||
+      keepTrackApi.getMainCamera().panCurrent.x !== 0 ||
+      keepTrackApi.getMainCamera().panCurrent.y !== 0 ||
+      keepTrackApi.getMainCamera().panCurrent.z
+        ? keepTrackApi.getMainCamera().zoomLevel()
         : 1.0;
 
     gl.uniform1f(this.uniforms_.uZoomModifier, uZoomModifier);
@@ -317,11 +320,11 @@ export class Earth {
     this.glowDirection = this.glowNumber > 1 ? -1 : this.glowDirection;
     this.glowDirection = this.glowNumber < 0 ? 1 : this.glowDirection;
     gl.uniform1f(this.uniforms_.uGlow, this.glowNumber);
-    gl.uniform3fv(this.uniforms_.uCamPos, mainCameraInstance.getForwardVector());
+    gl.uniform3fv(this.uniforms_.uCamPos, keepTrackApi.getMainCamera().getForwardVector());
     gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.uCamMatrix, false, mainCameraInstance.camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.uCamMatrix, false, keepTrackApi.getMainCamera().camMatrix);
     gl.uniform3fv(this.uniforms_.uLightDirection, this.lightDirection);
     gl.uniform3fv(this.uniforms_.uAmbientLightColor, [0.1, 0.1, 0.1]); // RGB ambient light
     gl.uniform3fv(this.uniforms_.uDirectionalLightColor, [1.0, 1.0, 1.0]); // RGB directional light

@@ -1,7 +1,8 @@
-import { KeepTrack } from '@app/js/keeptrack';
 import { keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrack } from '@app/js/keeptrack';
 import { KeepTrackPlugin } from '@app/js/plugins/KeepTrackPlugin';
 import { StandardSensorManager } from '@app/js/plugins/sensor/sensorManager';
+import { SettingsManager } from '@app/js/settings/settings';
 import { Camera } from '@app/js/singletons/camera';
 import { DotsManager } from '@app/js/singletons/dots-manager';
 import { StandardGroupManager } from '@app/js/singletons/groups-manager';
@@ -9,6 +10,7 @@ import { InputManager } from '@app/js/singletons/input-manager';
 import { SearchManager } from '@app/js/singletons/search-manager';
 import { TimeManager } from '@app/js/singletons/time-manager';
 import { SensorMath } from '@app/js/static/sensor-math';
+import { mat4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../src/js/container';
 import { Constructor, Singletons } from '../../src/js/interfaces';
 import { StandardCatalogManager } from '../../src/js/singletons/catalog-manager';
@@ -16,7 +18,6 @@ import { StandardColorSchemeManager } from '../../src/js/singletons/color-scheme
 import { StandardDrawManager } from '../../src/js/singletons/draw-manager';
 import { StandardOrbitManager } from '../../src/js/singletons/orbitManager';
 import { defaultSat } from './apiMocks';
-import { SettingsManager } from '@app/js/settings/settings';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
   const settingsManager = new SettingsManager();
@@ -174,7 +175,7 @@ export const mockUiManager = {
 
 export const mockCameraManager = <Camera>(<unknown>{
   camAngleSnappedOnSat: false,
-  camMatrix: null,
+  camMatrix: mat4.create().fill(0),
   camPitch: null,
   camPitchSpeed: 0,
   camPitchTarget: null,
@@ -250,6 +251,7 @@ export const mockCameraManager = <Camera>(<unknown>{
 });
 
 export const setupDefaultHtml = () => {
+  keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
   KeepTrack.getDefaultBodyHtml();
   document.body.innerHTML += `
     <input id="search"></input>

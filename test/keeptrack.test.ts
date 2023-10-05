@@ -8,7 +8,7 @@ import { StandardOrbitManager } from '../src/js/singletons/orbitManager';
 import { StandardUiManager } from '../src/js/singletons/uiManager';
 import { CatalogLoader } from '../src/js/static/catalog-loader';
 import { KeepTrack } from './../src/js/keeptrack';
-import { setupDefaultHtml } from './environment/standard-env';
+import { mockCameraManager, setupDefaultHtml } from './environment/standard-env';
 
 /*
 Code Analysis
@@ -76,6 +76,7 @@ const setupStandardEnvironment = () => {
   keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
+  keepTrackContainer.registerSingleton(Singletons.MainCamera, mockCameraManager);
 };
 
 describe('code_snippet', () => {

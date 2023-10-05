@@ -78,7 +78,7 @@ export class StandardUiManager implements UiManager {
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
+      document.documentElement?.requestFullscreen().catch((err) => {
         // Might fail on some browsers
         errorManagerInstance.debug(err);
       });

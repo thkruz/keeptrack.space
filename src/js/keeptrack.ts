@@ -29,6 +29,7 @@
 /* eslint-disable no-unreachable */
 
 import rocket1920Jpg from '@app/img/wallpaper/rocket.jpg';
+import rocket21920Jpg from '@app/img/wallpaper/rocket2.jpg';
 import telescope1920Jpg from '@app/img/wallpaper/telescope.jpg';
 import thule1920Jpg from '@app/img/wallpaper/thule.jpg';
 
@@ -70,7 +71,7 @@ import { SplashScreen } from './static/splash-screen';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
-  private static splashScreenImgList_ = [thule1920Jpg, thule1920Jpg, rocket1920Jpg, rocket1920Jpg, telescope1920Jpg, telescope1920Jpg];
+  private static splashScreenImgList_ = [thule1920Jpg, thule1920Jpg, rocket1920Jpg, rocket1920Jpg, rocket21920Jpg, rocket21920Jpg, telescope1920Jpg, telescope1920Jpg];
 
   private isShowFPS = false;
   public isReady = false;

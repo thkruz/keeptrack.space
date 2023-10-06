@@ -98,7 +98,7 @@ let isResetMarker = false;
 let isResetInView = false;
 let fieldOfViewSetLength = 0;
 let len: number;
-const MAX_DIFFERENCE_BETWEEN_POS = 50;
+let MAX_DIFFERENCE_BETWEEN_POS = 50;
 
 /** OBSERVER VARIABLES */
 let mSensor = <SensorObjectCruncher[]>[];
@@ -643,8 +643,11 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
   const pv = Sgp4.propagate(<any>satCache[i], m) as { position: EciVec3, velocity: EciVec3 };
 
   try {
-    if (isResponseCount < 5 && isResponseCount > 1 && (Math.abs(pv.position.x - satPos[i * 3]) > MAX_DIFFERENCE_BETWEEN_POS || Math.abs(pv.position.y - satPos[i * 3 + 1]) > MAX_DIFFERENCE_BETWEEN_POS || Math.abs(pv.position.z - satPos[i * 3 + 2]) > MAX_DIFFERENCE_BETWEEN_POS)) {
-      throw new Error('Impossible orbit');
+    if (isResponseCount < 5 && isResponseCount > 1) {
+      MAX_DIFFERENCE_BETWEEN_POS = Math.max(MAX_DIFFERENCE_BETWEEN_POS, MAX_DIFFERENCE_BETWEEN_POS * propRate);
+      if (Math.abs(pv.position.x - satPos[i * 3]) > MAX_DIFFERENCE_BETWEEN_POS || Math.abs(pv.position.y - satPos[i * 3 + 1]) > MAX_DIFFERENCE_BETWEEN_POS || Math.abs(pv.position.z - satPos[i * 3 + 2]) > MAX_DIFFERENCE_BETWEEN_POS) {
+        throw new Error('Impossible orbit');
+      }
     }
 
     satPos[i * 3] = pv.position.x;

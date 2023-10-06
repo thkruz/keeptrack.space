@@ -58,7 +58,7 @@ export class CatalogLoader {
         }
       }
 
-      const jsCatalog: {
+      let jsCatalog: {
         source: string;
         altId: string;
         NoradId: string;
@@ -163,6 +163,10 @@ export class CatalogLoader {
           errorManagerInstance.info(e);
         }
       }
+      if (settingsManager.isEnableJscCatalog) {
+        const resp = await (await fetch(`${settingsManager.installDirectory}tle/jsc-orbits.json`)).json();
+        jsCatalog = resp;
+      }
 
       const externalCatalog: { SCC: string; ON?: string; TLE1: TleLine1; TLE2: TleLine2 }[] = [];
       if (!settingsManager.externalTLEs) {
@@ -190,63 +194,70 @@ export class CatalogLoader {
 
       let isUsingExternalTLEs = false;
       if (settingsManager.externalTLEs) {
-        // https://celestrak.org/pub/TLE/catalog.txt
-        await fetch(settingsManager.externalTLEs).then((resp) => {
-          if (resp.ok) {
-            resp.text().then((data) => {
-              const content = data.split('\n');
-              // Check if last line is empty and remove it if so
-              if (content[content.length - 1] === '') {
-                content.pop();
-              }
+        await fetch(settingsManager.externalTLEs)
+          .then((resp) => {
+            if (resp.ok) {
+              resp.text().then((data) => {
+                const content = data.split('\n');
+                // Check if last line is empty and remove it if so
+                if (content[content.length - 1] === '') {
+                  content.pop();
+                }
 
-              // Remove any \r characters
-              for (let i = 0; i < content.length; i++) {
-                content[i] = content[i].replace('\r', '');
-              }
+                // Remove any \r characters
+                for (let i = 0; i < content.length; i++) {
+                  content[i] = content[i].replace('\r', '');
+                }
 
-              if (content[0].substr(0, 2) === '1 ') {
-                // This is a 2 line TLE
-                for (let i = 0; i < content.length; i = i + 2) {
-                  externalCatalog.push({
-                    SCC: StringPad.pad0(content[i].substr(2, 5).trim(), 5),
-                    TLE1: <TleLine1>content[i],
-                    TLE2: <TleLine2>content[i + 1],
-                  });
+                if (content[0].substr(0, 2) === '1 ') {
+                  // This is a 2 line TLE
+                  for (let i = 0; i < content.length; i = i + 2) {
+                    externalCatalog.push({
+                      SCC: StringPad.pad0(content[i].substr(2, 5).trim(), 5),
+                      TLE1: <TleLine1>content[i],
+                      TLE2: <TleLine2>content[i + 1],
+                    });
+                  }
+                  isUsingExternalTLEs = true;
+                } else if (content[1].substr(0, 2) === '1 ') {
+                  // This is a 3 line TLE
+                  for (let i = 0; i < content.length; i = i + 3) {
+                    externalCatalog.push({
+                      SCC: StringPad.pad0(content[i + 1].substr(2, 5).trim(), 5),
+                      ON: content[i].trim(),
+                      TLE1: <TleLine1>content[i + 1],
+                      TLE2: <TleLine2>content[i + 2],
+                    });
+                  }
+                  isUsingExternalTLEs = true;
+                } else {
+                  errorManagerInstance.warn('External TLEs are not in the correct format');
                 }
-                isUsingExternalTLEs = true;
-              } else if (content[1].substr(0, 2) === '1 ') {
-                // This is a 3 line TLE
-                for (let i = 0; i < content.length; i = i + 3) {
-                  externalCatalog.push({
-                    SCC: StringPad.pad0(content[i + 1].substr(2, 5).trim(), 5),
-                    ON: content[i].trim(),
-                    TLE1: <TleLine1>content[i + 1],
-                    TLE2: <TleLine2>content[i + 2],
-                  });
-                }
-                isUsingExternalTLEs = true;
-              } else {
-                errorManagerInstance.warn('External TLEs are not in the correct format');
-              }
 
-              // Sort asciiCatalog by SCC
-              externalCatalog.sort((a, b) => {
-                if (a.SCC < b.SCC) {
-                  return -1;
-                }
-                if (a.SCC > b.SCC) {
-                  return 1;
-                }
-                return 0;
+                // Sort asciiCatalog by SCC
+                externalCatalog.sort((a, b) => {
+                  if (a.SCC < b.SCC) {
+                    return -1;
+                  }
+                  if (a.SCC > b.SCC) {
+                    return 1;
+                  }
+                  return 0;
+                });
               });
-            });
-          } else {
+            } else {
+              isUsingExternalTLEs = false;
+              errorManagerInstance.warn('Error loading external TLEs from ' + settingsManager.externalTLEs);
+              errorManagerInstance.info('Reverting to internal TLEs');
+              settingsManager.externalTLEs = '';
+            }
+          })
+          .catch(() => {
             isUsingExternalTLEs = false;
             errorManagerInstance.warn('Error loading external TLEs from ' + settingsManager.externalTLEs);
             errorManagerInstance.info('Reverting to internal TLEs');
-          }
-        });
+            settingsManager.externalTLEs = '';
+          });
       }
 
       if (settingsManager.isUseDebrisCatalog) {
@@ -534,7 +545,11 @@ export class CatalogLoader {
     }
     let asciiSatInfo;
     if (asciiCatalog?.length > 0 && (settingsManager.offline || settingsManager.externalTLEs)) {
-      errorManagerInstance.info(`Processing ${settingsManager.externalTLEs ? settingsManager.externalTLEs : 'ASCII'}`);
+      if (settingsManager.externalTLEs) {
+        errorManagerInstance.info(`Processing ${settingsManager.externalTLEs}`);
+      } else {
+        errorManagerInstance.log(`Processing ASCII Catalog`);
+      }
       // If asciiCatalog catalogue
       for (const element of asciiCatalog) {
         if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
@@ -600,8 +615,8 @@ export class CatalogLoader {
     }
 
     let jsSatInfo;
-    if (jsCatalog?.length > 0 && settingsManager.isEnableExtendedCatalog) {
-      errorManagerInstance.info('Processing js Catalog');
+    if (jsCatalog?.length > 0 && (settingsManager.isEnableExtendedCatalog || settingsManager.isEnableJscCatalog)) {
+      errorManagerInstance.log(`Processing ${settingsManager.isEnableJscCatalog ? 'JSC Vimpel' : 'Extended'} Catalog`);
       // If jsCatalog catalogue
       for (const element of jsCatalog) {
         if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information

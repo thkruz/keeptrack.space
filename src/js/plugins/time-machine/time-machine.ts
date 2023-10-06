@@ -24,6 +24,7 @@ export class TimeMachine extends KeepTrackPlugin {
       getEl('menu-time-machine').classList.add('bmenu-item-selected');
       this.historyOfSatellitesPlay();
     } else {
+      this.isTimeMachineRunning = false;
       LegendManager.change('clear');
       settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
       groupManagerInstance.clearSelect();
@@ -65,7 +66,10 @@ export class TimeMachine extends KeepTrackPlugin {
   }
 
   playNextSatellite(runCount: number, year: number) {
-    if (!this.isMenuButtonEnabled && !this.isTimeMachineRunning) return;
+    if (!this.isMenuButtonEnabled || !this.isTimeMachineRunning) {
+      if (this.isMenuButtonEnabled) this.setBottomIconToUnselected();
+      return;
+    }
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
 

@@ -1,5 +1,6 @@
 import { CatalogManager, GetSatType, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
+import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/js/singletons/camera';
 import { UrlManager } from '@app/js/static/url-manager';
 import { Kilometers } from 'ootk';
@@ -778,6 +779,7 @@ export class MouseInput {
         drawManagerInstance.sceneManager.earth.reloadEarthTextures();
         break;
       case 'clear-screen-rmb':
+        (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false;
         uiManagerInstance.doSearch('');
         uiManagerInstance.searchManager.searchToggle(false);
         uiManagerInstance.hideSideMenus();

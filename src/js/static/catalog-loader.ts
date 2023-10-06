@@ -7,6 +7,7 @@ import { StringPad } from '@app/js/lib/stringPad';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { DotsManager } from '@app/js/singletons/dots-manager';
+import { TleLine1, TleLine2 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 
@@ -57,7 +58,7 @@ export class CatalogLoader {
         }
       }
 
-      const jsCatalog: {
+      let jsCatalog: {
         source: string;
         altId: string;
         NoradId: string;
@@ -162,6 +163,106 @@ export class CatalogLoader {
           errorManagerInstance.info(e);
         }
       }
+      if (settingsManager.isEnableJscCatalog) {
+        const resp = await (await fetch(`${settingsManager.installDirectory}tle/jsc-orbits.json`)).json();
+        jsCatalog = resp;
+      }
+
+      const externalCatalog: { SCC: string; ON?: string; TLE1: TleLine1; TLE2: TleLine2 }[] = [];
+      if (!settingsManager.externalTLEs && !settingsManager.isDisableAsciiCatalog) {
+        const resp = await fetch(`${settingsManager.installDirectory}tle/TLE.txt`);
+
+        if (resp.ok) {
+          const asciiCatalogFile = await resp.text();
+          const content = asciiCatalogFile.split('\n');
+          for (let i = 0; i < content.length; i = i + 2) {
+            asciiCatalog.push({
+              SCC: StringPad.pad0(content[i].substr(2, 5).trim(), 5),
+              TLE1: content[i],
+              TLE2: content[i + 1],
+            });
+          }
+
+          // Sort asciiCatalog by SCC
+          asciiCatalog.sort((a, b) => {
+            if (a.SCC < b.SCC) {
+              return -1;
+            }
+            if (a.SCC > b.SCC) {
+              return 1;
+            }
+            return 0;
+          });
+        }
+      }
+
+      let isUsingExternalTLEs = false;
+      if (settingsManager.externalTLEs) {
+        await fetch(settingsManager.externalTLEs)
+          .then((resp) => {
+            if (resp.ok) {
+              resp.text().then((data) => {
+                const content = data.split('\n');
+                // Check if last line is empty and remove it if so
+                if (content[content.length - 1] === '') {
+                  content.pop();
+                }
+
+                // Remove any \r characters
+                for (let i = 0; i < content.length; i++) {
+                  content[i] = content[i].replace('\r', '');
+                }
+
+                if (content[0].substr(0, 2) === '1 ') {
+                  // This is a 2 line TLE
+                  for (let i = 0; i < content.length; i = i + 2) {
+                    externalCatalog.push({
+                      SCC: StringPad.pad0(content[i].substr(2, 5).trim(), 5),
+                      TLE1: <TleLine1>content[i],
+                      TLE2: <TleLine2>content[i + 1],
+                    });
+                  }
+                  isUsingExternalTLEs = true;
+                } else if (content[1].substr(0, 2) === '1 ') {
+                  // This is a 3 line TLE
+                  for (let i = 0; i < content.length; i = i + 3) {
+                    externalCatalog.push({
+                      SCC: StringPad.pad0(content[i + 1].substr(2, 5).trim(), 5),
+                      ON: content[i].trim(),
+                      TLE1: <TleLine1>content[i + 1],
+                      TLE2: <TleLine2>content[i + 2],
+                    });
+                  }
+                  isUsingExternalTLEs = true;
+                } else {
+                  errorManagerInstance.warn('External TLEs are not in the correct format');
+                }
+
+                // Sort asciiCatalog by SCC
+                externalCatalog.sort((a, b) => {
+                  if (a.SCC < b.SCC) {
+                    return -1;
+                  }
+                  if (a.SCC > b.SCC) {
+                    return 1;
+                  }
+                  return 0;
+                });
+              });
+            } else {
+              isUsingExternalTLEs = false;
+              errorManagerInstance.warn('Error loading external TLEs from ' + settingsManager.externalTLEs);
+              errorManagerInstance.info('Reverting to internal TLEs');
+              settingsManager.externalTLEs = '';
+            }
+          })
+          .catch(() => {
+            isUsingExternalTLEs = false;
+            errorManagerInstance.warn('Error loading external TLEs from ' + settingsManager.externalTLEs);
+            errorManagerInstance.info('Reverting to internal TLEs');
+            settingsManager.externalTLEs = '';
+          });
+      }
 
       if (settingsManager.isUseDebrisCatalog) {
         await fetch(`${settingsManager.installDirectory}tle/TLEdebris.json`)
@@ -173,12 +274,13 @@ export class CatalogLoader {
       } else {
         await fetch(`${settingsManager.installDirectory}tle/TLE2.json`)
           .then((response) => response.json())
-          .then((data) => CatalogLoader.parse(data, extraSats, asciiCatalog, jsCatalog))
+          .then((data) => CatalogLoader.parse(data, extraSats, isUsingExternalTLEs ? externalCatalog : asciiCatalog, jsCatalog))
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
       }
-    } catch {
+    } catch (e) {
+      console.warn(e);
       console.error('Failed to load TLE catalog!');
     }
   }
@@ -261,7 +363,7 @@ export class CatalogLoader {
   }
 
   static filterTLEDatabase(resp: SatObject[], limitSatsArray?: string[], extraSats?: any[], asciiCatalog?: any[], jsCatalog?: any[]): void {
-    const tempSatData = [];
+    let tempSatData = [];
     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
     catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
@@ -309,7 +411,13 @@ export class CatalogLoader {
 
     let i = 0;
     for (i; i < resp.length; i++) {
+      // TODO: This should be done by the catalog-manager itself
+      // Fix TLEs without leading zeros
       resp[i].sccNum = StringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
+      // Also update TLE1
+      resp[i].TLE1 = <TleLine1>(resp[i].TLE1.substr(0, 2) + resp[i].sccNum + resp[i].TLE1.substr(7));
+      // Also update TLE2
+      resp[i].TLE2 = <TleLine2>(resp[i].TLE2.substr(0, 2) + resp[i].sccNum + resp[i].TLE2.substr(7));
 
       // Check if first digit is a letter
       resp[i].sccNum = CatalogLoader.convertA5to6Digit(resp[i].sccNum);
@@ -441,16 +549,24 @@ export class CatalogLoader {
       }
     }
     let asciiSatInfo;
-    if (asciiCatalog?.length > 0 && settingsManager.offline) {
-      errorManagerInstance.info('Processing ASCII Catalog');
+    if (asciiCatalog?.length > 0 && (settingsManager.offline || settingsManager.externalTLEs)) {
+      if (settingsManager.externalTLEs) {
+        errorManagerInstance.info(`Processing ${settingsManager.externalTLEs}`);
+      } else {
+        errorManagerInstance.log(`Processing ASCII Catalog`);
+      }
       // If asciiCatalog catalogue
       for (const element of asciiCatalog) {
         if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
         if (typeof element.TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
+
+        // See if we know anything about it already
         if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
           i = catalogManagerInstance.sccIndex[`${element.SCC}`];
           tempSatData[i].TLE1 = element.TLE1;
           tempSatData[i].TLE2 = element.TLE2;
+          tempSatData[i].name = element.ON;
+          tempSatData[i].isExternal = true;
         } else {
           if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information
           if (typeof element.TLE2 == 'undefined') continue; // Don't Process Bad Satellite Information
@@ -482,17 +598,30 @@ export class CatalogLoader {
             intlDes: year + '-' + rest,
             typ: 'sat',
             id: tempSatData.length,
+            isExternal: true,
           };
           catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
           catalogManagerInstance.cosparIndex[`${year}-${rest}`] = tempSatData.length;
           tempSatData.push(asciiSatInfo);
         }
       }
+
+      if (settingsManager.externalTLEs) {
+        tempSatData = tempSatData.filter((sat) => sat.isExternal);
+        catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
+        catalogManagerInstance.cosparIndex = <{ [key: string]: number }>{};
+
+        for (let idx = 0; idx < tempSatData.length; idx++) {
+          tempSatData[idx].id = idx;
+          catalogManagerInstance.sccIndex[`${tempSatData[idx].sccNum}`] = idx;
+          catalogManagerInstance.cosparIndex[`${tempSatData[idx].intlDes}`] = idx;
+        }
+      }
     }
 
     let jsSatInfo;
-    if (jsCatalog?.length > 0 && settingsManager.isEnableExtendedCatalog) {
-      errorManagerInstance.info('Processing js Catalog');
+    if (jsCatalog?.length > 0 && (settingsManager.isEnableExtendedCatalog || settingsManager.isEnableJscCatalog)) {
+      errorManagerInstance.log(`Processing ${settingsManager.isEnableJscCatalog ? 'JSC Vimpel' : 'Extended'} Catalog`);
       // If jsCatalog catalogue
       for (const element of jsCatalog) {
         if (typeof element.TLE1 == 'undefined') continue; // Don't Process Bad Satellite Information

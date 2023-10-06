@@ -759,6 +759,10 @@ export class SettingsManager {
    * Determines whether or not to use political map texture for the Earth.
    */
   politicalImages = false;
+  /**
+   * url for an external TLE source
+   */
+  externalTLEs: string;
   pTime = [];
   /**
    * Global flag for determining if a screenshot is queued
@@ -909,7 +913,7 @@ export class SettingsManager {
    */
   isDrawTrailingOrbits = true;
   /**
-   * Enables the new extended catalog including JSC Vimpel data
+   * Enables the old extended catalog including JSC Vimpel data
    */
   isEnableExtendedCatalog = false;
   selectedColorFallback = <[number, number, number, number]>[0, 0, 0, 0];
@@ -943,6 +947,10 @@ export class SettingsManager {
    * Disable toast messages
    */
   isDisableToasts = false;
+  /*
+   * Enables the new JSC Vimpel catalog
+   */
+  isEnableJscCatalog = false;
 
   init(settingsOverride?: any) {
     this.pTime = [];
@@ -1105,8 +1113,21 @@ export class SettingsManager {
    * @returns An array of query string parameters.
    */
   private loadOverridesFromUrl() {
-    const queryStr = window.location.search.substring(1);
-    const params = queryStr.split('&');
+    let queryStr = window.location.search.substring(1);
+
+    // URI Encode all %22 to ensure url is not broken
+    const params = queryStr
+      .split('%22')
+      .map((item, index) => {
+        if (index % 2 === 0) {
+          return item;
+        } else {
+          return encodeURIComponent(item);
+        }
+      })
+      .join('')
+      .split('&');
+
     const plugins = this.plugins;
     for (const param of params) {
       const key = param.split('=')[0];
@@ -1327,6 +1348,13 @@ export class SettingsManager {
               default:
                 break;
             }
+            break;
+          case 'tle':
+            // Decode from UTF-8
+            this.externalTLEs = decodeURIComponent(val);
+            break;
+          case 'jsc':
+            this.isEnableJscCatalog = true;
             break;
           case 'sat':
             keepTrackApi.register({

@@ -149,7 +149,7 @@ export class SearchManager {
         if (sat.static && sat.type !== SpaceObjectType.STAR) return true; // Skip static dots (Maybe these should be searchable?)
         if (sat.marker) return false; // Stop searching once you reach the markers
         if (settingsManager.isSatOverflyModeOn && sat.type !== SpaceObjectType.PAYLOAD) return true; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
-        if (sat.missile && !sat.active) return true; // Skip inactive missiles.
+        if (!sat.active) return true; // Skip inactive missiles.
         if (sat.country == 'ANALSAT' && !sat.active) return true; // Skip Fake Analyst satellites
         if (!sat.name) return true; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 

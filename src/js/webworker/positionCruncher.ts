@@ -98,6 +98,7 @@ let isResetMarker = false;
 let isResetInView = false;
 let fieldOfViewSetLength = 0;
 let len: number;
+let MAX_DIFFERENCE_BETWEEN_POS = 50;
 
 /** OBSERVER VARIABLES */
 let mSensor = <SensorObjectCruncher[]>[];
@@ -173,6 +174,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => { // NOSO
           extraRec.apogee = <Kilometers>(extraRec.semiMajorAxis * (1 + extraRec.eccentricity) - RADIUS_OF_EARTH);
           satrec.apogee = extraRec.apogee;
           extraRec.perigee = <Kilometers>(extraRec.semiMajorAxis * (1 - extraRec.eccentricity) - RADIUS_OF_EARTH);
+          satrec.perigee = extraRec.perigee;
           extraRec.period = <Minutes>(1440.0 / extraRec.meanMotion);
 
           extraData.push(extraRec);
@@ -641,6 +643,13 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
   const pv = Sgp4.propagate(<any>satCache[i], m) as { position: EciVec3, velocity: EciVec3 };
 
   try {
+    if (isResponseCount < 5 && isResponseCount > 1) {
+      MAX_DIFFERENCE_BETWEEN_POS = Math.max(MAX_DIFFERENCE_BETWEEN_POS, MAX_DIFFERENCE_BETWEEN_POS * propRate);
+      if (Math.abs(pv.position.x - satPos[i * 3]) > MAX_DIFFERENCE_BETWEEN_POS || Math.abs(pv.position.y - satPos[i * 3 + 1]) > MAX_DIFFERENCE_BETWEEN_POS || Math.abs(pv.position.z - satPos[i * 3 + 2]) > MAX_DIFFERENCE_BETWEEN_POS) {
+        throw new Error('Impossible orbit');
+      }
+    }
+
     satPos[i * 3] = pv.position.x;
     satPos[i * 3 + 1] = pv.position.y;
     satPos[i * 3 + 2] = pv.position.z;
@@ -676,13 +685,9 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
         k += 1;
       }
       const alt = R / Math.cos(lat) - a * C;
-      if (alt > satCache[i].apogee + 1000) {
+      if (alt > satCache[i].apogee + 1000 || alt < satCache[i].perigee - 100) {
         throw new Error('Impossible orbit');
       }
-    }
-
-    if (satCache[i].apogee < 350 && Math.sqrt(pv.velocity.x * pv.velocity.x + pv.velocity.y * pv.velocity.y) < 5.5) {
-      throw new Error('Impossible orbit');
     }
 
     // Skip Calculating Lookangles if No Sensor is Selected
@@ -692,6 +697,11 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
   } catch (e) {
     // This is probably a reentry and should be skipped from now on.
     satCache[i].skip = true;
+
+    postMessage({
+      badSatNumber: satCache[i].satnum,
+    });
+
     satPos[i * 3] = 0;
     satPos[i * 3 + 1] = 0;
     satPos[i * 3 + 2] = 0;
@@ -1166,7 +1176,11 @@ export const updateMarkerFov = (i: number, gmst: GreenwichMeanSiderealTime): num
   // Let the main loop know what i we ended on
   return i;
 };
+
+let isResponseCount = 0;
 export const sendDataToSatSet = () => {
+  if (isResponseCount < 5) isResponseCount++;
+
   const postMessageArray = <PositionCruncherOutgoingMsg>{
     satPos: satPos,
   };

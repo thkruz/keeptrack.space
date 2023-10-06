@@ -82,6 +82,11 @@ declare module '@app/js/interfaces' {
   interface SatCruncherMessageData {
   extraData?: string;
   extraUpdate?: boolean;
+  /**
+   * Satellite Number that is now being skipped by the cruncher
+   * due to a bad TLE
+   */
+  badSatNumber?: number;
   // JSON string
   satId?: number;
   sensorMarkerArray?: number[];
@@ -586,6 +591,18 @@ export class StandardCatalogManager implements CatalogManager {
 
   public satCruncherOnMessage({ data: mData }: { data: SatCruncherMessageData }) {
     if (!mData) return;
+
+    if (mData.badSatNumber) {
+      // Makr the satellite as inactive
+      const id = this.getIdFromObjNum(mData.badSatNumber);
+      if (id !== null) {
+        this.satData[id].active = false;
+        // (<any>window).decayedSats = (<any>window).decayedSats || [];
+        // (<any>window).decayedSats.push(this.satData[id].sccNum);
+        errorManagerInstance.debug(`Satellite ${mData.badSatNumber} is inactive due to bad TLE`);
+      }
+    }
+
     // store extra data that comes from crunching
     // Only do this once
     if (!this.gotExtraData && mData.extraData) {

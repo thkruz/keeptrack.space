@@ -183,6 +183,7 @@ export interface SatCruncherMessageData {
     propRate?: number;
     staticOffset?: number;
     dynamicOffsetEpoch?: number;
+    badSatNumber?: number;
   };
 }
 

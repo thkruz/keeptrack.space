@@ -356,6 +356,7 @@ export class StandardOrbitManager implements OrbitManager {
         if (typeof colorSchemeManagerInstance.colorData[id * 4 + 1] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
         if (typeof colorSchemeManagerInstance.colorData[id * 4 + 2] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
         if (typeof colorSchemeManagerInstance.colorData[id * 4 + 3] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
+        if (!catalogManagerInstance.satData[id].active) return; // Skip inactive objects
         if (catalogManagerInstance.selectedSat !== id) {
           // if color is black, we probably have old data, so recalculate color buffers
           if (colorSchemeManagerInstance.colorData[id * 4] <= 0 && colorSchemeManagerInstance.colorData[id * 4 + 1] <= 0 && colorSchemeManagerInstance.colorData[id * 4 + 2] <= 0) {

@@ -7,6 +7,7 @@ import { StringPad } from '@app/js/lib/stringPad';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { DotsManager } from '@app/js/singletons/dots-manager';
+import { TleLine1, TleLine2 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 
@@ -309,7 +310,13 @@ export class CatalogLoader {
 
     let i = 0;
     for (i; i < resp.length; i++) {
+      // TODO: This should be done by the catalog-manager itself
+      // Fix TLEs without leading zeros
       resp[i].sccNum = StringPad.pad0(resp[i].TLE1.substr(2, 5).trim(), 5);
+      // Also update TLE1
+      resp[i].TLE1 = <TleLine1>(resp[i].TLE1.substr(0, 2) + resp[i].sccNum + resp[i].TLE1.substr(7));
+      // Also update TLE2
+      resp[i].TLE2 = <TleLine2>(resp[i].TLE2.substr(0, 2) + resp[i].sccNum + resp[i].TLE2.substr(7));
 
       // Check if first digit is a letter
       resp[i].sccNum = CatalogLoader.convertA5to6Digit(resp[i].sccNum);

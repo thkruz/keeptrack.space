@@ -13,6 +13,7 @@ export interface SatCacheObject extends Ootk.SatelliteRecord {
   id?: number;
   isimp: number;
   apogee: Kilometers;
+  perigee: Kilometers;
   isRadarData: any;
   static: boolean;
   marker: any;

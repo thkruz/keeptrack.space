@@ -759,6 +759,10 @@ export class SettingsManager {
    * Determines whether or not to use political map texture for the Earth.
    */
   politicalImages = false;
+  /**
+   * url for an external TLE source
+   */
+  externalTLEs: string;
   pTime = [];
   /**
    * Global flag for determining if a screenshot is queued
@@ -1327,6 +1331,9 @@ export class SettingsManager {
               default:
                 break;
             }
+            break;
+          case 'tle':
+            this.externalTLEs = val;
             break;
           case 'sat':
             keepTrackApi.register({

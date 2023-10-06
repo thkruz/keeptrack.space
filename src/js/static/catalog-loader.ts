@@ -169,27 +169,31 @@ export class CatalogLoader {
       }
 
       const externalCatalog: { SCC: string; ON?: string; TLE1: TleLine1; TLE2: TleLine2 }[] = [];
-      if (!settingsManager.externalTLEs) {
-        const resp = await (await fetch(`${settingsManager.installDirectory}tle/TLE.txt`)).text();
-        const content = resp.split('\n');
-        for (let i = 0; i < content.length; i = i + 2) {
-          asciiCatalog.push({
-            SCC: StringPad.pad0(content[i].substr(2, 5).trim(), 5),
-            TLE1: content[i],
-            TLE2: content[i + 1],
+      if (!settingsManager.externalTLEs && !settingsManager.isDisableAsciiCatalog) {
+        const resp = await fetch(`${settingsManager.installDirectory}tle/TLE.txt`);
+
+        if (resp.ok) {
+          const asciiCatalogFile = await resp.text();
+          const content = asciiCatalogFile.split('\n');
+          for (let i = 0; i < content.length; i = i + 2) {
+            asciiCatalog.push({
+              SCC: StringPad.pad0(content[i].substr(2, 5).trim(), 5),
+              TLE1: content[i],
+              TLE2: content[i + 1],
+            });
+          }
+
+          // Sort asciiCatalog by SCC
+          asciiCatalog.sort((a, b) => {
+            if (a.SCC < b.SCC) {
+              return -1;
+            }
+            if (a.SCC > b.SCC) {
+              return 1;
+            }
+            return 0;
           });
         }
-
-        // Sort asciiCatalog by SCC
-        asciiCatalog.sort((a, b) => {
-          if (a.SCC < b.SCC) {
-            return -1;
-          }
-          if (a.SCC > b.SCC) {
-            return 1;
-          }
-          return 0;
-        });
       }
 
       let isUsingExternalTLEs = false;
@@ -275,7 +279,8 @@ export class CatalogLoader {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
       }
-    } catch {
+    } catch (e) {
+      console.warn(e);
       console.error('Failed to load TLE catalog!');
     }
   }

@@ -1376,6 +1376,13 @@ export class SettingsManager {
           case 'noorbits':
             this.isDrawOrbits = false;
             break;
+          case 'searchLimit':
+            if (parseInt(val) > 0) {
+              this.searchLimit = parseInt(val);
+            } else {
+              keepTrackApi.getUiManager().toast(`Invalid search limit: ${val}`, 'error');
+            }
+            break;
           case 'console':
             this.isEnableConsole = true;
             break;

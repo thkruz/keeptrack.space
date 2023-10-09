@@ -55,6 +55,7 @@ const SunMath = Utils.SunMath;
 
 const EMPTY_FLOAT32_ARRAY = new Float32Array(0);
 const EMPTY_INT8_ARRAY = new Int8Array(0);
+let isResponseCount = 0;
 
 /** ARRAYS */
 let satCache = <SatCacheObject[]>[]; // Cache of Satellite Data from TLE.json and Static Data from variable.js
@@ -1177,7 +1178,6 @@ export const updateMarkerFov = (i: number, gmst: GreenwichMeanSiderealTime): num
   return i;
 };
 
-let isResponseCount = 0;
 export const sendDataToSatSet = () => {
   if (isResponseCount < 5) isResponseCount++;
 

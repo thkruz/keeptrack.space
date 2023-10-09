@@ -28,10 +28,13 @@
 
 /* eslint-disable no-unreachable */
 
-import rocket1920Jpg from '@app/img/wallpaper/rocket.jpg';
-import rocket21920Jpg from '@app/img/wallpaper/rocket2.jpg';
-import telescope1920Jpg from '@app/img/wallpaper/telescope.jpg';
-import thule1920Jpg from '@app/img/wallpaper/thule.jpg';
+import issJpg from '@app/img/wallpaper/iss.jpg';
+import missionControlJpg from '@app/img/wallpaper/mission-control.jpg';
+import rocketJpg from '@app/img/wallpaper/rocket.jpg';
+import rocket2Jpg from '@app/img/wallpaper/rocket2.jpg';
+import rocket3Jpg from '@app/img/wallpaper/rocket3.jpg';
+import telescopeJpg from '@app/img/wallpaper/telescope.jpg';
+import thuleJpg from '@app/img/wallpaper/thule.jpg';
 
 import eruda from 'eruda';
 import erudaFps from 'eruda-fps';
@@ -71,7 +74,7 @@ import { SplashScreen } from './static/splash-screen';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
-  private static splashScreenImgList_ = [thule1920Jpg, thule1920Jpg, rocket1920Jpg, rocket1920Jpg, rocket21920Jpg, rocket21920Jpg, telescope1920Jpg, telescope1920Jpg];
+  private static splashScreenImgList_ = [thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, missionControlJpg, issJpg, rocket3Jpg];
 
   private isShowFPS = false;
   public isReady = false;
@@ -288,8 +291,7 @@ export class KeepTrack {
   /* istanbul ignore next */
   private static loadSplashScreen_(): void {
     // Randomly load a splash screen - not a vulnerability
-    const width = window.innerWidth > 1920 ? 1 : 0;
-    const image = KeepTrack.splashScreenImgList_[Math.floor(Math.random() * KeepTrack.splashScreenImgList_.length) + width];
+    const image = KeepTrack.splashScreenImgList_[Math.floor(Math.random() * KeepTrack.splashScreenImgList_.length)];
     const loadingDom = document.getElementById('loading-screen');
 
     loadingDom.style.backgroundImage = `url(${image})`;
@@ -297,12 +299,13 @@ export class KeepTrack {
     loadingDom.style.backgroundPosition = 'center';
     loadingDom.style.backgroundRepeat = 'no-repeat';
 
-    for (let i = 0; i < KeepTrack.splashScreenImgList_.length / 2; i += 2) {
-      setTimeout(() => {
-        const width = window.innerWidth > 1920 ? 1 : 0;
-        new Image().src = KeepTrack.splashScreenImgList_[Math.floor(Math.random() * KeepTrack.splashScreenImgList_.length) + width];
-      }, 5000 * i);
-    }
+    // Preload the rest of the images after 30 seconds
+    setTimeout(() => {
+      KeepTrack.splashScreenImgList_.forEach((img) => {
+        const preloadImg = new Image();
+        preloadImg.src = img;
+      });
+    }, 30000);
   }
 
   private static printLogoToConsole_() {

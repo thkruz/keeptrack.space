@@ -232,6 +232,11 @@ export const uiManagerFinal = (plugins: any): void => {
     getEl('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
   }
 
+  // Only turn on analytics if on keeptrack.space ()
+  if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
+    startGoogleAnalytics();
+  }
+
   const wheel = (dom: any, deltaY: number) => {
     const step = 0.15;
     const pos = dom.scrollTop;
@@ -247,6 +252,23 @@ export const uiManagerFinal = (plugins: any): void => {
     },
     { passive: false }
   );
+};
+
+/* istanbul ignore next */
+export const startGoogleAnalytics = (): void => {
+  const newScript = document.createElement('script');
+  newScript.type = 'text/javascript';
+  newScript.setAttribute('async', 'true');
+  newScript.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7');
+  document.documentElement.firstChild.appendChild(newScript);
+  window.dataLayer = window.dataLayer || [];
+  // eslint-disable-next-line no-unused-vars
+  const gtag = function (_a?: string, _b?: any): void {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer.push(arguments);
+  };
+  gtag('js', new Date());
+  gtag('config', 'G-ENHWK6L0X7');
 };
 
 // Create common import for all plugins

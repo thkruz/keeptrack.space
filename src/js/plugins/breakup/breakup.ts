@@ -203,7 +203,7 @@ export class Breakup extends KeepTrackPlugin {
     const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
     mainsat.TLE1 = (mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32)) as TleLine1;
 
-    keepTrackApi.getMainCamera().isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');

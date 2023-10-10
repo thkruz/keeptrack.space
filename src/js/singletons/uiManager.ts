@@ -42,7 +42,6 @@ import { getClass } from '../lib/get-class';
 import { getEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
 import { SpaceObjectType } from '../lib/space-object-type';
-import { StandardSensorManager } from '../plugins/sensor/sensorManager';
 import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
 import { StandardColorSchemeManager } from './color-scheme-manager';
@@ -50,7 +49,6 @@ import { errorManagerInstance } from './errorManager';
 import { hoverManagerInstance } from './hover-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
-import { TimeManager } from './time-manager';
 
 export class StandardUiManager implements UiManager {
   private static LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
@@ -141,8 +139,7 @@ export class StandardUiManager implements UiManager {
     // istanbul ignore next
     if (currentSensor !== null) {
       try {
-        const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-        const sensorManagerInstance = keepTrackContainer.get<StandardSensorManager>(Singletons.SensorManager);
+        const sensorManagerInstance = keepTrackApi.getSensorManager();
 
         // If there is a staticnum set use that
         if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
@@ -153,14 +150,10 @@ export class StandardUiManager implements UiManager {
           if (typeof currentSensor[0].shortName == 'undefined') {
             sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
             LegendManager.change('default');
-            const curSensor = sensorManagerInstance.currentSensors[0];
-            keepTrackApi.getMainCamera().lookAtLatLon(curSensor.lat, curSensor.lon, curSensor.zoom, timeManagerInstance.selectedDate);
           } else {
             // Seems to be a single sensor without a staticnum, load that
             sensorManagerInstance.setSensor(sensorManagerInstance.sensors[currentSensor[0].shortName], currentSensor[1]);
             LegendManager.change('default');
-            const curSensor = sensorManagerInstance.currentSensors[0];
-            keepTrackApi.getMainCamera().lookAtLatLon(curSensor.lat, curSensor.lon, curSensor.zoom, timeManagerInstance.selectedDate);
           }
         }
       } catch (e) {

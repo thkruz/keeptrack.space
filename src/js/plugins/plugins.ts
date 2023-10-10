@@ -20,6 +20,7 @@ import { collissionsPlugin } from './collisions/collisions';
 import { colorMenuPlugin } from './colors-menu/colors-menu';
 import { dateTimeManagerPlugin } from './date-time-manager/date-time-manager';
 import { debrisScreeningPlugin } from './debris-screening/debris-screening';
+import { debugMenuPlugin } from './debug/debug';
 import { dopsPlugin } from './dops/dops';
 import { editSatPlugin } from './edit-sat/edit-sat';
 import { findSatPlugin } from './find-sat/find-sat';
@@ -120,7 +121,7 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     // catalogLoader.init();
 
     // Load Debug Plugins
-    // if (plugins.debug) debug.init();
+    if (plugins.debug) debugMenuPlugin.init();
 
     // Register selectSatData
     const selectSatManagerInstance = new SelectSatManager();

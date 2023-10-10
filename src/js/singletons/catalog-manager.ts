@@ -713,6 +713,10 @@ export class StandardCatalogManager implements CatalogManager {
     this.satData[i].velocity ??= { total: 0, x: 0, y: 0, z: 0 }; // Set the velocity to 0 if it doesn't exist
   }
 
+  public getSelectedSat(): SatObject {
+    return this.getSat(this.selectedSat);
+  }
+
   public setSecondarySat(id: number): void {
     if (settingsManager.isDisableSelectSat) return;
     this.secondarySat = id;
@@ -749,7 +753,7 @@ export class StandardCatalogManager implements CatalogManager {
 
     lineManagerInstance.create('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
     keepTrackApi.getMainCamera().cameraType = CameraType.OFFSET;
-    keepTrackApi.getMainCamera().lookAtObject(sat, false, timeManagerInstance.selectedDate);
+    keepTrackApi.getMainCamera().lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
   }
 
   public switchPrimarySecondary(): void {

@@ -181,7 +181,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
 
-    keepTrackApi.getMainCamera().isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     const simulationTimeObj = timeManagerInstance.simulationTimeObj;
 

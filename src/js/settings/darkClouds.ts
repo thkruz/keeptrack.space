@@ -129,7 +129,7 @@ export const darkClouds = () => {
         keepTrackApi.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
       setTimeout(() => {
-        keepTrackApi.getMainCamera().isCamSnapMode = false; // Disable Camera Snap Mode
+        keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
         keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };

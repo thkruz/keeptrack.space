@@ -610,6 +610,7 @@ export interface GroupsManager {
 }
 
 export interface CatalogManager {
+  getSelectedSat(): SatObject;
   analSatSet: SatObject[];
   cosparIndex: { [key: string]: number };
   fieldOfViewSet: SatObject[];

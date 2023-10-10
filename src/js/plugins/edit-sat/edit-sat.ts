@@ -309,7 +309,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
       const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
       mainsat.TLE1 = (mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32)) as TleLine1;
 
-      keepTrackApi.getMainCamera().isCamSnapMode = false;
+      keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
       let TLEs;
       // Ignore argument of perigee for round orbits OPTIMIZE

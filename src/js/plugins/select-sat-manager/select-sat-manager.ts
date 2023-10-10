@@ -86,7 +86,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       };
     }
 
-    keepTrackApi.getMainCamera().isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
     // Don't select -1 twice
     if (!(satId === -1 && this.isselectedSatNegativeOne)) {
       catalogManagerInstance.selectSat(satId);
@@ -114,7 +114,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // If we deselect an object but had previously selected one then disable/hide stuff
     if (satId === -1 && !this.isselectedSatNegativeOne) {
-      keepTrackApi.getMainCamera().fts2default();
+      keepTrackApi.getMainCamera().exitFixedToSat();
       this.isselectedSatNegativeOne = true;
 
       const rootElement = document.querySelector(':root') as HTMLElement;
@@ -132,7 +132,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       getEl('menu-plot-analysis3', true)?.classList.add('bmenu-item-disabled');
     } else if (satId !== -1) {
       if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
-        keepTrackApi.getMainCamera().ecLastZoom = keepTrackApi.getMainCamera().zoomLevel();
+        keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
         if (!sat.static) {
           keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
         } else if (typeof sat.staticNum !== 'undefined' && !settingsManager.isMobileModeEnabled) {

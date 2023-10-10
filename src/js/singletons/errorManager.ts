@@ -4,7 +4,7 @@ import { Singletons, UiManager } from '../interfaces';
 import { isThisNode } from '../keepTrackApi';
 
 export class ErrorManager {
-  private readonly ALLOW_DEBUG = window.location.hostname === 'localhost';
+  private readonly ALLOW_DEBUG = false; // window.location.hostname === 'localhost';
   private readonly ALLOW_LOG = window.location.hostname === 'localhost';
   private readonly ALLOW_INFO = true;
   private readonly ALLOW_WARN = true;

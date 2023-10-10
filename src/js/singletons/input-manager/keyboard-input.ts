@@ -2,7 +2,8 @@ import { keepTrackContainer } from '@app/js/container';
 import { Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
-import { Camera } from '@app/js/singletons/camera';
+import { DebugMenuPlugin } from '@app/js/plugins/debug/debug';
+import { Camera, CameraType } from '@app/js/singletons/camera';
 import eruda from 'eruda';
 import { KeyEvent } from '../input-manager';
 import { TimeManager } from '../time-manager';
@@ -17,7 +18,7 @@ export class KeyboardInput {
 
     const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
 
-    const bodyDOM = document;
+    const bodyDOM = window;
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.ctrlKey === true || e.metaKey === true) this.isCtrlPressed = true;
@@ -71,7 +72,7 @@ export class KeyboardInput {
 
   keyUpHandler(evt: KeyboardEvent) {
     this.keyUpEvents
-      .filter((event) => event.key == evt.key.toUpperCase())
+      .filter((event) => event.key == evt.key?.toUpperCase())
       .forEach((event) => {
         event.callback();
       });
@@ -79,7 +80,7 @@ export class KeyboardInput {
 
   keyDownHandler(evt: KeyboardEvent) {
     this.keyDownEvents
-      .filter((event) => event.key == evt.key.toUpperCase())
+      .filter((event) => event.key == evt.key?.toUpperCase())
       .forEach((event) => {
         event.callback();
       });
@@ -88,7 +89,6 @@ export class KeyboardInput {
   keyHandler(evt: KeyboardEvent) {
     // Error Handling
     if (typeof evt.key == 'undefined') return;
-    const { debug } = keepTrackApi.programs;
 
     const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
     const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
@@ -114,13 +114,13 @@ export class KeyboardInput {
         }
         break;
       case 'D':
-        if (this.isShiftPressed) {
-          if (debug.isErudaVisible) {
+        if (this.isShiftPressed && keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
+          if ((<DebugMenuPlugin>keepTrackApi.getPlugin(DebugMenuPlugin)).isErudaVisible) {
             eruda.hide();
-            debug.isErudaVisible = false;
+            (<DebugMenuPlugin>keepTrackApi.getPlugin(DebugMenuPlugin)).isErudaVisible = false;
           } else {
             eruda.show();
-            debug.isErudaVisible = true;
+            (<DebugMenuPlugin>keepTrackApi.getPlugin(DebugMenuPlugin)).isErudaVisible = true;
           }
         }
         break;

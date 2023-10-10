@@ -1,147 +1,41 @@
 import * as gremlins from 'gremlins.js';
 
-import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
-import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
-import { helpBodyTextDebug, helpTitleTextDebug } from './help';
 
-import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
-// @ts-ignore-next-line
 import debugPng from '@app/img/icons/debug.png';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons, UiManager } from '@app/js/interfaces';
+import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
 import eruda from 'eruda';
+import { Milliseconds } from 'ootk';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 
-// ////////////////////////////////////////////////////////////////////////////
-// TODO: This is currently obsolete and needs to be updated to the new Plugin
-// Framework. It is for debugging only so it is low priority.
-// ////////////////////////////////////////////////////////////////////////////
+export class DebugMenuPlugin extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Debug Menu';
+  isErudaVisible = false;
+  constructor() {
+    super(DebugMenuPlugin.PLUGIN_NAME);
+  }
 
-/* istanbul ignore file */
+  bottomIconImg = debugPng;
+  bottomIconElementName = 'menu-debug';
+  bottomIconLabel = 'Debug';
 
-/*
- * Returns a random integer between min (inclusive) and max (inclusive).
- * The value is no lower than min (or the next integer greater than min
- * if min isn't an integer) and no greater than max (or the next integer
- * lower than max if max isn't an integer).
- * Using Math.round() will give you a non-uniform distribution!
- */
-export const getRandomInt = (min: number, max: number): any => {
-  min = Number.isNaN(min) ? 0 : Math.ceil(min);
-  max = Number.isNaN(max) ? 100 : Math.floor(max);
-  // The use of Math.random here is for debugging purposes only.
-  // It is not used in any cryptographic way.
-  return Math.floor(Math.random() * (max - min + 1)) + min; // NOSONAR
-};
-
-export const defaultPositionSelector = () => {
-  const x = getRandomInt(0, Math.max(0, document.documentElement.clientWidth - 1));
-  const y = getRandomInt(Math.max(0, document.documentElement.clientHeight - 100), Math.max(0, document.documentElement.clientHeight - 1));
-  return [x, y];
-};
-export const canClick = (element: { parentElement: { className: string } }) => {
-  if (typeof element.parentElement == 'undefined' || element.parentElement == null) return null;
-  return element.parentElement.className === 'bmenu-item';
-};
-export const startGremlins = () => {
-  const bottomMenuGremlinClicker = gremlins.species.clicker({
-    // Click only if parent is has class test-class
-    canClick: canClick,
-    defaultPositionSelector: defaultPositionSelector,
-  });
-  const bottomMenuGremlinScroller = gremlins.species.toucher({
-    touchTypes: ['gesture'],
-    defaultPositionSelector: defaultPositionSelector,
-  });
-  const distributionStrategy = gremlins.strategies.distribution({
-    distribution: [0.3, 0.3, 0.1, 0.1, 0.1, 0.1],
-    delay: 5, // wait 5 ms between each action
-  });
-  gremlins
-    .createHorde({
-      species: [
-        bottomMenuGremlinClicker,
-        bottomMenuGremlinScroller,
-        gremlins.species.clicker(),
-        gremlins.species.toucher(),
-        gremlins.species.formFiller(),
-        gremlins.species.typer(),
-      ],
-      mogwais: [gremlins.mogwais.alert(), gremlins.mogwais.fps(), gremlins.mogwais.gizmo({ maxErrors: 1000 })],
-      strategies: [distributionStrategy],
-    })
-    .unleash();
-};
-export const runGremlins = () => {
-  getEl('nav-footer').style.height = '200px';
-  getEl('nav-footer-toggle').style.display = 'none';
-  getEl('bottom-icons-container').style.height = '200px';
-  getEl('bottom-icons').style.height = '200px';
-  startGremlins();
-};
-
-let isDebugMenuOpen = false;
-
-export const init = (): void => {
-  keepTrackApi.programs.debug = {
-    isErudaVisible: false,
-    gremlinsSettings: {
-      nb: 100000,
-      delay: 5,
-    },
-    gremlins: runGremlins,
+  dragOptions: clickDragOptions = {
+    isDraggable: true,
+    minWidth: 300,
+    maxWidth: 500,
   };
 
-  keepTrackApi.register({
-    method: 'onHelpMenuClick',
-    cbName: 'debugMenu',
-    cb: onHelpMenuClick,
-  });
-};
+  helpTitle: string = 'Debug Menu';
+  helpBody: string = keepTrackApi.html`The Debug Menu is used for debugging the app. It is probably not very useful unless you are assisting me with debugging an issue
+  <br><br>
+  Open Debug Menu allows you to access the console even when it is blocked by the browser. This is useful for debugging issues that only occur in the browser console.
+  <br><br>
+  Run Gremlins will run a series of tests to try to break the app. This kind of fuzz testing is useful for testing the app's robustness.`;
 
-export const onHelpMenuClick = (): boolean => {
-  if (isDebugMenuOpen) {
-    adviceManagerInstance.showAdvice(helpTitleTextDebug, helpBodyTextDebug);
-    return true;
-  }
-  return false;
-};
-
-export const initMenu = (): void => {
-  // Add HTML
-  keepTrackApi.register({
-    method: 'uiManagerInit',
-    cbName: 'debug',
-    cb: uiManagerInit,
-  });
-
-  keepTrackApi.register({
-    method: 'uiManagerFinal',
-    cbName: 'debug',
-    cb: uiManagerFinal,
-  });
-
-  // Add JavaScript
-  keepTrackApi.register({
-    method: 'bottomMenuClick',
-    cbName: 'debug',
-    cb: (iconName: string): void => bottomMenuClick(iconName),
-  });
-
-  keepTrackApi.register({
-    method: 'hideSideMenus',
-    cbName: 'debug',
-    cb: (): void => hideSideMenus(),
-  });
-};
-
-export const uiManagerInit = (): void => {
-  // Side Menu
-  getEl('left-menus').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
+  sideMenuElementName = 'debug-menu';
+  sideMenuElementHtml = keepTrackApi.html`
     <div id="debug-menu" class="side-menu-parent start-hidden text-select">
       <div id="debug-content" class="side-menu">
         <div class="row">
@@ -153,64 +47,190 @@ export const uiManagerInit = (): void => {
             <button id="debug-gremlins" class="btn btn-ui waves-effect waves-light" type="button">Unleash Gremlins &#9658;</button>
           </div>
         </div>
-      </div>
+        <div class="row">
+          <h6 class="center-align">Camera</h5>
+          <div class="center-align row">
+            <span id="debug-camera-position-x"></span>
+          </div>
+          <div class="center-align row">
+            <span id="debug-camera-position-y"></span>
+          </div>
+          <div class="center-align row">
+            <span id="debug-camera-position-z"></span>
+          </div>
+          <div class="center-align row">
+            <span id="debug-camera-distance-from-earth"></span>
+          </div>
+          <div class="center-align row">
+            <button id="debug-cam-to-center" class="btn btn-ui waves-effect waves-light" type="button">Draw Cam to Center Line &#9658;</button>
+          </div>
+          <div class="center-align row">
+            <button id="debug-cam-to-sat" class="btn btn-ui waves-effect waves-light" type="button">Draw Cam to Sat Line &#9658;</button>
+          </div>
+        </div>
+        <div class="row">
+          <h6 class="center-align">Satellite</h5>
+          <div class="center-align row">
+            <span id="debug-sat-position-x"></span>
+          </div>
+          <div class="center-align row">
+            <span id="debug-sat-position-y"></span>
+          </div>
+          <div class="center-align row">
+            <span id="debug-sat-position-z"></span>
+          </div>
+        </div>
     </div>
-    `
-  );
+  `;
 
-  // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
-    'beforeend',
-    keepTrackApi.html`
-    <div id="menu-debug" class="bmenu-item">
-      <img
-        alt="debug"
-        src="${debugPng}"/>
-      <span class="bmenu-title">Debug</span>
-      <div class="status-icon"></div>
-    </div>
-  `
-  );
-};
+  gremlinsSettings = {
+    nb: 100000,
+    delay: 5,
+  };
 
-export const uiManagerFinal = (): void => {
-  clickAndDragWidth(getEl('debug-menu'));
+  addHtml(): void {
+    super.addHtml();
 
-  getEl('debug-console').addEventListener('click', () => {
-    if (keepTrackApi.programs.debug.isErudaVisible) {
-      eruda.hide();
-      keepTrackApi.programs.debug.isErudaVisible = false;
-    } else {
-      eruda.show();
-      keepTrackApi.programs.debug.isErudaVisible = true;
-    }
-  });
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
+      cb: (): void => {
+        getEl('debug-console').addEventListener('click', () => {
+          if (this.isErudaVisible) {
+            eruda.hide();
+            this.isErudaVisible = false;
+          } else {
+            eruda.show();
+            this.isErudaVisible = true;
+          }
+        });
 
-  getEl('debug-gremlins').addEventListener('click', () => {
-    keepTrackApi.programs.debug.gremlins();
-  });
-};
+        getEl('debug-gremlins').addEventListener('click', () => {
+          this.runGremlins();
+        });
 
-export const bottomMenuClick = (iconName: string) => {
-  if (iconName === 'menu-debug') {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    if (isDebugMenuOpen) {
-      isDebugMenuOpen = false;
-      uiManagerInstance.hideSideMenus();
-      return;
-    } else {
-      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(false);
-      uiManagerInstance.hideSideMenus();
-      slideInRight(getEl('debug-menu'), 1000);
-      getEl('menu-debug').classList.add('bmenu-item-selected');
-      isDebugMenuOpen = true;
-    }
-    return;
+        getEl('debug-cam-to-sat').addEventListener('click', () => {
+          const camera = keepTrackApi.getMainCamera();
+          if (camera) {
+            const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat);
+            if (sat) {
+              const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
+              const position = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
+              lineManagerInstance.create('sat2', [keepTrackApi.getCatalogManager().selectedSat, position[0], position[1], position[2]], 'o');
+            }
+          }
+        });
+
+        getEl('debug-cam-to-center').addEventListener('click', () => {
+          const camera = keepTrackApi.getMainCamera();
+          if (camera) {
+            const position = camera.getCameraPosition();
+            lineManagerInstance.create('ref', [position[0], position[1], position[2]], 'r');
+          }
+        });
+      },
+    });
   }
-};
 
-export const hideSideMenus = () => {
-  slideOutLeft(getEl('debug-menu'), 1000);
-  getEl('menu-debug').classList.remove('bmenu-item-selected');
-  isDebugMenuOpen = false;
-};
+  delayForCameraUpdates = <Milliseconds>1000;
+  lastCameraUpdate = <Milliseconds>0;
+
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.register({
+      method: KeepTrackApiMethods.updateLoop,
+      cbName: this.PLUGIN_NAME,
+      cb: (): void => {
+        if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) return;
+        const camera = keepTrackApi.getMainCamera();
+        if (camera) {
+          const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat);
+          const position = camera.getCameraPosition(sat?.position);
+          getEl('debug-camera-position-x').innerHTML = `X: ${position[0].toFixed(2)}`;
+          getEl('debug-camera-position-y').innerHTML = `Y: ${position[1].toFixed(2)}`;
+          getEl('debug-camera-position-z').innerHTML = `Z: ${position[2].toFixed(2)}`;
+          getEl('debug-camera-distance-from-earth').innerHTML = `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`;
+          this.lastCameraUpdate = <Milliseconds>new Date().getTime();
+        }
+        if (keepTrackApi.getCatalogManager().selectedSat >= 0) {
+          const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat);
+          const position = sat.position;
+          getEl('debug-sat-position-x').innerHTML = `X: ${position.x.toFixed(2)}`;
+          getEl('debug-sat-position-y').innerHTML = `Y: ${position.y.toFixed(2)}`;
+          getEl('debug-sat-position-z').innerHTML = `Z: ${position.z.toFixed(2)}`;
+        }
+      },
+    });
+  }
+
+  /*
+   * Returns a random integer between min (inclusive) and max (inclusive).
+   * The value is no lower than min (or the next integer greater than min
+   * if min isn't an integer) and no greater than max (or the next integer
+   * lower than max if max isn't an integer).
+   * Using Math.round() will give you a non-uniform distribution!
+   */
+  private static getRandomInt_(min: number, max: number): number {
+    min = Number.isNaN(min) ? 0 : Math.ceil(min);
+    max = Number.isNaN(max) ? 100 : Math.floor(max);
+    // The use of Math.random here is for debugging purposes only.
+    // It is not used in any cryptographic way.
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  private static defaultPositionSelector_() {
+    const x = DebugMenuPlugin.getRandomInt_(0, Math.max(0, document.documentElement.clientWidth - 1));
+    const y = DebugMenuPlugin.getRandomInt_(Math.max(0, document.documentElement.clientHeight - 100), Math.max(0, document.documentElement.clientHeight - 1));
+    return [x, y];
+  }
+
+  private static canClick_(element: { parentElement: { className: string } }) {
+    if (typeof element.parentElement == 'undefined' || element.parentElement == null) return null;
+    return element.parentElement.className === 'bmenu-item';
+  }
+
+  startGremlins() {
+    const bottomMenuGremlinClicker = gremlins.species.clicker({
+      // Click only if parent is has class test-class
+      canClick: DebugMenuPlugin.canClick_,
+      defaultPositionSelector: DebugMenuPlugin.defaultPositionSelector_,
+    });
+    const bottomMenuGremlinScroller = gremlins.species.toucher({
+      touchTypes: ['gesture'],
+      defaultPositionSelector: DebugMenuPlugin.defaultPositionSelector_,
+    });
+    const distributionStrategy = gremlins.strategies.distribution({
+      distribution: [0.3, 0.3, 0.1, 0.1, 0.1, 0.1],
+      delay: this.gremlinsSettings.delay,
+    });
+
+    gremlins
+      .createHorde({
+        species: [
+          bottomMenuGremlinClicker,
+          bottomMenuGremlinScroller,
+          gremlins.species.clicker(),
+          gremlins.species.toucher(),
+          gremlins.species.formFiller(),
+          gremlins.species.typer({
+            log: true,
+            logger: console,
+          }),
+        ],
+        mogwais: [gremlins.mogwais.alert(), gremlins.mogwais.fps(), gremlins.mogwais.gizmo({ maxErrors: 1000 })],
+        strategies: [distributionStrategy],
+      })
+      .unleash();
+  }
+
+  runGremlins() {
+    getEl('nav-footer').style.height = '200px';
+    getEl('nav-footer-toggle').style.display = 'none';
+    getEl('bottom-icons-container').style.height = '200px';
+    getEl('bottom-icons').style.height = '200px';
+    this.startGremlins();
+  }
+}
+
+export const debugMenuPlugin = new DebugMenuPlugin();

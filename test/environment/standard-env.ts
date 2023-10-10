@@ -142,6 +142,7 @@ export const setupMinimumHtml = () => {
 };
 
 export const mockUiManager = {
+  dismissAllToasts: jest.fn(),
   toast: jest.fn(),
   M: null,
   bottomIconPress: jest.fn(),
@@ -232,14 +233,14 @@ export const mockCameraManager = <Camera>(<unknown>{
   changeCameraType: jest.fn(),
   changeZoom: jest.fn(),
   draw: jest.fn(),
-  fts2default: jest.fn(),
+  exitFixedToSat: jest.fn(),
   getCamDist: jest.fn(),
   getCamPos: jest.fn(),
   getDistFromEarth: jest.fn(),
   getForwardVector: jest.fn(),
   init: jest.fn(),
   lookAtLatLon: jest.fn(),
-  lookAtObject: jest.fn(),
+  lookAtPosition: jest.fn(),
   setCameraType: jest.fn(),
   snapToSat: jest.fn(),
   update: jest.fn(),

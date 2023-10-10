@@ -687,7 +687,7 @@ export class SettingsManager {
    */
   minimumSearchCharacters = 2; // Searches after 3 characters typed
   /**
-   * The minimum zoom distance from the Earth's surface in kilometers.
+   * The minimum zoom distance from 0,0,0 in kilometers.
    *
    * Used for zooming in and out in default and offset camera modes.
    */
@@ -907,7 +907,7 @@ export class SettingsManager {
   /**
    * The speed at which the zoom level changes when the user zooms in or out.
    */
-  zoomSpeed = 0.01;
+  zoomSpeed = 0.0025;
   /**
    * Draw Trailing Orbits
    */

@@ -253,7 +253,7 @@ export class GamepadPlugin {
         zoomTarget -= (zoomIn / 500) * drawManagerInstance.dt;
         keepTrackApi.getMainCamera().zoomTarget = zoomTarget;
         keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
-        keepTrackApi.getMainCamera().isCamSnapMode = false;
+        keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
         if (zoomTarget < keepTrackApi.getMainCamera().zoomLevel()) {
           keepTrackApi.getMainCamera().isZoomIn = true;
@@ -289,7 +289,7 @@ export class GamepadPlugin {
         case CameraType.OFFSET:
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
-          keepTrackApi.getMainCamera().isCamSnapMode = false;
+          keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
           keepTrackApi.getMainCamera().camPitchSpeed -= (y ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
           keepTrackApi.getMainCamera().camYawSpeed += (x ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
           break;

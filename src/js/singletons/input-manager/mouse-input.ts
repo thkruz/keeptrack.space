@@ -74,7 +74,7 @@ export class MouseInput {
         settingsManager.isPropRateChange = true;
       }
     }
-    keepTrackApi.getMainCamera().isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
     if (!settingsManager.disableUI) {
       keepTrackApi.getMainCamera().autoRotate(false);
     }
@@ -326,7 +326,7 @@ export class MouseInput {
       this.touchStartTime = Date.now();
       // If you hit the canvas hide any popups
       keepTrackApi.getInputManager().hidePopUps();
-      keepTrackApi.getMainCamera().isCamSnapMode = false;
+      keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
       if (!settingsManager.disableUI) {
         keepTrackApi.getMainCamera().autoRotate(false);
       }
@@ -655,7 +655,9 @@ export class MouseInput {
         catalogManagerInstance.setSecondarySat(this.clickedSat);
         break;
       case 'reset-camera-rmb':
-        keepTrackApi.getMainCamera().isPanReset = true;
+        if (keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
+          keepTrackApi.getMainCamera().isPanReset = true;
+        }
         keepTrackApi.getMainCamera().isLocalRotateReset = true;
         keepTrackApi.getMainCamera().ftsRotateReset = true;
         break;
@@ -666,9 +668,9 @@ export class MouseInput {
         }
         break;
       case 'line-eci-axis-rmb':
-        lineManagerInstance.create('ref', [10000, 0, 0], 'r');
-        lineManagerInstance.create('ref', [0, 10000, 0], 'g');
-        lineManagerInstance.create('ref', [0, 0, 10000], 'b');
+        lineManagerInstance.create('ref', [25000, 0, 0], 'r');
+        lineManagerInstance.create('ref', [0, 25000, 0], 'g');
+        lineManagerInstance.create('ref', [0, 0, 25000], 'b');
         break;
       case 'line-eci-xgrid-rmb':
         lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 1], 1);

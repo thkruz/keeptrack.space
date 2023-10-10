@@ -111,7 +111,7 @@ export class CollissionsPlugin extends KeepTrackPlugin {
   private eventClicked_(row: number) {
     const now = new Date();
     keepTrackApi.getTimeManager().changeStaticOffset(this.collisionList[row].toca.getTime() - now.getTime() - 1000 * 30);
-    keepTrackApi.getMainCamera().isCamSnapMode = false;
+    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     keepTrackApi.getUiManager().doSearch(`${this.collisionList[row].sat1},${this.collisionList[row].sat2}`);
     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);

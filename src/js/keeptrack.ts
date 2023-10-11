@@ -375,7 +375,7 @@ theodore.kruczek at gmail dot com.
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if (catalogManagerInstance.selectedSat !== -1) {
-      if (!settingsManager.modelsOnSatelliteViewOverride) {
+      if (!settingsManager.modelsOnSatelliteViewOverride && keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera) {
         drawManagerInstance.meshManager.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
       }
 

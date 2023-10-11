@@ -671,7 +671,7 @@ export interface OrbitManager {
   changeOrbitBufferData(satId: number, TLE1?: string, TLE2?: string): void;
   clearHoverOrbit(): void;
   clearInViewOrbit(): void;
-  clearSelectOrbit(isSecondary: boolean): void;
+  clearSelectOrbit(isSecondary?: boolean): void;
   draw(
     pMatrix: mat4,
     camMatrix: mat4,
@@ -683,7 +683,7 @@ export interface OrbitManager {
   init(lineManagerInstance: LineManager, gl: WebGL2RenderingContext, orbitWorker?: Worker): void;
   removeInViewOrbit(satId: number): void;
   setHoverOrbit(satId: number): void;
-  setSelectOrbit(satId: number, isSecondary: boolean): void;
+  setSelectOrbit(satId: number, isSecondary?: boolean): void;
   updateAllVisibleOrbits(uiManagerInstance: UiManager): void;
   updateOrbitBuffer(satId: number, missileParams?: MissileParams): void;
 }

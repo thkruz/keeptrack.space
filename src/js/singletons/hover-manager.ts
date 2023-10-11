@@ -409,5 +409,3 @@ export class HoverManager {
     this.lasthoveringSat = this.hoveringSat;
   }
 }
-
-export const hoverManagerInstance = new HoverManager();

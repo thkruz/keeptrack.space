@@ -46,7 +46,6 @@ import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
 import { StandardColorSchemeManager } from './color-scheme-manager';
 import { errorManagerInstance } from './errorManager';
-import { hoverManagerInstance } from './hover-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 
@@ -473,11 +472,11 @@ export class StandardUiManager implements UiManager {
         return;
       }
 
-      hoverManagerInstance.setHoverId(satId);
+      keepTrackApi.getHoverManager().setHoverId(satId);
       this.hoverSatId = satId;
     });
     getEl('search-results')?.addEventListener('mouseout', () => {
-      hoverManagerInstance.setHoverId(-1);
+      keepTrackApi.getHoverManager().setHoverId(-1);
       this.hoverSatId = -1;
     });
 

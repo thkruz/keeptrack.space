@@ -112,11 +112,14 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
         getEl('debug-cam-to-sat').addEventListener('click', () => {
           const camera = keepTrackApi.getMainCamera();
           if (camera) {
-            const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat);
+            const selectedSat = keepTrackApi.getCatalogManager().selectedSat;
+            if (selectedSat === -1) return;
+
+            const sat = keepTrackApi.getCatalogManager().getSat(selectedSat);
             if (sat) {
               const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
               const position = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
-              lineManagerInstance.create('sat2', [keepTrackApi.getCatalogManager().selectedSat, position[0], position[1], position[2]], 'o');
+              lineManagerInstance.create('sat2', [selectedSat, position[0], position[1], position[2]], 'o');
             }
           }
         });

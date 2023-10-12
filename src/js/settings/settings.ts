@@ -951,6 +951,18 @@ export class SettingsManager {
    * Enables the new JSC Vimpel catalog
    */
   isEnableJscCatalog = false;
+  /**
+   * Size of the dot for picking purposes
+   */
+  pickingDotSize: string = '16.0';
+
+  /**
+   * Disable drawing godrays (huge performance hit on mobile)
+   */
+  isDisableGodrays = false;
+  isDisableSkybox = false;
+  isDisableMoon = false;
+  isDisableAsyncReadPixels = false;
 
   init(settingsOverride?: any) {
     this.pTime = [];
@@ -1582,11 +1594,9 @@ export class SettingsManager {
    * mobile mode is enabled and certain settings are adjusted accordingly.
    */
   private setMobileSettings() {
-    // this.isMobileModeEnabled = false;
     if (window.innerWidth <= this.desktopMinimumWidth) {
       this.disableWindowTouchMove = false;
-      // this.isMobileModeEnabled = true;
-      this.maxFieldOfViewMarkers = 20000;
+      // this.maxFieldOfViewMarkers = 20000;
       // this.isDrawLess = true;
       // this.noMeshManager = true;
     }

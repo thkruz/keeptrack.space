@@ -1,8 +1,7 @@
-import { keepTrackContainer } from '@app/js/container';
 import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { mat4, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
-import { CatalogManager, GetSatType, GroupsManager, SatObject, SensorManager, Singletons } from '../interfaces';
+import { GetSatType, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { SelectSatManager } from '../plugins/select-sat-manager/select-sat-manager';
@@ -22,10 +21,8 @@ import { Moon } from './draw-manager/moon';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
-import { hoverManagerInstance } from './hover-manager';
+import { errorManagerInstance } from './errorManager';
 import { GroupType } from './object-group';
-import { StandardOrbitManager } from './orbitManager';
-import { TimeManager } from './time-manager';
 
 declare module '@app/js/interfaces' {
   interface UserSettings {
@@ -136,7 +133,7 @@ export class StandardDrawManager implements DrawManager {
     searchBox: new SearchBox(),
   };
 
-  public selectSatManager = keepTrackContainer.get<SelectSatManager>(Singletons.SelectSatManager);
+  public selectSatManager = keepTrackApi.getSelectSatManager();
   public sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
 
   public static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
@@ -214,7 +211,7 @@ export class StandardDrawManager implements DrawManager {
   }
 
   public drawOptionalScenery(mainCameraInstance: Camera) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (!settingsManager.isDrawLess) {
       if (this.isPostProcessingResizeNeeded) this.resizePostProcessingTexture(this.gl, this.sceneManager.sun, this.postProcessingManager);
@@ -230,7 +227,11 @@ export class StandardDrawManager implements DrawManager {
           this?.postProcessingManager?.programs?.occlusion,
           this.sceneManager?.sun?.godrays?.frameBuffer
         );
-        if (!settingsManager.modelsOnSatelliteViewOverride && catalogManagerInstance.selectedSat !== -1) {
+        if (
+          !settingsManager.modelsOnSatelliteViewOverride &&
+          catalogManagerInstance.selectedSat !== -1 &&
+          keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera
+        ) {
           this.meshManager.drawOcclusion(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.programs.occlusion, this.sceneManager.sun.godrays.frameBuffer);
         }
         // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
@@ -319,7 +320,7 @@ export class StandardDrawManager implements DrawManager {
     this.settings_ = settings;
 
     this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
-    hoverManagerInstance.init();
+    keepTrackApi.getHoverManager().init();
     this.startWithOrbits();
 
     // Reinitialize the canvas on mobile rotation
@@ -331,12 +332,12 @@ export class StandardDrawManager implements DrawManager {
   }
 
   public async loadHiRes(): Promise<void> {
-    try {
-      this.sceneManager.earth.loadHiRes();
-      this.sceneManager.earth.loadHiResNight();
-    } catch (error) {
-      console.debug(error);
-    }
+    this.sceneManager.earth.loadHiRes().catch((error) => {
+      errorManagerInstance.error(error, 'loadHiRes');
+    });
+    this.sceneManager.earth.loadHiResNight().catch((error) => {
+      errorManagerInstance.error(error, 'loadHiResNight');
+    });
   }
 
   public async loadScene(): Promise<void> {
@@ -346,9 +347,13 @@ export class StandardDrawManager implements DrawManager {
       await this.sceneManager.earth.init(settingsManager, this.gl);
       keepTrackApi.methods.drawManagerLoadScene();
       await this.sceneManager.sun.init(this.gl);
-      await this.sceneManager.moon.init(this.gl);
+      if (!settingsManager.isDisableMoon) {
+        await this.sceneManager.moon.init(this.gl);
+      }
       await this.sceneManager.searchBox.init(this.gl);
-      await this.sceneManager.skybox.init(settingsManager, this.gl);
+      if (!settingsManager.isDisableSkybox) {
+        await this.sceneManager.skybox.init(settingsManager, this.gl);
+      }
       // await sceneManager.cone.init();
     } catch (error) {
       console.debug(error);
@@ -356,9 +361,9 @@ export class StandardDrawManager implements DrawManager {
   }
 
   public orbitsAbove() {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
 
     if (
       keepTrackApi.getMainCamera().cameraType == CameraType.ASTRONOMY ||
@@ -385,7 +390,7 @@ export class StandardDrawManager implements DrawManager {
       if (sensorManagerInstance?.currentSensors[0]?.lat === null) return;
       if (timeManagerInstance.realTime - this.satLabelModeLastTime_ < settingsManager.minTimeBetweenSatLabels) return;
 
-      const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.clearInViewOrbit();
 
       let sat;
@@ -399,7 +404,7 @@ export class StandardDrawManager implements DrawManager {
        */
       this.hoverBoxOnSatMiniElements_.innerHTML = '';
       if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
           sat = catalogManagerInstance.getSat(i, GetSatType.POSITION_ONLY);
@@ -437,8 +442,8 @@ export class StandardDrawManager implements DrawManager {
           this.labelCount_++;
         }
       } else {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-        const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const dotsManagerInstance = keepTrackApi.getDotsManager();
 
         if (!dotsManagerInstance.inViewData) return;
 
@@ -557,7 +562,7 @@ export class StandardDrawManager implements DrawManager {
     this.isPostProcessingResizeNeeded = true;
 
     // Fix the gpu picker texture size if it has already been created
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     if (dotsManagerInstance.isReady) dotsManagerInstance.initProgramPicking();
   }
 
@@ -575,12 +580,11 @@ export class StandardDrawManager implements DrawManager {
   }
 
   public satCalculate() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    const selectSatManager = keepTrackContainer.get<SelectSatManager>(Singletons.SelectSatManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const selectSatManager = keepTrackApi.getSelectSatManager();
 
     if (catalogManagerInstance.selectedSat !== -1) {
       this.sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
@@ -613,10 +617,12 @@ export class StandardDrawManager implements DrawManager {
 
     if (catalogManagerInstance.selectedSat !== this.lastSelectedSat) {
       if (catalogManagerInstance.selectedSat === -1 && !selectSatManager.isselectedSatNegativeOne) orbitManagerInstance.clearSelectOrbit();
+      // WARNING: This is probably here on purpose - but it is getting called twice
+      // THIS IS WHAT ACTUALLY SELECTS A SATELLITE, MOVES THE CAMERA, ETC!
       selectSatManager.selectSat(catalogManagerInstance.selectedSat);
       if (catalogManagerInstance.selectedSat !== -1) {
         orbitManagerInstance.setSelectOrbit(catalogManagerInstance.selectedSat);
-        if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && dotsManagerInstance.inViewData?.[this.sat.id] === 1) {
+        if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && keepTrackApi.getDotsManager().inViewData?.[this.sat.id] === 1) {
           lineManagerInstance.drawWhenSelected();
           lineManagerInstance.updateLineToSat(catalogManagerInstance.selectedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
         }
@@ -640,22 +646,22 @@ export class StandardDrawManager implements DrawManager {
 
   public async startWithOrbits(): Promise<void> {
     if (this.settings_.startWithOrbitsDisplayed) {
-      const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-      const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
-      const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+      const groupsManagerInstance = keepTrackApi.getGroupsManager();
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
 
       // All Orbits
-      groupManagerInstance.groupList['debris'] = groupManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');
-      groupManagerInstance.selectGroup(groupManagerInstance.groupList['debris']);
+      groupsManagerInstance.groupList['debris'] = groupsManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');
+      groupsManagerInstance.selectGroup(groupsManagerInstance.groupList['debris']);
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true); // force color recalc
-      groupManagerInstance.groupList['debris'].updateOrbits(orbitManagerInstance);
+      groupsManagerInstance.groupList['debris'].updateOrbits(orbitManagerInstance);
       this.settings_.isOrbitOverlayVisible = true;
     }
   }
 
   public updateLoop(): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     // Calculate changes related to satellites objects
     this.satCalculate();
@@ -665,7 +671,7 @@ export class StandardDrawManager implements DrawManager {
 
     // If in satellite view the orbit buffer needs to be updated every time
     if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE && catalogManagerInstance.selectedSat !== -1) {
-      const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.updateOrbitBuffer(catalogManagerInstance.lastSelectedSat());
     }
 

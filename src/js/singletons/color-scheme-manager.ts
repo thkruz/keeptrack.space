@@ -1,4 +1,3 @@
-import { TimeMachine } from './../plugins/time-machine/time-machine';
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
@@ -30,9 +29,9 @@ import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
 import { getDayOfYear } from '../lib/transforms';
+import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { DotsManager } from './dots-manager';
 import { DrawManager } from './draw-manager';
-import { hoverManagerInstance } from './hover-manager';
 
 export class StandardColorSchemeManager {
   private readonly DOTS_PER_CALC = 450;
@@ -227,7 +226,7 @@ export class StandardColorSchemeManager {
 
       this.sendColorBufferToGpu();
     } catch (e) {
-      // Intentionally left blank
+      errorManagerInstance.debug(e);
     }
   }
 
@@ -1555,7 +1554,7 @@ export class StandardColorSchemeManager {
     this.colorData[selSat * 4 + 2] = settingsManager.selectedColor[2]; // B
     this.colorData[selSat * 4 + 3] = settingsManager.selectedColor[3]; // A
 
-    const hovSat = hoverManagerInstance.hoveringSat;
+    const hovSat = keepTrackApi.getHoverManager().hoveringSat;
     // Hover satellites are always one color so forget whatever we just did
     // We check this last so you can hover over the selected satellite
     this.colorData[hovSat * 4] = settingsManager.hoverColor[0]; // R

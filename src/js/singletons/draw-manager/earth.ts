@@ -84,8 +84,8 @@ export class Earth {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
 
     let src = `${settings.installDirectory}textures/earthbump8k.jpg`;
-    if (settings.smallImages) src = `${settings.installDirectory}textures/earthbump256.jpg`;
-    if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthbump4k.jpg`;
+    if (settings.smallImages || settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthbump256.jpg`;
+    // if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthbump4k.jpg`;
 
     return src;
   }
@@ -150,8 +150,8 @@ export class Earth {
     if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
 
     let src = `${settings.installDirectory}textures/earthspec8k.jpg`;
-    if (settings.smallImages) src = `${settings.installDirectory}textures/earthspec256.jpg`;
-    if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthspec4k.jpg`;
+    if (settings.smallImages || settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthspec256.jpg`;
+    // if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthspec4k.jpg`;
 
     return src;
   }
@@ -279,7 +279,12 @@ export class Earth {
     // we're only going to read one
     if (!this.settings_.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
-      gl.scissor(keepTrackApi.getMainCamera().mouseX, gl.drawingBufferHeight - keepTrackApi.getMainCamera().mouseY, 1, 1);
+      gl.scissor(
+        keepTrackApi.getMainCamera().mouseX,
+        gl.drawingBufferHeight - keepTrackApi.getMainCamera().mouseY,
+        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
+        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE
+      );
     }
 
     // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers_.vertIndexBuf);

@@ -27,6 +27,8 @@ declare module '@app/js/interfaces' {
  * Class representing a manager for dots in a space visualization.
  */
 export class DotsManager {
+  readonly PICKING_READ_PIXEL_BUFFER_SIZE = 1;
+
   private drawI_: number;
   private isAlternateVelocity = false;
   private lastDrawDt = 0;
@@ -34,7 +36,6 @@ export class DotsManager {
   private pickingColorData: number[] = [];
   // We draw the picking object bigger than the actual dot to make it easier to select objects
   // glsl code - keep as a string
-  private pickingDotSize_ = '16.0';
   private positionBufferOneTime_ = false;
   private satDataLenInDraw_: number;
   private settings_: SettingsManager;
@@ -176,7 +177,7 @@ export class DotsManager {
     // no reason to render 100000s of pixels when we're only going to read one
     if (!settingsManager.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
-      gl.scissor(mouseX, gl.drawingBufferHeight - mouseY, 1, 1);
+      gl.scissor(mouseX, gl.drawingBufferHeight - mouseY, this.PICKING_READ_PIXEL_BUFFER_SIZE, this.PICKING_READ_PIXEL_BUFFER_SIZE);
     }
 
     gl.bindVertexArray(this.programs.picking.vao);
@@ -341,7 +342,7 @@ export class DotsManager {
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.pickingTexture, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.pickingRenderBuffer);
 
-    this.pickReadPixelBuffer = new Uint8Array(4);
+    this.pickReadPixelBuffer = new Uint8Array(4 * this.PICKING_READ_PIXEL_BUFFER_SIZE * this.PICKING_READ_PIXEL_BUFFER_SIZE);
   }
 
   /**
@@ -767,7 +768,7 @@ export class DotsManager {
                 void main(void) {
                 vec4 position = u_pMvCamMatrix * vec4(a_position, 1.0);
                 gl_Position = position;
-                gl_PointSize = ${this.pickingDotSize_} * a_pickable;
+                gl_PointSize = ${settingsManager.pickingDotSize} * a_pickable;
                 vColor = a_color * a_pickable;
                 }
             `,

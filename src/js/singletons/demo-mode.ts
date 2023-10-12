@@ -3,7 +3,7 @@ import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from '../container';
 import { StandardOrbitManager } from './orbitManager';
 
-import { hoverManagerInstance } from './hover-manager';
+import { keepTrackApi } from '../keepTrackApi';
 import { StandardColorSchemeManager } from './color-scheme-manager';
 
 export class DemoManager {
@@ -34,7 +34,7 @@ export class DemoManager {
       )
         continue;
 
-      hoverManagerInstance.setHoverId(i);
+      keepTrackApi.getHoverManager().setHoverId(i);
       orbitManagerInstance.setSelectOrbit(i);
       this.satellite = i + 1;
     }

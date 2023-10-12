@@ -384,6 +384,8 @@ export class StandardOrbitManager implements OrbitManager {
   }
 
   private drawHoverObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
+    if (settingsManager.isMobileModeEnabled) return; // No hover orbit on mobile
+
     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
     const hoverId = hoverManagerInstance.getHoverId();

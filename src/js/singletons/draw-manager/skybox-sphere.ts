@@ -11,7 +11,6 @@ declare module '@app/js/interfaces' {
     isDrawConstellationBoundaries: boolean;
     isDrawMilkyWay: boolean;
     isDrawNasaConstellations: boolean;
-    isMobileModeEnabled: boolean;
   }
 }
 export class SkyBoxSphere {
@@ -150,9 +149,9 @@ export class SkyBoxSphere {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
 
     let src = `${settings.installDirectory}textures/skybox8k.jpg`;
-    if (settings.isMobileModeEnabled) {
-      src = `${settings.installDirectory}textures/skybox4k.jpg`;
-    }
+    // if (settings.isMobileModeEnabled) {
+    //   src = `${settings.installDirectory}textures/skybox4k.jpg`;
+    // }
 
     return src;
   }
@@ -162,7 +161,7 @@ export class SkyBoxSphere {
   // #region Public Methods (3)
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer): void {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_ || settingsManager.isDisableSkybox) return;
 
     // Make sure there is something to draw
     if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations && !this.settings_.isGraySkybox) return;

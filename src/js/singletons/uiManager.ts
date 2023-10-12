@@ -25,13 +25,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-// organize-imports-ignore
 import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import '@app/js/lib/external/colorPick.js';
-import 'jquery-ui-bundle';
-import '@app/js/lib/external/jquery-ui-slideraccess.js';
-import '@app/js/lib/external/jquery-ui-timepicker.js';
+import { loadJquery } from '@app/js/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from '../container';
@@ -46,7 +42,6 @@ import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
 import { StandardColorSchemeManager } from './color-scheme-manager';
 import { errorManagerInstance } from './errorManager';
-import { hoverManagerInstance } from './hover-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 
@@ -72,7 +67,7 @@ export class StandardUiManager implements UiManager {
   searchManager: SearchManager;
   updateInterval = 1000;
   updateNextPassOverlay = null;
-  hoverSatId: number;
+  hoverSatId = -1;
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
@@ -321,6 +316,7 @@ export class StandardUiManager implements UiManager {
 
   init() {
     if (this.isInitialized_) throw new Error('UiManager already initialized');
+    loadJquery();
 
     this.searchManager = new SearchManager(this);
 
@@ -473,11 +469,11 @@ export class StandardUiManager implements UiManager {
         return;
       }
 
-      hoverManagerInstance.setHoverId(satId);
+      keepTrackApi.getHoverManager().setHoverId(satId);
       this.hoverSatId = satId;
     });
     getEl('search-results')?.addEventListener('mouseout', () => {
-      hoverManagerInstance.setHoverId(-1);
+      keepTrackApi.getHoverManager().setHoverId(-1);
       this.hoverSatId = -1;
     });
 

@@ -1,3 +1,5 @@
+/* eslint-disable no-unreachable */
+// eslint-disable-next-line max-classes-per-file
 import { CatalogManager, GetSatType, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
@@ -16,20 +18,16 @@ import { LegendManager } from '../../static/legend-manager';
 import { StandardColorSchemeManager } from '../color-scheme-manager';
 import { DrawManager } from '../draw-manager';
 import { lineManagerInstance } from '../draw-manager/line-manager';
+import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { starManager } from '../starManager';
 import { TimeManager } from '../time-manager';
 import { KeyboardInput } from './keyboard-input';
 
 export class MouseInput {
-  private deltaPinchDistance = 0;
   private dragHasMoved = false;
   private keyboard_: KeyboardInput;
-  private isPinching = false;
-  private maxPinchSize = Math.hypot(window.innerWidth, window.innerHeight);
   private mouseTimeout = -1;
-  private startPinchDistance = 0;
-  private touchStartTime: number;
 
   public canvasClick = null;
   clickedSat = 0;
@@ -39,6 +37,7 @@ export class MouseInput {
   public latLon: LatLon;
   public mouseMoveTimeout = -1;
   public mouseSat = -1;
+  touchSat: number;
 
   constructor(keyboard: KeyboardInput) {
     this.keyboard_ = keyboard;
@@ -200,11 +199,11 @@ export class MouseInput {
     this.isStartedOnCanvas = false;
 
     if (!this.dragHasMoved) {
-      if (settingsManager.isMobileModeEnabled) {
-        keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
-        keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
-        this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-      }
+      // if (settingsManager.isMobileModeEnabled) {
+      //   keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
+      //   keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
+      //   this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+      // }
       this.clickedSat = this.mouseSat;
       if (evt.button === 0) {
         const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
@@ -240,102 +239,6 @@ export class MouseInput {
     }
   }
 
-  public canvasTouchEnd(mainCameraInstance: Camera) {
-    const touchTime = Date.now() - this.touchStartTime;
-
-    if (
-      touchTime > 150 &&
-      !this.isPinching &&
-      Math.abs(mainCameraInstance.startMouseX - mainCameraInstance.mouseX) < 50 &&
-      Math.abs(mainCameraInstance.startMouseY - mainCameraInstance.mouseY) < 50
-    ) {
-      keepTrackApi.getInputManager().openRmbMenu();
-      this.mouseSat = -1;
-    }
-
-    if (this.isPinching) {
-      // pinchEnd(e)
-      this.isPinching = false;
-    }
-    mainCameraInstance.mouseX = 0;
-    mainCameraInstance.mouseY = 0;
-    this.dragHasMoved = false;
-    mainCameraInstance.isDragging = false;
-    if (!settingsManager.disableUI) {
-      mainCameraInstance.autoRotate(false);
-    }
-  }
-
-  public canvasTouchMove(evt: TouchEvent, mainCameraInstance: Camera): void {
-    if (settingsManager.disableNormalEvents) {
-      evt.preventDefault();
-    }
-    if (!evt.touches || evt.touches.length < 1) return;
-
-    if (this.isPinching && typeof evt.touches[0] != 'undefined' && typeof evt.touches[1] != 'undefined') {
-      const currentPinchDistance = Math.hypot(evt.touches[0].pageX - evt.touches[1].pageX, evt.touches[0].pageY - evt.touches[1].pageY);
-      if (isNaN(currentPinchDistance)) return;
-
-      this.deltaPinchDistance = (this.startPinchDistance - currentPinchDistance) / this.maxPinchSize;
-      let zoomTarget = mainCameraInstance.zoomTarget;
-      zoomTarget += this.deltaPinchDistance * (settingsManager.cameraMovementSpeed * 50);
-      zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
-      mainCameraInstance.zoomTarget = zoomTarget;
-    } else {
-      // Dont Move While Zooming
-      mainCameraInstance.mouseX = evt.touches[0].clientX;
-      mainCameraInstance.mouseY = evt.touches[0].clientY;
-      if (
-        mainCameraInstance.isDragging &&
-        mainCameraInstance.screenDragPoint[0] !== mainCameraInstance.mouseX &&
-        mainCameraInstance.screenDragPoint[1] !== mainCameraInstance.mouseY
-      ) {
-        this.dragHasMoved = true;
-        mainCameraInstance.camAngleSnappedOnSat = false;
-      }
-      this.isMouseMoving = true;
-      clearTimeout(this.mouseTimeout);
-      this.mouseTimeout = window.setTimeout(() => {
-        this.isMouseMoving = false;
-      }, 250);
-    }
-  }
-
-  public canvasTouchStart(evt: TouchEvent): void {
-    settingsManager.cameraMovementSpeed = 0.0001;
-    settingsManager.cameraMovementSpeedMin = 0.0001;
-    if (evt.touches.length > 1) {
-      // Two Finger Touch
-      this.isPinching = true;
-      this.startPinchDistance = Math.hypot(evt.touches[0].pageX - evt.touches[1].pageX, evt.touches[0].pageY - evt.touches[1].pageY);
-      // _pinchStart(evt)
-    } else {
-      // Single Finger Touch
-      keepTrackApi.getMainCamera().startMouseX = evt.touches[0].clientX;
-      keepTrackApi.getMainCamera().startMouseY = evt.touches[0].clientY;
-      keepTrackApi.getMainCamera().mouseX = evt.touches[0].clientX;
-      keepTrackApi.getMainCamera().mouseY = evt.touches[0].clientY;
-      this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-      settingsManager.cameraMovementSpeed = Math.max(0.005 * keepTrackApi.getMainCamera().zoomLevel(), settingsManager.cameraMovementSpeedMin);
-      keepTrackApi.getMainCamera().screenDragPoint = [keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY];
-      // dragPoint = getEarthScreenPoint(x, y)
-      // dragPoint = keepTrackApi.getMainCamera().screenDragPoint; // Ignore the earth on mobile
-      keepTrackApi.getMainCamera().dragStartPitch = keepTrackApi.getMainCamera().camPitch;
-      keepTrackApi.getMainCamera().dragStartYaw = keepTrackApi.getMainCamera().camYaw;
-      keepTrackApi.getMainCamera().isDragging = true;
-      this.touchStartTime = Date.now();
-      // If you hit the canvas hide any popups
-      keepTrackApi.getInputManager().hidePopUps();
-      keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-      if (!settingsManager.disableUI) {
-        keepTrackApi.getMainCamera().autoRotate(false);
-      }
-
-      // TODO: Make updateUrl() a setting that is disabled by default
-      UrlManager.updateURL();
-    }
-  }
-
   public static canvasWheel(evt: WheelEvent): void {
     if (!settingsManager.disableUI && settingsManager.disableNormalEvents) {
       evt.preventDefault();
@@ -365,10 +268,6 @@ export class MouseInput {
     const rightBtnCreateDOM = getEl('create-rmb');
     const rightBtnDrawDOM = getEl('draw-rmb');
     const rightBtnEarthDOM = getEl('earth-rmb');
-
-    canvasDOM.addEventListener('touchmove', (e) => {
-      this.canvasTouchMove(e, keepTrackApi.getMainCamera());
-    });
 
     if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
       const stopWheelZoom = (event: Event) => {
@@ -411,18 +310,18 @@ export class MouseInput {
         keepTrackApi.getInputManager().hidePopUps();
         closeColorbox();
       };
-      canvasDOM.addEventListener('click', (e: MouseEvent) => {
-        this.canvasClick(e);
-      });
-      canvasDOM.addEventListener('mousedown', (e: MouseEvent) => {
-        this.canvasMouseDown(e);
-      });
-      canvasDOM.addEventListener('touchstart', (e: TouchEvent) => {
-        this.canvasTouchStart(e);
-      });
-      canvasDOM.addEventListener('mouseup', (e: MouseEvent) => {
-        this.canvasMouseUp(e);
-      });
+
+      if (!settingsManager.isMobileModeEnabled) {
+        canvasDOM.addEventListener('click', (e: MouseEvent) => {
+          this.canvasClick(e);
+        });
+        canvasDOM.addEventListener('mousedown', (e: MouseEvent) => {
+          this.canvasMouseDown(e);
+        });
+        canvasDOM.addEventListener('mouseup', (e: MouseEvent) => {
+          this.canvasMouseUp(e);
+        });
+      }
 
       const rightBtnViewDOMDropdown = () => {
         InputManager.clearRMBSubMenu();
@@ -519,10 +418,6 @@ export class MouseInput {
       });
     }
 
-    canvasDOM.addEventListener('touchend', () => {
-      this.canvasTouchEnd(keepTrackApi.getMainCamera());
-    });
-
     if (!settingsManager.disableCameraControls) {
       // prettier-ignore
       window.addEventListener('mousedown', (evt) => {
@@ -608,7 +503,7 @@ export class MouseInput {
     switch (targetId) {
       case 'view-info-rmb':
         if (typeof this.latLon == 'undefined' || isNaN(this.latLon.lat) || isNaN(this.latLon.lon)) {
-          console.debug('latLon undefined!');
+          errorManagerInstance.debug('latLon undefined!');
           this.latLon = CoordinateTransforms.eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, timeManagerInstance.simulationTimeObj);
         }
         uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, 'normal', true);
@@ -781,7 +676,9 @@ export class MouseInput {
         drawManagerInstance.sceneManager.earth.reloadEarthTextures();
         break;
       case 'clear-screen-rmb':
-        (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false;
+        if (keepTrackApi.getPlugin(TimeMachine)) {
+          (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false;
+        }
         uiManagerInstance.doSearch('');
         uiManagerInstance.searchManager.searchToggle(false);
         uiManagerInstance.hideSideMenus();

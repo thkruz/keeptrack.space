@@ -18,14 +18,10 @@ const reqFiles = [
   'KeepTrack.lnk',
   'Chrome With Local Files.lnk',
   'config.html',
-  'favicon.ico',
   'index.html',
   'manifest.webmanifest',
   'serviceWorker.js',
   'SOCRATES.html',
-  'img/logo128.png',
-  'img/logo192.png',
-  'img/logo512.png',
 ];
 const optFiles = [];
 

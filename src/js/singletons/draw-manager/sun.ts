@@ -137,7 +137,8 @@ export class Sun {
   }
 
   public drawGodrays(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer) {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_ || settingsManager.isDisableGodrays) return;
+
     const gl = this.gl_;
     gl.useProgram(this.godrays.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);

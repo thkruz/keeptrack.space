@@ -2,6 +2,72 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v8.1.0
+
+>  
+
+- fix: :bug: fix controller disconnected crash
+- feat: :sparkles: add external catalog loader
+- feat: :sparkles: abstract camera and add dark-clouds preset
+- fix: :bug: fix mobile controls
+- feat: :sparkles: update gamepad logic
+- feat: :zap: improve performance on mobile
+- fix: :bug: fix satinfobox crashing with missiles
+- fix: :bug: fixes for iframes
+- feat: :children_crossing: add improved debug menu
+- feat: :children_crossing: improved camera controls
+- feat: :sparkles: add video director menu
+- fix: :bug: fix string extractor
+- docs: :memo: update changelog
+- feat: :sparkles: add support for external TLE files
+- feat: :sparkles: update to setting defaults
+- feat: :lipstick: update site manifest and favicons
+- feat: :zap: improve notional debris logic
+- feat: :sparkles: improve mobile experience
+- refactor: :recycle: add skip when mesh can't be seen anyway
+- refactor: :fire: revert to google analytics
+- feat: :sparkles: add auto rotate pan and zoom settings
+- feat: :sparkles: force presets for facsat2
+- fix: :bug: fix hovermanager not available in KeepTrackApi
+- feat: :sparkles: add presets for facsat2
+- refactor: :label: update settings type
+- test: :bug: move analytics to fix jest hanging
+- fix: :bug: fix analytics error
+- test: :bug: fix catalog test
+- feat: :sparkles: filter out objects that appear to have reentered
+- feat: :sparkles: new splash screens
+- fix: :bug: fix issue in mobile logic
+- test: :bug: fix failing tests
+- feat: :sparkles: add iframe example
+- fix: :bug: fixed notional satellites being found in search
+- fix: :bug: dont use orbit manager if it isn't available
+- fix: :bug: fix bug with legend menu showing empty
+- test: :bug: make getEl optional for select-sat-manager tests
+- fix: :zap: better camera zooming controls
+- feat: :sparkles: add searchLimit param to settings
+- feat: :sparkles: add iframe check
+- feat: :sparkles: update readme splash screen and meta data
+- fix: :bug: fix time machine not stopping correctly
+- fix: :bug: better handling of prop rate on load
+- feat: :sparkles: update notional debris coloring
+- feat: :sparkles: update iframe example
+- fix: :bug: fix search results
+- fix: :zap: remove debug code
+- fix: :adhesive_bandage: quick fix for TLEs without leading 0s
+- fix: :bug: fix coloring issue with video-director plugin
+- refactor: :recycle: use sputnik as extra satellite
+- refactor: :recycle: make use of keepTrackApi
+- fix: :bug: fix mesh shaders turning white
+- fix: :bug: fix crash caused by sat-sun being missing
+- chore: :card_file_box: update default catalog
+- refactor: :coffin: hide debug only code
+- refactor: :recycle: move event listener for keyboard to document level
+- fix: :bug: reduce scrolling errors
+- refactor: :card_file_box: update default settingsOverride
+- docs: :memo: update build date
+- fix: :bug: fix hover id error caused by id 0
+- build: :lock: fix audit issues
+
 #### v8.0.0
 
 >  

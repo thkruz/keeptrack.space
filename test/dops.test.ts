@@ -7,7 +7,7 @@ import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSu
 describe('Dops_class', () => {
   beforeEach(() => {
     setupStandardEnvironment();
-    keepTrackApi.getInputManager().Mouse = {
+    keepTrackApi.getInputManager().mouse = {
       latLon: {
         lat: <Degrees>0,
         lon: <Degrees>0,

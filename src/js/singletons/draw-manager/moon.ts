@@ -131,7 +131,7 @@ export class Moon {
   public eci: Ootk.EciVec3;
 
   public draw(sunPosition: vec3, pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_ || settingsManager.isDisableMoon) return;
     const gl = this.gl_;
 
     gl.useProgram(this.program_);

@@ -595,14 +595,14 @@ export class Camera {
     const inputManager = keepTrackContainer.get<InputManager>(Singletons.InputManager);
     const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'I', 'J', 'K', 'L', 'Q', 'E', 'R', 'C'];
     keysDown.forEach((key) => {
-      inputManager.Keyboard.registerKeyDownEvent({
+      inputManager.keyboard.registerKeyDownEvent({
         key,
         callback: this[`keyDown${key}_`].bind(this),
       });
     });
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'I', 'J', 'K', 'L', 'Q', 'E'];
     keysUp.forEach((key) => {
-      inputManager.Keyboard.registerKeyUpEvent({
+      inputManager.keyboard.registerKeyUpEvent({
         key,
         callback: this[`keyUp${key}_`].bind(this),
       });
@@ -906,6 +906,8 @@ export class Camera {
       // Only Zoom in Once on Mobile
       if (this.settings_.isMobileModeEnabled) this.camZoomSnappedOnSat = false;
     }
+
+    this.updateSatShaderSizes();
 
     if (this.cameraType === CameraType.PLANETARIUM) {
       this.zoomTarget = 0.01;
@@ -1459,17 +1461,10 @@ export class Camera {
    */
   private updateZoom_(dt: number) {
     if (this.zoomLevel_ !== this.zoomTarget_) {
-      if (this.zoomLevel_ > this.settings_.satShader.largeObjectMaxZoom) {
-        this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize * 1.5;
-      } else if (this.zoomLevel_ < this.settings_.satShader.largeObjectMinZoom) {
-        this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize / 3;
-      } else {
-        this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize;
-      }
+      this.updateSatShaderSizes();
     }
 
     if (this.settings_.isAutoZoomIn || this.settings_.isAutoZoomOut) {
-      this.isAutoPitchYawToTarget;
       if (this.settings_.isAutoZoomIn) {
         this.zoomTarget_ -= dt * this.settings_.autoZoomSpeed;
       }
@@ -1498,6 +1493,16 @@ export class Camera {
       if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
         this.zoomTarget = this.zoomLevel_ + 0.001;
       }
+    }
+  }
+
+  updateSatShaderSizes() {
+    if (this.zoomLevel_ > this.settings_.satShader.largeObjectMaxZoom) {
+      this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize * 1.5;
+    } else if (this.zoomLevel_ < this.settings_.satShader.largeObjectMinZoom) {
+      this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize / 3;
+    } else {
+      this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize;
     }
   }
 }

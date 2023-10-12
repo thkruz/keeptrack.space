@@ -41,7 +41,7 @@ import erudaFps from 'eruda-fps';
 import * as Ootk from 'ootk';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { CatalogManager, ColorSchemeManager, MapManager, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
+import { CatalogManager, MapManager, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
 import { isThisNode, keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
 import { getUnique } from './lib/get-unique';
@@ -60,9 +60,9 @@ import { DrawManager, StandardDrawManager } from './singletons/draw-manager';
 import { LineManager, lineManagerInstance } from './singletons/draw-manager/line-manager';
 import { ErrorManager, errorManagerInstance } from './singletons/errorManager';
 import { StandardGroupManager } from './singletons/groups-manager';
-import { hoverManagerInstance } from './singletons/hover-manager';
+import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
-import { MobileManager } from './singletons/mobileManager';
+import { mobileManager } from './singletons/mobileManager';
 import { StandardOrbitManager } from './singletons/orbitManager';
 import { starManager } from './singletons/starManager';
 import { TimeManager } from './singletons/time-manager';
@@ -142,6 +142,8 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
     const mainCameraInstance = new Camera();
     keepTrackContainer.registerSingleton(Singletons.MainCamera, mainCameraInstance);
+    const hoverManagerInstance = new HoverManager();
+    keepTrackContainer.registerSingleton(Singletons.HoverManager, hoverManagerInstance);
 
     this.mainCameraInstance = mainCameraInstance;
     this.errorManager = errorManagerInstance;
@@ -344,13 +346,14 @@ theodore.kruczek at gmail dot com.
   }
 
   private draw_(dt?: Milliseconds) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const hoverManagerInstance = keepTrackApi.getHoverManager();
 
     keepTrackApi.getMainCamera().draw(drawManagerInstance.sat, drawManagerInstance.sensorPos);
 
@@ -375,7 +378,7 @@ theodore.kruczek at gmail dot com.
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if (catalogManagerInstance.selectedSat !== -1) {
-      if (!settingsManager.modelsOnSatelliteViewOverride) {
+      if (!settingsManager.modelsOnSatelliteViewOverride && keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera) {
         drawManagerInstance.meshManager.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
       }
 
@@ -388,7 +391,7 @@ theodore.kruczek at gmail dot com.
 
       // Only update hover if we are not on mobile
       if (!settingsManager.isMobileModeEnabled) {
-        hoverManagerInstance.setHoverId(this.inputManager.Mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+        hoverManagerInstance.setHoverId(this.inputManager.mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
       }
     }
 
@@ -402,13 +405,13 @@ theodore.kruczek at gmail dot com.
 
   public async init(): Promise<void> {
     try {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-      const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-      const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const timeManagerInstance = keepTrackApi.getTimeManager();
+      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
+      const uiManagerInstance = keepTrackApi.getUiManager();
+      const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
 
       // Upodate the version number and date
       settingsManager.versionNumber = VERSION;
@@ -435,7 +438,7 @@ theodore.kruczek at gmail dot com.
       };
 
       SplashScreen.loadStr(SplashScreen.msg.science);
-      MobileManager.checkMobileMode();
+      mobileManager.init();
 
       // Load all the plugins now that we have the API initialized
       await import('./plugins/plugins')
@@ -575,7 +578,9 @@ theodore.kruczek at gmail dot com.
 
     // Update Colors
     // NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
+    if (!settingsManager.isMobileModeEnabled) {
+      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
+    }
 
     // Update Draw Positions
     dotsManagerInstance.updatePositionBuffer();

@@ -92,8 +92,8 @@ export class DopsPlugin extends KeepTrackPlugin {
   rmbCallback = (targetId: string): void => {
     switch (targetId) {
       case 'dops-curdops-rmb': {
-        let latLon = keepTrackApi.getInputManager().Mouse.latLon;
-        const dragPosition = keepTrackApi.getInputManager().Mouse.dragPosition;
+        let latLon = keepTrackApi.getInputManager().mouse.latLon;
+        const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
 
         if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
           console.debug('latLon undefined!');
@@ -107,7 +107,7 @@ export class DopsPlugin extends KeepTrackPlugin {
         break;
       }
       case 'dops-24dops-rmb': {
-        const latLon = keepTrackApi.getInputManager().Mouse.latLon;
+        const latLon = keepTrackApi.getInputManager().mouse.latLon;
         if (!this.isMenuButtonEnabled) {
           (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);

@@ -25,7 +25,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-// organize-imports-ignore
 import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { loadJquery } from '@app/js/singletons/ui-manager/jquery';

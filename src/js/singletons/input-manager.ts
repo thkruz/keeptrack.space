@@ -13,7 +13,8 @@ import { DotsManager } from './dots-manager';
 import { DrawManager } from './draw-manager';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
-import { MouseInput, TouchInput } from './input-manager/mouse-input';
+import { MouseInput } from './input-manager/mouse-input';
+import { TouchInput } from './input-manager/touch-input';
 
 export type LatLon = {
   lat: Degrees;
@@ -38,7 +39,7 @@ export class InputManager {
   constructor() {
     this.keyboard = new KeyboardInput();
     this.mouse = new MouseInput(this.keyboard);
-    this.touch = new TouchInput(this.mouse);
+    this.touch = new TouchInput();
   }
 
   // *********************************************************************************************************************
@@ -404,9 +405,10 @@ export class InputManager {
         if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && sensorManagerInstance.whichRadar !== 'CUSTOM') {
           getEl('line-sensor-sat-rmb').style.display = 'block';
         }
-        getEl('line-earth-sat-rmb').style.display = 'block';
-        getEl('line-sat-sat-rmb').style.display = 'block';
-        getEl('line-sat-sun-rmb').style.display = 'block';
+
+        if (!settingsManager.isMobileModeEnabled) getEl('line-earth-sat-rmb').style.display = 'block';
+        if (!settingsManager.isMobileModeEnabled) getEl('line-sat-sat-rmb').style.display = 'block';
+        if (!settingsManager.isMobileModeEnabled) getEl('line-sat-sun-rmb').style.display = 'block';
         rightBtnDrawDOM.style.display = 'block';
         isDrawDOM = true;
         numMenuItems++;
@@ -506,7 +508,7 @@ export class InputManager {
 
     const mainCameraInstance = keepTrackApi.getMainCamera();
     if (settingsManager.isMobileModeEnabled) {
-      this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+      // this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
       return;
     }
 

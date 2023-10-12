@@ -1,5 +1,6 @@
 import { Kilometers } from 'ootk';
 import { KeepTrackApiMethods, keepTrackApi } from '../keepTrackApi';
+import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 
 export class MobileManager {
@@ -15,8 +16,10 @@ export class MobileManager {
 
           settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
           settingsManager.enableHoverOverlay = false;
-          settingsManager.cameraMovementSpeed = 0.0001;
-          settingsManager.cameraMovementSpeedMin = 0.0001;
+          settingsManager.cameraMovementSpeed = 0.0025;
+          settingsManager.cameraMovementSpeedMin = 0.0025;
+          settingsManager.zoomSpeed = 0.025;
+
           if (settingsManager.isUseHigherFOVonMobile) {
             settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
           } else {
@@ -53,13 +56,21 @@ export class MobileManager {
             method: KeepTrackApiMethods.selectSatData,
             cbName: 'MobileManager.selectSatData',
             cb: () => {
-              keepTrackApi.getUiManager().searchManager.searchToggle(false);
+              const searchManager = keepTrackApi.getUiManager().searchManager;
+
+              if (searchManager.isResultsOpen) {
+                searchManager.searchToggle(false);
+              }
             },
           });
 
-          settingsManager.zoomSpeed = 0.05;
-          settingsManager.cameraMovementSpeedMin = 1;
-          settingsManager.cameraMovementSpeed = 1;
+          keepTrackApi.register({
+            method: KeepTrackApiMethods.uiManagerFinal,
+            cbName: 'MobileManager.uiManagerFinal',
+            cb: () => {
+              getEl('tutorial-btn').style.display = 'none';
+            },
+          });
 
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;

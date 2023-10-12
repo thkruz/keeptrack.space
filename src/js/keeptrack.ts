@@ -578,7 +578,9 @@ theodore.kruczek at gmail dot com.
 
     // Update Colors
     // NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
+    if (!settingsManager.isMobileModeEnabled) {
+      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
+    }
 
     // Update Draw Positions
     dotsManagerInstance.updatePositionBuffer();

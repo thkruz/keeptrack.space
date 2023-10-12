@@ -1,4 +1,3 @@
-import { TimeMachine } from './../plugins/time-machine/time-machine';
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
@@ -30,6 +29,7 @@ import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
 import { getDayOfYear } from '../lib/transforms';
+import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { DotsManager } from './dots-manager';
 import { DrawManager } from './draw-manager';
 

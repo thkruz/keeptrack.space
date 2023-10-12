@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { CatalogManager, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
+import { CatalogManager, SensorManager, Singletons } from '@app/js/interfaces';
 import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
@@ -13,7 +13,7 @@ import { DotsManager } from './dots-manager';
 import { DrawManager } from './draw-manager';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
-import { MouseInput } from './input-manager/mouse-input';
+import { MouseInput, TouchInput } from './input-manager/mouse-input';
 
 export type LatLon = {
   lat: Degrees;
@@ -30,13 +30,15 @@ export class InputManager {
   private updateHoverDelayLimit = 3;
   isRmbMenuOpen = false;
 
-  public Keyboard: KeyboardInput;
-  public Mouse: MouseInput;
+  public keyboard: KeyboardInput;
+  public mouse: MouseInput;
+  public touch: TouchInput;
   public isAsyncWorking = true;
 
   constructor() {
-    this.Keyboard = new KeyboardInput();
-    this.Mouse = new MouseInput(this.Keyboard);
+    this.keyboard = new KeyboardInput();
+    this.mouse = new MouseInput(this.keyboard);
+    this.touch = new TouchInput(this.mouse);
   }
 
   // *********************************************************************************************************************
@@ -49,8 +51,7 @@ export class InputManager {
         // eslint-disable-next-line no-sync
         const res = gl.clientWaitSync(sync, flags, 0);
         if (res == gl.WAIT_FAILED) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject();
+          reject(new Error('Async Rejected!'));
           return;
         }
         if (res == gl.TIMEOUT_EXPIRED) {
@@ -198,9 +199,9 @@ export class InputManager {
     const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
     const { gl } = drawManagerInstance;
 
-    // NOTE: gl.readPixels is a huge bottleneck
+    // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile
     gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManagerInstance.pickingFrameBuffer);
-    if (!isThisNode() && this.isAsyncWorking) {
+    if (!isThisNode() && this.isAsyncWorking && !settingsManager.isDisableAsyncReadPixels) {
       this.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
     }
     if (!this.isAsyncWorking) {
@@ -307,8 +308,13 @@ export class InputManager {
       canvasDOM.focus();
     }
 
-    this.Mouse.init(canvasDOM);
-    this.Keyboard.init();
+    if (settingsManager.isDisableAsyncReadPixels) {
+      this.isAsyncWorking = false;
+    }
+
+    this.mouse.init(canvasDOM);
+    this.touch.init(canvasDOM);
+    this.keyboard.init();
   }
 
   public openRmbMenu(clickedSatId: number = -1) {
@@ -381,9 +387,9 @@ export class InputManager {
       numMenuItems++;
     }
 
-    if (this.Mouse.mouseSat !== -1 || clickedSatId !== -1) {
-      if (typeof this.Mouse.clickedSat == 'undefined') return;
-      const sat = catalogManagerInstance.getSat(this.Mouse.clickedSat);
+    if (this.mouse.mouseSat !== -1 || clickedSatId !== -1) {
+      if (typeof this.mouse.clickedSat == 'undefined') return;
+      const sat = catalogManagerInstance.getSat(this.mouse.clickedSat);
       if (typeof sat == 'undefined' || sat == null) return;
       if (typeof sat.type == 'undefined' || sat.type !== SpaceObjectType.STAR) {
         rightBtnViewDOM.style.display = 'block';
@@ -419,7 +425,7 @@ export class InputManager {
       // Intentional
     }
 
-    if (typeof this.Mouse.latLon == 'undefined' || isNaN(this.Mouse.latLon.lat) || isNaN(this.Mouse.latLon.lon)) {
+    if (typeof this.mouse.latLon == 'undefined' || isNaN(this.mouse.latLon.lat) || isNaN(this.mouse.latLon.lon)) {
       // Not Earth
       keepTrackApi.rmbMenuItems
         .filter((item) => item.isRmbOffEarth || (item.isRmbOnSat && clickedSatId !== -1))
@@ -496,18 +502,23 @@ export class InputManager {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     }
 
-    if (keepTrackApi.getMainCamera().isDragging || settingsManager.isMobileModeEnabled) return;
+    if (keepTrackApi.getMainCamera().isDragging) return;
+
+    const mainCameraInstance = keepTrackApi.getMainCamera();
+    if (settingsManager.isMobileModeEnabled) {
+      this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+      return;
+    }
 
     if (++this.updateHoverDelay >= this.updateHoverDelayLimit) {
       this.updateHoverDelay = 0;
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
 
       // If we are hovering over a satellite on a menu we don't want to change the mouseSat
-      if (uiManagerInstance.hoverSatId > 0) {
-        this.Mouse.mouseSat = uiManagerInstance.hoverSatId;
-      } else {
-        const mainCameraInstance = keepTrackApi.getMainCamera();
-        this.Mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+      if (uiManagerInstance.hoverSatId >= 0) {
+        this.mouse.mouseSat = uiManagerInstance.hoverSatId;
+      } else if (!settingsManager.isMobileModeEnabled) {
+        this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
       }
     }
   }

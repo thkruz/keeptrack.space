@@ -28,10 +28,7 @@
 // organize-imports-ignore
 import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import '@app/js/lib/external/colorPick.js';
-import 'jquery-ui-bundle';
-import '@app/js/lib/external/jquery-ui-slideraccess.js';
-import '@app/js/lib/external/jquery-ui-timepicker.js';
+import { loadJquery } from '@app/js/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from '../container';
@@ -71,7 +68,7 @@ export class StandardUiManager implements UiManager {
   searchManager: SearchManager;
   updateInterval = 1000;
   updateNextPassOverlay = null;
-  hoverSatId: number;
+  hoverSatId = -1;
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
@@ -320,6 +317,7 @@ export class StandardUiManager implements UiManager {
 
   init() {
     if (this.isInitialized_) throw new Error('UiManager already initialized');
+    loadJquery();
 
     this.searchManager = new SearchManager(this);
 

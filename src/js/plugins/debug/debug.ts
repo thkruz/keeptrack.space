@@ -148,7 +148,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
         if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) return;
         const camera = keepTrackApi.getMainCamera();
         if (camera) {
-          const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat);
+          const selectedSat = keepTrackApi.getCatalogManager().selectedSat;
+          const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getSat(selectedSat) : null;
+
           const position = camera.getCameraPosition(sat?.position);
           getEl('debug-camera-position-x').innerHTML = `X: ${position[0].toFixed(2)}`;
           getEl('debug-camera-position-y').innerHTML = `Y: ${position[1].toFixed(2)}`;

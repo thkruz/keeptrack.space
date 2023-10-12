@@ -595,14 +595,14 @@ export class Camera {
     const inputManager = keepTrackContainer.get<InputManager>(Singletons.InputManager);
     const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'I', 'J', 'K', 'L', 'Q', 'E', 'R', 'C'];
     keysDown.forEach((key) => {
-      inputManager.Keyboard.registerKeyDownEvent({
+      inputManager.keyboard.registerKeyDownEvent({
         key,
         callback: this[`keyDown${key}_`].bind(this),
       });
     });
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'I', 'J', 'K', 'L', 'Q', 'E'];
     keysUp.forEach((key) => {
-      inputManager.Keyboard.registerKeyUpEvent({
+      inputManager.keyboard.registerKeyUpEvent({
         key,
         callback: this[`keyUp${key}_`].bind(this),
       });

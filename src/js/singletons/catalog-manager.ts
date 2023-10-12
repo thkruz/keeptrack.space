@@ -93,7 +93,6 @@ declare module '@app/js/interfaces' {
 }
   interface UserSettings {
   installDirectory: string;
-  isMobileModeEnabled: boolean;
 }
 }
 
@@ -312,7 +311,7 @@ export class StandardCatalogManager implements CatalogManager {
    */
   public getSat(i: number | null, type: GetSatType = GetSatType.DEFAULT): SatObject | null {
     if (i == -1 || !this.satData || !this.satData[i]) {
-      if (!isThisNode()) console.warn(`Satellite ${i} not found`);
+      if (!isThisNode() && i >= 0 && !this.satData[i]) console.warn(`Satellite ${i} not found`);
       return null;
     }
 
@@ -433,9 +432,6 @@ export class StandardCatalogManager implements CatalogManager {
     }
 
     // Create a buffer of analyst satellite objects
-    if (settingsManager.isMobileModeEnabled) {
-      settingsManager.maxAnalystSats = 2000;
-    }
     for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
       const sccNum = (80000 + i).toString();
       this.analSatSet.push(<SatObject>{
@@ -456,7 +452,7 @@ export class StandardCatalogManager implements CatalogManager {
     }
 
     // Create Stars
-    if (!settingsManager.lowPerf && !settingsManager.isDisableStars && !settingsManager.isMobileModeEnabled) {
+    if (!settingsManager.lowPerf && !settingsManager.isDisableStars) {
       this.starIndex1 = this.staticSet.length;
       stars.forEach((star) => {
         this.staticSet.push({
@@ -484,7 +480,7 @@ export class StandardCatalogManager implements CatalogManager {
     this.isSensorManagerLoaded = true;
 
     // Create Launch Sites
-    if (!settingsManager.isDisableLaunchSites && !settingsManager.isMobileModeEnabled) {
+    if (!settingsManager.isDisableLaunchSites) {
       for (const launchSiteName in launchSites) {
         const launchSite = launchSites[launchSiteName];
         this.staticSet.push({
@@ -503,7 +499,7 @@ export class StandardCatalogManager implements CatalogManager {
     }
 
     // Try Loading the Control Site Module
-    if (!settingsManager.isDisableControlSites && !settingsManager.isMobileModeEnabled) {
+    if (!settingsManager.isDisableControlSites) {
       controlSites
         // Remove any control sites that are closed
         .filter((controlSite) => controlSite.TStop === '')
@@ -642,7 +638,6 @@ export class StandardCatalogManager implements CatalogManager {
     if (settingsManager.isDisableSelectSat) return;
     const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
     const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
     const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
     const { gl } = drawManagerInstance;
 
@@ -652,7 +647,6 @@ export class StandardCatalogManager implements CatalogManager {
       typ: 'satelliteSelected',
       satelliteSelected: [i],
     });
-    if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(false);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color
@@ -771,13 +765,13 @@ export class StandardCatalogManager implements CatalogManager {
 
   private registerKeyboardEvents_() {
     const inputManagerInstance = keepTrackContainer.get<InputManager>(Singletons.InputManager);
-    inputManagerInstance.Keyboard.registerKeyDownEvent({
+    inputManagerInstance.keyboard.registerKeyDownEvent({
       key: ']',
       callback: () => {
         this.switchPrimarySecondary();
       },
     });
-    inputManagerInstance.Keyboard.registerKeyDownEvent({
+    inputManagerInstance.keyboard.registerKeyDownEvent({
       key: '{',
       callback: () => {
         this.switchPrimarySecondary();

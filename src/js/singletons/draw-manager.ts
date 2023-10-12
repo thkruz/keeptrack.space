@@ -347,9 +347,13 @@ export class StandardDrawManager implements DrawManager {
       await this.sceneManager.earth.init(settingsManager, this.gl);
       keepTrackApi.methods.drawManagerLoadScene();
       await this.sceneManager.sun.init(this.gl);
-      await this.sceneManager.moon.init(this.gl);
+      if (!settingsManager.isDisableMoon) {
+        await this.sceneManager.moon.init(this.gl);
+      }
       await this.sceneManager.searchBox.init(this.gl);
-      await this.sceneManager.skybox.init(settingsManager, this.gl);
+      if (!settingsManager.isDisableSkybox) {
+        await this.sceneManager.skybox.init(settingsManager, this.gl);
+      }
       // await sceneManager.cone.init();
     } catch (error) {
       console.debug(error);
@@ -613,6 +617,8 @@ export class StandardDrawManager implements DrawManager {
 
     if (catalogManagerInstance.selectedSat !== this.lastSelectedSat) {
       if (catalogManagerInstance.selectedSat === -1 && !selectSatManager.isselectedSatNegativeOne) orbitManagerInstance.clearSelectOrbit();
+      // WARNING: This is probably here on purpose - but it is getting called twice
+      // THIS IS WHAT ACTUALLY SELECTS A SATELLITE, MOVES THE CAMERA, ETC!
       selectSatManager.selectSat(catalogManagerInstance.selectedSat);
       if (catalogManagerInstance.selectedSat !== -1) {
         orbitManagerInstance.setSelectOrbit(catalogManagerInstance.selectedSat);

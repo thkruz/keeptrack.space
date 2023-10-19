@@ -23,6 +23,7 @@ export class KeepTrackPlugin {
   static readonly rmbMenuL1ContainerId = 'right-btn-menu-ul';
   static readonly rmbMenuL2ContainerId = 'rmb-wrapper';
   static readonly iconSelectedClassString = 'bmenu-item-selected';
+  static readonly iconDisabledClassString = 'bmenu-item-disabled';
 
   /**
    * The name of the plugin.

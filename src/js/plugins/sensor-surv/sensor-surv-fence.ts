@@ -22,7 +22,7 @@
 
 import fencePng from '@app/img/icons/fence.png';
 import { CatalogManager, SensorObject } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -35,8 +35,6 @@ declare module '@app/js/interfaces' {
 
 export class SensorSurvFence extends KeepTrackPlugin {
   bottomIconCallback = () => {
-    if (!this.isMenuButtonEnabled) return;
-
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     if (settingsManager.isShowSurvFence) {
       this.disableSurvView_(catalogManagerInstance);
@@ -98,21 +96,23 @@ export class SensorSurvFence extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (sensor: SensorObject): void => {
         if (sensor) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
         } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+          getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = true;
+          this.isMenuButtonEnabled = false;
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
     });
 
     keepTrackApi.register({
-      method: 'changeSensorMarkers',
+      method: KeepTrackApiMethods.changeSensorMarkers,
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
     });

@@ -86,8 +86,9 @@ export class StandardSensorManager implements SensorManager {
 
   addSecondarySensor(sensor: SensorObject): void {
     // If there is no primary sensor, make this the primary sensor
-    if (this.currentSensors.length === 0) {
+    if (!this.currentSensors[0].lat) {
       this.currentSensors.push(sensor);
+      this.setSensor(sensor, null);
     } else {
       this.secondarySensors.push(sensor);
     }
@@ -129,7 +130,7 @@ export class StandardSensorManager implements SensorManager {
   whichRadar = '';
 
   constructor() {
-    this.currentSensors = this.defaultSensor;
+    this.currentSensors = [...this.defaultSensor];
   }
 
   static drawFov(sensor: SensorObject) {
@@ -170,25 +171,16 @@ export class StandardSensorManager implements SensorManager {
     }
   }
 
-  addCustomSensor(sensor: SensorObject): SensorObject[] {
-    this.customSensors.push(sensor);
-    return this.customSensors;
-  }
-
   addStf(sensor: SensorObject) {
     this.stfSensors.push(sensor);
     this.updatePositionCruncher_();
   }
 
-  clearCustomSensors() {
-    this.customSensors = [];
-    if (this.whichRadar === 'MULTI CUSTOM' || this.whichRadar === 'CUSTOM') {
-      // this.setSensor(this.currentSensors);
-    }
-  }
-
   clearSecondarySensors() {
     this.secondarySensors = [];
+    if (this.currentSensors[0]?.name === 'Custom Sensor') {
+      this.resetSensorSelected();
+    }
     this.updatePositionCruncher_();
   }
 
@@ -203,16 +195,6 @@ export class StandardSensorManager implements SensorManager {
     }
 
     return false;
-  }
-
-  removeLastSensor() {
-    if (this.customSensors.length > 1) {
-      this.customSensors.pop();
-    } else {
-      this.clearCustomSensors();
-    }
-
-    this.updateCruncherOnCustomSensors();
   }
 
   removeSecondarySensor(sensor?: SensorObject) {
@@ -326,7 +308,7 @@ export class StandardSensorManager implements SensorManager {
     if (selectedSensor == null && staticNum == null) {
       // No sensor selected
       this.sensorTitle = '';
-      this.currentSensors = this.defaultSensor;
+      this.currentSensors = [this.defaultSensor[0]];
     } else if (selectedSensor === 'SSN') {
       this.sensorTitle = 'All Space Surveillance Network Sensors';
       const filteredSensors = Object.values(this.sensors).filter(
@@ -391,6 +373,23 @@ export class StandardSensorManager implements SensorManager {
           sensor == this.sensors.KCS ||
           sensor == this.sensors.SBX
       );
+    } else if ((<SensorObject>selectedSensor)?.name === 'Custom Sensor') {
+      this.currentSensors = [<SensorObject>selectedSensor];
+
+      // TODO: This should all be in the sensor plugin instead
+      const sensorInfoTitleDom = getEl('sensor-info-title', true);
+
+      if (sensorInfoTitleDom) {
+        sensorInfoTitleDom.innerHTML = "<a href=''>" + this.currentSensors[0].name + '</a>';
+        sensorInfoTitleDom.addEventListener('click', () => {
+          openColorbox(this.currentSensors[0].url);
+        });
+
+        getEl('sensor-type').innerHTML = spaceObjType2Str(this.currentSensors[0].type);
+        getEl('sensor-country').innerHTML = this.currentSensors[0].country;
+      }
+
+      this.sensorTitle = this.currentSensors[0].name;
     } else {
       // Look through all known sensors
       for (const sensor in this.sensors) {

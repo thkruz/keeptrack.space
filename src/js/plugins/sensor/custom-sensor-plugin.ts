@@ -1,12 +1,10 @@
 import customPng from '@app/img/icons/custom.png';
-import { keepTrackContainer } from '@app/js/container';
-import { SensorManager, Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { UiGeolocation } from '@app/js/static/ui-manager-geolocation';
 import { Degrees, Kilometers, SpaceObjectType } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
@@ -136,7 +134,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   private static addCustomSensorFormSubmitListener() {
     getEl('customSensor').addEventListener('submit', (e: Event) => {
       e.preventDefault();
-      CustomSensorPlugin.processCustomSensorSubmit_();
+      // CustomSensorPlugin.processCustomSensorSubmit_();
     });
   }
 
@@ -146,8 +144,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   private static addClearCustomSensorListener_() {
     getEl('cs-clear').addEventListener('click', () => {
-      const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-      sensorManagerInstance.clearCustomSensors();
+      keepTrackApi.getSensorManager().clearSecondarySensors();
     });
   }
 

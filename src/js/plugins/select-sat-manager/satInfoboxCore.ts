@@ -443,7 +443,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     getEl('ui-wrapper').insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-            <div id="sat-infobox" class="text-select satinfo-fixed">
+            <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
               <div id="sat-info-top-links">
                 <div id="sat-info-title" class="center-text sat-info-section-header sat-info-title-header">This is a title</div>
                 <div id="all-objects-link" class="link sat-infobox-links sat-only-info tooltipped" data-position="top" data-delay="50"

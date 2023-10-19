@@ -900,7 +900,7 @@ export const updateMarkerFov = (i: number, gmst: GreenwichMeanSiderealTime): num
       } else {
         for (rng = <Kilometers>Math.max(sensor.obsminrange, 100); rng < Math.min(sensor.obsmaxrange, 60000); rng = <Kilometers>(rng + Math.min(sensor.obsmaxrange, 60000) / q2)) {
           el = sensor.obsmaxel;
-          for (az = sensor.obsminaz; az < sensor.obsmaxaz; el = <Degrees>(el + q)) {
+          for (az = sensor.obsminaz; az < sensor.obsmaxaz; az = <Degrees>(az + q)) {
             pos = Transforms.ecf2eci(lookAnglesToEcf(az, el, rng, sensor.observerGd.lat, sensor.observerGd.lon, sensor.observerGd.alt), gmst);
             try {
               satCache[i].active = true;

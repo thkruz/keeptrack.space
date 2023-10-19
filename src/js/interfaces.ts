@@ -703,14 +703,11 @@ export interface SensorManager {
   /** Deprecated - Stop using this */
   whichRadar: string;
 
-  addCustomSensor(sensor: SensorObject): SensorObject[];
   addSecondarySensor(sensor: SensorObject): void;
   addStf(sensor: SensorObject): void;
-  clearCustomSensors(): void;
   clearSecondarySensors(): void;
   clearStf(): void;
   isSensorSelected(): boolean;
-  removeLastSensor(): void;
   removeSecondarySensor(sensor: SensorObject): void;
   removeStf(sensor?: SensorObject): void;
   resetSensorSelected(): void;

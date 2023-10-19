@@ -522,8 +522,8 @@ export class MouseInput {
         uiManagerInstance.doSearch(searchStr);
         break;
       case 'create-sensor-rmb':
-        slideInRight(getEl('customSensor-menu'), 1000);
-        getEl('menu-customSensor').classList.add('bmenu-item-selected');
+        slideInRight(getEl('custom-sensor-menu'), 1000);
+        getEl('custom-sensor-icon').classList.add('bmenu-item-selected');
         sensorManagerInstance.isCustomSensorMenuOpen = true;
         if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
           getEl('cs-telescope').click();
@@ -599,8 +599,8 @@ export class MouseInput {
         );
         break;
       case 'create-observer-rmb':
-        slideInRight(getEl('customSensor-menu'), 1000);
-        getEl('menu-customSensor').classList.add('bmenu-item-selected');
+        slideInRight(getEl('custom-sensor-menu'), 1000);
+        getEl('custom-sensor-icon').classList.add('bmenu-item-selected');
         sensorManagerInstance.isCustomSensorMenuOpen = true;
         if (!(<HTMLInputElement>getEl('cs-telescope')).checked) {
           getEl('cs-telescope').click();

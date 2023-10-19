@@ -21,9 +21,8 @@
  */
 
 import fovPng from '@app/img/icons/fov.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SensorObject, Singletons } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { SensorObject } from '@app/js/interfaces';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -37,8 +36,6 @@ declare module '@app/js/interfaces' {
 
 export class SensorFov extends KeepTrackPlugin {
   bottomIconCallback = () => {
-    if (!this.isMenuButtonEnabled) return;
-
     if (!this.verifySensorSelected()) {
       return;
     }
@@ -65,45 +62,43 @@ export class SensorFov extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: 'setSensor',
+      method: KeepTrackApiMethods.setSensor,
       cbName: this.PLUGIN_NAME,
       cb: (sensor: SensorObject): void => {
         if (sensor) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
         } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+          getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = true;
+          this.isMenuButtonEnabled = false;
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
     });
 
     keepTrackApi.register({
-      method: 'changeSensorMarkers',
+      method: KeepTrackApiMethods.changeSensorMarkers,
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
     });
   }
 
   private disableFovView_() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-
     settingsManager.isFOVBubbleModeOn = false;
     this.setBottomIconToUnselected();
 
-    catalogManagerInstance.satCruncher.postMessage({
+    keepTrackApi.getCatalogManager().satCruncher.postMessage({
       isShowFOVBubble: 'reset',
       isShowSurvFence: 'disable',
     });
   }
 
   public enableFovView() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-
     keepTrackApi.methods.changeSensorMarkers(this.PLUGIN_NAME);
 
     settingsManager.isFOVBubbleModeOn = true;
@@ -112,12 +107,12 @@ export class SensorFov extends KeepTrackPlugin {
 
     this.setBottomIconToSelected();
 
-    catalogManagerInstance.satCruncher.postMessage({
+    keepTrackApi.getCatalogManager().satCruncher.postMessage({
       isShowFOVBubble: 'enable',
       isShowSurvFence: 'disable',
     });
 
-    catalogManagerInstance.satCruncher.postMessage({
+    keepTrackApi.getCatalogManager().satCruncher.postMessage({
       typ: 'isShowSatOverfly',
       isShowSatOverfly: 'reset',
     });

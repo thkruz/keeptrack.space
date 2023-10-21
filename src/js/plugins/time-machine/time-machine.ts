@@ -66,7 +66,7 @@ export class TimeMachine extends KeepTrackPlugin {
   }
 
   playNextSatellite(runCount: number, year: number) {
-    if (!this.isMenuButtonEnabled || !this.isTimeMachineRunning) {
+    if (!this.isTimeMachineRunning) {
       if (this.isMenuButtonEnabled) this.setBottomIconToUnselected();
       return;
     }

@@ -73,8 +73,6 @@ src/tle/trus*
 src/tle/TLEAltNemo*
 .notes.js
 classfd.tle
-src/textures/earthmap16ak.jpg
-src/textures/earthmapclouds16k.jpg
 src/audio/samples
 
 # Jest Coverage

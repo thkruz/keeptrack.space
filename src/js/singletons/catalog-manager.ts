@@ -453,7 +453,6 @@ export class StandardCatalogManager implements CatalogManager {
 
     // Create Stars
     if (!settingsManager.lowPerf && !settingsManager.isDisableStars) {
-      this.starIndex1 = this.staticSet.length;
       stars.forEach((star) => {
         this.staticSet.push({
           name: star.name,
@@ -516,8 +515,6 @@ export class StandardCatalogManager implements CatalogManager {
           this.staticSet.push(controlSite);
         });
     }
-
-    this.starIndex2 = this.staticSet.length - 1;
 
     if (typeof settingsManager.maxFieldOfViewMarkers !== 'undefined') {
       for (let i = 0; i < settingsManager.maxFieldOfViewMarkers; i++) {
@@ -619,6 +616,16 @@ export class StandardCatalogManager implements CatalogManager {
     // Only do this once after catalogManagerInstance.satData is ready
     if (!settingsManager.cruncherReady && typeof this.satData !== 'undefined') {
       SplashScreen.hideSplashScreen();
+
+      const stars = this.satData.filter((sat) => sat?.type === SpaceObjectType.STAR);
+      if (stars.length > 0) {
+        stars.sort((a, b) => a.id - b.id);
+        // this is the smallest id
+        keepTrackApi.getDotsManager().starIndex1 = stars[0].id;
+        // this is the largest id
+        keepTrackApi.getDotsManager().starIndex2 = stars[stars.length - 1].id;
+        keepTrackApi.getDotsManager().updateSizeBuffer();
+      }
 
       UrlManager.parseGetVariables();
 

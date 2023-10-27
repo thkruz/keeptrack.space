@@ -631,7 +631,7 @@ export class DotsManager {
     // This has to happen first because it resets things to 0
     for (let i = 0; i < bufferLen; i++) {
       // Stars are always bigger
-      if (i >= this.starIndex1 && i <= this.starIndex1) {
+      if (i >= this.starIndex1 && i <= this.starIndex2) {
         this.sizeData[i] = 1.0;
       } else {
         this.sizeData[i] = 0.0;

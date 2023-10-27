@@ -403,7 +403,7 @@ export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSidereal
       isContinue = !updateSatellite(i, gmst, sunEci, j, isSunExclusion);
     } else if (satCache[i].isRadarData) {
       isContinue = !updateRadarData(i);
-    } else if (satCache[i].static && !satCache[i].marker && satCache[i].type === SpaceObjectType.STAR) {
+    } else if (satCache[i].static && !satCache[i].marker && satCache[i].isStar) {
       updateStar(i, now);
       resetVelocity(satVel, i);
     } else if (satCache[i].static && !satCache[i].marker) {

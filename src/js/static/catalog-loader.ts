@@ -320,20 +320,30 @@ export class CatalogLoader {
 
   static getSatDataString(satData: any[]) {
     return JSON.stringify(
-      satData.map((sat) => ({
-        static: sat.static,
-        missile: sat.missile,
-        isRadarData: sat.isRadarData,
-        lat: sat.lat,
-        lon: sat.lon,
-        alt: sat.alt,
-        latList: sat.latList,
-        lonList: sat.lonList,
-        altList: sat.altList,
-        TLE1: sat.TLE1,
-        TLE2: sat.TLE2,
-        marker: sat.marker,
-      }))
+      satData.map((sat) => {
+        const satData = <any>{
+          static: sat.static,
+          missile: sat.missile,
+          isRadarData: sat.isRadarData,
+          lat: sat.lat,
+          lon: sat.lon,
+          alt: sat.alt,
+          latList: sat.latList,
+          lonList: sat.lonList,
+          altList: sat.altList,
+          TLE1: sat.TLE1,
+          TLE2: sat.TLE2,
+          marker: sat.marker,
+        };
+
+        if (sat.type === SpaceObjectType.STAR) {
+          satData.isStar = true;
+          satData.ra = sat.ra;
+          satData.dec = sat.dec;
+        }
+
+        return satData;
+      })
     );
   }
 

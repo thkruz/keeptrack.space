@@ -2,6 +2,7 @@ import { DEG2RAD } from '@app/js/lib/constants';
 import { SettingsManager } from '@app/js/settings/settings';
 import { GlUtils } from '@app/js/static/gl-utils';
 import { mat3, mat4 } from 'gl-matrix';
+import { keepTrackApi } from './../../keepTrackApi';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -14,9 +15,7 @@ declare module '@app/js/interfaces' {
   }
 }
 export class SkyBoxSphere {
-  // #region Properties (23)
-
-  private DRAW_RADIUS = 260000;
+  private DRAW_RADIUS = 200000;
   private NUM_LAT_SEGS = 16;
   private NUM_LON_SEGS = 16;
   private attribs_ = {
@@ -37,6 +36,7 @@ export class SkyBoxSphere {
   private isLoaded_: boolean;
   private isReadyBoundaries_ = false;
   private isReadyConstellations_ = false;
+  private isReadyGraySkybox_ = false;
   private isReadyMilkyWay_ = false;
   private mvMatrix_ = mat4.create();
   private nMatrix_ = mat3.create();
@@ -108,18 +108,13 @@ export class SkyBoxSphere {
   private texBuf_: WebGLBuffer;
   private textureBoundaries_ = <WebGLTexture>null;
   private textureConstellations_ = <WebGLTexture>null;
+  private textureGraySkybox_: WebGLTexture;
   private textureMilkyWay_ = <WebGLTexture>null;
   private vao_: WebGLVertexArrayObject;
   private vertCount_: number;
   private vertIndexBuf_: WebGLBuffer;
   private vertNormBuf_: WebGLBuffer;
   private vertPosBuf_: WebGLBuffer;
-  private isReadyGraySkybox_: any;
-  private textureGraySkybox_: WebGLTexture;
-
-  // #endregion Properties (23)
-
-  // #region Public Static Methods (3)
 
   public static getSrcBoundaries(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
@@ -149,16 +144,13 @@ export class SkyBoxSphere {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
 
     let src = `${settings.installDirectory}textures/skybox8k.jpg`;
-    // if (settings.isMobileModeEnabled) {
-    //   src = `${settings.installDirectory}textures/skybox4k.jpg`;
-    // }
+
+    if (settings.hiresMilkWay) {
+      src = `${settings.installDirectory}textures/skybox16k.jpg`;
+    }
 
     return src;
   }
-
-  // #endregion Public Static Methods (3)
-
-  // #region Public Methods (3)
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer): void {
     if (!this.isLoaded_ || settingsManager.isDisableSkybox) return;
@@ -252,13 +244,13 @@ export class SkyBoxSphere {
   public update(): void {
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
+
+    const cameraPos = keepTrackApi.getMainCamera().getCameraPosition();
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, cameraPos);
+
     mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, -90 * DEG2RAD);
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
   }
-
-  // #endregion Public Methods (3)
-
-  // #region Private Methods (5)
 
   private initBuffers_(): void {
     // generate a uvsphere bottom up, CCW order
@@ -398,6 +390,4 @@ export class SkyBoxSphere {
 
     gl.bindVertexArray(null);
   }
-
-  // #endregion Private Methods (5)
 }

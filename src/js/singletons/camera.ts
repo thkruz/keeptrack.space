@@ -1465,6 +1465,29 @@ export class Camera {
     }
 
     if (this.settings_.isAutoZoomIn || this.settings_.isAutoZoomOut) {
+      const cameraDistance = this.getCameraDistance();
+      if (cameraDistance > 140000) {
+        this.settings_.satShader.minSize = 7;
+      }
+      if (cameraDistance > 180000) {
+        this.settings_.satShader.minSize = 6;
+      }
+      if (cameraDistance > 220000) {
+        this.settings_.satShader.minSize = 5;
+      }
+      if (cameraDistance > 280000) {
+        this.settings_.satShader.minSize = 4;
+      }
+      if (cameraDistance > 350000) {
+        this.settings_.satShader.minSize = 3;
+      }
+      if (cameraDistance > 400000) {
+        this.settings_.satShader.minSize = 2;
+      }
+      if (cameraDistance > 450000) {
+        this.settings_.satShader.minSize = 1;
+      }
+
       if (this.settings_.isAutoZoomIn) {
         this.zoomTarget_ -= dt * this.settings_.autoZoomSpeed;
       }

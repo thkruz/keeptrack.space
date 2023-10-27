@@ -207,6 +207,39 @@ export class CatalogSearch {
    */
   static yearOrLess(satData: SatObject[], yr: number) {
     return satData.filter((sat) => {
+      // 2007 Fengyun 1C ASAT Event
+      if (sat.intlDes?.includes('1999-025')) {
+        if (sat.intlDes !== '1999-025A') {
+          if (yr >= 7 && yr < 57) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+
+      // 2009 Cosmos Iridium Collision
+      if (sat.intlDes?.includes('1993-036') || sat.intlDes?.includes('1997-051')) {
+        if (sat.intlDes !== '1993-036A' && sat.intlDes !== '1997-051A') {
+          if (yr >= 9 && yr < 57) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+
+      // 2021 Cosmos 2542 ASAT Event
+      if (sat.intlDes?.includes('1982-092')) {
+        if (sat.intlDes !== '1982-092A' && sat.intlDes !== '1982-092B') {
+          if (yr >= 21 && yr < 57) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+
       const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
       if (yr >= 57 && yr < 100) {
         return parseInt(tleYear) <= yr && parseInt(tleYear) >= 57;

@@ -113,7 +113,7 @@ export class Earth {
     if (settings.blueImages) src = `${settings.installDirectory}textures/world_blue-2048.png`;
     if (settings.vectorImages) src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
     if (settings.politicalImages) src = `${settings.installDirectory}textures/political8k-gray.jpg`;
-    if (settings.hiresImages) src = `${settings.installDirectory}textures/earthmapclouds16k.jpg`;
+    if (settings.hiresImages) src = `${settings.installDirectory}textures/earthmap16k.jpg`;
     if (settings.hiresNoCloudsImages) src = `${settings.installDirectory}textures/earthmap16k.jpg`;
     return src;
   }

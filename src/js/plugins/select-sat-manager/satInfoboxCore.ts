@@ -1,16 +1,14 @@
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, GetSatType, SatObject, SensorManager, Singletons } from '@app/js/interfaces';
+import { GetSatType, SatObject } from '@app/js/interfaces';
 import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { openColorbox } from '@app/js/lib/colorbox';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { getDayOfYear } from '@app/js/lib/transforms';
-import { DrawManager } from '@app/js/singletons/draw-manager';
 import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
 import { SearchManager } from '@app/js/singletons/search-manager';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { CatalogSearch } from '@app/js/static/catalog-search';
+import { FormatTle } from '@app/js/static/format-tle';
 import { SatMath } from '@app/js/static/sat-math';
 import { StringExtractor } from '@app/js/static/string-extractor';
 import Draggabilly from 'draggabilly';
@@ -135,15 +133,14 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   private static nearOrbitsLink() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-
-    const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.satData, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat));
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.getSatsFromSatData(), catalogManagerInstance.getSat(catalogManagerInstance.selectedSat));
     const searchStr = SearchManager.doArraySearch(catalogManagerInstance, nearbyObjects);
     keepTrackApi.getUiManager().searchManager.doSearch(searchStr, false);
   }
 
   private static allObjectsLink(): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (catalogManagerInstance.selectedSat === -1) {
       return;
@@ -155,7 +152,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   private static drawLineToSun() {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
 
     lineManagerInstance.create(
       'sat2',
@@ -174,7 +171,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   private static drawLineToSat() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (catalogManagerInstance.secondarySat == -1) keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', 'caution');
     lineManagerInstance.create('sat5', [catalogManagerInstance.selectedSat, catalogManagerInstance.secondarySat], 'b');
@@ -252,7 +249,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat === null || typeof sat === 'undefined') return;
     if (sat.static || sat.staticNum >= 0) return;
 
-    getEl('sat-info-title').innerHTML = sat.name;
+    getEl('sat-info-title').innerHTML = sat.name === 'Unknown' ? sat.sccNum : sat.name;
 
     SatInfoBoxCore.updateSatType(sat);
 
@@ -268,10 +265,10 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       getEl('sat-intl-des').innerHTML = sat.intlDes === 'none' ? 'N/A' : sat.intlDes;
       if (sat.source && sat.source !== 'USSF') {
         getEl('sat-objnum').innerHTML = 'N/A';
-      } else if (sat.type > 4) {
-        getEl('sat-objnum').innerHTML = 1 + sat.TLE2.substr(2, 7).toString();
       } else {
-        getEl('sat-objnum').innerHTML = sat.sccNum;
+        const satObjNumDom = getEl('sat-objnum');
+        satObjNumDom.innerHTML = sat.sccNum;
+        satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
       getEl('sat-altid').innerHTML = sat.altId || 'N/A';
@@ -471,9 +468,9 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
                   <div class="sat-info-value" id="sat-intl-des">xxxx-xxxA</div>
                 </div>
                 <div class="sat-info-row sat-only-info">
-                  <div class="sat-info-key" tooltipped" data-position="top" data-delay="50"
+                  <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
                   data-tooltip="USSF Catalog Number - Originally North American Air Defense (NORAD)">NORAD</div>
-                  <div class="sat-info-value" id="sat-objnum">99999</div>
+                  <div class="sat-info-value tooltipped" id="sat-objnum" data-position="top" data-delay="50">99999</div>
                 </div>
                 <div class="sat-info-row sat-only-info">
                   <div class="sat-info-key">Alt ID</div>
@@ -633,15 +630,19 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   private static updateRcsData(sat: SatObject) {
     const satRcsEl = getEl('sat-rcs');
     if (sat.rcs === null || typeof sat.rcs == 'undefined' || sat.rcs === '' || sat.rcs === 'N/A') {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-      const historicRcs = catalogManagerInstance.satData
+      const historicRcs = keepTrackApi
+        .getCatalogManager()
+        .getSatsFromSatData()
         .filter((sat_) => {
           if (typeof sat_.name !== 'string') return false;
           // If 85% of the characters in satellite's name matches then include it
           // Only use the first word of the name
           // character must be in the same order
           const name = sat_.name.toLowerCase().split(' ')[0];
-          const satName = sat.name.toLowerCase().split(' ')[0];
+          let satName = 'Unknown';
+          if (sat.name) {
+            satName = sat.name.toLowerCase().split(' ')[0];
+          }
           const nameLength = name.length;
           const satNameLength = satName.length;
           const minLength = Math.min(nameLength, satNameLength);
@@ -990,8 +991,8 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   private static updateSensorInfo(sat: SatObject) {
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // If we are using the sensor manager plugin then we should hide the sensor to satellite
     // info when there is no sensor selected
@@ -1014,14 +1015,14 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       const satSunDom = getEl('sat-sun');
       if (satSunDom) satSunDom.style.display = 'none';
     } else {
-      const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+      const timeManagerInstance = keepTrackApi.getTimeManager();
       const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);
 
       let satInSun = -1;
       let sunTime;
       try {
         sunTime = Ootk.Utils.SunMath.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
-        const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+        const drawManagerInstance = keepTrackApi.getDrawManager();
         satInSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.eci);
       } catch {
         satInSun = -1;

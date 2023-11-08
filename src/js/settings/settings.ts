@@ -146,7 +146,7 @@ export class SettingsManager {
    *
    * /tle/TLE.txt
    */
-  isDisableAsciiCatalog = false;
+  isDisableAsciiCatalog = true;
   settingsManager = null;
   /**
    * Indicates whether or not Launch Agency and Payload Owners/Manufacturers should be displayed on globe.
@@ -713,7 +713,10 @@ export class SettingsManager {
    */
   nextNPassesCount = 5;
   noMeshManager = false;
-  isDisableStars = false;
+  /**
+   * TODO: Reimplement stars
+   */
+  isDisableStars = true;
   offline = false;
   /**
    * The offset in the x direction for the offset camera mode.
@@ -811,7 +814,7 @@ export class SettingsManager {
      */
     dynamicSizeScalar: 1.0,
     /**
-     * The size of stars in the shader.
+     * The size of stars and searched objects in the shader.
      */
     starSize: '20.0',
     /**
@@ -914,6 +917,7 @@ export class SettingsManager {
   isDrawTrailingOrbits = true;
   /**
    * Enables the old extended catalog including JSC Vimpel data
+   * @deprecated Use isEnableJscCatalog instead
    */
   isEnableExtendedCatalog = false;
   selectedColorFallback = <[number, number, number, number]>[0, 0, 0, 0];
@@ -950,7 +954,7 @@ export class SettingsManager {
   /*
    * Enables the new JSC Vimpel catalog
    */
-  isEnableJscCatalog = false;
+  isEnableJscCatalog = true;
   /**
    * Size of the dot for picking purposes
    */
@@ -963,6 +967,10 @@ export class SettingsManager {
   isDisableSkybox = false;
   isDisableMoon = false;
   isDisableAsyncReadPixels = false;
+  /**
+   * Use 16K textures for the Milky Way
+   */
+  hiresMilkWay = false;
 
   init(settingsOverride?: any) {
     this.pTime = [];
@@ -1287,7 +1295,7 @@ export class SettingsManager {
                 this.maxMissiles = 1;
                 this.maxFieldOfViewMarkers = 1;
                 // this.isNotionalDebris = true;
-                // this.isEnableExtendedCatalog = true;
+                this.isEnableExtendedCatalog = true;
                 this.isShowAgencies = false;
                 this.isDisableLaunchSites = true;
                 this.isDisableControlSites = true;
@@ -1306,9 +1314,21 @@ export class SettingsManager {
                 this.isEPFL = true;
                 this.isDisableExtraCatalog = false;
                 this.offline = true;
-                this.timeMachineDelay = <Milliseconds>1000;
+                this.timeMachineDelay = <Milliseconds>1325;
+                this.maxZoomDistance = <Kilometers>2000000;
                 this.satShader.minSize = 8.0;
                 this.isDisableAsciiCatalog = true;
+                this.plugins.videoDirector = true;
+                this.zFar = 1250000.0;
+                this.isDisableMoon = true;
+
+                this.hiresMilkWay = true;
+                this.earthNumLatSegs = 128;
+                this.earthNumLonSegs = 128;
+                this.hiresImages = true;
+
+                this.autoZoomSpeed = 0.001;
+                this.autoRotateSpeed = 0.000015;
 
                 this.timeMachineString = (yearStr) => {
                   window.M.Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
@@ -1642,6 +1662,7 @@ export class SettingsManager {
         break;
       case '':
         this.offline = true;
+        this.isDisableAsciiCatalog = false;
         this.installDirectory = './';
         break;
       case 'poderespacial.fac.mil.co':

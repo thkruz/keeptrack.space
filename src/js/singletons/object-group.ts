@@ -1,6 +1,7 @@
 import { keepTrackContainer } from '../container';
-import { CatalogManager, GetSatType, MissileObject, OrbitManager, SatObject, Singletons } from '../interfaces';
+import { CatalogManager, GetSatType, MissileObject, SatObject, Singletons } from '../interfaces';
 import { CatalogSearch } from '../static/catalog-search';
+import { keepTrackApi } from './../keepTrackApi';
 
 export enum GroupType {
   ALL = 0,
@@ -20,10 +21,10 @@ export class ObjectGroup {
   objects: number[] = [];
 
   constructor(type: GroupType, data: any) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
     switch (type) {
       case GroupType.ALL:
-        catalogManagerInstance.satData.every((sat) => {
+        satData.every((sat) => {
           if (typeof sat.sccNum !== 'undefined') {
             this.objects.push(sat.id);
           }
@@ -32,13 +33,13 @@ export class ObjectGroup {
         });
         break;
       case GroupType.YEAR:
-        this.objects = CatalogSearch.year(catalogManagerInstance.satData, data)
+        this.objects = CatalogSearch.year(satData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .filter((sat: SatObject) => typeof sat.id !== 'undefined' && !sat.static)
           .map((sat: SatObject) => sat.id);
         break;
       case GroupType.YEAR_OR_LESS:
-        this.objects = CatalogSearch.yearOrLess(catalogManagerInstance.satData, data)
+        this.objects = CatalogSearch.yearOrLess(satData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .filter((sat: SatObject) => typeof sat.id !== 'undefined' && !sat.static)
           .map((sat: SatObject) => sat.id);
@@ -46,39 +47,39 @@ export class ObjectGroup {
       case GroupType.INTLDES:
         this.objects = data
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((intlDes: string) => catalogManagerInstance.getIdFromIntlDes(intlDes))
+          .map((intlDes: string) => keepTrackApi.getCatalogManager().getIdFromIntlDes(intlDes))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.NAME_REGEX:
-        this.objects = CatalogSearch.objectName(catalogManagerInstance.satData, data)
+        this.objects = CatalogSearch.objectName(satData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => sat.id);
         break;
       case GroupType.COUNTRY:
-        this.objects = catalogManagerInstance.satData
+        this.objects = satData
           .filter((sat: SatObject) => data.split('|').includes(sat.country))
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => sat.id);
         break;
       case GroupType.COUNTRY_REGEX:
-        this.objects = CatalogSearch.country(catalogManagerInstance.satData, data)
+        this.objects = CatalogSearch.country(satData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => sat.id);
         break;
       case GroupType.SHAPE_REGEX:
-        this.objects = CatalogSearch.shape(catalogManagerInstance.satData, data)
+        this.objects = CatalogSearch.shape(satData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => sat.id);
         break;
       case GroupType.BUS_REGEX:
-        this.objects = CatalogSearch.bus(catalogManagerInstance.satData, data)
+        this.objects = CatalogSearch.bus(satData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: SatObject) => sat.id);
         break;
       case GroupType.SCC_NUM:
         this.objects = data
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sccNum: number) => catalogManagerInstance.getIdFromObjNum(sccNum))
+          .map((sccNum: number) => keepTrackApi.getCatalogManager().getIdFromObjNum(sccNum))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.ID_LIST:
@@ -89,14 +90,13 @@ export class ObjectGroup {
     }
   }
 
-  public hasObject = (id: number) => this.objects.findIndex((id_) => id_ === id) !== -1;
+  hasObject = (id: number) => this.objects.findIndex((id_) => id_ === id) !== -1;
 
   // What calls the orbit buffer when selected a group from the menu.
-  public updateOrbits = (): ObjectGroup => {
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  updateOrbits = (): this => {
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
     this.objects.forEach((id) => {
-      if (catalogManagerInstance.satData[id].missile) {
+      if ((<SatObject | MissileObject>keepTrackApi.getCatalogManager().satData[id]).missile) {
         const missile = <MissileObject>(<unknown>id);
         orbitManagerInstance.updateOrbitBuffer(missile.id, {
           missile: true,
@@ -112,7 +112,7 @@ export class ObjectGroup {
     return this;
   };
 
-  public updateIsInGroup(): ObjectGroup {
+  updateIsInGroup(): this {
     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 
     this.objects.forEach((id: number) => {
@@ -122,7 +122,7 @@ export class ObjectGroup {
     return this;
   }
 
-  public clear(): ObjectGroup {
+  clear(): this {
     if (this.objects.length === 0) return this;
     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
 

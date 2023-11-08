@@ -216,9 +216,9 @@ export class StandardColorSchemeManager {
       const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
       // Velocity is a special case - we need to know the velocity of each satellite
       if (this.currentColorScheme === this.velocity) {
-        this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.satData, satVel, params);
+        this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.getSatsFromSatData(), satVel, params);
       } else {
-        this.calculateBufferData_(firstDotToColor, lastDotToColor, catalogManagerInstance.satData, params);
+        this.calculateBufferData_(firstDotToColor, lastDotToColor, catalogManagerInstance.getSatsFromSatData(), params);
       }
 
       // If we don't do this then everytime the color refreshes it will undo any effect being applied outside of this loop

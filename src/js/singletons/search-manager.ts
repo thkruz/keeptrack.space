@@ -1,3 +1,4 @@
+import { CatalogObject } from './../interfaces';
 /* */
 
 import { CatalogManager, GroupsManager, SatObject, Singletons, UiManager } from '@app/js/interfaces';
@@ -91,7 +92,7 @@ export class SearchManager {
   }
 
   public static doArraySearch(catalogManagerInstance: CatalogManager, array: number[]) {
-    return array.reduce((searchStr, i) => `${searchStr}${catalogManagerInstance.satData[i].sccNum},`, '').slice(0, -1);
+    return array.reduce((searchStr, i) => `${searchStr}${(<SatObject>catalogManagerInstance.satData[i])?.sccNum},`, '').slice(0, -1);
   }
 
   public doSearch(searchString: string, isPreventDropDown?: boolean): void {
@@ -270,7 +271,7 @@ export class SearchManager {
 
     let satData = catalogManagerInstance.satData;
     getEl('search-results').innerHTML = results.reduce((html, result) => {
-      const sat = satData[result.satId];
+      const sat = <CatalogObject>satData[result.satId];
       html += '<div class="search-result" data-obj-id="' + sat.id + '">';
       html += '<div class="truncate-search">';
       if (sat.missile) {

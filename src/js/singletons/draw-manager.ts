@@ -252,7 +252,9 @@ export class StandardDrawManager implements DrawManager {
       // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
 
       // Draw the moon
-      this.sceneManager.moon.draw(this.sceneManager.sun.drawPosition, this.pMatrix, mainCameraInstance.camMatrix);
+      if (!settingsManager.isDisableMoon) {
+        this.sceneManager.moon.draw(this.sceneManager.sun.drawPosition, this.pMatrix, mainCameraInstance.camMatrix);
+      }
 
       keepTrackApi.methods.drawOptionalScenery();
     }

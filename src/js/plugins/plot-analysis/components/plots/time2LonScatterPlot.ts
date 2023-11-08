@@ -1,8 +1,9 @@
 import * as echarts from 'echarts';
 
-import { CatalogManager, GetSatType, Singletons } from '@app/js/interfaces';
+import { CatalogManager, GetSatType, SatObject, Singletons } from '@app/js/interfaces';
 
 import { keepTrackContainer } from '@app/js/container';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { SatMathApi } from '@app/js/singletons/sat-math-api';
@@ -139,13 +140,13 @@ export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart,
 };
 
 export const getTime2LonScatterData = () => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
   const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
 
   const now = timeManagerInstance.simulationTimeObj.getTime();
 
   const data = [];
-  catalogManagerInstance.satData.forEach((sat) => {
+  satData.forEach((sat) => {
     if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
     if (sat.eccentricity > 0.1) return;
     if (sat.period < 1240) return;
@@ -165,7 +166,7 @@ export const getTime2LonScatterData = () => {
       default:
         return;
     }
-    sat = catalogManagerInstance.getSat(sat.id, GetSatType.POSITION_ONLY);
+    sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
     const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
     const plotData = [];
     plotPoints.forEach((point) => {

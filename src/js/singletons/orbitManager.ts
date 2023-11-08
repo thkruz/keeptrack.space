@@ -190,7 +190,7 @@ export class StandardOrbitManager implements OrbitManager {
       this.glBuffers_.push(this.allocateBuffer());
     }
 
-    const satDataString = StandardOrbitManager.getSatDataString(catalogManagerInstance.satData);
+    const satDataString = StandardOrbitManager.getSatDataString(keepTrackApi.getCatalogManager().getSatsFromSatData());
 
     if (!this.orbitWorker) return;
     this.orbitWorker.postMessage({
@@ -322,11 +322,13 @@ export class StandardOrbitManager implements OrbitManager {
     return buf;
   }
 
+  private isCalculateColorLocked = false;
+
   private drawGroupObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
     const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
 
     if (groupManagerInstance.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
 
       // DEBUG: Planned future feature
       // if (sensorManager.currentSensor?.lat) {
@@ -356,15 +358,32 @@ export class StandardOrbitManager implements OrbitManager {
         if (typeof colorSchemeManagerInstance.colorData[id * 4 + 1] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
         if (typeof colorSchemeManagerInstance.colorData[id * 4 + 2] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
         if (typeof colorSchemeManagerInstance.colorData[id * 4 + 3] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
-        if (!catalogManagerInstance.satData[id].active) return; // Skip inactive objects
-        if (catalogManagerInstance.selectedSat !== id) {
+        if (!satData[id].active) return; // Skip inactive objects
+        if (keepTrackApi.getCatalogManager().selectedSat !== id) {
           // if color is black, we probably have old data, so recalculate color buffers
-          if (colorSchemeManagerInstance.colorData[id * 4] <= 0 && colorSchemeManagerInstance.colorData[id * 4 + 1] <= 0 && colorSchemeManagerInstance.colorData[id * 4 + 2] <= 0) {
+          if (
+            settingsManager.isShowLeoSats &&
+            settingsManager.isShowMeoSats &&
+            settingsManager.isShowGeoSats &&
+            settingsManager.isShowHeoSats &&
+            colorSchemeManagerInstance.colorData[id * 4] <= 0 &&
+            colorSchemeManagerInstance.colorData[id * 4 + 1] <= 0 &&
+            colorSchemeManagerInstance.colorData[id * 4 + 2] <= 0
+          ) {
+            if (this.isCalculateColorLocked) {
+              // Prevent unexpected infinite coloring loop!
+              // TODO: This should be explored more to see if there is a better way to handle this
+              return;
+            }
             colorSchemeManagerInstance.calculateColorBuffers(true);
             // Fix: Crued workaround to getting dots to show up when loading with search parameter
             setTimeout(() => {
               colorSchemeManagerInstance.calculateColorBuffers(true);
+              this.isCalculateColorLocked = true;
             }, 500);
+            setTimeout(() => {
+              this.isCalculateColorLocked = false;
+            }, 2000);
           }
           if (colorSchemeManagerInstance.colorData[id * 4 + 3] <= 0) {
             return; // Skip transparent objects

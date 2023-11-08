@@ -162,24 +162,25 @@ export const uiManagerFinal = () => {
     showLoading(findRaBtnClick);
   });
 
+  const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
   getEl('export-catalog-csv-btn')?.addEventListener('click', () => {
-    CatalogExporter.exportTle2Csv(keepTrackApi.getCatalogManager().satData);
+    CatalogExporter.exportTle2Csv(satData);
   });
 
   getEl('export-catalog-txt-2a')?.addEventListener('click', () => {
-    CatalogExporter.exportTle2Txt(keepTrackApi.getCatalogManager().satData);
+    CatalogExporter.exportTle2Txt(satData);
   });
 
   getEl('export-catalog-txt-2b')?.addEventListener('click', () => {
-    CatalogExporter.exportTle2Txt(keepTrackApi.getCatalogManager().satData, 2, false);
+    CatalogExporter.exportTle2Txt(satData, 2, false);
   });
 
   getEl('export-catalog-txt-3a')?.addEventListener('click', () => {
-    CatalogExporter.exportTle2Txt(keepTrackApi.getCatalogManager().satData, 3);
+    CatalogExporter.exportTle2Txt(satData, 3);
   });
 
   getEl('export-catalog-txt-3b')?.addEventListener('click', () => {
-    CatalogExporter.exportTle2Txt(keepTrackApi.getCatalogManager().satData, 3, false);
+    CatalogExporter.exportTle2Txt(satData, 3, false);
   });
 
   clickAndDragWidth(getEl('analysis-menu'));
@@ -344,7 +345,7 @@ export const findCloseObjects = () => {
 export const findRaBtnClick = () => {
   const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
 
-  const searchStr = CatalogSearch.findReentry(keepTrackApi.getCatalogManager().satData).join(',');
+  const searchStr = CatalogSearch.findReentry(<SatObject[]>keepTrackApi.getCatalogManager().satData).join(',');
   uiManagerInstance.doSearch(searchStr);
 };
 export const analysisBptSumbit = () => {

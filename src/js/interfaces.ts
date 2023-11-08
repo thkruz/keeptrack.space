@@ -608,7 +608,7 @@ export interface GroupsManager {
   selectedGroup: ObjectGroup;
   stopUpdatingInViewSoon: boolean;
 }
-
+export type CatalogObject = SatObject & RadarDataObject & MissileObject & SensorObject;
 export interface CatalogManager {
   getSelectedSat(): SatObject;
   analSatSet: SatObject[];
@@ -627,7 +627,8 @@ export interface CatalogManager {
   orbitalSats: number;
   radarDataSet: RadarDataObject[];
   satCruncher: Worker;
-  satData: SatObject[];
+  getSatsFromSatData: () => SatObject[];
+  satData: (SatObject | MissileObject | SensorObject | RadarDataObject)[];
   satExtraData: undefined;
   satLinkManager: SatLinkManager;
   sccIndex: { [key: string]: number };

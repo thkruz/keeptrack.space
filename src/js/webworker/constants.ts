@@ -1,7 +1,6 @@
 import * as Ootk from 'ootk';
 import { Degrees, Kilometers, Radians } from 'ootk';
 import { SensorObjectCruncher } from '../interfaces';
-import { SpaceObjectType } from '../lib/space-object-type';
 
 // //////////////////////////////////////////////////////////////////////////////
 // Typing
@@ -17,7 +16,7 @@ export interface SatCacheObject extends Ootk.SatelliteRecord {
   isRadarData: any;
   static: boolean;
   marker: any;
-  type: SpaceObjectType;
+  isStar: boolean;
   lat: Degrees;
   lon: Degrees;
   alt: Kilometers;

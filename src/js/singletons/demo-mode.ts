@@ -1,7 +1,4 @@
-import { CatalogManager, Singletons } from '@app/js/interfaces';
 import { Milliseconds } from 'ootk';
-import { keepTrackContainer } from '../container';
-import { StandardOrbitManager } from './orbitManager';
 
 import { keepTrackApi } from '../keepTrackApi';
 import { StandardColorSchemeManager } from './color-scheme-manager';
@@ -12,18 +9,17 @@ export class DemoManager {
   public satellite = 0;
 
   public update(): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
+    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
 
     const realTime = <Milliseconds>Date.now();
     if (realTime - this.lastTime_ < this.UPDATE_INTERVAL_) return;
 
     this.lastTime_ = realTime;
-    this.satellite = this.satellite === catalogManagerInstance.satData.length ? 0 : this.satellite;
+    this.satellite = this.satellite === satData.length ? 0 : this.satellite;
 
-    for (let i = this.satellite; i < catalogManagerInstance.satData.length; i++) {
-      const sat = catalogManagerInstance.satData[i];
+    for (let i = this.satellite; i < satData.length; i++) {
+      const sat = satData[i];
       if (
         colorSchemeManagerInstance.isPayloadOff(sat) ||
         colorSchemeManagerInstance.isRocketBodyOff(sat) ||
@@ -35,7 +31,7 @@ export class DemoManager {
         continue;
 
       keepTrackApi.getHoverManager().setHoverId(i);
-      orbitManagerInstance.setSelectOrbit(i);
+      keepTrackApi.getOrbitManager().setSelectOrbit(i);
       this.satellite = i + 1;
     }
   }

@@ -16,7 +16,7 @@ describe('Catalog Loader', () => {
   it('should load the catalog', async () => {
     settingsManager.isDisableAsciiCatalog = true;
     await CatalogLoader.load();
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(errorWatch).toHaveBeenCalledTimes(0);
   });
 });

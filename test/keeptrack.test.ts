@@ -125,6 +125,7 @@ describe('code_snippet', () => {
     keepTrack.init().then(() => {
       drawManagerInstance.updateLoop = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();
+      settingsManager.cruncherReady = true;
       keepTrack.gameLoop();
       expect(drawManagerInstance.updateLoop).toHaveBeenCalled();
       expect(keepTrackApi.getMainCamera().draw).toHaveBeenCalled();

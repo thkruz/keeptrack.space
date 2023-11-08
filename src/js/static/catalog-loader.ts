@@ -686,7 +686,7 @@ export class CatalogLoader {
   }
 
   private static processJsCatalog_(jsCatalog: JsSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {
-    errorManagerInstance.log(`Processing ${settingsManager.isEnableJscCatalog ? 'JSC Vimpel' : 'Extended'} Catalog`);
+    errorManagerInstance.debug(`Processing ${settingsManager.isEnableJscCatalog ? 'JSC Vimpel' : 'Extended'} Catalog`);
     // If jsCatalog catalogue
     for (const element of jsCatalog) {
       if (!element.TLE1 || !element.TLE2) continue; // Don't Process Bad Satellite Information

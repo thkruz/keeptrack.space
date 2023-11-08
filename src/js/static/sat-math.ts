@@ -700,8 +700,3 @@ export abstract class SatMath {
     return SatMathApi.getLlaTimeView(now, sat);
   }
 }
-
-(window as any).SatMathApi = {
-  calcInertAz: SatMath.calcInertAz,
-  calcIncFromAz: SatMath.calcIncFromAz,
-};

@@ -146,7 +146,7 @@ export class SettingsManager {
    *
    * /tle/TLE.txt
    */
-  isDisableAsciiCatalog = false;
+  isDisableAsciiCatalog = true;
   settingsManager = null;
   /**
    * Indicates whether or not Launch Agency and Payload Owners/Manufacturers should be displayed on globe.
@@ -917,6 +917,7 @@ export class SettingsManager {
   isDrawTrailingOrbits = true;
   /**
    * Enables the old extended catalog including JSC Vimpel data
+   * @deprecated Use isEnableJscCatalog instead
    */
   isEnableExtendedCatalog = false;
   selectedColorFallback = <[number, number, number, number]>[0, 0, 0, 0];
@@ -953,7 +954,7 @@ export class SettingsManager {
   /*
    * Enables the new JSC Vimpel catalog
    */
-  isEnableJscCatalog = false;
+  isEnableJscCatalog = true;
   /**
    * Size of the dot for picking purposes
    */
@@ -1294,7 +1295,7 @@ export class SettingsManager {
                 this.maxMissiles = 1;
                 this.maxFieldOfViewMarkers = 1;
                 // this.isNotionalDebris = true;
-                // this.isEnableExtendedCatalog = true;
+                this.isEnableExtendedCatalog = true;
                 this.isShowAgencies = false;
                 this.isDisableLaunchSites = true;
                 this.isDisableControlSites = true;
@@ -1661,6 +1662,7 @@ export class SettingsManager {
         break;
       case '':
         this.offline = true;
+        this.isDisableAsciiCatalog = false;
         this.installDirectory = './';
         break;
       case 'poderespacial.fac.mil.co':

@@ -1,11 +1,9 @@
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, GetSatType, SatObject, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
+import { GetSatType, SatObject } from '@app/js/interfaces';
 import { isSatObject, keepTrackApi } from '@app/js/keepTrackApi';
 import { fadeIn, fadeOut } from '@app/js/lib/fade';
 import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { CameraType } from '@app/js/singletons/camera';
-import { TimeManager } from '@app/js/singletons/time-manager';
 
 import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -41,7 +39,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       let cssStyle = searchVal.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
 
       // If a satellite is selected on a desktop computer then shrink the search box
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
       if (window.innerWidth > 1000 && catalogManagerInstance.selectedSat !== -1) cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
 
       // Avoid unnecessary dom updates
@@ -53,8 +51,8 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   selectSat(satId: number) {
     if (settingsManager.isDisableSelectSat) return;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     let sat: SatObject | any;
 
@@ -67,11 +65,12 @@ export class SelectSatManager extends KeepTrackPlugin {
       // Selecting a non-missile non-sensor object does nothing
       if ((!sat.active || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') {
         if (sat.type == SpaceObjectType.PAYLOAD_OWNER || sat.type == SpaceObjectType.PAYLOAD_MANUFACTURER) {
-          const searchStr = catalogManagerInstance.satData
+          const searchStr = catalogManagerInstance
+            .getSatsFromSatData()
             .filter((_sat) => _sat.owner === sat.Code || _sat.manufacturer === sat.Code)
             .map((_sat) => _sat.sccNum)
             .join(',');
-          const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+          const uiManagerInstance = keepTrackApi.getUiManager();
           uiManagerInstance.searchManager.doSearch(searchStr);
           keepTrackApi.getMainCamera().changeZoom(0.9);
         }
@@ -94,7 +93,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // If deselecting an object
     if (satId === -1) {
-      const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+      const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
       if (
         colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group ||
         (typeof (<HTMLInputElement>getEl('search'))?.value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
@@ -140,7 +139,7 @@ export class SelectSatManager extends KeepTrackPlugin {
           sensorManagerInstance.setSensor(null, sat.staticNum);
 
           if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
-          const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+          const timeManagerInstance = keepTrackApi.getTimeManager();
           keepTrackApi
             .getMainCamera()
             .lookAtLatLon(

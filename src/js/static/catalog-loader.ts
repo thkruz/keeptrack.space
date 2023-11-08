@@ -405,9 +405,18 @@ export class CatalogLoader {
    * @returns A promise that resolves to an array of JsSat objects.
    */
   private static async getJscCatalog_(settingsManager: SettingsManager): Promise<JsSat[]> {
-    return (await fetch(`${settingsManager.installDirectory}tle/jsc-orbits.json`)).json().catch(() => {
-      errorManagerInstance.warn('Error loading jsc-orbits.json');
-    });
+    return fetch(`${settingsManager.installDirectory}tle/jsc-orbits.json`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          errorManagerInstance.warn('Error loading jsc-orbits.json');
+          return [];
+        }
+      })
+      .catch(() => {
+        errorManagerInstance.warn('Error loading jsc-orbits.json');
+      });
   }
 
   /**

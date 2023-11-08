@@ -2,6 +2,80 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v8.1.1
+
+>  
+
+- 772 right click create sensor here
+- Develop
+- Develop
+- refactor: :fire: revert to google analytics
+- feat: :sparkles: new splash screens
+- feat: :sparkles: add searchLimit param to settings
+- Develop
+- feat: :sparkles: abstract camera and add dark-clouds preset
+- fix: :bug: fix issue in mobile logic
+- feat: :sparkles: update gamepad logic
+- Develop
+- fix: :bug: fixes for iframes
+- feat: :sparkles: update iframe example
+- Develop
+- feat: :sparkles: update readme
+- fix: :bug: fix illegal return
+- Develop
+- ci: :rotating_light: fix minor linter error
+- ci: :construction_worker: expand ignore list for deploy
+- ci: :construction_worker: fix ignore list for sftp
+- ci: :construction_worker: fix ignore list for sftp
+- ci: :construction_worker: fix sftp typo
+- ci: :construction_worker: fix sftp ignore list
+- ci: :construction_worker: fix sftp settings
+- ci: :construction_worker: use new sftp deployer
+- ci: :construction_worker: fix ci/cd increase timeout
+- Develop
+- ci: :pencil2: sftp to ftps
+- Develop
+- ci: :construction_worker: fix ci/cd sftp
+- ci: :construction_worker: update ci/cd pipeline
+- fix gh-pages deployment
+- fix ci/cd
+- ci: :construction_worker: update ci/cd pipeline
+- Minor updates
+- Keep Track Version 8
+- refactor: :art: put catalog loader in class for more clear loading
+- refactor: :recycle: refactor format-tle class for standardization
+- refactor: :label: add clear difference between catalog objects and sat objects
+- fix: :bug: fix custom sensor errors
+- docs: :memo: update changelog
+- fix: :bug: add checks for missing data in satInfoboxCore
+- fix: :bug: fix position cruncher not calculating star positions
+- feat: :sparkles: add hires skybox and have skybox follow camera
+- fix: :bug: update year or less logic to make large fragmentation events match date it occurred
+- fix: :bug: add defensive code to block infinite loops
+- feat: :sparkles: add new altitudes settings and disable stars by default
+- fix: :white_check_mark: fix failing catalog-loader testing
+- feat: :sparkles: scale dots during auto zoom out
+- refactor: :label: add better type support for catalog
+- refactor: :recycle: refactor to reduce code
+- fix: :bug: fix star index calculations
+- feat: :sparkles: make vimpel catalog available by default
+- fix: :bug: fix race condition found in #793
+- fix: :green_heart: fix build error
+- refactor: :wastebasket: remove debug code
+- refactor: :recycle: refactor for better type support
+- feat: :sparkles: allow disabling the moon
+- refactor: :coffin: remove old reference
+- fix: :bug: fix Right Click &gt; Create Sensor Here error #772
+- refactor: :recycle: update cruncher interfaces
+- fix: :bug: reduce unnecessary logging in default settings
+- docs: :memo: update version date
+- fix: :recycle: update texture url for hires earth
+- fix: :pencil2: fix typo in star indexs
+- fix: :bug: fix typo in time-machine logic
+- fix: :bug: fix satinfobox appearing on first static object clicked
+- fix: :white_check_mark: fix test issue caused by new settingsManager
+- build: :lock: fix security issues
+
 #### v8.1.0
 
 >  

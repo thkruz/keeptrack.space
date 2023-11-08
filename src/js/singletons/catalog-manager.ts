@@ -613,8 +613,8 @@ export class StandardCatalogManager implements CatalogManager {
     // Run any callbacks for a normal position cruncher message
     keepTrackApi.methods.onCruncherMessage();
 
-    // Only do this once after catalogManagerInstance.satData is ready
-    if (!settingsManager.cruncherReady && typeof this.satData !== 'undefined') {
+    // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
+    if (!settingsManager.cruncherReady && this.satData && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
       SplashScreen.hideSplashScreen();
 
       const stars = this.satData.filter((sat) => sat?.type === SpaceObjectType.STAR);
@@ -712,6 +712,10 @@ export class StandardCatalogManager implements CatalogManager {
     if (!this.satData) return; // Cant set a satellite without a catalog
     this.satData[i] = sat;
     this.satData[i].velocity ??= { total: 0, x: 0, y: 0, z: 0 }; // Set the velocity to 0 if it doesn't exist
+  }
+
+  getSatsFromSatData(): SatObject[] {
+    return <SatObject[]>this.satData;
   }
 
   public getSelectedSat(): SatObject {

@@ -1,11 +1,10 @@
 import aboutPng from '@app/img/icons/about.png';
 import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, GetSatType, SatObject, Singletons, UiManager } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { CatalogManager, GetSatType, SatObject, Singletons } from '@app/js/interfaces';
+import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 import { DrawManager } from '@app/js/singletons/draw-manager';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 import { SatMath } from '@app/js/static/sat-math';
 import { EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
@@ -168,19 +167,15 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   onFormSubmit(): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-
-    let satId = catalogManagerInstance.getIdFromObjNum(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
+    let satId = keepTrackApi.getCatalogManager().getIdFromObjNum(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
 
     const uVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-u`)).value);
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);
     const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value);
     const timeVal = <Hours>parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-time`)).value);
-    const sat = catalogManagerInstance.getSat(satId, GetSatType.SKIP_POS_VEL);
+    const sat = keepTrackApi.getCatalogManager().getSat(satId, GetSatType.SKIP_POS_VEL);
 
-    const possibleSats = catalogManagerInstance.satData
+    const possibleSats = (<SatObject[]>keepTrackApi.getCatalogManager().satData)
       .filter((sat2) => {
         if (!sat2.satrec) return false;
         if (sat2.perigee > sat.apogee) return false;
@@ -194,12 +189,12 @@ export class DebrisScreening extends KeepTrackPlugin {
     let searchList = <string[]>[];
     for (let t = <Minutes>0; t < <Seconds>(timeVal * 60); t++) {
       offset = <Milliseconds>(t * 1000 * 60);
-      const now = timeManagerInstance.getOffsetTimeObj(offset);
+      const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
       const { m } = SatMath.calculateTimeVariables(now, sat.satrec);
       const satSv = Sgp4.propagate(sat.satrec, m) as { position: EciVec3; velocity: EciVec3 };
 
       for (let idx = 0; idx < possibleSats.length; idx++) {
-        const sat2 = catalogManagerInstance.getSat(possibleSats[idx], GetSatType.SKIP_POS_VEL);
+        const sat2 = keepTrackApi.getCatalogManager().getSat(possibleSats[idx], GetSatType.SKIP_POS_VEL);
         if (!sat2 || !sat2.satrec) continue;
 
         const { m } = SatMath.calculateTimeVariables(now, sat2.satrec);
@@ -228,7 +223,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     const searchStr = searchList.join(',');
     // Remove trailing comma
     searchStr.replace(/,\s*$/u, '');
-    uiManagerInstance.doSearch(searchStr);
+    keepTrackApi.getUiManager().doSearch(searchStr);
   }
 }
 

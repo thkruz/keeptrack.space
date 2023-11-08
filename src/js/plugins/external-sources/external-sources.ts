@@ -33,7 +33,7 @@
 
 import externalPng from '@app/img/icons/external.png';
 import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, Singletons, UiManager } from '@app/js/interfaces';
+import { CatalogManager, SatObject, Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
@@ -179,20 +179,19 @@ export const n2yoFormSubmit = () => {
 };
 
 export const searchN2yo = (satNum: any, analsat?: number) => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  const { satData } = catalogManagerInstance;
+  const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
 
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
     for (let i = 15000; i < satData.length; i++) {
-      if (parseInt(satData[i].sccNum) >= 80000 && !satData[i].active) {
+      if (parseInt(satData[i]?.sccNum) >= 80000 && !satData[i]?.active) {
         analsat = i;
         break;
       }
     }
   } else {
     // Satnum to Id
-    analsat = catalogManagerInstance.getIdFromObjNum(analsat);
+    analsat = keepTrackApi.getCatalogManager().getIdFromObjNum(analsat);
   }
 
   const request = new XMLHttpRequest();
@@ -263,19 +262,18 @@ export const searchCelestrackOnLoad = (request: any, analsat: number): any => {
 };
 
 export const searchCelestrak = (satNum: any, analsat?: number) => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  const { satData } = catalogManagerInstance;
+  const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
   // If no Analyst Satellite specified find the first unused one
   if (typeof analsat == 'undefined') {
     for (let i = 15000; i < satData.length; i++) {
-      if (parseInt(satData[i].sccNum) >= 80000 && !satData[i].active) {
+      if (parseInt(satData[i]?.sccNum) >= 80000 && !satData[i]?.active) {
         analsat = i;
         break;
       }
     }
   } else {
     // Satnum to Id
-    analsat = catalogManagerInstance.getIdFromObjNum(analsat);
+    analsat = keepTrackApi.getCatalogManager().getIdFromObjNum(analsat);
   }
 
   const request = new XMLHttpRequest();

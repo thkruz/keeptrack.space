@@ -1,12 +1,11 @@
 import * as echarts from 'echarts';
 
-import { CatalogManager, GetSatType, Singletons } from '@app/js/interfaces';
+import { GetSatType, SatObject } from '@app/js/interfaces';
 import { MILLISECONDS2DAYS, RAD2DEG } from '@app/js/lib/constants';
 
-import { keepTrackContainer } from '@app/js/container';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { jday } from '@app/js/lib/transforms';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { SatMath } from '@app/js/static/sat-math';
 import { Sgp4, Transforms } from 'ootk';
 
@@ -21,7 +20,7 @@ export const createInc2AltScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
     curChart = echarts.init(chartDom);
     curChart.on('click', (event) => {
       if (event.data?.id) {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         catalogManagerInstance.selectSat(event.data.id);
       }
     });
@@ -147,19 +146,18 @@ export const createInc2AltScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
 };
 
 export const getInc2AltScatterData = () => {
-  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
 
   const china = [];
   const usa = [];
   const russia = [];
   const other = [];
 
-  catalogManagerInstance.satData.forEach((sat) => {
+  satData.forEach((sat) => {
     if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
     if (sat.period > 250) return;
-    sat = catalogManagerInstance.getSat(sat.id, GetSatType.POSITION_ONLY);
-    const now = timeManagerInstance.simulationTimeObj;
+    sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
+    const now = keepTrackApi.getTimeManager().simulationTimeObj;
     let j = jday(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.

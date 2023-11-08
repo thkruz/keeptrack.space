@@ -119,6 +119,7 @@ export class CollissionsPlugin extends KeepTrackPlugin {
   }
 
   private processSocratesHtm(socratesHTM: Document): void {
+    // TODO: This should be pushed to the daily cron job!
     try {
       // Find a table whose class is "center outline" using pure javascript
       const table = socratesHTM.getElementsByClassName('center outline')[0];

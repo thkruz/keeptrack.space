@@ -1,5 +1,5 @@
 import findSatPng from '@app/img/icons/find2.png';
-import { CatalogManager, SatObject, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
+import { SatObject, Singletons, UiManager } from '@app/js/interfaces';
 import { getEl } from '@app/js/lib/get-el';
 import { getUnique } from '@app/js/lib/get-unique';
 import { hideLoading, showLoading } from '@app/js/lib/showLoading';
@@ -116,11 +116,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
       throw new Error('No Search Criteria Entered');
     }
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    let res = catalogManagerInstance.satData
+    let res = keepTrackApi
+      .getCatalogManager()
+      .getSatsFromSatData()
       .filter((sat: SatObject) => !sat.static && !sat.missile && sat.active)
       .map((sat: SatObject) => {
-        const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+        const sensorManagerInstance = keepTrackApi.getSensorManager();
         if (sensorManagerInstance.currentSensors?.length > 0) {
           const tearr = SensorMath.getTearr(sat, sensorManagerInstance.currentSensors);
           return <SearchResults>{ ...sat, az: tearr.az, el: tearr.el, rng: tearr.rng, inView: tearr.inView };
@@ -412,7 +413,7 @@ The search will then find all satellites within those inclinations and display t
   }
 
   public uiManagerFinal() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
 
     getEl('findByLooks-form').addEventListener('submit', (e: Event) => {
       e.preventDefault();
@@ -422,7 +423,7 @@ The search will then find all satellites within those inclinations and display t
       });
     });
 
-    getUnique(catalogManagerInstance.satData.filter((obj: SatObject) => obj.bus).map((obj) => obj.bus))
+    getUnique(satData.filter((obj: SatObject) => obj.bus).map((obj) => obj.bus))
       // Sort using lower case
       .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
       .forEach((bus) => {
@@ -433,14 +434,14 @@ The search will then find all satellites within those inclinations and display t
       getEl('fbl-country').insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
     });
 
-    getUnique(catalogManagerInstance.satData.filter((obj: SatObject) => obj.shape).map((obj) => obj.shape))
+    getUnique(satData.filter((obj: SatObject) => obj.shape).map((obj) => obj.shape))
       // Sort using lower case
       .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
       .forEach((shape) => {
         getEl('fbl-shape').insertAdjacentHTML('beforeend', `<option value="${shape}">${shape}</option>`);
       });
 
-    const payloadPartials = catalogManagerInstance.satData
+    const payloadPartials = satData
       .filter((obj: SatObject) => obj.payload)
       .map((obj) =>
         obj.payload

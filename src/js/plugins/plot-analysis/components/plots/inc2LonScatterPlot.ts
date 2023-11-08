@@ -1,11 +1,11 @@
 import * as echarts from 'echarts';
 
-import { CatalogManager, GetSatType, Singletons } from '@app/js/interfaces';
+import { CatalogManager, GetSatType, SatObject, Singletons } from '@app/js/interfaces';
 
 import { keepTrackContainer } from '@app/js/container';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 
 export const createInc2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, chartDom) => {
@@ -145,22 +145,19 @@ export const createInc2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
 };
 
 export const getInc2LonScatterData = () => {
-  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-
   const china = [];
   const usa = [];
   const russia = [];
   const other = [];
 
-  catalogManagerInstance.satData.forEach((sat) => {
+  (<SatObject[]>keepTrackApi.getCatalogManager().satData).forEach((sat) => {
     if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
     if (sat.eccentricity > 0.1) return;
     if (sat.period < 1240) return;
     if (sat.period > 1640) return;
     if (sat.inclination * RAD2DEG > 17) return;
-    sat = catalogManagerInstance.getSat(sat.id, GetSatType.POSITION_ONLY);
-    sat = { ...sat, ...CoordinateTransforms.eci2lla(sat.position, timeManagerInstance.simulationTimeObj) };
+    sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
+    sat = { ...sat, ...CoordinateTransforms.eci2lla(sat.position, keepTrackApi.getTimeManager().simulationTimeObj) };
     switch (sat.country) {
       case 'United States of America':
       case 'United States':

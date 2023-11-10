@@ -15,6 +15,21 @@
       "sizes": "192x192"
     }
   ],
+  "screenshots": [
+    {
+      "src": "img/pwa/wide.png",
+      "sizes": "3366x1456",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "KeepTrack"
+    },
+    {
+      "src": "img/pwa/square.png",
+      "sizes": "2038x1456",
+      "type": "image/png",
+      "label": "KeepTrack"
+    }
+  ],
   "start_url": "/",
   "background_color": "#172635",
   "display": "fullscreen",

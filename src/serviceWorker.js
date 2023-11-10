@@ -1,4 +1,4 @@
-const currentCacheName = 'KeepTrack-v2.8.1';
+const currentCacheName = 'KeepTrack-v8.1.1';
 const contentToCache = ['./'];
 
 // ////////////////////////////////////////////////////////////////////////////
@@ -28,14 +28,10 @@ self.addEventListener('fetch', (e) => {
 
 self.addEventListener('activate', function (event) {
   event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames.forEach((cacheName) => {
-          if (cacheName !== currentCacheName && cacheName.startsWith('KeepTrack-')) {
-            return caches.delete(cacheName);
-          }
-        })
+    caches
+      .keys()
+      .then((cacheNames) =>
+        Promise.all(cacheNames.filter((cacheName) => cacheName !== currentCacheName && cacheName.startsWith('KeepTrack-')).map((cacheName) => caches.delete(cacheName)))
       )
-    )
   );
 });

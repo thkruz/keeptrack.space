@@ -9,7 +9,7 @@ import { generateConfig } from './webpack.mjs';
 console.clear();
 console.log('Copying files...'); // NOSONAR
 
-const reqDirs = ['meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle'];
+const reqDirs = ['meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle', 'img'];
 const optDirs = [''];
 
 const reqFiles = [

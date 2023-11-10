@@ -179,18 +179,4 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
-  analyze:
-    needs: build
-    name: SonarQube
-    runs-on: ubuntu-latest
-
-    steps:
-      # Checkout code
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      # SonarQube
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  

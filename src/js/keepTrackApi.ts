@@ -195,7 +195,6 @@ export const keepTrackApi = {
     selectSatData: (sat: SatObject, satId: number) => {
       keepTrackApi.getSoundManager()?.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
-      window.M.AutoInit();
     },
     onKeepTrackReady: () => {
       keepTrackApi.callbacks.onKeepTrackReady.forEach((cb: any) => cb.cb());

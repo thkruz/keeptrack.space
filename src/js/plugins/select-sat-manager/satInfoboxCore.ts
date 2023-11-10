@@ -269,6 +269,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         const satObjNumDom = getEl('sat-objnum');
         satObjNumDom.innerHTML = sat.sccNum;
         satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
+        window.M.Tooltip.init(satObjNumDom);
       }
 
       getEl('sat-altid').innerHTML = sat.altId || 'N/A';
@@ -659,17 +660,21 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         const rcs = historicRcs.map((rcs_) => parseFloat(rcs_)).reduce((a, b) => a + b, 0) / historicRcs.length;
         satRcsEl.innerHTML = `H-Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(rcs).toFixed(2) + ' dBsm (Historical Estimate)');
+        window.M.Tooltip.init(satRcsEl);
       } else if (sat.length && sat.diameter && sat.span && sat.shape) {
         const rcs = SatMath.estimateRcs(parseFloat(sat.length), parseFloat(sat.diameter), parseFloat(sat.span), sat.shape);
         satRcsEl.innerHTML = `Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
+        window.M.Tooltip.init(satRcsEl);
       } else {
         satRcsEl.innerHTML = `Unknown`;
         satRcsEl.setAttribute('data-tooltip', 'Unknown');
+        window.M.Tooltip.init(satRcsEl);
       }
     } else {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
       satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(parseFloat(sat.rcs)).toFixed(2) + ' dBsm');
+      window.M.Tooltip.init(satRcsEl);
     }
   }
 

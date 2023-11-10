@@ -9,6 +9,7 @@ import { SatObject } from '../../interfaces';
 import { SpaceObjectType } from '../../lib/space-object-type';
 import { SatMath } from '../../static/sat-math';
 import { SplashScreen } from '../../static/splash-screen';
+import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
 
 type MeshModel = {
@@ -261,7 +262,8 @@ export class MeshManager {
       return;
 
     if (this.currentMeshObject.model === null) {
-      console.warn('Race Condition: Mesh Object Model is null');
+      errorManagerInstance.debug('Race Condition: Mesh Object Model is null');
+      return;
     }
 
     const gl = this.gl_;

@@ -22,7 +22,7 @@
 
 import fencePng from '@app/img/icons/fence.png';
 import { CatalogManager, SensorObject } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -92,7 +92,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     // It does not break anything, but it is a bug
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.setSensor,
+      event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
       cb: (sensor: SensorObject): void => {
         if (sensor) {
@@ -108,7 +108,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.changeSensorMarkers,
+      event: KeepTrackApiEvents.changeSensorMarkers,
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {

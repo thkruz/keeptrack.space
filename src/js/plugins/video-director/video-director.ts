@@ -1,5 +1,5 @@
 import settingsPng from '@app/img/icons/settings.png';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -165,7 +165,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('video-director-form').addEventListener('change', VideoDirectorPlugin.onFormChange);

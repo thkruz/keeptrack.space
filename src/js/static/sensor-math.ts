@@ -1,11 +1,9 @@
-import { CatalogManager, SatObject, sccPassTimes, SensorManager, SensorObject, Singletons } from '@app/js/interfaces';
+import { SatObject, sccPassTimes, SensorObject } from '@app/js/interfaces';
 import { Degrees, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Transforms } from 'ootk';
-import { keepTrackContainer } from '../container';
 import { keepTrackApi } from '../keepTrackApi';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, TAU } from '../lib/constants';
 import { dateFormat } from '../lib/dateFormat';
 import { UpdateSatManager } from '../plugins/update-select-box/update-select-box';
-import { TimeManager } from '../singletons/time-manager';
 import { SatMath } from './sat-math';
 
 export type TearrData = {
@@ -93,11 +91,11 @@ export class SensorMath {
   }
 
   static getTearr(sat: SatObject, sensors: SensorObject[], propTime?: Date): TearrData {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const tearr = <TearrData>{}; // Most current TEARR data that is set in satellite object and returned.
 
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
     sensors = sensorManagerInstance.verifySensors(sensors);
     // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
     const sensor = sensors[0];
@@ -148,7 +146,7 @@ export class SensorMath {
     if (hoverSat == null || selectedSat == null) return '';
 
     // Get Objects
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     hoverSat = catalogManagerInstance.getSat(hoverSat.id);
     selectedSat = catalogManagerInstance.getSat(selectedSat.id);
 
@@ -164,7 +162,7 @@ export class SensorMath {
     try {
       const updateSelectBoxPlugin = <UpdateSatManager>keepTrackApi.getPlugin(UpdateSatManager);
       if (updateSelectBoxPlugin.currentTEARR?.inView) {
-        const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+        const sensorManagerInstance = keepTrackApi.getSensorManager();
 
         if (parseFloat(distanceApart) < updateSelectBoxPlugin.currentTEARR?.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)) {
           if (updateSelectBoxPlugin.currentTEARR?.rng < sensorManagerInstance.currentSensors[0].obsmaxrange && updateSelectBoxPlugin.currentTEARR?.rng > 0) {
@@ -180,8 +178,8 @@ export class SensorMath {
   }
 
   static getSunTimes(sat: SatObject, sensors?: SensorObject[], searchLength = 2, interval = 30) {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     sensors = sensorManagerInstance.verifySensors(sensors);
     // TOOD: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
@@ -239,8 +237,8 @@ export class SensorMath {
   }
 
   static nextNpasses(sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     sensors = sensorManagerInstance.verifySensors(sensors);
     // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
@@ -277,8 +275,8 @@ export class SensorMath {
   }
 
   static nextpass(sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     sensors = sensorManagerInstance.verifySensors(sensors);
     // Loop through sensors looking for in view times

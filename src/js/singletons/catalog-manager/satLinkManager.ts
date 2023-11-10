@@ -1,8 +1,8 @@
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { SensorMath } from '@app/js/static/sensor-math';
 import numeric from 'numeric';
 import { ControlSiteObject } from '../../catalogs/control-sites';
-import { keepTrackContainer } from '../../container';
-import { CatalogManager, SatObject, SensorManager, SensorObject, Singletons } from '../../interfaces';
+import { SatObject, SensorObject } from '../../interfaces';
 import { RAD2DEG } from '../../lib/constants';
 import { LineManager } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
@@ -67,7 +67,7 @@ export class SatLinkManager {
   ];
 
   idToSatnum(): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     this.aehf = catalogManagerInstance.convertSatnumArrayToIdArray(this.aehf);
     this.dscs = catalogManagerInstance.convertSatnumArrayToIdArray(this.dscs);
     this.wgs = catalogManagerInstance.convertSatnumArrayToIdArray(this.wgs);
@@ -102,7 +102,7 @@ export class SatLinkManager {
       errorManagerInstance.info('controlSiteManager unable to load!');
     }
 
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
     for (let sensor in sensorManagerInstance.sensors) {
       if (sensorManagerInstance.sensors[sensor].linkAehf) {
         this.aehfUsers.push(sensorManagerInstance.sensors[sensor].name);
@@ -187,7 +187,7 @@ export class SatLinkManager {
         for (let i = 0; i < satlist.length; i++) {
           for (let j = 0; j < satlist.length; j++) {
             if (i !== j) {
-              const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+              const catalogManagerInstance = keepTrackApi.getCatalogManager();
               var sat1 = catalogManagerInstance.getSat(satlist[i]);
               var sat2 = catalogManagerInstance.getSat(satlist[j]);
               //
@@ -218,7 +218,7 @@ export class SatLinkManager {
             }
           }
         }
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         for (let i = 0; i < userlist.length; i++) {
           let id = catalogManagerInstance.getSensorFromSensorName(userlist[i].toString());
           let user = <SensorObject>(<unknown>catalogManagerInstance.getSat(id));
@@ -244,7 +244,7 @@ export class SatLinkManager {
     if (linkType === LinkType.Users) {
       try {
         // Loop through all the users
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         for (let i = 0; i < userlist.length; i++) {
           // Select the current user
           let user = <SensorObject>(<unknown>catalogManagerInstance.getSat(catalogManagerInstance.getSensorFromSensorName(userlist[i].toString())));

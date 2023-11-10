@@ -1,10 +1,8 @@
 import aboutPng from '@app/img/icons/about.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, GetSatType, SatObject, Singletons } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { GetSatType, SatObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
-import { DrawManager } from '@app/js/singletons/draw-manager';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 import { SatMath } from '@app/js/static/sat-math';
 import { EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
@@ -15,7 +13,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     if (!this.verifySatelliteSelected()) return;
 
     if (this.isMenuButtonEnabled) {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       const sat: SatObject = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY);
       (<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value = sat.sccNum;
@@ -121,7 +119,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl(`${this.sideMenuElementName}-form`).addEventListener('submit', (e: Event) => {
@@ -140,7 +138,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject): void => {
         if (sat) {
@@ -153,7 +151,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   onVisClick(): void {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     const uVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-u`)).value);
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);
     const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value);
@@ -162,7 +160,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   static onClearVisClick(): void {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     drawManagerInstance.sceneManager.searchBox.setCubeSize(<Kilometers>0, <Kilometers>0, <Kilometers>0);
   }
 

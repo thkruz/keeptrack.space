@@ -1,17 +1,15 @@
 import { CatalogObject } from './../interfaces';
 /* */
 
-import { CatalogManager, GroupsManager, SatObject, Singletons, UiManager } from '@app/js/interfaces';
+import { CatalogManager, SatObject, UiManager } from '@app/js/interfaces';
 import { GroupType, ObjectGroup } from '@app/js/singletons/object-group';
 import { SpaceObjectType } from 'ootk';
-import { keepTrackContainer } from '../container';
+import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
 import { LegendManager } from '../static/legend-manager';
 import { UrlManager } from '../static/url-manager';
-import { StandardColorSchemeManager } from './color-scheme-manager';
-import { DotsManager } from './dots-manager';
 
 interface SearchResult {
   isBus: any;
@@ -66,10 +64,10 @@ export class SearchManager {
    */
   public hideResults(): void {
     try {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-      const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-      const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
+      const groupManagerInstance = keepTrackApi.getGroupsManager();
+      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
       slideOutUp(getEl('search-results'), 1000);
       groupManagerInstance.clearSelect();
@@ -101,8 +99,8 @@ export class SearchManager {
       return;
     }
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
 
     if (catalogManagerInstance.satData.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');
 
@@ -238,8 +236,8 @@ export class SearchManager {
 
     dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length);
 
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     const dispGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, idList);
     this.lastResultGroup_ = dispGroup;
@@ -267,7 +265,7 @@ export class SearchManager {
   }
 
   public fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     let satData = catalogManagerInstance.satData;
     getEl('search-results').innerHTML = results.reduce((html, result) => {

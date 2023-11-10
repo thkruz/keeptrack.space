@@ -1,8 +1,7 @@
 import * as echarts from 'echarts';
 
-import { CatalogManager, GetSatType, SatObject, Singletons } from '@app/js/interfaces';
+import { GetSatType, SatObject } from '@app/js/interfaces';
 
-import { keepTrackContainer } from '@app/js/container';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
@@ -19,7 +18,7 @@ export const createInc2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, 
     curChart = echarts.init(chartDom);
     curChart.on('click', (event) => {
       if (event.data?.id) {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         catalogManagerInstance.selectSat(event.data.id);
       }
     });

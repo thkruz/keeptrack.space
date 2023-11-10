@@ -1,14 +1,11 @@
 import findSatPng from '@app/img/icons/find2.png';
-import { SatObject, Singletons, UiManager } from '@app/js/interfaces';
+import { SatObject } from '@app/js/interfaces';
 import { getEl } from '@app/js/lib/get-el';
 import { getUnique } from '@app/js/lib/get-unique';
 import { hideLoading, showLoading } from '@app/js/lib/showLoading';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
-import { keepTrackContainer } from '@app/js/container';
-
 import { countryCodeList, countryNameList } from '@app/js/catalogs/countries';
-import { DotsManager } from '@app/js/singletons/dots-manager';
 import { SensorMath } from '@app/js/static/sensor-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
@@ -55,7 +52,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   public static checkInview(posAll: SearchResults[]) {
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
   }
 
@@ -68,7 +65,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   public static limitPossibles(possibles: any[], limit: number): any[] {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     if (possibles.length >= limit) uiManagerInstance.toast(`Too many results, limited to ${limit}`, 'serious');
     possibles = possibles.slice(0, limit);
     return possibles;
@@ -163,7 +160,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
 
     (<HTMLInputElement>getEl('search')).value = result;
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
     return res;
   }
@@ -325,7 +322,7 @@ The search will then find all satellites within those inclinations and display t
 `;
 
   public async findByLooksSubmit() {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
     const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);
@@ -388,7 +385,7 @@ The search will then find all satellites within those inclinations and display t
     super.addJs();
 
     keepTrackApi.register({
-      method: 'uiManagerInit',
+      event: 'uiManagerInit',
       cbName: 'findSat',
       cb: () => {
         getEl('fbl-error').addEventListener('click', function () {
@@ -397,7 +394,7 @@ The search will then find all satellites within those inclinations and display t
       },
     });
     keepTrackApi.register({
-      method: 'uiManagerFinal',
+      event: 'uiManagerFinal',
       cbName: 'findSat',
       cb: this.uiManagerFinal.bind(this),
     });

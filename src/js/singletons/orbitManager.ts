@@ -2,14 +2,12 @@
 
 import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { mat4 } from 'gl-matrix';
-import { keepTrackContainer } from '../container';
-import { CatalogManager, ColorSchemeManager, GetSatType, GroupsManager, MissileParams, OrbitManager, SatObject, Singletons, UiManager } from '../interfaces';
+import { ColorSchemeManager, GetSatType, MissileParams, OrbitManager, SatObject, UiManager } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { Camera, CameraType } from './camera';
 import { LineManager } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import { HoverManager } from './hover-manager';
-import { TimeManager } from './time-manager';
 
 /* export const setOrbit = function (satId: number) {
 let sat = catalogManagerInstance.getSat(satId: number);
@@ -98,7 +96,7 @@ export class StandardOrbitManager implements OrbitManager {
   ): void {
     if (!this.initialized_) return;
     const gl = this.gl_;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.lineManagerInstance_.program);
@@ -141,7 +139,7 @@ export class StandardOrbitManager implements OrbitManager {
 
     this.lineManagerInstance_ = lineManagerInstance;
     this.gl_ = gl;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // See if we are running jest right now for testing
     if (isThisNode()) {
@@ -242,7 +240,7 @@ export class StandardOrbitManager implements OrbitManager {
   }
 
   changeOrbitBufferData(satId: number, TLE1: string, TLE2: string): void {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     if (!this.orbitWorker) return;
     this.orbitWorker.postMessage({
@@ -267,8 +265,8 @@ export class StandardOrbitManager implements OrbitManager {
       altList: [],
     }
   ) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const sat = catalogManagerInstance.getSat(satId);
     if (!sat) return;
@@ -325,7 +323,7 @@ export class StandardOrbitManager implements OrbitManager {
   private isCalculateColorLocked = false;
 
   private drawGroupObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
 
     if (groupManagerInstance.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
       const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
@@ -405,7 +403,7 @@ export class StandardOrbitManager implements OrbitManager {
   private drawHoverObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
     if (settingsManager.isMobileModeEnabled) return; // No hover orbit on mobile
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const hoverId = hoverManagerInstance.getHoverId();
     if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !catalogManagerInstance.getSat(hoverId, GetSatType.EXTRA_ONLY).static) {
@@ -434,7 +432,7 @@ export class StandardOrbitManager implements OrbitManager {
   }
 
   private drawPrimaryObjectOrbit() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     if (this.currentSelectId_ !== -1 && !catalogManagerInstance.getSat(this.currentSelectId_, GetSatType.EXTRA_ONLY).static) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor);
       this.writePathToGpu(this.currentSelectId_);
@@ -442,7 +440,7 @@ export class StandardOrbitManager implements OrbitManager {
   }
 
   private drawSecondaryObjectOrbit(): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     if (this.secondarySelectId_ !== -1 && !catalogManagerInstance.getSat(this.secondarySelectId_, GetSatType.EXTRA_ONLY).static) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor2);
       this.writePathToGpu(this.secondarySelectId_);

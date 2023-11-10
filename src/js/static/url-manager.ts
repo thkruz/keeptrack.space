@@ -1,8 +1,6 @@
-import { CatalogManager, GetSatType, Singletons, UiManager } from '@app/js/interfaces';
+import { GetSatType } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import { keepTrackContainer } from '../container';
 import { getEl } from '../lib/get-el';
-import { TimeManager } from '../singletons/time-manager';
 
 export abstract class UrlManager {
   static parseGetVariables() {
@@ -18,9 +16,9 @@ export abstract class UrlManager {
   }
 
   static updateURL() {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (!uiManagerInstance.searchManager) return;
     const currentSearch = uiManagerInstance.searchManager.getCurrentSearch();
@@ -74,11 +72,11 @@ export abstract class UrlManager {
 
   private static handleIntldesParam_(val: string) {
     keepTrackApi.register({
-      method: 'onKeepTrackReady',
+      event: 'onKeepTrackReady',
       cbName: 'getVariableSat',
       cb: () => {
-        const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const uiManagerInstance = keepTrackApi.getUiManager();
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.getIdFromIntlDes(val.toUpperCase());
         if (urlSatId !== null && catalogManagerInstance.getSat(urlSatId).active) {
           catalogManagerInstance.setSelectedSat(urlSatId);
@@ -91,11 +89,11 @@ export abstract class UrlManager {
 
   private static handleSatParam_(val: string) {
     keepTrackApi.register({
-      method: 'onKeepTrackReady',
+      event: 'onKeepTrackReady',
       cbName: 'getVariableSat',
       cb: () => {
-        const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const uiManagerInstance = keepTrackApi.getUiManager();
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.getIdFromObjNum(parseInt(val));
         if (urlSatId !== null) {
           catalogManagerInstance.setSelectedSat(urlSatId);
@@ -112,13 +110,13 @@ export abstract class UrlManager {
     (<HTMLSelectElement>getEl('ms-attacker')).value = subVal[1].toString();
     (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
     (<HTMLButtonElement>getEl('missile')).click();
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.toast(`Missile launched!`, 'normal', false);
   }
 
   private static handleDateParam_(val: string) {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
     if (isNaN(parseInt(val))) {
       uiManagerInstance.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
       return;
@@ -127,8 +125,8 @@ export abstract class UrlManager {
   }
 
   private static handleRateParam_(val: string) {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
     var rate = parseFloat(val);
     if (isNaN(rate)) {
       uiManagerInstance.toast(`Propagation rate of "${rate}" is not a valid float!`, 'caution', true);
@@ -151,7 +149,7 @@ export abstract class UrlManager {
       if (key === 'search' && !settingsManager.disableUI) {
         const decodedVal = decodeURIComponent(val.replace(/\+/gu, ' '));
 
-        const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+        const uiManagerInstance = keepTrackApi.getUiManager();
         uiManagerInstance.doSearch(decodedVal);
         if (settingsManager.lastSearchResults.length == 0) {
           uiManagerInstance.toast(`Search for "${val}" found nothing!`, 'caution', true);

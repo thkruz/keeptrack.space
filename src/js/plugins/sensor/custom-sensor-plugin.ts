@@ -1,5 +1,5 @@
 import customPng from '@app/img/icons/custom.png';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { UiGeolocation } from '@app/js/static/ui-manager-geolocation';
@@ -119,7 +119,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         CustomSensorPlugin.addCustomSensorFormSubmitListener();

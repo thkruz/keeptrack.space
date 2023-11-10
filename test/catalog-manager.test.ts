@@ -1,10 +1,8 @@
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, GetSatType, SatCruncherMessageData, SatObject, Singletons } from '@app/js/interfaces';
+import { CatalogManager, GetSatType, SatCruncherMessageData, SatObject } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { StandardCatalogManager } from '@app/js/singletons/catalog-manager';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
-import { DotsManager } from '@app/js/singletons/dots-manager';
 import { CatalogExporter } from '@app/js/static/catalog-exporter';
 import { CatalogSearch } from '@app/js/static/catalog-search';
 import { defaultSat } from './environment/apiMocks';
@@ -52,7 +50,7 @@ describe('calcSatrec', () => {
 
     catalogManagerInstance.selectedSat = defaultSat.id;
     catalogManagerInstance.satData = [matchSat, defaultSat, nonmatchSat, nonmatchSat2, nonmatchSat3, nonmatchSat4];
-    const satData = CatalogSearch.findObjsByOrbit(catalogManagerInstance.satData, defaultSat);
+    const satData = CatalogSearch.findObjsByOrbit(<SatObject[]>(<unknown>catalogManagerInstance.satData), defaultSat);
     expect(satData).toStrictEqual([0, 1]);
   });
 
@@ -130,7 +128,7 @@ describe('calcSatrec', () => {
   // should process getSatPosOnly
   it('process_get_sat_pos_only', () => {
     catalogManagerInstance.satData = [defaultSat];
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     dotsManagerInstance.positionData = new Float32Array(3);
     const result = catalogManagerInstance.getSat(0, GetSatType.POSITION_ONLY);
     expect(result).toStrictEqual(defaultSat);
@@ -143,12 +141,12 @@ describe('calcSatrec', () => {
       postMessage: jest.fn(),
       terminate: jest.fn(),
     } as any;
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     colorSchemeManagerInstance.colorData = new Float32Array([0, 1, 2, 3, 4, 5, 6, 7]);
     colorSchemeManagerInstance.currentColorScheme = colorSchemeManagerInstance.default;
     colorSchemeManagerInstance.init();
 
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     dotsManagerInstance.sizeData = new Int8Array([0, 1, 2, 3, 4, 5, 6, 7]);
 
     document.body.innerHTML = `<div id="menu-lookangles" class="bmenu-item-disabled"></div>

@@ -1,5 +1,5 @@
 import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { openColorbox } from '@app/js/lib/colorbox';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
@@ -38,48 +38,48 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     // NOTE: This has to go first.
     // Register orbital element data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_orbitalData`,
       cb: this.orbitalData.bind(this),
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_secondaryData`,
       cb: this.secondaryData.bind(this),
     });
 
     // Register sensor data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_sensorInfo`,
       cb: this.sensorInfo.bind(this),
     });
 
     // Register launch data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_launchData`,
       cb: this.launchData.bind(this),
     });
 
     // Register mission data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_satMissionData`,
       cb: this.satMissionData.bind(this),
     });
 
     // Register intel data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_intelData`,
       cb: this.intelData.bind(this),
     });
 
     // Register object data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_objectData`,
       cb: SatInfoBoxCore.updateObjectData,
     });

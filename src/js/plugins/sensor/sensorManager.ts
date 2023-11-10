@@ -24,7 +24,6 @@
  */
 
 import { sensors } from '@app/js/catalogs/sensors';
-import { keepTrackContainer } from '@app/js/container';
 import { openColorbox } from '@app/js/lib/colorbox';
 import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
@@ -32,14 +31,12 @@ import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { SatMath } from '@app/js/static/sat-math';
 import { TearrData } from '@app/js/static/sensor-math';
 import { Degrees, GreenwichMeanSiderealTime, Kilometers, Radians } from 'ootk';
-import { CatalogManager, SensorManager, SensorObject, Singletons } from '../../interfaces';
+import { SensorManager, SensorObject } from '../../interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
 
 export class StandardSensorManager implements SensorManager {
@@ -134,7 +131,7 @@ export class StandardSensorManager implements SensorManager {
   }
 
   static drawFov(sensor: SensorObject) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     switch (sensor.shortName) {
       case 'COD':
       case 'BLE':
@@ -216,7 +213,7 @@ export class StandardSensorManager implements SensorManager {
   }
 
   resetSensorSelected() {
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     // Return to default settings with nothing 'inview'
     StandardSensorManager.updateSensorUiStyling(null);
@@ -224,7 +221,7 @@ export class StandardSensorManager implements SensorManager {
     if (settingsManager.currentColorScheme == colorSchemeManagerInstance.default) {
       LegendManager.change('default');
     }
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.satCruncher.postMessage({
       typ: 'sensor',
       setlatlong: true,
@@ -303,7 +300,7 @@ export class StandardSensorManager implements SensorManager {
       errorManagerInstance.warn('Sensor Manager: Unable to set current sensor - localStorage issue!');
     }
 
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     if (selectedSensor == null && staticNum == null) {
       // No sensor selected
@@ -443,7 +440,7 @@ export class StandardSensorManager implements SensorManager {
 
   updateCruncherOnCustomSensors() {
     this.whichRadar = this.customSensors.length > 1 ? 'MULTI CUSTOM' : 'CUSTOM';
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     catalogManagerInstance.satCruncher.postMessage({
       typ: 'sensor',
@@ -523,7 +520,7 @@ export class StandardSensorManager implements SensorManager {
   }
 
   private cameraToCurrentSensor_() {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
     const primarySensor = this.currentSensors[0];
 
     if (primarySensor.obsmaxrange > 6000) {
@@ -535,7 +532,7 @@ export class StandardSensorManager implements SensorManager {
   }
 
   private updatePositionCruncher_(): void {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const combinedSensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
 

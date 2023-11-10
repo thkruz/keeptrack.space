@@ -1,16 +1,12 @@
+import { SatObject } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import { CatalogManager, SatObject, Singletons } from '@app/js/interfaces';
 import { DEG2RAD, RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { lon2yaw } from '@app/js/lib/transforms';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
-import { keepTrackContainer } from '../../container';
 
-import { TimeManager } from '../time-manager';
-import { GlUtils } from '../../static/gl-utils';
-import { DrawManager } from '../draw-manager';
-import { DotsManager } from '../dots-manager';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
+import { GlUtils } from '../../static/gl-utils';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -20,7 +16,7 @@ import { CoordinateTransforms } from '../../static/coordinate-transforms';
 const offsetDistance = RADIUS_OF_EARTH + 80 + 1;
 
 export const init = async () => {
-  const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+  const drawManagerInstance = keepTrackApi.getDrawManager();
   const { gl } = drawManagerInstance;
 
   initProgram(gl);
@@ -28,11 +24,11 @@ export const init = async () => {
   initVao(gl);
 
   keepTrackApi.register({
-    method: 'selectSatData',
+    event: 'selectSatData',
     cbName: 'coneInit',
     cb: (sat: SatObject | null, satId: number) => {
       if (!sat) return;
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
       cone.pos = [dotsManagerInstance.positionData[satId * 3], dotsManagerInstance.positionData[satId * 3 + 1], dotsManagerInstance.positionData[satId * 3 + 2]];
       init();
     },
@@ -130,8 +126,8 @@ export const initVao = (gl: WebGL2RenderingContext) => {
  * Render Loop Code
  * ***************************************************************************/
 export const update = (position: Kilometers[]) => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  const timeManagerInstance = keepTrackApi.getTimeManager();
 
   if (catalogManagerInstance.selectedSat === -1) return;
 
@@ -154,8 +150,8 @@ export const update = (position: Kilometers[]) => {
 };
 
 export const draw = function (pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  const drawManagerInstance = keepTrackApi.getDrawManager();
 
   if (catalogManagerInstance.selectedSat === -1) return;
 

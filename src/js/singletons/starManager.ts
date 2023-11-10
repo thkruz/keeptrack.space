@@ -14,11 +14,8 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import { CatalogManager, Singletons } from '@app/js/interfaces';
-import { isThisNode } from '@app/js/keepTrackApi';
+import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { constellations } from '../catalogs/constellations';
-import { keepTrackContainer } from '../container';
-import { DotsManager } from './dots-manager';
 import { lineManagerInstance } from './draw-manager/line-manager';
 
 export class StarManager {
@@ -42,14 +39,14 @@ export class StarManager {
   }
 
   public drawAllConstellations() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     for (let i = 0; i < this.constellations.length; i++) {
       for (let s = 0; s < this.constellations[i].stars.length; s++) {
         // Verify Stars Exist
         let star1, star2;
         try {
-          const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+          const dotsManagerInstance = keepTrackApi.getDotsManager();
           const starIdx1 = dotsManagerInstance.starIndex1;
           const starIdx2 = dotsManagerInstance.starIndex2;
           star1 = catalogManagerInstance.getIdFromStarName(this.constellations[i].stars[s][0], starIdx1, starIdx2);
@@ -71,7 +68,7 @@ export class StarManager {
   }
 
   public drawConstellations(C: string) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (typeof C === 'undefined') return;
     if (this.currentConstellationName_ === C) return;
@@ -79,7 +76,7 @@ export class StarManager {
       if (this.constellations[i].name === C) {
         for (let s = 0; s < this.constellations[i].stars.length; s++) {
           // Verify Stars Exist
-          const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+          const dotsManagerInstance = keepTrackApi.getDotsManager();
           const starIdx1 = dotsManagerInstance.starIndex1;
           const starIdx2 = dotsManagerInstance.starIndex2;
           const star1 = catalogManagerInstance.getIdFromStarName(this.constellations[i].stars[s][0], starIdx1, starIdx2);

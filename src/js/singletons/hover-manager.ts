@@ -1,18 +1,14 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getDayOfYear } from '@app/js/lib/transforms';
 import { CameraType } from '@app/js/singletons/camera';
-import { keepTrackContainer } from '../container';
-import { CatalogManager, RadarDataObject, SatObject, SensorManager, Singletons } from '../interfaces';
+import { RadarDataObject, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { spaceObjType2Str } from '../lib/spaceObjType2Str';
 import { CoordinateTransforms } from '../static/coordinate-transforms';
 import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
-import { StandardColorSchemeManager } from './color-scheme-manager';
-import { DrawManager } from './draw-manager';
 import { errorManagerInstance } from './errorManager';
-import { StandardOrbitManager } from './orbitManager';
 
 export class HoverManager {
   /** The id of the object currently being hovered */
@@ -54,7 +50,7 @@ export class HoverManager {
   }
 
   private controlFacility_(sat: SatObject) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     this.satHoverBoxNode1.textContent = sat.name;
     this.satHoverBoxNode2.innerHTML = sat.country + SensorMath.distanceString(sat, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
@@ -64,11 +60,11 @@ export class HoverManager {
   private hoverOverNothing_() {
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
     if (this.satHoverBoxDOM.style.display === 'none' || !settingsManager.enableHoverOverlay) return false;
-    const { starManager } = keepTrackApi.programs;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const drawManagerInstance = keepTrackApi.getDrawManager();
 
     if (catalogManagerInstance.isStarManagerLoaded) {
+      const starManager = keepTrackApi.getStarManager();
       if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) starManager.clearConstellations();
     }
 
@@ -81,8 +77,8 @@ export class HoverManager {
     if (!keepTrackApi.getMainCamera().isDragging && settingsManager.enableHoverOverlay) {
       // NOTE: The radar mesurement logic breaks if you call it a SatObject
 
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const drawManagerInstance = keepTrackApi.getDrawManager();
 
       const sat = catalogManagerInstance.getSat(id);
       const satScreenPositionArray = drawManagerInstance.getScreenCoords(sat);
@@ -129,7 +125,7 @@ export class HoverManager {
   }
 
   private launchFacility_(sat: SatObject) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     let launchSite = StringExtractor.extractLaunchSite(sat.name);
     this.satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
@@ -147,7 +143,7 @@ export class HoverManager {
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
       this.satHoverBoxDOM.style.display = 'none';
 
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+      const drawManagerInstance = keepTrackApi.getDrawManager();
       if (satId !== -1) {
         drawManagerInstance.setCursor('pointer');
       } else {
@@ -160,7 +156,7 @@ export class HoverManager {
 
   /** TODO: Implement a RadarDataObject to replace SatObject */
   private radarData_(sat: RadarDataObject) {
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     this.satHoverBoxNode1.innerHTML = 'Measurement: ' + sat.mId + '</br>Track: ' + sat.trackId + '</br>Object: ' + sat.objectId;
     if (sat.missileComplex !== -1) {
@@ -200,8 +196,8 @@ export class HoverManager {
 
   private satObj_(sat: SatObject) {
     if (!settingsManager.enableHoverOverlay) return;
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     // Use this as a default if no UI
     if (settingsManager.disableUI || settingsManager.isEPFL) {
@@ -212,7 +208,7 @@ export class HoverManager {
       country = country.length > 0 ? country : 'Unknown';
       this.satHoverBoxNode3.textContent = country;
     } else {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       if (
         catalogManagerInstance.isSensorManagerLoaded &&
@@ -308,8 +304,8 @@ export class HoverManager {
   }
 
   private showRicOrEci_(sat: SatObject) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const drawManagerInstance = keepTrackApi.getDrawManager();
 
     drawManagerInstance.sat2 = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
     if (typeof drawManagerInstance.sat2 !== 'undefined' && drawManagerInstance.sat2 !== null && sat !== drawManagerInstance.sat2) {
@@ -323,8 +319,7 @@ export class HoverManager {
   }
 
   private star_(sat: SatObject) {
-    const { starManager } = keepTrackApi.programs;
-    const constellationName = starManager.findStarsConstellation(sat.name);
+    const constellationName = keepTrackApi.getStarManager().findStarsConstellation(sat.name);
     if (constellationName !== null) {
       this.satHoverBoxNode1.innerHTML = sat.name + '</br>' + constellationName;
     } else {
@@ -334,7 +329,7 @@ export class HoverManager {
     this.satHoverBoxNode3.innerHTML = 'RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg';
 
     if (this.lasthoveringSat !== sat.id && typeof sat !== 'undefined' && constellationName !== null) {
-      starManager.drawConstellations(constellationName);
+      keepTrackApi.getStarManager().drawConstellations(constellationName);
     }
   }
 
@@ -349,7 +344,7 @@ export class HoverManager {
     } else if (sat.type === SpaceObjectType.STAR) {
       this.star_(sat);
     } else {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       this.satHoverBoxNode1.textContent = sat.name;
       if (catalogManagerInstance.selectedSat !== -1) {
@@ -365,8 +360,8 @@ export class HoverManager {
   /** The internal method that actually updates the hover.
    * TODO: Rename this */
   private updateHover_(id: number) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const orbitManagerInstance = keepTrackContainer.get<StandardOrbitManager>(Singletons.OrbitManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     this.currentHoverId = id;
     if (id !== -1 && catalogManagerInstance.satData[id]?.type !== SpaceObjectType.STAR) {
@@ -383,9 +378,9 @@ export class HoverManager {
       return;
     }
 
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const gl = keepTrackContainer.get<DrawManager>(Singletons.DrawManager).gl;
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const gl = keepTrackApi.getDrawManager().gl;
 
     this.hoveringSat = i;
     if (i === this.lasthoveringSat) return;

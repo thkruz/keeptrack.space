@@ -529,28 +529,14 @@ export interface ObjectTypeFlags {
 }
 export interface ColorSchemeManager {
   calculateColorBuffers: (force: boolean) => void;
-  colorBuf: WebGLBuffer;
   colorBuffer: WebGLBuffer;
   colorBufferOneTime: boolean;
   colorData: Float32Array;
-  colorRuleSet: ColorRuleSet;
-  colors: any;
-  gl: WebGL2RenderingContext;
-  hoverSat: number;
   iSensor: number;
-  isSunlightColorScheme: boolean;
-  isVelocityColorScheme: boolean;
-  now: number;
-  pickableBuf: WebGLBuffer;
   pickableBuffer: WebGLBuffer;
   pickableBufferOneTime: boolean;
   pickableData: Int8Array;
-  satData: SatObject[];
-  satInSun: Int8Array;
-  satInView: Int8Array;
-  satVel: number[];
   setColorScheme: (scheme: (sat: SatObject, params?: any) => ColorInformation, isForceRecolor?: boolean) => void;
-  tempNumOfSats: number;
 }
 
 export enum Pickable {

@@ -1,6 +1,4 @@
 import timeMachinePng from '@app/img/icons/time-machine.png';
-import { keepTrackContainer } from '@app/js/container';
-import { GroupsManager, OrbitManager, Singletons } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
@@ -14,9 +12,9 @@ export class TimeMachine extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Time Machine';
 
   bottomIconCallback = () => {
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     if (this.isMenuButtonEnabled) {
       LegendManager.change('timeMachine');
@@ -71,7 +69,7 @@ export class TimeMachine extends KeepTrackPlugin {
       return;
     }
     const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     // Kill all old async calls if run count updates
     if (runCount !== this.historyOfSatellitesRunCount) return;
@@ -105,9 +103,9 @@ export class TimeMachine extends KeepTrackPlugin {
   }
 
   removeSatellite(runCount: number, colorSchemeManager: StandardColorSchemeManager): void {
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     if (runCount !== this.historyOfSatellitesRunCount) return;
     if (!this.isMenuButtonEnabled) return;

@@ -1,8 +1,8 @@
 import * as echarts from 'echarts';
 
-import { CatalogManager, EChartsData, Singletons } from '@app/js/interfaces';
+import { EChartsData } from '@app/js/interfaces';
 
-import { keepTrackContainer } from '@app/js/container';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { SatMathApi } from '@app/js/singletons/sat-math-api';
 
 type EChartsOption = echarts.EChartsOption;
@@ -119,7 +119,7 @@ export const createRicScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
 export const getRicScatterData = () => {
   const NUMBER_OF_POINTS = 500;
   const data = [] as EChartsData;
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
   if (catalogManagerInstance.selectedSat === -1 || catalogManagerInstance.secondarySat === -1) return [];
 

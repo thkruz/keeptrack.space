@@ -5,9 +5,7 @@ import githubPng from '@app/img/icons/github.png';
 import soundOffPng from '@app/img/icons/sound-off.png';
 import soundOnPng from '@app/img/icons/sound-on.png';
 import layersIconPng from '@app/img/layers-icon.png';
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons, SoundManager } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 import { errorManagerInstance } from '../../singletons/errorManager';
@@ -23,7 +21,7 @@ export class TopMenu extends KeepTrackPlugin {
   addHtml = (): void => {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerInit,
+      event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: async () => {
         getEl('keeptrack-header').insertAdjacentHTML(
@@ -115,12 +113,12 @@ export class TopMenu extends KeepTrackPlugin {
   addJs = (): void => {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: async () => {
         getEl('sound-btn').onclick = () => {
           const soundIcon = <HTMLImageElement>getEl('sound-icon');
-          const soundManager = keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
+          const soundManager = keepTrackApi.getSoundManager();
 
           if (!soundManager) {
             errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');

@@ -1,10 +1,8 @@
-import { keepTrackContainer } from '@app/js/container';
-import { MissileObject, SatObject, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
-import { KeepTrackApiMethods, isMissileObject, isSatObject, isSensorObject, keepTrackApi } from '@app/js/keepTrackApi';
+import { MissileObject, SatObject, SensorObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, isMissileObject, isSatObject, isSensorObject, keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD, cKmPerMs } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { getDayOfYear } from '@app/js/lib/transforms';
-import { DrawManager } from '@app/js/singletons/draw-manager';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 import { SatMath } from '@app/js/static/sat-math';
@@ -43,7 +41,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.updateSelectBox,
+      event: KeepTrackApiEvents.updateSelectBox,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject | SensorObject | MissileObject) => {
         if (!keepTrackApi.isInitialized) return;
@@ -128,7 +126,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
               if (getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = this.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
               if (getEl('sat-elevation')) getEl('sat-elevation').innerHTML = this.currentTEARR.el.toFixed(1) + '°';
               if (getEl('sat-range')) getEl('sat-range').innerHTML = this.currentTEARR.rng.toFixed(2) + ' km';
-              const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+              const drawManagerInstance = keepTrackApi.getDrawManager();
               const sun = drawManagerInstance.sceneManager.sun;
               if (getEl('sat-vmag'))
                 if (isMissileObject(sat)) {
@@ -185,7 +183,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
 
           if (catalogManagerInstance.isSensorManagerLoaded) {
             if (sensorManagerInstance.isSensorSelected()) {
-              const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+              const uiManagerInstance = keepTrackApi.getUiManager();
 
               // If we didn't just calculate next pass time for this satellite and sensor combination do it
               // TODO: Make new logic for this to allow it to be updated while selected

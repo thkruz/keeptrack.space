@@ -1,15 +1,14 @@
 /* */
 
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD } from '@app/js/lib/constants';
 import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Kilometers, Radians, TleLine1, TleLine2 } from 'ootk';
-import { keepTrackContainer } from '../../container';
-import { CatalogManager, SatObject, Singletons } from '../../interfaces';
+import { SatObject } from '../../interfaces';
 import { SpaceObjectType } from '../../lib/space-object-type';
 import { SatMath } from '../../static/sat-math';
 import { SplashScreen } from '../../static/splash-screen';
-import { DrawManager } from '../draw-manager';
 import { OcclusionProgram } from './post-processing';
 
 type MeshModel = {
@@ -274,7 +273,7 @@ export class MeshManager {
 
     // Rotate the Satellite to Face Nadir if needed
     if (this.currentMeshObject.nadirYaw !== null) {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const sat = catalogManagerInstance.getSat(this.currentMeshObject.id);
       const drawPosition = vec3.fromValues(sat.position.x, sat.position.y, sat.position.z);
 
@@ -579,7 +578,7 @@ export class MeshManager {
 
       this.updatePosition(sat.position);
 
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+      const drawManagerInstance = keepTrackApi.getDrawManager();
 
       this.currentMeshObject.inSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.eci);
       this.currentMeshObject.nadirYaw = null;

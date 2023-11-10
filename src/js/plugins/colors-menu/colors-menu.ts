@@ -1,9 +1,8 @@
 import colorsPng from '@app/img/icons/colors.png';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 import { waitForCruncher } from '@app/js/lib/waitForCruncher';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -104,7 +103,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         document
@@ -123,7 +122,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
   static colorsMenuClick = (colorName: string) => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     // TODO: Update ColorScheme interface
-    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     catalogManagerInstance.setSelectedSat(-1); // clear selected sat

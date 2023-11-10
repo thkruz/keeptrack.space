@@ -1,11 +1,9 @@
-import { Singletons, UiManager } from '@app/js/interfaces';
 import { openColorbox } from '@app/js/lib/colorbox';
 import { getEl } from '@app/js/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
 
 import photoManagerPng from '@app/img/icons/photoManager.png';
-import { keepTrackContainer } from '@app/js/container';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatellitePhotos extends KeepTrackPlugin {
@@ -40,7 +38,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('meteosat8-link').addEventListener('click', () => {
@@ -128,7 +126,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     if (propTime.getTime() < Date.now()) {
       propTime = new Date(propTime.getTime() - 1000 * 60 * 30);
     } else {
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.toast(`Can't load pictures from the future. Loading most recent photos.`, 'caution');
       propTime = new Date(Date.now() - 1000 * 60 * 30);
     }

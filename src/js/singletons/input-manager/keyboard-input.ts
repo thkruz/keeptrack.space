@@ -1,12 +1,9 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { DebugMenuPlugin } from '@app/js/plugins/debug/debug';
 import { Camera, CameraType } from '@app/js/singletons/camera';
 import eruda from 'eruda';
 import { KeyEvent } from '../input-manager';
-import { TimeManager } from '../time-manager';
 
 export class KeyboardInput {
   private isCreateClockDOMOnce_ = false;
@@ -16,7 +13,7 @@ export class KeyboardInput {
   init() {
     if (settingsManager.isDisableKeyboard) return;
 
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     const bodyDOM = window;
 
@@ -90,8 +87,8 @@ export class KeyboardInput {
     // Error Handling
     if (typeof evt.key == 'undefined') return;
 
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (uiManagerInstance.isCurrentlyTyping) return;
 

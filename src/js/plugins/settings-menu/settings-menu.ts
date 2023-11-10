@@ -1,13 +1,9 @@
 import settingsPng from '@app/img/icons/settings.png';
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { rgbCss } from '@app/js/lib/rgbCss';
 
 import { parseRgba } from '@app/js/lib/rgba';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
-import { DrawManager } from '@app/js/singletons/draw-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import $ from 'jquery'; // TODO: Remove Color Picker
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -319,7 +315,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('settings-form').addEventListener('change', SettingsMenuPlugin.onFormChange);
@@ -405,7 +401,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (this.isNotColorPickerInitialSetup) {
       settingsManager.colors[colorStr] = parseRgba(context.color);
       LegendManager.legendColorsChange();
-      const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
       try {
         localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
@@ -475,7 +471,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     e.preventDefault();
 
     const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     keepTrackApi.getSoundManager()?.play('button');
 
@@ -497,7 +493,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
     if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+      const drawManagerInstance = keepTrackApi.getDrawManager();
       drawManagerInstance.sceneManager.earth.init(settingsManager, drawManagerInstance.gl);
       drawManagerInstance.sceneManager.earth.loadHiRes();
       drawManagerInstance.sceneManager.earth.loadHiResNight();

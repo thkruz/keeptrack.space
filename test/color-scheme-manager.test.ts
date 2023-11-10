@@ -1,7 +1,6 @@
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SatObject, Singletons } from '@app/js/interfaces';
+import { SatObject } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
-import { DotsManager } from '@app/js/singletons/dots-manager';
 import { SpaceObjectType, TleLine1 } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 
@@ -89,11 +88,11 @@ describe('StandardColorSchemeManager', () => {
     colorSchemeManager = new StandardColorSchemeManager();
     colorSchemeManager.init();
 
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     dotsManagerInstance.inViewData = new Int8Array([0, 1, 1]);
     dotsManagerInstance.inSunData = new Int8Array([2, 1, 1]);
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.sensorMarkerArray = [1];
   });
 
@@ -129,7 +128,7 @@ describe('StandardColorSchemeManager', () => {
     const test = (sat: SatObject) => colorSchemeManager.default(sat);
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
 
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     dotsManagerInstance.inViewData = new Int8Array([0, 0, 0]);
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });

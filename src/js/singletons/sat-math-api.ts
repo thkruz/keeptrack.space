@@ -23,10 +23,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SatObject, SensorManager, Singletons } from "@app/js/interfaces";
-import { keepTrackContainer } from "../container";
-import { SatMath } from "../static/sat-math";
-import { TimeManager } from "./time-manager";
+import { SatObject } from '@app/js/interfaces';
+import { keepTrackApi } from '../keepTrackApi';
+import { SatMath } from '../static/sat-math';
 
 /**
  * `SatMathApi` is a singleton class that provides a wrapper around the `SatMath` class.
@@ -36,41 +35,35 @@ import { TimeManager } from "./time-manager";
  * through this class.
  */
 export class SatMathApi {
-    static getEcfOfCurrentOrbit(sat: SatObject, points: number) {
-        const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-        const cb = (offset: number) => timeManagerInstance.getOffsetTimeObj(offset);
-        return SatMath.getEcfOfCurrentOrbit(sat, points, cb);
-    }
+  static getEcfOfCurrentOrbit(sat: SatObject, points: number) {
+    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    return SatMath.getEcfOfCurrentOrbit(sat, points, cb);
+  }
 
-    static getEciOfCurrentOrbit(sat: SatObject, points: number) {
-        const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-        const cb = (offset: number) => timeManagerInstance.getOffsetTimeObj(offset);
-        return SatMath.getEciOfCurrentOrbit(sat, points, cb);
-    }
+  static getEciOfCurrentOrbit(sat: SatObject, points: number) {
+    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    return SatMath.getEciOfCurrentOrbit(sat, points, cb);
+  }
 
-    static getLlaOfCurrentOrbit(sat: SatObject, points: number) {
-        const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-        const cb = (offset: number) => timeManagerInstance.getOffsetTimeObj(offset);
-        return SatMath.getLlaOfCurrentOrbit(sat, points, cb);
-    }
+  static getLlaOfCurrentOrbit(sat: SatObject, points: number) {
+    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    return SatMath.getLlaOfCurrentOrbit(sat, points, cb);
+  }
 
-    static getLlaTimeView(now: Date, sat: SatObject): { lat: number; lon: number; time: string; inView: boolean } {
-        const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-        const sensor = sensorManagerInstance.currentSensors[0];
-        return SatMath.getLlaTimeView(now, sat, sensor);
-    }
+  static getLlaTimeView(now: Date, sat: SatObject): { lat: number; lon: number; time: string; inView: boolean } {
+    const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+    return SatMath.getLlaTimeView(now, sat, sensor);
+  }
 
-    static getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits = 1) {
-        const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-        const cb = (offset: number) => timeManagerInstance.getOffsetTimeObj(offset);
-        return SatMath.getRicOfCurrentOrbit(sat, sat2, points, cb, orbits);
-    }
+  static getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits = 1) {
+    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    return SatMath.getRicOfCurrentOrbit(sat, sat2, points, cb, orbits);
+  }
 
-    static map(sat: SatObject, i: number, pointPerOrbit = 256): { time: string; lat: number; lon: number; inView: boolean } {
-        const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-        const cb = (offset: number) => timeManagerInstance.getOffsetTimeObj(offset);
-        return SatMath.map(sat, i, cb, pointPerOrbit);
-    }
+  static map(sat: SatObject, i: number, pointPerOrbit = 256): { time: string; lat: number; lon: number; inView: boolean } {
+    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    return SatMath.map(sat, i, cb, pointPerOrbit);
+  }
 }
 
 export const satMathApi = new SatMathApi();

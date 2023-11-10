@@ -1,8 +1,7 @@
-import { StandardColorSchemeManager } from './color-scheme-manager';
-import { keepTrackContainer } from '../container';
+import { keepTrackApi } from '../keepTrackApi';
 import { GroupType, ObjectGroup } from './object-group';
 
-import { GroupsManager, Singletons } from '@app/js/interfaces';
+import { GroupsManager } from '@app/js/interfaces';
 
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
@@ -43,7 +42,7 @@ export class StandardGroupManager implements GroupsManager {
   selectGroup(group: ObjectGroup): void {
     this.changeGroup_(group).updateIsInGroup();
     group.updateOrbits();
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     colorSchemeManagerInstance.setToGroupColorScheme();
 
     this.stopUpdatingInViewSoon = false;
@@ -53,7 +52,7 @@ export class StandardGroupManager implements GroupsManager {
     this.changeGroup_(group).updateIsInGroup();
     settingsManager.isGroupOverlayDisabled = true;
 
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group);
   }
 

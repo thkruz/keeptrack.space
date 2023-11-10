@@ -1,9 +1,8 @@
 import * as echarts from 'echarts';
 
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, Singletons } from '@app/js/interfaces';
-import { EciVec3 } from 'ootk';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { SatMathApi } from '@app/js/singletons/sat-math-api';
+import { EciVec3 } from 'ootk';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -127,7 +126,7 @@ export const createEciScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, char
 export const getEciScatterData = () => {
   const NUMBER_OF_POINTS = 100;
   const data = [];
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
   let sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
   data.push({ name: sat.name, value: SatMathApi.getEciOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });

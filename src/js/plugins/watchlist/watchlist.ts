@@ -27,13 +27,12 @@ import addPng from '@app/img/add.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
 import removePng from '@app/img/remove.png';
 import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiMethods, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import saveAs from 'file-saver';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 
 export class WatchlistPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'watchlist';
@@ -110,13 +109,13 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: this.uiManagerFinal_.bind(this),
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.onCruncherReady,
+      event: KeepTrackApiEvents.onCruncherReady,
       cbName: this.PLUGIN_NAME,
       cb: this.onCruncherReady_.bind(this),
     });
@@ -299,7 +298,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   private onRemoveClicked(satId: number): void {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       if (this.watchlistList[i] === satId) {

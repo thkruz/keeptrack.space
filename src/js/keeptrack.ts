@@ -38,15 +38,13 @@ import thuleJpg from '@app/img/wallpaper/thule.jpg';
 
 import eruda from 'eruda';
 import erudaFps from 'eruda-fps';
-import * as Ootk from 'ootk';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { CatalogManager, MapManager, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
+import { CatalogManager, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
 import { isThisNode, keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
 import { getUnique } from './lib/get-unique';
 import { saveCsv, saveVariable } from './lib/saveVariable';
-import { missileManager } from './plugins/missile/missileManager';
 import { StandardSensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager } from './settings/settings';
 import { VERSION } from './settings/version.js';
@@ -64,7 +62,6 @@ import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
 import { mobileManager } from './singletons/mobileManager';
 import { StandardOrbitManager } from './singletons/orbitManager';
-import { starManager } from './singletons/starManager';
 import { TimeManager } from './singletons/time-manager';
 import { StandardUiManager } from './singletons/uiManager';
 import { CatalogLoader } from './static/catalog-loader';
@@ -80,7 +77,6 @@ export class KeepTrack {
   public isReady = false;
   private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
-  private satellite: SatMath;
   public api = {
     SatMath: SatMath,
   };
@@ -173,9 +169,8 @@ export class KeepTrack {
     if (settingsManager.cruncherReady) {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
       if (this.catalogManager.selectedSat !== -1) {
-        uiManagerInstance.updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, this.catalogManager.getSat(this.catalogManager.selectedSat));
+        keepTrackApi.getUiManager().updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, this.catalogManager.getSat(this.catalogManager.selectedSat));
       }
     }
   }
@@ -411,7 +406,7 @@ theodore.kruczek at gmail dot com.
       const drawManagerInstance = keepTrackApi.getDrawManager();
       const dotsManagerInstance = keepTrackApi.getDotsManager();
       const uiManagerInstance = keepTrackApi.getUiManager();
-      const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
       // Upodate the version number and date
       settingsManager.versionNumber = VERSION;
@@ -427,15 +422,6 @@ theodore.kruczek at gmail dot com.
       });
 
       keepTrackApi.getMainCamera().init(settingsManager);
-
-      // Add all of the imported programs to the API
-      keepTrackApi.programs = <any>{
-        mapManager: <MapManager>(<unknown>{}),
-        missileManager,
-        ootk: Ootk,
-        satellite: this.satellite,
-        starManager,
-      };
 
       SplashScreen.loadStr(SplashScreen.msg.science);
       mobileManager.init();
@@ -494,8 +480,6 @@ theodore.kruczek at gmail dot com.
   }
 
   private postStart_() {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     StandardUiManager.postStart();
 
@@ -534,7 +518,7 @@ theodore.kruczek at gmail dot com.
         settingsManager.onLoadCb();
       }
 
-      uiManagerInstance.initMenuController();
+      keepTrackApi.getUiManager().initMenuController();
 
       // Update MaterialUI with new menu options
       try {
@@ -554,10 +538,9 @@ theodore.kruczek at gmail dot com.
   }
 
   private update_(dt?: Milliseconds) {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     drawManagerInstance.dt = dt;
     drawManagerInstance.dtAdjusted = <Milliseconds>(Math.min(drawManagerInstance.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
@@ -583,7 +566,7 @@ theodore.kruczek at gmail dot com.
     }
 
     // Update Draw Positions
-    dotsManagerInstance.updatePositionBuffer();
+    keepTrackApi.getDotsManager().updatePositionBuffer();
   }
 }
 

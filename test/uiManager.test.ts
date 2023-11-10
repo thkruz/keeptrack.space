@@ -1,5 +1,5 @@
-import { keepTrackContainer } from '@app/js/container';
-import { GeolocationPosition, SensorManager, Singletons } from '@app/js/interfaces';
+import { GeolocationPosition } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { StandardUiManager } from '@app/js/singletons/uiManager';
 import { UiGeolocation } from '@app/js/static/ui-manager-geolocation';
@@ -25,7 +25,7 @@ describe('uiManager', () => {
     <div id="sensor-minrange"></div>
     <div id="sensor-maxrange"></div>
     `;
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
     sensorManagerInstance.currentSensors = [defaultSensor];
   });
 

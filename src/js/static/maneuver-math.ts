@@ -1,6 +1,6 @@
-import { CatalogManager, SatObject, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
+import { SatObject } from '@app/js/interfaces';
 import { SatelliteRecord, Sgp4, TleLine1, TleLine2, Transforms } from 'ootk';
-import { keepTrackContainer } from '../container';
+import { keepTrackApi } from '../keepTrackApi';
 import { StringPad } from '../lib/stringPad';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { OrbitFinder } from '../singletons/orbit-finder';
@@ -13,10 +13,10 @@ import { SensorMath } from './sensor-math';
  */
 export abstract class ManueverMath {
   public static createManeuverAnalyst = (satId: number, incVariation: number, meanmoVariation: number, rascVariation: number) => {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (sensorManagerInstance.currentSensors?.length == 0) throw new Error('No sensors selected');
 
@@ -112,7 +112,7 @@ export abstract class ManueverMath {
   };
 
   public static findChangeOrbitToDock = (sat: SatObject, sat2: SatObject, propLength: number) => {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     let closestInc = 0;
     let closestRaan = 0;
     let closestMeanMo = 1;

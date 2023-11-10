@@ -11,7 +11,6 @@ import { SettingsManager } from '../settings/settings';
 import { GlUtils } from '../static/gl-utils';
 import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
-import { StandardColorSchemeManager } from './color-scheme-manager';
 import { DotsManager } from './dots-manager';
 import { Box as SearchBox } from './draw-manager/cube';
 import { Earth } from './draw-manager/earth';
@@ -365,7 +364,7 @@ export class StandardDrawManager implements DrawManager {
   public orbitsAbove() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     if (
       keepTrackApi.getMainCamera().cameraType == CameraType.ASTRONOMY ||
@@ -650,7 +649,7 @@ export class StandardDrawManager implements DrawManager {
     if (this.settings_.startWithOrbitsDisplayed) {
       const groupsManagerInstance = keepTrackApi.getGroupsManager();
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
       // All Orbits
       groupsManagerInstance.groupList['debris'] = groupsManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');

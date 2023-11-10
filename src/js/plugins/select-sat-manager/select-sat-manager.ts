@@ -5,7 +5,6 @@ import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { CameraType } from '@app/js/singletons/camera';
 
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 
@@ -25,7 +24,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: 'updateLoop',
+      event: 'updateLoop',
       cbName: 'selectSatManager',
       cb: this.checkIfSelectSatVisible.bind(this),
     });
@@ -93,7 +92,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // If deselecting an object
     if (satId === -1) {
-      const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
       if (
         colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group ||
         (typeof (<HTMLInputElement>getEl('search'))?.value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)

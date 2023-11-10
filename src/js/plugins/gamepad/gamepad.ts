@@ -1,9 +1,10 @@
 /* eslint-disable class-methods-use-this */
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { CameraType } from '@app/js/singletons/camera';
 import { Radians } from 'ootk';
 
 export class GamepadPlugin {
+  PLUGIN_NAME = 'Gamepad';
   currentController: Gamepad;
   deadzone = 0.55;
   buttonsPressedHistory: number[] = [];
@@ -15,8 +16,8 @@ export class GamepadPlugin {
         this.initializeGamepad(e.gamepad);
       } else {
         keepTrackApi.register({
-          method: 'uiManagerInit',
-          cbName: 'gamepad',
+          event: KeepTrackApiEvents.uiManagerInit,
+          cbName: this.PLUGIN_NAME,
           cb: () => this.initializeGamepad(e.gamepad),
         });
       }
@@ -33,8 +34,8 @@ export class GamepadPlugin {
     // Only initialize once
     if (!this.currentController) {
       keepTrackApi.register({
-        method: 'updateLoop',
-        cbName: 'gamepad',
+        event: KeepTrackApiEvents.updateLoop,
+        cbName: this.PLUGIN_NAME,
         cb: this.updateGamepad.bind(this),
       });
     }

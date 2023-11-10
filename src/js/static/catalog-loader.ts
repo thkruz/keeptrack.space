@@ -5,7 +5,7 @@ import { StringPad } from '@app/js/lib/stringPad';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { TleLine1, TleLine2 } from 'ootk';
-import { KeepTrackApiMethods, keepTrackApi } from '../keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { FormatTle } from './format-tle';
 
@@ -74,7 +74,7 @@ export class CatalogLoader {
 
     if (settingsManager.isExtraSatellitesAdded) {
       keepTrackApi.register({
-        method: KeepTrackApiMethods.uiManagerFinal,
+        event: KeepTrackApiEvents.uiManagerFinal,
         cbName: 'CatalogLoader',
         cb: () => {
           try {

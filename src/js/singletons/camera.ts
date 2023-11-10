@@ -20,11 +20,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { CatalogManager, OrbitManager, SatObject, SatShader, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
+import { OrbitManager, SatObject, SatShader } from '@app/js/interfaces';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
-import { keepTrackContainer } from '../container';
 import { keepTrackApi } from '../keepTrackApi';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
@@ -32,10 +31,7 @@ import { SettingsManager } from '../settings/settings';
 import { CoordinateTransforms } from '../static/coordinate-transforms';
 import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
-import { DrawManager } from './draw-manager';
 import { errorManagerInstance } from './errorManager';
-import { InputManager } from './input-manager';
-import { TimeManager } from './time-manager';
 
 declare module '@app/js/interfaces' {
   interface SatShader {
@@ -296,8 +292,8 @@ export class Camera {
   }
 
   public changeCameraType(orbitManager: OrbitManager) {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     if (this.cameraType === CameraType.PLANETARIUM) {
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
@@ -324,7 +320,7 @@ export class Camera {
     }
 
     if (this.cameraType === CameraType.MAX_CAMERA_TYPES) {
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+      const drawManagerInstance = keepTrackApi.getDrawManager();
 
       this.isLocalRotateReset = true;
       this.settings_.fieldOfView = 0.6;
@@ -388,7 +384,7 @@ export class Camera {
       // getEl('fov-text').innerHTML = 'FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg';
       if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
       if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+      const drawManagerInstance = keepTrackApi.getDrawManager();
       drawManagerInstance.glInit();
     }
   }
@@ -419,7 +415,7 @@ export class Camera {
 
     let gmst: GreenwichMeanSiderealTime;
     if (!sensorPos?.gmst) {
-      const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+      const timeManagerInstance = keepTrackApi.getTimeManager();
       gmst = sensorPos?.gmst ?? SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
     } else {
       gmst = sensorPos.gmst;
@@ -592,7 +588,7 @@ export class Camera {
   public init(settings: SettingsManager) {
     this.settings_ = settings;
 
-    const inputManager = keepTrackContainer.get<InputManager>(Singletons.InputManager);
+    const inputManager = keepTrackApi.getInputManager();
     const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'I', 'J', 'K', 'L', 'Q', 'E', 'R', 'C'];
     keysDown.forEach((key) => {
       inputManager.keyboard.registerKeyDownEvent({
@@ -610,8 +606,8 @@ export class Camera {
   }
 
   public keyDownC_() {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     this.changeCameraType(orbitManagerInstance);
 
@@ -1323,7 +1319,7 @@ export class Camera {
     if (this.isScreenPan || this.isWorldPan || this.isPanReset) {
       // If user is actively moving
       if (this.isScreenPan || this.isWorldPan) {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         this.camPitchSpeed = 0;
         this.camYawSpeed = 0;
         this.panDif_.x = this.screenDragPoint[0] - this.mouseX;

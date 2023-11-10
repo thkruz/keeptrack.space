@@ -21,11 +21,8 @@
  */
 
 import sat2Png from '@app/img/icons/sat2.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, Singletons, UiManager } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -65,7 +62,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.changeSensorMarkers,
+      event: KeepTrackApiEvents.changeSensorMarkers,
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {
@@ -76,7 +73,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   }
 
   private disableFovView_() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     settingsManager.isSatOverflyModeOn = false;
     this.setBottomIconToUnselected();
@@ -110,9 +107,9 @@ export class SatelliteFov extends KeepTrackPlugin {
   }
 
   private enableFovView_() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     keepTrackApi.methods.changeSensorMarkers(this.PLUGIN_NAME);
 

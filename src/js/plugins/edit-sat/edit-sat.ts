@@ -1,5 +1,5 @@
 import editPng from '@app/img/icons/edit.png';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
@@ -7,8 +7,7 @@ import { StringPad } from '@app/js/lib/stringPad';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { saveAs } from 'file-saver';
 
-import { keepTrackContainer } from '@app/js/container';
-import { GetSatType, OrbitManager, Singletons, UiManager } from '@app/js/interfaces';
+import { GetSatType } from '@app/js/interfaces';
 import { OrbitFinder } from '@app/js/singletons/orbit-finder';
 import { TimeManager } from '@app/js/singletons/time-manager';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
@@ -142,7 +141,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'editSat',
       cb: () => {
         getEl('editSat-newTLE').addEventListener('click', EditSatPlugin.editSatNewTleClick);
@@ -194,7 +193,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
   rmbCallback: (targetId: string, clickedSat?: number) => void = (_targetId: string, clickedSat?: number): void => {
     if (typeof clickedSat === 'undefined' || clickedSat === null) throw new Error('clickedSat is undefined');
 
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     keepTrackApi.getCatalogManager().setSelectedSat(clickedSat);
     if (!this.isMenuButtonEnabled) {
@@ -226,9 +225,9 @@ export class EditSatPlugin extends KeepTrackPlugin {
       return;
     }
 
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     const object = JSON.parse(<string>evt.target.result);
     const scc = parseInt(StringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
@@ -285,8 +284,8 @@ export class EditSatPlugin extends KeepTrackPlugin {
   }
 
   static editSatNewTleClickFadeIn() {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     try {
       // Update Satellite TLE so that Epoch is Now but ECI position is very very close
@@ -333,7 +332,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
         TLE1: TLE1,
         TLE2: TLE2,
       });
-      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
       //
       // Reload Menu with new TLE
@@ -365,8 +364,8 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
   static editSatSubmit() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     getEl(`${EditSatPlugin.elementPrefix}-error`).style.display = 'none';
     const scc = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value;
@@ -402,7 +401,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
         TLE1: TLE1,
         TLE2: TLE2,
       });
-      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
       sat.active = true;
 

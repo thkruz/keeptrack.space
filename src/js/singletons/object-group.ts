@@ -1,5 +1,4 @@
-import { keepTrackContainer } from '../container';
-import { CatalogManager, GetSatType, MissileObject, SatObject, Singletons } from '../interfaces';
+import { GetSatType, MissileObject, SatObject } from '../interfaces';
 import { CatalogSearch } from '../static/catalog-search';
 import { keepTrackApi } from './../keepTrackApi';
 
@@ -113,7 +112,7 @@ export class ObjectGroup {
   };
 
   updateIsInGroup(): this {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     this.objects.forEach((id: number) => {
       catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY).isInGroup = true;
@@ -124,7 +123,7 @@ export class ObjectGroup {
 
   clear(): this {
     if (this.objects.length === 0) return this;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     this.objects.forEach((id: number) => {
       catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY).isInGroup = false;

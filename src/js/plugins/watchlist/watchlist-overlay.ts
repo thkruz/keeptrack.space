@@ -1,6 +1,6 @@
 import infoPng from '@app/img/icons/info.png';
 import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants';
 import { dateFormat } from '@app/js/lib/dateFormat';
 import { getEl } from '@app/js/lib/get-el';
@@ -94,17 +94,17 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: 'updateLoop',
+      event: 'updateLoop',
       cbName: 'watchlist',
       cb: this.updateLoop.bind(this),
     });
     keepTrackApi.register({
-      method: KeepTrackApiMethods.onWatchlistUpdated,
+      event: KeepTrackApiEvents.onWatchlistUpdated,
       cbName: this.PLUGIN_NAME,
       cb: this.onWatchlistUpdated_.bind(this),
     });
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: WatchlistOverlay.uiManagerFinal.bind(this),
     });

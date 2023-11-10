@@ -1,12 +1,10 @@
 import gpsPng from '@app/img/icons/gps.png';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, GroupsManager, SatObject, Singletons } from '@app/js/interfaces';
+import { CatalogManager, GroupsManager, SatObject } from '@app/js/interfaces';
 import { GroupType } from '@app/js/singletons/object-group';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
 import { DopMath } from '@app/js/static/dop-math';
 import { Degrees, Kilometers } from 'ootk';
@@ -134,7 +132,7 @@ export class DopsPlugin extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('dops-form').addEventListener('submit', (e: Event) => {
@@ -146,9 +144,9 @@ export class DopsPlugin extends KeepTrackPlugin {
   }
 
   static updateSideMenu(): void {
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const lat = <Degrees>parseFloat(<string>(<HTMLInputElement>getEl('dops-lat')).value);
     const lon = <Degrees>parseFloat(<string>(<HTMLInputElement>getEl('dops-lon')).value);

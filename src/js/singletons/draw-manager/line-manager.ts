@@ -1,8 +1,9 @@
 /* eslint-disable camelcase */
-import { CatalogManager, GetSatType, SatObject, SensorManager, Singletons } from '@app/js/interfaces';
+import { GetSatType, SatObject, Singletons } from '@app/js/interfaces';
 import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { mat4, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { keepTrackContainer } from '../../container';
@@ -10,7 +11,6 @@ import { EciArr3 } from '../../interfaces';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { GlUtils } from '../../static/gl-utils';
 import { SensorMath } from '../../static/sensor-math';
-import { DotsManager } from '../dots-manager';
 import { DrawManager } from '../draw-manager';
 import { Line } from './line-manager/line';
 
@@ -100,8 +100,7 @@ export class LineManager {
   // #region Constructors (1)
 
   init() {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    this.gl_ = drawManagerInstance.gl;
+    this.gl_ = keepTrackApi.getDrawManager().gl;
     this.initProgram_();
   }
 
@@ -167,7 +166,7 @@ export class LineManager {
   // Splitting it into subfunctions would not be optimal
   // prettier-ignore
   public create(type: LineTypes, value: number[] | number, inputColor?: LineColors): void { // NOSONAR
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const getSat = catalogManagerInstance.getSat.bind(catalogManagerInstance);
     let sat = null;
     let sat2 = null;
@@ -453,7 +452,7 @@ export class LineManager {
     gl.enableVertexAttribArray(this.attribs_.a_position); // Enable
 
     if (this.drawLineList.length == 0) return;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     for (let i = 0; i < this.drawLineList.length; i++) {
       try {
@@ -475,7 +474,7 @@ export class LineManager {
                 continue;
               }
               if (this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV) {
-                const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+                const sensorManagerInstance = keepTrackApi.getSensorManager();
                 Object.keys(sensorManagerInstance.sensors).forEach((key) => {
                   const sensor = sensorManagerInstance.sensors[key];
                   if (sensor.name == this.drawLineList[i].sat2.name) {
@@ -582,7 +581,7 @@ export class LineManager {
           this.drawLineList[i].star2 != null
         ) {
           // Constellation
-          const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+          const dotsManagerInstance = keepTrackApi.getDotsManager();
           const starIdx1 = dotsManagerInstance.starIndex1;
           const starIdx2 = dotsManagerInstance.starIndex2;
 
@@ -610,7 +609,7 @@ export class LineManager {
       }
 
       // When multiple sensors are selected it will keep creating new lines so we have to purge them
-      const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+      const sensorManagerInstance = keepTrackApi.getSensorManager();
       if (sensorManagerInstance.currentSensors.length > 1 && this.drawLineList[i].isOnlyInFOV && !this.drawLineList[i].isDrawWhenSelected) {
         this.drawLineList.splice(i, 1);
       }

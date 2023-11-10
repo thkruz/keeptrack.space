@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { StandardGroupManager } from '@app/js/singletons/groups-manager';
 import { keepTrackContainer } from '../src/js/container';
-import { CatalogManager, GroupsManager, Singletons } from '../src/js/interfaces';
+import { Singletons } from '../src/js/interfaces';
 import { CountriesMenu } from './../src/js/plugins/countries/countries';
 import { defaultSat } from './environment/apiMocks';
 import { mockUiManager, setupDefaultHtml } from './environment/standard-env';
@@ -30,7 +30,7 @@ describe('CountriesMenu_class', () => {
 
   // Tests that groupSelected selects group and populates searchDOM
   it('test_group_selected_selects_group_and_populates_search_dom', () => {
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
     const uiManagerInstance = mockUiManager;
     uiManagerInstance.searchManager.doSearch = jest.fn();
     groupManagerInstance.selectGroup = jest.fn();
@@ -44,8 +44,8 @@ describe('CountriesMenu_class', () => {
   // Tests that groupSelected fills result box and clears selected sat
   it('test_group_selected_fills_result_box_and_clears_selected_sat', () => {
     settingsManager.searchLimit = 10;
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     // const uiManagerInstance = mockUiManager;
     // uiManagerInstance.searchManager.fillResultBox = jest.fn();
     catalogManagerInstance.setSelectedSat = jest.fn();
@@ -58,7 +58,7 @@ describe('CountriesMenu_class', () => {
 
   // Tests that countryMenuClick_ creates group if it doesn't exist
   it('test_group_selected_creates_group_if_it_doesnt_exist', () => {
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
     groupManagerInstance.selectGroup = jest.fn();
     groupManagerInstance.createGroup = jest.fn();
     groupManagerInstance.groupList = [];

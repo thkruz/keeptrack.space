@@ -1,7 +1,6 @@
 import breakupPng from '@app/img/icons/breakup.png';
-import { keepTrackContainer } from '@app/js/container';
-import { GetSatType, OrbitManager, SatObject, Singletons } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { GetSatType, SatObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 import { StringPad } from '@app/js/lib/stringPad';
@@ -143,7 +142,7 @@ export class Breakup extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('breakup').addEventListener('submit', (e: Event) => {
@@ -154,7 +153,7 @@ export class Breakup extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (!sat?.sccNum) {
@@ -220,7 +219,7 @@ export class Breakup extends KeepTrackPlugin {
       TLE1: TLE1,
       TLE2: TLE2,
     });
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
     orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
 
     const meanmoVariation = parseFloat(<string>(<HTMLInputElement>getEl('hc-per')).value);

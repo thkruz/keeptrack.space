@@ -1,9 +1,8 @@
-/* eslint-disable no-unreachable */
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
- * main.js is the primary javascript file for keeptrack.space. It manages all user
- * interaction with the application.
+ * main.ts is a TypeScript implementation of the KeepTrack class. This is responsible for
+ * initializing the website.
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
@@ -35,9 +34,11 @@ declare global {
   }
 }
 
-// Load the main website
+// Load the main website class
 const keepTrack = new KeepTrack(window.settingsOverride);
+// Expose to window for debugging
 window.keepTrack = keepTrack;
+// Initialize the website
 KeepTrack.initCss().then(() => {
   keepTrack.init();
 });

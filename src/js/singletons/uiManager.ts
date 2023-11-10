@@ -25,12 +25,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { CatalogManager, ColorRuleSet, SatObject, SensorObject, Singletons, ToastMsgType, UiManager } from '@app/js/interfaces';
+import { ColorRuleSet, SatObject, SensorObject, ToastMsgType, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { loadJquery } from '@app/js/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
-import { keepTrackContainer } from '../container';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
 import { closeColorbox } from '../lib/colorbox';
 import { MILLISECONDS_PER_SECOND } from '../lib/constants';
@@ -40,7 +39,6 @@ import { rgbCss } from '../lib/rgbCss';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
-import { StandardColorSchemeManager } from './color-scheme-manager';
 import { errorManagerInstance } from './errorManager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
@@ -190,27 +188,27 @@ export class StandardUiManager implements UiManager {
     switch (type) {
       case 'standby':
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
-        keepTrackApi.programs.soundManager?.play('standby');
+        keepTrackApi.getSoundManager()?.play('standby');
         break;
       case 'normal':
         toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
-        keepTrackApi.programs.soundManager?.play('standby');
+        keepTrackApi.getSoundManager()?.play('standby');
         break;
       case 'caution':
         toastMsg.$el[0].style.background = 'var(--statusDarkCaution)';
-        keepTrackApi.programs.soundManager?.play('standby');
+        keepTrackApi.getSoundManager()?.play('standby');
         break;
       case 'serious':
         toastMsg.$el[0].style.background = 'var(--statusDarkSerious)';
-        keepTrackApi.programs.soundManager?.play('standby');
+        keepTrackApi.getSoundManager()?.play('standby');
         break;
       case 'critical':
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
-        keepTrackApi.programs.soundManager?.play('standby');
+        keepTrackApi.getSoundManager()?.play('standby');
         break;
       case 'error':
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
-        keepTrackApi.programs.soundManager?.play('error');
+        keepTrackApi.getSoundManager()?.play('error');
         break;
     }
 
@@ -365,7 +363,7 @@ export class StandardUiManager implements UiManager {
     // const MenuSelectable = document.querySelector('.menu-selectable');
     // MenuSelectable &&
     //   MenuSelectable.addEventListener('click', () => {
-    //     const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    //     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     //     if (catalogManagerInstance.selectedSat !== -1) {
     //       getEl('menu-lookangles').classList.remove('bmenu-item-disabled');
     //       getEl('menu-satview').classList.remove('bmenu-item-disabled');
@@ -447,7 +445,7 @@ export class StandardUiManager implements UiManager {
         return;
       }
 
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const sat = catalogManagerInstance.getSat(satId);
       if (sat.type === SpaceObjectType.STAR) {
         catalogManagerInstance.panToStar(sat);
@@ -484,7 +482,7 @@ export class StandardUiManager implements UiManager {
   }
 
   legendHoverMenuClick(legendType?: string) {
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     console.log(this.isUiVisible);
     const slug = legendType.split('-')[1];

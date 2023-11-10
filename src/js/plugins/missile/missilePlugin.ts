@@ -1,12 +1,9 @@
 import missilePng from '@app/img/icons/missile.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, OrbitManager, Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 import { showLoading } from '@app/js/lib/showLoading';
 import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
-import { TimeManager } from '@app/js/singletons/time-manager';
 
 import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 
@@ -19,7 +16,7 @@ let i = 0;
 
 export const updateLoop = (): void => {
   if (typeof missileManagerInstance != 'undefined' && missileManagerInstance.missileArray.length > 0) {
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
     for (i = 0; i < missileManagerInstance.missileArray.length; i++) {
       orbitManagerInstance.updateOrbitBuffer(missileManagerInstance.missileArray[i].id);
     }
@@ -32,7 +29,7 @@ export const hideSideMenus = (): void => {
 };
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-missile') {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     if (isMissileMenuOpen) {
       isMissileMenuOpen = false;
       uiManagerInstance.hideSideMenus();
@@ -68,8 +65,8 @@ export const msTargetChange = () => {
 };
 export const missileSubmit = (): void => {
   showLoading(() => {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     getEl('ms-error').style.display = 'none';
     const type = parseFloat((<HTMLInputElement>getEl('ms-type')).value);
@@ -147,7 +144,7 @@ export const missileSubmit = (): void => {
 
       let a: number;
       let b: number;
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       if (attacker < 200) {
         // USA
@@ -492,7 +489,7 @@ export const uiManagerInit = (): void => {
 };
 
 export const searchForRvs = () => {
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const uiManagerInstance = keepTrackApi.getUiManager();
   uiManagerInstance.doSearch('RV_');
 };
 
@@ -515,39 +512,39 @@ export const uiManagerFinal = (): void => {
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    method: 'uiManagerInit',
+    event: 'uiManagerInit',
     cbName: 'missile',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    method: 'uiManagerFinal',
+    event: 'uiManagerFinal',
     cbName: 'missile',
     cb: uiManagerFinal,
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    method: 'bottomMenuClick',
+    event: 'bottomMenuClick',
     cbName: 'missile',
     cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
-    method: 'hideSideMenus',
+    event: 'hideSideMenus',
     cbName: 'missile',
     cb: hideSideMenus,
   });
 
   // Missile oribts have to be updated every draw or they quickly become innacurate
   keepTrackApi.register({
-    method: 'updateLoop',
+    event: 'updateLoop',
     cbName: 'updateMissileOrbits',
     cb: updateLoop,
   });
 
   keepTrackApi.register({
-    method: 'onHelpMenuClick',
+    event: 'onHelpMenuClick',
     cbName: 'missile',
     cb: onHelpMenuClick,
   });

@@ -3,7 +3,7 @@ import * as gremlins from 'gremlins.js';
 import { getEl } from '@app/js/lib/get-el';
 
 import debugPng from '@app/img/icons/debug.png';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 
 import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
 import eruda from 'eruda';
@@ -92,7 +92,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: (): void => {
         getEl('debug-console').addEventListener('click', () => {
@@ -142,7 +142,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.updateLoop,
+      event: KeepTrackApiEvents.updateLoop,
       cbName: this.PLUGIN_NAME,
       cb: (): void => {
         if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) return;

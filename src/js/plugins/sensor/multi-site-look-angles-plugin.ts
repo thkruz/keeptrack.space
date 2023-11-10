@@ -1,6 +1,6 @@
 import multiSitePng from '@app/img/icons/multi-site.png';
 import { GetSatType, SatObject, SensorObject } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
 import { dateFormat } from '@app/js/lib/dateFormat';
 import { getEl } from '@app/js/lib/get-el';
@@ -9,7 +9,7 @@ import { showLoading } from '@app/js/lib/showLoading';
 import { SatMath } from '@app/js/static/sat-math';
 import { TearrData } from '@app/js/static/sensor-math';
 import { Degrees, Kilometers, SatelliteRecord, Seconds } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { StandardSensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   isRequireSatelliteSelected: boolean = true;
@@ -68,7 +68,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('multi-site-look-angles-export')?.addEventListener('click', () => {
@@ -85,7 +85,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (this.isMenuButtonEnabled && (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected())) {
@@ -105,7 +105,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.staticOffsetChange,
+      event: KeepTrackApiEvents.staticOffsetChange,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         this.refreshSideMenuData();

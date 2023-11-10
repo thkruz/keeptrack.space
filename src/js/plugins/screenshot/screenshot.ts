@@ -24,10 +24,7 @@
  */
 
 import cameraPng from '@app/img/icons/camera.png';
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
-import { DrawManager } from '@app/js/singletons/draw-manager';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { Classification, ClassificationString } from '@app/js/static/classification';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -101,13 +98,13 @@ export class Screenshot extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.altCanvasResize,
+      event: KeepTrackApiEvents.altCanvasResize,
       cbName: this.PLUGIN_NAME,
       cb: () => this.queuedScreenshot_,
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.endOfDraw,
+      event: KeepTrackApiEvents.endOfDraw,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         if (this.queuedScreenshot_) this.takeScreenShot();
@@ -137,7 +134,7 @@ export class Screenshot extends KeepTrackPlugin {
   }
 
   private static watermarkedDataUrl(text: string) {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     const canvas = drawManagerInstance.canvas;
 
     const tempCanvas = document.createElement('canvas');

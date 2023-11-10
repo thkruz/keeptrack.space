@@ -19,7 +19,7 @@
  */
 
 import { SensorGeolocation } from '@app/js/interfaces';
-import { KeepTrackApiMethods, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { ClassificationString } from '../static/classification';
@@ -1390,7 +1390,7 @@ export class SettingsManager {
             break;
           case 'sat':
             keepTrackApi.register({
-              method: KeepTrackApiMethods.onCruncherReady,
+              event: KeepTrackApiEvents.onCruncherReady,
               cbName: 'satFromSettings',
               cb: () => {
                 setTimeout(() => {
@@ -1513,7 +1513,7 @@ export class SettingsManager {
     this.colors.unknown = [0.5, 0.5, 0.5, 0.1];
     this.colors.pink = [0.5, 0.5, 0.5, 0.1];
     keepTrackApi.register({
-      method: KeepTrackApiMethods.onCruncherReady,
+      event: KeepTrackApiEvents.onCruncherReady,
       cbName: 'satFromSettings',
       cb: () => {
         keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());

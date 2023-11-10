@@ -1,5 +1,5 @@
 import recorderPng from '@app/img/icons/video.png';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { StreamManager } from './stream-manager';
@@ -46,7 +46,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerOnReady,
+      event: KeepTrackApiEvents.uiManagerOnReady,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         try {

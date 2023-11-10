@@ -5,7 +5,6 @@ import {
   ColorSchemeManager,
   Constructor,
   GroupsManager,
-  KeepTrackPrograms,
   MissileObject,
   OrbitManager,
   SatObject,
@@ -19,11 +18,13 @@ import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
+import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
 import { DotsManager } from './singletons/dots-manager';
 import { DrawManager } from './singletons/draw-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
+import { StarManager } from './singletons/starManager';
 import { TimeManager } from './singletons/time-manager';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
@@ -44,21 +45,42 @@ declare global {
   }
 }
 
-export const register = (params: { method: KeepTrackApiMethods | string; cbName: string; cb: any }) => {
+export type KeepTrackApiRegisterParams = {
+  event: KeepTrackApiEvents | string;
+  cbName: string;
+  cb:
+    | ((iconName: string) => void)
+    | (() => void)
+    | (() => boolean)
+    | ((sat: SatObject, satId: number) => void)
+    | ((sensor: SensorObject) => void)
+    | ((gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => void)
+    | ((sensor: SensorObject | string, staticNum: number) => void);
+};
+
+/**
+ * Registers a callback function for a specific event.
+ * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
+ * @param {string} params.cbName - The name of the callback function.
+ * @param params.cb - The callback function to register.
+ * @throws An error if the event is invalid.
+ */
+export const register = (params: KeepTrackApiRegisterParams) => {
   // If this is a valid callback
-  if (typeof keepTrackApi.callbacks[params.method] !== 'undefined') {
+  if (typeof keepTrackApi.callbacks[params.event] !== 'undefined') {
+    // TODO: Pass the parameters to a validation function to ensure they are correct
     // Add the callback
-    keepTrackApi.callbacks[params.method].push({ name: params.cbName, cb: params.cb });
+    keepTrackApi.callbacks[params.event].push({ name: params.cbName, cb: params.cb });
   } else {
-    throw new Error(`Invalid callback "${params.method}"!`);
+    throw new Error(`Invalid callback "${params.event}"!`);
   }
 };
-export const unregister = (params: { method: string; cbName: string }) => {
+export const unregister = (params: { event: string; cbName: string }) => {
   // If this is a valid callback
-  if (typeof keepTrackApi.callbacks[params.method] !== 'undefined') {
-    for (let i = 0; i < keepTrackApi.callbacks[params.method].length; i++) {
-      if (keepTrackApi.callbacks[params.method][i].name == params.cbName) {
-        keepTrackApi.callbacks[params.method].splice(i, 1);
+  if (typeof keepTrackApi.callbacks[params.event] !== 'undefined') {
+    for (let i = 0; i < keepTrackApi.callbacks[params.event].length; i++) {
+      if (keepTrackApi.callbacks[params.event][i].name == params.cbName) {
+        keepTrackApi.callbacks[params.event].splice(i, 1);
         return;
       }
     }
@@ -66,7 +88,7 @@ export const unregister = (params: { method: string; cbName: string }) => {
     throw new Error(`Callback "${params.cbName} not found"!`);
   } else {
     // Couldn't find the method
-    throw new Error(`Invalid callback "${params.method}"!`);
+    throw new Error(`Invalid callback "${params.event}"!`);
   }
 };
 /**
@@ -173,7 +195,6 @@ export const keepTrackApi = {
     selectSatData: (sat: SatObject, satId: number) => {
       keepTrackApi.getSoundManager()?.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
-      window.M.AutoInit();
     },
     onKeepTrackReady: () => {
       keepTrackApi.callbacks.onKeepTrackReady.forEach((cb: any) => cb.cb());
@@ -251,7 +272,6 @@ export const keepTrackApi = {
       keepTrackApi.callbacks.staticOffsetChange.forEach((cb: any) => cb.cb(staticOffset));
     },
   },
-  programs: <KeepTrackPrograms>{},
   loadedPlugins: <KeepTrackPlugin[]>[],
   getPlugin: (pluginClass: Constructor<KeepTrackPlugin>) => {
     if (keepTrackApi.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass))
@@ -260,6 +280,7 @@ export const keepTrackApi = {
   },
   rmbMenuItems: <rmbMenuItem[]>[],
   getSoundManager: () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager),
+  getStarManager: () => keepTrackContainer.get<StarManager>(Singletons.StarManager),
   getDrawManager: () => keepTrackContainer.get<DrawManager>(Singletons.DrawManager),
   getCatalogManager: () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager),
   getSensorManager: () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager),
@@ -268,7 +289,7 @@ export const keepTrackApi = {
   getGroupsManager: () => keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager),
   getTimeManager: () => keepTrackContainer.get<TimeManager>(Singletons.TimeManager),
   getOrbitManager: () => keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager),
-  getColorSchemeManager: () => keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager),
+  getColorSchemeManager: () => <StandardColorSchemeManager>(<unknown>keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager)),
   getDotsManager: () => keepTrackContainer.get<DotsManager>(Singletons.DotsManager),
   getSensorMath: () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath),
   getLineManager: () => keepTrackContainer.get<LineManager>(Singletons.LineManager),
@@ -277,7 +298,10 @@ export const keepTrackApi = {
   getMainCamera: () => keepTrackContainer.get<Camera>(Singletons.MainCamera),
 };
 
-export enum KeepTrackApiMethods {
+/**
+ * Enum containing the registrable events used in the KeepTrack API.
+ */
+export enum KeepTrackApiEvents {
   onHelpMenuClick = 'onHelpMenuClick',
   /**
    * Run at the end of catalogManager.selectSat with parameters (sat: SatObject, satId: number)
@@ -318,10 +342,15 @@ export enum KeepTrackApiMethods {
   staticOffsetChange = 'staticOffsetChange',
 }
 
-export const isSensorObject = (sat: SatObject | MissileObject | SensorObject): boolean =>
+/**
+ * Represents an object that can be in the catalog, such as a satellite, missile, or sensor.
+ */
+type CatalogObject = SatObject | MissileObject | SensorObject;
+
+export const isSensorObject = (sat: CatalogObject): boolean =>
   !!((<SensorObject>sat).observerGd?.lat || (<SensorObject>sat).observerGd?.lon || (<SensorObject>sat).observerGd?.alt);
-export const isMissileObject = (sat: SatObject | MissileObject | SensorObject): boolean => !!(<MissileObject>sat).missile;
-export const isSatObject = (sat: SatObject | MissileObject | SensorObject): boolean => {
+export const isMissileObject = (sat: CatalogObject): boolean => !!(<MissileObject>sat).missile;
+export const isSatObject = (sat: CatalogObject): boolean => {
   if (!sat) return false;
 
   return !!((<SatObject>sat).sccNum || (<SatObject>sat).intlDes);

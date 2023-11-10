@@ -1,11 +1,9 @@
 import iodPng from '@app/img/icons/iod.png';
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons, UiManager } from '@app/js/interfaces';
+import { UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
 import { omManager } from '@app/js/plugins/initial-orbit/om-manager';
-import { TimeManager } from '@app/js/singletons/time-manager';
 
 import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 import { helpBodyTextInitOrbit, helpTitleTextInitOrbit } from './help';
@@ -14,32 +12,32 @@ let isObfitMenuOpen = false;
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    method: 'uiManagerInit',
+    event: 'uiManagerInit',
     cbName: 'initialOrbit',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    method: 'uiManagerFinal',
+    event: 'uiManagerFinal',
     cbName: 'initialOrbit',
     cb: uiManagerFinal,
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    method: 'bottomMenuClick',
+    event: 'bottomMenuClick',
     cbName: 'initialOrbit',
     cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
-    method: 'hideSideMenus',
+    event: 'hideSideMenus',
     cbName: 'initialOrbit',
     cb: hideSideMenus,
   });
 
   keepTrackApi.register({
-    method: 'onHelpMenuClick',
+    event: 'onHelpMenuClick',
     cbName: 'initialOrbit',
     cb: onHelpMenuClick,
   });
@@ -231,7 +229,7 @@ export const uiManagerFinal = (): void => {
 
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-obfit') {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (isObfitMenuOpen) {
       isObfitMenuOpen = false;
@@ -250,9 +248,8 @@ export const bottomMenuClick = (iconName: string): void => {
 
 // prettier-ignore
 export const obfitFormSubmit = (e: any) => { // NOSONAR
-  const { satellite } = keepTrackApi.programs;
-  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const timeManagerInstance = keepTrackApi.getTimeManager();
+  const uiManagerInstance = keepTrackApi.getUiManager();
 
   let isOb2 = false;
   let isOb3 = false;
@@ -320,7 +317,7 @@ export const obfitFormSubmit = (e: any) => { // NOSONAR
   isOb3 = _isOb3;
   svs.push(sv3);
 
-  omManager.svs2analyst(svs, timeManagerInstance, satellite);
+  omManager.svs2analyst(svs, timeManagerInstance);
   e.preventDefault();
   return true;
 };

@@ -61,7 +61,7 @@ export class SoundManager extends KeepTrackPlugin {
     keepTrackContainer.registerSingleton<SoundManager>(Singletons.SoundManager, this);
 
     keepTrackApi.register({
-      method: 'uiManagerInit',
+      event: 'uiManagerInit',
       cbName: this.PLUGIN_NAME,
       cb: () => {
         this.voices = speechSynthesis.getVoices();
@@ -97,27 +97,32 @@ export class SoundManager extends KeepTrackPlugin {
   }
 
   play(sound: string) {
-    if (this.isMute) return; // Muted
-    if (getEl('loading-screen').classList.contains('fullscreen')) return; // Not Ready Yet
+    if (document.readyState === 'complete') {
+      // User has interacted with the document
+      if (this.isMute) return; // Muted
+      if (getEl('loading-screen').classList.contains('fullscreen')) return; // Not Ready Yet
 
-    let random = 1;
-    switch (sound) {
-      case 'genericBeep':
-        random = Math.floor(Math.random() * 3) + 1;
-        this.sounds[`genericBeep${random}`].play();
-        return;
-      case 'whoosh':
-        random = Math.floor(Math.random() * 8) + 1;
-        this.sounds[`whoosh${random}`].play();
-        return;
-      case 'error':
-        if (this.lastLongAudioTimne + 1200000 > Date.now()) return; // Don't play if played in last 30 second
-        this.lastLongAudioTimne = Date.now();
-        this.sounds.error.play();
-        return;
-      default:
-        this.sounds[sound].play();
-        return;
+      let random = 1;
+      switch (sound) {
+        case 'genericBeep':
+          random = Math.floor(Math.random() * 3) + 1;
+          this.sounds[`genericBeep${random}`].play();
+          return;
+        case 'whoosh':
+          random = Math.floor(Math.random() * 8) + 1;
+          this.sounds[`whoosh${random}`].play();
+          return;
+        case 'error':
+          if (this.lastLongAudioTimne + 1200000 > Date.now()) return; // Don't play if played in last 30 second
+          this.lastLongAudioTimne = Date.now();
+          this.sounds.error.play();
+          return;
+        default:
+          this.sounds[sound].play();
+          return;
+      }
+    } else {
+      // User has not interacted with the document yet
     }
   }
 }

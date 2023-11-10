@@ -1,10 +1,6 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons, UiManager } from '@app/js/interfaces';
 import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { getDayOfYear } from '@app/js/lib/transforms';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { UrlManager } from '@app/js/static/url-manager';
 import $ from 'jquery';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -25,26 +21,26 @@ export class DateTimeManager extends KeepTrackPlugin {
     super.init();
 
     keepTrackApi.register({
-      method: 'uiManagerInit',
+      event: 'uiManagerInit',
       cbName: 'datetime',
       cb: this.uiManagerInit.bind(this),
     });
 
     keepTrackApi.register({
-      method: 'uiManagerFinal',
+      event: 'uiManagerFinal',
       cbName: 'datetime',
       cb: this.uiManagerFinal.bind(this),
     });
 
     keepTrackApi.register({
-      method: 'updateDateTime',
+      event: 'updateDateTime',
       cbName: 'datetime',
       cb: this.updateDateTime.bind(this),
     });
   }
 
   updateDateTime(date: Date) {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
     const dateTimeInputTbDOM = $(`#${this.dateTimeInputTbId}`);
     // TODO: remove this check when jest is fixed
     if (dateTimeInputTbDOM && !isThisNode()) {
@@ -118,7 +114,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
           // TODO: Migrate to watchlist.ts
           try {
-            const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+            const uiManagerInstance = keepTrackApi.getUiManager();
             uiManagerInstance.updateNextPassOverlay(true);
           } catch {
             // Intentionally ignored
@@ -128,8 +124,8 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   datetimeInputFormChange(jestOverride?: Date) {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     let selectedDate: Date;
 
@@ -150,7 +146,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     // TODO: Migrate to watchlist.ts
     try {
       (<WatchlistOverlay>keepTrackApi.getPlugin(WatchlistOverlay)).lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.updateNextPassOverlay(true);
     } catch {
       // Ignore

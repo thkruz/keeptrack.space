@@ -32,8 +32,7 @@
 /* istanbul ignore file */
 
 import externalPng from '@app/img/icons/external.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SatObject, Singletons, UiManager } from '@app/js/interfaces';
+import { SatObject } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
@@ -132,32 +131,32 @@ export const uiManagerFinal = () => {
 
 export const init = (): void => {
   keepTrackApi.register({
-    method: 'uiManagerInit',
+    event: 'uiManagerInit',
     cbName: 'externalSources',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    method: 'uiManagerFinal',
+    event: 'uiManagerFinal',
     cbName: 'externalSources',
     cb: uiManagerFinal,
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    method: 'bottomMenuClick',
+    event: 'bottomMenuClick',
     cbName: 'externalSources',
     cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
-    method: 'hideSideMenus',
+    event: 'hideSideMenus',
     cbName: 'externalSources',
     cb: hideSideMenus,
   });
 
   keepTrackApi.register({
-    method: 'onHelpMenuClick',
+    event: 'onHelpMenuClick',
     cbName: 'externalSources',
     cb: onHelpMenuClick,
   });
@@ -206,14 +205,14 @@ export const searchN2yoOnLoad = (request: { status: number; response: string }, 
   if (request.status >= 200 && request.status < 400) {
     // Success!
     try {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const tles = request.response.split('<div id="tle">')[1].split('<pre>')[1].split('\n');
       const TLE1 = tles[1];
       const TLE2 = tles[2];
       if (TLE1.substr(0, 2) !== '1 ') throw new Error('N2YO TLE 1 is not a valid TLE');
       if (TLE2.substr(0, 2) !== '2 ') throw new Error('N2YO TLE 2 is not a valid TLE');
       const sat = catalogManagerInstance.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.doSearch(sat.sccNum.toString());
     } catch (e) {
       errorManagerInstance.error(e, 'external-sources.ts', 'Error in Loading N2YO TLE');
@@ -225,7 +224,7 @@ export const searchN2yoOnLoad = (request: { status: number; response: string }, 
 
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-external') {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     if (isExternalMenuOpen) {
       isExternalMenuOpen = false;
       getEl('menu-external').classList.remove('bmenu-item-selected');
@@ -234,7 +233,7 @@ export const bottomMenuClick = (iconName: string): void => {
     } else {
       uiManagerInstance.hideSideMenus();
       slideInRight(getEl('external-menu'), 1000);
-      keepTrackApi.programs.watchlist.updateWatchlist();
+      // keepTrackApi.programs.watchlist.updateWatchlist();
       isExternalMenuOpen = true;
       getEl('menu-external').classList.add('bmenu-item-selected');
       return;
@@ -244,14 +243,14 @@ export const bottomMenuClick = (iconName: string): void => {
 export const searchCelestrackOnLoad = (request: any, analsat: number): any => {
   if (request.status >= 200 && request.status < 400) {
     try {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const tles = JSON.parse(request.response).split('\n');
       const TLE1 = tles[1];
       const TLE2 = tles[2];
       if (TLE1.substr(0, 2) !== '1 ') throw new Error(`Celestrak TLE 1 is not a valid TLE -- ${TLE1.substr(0, 2)}`);
       if (TLE2.substr(0, 2) !== '2 ') throw new Error(`Celestrak TLE 2 is not a valid TLE -- ${TLE2.substr(0, 2)}`);
       const sat = catalogManagerInstance.insertNewAnalystSatellite(TLE1, TLE2, analsat);
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.doSearch(sat.sccNum.toString());
     } catch (e) {
       errorManagerInstance.error(e, 'external-sources.ts', 'Error in Loading Celestrak TLE');

@@ -1,7 +1,5 @@
 import { Options } from 'new-github-issue-url';
-import { keepTrackContainer } from '../container';
-import { Singletons, UiManager } from '../interfaces';
-import { isThisNode } from '../keepTrackApi';
+import { isThisNode, keepTrackApi } from '../keepTrackApi';
 
 export class ErrorManager {
   private readonly ALLOW_DEBUG = false; // window.location.hostname === 'localhost';
@@ -40,7 +38,7 @@ export class ErrorManager {
       window.open(url, '_blank');
     }
 
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.toast(toastMsg, 'error', true);
 
     if (isThisNode()) {
@@ -67,7 +65,7 @@ ${e.stack}`,
 
   public warn(msg: string) {
     if (this.ALLOW_WARN) {
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.toast(msg, 'serious', true);
     }
     if (this.isDebug) {
@@ -77,7 +75,7 @@ ${e.stack}`,
 
   public info(msg: string) {
     if (this.ALLOW_INFO) {
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.toast(msg, 'normal', true);
     }
     if (this.isDebug) {
@@ -87,7 +85,7 @@ ${e.stack}`,
 
   public log(msg: string) {
     if (this.ALLOW_LOG) {
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.toast(msg, 'normal', true);
     }
     if (this.isDebug) {
@@ -97,7 +95,7 @@ ${e.stack}`,
 
   public debug(msg: string) {
     if (this.ALLOW_DEBUG) {
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.toast(msg, 'standby', true);
       // eslint-disable-next-line no-debugger
       debugger;

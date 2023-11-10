@@ -3,9 +3,9 @@ import 'echarts-gl';
 import * as echarts from 'echarts';
 
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
+import { getEl } from '@app/js/lib/get-el';
 import { shake } from '@app/js/lib/shake';
 import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
-import { getEl } from '@app/js/lib/get-el';
 import { createEcfScatterPlot, getEcfScatterData } from './components/plots/ecfScatterPlot';
 import { createEciScatterPlot, getEciScatterData } from './components/plots/eciScatterPlot';
 import { createInc2AltScatterPlot, getInc2AltScatterData } from './components/plots/inc2AltScatterPlot';
@@ -13,10 +13,9 @@ import { createInc2LonScatterPlot, getInc2LonScatterData } from './components/pl
 import { createRicScatterPlot, getRicScatterData } from './components/plots/ricScatterPlot';
 import { createTime2LonScatterPlot, getTime2LonScatterData } from './components/plots/time2LonScatterPlot';
 
+import { SatObject } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import { CatalogManager, SatObject, Singletons, UiManager } from '@app/js/interfaces';
 
-import { keepTrackContainer } from '@app/js/container';
 import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
 import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
@@ -51,32 +50,32 @@ export let curChart6: echarts.ECharts;
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    method: 'uiManagerInit',
+    event: 'uiManagerInit',
     cbName: 'plotAnalysis',
     cb: () => uiManagerInit(),
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    method: 'bottomMenuClick',
+    event: 'bottomMenuClick',
     cbName: 'plotAnalysis',
     cb: (iconName: string): void => bottomMenuClick(iconName),
   });
 
   keepTrackApi.register({
-    method: 'hideSideMenus',
+    event: 'hideSideMenus',
     cbName: 'plotAnalysis',
     cb: (): void => hideSideMenus(),
   });
 
   keepTrackApi.register({
-    method: 'selectSatData',
+    event: 'selectSatData',
     cbName: 'plotAnalysis',
     cb: selectSatData,
   });
 
   keepTrackApi.register({
-    method: 'onHelpMenuClick',
+    event: 'onHelpMenuClick',
     cbName: 'plotAnalysis',
     cb: onHelpMenuClick,
   });
@@ -165,8 +164,8 @@ export const bottomMenuClick = (iconName: string): void => {
 };
 
 export const onEciPlotBtnClick = () => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  const uiManagerInstance = keepTrackApi.getUiManager();
 
   if (catalogManagerInstance.selectedSat === -1) {
     uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
@@ -195,8 +194,8 @@ export const onEciPlotBtnClick = () => {
 };
 
 export const onEcfPlotBtnClick = () => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  const uiManagerInstance = keepTrackApi.getUiManager();
 
   if (catalogManagerInstance.selectedSat === -1) {
     uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
@@ -225,8 +224,8 @@ export const onEcfPlotBtnClick = () => {
 };
 
 export const onRicPlotBtnClick = () => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  const uiManagerInstance = keepTrackApi.getUiManager();
 
   if (catalogManagerInstance.secondarySat === -1) {
     uiManagerInstance.toast(`Select a Secondary Satellite First!`, 'caution');
@@ -261,7 +260,7 @@ export const onRicPlotBtnClick = () => {
 };
 
 export const onInc2LonPlotBtnClick = () => {
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const uiManagerInstance = keepTrackApi.getUiManager();
 
   if (isPlotAnalyisMenuOpen4) {
     uiManagerInstance.hideSideMenus();
@@ -287,7 +286,7 @@ export const onInc2LonPlotBtnClick = () => {
 };
 
 export const onInc2AltPlotBtnClick = () => {
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const uiManagerInstance = keepTrackApi.getUiManager();
 
   if (isPlotAnalyisMenuOpen6) {
     uiManagerInstance.hideSideMenus();
@@ -313,7 +312,7 @@ export const onInc2AltPlotBtnClick = () => {
 };
 
 export const onTime2LonPlotBtnClick = () => {
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const uiManagerInstance = keepTrackApi.getUiManager();
 
   if (isPlotAnalyisMenuOpen5) {
     uiManagerInstance.hideSideMenus();
@@ -386,7 +385,7 @@ export const selectSatData = (_sat: SatObject, satId: number): void => {
     curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
   }
 
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
   if (catalogManagerInstance.secondarySat !== -1 && isPlotAnalyisMenuOpen3) {
     getEl('menu-plot-analysis3').classList.add('bmenu-item-selected');
     const chartDom3 = getEl('plot-analysis-chart3');

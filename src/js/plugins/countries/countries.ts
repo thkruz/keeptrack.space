@@ -2,9 +2,7 @@ import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 
 import flagPng from '@app/img/icons/flag.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, GroupsManager, Singletons, UiManager } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { GroupType } from '@app/js/singletons/object-group';
 import { StringExtractor } from '@app/js/static/string-extractor';
 
@@ -80,7 +78,7 @@ export class CountriesMenu extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('country-menu')
@@ -98,7 +96,7 @@ export class CountriesMenu extends KeepTrackPlugin {
   }
 
   private static countryMenuClick_(groupName: string): void {
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
     const countryCode = StringExtractor.getCountryCode(groupName);
     if (countryCode === '') throw new Error('Unknown country group');
 
@@ -110,9 +108,9 @@ export class CountriesMenu extends KeepTrackPlugin {
   }
 
   private static groupSelected_(groupName: string): void {
-    const groupManagerInstance = keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
 
     const searchDOM = <HTMLInputElement>getEl('search');
     if (typeof groupName == 'undefined') return;

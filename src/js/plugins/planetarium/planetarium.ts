@@ -23,14 +23,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { CatalogManager, OrbitManager, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
+import { SensorObject } from '@app/js/interfaces';
 import { getEl } from '@app/js/lib/get-el';
 import { CameraType } from '@app/js/singletons/camera';
 
 import planetariumPng from '@app/img/icons/planetarium.png';
-import { keepTrackContainer } from '@app/js/container';
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DrawManager } from '@app/js/singletons/draw-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
@@ -42,9 +40,8 @@ export class Planetarium extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   bottomIconCallback = (): void => {
-    const { starManager } = keepTrackApi.programs;
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
     if (this.isMenuButtonEnabled) {
       if (!this.verifySensorSelected()) return;
 
@@ -66,9 +63,9 @@ export class Planetarium extends KeepTrackPlugin {
       // TODO: implement fov information
       // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
       LegendManager.change('planetarium');
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
       if (catalogManagerInstance.isStarManagerLoaded) {
-        starManager.clearConstellations();
+        keepTrackApi.getStarManager().clearConstellations();
       }
 
       keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
@@ -78,7 +75,7 @@ export class Planetarium extends KeepTrackPlugin {
       settingsManager.fieldOfView = 0.6;
       drawManagerInstance.glInit();
       uiManagerInstance.hideSideMenus();
-      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
       keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       // TODO: implement fov information
@@ -94,7 +91,7 @@ export class Planetarium extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: 'setSensor',
+      event: 'setSensor',
       cbName: this.PLUGIN_NAME,
       cb: (sensor: SensorObject): void => {
         if (sensor) {

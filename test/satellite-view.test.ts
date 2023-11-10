@@ -1,5 +1,5 @@
 import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, Singletons, UiManager } from '@app/js/interfaces';
+import { Singletons, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { SatelliteViewPlugin } from '@app/js/plugins/satellite-view/satellite-view';
@@ -50,8 +50,8 @@ describe('SatelliteViewPlugin_class', () => {
   // Tests that a toast message is displayed when no satellite is selected and trying to activate Satellite Camera Mode
   it('test_bottomMenuClick_callback_no_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.selectedSat = -1;
     plugin.init();
     keepTrackApi.methods.uiManagerInit();
@@ -64,8 +64,8 @@ describe('SatelliteViewPlugin_class', () => {
   // Tests that a toast message is not displayed when a satellite is selected and trying to activate Satellite Camera Mode
   it('test_bottomMenuClick_callback_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.selectedSat = 1;
     plugin.init();
     keepTrackApi.methods.uiManagerInit();
@@ -78,8 +78,8 @@ describe('SatelliteViewPlugin_class', () => {
   // Tests that clicking the Satellite Camera Mode icon reverts the camera to the default camera
   it('test_bottomMenuClick_callback_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.selectedSat = 1;
     plugin.init();
     keepTrackApi.methods.uiManagerInit();

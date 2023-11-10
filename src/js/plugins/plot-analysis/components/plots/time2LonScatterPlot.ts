@@ -1,13 +1,11 @@
 import * as echarts from 'echarts';
 
-import { CatalogManager, GetSatType, SatObject, Singletons } from '@app/js/interfaces';
+import { GetSatType, SatObject } from '@app/js/interfaces';
 
-import { keepTrackContainer } from '@app/js/container';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { SatMathApi } from '@app/js/singletons/sat-math-api';
-import { TimeManager } from '@app/js/singletons/time-manager';
 
 export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart, chartDom) => {
   // Dont Load Anything if the Chart is Closed
@@ -20,7 +18,7 @@ export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart,
     curChart = echarts.init(chartDom);
     curChart.on('click', (event) => {
       if (event.data?.id) {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         catalogManagerInstance.selectSat(event.data.id);
       }
     });
@@ -141,7 +139,7 @@ export const createTime2LonScatterPlot = (data, isPlotAnalyisMenuOpen, curChart,
 
 export const getTime2LonScatterData = () => {
   const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
-  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+  const timeManagerInstance = keepTrackApi.getTimeManager();
 
   const now = timeManagerInstance.simulationTimeObj.getTime();
 

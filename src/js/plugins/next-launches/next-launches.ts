@@ -1,6 +1,6 @@
 import calendar2Png from '@app/img/icons/calendar2.png';
 import { LaunchInfoObject } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { openColorbox } from '@app/js/lib/colorbox';
 import { dateFormat } from '@app/js/lib/dateFormat';
 import { getEl } from '@app/js/lib/get-el';
@@ -62,7 +62,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('export-launch-info').addEventListener('click', () => {

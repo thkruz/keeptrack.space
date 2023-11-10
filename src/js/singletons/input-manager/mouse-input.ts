@@ -1,12 +1,11 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
-import { CatalogManager, GetSatType, SensorManager, Singletons, UiManager } from '@app/js/interfaces';
+import { GetSatType } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/js/singletons/camera';
 import { UrlManager } from '@app/js/static/url-manager';
 import { Kilometers } from 'ootk';
-import { keepTrackContainer } from '../../container';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
 import { showLoading } from '../../lib/showLoading';
@@ -15,13 +14,10 @@ import { triggerSubmit } from '../../lib/trigger-submit';
 import { waitForCruncher } from '../../lib/waitForCruncher';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { LegendManager } from '../../static/legend-manager';
-import { StandardColorSchemeManager } from '../color-scheme-manager';
-import { DrawManager } from '../draw-manager';
 import { lineManagerInstance } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { starManager } from '../starManager';
-import { TimeManager } from '../time-manager';
 import { KeyboardInput } from './keyboard-input';
 
 export class MouseInput {
@@ -47,7 +43,7 @@ export class MouseInput {
     if (settingsManager.disableNormalEvents) {
       evt.preventDefault();
     }
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     this.isStartedOnCanvas = true;
 
@@ -191,7 +187,7 @@ export class MouseInput {
     if (settingsManager.disableNormalEvents) {
       evt.preventDefault();
     }
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     if (!this.isStartedOnCanvas) {
       return;
@@ -206,7 +202,7 @@ export class MouseInput {
       // }
       this.clickedSat = this.mouseSat;
       if (evt.button === 0) {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         // Left Mouse Button Clicked
         if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
@@ -484,12 +480,12 @@ export class MouseInput {
     // No Right Click Without UI
     if (settingsManager.disableUI) return;
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     let target = <HTMLElement>e.target;
     let targetId = target.id;

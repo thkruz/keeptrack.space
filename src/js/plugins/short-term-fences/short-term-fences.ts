@@ -1,7 +1,6 @@
 import searchPng from '@app/img/icons/search.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SatObject, SensorObject, Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { SatObject, SensorObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
 
@@ -83,7 +82,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         // Skip this if there is no satellite object because the menu isn't open
@@ -110,7 +109,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('stfForm').addEventListener('submit', (e: Event) => {
@@ -127,13 +126,13 @@ export class ShortTermFences extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: 'resetSensor',
+      event: 'resetSensor',
       cbName: 'shortTermFences',
       cb: this.closeAndDisable.bind(this),
     });
 
     keepTrackApi.register({
-      method: 'setSensor',
+      event: 'setSensor',
       cbName: 'shortTermFences',
       cb: (sensor: any, id: number): void => {
         if (sensor == null && id == null) {
@@ -215,7 +214,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     if (!this.verifySatelliteSelected()) return;
 
     // Update TEARR
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const tearr = SensorMath.getTearr(catalogManagerInstance.getSat(catalogManagerInstance.selectedSat), sensorManagerInstance.currentSensors);
 
     (<HTMLInputElement>getEl('stf-az')).value = tearr.az.toFixed(1);

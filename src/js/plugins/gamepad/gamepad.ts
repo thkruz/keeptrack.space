@@ -1,9 +1,11 @@
 /* eslint-disable class-methods-use-this */
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { SatObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { CameraType } from '@app/js/singletons/camera';
 import { Radians } from 'ootk';
 
 export class GamepadPlugin {
+  PLUGIN_NAME = 'Gamepad';
   currentController: Gamepad;
   deadzone = 0.55;
   buttonsPressedHistory: number[] = [];
@@ -15,8 +17,8 @@ export class GamepadPlugin {
         this.initializeGamepad(e.gamepad);
       } else {
         keepTrackApi.register({
-          method: 'uiManagerInit',
-          cbName: 'gamepad',
+          event: KeepTrackApiEvents.uiManagerInit,
+          cbName: this.PLUGIN_NAME,
           cb: () => this.initializeGamepad(e.gamepad),
         });
       }
@@ -33,8 +35,8 @@ export class GamepadPlugin {
     // Only initialize once
     if (!this.currentController) {
       keepTrackApi.register({
-        method: 'updateLoop',
-        cbName: 'gamepad',
+        event: KeepTrackApiEvents.updateLoop,
+        cbName: this.PLUGIN_NAME,
         cb: this.updateGamepad.bind(this),
       });
     }
@@ -168,7 +170,9 @@ export class GamepadPlugin {
     if (satId >= 0) {
       catalogManagerInstance.selectSat(satId);
     } else {
-      catalogManagerInstance.selectSat(catalogManagerInstance.satData.length - 1);
+      const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+      const lastSatId = activeSats[activeSats.length - 1].id;
+      catalogManagerInstance.selectSat(lastSatId);
     }
   }
 
@@ -177,8 +181,10 @@ export class GamepadPlugin {
     console.log('Right Bumper');
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+    const lastSatId = activeSats[activeSats.length - 1].id;
     const satId = catalogManagerInstance.selectedSat + 1;
-    if (satId <= catalogManagerInstance.satData.length - 1) {
+    if (satId <= lastSatId) {
       catalogManagerInstance.selectSat(satId);
     } else {
       catalogManagerInstance.selectSat(0);
@@ -350,7 +356,7 @@ export class GamepadPlugin {
 
   static getController(index = 0): Gamepad | null {
     // If gamepad not specified then try the first one
-    const gamepads = navigator.getGamepads();
+    const gamepads = navigator.getGamepads().filter((gamepad) => gamepad !== null);
     if (gamepads.length > index && gamepads[index] !== null) {
       return gamepads[index];
     }

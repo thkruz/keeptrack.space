@@ -1,5 +1,4 @@
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SatObject, Singletons, UiManager } from '@app/js/interfaces';
+import { SatObject } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
@@ -26,7 +25,7 @@ export class OrbitReferences extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      method: 'selectSatData',
+      event: 'selectSatData',
       cbName: 'orbitReferences',
       cb: (sat: SatObject) => {
         // Skip this if there is no satellite object because the menu isn't open
@@ -50,7 +49,7 @@ export class OrbitReferences extends KeepTrackPlugin {
   }
 
   orbitReferencesLinkClick() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // Determine which satellite is selected
     const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
@@ -82,7 +81,7 @@ export class OrbitReferences extends KeepTrackPlugin {
 
     // Remove the last comma
     searchStr = searchStr.substr(0, searchStr.length - 1);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.doSearch(searchStr);
 
     this.isReferenceSatsActive = true;

@@ -10,6 +10,7 @@ import * as catalogLoader from '@app/js/static/catalog-loader';
 
 import { Singletons } from '@app/js/interfaces';
 import { keepTrackContainer } from '../container';
+import { KeepTrackApiEvents, KeepTrackApiRegisterParams } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { aboutMenuPlugin } from './about-menu/about-menu';
@@ -113,8 +114,7 @@ export type KeepTrackPlugins = {
 };
 
 // Register all core modules
-// prettier-ignore
-export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?: any }, plugins: KeepTrackPlugins): Promise<void> => {  // NOSONAR
+export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTrackApiRegisterParams) => void }, plugins: KeepTrackPlugins): Promise<void> => {
   plugins ??= {};
   try {
     // Register Catalog Loader
@@ -190,9 +190,9 @@ export const loadCorePlugins = async (keepTrackApi: { programs?: any; register?:
     if (plugins.videoDirector) videoDirectorPlugin.init();
 
     keepTrackApi.register({
-      method: 'uiManagerFinal',
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'core',
-      cb: function () {
+      cb: () => {
         uiManagerFinal(plugins);
       },
     });

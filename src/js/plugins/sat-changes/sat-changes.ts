@@ -1,7 +1,6 @@
 import satChngPng from '@app/img/icons/sats.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SatChngObject, Singletons, UiManager } from '@app/js/interfaces';
-import { isThisNode, keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { SatChngObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
@@ -22,26 +21,26 @@ let issatChngMenuOpen = false;
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    method: KeepTrackApiMethods.uiManagerInit,
+    event: KeepTrackApiEvents.uiManagerInit,
     cbName: 'satChanges',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    method: KeepTrackApiMethods.uiManagerFinal,
+    event: KeepTrackApiEvents.uiManagerFinal,
     cbName: 'satChanges',
     cb: uiManagerFinal,
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    method: KeepTrackApiMethods.bottomMenuClick,
+    event: KeepTrackApiEvents.bottomMenuClick,
     cbName: 'satChanges',
     cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
-    method: KeepTrackApiMethods.hideSideMenus,
+    event: KeepTrackApiEvents.hideSideMenus,
     cbName: 'satChanges',
     cb: hideSideMenus,
   });
@@ -113,7 +112,7 @@ export const satChng = (row: number, testOverride?: any): void => {
   if (row !== -1) {
     // If an object was selected from the menu
     if (!satChngTable[row].SCC) return;
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.doSearch(satChngTable[row].SCC.toString()); // Actually perform the search of the two objects
     (<HTMLInputElement>getEl('anal-sat')).value = satChngTable[row].SCC.toString();
   } // If a row was selected
@@ -127,7 +126,7 @@ export const hideSideMenus = (): void => {
 
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-satChng') {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const uiManagerInstance = keepTrackApi.getUiManager();
     if (issatChngMenuOpen) {
       issatChngMenuOpen = false;
       uiManagerInstance.hideSideMenus();
@@ -145,7 +144,7 @@ export const bottomMenuClick = (iconName: string): void => {
 };
 
 export const getSatChngJson = (json: any) => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
   // TODO: This is a temporary fix for the fact that the JSON is not being parsed correctly.
   if (!json && isThisNode()) return { resp: json, satChngTable: [] };

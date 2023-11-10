@@ -1,18 +1,16 @@
-import { CatalogManager, GeolocationPosition, SensorGeolocation, SensorObject, Singletons } from '@app/js/interfaces';
+import { GeolocationPosition, SensorGeolocation, SensorObject } from '@app/js/interfaces';
 import { Degrees, Kilometers } from 'ootk';
-import { keepTrackContainer } from '../container';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { lat2pitch, lon2yaw } from '../lib/transforms';
 import { StandardSensorManager } from '../plugins/sensor/sensorManager';
 import { errorManagerInstance } from '../singletons/errorManager';
-import { TimeManager } from '../singletons/time-manager';
 
 export class UiGeolocation {
   static updateSensorPosition(position: GeolocationPosition): void {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const sensorManagerInstance = keepTrackContainer.get<StandardSensorManager>(Singletons.SensorManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
     const { lon, lat, alt, minaz, maxaz, minel, maxel, minrange, maxrange } = UiGeolocation.updateSettingsManager(position);
 
     sensorManagerInstance.whichRadar = 'CUSTOM';

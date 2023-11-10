@@ -31,8 +31,7 @@ import { SatelliteRecord, Sgp4 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
 import { stars } from '../catalogs/stars';
-import { keepTrackContainer } from '../container';
-import { CatalogManager, GetSatType, OrbitManager, RadarDataObject, SatCruncherMessageData, SatObject, SensorManager, Singletons, UiManager } from '../interfaces';
+import { CatalogManager, GetSatType, RadarDataObject, SatCruncherMessageData, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { StringPad } from '../lib/stringPad';
@@ -42,13 +41,8 @@ import { StringExtractor } from '../static/string-extractor';
 import { UrlManager } from '../static/url-manager';
 import { CameraType } from './camera';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
-import { StandardColorSchemeManager } from './color-scheme-manager';
-import { DotsManager } from './dots-manager';
-import { DrawManager } from './draw-manager';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
-import { InputManager } from './input-manager';
-import { TimeManager } from './time-manager';
 import { StandardUiManager } from './uiManager';
 // TODO: FUTURE FEATURE
 // import { radarDataManager } from '@app/js/catalogManagerInstance/radarDataManager.js';
@@ -134,12 +128,11 @@ export class StandardCatalogManager implements CatalogManager {
   public starIndex2 = 0;
   public staticSet = [];
   public updateCruncherBuffers = (mData: SatCruncherMessageData): void => {
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
     // We need to wait for the first message to arrive before we can start updating the buffers
     // this.wait5_++;
     // if (this.wait5_ <= 5) return;
 
-    dotsManagerInstance.updateCruncherBuffers(mData);
+    keepTrackApi.getDotsManager().updateCruncherBuffers(mData);
 
     if (typeof mData?.sensorMarkerArray != 'undefined' && mData?.sensorMarkerArray?.length !== 0) {
       this.sensorMarkerArray = mData.sensorMarkerArray;
@@ -320,14 +313,12 @@ export class StandardCatalogManager implements CatalogManager {
     }
 
     if (type === GetSatType.POSITION_ONLY) {
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-      this.satData[i].position = dotsManagerInstance.getCurrentPosition(i);
+      this.satData[i].position = keepTrackApi.getDotsManager().getCurrentPosition(i);
       return this.satData[i];
     }
 
     if (this.gotExtraData && type !== GetSatType.SKIP_POS_VEL) {
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-      dotsManagerInstance.updatePosVel(this.satData[i], i);
+      keepTrackApi.getDotsManager().updatePosVel(this.satData[i], i);
     }
 
     // Update the satrec object
@@ -471,9 +462,8 @@ export class StandardCatalogManager implements CatalogManager {
 
     // Create Sensors
     if (!settingsManager.isDisableSensors) {
-      const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
-      for (const sensor in sensorManagerInstance.sensors) {
-        this.staticSet.push({ ...{ static: true }, ...sensorManagerInstance.sensors[sensor] });
+      for (const sensor in keepTrackApi.getSensorManager().sensors) {
+        this.staticSet.push({ ...{ static: true }, ...keepTrackApi.getSensorManager().sensors[sensor] });
       }
     }
     this.isSensorManagerLoaded = true;
@@ -540,9 +530,6 @@ export class StandardCatalogManager implements CatalogManager {
   }
 
   public insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string): any {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-
     if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
     if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
 
@@ -554,7 +541,7 @@ export class StandardCatalogManager implements CatalogManager {
       return;
     }
 
-    if (SatMath.altitudeCheck(satrec, timeManagerInstance.simulationTimeObj) > 1) {
+    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
       this.satCruncher.postMessage({
         typ: 'satEdit',
         id: id,
@@ -562,8 +549,7 @@ export class StandardCatalogManager implements CatalogManager {
         TLE1: TLE1,
         TLE2: TLE2,
       });
-      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-      orbitManagerInstance.changeOrbitBufferData(id, TLE1, TLE2);
+      keepTrackApi.getOrbitManager().changeOrbitBufferData(id, TLE1, TLE2);
       const sat = this.getSat(id);
       sat.active = true;
       sat.type = SpaceObjectType.PAYLOAD; // Default to Satellite
@@ -572,7 +558,7 @@ export class StandardCatalogManager implements CatalogManager {
     } else {
       console.debug(TLE1);
       console.debug(TLE2);
-      uiManagerInstance.toast(`New Analyst Satellite is Invalid!`, 'critical');
+      keepTrackApi.getUiManager().toast(`New Analyst Satellite is Invalid!`, 'critical');
       return false;
     }
   }
@@ -643,10 +629,9 @@ export class StandardCatalogManager implements CatalogManager {
   // TODO: Move this to Higher Level
   public selectSat(i: number): void {
     if (settingsManager.isDisableSelectSat) return;
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
-    const colorSchemeManagerInstance = keepTrackContainer.get<StandardColorSchemeManager>(Singletons.ColorSchemeManager);
-    const { gl } = drawManagerInstance;
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const { gl } = keepTrackApi.getDrawManager();
 
     if (i === this.lastSelectedSat()) return;
 
@@ -741,9 +726,8 @@ export class StandardCatalogManager implements CatalogManager {
   }
 
   panToStar(c: SatObject): void {
-    const { starManager } = keepTrackApi.programs;
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
 
     // Try with the pname
     let satId = this.getIdFromStarName(c.name, dotsManagerInstance.starIndex1, dotsManagerInstance.starIndex2);
@@ -753,7 +737,7 @@ export class StandardCatalogManager implements CatalogManager {
 
     lineManagerInstance.clear();
     if (this.isStarManagerLoaded) {
-      starManager.isAllConstellationVisible = false;
+      keepTrackApi.getStarManager().isAllConstellationVisible = false;
     }
 
     lineManagerInstance.create('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
@@ -765,7 +749,7 @@ export class StandardCatalogManager implements CatalogManager {
     const _primary = this.selectedSat;
     const _secondary = this.secondarySat;
     this.setSecondarySat(_primary);
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
     if (_primary !== -1) {
       orbitManagerInstance.setSelectOrbit(_primary, true);
     } else {
@@ -775,7 +759,7 @@ export class StandardCatalogManager implements CatalogManager {
   }
 
   private registerKeyboardEvents_() {
-    const inputManagerInstance = keepTrackContainer.get<InputManager>(Singletons.InputManager);
+    const inputManagerInstance = keepTrackApi.getInputManager();
     inputManagerInstance.keyboard.registerKeyDownEvent({
       key: ']',
       callback: () => {

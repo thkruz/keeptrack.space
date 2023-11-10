@@ -1,7 +1,5 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { mat4 } from 'gl-matrix';
-import { DrawManager } from '../draw-manager';
 import { CustomMesh } from './custom-mesh';
 import { RadarDome } from './radar-dome';
 
@@ -17,7 +15,7 @@ export class CustomMeshFactory {
   createCustomMesh(vertexList: Float32Array) {
     const customMesh = new CustomMesh();
 
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     customMesh.init(drawManagerInstance.gl, vertexList);
     customMesh.id = this.customMeshes_.length;
     this.customMeshes_.push(customMesh);
@@ -51,7 +49,7 @@ export class CustomMeshFactory {
   createRadarDome() {
     const radarDome = new RadarDome();
 
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     radarDome.init(drawManagerInstance.gl);
     radarDome.id = this.customMeshes_.length;
     this.customMeshes_.push(radarDome);

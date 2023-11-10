@@ -1,5 +1,4 @@
-import { keepTrackContainer } from '@app/js/container';
-import { lookanglesRow, SatObject, SensorManager, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
+import { lookanglesRow, SatObject, SensorObject } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
@@ -12,7 +11,6 @@ import { SatMath } from '@app/js/static/sat-math';
 import { DEG2RAD, MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
 import { getUnique } from '@app/js/lib/get-unique';
 import { saveCsv } from '@app/js/lib/saveVariable';
-import { TimeManager } from '@app/js/singletons/time-manager';
 import { CatalogExporter } from '@app/js/static/catalog-exporter';
 import { CatalogSearch } from '@app/js/static/catalog-search';
 import { EciVec3, Kilometers, Radians, SatelliteRecord } from 'ootk';
@@ -50,24 +48,24 @@ let isAnalysisMenuOpen = false;
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    method: 'uiManagerInit',
+    event: 'uiManagerInit',
     cbName: 'analysis',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    method: 'uiManagerFinal',
+    event: 'uiManagerFinal',
     cbName: 'analysis',
     cb: uiManagerFinal,
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    method: 'bottomMenuClick',
+    event: 'bottomMenuClick',
     cbName: 'analysis',
     cb: (iconName: string): void => {
       if (iconName === 'menu-analysis') {
-        const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+        const uiManagerInstance = keepTrackApi.getUiManager();
 
         if (isAnalysisMenuOpen) {
           isAnalysisMenuOpen = false;
@@ -103,18 +101,17 @@ export const init = (): void => {
   });
 
   keepTrackApi.register({
-    method: 'selectSatData',
+    event: 'selectSatData',
     cbName: 'analysis',
     cb: (sat: any): void => {
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-      if (uiManagerInstance.isAnalysisMenuOpen) {
+      if (keepTrackApi.getUiManager().isAnalysisMenuOpen) {
         (<HTMLInputElement>getEl('anal-sat')).value = sat.sccNum;
       }
     },
   });
 
   keepTrackApi.register({
-    method: 'hideSideMenus',
+    event: 'hideSideMenus',
     cbName: 'analysis',
     cb: (): void => {
       slideOutLeft(getEl('analysis-menu'), 1000);
@@ -124,7 +121,7 @@ export const init = (): void => {
   });
 
   keepTrackApi.register({
-    method: 'onHelpMenuClick',
+    event: 'onHelpMenuClick',
     cbName: 'analysis',
     cb: onHelpMenuClick,
   });
@@ -208,10 +205,8 @@ export const analysisFormSubmit = () => {
   // }
 };
 export const findCsoBtnClick = () => {
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-
   const searchStr = findCloseObjects();
-  uiManagerInstance.doSearch(searchStr);
+  keepTrackApi.getUiManager().doSearch(searchStr);
 };
 
 let searchStrCache_ = null;
@@ -343,30 +338,26 @@ export const findCloseObjects = () => {
 };
 
 export const findRaBtnClick = () => {
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-
   const searchStr = CatalogSearch.findReentry(<SatObject[]>keepTrackApi.getCatalogManager().satData).join(',');
-  uiManagerInstance.doSearch(searchStr);
+  keepTrackApi.getUiManager().doSearch(searchStr);
 };
 export const analysisBptSumbit = () => {
   const sats = (<HTMLInputElement>getEl('analysis-bpt-sats')).value;
-  const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+  const sensorManagerInstance = keepTrackApi.getSensorManager();
 
   if (!sensorManagerInstance.isSensorSelected()) {
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
-    uiManagerInstance.toast(`You must select a sensor first!`, 'critical');
+    keepTrackApi.getUiManager().toast(`You must select a sensor first!`, 'critical');
   } else {
     findBestPasses(sats, sensorManagerInstance.currentSensors[0]);
   }
 };
 
 export const findBestPass = (sat: SatObject, sensors: SensorObject[]): lookanglesRow[] => {
-  const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-  const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  const timeManagerInstance = keepTrackApi.getTimeManager();
 
   // Check if there is a sensor
   if (sensors.length <= 0 || !sensors[0] || typeof sensors[0].obsminaz == 'undefined') {
-    uiManagerInstance.toast(`Sensor's format incorrect. Did you select a sensor first?`, 'critical');
+    keepTrackApi.getUiManager().toast(`Sensor's format incorrect. Did you select a sensor first?`, 'critical');
     return [];
   }
   sensors[0].observerGd = {

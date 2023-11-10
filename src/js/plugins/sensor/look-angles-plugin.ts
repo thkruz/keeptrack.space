@@ -1,12 +1,12 @@
 import lookanglesPng from '@app/img/icons/lookangles.png';
 import { GetSatType, SatObject, SensorObject } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { dateFormat } from '@app/js/lib/dateFormat';
 import { getEl } from '@app/js/lib/get-el';
 import { saveCsv } from '@app/js/lib/saveVariable';
 import { showLoading } from '@app/js/lib/showLoading';
 import { SensorMath, TearrData } from '@app/js/static/sensor-math';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 export class LookAnglesPlugin extends KeepTrackPlugin {
   isRequireSatelliteSelected: boolean = true;
   isRequireSensorSelected: boolean = true;
@@ -97,7 +97,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('look-angles-length').addEventListener('change', () => {
@@ -119,7 +119,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (this.isMenuButtonEnabled && (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected())) {
@@ -139,7 +139,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.staticOffsetChange,
+      event: KeepTrackApiEvents.staticOffsetChange,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         this.refreshSideMenuData();

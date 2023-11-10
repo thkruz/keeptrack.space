@@ -1,133 +1,131 @@
 import { expect } from '@jest/globals';
+import { SatObject } from '../src/js/interfaces';
 import { isThisNode, keepTrackApi } from '../src/js/keepTrackApi';
-import { KeepTrackPrograms, SatObject } from '../src/js/interfaces';
-import { defaultSat, keepTrackApiStubs } from './environment/apiMocks';
-
-keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
+import { defaultSat } from './environment/apiMocks';
 
 test(`keepTrackApi Unit Testing`, () => {
   expect(() => {
     keepTrackApi.register({
-      method: 'test',
+      event: 'test',
       cbName: 'test',
       cb: () => console.log('test'),
     });
   }).toThrow(Error);
 
   keepTrackApi.register({
-    method: 'selectSatData',
+    event: 'selectSatData',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   expect(() => {
-    keepTrackApi.unregister({ method: 'test', cbName: 'test' });
+    keepTrackApi.unregister({ event: 'test', cbName: 'test' });
   }).toThrow(Error);
 
   expect(() => {
-    keepTrackApi.unregister({ method: 'selectSatData', cbName: 'test2' });
+    keepTrackApi.unregister({ event: 'selectSatData', cbName: 'test2' });
   }).toThrow(Error);
 
-  keepTrackApi.unregister({ method: 'selectSatData', cbName: 'test' });
+  keepTrackApi.unregister({ event: 'selectSatData', cbName: 'test' });
 
   keepTrackApi.register({
-    method: 'updateSelectBox',
+    event: 'updateSelectBox',
     cbName: 'test',
     cb: (sat: SatObject) => console.log(sat),
   });
 
   keepTrackApi.register({
-    method: 'onCruncherReady',
+    event: 'onCruncherReady',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'onCruncherMessage',
+    event: 'onCruncherMessage',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'uiManagerInit',
+    event: 'uiManagerInit',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'uiManagerOnReady',
+    event: 'uiManagerOnReady',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'bottomMenuClick',
+    event: 'bottomMenuClick',
     cbName: 'test',
     cb: (name) => console.log(name),
   });
 
   keepTrackApi.register({
-    method: 'hideSideMenus',
+    event: 'hideSideMenus',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'nightToggle',
+    event: 'nightToggle',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'orbitManagerInit',
+    event: 'orbitManagerInit',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'drawManagerLoadScene',
+    event: 'drawManagerLoadScene',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'drawOptionalScenery',
+    event: 'drawOptionalScenery',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'updateLoop',
+    event: 'updateLoop',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'rmbMenuActions',
+    event: 'rmbMenuActions',
     cbName: 'test',
     cb: (str) => console.log(str),
   });
 
   keepTrackApi.register({
-    method: 'updateDateTime',
+    event: 'updateDateTime',
     cbName: 'test',
     cb: (str) => console.log(str),
   });
 
   keepTrackApi.register({
-    method: 'uiManagerFinal',
+    event: 'uiManagerFinal',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'rightBtnMenuAdd',
+    event: 'rightBtnMenuAdd',
     cbName: 'test',
     cb: () => console.log('test'),
   });
 
   keepTrackApi.register({
-    method: 'selectSatData',
+    event: 'selectSatData',
     cbName: 'test',
     cb: (sat, satId) => console.log(`${sat} - ${satId}`),
   });

@@ -1,5 +1,5 @@
 import { keepTrackContainer } from '@app/js/container';
-import { Singletons, SoundManager } from '@app/js/interfaces';
+import { Singletons } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { soundManagerPlugin } from '@app/js/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/js/plugins/top-menu/top-menu';
@@ -40,7 +40,7 @@ describe('TopMenu_class', () => {
     const soundBtn = document.getElementById('sound-btn') as HTMLAnchorElement;
     const soundIcon = document.getElementById('sound-icon') as HTMLImageElement;
     keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerPlugin);
-    const soundManager = keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
+    const soundManager = keepTrackApi.getSoundManager();
     soundBtn.click();
     expect(soundManager.isMute).toBe(true);
     expect(soundIcon.parentElement.classList.contains('bmenu-item-selected')).toBe(false);

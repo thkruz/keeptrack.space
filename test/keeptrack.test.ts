@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/js/keepTrackApi';
 import { keepTrackContainer } from '../src/js/container';
 import { SatObject, Singletons } from '../src/js/interfaces';
 import { StandardCatalogManager } from '../src/js/singletons/catalog-manager';
-import { DrawManager, StandardDrawManager } from '../src/js/singletons/draw-manager';
+import { StandardDrawManager } from '../src/js/singletons/draw-manager';
 import { StandardOrbitManager } from '../src/js/singletons/orbitManager';
 import { StandardUiManager } from '../src/js/singletons/uiManager';
 import { CatalogLoader } from '../src/js/static/catalog-loader';
@@ -57,7 +57,7 @@ const setupStandardEnvironment = () => {
 
   jest.spyOn(CatalogLoader, 'load').mockImplementation(async () => {
     // Setup a mock catalog
-    const catalogManagerInstance = keepTrackContainer.get<StandardCatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance['satData'] = [<SatObject>{ id: 0, type: 1 }, <SatObject>{ id: 1, type: 1 }];
     catalogManagerInstance.satCruncher = {
       postMessage: jest.fn(),
@@ -91,7 +91,7 @@ describe('code_snippet', () => {
 
   // Tests that the constructor initializes all necessary objects and settings correctly.
   it('test_constructor_initializes_objects', () => {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     drawManagerInstance.updateLoop = jest.fn();
     keepTrackApi.getMainCamera().draw = jest.fn();
 
@@ -106,7 +106,7 @@ describe('code_snippet', () => {
 
   // Test that error messages are displayed on the loading screen in case of errors.
   it('test_error_messages_displayed_on_loading_screen', () => {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     drawManagerInstance.loadScene = () => {
       throw new Error('Test error');
     };
@@ -121,7 +121,7 @@ describe('code_snippet', () => {
   // Tests that the game loop updates and draws the application correctly.
   it('test_game_loop_updates_and_draws_application', () => {
     const keepTrack = new KeepTrack(<any>settingsOverride);
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     keepTrack.init().then(() => {
       drawManagerInstance.updateLoop = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();

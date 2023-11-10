@@ -1,6 +1,4 @@
 import collissionsPng from '@app/img/icons/socrates.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, Singletons } from '@app/js/interfaces';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { getEl } from '@app/js/lib/get-el';
@@ -74,13 +72,13 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      method: 'uiManagerFinal',
+      event: 'uiManagerFinal',
       cbName: 'collisions',
       cb: this.uiManagerFinal.bind(this),
     });
 
     keepTrackApi.register({
-      method: 'onCruncherMessage',
+      event: 'onCruncherMessage',
       cbName: 'collisions',
       cb: () => {
         if (this.socratesOnSatCruncher !== null) {
@@ -114,7 +112,7 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     keepTrackApi.getUiManager().doSearch(`${this.collisionList[row].sat1},${this.collisionList[row].sat2}`);
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     this.socratesOnSatCruncher = catalogManagerInstance.getIdFromObjNum(parseInt(this.collisionList[row].sat1));
   }
 

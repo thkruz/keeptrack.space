@@ -1,7 +1,6 @@
 import rocketPng from '@app/img/icons/rocket.png';
-import { keepTrackContainer } from '@app/js/container';
-import { GetSatType, OrbitManager, SatObject, Singletons } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { GetSatType, SatObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/js/lib/showLoading';
@@ -217,7 +216,7 @@ export class NewLaunch extends KeepTrackPlugin {
         TLE1: TLE1,
         TLE2: TLE2,
       });
-      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
     } else {
       uiManagerInstance.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
@@ -241,7 +240,7 @@ export class NewLaunch extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (sat) {

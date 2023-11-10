@@ -29,12 +29,9 @@ import radar1 from '@app/img/radar-1.png';
 import redSquare from '@app/img/red-square.png';
 import satellite2 from '@app/img/satellite-2.png';
 import yellowSquare from '@app/img/yellow-square.png';
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SensorManager, Singletons } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiMethods } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
-import { TimeManager } from '@app/js/singletons/time-manager';
 
 import { SatMathApi } from '@app/js/singletons/sat-math-api';
 import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
@@ -125,7 +122,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
     import('./stereo-map.css');
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         StereoMapPlugin.resize2DMap();
@@ -149,7 +146,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.onCruncherMessage,
+      event: KeepTrackApiEvents.onCruncherMessage,
       cbName: this.PLUGIN_NAME,
       cb: this.onCruncherMessage.bind(this),
     });
@@ -157,9 +154,9 @@ export class StereoMapPlugin extends KeepTrackPlugin {
 
   async updateMap(): Promise<void> {
     try {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-      const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
-      const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const timeManagerInstance = keepTrackApi.getTimeManager();
+      const sensorManagerInstance = keepTrackApi.getSensorManager();
 
       if (catalogManagerInstance.selectedSat === -1) return;
       if (!this.isMenuButtonEnabled) return;
@@ -349,7 +346,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
   }
 
   mapMenuClick(evt: any) {
-    const timeManagerInstance = keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     this.isMapUpdateOverride = true;
     if (!evt.target?.dataset.time) return;

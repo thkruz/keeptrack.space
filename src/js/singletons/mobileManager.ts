@@ -1,5 +1,5 @@
 import { Kilometers } from 'ootk';
-import { KeepTrackApiMethods, keepTrackApi } from '../keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 
@@ -53,7 +53,7 @@ export class MobileManager {
           settingsManager.isDisableControlSites = true;
 
           keepTrackApi.register({
-            method: KeepTrackApiMethods.selectSatData,
+            event: KeepTrackApiEvents.selectSatData,
             cbName: 'MobileManager.selectSatData',
             cb: () => {
               const searchManager = keepTrackApi.getUiManager().searchManager;
@@ -65,7 +65,7 @@ export class MobileManager {
           });
 
           keepTrackApi.register({
-            method: KeepTrackApiMethods.uiManagerFinal,
+            event: KeepTrackApiEvents.uiManagerFinal,
             cbName: 'MobileManager.uiManagerFinal',
             cb: () => {
               getEl('tutorial-btn').style.display = 'none';

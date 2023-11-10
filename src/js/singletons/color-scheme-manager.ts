@@ -20,8 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackContainer } from '../container';
-import { CatalogManager, ColorInformation, ColorRuleSet, Colors, Pickable, rgbaArray, SatObject, Singletons, UiManager } from '../interfaces';
+import { ColorInformation, ColorRuleSet, Colors, ColorSchemeManager, Pickable, rgbaArray, SatObject } from '../interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
@@ -30,10 +29,8 @@ import { errorManagerInstance } from './errorManager';
 
 import { getDayOfYear } from '../lib/transforms';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
-import { DotsManager } from './dots-manager';
-import { DrawManager } from './draw-manager';
 
-export class StandardColorSchemeManager {
+export class StandardColorSchemeManager implements ColorSchemeManager {
   private readonly DOTS_PER_CALC = 450;
 
   private gl_: WebGL2RenderingContext;
@@ -197,7 +194,7 @@ export class StandardColorSchemeManager {
       // Note the colorscheme for next time
       this.lastColorScheme = this.currentColorScheme;
 
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
 
       // We also need the velocity data if we are trying to colorizing that
       let satVel = null;
@@ -213,7 +210,7 @@ export class StandardColorSchemeManager {
       // Lets loop through all the satellites and color them in one by one
       let params = this.calculateParams_();
 
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
       // Velocity is a special case - we need to know the velocity of each satellite
       if (this.currentColorScheme === this.velocity) {
         this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.getSatsFromSatData(), satVel, params);
@@ -505,7 +502,7 @@ export class StandardColorSchemeManager {
         pickable: Pickable.No,
       };
     } else {
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
       if (dotsManagerInstance.inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
         return {
           color: this.colorTheme.inFOV,
@@ -584,7 +581,7 @@ export class StandardColorSchemeManager {
   }
 
   public init(): void {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
 
     this.gl_ = drawManagerInstance.gl;
     this.colorTheme = settingsManager.colors || {
@@ -654,10 +651,10 @@ export class StandardColorSchemeManager {
 
     // Create the color buffers as soon as the position cruncher is ready
     keepTrackApi.register({
-      method: 'onCruncherReady',
+      event: 'onCruncherReady',
       cbName: 'colorSchemeManager',
       cb: (): void => {
-        const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         // Generate some public buffers
         this.colorData = new Float32Array(catalogManagerInstance.numSats * 4);
@@ -674,7 +671,7 @@ export class StandardColorSchemeManager {
   }
 
   public isInViewOff(sat: SatObject) {
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     return dotsManagerInstance.inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === false;
   }
 
@@ -706,7 +703,7 @@ export class StandardColorSchemeManager {
         pickable: Pickable.No,
       };
     } else {
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
       if (dotsManagerInstance.inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
         return {
           color: this.colorTheme.inFOV,
@@ -770,7 +767,7 @@ export class StandardColorSchemeManager {
     // Hover and Select code might not pass params, so we will handle that here
     // TODO: Hover and select code should be refactored to pass params
     if (!params) {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       params = {
         orbitDensity: catalogManagerInstance.orbitDensity,
@@ -844,7 +841,7 @@ export class StandardColorSchemeManager {
   }
 
   public onlyFOV(sat: SatObject): ColorInformation {
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     if (dotsManagerInstance.inViewData[sat.id] === 1) {
       return {
         color: this.colorTheme.inFOV,
@@ -961,7 +958,7 @@ export class StandardColorSchemeManager {
 
   public async setColorScheme(scheme: (sat: SatObject, params?: any) => ColorInformation, isForceRecolor?: boolean) {
     try {
-      const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
 
       settingsManager.setCurrentColorScheme(scheme); // Deprecated
       this.currentColorScheme = scheme;
@@ -1033,7 +1030,7 @@ export class StandardColorSchemeManager {
       };
     }
 
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     if (sat.missile && dotsManagerInstance.inViewData[sat.id] === 0) {
       return {
         color: this.colorTheme.missile,
@@ -1127,7 +1124,7 @@ export class StandardColorSchemeManager {
       };
     }
 
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     if (dotsManagerInstance.inViewData[sat.id] === 1) {
       if (this.objectTypeFlags.inViewAlt === false) {
         return {
@@ -1298,7 +1295,7 @@ export class StandardColorSchemeManager {
     }
 
     if (this.currentColorScheme === this.neighbors) {
-      const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       params.orbitDensity = catalogManagerInstance.orbitDensity;
       params.orbitDensityMax = catalogManagerInstance.orbitDensityMax;
@@ -1412,7 +1409,7 @@ export class StandardColorSchemeManager {
   }
 
   private getMarkerColor_(sat: SatObject): ColorInformation {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // This doesn't apply to sat overfly mode
     if (!settingsManager.isSatOverflyModeOn) {
@@ -1441,7 +1438,7 @@ export class StandardColorSchemeManager {
   }
 
   private missileColor_(sat: SatObject): ColorInformation {
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
 
     if (dotsManagerInstance.inViewData?.[sat.id] === 0) {
       if (this.objectTypeFlags.missile === false) {
@@ -1472,7 +1469,7 @@ export class StandardColorSchemeManager {
 
   private preValidateColorScheme_(isForceRecolor: boolean = false) {
     if (this.currentColorScheme === this.group || this.currentColorScheme === this.groupCountries) {
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
 
       const watchlistMenu = getEl('watchlist-menu');
       const watchlistTransform = watchlistMenu?.style.transform || '';
@@ -1545,7 +1542,7 @@ export class StandardColorSchemeManager {
   }
 
   private setSelectedAndHoverBuffer_() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const selSat = catalogManagerInstance.selectedSat;
     // Selected satellites are always one color so forget whatever we just did

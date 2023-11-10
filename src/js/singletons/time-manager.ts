@@ -1,6 +1,4 @@
-import { CatalogManager, OrbitManager, Singletons } from '@app/js/interfaces';
 import { Milliseconds } from 'ootk';
-import { keepTrackContainer } from '../container';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { StringPad } from '../lib/stringPad';
@@ -198,8 +196,8 @@ export class TimeManager {
   }
 
   synchronize() {
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     const message = {
       typ: 'offset',

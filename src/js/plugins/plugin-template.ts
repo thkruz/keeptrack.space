@@ -1,4 +1,4 @@
-import { keepTrackApi, KeepTrackApiMethods } from '../keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { clickDragOptions, KeepTrackPlugin } from './KeepTrackPlugin';
 
@@ -36,7 +36,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         SensorInfoPlugin.addSensorToMoonBtnListener();

@@ -1,7 +1,6 @@
 import { Milliseconds } from 'ootk';
 
 import { keepTrackApi } from '../keepTrackApi';
-import { StandardColorSchemeManager } from './color-scheme-manager';
 
 export class DemoManager {
   private lastTime_ = <Milliseconds>0;
@@ -10,7 +9,7 @@ export class DemoManager {
 
   public update(): void {
     const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
-    const colorSchemeManagerInstance = <StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager());
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     const realTime = <Milliseconds>Date.now();
     if (realTime - this.lastTime_ < this.UPDATE_INTERVAL_) return;

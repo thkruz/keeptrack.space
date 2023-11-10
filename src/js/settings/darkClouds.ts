@@ -3,7 +3,6 @@ import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { lat2pitch, lon2yaw } from '../lib/transforms';
 import { TimeMachine } from '../plugins/time-machine/time-machine';
-import { StandardColorSchemeManager } from '../singletons/color-scheme-manager';
 
 export const darkClouds = () => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -167,7 +166,7 @@ export const darkClouds = () => {
             keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
 
             // groupsManager.selectGroup(null); // Deselect all orbits
-            keepTrackApi.getColorSchemeManager().setColorScheme((<StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager())).default, true); // Reset All Colors
+            keepTrackApi.getColorSchemeManager().setColorScheme(keepTrackApi.getColorSchemeManager().default, true); // Reset All Colors
             keepTrackApi.getUiManager().dismissAllToasts();
 
             // Add these four lines if you want to hide the orbits when interacting with the mouse

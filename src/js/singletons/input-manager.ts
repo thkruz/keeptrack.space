@@ -1,16 +1,12 @@
 /* eslint-disable max-classes-per-file */
-import { CatalogManager, SensorManager, Singletons } from '@app/js/interfaces';
 import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
-import { keepTrackContainer } from '../container';
 import { KeepTrack } from '../keeptrack';
 import { getEl } from '../lib/get-el';
 
-import { DotsManager } from './dots-manager';
-import { DrawManager } from './draw-manager';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
@@ -132,8 +128,8 @@ export class InputManager {
       z: eci[2],
     };
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     return dotsManagerInstance.getIdFromEci(eciArray, catalogManagerInstance.orbitalSats);
   }
 
@@ -172,7 +168,7 @@ export class InputManager {
   }
 
   public static unProject(x: number, y: number): [number, number, number] {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
     const { gl } = drawManagerInstance;
 
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
@@ -196,8 +192,8 @@ export class InputManager {
    * @returns The ID of the satellite at the given screen coordinates.
    */
   public getSatIdFromCoord(x: number, y: number): number {
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const dotsManagerInstance = keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
     const { gl } = drawManagerInstance;
 
     // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile
@@ -323,8 +319,8 @@ export class InputManager {
 
     this.isRmbMenuOpen = true;
 
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     const canvasDOM = getEl('keeptrack-canvas');
     const rightBtnMenuDOM = getEl('right-btn-menu');
@@ -469,7 +465,7 @@ export class InputManager {
   /* istanbul ignore next */
   public async readPixelsAsync(x: number, y: number, w: number, h: number, format: number, type: number, dstBuffer: Uint8Array) {
     try {
-      const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
+      const drawManagerInstance = keepTrackApi.getDrawManager();
 
       const { gl } = drawManagerInstance;
       const buf = gl.createBuffer();

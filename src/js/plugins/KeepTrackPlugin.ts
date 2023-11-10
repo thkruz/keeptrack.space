@@ -1,7 +1,7 @@
 import { SatObject, SensorObject, Singletons } from '@app/js/interfaces';
 import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 import Module from 'module';
-import { KeepTrackApiMethods, keepTrackApi } from '../keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
 import { clickAndDragWidth } from '../lib/click-and-drag';
 import { getEl } from '../lib/get-el';
 import { shake } from '../lib/shake';
@@ -296,7 +296,7 @@ export class KeepTrackPlugin {
 
   registerRmbCallback(callback: (targetId: string, clickedSat?: number) => void): void {
     keepTrackApi.register({
-      method: KeepTrackApiMethods.rmbMenuActions,
+      event: KeepTrackApiEvents.rmbMenuActions,
       cbName: this.PLUGIN_NAME,
       cb: callback,
     });
@@ -304,7 +304,7 @@ export class KeepTrackPlugin {
 
   addContextMenuLevel1Item(html: string): void {
     keepTrackApi.register({
-      method: KeepTrackApiMethods.rightBtnMenuAdd,
+      event: KeepTrackApiEvents.rightBtnMenuAdd,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const item = document.createElement('div');
@@ -316,7 +316,7 @@ export class KeepTrackPlugin {
 
   addContextMenuLevel2Item(elementId: string, html: string): void {
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerInit,
+      event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const item = document.createElement('div');
@@ -334,7 +334,7 @@ export class KeepTrackPlugin {
    */
   addBottomIcon(icon: Module, isDisabled = false): void {
     keepTrackApi.register({
-      method: 'uiManagerInit',
+      event: 'uiManagerInit',
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const button = document.createElement('div');
@@ -410,7 +410,7 @@ export class KeepTrackPlugin {
 
   addSideMenu(sideMenuHtml: string): void {
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerInit,
+      event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl(KeepTrackPlugin.sideMenuContainerId).insertAdjacentHTML('beforeend', sideMenuHtml);
@@ -426,7 +426,7 @@ export class KeepTrackPlugin {
   registerBottomMenuClicked(callback: () => void = null) {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
       keepTrackApi.register({
-        method: KeepTrackApiMethods.selectSatData,
+        event: KeepTrackApiEvents.selectSatData,
         cbName: this.PLUGIN_NAME,
         cb: (sat: SatObject): void => {
           if (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected()) {
@@ -440,7 +440,7 @@ export class KeepTrackPlugin {
     }
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
       keepTrackApi.register({
-        method: KeepTrackApiMethods.selectSatData,
+        event: KeepTrackApiEvents.selectSatData,
         cbName: this.PLUGIN_NAME,
         cb: (sat: SatObject): void => {
           if (!sat) {
@@ -455,7 +455,7 @@ export class KeepTrackPlugin {
 
     if (this.isRequireSensorSelected && !this.isRequireSatelliteSelected) {
       keepTrackApi.register({
-        method: KeepTrackApiMethods.setSensor,
+        event: KeepTrackApiEvents.setSensor,
         cbName: this.PLUGIN_NAME,
         cb: (sensor: SensorObject | string, staticNum: number): void => {
           if (!sensor && !staticNum) {
@@ -469,7 +469,7 @@ export class KeepTrackPlugin {
     }
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.bottomMenuClick,
+      event: KeepTrackApiEvents.bottomMenuClick,
       cbName: this.PLUGIN_NAME,
       cb: (iconName: string): void => {
         if (iconName === this.bottomIconElementName) {
@@ -528,7 +528,7 @@ export class KeepTrackPlugin {
 
   registerSubmitButtonClicked(callback: () => void = null) {
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const form = getEl(`${this.sideMenuElementName}-form`);
@@ -546,7 +546,7 @@ export class KeepTrackPlugin {
 
   registerClickAndDragOptions(opts?: clickDragOptions): void {
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         clickAndDragWidth(getEl(this.sideMenuElementName), opts);
@@ -561,7 +561,7 @@ export class KeepTrackPlugin {
    */
   registerHelp(helpTitle: string, helpText: string) {
     keepTrackApi.register({
-      method: 'onHelpMenuClick',
+      event: 'onHelpMenuClick',
       cbName: `${this.PLUGIN_NAME}`,
       cb: (): boolean => {
         if (this.isMenuButtonEnabled) {
@@ -580,7 +580,7 @@ export class KeepTrackPlugin {
    */
   registerHideSideMenu(bottomIconElementName: string, sideMenuElementName: string): void {
     keepTrackApi.register({
-      method: KeepTrackApiMethods.hideSideMenus,
+      event: KeepTrackApiEvents.hideSideMenus,
       cbName: this.PLUGIN_NAME,
       cb: (): void => {
         slideOutLeft(getEl(sideMenuElementName), 1000);

@@ -23,14 +23,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { OrbitManager, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
+import { SensorObject } from '@app/js/interfaces';
 import { getEl } from '@app/js/lib/get-el';
 import { CameraType } from '@app/js/singletons/camera';
 
 import constellationPng from '@app/img/icons/constellation.png';
-import { keepTrackContainer } from '@app/js/container';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DrawManager } from '@app/js/singletons/draw-manager';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
@@ -42,18 +40,17 @@ export class Astronomy extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   bottomIconCallback = (): void => {
-    const { starManager } = keepTrackApi.programs;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-    const drawManagerInstance = keepTrackContainer.get<DrawManager>(Singletons.DrawManager);
-    const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
     if (this.isMenuButtonEnabled) {
       if (!this.verifySensorSelected()) return;
 
       if (catalogManagerInstance.isStarManagerLoaded) {
         // TODO: This takes way too long trying to find the star's
         // satellite id from its name. The ids should be predetermined.
-        starManager.drawAllConstellations();
+        keepTrackApi.getStarManager().drawAllConstellations();
       }
       orbitManagerInstance.clearInViewOrbit();
       keepTrackApi.getMainCamera().cameraType = CameraType.ASTRONOMY; // Activate Astronomy Camera Mode
@@ -70,7 +67,7 @@ export class Astronomy extends KeepTrackPlugin {
       keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       LegendManager.change('default');
       if (catalogManagerInstance.isStarManagerLoaded) {
-        starManager.clearConstellations();
+        keepTrackApi.getStarManager().clearConstellations();
       }
       // getEl('fov-text').innerHTML = ('');
       getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
@@ -86,7 +83,7 @@ export class Astronomy extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      method: 'setSensor',
+      event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
       cb: (sensor: SensorObject): void => {
         if (sensor) {

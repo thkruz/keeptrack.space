@@ -1,5 +1,5 @@
 import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { openColorbox } from '@app/js/lib/colorbox';
 import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
@@ -38,48 +38,48 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     // NOTE: This has to go first.
     // Register orbital element data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_orbitalData`,
       cb: this.orbitalData.bind(this),
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_secondaryData`,
       cb: this.secondaryData.bind(this),
     });
 
     // Register sensor data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_sensorInfo`,
       cb: this.sensorInfo.bind(this),
     });
 
     // Register launch data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_launchData`,
       cb: this.launchData.bind(this),
     });
 
     // Register mission data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_satMissionData`,
       cb: this.satMissionData.bind(this),
     });
 
     // Register intel data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_intelData`,
       cb: this.intelData.bind(this),
     });
 
     // Register object data
     keepTrackApi.register({
-      method: KeepTrackApiMethods.selectSatData,
+      event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_objectData`,
       cb: SatInfoBoxCore.updateObjectData,
     });
@@ -269,6 +269,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         const satObjNumDom = getEl('sat-objnum');
         satObjNumDom.innerHTML = sat.sccNum;
         satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
+        window.M.Tooltip.init(satObjNumDom);
       }
 
       getEl('sat-altid').innerHTML = sat.altId || 'N/A';
@@ -659,17 +660,21 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         const rcs = historicRcs.map((rcs_) => parseFloat(rcs_)).reduce((a, b) => a + b, 0) / historicRcs.length;
         satRcsEl.innerHTML = `H-Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(rcs).toFixed(2) + ' dBsm (Historical Estimate)');
+        window.M.Tooltip.init(satRcsEl);
       } else if (sat.length && sat.diameter && sat.span && sat.shape) {
         const rcs = SatMath.estimateRcs(parseFloat(sat.length), parseFloat(sat.diameter), parseFloat(sat.span), sat.shape);
         satRcsEl.innerHTML = `Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
+        window.M.Tooltip.init(satRcsEl);
       } else {
         satRcsEl.innerHTML = `Unknown`;
         satRcsEl.setAttribute('data-tooltip', 'Unknown');
+        window.M.Tooltip.init(satRcsEl);
       }
     } else {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
       satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(parseFloat(sat.rcs)).toFixed(2) + ' dBsm');
+      window.M.Tooltip.init(satRcsEl);
     }
   }
 

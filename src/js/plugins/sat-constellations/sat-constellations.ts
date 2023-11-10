@@ -50,7 +50,7 @@ export class SatConstellations extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      method: 'uiManagerFinal',
+      event: 'uiManagerFinal',
       cbName: 'constellations',
       cb: () => {
         getEl('constellation-menu')

@@ -12,8 +12,7 @@ Fields:
 - None of the fields are directly used in the methods of this class, but it uses fields from other classes such as CatalogManager, TimeManager, SensorManager, and SatMath.
  */
 
-import { keepTrackContainer } from '@app/js/container';
-import { CatalogManager, SensorManager, Singletons } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { ManueverMath } from '@app/js/static/maneuver-math';
 import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
@@ -22,7 +21,7 @@ import { setupStandardEnvironment } from './environment/standard-env';
 describe('ManueverMath_class', () => {
   beforeEach(() => {
     setupStandardEnvironment();
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
     sensorManagerInstance.currentSensors = [
       {
         id: 0,
@@ -49,7 +48,7 @@ describe('ManueverMath_class', () => {
         volume: false,
       },
     ];
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.satData[80000] = { ...defaultSat, ...{ sccNum: '80000' } };
   });
 
@@ -68,7 +67,7 @@ describe('ManueverMath_class', () => {
     const incVariation = 0.1;
     const meanmoVariation = 0.1;
     const rascVariation = 0.1;
-    const sensorManagerInstance = keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
     sensorManagerInstance.currentSensors = [];
     expect(() => {
       ManueverMath.createManeuverAnalyst(satId, incVariation, meanmoVariation, rascVariation);
@@ -81,7 +80,7 @@ describe('ManueverMath_class', () => {
     const incVariation = 0.1;
     const meanmoVariation = 0.1;
     const rascVariation = 0.1;
-    const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.satCruncher.postMessage = jest.fn();
     expect(ManueverMath.createManeuverAnalyst(satId, incVariation, meanmoVariation, rascVariation)).toBeFalsy();
     expect(catalogManagerInstance.satCruncher.postMessage).not.toHaveBeenCalled();

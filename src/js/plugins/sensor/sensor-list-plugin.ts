@@ -1,10 +1,8 @@
 import radarPng from '@app/img/icons/radar.png';
-import { keepTrackContainer } from '@app/js/container';
-import { OrbitManager, SatObject, SensorObject, Singletons, UiManager } from '@app/js/interfaces';
-import { KeepTrackApiMethods, keepTrackApi } from '@app/js/keepTrackApi';
+import { SatObject, SensorObject } from '@app/js/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { CameraType } from '@app/js/singletons/camera';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { SensorMath } from '@app/js/static/sensor-math';
@@ -226,14 +224,14 @@ export class SensorListPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerInit,
+      event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('nav-mobile').insertAdjacentHTML('beforeend', keepTrackApi.html`<div id="sensor-selected"></div>`);
       },
     });
     keepTrackApi.register({
-      method: KeepTrackApiMethods.uiManagerFinal,
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('sensor-selected').addEventListener('click', () => {
@@ -253,7 +251,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: 'selectSatData',
+      event: 'selectSatData',
       cbName: 'sensor',
       cb: (sat: SatObject) => {
         // Skip this if there is no satellite object because the menu isn't open
@@ -288,7 +286,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      method: KeepTrackApiMethods.setSensor,
+      event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
       cb: (sensor: SensorObject | string) => {
         if (!sensor) {
@@ -350,7 +348,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       errorManagerInstance.warn('Error in sensorListContentClick: ' + e);
       // Multi-sensors break this
     }
-    if (settingsManager.currentColorScheme == (<StandardColorSchemeManager>(<unknown>keepTrackApi.getColorSchemeManager())).default) {
+    if (settingsManager.currentColorScheme == keepTrackApi.getColorSchemeManager().default) {
       LegendManager.change('default');
     }
   }
@@ -369,9 +367,9 @@ export class SensorListPlugin extends KeepTrackPlugin {
       keepTrackApi.getMainCamera().isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
       keepTrackApi.getDrawManager().glInit();
-      const uiManagerInstance = keepTrackContainer.get<UiManager>(Singletons.UiManager);
+      const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.hideSideMenus();
-      const orbitManagerInstance = keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
       keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       // TODO: implement fov information

@@ -31,17 +31,18 @@
 
 'use strict';
 
-import { keepTrackContainer } from '@app/js/container';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
-import { CatalogManager, SatObject, Singletons } from '@app/js/interfaces';
+import { SatObject } from '@app/js/interfaces';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { EARTHS_GRAV_CONST } from '@app/js/lib/constants';
 import { StandardCatalogManager } from '@app/js/singletons/catalog-manager';
+import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { TimeManager } from '@app/js/singletons/time-manager';
+import { SatMath } from '@app/js/static/sat-math';
+import { Sgp4 } from 'ootk';
 
 // Constants
 const RADIUS_OF_EARTH = 6371000; // Radius of Earth in meters
 const MILLISECONDS_PER_DAY = 1.15741e-8;
-const MINUTES_PER_DAY = 1440;
 const PI = Math.PI;
 const TAU = 2 * PI;
 const RAD2DEG = 360 / TAU;
@@ -207,7 +208,7 @@ om.svs2kps = (svs: StateVector[]) => { // NOSONAR
 
   return r;
 };
-om.iod = async (svs: StateVector[], timeManager: TimeManager, satellite) => {
+om.iod = async (svs: StateVector[], timeManager: TimeManager) => {
   try {
     const kps = om.svs2kps(svs);
 
@@ -219,14 +220,14 @@ om.iod = async (svs: StateVector[], timeManager: TimeManager, satellite) => {
     // Change Time to Relative to the First Observation
     const epoch = new Date(svs[0][0]);
 
-    return om.fitTles(epoch, svs, kps, timeManager, satellite);
+    return om.fitTles(epoch, svs, kps, timeManager);
   } catch (e) {
     errorManagerInstance.info(e);
   }
 };
 
 // prettier-ignore
-om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, satellite) => { // NOSONAR
+om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager) => { // NOSONAR
   try {
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
@@ -258,7 +259,7 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, sa
           for (let svI = 0; svI < svs.length; svI++) {
             let eci;
             try {
-              eci = _propagate(tles.tle1, tles.tle2, new Date(epoch + (svs[svI][0] - svs[0][0])), satellite);
+              eci = _propagate(tles.tle1, tles.tle2, new Date(epoch + (svs[svI][0] - svs[0][0])));
               xError += Math.abs(eci.position.x - svs[svI][1]);
               yError += Math.abs(eci.position.y - svs[svI][2]);
               zError += Math.abs(eci.position.z - svs[svI][3]);
@@ -294,9 +295,9 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager, sa
     errorManagerInstance.debug(e);
   }
 };
-om.svs2analyst = async (svs: StateVector[], timeManager: TimeManager, satellite) => {
-  const catalogManagerInstance = keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
-  om.iod(svs, timeManager, satellite)
+om.svs2analyst = async (svs: StateVector[], timeManager: TimeManager) => {
+  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  om.iod(svs, timeManager)
     .then((tles: { tle1: string; tle2: string }) => {
       catalogManagerInstance.insertNewAnalystSatellite(tles.tle1, tles.tle2, catalogManagerInstance.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
       // searchBox.doSearch('100500', false);
@@ -326,25 +327,9 @@ om.debug = {
   closestApproach: 0,
 };
 
-export const _propagate = async (tle1: string, tle2: string, epoch: Date, satellite) => {
-  try {
-    let satrec = satellite.twoline2satrec(tle1, tle2); // perform and store sat init calcs
-    let j = _jday(
-      epoch.getUTCFullYear(),
-      epoch.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-      epoch.getUTCDate(),
-      epoch.getUTCHours(),
-      epoch.getUTCMinutes(),
-      epoch.getUTCSeconds()
-    ); // Converts time to jday (TLEs use epoch year/day)
-    j += epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;
-
-    let m = (j - satrec.jdsatepoch) * MINUTES_PER_DAY;
-    let eci = satellite.sgp4(satrec, m);
-    return eci;
-  } catch (error) {
-    // intentionally left blank
-  }
+export const _propagate = (tle1: string, tle2: string, epoch: Date) => {
+  const satrec = Sgp4.createSatrec(tle1, tle2); // perform and store sat init calcs
+  return SatMath.getEci(<SatObject>{ satrec }, epoch);
 };
 export const _jday = (year: number, mon: number, day: number, hr: number, minute: number, sec: number): number => {
   'use strict';

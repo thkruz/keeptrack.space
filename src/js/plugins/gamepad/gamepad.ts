@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { SatObject } from '@app/js/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { CameraType } from '@app/js/singletons/camera';
 import { Radians } from 'ootk';
@@ -169,7 +170,9 @@ export class GamepadPlugin {
     if (satId >= 0) {
       catalogManagerInstance.selectSat(satId);
     } else {
-      catalogManagerInstance.selectSat(catalogManagerInstance.satData.length - 1);
+      const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+      const lastSatId = activeSats[activeSats.length - 1].id;
+      catalogManagerInstance.selectSat(lastSatId);
     }
   }
 
@@ -178,8 +181,10 @@ export class GamepadPlugin {
     console.log('Right Bumper');
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+    const lastSatId = activeSats[activeSats.length - 1].id;
     const satId = catalogManagerInstance.selectedSat + 1;
-    if (satId <= catalogManagerInstance.satData.length - 1) {
+    if (satId <= lastSatId) {
       catalogManagerInstance.selectSat(satId);
     } else {
       catalogManagerInstance.selectSat(0);

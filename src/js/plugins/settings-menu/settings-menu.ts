@@ -393,6 +393,17 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     });
   }
 
+  addJs(): void {
+    super.addJs();
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        SettingsMenuPlugin.syncOnLoad();
+      },
+    });
+  }
+
   onColorSelected(context: any, colorStr: string) {
     if (typeof context === 'undefined' || context === null) throw new Error('context is undefined');
     if (typeof colorStr === 'undefined' || colorStr === null) throw new Error('colorStr is undefined');
@@ -464,6 +475,37 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       (<HTMLInputElement>getEl('settings-demo-mode')).checked = false;
       getEl('settings-sat-label-mode').classList.remove('lever:after');
     }
+  }
+
+  static syncOnLoad() {
+    (<HTMLInputElement>getEl('settings-leoSats')).checked = settingsManager.isShowLeoSats;
+    (<HTMLInputElement>getEl('settings-heoSats')).checked = settingsManager.isShowHeoSats;
+    (<HTMLInputElement>getEl('settings-meoSats')).checked = settingsManager.isShowMeoSats;
+    (<HTMLInputElement>getEl('settings-geoSats')).checked = settingsManager.isShowGeoSats;
+    (<HTMLInputElement>getEl('settings-showPayloads')).checked = settingsManager.isShowPayloads;
+    (<HTMLInputElement>getEl('settings-showRocketBodies')).checked = settingsManager.isShowRocketBodies;
+    (<HTMLInputElement>getEl('settings-showDebris')).checked = settingsManager.isShowDebris;
+    (<HTMLInputElement>getEl('settings-showAgencies')).checked = settingsManager.isShowAgencies;
+    (<HTMLInputElement>getEl('settings-drawOrbits')).checked = settingsManager.isDrawOrbits;
+    (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked = settingsManager.isDrawTrailingOrbits;
+    (<HTMLInputElement>getEl('settings-drawEcf')).checked = settingsManager.isOrbitCruncherInEcf;
+    (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked = settingsManager.isDrawInCoverageLines;
+    (<HTMLInputElement>getEl('settings-drawSun')).checked = settingsManager.isDrawSun;
+    (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked = settingsManager.isBlackEarth;
+    (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked = settingsManager.isDrawAtmosphere;
+    (<HTMLInputElement>getEl('settings-drawAurora')).checked = settingsManager.isDrawAurora;
+    (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked = settingsManager.isDrawMilkyWay;
+    (<HTMLInputElement>getEl('settings-graySkybox')).checked = settingsManager.isGraySkybox;
+    (<HTMLInputElement>getEl('settings-eciOnHover')).checked = settingsManager.isEciOnHover;
+    (<HTMLInputElement>getEl('settings-hos')).checked = settingsManager.colors.transparent[3] === 0;
+    (<HTMLInputElement>getEl('settings-demo-mode')).checked = settingsManager.isDemoModeOn;
+    (<HTMLInputElement>getEl('settings-sat-label-mode')).checked = settingsManager.isSatLabelModeOn;
+    (<HTMLInputElement>getEl('settings-freeze-drag')).checked = settingsManager.isFreezePropRateOnDrag;
+    (<HTMLInputElement>getEl('settings-time-machine-toasts')).checked = settingsManager.isDisableTimeMachineToasts;
+    (<HTMLInputElement>getEl('maxSearchSats')).value = settingsManager.searchLimit.toString();
+
+    // TODO: This should be preserved in settingsManager
+    // (<HTMLInputElement>getEl('satFieldOfView')).value = settingsManager.selectedSatFOV.toString();
   }
 
   static onSubmit(e: any) {

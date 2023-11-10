@@ -218,9 +218,9 @@ export class DebrisScreening extends KeepTrackPlugin {
     // Remove duplicates
     searchList = searchList.filter((v, i, a) => a.indexOf(v) === i);
 
-    const searchStr = searchList.join(',');
+    let searchStr = searchList.join(',');
     // Remove trailing comma
-    searchStr.replace(/,\s*$/u, '');
+    searchStr = searchStr.replace(/,\s*$/u, '');
     keepTrackApi.getUiManager().doSearch(searchStr);
   }
 }

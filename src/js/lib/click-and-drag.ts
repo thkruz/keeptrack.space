@@ -1,9 +1,9 @@
-interface clickDragOptions {
+interface ClickDragOptions {
   minWidth?: number;
   maxWidth?: number;
 }
 
-export const clickAndDragWidth = (el: HTMLElement, options: clickDragOptions = {}): void => {
+export const clickAndDragWidth = (el: HTMLElement, options: ClickDragOptions = {}): void => {
   if (!el) return;
 
   const minWidth = options.minWidth || 280;
@@ -16,30 +16,26 @@ export const clickAndDragWidth = (el: HTMLElement, options: clickDragOptions = {
 
   let lastUpdate = Date.now();
 
-  let startX: number;
-  let startWidth: number;
   settingsManager.isDragging = false;
 
   // create new element on right edge
   const edgeEl = createElWidth_(el);
 
-  ({ startX, startWidth, width, lastUpdate } = addEventsWidth_(edgeEl, startX, startWidth, el, width, minWidth, maxWidth, lastUpdate));
+  addEventsWidth_(edgeEl, el, width, minWidth, maxWidth, lastUpdate);
 };
 
 export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback?: () => void): void => {
-  let lastUpdate = Date.now();
-  let startY: number;
-  let startHeight: number;
-  let height: number;
   settingsManager.isDragging = false;
 
   // create new element on right edge
   const edgeEl = createElHeight_(el);
 
-  ({ startY, startHeight, height, lastUpdate } = addEventsHeight_(edgeEl, startY, startHeight, el, callback, height, maxHeight, lastUpdate));
+  addEventsHeight_(edgeEl, el, callback, maxHeight);
 };
 
-const addEventsWidth_ = (edgeEl: HTMLDivElement, startX: number, startWidth: number, el: HTMLElement, width: number, minWidth: number, maxWidth: number, lastUpdate: number) => {
+const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number, lastUpdate: number) => {
+  let startX: number;
+  let startWidth: number;
   edgeEl.addEventListener('mousedown', (e: MouseEvent) => {
     Object.assign(edgeEl.style, {
       width: '100vw',
@@ -88,16 +84,12 @@ const createElWidth_ = (el: HTMLElement) => {
   return edgeEl;
 };
 
-const addEventsHeight_ = (
-  edgeEl: HTMLDivElement,
-  startY: number,
-  startHeight: number,
-  el: HTMLElement,
-  callback: () => void,
-  height: number,
-  maxHeight: number,
-  lastUpdate: number
-) => {
+const addEventsHeight_ = (edgeEl: HTMLDivElement, el: HTMLElement, callback: () => void, maxHeight?: number) => {
+  let lastUpdate = Date.now();
+  let startY: number;
+  let startHeight: number;
+  let height: number;
+
   edgeEl.addEventListener('mousedown', (e: MouseEvent) => {
     Object.assign(edgeEl.style, {
       width: '100vw',

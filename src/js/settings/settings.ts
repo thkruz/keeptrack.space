@@ -914,7 +914,7 @@ export class SettingsManager {
   /**
    * Draw Trailing Orbits
    */
-  isDrawTrailingOrbits = true;
+  isDrawTrailingOrbits = false;
   /**
    * Enables the old extended catalog including JSC Vimpel data
    * @deprecated Use isEnableJscCatalog instead

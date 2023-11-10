@@ -75,7 +75,7 @@ export class OrbitFinder {
   rotateOrbitToLatLon(): [string, string] {
     this.parseTle();
 
-    this.meanACalcResults = this.meanACalcLoop(this.meanACalcResults, this.now, this.goalDirection);
+    this.meanACalcResults = this.meanACalcLoop(this.now, this.goalDirection);
     if (this.meanACalcResults !== PropagationResults.Success) {
       return ['Error', 'Failed to find a solution for Mean Anomaly'];
     }
@@ -87,7 +87,7 @@ export class OrbitFinder {
       }
     }
 
-    this.raanCalcResults = this.raanCalcLoop(this.raanCalcResults, this.raanOffset, this.now);
+    this.raanCalcResults = this.raanCalcLoop(this.raanOffset, this.now);
     if (this.raanCalcResults !== PropagationResults.Success) {
       return ['Error', 'Failed to find a solution for Right Ascension of Ascending Node'];
     }
@@ -97,13 +97,13 @@ export class OrbitFinder {
 
   private argPerCalcLoop(): PropagationResults {
     this.meanACalcResults = PropagationResults.Near;
-    for (let i = 0; i < 360 * 10; i += 1) {
+    for (let offset = 0; offset < 360 * 10; offset += 1) {
       // Start with this.argPer - 10 degrees
-      let j = parseFloat(this.argPer) * 10 - 100 + i;
-      if (j > 360 * 10) {
-        j = j - 360 * 10;
+      let posVal = parseFloat(this.argPer) * 10 - 100 + offset;
+      if (posVal > 360 * 10) {
+        posVal = posVal - 360 * 10;
       }
-      this.argPerCalcResults = this.argPerCalc(j.toString(), this.now);
+      this.argPerCalcResults = this.argPerCalc(posVal.toString(), this.now);
 
       // Found it
       if (this.argPerCalcResults === PropagationResults.Success) {
@@ -116,7 +116,7 @@ export class OrbitFinder {
 
       // Really far away
       if (this.argPerCalcResults === PropagationResults.Far) {
-        i += 49;
+        offset += 49;
       }
 
       // Broke
@@ -127,14 +127,12 @@ export class OrbitFinder {
       this.meanACalcResults = this.meanACalcLoop2();
       if (this.meanACalcResults === PropagationResults.Success) {
         if (this.currentDirection !== this.goalDirection) {
-          i = i + 20;
-        } else {
-          if (this.argPerCalcResults === PropagationResults.Success) {
-            break;
-          }
+          offset = offset + 20;
+        } else if (this.argPerCalcResults === PropagationResults.Success) {
+          break;
         }
       }
-      i = this.meanACalcResults === PropagationResults.Far ? i + 100 : i;
+      offset = this.meanACalcResults === PropagationResults.Far ? offset + 100 : offset;
       if (this.meanACalcResults === PropagationResults.Error) {
         return PropagationResults.Error;
       }
@@ -143,16 +141,16 @@ export class OrbitFinder {
   }
 
   private meanACalcLoop2(): PropagationResults {
-    for (let j = 0; j < 520 * 10; j += 1) {
-      this.meanACalcResults = this.meanACalc(j, this.now);
+    for (let posVal = 0; posVal < 520 * 10; posVal += 1) {
+      this.meanACalcResults = this.meanACalc(posVal, this.now);
       if (this.meanACalcResults === PropagationResults.Success) {
         if (this.currentDirection !== this.goalDirection) {
-          j = j + 20;
+          posVal = posVal + 20;
         } else {
           break;
         }
       }
-      j = this.meanACalcResults === PropagationResults.Far ? j + 100 : j;
+      posVal = this.meanACalcResults === PropagationResults.Far ? posVal + 100 : posVal;
       if (this.meanACalcResults === PropagationResults.Error) {
         return PropagationResults.Error;
       }
@@ -175,34 +173,36 @@ export class OrbitFinder {
   }
 
   /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 520 Degrees */
-  private meanACalcLoop(meanACalcResults: PropagationResults, now: Date, goalDirection: string) {
-    for (let i = 0; i < 520 * 10; i += 1) {
-      meanACalcResults = this.meanACalc(i, now);
-      if (meanACalcResults === PropagationResults.Success) {
+  private meanACalcLoop(now: Date, goalDirection: string) {
+    let result = PropagationResults.Near;
+    for (let posVal = 0; posVal < 520 * 10; posVal += 1) {
+      result = this.meanACalc(posVal, now);
+      if (result === PropagationResults.Success) {
         if (this.currentDirection !== goalDirection) {
           // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
           // This happens when the goal latitude is near the poles
-          i += 20;
+          posVal += 20;
         } else {
           break; // Stop changing the Mean Anomaly
         }
       }
-      if (meanACalcResults === PropagationResults.Far) {
-        i += 100;
+      if (result === PropagationResults.Far) {
+        posVal += 100;
       }
     }
-    return meanACalcResults;
+    return result;
   }
 
-  private raanCalcLoop(raanCalcResults: PropagationResults, raanOffset: number, now: Date) {
-    for (let i = 0; i < 520 * 100; i += 1) {
+  private raanCalcLoop(raanOffset: number, now: Date) {
+    let raanCalcResults = PropagationResults.Near;
+    for (let posVal = 0; posVal < 520 * 100; posVal += 1) {
       // 520 degress in 0.01 increments TODO More precise?
-      raanCalcResults = this.raanCalc(i, raanOffset, now);
+      raanCalcResults = this.raanCalc(posVal, raanOffset, now);
       if (raanCalcResults === PropagationResults.Success) {
         break;
       }
       if (raanCalcResults === PropagationResults.Far) {
-        i += 10 * 100;
+        posVal += 10 * 100;
       }
     }
     return raanCalcResults;
@@ -225,7 +225,7 @@ export class OrbitFinder {
 
     const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
 
-    const _TLE1Ending = sat.TLE1.substr(32, 39);
+    const _TLE1Ending = sat.TLE1.substring(32, 71);
     const TLE1 = '1 ' + sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + _TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     const TLE2 = '2 ' + sat.sccNum + ' ' + this.inc + ' ' + raan + ' ' + this.ecen + ' ' + argPe + ' ' + meanaStr + ' ' + this.meanmo + '    10';
 
@@ -270,6 +270,7 @@ export class OrbitFinder {
     }
 
     if (type === PropagationOptions.MeanAnomaly && latDeg > this.goalLat - OrbitFinder.MAX_LAT_ERROR && latDeg < this.goalLat + OrbitFinder.MAX_LAT_ERROR) {
+      // Debugging Code:
       // const distance = Math.sqrt(
       //   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
       // );
@@ -278,6 +279,7 @@ export class OrbitFinder {
     }
 
     if (type === PropagationOptions.RightAscensionOfAscendingNode && lonDeg > this.goalLon - OrbitFinder.MAX_LON_ERROR && lonDeg < this.goalLon + OrbitFinder.MAX_LON_ERROR) {
+      // Debugging Code:
       // const distance = Math.sqrt(
       //   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
       // );
@@ -286,6 +288,7 @@ export class OrbitFinder {
     }
 
     if (type === PropagationOptions.ArgumentOfPerigee && alt > this.goalAlt - OrbitFinder.MAX_ALT_ERROR && alt < this.goalAlt + OrbitFinder.MAX_ALT_ERROR) {
+      // Debugging Code:
       // const distance = Math.sqrt(
       //   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
       // );

@@ -1,10 +1,12 @@
 import { Milliseconds } from 'ootk';
 
+import { SatObject } from '@app/js/interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 
 export class DemoManager {
+  private readonly UPDATE_INTERVAL_ = <Milliseconds>3000;
+  private readonly IS_RANDOM_ = true;
   private lastTime_ = <Milliseconds>0;
-  private readonly UPDATE_INTERVAL_ = <Milliseconds>1000;
   public satellite = 0;
 
   public update(): void {
@@ -15,11 +17,16 @@ export class DemoManager {
     if (realTime - this.lastTime_ < this.UPDATE_INTERVAL_) return;
 
     this.lastTime_ = realTime;
-    this.satellite = this.satellite === satData.length ? 0 : this.satellite;
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+    const lastSatId = activeSats[activeSats.length - 1].id;
 
-    for (let i = this.satellite; i < satData.length; i++) {
-      const sat = satData[i];
+    for (this.satellite; this.satellite < lastSatId; ) {
+      if (this.IS_RANDOM_) this.satellite = Math.floor(Math.random() * lastSatId);
+
+      const sat = satData[this.satellite];
       if (
+        !sat.TLE1 ||
         colorSchemeManagerInstance.isPayloadOff(sat) ||
         colorSchemeManagerInstance.isRocketBodyOff(sat) ||
         colorSchemeManagerInstance.isDebrisOff(sat) ||
@@ -29,9 +36,10 @@ export class DemoManager {
       )
         continue;
 
-      keepTrackApi.getHoverManager().setHoverId(i);
-      keepTrackApi.getOrbitManager().setSelectOrbit(i);
-      this.satellite = i + 1;
+      keepTrackApi.getHoverManager().setHoverId(this.satellite);
+      keepTrackApi.getOrbitManager().setSelectOrbit(this.satellite);
+      this.satellite++;
+      break;
     }
   }
 }

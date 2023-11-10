@@ -197,8 +197,6 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
       },
     });
   } catch (e) {
-    // eslint-disable-next-line no-debugger
-    debugger;
     errorManagerInstance.info('Error loading core plugins:' + e.message);
   }
 };

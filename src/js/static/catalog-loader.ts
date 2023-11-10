@@ -508,7 +508,11 @@ export class CatalogLoader {
     let year = TLE1.substring(9, 17).trim().substring(0, 2); // clean up intl des for display
     if (year === '') {
       errorManagerInstance.debug('intlDes is empty for ' + TLE1);
-      return 'none';
+      return 'None';
+    }
+    if (isNaN(parseInt(year))) {
+      // eslint-disable-next-line no-debugger
+      debugger;
     }
     const prefix = parseInt(year) > 50 ? '19' : '20';
     year = prefix + year;
@@ -698,10 +702,7 @@ export class CatalogLoader {
         // tempSatData[i].TLE2 = jsCatalog[s].TLE2;
       } else {
         settingsManager.isExtraSatellitesAdded = true;
-        let year = element.TLE1.substring(9, 17).trim().substring(0, 2); // clean up intl des for display
-        let prefix = parseInt(year) > 50 ? '19' : '20';
-        year = prefix + year;
-        const rest = element.TLE1.substring(9, 17).trim().substring(2);
+        const intlDes = CatalogLoader.parseIntlDes_(element.TLE1);
         const jsSatInfo = {
           static: false,
           missile: false,
@@ -716,11 +717,10 @@ export class CatalogLoader {
           TLE2: element.TLE2,
           source: element.source,
           altId: element.altId,
-          intlDes: year + '-' + rest,
+          intlDes: intlDes,
           id: tempSatData.length,
         };
         catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
-        catalogManagerInstance.cosparIndex[`${year}-${rest}`] = tempSatData.length;
         tempSatData.push(jsSatInfo);
       }
     }

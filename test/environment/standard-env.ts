@@ -8,6 +8,7 @@ import { DotsManager } from '@app/js/singletons/dots-manager';
 import { StandardGroupManager } from '@app/js/singletons/groups-manager';
 import { InputManager } from '@app/js/singletons/input-manager';
 import { SearchManager } from '@app/js/singletons/search-manager';
+import { starManager } from '@app/js/singletons/starManager';
 import { TimeManager } from '@app/js/singletons/time-manager';
 import { SensorMath } from '@app/js/static/sensor-math';
 import { mat4 } from 'gl-matrix';
@@ -71,6 +72,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
+  keepTrackContainer.registerSingleton(Singletons.StarManager, starManager);
   const sensorMathInstance = new SensorMath();
   keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
 

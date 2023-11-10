@@ -28,7 +28,7 @@ import { getEl } from '@app/js/lib/get-el';
 import { CameraType } from '@app/js/singletons/camera';
 
 import constellationPng from '@app/img/icons/constellation.png';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
@@ -83,7 +83,7 @@ export class Astronomy extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      event: 'setSensor',
+      event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
       cb: (sensor: SensorObject): void => {
         if (sensor) {

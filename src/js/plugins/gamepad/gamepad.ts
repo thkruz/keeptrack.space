@@ -351,7 +351,7 @@ export class GamepadPlugin {
 
   static getController(index = 0): Gamepad | null {
     // If gamepad not specified then try the first one
-    const gamepads = navigator.getGamepads();
+    const gamepads = navigator.getGamepads().filter((gamepad) => gamepad !== null);
     if (gamepads.length > index && gamepads[index] !== null) {
       return gamepads[index];
     }

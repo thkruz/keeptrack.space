@@ -5,7 +5,6 @@ import {
   ColorSchemeManager,
   Constructor,
   GroupsManager,
-  KeepTrackPrograms,
   MissileObject,
   OrbitManager,
   SatObject,
@@ -251,7 +250,6 @@ export const keepTrackApi = {
       keepTrackApi.callbacks.staticOffsetChange.forEach((cb: any) => cb.cb(staticOffset));
     },
   },
-  programs: <KeepTrackPrograms>{},
   loadedPlugins: <KeepTrackPlugin[]>[],
   getPlugin: (pluginClass: Constructor<KeepTrackPlugin>) => {
     if (keepTrackApi.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass))

@@ -5,15 +5,10 @@ import { GroupType, ObjectGroup } from './singletons/object-group';
 import { mat4 } from 'gl-matrix';
 import { SensorList } from './catalogs/sensors';
 import { SpaceObjectType } from './lib/space-object-type';
-import { MissileManager } from './plugins/missile/missileManager';
-import { WatchlistPlugin } from './plugins/watchlist/watchlist';
 import { SatLinkManager } from './singletons/catalog-manager/satLinkManager';
-import { Earth } from './singletons/draw-manager/earth';
 import { LineManager } from './singletons/draw-manager/line-manager';
 import { HoverManager } from './singletons/hover-manager';
 import { SearchManager } from './singletons/search-manager';
-import { StarManager } from './singletons/starManager';
-import { SatMath } from './static/sat-math';
 import { TearrData } from './static/sensor-math';
 
 /** Array of ECI Coordinates [x, y, z] */
@@ -466,26 +461,6 @@ export interface GamepadPlugin {
 export interface SocratesPlugin {
   socratesObjOne: any;
   socratesObjTwo: any;
-}
-
-export interface KeepTrackPrograms {
-  // starManager: StarManager;
-  astronomy: any;
-  debug: any;
-  // depricated
-  earth: Earth;
-  gamepad: GamepadPlugin;
-  mapManager: MapManager;
-  missileManager: MissileManager;
-  photoManager: PhotoManager;
-  satChange: SatChangePlugin;
-  satCruncher: any;
-  satellite: SatMath;
-  sensorFov: SensorFovPlugin;
-  socrates: SocratesPlugin;
-  soundManager: SoundManager;
-  starManager: StarManager;
-  watchlist: WatchlistPlugin;
 }
 
 export type ToastMsgType = 'standby' | 'normal' | 'caution' | 'serious' | 'critical' | 'error';

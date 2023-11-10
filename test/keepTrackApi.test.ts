@@ -1,9 +1,7 @@
 import { expect } from '@jest/globals';
+import { SatObject } from '../src/js/interfaces';
 import { isThisNode, keepTrackApi } from '../src/js/keepTrackApi';
-import { KeepTrackPrograms, SatObject } from '../src/js/interfaces';
-import { defaultSat, keepTrackApiStubs } from './environment/apiMocks';
-
-keepTrackApi.programs = <KeepTrackPrograms>(<unknown>{ ...keepTrackApi.programs, ...keepTrackApiStubs.programs });
+import { defaultSat } from './environment/apiMocks';
 
 test(`keepTrackApi Unit Testing`, () => {
   expect(() => {

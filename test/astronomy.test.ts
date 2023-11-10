@@ -9,9 +9,5 @@ describe('astronomy plugin', () => {
 
   keepTrackApi.methods.setSensor(defaultSensor, 0);
   keepTrackApi.getCatalogManager().isStarManagerLoaded = true;
-  keepTrackApi.programs.starManager = {
-    clearConstellations: jest.fn(),
-    drawAllConstellations: jest.fn(),
-  } as any;
   standardPluginMenuButtonTests(Astronomy);
 });

@@ -228,8 +228,11 @@ export class CatalogLoader {
     dotsManagerInstance.starIndex1 = catalogManagerInstance.starIndex1 + catalogManagerInstance.orbitalSats;
     dotsManagerInstance.starIndex2 = catalogManagerInstance.starIndex2 + catalogManagerInstance.orbitalSats;
 
+    let i = 0;
     for (const staticSat of catalogManagerInstance.staticSet) {
       staticSat.id = tempSatData.length;
+      catalogManagerInstance.staticSet[i].id = tempSatData.length;
+      i++;
       tempSatData.push(staticSat);
     }
     for (const analSat of catalogManagerInstance.analSatSet) {

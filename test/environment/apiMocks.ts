@@ -75,7 +75,7 @@ export const defaultSensor: SensorObject = {
   obsminaz: 347,
   obsminel: 3,
   obsminrange: 200,
-  shortName: 'COD',
+  objName: 'CODSFS',
   static: true,
   staticNum: 0,
   sun: 'No Impact',

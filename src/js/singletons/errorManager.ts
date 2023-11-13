@@ -1,5 +1,6 @@
 import { Options } from 'new-github-issue-url';
-import { isThisNode, keepTrackApi } from '../keepTrackApi';
+import { keepTrackApi } from '../keepTrackApi';
+import { isThisNode } from '../static/isThisNode';
 
 export class ErrorManager {
   private readonly ALLOW_DEBUG = false; // window.location.hostname === 'localhost';

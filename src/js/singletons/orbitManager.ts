@@ -1,9 +1,10 @@
 /* */
 
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { mat4 } from 'gl-matrix';
 import { ColorSchemeManager, GetSatType, MissileParams, OrbitManager, SatObject, UiManager } from '../interfaces';
 import { getEl } from '../lib/get-el';
+import { isThisNode } from '../static/isThisNode';
 import { Camera, CameraType } from './camera';
 import { LineManager } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';

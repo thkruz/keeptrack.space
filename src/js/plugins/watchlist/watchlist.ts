@@ -27,10 +27,11 @@ import addPng from '@app/img/add.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
 import removePng from '@app/img/remove.png';
 import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { isThisNode } from '@app/js/static/isThisNode';
 import saveAs from 'file-saver';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

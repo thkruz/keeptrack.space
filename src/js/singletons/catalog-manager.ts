@@ -26,15 +26,17 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { SatelliteRecord, Sgp4 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
+import { sensors } from '../catalogs/sensors';
 import { stars } from '../catalogs/stars';
 import { CatalogManager, GetSatType, RadarDataObject, SatCruncherMessageData, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { StringPad } from '../lib/stringPad';
+import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { SplashScreen } from '../static/splash-screen';
 import { StringExtractor } from '../static/string-extractor';
@@ -462,11 +464,15 @@ export class StandardCatalogManager implements CatalogManager {
 
     // Create Sensors
     if (!settingsManager.isDisableSensors) {
-      for (const sensor in keepTrackApi.getSensorManager().sensors) {
-        this.staticSet.push({ ...{ static: true }, ...keepTrackApi.getSensorManager().sensors[sensor] });
+      let i = 0;
+      for (const sensor in sensors) {
+        sensors[sensor].staticNum = i;
+        sensors[sensor].static = true;
+        this.staticSet.push(sensors[sensor]);
+        i++;
       }
     }
-    this.isSensorManagerLoaded = true;
+    this.isSensorManagerLoaded = true; // TODO: Why is this always true?
 
     // Create Launch Sites
     if (!settingsManager.isDisableLaunchSites) {

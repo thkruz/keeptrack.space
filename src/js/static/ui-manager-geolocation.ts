@@ -4,6 +4,7 @@ import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { lat2pitch, lon2yaw } from '../lib/transforms';
 import { StandardSensorManager } from '../plugins/sensor/sensorManager';
+import { ZoomValue } from '../singletons/camera';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export class UiGeolocation {
@@ -38,7 +39,7 @@ export class UiGeolocation {
 
     catalogManagerInstance.setSelectedSat(-1);
     const mainCameraInstance = keepTrackApi.getMainCamera();
-    maxrange > 6000 ? mainCameraInstance.changeZoom('geo') : mainCameraInstance.changeZoom('leo');
+    maxrange > 6000 ? mainCameraInstance.changeZoom(ZoomValue.GEO) : mainCameraInstance.changeZoom(ZoomValue.LEO);
     mainCameraInstance.camSnap(lat2pitch(lat), lon2yaw(lon, timeManagerInstance.simulationTimeObj));
   }
 

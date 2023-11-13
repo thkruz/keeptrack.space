@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getDayOfYear } from '@app/js/lib/transforms';
 import { CameraType } from '@app/js/singletons/camera';
-import { RadarDataObject, SatObject } from '../interfaces';
+import { RadarDataObject, SatObject, SensorObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { spaceObjType2Str } from '../lib/spaceObjType2Str';
@@ -104,7 +104,7 @@ export class HoverManager {
         this.staticObj_(sat);
       } else if (sat.missile) {
         this.missile_(sat);
-      } else if (Number(sat.sccNum) > 0) {
+      } else if (sat.TLE1) {
         this.satObj_(sat);
       } else {
         this.staticObj_(sat);
@@ -210,30 +210,29 @@ export class HoverManager {
     } else {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
+      this.satHoverBoxNode1.textContent = sat.name;
+      this.satHoverBoxNode2.textContent = sat.sccNum;
+
       if (
         catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].lat != null &&
         settingsManager.isShowNextPass &&
         drawManagerInstance.isShowDistance
       ) {
-        this.satHoverBoxNode1.textContent = sat.name;
-        this.satHoverBoxNode2.textContent = sat.sccNum;
         if (catalogManagerInstance.selectedSat !== -1) {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat) + SensorMath.distanceString(sat, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
         } else {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat);
         }
       } else if (drawManagerInstance.isShowDistance) {
-        this.satHoverBoxNode1.textContent = sat.name;
         this.showRicOrEci_(sat);
       } else if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && settingsManager.isShowNextPass) {
-        this.satHoverBoxNode1.textContent = sat.name;
-        this.satHoverBoxNode2.textContent = sat.sccNum;
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);
-      } else {
-        this.satHoverBoxNode1.textContent = sat.name;
-        this.satHoverBoxNode2.textContent = sat.sccNum;
+      } else if (settingsManager.isEciOnHover) {
         this.showEciVel_(sat);
+      } else {
+        let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
+        this.satHoverBoxNode3.textContent = `Launched: ${year}`;
       }
     }
   }
@@ -266,23 +265,19 @@ export class HoverManager {
   }
 
   private showEciVel_(sat: SatObject) {
-    if (settingsManager.isEciOnHover) {
-      this.satHoverBoxNode3.innerHTML =
-        'X: ' +
-        sat.position.x.toFixed(2) +
-        ' Y: ' +
-        sat.position.y.toFixed(2) +
-        ' Z: ' +
-        sat.position.z.toFixed(2) +
-        '</br>X: ' +
-        sat.velocity.x.toFixed(2) +
-        ' Y: ' +
-        sat.velocity.y.toFixed(2) +
-        ' Z: ' +
-        sat.velocity.z.toFixed(2);
-    } else {
-      this.satHoverBoxNode3.innerHTML = '';
-    }
+    this.satHoverBoxNode3.innerHTML =
+      'X: ' +
+      sat.position.x.toFixed(2) +
+      ' Y: ' +
+      sat.position.y.toFixed(2) +
+      ' Z: ' +
+      sat.position.z.toFixed(2) +
+      '</br>X: ' +
+      sat.velocity.x.toFixed(2) +
+      ' Y: ' +
+      sat.velocity.y.toFixed(2) +
+      ' Z: ' +
+      sat.velocity.z.toFixed(2);
   }
 
   private showHoverDetails_(id: number, satX?: number, satY?: number) {
@@ -344,16 +339,12 @@ export class HoverManager {
     } else if (sat.type === SpaceObjectType.STAR) {
       this.star_(sat);
     } else {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-      this.satHoverBoxNode1.textContent = sat.name;
-      if (catalogManagerInstance.selectedSat !== -1) {
-        this.satHoverBoxNode2.innerHTML =
-          spaceObjType2Str(sat.type) + SensorMath.distanceString(sat as SatObject, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
-      } else {
-        this.satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + '';
-      }
-      this.satHoverBoxNode3.textContent = '';
+      // It is a Sensor at this point
+      const sensor = <SensorObject>(<unknown>sat);
+      this.satHoverBoxNode1.textContent = sensor.name;
+      const isTelescope = sensor.type === SpaceObjectType.OPTICAL;
+      this.satHoverBoxNode2.textContent = sensor.country;
+      this.satHoverBoxNode3.innerHTML = !isTelescope && sensor.band ? `${sensor.system} (${sensor.band})` : sensor.system;
     }
   }
 

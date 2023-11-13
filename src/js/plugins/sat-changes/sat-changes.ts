@@ -1,9 +1,10 @@
 import satChngPng from '@app/img/icons/sats.png';
 import { SatChngObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
+import { isThisNode } from '@app/js/static/isThisNode';
 
 import { dateFromJday } from '@app/js/lib/transforms';
 

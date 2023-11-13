@@ -1,11 +1,12 @@
 /* eslint-disable max-classes-per-file */
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { KeepTrack } from '../keeptrack';
 import { getEl } from '../lib/get-el';
+import { isThisNode } from '../static/isThisNode';
 
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';

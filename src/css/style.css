@@ -181,8 +181,14 @@ ul {
   font-size: 14px !important;
   outline: 0 !important;
 
-  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
+  -webkit-box-shadow:
+    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.12),
+    0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
+  box-shadow:
+    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.12),
+    0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
 
   position: relative !important;
   cursor: pointer !important;
@@ -304,7 +310,7 @@ ul {
   border-radius: 0px;
   border: 5px solid var(--colorTertiaryDarken3);
   pointer-events: none;
-  z-index: 100000000;
+  z-index: 0;
 }
 
 #sat-minibox {
@@ -438,7 +444,9 @@ ul {
   border-width: 2px;
   border-style: solid;
   border-radius: 10px;
-  box-shadow: 0 0px 6px 0 rgba(0, 0, 0, 0.2), 0 0px 8px 0 rgba(0, 0, 0, 0.19);
+  box-shadow:
+    0 0px 6px 0 rgba(0, 0, 0, 0.2),
+    0 0px 8px 0 rgba(0, 0, 0, 0.19);
   margin-right: 35px;
 }
 
@@ -670,7 +678,6 @@ ul {
   background-color: rgb(255, 0, 0) !important;
 }
 
-
 #looks {
   margin: 0 auto;
 }
@@ -746,7 +753,7 @@ input[type='checkbox'].css-checkbox {
   border: 0;
 }
 
-input[type='checkbox'].css-checkbox+label.css-label {
+input[type='checkbox'].css-checkbox + label.css-label {
   padding-left: 25px;
   height: 20px;
   display: inline-block;
@@ -758,7 +765,7 @@ input[type='checkbox'].css-checkbox+label.css-label {
   cursor: pointer;
 }
 
-input[type='checkbox'].css-checkbox:checked+label.css-label {
+input[type='checkbox'].css-checkbox:checked + label.css-label {
   background-position: 0px -20px;
 }
 
@@ -804,7 +811,10 @@ fieldset {
   box-sizing: border-box;
   color: var(--colorWhite);
   background: rgba(0, 0, 0, 0);
-  font-family: Open Sans, Verdana, sans-serif;
+  font-family:
+    Open Sans,
+    Verdana,
+    sans-serif;
   -webkit-transition: all 0.1s ease-in-out;
   -moz-transition: all 0.1s ease-in-out;
   -ms-transition: all 0.1s ease-in-out;
@@ -867,7 +877,7 @@ ul li {
 }
 
 .satPhotoRow {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
 }
 
@@ -961,8 +971,7 @@ input:focus {
 
 #bottom-icons {
   display: grid;
-  grid-template-columns:
-    minmax(var(--bottom-icon-width), max-content) repeat(auto-fill, var(--bottom-icon-width));
+  grid-template-columns: minmax(var(--bottom-icon-width), max-content) repeat(auto-fill, var(--bottom-icon-width));
   justify-content: center;
   row-gap: 0px;
   background: var(--colorTertiaryDarken2);
@@ -1112,6 +1121,27 @@ input:focus {
 #sensor-list-content ul li {
   padding: 2px !important;
   overflow: hidden !important;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+/* First span goes left */
+#sensor-list-content ul li span:first-child {
+  float: left;
+  text-align: left;
+}
+
+/* Second span is centered */
+#sensor-list-content ul li span:nth-child(2) {
+  text-align: center;
+}
+
+/* Third span goes right */
+#sensor-list-content ul li span:last-child {
+  float: right;
+  text-align: right;
 }
 
 #colors-menu ul li {

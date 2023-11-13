@@ -30,6 +30,7 @@ import { keepTrackApi } from '@app/js/keepTrackApi';
 import { loadJquery } from '@app/js/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
+import { sensors } from '../catalogs/sensors';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
 import { closeColorbox } from '../lib/colorbox';
 import { MILLISECONDS_PER_SECOND } from '../lib/constants';
@@ -145,7 +146,7 @@ export class StandardUiManager implements UiManager {
             LegendManager.change('default');
           } else {
             // Seems to be a single sensor without a staticnum, load that
-            sensorManagerInstance.setSensor(sensorManagerInstance.sensors[currentSensor[0].shortName], currentSensor[1]);
+            sensorManagerInstance.setSensor(sensors[currentSensor[0].shortName], currentSensor[1]);
             LegendManager.change('default');
           }
         }

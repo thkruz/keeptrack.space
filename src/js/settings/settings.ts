@@ -19,10 +19,11 @@
  */
 
 import { SensorGeolocation } from '@app/js/interfaces';
-import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { ClassificationString } from '../static/classification';
+import { isThisNode } from '../static/isThisNode';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;

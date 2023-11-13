@@ -3,7 +3,6 @@ import { Camera, ZoomValue } from './singletons/camera';
 import { GroupType, ObjectGroup } from './singletons/object-group';
 
 import { mat4 } from 'gl-matrix';
-import { SensorList } from './catalogs/sensors';
 import { SpaceObjectType } from './lib/space-object-type';
 import { SatLinkManager } from './singletons/catalog-manager/satLinkManager';
 import { LineManager } from './singletons/draw-manager/line-manager';
@@ -327,14 +326,24 @@ export interface SensorObject {
   obsminel2?: Degrees;
   obsminrange: Kilometers;
   obsminrange2?: Kilometers;
-  shortName: string;
   static?: boolean;
   staticNum?: number;
-  sun: string;
   type?: SpaceObjectType;
   url?: string;
-  volume: boolean;
+  volume?: boolean;
   zoom: ZoomValue;
+  band?: string;
+  // //////////////////////////////////////////
+  // These parts control the UI //
+  // //////////////////////////////////////////
+  /** This is the name of the object in the array */
+  objName: string;
+  /** This is the name of the object in the UI */
+  uiName: string;
+  /** This is the specific system (ex. AN/FPS-132) */
+  system: string;
+  /** This is who operates the sensor */
+  operator: string;
 }
 
 export interface SensorObjectCruncher {
@@ -660,7 +669,6 @@ export interface SensorManager {
   secondarySensors: SensorObject[];
   sensorListUS: SensorObject[];
   sensorTitle: string;
-  sensors: SensorList;
   stfSensors: SensorObject[];
   /** Deprecated - Stop using this */
   whichRadar: string;

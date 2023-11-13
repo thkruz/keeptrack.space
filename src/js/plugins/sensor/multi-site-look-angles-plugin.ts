@@ -132,7 +132,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
             allSensors.push(sensor);
 
-            sensorButton.innerText = sensor.shortName;
+            sensorButton.innerText = sensor.objName;
             sensorButton.addEventListener('click', () => {
               if (sensorButton.classList.contains('btn-red')) {
                 sensorButton.classList.remove('btn-red');
@@ -168,11 +168,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   public getlookanglesMultiSite(sat: SatObject, sensors?: SensorObject[]): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const staticSet = keepTrackApi.getCatalogManager().staticSet;
 
     if (!sensors) {
       sensors = [];
-      for (const sensorName in sensorManagerInstance.sensors) {
-        const sensor = sensorManagerInstance.sensors[sensorName];
+      for (const sensorName in staticSet) {
+        const sensor = staticSet[sensorName];
         sensors.push(sensor);
       }
     }
@@ -223,7 +224,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         el: aer.el,
         az: aer.az,
         rng: aer.rng,
-        name: sensor.shortName,
+        name: sensor.objName,
       };
     } else {
       return {
@@ -238,6 +239,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   static populateMultiSiteTable(multiSiteArray: TearrData[]) {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const staticSet = keepTrackApi.getCatalogManager().staticSet;
 
     const tbl = <HTMLTableElement>getEl('multi-site-look-angles-table'); // Identify the table to update
     tbl.innerHTML = ''; // Clear the table from old object data
@@ -260,7 +262,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
     const timeManagerInstance = keepTrackApi.getTimeManager();
     for (let i = 0; i < multiSiteArray.length; i++) {
-      if (sensorManagerInstance.sensorListUS.includes(sensorManagerInstance.sensors[multiSiteArray[i].name])) {
+      if (sensorManagerInstance.sensorListUS.includes(staticSet[multiSiteArray[i].name])) {
         tr = tbl.insertRow();
         tr.setAttribute('class', 'link');
         tdT = tr.insertCell();
@@ -276,7 +278,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         // TODO: Future feature
         tr.addEventListener('click', () => {
           timeManagerInstance.changeStaticOffset(new Date(multiSiteArray[i].time).getTime() - new Date().getTime());
-          const sensor = sensorManagerInstance.sensors[multiSiteArray[i].name];
+          const sensor = staticSet[multiSiteArray[i].name];
           sensorManagerInstance.setSensor(sensor, sensor.staticNum);
         });
       }

@@ -474,9 +474,9 @@ export class LineManager {
                 continue;
               }
               if (this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV) {
-                const sensorManagerInstance = keepTrackApi.getSensorManager();
-                Object.keys(sensorManagerInstance.sensors).forEach((key) => {
-                  const sensor = sensorManagerInstance.sensors[key];
+                const staticSet = keepTrackApi.getCatalogManager().staticSet;
+                Object.keys(staticSet).forEach((key) => {
+                  const sensor = staticSet[key];
                   if (sensor.name == this.drawLineList[i].sat2.name) {
                     let tearr = SensorMath.getTearr(this.drawLineList[i].sat, [sensor]);
                     if (!tearr.inView || !settingsManager.isDrawInCoverageLines) {

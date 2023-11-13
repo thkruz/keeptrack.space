@@ -26,7 +26,7 @@ describe('ManueverMath_class', () => {
       {
         id: 0,
         name: 'Cape Cod SFS, Massachusetts',
-        shortName: 'COD',
+        objName: 'COD',
         type: SpaceObjectType.PHASED_ARRAY_RADAR,
         lat: <Degrees>41.754785,
         lon: <Degrees>-70.539151,

@@ -1,6 +1,7 @@
 import customPng from '@app/img/icons/custom.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
+import { ZoomValue } from '@app/js/singletons/camera';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { UiGeolocation } from '@app/js/static/ui-manager-geolocation';
 import { Degrees, Kilometers, SpaceObjectType } from 'ootk';
@@ -208,10 +209,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       obsmaxrange: CustomSensorPlugin.str2Km(maxrange),
       type,
       name: 'Custom Sensor',
+      uiName: 'Custom Sensor',
+      system: 'Custom Sensor',
       country: 'Custom Sensor',
-      shortName: 'Custom Sensor',
-      sun: 'No Impact',
-      zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? 'geo' : 'leo',
+      objName: 'Custom Sensor',
+      operator: 'Custom Sensor',
+      zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
       volume: false,
     });
   }

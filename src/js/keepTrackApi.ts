@@ -345,5 +345,5 @@ export const isMissileObject = (sat: CatalogObject): boolean => !!(<MissileObjec
 export const isSatObject = (sat: CatalogObject): boolean => {
   if (!sat) return false;
 
-  return !!((<SatObject>sat).sccNum || (<SatObject>sat).intlDes);
+  return !!((<SatObject>sat).sccNum || (<SatObject>sat).intlDes || (<SatObject>sat).TLE1);
 };

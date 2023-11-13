@@ -211,7 +211,21 @@ export class HoverManager {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       this.satHoverBoxNode1.textContent = sat.name;
-      this.satHoverBoxNode2.textContent = sat.sccNum;
+      if (sat.sccNum) {
+        this.satHoverBoxNode2.textContent = sat.sccNum;
+      } else {
+        let now: Date | number | string = new Date();
+        const jday = getDayOfYear(now);
+        now = now.getUTCFullYear();
+        now = now.toString().substr(2, 2);
+        let daysold;
+        if (sat.TLE1.substr(18, 2) === now) {
+          daysold = jday - parseInt(sat.TLE1.substr(20, 3));
+        } else {
+          daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
+        }
+        this.satHoverBoxNode2.textContent = `Last Seen: ${daysold} days ago`;
+      }
 
       if (
         catalogManagerInstance.isSensorManagerLoaded &&
@@ -232,6 +246,7 @@ export class HoverManager {
         this.showEciVel_(sat);
       } else {
         let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
+        year = year === '' ? 'Unknown' : year; // JSC VIMPEL objects have no launch year
         this.satHoverBoxNode3.textContent = `Launched: ${year}`;
       }
     }

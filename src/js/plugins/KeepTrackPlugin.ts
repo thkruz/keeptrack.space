@@ -429,7 +429,7 @@ export class KeepTrackPlugin {
         event: KeepTrackApiEvents.selectSatData,
         cbName: this.PLUGIN_NAME,
         cb: (sat: SatObject): void => {
-          if (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected()) {
+          if (!sat?.TLE1 || !keepTrackApi.getSensorManager().isSensorSelected()) {
             this.setBottomIconToDisabled();
             this.setBottomIconToUnselected();
           } else {

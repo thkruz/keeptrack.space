@@ -30,7 +30,9 @@ export abstract class UrlManager {
     const paramSlices = [];
 
     if (catalogManagerInstance.selectedSat !== -1 && typeof catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum != 'undefined') {
-      paramSlices.push('sat=' + catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum);
+      // TODO: This doesn't work for VIMPEL objects
+      const scc = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum;
+      if (scc !== '') paramSlices.push('sat=' + scc);
     }
     if (currentSearch !== '') {
       paramSlices.push('search=' + currentSearch);

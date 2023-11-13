@@ -31,7 +31,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
     az: 0,
     el: 0,
     rng: 0,
-    name: '',
+    objName: '',
     lat: 0,
     lon: 0,
     alt: 0,

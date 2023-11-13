@@ -5,6 +5,7 @@ import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { CameraType } from '@app/js/singletons/camera';
 
+import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 
@@ -50,6 +51,10 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   selectSat(satId: number) {
     if (settingsManager.isDisableSelectSat) return;
+    if (satId === null) {
+      errorManagerInstance.debug('SelectSatManager.selectSat: satId is null');
+      return;
+    }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 

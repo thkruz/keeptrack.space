@@ -10,12 +10,8 @@ import { SettingsManager } from '../settings/settings';
 import { FormatTle } from './format-tle';
 
 interface JsSat {
-  NoradId: string;
-  SCC: string;
   TLE1: string;
   TLE2: string;
-  altId: number;
-  source: string;
   vmag?: number;
 }
 
@@ -697,34 +693,40 @@ export class CatalogLoader {
     // If jsCatalog catalogue
     for (const element of jsCatalog) {
       if (!element.TLE1 || !element.TLE2) continue; // Don't Process Bad Satellite Information
-      if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
+      const scc = FormatTle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
+      if (typeof catalogManagerInstance.sccIndex[`${scc}`] !== 'undefined') {
         // console.warn('Duplicate Satellite Found in jsCatalog');
         // NOTE: We don't trust the jsCatalog, so we don't update the TLEs
         // i = catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC}`];
         // tempSatData[i].TLE1 = jsCatalog[s].TLE1;
         // tempSatData[i].TLE2 = jsCatalog[s].TLE2;
       } else {
-        settingsManager.isExtraSatellitesAdded = true;
-        const intlDes = CatalogLoader.parseIntlDes_(element.TLE1);
-        const jsSatInfo = {
-          static: false,
-          missile: false,
-          active: true,
-          name: `${element.source} ${element.altId}`,
-          type: SpaceObjectType.DEBRIS,
-          country: 'Unknown',
-          rocket: 'Unknown',
-          site: 'Unknown',
-          sccNum: element.SCC.toString(),
-          TLE1: element.TLE1,
-          TLE2: element.TLE2,
-          source: element.source,
-          altId: element.altId,
-          intlDes: intlDes,
-          id: tempSatData.length,
-        };
-        catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
-        tempSatData.push(jsSatInfo);
+        // Check if the 8th character is 'V' for Vimpel
+        const isVimpel = element.TLE1[7] === 'V';
+        if (isVimpel) {
+          const altId = element.TLE1.substring(9, 17).trim();
+          settingsManager.isExtraSatellitesAdded = true;
+          const jsSatInfo = {
+            static: false,
+            missile: false,
+            active: true,
+            name: `JSC Vimpel ${altId}`,
+            type: SpaceObjectType.DEBRIS,
+            country: 'Unknown',
+            rocket: 'Unknown',
+            site: 'Unknown',
+            sccNum: '',
+            TLE1: element.TLE1,
+            TLE2: element.TLE2,
+            source: 'JSC Vimpel',
+            altId: altId,
+            intlDes: '',
+            id: tempSatData.length,
+          };
+          tempSatData.push(jsSatInfo);
+        } else {
+          errorManagerInstance.debug('Skipping non-Vimpel satellite in JSC Vimpel catalog');
+        }
       }
     }
   }
@@ -746,7 +748,7 @@ export class CatalogLoader {
     }
   }
 
-  private static sortByScc_(catalog: AsciiTleSat[] | JsSat[] | ExtraSat[]) {
+  private static sortByScc_(catalog: AsciiTleSat[] | ExtraSat[]) {
     catalog.sort((a: { SCC: string }, b: { SCC: string }) => {
       if (a.SCC < b.SCC) {
         return -1;

@@ -156,7 +156,7 @@ export class Breakup extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (!sat?.sccNum) {
+        if (!sat?.TLE1) {
           if (this.isMenuButtonEnabled) {
             this.closeSideMenu();
           }

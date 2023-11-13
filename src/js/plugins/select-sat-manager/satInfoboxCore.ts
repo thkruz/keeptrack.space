@@ -197,7 +197,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       const jday = getDayOfYear(now);
       now = now.getUTCFullYear();
       now = now.toString().substr(2, 2);
-      let daysold;
+      let daysold: number;
       if (sat.TLE1.substr(18, 2) === now) {
         daysold = jday - parseInt(sat.TLE1.substr(20, 3));
       } else {
@@ -207,8 +207,10 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       const elsetAgeDom = getEl('sat-elset-age');
 
       if (elsetAgeDom) {
-        elsetAgeDom.innerHTML = daysold + ' Days';
+        elsetAgeDom.innerHTML = `${daysold} Days`;
       }
+
+      SatInfoBoxCore.updateConfidenceDom(sat, daysold);
 
       elsetAgeDom.dataset.position = 'left';
       elsetAgeDom.dataset.delay = '50';
@@ -233,6 +235,34 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       this.issecondaryDataLoaded = true;
     }
   };
+
+  private static updateConfidenceDom(sat: SatObject, daysold: number) {
+    let color = '';
+    let text = '';
+
+    const confidenceDom = getEl('sat-confidence');
+    if (confidenceDom) {
+      // If we have a good source, we can be confident
+      if (sat.source === 'USSF') {
+        text = 'High';
+        color = 'green';
+      } else {
+        text = 'Medium';
+        color = 'orange';
+      }
+
+      // Maybe we need to lower it?
+      if (daysold > 30) {
+        text = 'Low';
+        color = 'red';
+      } else if (daysold > 7) {
+        text = 'Medium';
+        color = 'orange';
+      }
+      confidenceDom.innerHTML = text;
+      confidenceDom.style.color = color;
+    }
+  }
 
   launchData(sat: SatObject): void {
     if (sat === null || typeof sat === 'undefined') return;
@@ -265,6 +295,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       getEl('sat-intl-des').innerHTML = sat.intlDes === 'none' ? 'N/A' : sat.intlDes;
       if (sat.source && sat.source !== 'USSF') {
         getEl('sat-objnum').innerHTML = 'N/A';
+        getEl('sat-intl-des').innerHTML = 'N/A';
       } else {
         const satObjNumDom = getEl('sat-objnum');
         satObjNumDom.innerHTML = sat.sccNum;
@@ -480,6 +511,10 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
                 <div class="sat-info-row sat-only-info">
                   <div class="sat-info-key">Source</div>
                   <div class="sat-info-value" id="sat-source">USSF</div>
+                </div>
+                <div class="sat-info-row sat-only-info">
+                  <div class="sat-info-key">Confidence</div>
+                  <div class="sat-info-value" id="sat-confidence">High</div>
                 </div>
               </div>
               <div class="sat-info-section-header">Orbit Data</div>

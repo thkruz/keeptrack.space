@@ -32,6 +32,7 @@ export enum Operators {
 export const sensors = <SensorList>{
   CODSFS: {
     objName: 'CODSFS',
+    shortName: 'COD',
     id: 0,
     name: 'Cape Cod SFS, Massachusetts',
     uiName: 'Cape Cod SFS',
@@ -59,6 +60,7 @@ export const sensors = <SensorList>{
   },
   BLEAFB: {
     objName: 'BLEAFB',
+    shortName: 'BLE',
     id: 0,
     name: 'Beale AFB, California',
     uiName: 'Beale AFB',
@@ -84,6 +86,7 @@ export const sensors = <SensorList>{
   },
   CLRSFS: {
     objName: 'CLRSFS',
+    shortName: 'CLR',
     id: 0,
     name: 'Clear SFS, Alaska',
     uiName: 'Clear SFS',
@@ -109,6 +112,7 @@ export const sensors = <SensorList>{
   },
   EGLAFB: {
     objName: 'EGLAFB',
+    shortName: 'EGL',
     id: 0,
     name: 'Eglin AFB, Florida',
     uiName: 'Eglin AFB',
@@ -133,6 +137,7 @@ export const sensors = <SensorList>{
   },
   RAFFYL: {
     objName: 'RAFFYL',
+    shortName: 'FYL',
     id: 0,
     name: 'RAF Fylingdales, United Kingdom',
     uiName: 'RAF Fylingdales',
@@ -158,6 +163,7 @@ export const sensors = <SensorList>{
   },
   CAVSFS: {
     objName: 'CAVSFS',
+    shortName: 'CAV',
     id: 0,
     name: 'Cavalier SFS, North Dakota',
     uiName: 'Cavalier SFS',
@@ -183,6 +189,7 @@ export const sensors = <SensorList>{
   },
   PITSB: {
     objName: 'PITSB',
+    shortName: 'THL',
     id: 0,
     name: 'Pituffik SB, Greenland',
     uiName: 'Pituffik SB',
@@ -209,6 +216,7 @@ export const sensors = <SensorList>{
   },
   COBRADANE: {
     objName: 'COBRADANE',
+    shortName: 'CDN',
     id: 0,
     name: 'Eareckson Air Station, Alaska',
     uiName: 'Eareckson AFS',
@@ -242,6 +250,7 @@ export const sensors = <SensorList>{
   },
   KWAJALT: {
     objName: 'KWAJALT',
+    shortName: 'ALT',
     id: 0,
     name: 'ALTAIR, Kwajalein Atoll',
     uiName: 'Kwajalein Atoll',
@@ -361,6 +370,7 @@ export const sensors = <SensorList>{
   },
   KWAJSPF: {
     objName: 'KWAJSPF',
+    shortName: 'SF',
     id: 0,
     name: 'Space Fence, Kwajalein Atoll',
     uiName: 'Kwajalein Atoll',
@@ -385,6 +395,7 @@ export const sensors = <SensorList>{
   },
   MITMIL: {
     objName: 'MITMIL',
+    shortName: 'MIL',
     id: 0,
     name: 'Westford, Massachusetts',
     uiName: 'Westford',
@@ -473,6 +484,7 @@ export const sensors = <SensorList>{
   },
   RAFASC: {
     objName: 'RAFASC',
+    shortName: 'ASC',
     id: 0,
     name: 'Ascension Island, United Kingdom',
     uiName: 'RAF Ascension Island',

@@ -101,7 +101,7 @@
     "coverage-istanbul-loader": "^3.0.5",
     "cross-env": "^7.0.3",
     "css-loader": "^6.8.1",
-    "cypress": "^12.17.4",
+    "cypress": "^13.5.1",
     "download-file": "^0.1.5",
     "eslint": "^8.50.0",
     "eslint-plugin-jest": "^27.4.0",

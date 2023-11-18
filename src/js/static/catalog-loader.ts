@@ -68,24 +68,6 @@ export class CatalogLoader {
       CatalogLoader.processJsCatalog_(jsCatalog, catalogManagerInstance, tempSatData);
     }
 
-    if (settingsManager.isExtraSatellitesAdded) {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerFinal,
-        cbName: 'CatalogLoader',
-        cb: () => {
-          try {
-            document.querySelector<HTMLElement>('.legend-pink-box').style.display = 'block';
-            document.querySelectorAll('.legend-pink-box').forEach((element) => {
-              element.parentElement.style.display = 'none';
-              element.parentElement.innerHTML = `<div class="Square-Box legend-pink-box"></div>${settingsManager.nameOfSpecialSats}`;
-            });
-          } catch (e) {
-            // Intentionally Blank
-          }
-        },
-      });
-    }
-
     CatalogLoader.addNonSatelliteObjects_(catalogManagerInstance, tempSatData);
 
     catalogManagerInstance.satData = tempSatData;

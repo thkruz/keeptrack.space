@@ -53,7 +53,6 @@ a,
   cursor: pointer;
 }
 
-a:hover,
 .link:hover {
   background: rgba(0, 0, 0, 0.2);
 }
@@ -896,7 +895,6 @@ ul li {
 #datetime {
   font-size: 12px;
   text-align: center;
-  margin-top: -2px;
 }
 
 #datetime-input {
@@ -934,21 +932,29 @@ input:focus {
 #datetime-text {
   font-family: 'Roboto Mono', monospace;
   font-size: 20px;
-  padding: 0px 0px 0px 5px;
-  width: 110px;
   cursor: pointer;
-  overflow: hidden;
-  top: 0px;
   border-width: 0px 0px 0px 1px;
   border-style: solid;
   border-color: var(--colorSecondary);
-  position: relative;
-  left: 5px;
+  padding: 0px 10px 0px 10px;
+  vertical-align: bottom;
 }
 
+#nav-mobile {
+  display: flex;
+  width: 600px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 20px;
+  font-family: 'Roboto Mono', monospace;
+}
+
+#sensor-selected:hover,
 #datetime-text:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 #sensor-selected {

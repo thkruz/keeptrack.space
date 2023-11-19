@@ -107,7 +107,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl('nav-mobile').insertAdjacentHTML('beforeend', keepTrackApi.html`<div id="sensor-selected"></div>`);
+        getEl('nav-mobile').insertAdjacentHTML('beforeend', keepTrackApi.html`<div id="sensor-selected" class="waves-effect waves-light"></div>`);
       },
     });
     keepTrackApi.register({

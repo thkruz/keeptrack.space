@@ -89,6 +89,9 @@ export interface Colors {
   radarData: rgbaArray;
   radarDataMissile: rgbaArray;
   radarDataSatellite: rgbaArray;
+  confidenceHigh: rgbaArray;
+  confidenceLow: rgbaArray;
+  confidenceMed: rgbaArray;
   rcsLarge: rgbaArray;
   rcsMed: rgbaArray;
   rcsSmall: rgbaArray;

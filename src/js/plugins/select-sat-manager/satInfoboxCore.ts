@@ -210,7 +210,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         elsetAgeDom.innerHTML = `${daysold} Days`;
       }
 
-      SatInfoBoxCore.updateConfidenceDom(sat, daysold);
+      SatInfoBoxCore.updateConfidenceDom(sat);
 
       elsetAgeDom.dataset.position = 'left';
       elsetAgeDom.dataset.delay = '50';
@@ -236,29 +236,25 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     }
   };
 
-  private static updateConfidenceDom(sat: SatObject, daysold: number) {
+  private static updateConfidenceDom(sat: SatObject) {
     let color = '';
     let text = '';
 
     const confidenceDom = getEl('sat-confidence');
     if (confidenceDom) {
-      // If we have a good source, we can be confident
-      if (sat.source === 'USSF') {
-        text = 'High';
+      let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
+
+      if (confidenceScore >= 7) {
+        text = `High (${confidenceScore})`;
         color = 'green';
-      } else {
-        text = 'Medium';
+      } else if (confidenceScore >= 4) {
+        text = `Medium (${confidenceScore})`;
         color = 'orange';
+      } else {
+        text = `Low (${confidenceScore})`;
+        color = 'red';
       }
 
-      // Maybe we need to lower it?
-      if (daysold > 30) {
-        text = 'Low';
-        color = 'red';
-      } else if (daysold > 7) {
-        text = 'Medium';
-        color = 'orange';
-      }
       confidenceDom.innerHTML = text;
       confidenceDom.style.color = color;
     }

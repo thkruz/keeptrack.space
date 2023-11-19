@@ -4,8 +4,8 @@ import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { StringPad } from '@app/js/lib/stringPad';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
-import { TleLine1, TleLine2 } from 'ootk';
-import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
+import { Tle, TleLine1, TleLine2 } from 'ootk';
+import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { FormatTle } from './format-tle';
 
@@ -509,7 +509,24 @@ export class CatalogLoader {
     resp[i].active = true;
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
       resp[i].id = tempSatData.length;
-      resp[i].source = 'USSF';
+      const source = Tle.getClassification(resp[i].TLE1);
+      switch (source) {
+        case 'U':
+          resp[i].source = 'USSF';
+          break;
+        case 'C':
+          resp[i].source = 'CelesTrak';
+          break;
+        case 'M':
+          resp[i].source = 'University of Michigan';
+          break;
+        case 'V':
+          resp[i].source = 'JSC Vimpel';
+          break;
+        default:
+          // Default to USSF for now
+          resp[i].source = 'USSF';
+      }
       tempSatData.push(resp[i]);
     }
 
@@ -724,7 +741,24 @@ export class CatalogLoader {
         catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
         resp[i].active = true;
-        resp[i].source = 'USSF';
+        const source = Tle.getClassification(resp[i].TLE1);
+        switch (source) {
+          case 'U':
+            resp[i].source = 'USSF';
+            break;
+          case 'C':
+            resp[i].source = 'CelesTrak';
+            break;
+          case 'M':
+            resp[i].source = 'University of Michigan';
+            break;
+          case 'V':
+            resp[i].source = 'JSC Vimpel';
+            break;
+          default:
+            // Default to USSF for now
+            resp[i].source = 'USSF';
+        }
         tempSatData.push(resp[i]);
       }
     }

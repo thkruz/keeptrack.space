@@ -210,21 +210,16 @@ export class HoverManager {
     } else {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-      this.satHoverBoxNode1.textContent = sat.name;
+      let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
+      // eslint-disable-next-line no-nested-ternary
+      const color = confidenceScore >= 7 ? 'green' : confidenceScore >= 4 ? 'orange' : 'red';
+      this.satHoverBoxNode1.innerHTML = keepTrackApi.html`<span>${sat.name}</span><span style='color:${color};'> (${confidenceScore.toString()})</span>`;
       if (sat.sccNum) {
-        this.satHoverBoxNode2.textContent = sat.sccNum;
+        this.satHoverBoxNode2.textContent = `NORAD: ${sat.sccNum}`;
       } else {
-        let now: Date | number | string = new Date();
-        const jday = getDayOfYear(now);
-        now = now.getUTCFullYear();
-        now = now.toString().substr(2, 2);
-        let daysold;
-        if (sat.TLE1.substr(18, 2) === now) {
-          daysold = jday - parseInt(sat.TLE1.substr(20, 3));
-        } else {
-          daysold = jday + parseInt(now) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
-        }
-        this.satHoverBoxNode2.textContent = `Last Seen: ${daysold} days ago`;
+        let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
+        year = year === '' ? 'Unknown' : year; // JSC VIMPEL objects have no launch year
+        this.satHoverBoxNode2.textContent = `Launched: ${year}`;
       }
 
       if (
@@ -246,8 +241,11 @@ export class HoverManager {
         this.showEciVel_(sat);
       } else {
         let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
-        year = year === '' ? 'Unknown' : year; // JSC VIMPEL objects have no launch year
-        this.satHoverBoxNode3.textContent = `Launched: ${year}`;
+        if (year) {
+          this.satHoverBoxNode3.textContent = `Launched: ${year}`;
+        } else {
+          this.satHoverBoxNode3.textContent = '';
+        }
       }
     }
   }

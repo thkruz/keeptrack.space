@@ -66,6 +66,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     satMed: true,
     satHi: true,
     satSmall: true,
+    confidenceHigh: true,
+    confidenceMed: true,
+    confidenceLow: true,
     rcsSmall: true,
     rcsMed: true,
     rcsLarge: true,
@@ -603,6 +606,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       satMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       satHi: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       satSmall: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      confidenceHigh: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      confidenceMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      confidenceLow: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsSmall: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsLarge: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
@@ -918,6 +924,36 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
   }
 
+  public confidence(sat: SatObject): ColorInformation {
+    if (!sat.TLE1) {
+      return {
+        color: this.colorTheme.transparent,
+        pickable: Pickable.No,
+      };
+    }
+
+    let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
+    let pickable = Pickable.No;
+    let color: [number, number, number, number];
+    if (confidenceScore >= 7 && this.objectTypeFlags.confidenceHigh) {
+      color = this.colorTheme.confidenceHigh;
+      pickable = Pickable.Yes;
+    } else if (confidenceScore >= 4 && confidenceScore < 7 && this.objectTypeFlags.confidenceMed) {
+      color = this.colorTheme.confidenceMed;
+      pickable = Pickable.Yes;
+    } else if (confidenceScore >= 0 && confidenceScore < 4 && this.objectTypeFlags.confidenceLow) {
+      color = this.colorTheme.confidenceLow;
+      pickable = Pickable.Yes;
+    } else {
+      color = this.colorTheme.transparent;
+      pickable = Pickable.No;
+    }
+    return {
+      color,
+      pickable,
+    };
+  }
+
   public reloadColors() {
     this.colorTheme = settingsManager.colors;
   }
@@ -943,6 +979,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     this.objectTypeFlags.satMed = true;
     this.objectTypeFlags.satHi = true;
     this.objectTypeFlags.satSmall = true;
+    this.objectTypeFlags.confidenceHigh = true;
+    this.objectTypeFlags.confidenceMed = true;
+    this.objectTypeFlags.confidenceLow = true;
     this.objectTypeFlags.rcsSmall = true;
     this.objectTypeFlags.rcsMed = true;
     this.objectTypeFlags.rcsLarge = true;
@@ -1492,6 +1531,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       switch (this.currentColorScheme) {
         case StandardColorSchemeManager.apogee:
         case this.smallsats:
+        case this.confidence:
         case this.rcs:
         case this.countries:
         case this.ageOfElset:

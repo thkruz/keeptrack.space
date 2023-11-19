@@ -5,6 +5,7 @@ import { StandardColorSchemeManager } from '../singletons/color-scheme-manager';
 import {
   ageOfElsetDiv,
   astronomyDiv,
+  confidenceDiv,
   countriesDiv,
   deepDiv,
   defaultDiv,
@@ -40,6 +41,9 @@ export abstract class LegendManager {
     '.legend-satMed-box',
     '.legend-satHi-box',
     '.legend-inviewAlt-box',
+    '.legend-confidenceLow-box',
+    '.legend-confidenceMed-box',
+    '.legend-confidenceHi-box',
     '.legend-rcsSmall-box',
     '.legend-rcsMed-box',
     '.legend-rcsLarge-box',
@@ -64,6 +68,7 @@ export abstract class LegendManager {
 
   private static readonly menuOptions = {
     rcs: rcsDiv,
+    confidence: confidenceDiv,
     neighbors: neighborsDiv,
     small: smallDiv,
     near: nearDiv,

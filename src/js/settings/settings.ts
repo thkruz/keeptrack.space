@@ -1033,9 +1033,9 @@ export class SettingsManager {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.2.0') {
+    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.0') {
       this.colors = {
-        version: '1.2.0',
+        version: '1.3.0',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 1.0],
@@ -1096,6 +1096,9 @@ export class SettingsManager {
         // apogeeGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
         // velGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
         satSmall: [0.2, 1.0, 0.0, 0.65],
+        confidenceHigh: [0.0, 1.0, 0.0, 0.65],
+        confidenceMed: [1.0, 0.4, 0.0, 0.65],
+        confidenceLow: [1.0, 0.0, 0.0, 0.65],
         rcsXXSmall: [1.0, 0, 0, 0.6],
         rcsXSmall: [1.0, 0.2, 0, 0.6],
         rcsSmall: [1.0, 0.4, 0, 0.6],

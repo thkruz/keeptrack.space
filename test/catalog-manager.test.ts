@@ -42,14 +42,14 @@ describe('calcSatrec', () => {
   // should search for objects in similar orbits
   it('search_for_similar_orbits', () => {
     defaultSat.period = 100;
-    const matchSat = { ...defaultSat, id: 0, period: 99 };
+    const matchSat = { ...defaultSat, id: 1, period: 99 };
     const nonmatchSat = { ...defaultSat, id: 2, period: 200 };
     const nonmatchSat2 = { ...defaultSat, id: 3, inclination: 90 * DEG2RAD };
     const nonmatchSat3 = { ...defaultSat, id: 4, raan: 200 * DEG2RAD };
     const nonmatchSat4 = { ...defaultSat, id: 5, static: true };
 
     catalogManagerInstance.selectedSat = defaultSat.id;
-    catalogManagerInstance.satData = [matchSat, defaultSat, nonmatchSat, nonmatchSat2, nonmatchSat3, nonmatchSat4];
+    catalogManagerInstance.satData = [defaultSat, matchSat, nonmatchSat, nonmatchSat2, nonmatchSat3, nonmatchSat4];
     const satData = CatalogSearch.findObjsByOrbit(<SatObject[]>(<unknown>catalogManagerInstance.satData), defaultSat);
     expect(satData).toStrictEqual([0, 1]);
   });
@@ -70,7 +70,7 @@ describe('calcSatrec', () => {
       correctResult.push(matchSat.sccNum);
     }
 
-    const satData = CatalogSearch.findReentry(catalogManagerInstance.satData);
+    const satData = CatalogSearch.findReentry(catalogManagerInstance.satData as SatObject[]);
     expect(satData).toStrictEqual(correctResult);
   });
 

@@ -18,7 +18,7 @@ import { StandardCatalogManager } from '../../src/js/singletons/catalog-manager'
 import { StandardColorSchemeManager } from '../../src/js/singletons/color-scheme-manager';
 import { StandardDrawManager } from '../../src/js/singletons/draw-manager';
 import { StandardOrbitManager } from '../../src/js/singletons/orbitManager';
-import { defaultSat } from './apiMocks';
+import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
   const settingsManager = new SettingsManager();
@@ -45,9 +45,6 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
   // Jest all Image class objects with a mock decode method.
   Image.prototype.decode = jest.fn();
-
-  // Setup a mock catalog
-  catalogManagerInstance['satData'] = [defaultSat, { ...defaultSat, ...{ id: 2, sccNum: '11' } }];
 
   catalogManagerInstance.satCruncher = {
     postMessage: jest.fn(),
@@ -79,7 +76,10 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-  keepTrackApi.getCatalogManager().satData = [defaultSat, defaultSat];
+  // Setup a mock catalog
+  keepTrackApi.getCatalogManager().satData = [defaultSat, { ...defaultSat, ...{ id: 1, sccNum: '11' } }];
+  catalogManagerInstance.selectedSat = -1;
+  catalogManagerInstance.staticSet = [defaultSensor];
 
   window.M = {
     AutoInit: jest.fn(),

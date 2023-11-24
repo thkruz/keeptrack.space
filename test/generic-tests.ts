@@ -2,8 +2,8 @@ import { Constructor } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { KeepTrackPlugin } from '@app/js/plugins/KeepTrackPlugin';
-import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { SettingsManager } from '@app/js/settings/settings';
+import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {
   pluginName ??= Plugin.name;
@@ -130,12 +130,18 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     const toggleButton = getEl(plugin.bottomIconElementName);
     expect(toggleButton).toBeDefined();
-    expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.methods.bottomMenuClick(plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled || plugin.isRequireSatelliteSelected) {
+      if (plugin.PLUGIN_NAME !== 'Screenshot') {
+        expect(toggleButton.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeTruthy();
+      }
+      expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
+      keepTrackApi.methods.bottomMenuClick(plugin.bottomIconElementName);
       expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
+      expect(toggleButton.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeFalsy();
+      expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
+      keepTrackApi.methods.bottomMenuClick(plugin.bottomIconElementName);
       expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
       keepTrackApi.methods.bottomMenuClick(plugin.bottomIconElementName);
       expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
@@ -166,6 +172,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     keepTrackApi.getCatalogManager().satData = [];
     keepTrackApi.getCatalogManager().selectSat(-1);
+    console.warn(keepTrackApi.getCatalogManager().selectedSat);
   });
 
   // Tests that clicking on the bottom icon toggles with satellite and sensor

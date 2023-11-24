@@ -621,6 +621,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       if (e.button === 2) {
         satInfobox.classList.remove('satinfo-fixed');
         satInfobox.removeAttribute('style');
+        satInfobox.style.display = 'block';
         const rootElement = document.querySelector(':root') as HTMLElement;
         const searchBoxHeight = satInfobox.clientHeight;
         rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);

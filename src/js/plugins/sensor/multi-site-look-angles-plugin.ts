@@ -117,10 +117,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   refreshSideMenuData() {
     if (this.isMenuButtonEnabled) {
-      if (keepTrackApi.getCatalogManager().selectedSat !== -1) {
+      const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+      if (sat) {
         showLoading(() => {
-          const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
           const sensorListDom = getEl('multi-site-look-angles-sensor-list');
           sensorListDom.innerHTML = ''; // TODO: This should be a class property that persists between refreshes
 
@@ -142,7 +141,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
                 this.disabledSensors.push(sensor);
               }
 
-              const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY);
               this.getlookanglesMultiSite(
                 sat,
                 allSensors.filter((s) => !this.disabledSensors.includes(s))
@@ -152,7 +150,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
             sensorListDom.appendChild(document.createTextNode(' '));
           }
 
-          const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY);
           this.getlookanglesMultiSite(
             sat,
             allSensors.filter((s) => !this.disabledSensors.includes(s))
@@ -263,6 +260,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     for (const entry of multiSiteArray) {
       const sensor = staticSet.find((s) => s.objName === entry.objName);
+      if (!sensor) continue;
       tr = tbl.insertRow();
       tr.setAttribute('class', 'link');
       tdT = tr.insertCell();

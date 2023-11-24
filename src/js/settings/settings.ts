@@ -974,6 +974,105 @@ export class SettingsManager {
    */
   hiresMilkWay = false;
 
+  loadPersistedSettings() {
+    const leoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_LEO_SATS);
+    if (leoSatsString !== null) {
+      this.isShowLeoSats = leoSatsString === 'true';
+    }
+    const heoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_HEO_SATS);
+    if (heoSatsString !== null) {
+      this.isShowHeoSats = heoSatsString === 'true';
+    }
+    const meoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_MEO_SATS);
+    if (meoSatsString !== null) {
+      this.isShowMeoSats = meoSatsString === 'true';
+    }
+    const geoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GEO_SATS);
+    if (geoSatsString !== null) {
+      this.isShowGeoSats = geoSatsString === 'true';
+    }
+    const payloadsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_PAYLOADS);
+    if (payloadsString !== null) {
+      this.isShowPayloads = payloadsString === 'true';
+    }
+    const rocketBodiesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ROCKET_BODIES);
+    if (rocketBodiesString !== null) {
+      this.isShowRocketBodies = rocketBodiesString === 'true';
+    }
+    const debrisString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEBRIS);
+    if (debrisString !== null) {
+      this.isShowDebris = debrisString === 'true';
+    }
+    const agenciesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_AGENCIES);
+    if (agenciesString !== null) {
+      this.isShowAgencies = agenciesString === 'true';
+    }
+    const drawOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ORBITS);
+    if (drawOrbitsString !== null) {
+      this.isDrawOrbits = drawOrbitsString === 'true';
+    }
+    const drawTrailingOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS);
+    if (drawTrailingOrbitsString !== null) {
+      this.isDrawTrailingOrbits = drawTrailingOrbitsString === 'true';
+    }
+    const isOrbitCruncherInEcfString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ECF);
+    if (isOrbitCruncherInEcfString !== null) {
+      this.isOrbitCruncherInEcf = isOrbitCruncherInEcfString === 'true';
+    }
+    const drawInCoverageLinesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES);
+    if (drawInCoverageLinesString !== null) {
+      this.isDrawInCoverageLines = drawInCoverageLinesString === 'true';
+    }
+    const drawSunString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_SUN);
+    if (drawSunString !== null) {
+      this.isDrawSun = drawSunString === 'true';
+    }
+    const blackEarthString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH);
+    if (blackEarthString !== null) {
+      this.isBlackEarth = blackEarthString === 'true';
+    }
+    const drawAtmosphereString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE);
+    if (drawAtmosphereString !== null) {
+      this.isDrawAtmosphere = drawAtmosphereString === 'true';
+    }
+    const drawAuroraString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_AURORA);
+    if (drawAuroraString !== null) {
+      this.isDrawAurora = drawAuroraString === 'true';
+    }
+    const drawMilkyWayString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_MILKY_WAY);
+    if (drawMilkyWayString !== null) {
+      this.isDrawMilkyWay = drawMilkyWayString === 'true';
+    }
+    const graySkyboxString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GRAY_SKYBOX);
+    if (graySkyboxString !== null) {
+      this.isGraySkybox = graySkyboxString === 'true';
+    }
+    const eciOnHoverString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ECI_ON_HOVER);
+    if (eciOnHoverString !== null) {
+      this.isEciOnHover = eciOnHoverString === 'true';
+    }
+    const demoModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEMO_MODE);
+    if (demoModeOnString !== null) {
+      this.isDemoModeOn = demoModeOnString === 'true';
+    }
+    const satLabelModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SAT_LABEL_MODE);
+    if (satLabelModeOnString !== null) {
+      this.isSatLabelModeOn = satLabelModeOnString === 'true';
+    }
+    const freezePropRateOnDragString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG);
+    if (freezePropRateOnDragString !== null) {
+      this.isFreezePropRateOnDrag = freezePropRateOnDragString === 'true';
+    }
+    const disableTimeMachineToastsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS);
+    if (disableTimeMachineToastsString !== null) {
+      this.isDisableTimeMachineToasts = disableTimeMachineToastsString === 'true';
+    }
+    const searchLimitString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SEARCH_LIMIT);
+    if (searchLimitString !== null) {
+      this.searchLimit = parseInt(searchLimitString);
+    }
+  }
+
   init(settingsOverride?: any) {
     this.pTime = [];
 
@@ -982,7 +1081,12 @@ export class SettingsManager {
     this.setMobileSettings();
     this.setEmbedOverrides();
     this.setColorSettings();
+    /**
+     * Load Order:
+     * URL Params > Local Storage > Default
+     */
     this.loadOverrides(settingsOverride);
+    this.loadPersistedSettings();
 
     const params = this.loadOverridesFromUrl();
 

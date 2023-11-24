@@ -24,13 +24,6 @@ import { Sun } from './draw-manager/sun';
 import { errorManagerInstance } from './errorManager';
 import { GroupType } from './object-group';
 
-declare module '@app/js/interfaces' {
-  interface UserSettings {
-    isOrbitOverlayVisible: boolean;
-    startWithOrbitsDisplayed: boolean;
-  }
-}
-
 export interface DrawManager {
   canvas: HTMLCanvasElement;
   demoModeSatellite: any;

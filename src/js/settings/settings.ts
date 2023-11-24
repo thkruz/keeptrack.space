@@ -1569,11 +1569,6 @@ export class SettingsManager {
           break;
         case 'political':
           this.politicalImages = true;
-          this.isDrawSun = false;
-          this.isDrawAtmosphere = false;
-          this.isDrawAurora = false;
-          this.isShowRocketBodies = false;
-          this.isShowDebris = false;
           break;
         // file deepcode ignore DuplicateCaseBody: The default image could change in the future
         default:
@@ -1583,7 +1578,17 @@ export class SettingsManager {
     }
 
     // Make sure there is some map loaded!
-    if (!this.smallImages && !this.nasaImages && !this.blueImages && !this.lowresImages && !this.hiresImages && !this.hiresNoCloudsImages && !this.vectorImages) {
+    if (
+      !this.blueImages &&
+      !this.nasaImages &&
+      !this.lowresImages &&
+      !this.trusatImages &&
+      !this.hiresImages &&
+      !this.hiresNoCloudsImages &&
+      !this.vectorImages &&
+      !this.politicalImages &&
+      !this.smallImages
+    ) {
       this.lowresImages = true;
     }
   }

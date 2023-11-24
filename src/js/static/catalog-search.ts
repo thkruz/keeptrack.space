@@ -207,6 +207,8 @@ export class CatalogSearch {
    */
   static yearOrLess(satData: SatObject[], yr: number) {
     return satData.filter((sat) => {
+      if (sat.source !== 'USSF') return false;
+
       // 2007 Fengyun 1C ASAT Event
       if (sat.intlDes?.includes('1999-025')) {
         if (sat.intlDes !== '1999-025A') {

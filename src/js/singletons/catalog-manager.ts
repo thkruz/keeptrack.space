@@ -79,10 +79,11 @@ declare module '@app/js/interfaces' {
   extraData?: string;
   extraUpdate?: boolean;
   /**
-   * Satellite Number that is now being skipped by the cruncher
-   * due to a bad TLE
+   * Object id that is now being skipped by the cruncher
+   * due to a bad TLE. VIMPEL don't have satids so we use the
+   * object id instead.
    */
-  badSatNumber?: number;
+  badObjectId?: number;
   // JSON string
   satId?: number;
   sensorMarkerArray?: number[];
@@ -577,14 +578,19 @@ export class StandardCatalogManager implements CatalogManager {
   public satCruncherOnMessage({ data: mData }: { data: SatCruncherMessageData }) {
     if (!mData) return;
 
-    if (mData.badSatNumber) {
-      // Makr the satellite as inactive
-      const id = this.getIdFromObjNum(mData.badSatNumber);
-      if (id !== null) {
-        this.satData[id].active = false;
-        // (<any>window).decayedSats = (<any>window).decayedSats || [];
-        // (<any>window).decayedSats.push(this.satData[id].sccNum);
-        errorManagerInstance.debug(`Satellite ${mData.badSatNumber} is inactive due to bad TLE`);
+    if (mData.badObjectId) {
+      if (mData.badObjectId >= 0) {
+        // Mark the satellite as inactive
+        const id = this.getIdFromObjNum(mData.badObjectId);
+        if (id !== null) {
+          this.satData[id].active = false;
+          // (<any>window).decayedSats = (<any>window).decayedSats || [];
+          // (<any>window).decayedSats.push(this.satData[id].sccNum);
+          errorManagerInstance.debug(`Satellite ${mData.badObjectId} is inactive due to bad TLE`);
+        }
+      } else {
+        // console.debug(`Bad sat number: ${mData.badObjectId}`);
+        // How are we getting a negative number? There is a bug somewhere...
       }
     }
 

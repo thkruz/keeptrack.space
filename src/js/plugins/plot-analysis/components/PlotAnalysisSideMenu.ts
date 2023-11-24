@@ -3,16 +3,6 @@ import './PlotAnalysisSideMenu.css';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 
 export const PlotAnalysisSideMenu = keepTrackApi.html`
-      <div id="plot-analysis-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
-        <div id="plot-analysis-content" class="side-menu">
-          <div id="plot-analysis-chart" class="plot-analysis-chart""></div>
-        </div>
-      </div>
-      <div id="plot-analysis-menu2" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
-        <div id="plot-analysis-content2" class="side-menu">
-          <div id="plot-analysis-chart2" class="plot-analysis-chart""></div>
-        </div>
-      </div>
       <div id="plot-analysis-menu3" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
         <div id="plot-analysis-content3" class="side-menu">
           <div id="plot-analysis-chart3" class="plot-analysis-chart""></div>

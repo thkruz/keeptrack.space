@@ -1,13 +1,5 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 
-export const helpTitleTextEciPlot = `ECI Plot Menu`;
-export const helpBodyTextEciPlot = keepTrackApi.html`The ECI Plot Menu is used for plotting the ECI position of a satellite over time.
-`;
-
-export const helpTitleTextEcfPlot = `ECF Plot Menu`;
-export const helpBodyTextEcfPlot = keepTrackApi.html`The ECF Plot Menu is used for plotting the ECF position of a satellite over time.
-`;
-
 export const helpTitleTextRicPlot = `RIC Plot Menu`;
 export const helpBodyTextRicPlot = keepTrackApi.html`The RIC Plot Menu is used for plotting the RIC position of a satellite over time.
 `;

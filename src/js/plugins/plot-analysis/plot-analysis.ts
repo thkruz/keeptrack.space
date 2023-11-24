@@ -6,8 +6,6 @@ import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 import { shake } from '@app/js/lib/shake';
 import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
-import { createEcfScatterPlot, getEcfScatterData } from './components/plots/ecfScatterPlot';
-import { createEciScatterPlot, getEciScatterData } from './components/plots/eciScatterPlot';
 import { createInc2AltScatterPlot, getInc2AltScatterData } from './components/plots/inc2AltScatterPlot';
 import { createInc2LonScatterPlot, getInc2LonScatterData } from './components/plots/inc2LonScatterPlot';
 import { createRicScatterPlot, getRicScatterData } from './components/plots/ricScatterPlot';
@@ -20,28 +18,20 @@ import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
 import { PlotAnalysisBottomIcon } from './components/PlotAnalysisBottomIcon';
 import { PlotAnalysisSideMenu } from './components/PlotAnalysisSideMenu';
 import {
-  helpBodyTextEcfPlot,
-  helpBodyTextEciPlot,
   helpBodyTextIncAltPlot,
   helpBodyTextIncLonPlot,
   helpBodyTextRicPlot,
   helpBodyTextTimeLonPlot,
-  helpTitleTextEcfPlot,
-  helpTitleTextEciPlot,
   helpTitleTextIncAltPlot,
   helpTitleTextIncLonPlot,
   helpTitleTextRicPlot,
   helpTitleTextTimeLonPlot,
 } from './help';
 
-export let isPlotAnalyisMenuOpen = false;
-export let isPlotAnalyisMenuOpen2 = false;
 export let isPlotAnalyisMenuOpen3 = false;
 export let isPlotAnalyisMenuOpen4 = false;
 export let isPlotAnalyisMenuOpen5 = false;
 export let isPlotAnalyisMenuOpen6 = false;
-export let curChart: echarts.ECharts;
-export let curChart2: echarts.ECharts;
 export let curChart3: echarts.ECharts;
 export let curChart4: echarts.ECharts;
 export let curChart5: echarts.ECharts;
@@ -82,16 +72,6 @@ export const init = (): void => {
 };
 
 export const onHelpMenuClick = (): boolean => {
-  if (isPlotAnalyisMenuOpen) {
-    adviceManagerInstance.showAdvice(helpTitleTextEciPlot, helpBodyTextEciPlot);
-    return true;
-  }
-
-  if (isPlotAnalyisMenuOpen2) {
-    adviceManagerInstance.showAdvice(helpTitleTextEcfPlot, helpBodyTextEcfPlot);
-    return true;
-  }
-
   if (isPlotAnalyisMenuOpen3) {
     adviceManagerInstance.showAdvice(helpTitleTextRicPlot, helpBodyTextRicPlot);
     return true;
@@ -119,14 +99,6 @@ export const uiManagerInit = (): void => {
   getEl('left-menus').insertAdjacentHTML('beforeend', PlotAnalysisSideMenu);
   getEl('bottom-icons').insertAdjacentHTML('beforeend', PlotAnalysisBottomIcon);
 
-  clickAndDragWidth(getEl('plot-analysis-menu'), {
-    maxWidth: 1200,
-    minWidth: 500,
-  });
-  clickAndDragWidth(getEl('plot-analysis-menu2'), {
-    maxWidth: 1200,
-    minWidth: 500,
-  });
   clickAndDragWidth(getEl('plot-analysis-menu3'), {
     maxWidth: 1200,
     minWidth: 500,
@@ -140,12 +112,6 @@ export const uiManagerInit = (): void => {
  */
 export const bottomMenuClick = (iconName: string): void => {
   switch (iconName) {
-    case 'menu-plot-analysis':
-      onEciPlotBtnClick();
-      break;
-    case 'menu-plot-analysis2':
-      onEcfPlotBtnClick();
-      break;
     case 'menu-plot-analysis3':
       onRicPlotBtnClick();
       break;
@@ -160,66 +126,6 @@ export const bottomMenuClick = (iconName: string): void => {
       break;
     default:
       break;
-  }
-};
-
-export const onEciPlotBtnClick = () => {
-  const catalogManagerInstance = keepTrackApi.getCatalogManager();
-  const uiManagerInstance = keepTrackApi.getUiManager();
-
-  if (catalogManagerInstance.selectedSat === -1) {
-    uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
-    shake(getEl('menu-plot-analysis'));
-    return;
-  }
-
-  if (isPlotAnalyisMenuOpen) {
-    uiManagerInstance.hideSideMenus();
-    isPlotAnalyisMenuOpen = false;
-    return;
-  } else {
-    uiManagerInstance.hideSideMenus();
-    slideInRight(getEl('plot-analysis-menu'), 1000);
-    isPlotAnalyisMenuOpen = true;
-
-    const chartDom = getEl('plot-analysis-chart');
-
-    curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart, chartDom);
-    setTimeout(() => {
-      curChart.resize();
-    }, 1000);
-    getEl('menu-plot-analysis').classList.add('bmenu-item-selected');
-    return;
-  }
-};
-
-export const onEcfPlotBtnClick = () => {
-  const catalogManagerInstance = keepTrackApi.getCatalogManager();
-  const uiManagerInstance = keepTrackApi.getUiManager();
-
-  if (catalogManagerInstance.selectedSat === -1) {
-    uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
-    shake(getEl('menu-plot-analysis2'));
-    return;
-  }
-
-  if (isPlotAnalyisMenuOpen2) {
-    uiManagerInstance.hideSideMenus();
-    isPlotAnalyisMenuOpen2 = false;
-    return;
-  } else {
-    uiManagerInstance.hideSideMenus();
-    slideInRight(getEl('plot-analysis-menu2'), 1000);
-    isPlotAnalyisMenuOpen2 = true;
-
-    const chartDom2 = getEl('plot-analysis-chart2');
-
-    curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
-    setTimeout(() => {
-      curChart2.resize();
-    }, 1000);
-    getEl('menu-plot-analysis2').classList.add('bmenu-item-selected');
-    return;
   }
 };
 
@@ -342,12 +248,6 @@ export const onTime2LonPlotBtnClick = () => {
  * @returns {void}
  */
 export const hideSideMenus = (): void => {
-  slideOutLeft(getEl('plot-analysis-menu'), 1000);
-  getEl('menu-plot-analysis').classList.remove('bmenu-item-selected');
-  isPlotAnalyisMenuOpen = false;
-  slideOutLeft(getEl('plot-analysis-menu2'), 1000);
-  getEl('menu-plot-analysis2').classList.remove('bmenu-item-selected');
-  isPlotAnalyisMenuOpen2 = false;
   slideOutLeft(getEl('plot-analysis-menu3'), 1000);
   getEl('menu-plot-analysis3').classList.remove('bmenu-item-selected');
   isPlotAnalyisMenuOpen3 = false;
@@ -373,16 +273,6 @@ export const selectSatData = (_sat: SatObject, satId: number): void => {
   if (satId === -1) {
     hideSideMenus();
     return;
-  }
-  if (isPlotAnalyisMenuOpen) {
-    getEl('menu-plot-analysis').classList.add('bmenu-item-selected');
-    const chartDom = getEl('plot-analysis-chart');
-    curChart = createEciScatterPlot(getEciScatterData(), isPlotAnalyisMenuOpen, curChart, chartDom);
-  }
-  if (isPlotAnalyisMenuOpen2) {
-    getEl('menu-plot-analysis2').classList.add('bmenu-item-selected');
-    const chartDom2 = getEl('plot-analysis-chart2');
-    curChart2 = createEcfScatterPlot(getEcfScatterData(), isPlotAnalyisMenuOpen2, curChart2, chartDom2);
   }
 
   const catalogManagerInstance = keepTrackApi.getCatalogManager();

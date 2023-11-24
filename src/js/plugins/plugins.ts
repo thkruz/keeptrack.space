@@ -33,6 +33,8 @@ import { nextLaunchesPlugin } from './next-launches/next-launches';
 import { nightTogglePlugin } from './night-toggle/night-toggle';
 import { orbitReferencesPlugin } from './orbit-references/orbit-references';
 import { planetariumPlugin } from './planetarium/planetarium';
+import { ecfPlotsPlugin } from './plot-analysis/ecf-plots';
+import { eciPlotsPlugin } from './plot-analysis/eci-plots';
 import { satConstellationsPlugin } from './sat-constellations/sat-constellations';
 import { satelliteFovPlugin } from './satellite-fov/satellite-fov';
 import { satellitePhotosPlugin } from './satellite-photos/satellite-photos';
@@ -180,6 +182,8 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     if (plugins.photoManager) satellitePhotosPlugin.init();
     if (plugins.screenRecorder) screenRecorderPlugin.init();
     if (plugins.analysis) analysis.init();
+    if (plugins.plotAnalysis) eciPlotsPlugin.init();
+    if (plugins.plotAnalysis) ecfPlotsPlugin.init();
     if (plugins.plotAnalysis) plotAnalysis.init();
     // if (plugins.externalSources) externalSources.init();
     if (plugins.aboutManager) aboutMenuPlugin.init();

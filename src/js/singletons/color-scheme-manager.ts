@@ -29,6 +29,7 @@ import { errorManagerInstance } from './errorManager';
 
 import { getDayOfYear } from '../lib/transforms';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
+import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class StandardColorSchemeManager implements ColorSchemeManager {
   private readonly DOTS_PER_CALC = 450;
@@ -196,6 +197,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
       // Note the colorscheme for next time
       this.lastColorScheme = this.currentColorScheme;
+      PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.name);
 
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
@@ -660,6 +662,11 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       event: 'onCruncherReady',
       cbName: 'colorSchemeManager',
       cb: (): void => {
+        const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
+        if (cachedColorScheme) {
+          this.currentColorScheme = this[cachedColorScheme];
+        }
+
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         // Generate some public buffers

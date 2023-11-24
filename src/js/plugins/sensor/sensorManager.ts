@@ -33,6 +33,7 @@ import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
 import { ZoomValue } from '@app/js/singletons/camera';
 import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { SatMath } from '@app/js/static/sat-math';
 import { TearrData } from '@app/js/static/sensor-math';
@@ -296,11 +297,7 @@ export class StandardSensorManager implements SensorManager {
       selectedSensor = StandardSensorManager.getSensorFromStaticNum(staticNum);
     }
 
-    try {
-      localStorage.setItem('currentSensor', JSON.stringify([selectedSensor, staticNum]));
-    } catch {
-      errorManagerInstance.warn('Sensor Manager: Unable to set current sensor - localStorage issue!');
-    }
+    PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, staticNum]));
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 

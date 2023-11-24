@@ -16,8 +16,9 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import { getEl } from '../lib/get-el';
 import { keepTrackApi } from '../keepTrackApi';
+import { getEl } from '../lib/get-el';
+import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class AdviceManager {
   private helpHeaderDOM: HTMLElement;
@@ -60,11 +61,7 @@ export class AdviceManager {
   }
 
   public off() {
-    try {
-      localStorage.setItem('isAdviceEnabled', 'false');
-    } catch {
-      // Do Nothing
-    }
+    PersistenceManager.getInstance().saveItem(StorageKey.IS_ADVICE_ENABLED, 'false');
     this.isAdviceEnabled = false;
     this.isAdviceOpen = false;
     this.helpOuterDOM.style.display = 'none';
@@ -72,11 +69,7 @@ export class AdviceManager {
   }
 
   public on() {
-    try {
-      localStorage.setItem('isAdviceEnabled', 'true');
-    } catch {
-      // Do Nothing
-    }
+    PersistenceManager.getInstance().saveItem(StorageKey.IS_ADVICE_ENABLED, 'true');
     this.isAdviceEnabled = true;
     this.tutIconDOM.classList.add('bmenu-item-selected');
   }

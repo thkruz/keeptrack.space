@@ -22,6 +22,7 @@ import { SensorGeolocation } from '@app/js/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
+import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
 
@@ -1029,7 +1030,7 @@ export class SettingsManager {
 
     this.colors = null;
     try {
-      this.colors = JSON.parse(localStorage.getItem('this-colors'));
+      this.colors = JSON.parse(PersistenceManager.getInstance().getItem(StorageKey.THIS_COLORS));
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
@@ -1124,11 +1125,8 @@ export class SettingsManager {
         densityOther: [0.8, 0.8, 0.8, 0.3],
         notional: [1, 0, 0, 0.8],
       };
-      try {
-        localStorage.setItem('this-colors', JSON.stringify(this.colors));
-      } catch {
-        console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
-      }
+
+      PersistenceManager.getInstance().saveItem(StorageKey.THIS_COLORS, JSON.stringify(this.colors));
     }
   }
 
@@ -1538,13 +1536,7 @@ export class SettingsManager {
     }
 
     if (this.isLoadLastMap && !this.isDrawLess) {
-      let lastMap: string;
-      try {
-        lastMap = localStorage.getItem('lastMap');
-      } catch {
-        lastMap = null;
-        console.warn('Settings Manager: localStorage not available!');
-      }
+      const lastMap = PersistenceManager.getInstance().getItem(StorageKey.LAST_MAP);
       switch (lastMap) {
         case 'blue':
           this.blueImages = true;

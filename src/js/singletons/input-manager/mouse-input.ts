@@ -17,6 +17,7 @@ import { LegendManager } from '../../static/legend-manager';
 import { lineManagerInstance } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
+import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { starManager } from '../starManager';
 import { KeyboardInput } from './keyboard-input';
 
@@ -720,10 +721,6 @@ export class MouseInput {
   }
 
   private static saveMapToLocalStorage(name: string) {
-    try {
-      localStorage.setItem('lastMap', name);
-    } catch {
-      // do nothing
-    }
+    PersistenceManager.getInstance().saveItem(StorageKey.LAST_MAP, name);
   }
 }

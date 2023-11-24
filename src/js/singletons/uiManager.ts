@@ -25,7 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, SatObject, SensorObject, ToastMsgType, UiManager } from '@app/js/interfaces';
+import { ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { loadJquery } from '@app/js/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
@@ -42,6 +42,7 @@ import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
 import { errorManagerInstance } from './errorManager';
 import { MobileManager } from './mobileManager';
+import { PersistenceManager, StorageKey } from './persistence-manager';
 import { SearchManager } from './search-manager';
 
 export class StandardUiManager implements UiManager {
@@ -124,12 +125,7 @@ export class StandardUiManager implements UiManager {
   }
 
   static reloadLastSensor() {
-    let currentSensor: SensorObject;
-    try {
-      currentSensor = JSON.parse(localStorage.getItem('currentSensor'));
-    } catch (e) {
-      currentSensor = null;
-    }
+    const currentSensor = JSON.parse(PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR));
     // istanbul ignore next
     if (currentSensor !== null) {
       try {
@@ -141,23 +137,17 @@ export class StandardUiManager implements UiManager {
           LegendManager.change('default');
         } else {
           // If the sensor is a string, load that collection of sensors
-          if (typeof currentSensor[0].shortName == 'undefined') {
+          if (typeof currentSensor[0].objName == 'undefined') {
             sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
             LegendManager.change('default');
           } else {
             // Seems to be a single sensor without a staticnum, load that
-            sensorManagerInstance.setSensor(sensors[currentSensor[0].shortName], currentSensor[1]);
+            sensorManagerInstance.setSensor(sensors[currentSensor[0].objName], currentSensor[1]);
             LegendManager.change('default');
           }
         }
-      } catch (e) {
-        // Clear old settings because they seem corrupted
-        try {
-          localStorage.setItem('currentSensor', null);
-          console.warn('Saved Sensor Information Invalid');
-        } catch {
-          // do nothing
-        }
+      } catch {
+        PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, null);
       }
     }
   }

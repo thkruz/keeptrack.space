@@ -4,6 +4,7 @@ import { getEl } from '@app/js/lib/get-el';
 import { rgbCss } from '@app/js/lib/rgbCss';
 
 import { parseRgba } from '@app/js/lib/rgba';
+import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import $ from 'jquery'; // TODO: Remove Color Picker
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -414,11 +415,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       LegendManager.legendColorsChange();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
-      try {
-        localStorage.setItem('settingsManager-colors', JSON.stringify(settingsManager.colors));
-      } catch {
-        console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
-      }
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MANAGER_COLORS, JSON.stringify(settingsManager.colors));
     }
   }
 

@@ -23,6 +23,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
   }
 
   isRequireSatelliteSelected: boolean = true;
+  isIconDisabledOnLoad: boolean = true;
 
   helpTitle = `Edit Satellite Menu`;
   helpBody = keepTrackApi.html`The Edit Satellite Menu is used to edit the satellite data.

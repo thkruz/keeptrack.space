@@ -75,6 +75,8 @@ export class SatellitePhotos extends KeepTrackPlugin {
       console.debug('https://epic.gsfc.nasa.gov/ request failed!');
     };
 
+    // DISCOVR is at the L1 Lagrange point, so we can't select it in KeepTrack
+    // Instead we will rotate the camera to look at the Earth using the coordinates of the DISCOVR satellite in dscovrLoaded
     keepTrackApi.getCatalogManager().selectSat(-1);
     request.send();
   }

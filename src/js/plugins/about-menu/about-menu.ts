@@ -2,6 +2,10 @@ import aboutPng from '@app/img/icons/about.png';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
+/**
+ * @deprecated
+ * The main website now covers all of this functionality.
+ */
 export class AboutMenu extends KeepTrackPlugin {
   bottomIconElementName = 'menu-about-icon';
   bottomIconImg = aboutPng;
@@ -101,4 +105,8 @@ export class AboutMenu extends KeepTrackPlugin {
   }
 }
 
+/**
+ * @deprecated
+ * The main website now covers all of this functionality.
+ */
 export const aboutMenuPlugin = new AboutMenu();

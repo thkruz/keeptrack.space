@@ -1,5 +1,5 @@
 import scatterPlotPng3 from '@app/img/icons/scatter-plot3.png';
-import { SatObject } from '@app/js/interfaces';
+import { EChartsData, SatObject } from '@app/js/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { SatMathApi } from '@app/js/singletons/sat-math-api';
@@ -10,16 +10,18 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type EChartsOption = echarts.EChartsOption;
 
-export class EcfPlots extends KeepTrackPlugin {
+export class EcfPlot extends KeepTrackPlugin {
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
   bottomIconElementName = 'ecf-plots-bottom-icon';
   bottomIconLabel = 'ECF Plots';
   bottomIconImg = scatterPlotPng3;
   bottomIconCallback = () => {
-    const chartDom = getEl('plot-analysis-chart-ecf');
-    this.createEcfScatterPlot(EcfPlots.getEcfScatterData(), chartDom);
+    if (!this.isMenuButtonEnabled) return;
+
+    this.createPlot(EcfPlot.getPlotData(), getEl(this.plotCanvasId));
   };
 
+  plotCanvasId = 'plot-analysis-chart-ecf';
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
   chart: echarts.ECharts;
@@ -33,9 +35,9 @@ export class EcfPlots extends KeepTrackPlugin {
 
   sideMenuElementName = 'ecf-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
-  <div id="ecf-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
+  <div id="ecf-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
     <div id="plot-analysis-content" class="side-menu">
-      <div id="plot-analysis-chart-ecf" class="plot-analysis-chart"></div>
+      <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
   </div>`;
 
@@ -46,7 +48,7 @@ export class EcfPlots extends KeepTrackPlugin {
 
   static PLUGIN_NAME = 'ECF Plots';
   constructor() {
-    super(EcfPlots.PLUGIN_NAME);
+    super(EcfPlot.PLUGIN_NAME);
   }
 
   addHtml(): void {
@@ -56,18 +58,25 @@ export class EcfPlots extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        // Skip this if there is no satellite object because the menu isn't open
-        if (sat === null || typeof sat === 'undefined') {
+        // This runs no matter what
+        if (sat) {
+          this.setBottomIconToEnabled();
+        } else {
+          this.setBottomIconToDisabled();
+        }
+        if (!this.isMenuButtonEnabled) return;
+
+        // This runs if the menu is open
+        if (!sat) {
           this.hideSideMenus();
         } else {
-          const chartDom = getEl('plot-analysis-chart-ecf');
-          this.createEcfScatterPlot(EcfPlots.getEcfScatterData(), chartDom);
+          this.createPlot(EcfPlot.getPlotData(), getEl(this.plotCanvasId));
         }
       },
     });
   }
 
-  createEcfScatterPlot(data, chartDom: HTMLElement) {
+  createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
     if (!this.isMenuButtonEnabled) return;
 
@@ -75,37 +84,22 @@ export class EcfPlots extends KeepTrackPlugin {
     if (this.chart) {
       echarts.dispose(this.chart);
     }
-
-    // Setup Configuration
-    const app = {
-      config: {
-        xAxis3D: 'X',
-        yAxis3D: 'Y',
-        zAxis3D: 'Z',
-      },
-      configParameters: {} as EChartsOption,
-    };
-
     this.chart = echarts.init(chartDom);
-    const schema = [
-      { name: 'X', index: 0 },
-      { name: 'Y', index: 1 },
-      { name: 'Z', index: 2 },
-    ];
-    const fieldIndices = schema.reduce(function (obj, item): {} {
-      obj[item.name] = item.index;
-      return obj;
-    }, {});
-    let fieldNames = schema.map((item) => item.name);
-    fieldNames = fieldNames.slice(2, fieldNames.length - 2);
-    ['xAxis3D', 'yAxis3D', 'zAxis3D', 'color', 'symbolSize'].forEach((fieldName) => {
-      app.configParameters[fieldName] = {
-        options: fieldNames,
-      };
-    });
+
+    const X_AXIS = 'X';
+    const Y_AXIS = 'Y';
+    const Z_AXIS = 'Z';
+    const app = EcfPlot.updateAppObject_(X_AXIS, Y_AXIS, Z_AXIS);
 
     // Setup Chart
     this.chart.setOption({
+      title: {
+        text: 'Earth Centered Fixed (ECF) Plot',
+        textStyle: {
+          fontSize: 16,
+          color: '#fff',
+        },
+      },
       tooltip: {
         formatter: (params) => {
           const data = params.value;
@@ -122,6 +116,12 @@ export class EcfPlots extends KeepTrackPlugin {
               <div>Z: ${data[2].toFixed(2)} km</div>
             </div>
           `;
+        },
+      },
+      legend: {
+        show: true,
+        textStyle: {
+          color: '#fff',
         },
       },
       xAxis3D: {
@@ -161,7 +161,7 @@ export class EcfPlots extends KeepTrackPlugin {
           itemStyle: {
             opacity: 1 - idx / sat.value.length, // opacity by time
           },
-          value: [item[fieldIndices[app.config.xAxis3D]], item[fieldIndices[app.config.yAxis3D]], item[fieldIndices[app.config.zAxis3D]]],
+          value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]]],
         })),
         symbolSize: 12,
         // symbol: 'triangle',
@@ -178,21 +178,61 @@ export class EcfPlots extends KeepTrackPlugin {
     });
   }
 
-  static getEcfScatterData() {
+  private static updateAppObject_(X_AXIS: string, Y_AXIS: string, Z_AXIS: string) {
+    // Setup Configuration
+    const app = {
+      config: {
+        xAxis3D: X_AXIS,
+        yAxis3D: Y_AXIS,
+        zAxis3D: Z_AXIS,
+      },
+      fieldIndices: {},
+      configParameters: {} as EChartsOption,
+    };
+
+    const schema = [
+      { name: X_AXIS, index: 0 },
+      { name: Y_AXIS, index: 1 },
+      { name: Z_AXIS, index: 2 },
+    ];
+
+    const fieldIndices = schema.reduce(function (obj, item): {} {
+      obj[item.name] = item.index;
+      return obj;
+    }, {});
+    let fieldNames = schema.map((item) => item.name);
+    fieldNames = fieldNames.slice(2, fieldNames.length - 2);
+    ['xAxis3D', 'yAxis3D', 'zAxis3D', 'color', 'symbolSize'].forEach((fieldName) => {
+      app.configParameters[fieldName] = {
+        options: fieldNames,
+      };
+    });
+    app.fieldIndices = fieldIndices;
+
+    return app;
+  }
+
+  static getPlotData(): EChartsData {
     const NUMBER_OF_POINTS = 100;
-    const data = [];
+    const data = [] as EChartsData;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    let sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
-    data.push({ name: sat.name, value: SatMathApi.getEcfOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
-    const lastSat = catalogManagerInstance.lastSelectedSat();
-    if (lastSat !== -1) {
-      sat = catalogManagerInstance.getSat(lastSat);
-      data.push({ name: sat.name, value: SatMathApi.getEcfOfCurrentOrbit(sat, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+    const curSatObj = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+    data.push({ name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+
+    const secSatObj = catalogManagerInstance.secondarySatObj;
+    if (secSatObj) {
+      data.push({ name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+    }
+
+    const lastSatId = catalogManagerInstance.lastSelectedSat();
+    if (lastSatId !== -1) {
+      const lastSatObj = catalogManagerInstance.getSat(lastSatId);
+      data.push({ name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
     }
 
     return data;
   }
 }
 
-export const ecfPlotsPlugin = new EcfPlots();
+export const ecfPlotsPlugin = new EcfPlot();

@@ -481,9 +481,17 @@ export abstract class SatMath {
       sat,
       points,
       getOffsetTimeObj,
-      (params: { eciPts: EciVec3; eciPts2: EciVec3; offset: number }) => {
-        sat = { ...sat, ...(<SatObject>{ position: params.eciPts }) };
-        sat2 = { ...sat2, ...(<SatObject>{ position: params.eciPts2 }) };
+      (params: { eciPts: EciVec3; eciPts2: EciVec3; velPts: EciVec3; velPts2: EciVec3; offset: number }) => {
+        const vel1 = {
+          total: 0,
+          ...params.velPts,
+        };
+        const vel2 = {
+          total: 0,
+          ...params.velPts2,
+        };
+        sat = { ...sat, ...{ position: params.eciPts, velocity: vel1 } };
+        sat2 = { ...sat2, ...{ position: params.eciPts2, velocity: vel2 } };
         const ric = CoordinateTransforms.sat2ric(sat, sat2).position;
         return { x: ric[0], y: ric[1], z: ric[2] };
       },
@@ -506,7 +514,7 @@ export abstract class SatMath {
     sat: SatObject,
     points: number,
     getOffsetTimeObj: (offset: number) => Date,
-    transformFunc: (params: { eciPts: EciVec3; eciPts2: EciVec3; angle: number; offset: number }) => T,
+    transformFunc: (params: { eciPts: EciVec3; eciPts2: EciVec3; velPts: EciVec3; velPts2: EciVec3; angle: number; offset: number }) => T,
     sat2?: SatObject,
     orbits = 1
   ): T[] {
@@ -516,21 +524,24 @@ export abstract class SatMath {
       const now = getOffsetTimeObj(offset);
       const angle = (-i * (sat.period / points) * TAU) / sat.period;
       const eciPts = <EciVec3>SatMath.getEci(sat, now).position;
+      const velPts = <EciVec3>SatMath.getEci(sat, now).velocity;
       if (!eciPts) {
         errorManagerInstance.debug(`No ECI position for ${sat.sccNum} at ${now}`);
         continue;
       }
 
       let eciPts2: EciVec3;
+      let velPts2: EciVec3;
       if (sat2) {
         eciPts2 = <EciVec3>SatMath.getEci(sat2, now).position;
+        velPts2 = <EciVec3>SatMath.getEci(sat2, now).velocity;
         if (!eciPts2) {
           errorManagerInstance.debug(`No ECI position for ${sat2.sccNum} at ${now}`);
           continue;
         }
       }
 
-      orbitPoints.push(transformFunc({ eciPts, eciPts2, angle, offset }));
+      orbitPoints.push(transformFunc({ eciPts, velPts, eciPts2, velPts2, angle, offset }));
     }
     return orbitPoints;
   }

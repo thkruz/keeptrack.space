@@ -697,9 +697,6 @@ export class StandardCatalogManager implements CatalogManager {
     getEl('menu-breakup', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-plot-analysis', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-plot-analysis2', true)?.classList.remove('bmenu-item-disabled');
-    if (this.secondarySat !== -1) {
-      getEl('menu-plot-analysis3', true)?.classList.remove('bmenu-item-disabled');
-    }
 
     keepTrackApi.methods.selectSatData(this.getSat(i), i);
   }
@@ -725,9 +722,8 @@ export class StandardCatalogManager implements CatalogManager {
     if (!(this.secondarySatObj?.id === id)) {
       this.secondarySatObj = this.getSat(id);
     }
-    if (this.selectedSat !== -1) {
-      getEl('menu-plot-analysis3').classList.remove('bmenu-item-disabled');
-    }
+
+    keepTrackApi.methods.setSecondarySat(this.secondarySatObj, id);
   }
 
   public setSelectedSat(id: number): void {

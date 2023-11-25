@@ -153,6 +153,7 @@ export const keepTrackApi = {
   callbacks: {
     onKeepTrackReady: [],
     selectSatData: [],
+    setSecondarySat: [],
     updateSelectBox: [],
     onCruncherReady: [],
     onCruncherMessage: [],
@@ -187,6 +188,9 @@ export const keepTrackApi = {
     selectSatData: (sat: SatObject, satId: number) => {
       keepTrackApi.getSoundManager()?.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
+    },
+    setSecondarySat: (sat: SatObject, satId: number) => {
+      keepTrackApi.callbacks.setSecondarySat.forEach((cb: any) => cb.cb(sat, satId));
     },
     onKeepTrackReady: () => {
       keepTrackApi.callbacks.onKeepTrackReady.forEach((cb: any) => cb.cb());
@@ -299,6 +303,10 @@ export enum KeepTrackApiEvents {
    * Run at the end of catalogManager.selectSat with parameters (sat: SatObject, satId: number)
    */
   selectSatData = 'selectSatData',
+  /**
+   * Run at the end of catalogManager.setSecondarySat with parameters (sat: SatObject, satId: number)
+   */
+  setSecondarySat = 'setSecondarySat',
   onKeepTrackReady = 'onKeepTrackReady',
   updateSelectBox = 'updateSelectBox',
   onCruncherReady = 'onCruncherReady',

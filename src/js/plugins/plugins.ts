@@ -2,7 +2,6 @@ import * as analysis from '@app/js/plugins/analysis/analysis';
 import { countriesMenuPlugin } from '@app/js/plugins/countries/countries';
 import * as initialOrbit from '@app/js/plugins/initial-orbit/initial-orbit';
 import * as missile from '@app/js/plugins/missile/missilePlugin';
-import * as plotAnalysis from '@app/js/plugins/plot-analysis/plot-analysis';
 import { satelliteViewPlugin } from '@app/js/plugins/satellite-view/satellite-view';
 import { soundManagerPlugin } from '@app/js/plugins/sounds/sound-manager';
 import { topMenuPlugin } from '@app/js/plugins/top-menu/top-menu';
@@ -35,6 +34,10 @@ import { orbitReferencesPlugin } from './orbit-references/orbit-references';
 import { planetariumPlugin } from './planetarium/planetarium';
 import { ecfPlotsPlugin } from './plot-analysis/ecf-plots';
 import { eciPlotsPlugin } from './plot-analysis/eci-plots';
+import { inc2AltPlotPlugin } from './plot-analysis/inc2alt';
+import { inc2LonPlotPlugin } from './plot-analysis/inc2lon';
+import { ricPlotPlugin } from './plot-analysis/ric-plots';
+import { time2LonPlotsPlugin } from './plot-analysis/time2lon';
 import { satConstellationsPlugin } from './sat-constellations/sat-constellations';
 import { satelliteFovPlugin } from './satellite-fov/satellite-fov';
 import { satellitePhotosPlugin } from './satellite-photos/satellite-photos';
@@ -184,7 +187,10 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     if (plugins.analysis) analysis.init();
     if (plugins.plotAnalysis) eciPlotsPlugin.init();
     if (plugins.plotAnalysis) ecfPlotsPlugin.init();
-    if (plugins.plotAnalysis) plotAnalysis.init();
+    if (plugins.plotAnalysis) ricPlotPlugin.init();
+    if (plugins.plotAnalysis) time2LonPlotsPlugin.init();
+    if (plugins.plotAnalysis) inc2AltPlotPlugin.init();
+    if (plugins.plotAnalysis) inc2LonPlotPlugin.init();
     // if (plugins.externalSources) externalSources.init();
     if (plugins.aboutManager) aboutMenuPlugin.init();
     if (plugins.settingsMenu) settingsMenuPlugin.init();
@@ -277,4 +283,4 @@ export const startGoogleAnalytics = (): void => {
 };
 
 // Create common import for all plugins
-export { StreamManager as CanvasRecorder, analysis, catalogLoader, initialOrbit, missile, omManager, plotAnalysis };
+export { StreamManager as CanvasRecorder, analysis, catalogLoader, initialOrbit, missile, omManager };

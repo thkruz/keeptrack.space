@@ -50,7 +50,10 @@ export type MissileParams = {
 
 export type EChartsData = {
   name: string;
-  value: [number, number, number][];
+  satId?: number;
+  country?: string;
+  value?: [number, number, number][];
+  data?: [number, number, number][];
 }[];
 
 export type rgbaArray = [number, number, number, number];

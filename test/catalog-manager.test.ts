@@ -94,19 +94,19 @@ describe('calcSatrec', () => {
   // should process exportTle2Csv
   it('process_export_tle_csv', () => {
     catalogManagerInstance.satData = [];
-    CatalogExporter.exportTle2Csv(catalogManagerInstance.satData);
+    CatalogExporter.exportTle2Csv(catalogManagerInstance.satData as any);
 
     catalogManagerInstance.satData = [defaultSat];
-    CatalogExporter.exportTle2Csv(catalogManagerInstance.satData);
+    CatalogExporter.exportTle2Csv(catalogManagerInstance.satData as any);
   });
 
   // should process exportTle2Txt
   it('process_export_tle_csv', () => {
     catalogManagerInstance.satData = [];
-    CatalogExporter.exportTle2Txt(catalogManagerInstance.satData);
+    CatalogExporter.exportTle2Txt(catalogManagerInstance.satData as any);
 
     catalogManagerInstance.satData = [defaultSat];
-    CatalogExporter.exportTle2Txt(catalogManagerInstance.satData);
+    CatalogExporter.exportTle2Txt(catalogManagerInstance.satData as any);
   });
 
   // should process getIdFromIntlDes
@@ -157,9 +157,6 @@ describe('calcSatrec', () => {
     <div id="menu-sat-fov" class="bmenu-item-disabled"></div>
     <div id="menu-newLaunch" class="bmenu-item-disabled"></div>
     <div id="menu-breakup" class="bmenu-item-disabled"></div>
-    <div id="menu-plot-analysis" class="bmenu-item-disabled"></div>
-    <div id="menu-plot-analysis2" class="bmenu-item-disabled"></div>
-    <div id="menu-plot-analysis3" class="bmenu-item-disabled"></div>
     <div id="search-holder" class="bmenu-item-disabled"></div>
     <div id="search-icon" class="bmenu-item-disabled"></div>`;
 

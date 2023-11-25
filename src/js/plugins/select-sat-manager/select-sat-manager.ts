@@ -130,9 +130,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       getEl('menu-map', true)?.classList.add('bmenu-item-disabled');
       getEl('menu-newLaunch', true)?.classList.add('bmenu-item-disabled');
       getEl('menu-breakup', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-plot-analysis', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-plot-analysis2', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-plot-analysis3', true)?.classList.add('bmenu-item-disabled');
     } else if (satId !== -1) {
       if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
         keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
@@ -194,11 +191,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
       getEl('menu-map', true)?.classList.remove('bmenu-item-disabled');
       getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-plot-analysis', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-plot-analysis2', true)?.classList.remove('bmenu-item-disabled');
-      if (catalogManagerInstance.secondarySat !== -1) {
-        getEl('menu-plot-analysis3', true)?.classList.remove('bmenu-item-disabled');
-      }
     }
 
     catalogManagerInstance.setSelectedSat(satId);

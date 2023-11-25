@@ -58,6 +58,7 @@ export const defaultSat: SatObject = {
   },
   static: false,
   staticNum: null,
+  source: 'USSF',
 };
 
 export const defaultSensor: SensorObject = {

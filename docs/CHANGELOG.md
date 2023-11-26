@@ -2,6 +2,69 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v8.2.0
+
+>  
+
+- Develop
+- fix: :bug: fix typo in time-machine logic
+- Develop
+- fix: :bug: fix #758
+- feat: :sparkles: add improvements for JSC Vimpel data
+- fix: :bug: fix time machine showing vimpel objects in 1958
+- feat: :sparkles: add confidence color scheme
+- refactor: :recycle: rewrite of sensors
+- refactor: :recycle: move all plot plugins to class based design
+- refactor: :recycle: reduce dependencies by using keepTrackApi more
+- refactor: :recycle: refactor analysis menu into class structure
+- refactor: :recycle: move ECI and ECF plots to stand-alone plugins
+- refactor: :recycle: cleanup satinfobox design
+- refactor: :recycle: consolidate right click menu
+- feat: :sparkles: add persistanceManager for localStorage management
+- feat: :sparkles: persist settings across sessions
+- fix: :rotating_light: fix sonarcloud findings
+- fix: :bug: add error checking to new launch plugin
+- test: :white_check_mark: fix broken tests
+- fix: :bug: add fixes for multi-site lookangles plugin
+- docs: :memo: update changelog
+- feat: :children_crossing: update to address #803
+- feat: :sparkles: add alternate names and notional TLEs
+- refactor: :wastebasket: remove old keepTrackApi.programs object
+- fix: :bug: add fixes to position cruncher for VIMPEL objects
+- fix: :adhesive_bandage: fix minor PWA errors
+- ci: :construction_worker: remove cypress for now
+- fix: :bug: fix bug in demo-mode logic
+- fix: :lipstick: fix incorrect icon color
+- fix: :bug: fix to #809
+- fix: :bug: fix bug where low resolution menu not visible
+- ci: :green_heart: move sonarcloud scan to a github app instead
+- ci: :construction_worker: update sonarcloud scan
+- ci: :bug: fix yaml format
+- fix: :bug: consolidate imports
+- test: :white_check_mark: fix broken test
+- ci: :construction_worker: fix sonarlint
+- docs: :memo: update main.ts docs
+- docs: :wastebasket: deprecate the about menu
+- fix: :bug: add defensive code for missing satellite or sensor
+- test: :white_check_mark: fix test environment
+- fix: :fire: consolidate imports
+- fix: :zap: only reinitialize impacted components for better performance
+- test: :white_check_mark: fix broken test
+- fix: :bug: fix for #759
+- docs: :memo: explain DISCOVR differences
+- fix: :bug: fix time machine showing VIMPEL
+- ci: :construction_worker: migrate to automatic sonarcloud analysis
+- build: :lock: fix security issue
+- ci: :construction_worker: update sonarcloud scan
+- Update README.md
+- Update README.md
+- fix: :bug: fix issue w/ 2nd gamepad but no 1st gamepad
+- chore: :card_file_box: update TLE2.json
+- fix: :adhesive_bandage: remove debugger
+- fix: :bug: fix bug where satinfobox disappears on rmb
+- fix: :lipstick: fix wrong icon color
+- ci: :pencil2: remove extra line from build yml
+
 #### v8.1.1
 
 >  

@@ -235,7 +235,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       (id) => {
         const el = getEl(id, true);
         if (!el) return;
-        el.parentElement.style.display = 'block';
+        el.parentElement.style.display = 'flex';
       }
     );
 

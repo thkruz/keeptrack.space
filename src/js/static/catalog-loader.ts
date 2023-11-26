@@ -32,6 +32,15 @@ interface AsciiTleSat {
   TLE2: TleLine2;
 }
 
+export enum CatalogSource {
+  USSF = 'USSF',
+  CELESTRAK = 'Celestrak',
+  UNIV_OF_MICH = 'University of Michigan',
+  VIMPEL = 'JSC Vimpel',
+  TLE_TXT = 'TLE.txt',
+  EXTRA_JSON = 'extra.json',
+}
+
 export class CatalogLoader {
   static filterTLEDatabase(resp: SatObject[], limitSatsArray?: string[], extraSats?: ExtraSat[], asciiCatalog?: AsciiTleSat[] | void, jsCatalog?: JsSat[]): void {
     let tempSatData: (SatObject | SensorObject | RadarDataObject)[] = [];
@@ -512,20 +521,20 @@ export class CatalogLoader {
       const source = Tle.getClassification(resp[i].TLE1);
       switch (source) {
         case 'U':
-          resp[i].source = 'USSF';
+          resp[i].source = CatalogSource.USSF;
           break;
         case 'C':
-          resp[i].source = 'CelesTrak';
+          resp[i].source = CatalogSource.CELESTRAK;
           break;
         case 'M':
-          resp[i].source = 'University of Michigan';
+          resp[i].source = CatalogSource.UNIV_OF_MICH;
           break;
         case 'V':
-          resp[i].source = 'JSC Vimpel';
+          resp[i].source = CatalogSource.VIMPEL;
           break;
         default:
           // Default to USSF for now
-          resp[i].source = 'USSF';
+          resp[i].source = CatalogSource.USSF;
       }
       tempSatData.push(resp[i]);
     }
@@ -578,7 +587,7 @@ export class CatalogLoader {
     tempSatData[i].TLE2 = element.TLE2;
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
     tempSatData[i].isExternal = true;
-    tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : 'TLE.txt';
+    tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
   }
 
   private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempSatData: any[], catalogManagerInstance: CatalogManager) {
@@ -604,7 +613,7 @@ export class CatalogLoader {
       sccNum: sccNum,
       TLE1: element.TLE1,
       TLE2: element.TLE2,
-      source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : 'TLE.txt',
+      source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT,
       intlDes: intlDes,
       typ: 'sat',
       id: tempSatData.length,
@@ -657,7 +666,7 @@ export class CatalogLoader {
         if (typeof tempSatData[i] === 'undefined') continue;
         tempSatData[i].TLE1 = element.TLE1;
         tempSatData[i].TLE2 = element.TLE2;
-        tempSatData[i].source = 'extra.json';
+        tempSatData[i].source = CatalogSource.EXTRA_JSON;
       } else {
         settingsManager.isExtraSatellitesAdded = true;
 
@@ -744,20 +753,20 @@ export class CatalogLoader {
         const source = Tle.getClassification(resp[i].TLE1);
         switch (source) {
           case 'U':
-            resp[i].source = 'USSF';
+            resp[i].source = CatalogSource.USSF;
             break;
           case 'C':
-            resp[i].source = 'CelesTrak';
+            resp[i].source = CatalogSource.CELESTRAK;
             break;
           case 'M':
-            resp[i].source = 'University of Michigan';
+            resp[i].source = CatalogSource.UNIV_OF_MICH;
             break;
           case 'V':
-            resp[i].source = 'JSC Vimpel';
+            resp[i].source = CatalogSource.VIMPEL;
             break;
           default:
             // Default to USSF for now
-            resp[i].source = 'USSF';
+            resp[i].source = CatalogSource.USSF;
         }
         tempSatData.push(resp[i]);
       }

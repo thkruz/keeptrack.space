@@ -188,7 +188,6 @@
     top: calc(27% - 5px);
     bottom: 0px;
     margin-top: 25px;
-    padding: 0 10px 0px 10px;
     right: 0px;
     width: 355px;
     border-width: 5px;
@@ -205,9 +204,7 @@
   .sat-info-value {
     float: right;
     width: 220px;
-    height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    padding: 0px 25px;
     text-align: center;
   }
   #footer-toggle-wrapper {

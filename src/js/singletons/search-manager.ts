@@ -152,7 +152,7 @@ export class SearchManager {
         if (sat.country == 'ANALSAT' && !sat.active) return true; // Skip Fake Analyst satellites
         if (!sat.name) return true; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
-        if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1) {
+        if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
           results.push({
             strIndex: sat.name.indexOf(searchStringIn),
             type: sat.type,

@@ -3,6 +3,7 @@
 import { Operators } from '@app/js/catalogs/sensors';
 import { DEG2RAD } from '@app/js/lib/constants';
 import { ZoomValue } from '@app/js/singletons/camera';
+import { CatalogSource } from '@app/js/static/catalog-loader';
 import { Degrees, Kilometers, Milliseconds, Sgp4 } from 'ootk';
 import { SatObject, SensorObject } from '../../src/js/interfaces';
 import { SpaceObjectType } from '../../src/js/lib/space-object-type';
@@ -58,7 +59,7 @@ export const defaultSat: SatObject = {
   },
   static: false,
   staticNum: null,
-  source: 'USSF',
+  source: CatalogSource.USSF,
 };
 
 export const defaultSensor: SensorObject = {

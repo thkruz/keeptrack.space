@@ -1,12 +1,10 @@
 import { ControlSiteObject } from '../catalogs/control-sites';
 import { countryCodeList, countryMapList, launchSiteMap } from '../catalogs/countries';
+import { rocketUrls } from '../catalogs/rocket-urls';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export abstract class StringExtractor {
-  // TODO: Add URLs for all rockets
-  private static rocketUrls = [];
-
   /** Use this to adjust which type of objects are loaded
    * TODO: Move this somewhere else!
    */
@@ -56,7 +54,7 @@ export abstract class StringExtractor {
     if (!LV || LV == 'U' || LV == 'TBD' || LV == '') {
       return 'Unknown';
     } else {
-      const rocketUrl = StringExtractor.rocketUrls.filter((url) => url.rocket === LV);
+      const rocketUrl = rocketUrls.filter((url) => url.rocket === LV);
       if (rocketUrl.length > 0) {
         return `<a class="iframe" href="${rocketUrl[0].url}">${LV}</a>`;
       } else {

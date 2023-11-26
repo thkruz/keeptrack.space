@@ -201,14 +201,12 @@ export declare interface BaseObject {
 }
 
 export declare interface SatObject extends BaseObject {
-  TTP?: string;
   TLE1: TleLine1;
   TLE2: TleLine2;
   alt?: number;
   altId: string;
   apogee: number;
   argPe: number;
-  associates?: any;
   az: number;
   bf?: string;
   bus?: string;
@@ -267,6 +265,10 @@ export declare interface SatObject extends BaseObject {
   staticNum: number;
   ra: number;
   dec: number;
+  /** @deprecated */
+  TTP?: string;
+  /** @deprecated */
+  associates?: any;
   /** @deprecated */
   maneuver?: string;
   /** @deprecated */

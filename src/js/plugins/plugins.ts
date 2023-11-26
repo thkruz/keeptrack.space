@@ -1,4 +1,3 @@
-import * as analysis from '@app/js/plugins/analysis/analysis';
 import { countriesMenuPlugin } from '@app/js/plugins/countries/countries';
 import * as initialOrbit from '@app/js/plugins/initial-orbit/initial-orbit';
 import * as missile from '@app/js/plugins/missile/missilePlugin';
@@ -13,6 +12,7 @@ import { KeepTrackApiEvents, KeepTrackApiRegisterParams } from '../keepTrackApi'
 import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { aboutMenuPlugin } from './about-menu/about-menu';
+import { analysisMenuPlugin } from './analysis/analysis';
 import { astronomyPlugin } from './astronomy/astronomy';
 import { breakupPlugin } from './breakup/breakup';
 import { classificationBarPlugin } from './classification-bar/classification-bar';
@@ -184,7 +184,7 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     if (plugins.timeMachine) timeMachinePlugin.init();
     if (plugins.photoManager) satellitePhotosPlugin.init();
     if (plugins.screenRecorder) screenRecorderPlugin.init();
-    if (plugins.analysis) analysis.init();
+    if (plugins.analysis) analysisMenuPlugin.init();
     if (plugins.plotAnalysis) eciPlotsPlugin.init();
     if (plugins.plotAnalysis) ecfPlotsPlugin.init();
     if (plugins.plotAnalysis) ricPlotPlugin.init();
@@ -283,4 +283,4 @@ export const startGoogleAnalytics = (): void => {
 };
 
 // Create common import for all plugins
-export { StreamManager as CanvasRecorder, analysis, catalogLoader, initialOrbit, missile, omManager };
+export { StreamManager as CanvasRecorder, catalogLoader, initialOrbit, missile, omManager };

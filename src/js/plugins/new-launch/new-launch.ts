@@ -282,7 +282,7 @@ export class NewLaunch extends KeepTrackPlugin {
     });
   }
 
-  preValidate_(sat: SatObject): void {
+  private preValidate_(sat: SatObject): void {
     // Get Current LaunchSiteOptionValue
     const launchSiteOptionValue = (<HTMLInputElement>getEl('nl-facility')).value;
     const lat = launchSites[launchSiteOptionValue].lat;

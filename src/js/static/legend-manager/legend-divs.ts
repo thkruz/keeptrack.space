@@ -165,7 +165,7 @@ export const confidenceDiv = keepTrackApi.html`
     Between 3 and 7
   </li>
   <li>
-    <div class="Square-Box legend-confidenceHigh-box"></div>
+    <div class="Square-Box legend-confidenceHi-box"></div>
     7 or Higher
   </li>
 </ul>

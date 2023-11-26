@@ -28,6 +28,7 @@ import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
 import { getDayOfYear } from '../lib/transforms';
+import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
@@ -67,7 +68,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     satMed: true,
     satHi: true,
     satSmall: true,
-    confidenceHigh: true,
+    confidenceHi: true,
     confidenceMed: true,
     confidenceLow: true,
     rcsSmall: true,
@@ -114,7 +115,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     // TODO: Hover and select code should be refactored to pass params
 
     if (!params) {
-      errorManagerInstance.warn('No params passed to ageOfElset');
+      // errorManagerInstance.warn('No params passed to ageOfElset');
       const now = new Date();
       params = {
         jday: getDayOfYear(now),
@@ -603,7 +604,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       satMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       satHi: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       satSmall: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      confidenceHigh: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      confidenceHi: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       confidenceMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       confidenceLow: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsSmall: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
@@ -658,6 +659,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       cbName: 'colorSchemeManager',
       cb: (): void => {
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
+        LegendManager.change(cachedColorScheme);
         if (cachedColorScheme) {
           this.currentColorScheme = this[cachedColorScheme];
         }
@@ -937,8 +939,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
     let pickable = Pickable.No;
     let color: [number, number, number, number];
-    if (confidenceScore >= 7 && this.objectTypeFlags.confidenceHigh) {
-      color = this.colorTheme.confidenceHigh;
+    if (confidenceScore >= 7 && this.objectTypeFlags.confidenceHi) {
+      color = this.colorTheme.confidenceHi;
       pickable = Pickable.Yes;
     } else if (confidenceScore >= 4 && confidenceScore < 7 && this.objectTypeFlags.confidenceMed) {
       color = this.colorTheme.confidenceMed;
@@ -981,7 +983,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     this.objectTypeFlags.satMed = true;
     this.objectTypeFlags.satHi = true;
     this.objectTypeFlags.satSmall = true;
-    this.objectTypeFlags.confidenceHigh = true;
+    this.objectTypeFlags.confidenceHi = true;
     this.objectTypeFlags.confidenceMed = true;
     this.objectTypeFlags.confidenceLow = true;
     this.objectTypeFlags.rcsSmall = true;

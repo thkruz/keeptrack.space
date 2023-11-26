@@ -1201,7 +1201,7 @@ export class SettingsManager {
         // apogeeGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
         // velGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
         satSmall: [0.2, 1.0, 0.0, 0.65],
-        confidenceHigh: [0.0, 1.0, 0.0, 0.65],
+        confidenceHi: [0.0, 1.0, 0.0, 0.65],
         confidenceMed: [1.0, 0.4, 0.0, 0.65],
         confidenceLow: [1.0, 0.0, 0.0, 0.65],
         rcsXXSmall: [1.0, 0, 0, 0.6],

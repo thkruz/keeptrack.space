@@ -309,7 +309,8 @@ export class KeepTrackPlugin {
       cb: () => {
         const item = document.createElement('div');
         item.innerHTML = html;
-        getEl(KeepTrackPlugin.rmbMenuL1ContainerId).appendChild(item);
+        // Replace outer element with first child
+        getEl(KeepTrackPlugin.rmbMenuL1ContainerId).appendChild(item.lastChild);
       },
     });
   }

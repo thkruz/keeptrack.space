@@ -75,6 +75,7 @@ export class MeshManager {
   ];
 
   private sccNumIss_ = '25544';
+  private sccNumTianhe_ = '48274';
   private shader_ = {
     frag: `#version 300 es
     precision mediump float;
@@ -394,6 +395,16 @@ export class MeshManager {
     }
 
     if (sat.sccNum === this.sccNumIss_) {
+      this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
+      this.currentMeshObject.model = this.models.iss;
+      return;
+    }
+
+    /**
+     * Temporary solution for Tianhe-1
+     * TODO: Create a real model for Tianhe-1
+     */
+    if (sat.sccNum === this.sccNumTianhe_) {
       this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
       this.currentMeshObject.model = this.models.iss;
       return;

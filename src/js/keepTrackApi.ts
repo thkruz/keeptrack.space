@@ -22,6 +22,7 @@ import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
 import { DotsManager } from './singletons/dots-manager';
 import { DrawManager } from './singletons/draw-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
+import { errorManagerInstance } from './singletons/errorManager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
 import { StarManager } from './singletons/starManager';
@@ -72,7 +73,7 @@ export const register = (params: KeepTrackApiRegisterParams) => {
     // Add the callback
     keepTrackApi.callbacks[params.event].push({ name: params.cbName, cb: params.cb });
   } else {
-    throw new Error(`Invalid callback "${params.event}"!`);
+    errorManagerInstance.error(new Error(`Invalid callback "${params.event}"!`), 'keepTrackApi.register');
   }
 };
 export const unregister = (params: { event: string; cbName: string }) => {
@@ -85,21 +86,12 @@ export const unregister = (params: { event: string; cbName: string }) => {
       }
     }
     // If we got this far, it means we couldn't find the callback
-    throw new Error(`Callback "${params.cbName} not found"!`);
+    errorManagerInstance.error(new Error(`Callback "${params.cbName} not found"!`), 'keepTrackApi.unregister');
   } else {
     // Couldn't find the method
-    throw new Error(`Invalid callback "${params.event}"!`);
+    errorManagerInstance.error(new Error(`Invalid callback "${params.event}"!`), 'keepTrackApi.unregister');
   }
 };
-/**
- * Checks if the current environment is Node.js.
- * @returns {boolean} Returns true if the current environment is Node.js, false otherwise.
- */
-export const isThisNode = () => {
-  const nodeName = (typeof process !== 'undefined' && process?.release?.name) || false;
-  return !!nodeName;
-};
-
 export const glsl = (literals: TemplateStringsArray, ...placeholders: Array<any>): string => {
   let str = '';
   for (let i = 0; i < placeholders.length; i++) {
@@ -116,7 +108,7 @@ example: keepTrackApi.html\`\<div>example\</div>\`
 export const html = (strings: TemplateStringsArray, ...placeholders: any[]) => {
   for (const placeholder of placeholders) {
     if (typeof placeholder !== 'string') {
-      throw Error('Invalid input');
+      errorManagerInstance.error(new Error('Invalid input'), 'keepTrackApi.html');
     }
   }
   return String.raw(strings, ...placeholders);
@@ -161,6 +153,7 @@ export const keepTrackApi = {
   callbacks: {
     onKeepTrackReady: [],
     selectSatData: [],
+    setSecondarySat: [],
     updateSelectBox: [],
     onCruncherReady: [],
     onCruncherMessage: [],
@@ -195,6 +188,9 @@ export const keepTrackApi = {
     selectSatData: (sat: SatObject, satId: number) => {
       keepTrackApi.getSoundManager()?.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
+    },
+    setSecondarySat: (sat: SatObject, satId: number) => {
+      keepTrackApi.callbacks.setSecondarySat.forEach((cb: any) => cb.cb(sat, satId));
     },
     onKeepTrackReady: () => {
       keepTrackApi.callbacks.onKeepTrackReady.forEach((cb: any) => cb.cb());
@@ -307,6 +303,10 @@ export enum KeepTrackApiEvents {
    * Run at the end of catalogManager.selectSat with parameters (sat: SatObject, satId: number)
    */
   selectSatData = 'selectSatData',
+  /**
+   * Run at the end of catalogManager.setSecondarySat with parameters (sat: SatObject, satId: number)
+   */
+  setSecondarySat = 'setSecondarySat',
   onKeepTrackReady = 'onKeepTrackReady',
   updateSelectBox = 'updateSelectBox',
   onCruncherReady = 'onCruncherReady',
@@ -353,5 +353,5 @@ export const isMissileObject = (sat: CatalogObject): boolean => !!(<MissileObjec
 export const isSatObject = (sat: CatalogObject): boolean => {
   if (!sat) return false;
 
-  return !!((<SatObject>sat).sccNum || (<SatObject>sat).intlDes);
+  return !!((<SatObject>sat).sccNum || (<SatObject>sat).intlDes || (<SatObject>sat).TLE1);
 };

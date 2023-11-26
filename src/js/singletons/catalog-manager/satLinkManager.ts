@@ -102,22 +102,22 @@ export class SatLinkManager {
       errorManagerInstance.info('controlSiteManager unable to load!');
     }
 
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    for (let sensor in sensorManagerInstance.sensors) {
-      if (sensorManagerInstance.sensors[sensor].linkAehf) {
-        this.aehfUsers.push(sensorManagerInstance.sensors[sensor].name);
+    const staticSet = keepTrackApi.getCatalogManager().staticSet;
+    for (let sensor in staticSet) {
+      if (staticSet[sensor].linkAehf) {
+        this.aehfUsers.push(staticSet[sensor].name);
       }
-      if (sensorManagerInstance.sensors[sensor].linkWgs) {
-        this.wgsUsers.push(sensorManagerInstance.sensors[sensor].name);
+      if (staticSet[sensor].linkWgs) {
+        this.wgsUsers.push(staticSet[sensor].name);
       }
-      if (sensorManagerInstance.sensors[sensor].linkIridium) {
-        this.wgsUsers.push(sensorManagerInstance.sensors[sensor].name);
+      if (staticSet[sensor].linkIridium) {
+        this.wgsUsers.push(staticSet[sensor].name);
       }
-      if (sensorManagerInstance.sensors[sensor].linkGalileo) {
-        this.galileoUsers.push(sensorManagerInstance.sensors[sensor].name);
+      if (staticSet[sensor].linkGalileo) {
+        this.galileoUsers.push(staticSet[sensor].name);
       }
-      if (sensorManagerInstance.sensors[sensor].linkStarlink) {
-        this.starlinkUsers.push(sensorManagerInstance.sensors[sensor].name);
+      if (staticSet[sensor].linkStarlink) {
+        this.starlinkUsers.push(staticSet[sensor].name);
       }
     }
   }

@@ -26,6 +26,7 @@ import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { Degrees, Minutes } from 'ootk';
 import { SatObject } from '../interfaces';
 import { DEG2RAD } from '../lib/constants';
+import { CatalogSource } from './catalog-loader';
 
 /**
  * The CatalogSearch class provides static methods for filtering and searching through an array of satellite data.
@@ -207,6 +208,8 @@ export class CatalogSearch {
    */
   static yearOrLess(satData: SatObject[], yr: number) {
     return satData.filter((sat) => {
+      if (sat.source === CatalogSource.VIMPEL) return false;
+
       // 2007 Fengyun 1C ASAT Event
       if (sat.intlDes?.includes('1999-025')) {
         if (sat.intlDes !== '1999-025A') {

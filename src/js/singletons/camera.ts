@@ -73,8 +73,10 @@ export enum CameraType {
   MAX_CAMERA_TYPES = 8,
 }
 
-export type ZoomValue = 'leo' | 'geo';
-
+export enum ZoomValue {
+  GEO = 'geo',
+  LEO = 'leo',
+}
 export class Camera {
   private camYawTarget_ = <Radians>0;
   private chaseSpeed_ = 0.0035;

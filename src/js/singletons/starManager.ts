@@ -14,8 +14,9 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { constellations } from '../catalogs/constellations';
+import { isThisNode } from '../static/isThisNode';
 import { lineManagerInstance } from './draw-manager/line-manager';
 
 export class StarManager {

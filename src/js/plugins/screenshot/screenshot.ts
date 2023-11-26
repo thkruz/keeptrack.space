@@ -25,7 +25,7 @@
 
 import cameraPng from '@app/img/icons/camera.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { Classification, ClassificationString } from '@app/js/static/classification';
+import { Classification } from '@app/js/static/classification';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class Screenshot extends KeepTrackPlugin {
@@ -175,16 +175,6 @@ export class Screenshot extends KeepTrackPlugin {
         classificationColor: Classification.getColors(settingsManager.classificationStr).backgroundColor,
       };
     }
-  }
-}
-
-declare module '@app/js/interfaces' {
-  interface UserSettings {
-    classificationStr: ClassificationString;
-    /**
-     * If true, the copywrite will be hidden.
-     */
-    copyrightOveride?: boolean;
   }
 }
 

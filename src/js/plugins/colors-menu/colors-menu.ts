@@ -22,6 +22,7 @@ export class ColorMenu extends KeepTrackPlugin {
         <li class="menu-selectable" data-color="sunlight">Sunlight</li>
         <li class="menu-selectable" data-color="velocity">Velocity</li>
         <li class="menu-selectable" data-color="neighbors">Orbit Density</li>
+        <li class="menu-selectable" data-color="confidence">Confidence Level</li>
         <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
         <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
         <li class="menu-selectable" data-color="countries">Countries</li>
@@ -56,6 +57,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
     <li id="colors-density-rmb"><a href="#">Orbit Density</a></li>
     <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
     <li id="colors-country-rmb"><a href="#">Country</a></li>
+    <li id="colors-confidence-rmb"><a href="#">Confidence Level</a></li>
     <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
     <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
   </ul>`;
@@ -70,6 +72,9 @@ The various themes can change the colors based on the objects' orbits, objects' 
     switch (targetId) {
       case 'colors-default-rmb':
         ColorMenu.colorsMenuClick('default');
+        break;
+      case 'colors-confidence-rmb':
+        ColorMenu.colorsMenuClick('confidence');
         break;
       case 'colors-rcs-rmb':
         ColorMenu.colorsMenuClick('rcs');
@@ -135,6 +140,11 @@ The various themes can change the colors based on the objects' orbits, objects' 
       case 'default':
         LegendManager.change('default');
         colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'confidence':
+        LegendManager.change('confidence');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.confidence, true);
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         break;
       case 'velocity':

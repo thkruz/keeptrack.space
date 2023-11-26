@@ -4,13 +4,7 @@
     display: none;
   }
   #datetime {
-    top: 1px;
-    z-index: 11;
-    left: 55px;
-    width: 240px;
     height: 25px;
-    background: transparent;
-    overflow: hidden;
   }
   #demo-logo {
     font-size: 3vh;
@@ -44,27 +38,13 @@
     font-weight: bold;
     font-size: 12px;
   }
-  #datetime-text:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
   #sensor-selected {
-    display: block;
-    top: 1px;
-    z-index: 11;
-    left: 167px;
-    max-width: 440px;
-    height: 25px;
-    background: transparent;
-    overflow: hidden;
-    text-align: left;
-    padding-left: 10px;
-    font-weight: normal;
-    font-size: 19px;
-    position: absolute;
+    padding: 0px 10px 0px 10px;
     border-width: 0px 0px 0px 1px;
     border-style: solid;
     border-color: var(--colorSecondary);
   }
+
   .top-menu-icons {
     display: inline-flex;
     transition: 1s;
@@ -208,7 +188,6 @@
     top: calc(27% - 5px);
     bottom: 0px;
     margin-top: 25px;
-    padding: 0 10px 0px 10px;
     right: 0px;
     width: 355px;
     border-width: 5px;
@@ -225,9 +204,7 @@
   .sat-info-value {
     float: right;
     width: 220px;
-    height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    padding: 0px 25px;
     text-align: center;
   }
   #footer-toggle-wrapper {
@@ -256,8 +233,7 @@
     width: 100%;
   }
   #jday {
-    display: block;
-    padding-left: 10px;
+    padding: 0px 10px 0px 10px;
   }
   #social {
     display: block;
@@ -409,18 +385,7 @@
   }
 
   #datetime {
-    top: 15px;
-    height: 26px;
-    position: fixed;
-    z-index: 11;
-    left: 45px;
-    width: 120px;
-    background: transparent;
-    overflow: hidden;
-  }
-
-  #nav-mobile {
-    display: inline-block;
+    height: 25px;
   }
 
   #github-share1 {
@@ -610,10 +575,7 @@
   }
 
   #datetime {
-    left: 1px;
-    top: 6px;
     height: 40px;
-    width: 130px;
   }
 
   #datetime-text {

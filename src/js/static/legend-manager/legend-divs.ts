@@ -154,6 +154,22 @@ export const defaultSensorDiv = keepTrackApi.html`
   </li>
 </ul>
 `.trim();
+export const confidenceDiv = keepTrackApi.html`
+<ul id="legend-list-confidence">
+  <li>
+    <div class="Square-Box legend-confidenceLow-box"></div>
+    3 or Lower
+  </li>
+  <li>
+    <div class="Square-Box legend-confidenceMed-box"></div>
+    Between 3 and 7
+  </li>
+  <li>
+    <div class="Square-Box legend-confidenceHi-box"></div>
+    7 or Higher
+  </li>
+</ul>
+`.trim();
 export const rcsDiv = keepTrackApi.html`
 <ul id="legend-list-rcs">
   <li>

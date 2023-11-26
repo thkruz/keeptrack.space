@@ -31,7 +31,7 @@
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import { errorManagerInstance } from '../singletons/errorManager';
-import { isThisNode } from '../keepTrackApi';
+import { isThisNode } from '../static/isThisNode';
 
 /**
  * Saves a variable as a text file.

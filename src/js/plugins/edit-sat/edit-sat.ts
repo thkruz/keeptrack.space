@@ -23,6 +23,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
   }
 
   isRequireSatelliteSelected: boolean = true;
+  isIconDisabledOnLoad: boolean = true;
 
   helpTitle = `Edit Satellite Menu`;
   helpBody = keepTrackApi.html`The Edit Satellite Menu is used to edit the satellite data.
@@ -186,26 +187,39 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
   static elementPrefix: string = 'es';
 
+  isRmbOnSat = true;
+  rmbMenuOrder = 2;
   rmbL1ElementName: string = `edit-rmb`;
   rmbL1Html: string = keepTrackApi.html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Edit Sat &#x27A4;</a></li>`;
 
-  rmbCallback: (targetId: string, clickedSat?: number) => void = (_targetId: string, clickedSat?: number): void => {
+  rmbCallback = (targetId: string, clickedSat?: number): void => {
     if (typeof clickedSat === 'undefined' || clickedSat === null) throw new Error('clickedSat is undefined');
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
-
-    keepTrackApi.getCatalogManager().setSelectedSat(clickedSat);
-    if (!this.isMenuButtonEnabled) {
-      uiManagerInstance.bottomIconPress(<HTMLElement>{ id: 'menu-editSat' });
+    switch (targetId) {
+      case 'set-pri-sat-rmb':
+        keepTrackApi.getCatalogManager().selectSat(clickedSat);
+        break;
+      case 'set-sec-sat-rmb':
+        keepTrackApi.getCatalogManager().setSecondarySat(clickedSat);
+        break;
+      case 'edit-sat-rmb':
+        keepTrackApi.getCatalogManager().setSelectedSat(clickedSat);
+        if (!this.isMenuButtonEnabled) {
+          keepTrackApi.getUiManager().bottomIconPress(<HTMLElement>{ id: 'menu-editSat' });
+        }
+        break;
+      default:
+        break;
     }
   };
 
   rmbL2ElementName: string = 'edit-rmb-menu';
   rmbL2Html: string = keepTrackApi.html`
     <ul class='dropdown-contents'>
-      <li id="edit-sat-rmb"><a href="#">Edit Satellite</a></li>
+      <li id="set-pri-sat-rmb"><a href="#">Set as Primary Sat</a></li>
       <li id="set-sec-sat-rmb"><a href="#">Set as Secondary Sat</a></li>
+      <li id="edit-sat-rmb"><a href="#">Edit Satellite</a></li>
     </ul>`;
 
   static doReaderActions(evt: Event) {

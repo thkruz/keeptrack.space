@@ -53,6 +53,7 @@ export class Planetarium extends KeepTrackPlugin {
         getEl('cspocAllSensor').style.display = 'none';
         getEl('mwAllSensor').style.display = 'none';
         getEl('mdAllSensor').style.display = 'none';
+        getEl('esocAllSensor').style.display = 'none';
         getEl('llAllSensor').style.display = 'none';
         getEl('rusAllSensor').style.display = 'none';
         getEl('prcAllSensor').style.display = 'none';

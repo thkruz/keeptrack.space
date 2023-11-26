@@ -5,6 +5,7 @@ import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { CameraType } from '@app/js/singletons/camera';
 
+import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 
@@ -50,6 +51,10 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   selectSat(satId: number) {
     if (settingsManager.isDisableSelectSat) return;
+    if (satId === null) {
+      errorManagerInstance.debug('SelectSatManager.selectSat: satId is null');
+      return;
+    }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -125,9 +130,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       getEl('menu-map', true)?.classList.add('bmenu-item-disabled');
       getEl('menu-newLaunch', true)?.classList.add('bmenu-item-disabled');
       getEl('menu-breakup', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-plot-analysis', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-plot-analysis2', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-plot-analysis3', true)?.classList.add('bmenu-item-disabled');
     } else if (satId !== -1) {
       if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
         keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
@@ -189,11 +191,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
       getEl('menu-map', true)?.classList.remove('bmenu-item-disabled');
       getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-plot-analysis', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-plot-analysis2', true)?.classList.remove('bmenu-item-disabled');
-      if (catalogManagerInstance.secondarySat !== -1) {
-        getEl('menu-plot-analysis3', true)?.classList.remove('bmenu-item-disabled');
-      }
     }
 
     catalogManagerInstance.setSelectedSat(satId);
@@ -238,7 +235,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       (id) => {
         const el = getEl(id, true);
         if (!el) return;
-        el.parentElement.style.display = 'block';
+        el.parentElement.style.display = 'flex';
       }
     );
 

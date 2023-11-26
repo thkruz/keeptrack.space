@@ -1,4 +1,4 @@
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { mat4, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';
@@ -9,6 +9,7 @@ import { StereoMapPlugin } from '../plugins/stereo-map/stereo-map';
 import { watchlistPlugin } from '../plugins/watchlist/watchlist';
 import { SettingsManager } from '../settings/settings';
 import { GlUtils } from '../static/gl-utils';
+import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
 import { DotsManager } from './dots-manager';
@@ -22,13 +23,6 @@ import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
 import { errorManagerInstance } from './errorManager';
 import { GroupType } from './object-group';
-
-declare module '@app/js/interfaces' {
-  interface UserSettings {
-    isOrbitOverlayVisible: boolean;
-    startWithOrbitsDisplayed: boolean;
-  }
-}
 
 export interface DrawManager {
   canvas: HTMLCanvasElement;
@@ -364,7 +358,6 @@ export class StandardDrawManager implements DrawManager {
   public orbitsAbove() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     if (
       keepTrackApi.getMainCamera().cameraType == CameraType.ASTRONOMY ||
@@ -394,7 +387,7 @@ export class StandardDrawManager implements DrawManager {
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.clearInViewOrbit();
 
-      let sat;
+      let sat: SatObject;
       this.labelCount_ = 0;
 
       this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
@@ -412,10 +405,10 @@ export class StandardDrawManager implements DrawManager {
 
           if (sat.static) continue;
           if (sat.missile) continue;
-          if (sat.OT === 1 && colorSchemeManagerInstance.objectTypeFlags.payload === false) continue;
-          if (sat.OT === 2 && colorSchemeManagerInstance.objectTypeFlags.rocketBody === false) continue;
-          if (sat.OT === 3 && colorSchemeManagerInstance.objectTypeFlags.debris === false) continue;
-          if (sat.inView === 1 && colorSchemeManagerInstance.objectTypeFlags.inFOV === false) continue;
+          if (keepTrackApi.getColorSchemeManager().isPayloadOff(sat)) continue;
+          if (keepTrackApi.getColorSchemeManager().isRocketBodyOff(sat)) continue;
+          if (keepTrackApi.getColorSchemeManager().isDebrisOff(sat)) continue;
+          if (keepTrackApi.getColorSchemeManager().isInViewOff(sat)) continue;
 
           const satScreenPositionArray = this.getScreenCoords(sat);
           if (satScreenPositionArray.error) continue;
@@ -431,7 +424,13 @@ export class StandardDrawManager implements DrawManager {
           // if (!settingsManager.enableHoverOverlay) continue
           this.satHoverMiniDOM_ = document.createElement('div');
           this.satHoverMiniDOM_.id = 'sat-minibox-' + i;
-          this.satHoverMiniDOM_.textContent = sat.sccNum;
+          const isAltId = sat.altId;
+          if (isAltId) {
+            // TODO: Needs to handle nonJSC sats
+            this.satHoverMiniDOM_.textContent = `JSC${sat.altId}`;
+          } else {
+            this.satHoverMiniDOM_.textContent = sat.sccNum;
+          }
 
           this.satHoverMiniDOM_.style.display = 'block';
           this.satHoverMiniDOM_.style.position = 'absolute';

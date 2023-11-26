@@ -31,7 +31,9 @@ import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
+import { ZoomValue } from '@app/js/singletons/camera';
 import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { SatMath } from '@app/js/static/sat-math';
 import { TearrData } from '@app/js/static/sensor-math';
@@ -53,17 +55,19 @@ export class StandardSensorManager implements SensorManager {
     lat: null,
     lon: null,
     name: '',
+    uiName: '',
+    system: '',
+    operator: '',
     obsmaxaz: <Degrees>0,
     obsmaxel: <Degrees>0,
     obsmaxrange: <Kilometers>0,
     obsminaz: <Degrees>0,
     obsminel: <Degrees>0,
     obsminrange: <Kilometers>0,
-    shortName: '',
+    objName: '',
     staticNum: 0,
-    sun: '',
     volume: false,
-    zoom: 'geo',
+    zoom: ZoomValue.GEO,
   };
 
   lastMultiSiteArray: TearrData[];
@@ -77,9 +81,6 @@ export class StandardSensorManager implements SensorManager {
       },
     },
   ];
-
-  /** List of known satellite/missile sensors */
-  readonly sensors = sensors;
 
   addSecondarySensor(sensor: SensorObject): void {
     // If there is no primary sensor, make this the primary sensor
@@ -105,17 +106,17 @@ export class StandardSensorManager implements SensorManager {
    */
   secondarySensors = <SensorObject[]>[];
   sensorListUS = [
-    this.sensors.COD,
-    this.sensors.BLE,
-    this.sensors.CAV,
-    this.sensors.CLR,
-    this.sensors.EGL,
-    this.sensors.FYL,
-    this.sensors.THL,
-    this.sensors.MIL,
-    this.sensors.ALT,
-    this.sensors.ASC,
-    this.sensors.CDN,
+    sensors.CODSFS,
+    sensors.BLEAFB,
+    sensors.CAVSFS,
+    sensors.CLRSFS,
+    sensors.EGLAFB,
+    sensors.RAFFYL,
+    sensors.PITSB,
+    sensors.MITMIL,
+    sensors.KWAJALT,
+    sensors.RAFASC,
+    sensors.COBRADANE,
   ];
 
   sensorTitle = '';
@@ -132,7 +133,7 @@ export class StandardSensorManager implements SensorManager {
 
   static drawFov(sensor: SensorObject) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    switch (sensor.shortName) {
+    switch (sensor.objName) {
       case 'COD':
       case 'BLE':
       case 'CLR':
@@ -279,10 +280,12 @@ export class StandardSensorManager implements SensorManager {
     });
   }
 
-  getSensorFromStaticNum(staticNum: number): SensorObject {
-    for (const sensor in this.sensors) {
-      if (this.sensors[sensor].staticNum === staticNum) {
-        return this.sensors[sensor];
+  static getSensorFromStaticNum(staticNum: number): SensorObject {
+    if (typeof staticNum === 'undefined') return null;
+
+    for (const sensor in sensors) {
+      if (sensors[sensor].staticNum === staticNum) {
+        return sensors[sensor];
       }
     }
 
@@ -291,14 +294,10 @@ export class StandardSensorManager implements SensorManager {
 
   setSensor(selectedSensor: SensorObject | string, staticNum?: number): void {
     if (!selectedSensor) {
-      selectedSensor = this.getSensorFromStaticNum(staticNum);
+      selectedSensor = StandardSensorManager.getSensorFromStaticNum(staticNum);
     }
 
-    try {
-      localStorage.setItem('currentSensor', JSON.stringify([selectedSensor, staticNum]));
-    } catch {
-      errorManagerInstance.warn('Sensor Manager: Unable to set current sensor - localStorage issue!');
-    }
+    PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, staticNum]));
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
@@ -308,67 +307,63 @@ export class StandardSensorManager implements SensorManager {
       this.currentSensors = [this.defaultSensor[0]];
     } else if (selectedSensor === 'SSN') {
       this.sensorTitle = 'All Space Surveillance Network Sensors';
-      const filteredSensors = Object.values(this.sensors).filter(
-        (sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway'
-      );
+      const filteredSensors = Object.values(sensors).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
       StandardSensorManager.updateSensorUiStyling(filteredSensors);
     } else if (selectedSensor === 'NATO-MW') {
       this.sensorTitle = 'All North American Aerospace Defense Command Sensors';
-      this.currentSensors = Object.values(this.sensors).filter(
-        (sensor) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          sensor == this.sensors.BLE ||
-          sensor == this.sensors.CAV ||
-          sensor == this.sensors.CDN ||
-          sensor == this.sensors.COD ||
-          sensor == this.sensors.CLR ||
-          sensor == this.sensors.FYL ||
-          sensor == this.sensors.THL
+      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+        [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB].includes(sensor)
       );
     } else if (selectedSensor === 'RUS-ALL') {
       this.sensorTitle = 'All Russian Sensors';
-      this.currentSensors = Object.values(this.sensors).filter(
-        (sensor) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          sensor == this.sensors.ARM ||
-          sensor == this.sensors.BAL ||
-          sensor == this.sensors.GAN ||
-          sensor == this.sensors.LEK ||
-          sensor == this.sensors.MIS ||
-          sensor == this.sensors.OLE ||
-          sensor == this.sensors.PEC ||
-          sensor == this.sensors.PIO
+      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+        [
+          sensors.OLED,
+          sensors.OLEV,
+          sensors.PEC,
+          sensors.MISD,
+          sensors.MISV,
+          sensors.LEKV,
+          sensors.ARMV,
+          sensors.KALV,
+          sensors.BARV,
+          sensors.YENV,
+          sensors.ORSV,
+          sensors.STO,
+          sensors.NAK,
+        ].includes(sensor)
       );
     } else if (selectedSensor === 'PRC-ALL') {
       this.sensorTitle = 'All Chinese Sensors';
-      this.currentSensors = Object.values(this.sensors).filter(
-        (sensor) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          sensor == this.sensors.XIN || sensor == this.sensors.ZHE || sensor == this.sensors.HEI || sensor == this.sensors.SHD
-      );
+      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) => [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO].includes(sensor));
     } else if (selectedSensor === 'LEO-LABS') {
       this.sensorTitle = 'All LEO Labs Sensors';
-      this.currentSensors = Object.values(this.sensors).filter(
-        (sensor) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          sensor == this.sensors.MSR || sensor == this.sensors.PFISR || sensor == this.sensors.CRSR || sensor == this.sensors.KSR
+      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+        [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR].includes(sensor)
+      );
+    } else if (selectedSensor === 'ESOC-ALL') {
+      this.sensorTitle = 'All Missile Defense Agency Sensors';
+      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+        [
+          sensors.GRV,
+          sensors.TIR,
+          sensors.GES,
+          sensors.NRC,
+          sensors.PDM,
+          sensors.TRO,
+          sensors.Tenerife,
+          sensors.ZimLAT,
+          sensors.ZimSMART,
+          sensors.Tromso,
+          sensors.Kiruna,
+          sensors.Sodankyla,
+          sensors.Svalbard,
+        ].includes(sensor)
       );
     } else if (selectedSensor === 'MD-ALL') {
       this.sensorTitle = 'All Missile Defense Agency Sensors';
-      this.currentSensors = Object.values(this.sensors).filter(
-        (sensor) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          sensor == this.sensors.COD ||
-          sensor == this.sensors.BLE ||
-          sensor == this.sensors.CLR ||
-          sensor == this.sensors.FYL ||
-          sensor == this.sensors.THL ||
-          sensor == this.sensors.HAR ||
-          sensor == this.sensors.QTR ||
-          sensor == this.sensors.KUR ||
-          sensor == this.sensors.SHA ||
-          sensor == this.sensors.KCS ||
-          sensor == this.sensors.SBX
+      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+        [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor)
       );
     } else if ((<SensorObject>selectedSensor)?.name === 'Custom Sensor') {
       this.currentSensors = [<SensorObject>selectedSensor];
@@ -389,11 +384,15 @@ export class StandardSensorManager implements SensorManager {
       this.sensorTitle = this.currentSensors[0].name;
     } else {
       // Look through all known sensors
-      for (const sensor in this.sensors) {
+      for (const sensor in sensors) {
         // TODO: Require explicit sensor selection!
         // If this is the sensor we selected
-        if (this.sensors[sensor] == selectedSensor || (this.sensors[sensor].staticNum === staticNum && typeof staticNum != 'undefined')) {
-          this.currentSensors = [this.sensors[sensor]];
+        const isMatchString = typeof selectedSensor === 'string' && sensors[sensor].objName === selectedSensor;
+        const isMatchObj = typeof selectedSensor !== 'string' && sensors[sensor] === selectedSensor;
+        const isMatchStaticNum = typeof staticNum !== 'undefined' && sensors[sensor].staticNum === staticNum;
+
+        if (isMatchString || isMatchObj || isMatchStaticNum) {
+          this.currentSensors = [sensors[sensor]];
 
           // TODO: This should all be in the sensor plugin instead
           const sensorInfoTitleDom = getEl('sensor-info-title', true);
@@ -524,9 +523,9 @@ export class StandardSensorManager implements SensorManager {
     const primarySensor = this.currentSensors[0];
 
     if (primarySensor.obsmaxrange > 6000) {
-      keepTrackApi.getMainCamera().changeZoom('geo');
+      keepTrackApi.getMainCamera().changeZoom(ZoomValue.GEO);
     } else {
-      keepTrackApi.getMainCamera().changeZoom('leo');
+      keepTrackApi.getMainCamera().changeZoom(ZoomValue.LEO);
     }
     keepTrackApi.getMainCamera().camSnap(lat2pitch(primarySensor.lat), lon2yaw(primarySensor.lon, timeManagerInstance.selectedDate));
   }

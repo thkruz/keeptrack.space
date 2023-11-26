@@ -19,10 +19,12 @@
  */
 
 import { SensorGeolocation } from '@app/js/interfaces';
-import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
+import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
+import { isThisNode } from '../static/isThisNode';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
@@ -914,7 +916,7 @@ export class SettingsManager {
   /**
    * Draw Trailing Orbits
    */
-  isDrawTrailingOrbits = true;
+  isDrawTrailingOrbits = false;
   /**
    * Enables the old extended catalog including JSC Vimpel data
    * @deprecated Use isEnableJscCatalog instead
@@ -972,6 +974,105 @@ export class SettingsManager {
    */
   hiresMilkWay = false;
 
+  loadPersistedSettings() {
+    const leoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_LEO_SATS);
+    if (leoSatsString !== null) {
+      this.isShowLeoSats = leoSatsString === 'true';
+    }
+    const heoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_HEO_SATS);
+    if (heoSatsString !== null) {
+      this.isShowHeoSats = heoSatsString === 'true';
+    }
+    const meoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_MEO_SATS);
+    if (meoSatsString !== null) {
+      this.isShowMeoSats = meoSatsString === 'true';
+    }
+    const geoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GEO_SATS);
+    if (geoSatsString !== null) {
+      this.isShowGeoSats = geoSatsString === 'true';
+    }
+    const payloadsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_PAYLOADS);
+    if (payloadsString !== null) {
+      this.isShowPayloads = payloadsString === 'true';
+    }
+    const rocketBodiesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ROCKET_BODIES);
+    if (rocketBodiesString !== null) {
+      this.isShowRocketBodies = rocketBodiesString === 'true';
+    }
+    const debrisString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEBRIS);
+    if (debrisString !== null) {
+      this.isShowDebris = debrisString === 'true';
+    }
+    const agenciesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_AGENCIES);
+    if (agenciesString !== null) {
+      this.isShowAgencies = agenciesString === 'true';
+    }
+    const drawOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ORBITS);
+    if (drawOrbitsString !== null) {
+      this.isDrawOrbits = drawOrbitsString === 'true';
+    }
+    const drawTrailingOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS);
+    if (drawTrailingOrbitsString !== null) {
+      this.isDrawTrailingOrbits = drawTrailingOrbitsString === 'true';
+    }
+    const isOrbitCruncherInEcfString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ECF);
+    if (isOrbitCruncherInEcfString !== null) {
+      this.isOrbitCruncherInEcf = isOrbitCruncherInEcfString === 'true';
+    }
+    const drawInCoverageLinesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES);
+    if (drawInCoverageLinesString !== null) {
+      this.isDrawInCoverageLines = drawInCoverageLinesString === 'true';
+    }
+    const drawSunString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_SUN);
+    if (drawSunString !== null) {
+      this.isDrawSun = drawSunString === 'true';
+    }
+    const blackEarthString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH);
+    if (blackEarthString !== null) {
+      this.isBlackEarth = blackEarthString === 'true';
+    }
+    const drawAtmosphereString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE);
+    if (drawAtmosphereString !== null) {
+      this.isDrawAtmosphere = drawAtmosphereString === 'true';
+    }
+    const drawAuroraString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_AURORA);
+    if (drawAuroraString !== null) {
+      this.isDrawAurora = drawAuroraString === 'true';
+    }
+    const drawMilkyWayString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_MILKY_WAY);
+    if (drawMilkyWayString !== null) {
+      this.isDrawMilkyWay = drawMilkyWayString === 'true';
+    }
+    const graySkyboxString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GRAY_SKYBOX);
+    if (graySkyboxString !== null) {
+      this.isGraySkybox = graySkyboxString === 'true';
+    }
+    const eciOnHoverString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ECI_ON_HOVER);
+    if (eciOnHoverString !== null) {
+      this.isEciOnHover = eciOnHoverString === 'true';
+    }
+    const demoModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEMO_MODE);
+    if (demoModeOnString !== null) {
+      this.isDemoModeOn = demoModeOnString === 'true';
+    }
+    const satLabelModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SAT_LABEL_MODE);
+    if (satLabelModeOnString !== null) {
+      this.isSatLabelModeOn = satLabelModeOnString === 'true';
+    }
+    const freezePropRateOnDragString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG);
+    if (freezePropRateOnDragString !== null) {
+      this.isFreezePropRateOnDrag = freezePropRateOnDragString === 'true';
+    }
+    const disableTimeMachineToastsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS);
+    if (disableTimeMachineToastsString !== null) {
+      this.isDisableTimeMachineToasts = disableTimeMachineToastsString === 'true';
+    }
+    const searchLimitString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SEARCH_LIMIT);
+    if (searchLimitString !== null) {
+      this.searchLimit = parseInt(searchLimitString);
+    }
+  }
+
   init(settingsOverride?: any) {
     this.pTime = [];
 
@@ -980,7 +1081,12 @@ export class SettingsManager {
     this.setMobileSettings();
     this.setEmbedOverrides();
     this.setColorSettings();
+    /**
+     * Load Order:
+     * URL Params > Local Storage > Default
+     */
     this.loadOverrides(settingsOverride);
+    this.loadPersistedSettings();
 
     const params = this.loadOverridesFromUrl();
 
@@ -1028,13 +1134,13 @@ export class SettingsManager {
 
     this.colors = null;
     try {
-      this.colors = JSON.parse(localStorage.getItem('this-colors'));
+      this.colors = JSON.parse(PersistenceManager.getInstance().getItem(StorageKey.THIS_COLORS));
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.2.0') {
+    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.0') {
       this.colors = {
-        version: '1.2.0',
+        version: '1.3.0',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 1.0],
@@ -1095,6 +1201,9 @@ export class SettingsManager {
         // apogeeGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
         // velGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
         satSmall: [0.2, 1.0, 0.0, 0.65],
+        confidenceHi: [0.0, 1.0, 0.0, 0.65],
+        confidenceMed: [1.0, 0.4, 0.0, 0.65],
+        confidenceLow: [1.0, 0.0, 0.0, 0.65],
         rcsXXSmall: [1.0, 0, 0, 0.6],
         rcsXSmall: [1.0, 0.2, 0, 0.6],
         rcsSmall: [1.0, 0.4, 0, 0.6],
@@ -1120,11 +1229,8 @@ export class SettingsManager {
         densityOther: [0.8, 0.8, 0.8, 0.3],
         notional: [1, 0, 0, 0.8],
       };
-      try {
-        localStorage.setItem('this-colors', JSON.stringify(this.colors));
-      } catch {
-        console.warn('Settings Manager: Unable to save color settings - localStorage issue!');
-      }
+
+      PersistenceManager.getInstance().saveItem(StorageKey.THIS_COLORS, JSON.stringify(this.colors));
     }
   }
 
@@ -1534,13 +1640,7 @@ export class SettingsManager {
     }
 
     if (this.isLoadLastMap && !this.isDrawLess) {
-      let lastMap: string;
-      try {
-        lastMap = localStorage.getItem('lastMap');
-      } catch {
-        lastMap = null;
-        console.warn('Settings Manager: localStorage not available!');
-      }
+      const lastMap = PersistenceManager.getInstance().getItem(StorageKey.LAST_MAP);
       switch (lastMap) {
         case 'blue':
           this.blueImages = true;
@@ -1565,11 +1665,6 @@ export class SettingsManager {
           break;
         case 'political':
           this.politicalImages = true;
-          this.isDrawSun = false;
-          this.isDrawAtmosphere = false;
-          this.isDrawAurora = false;
-          this.isShowRocketBodies = false;
-          this.isShowDebris = false;
           break;
         // file deepcode ignore DuplicateCaseBody: The default image could change in the future
         default:
@@ -1579,7 +1674,17 @@ export class SettingsManager {
     }
 
     // Make sure there is some map loaded!
-    if (!this.smallImages && !this.nasaImages && !this.blueImages && !this.lowresImages && !this.hiresImages && !this.hiresNoCloudsImages && !this.vectorImages) {
+    if (
+      !this.blueImages &&
+      !this.nasaImages &&
+      !this.lowresImages &&
+      !this.trusatImages &&
+      !this.hiresImages &&
+      !this.hiresNoCloudsImages &&
+      !this.vectorImages &&
+      !this.politicalImages &&
+      !this.smallImages
+    ) {
       this.lowresImages = true;
     }
   }

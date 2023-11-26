@@ -7,7 +7,7 @@ import { UpdateSatManager } from '../plugins/update-select-box/update-select-box
 import { SatMath } from './sat-math';
 
 export type TearrData = {
-  name: string;
+  objName: string;
   rng: Kilometers;
   az: Degrees;
   el: Degrees;
@@ -42,7 +42,7 @@ export class SensorMath {
             az: aer.az,
             el: aer.el,
             inView: isInFOV,
-            name: sensor.shortName,
+            objName: sensor.objName,
           };
         } else {
           // Next Pass to Calculate Last line of coverage
@@ -58,7 +58,7 @@ export class SensorMath {
               az: aer.az,
               el: aer.el,
               inView: isInFOV,
-              name: sensor.shortName,
+              objName: sensor.objName,
             };
           }
         }
@@ -68,7 +68,7 @@ export class SensorMath {
           az: <Degrees>null,
           el: <Degrees>null,
           inView: isInFOV,
-          name: sensor.shortName,
+          objName: sensor.objName,
         };
       }
       return {
@@ -77,7 +77,7 @@ export class SensorMath {
         az: aer.az,
         el: aer.el,
         inView: isInFOV,
-        name: sensor.shortName,
+        objName: sensor.objName,
       };
     }
     return {
@@ -86,7 +86,7 @@ export class SensorMath {
       az: aer.az,
       el: aer.el,
       inView: isInFOV,
-      name: sensor.shortName,
+      objName: sensor.objName,
     };
   }
 

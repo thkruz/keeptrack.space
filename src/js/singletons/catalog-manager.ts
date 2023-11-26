@@ -26,15 +26,17 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { SatelliteRecord, Sgp4 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
+import { sensors } from '../catalogs/sensors';
 import { stars } from '../catalogs/stars';
 import { CatalogManager, GetSatType, RadarDataObject, SatCruncherMessageData, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { StringPad } from '../lib/stringPad';
+import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { SplashScreen } from '../static/splash-screen';
 import { StringExtractor } from '../static/string-extractor';
@@ -77,10 +79,11 @@ declare module '@app/js/interfaces' {
   extraData?: string;
   extraUpdate?: boolean;
   /**
-   * Satellite Number that is now being skipped by the cruncher
-   * due to a bad TLE
+   * Object id that is now being skipped by the cruncher
+   * due to a bad TLE. VIMPEL don't have satids so we use the
+   * object id instead.
    */
-  badSatNumber?: number;
+  badObjectId?: number;
   // JSON string
   satId?: number;
   sensorMarkerArray?: number[];
@@ -462,11 +465,15 @@ export class StandardCatalogManager implements CatalogManager {
 
     // Create Sensors
     if (!settingsManager.isDisableSensors) {
-      for (const sensor in keepTrackApi.getSensorManager().sensors) {
-        this.staticSet.push({ ...{ static: true }, ...keepTrackApi.getSensorManager().sensors[sensor] });
+      let i = 0;
+      for (const sensor in sensors) {
+        sensors[sensor].staticNum = i;
+        sensors[sensor].static = true;
+        this.staticSet.push(sensors[sensor]);
+        i++;
       }
     }
-    this.isSensorManagerLoaded = true;
+    this.isSensorManagerLoaded = true; // TODO: Why is this always true?
 
     // Create Launch Sites
     if (!settingsManager.isDisableLaunchSites) {
@@ -571,14 +578,19 @@ export class StandardCatalogManager implements CatalogManager {
   public satCruncherOnMessage({ data: mData }: { data: SatCruncherMessageData }) {
     if (!mData) return;
 
-    if (mData.badSatNumber) {
-      // Makr the satellite as inactive
-      const id = this.getIdFromObjNum(mData.badSatNumber);
-      if (id !== null) {
-        this.satData[id].active = false;
-        // (<any>window).decayedSats = (<any>window).decayedSats || [];
-        // (<any>window).decayedSats.push(this.satData[id].sccNum);
-        errorManagerInstance.debug(`Satellite ${mData.badSatNumber} is inactive due to bad TLE`);
+    if (mData.badObjectId) {
+      if (mData.badObjectId >= 0) {
+        // Mark the satellite as inactive
+        const id = this.getIdFromObjNum(mData.badObjectId);
+        if (id !== null) {
+          this.satData[id].active = false;
+          // (<any>window).decayedSats = (<any>window).decayedSats || [];
+          // (<any>window).decayedSats.push(this.satData[id].sccNum);
+          errorManagerInstance.debug(`Satellite ${mData.badObjectId} is inactive due to bad TLE`);
+        }
+      } else {
+        // console.debug(`Bad sat number: ${mData.badObjectId}`);
+        // How are we getting a negative number? There is a bug somewhere...
       }
     }
 
@@ -685,9 +697,6 @@ export class StandardCatalogManager implements CatalogManager {
     getEl('menu-breakup', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-plot-analysis', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-plot-analysis2', true)?.classList.remove('bmenu-item-disabled');
-    if (this.secondarySat !== -1) {
-      getEl('menu-plot-analysis3', true)?.classList.remove('bmenu-item-disabled');
-    }
 
     keepTrackApi.methods.selectSatData(this.getSat(i), i);
   }
@@ -713,9 +722,8 @@ export class StandardCatalogManager implements CatalogManager {
     if (!(this.secondarySatObj?.id === id)) {
       this.secondarySatObj = this.getSat(id);
     }
-    if (this.selectedSat !== -1) {
-      getEl('menu-plot-analysis3').classList.remove('bmenu-item-disabled');
-    }
+
+    keepTrackApi.methods.setSecondarySat(this.secondarySatObj, id);
   }
 
   public setSelectedSat(id: number): void {

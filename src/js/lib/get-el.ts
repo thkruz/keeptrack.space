@@ -1,4 +1,4 @@
-import { isThisNode } from '@app/js/keepTrackApi';
+import { isThisNode } from '../static/isThisNode';
 
 /**
  * Returns the HTML element with the specified ID. If the element is not found, it returns null.

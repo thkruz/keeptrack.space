@@ -122,7 +122,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (this.isMenuButtonEnabled && (!sat?.sccNum || !keepTrackApi.getSensorManager().isSensorSelected())) {
+        if (this.isMenuButtonEnabled && (!sat?.TLE1 || !keepTrackApi.getSensorManager().isSensorSelected())) {
           this.setBottomIconToDisabled();
           this.closeSideMenu();
           return;

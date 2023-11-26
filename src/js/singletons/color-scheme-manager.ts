@@ -28,7 +28,9 @@ import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
 import { getDayOfYear } from '../lib/transforms';
+import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
+import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class StandardColorSchemeManager implements ColorSchemeManager {
   private readonly DOTS_PER_CALC = 450;
@@ -66,6 +68,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     satMed: true,
     satHi: true,
     satSmall: true,
+    confidenceHi: true,
+    confidenceMed: true,
+    confidenceLow: true,
     rcsSmall: true,
     rcsMed: true,
     rcsLarge: true,
@@ -110,7 +115,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     // TODO: Hover and select code should be refactored to pass params
 
     if (!params) {
-      errorManagerInstance.warn('No params passed to ageOfElset');
+      // errorManagerInstance.warn('No params passed to ageOfElset');
       const now = new Date();
       params = {
         jday: getDayOfYear(now),
@@ -193,6 +198,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
       // Note the colorscheme for next time
       this.lastColorScheme = this.currentColorScheme;
+      PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.name);
 
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
@@ -267,19 +273,12 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   public default(sat: SatObject): ColorInformation {
     // NOTE: The order of these checks is important
     // Grab reference to outside managers for their functions
-    if (sat.type === SpaceObjectType.NOTIONAL) {
-      // @ts-ignore
-      if (window.noNotional) {
-        return {
-          color: this.colorTheme.deselected,
-          pickable: Pickable.No,
-        };
-      } else {
-        return {
-          color: this.colorTheme.notional,
-          pickable: Pickable.Yes,
-        };
-      }
+    // @ts-ignore
+    if (sat.type === SpaceObjectType.NOTIONAL && window.noNotional) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
     }
 
     if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
@@ -416,15 +415,15 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     // NOTE: Treat TBA Satellites as SPECIAL if SCC NUM is less than 70000 (ie a real satellite)
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
-        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
       (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
-        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
         typeof sat.vmag == 'undefined' &&
-        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false)
     ) {
       return {
@@ -466,6 +465,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     } else if (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) {
       // Special Object
       color = this.colorTheme.pink;
+    } else if (sat.type === SpaceObjectType.NOTIONAL) {
+      color = this.colorTheme.notional;
     } else {
       color = this.colorTheme.unknown;
     }
@@ -603,6 +604,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       satMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       satHi: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       satSmall: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      confidenceHi: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      confidenceMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      confidenceLow: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsSmall: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsLarge: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
@@ -654,6 +658,12 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       event: 'onCruncherReady',
       cbName: 'colorSchemeManager',
       cb: (): void => {
+        const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
+        LegendManager.change(cachedColorScheme);
+        if (cachedColorScheme) {
+          this.currentColorScheme = this[cachedColorScheme];
+        }
+
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         // Generate some public buffers
@@ -918,6 +928,36 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
   }
 
+  public confidence(sat: SatObject): ColorInformation {
+    if (!sat.TLE1) {
+      return {
+        color: this.colorTheme.transparent,
+        pickable: Pickable.No,
+      };
+    }
+
+    let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
+    let pickable = Pickable.No;
+    let color: [number, number, number, number];
+    if (confidenceScore >= 7 && this.objectTypeFlags.confidenceHi) {
+      color = this.colorTheme.confidenceHi;
+      pickable = Pickable.Yes;
+    } else if (confidenceScore >= 4 && confidenceScore < 7 && this.objectTypeFlags.confidenceMed) {
+      color = this.colorTheme.confidenceMed;
+      pickable = Pickable.Yes;
+    } else if (confidenceScore >= 0 && confidenceScore < 4 && this.objectTypeFlags.confidenceLow) {
+      color = this.colorTheme.confidenceLow;
+      pickable = Pickable.Yes;
+    } else {
+      color = this.colorTheme.transparent;
+      pickable = Pickable.No;
+    }
+    return {
+      color,
+      pickable,
+    };
+  }
+
   public reloadColors() {
     this.colorTheme = settingsManager.colors;
   }
@@ -943,6 +983,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     this.objectTypeFlags.satMed = true;
     this.objectTypeFlags.satHi = true;
     this.objectTypeFlags.satSmall = true;
+    this.objectTypeFlags.confidenceHi = true;
+    this.objectTypeFlags.confidenceMed = true;
+    this.objectTypeFlags.confidenceLow = true;
     this.objectTypeFlags.rcsSmall = true;
     this.objectTypeFlags.rcsMed = true;
     this.objectTypeFlags.rcsLarge = true;
@@ -1492,6 +1535,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       switch (this.currentColorScheme) {
         case StandardColorSchemeManager.apogee:
         case this.smallsats:
+        case this.confidence:
         case this.rcs:
         case this.countries:
         case this.ageOfElset:

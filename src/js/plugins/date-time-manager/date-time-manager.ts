@@ -1,6 +1,7 @@
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
 import { getDayOfYear } from '@app/js/lib/transforms';
+import { isThisNode } from '@app/js/static/isThisNode';
 import { UrlManager } from '@app/js/static/url-manager';
 import $ from 'jquery';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -73,7 +74,7 @@ export class DateTimeManager extends KeepTrackPlugin {
           <ul id="nav-mobile">
             <li id="jday"></li>
             <div id="${this.divContainerId}" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Time Menu">
-              <div id="datetime-text">Placeholder Text</div>
+              <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
               <div id="datetime-input">
                 <form id="datetime-input-form">
                   <input type="text" id="${this.dateTimeInputTbId}" readonly="true" />

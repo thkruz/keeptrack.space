@@ -1,6 +1,7 @@
+import { isThisNode } from '@app/js/static/isThisNode';
 import { expect } from '@jest/globals';
 import { SatObject } from '../src/js/interfaces';
-import { isThisNode, keepTrackApi } from '../src/js/keepTrackApi';
+import { keepTrackApi } from '../src/js/keepTrackApi';
 import { defaultSat } from './environment/apiMocks';
 
 test(`keepTrackApi Unit Testing`, () => {

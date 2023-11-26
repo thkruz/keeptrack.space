@@ -9,6 +9,7 @@ import { waitForCruncher } from '@app/js/lib/waitForCruncher';
 
 import { SatMath } from '@app/js/static/sat-math';
 
+import { launchSites } from '@app/js/catalogs/launch-sites';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { OrbitFinder } from '@app/js/singletons/orbit-finder';
 import { SatelliteRecord, Sgp4 } from 'ootk';
@@ -173,10 +174,9 @@ export class NewLaunch extends KeepTrackPlugin {
     // Date object defaults to local time.
     quadZTime.setUTCHours(0); // Move to UTC Hour
 
-    timeManagerInstance.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
+    const cacheStaticOffset = timeManagerInstance.staticOffset; // Cache the current static offset
 
-    uiManagerInstance.toast(`Time is now relative to launch time.`, 'standby');
-    keepTrackApi.getSoundManager()?.play('liftoff');
+    timeManagerInstance.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
 
     colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
 
@@ -189,14 +189,24 @@ export class NewLaunch extends KeepTrackPlugin {
     const TLE1 = TLEs[0];
     const TLE2 = TLEs[1];
 
-    if (TLE1.length !== 69) {
-      uiManagerInstance.toast(`Invalid TLE1: length is not 69 - ${TLE1}`, 'critical');
+    if (TLE1 === 'Error' || TLE1.length !== 69 || TLE2.length !== 69) {
+      if (TLE1 === 'Error') {
+        uiManagerInstance.toast(`Failed to Create TLE: ${TLE2}`, 'critical');
+      } else if (TLE1.length !== 69) {
+        uiManagerInstance.toast(`Invalid TLE1 Created: length is not 69 - ${TLE1}`, 'critical');
+      } else if (TLE2.length !== 69) {
+        uiManagerInstance.toast(`Invalid TLE2 Created: length is not 69 - ${TLE2}`, 'critical');
+      }
+
+      // We have to change the time for the TLE creation, but it failed, so revert it.
+      timeManagerInstance.changeStaticOffset(cacheStaticOffset);
+      this.isDoingCalculations = false;
+      hideLoading();
       return;
     }
-    if (TLE2.length !== 69) {
-      uiManagerInstance.toast(`Invalid TLE2: length is not 69 - ${TLE1}`, 'critical');
-      return;
-    }
+
+    uiManagerInstance.toast(`Time is now relative to launch time.`, 'standby');
+    keepTrackApi.getSoundManager()?.play('liftoff');
 
     // Prevent caching of old TLEs
     sat.satrec = null;
@@ -228,7 +238,12 @@ export class NewLaunch extends KeepTrackPlugin {
         this.isDoingCalculations = false;
         hideLoading();
       },
-      (data) => typeof data.satPos !== 'undefined'
+      (data) => typeof data.satPos !== 'undefined',
+      () => {
+        this.isDoingCalculations = false;
+        hideLoading();
+        uiManagerInstance.toast(`Cruncher failed to meet requirement after two tries! Is this launch even possible?`, 'critical');
+      }
     );
   };
 
@@ -240,18 +255,48 @@ export class NewLaunch extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        getEl(this.sideMenuElementName + '-form').addEventListener('change', () => {
+          const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+          this.preValidate_(sat);
+        });
+      },
+    });
+
+    keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (sat) {
+          (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
+          this.preValidate_(sat);
         } else {
           getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
           this.isIconDisabled = true;
         }
       },
     });
+  }
+
+  private preValidate_(sat: SatObject): void {
+    // Get Current LaunchSiteOptionValue
+    const launchSiteOptionValue = (<HTMLInputElement>getEl('nl-facility')).value;
+    const lat = launchSites[launchSiteOptionValue].lat;
+    let inc = sat.inclination * RAD2DEG;
+    inc = inc > 90 ? 180 - inc : inc;
+
+    const submitButtonDom = <HTMLButtonElement>getEl(this.sideMenuElementName + '-submit');
+    if (inc < lat) {
+      submitButtonDom.disabled = true;
+      submitButtonDom.textContent = 'Inclination Too Low!';
+    } else {
+      submitButtonDom.disabled = false;
+      submitButtonDom.textContent = 'Create Launch Nominal \u25B6';
+    }
   }
 }
 

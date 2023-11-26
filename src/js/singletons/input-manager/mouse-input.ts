@@ -17,6 +17,7 @@ import { LegendManager } from '../../static/legend-manager';
 import { lineManagerInstance } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
+import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { starManager } from '../starManager';
 import { KeyboardInput } from './keyboard-input';
 
@@ -79,59 +80,19 @@ export class MouseInput {
     UrlManager.updateURL();
   }
 
-  public static earthClicked({
-    isViewDOM,
-    rightBtnViewDOM,
-    numMenuItems,
-    isCreateDOM,
-    rightBtnCreateDOM,
-    isDrawDOM,
-    rightBtnDrawDOM,
-    isEarthDOM,
-    rightBtnEarthDOM,
-    clickedSatId,
-  }: {
-    isViewDOM: boolean;
-    rightBtnViewDOM: HTMLElement;
-    numMenuItems: number;
-    isCreateDOM: boolean;
-    rightBtnCreateDOM: HTMLElement;
-    isDrawDOM: boolean;
-    rightBtnDrawDOM: HTMLElement;
-    isEarthDOM: boolean;
-    rightBtnEarthDOM: HTMLElement;
-    clickedSatId: number;
-  }) {
-    if (!isViewDOM) {
-      rightBtnViewDOM.style.display = 'block';
-      ++numMenuItems;
-    }
-    getEl('view-info-rmb').style.display = 'block';
-
-    if (!isCreateDOM) {
-      rightBtnCreateDOM.style.display = 'block';
-      ++numMenuItems;
-    }
+  public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {
     getEl('create-observer-rmb').style.display = 'block';
     getEl('create-sensor-rmb').style.display = 'block';
-
-    if (!isDrawDOM) {
-      rightBtnDrawDOM.style.display = 'block';
-      ++numMenuItems;
-    }
     getEl('line-eci-axis-rmb').style.display = 'block';
-
-    if (!isEarthDOM) {
-      rightBtnEarthDOM.style.display = 'block';
-      ++numMenuItems;
-    }
-
     keepTrackApi.rmbMenuItems
       .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
       .sort((a, b) => a.order - b.order)
       .forEach((item) => {
-        getEl(item.elementIdL1).style.display = 'block';
-        ++numMenuItems;
+        const dom = getEl(item.elementIdL1);
+        if (dom) {
+          dom.style.display = 'block';
+          ++numMenuItems;
+        }
       });
 
     getEl('earth-nasa-rmb').style.display = 'block';
@@ -251,16 +212,12 @@ export class MouseInput {
   init(canvasDOM: HTMLCanvasElement) {
     const rightBtnMenuDOM = getEl('right-btn-menu');
     const satHoverBoxDOM = getEl('sat-hoverbox');
-    const rightBtnViewMenuDOM = getEl('view-rmb-menu');
-    const rightBtnEditMenuDOM = getEl('edit-rmb-menu');
     const rightBtnCreateMenuDOM = getEl('create-rmb-menu');
     const rightBtnDrawMenuDOM = getEl('draw-rmb-menu');
     const rightBtnEarthMenuDOM = getEl('earth-rmb-menu');
     const resetCameraDOM = getEl('reset-camera-rmb');
     const clearScreenDOM = getEl('clear-screen-rmb');
     const clearLinesDOM = getEl('clear-lines-rmb');
-    const rightBtnViewDOM = getEl('view-rmb');
-    const rightBtnEditDOM = getEl('edit-rmb');
     const rightBtnCreateDOM = getEl('create-rmb');
     const rightBtnDrawDOM = getEl('draw-rmb');
     const rightBtnEarthDOM = getEl('earth-rmb');
@@ -319,14 +276,6 @@ export class MouseInput {
         });
       }
 
-      const rightBtnViewDOMDropdown = () => {
-        InputManager.clearRMBSubMenu();
-        InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnViewMenuDOM, canvasDOM);
-      };
-      const rightBtnEditDOMDropdown = () => {
-        InputManager.clearRMBSubMenu();
-        InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnEditMenuDOM, canvasDOM);
-      };
       const rightBtnCreateDOMDropdown = () => {
         InputManager.clearRMBSubMenu();
         InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnCreateMenuDOM, canvasDOM);
@@ -343,7 +292,7 @@ export class MouseInput {
       // Create Event Listeners for Right Menu Buttons
       keepTrackApi.rmbMenuItems
         .map(({ elementIdL2 }) => getEl(elementIdL2))
-        .concat([rightBtnViewMenuDOM, rightBtnEditMenuDOM, rightBtnCreateMenuDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
+        .concat([rightBtnCreateMenuDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
             this.rmbMenuActions(e);
@@ -361,26 +310,6 @@ export class MouseInput {
         el2?.addEventListener('mouseleave', () => {
           el2.style.display = 'none';
         });
-      });
-
-      rightBtnViewDOM?.addEventListener('mouseenter', () => {
-        rightBtnViewDOMDropdown();
-      });
-      rightBtnViewDOM?.addEventListener('click', () => {
-        rightBtnViewDOMDropdown();
-      });
-      rightBtnViewMenuDOM?.addEventListener('mouseleave', () => {
-        rightBtnViewMenuDOM.style.display = 'none';
-      });
-
-      rightBtnEditDOM?.addEventListener('mouseenter', () => {
-        rightBtnEditDOMDropdown();
-      });
-      rightBtnEditDOM?.addEventListener('click', () => {
-        rightBtnEditDOMDropdown();
-      });
-      rightBtnEditMenuDOM?.addEventListener('mouseleave', () => {
-        rightBtnEditMenuDOM.style.display = 'none';
       });
 
       rightBtnCreateDOM?.addEventListener('mouseenter', () => {
@@ -720,10 +649,6 @@ export class MouseInput {
   }
 
   private static saveMapToLocalStorage(name: string) {
-    try {
-      localStorage.setItem('lastMap', name);
-    } catch {
-      // do nothing
-    }
+    PersistenceManager.getInstance().saveItem(StorageKey.LAST_MAP, name);
   }
 }

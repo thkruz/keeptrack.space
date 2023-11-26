@@ -31,7 +31,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
     az: 0,
     el: 0,
     rng: 0,
-    name: '',
+    objName: '',
     lat: 0,
     lon: 0,
     alt: 0,
@@ -189,7 +189,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
               // TODO: Make new logic for this to allow it to be updated while selected
               if (
                 (catalogManagerInstance.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
-                  sensorManagerInstance.currentSensors[0].shortName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
+                  sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
                 !isMissileObject(sat)
               ) {
                 sat = <SatObject>sat;
@@ -204,7 +204,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
                 //lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
               }
               uiManagerInstance.lastNextPassCalcSatId = catalogManagerInstance.selectedSat;
-              uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0].shortName;
+              uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0].objName;
             } else if (getEl('sat-nextpass')) {
               getEl('sat-nextpass').innerHTML = 'Unavailable';
             }

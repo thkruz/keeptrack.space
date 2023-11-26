@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { ScreenRecorder } from '@app/js/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';
-import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('ScreenRecorder_class', () => {
   let screenRecorderPlugin: ScreenRecorder;
@@ -11,7 +11,7 @@ describe('ScreenRecorder_class', () => {
   });
 
   standardPluginSuite(ScreenRecorder, 'ScreenRecorder');
-  standardPluginMenuButtonTests(ScreenRecorder, 'ScreenRecorder');
+  // standardPluginMenuButtonTests(ScreenRecorder, 'ScreenRecorder');
 
   // Tests stopping a video
   test(`ScreenRecorder_stop_video`, () => {

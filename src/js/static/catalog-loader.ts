@@ -4,18 +4,14 @@ import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { StringPad } from '@app/js/lib/stringPad';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
-import { TleLine1, TleLine2 } from 'ootk';
-import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
+import { Tle, TleLine1, TleLine2 } from 'ootk';
+import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { FormatTle } from './format-tle';
 
 interface JsSat {
-  NoradId: string;
-  SCC: string;
   TLE1: string;
   TLE2: string;
-  altId: number;
-  source: string;
   vmag?: number;
 }
 
@@ -34,6 +30,15 @@ interface AsciiTleSat {
   SCC: string;
   TLE1: TleLine1;
   TLE2: TleLine2;
+}
+
+export enum CatalogSource {
+  USSF = 'USSF',
+  CELESTRAK = 'Celestrak',
+  UNIV_OF_MICH = 'University of Michigan',
+  VIMPEL = 'JSC Vimpel',
+  TLE_TXT = 'TLE.txt',
+  EXTRA_JSON = 'extra.json',
 }
 
 export class CatalogLoader {
@@ -70,24 +75,6 @@ export class CatalogLoader {
 
     if (jsCatalog?.length > 0) {
       CatalogLoader.processJsCatalog_(jsCatalog, catalogManagerInstance, tempSatData);
-    }
-
-    if (settingsManager.isExtraSatellitesAdded) {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerFinal,
-        cbName: 'CatalogLoader',
-        cb: () => {
-          try {
-            document.querySelector<HTMLElement>('.legend-pink-box').style.display = 'block';
-            document.querySelectorAll('.legend-pink-box').forEach((element) => {
-              element.parentElement.style.display = 'none';
-              element.parentElement.innerHTML = `<div class="Square-Box legend-pink-box"></div>${settingsManager.nameOfSpecialSats}`;
-            });
-          } catch (e) {
-            // Intentionally Blank
-          }
-        },
-      });
     }
 
     CatalogLoader.addNonSatelliteObjects_(catalogManagerInstance, tempSatData);
@@ -228,8 +215,11 @@ export class CatalogLoader {
     dotsManagerInstance.starIndex1 = catalogManagerInstance.starIndex1 + catalogManagerInstance.orbitalSats;
     dotsManagerInstance.starIndex2 = catalogManagerInstance.starIndex2 + catalogManagerInstance.orbitalSats;
 
+    let i = 0;
     for (const staticSat of catalogManagerInstance.staticSet) {
       staticSat.id = tempSatData.length;
+      catalogManagerInstance.staticSet[i].id = tempSatData.length;
+      i++;
       tempSatData.push(staticSat);
     }
     for (const analSat of catalogManagerInstance.analSatSet) {
@@ -528,7 +518,24 @@ export class CatalogLoader {
     resp[i].active = true;
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
       resp[i].id = tempSatData.length;
-      resp[i].source = 'USSF';
+      const source = Tle.getClassification(resp[i].TLE1);
+      switch (source) {
+        case 'U':
+          resp[i].source = CatalogSource.USSF;
+          break;
+        case 'C':
+          resp[i].source = CatalogSource.CELESTRAK;
+          break;
+        case 'M':
+          resp[i].source = CatalogSource.UNIV_OF_MICH;
+          break;
+        case 'V':
+          resp[i].source = CatalogSource.VIMPEL;
+          break;
+        default:
+          // Default to USSF for now
+          resp[i].source = CatalogSource.USSF;
+      }
       tempSatData.push(resp[i]);
     }
 
@@ -580,7 +587,7 @@ export class CatalogLoader {
     tempSatData[i].TLE2 = element.TLE2;
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
     tempSatData[i].isExternal = true;
-    tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : 'TLE.txt';
+    tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
   }
 
   private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempSatData: any[], catalogManagerInstance: CatalogManager) {
@@ -606,7 +613,7 @@ export class CatalogLoader {
       sccNum: sccNum,
       TLE1: element.TLE1,
       TLE2: element.TLE2,
-      source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : 'TLE.txt',
+      source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT,
       intlDes: intlDes,
       typ: 'sat',
       id: tempSatData.length,
@@ -659,7 +666,7 @@ export class CatalogLoader {
         if (typeof tempSatData[i] === 'undefined') continue;
         tempSatData[i].TLE1 = element.TLE1;
         tempSatData[i].TLE2 = element.TLE2;
-        tempSatData[i].source = 'extra.json';
+        tempSatData[i].source = CatalogSource.EXTRA_JSON;
       } else {
         settingsManager.isExtraSatellitesAdded = true;
 
@@ -694,34 +701,40 @@ export class CatalogLoader {
     // If jsCatalog catalogue
     for (const element of jsCatalog) {
       if (!element.TLE1 || !element.TLE2) continue; // Don't Process Bad Satellite Information
-      if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
+      const scc = FormatTle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
+      if (typeof catalogManagerInstance.sccIndex[`${scc}`] !== 'undefined') {
         // console.warn('Duplicate Satellite Found in jsCatalog');
         // NOTE: We don't trust the jsCatalog, so we don't update the TLEs
         // i = catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC}`];
         // tempSatData[i].TLE1 = jsCatalog[s].TLE1;
         // tempSatData[i].TLE2 = jsCatalog[s].TLE2;
       } else {
-        settingsManager.isExtraSatellitesAdded = true;
-        const intlDes = CatalogLoader.parseIntlDes_(element.TLE1);
-        const jsSatInfo = {
-          static: false,
-          missile: false,
-          active: true,
-          name: `${element.source} ${element.altId}`,
-          type: SpaceObjectType.DEBRIS,
-          country: 'Unknown',
-          rocket: 'Unknown',
-          site: 'Unknown',
-          sccNum: element.SCC.toString(),
-          TLE1: element.TLE1,
-          TLE2: element.TLE2,
-          source: element.source,
-          altId: element.altId,
-          intlDes: intlDes,
-          id: tempSatData.length,
-        };
-        catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
-        tempSatData.push(jsSatInfo);
+        // Check if the 8th character is 'V' for Vimpel
+        const isVimpel = element.TLE1[7] === 'V';
+        if (isVimpel) {
+          const altId = element.TLE1.substring(9, 17).trim();
+          settingsManager.isExtraSatellitesAdded = true;
+          const jsSatInfo = {
+            static: false,
+            missile: false,
+            active: true,
+            name: `JSC Vimpel ${altId}`,
+            type: SpaceObjectType.DEBRIS,
+            country: 'Unknown',
+            rocket: 'Unknown',
+            site: 'Unknown',
+            sccNum: '',
+            TLE1: element.TLE1,
+            TLE2: element.TLE2,
+            source: 'JSC Vimpel',
+            altId: altId,
+            intlDes: '',
+            id: tempSatData.length,
+          };
+          tempSatData.push(jsSatInfo);
+        } else {
+          errorManagerInstance.debug('Skipping non-Vimpel satellite in JSC Vimpel catalog');
+        }
       }
     }
   }
@@ -737,13 +750,30 @@ export class CatalogLoader {
         catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
         resp[i].active = true;
-        resp[i].source = 'USSF';
+        const source = Tle.getClassification(resp[i].TLE1);
+        switch (source) {
+          case 'U':
+            resp[i].source = CatalogSource.USSF;
+            break;
+          case 'C':
+            resp[i].source = CatalogSource.CELESTRAK;
+            break;
+          case 'M':
+            resp[i].source = CatalogSource.UNIV_OF_MICH;
+            break;
+          case 'V':
+            resp[i].source = CatalogSource.VIMPEL;
+            break;
+          default:
+            // Default to USSF for now
+            resp[i].source = CatalogSource.USSF;
+        }
         tempSatData.push(resp[i]);
       }
     }
   }
 
-  private static sortByScc_(catalog: AsciiTleSat[] | JsSat[] | ExtraSat[]) {
+  private static sortByScc_(catalog: AsciiTleSat[] | ExtraSat[]) {
     catalog.sort((a: { SCC: string }, b: { SCC: string }) => {
       if (a.SCC < b.SCC) {
         return -1;

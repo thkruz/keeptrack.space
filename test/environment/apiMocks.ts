@@ -1,7 +1,10 @@
 // @ts-nocheck
 
+import { Operators } from '@app/js/catalogs/sensors';
 import { DEG2RAD } from '@app/js/lib/constants';
-import { Sgp4 } from 'ootk';
+import { ZoomValue } from '@app/js/singletons/camera';
+import { CatalogSource } from '@app/js/static/catalog-loader';
+import { Degrees, Kilometers, Milliseconds, Sgp4 } from 'ootk';
 import { SatObject, SensorObject } from '../../src/js/interfaces';
 import { SpaceObjectType } from '../../src/js/lib/space-object-type';
 declare const jest: any;
@@ -10,7 +13,7 @@ const fakeTimeObj = new Date(2022, 0, 1);
 fakeTimeObj.setUTCHours(0, 0, 0, 0);
 
 export const defaultSat: SatObject = {
-  id: 1,
+  id: 0,
   active: true,
   sccNum: '00005',
   intlDes: '1998-AEF',
@@ -56,33 +59,37 @@ export const defaultSat: SatObject = {
   },
   static: false,
   staticNum: null,
+  source: CatalogSource.USSF,
 };
 
 export const defaultSensor: SensorObject = {
-  alt: 0.060966,
-  beamwidth: 2,
-  changeObjectInterval: 1000,
-  country: 'United States',
-  lat: 41.754785,
+  observerGd: { lat: 0.7287584767123405, lon: -1.2311404365114507, alt: 0.060966 },
+  objName: 'CODSFS',
+  shortName: 'COD',
+  id: 3,
+  name: 'Cape Cod SFS, Massachusetts',
+  uiName: 'Cape Cod SFS',
+  system: 'PAVE PAWS UEWR',
+  band: 'UHF',
+  type: SpaceObjectType.PHASED_ARRAY_RADAR,
+  lat: <Degrees>41.754785,
+  lon: <Degrees>-70.539151,
+  alt: <Kilometers>0.060966,
+  obsminaz: <Degrees>347,
+  obsmaxaz: <Degrees>227,
+  obsminel: <Degrees>3,
+  obsmaxel: <Degrees>85,
+  obsminrange: <Kilometers>200,
+  obsmaxrange: <Kilometers>5556,
+  changeObjectInterval: <Milliseconds>1000,
+  beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
   linkAehf: true,
   linkWgs: true,
-  lon: -70.539151,
-  name: 'Cape Cod SFS, Massachusetts',
-  observerGd: { lat: 0.7287584767123405, lon: -1.2311404365114507, alt: 0.060966 },
-  obsmaxaz: 227,
-  obsmaxel: 85,
-  obsmaxrange: 5556,
-  obsminaz: 347,
-  obsminel: 3,
-  obsminrange: 200,
-  shortName: 'COD',
-  static: true,
-  staticNum: 0,
-  sun: 'No Impact',
-  type: SpaceObjectType.PHASED_ARRAY_RADAR,
+  zoom: ZoomValue.LEO,
   url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
-  volume: false,
-  zoom: 'leo',
+  country: 'United States',
+  operator: Operators.USSF,
+  staticNum: 0, // For Testing Only
 };
 
 export const useMockWorkers = (): void => {

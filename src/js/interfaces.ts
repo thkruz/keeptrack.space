@@ -3,7 +3,6 @@ import { Camera, ZoomValue } from './singletons/camera';
 import { GroupType, ObjectGroup } from './singletons/object-group';
 
 import { mat4 } from 'gl-matrix';
-import { SensorList } from './catalogs/sensors';
 import { SpaceObjectType } from './lib/space-object-type';
 import { SatLinkManager } from './singletons/catalog-manager/satLinkManager';
 import { LineManager } from './singletons/draw-manager/line-manager';
@@ -51,7 +50,10 @@ export type MissileParams = {
 
 export type EChartsData = {
   name: string;
-  value: [number, number, number][];
+  satId?: number;
+  country?: string;
+  value?: [number, number, number][];
+  data?: [number, number, number][];
 }[];
 
 export type rgbaArray = [number, number, number, number];
@@ -90,6 +92,9 @@ export interface Colors {
   radarData: rgbaArray;
   radarDataMissile: rgbaArray;
   radarDataSatellite: rgbaArray;
+  confidenceHi: rgbaArray;
+  confidenceLow: rgbaArray;
+  confidenceMed: rgbaArray;
   rcsLarge: rgbaArray;
   rcsMed: rgbaArray;
   rcsSmall: rgbaArray;
@@ -196,24 +201,19 @@ export declare interface BaseObject {
 }
 
 export declare interface SatObject extends BaseObject {
-  FMISSED?: any;
-  NOTES?: string;
-  ORPO?: string;
   TLE1: TleLine1;
   TLE2: TleLine2;
-  TTP?: string;
   alt?: number;
+  altName?: string;
   altId: string;
   apogee: number;
   argPe: number;
-  associates?: any;
   az: number;
   bf?: string;
   bus?: string;
   configuration?: string;
   constellation?: any;
   country?: string;
-  dec: number;
   desc?: string;
   diameter?: string;
   dryMass?: string;
@@ -223,22 +223,14 @@ export declare interface SatObject extends BaseObject {
   /**Degrees */
   inclination: number;
   intlDes?: string;
-  isInGroup?: boolean;
-  isRadarData?: boolean;
-  lat?: number;
   launchDate?: string;
   launchMass?: string;
   launchSite?: string;
   launchVehicle?: string;
   length?: string;
   lifetime?: string | number;
-  lon?: number;
-  maneuver?: string;
   manufacturer?: string;
-  marker?: boolean;
   meanMotion: number;
-  missile?: boolean;
-  missileComplex?: number;
   mission?: string;
   motor?: string;
   name?: string;
@@ -249,7 +241,6 @@ export declare interface SatObject extends BaseObject {
   pname?: string;
   power?: string;
   purpose?: string;
-  ra: number;
   raan: number;
   rae: any;
   rcs?: string;
@@ -257,15 +248,37 @@ export declare interface SatObject extends BaseObject {
   sccNum?: string;
   semiMajorAxis: number;
   semiMinorAxis: number;
-  setRAE: any;
   shape?: string;
   source: string;
   span?: string;
   static?: boolean;
-  staticNum: number;
   status?: string;
   user?: string;
   vmag?: number;
+  isInGroup?: boolean;
+  isRadarData?: boolean;
+  lat?: number;
+  lon?: number;
+  marker?: boolean;
+  missile?: boolean;
+  missileComplex?: number;
+  setRAE: any;
+  staticNum: number;
+  ra: number;
+  dec: number;
+  /** @deprecated */
+  TTP?: string;
+  /** @deprecated */
+  associates?: any;
+  /** @deprecated */
+  maneuver?: string;
+  /** @deprecated */
+  FMISSED?: any;
+  /** @deprecated */
+  NOTES?: string;
+  /** @deprecated */
+  ORPO?: string;
+  /** @deprecated */
 }
 
 export interface MissileObject extends SatObject {
@@ -297,6 +310,8 @@ export interface RadarDataObject {
 }
 
 export interface SensorObject {
+  /** 3 Letter Designation */
+  shortName?: string;
   alt: Kilometers;
   beamwidth?: Degrees;
   changeObjectInterval?: Milliseconds;
@@ -327,14 +342,24 @@ export interface SensorObject {
   obsminel2?: Degrees;
   obsminrange: Kilometers;
   obsminrange2?: Kilometers;
-  shortName: string;
   static?: boolean;
   staticNum?: number;
-  sun: string;
   type?: SpaceObjectType;
   url?: string;
-  volume: boolean;
+  volume?: boolean;
   zoom: ZoomValue;
+  band?: string;
+  // //////////////////////////////////////////
+  // These parts control the UI //
+  // //////////////////////////////////////////
+  /** This is the name of the object in the array */
+  objName: string;
+  /** This is the name of the object in the UI */
+  uiName: string;
+  /** This is the specific system (ex. AN/FPS-132) */
+  system: string;
+  /** This is who operates the sensor */
+  operator: string;
 }
 
 export interface SensorObjectCruncher {
@@ -660,7 +685,6 @@ export interface SensorManager {
   secondarySensors: SensorObject[];
   sensorListUS: SensorObject[];
   sensorTitle: string;
-  sensors: SensorList;
   stfSensors: SensorObject[];
   /** Deprecated - Stop using this */
   whichRadar: string;
@@ -727,4 +751,5 @@ export enum Singletons {
   SoundManager = 'SoundManager',
   SensorMath = 'SensorMathManager',
   MainCamera = 'MainCamera',
+  PersistenceManager = 'PersistenceManager',
 }

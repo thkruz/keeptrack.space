@@ -117,3 +117,6 @@ lib/example*
 
 # Tools
 src/tools
+
+# Notes
+**/leolabs.json

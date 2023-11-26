@@ -27,10 +27,12 @@ import addPng from '@app/img/add.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
 import removePng from '@app/img/remove.png';
 import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
+import { isThisNode } from '@app/js/static/isThisNode';
 import saveAs from 'file-saver';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -126,12 +128,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @returns A promise that resolves to void.
    */
   private async onCruncherReady_(): Promise<void> {
-    let watchlistString: string;
-    try {
-      watchlistString = localStorage.getItem('watchlistList');
-    } catch {
-      watchlistString = null;
-    }
+    let watchlistString = PersistenceManager.getInstance().getItem(StorageKey.WATCHLIST_LIST);
+
     if (!watchlistString || watchlistString === '[]') {
       try {
         watchlistString = await fetch(`${settingsManager.installDirectory}tle/watchlist.json`).then((response) => response.text());
@@ -280,13 +278,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       sat = catalogManagerInstance.getSat(this.watchlistList[i], GetSatType.EXTRA_ONLY);
       saveWatchlist[i] = sat.sccNum;
     }
-    const variable = JSON.stringify(saveWatchlist);
-    try {
-      localStorage.setItem('watchlistList', variable);
-    } catch {
-      // DEBUG:
-      // console.warn('Watchlist Plugin: Unable to save watchlist - localStorage issue!');
-    }
+
+    PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, JSON.stringify(saveWatchlist));
   }
 
   /**

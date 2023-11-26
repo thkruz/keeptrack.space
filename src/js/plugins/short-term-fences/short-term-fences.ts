@@ -17,7 +17,9 @@ export class ShortTermFences extends KeepTrackPlugin {
   bottomIconElementName = 'stf-bottom-icon';
   bottomIconLabel = 'Short Term Fence';
   bottomIconImg = searchPng;
-  isRequireSensorSelected: boolean = true;
+  isRequireSensorSelected = true;
+  isIconDisabledOnLoad = true;
+  isAddStfLinksOnce = false;
 
   helpTitle = `Short Term Fences (STF) Menu`;
   helpBody = keepTrackApi.html`The Short Term Fences (STF) Menu is used for visualizing sensor search boxes.
@@ -70,8 +72,6 @@ export class ShortTermFences extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
-
-  isAddStfLinksOnce = false;
 
   static PLUGIN_NAME = 'Short Term Fences';
   constructor() {
@@ -160,12 +160,12 @@ export class ShortTermFences extends KeepTrackPlugin {
     const sensorType = 'Short Range Fence';
 
     // Multiply everything by 1 to convert string to number
-    const az = parseFloat(<string>(<HTMLInputElement>getEl('stf-az')).value);
-    const azExt = parseFloat(<string>(<HTMLInputElement>getEl('stf-azExt')).value);
-    const el = parseFloat(<string>(<HTMLInputElement>getEl('stf-el')).value);
-    const elExt = parseFloat(<string>(<HTMLInputElement>getEl('stf-elExt')).value);
-    const rng = parseFloat(<string>(<HTMLInputElement>getEl('stf-rng')).value);
-    const rngExt = parseFloat(<string>(<HTMLInputElement>getEl('stf-rngExt')).value);
+    const az = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
+    const azExt = parseFloat((<HTMLInputElement>getEl('stf-azExt')).value);
+    const el = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
+    const elExt = parseFloat((<HTMLInputElement>getEl('stf-elExt')).value);
+    const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
+    const rngExt = parseFloat((<HTMLInputElement>getEl('stf-rngExt')).value);
 
     const minaz = az - azExt < 0 ? az - azExt + 360 : az - azExt / 2;
     const maxaz = az + azExt > 360 ? az + azExt - 360 : az + azExt / 2;

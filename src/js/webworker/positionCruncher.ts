@@ -399,7 +399,8 @@ export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSidereal
     i++; // At the beginning so i starts at 0
     let isContinue = false;
 
-    if (satCache[i].satnum) {
+    // Don't use satnum because of VIMPEL objects
+    if (satCache[i].inclo) {
       isContinue = !updateSatellite(i, gmst, sunEci, j, isSunExclusion);
     } else if (satCache[i].isRadarData) {
       isContinue = !updateRadarData(i);
@@ -700,7 +701,7 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
     satCache[i].skip = true;
 
     postMessage({
-      badSatNumber: satCache[i].satnum,
+      badObjectId: i,
     });
 
     satPos[i * 3] = 0;

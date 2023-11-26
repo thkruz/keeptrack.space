@@ -1,11 +1,12 @@
 /* eslint-disable max-classes-per-file */
-import { isThisNode, keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { KeepTrack } from '../keeptrack';
 import { getEl } from '../lib/get-el';
+import { isThisNode } from '../static/isThisNode';
 
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
@@ -145,12 +146,8 @@ export class InputManager {
     keepTrackApi.rmbMenuItems.forEach((item) => {
       getEl(item.elementIdL2).style.display = 'none';
     });
-    getEl('view-rmb-menu').style.display = 'none';
-    getEl('create-rmb-menu').style.display = 'none';
     const colorsDom = getEl('colors-rmb-menu');
     if (colorsDom) colorsDom.style.display = 'none';
-    getEl('draw-rmb-menu').style.display = 'none';
-    getEl('earth-rmb-menu').style.display = 'none';
   };
 
   static showDropdownSubMenu(rightBtnMenuDOM: HTMLElement, rightBtnDOM: HTMLElement, canvasDOM: HTMLCanvasElement, element1?: HTMLElement) {
@@ -279,6 +276,54 @@ export class InputManager {
     `
     );
 
+    keepTrackApi.rmbMenuItems.push({
+      elementIdL1: 'view-rmb',
+      elementIdL2: 'view-rmb-menu',
+      order: 1,
+      isRmbOnEarth: false,
+      isRmbOffEarth: false,
+      isRmbOnSat: true,
+    });
+
+    keepTrackApi.rmbMenuItems.push({
+      elementIdL1: 'draw-rmb',
+      elementIdL2: 'draw-rmb-menu',
+      order: 5,
+      isRmbOnEarth: true,
+      isRmbOffEarth: true,
+      isRmbOnSat: false,
+    });
+
+    keepTrackApi.rmbMenuItems.push({
+      elementIdL1: 'create-rmb',
+      elementIdL2: 'create-rmb-menu',
+      order: 10,
+      isRmbOnEarth: true,
+      isRmbOffEarth: false,
+      isRmbOnSat: false,
+    });
+
+    keepTrackApi.rmbMenuItems.push({
+      elementIdL1: 'earth-rmb',
+      elementIdL2: 'earth-rmb-menu',
+      order: 15,
+      isRmbOnEarth: true,
+      isRmbOffEarth: false,
+      isRmbOnSat: false,
+    });
+
+    // sort document.getElementById('rmb-wrapper').children by order in rmbMenuItems
+    const rmbWrapper = getEl('right-btn-menu-ul');
+    const rmbWrapperChildren = rmbWrapper.children;
+    const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
+    rmbWrapperChildrenArray.sort((a, b) => {
+      const aOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
+      const bOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
+      return aOrder - bOrder;
+    });
+    rmbWrapper.innerHTML = '';
+    rmbWrapperChildrenArray.forEach((child) => rmbWrapper.appendChild(child));
+
     const canvasDOM = <HTMLCanvasElement>getEl('keeptrack-canvas');
 
     // Needed?
@@ -324,17 +369,14 @@ export class InputManager {
 
     const canvasDOM = getEl('keeptrack-canvas');
     const rightBtnMenuDOM = getEl('right-btn-menu');
-    const rightBtnViewDOM = getEl('view-rmb');
-    const rightBtnCreateDOM = getEl('create-rmb');
-    const rightBtnDrawDOM = getEl('draw-rmb');
-    const rightBtnEarthDOM = getEl('earth-rmb');
     const satHoverBoxDOM = getEl('sat-hoverbox');
 
     // Reset and Clear are always visible
     let numMenuItems = 2;
 
     keepTrackApi.rmbMenuItems.forEach((item) => {
-      getEl(item.elementIdL1).style.display = 'none';
+      const dom = getEl(item.elementIdL1);
+      if (dom) dom.style.display = 'none';
     });
 
     getEl('clear-lines-rmb').style.display = 'none';
@@ -366,19 +408,6 @@ export class InputManager {
     const earthPoliticalRmb = getEl('earth-political-rmb');
     if (earthPoliticalRmb) earthPoliticalRmb.style.display = 'none';
 
-    // Reset Camera
-    // getEl('reset-camera-rmb').style.display = 'none';
-    // Colors Always Present
-    let isViewDOM = false;
-    const isCreateDOM = false;
-    let isDrawDOM = false;
-    const isEarthDOM = false;
-
-    rightBtnViewDOM.style.display = 'none';
-    rightBtnCreateDOM.style.display = 'none';
-    rightBtnDrawDOM.style.display = 'none';
-    rightBtnEarthDOM.style.display = 'none';
-
     if (lineManagerInstance.getLineListLen() > 0) {
       getEl('clear-lines-rmb').style.display = 'block';
       numMenuItems++;
@@ -388,11 +417,6 @@ export class InputManager {
       if (typeof this.mouse.clickedSat == 'undefined') return;
       const sat = catalogManagerInstance.getSat(this.mouse.clickedSat);
       if (typeof sat == 'undefined' || sat == null) return;
-      if (typeof sat.type == 'undefined' || sat.type !== SpaceObjectType.STAR) {
-        rightBtnViewDOM.style.display = 'block';
-        isViewDOM = true;
-        numMenuItems++;
-      }
 
       if (!sat.static) {
         getEl('view-sat-info-rmb').style.display = 'block';
@@ -405,9 +429,6 @@ export class InputManager {
         if (!settingsManager.isMobileModeEnabled) getEl('line-earth-sat-rmb').style.display = 'block';
         if (!settingsManager.isMobileModeEnabled) getEl('line-sat-sat-rmb').style.display = 'block';
         if (!settingsManager.isMobileModeEnabled) getEl('line-sat-sun-rmb').style.display = 'block';
-        rightBtnDrawDOM.style.display = 'block';
-        isDrawDOM = true;
-        numMenuItems++;
       } else {
         switch (sat.type) {
           case SpaceObjectType.PHASED_ARRAY_RADAR:
@@ -428,21 +449,16 @@ export class InputManager {
       keepTrackApi.rmbMenuItems
         .filter((item) => item.isRmbOffEarth || (item.isRmbOnSat && clickedSatId !== -1))
         .forEach((item) => {
-          getEl(item.elementIdL1).style.display = 'block';
-          numMenuItems++;
+          const dom = getEl(item.elementIdL1);
+          if (dom) {
+            dom.style.display = 'block';
+            numMenuItems++;
+          }
         });
     } else {
       // This is the Earth
       numMenuItems = MouseInput.earthClicked({
-        isViewDOM,
-        rightBtnViewDOM,
         numMenuItems,
-        isCreateDOM,
-        rightBtnCreateDOM,
-        isDrawDOM,
-        rightBtnDrawDOM,
-        isEarthDOM,
-        rightBtnEarthDOM,
         clickedSatId,
       });
     }

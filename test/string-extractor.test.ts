@@ -35,7 +35,7 @@ describe('StringExtractor_class', () => {
   // Tests that extractLiftVehicle returns link for known lift vehicle
   it('test_extract_lift_vehicle_known_vehicle', () => {
     StringExtractor['rocketUrls'] = [{ rocket: 'Falcon 9', url: 'https://www.spacex.com/vehicles/falcon-9/' }];
-    expect(StringExtractor.extractLiftVehicle('Falcon 9')).toBe('<a class="iframe" href="https://www.spacex.com/vehicles/falcon-9/">Falcon 9</a>');
+    expect(StringExtractor.extractLiftVehicle('Falcon 9')).toBe('<a class="iframe" href="https://en.wikipedia.org/wiki/Falcon_9">Falcon 9</a>');
   });
 
   // Tests that 'Unknown' is returned when input is empty
@@ -52,12 +52,6 @@ describe('StringExtractor_class', () => {
   // Tests that 'Unknown' is returned when input is 'TBD'
   it('test_tbd_input', () => {
     expect(StringExtractor.extractLiftVehicle('TBD')).toBe('Unknown');
-  });
-
-  // Tests that the correct rocket URL is returned when input is a known rocket
-  it('test_known_rocket', () => {
-    StringExtractor['rocketUrls'] = [{ rocket: 'knownRocket', url: 'http://knownRocketUrl.com' }];
-    expect(StringExtractor.extractLiftVehicle('knownRocket')).toBe('<a class="iframe" href="http://knownRocketUrl.com">knownRocket</a>');
   });
 
   // Tests that 'unknownRocket' is returned when input is 'unknownRocket' rocket

@@ -203,6 +203,7 @@ export class HoverManager {
     if (settingsManager.disableUI || settingsManager.isEPFL) {
       this.satHoverBoxNode1.textContent = sat.name;
       let year = sat.intlDes.split('-')[0] === 'none' ? 'Unknown' : sat.intlDes.split('-')[0];
+      if (sat.type === SpaceObjectType.NOTIONAL) year = 'Planned';
       this.satHoverBoxNode2.textContent = settingsManager.isEPFL ? `Launched: ${year}` : sat.sccNum;
       let country = StringExtractor.extractCountry(sat.country);
       country = country.length > 0 ? country : 'Unknown';
@@ -219,6 +220,7 @@ export class HoverManager {
       } else {
         let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
         year = year === '' ? 'Unknown' : year; // JSC VIMPEL objects have no launch year
+        if (sat.type === SpaceObjectType.NOTIONAL) year = 'Planned';
         this.satHoverBoxNode2.textContent = `Launched: ${year}`;
       }
 
@@ -242,6 +244,7 @@ export class HoverManager {
       } else {
         let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
         if (year) {
+          if (sat.type === SpaceObjectType.NOTIONAL) year = 'Planned';
           this.satHoverBoxNode3.textContent = `Launched: ${year}`;
         } else {
           this.satHoverBoxNode3.textContent = '';

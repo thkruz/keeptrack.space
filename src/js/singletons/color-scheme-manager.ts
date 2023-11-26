@@ -272,19 +272,12 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   public default(sat: SatObject): ColorInformation {
     // NOTE: The order of these checks is important
     // Grab reference to outside managers for their functions
-    if (sat.type === SpaceObjectType.NOTIONAL) {
-      // @ts-ignore
-      if (window.noNotional) {
-        return {
-          color: this.colorTheme.deselected,
-          pickable: Pickable.No,
-        };
-      } else {
-        return {
-          color: this.colorTheme.notional,
-          pickable: Pickable.Yes,
-        };
-      }
+    // @ts-ignore
+    if (sat.type === SpaceObjectType.NOTIONAL && window.noNotional) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
     }
 
     if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
@@ -421,15 +414,15 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     // NOTE: Treat TBA Satellites as SPECIAL if SCC NUM is less than 70000 (ie a real satellite)
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
-        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
       (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
-        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
         typeof sat.vmag == 'undefined' &&
-        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false)
     ) {
       return {
@@ -471,6 +464,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     } else if (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) {
       // Special Object
       color = this.colorTheme.pink;
+    } else if (sat.type === SpaceObjectType.NOTIONAL) {
+      color = this.colorTheme.notional;
     } else {
       color = this.colorTheme.unknown;
     }

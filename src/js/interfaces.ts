@@ -204,6 +204,7 @@ export declare interface SatObject extends BaseObject {
   TLE1: TleLine1;
   TLE2: TleLine2;
   alt?: number;
+  altName?: string;
   altId: string;
   apogee: number;
   argPe: number;

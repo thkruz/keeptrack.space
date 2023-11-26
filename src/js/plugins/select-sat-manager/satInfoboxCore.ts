@@ -276,7 +276,9 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat === null || typeof sat === 'undefined') return;
     if (sat.static || sat.staticNum >= 0) return;
 
-    getEl('sat-info-title').innerHTML = sat.name === 'Unknown' ? sat.sccNum : sat.name;
+    const isHasAltName = sat?.altName && sat.altName !== '';
+    getEl('sat-info-title').innerHTML = sat.name;
+    getEl('sat-alt-name').innerHTML = isHasAltName ? sat.altName : 'N/A';
 
     SatInfoBoxCore.updateSatType(sat);
 
@@ -509,6 +511,10 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
                   <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
                   data-tooltip="USSF Catalog Number - Originally North American Air Defense (NORAD)">NORAD</div>
                   <div class="sat-info-value tooltipped" id="sat-objnum" data-position="top" data-delay="50">99999</div>
+                </div>
+                <div class="sat-info-row sat-only-info">
+                  <div class="sat-info-key">Alt Name</div>
+                  <div class="sat-info-value" id="sat-alt-name">Alt Name</div>
                 </div>
                 <div class="sat-info-row sat-only-info">
                   <div class="sat-info-key">Alt ID</div>

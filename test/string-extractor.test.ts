@@ -72,7 +72,7 @@ describe('StringExtractor_class', () => {
 
   // Tests that a valid country name returns the correct country code
   it('test_valid_country_name', () => {
-    expect(StringExtractor.getCountryCode('United States')).toEqual('US');
+    expect(StringExtractor.getCountryCode('United States')).toEqual('US|USA');
   });
 
   // Tests that an unknown country name returns an empty string

@@ -1,3 +1,4 @@
+import { countryMapList } from '../catalogs/countries';
 import { GetSatType, MissileObject, SatObject } from '../interfaces';
 import { CatalogSearch } from '../static/catalog-search';
 import { keepTrackApi } from './../keepTrackApi';
@@ -55,10 +56,7 @@ export class ObjectGroup {
           .map((sat: SatObject) => sat.id);
         break;
       case GroupType.COUNTRY:
-        this.objects = satData
-          .filter((sat: SatObject) => data.split('|').includes(sat.country))
-          // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sat: SatObject) => sat.id);
+        this.createGroupByCountry_(data, satData);
         break;
       case GroupType.COUNTRY_REGEX:
         this.objects = CatalogSearch.country(satData, data)
@@ -110,6 +108,20 @@ export class ObjectGroup {
 
     return this;
   };
+
+  private createGroupByCountry_(data: any, satData: SatObject[]) {
+    // Map country name to country code
+    const expandedData = data.split('|').map((countryName: string) => countryMapList[countryName]);
+    // Concat data with expandedData using | as a delimiter
+    data = `${data}|${expandedData.join('|')}`;
+    this.objects = satData
+      .filter((sat: SatObject) => data.split('|').includes(sat.country))
+      // .slice(0, settingsManager.maxOribtsDisplayed)
+      // eslint-disable-next-line arrow-body-style
+      .map((sat: SatObject) => {
+        return sat.id;
+      });
+  }
 
   updateIsInGroup(): this {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();

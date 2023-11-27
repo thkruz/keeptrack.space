@@ -1,4 +1,4 @@
-import { CatalogObject } from './../interfaces';
+import { CatalogObject, MissileObject, SensorObject } from './../interfaces';
 /* */
 
 import { CatalogManager, SatObject, UiManager } from '@app/js/interfaces';
@@ -130,103 +130,15 @@ export class SearchManager {
     // Split string into array using comma or space as delimiter
     // let searchList = searchString.split(/(?![0-9]+)\s(?=[0-9]+)|,/u);
 
-    // Split string into array using comma
-    let searchList = searchString.split(/,/u);
-
-    // Update last search with the most recent search results
-    settingsManager.lastSearch = searchList;
-
-    // Initialize search results
-    const satData = catalogManagerInstance.satData as SatObject[];
     let results = [];
-    searchList.forEach((searchStringIn) => {
-      satData.every((sat, i) => {
-        if (results.length >= settingsManager.searchLimit) return false;
-        if (i > catalogManagerInstance.missileSats) return false;
-        const len = searchStringIn.length;
-        if (len === 0) return true; // Skip empty strings
-        if (sat.static && sat.type !== SpaceObjectType.STAR) return true; // Skip static dots (Maybe these should be searchable?)
-        if (sat.marker) return false; // Stop searching once you reach the markers
-        if (settingsManager.isSatOverflyModeOn && sat.type !== SpaceObjectType.PAYLOAD) return true; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
-        if (!sat.active) return true; // Skip inactive missiles.
-        if (sat.country == 'ANALSAT' && !sat.active) return true; // Skip Fake Analyst satellites
-        if (!sat.name) return true; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
+    // If so, then do a number only search
+    if (/^[0-9,]+$/u.test(searchString)) {
+      results = SearchManager.doNumOnlySearch_(searchString);
+    } else {
+      // If not, then do a regular search
+      results = SearchManager.doRegularSearch_(searchString);
+    }
 
-        if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
-          results.push({
-            strIndex: sat.name.indexOf(searchStringIn),
-            type: sat.type,
-            isON: true,
-            patlen: len,
-            satId: i,
-          });
-          return true; // Prevent's duplicate results
-        }
-
-        if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
-          results.push({
-            strIndex: sat.bus.indexOf(searchStringIn),
-            type: sat.type,
-            isBus: true,
-            patlen: len,
-            satId: i,
-          });
-          return true; // Prevent's duplicate results
-        }
-
-        if (!sat.desc) {
-          // Do nothing there is no description property
-        } else if (sat.desc.toUpperCase().indexOf(searchStringIn) !== -1) {
-          results.push({
-            strIndex: sat.desc.indexOf(searchStringIn),
-            isMissile: true,
-            patlen: len,
-            satId: i,
-          });
-          return true; // Prevent's duplicate results
-        } else {
-          return true; // Last check for missiles
-        }
-
-        if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
-          // Ignore Notional Satellites unless all 6 characters are entered
-          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) return true;
-
-          results.push({
-            strIndex: sat.sccNum.indexOf(searchStringIn),
-            isSccNum: true,
-            patlen: len,
-            satId: i,
-          });
-          return true; // Prevent's duplicate results
-        }
-
-        if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
-          // Ignore Notional Satellites
-          if (sat.name.includes(' Notional)')) return true;
-
-          results.push({
-            strIndex: sat.intlDes.indexOf(searchStringIn),
-            isIntlDes: true,
-            patlen: len,
-            satId: i,
-          });
-          return true; // Prevent's duplicate results
-        }
-
-        if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
-          results.push({
-            strIndex: sat.launchVehicle.indexOf(searchStringIn),
-            isLV: true,
-            patlen: len,
-            satId: i,
-          });
-          return true; // Prevent's duplicate results
-        }
-
-        return true; // No match
-      });
-    });
     // Remove any results greater than the maximum allowed
     results = results.splice(0, settingsManager.searchLimit);
 
@@ -262,6 +174,167 @@ export class SearchManager {
     // Don't let the search overlap with the legend
     LegendManager.change('clear');
     UrlManager.updateURL();
+  }
+
+  private static doRegularSearch_(searchString: string) {
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const results = [];
+
+    // Split string into array using comma
+    let searchList = searchString.split(/,/u);
+
+    // Update last search with the most recent search results
+    settingsManager.lastSearch = searchList;
+
+    // Initialize search results
+    const satData = SearchManager.getSearchableObjects_(catalogManagerInstance);
+
+    searchList.forEach((searchStringIn) => {
+      satData.every((sat) => {
+        if (results.length >= settingsManager.searchLimit) return false;
+        const len = searchStringIn.length;
+        if (len === 0) return true; // Skip empty strings
+
+        if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
+          results.push({
+            strIndex: sat.name.indexOf(searchStringIn),
+            type: sat.type,
+            isON: true,
+            patlen: len,
+            satId: sat.id,
+          });
+          return true; // Prevent's duplicate results
+        }
+
+        if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
+          results.push({
+            strIndex: sat.bus.indexOf(searchStringIn),
+            type: sat.type,
+            isBus: true,
+            patlen: len,
+            satId: sat.id,
+          });
+          return true; // Prevent's duplicate results
+        }
+
+        if (!sat.desc) {
+          // Do nothing there is no description property
+        } else if (sat.desc.toUpperCase().indexOf(searchStringIn) !== -1) {
+          results.push({
+            strIndex: sat.desc.indexOf(searchStringIn),
+            isMissile: true,
+            patlen: len,
+            satId: sat.id,
+          });
+          return true; // Prevent's duplicate results
+        } else {
+          return true; // Last check for missiles
+        }
+
+        if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
+          // Ignore Notional Satellites unless all 6 characters are entered
+          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) return true;
+
+          results.push({
+            strIndex: sat.sccNum.indexOf(searchStringIn),
+            isSccNum: true,
+            patlen: len,
+            satId: sat.id,
+          });
+          return true; // Prevent's duplicate results
+        }
+
+        if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
+          // Ignore Notional Satellites
+          if (sat.name.includes(' Notional)')) return true;
+
+          results.push({
+            strIndex: sat.intlDes.indexOf(searchStringIn),
+            isIntlDes: true,
+            patlen: len,
+            satId: sat.id,
+          });
+          return true; // Prevent's duplicate results
+        }
+
+        if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
+          results.push({
+            strIndex: sat.launchVehicle.indexOf(searchStringIn),
+            isLV: true,
+            patlen: len,
+            satId: sat.id,
+          });
+          return true; // Prevent's duplicate results
+        }
+
+        return true;
+      });
+    });
+
+    return results;
+  }
+
+  private static doNumOnlySearch_(searchString: string) {
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const results = [];
+
+    // Split string into array using comma
+    let searchList = searchString.split(/,/u).filter((str) => str.length > 0);
+    // Sort the numbers so that the lowest numbers are searched first
+    searchList = searchList.sort((a, b) => parseInt(a) - parseInt(b));
+
+    // Update last search with the most recent search results
+    settingsManager.lastSearch = searchList;
+
+    // Initialize search results
+    const satData = SearchManager.getSearchableObjects_(catalogManagerInstance);
+
+    let i = 0;
+    searchList.forEach((searchStringIn) => {
+      for (; i < satData.length; i++) {
+        const sat = satData[i];
+        if (results.length >= settingsManager.searchLimit) break;
+        if (parseInt(sat.sccNum) > parseInt(searchStringIn)) break;
+
+        if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
+          // Ignore Notional Satellites unless all 6 characters are entered
+          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) continue;
+
+          results.push({
+            strIndex: sat.sccNum.indexOf(searchStringIn),
+            isSccNum: true,
+            patlen: searchStringIn.length,
+            satId: sat.id,
+          });
+          break;
+        }
+      }
+    });
+
+    return results;
+  }
+
+  private static getSearchableObjects_(catalogManagerInstance: CatalogManager) {
+    return (
+      catalogManagerInstance.satData.filter((sat) => {
+        // if ((sat as MissileObject).missile) return false;
+        if ((sat as SensorObject).staticNum) return false; // No sensors
+        if (sat.static) return false; // Skip static dots (Maybe these should be searchable?)
+        if ((sat as SatObject).marker) return false; // skip markers
+        if (settingsManager.isSatOverflyModeOn && sat.type !== SpaceObjectType.PAYLOAD) return false; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+        if (!(sat as MissileObject).active) return false; // Skip inactive missiles.
+        if ((sat as SatObject).country == 'ANALSAT' && !(sat as SatObject).active) return false; // Skip Fake Analyst satellites
+        if (!sat.name) return false; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
+        return true;
+      }) as (SatObject | MissileObject)[]
+    ).sort((a, b) => {
+      // Sort by sccNum
+      if (a.sccNum && b.sccNum) {
+        return parseInt(a.sccNum) - parseInt(b.sccNum);
+      } else {
+        return 0;
+      }
+    });
   }
 
   public fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {

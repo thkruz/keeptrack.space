@@ -430,9 +430,9 @@ export type lookanglesRow = {
   passMaxEl: string;
 };
 
-export type sccPassTimes = {
-  sccNum: string;
-  time: number;
+export type SatPassTimes = {
+  sat: SatObject;
+  time: Date;
 };
 
 export interface SoundManager {

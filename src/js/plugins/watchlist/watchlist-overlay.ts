@@ -1,5 +1,5 @@
 import infoPng from '@app/img/icons/info.png';
-import { GetSatType, SatObject } from '@app/js/interfaces';
+import { GetSatType, SatObject, SatPassTimes } from '@app/js/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { MILLISECONDS_PER_DAY } from '@app/js/lib/constants';
 import { dateFormat } from '@app/js/lib/dateFormat';
@@ -19,7 +19,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   private infoOverlayDOMHtmlStrArr = [];
   private lastSensorId: number;
   private lastSimTimeWhenCalc: number;
-  private nextPassArray: any = [];
+  private nextPassArray: SatPassTimes[] = [];
 
   static readonly PLUGIN_NAME = 'Watchlist Overlay';
 
@@ -193,14 +193,14 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       this.lastSensorId !== sensorManagerInstance.currentSensors[0].id
     ) {
       showLoading(() => {
-        this.nextPassArray = [];
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-        for (const satId of watchlistPlugin.watchlistList) {
-          this.nextPassArray.push(catalogManagerInstance.getSat(satId, GetSatType.EXTRA_ONLY));
+        const satArray: SatObject[] = [];
+        for (const id of watchlistPlugin.watchlistList) {
+          satArray.push(catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY));
         }
 
-        this.nextPassArray = SensorMath.nextpassList(this.nextPassArray, 1, this.OVERLAY_CALC_LENGTH_IN_DAYS);
+        this.nextPassArray = SensorMath.nextpassList(satArray, 1, this.OVERLAY_CALC_LENGTH_IN_DAYS);
         this.nextPassArray.sort(function (a: { time: string | number | Date }, b: { time: string | number | Date }) {
           return new Date(a.time).getTime() - new Date(b.time).getTime();
         });
@@ -218,33 +218,28 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   }
 
   private pushOverlayElement_(s: number, propTime: any, infoOverlayDOMHtmlStrArr: string[]) {
-    const isSatInView = keepTrackApi.getDotsManager().inViewData[keepTrackApi.getCatalogManager().getIdFromObjNum(this.nextPassArray[s].sccNum)];
+    const isSatInView = keepTrackApi.getDotsManager().inViewData[this.nextPassArray[s].sat.id];
     // If old time and not in view, skip it
-    if (this.nextPassArray[s].time - propTime < -1000 * 60 * 5 && !isSatInView) return;
+    if (this.nextPassArray[s].time.getTime() - propTime < -1000 * 60 * 5 && !isSatInView) return;
 
     // Get the pass Time
     const time = dateFormat(this.nextPassArray[s].time, 'isoTime', true);
+    const name = this.nextPassArray[s].sat.sccNum ? this.nextPassArray[s].sat.sccNum : this.nextPassArray[s].sat.name;
 
     // Yellow - In View (Only one pass can be in view at a time)
-    if (isSatInView === 1 && this.nextPassArray[s].time - propTime < 1000 * 60 * 5) {
-      infoOverlayDOMHtmlStrArr.push(
-        '<div class="row"><h5 class="center-align watchlist-object link" style="color: yellow">' + this.nextPassArray[s].sccNum + ': ' + time + '</h5></div>'
-      );
+    if (isSatInView === 1 && this.nextPassArray[s].time.getTime() - propTime < 1000 * 60 * 5) {
+      infoOverlayDOMHtmlStrArr.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: yellow">' + name + ': ' + time + '</h5></div>');
       return;
     }
     // Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time
     // This makes recent objects stay at the top of the list in blue
-    if (this.nextPassArray[s].time - propTime < 1000 * 60 * 30 && propTime - this.nextPassArray[s].time < 1000 * 60 * 10) {
-      infoOverlayDOMHtmlStrArr.push(
-        '<div class="row"><h5 class="center-align watchlist-object link" style="color: #0095ff">' + this.nextPassArray[s].sccNum + ': ' + time + '</h5></div>'
-      );
+    if (this.nextPassArray[s].time.getTime() - propTime < 1000 * 60 * 30 && propTime - this.nextPassArray[s].time.getTime() < 1000 * 60 * 10) {
+      infoOverlayDOMHtmlStrArr.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: #0095ff">' + name + ': ' + time + '</h5></div>');
       return;
     }
     // White - Any future pass not fitting the above requirements
-    if (this.nextPassArray[s].time - propTime > 0) {
-      infoOverlayDOMHtmlStrArr.push(
-        '<div class="row"><h5 class="center-align watchlist-object link" style="color: white">' + this.nextPassArray[s].sccNum + ': ' + time + '</h5></div>'
-      );
+    if (this.nextPassArray[s].time.getTime() - propTime > 0) {
+      infoOverlayDOMHtmlStrArr.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: white">' + name + ': ' + time + '</h5></div>');
     }
   }
 

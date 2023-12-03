@@ -33,6 +33,7 @@ import { getEl } from '@app/js/lib/get-el';
 import { LineTypes } from '@app/js/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
+import { CatalogSource } from '@app/js/static/catalog-loader';
 import { isThisNode } from '@app/js/static/isThisNode';
 import saveAs from 'file-saver';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -318,20 +319,20 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     }
   }
 
-  addSat(satNum: number, isMultiAdd = false) {
-    const satId = keepTrackApi.getCatalogManager().getIdFromObjNum(satNum);
+  addSat(id: number, isMultiAdd = false) {
+    const isDuplicate = this.watchlistList.some((id_: number) => id_ === id);
 
-    if (satId === null) {
-      errorManagerInstance.warn(`Sat ${satNum} not found!`);
-      return;
-    }
-
-    const isDuplicate = this.watchlistList.some((satId_: number) => satId_ === satId);
     if (!isDuplicate) {
-      this.watchlistList.push(satId);
+      this.watchlistList.push(id);
       this.watchlistInViewList.push(false);
     } else {
-      errorManagerInstance.warn(`Sat ${satNum} already in watchlist!`);
+      const sat = keepTrackApi.getCatalogManager().getSat(id);
+      if (sat.sccNum) {
+        errorManagerInstance.warn(`NORAD: ${sat.sccNum} already in watchlist!`);
+      } else {
+        const jscString = sat.source === CatalogSource.VIMPEL ? ` (JSC Vimpel ${sat.altId})` : '';
+        errorManagerInstance.warn(`Object ${id}${jscString} already in watchlist!`);
+      }
     }
 
     if (!isMultiAdd) {
@@ -356,7 +357,13 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   private onAddEvent_() {
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
     sats.forEach((satNum: string) => {
-      this.addSat(parseInt(satNum), true);
+      const id = keepTrackApi.getCatalogManager().getIdFromObjNum(parseInt(satNum));
+
+      if (id === null) {
+        errorManagerInstance.warn(`Sat ${id} not found!`);
+        return;
+      }
+      this.addSat(id, true);
     });
 
     this.watchlistList.sort((a: number, b: number) => {

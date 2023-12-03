@@ -8,7 +8,6 @@ import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { getDayOfYear } from '@app/js/lib/transforms';
 import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { SearchManager } from '@app/js/singletons/search-manager';
 import { CatalogSource } from '@app/js/static/catalog-loader';
 import { CatalogSearch } from '@app/js/static/catalog-search';
@@ -250,12 +249,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       if (watchlistPlugin.isOnWatchlist(id)) {
         watchlistPlugin.removeSat(id);
       } else {
-        const sccNum = parseInt(keepTrackApi.getCatalogManager().getSat(id, GetSatType.EXTRA_ONLY)?.sccNum);
-        if (isNaN(sccNum)) {
-          errorManagerInstance.error(new Error('Invalid SCC Number'), 'SatInfoBoxCore.addRemoveWatchlist', 'Invalid SCC Number');
-          return;
-        }
-        watchlistPlugin.addSat(sccNum);
+        watchlistPlugin.addSat(id);
       }
     }
   }

@@ -1,4 +1,4 @@
-import { SatObject, sccPassTimes, SensorObject } from '@app/js/interfaces';
+import { SatObject, SatPassTimes, SensorObject } from '@app/js/interfaces';
 import { Degrees, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Transforms } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, TAU } from '../lib/constants';
@@ -236,7 +236,7 @@ export class SensorMath {
     }
   }
 
-  static nextNpasses(sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number) {
+  static nextNpasses(sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number): Date[] {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -309,15 +309,15 @@ export class SensorMath {
     }
   }
 
-  static nextpassList(satArray: SatObject[], interval?: number, days = 7): sccPassTimes[] {
-    let nextPassArray = [];
+  static nextpassList(satArray: SatObject[], interval?: number, days = 7): SatPassTimes[] {
+    let nextPassArray: SatPassTimes[] = [];
     const nextNPassesCount = settingsManager ? settingsManager.nextNPassesCount : 1;
-    for (let s = 0; s < satArray.length; s++) {
-      let time = SensorMath.nextNpasses(satArray[s], null, days, interval || 30, nextNPassesCount); // Only do 1 day looks
-      for (let i = 0; i < time.length; i++) {
+    for (const sat of satArray) {
+      const passes = SensorMath.nextNpasses(sat, null, days, interval || 30, nextNPassesCount); // Only do 1 day looks
+      for (const pass of passes) {
         nextPassArray.push({
-          sccNum: satArray[s].sccNum,
-          time: time[i],
+          sat: sat,
+          time: pass,
         });
       }
     }

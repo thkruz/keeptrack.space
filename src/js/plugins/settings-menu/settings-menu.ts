@@ -591,10 +591,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
     if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-      drawManagerInstance.sceneManager.earth.init(settingsManager, drawManagerInstance.gl);
-      drawManagerInstance.sceneManager.earth.loadHiRes();
-      drawManagerInstance.sceneManager.earth.loadHiResNight();
+      keepTrackApi.getDrawManager().sceneManager.earth.reloadEarthHiResTextures();
     }
     settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
     settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;

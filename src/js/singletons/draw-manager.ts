@@ -8,6 +8,7 @@ import { SelectSatManager } from '../plugins/select-sat-manager/select-sat-manag
 import { StereoMapPlugin } from '../plugins/stereo-map/stereo-map';
 import { watchlistPlugin } from '../plugins/watchlist/watchlist';
 import { SettingsManager } from '../settings/settings';
+import { CatalogSource } from '../static/catalog-loader';
 import { GlUtils } from '../static/gl-utils';
 import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
@@ -21,7 +22,6 @@ import { Moon } from './draw-manager/moon';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
-import { errorManagerInstance } from './errorManager';
 import { GroupType } from './object-group';
 
 export interface DrawManager {
@@ -58,7 +58,6 @@ export interface DrawManager {
   drawOptionalScenery(mainCameraInstance: Camera): void;
   glInit(): Promise<WebGL2RenderingContext>;
   init(settings: SettingsManager): Promise<void>;
-  loadHiRes(): Promise<void>;
   loadScene(): Promise<void>;
   orbitsAbove(): void;
   getScreenCoords(sat: SatObject): {
@@ -200,7 +199,7 @@ export class StandardDrawManager implements DrawManager {
     // Sun, and Moon
     this.drawOptionalScenery(keepTrackApi.getMainCamera());
 
-    this.sceneManager.earth.draw(this.pMatrix, this.postProcessingManager.curBuffer, keepTrackApi.callbacks.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null);
+    this.sceneManager.earth.draw(this.postProcessingManager.curBuffer, keepTrackApi.callbacks.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null);
   }
 
   public drawOptionalScenery(mainCameraInstance: Camera) {
@@ -323,16 +322,7 @@ export class StandardDrawManager implements DrawManager {
       this.isRotationEvent_ = true;
     });
 
-    await this.loadHiRes();
-  }
-
-  public async loadHiRes(): Promise<void> {
-    this.sceneManager.earth.loadHiRes().catch((error) => {
-      errorManagerInstance.error(error, 'loadHiRes');
-    });
-    this.sceneManager.earth.loadHiResNight().catch((error) => {
-      errorManagerInstance.error(error, 'loadHiResNight');
-    });
+    this.sceneManager.earth.reloadEarthHiResTextures();
   }
 
   public async loadScene(): Promise<void> {
@@ -424,9 +414,7 @@ export class StandardDrawManager implements DrawManager {
           // if (!settingsManager.enableHoverOverlay) continue
           this.satHoverMiniDOM_ = document.createElement('div');
           this.satHoverMiniDOM_.id = 'sat-minibox-' + i;
-          const isAltId = sat.altId;
-          if (isAltId) {
-            // TODO: Needs to handle nonJSC sats
+          if (sat.source === CatalogSource.VIMPEL) {
             this.satHoverMiniDOM_.textContent = `JSC${sat.altId}`;
           } else {
             this.satHoverMiniDOM_.textContent = sat.sccNum;
@@ -447,9 +435,9 @@ export class StandardDrawManager implements DrawManager {
 
         if (!dotsManagerInstance.inViewData) return;
 
-        watchlistPlugin.watchlistList.forEach((satId: number) => {
-          sat = catalogManagerInstance.getSat(satId, GetSatType.POSITION_ONLY);
-          if (dotsManagerInstance.inViewData[satId] === 0) return;
+        watchlistPlugin.watchlistList.forEach((id: number) => {
+          sat = catalogManagerInstance.getSat(id, GetSatType.POSITION_ONLY);
+          if (dotsManagerInstance.inViewData[id] === 0) return;
           const satScreenPositionArray = this.getScreenCoords(sat);
           if (satScreenPositionArray.error) return;
           if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') return;
@@ -458,12 +446,16 @@ export class StandardDrawManager implements DrawManager {
           // Draw Sat Labels
           // if (!settingsManager.enableHoverOverlay) continue
           this.satHoverMiniDOM_ = document.createElement('div');
-          this.satHoverMiniDOM_.id = 'sat-minibox-' + satId;
-          this.satHoverMiniDOM_.textContent = sat.sccNum;
+          this.satHoverMiniDOM_.id = 'sat-minibox-' + id;
+          if (sat.source === CatalogSource.VIMPEL) {
+            this.satHoverMiniDOM_.textContent = `JSC${sat.altId}`;
+          } else {
+            this.satHoverMiniDOM_.textContent = sat.sccNum;
+          }
 
           // Draw Orbits
           if (!settingsManager.isShowSatNameNotOrbit) {
-            orbitManagerInstance.addInViewOrbit(satId);
+            orbitManagerInstance.addInViewOrbit(id);
           }
 
           this.satHoverMiniDOM_.style.display = 'block';

@@ -1,6 +1,7 @@
 import radioTowerPng from '@app/img/icons/radio-tower.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
+import { LineTypes } from '@app/js/singletons/draw-manager/line-manager';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
@@ -130,7 +131,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       keepTrackApi
         .getLineManager()
         .create(
-          'sat2',
+          LineTypes.REF_TO_SAT,
           [
             keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name),
             drawManagerInstance.sceneManager.moon.drawPosition[0],
@@ -155,7 +156,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       keepTrackApi
         .getLineManager()
         .create(
-          'sat2',
+          LineTypes.REF_TO_SAT,
           [
             keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name),
             drawManagerInstance.sceneManager.sun.drawPosition[0],

@@ -408,7 +408,7 @@ export class InputManager {
     const earthPoliticalRmb = getEl('earth-political-rmb');
     if (earthPoliticalRmb) earthPoliticalRmb.style.display = 'none';
 
-    if (lineManagerInstance.getLineListLen() > 0) {
+    if (lineManagerInstance.drawLineList.length > 0) {
       getEl('clear-lines-rmb').style.display = 'block';
       numMenuItems++;
     }

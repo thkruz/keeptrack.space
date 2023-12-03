@@ -43,7 +43,7 @@ import { StringExtractor } from '../static/string-extractor';
 import { UrlManager } from '../static/url-manager';
 import { CameraType } from './camera';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
-import { lineManagerInstance } from './draw-manager/line-manager';
+import { LineTypes, lineManagerInstance } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import { StandardUiManager } from './uiManager';
 // TODO: FUTURE FEATURE
@@ -748,7 +748,7 @@ export class StandardCatalogManager implements CatalogManager {
       keepTrackApi.getStarManager().isAllConstellationVisible = false;
     }
 
-    lineManagerInstance.create('ref', [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
+    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
     keepTrackApi.getMainCamera().cameraType = CameraType.OFFSET;
     keepTrackApi.getMainCamera().lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
   }

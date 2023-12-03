@@ -6,7 +6,7 @@ import { dateFormat } from '@app/js/lib/dateFormat';
 import { getEl } from '@app/js/lib/get-el';
 import { shake } from '@app/js/lib/shake';
 import { showLoading } from '@app/js/lib/showLoading';
-import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
 import { SatMath } from '@app/js/static/sat-math';
 import { SensorMath } from '@app/js/static/sensor-math';
 import { Sgp4 } from 'ootk';
@@ -132,7 +132,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       const rae = SatMath.getRae(keepTrackApi.getTimeManager().simulationTimeObj, satrec, sensor);
       const isInFov = SatMath.checkIsInView(sensor, rae);
       if (!isInFov) continue;
-      lineManagerInstance.create('sat3', [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
+      lineManagerInstance.create(LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
     }
   }
 
@@ -144,7 +144,11 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       // Is inview and wasn't previously
       watchlistPlugin.watchlistInViewList[i] = true;
       uiManagerInstance.toast(`Satellite ${sat.sccNum} is In Field of View!`, 'normal');
-      lineManagerInstance.create('sat3', [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(keepTrackApi.getSensorManager().currentSensors[0].name)], 'g');
+      lineManagerInstance.create(
+        LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV,
+        [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(keepTrackApi.getSensorManager().currentSensors[0].name)],
+        'g'
+      );
       keepTrackApi.getOrbitManager().addInViewOrbit(watchlistPlugin.watchlistList[i]);
     }
     if (inView === 0 && watchlistPlugin.watchlistInViewList[i] === true) {

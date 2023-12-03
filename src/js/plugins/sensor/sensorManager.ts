@@ -32,7 +32,7 @@ import { errorManagerInstance } from '@app/js/singletons/errorManager';
 
 import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
 import { ZoomValue } from '@app/js/singletons/camera';
-import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
 import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { SatMath } from '@app/js/static/sat-math';
@@ -139,26 +139,30 @@ export class StandardSensorManager implements SensorManager {
       case 'CLR':
       case 'THL':
         lineManagerInstance.create(
-          'scan2',
+          LineTypes.SENSOR_SCAN_HORIZON,
           [catalogManagerInstance.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange],
           'c'
         );
         lineManagerInstance.create(
-          'scan2',
+          LineTypes.SENSOR_SCAN_HORIZON,
           [catalogManagerInstance.getSensorFromSensorName(sensor.name), sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange],
           'c'
         );
         break;
       case 'FYL':
         // TODO: Find actual face directions
-        lineManagerInstance.create('scan2', [catalogManagerInstance.getSensorFromSensorName(sensor.name), 300, 60, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create('scan2', [catalogManagerInstance.getSensorFromSensorName(sensor.name), 60, 180, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create('scan2', [catalogManagerInstance.getSensorFromSensorName(sensor.name), 180, 300, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [catalogManagerInstance.getSensorFromSensorName(sensor.name), 300, 60, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [catalogManagerInstance.getSensorFromSensorName(sensor.name), 60, 180, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(
+          LineTypes.SENSOR_SCAN_HORIZON,
+          [catalogManagerInstance.getSensorFromSensorName(sensor.name), 180, 300, sensor.obsminel, sensor.obsmaxrange],
+          'c'
+        );
         break;
       case 'CDN':
         // NOTE: This will be a bit more complicated later
         lineManagerInstance.create(
-          'scan2',
+          LineTypes.SENSOR_SCAN_HORIZON,
           [catalogManagerInstance.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange],
           'c'
         );

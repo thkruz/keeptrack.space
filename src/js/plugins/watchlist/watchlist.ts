@@ -30,11 +30,18 @@ import { GetSatType, SatObject } from '@app/js/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
 import { getEl } from '@app/js/lib/get-el';
+import { LineTypes } from '@app/js/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
 import { isThisNode } from '@app/js/static/isThisNode';
 import saveAs from 'file-saver';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+
+interface UpdateWatchlistParams {
+  updateWatchlistList?: number[];
+  updateWatchlistInViewList?: boolean[];
+  isSkipSearch?: boolean;
+}
 
 export class WatchlistPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'watchlist';
@@ -155,7 +162,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         keepTrackApi.getUiManager().toast(`Watchlist Loaded with ${newWatchlist.length} Satellites`, 'normal');
       }
 
-      this.updateWatchlist(newWatchlist, _watchlistInViewList, true);
+      this.updateWatchlist({ updateWatchlistList: newWatchlist, updateWatchlistInViewList: _watchlistInViewList, isSkipSearch: true });
     }
   }
 
@@ -196,7 +203,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     // Remove button selected on watchlist menu
     getEl('watchlist-list').addEventListener('click', (evt: Event) => {
-      this.onRemoveClicked(parseInt((<HTMLElement>evt.target).dataset.satId));
+      this.removeSat(parseInt((<HTMLElement>evt.target).dataset.satId));
     });
 
     getEl('watchlist-save').addEventListener('click', (evt: Event) => {
@@ -225,7 +232,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @param updateWatchlistInViewList - An optional array of booleans indicating whether each item in the watchlist should be displayed.
    * @param isSkipSearch - A boolean indicating whether to skip the search operation.
    */
-  updateWatchlist(updateWatchlistList?: number[], updateWatchlistInViewList?: boolean[], isSkipSearch = false) {
+  updateWatchlist({ updateWatchlistList, updateWatchlistInViewList, isSkipSearch = false }: UpdateWatchlistParams = {}) {
     const settingsManager: any = window.settingsManager;
     if (typeof updateWatchlistList !== 'undefined') {
       this.watchlistList = updateWatchlistList;
@@ -283,24 +290,27 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   }
 
   /**
-   * Handles the click event when the remove button is clicked.
-   * Removes the satellite with the specified ID from the watchlist.
-   *
-   * @param satId - The NORAD ID of the satellite to remove.
+   * Removes the satellite with the specified id from the watchlist.
    */
-  private onRemoveClicked(satId: number): void {
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
+  removeSat(id: number) {
     for (let i = 0; i < this.watchlistList.length; i++) {
-      if (this.watchlistList[i] === satId) {
-        orbitManagerInstance.removeInViewOrbit(this.watchlistList[i]);
+      if (this.watchlistList[i] === id) {
+        keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistList[i]);
         this.watchlistList.splice(i, 1);
         this.watchlistInViewList.splice(i, 1);
+
+        keepTrackApi.getLineManager().drawLineList.forEach((line, idx) => {
+          if (line.type === LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV && line.sat.id === id) {
+            keepTrackApi.getLineManager().drawLineList.splice(idx, 1);
+          }
+        });
       }
     }
+
     this.updateWatchlist();
+
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     if (this.watchlistList.length <= 0) {
       uiManagerInstance.doSearch('');
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
@@ -308,36 +318,53 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     }
   }
 
+  addSat(satNum: number, isMultiAdd = false) {
+    const satId = keepTrackApi.getCatalogManager().getIdFromObjNum(satNum);
+
+    if (satId === null) {
+      errorManagerInstance.warn(`Sat ${satNum} not found!`);
+      return;
+    }
+
+    const isDuplicate = this.watchlistList.some((satId_: number) => satId_ === satId);
+    if (!isDuplicate) {
+      this.watchlistList.push(satId);
+      this.watchlistInViewList.push(false);
+    } else {
+      errorManagerInstance.warn(`Sat ${satNum} already in watchlist!`);
+    }
+
+    if (!isMultiAdd) {
+      this.watchlistList.sort((a: number, b: number) => {
+        const satA = keepTrackApi.getCatalogManager().getSat(a);
+        const satB = keepTrackApi.getCatalogManager().getSat(b);
+        if (satA === null || satB === null) return 0;
+        return parseInt(satA.sccNum) - parseInt(satB.sccNum);
+      });
+      this.updateWatchlist();
+    }
+  }
+
+  isOnWatchlist(id: number) {
+    if (id === null) return false;
+    return this.watchlistList.some((satId_: number) => satId_ === id);
+  }
+
   /**
    * Handles the event when a new satellite is added to the watchlist.
    */
   private onAddEvent_() {
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     sats.forEach((satNum: string) => {
-      const satId = catalogManagerInstance.getIdFromObjNum(parseInt(satNum));
-
-      if (satId === null) {
-        errorManagerInstance.warn(`Sat ${satNum} not found!`);
-        return;
-      }
-
-      const isDuplicate = this.watchlistList.some((satId_: number) => satId_ === satId);
-      if (!isDuplicate) {
-        this.watchlistList.push(satId);
-        this.watchlistInViewList.push(false);
-      } else {
-        errorManagerInstance.warn(`Sat ${satNum} already in watchlist!`);
-      }
+      this.addSat(parseInt(satNum), true);
     });
 
     this.watchlistList.sort((a: number, b: number) => {
-      const satA = catalogManagerInstance.getSat(a);
-      const satB = catalogManagerInstance.getSat(b);
+      const satA = keepTrackApi.getCatalogManager().getSat(a);
+      const satB = keepTrackApi.getCatalogManager().getSat(b);
       if (satA === null || satB === null) return 0;
       return parseInt(satA.sccNum) - parseInt(satB.sccNum);
     });
-
     this.updateWatchlist();
     (<HTMLInputElement>getEl('watchlist-new')).value = ''; // Clear the search box after enter pressed/selected
   }
@@ -352,7 +379,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       orbitManagerInstance.removeInViewOrbit(id);
     }
     // TODO: Clear lines from sensors to satellites
-    this.updateWatchlist([], [], true);
+    this.updateWatchlist({ updateWatchlistList: [], updateWatchlistInViewList: [], isSkipSearch: true });
   }
 
   /**

@@ -14,7 +14,7 @@ export class Line {
   };
 
   private gl_: WebGL2RenderingContext;
-  private uniforms_: { u_color: WebGLUniformLocation; u_camMatrix: WebGLUniformLocation; u_mvMatrix: WebGLUniformLocation; u_pMatrix: WebGLUniformLocation };
+  private uniforms_: { u_color: WebGLUniformLocation; u_camMatrix: WebGLUniformLocation; u_pMatrix: WebGLUniformLocation };
   private vertBuf_: WebGLBuffer;
 
   constructor(
@@ -25,7 +25,6 @@ export class Line {
     uniforms: {
       u_color: WebGLUniformLocation;
       u_camMatrix: WebGLUniformLocation;
-      u_mvMatrix: WebGLUniformLocation;
       u_pMatrix: WebGLUniformLocation;
     }
   ) {
@@ -40,7 +39,7 @@ export class Line {
   /**
    * This assumes that LineManager.drawFirst has already run and LineManager.drawLast will run after all lines are drawn.
    */
-  public draw(color = <vec4>[1.0, 1.0, 1.0, 1.0]) {
+  draw(color = <vec4>[1.0, 1.0, 1.0, 1.0]) {
     if (color[0] < 0 || color[0] > 1 || color[1] < 0 || color[1] > 1 || color[2] < 0 || color[2] > 1 || color[3] < 0 || color[3] > 1) {
       throw new Error('Invalid color');
     }
@@ -51,10 +50,10 @@ export class Line {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf_);
     gl.vertexAttribPointer(this.attribs_.a_position, 3, gl.FLOAT, false, 0, 0);
 
-    gl.drawArrays(gl.LINES, 0, 2); // Draw
+    gl.drawArrays(gl.LINES, 0, 2);
   }
 
-  public set(pt1: EciArr3, pt2: EciArr3) {
+  update(pt1: EciArr3, pt2: EciArr3) {
     GlUtils.bindBufferStreamDraw(this.gl_, this.vertBuf_, new Float32Array([pt1[0], pt1[1], pt1[2], pt2[0], pt2[1], pt2[2]]));
   }
 }

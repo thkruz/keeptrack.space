@@ -96,7 +96,17 @@ export class DotsManager {
     },
   };
 
-  shaders_ = null;
+  shaders_ = {
+    dots: {
+      vert: <string>null,
+      frag: <string>null,
+    },
+    picking: {
+      vert: <string>null,
+      frag: <string>null,
+    },
+  };
+
   sizeData: Int8Array;
   starIndex1: number;
   starIndex2: number;
@@ -269,7 +279,13 @@ export class DotsManager {
     this.settings_ = settings;
 
     this.initShaders_();
-    this.initProgram();
+    this.programs.dots.program = GlUtils.createProgram(
+      drawManagerInstance.gl,
+      this.shaders_.dots.vert,
+      this.shaders_.dots.frag,
+      this.programs.dots.attribs,
+      this.programs.dots.uniforms
+    );
 
     // Make buffers for satellite positions and size -- color and pickability are created in ColorScheme class
     this.buffers.position = drawManagerInstance.gl.createBuffer();
@@ -296,19 +312,6 @@ export class DotsManager {
    */
   initColorBuffer(colorBuffer: WebGLBuffer) {
     this.buffers.color = colorBuffer;
-  }
-
-  /**
-   * Initializes the dots program.
-   * @returns void
-   */
-  initProgram() {
-    const gl = keepTrackApi.getDrawManager().gl;
-    this.programs.dots.program = GlUtils.createProgramFromCode(gl, this.shaders_.dots.vert, this.shaders_.dots.frag);
-    gl.useProgram(this.programs.dots.program);
-
-    GlUtils.assignAttributes(this.programs.dots.attribs, gl, this.programs.dots.program, ['a_position', 'a_color', 'a_star']);
-    GlUtils.assignUniforms(this.programs.dots.uniforms, gl, this.programs.dots.program, ['u_minSize', 'u_maxSize', 'u_pMvCamMatrix']);
   }
 
   /**

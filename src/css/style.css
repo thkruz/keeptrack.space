@@ -721,7 +721,8 @@ ul {
   position: absolute;
   background: rgba(0, 0, 0, 0);
   color: white;
-  width: 260px;
+  max-width: 550px;
+  padding-left: 20px;
   top: 25px;
   bottom: 50px;
   overflow: auto;

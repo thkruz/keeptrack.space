@@ -4,12 +4,23 @@
 
 #sat-info-title {
   margin-bottom: 5px;
-  font-size: 18px;
-}
-
-.sat-info-title-header {
   font-size: 24px !important;
   padding: 5px 0 !important;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+#sat-info-title-name {
+  margin: 0px 25px;
+}
+
+#sat-add-remove-watchlist {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
 }
 
 .sat-info-section-header {

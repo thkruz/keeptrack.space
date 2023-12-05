@@ -5,6 +5,7 @@ import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { getClass } from '@app/js/lib/get-class';
 import { getEl } from '@app/js/lib/get-el';
 import { CameraType } from '@app/js/singletons/camera';
+import { LineTypes } from '@app/js/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import { SensorMath } from '@app/js/static/sensor-math';
@@ -162,7 +163,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
               const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
               const tearr = SensorMath.getTearr(sat, [sensor]);
               if (tearr.inView) {
-                keepTrackApi.getLineManager().create('sat6', [sat.id, catalogManagerInstance.getSensorFromSensorName(sensor.name)], 'g');
+                keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, catalogManagerInstance.getSensorFromSensorName(sensor.name)], 'g');
               }
             });
           });

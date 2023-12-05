@@ -4,7 +4,7 @@ import numeric from 'numeric';
 import { ControlSiteObject } from '../../catalogs/control-sites';
 import { SatObject, SensorObject } from '../../interfaces';
 import { RAD2DEG } from '../../lib/constants';
-import { LineManager } from '../draw-manager/line-manager';
+import { LineManager, LineTypes } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { TimeManager } from '../time-manager';
 
@@ -188,8 +188,8 @@ export class SatLinkManager {
           for (let j = 0; j < satlist.length; j++) {
             if (i !== j) {
               const catalogManagerInstance = keepTrackApi.getCatalogManager();
-              var sat1 = catalogManagerInstance.getSat(satlist[i]);
-              var sat2 = catalogManagerInstance.getSat(satlist[j]);
+              const sat1 = catalogManagerInstance.getSat(satlist[i]);
+              const sat2 = catalogManagerInstance.getSat(satlist[j]);
               //
               // Debug for finding decayed satellites
               //
@@ -213,19 +213,19 @@ export class SatLinkManager {
               if (theta < minTheta) {
                 // Intentional
               } else {
-                lineManager.create('sat5', [sat1.id, sat2.id], [0, 0.6, 1, 1]);
+                lineManager.create(LineTypes.SENSOR_TO_SAT, [sat1.id, sat2.id], [0, 0.6, 1, 1]);
               }
             }
           }
         }
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        for (let i = 0; i < userlist.length; i++) {
-          let id = catalogManagerInstance.getSensorFromSensorName(userlist[i].toString());
+        for (const sensorName of userlist) {
+          let id = catalogManagerInstance.getSensorFromSensorName(sensorName.toString());
           let user = <SensorObject>(<unknown>catalogManagerInstance.getSat(id));
           let bestSat: SatObject = null;
           let bestRange = 1000000;
-          for (let j = 0; j < satlist.length; j++) {
-            const sat = catalogManagerInstance.getSat(satlist[j]);
+          for (const satId of satlist) {
+            const sat = catalogManagerInstance.getSat(satId);
             const tearr = SensorMath.getTearr(sat, [user], timeManager.simulationTimeObj);
             if (tearr.el > elevationMask) {
               if (tearr.rng < bestRange) {
@@ -234,7 +234,7 @@ export class SatLinkManager {
               }
             }
           }
-          if (bestSat) lineManager.create('sat5', [bestSat.id, id], [0, 1.0, 0.6, 1.0]);
+          if (bestSat) lineManager.create(LineTypes.SENSOR_TO_SAT, [bestSat.id, id], [0, 1.0, 0.6, 1.0]);
         }
       } catch (e) {
         // Intentionally empty
@@ -245,16 +245,16 @@ export class SatLinkManager {
       try {
         // Loop through all the users
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        for (let i = 0; i < userlist.length; i++) {
+        for (const sensorName of userlist) {
           // Select the current user
-          let user = <SensorObject>(<unknown>catalogManagerInstance.getSat(catalogManagerInstance.getSensorFromSensorName(userlist[i].toString())));
+          let user = <SensorObject>(<unknown>catalogManagerInstance.getSat(catalogManagerInstance.getSensorFromSensorName(sensorName.toString())));
           if (!user) continue;
           // Loop through all of the satellites
           let bestSat: SatObject = null;
           let bestRange = 1000000;
-          for (let j = 0; j < satlist.length; j++) {
+          for (const satId of satlist) {
             // Select the current satelltie
-            let sat = catalogManagerInstance.getSat(satlist[j]);
+            let sat = catalogManagerInstance.getSat(satId);
             // Calculate Time, Elevation, Azimuth, Range, and Range Rate data
             // of the current satellite relevant to the current user. This allows
             // us to figure out if the user can see the satellite
@@ -276,7 +276,7 @@ export class SatLinkManager {
             }
           }
           // Draw a line from the user to the satellite
-          lineManager.create('sat5', [bestSat.id, catalogManagerInstance.getSensorFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
+          lineManager.create(LineTypes.SENSOR_TO_SAT, [bestSat.id, catalogManagerInstance.getSensorFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
         }
       } catch (e) {
         errorManagerInstance.info(e);

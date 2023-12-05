@@ -5,7 +5,7 @@ import { getEl } from '@app/js/lib/get-el';
 import debugPng from '@app/img/icons/debug.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 
-import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
@@ -119,7 +119,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
             if (sat) {
               const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
               const position = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
-              lineManagerInstance.create('sat2', [selectedSat, position[0], position[1], position[2]], 'o');
+              lineManagerInstance.create(LineTypes.REF_TO_SAT, [selectedSat, position[0], position[1], position[2]], 'o');
             }
           }
         });
@@ -128,7 +128,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           const camera = keepTrackApi.getMainCamera();
           if (camera) {
             const position = camera.getCameraPosition();
-            lineManagerInstance.create('ref', [position[0], position[1], position[2]], 'r');
+            lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [position[0], position[1], position[2]], 'r');
           }
         });
       },

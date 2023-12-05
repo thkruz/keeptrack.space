@@ -14,7 +14,7 @@ import { triggerSubmit } from '../../lib/trigger-submit';
 import { waitForCruncher } from '../../lib/waitForCruncher';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { LegendManager } from '../../static/legend-manager';
-import { lineManagerInstance } from '../draw-manager/line-manager';
+import { LineTypes, lineManagerInstance } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { PersistenceManager, StorageKey } from '../persistence-manager';
@@ -488,9 +488,9 @@ export class MouseInput {
         }
         break;
       case 'line-eci-axis-rmb':
-        lineManagerInstance.create('ref', [25000, 0, 0], 'r');
-        lineManagerInstance.create('ref', [0, 25000, 0], 'g');
-        lineManagerInstance.create('ref', [0, 0, 25000], 'b');
+        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [25000, 0, 0], 'r');
+        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [0, 25000, 0], 'g');
+        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [0, 0, 25000], 'b');
         break;
       case 'line-eci-xgrid-rmb':
         lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 1], 1);
@@ -502,18 +502,18 @@ export class MouseInput {
         lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 1], 1);
         break;
       case 'line-earth-sat-rmb':
-        lineManagerInstance.create('sat', this.clickedSat, 'p');
+        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_SAT, [this.clickedSat], 'p');
         break;
       case 'line-sensor-sat-rmb':
         // Sensor always has to be #2
-        lineManagerInstance.create('sat5', [this.clickedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name)], 'p');
+        lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.clickedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name)], 'p');
         break;
       case 'line-sat-sat-rmb':
-        lineManagerInstance.create('sat5', [this.clickedSat, catalogManagerInstance.selectedSat], 'b');
+        lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.clickedSat, catalogManagerInstance.selectedSat], 'b');
         break;
       case 'line-sat-sun-rmb':
         lineManagerInstance.create(
-          'sat2',
+          LineTypes.REF_TO_SAT,
           [
             this.clickedSat,
             drawManagerInstance.sceneManager.sun.drawPosition[0],
@@ -552,32 +552,32 @@ export class MouseInput {
         MouseInput.resetCurrentEarthTexture();
         settingsManager.blueImages = true;
         MouseInput.saveMapToLocalStorage('blue');
-        drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         break;
       case 'earth-nasa-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.nasaImages = true;
         MouseInput.saveMapToLocalStorage('nasa');
-        drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         break;
       case 'earth-trusat-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.trusatImages = true;
         MouseInput.saveMapToLocalStorage('trusat');
-        drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         break;
       case 'earth-low-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.lowresImages = true;
         MouseInput.saveMapToLocalStorage('low');
-        drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         break;
       case 'earth-high-rmb':
         showLoading(() => {
           MouseInput.resetCurrentEarthTexture();
           settingsManager.hiresImages = true;
           MouseInput.saveMapToLocalStorage('high');
-          drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+          drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         });
         break;
       case 'earth-high-no-clouds-rmb':
@@ -585,20 +585,20 @@ export class MouseInput {
           MouseInput.resetCurrentEarthTexture();
           settingsManager.hiresNoCloudsImages = true;
           MouseInput.saveMapToLocalStorage('high-nc');
-          drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+          drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         });
         break;
       case 'earth-vec-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.vectorImages = true;
         MouseInput.saveMapToLocalStorage('vec');
-        drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         break;
       case 'earth-political-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.politicalImages = true;
         MouseInput.saveMapToLocalStorage('political'); // TODO: Verify this
-        drawManagerInstance.sceneManager.earth.reloadEarthTextures();
+        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
         break;
       case 'clear-screen-rmb':
         if (keepTrackApi.getPlugin(TimeMachine)) {

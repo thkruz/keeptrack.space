@@ -56,7 +56,8 @@ export type KeepTrackApiRegisterParams = {
     | ((sat: SatObject, satId: number) => void)
     | ((sensor: SensorObject) => void)
     | ((gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => void)
-    | ((sensor: SensorObject | string, staticNum: number) => void);
+    | ((sensor: SensorObject | string, staticNum: number) => void)
+    | ((watchlistList: number[]) => void);
 };
 
 /**

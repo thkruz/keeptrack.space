@@ -1,3 +1,5 @@
+import addPng from '@app/img/add.png';
+import removePng from '@app/img/remove.png';
 import { GetSatType, SatObject } from '@app/js/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { openColorbox } from '@app/js/lib/colorbox';
@@ -5,7 +7,7 @@ import { MINUTES_PER_DAY, RAD2DEG } from '@app/js/lib/constants';
 import { getEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { getDayOfYear } from '@app/js/lib/transforms';
-import { lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
 import { SearchManager } from '@app/js/singletons/search-manager';
 import { CatalogSource } from '@app/js/static/catalog-loader';
 import { CatalogSearch } from '@app/js/static/catalog-search';
@@ -15,6 +17,7 @@ import { StringExtractor } from '@app/js/static/string-extractor';
 import Draggabilly from 'draggabilly';
 import * as Ootk from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { WatchlistPlugin } from '../watchlist/watchlist';
 import './satInfoboxCore.css';
 import { SelectSatManager } from './select-sat-manager';
 
@@ -156,7 +159,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     const drawManagerInstance = keepTrackApi.getDrawManager();
 
     lineManagerInstance.create(
-      'sat2',
+      LineTypes.REF_TO_SAT,
       [
         keepTrackApi.getCatalogManager().selectedSat,
         drawManagerInstance.sceneManager.sun.drawPosition[0],
@@ -168,14 +171,14 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 
   private static drawLineToEarth() {
-    lineManagerInstance.create('sat', keepTrackApi.getCatalogManager().selectedSat, 'p');
+    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_SAT, [keepTrackApi.getCatalogManager().selectedSat], 'p');
   }
 
   private static drawLineToSat() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (catalogManagerInstance.secondarySat == -1) keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', 'caution');
-    lineManagerInstance.create('sat5', [catalogManagerInstance.selectedSat, catalogManagerInstance.secondarySat], 'b');
+    lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [catalogManagerInstance.selectedSat, catalogManagerInstance.secondarySat], 'b');
   }
 
   private static updateOrbitData = (sat: SatObject): void => {
@@ -218,6 +221,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       elsetAgeDom.dataset.tooltip = 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString();
     }
 
+    getEl('sat-add-remove-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
     getEl('all-objects-link').addEventListener('click', SatInfoBoxCore.allObjectsLink);
     getEl('near-orbits-link').addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
     getEl('near-objects-link1').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
@@ -236,6 +240,19 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       this.issecondaryDataLoaded = true;
     }
   };
+
+  private static addRemoveWatchlist() {
+    const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
+    if (watchlistPlugin) {
+      const id = keepTrackApi.getCatalogManager().selectedSat;
+
+      if (watchlistPlugin.isOnWatchlist(id)) {
+        watchlistPlugin.removeSat(id);
+      } else {
+        watchlistPlugin.addSat(id);
+      }
+    }
+  }
 
   private static updateConfidenceDom(sat: SatObject) {
     let color = '';
@@ -277,8 +294,21 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat.static || sat.staticNum >= 0) return;
 
     const isHasAltName = sat?.altName && sat.altName !== '';
-    getEl('sat-info-title').innerHTML = sat.name;
+    getEl('sat-info-title-name').innerHTML = sat.name;
     getEl('sat-alt-name').innerHTML = isHasAltName ? sat.altName : 'N/A';
+
+    const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
+    if (watchlistPlugin) {
+      getEl('sat-add-remove-watchlist').style.display = 'block';
+
+      if (watchlistPlugin.isOnWatchlist(sat.id)) {
+        (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = removePng;
+      } else {
+        (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = addPng;
+      }
+    } else {
+      getEl('sat-add-remove-watchlist').style.display = 'none';
+    }
 
     SatInfoBoxCore.updateSatType(sat);
 
@@ -482,7 +512,12 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       keepTrackApi.html`
             <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
               <div id="sat-info-top-links">
-                <div id="sat-info-title" class="center-text sat-info-section-header sat-info-title-header">This is a title</div>
+                <div id="sat-info-title" class="center-text sat-info-section-header">
+                  <img id="sat-add-remove-watchlist" src="${addPng}"/>
+                  <span id="sat-info-title-name">
+                    This is a title
+                  </span>
+                </div>
                 <div id="all-objects-link" class="link sat-infobox-links sat-only-info tooltipped" data-position="top" data-delay="50"
                 data-tooltip="Find Related Objects">Find all objects from this launch...</div>
                 <div id="near-orbits-link" class="link sat-infobox-links sat-only-info tooltipped" data-position="top" data-delay="50"

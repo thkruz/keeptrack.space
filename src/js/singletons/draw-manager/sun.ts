@@ -164,7 +164,7 @@ export class Sun {
   public async init(gl: WebGL2RenderingContext): Promise<void> {
     this.gl_ = gl;
 
-    this.initProgram_();
+    this.program_ = GlUtils.createProgram(this.gl_, this.shaders_.sun.vert, this.shaders_.sun.frag, this.attribs_, this.uniforms_);
     this.initBuffers_();
     this.initVao_();
     this.initGodrays();
@@ -173,7 +173,7 @@ export class Sun {
   }
 
   public initGodrays() {
-    this.initGodraysProgram_();
+    this.godrays.program = GlUtils.createProgram(this.gl_, this.shaders_.godrays.vert, this.shaders_.godrays.frag, this.attribs_, this.uniforms_);
     this.initGodraysBuffers_();
     this.initGodraysVao_();
     this.initGodraysTextures_();
@@ -194,13 +194,6 @@ export class Sun {
     this.godrays.buffers.texCoordBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.godrays.buffers.texCoordBuf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]), gl.STATIC_DRAW);
-  }
-
-  public initGodraysProgram_() {
-    this.godrays.program = GlUtils.createProgramFromCode(this.gl_, this.shaders_.godrays.vert, this.shaders_.godrays.frag);
-    this.gl_.useProgram(this.godrays.program);
-    GlUtils.assignAttributes(this.godrays.attribs, this.gl_, this.godrays.program, ['a_position', 'a_texCoord']);
-    GlUtils.assignUniforms(this.godrays.uniforms, this.gl_, this.godrays.program, ['u_sunPosition', 'u_sampler', 'u_resolution']);
   }
 
   public initGodraysTextures_() {
@@ -302,13 +295,6 @@ export class Sun {
 
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.godrays.textureMap.texture, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.godrays.renderBuffer);
-  }
-
-  private initProgram_() {
-    this.program_ = GlUtils.createProgramFromCode(this.gl_, this.shaders_.sun.vert, this.shaders_.sun.frag);
-    this.gl_.useProgram(this.program_);
-    GlUtils.assignAttributes(this.attribs_, this.gl_, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, this.gl_, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_lightDir', 'u_sunDistance']);
   }
 
   private initVao_() {
@@ -421,7 +407,7 @@ export class Sun {
           color += newColor;
 
           // Update the illumination decay factor
-          illuminationDecay *= decay;        
+          illuminationDecay *= decay;
         }
         color = color * exposure;
 

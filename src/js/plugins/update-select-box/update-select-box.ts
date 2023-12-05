@@ -1,3 +1,5 @@
+import addPng from '@app/img/add.png';
+import removePng from '@app/img/remove.png';
 import { MissileObject, SatObject, SensorObject } from '@app/js/interfaces';
 import { KeepTrackApiEvents, isMissileObject, isSatObject, isSensorObject, keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD, cKmPerMs } from '@app/js/lib/constants';
@@ -213,6 +215,28 @@ export class UpdateSatManager extends KeepTrackPlugin {
           }
         } catch (e) {
           errorManagerInstance.debug('Error updating satellite info!');
+        }
+      },
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onWatchlistUpdated,
+      cbName: this.PLUGIN_NAME,
+      cb: (watchlistList: number[]) => {
+        let isOnList = false;
+        watchlistList.forEach((satId) => {
+          if (satId === keepTrackApi.getCatalogManager().selectedSat) {
+            isOnList = true;
+          }
+        });
+
+        const addRemoveWatchlistDom = getEl('sat-add-remove-watchlist');
+        if (addRemoveWatchlistDom) {
+          if (isOnList) {
+            (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = removePng;
+          } else {
+            (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = addPng;
+          }
         }
       },
     });

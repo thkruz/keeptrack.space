@@ -14,7 +14,19 @@ import { SensorMath } from '../../static/sensor-math';
 import { DrawManager } from '../draw-manager';
 import { Line } from './line-manager/line';
 
-export type LineTypes = 'sat' | 'sat2' | 'sat3' | 'sat4' | 'sat5' | 'sat6' | 'scan' | 'scan2' | 'misl' | 'ref' | 'ref2';
+export enum LineTypes {
+  CENTER_OF_EARTH_TO_SAT = 'sat',
+  REF_TO_SAT = 'sat2',
+  SELECTED_SENSOR_TO_SAT_IF_IN_FOV = 'sat3',
+  SELECTED_SENSOR_TO_SELECTED_SAT_IF_IN_FOV = 'sat4',
+  SENSOR_TO_SAT = 'sat5',
+  MULTI_SENSORS_TO_SAT = 'sat6',
+  SAT_SCAN_EARTH = 'scan',
+  SENSOR_SCAN_HORIZON = 'scan2',
+  SAT_TO_MISL = 'misl',
+  CENTER_OF_EARTH_TO_REF = 'ref',
+  REF_TO_REF = 'ref2',
+}
 export type LineColors = 'r' | 'o' | 'y' | 'g' | 'b' | 'c' | 'p' | 'w' | [number, number, number, number];
 
 export type LineTask = {
@@ -40,85 +52,27 @@ export type LineTask = {
   maxAz?: Degrees;
   minEl?: Degrees;
   maxRng?: Kilometers;
+  type: LineTypes;
 };
 
 export class LineManager {
-  // #region Properties (7)
-
-  private shaders_ = {
-    frag: `#version 300 es
-      precision mediump float;
-
-      in vec4 vColor;
-      in float vAlpha;
-
-      out vec4 fragColor;
-
-      void main(void) {
-        fragColor = vec4(vColor[0],vColor[1],vColor[2], vColor[3] * vAlpha);
-      }
-      `,
-    vert: `#version 300 es
-      in vec4 a_position;
-
-      uniform vec4 u_color;
-      uniform mat4 u_camMatrix;
-      uniform mat4 u_mvMatrix;
-      uniform mat4 u_pMatrix;
-
-      out vec4 vColor;
-      out float vAlpha;
-
-      void main(void) {
-          vec4 position = u_pMatrix * u_camMatrix *  u_mvMatrix * vec4(a_position[0],a_position[1],a_position[2], 1.0);
-          gl_Position = position;
-          vColor = u_color;
-          vAlpha = a_position[3];
-      }
-      `,
-  };
-
   private attribs_ = {
     a_position: 0,
   };
 
+  private gl_: WebGL2RenderingContext;
+  private tempStar1_: SatObject;
+  private tempStar2_: SatObject;
   private uniforms_ = {
     u_color: <WebGLUniformLocation>null,
     u_camMatrix: <WebGLUniformLocation>null,
-    u_mvMatrix: <WebGLUniformLocation>null,
     u_pMatrix: <WebGLUniformLocation>null,
   };
 
-  public drawLineList = <LineTask[]>[];
-  private gl_: WebGL2RenderingContext;
-  public program: WebGLProgram;
-  private tempStar1_: SatObject;
-  private tempStar2_: SatObject;
+  drawLineList = <LineTask[]>[];
+  program: WebGLProgram;
 
-  // #endregion Properties (7)
-
-  // #region Constructors (1)
-
-  init() {
-    this.gl_ = keepTrackApi.getDrawManager().gl;
-    this.initProgram_();
-  }
-
-  private initProgram_() {
-    const gl = this.gl_;
-    this.program = GlUtils.createProgramFromCode(gl, this.shaders_.vert, this.shaders_.frag);
-    this.gl_.useProgram(this.program);
-
-    // Assign Attributes
-    GlUtils.assignAttributes(this.attribs_, gl, this.program, ['a_position']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_color']);
-  }
-
-  // #endregion Constructors (1)
-
-  // #region Public Static Methods (1)
-
-  public static getColor(color?: LineColors): [number, number, number, number] {
+  static getColor(color?: LineColors): [number, number, number, number] {
     color ??= [1.0, 0, 1.0, 1.0];
     switch (color) {
       case 'r':
@@ -154,225 +108,295 @@ export class LineManager {
     return color;
   }
 
-  // #endregion Public Static Methods (1)
-
-  // #region Public Methods (8)
-
-  public clear(): void {
+  clear(): void {
     this.drawLineList = [];
   }
 
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
-  // prettier-ignore
-  public create(type: LineTypes, value: number[] | number, inputColor?: LineColors): void { // NOSONAR
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const getSat = catalogManagerInstance.getSat.bind(catalogManagerInstance);
-    let sat = null;
-    let sat2 = null;
-
+  create(type: LineTypes, value: number[], inputColor?: LineColors): void {
     const color = LineManager.getColor(inputColor);
 
-    // Center of the Earth to the Satellite
-    if (type == 'sat') {
-      const sat = getSat(<number>value);
-      if (!sat || !sat.position || !sat.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        ref: [0, 0, 0],
-        ref2: [sat.position.x, sat.position.y, sat.position.z],
-        color: color,
-      });
-    }
-    // Reference Point to Satellite
-    if (type == 'sat2') {
-      sat = getSat(value[0]);
-      if (!sat || !sat.position || !sat.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        ref: [value[1], value[2], value[3]],
-        ref2: [sat.position.x, sat.position.y, sat.position.z],
-        color: color,
-      });
-    }
-    // Sensor to Satellite When in View of Currently Selected Sensor
-    if (type == 'sat3') {
-      sat = getSat(value[0]);
-      sat2 = getSat(value[1]);
-      if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        console.debug(sat2);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        sat2: sat2,
-        ref: [sat.position.x, sat.position.y, sat.position.z],
-        ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
-        color: color,
-        isOnlyInFOV: true,
-        isDrawWhenSelected: false,
-      });
-    }
-    // Sensor to Satellite When in View of Currently Selected Sensor and Satellite Selected
-    if (type == 'sat4') {
-      sat = getSat(value[0]);
-      sat2 = getSat(value[1]);
-      if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        console.debug(sat2);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        sat2: sat2,
-        ref: [sat.position.x, sat.position.y, sat.position.z],
-        ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
-        color: color,
-        isOnlyInFOV: true,
-        isDrawWhenSelected: true,
-      });
-    }
-
-    // One Sensor to Satellite
-    if (type == 'sat5') {
-      sat = getSat(value[0]);
-      sat2 = getSat(value[1]);
-      if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        console.debug(sat2);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        sat2: sat2,
-        ref: [sat.position.x, sat.position.y, sat.position.z],
-        ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
-        color: color,
-        isOnlyInFOV: false,
-        isDrawWhenSelected: false,
-      });
-    }
-    // Multiple Sensors to Satellite
-    if (type == 'sat6') {
-      sat = getSat(value[0]);
-      sat2 = getSat(value[1]);
-      if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        console.debug(sat2);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        sat2: sat2,
-        ref: [sat.position.x, sat.position.y, sat.position.z],
-        ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
-        color: color,
-        isOnlyInFOV: true,
-        isDrawWhenSelected: false,
-        isCalculateIfInFOV: true,
-      });
-    }
-    // Scanning Satellite to Reference Points on Earth in FOV
-    if (type == 'scan') {
-      sat = getSat(value[0]);
-      if (!sat || !sat.position || !sat.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        ref: [0, 0, 0],
-        ref2: [sat.position.x, sat.position.y, sat.position.z],
-        color: color,
-        isScan: true,
-        lat: <Degrees>-90,
-        lon: <Degrees>0,
-      });
-    }
-
-    // Scanning Satellite to Reference Points on Earth in FOV
-    if (type == 'scan2') {
-      sat = getSat(value[0]);
-      if (!sat || !sat.position || !sat.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        ref: [0, 0, 0],
-        ref2: [sat.position.x, sat.position.y, sat.position.z],
-        color: color,
-        isScan2: true,
-        az: value[1],
-        minAz: value[1],
-        maxAz: value[2],
-        minEl: value[3],
-        maxRng: value[4],
-      });
-    }
-
-    // Satellite to Missile
-    if (type == 'misl') {
-      sat = getSat(value[0]);
-      sat2 = getSat(value[1]);
-      if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
-        console.debug(`No Satellite Position Available for Line`);
-        console.debug(sat);
-        console.debug(sat2);
-        return;
-      }
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        sat: sat,
-        sat2: sat2,
-        ref: [sat.position.x, sat.position.y, sat.position.z],
-        ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
-        color: color,
-      });
-    }
-
-    if (type == 'ref') {
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        ref: [0, 0, 0],
-        ref2: [value[0], value[1], value[2]],
-        color: color,
-      });
-    }
-    if (type == 'ref2') {
-      this.drawLineList.push({
-        line: new Line(this.gl_, this.attribs_, this.uniforms_),
-        ref: [value[0], value[1], value[2]],
-        ref2: [value[3], value[4], value[5]],
-        color: color,
-      });
+    switch (type) {
+      case LineTypes.CENTER_OF_EARTH_TO_SAT:
+        this.createSat_(value as [number], color);
+        break;
+      case LineTypes.REF_TO_SAT:
+        this.createSat2_(value as [number, number, number, number], color);
+        break;
+      case LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV:
+        this.createSat3_(value as [number, number], color);
+        break;
+      case LineTypes.SELECTED_SENSOR_TO_SELECTED_SAT_IF_IN_FOV:
+        this.createSat4_(value as [number, number], color);
+        break;
+      case LineTypes.SENSOR_TO_SAT:
+        this.createSat5_(value as [number, number], color);
+        break;
+      case LineTypes.MULTI_SENSORS_TO_SAT:
+        this.createSat6_(value as [number, number], color);
+        break;
+      case LineTypes.SAT_SCAN_EARTH:
+        this.createScan_(value as [number], color);
+        break;
+      case LineTypes.SENSOR_SCAN_HORIZON:
+        this.createScan2_(value as [number, Degrees, Degrees, Degrees, Kilometers], color);
+        break;
+      case LineTypes.SAT_TO_MISL:
+        this.createMisl_(value as [number, number], color);
+        break;
+      case LineTypes.CENTER_OF_EARTH_TO_REF:
+        this.createRef_(value as [number, number, number], color);
+        break;
+      case LineTypes.REF_TO_REF:
+        this.createRef2_(value as [number, number, number, number, number, number], color);
+        break;
+      default:
+        break;
     }
   }
 
-  public createGrid(type: 'x' | 'y' | 'z', inputColor?: LineColors, scalar?: number): void {
+  /**
+   * Reference Point to Reference Point
+   */
+  private createRef2_(value: [number, number, number, number, number, number], color: [number, number, number, number]) {
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      ref: [value[0], value[1], value[2]],
+      ref2: [value[3], value[4], value[5]],
+      color: color,
+      type: LineTypes.REF_TO_REF,
+    });
+  }
+
+  /**
+   * Center of the Earth to the Reference Point
+   */
+  private createRef_(value: [number, number, number], color: [number, number, number, number]) {
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      ref: [0, 0, 0],
+      ref2: [value[0], value[1], value[2]],
+      color: color,
+      type: LineTypes.CENTER_OF_EARTH_TO_REF,
+    });
+  }
+
+  /**
+   * Satellite to Missile
+   */
+  private createMisl_(value: [number, number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      console.debug(sat2);
+      return;
+    }
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      sat2: sat2,
+      ref: [sat.position.x, sat.position.y, sat.position.z],
+      ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+      color: color,
+      type: LineTypes.SAT_TO_MISL,
+    });
+  }
+
+  /**
+   * Center of the Earth to the Satellite
+   */
+  private createSat_(value: [number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    if (!sat?.position?.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      return;
+    }
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      ref: [0, 0, 0],
+      ref2: [sat.position.x, sat.position.y, sat.position.z],
+      color: color,
+      type: LineTypes.CENTER_OF_EARTH_TO_SAT,
+    });
+  }
+
+  /**
+   * Reference Point to Satellite
+   */
+  private createSat2_(value: [number, number, number, number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    if (!sat?.position?.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      return;
+    }
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      ref: [value[1], value[2], value[3]],
+      ref2: [sat.position.x, sat.position.y, sat.position.z],
+      color: color,
+      type: LineTypes.REF_TO_SAT,
+    });
+  }
+
+  /**
+   * Sensor to Satellite When in View of Currently Selected Sensor
+   */
+  private createSat3_(value: [number, number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+
+    if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      console.debug(sat2);
+      return;
+    }
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      sat2: sat2,
+      ref: [sat.position.x, sat.position.y, sat.position.z],
+      ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+      color: color,
+      isOnlyInFOV: true,
+      isDrawWhenSelected: false,
+      type: LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV,
+    });
+  }
+
+  /**
+   * Sensor to Satellite When in View of Currently Selected Sensor and Satellite Selected
+   */
+  private createSat4_(value: [number, number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      console.debug(sat2);
+      return;
+    }
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      sat2: sat2,
+      ref: [sat.position.x, sat.position.y, sat.position.z],
+      ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+      color: color,
+      isOnlyInFOV: true,
+      isDrawWhenSelected: true,
+      type: LineTypes.SELECTED_SENSOR_TO_SELECTED_SAT_IF_IN_FOV,
+    });
+  }
+
+  /**
+   * One Sensor to Satellite
+   */
+  private createSat5_(value: [number, number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      console.debug(sat2);
+      return;
+    }
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      sat2: sat2,
+      ref: [sat.position.x, sat.position.y, sat.position.z],
+      ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+      color: color,
+      isOnlyInFOV: false,
+      isDrawWhenSelected: false,
+      type: LineTypes.SENSOR_TO_SAT,
+    });
+  }
+
+  /**
+   * Multiple Sensors to Satellite
+   */
+  private createSat6_(value: [number, number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      console.debug(sat2);
+      return;
+    }
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      sat2: sat2,
+      ref: [sat.position.x, sat.position.y, sat.position.z],
+      ref2: [sat2.position.x, sat2.position.y, sat2.position.z],
+      color: color,
+      isOnlyInFOV: true,
+      isDrawWhenSelected: false,
+      isCalculateIfInFOV: true,
+      type: LineTypes.MULTI_SENSORS_TO_SAT,
+    });
+  }
+
+  /**
+   * Scanning Satellite to Reference Points on Earth in FOV
+   */
+  private createScan_(value: [number], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    if (!sat?.position?.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      return;
+    }
+
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      ref: [0, 0, 0],
+      ref2: [sat.position.x, sat.position.y, sat.position.z],
+      color: color,
+      isScan: true,
+      lat: <Degrees>-90,
+      lon: <Degrees>0,
+      type: LineTypes.SAT_SCAN_EARTH,
+    });
+  }
+
+  /**
+   * Scanning Satellite to Reference Points on Earth in FOV
+   */
+  private createScan2_(value: [number, Degrees, Degrees, Degrees, Kilometers], color: [number, number, number, number]) {
+    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    if (!sat?.position?.x) {
+      console.debug(`No Satellite Position Available for Line`);
+      console.debug(sat);
+      return;
+    }
+
+    this.drawLineList.push({
+      line: new Line(this.gl_, this.attribs_, this.uniforms_),
+      sat: sat,
+      ref: [0, 0, 0],
+      ref2: [sat.position.x, sat.position.y, sat.position.z],
+      color: color,
+      isScan2: true,
+      az: value[1],
+      minAz: value[1],
+      maxAz: value[2],
+      minEl: value[3],
+      maxRng: value[4],
+      type: LineTypes.SENSOR_SCAN_HORIZON,
+    });
+  }
+
+  createGrid(type: 'x' | 'y' | 'z', inputColor?: LineColors, scalar?: number): void {
     if (type !== 'x' && type !== 'y' && type !== 'z') {
       throw new Error('Invalid type');
     }
@@ -394,12 +418,14 @@ export class LineManager {
             ref: [num2, i * num1, 0],
             ref2: [-num2, i * num1, 0],
             color: color,
+            type: LineTypes.REF_TO_REF,
           });
           this.drawLineList.push({
             line: new Line(this.gl_, this.attribs_, this.uniforms_),
             ref: [i * num1, num2, 0],
             ref2: [i * num1, -num2, 0],
             color: color,
+            type: LineTypes.REF_TO_REF,
           });
         }
         break;
@@ -410,12 +436,14 @@ export class LineManager {
             ref: [num2, 0, i * num1],
             ref2: [-num2, 0, i * num1],
             color: color,
+            type: LineTypes.REF_TO_REF,
           });
           this.drawLineList.push({
             line: new Line(this.gl_, this.attribs_, this.uniforms_),
             ref: [i * num1, 0, num2],
             ref2: [i * num1, 0, -num2],
             color: color,
+            type: LineTypes.REF_TO_REF,
           });
         }
         break;
@@ -426,26 +454,27 @@ export class LineManager {
             ref: [0, num2, i * num1],
             ref2: [0, -num2, i * num1],
             color: color,
+            type: LineTypes.REF_TO_REF,
           });
           this.drawLineList.push({
             line: new Line(this.gl_, this.attribs_, this.uniforms_),
             ref: [0, i * num1, num2],
             ref2: [0, i * num1, -num2],
             color: color,
+            type: LineTypes.REF_TO_REF,
           });
         }
         break;
     }
   }
 
-  public draw(drawManager: DrawManager, inViewData: Int8Array, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null): void {
+  draw(drawManager: DrawManager, inViewData: Int8Array, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null): void {
     const gl = this.gl_;
     const { gmst, pMatrix } = drawManager;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
 
-    gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, mat4.create());
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
 
@@ -485,14 +514,14 @@ export class LineManager {
                   }
                 });
               }
-              this.drawLineList[i].line.set(
+              this.drawLineList[i].line.update(
                 [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
                 [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
               );
             } else {
               // Two Satellites
               this.drawLineList[i].sat2 = catalogManagerInstance.getSat(this.drawLineList[i].sat2.id, GetSatType.POSITION_ONLY);
-              this.drawLineList[i].line.set(
+              this.drawLineList[i].line.update(
                 [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
                 [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
               );
@@ -518,7 +547,7 @@ export class LineManager {
                 const el = rae.el * RAD2DEG;
                 if (el > settingsManager.lineScanMinEl) {
                   const pos = Transforms.lla2ecf(lla);
-                  this.drawLineList[i].line.set(
+                  this.drawLineList[i].line.update(
                     [pos.x, pos.y, pos.z],
                     [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]
                   );
@@ -564,10 +593,13 @@ export class LineManager {
                 gmst
               );
               // Update the line
-              this.drawLineList[i].line.set([pos.x, pos.y, pos.z], [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]);
+              this.drawLineList[i].line.update(
+                [pos.x, pos.y, pos.z],
+                [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]
+              );
             } else {
               // Just One Satellite
-              this.drawLineList[i].line.set(this.drawLineList[i].ref, [
+              this.drawLineList[i].line.update(this.drawLineList[i].ref, [
                 this.drawLineList[i].sat.position.x,
                 this.drawLineList[i].sat.position.y,
                 this.drawLineList[i].sat.position.z,
@@ -593,13 +625,13 @@ export class LineManager {
           }
           this.tempStar1_ = catalogManagerInstance.getSat(this.drawLineList[i].star1ID, GetSatType.POSITION_ONLY);
           this.tempStar2_ = catalogManagerInstance.getSat(this.drawLineList[i].star2ID, GetSatType.POSITION_ONLY);
-          this.drawLineList[i].line.set(
+          this.drawLineList[i].line.update(
             [this.tempStar1_.position.x, this.tempStar1_.position.y, this.tempStar1_.position.z],
             [this.tempStar2_.position.x, this.tempStar2_.position.y, this.tempStar2_.position.z]
           );
         } else {
           // Arbitrary Lines
-          this.drawLineList[i].line.set(this.drawLineList[i].ref, this.drawLineList[i].ref2);
+          this.drawLineList[i].line.update(this.drawLineList[i].ref, this.drawLineList[i].ref2);
         }
 
         this.drawLineList[i].line.draw(this.drawLineList[i].color);
@@ -618,7 +650,7 @@ export class LineManager {
     gl.disableVertexAttribArray(this.attribs_.a_position); // Reset
   }
 
-  public drawWhenSelected(): void {
+  drawWhenSelected(): void {
     for (let i = 0; i < this.drawLineList.length; i++) {
       if (this.drawLineList[i].isDrawWhenSelected) {
         this.drawLineList.splice(i, 1);
@@ -626,31 +658,12 @@ export class LineManager {
     }
   }
 
-  public getLineListLen(): number {
-    return this.drawLineList.length;
+  init() {
+    this.gl_ = keepTrackApi.getDrawManager().gl;
+    this.program = GlUtils.createProgram(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_);
   }
 
-  setWorldUniforms(camMatrix: mat4, pMatrix: mat4) {
-    const gl = this.gl_;
-    gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, mat4.create());
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
-  }
-
-  setColorUniforms(color: vec4) {
-    this.gl_.uniform4fv(this.uniforms_.u_color, color);
-  }
-
-  setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
-    const gl = this.gl_;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.vertexAttribPointer(this.attribs_.a_position, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(this.attribs_.a_position);
-    gl.drawArrays(gl.LINE_STRIP, 0, segments);
-    gl.disableVertexAttribArray(this.attribs_.a_position);
-  }
-
-  public removeStars(): boolean {
+  removeStars(): boolean {
     let starFound = false;
     for (let i = 0; i < this.drawLineList.length; i++) {
       if (
@@ -664,21 +677,72 @@ export class LineManager {
     return starFound;
   }
 
-  public updateLineToSat(satId: number, sensorId: number) {
-    let isLineDrawnToSat = false;
-    for (let i = 0; i < this.drawLineList.length; i++) {
-      if (typeof this.drawLineList[i].sat == 'undefined') continue;
+  setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
+    const gl = this.gl_;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.vertexAttribPointer(this.attribs_.a_position, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.attribs_.a_position);
+    gl.drawArrays(gl.LINE_STRIP, 0, segments);
+    gl.disableVertexAttribArray(this.attribs_.a_position);
+  }
 
-      if (this.drawLineList[i].sat.id == satId) {
+  setColorUniforms(color: vec4) {
+    this.gl_.uniform4fv(this.uniforms_.u_color, color);
+  }
+
+  setWorldUniforms(camMatrix: mat4, pMatrix: mat4) {
+    const gl = this.gl_;
+    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+  }
+
+  updateLineToSat(satId: number, sensorId: number) {
+    let isLineDrawnToSat = false;
+
+    for (const line of this.drawLineList) {
+      if (typeof line.sat == 'undefined') continue;
+
+      if (line.sat.id == satId) {
         isLineDrawnToSat = true;
       }
     }
+
     if (!isLineDrawnToSat) {
-      this.create('sat4', [satId, sensorId], 'g');
+      this.create(LineTypes.SELECTED_SENSOR_TO_SELECTED_SAT_IF_IN_FOV, [satId, sensorId], 'g');
     }
   }
 
-  // #endregion Public Methods (8)
+  private shaders_ = {
+    frag: keepTrackApi.glsl`#version 300 es
+      precision mediump float;
+
+      in vec4 vColor;
+      in float vAlpha;
+
+      out vec4 fragColor;
+
+      void main(void) {
+        fragColor = vec4(vColor[0],vColor[1],vColor[2], vColor[3] * vAlpha);
+      }
+      `,
+    vert: keepTrackApi.glsl`#version 300 es
+      in vec4 a_position;
+
+      uniform vec4 u_color;
+      uniform mat4 u_camMatrix;
+      uniform mat4 u_pMatrix;
+
+      out vec4 vColor;
+      out float vAlpha;
+
+      void main(void) {
+          vec4 position = u_pMatrix * u_camMatrix * vec4(a_position[0],a_position[1],a_position[2], 1.0);
+          gl_Position = position;
+          vColor = u_color;
+          vAlpha = a_position[3];
+      }
+      `,
+  };
 }
 
 export const lineManagerInstance = new LineManager();

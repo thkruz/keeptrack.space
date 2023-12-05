@@ -428,7 +428,7 @@ export const sensors = <SensorList>{
     alt: <Kilometers>0.0,
     obsminaz: <Degrees>0,
     obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>20,
+    obsminel: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
     obsmaxel: <Degrees>90,
     obsminrange: <Kilometers>15000,
     obsmaxrange: <Kilometers>200000,
@@ -450,7 +450,7 @@ export const sensors = <SensorList>{
     alt: <Kilometers>3.0,
     obsminaz: <Degrees>0,
     obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>20,
+    obsminel: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
     obsmaxel: <Degrees>90,
     obsminrange: <Kilometers>0,
     obsmaxrange: <Kilometers>200000,
@@ -472,7 +472,7 @@ export const sensors = <SensorList>{
     alt: <Kilometers>1.24,
     obsminaz: <Degrees>0,
     obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>20,
+    obsminel: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
     obsmaxel: <Degrees>90,
     obsminrange: <Kilometers>15000,
     obsmaxrange: <Kilometers>200000,
@@ -560,10 +560,10 @@ export const sensors = <SensorList>{
     type: SpaceObjectType.OPTICAL,
     lat: <Degrees>-21.816195,
     lon: <Degrees>114.165637,
-    alt: <Kilometers>0.0,
+    alt: <Kilometers>0.04572, // https://www.osti.gov/servlets/purl/1253293
     obsminaz: <Degrees>0,
     obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
+    obsminel: <Degrees>20, // https://amostech.com/TechnicalPapers/2015/SSA/Graham.pdf
     obsmaxel: <Degrees>90,
     obsminrange: <Kilometers>15000,
     obsmaxrange: <Kilometers>200000,
@@ -1014,7 +1014,7 @@ export const sensors = <SensorList>{
     alt: <Kilometers>0.0,
     obsminaz: <Degrees>0,
     obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>5,
+    obsminel: <Degrees>5, // 0 seems low - https://amostech.com/TechnicalPapers/2015/Adaptive_Optics_Imaging/DelGenio.pdf
     obsmaxel: <Degrees>90,
     obsminrange: <Kilometers>0, // https://amostech.com/TechnicalPapers/2015/Adaptive_Optics_Imaging/DelGenio.pdf
     obsmaxrange: <Kilometers>200000,

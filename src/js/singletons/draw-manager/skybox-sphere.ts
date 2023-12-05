@@ -22,6 +22,9 @@ export class SkyBoxSphere {
     a_position: 0,
     a_texCoord: 0,
     a_normal: 0,
+  };
+
+  private uniforms_ = {
     u_pMatrix: <WebGLUniformLocation>null,
     u_camMatrix: <WebGLUniformLocation>null,
     u_mvMatrix: <WebGLUniformLocation>null,
@@ -164,39 +167,39 @@ export class SkyBoxSphere {
     if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
     // Set the uniforms
-    gl.uniformMatrix3fv(this.attribs_.u_nMatrix, false, this.nMatrix_);
-    gl.uniformMatrix4fv(this.attribs_.u_mvMatrix, false, this.mvMatrix_);
-    gl.uniformMatrix4fv(this.attribs_.u_pMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(this.attribs_.u_camMatrix, false, camMatrix);
+    gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
+    gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
+    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
 
     if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations) {
-      gl.uniform1i(this.attribs_.u_texMilkyWay, 0);
+      gl.uniform1i(this.uniforms_.u_texMilkyWay, 0);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.textureGraySkybox_);
-      gl.uniform1f(this.attribs_.u_fMilkyWay, 2);
+      gl.uniform1f(this.uniforms_.u_fMilkyWay, 2);
     } else {
       if (this.settings_.isDrawMilkyWay) {
-        gl.uniform1i(this.attribs_.u_texMilkyWay, 0);
+        gl.uniform1i(this.uniforms_.u_texMilkyWay, 0);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay_);
       }
 
       if (this.settings_.isDrawConstellationBoundaries) {
-        gl.uniform1i(this.attribs_.u_texBoundaries, 1);
+        gl.uniform1i(this.uniforms_.u_texBoundaries, 1);
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.textureBoundaries_);
       } else {
-        gl.uniform1i(this.attribs_.u_texMilkyWay, 1);
+        gl.uniform1i(this.uniforms_.u_texMilkyWay, 1);
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay_);
       }
 
       if (this.settings_.isDrawNasaConstellations) {
-        gl.uniform1i(this.attribs_.u_texConstellations, 2);
+        gl.uniform1i(this.uniforms_.u_texConstellations, 2);
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, this.textureConstellations_);
       } else {
-        gl.uniform1i(this.attribs_.u_texMilkyWay, 2);
+        gl.uniform1i(this.uniforms_.u_texMilkyWay, 2);
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay_);
       }
@@ -213,7 +216,7 @@ export class SkyBoxSphere {
       else if (sum === 1) milkyWayMul = 2;
       else milkyWayMul = 0;
 
-      gl.uniform1f(this.attribs_.u_fMilkyWay, milkyWayMul);
+      gl.uniform1f(this.uniforms_.u_fMilkyWay, milkyWayMul);
     }
 
     gl.bindVertexArray(this.vao_);
@@ -233,7 +236,7 @@ export class SkyBoxSphere {
     this.gl_ = gl;
     this.settings_ = settings;
 
-    this.initProgram_();
+    this.program_ = GlUtils.createProgram(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_);
     this.initTextures_();
     this.initBuffers_();
     this.initVao_();
@@ -315,25 +318,6 @@ export class SkyBoxSphere {
     this.vertIndexBuf_ = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertIndexBuf_);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
-  }
-
-  private initProgram_(): void {
-    const gl = this.gl_;
-    this.program_ = GlUtils.createProgramFromCode(gl, this.shaders_.vert, this.shaders_.frag);
-    this.gl_.useProgram(this.program_);
-
-    // Assign Attributes
-    this.attribs_.a_position = gl.getAttribLocation(this.program_, 'a_position');
-    this.attribs_.a_normal = gl.getAttribLocation(this.program_, 'a_normal');
-    this.attribs_.a_texCoord = gl.getAttribLocation(this.program_, 'a_texCoord');
-    this.attribs_.u_pMatrix = gl.getUniformLocation(this.program_, 'u_pMatrix');
-    this.attribs_.u_camMatrix = gl.getUniformLocation(this.program_, 'u_camMatrix');
-    this.attribs_.u_mvMatrix = gl.getUniformLocation(this.program_, 'u_mvMatrix');
-    this.attribs_.u_nMatrix = gl.getUniformLocation(this.program_, 'u_nMatrix');
-    this.attribs_.u_texMilkyWay = gl.getUniformLocation(this.program_, 'u_texMilkyWay');
-    this.attribs_.u_texBoundaries = gl.getUniformLocation(this.program_, 'u_texBoundaries');
-    this.attribs_.u_texConstellations = gl.getUniformLocation(this.program_, 'u_texConstellations');
-    this.attribs_.u_fMilkyWay = gl.getUniformLocation(this.program_, 'u_fMilkyWay');
   }
 
   private initTexture_(src: string, texture: WebGLTexture): void {

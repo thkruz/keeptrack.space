@@ -97,7 +97,7 @@ export const darkClouds = () => {
 
     document.getElementById('textOverlay').style.cssText = `
                     border-radius: 2px;
-                    bottom: 75px;
+                    bottom: 125px;
                     right: 150px;
                     width: auto;
                     position: absolute;
@@ -105,7 +105,7 @@ export const darkClouds = () => {
                     line-height: 2.5em !important;
                     background-color: rgb(0, 0, 0) !important;
                     padding: 10px 55px !important;
-                    font-size: 1.8rem !important;
+                    font-size: 3.6rem !important;
                     font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
                     font-weight: 300;
                     color: white;

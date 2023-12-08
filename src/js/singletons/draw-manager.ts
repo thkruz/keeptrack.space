@@ -16,6 +16,7 @@ import { Camera, CameraType } from './camera';
 import { DotsManager } from './dots-manager';
 import { Box as SearchBox } from './draw-manager/cube';
 import { Earth } from './draw-manager/earth';
+import { Godrays } from './draw-manager/godrays';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { MeshManager } from './draw-manager/mesh-manager';
 import { Moon } from './draw-manager/moon';
@@ -121,6 +122,7 @@ export class StandardDrawManager implements DrawManager {
     earth: new Earth(),
     moon: new Moon(),
     sun: new Sun(),
+    godrays: new Godrays(),
     skybox: new SkyBoxSphere(),
     searchBox: new SearchBox(),
   };
@@ -194,7 +196,7 @@ export class StandardDrawManager implements DrawManager {
     this.pMvCamMatrix = GlUtils.createPMvCamMatrix(mat4.create(), this.pMatrix, keepTrackApi.getMainCamera().camMatrix);
 
     // Actually draw things now that math is done
-    this.clearFrameBuffers(dotsManager.pickingFrameBuffer, this.sceneManager.sun.godrays.frameBuffer);
+    this.clearFrameBuffers(dotsManager.pickingFrameBuffer, this.sceneManager.godrays.frameBuffer);
 
     // Sun, and Moon
     this.drawOptionalScenery(keepTrackApi.getMainCamera());
@@ -210,26 +212,26 @@ export class StandardDrawManager implements DrawManager {
 
       if (settingsManager.isDrawSun) {
         // Draw the Sun to the Godrays Frame Buffer
-        this.sceneManager.sun.draw(this.sceneManager.earth.lightDirection, this.pMatrix, mainCameraInstance.camMatrix, this.sceneManager.sun.godrays.frameBuffer);
+        this.sceneManager.sun.draw(this.sceneManager.earth.lightDirection, this.pMatrix, mainCameraInstance.camMatrix, this.sceneManager.godrays.frameBuffer);
 
         // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
         this.sceneManager.earth.drawOcclusion(
           this.pMatrix,
           mainCameraInstance.camMatrix,
           this?.postProcessingManager?.programs?.occlusion,
-          this.sceneManager?.sun?.godrays?.frameBuffer
+          this.sceneManager?.godrays?.frameBuffer
         );
         if (
           !settingsManager.modelsOnSatelliteViewOverride &&
           catalogManagerInstance.selectedSat !== -1 &&
           keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera
         ) {
-          this.meshManager.drawOcclusion(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.programs.occlusion, this.sceneManager.sun.godrays.frameBuffer);
+          this.meshManager.drawOcclusion(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.programs.occlusion, this.sceneManager.godrays.frameBuffer);
         }
         // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
         // todo: this should be a dynamic buffer not hardcoded to bufffer two
         this.postProcessingManager.curBuffer = null;
-        this.sceneManager.sun.drawGodrays(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
+        this.sceneManager.godrays.draw(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
       }
 
       this.sceneManager.skybox.draw(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
@@ -564,7 +566,7 @@ export class StandardDrawManager implements DrawManager {
     if (typeof postProcessingManagerRef === 'undefined' || postProcessingManagerRef === null) throw new Error('postProcessingManager is undefined or null');
 
     // Post Processing Texture Needs Scaled
-    sun.initGodrays();
+    this.sceneManager.godrays?.init(gl, sun);
     postProcessingManagerRef.init(gl);
 
     // Reset Flag now that textures are reinitialized
@@ -669,7 +671,7 @@ export class StandardDrawManager implements DrawManager {
 
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
     this.gmst = gmst;
-    this.sceneManager.sun.update(timeManagerInstance.simulationTimeObj, gmst, j);
+    this.sceneManager.sun.update(j);
 
     // Update Earth Direction
     this.sceneManager.earth.update(gmst, j);

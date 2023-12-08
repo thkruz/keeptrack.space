@@ -1,3 +1,4 @@
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
 import { mat3, mat4 } from 'gl-matrix';
 import * as Ootk from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -9,8 +10,18 @@ import { GlUtils } from '../../static/gl-utils';
 export class CustomMesh {
   public id = 0;
   private attribs_ = {
-    a_position: 0,
-    a_normal: 0,
+    a_position: new BufferAttribute({
+      location: 0,
+      vertices: 3,
+      offset: 0,
+      stride: Float32Array.BYTES_PER_ELEMENT * 6,
+    }),
+    a_normal: new BufferAttribute({
+      location: 1,
+      vertices: 3,
+      offset: Float32Array.BYTES_PER_ELEMENT * 3,
+      stride: Float32Array.BYTES_PER_ELEMENT * 6,
+    }),
   };
 
   private buffers_ = {
@@ -167,11 +178,11 @@ export class CustomMesh {
     gl.bindVertexArray(this.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers_.combinedBuf);
-    gl.enableVertexAttribArray(this.attribs_.a_position);
-    gl.vertexAttribPointer(this.attribs_.a_position, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, 0);
+    gl.enableVertexAttribArray(this.attribs_.a_position.location);
+    gl.vertexAttribPointer(this.attribs_.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, 0);
 
-    gl.enableVertexAttribArray(this.attribs_.a_normal);
-    gl.vertexAttribPointer(this.attribs_.a_normal, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, Float32Array.BYTES_PER_ELEMENT * 3);
+    gl.enableVertexAttribArray(this.attribs_.a_normal.location);
+    gl.vertexAttribPointer(this.attribs_.a_normal.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 6, Float32Array.BYTES_PER_ELEMENT * 3);
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers_.vertIndexBuf);

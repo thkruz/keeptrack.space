@@ -4,6 +4,7 @@ import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 
 import { keepTrackApi } from '@app/js/keepTrackApi';
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
 import { mat4, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { keepTrackContainer } from '../../container';
@@ -57,7 +58,12 @@ export type LineTask = {
 
 export class LineManager {
   private attribs_ = {
-    a_position: 0,
+    a_position: new BufferAttribute({
+      location: 0,
+      vertices: 4,
+      offset: 0,
+      stride: 0,
+    }),
   };
 
   private gl_: WebGL2RenderingContext;
@@ -478,7 +484,7 @@ export class LineManager {
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
 
-    gl.enableVertexAttribArray(this.attribs_.a_position); // Enable
+    gl.enableVertexAttribArray(this.attribs_.a_position.location); // Enable
 
     if (this.drawLineList.length == 0) return;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -647,7 +653,7 @@ export class LineManager {
       }
     }
 
-    gl.disableVertexAttribArray(this.attribs_.a_position); // Reset
+    gl.disableVertexAttribArray(this.attribs_.a_position.location); // Reset
   }
 
   drawWhenSelected(): void {
@@ -680,10 +686,10 @@ export class LineManager {
   setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
     const gl = this.gl_;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.vertexAttribPointer(this.attribs_.a_position, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(this.attribs_.a_position);
+    gl.vertexAttribPointer(this.attribs_.a_position.location, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.attribs_.a_position.location);
     gl.drawArrays(gl.LINE_STRIP, 0, segments);
-    gl.disableVertexAttribArray(this.attribs_.a_position);
+    gl.disableVertexAttribArray(this.attribs_.a_position.location);
   }
 
   setColorUniforms(color: vec4) {

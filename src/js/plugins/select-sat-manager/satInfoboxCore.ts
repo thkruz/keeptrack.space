@@ -1110,7 +1110,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       try {
         sunTime = Ootk.Utils.SunMath.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
         const drawManagerInstance = keepTrackApi.getDrawManager();
-        satInSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.eci);
+        satInSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.position);
       } catch {
         satInSun = -1;
       }

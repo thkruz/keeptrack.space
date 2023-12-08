@@ -1,5 +1,6 @@
 import { DEG2RAD } from '@app/js/lib/constants';
 import { SettingsManager } from '@app/js/settings/settings';
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
 import { GlUtils } from '@app/js/static/gl-utils';
 import { mat3, mat4 } from 'gl-matrix';
 import { keepTrackApi } from './../../keepTrackApi';
@@ -19,9 +20,21 @@ export class SkyBoxSphere {
   private NUM_LAT_SEGS = 16;
   private NUM_LON_SEGS = 16;
   private attribs_ = {
-    a_position: 0,
-    a_texCoord: 0,
-    a_normal: 0,
+    a_position: new BufferAttribute({
+      location: 0,
+      vertices: 3,
+      offset: 0,
+    }),
+    a_normal: new BufferAttribute({
+      location: 1,
+      vertices: 3,
+      offset: 0,
+    }),
+    a_texCoord: new BufferAttribute({
+      location: 2,
+      vertices: 2,
+      offset: 0,
+    }),
   };
 
   private uniforms_ = {
@@ -45,68 +58,6 @@ export class SkyBoxSphere {
   private nMatrix_ = mat3.create();
   private program_: WebGLProgram;
   private settings_: SettingsManager;
-  private shaders_ = {
-    frag: `#version 300 es
-        #ifdef GL_FRAGMENT_PRECISION_HIGH
-          precision highp float;
-        #else
-          precision mediump float;
-        #endif
-    
-        uniform sampler2D u_texMilkyWay;
-        uniform sampler2D u_texBoundaries;
-        uniform sampler2D u_texConstellations;
-  
-        uniform float u_fMilkyWay;
-  
-        in vec2 v_texcoord;
-        in vec3 v_normal;
-        in float v_dist;
-  
-        out vec4 fragColor;
-    
-        void main(void) {
-            // Don't draw the front of the sphere
-            if (v_dist < 1.0) {
-              discard;
-            }
-            
-            // 20% goes to the boundaries
-            vec4 vecBoundaries = texture(u_texBoundaries, v_texcoord) * 0.2;
-            // 20% goes to the constellations
-            vec4 vecConstellations = texture(u_texConstellations, v_texcoord) * 0.2;
-            // 60% goes to the milky way no matter what
-            vec4 vecMilkyWay = texture(u_texMilkyWay, v_texcoord) * u_fMilkyWay * 0.1;
-            fragColor = vecMilkyWay + vecConstellations + vecBoundaries;
-        }
-        `,
-    vert: `#version 300 es
-        uniform mat4 u_pMatrix;
-        uniform mat4 u_camMatrix;
-        uniform mat4 u_mvMatrix;
-        uniform mat3 u_nMatrix;
-        
-        in vec3 a_position;
-        in vec2 a_texCoord;
-        in vec3 a_normal;
-      
-        out vec2 v_texcoord;
-        out vec3 v_normal;
-        out float v_dist;
-    
-        void main(void) {
-            vec4 position = u_mvMatrix * vec4(a_position, 1.0);
-            gl_Position = u_pMatrix * u_camMatrix * position;
-  
-            // This lets us figure out which verticies are on the back half
-            v_dist = distance(position.xyz,vec3(0.0,0.0,0.0));
-            
-            v_texcoord = a_texCoord;
-            v_texcoord.x = 1.0 - v_texcoord.x;
-            v_normal = u_nMatrix * a_normal;
-        }
-        `,
-  };
 
   private texBuf_: WebGLBuffer;
   private textureBoundaries_ = <WebGLTexture>null;
@@ -358,20 +309,88 @@ export class SkyBoxSphere {
     gl.bindVertexArray(this.vao_);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertPosBuf_);
-    gl.enableVertexAttribArray(this.attribs_.a_position);
-    gl.vertexAttribPointer(this.attribs_.a_position, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.attribs_.a_position.location);
+    gl.vertexAttribPointer(this.attribs_.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertNormBuf_);
-    gl.enableVertexAttribArray(this.attribs_.a_normal);
-    gl.vertexAttribPointer(this.attribs_.a_normal, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.attribs_.a_normal.location);
+    gl.vertexAttribPointer(this.attribs_.a_normal.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.texBuf_);
-    gl.enableVertexAttribArray(this.attribs_.a_texCoord);
-    gl.vertexAttribPointer(this.attribs_.a_texCoord, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.attribs_.a_texCoord.location);
+    gl.vertexAttribPointer(this.attribs_.a_texCoord.location, 2, gl.FLOAT, false, 0, 0);
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertIndexBuf_);
 
     gl.bindVertexArray(null);
   }
+
+  /**
+   * Custom shaders
+   *
+   * Keep this at the bottom of the file for glsl color coding
+   */
+  private shaders_ = {
+    frag: keepTrackApi.glsl`#version 300 es
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+          precision highp float;
+        #else
+          precision mediump float;
+        #endif
+
+        uniform sampler2D u_texMilkyWay;
+        uniform sampler2D u_texBoundaries;
+        uniform sampler2D u_texConstellations;
+
+        uniform float u_fMilkyWay;
+
+        in vec2 v_texcoord;
+        in vec3 v_normal;
+        in float v_dist;
+
+        out vec4 fragColor;
+
+        void main(void) {
+            // Don't draw the front of the sphere
+            if (v_dist < 1.0) {
+              discard;
+            }
+
+            // 20% goes to the boundaries
+            vec4 vecBoundaries = texture(u_texBoundaries, v_texcoord) * 0.2;
+            // 20% goes to the constellations
+            vec4 vecConstellations = texture(u_texConstellations, v_texcoord) * 0.2;
+            // 60% goes to the milky way no matter what
+            vec4 vecMilkyWay = texture(u_texMilkyWay, v_texcoord) * u_fMilkyWay * 0.1;
+            fragColor = vecMilkyWay + vecConstellations + vecBoundaries;
+        }
+        `,
+    vert: keepTrackApi.glsl`#version 300 es
+        uniform mat4 u_pMatrix;
+        uniform mat4 u_camMatrix;
+        uniform mat4 u_mvMatrix;
+        uniform mat3 u_nMatrix;
+
+        in vec3 a_position;
+        in vec2 a_texCoord;
+        in vec3 a_normal;
+
+        out vec2 v_texcoord;
+        out vec3 v_normal;
+        out float v_dist;
+
+        void main(void) {
+            vec4 position = u_mvMatrix * vec4(a_position, 1.0);
+            gl_Position = u_pMatrix * u_camMatrix * position;
+
+            // This lets us figure out which verticies are on the back half
+            v_dist = distance(position.xyz,vec3(0.0,0.0,0.0));
+
+            v_texcoord = a_texCoord;
+            v_texcoord.x = 1.0 - v_texcoord.x;
+            v_normal = u_nMatrix * a_normal;
+        }
+        `,
+  };
 }

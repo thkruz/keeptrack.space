@@ -732,7 +732,7 @@ describe('calculateVisMag_method', () => {
     } as SensorObject;
     const propTime = new Date();
     const sun = new Sun();
-    sun.eci = {
+    sun.position = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
@@ -764,7 +764,7 @@ describe('calculateVisMag_method', () => {
     } as SensorObject;
     const propTime = new Date();
     const sun = new Sun();
-    sun.eci = {
+    sun.position = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
@@ -795,7 +795,7 @@ describe('calculateVisMag_method', () => {
     } as SensorObject;
     const propTime = new Date();
     const sun = new Sun();
-    sun.eci = {
+    sun.position = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
@@ -825,7 +825,7 @@ describe('calculateVisMag_method', () => {
     } as SensorObject;
     const propTime = new Date();
     const sun = new Sun();
-    sun.eci = {
+    sun.position = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,

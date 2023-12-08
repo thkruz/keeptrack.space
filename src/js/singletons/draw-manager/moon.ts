@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 import { RAD2DEG } from '@app/js/lib/constants';
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
 import { GLSL3 } from '@app/js/static/material';
 import { Mesh } from '@app/js/static/mesh';
 import { ShaderMaterial } from '@app/js/static/shader-material';
@@ -45,7 +46,6 @@ export class Moon {
   private rae_: { az: Radians; el: Radians; rng: number; parallacticAngle: number };
   private texture = <WebGLTexture>null;
   private uPCamMatrix_: mat4;
-  private vao: WebGLVertexArrayObject;
 
   drawPosition = [0, 0, 0] as vec3;
   eci: Ootk.EciVec3;
@@ -70,7 +70,7 @@ export class Moon {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
-    gl.bindVertexArray(this.vao);
+    gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
   }
@@ -89,9 +89,24 @@ export class Moon {
       heightSegments: this.numLonSegs_,
       isSkipTexture: false,
       attributes: {
-        a_position: 0,
-        a_texCoord: 0,
-        a_normal: 0,
+        a_position: new BufferAttribute({
+          location: 0,
+          vertices: 3,
+          stride: Float32Array.BYTES_PER_ELEMENT * 8,
+          offset: 0,
+        }),
+        a_normal: new BufferAttribute({
+          location: 1,
+          vertices: 3,
+          stride: Float32Array.BYTES_PER_ELEMENT * 8,
+          offset: Float32Array.BYTES_PER_ELEMENT * 3,
+        }),
+        a_texCoord: new BufferAttribute({
+          location: 2,
+          vertices: 2,
+          stride: Float32Array.BYTES_PER_ELEMENT * 8,
+          offset: Float32Array.BYTES_PER_ELEMENT * 6,
+        }),
       },
     });
     const material = new ShaderMaterial(this.gl_, {
@@ -108,7 +123,7 @@ export class Moon {
       glslVersion: GLSL3,
     });
     this.mesh = new Mesh(this.gl_, geometry, material);
-    this.initVao_();
+    this.mesh.geometry.initVao(this.mesh.program);
     this.isLoaded_ = true;
   }
 
@@ -145,28 +160,6 @@ export class Moon {
     img.src = `${settingsManager.installDirectory}textures/moon-1024.jpg`;
     await img.decode();
     GlUtils.bindImageToTexture(this.gl_, this.texture, img);
-  }
-
-  private initVao_() {
-    const gl = this.gl_;
-    // Make New Vertex Array Objects
-    this.vao = gl.createVertexArray();
-    gl.bindVertexArray(this.vao);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.combinedBuffer);
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.a_position);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.a_position, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
-
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.a_normal);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.a_normal, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 3);
-
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.a_texCoord);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.a_texCoord, 2, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 6);
-
-    // Select the vertex indicies buffer
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.index);
-
-    gl.bindVertexArray(null);
   }
 
   private shaders_ = {

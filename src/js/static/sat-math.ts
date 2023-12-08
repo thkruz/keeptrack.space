@@ -229,9 +229,11 @@ export abstract class SatMath {
     const distanceToSatellite = rae.rng; //This is in KM
 
     let phaseAngle = Math.acos(
-      <number>numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.eci.x, -sat.position.y + sun.eci.y, -sat.position.z + sun.eci.z]) /
+      <number>(
+        numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.position.x, -sat.position.y + sun.position.y, -sat.position.z + sun.position.z])
+      ) /
         (Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2)) *
-          Math.sqrt(Math.pow(-sat.position.x + sun.eci.x, 2) + Math.pow(-sat.position.y + sun.eci.y, 2) + Math.pow(-sat.position.z + sun.eci.z, 2)))
+          Math.sqrt(Math.pow(-sat.position.x + sun.position.x, 2) + Math.pow(-sat.position.y + sun.position.y, 2) + Math.pow(-sat.position.z + sun.position.z, 2)))
     );
 
     // The object is likely eclipsing the sun
@@ -628,6 +630,11 @@ export abstract class SatMath {
   }
 
   /**
+   * Keeps the last 1 sun direction calculations in memory to avoid unnecessary calculations.
+   */
+  static sunDirectionCache: { jd: number; sunDirection: EciArr3 } = { jd: null, sunDirection: null };
+
+  /**
     Calculates the direction of the sun in the sky based on the Julian date.
     The function returns an array of three numbers representing the x, y, and z components of the sun's direction vector.
    * @param jd Julian Day
@@ -635,6 +642,7 @@ export abstract class SatMath {
    */
   static getSunDirection(jd: number): EciArr3 {
     if (!jd) throw new Error('Julian date is required');
+    if (jd === SatMath.sunDirectionCache.jd) return SatMath.sunDirectionCache.sunDirection;
 
     const n = jd - 2451545;
     let L = 280.46 + 0.9856474 * n; // mean longitude of sun
@@ -665,6 +673,8 @@ export abstract class SatMath {
     const y = DISTANCE_TO_SUN * Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
     const z = DISTANCE_TO_SUN * Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
+    // Update cache
+    SatMath.sunDirectionCache = { jd, sunDirection: [x, y, z] };
     return [x, y, z];
   }
 

@@ -6,6 +6,7 @@ import { mat4 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
+import { BufferAttribute } from '../static/buffer-attribute';
 import { CameraType } from './camera';
 import { DrawManager } from './draw-manager';
 
@@ -68,10 +69,26 @@ export class DotsManager {
     dots: {
       program: <WebGLProgram>null,
       attribs: {
-        a_position: 0,
-        a_color: 0,
-        a_star: 0,
-        a_pickable: 0,
+        a_position: new BufferAttribute({
+          location: 0,
+          vertices: 3,
+          offset: 0,
+        }),
+        a_color: new BufferAttribute({
+          location: 1,
+          vertices: 4,
+          offset: 0,
+        }),
+        a_star: new BufferAttribute({
+          location: 2,
+          vertices: 1,
+          offset: 0,
+        }),
+        a_pickable: new BufferAttribute({
+          location: 3,
+          vertices: 1,
+          offset: 0,
+        }),
       },
       uniforms: {
         u_pMvCamMatrix: <WebGLUniformLocation>null,
@@ -83,9 +100,21 @@ export class DotsManager {
     picking: {
       program: <WebGLProgram>null,
       attribs: {
-        a_position: 0,
-        a_color: 0,
-        a_pickable: 0,
+        a_position: new BufferAttribute({
+          location: 0,
+          vertices: 3,
+          offset: 0,
+        }),
+        a_color: new BufferAttribute({
+          location: 1,
+          vertices: 4,
+          offset: 0,
+        }),
+        a_pickable: new BufferAttribute({
+          location: 2,
+          vertices: 1,
+          offset: 0,
+        }),
       },
       uniforms: {
         u_pMvCamMatrix: <WebGLUniformLocation>null,
@@ -139,7 +168,7 @@ export class DotsManager {
     gl.bindVertexArray(this.programs.dots.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
-    gl.enableVertexAttribArray(this.programs.dots.attribs.a_position);
+    gl.enableVertexAttribArray(this.programs.dots.attribs.a_position.location);
     // Buffering data here reduces the need to bind the buffer twice!
     // Either allocate and assign the data to the buffer
     if (!this.positionBufferOneTime_) {
@@ -149,7 +178,7 @@ export class DotsManager {
       // Or just update it if we have already allocated it - the length won't change
       gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.positionData);
     }
-    gl.vertexAttribPointer(this.programs.dots.attribs.a_position, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this.programs.dots.attribs.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
     // DEBUG:
     // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -360,12 +389,12 @@ export class DotsManager {
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
-    gl.enableVertexAttribArray(this.programs.dots.attribs.a_color);
-    gl.vertexAttribPointer(this.programs.dots.attribs.a_color, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.dots.attribs.a_color.location);
+    gl.vertexAttribPointer(this.programs.dots.attribs.a_color.location, 4, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.size);
-    gl.enableVertexAttribArray(this.programs.dots.attribs.a_star);
-    gl.vertexAttribPointer(this.programs.dots.attribs.a_star, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.dots.attribs.a_star.location);
+    gl.vertexAttribPointer(this.programs.dots.attribs.a_star.location, 1, gl.UNSIGNED_BYTE, false, 0, 0);
 
     gl.bindVertexArray(null);
 
@@ -374,16 +403,16 @@ export class DotsManager {
     gl.bindVertexArray(this.programs.picking.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
-    gl.enableVertexAttribArray(this.programs.picking.attribs.a_position);
-    gl.vertexAttribPointer(this.programs.picking.attribs.a_position, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.picking.attribs.a_position.location);
+    gl.vertexAttribPointer(this.programs.picking.attribs.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingBuffers.color);
-    gl.enableVertexAttribArray(this.programs.picking.attribs.a_color);
-    gl.vertexAttribPointer(this.programs.picking.attribs.a_color, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.picking.attribs.a_color.location);
+    gl.vertexAttribPointer(this.programs.picking.attribs.a_color.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.pickableBuffer);
-    gl.enableVertexAttribArray(this.programs.picking.attribs.a_pickable);
-    gl.vertexAttribPointer(this.programs.picking.attribs.a_pickable, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.picking.attribs.a_pickable.location);
+    gl.vertexAttribPointer(this.programs.picking.attribs.a_pickable.location, 1, gl.UNSIGNED_BYTE, false, 0, 0);
 
     gl.bindVertexArray(null);
   }

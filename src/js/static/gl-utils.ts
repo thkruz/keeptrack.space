@@ -1,4 +1,5 @@
 import { mat4 } from 'gl-matrix';
+import { BufferAttribute } from './buffer-attribute';
 
 export abstract class GlUtils {
   static readonly PLANE_DIRECTIONS = {
@@ -25,9 +26,9 @@ export abstract class GlUtils {
   /**
    * Assigns attributes to an attribute object.
    */
-  public static assignAttributes(attribs: any, gl: WebGL2RenderingContext, program: WebGLProgram, attributes: string[]): void {
+  public static assignAttributes(attribs: Record<string, BufferAttribute>, gl: WebGL2RenderingContext, program: WebGLProgram, attributes: string[]): void {
     attributes.forEach((attribute) => {
-      attribs[attribute] = gl.getAttribLocation(program, attribute);
+      attribs[attribute].location = gl.getAttribLocation(program, attribute);
     });
   }
 

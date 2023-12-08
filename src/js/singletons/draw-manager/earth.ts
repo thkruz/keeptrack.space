@@ -23,6 +23,7 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
 import { SettingsManager } from '@app/js/settings/settings';
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
 import { GlUtils } from '@app/js/static/gl-utils';
 import { GLSL3 } from '@app/js/static/material';
 import { Mesh } from '@app/js/static/mesh';
@@ -52,7 +53,6 @@ export class Earth {
   private textureSpec_: WebGLTexture;
   private uPCamMatrix_: mat4 = mat4.create();
   private vaoOcclusion_: WebGLVertexArrayObject;
-  private vaoVisible_: WebGLVertexArrayObject;
   isHiResReady: boolean;
   isUseHiRes: boolean;
   lightDirection = <vec3>[0, 0, 0];
@@ -100,9 +100,24 @@ export class Earth {
         heightSegments: this.settings_.earthNumLonSegs,
         isSkipTexture: false,
         attributes: {
-          aVertexPosition: 0,
-          aVertexNormal: 0,
-          aTexCoord: 0,
+          aVertexPosition: new BufferAttribute({
+            location: 0,
+            vertices: 3,
+            stride: Float32Array.BYTES_PER_ELEMENT * 8,
+            offset: 0,
+          }),
+          aVertexNormal: new BufferAttribute({
+            location: 1,
+            vertices: 3,
+            stride: Float32Array.BYTES_PER_ELEMENT * 8,
+            offset: Float32Array.BYTES_PER_ELEMENT * 3,
+          }),
+          aTexCoord: new BufferAttribute({
+            location: 2,
+            vertices: 2,
+            stride: Float32Array.BYTES_PER_ELEMENT * 8,
+            offset: Float32Array.BYTES_PER_ELEMENT * 6,
+          }),
         },
       });
       const material = new ShaderMaterial(this.gl_, {
@@ -127,7 +142,7 @@ export class Earth {
       this.mesh = new Mesh(this.gl_, geometry, material);
 
       this.initVaoVisible();
-      this.initVaoOcclusion_();
+      this.initVaoOcclusion();
     } catch (error) {
       console.debug(error);
     }
@@ -308,7 +323,7 @@ export class Earth {
     // Set the textures
     this.setTextures_(gl, altNightTexBind);
 
-    gl.bindVertexArray(this.vaoVisible_);
+    gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
   }
@@ -388,7 +403,7 @@ export class Earth {
     this.initTextureSpec_();
   }
 
-  private initVaoOcclusion_() {
+  initVaoOcclusion() {
     const gl = this.gl_;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
 
@@ -398,12 +413,12 @@ export class Earth {
     gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
     // Disable color vertex so that the earth is drawn black
     // TODO: Figure out why this is in the earth class
-    gl.disableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_color); // IMPORTANT!
+    gl.disableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_color.location); // IMPORTANT!
 
     // Only Enable Position Attribute
     gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
-    gl.enableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_position);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aVertexPosition, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
+    gl.enableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_position.location);
+    this.mesh.geometry.attributes.aVertexPosition.bindToArrayBuffer(gl);
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
@@ -414,19 +429,19 @@ export class Earth {
   private initVaoVisible() {
     const gl = this.gl_;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    this.vaoVisible_ = gl.createVertexArray();
-    gl.bindVertexArray(this.vaoVisible_);
+    this.mesh.geometry.vao = gl.createVertexArray();
+    gl.bindVertexArray(this.mesh.geometry.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexPosition);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aVertexPosition, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
-    gl.vertexAttribPointer(dotsManagerInstance.programs.picking.attribs.a_position, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
+    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexPosition.location);
+    this.mesh.geometry.attributes.aVertexPosition.bindToArrayBuffer(gl);
+    gl.vertexAttribPointer(dotsManagerInstance.programs.picking.attribs.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
 
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexNormal);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aVertexNormal, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 3);
+    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexNormal.location);
+    this.mesh.geometry.attributes.aVertexNormal.bindToArrayBuffer(gl);
 
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aTexCoord);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aTexCoord, 2, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 6);
+    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aTexCoord.location);
+    this.mesh.geometry.attributes.aTexCoord.bindToArrayBuffer(gl);
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());

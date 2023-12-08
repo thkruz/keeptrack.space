@@ -90,7 +90,7 @@ export class SettingsPresets {
     };
   }
 
-  static loadPresetDebris_(settings: SettingsManager) {
+  static loadPresetDebris(settings: SettingsManager) {
     settings.disableAllPlugins();
     settings.isDisableStars = true;
     settings.maxAnalystSats = 1;
@@ -124,7 +124,7 @@ export class SettingsPresets {
     };
   }
 
-  static loadPresetOpsCenter_(settings: SettingsManager) {
+  static loadPresetOpsCenter(settings: SettingsManager) {
     settings.politicalImages = true;
     settings.isDrawSun = false;
     settings.isDisableStars = true;
@@ -137,9 +137,11 @@ export class SettingsPresets {
     settings.isDrawMilkyWay = false;
     settings.isGraySkybox = false;
     settings.isLoadLastMap = false;
+    settings.isShowNotionalSats = false;
+    settings.isShowStarlinkSats = false;
   }
 
-  static loadPresetEducation_(settings: SettingsManager) {
+  static loadPresetEducation(settings: SettingsManager) {
     settings.isShowSplashScreen = true;
     settings.isEPFL = true;
     settings.disableAllPlugins();
@@ -161,7 +163,7 @@ export class SettingsPresets {
     settings.colors.pink = [0.5, 0.5, 0.5, 1];
   }
 
-  static loadPresetOutreach_(settings: SettingsManager) {
+  static loadPresetOutreach(settings: SettingsManager) {
     settings.satShader.minSize = 30.0;
     settings.limitSats = '25544';
     settings.disableAllPlugins();
@@ -191,7 +193,7 @@ export class SettingsPresets {
     };
   }
 
-  static loadPresetFacSat2_(settings: SettingsManager) {
+  static loadPresetFacSat2(settings: SettingsManager) {
     settings.isDisableKeyboard = true;
     settings.isShowLogo = true;
     settings.isShowSplashScreen = false;

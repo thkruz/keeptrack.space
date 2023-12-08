@@ -117,7 +117,7 @@ export class Sun {
 
   public screenPosition: vec2;
 
-  public draw(earthLightDirection: vec3, pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  public draw(earthLightDirection: vec3, pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null) {
     if (!this.isLoaded_) return;
     const gl = this.gl_;
 

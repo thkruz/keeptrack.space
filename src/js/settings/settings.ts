@@ -172,6 +172,15 @@ export class SettingsManager {
    */
   isShowLeoSats = true;
   /**
+   * Determines whether or not to show Notional satellites in the application.
+   * Notional satellites are satellites that haven't launched yet.
+   */
+  isShowNotionalSats = true;
+  /**
+   * Determines whether or not to show Starlink satellites in the application.
+   */
+  isShowStarlinkSats = true;
+  /**
    * Determines whether or not payloads should be displayed.
    */
   isShowPayloads = true;
@@ -976,9 +985,17 @@ export class SettingsManager {
   hiresMilkWay = false;
 
   loadPersistedSettings() {
+    const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
+    if (isShowNotionalSatsString !== null) {
+      this.isShowNotionalSats = isShowNotionalSatsString === 'true';
+    }
     const leoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_LEO_SATS);
     if (leoSatsString !== null) {
       this.isShowLeoSats = leoSatsString === 'true';
+    }
+    const starlinkSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_STARLINK_SATS);
+    if (starlinkSatsString !== null) {
+      this.isShowStarlinkSats = starlinkSatsString === 'true';
     }
     const heoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_HEO_SATS);
     if (heoSatsString !== null) {
@@ -1292,16 +1309,16 @@ export class SettingsManager {
           case 'preset':
             switch (val) {
               case 'ops-center':
-                SettingsPresets.loadPresetOpsCenter_(this);
+                SettingsPresets.loadPresetOpsCenter(this);
                 break;
               case 'education':
-                SettingsPresets.loadPresetEducation_(this);
+                SettingsPresets.loadPresetEducation(this);
                 break;
               case 'outreach':
-                SettingsPresets.loadPresetOutreach_(this);
+                SettingsPresets.loadPresetOutreach(this);
                 break;
               case 'debris':
-                SettingsPresets.loadPresetDebris_(this);
+                SettingsPresets.loadPresetDebris(this);
                 break;
               case 'dark-clouds':
                 // load ./darkClouds.ts and then run it
@@ -1310,7 +1327,7 @@ export class SettingsManager {
                 });
                 break;
               case 'facsat2':
-                SettingsPresets.loadPresetFacSat2_(this);
+                SettingsPresets.loadPresetFacSat2(this);
                 break;
               case 'altitudes':
                 SettingsPresets.loadPresetAltitudes_(this);
@@ -1564,7 +1581,7 @@ export class SettingsManager {
         this.installDirectory = './';
         break;
       case 'poderespacial.fac.mil.co':
-        SettingsPresets.loadPresetFacSat2_(this);
+        SettingsPresets.loadPresetFacSat2(this);
         break;
       default:
         this.installDirectory = '/';

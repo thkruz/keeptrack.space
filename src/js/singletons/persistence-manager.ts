@@ -10,6 +10,7 @@ export enum StorageKey {
   LAST_MAP = 'keepTrack-earthTexture',
   COLOR_SCHEME = 'keepTrack-colorScheme',
   SETTINGS_LEO_SATS = 'keepTrack-settings-LEOSats',
+  SETTINGS_STARLINK_SATS = 'keepTrack-settings-starlinkSats',
   SETTINGS_HEO_SATS = 'keepTrack-settings-HEOSats',
   SETTINGS_MEO_SATS = 'keepTrack-settings-MEOSats',
   SETTINGS_GEO_SATS = 'keepTrack-settings-GEOSats',
@@ -34,6 +35,7 @@ export enum StorageKey {
   SETTINGS_DRAW_TRAILING_ORBITS = 'keepTrack-settings-drawTrailingOrbits',
   SETTINGS_DRAW_AURORA = 'keepTrack-settings-drawAurora',
   SETTINGS_DRAW_SUN = 'keepTrack-settings-drawSun',
+  SETTINGS_NOTIONAL_SATS = 'keepTrack-settings-notionalSats',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;

@@ -1,8 +1,8 @@
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
-import { getEl } from '../lib/get-el';
-import { lat2pitch, lon2yaw } from '../lib/transforms';
-import { TimeMachine } from '../plugins/time-machine/time-machine';
+import { keepTrackApi } from '../../keepTrackApi';
+import { getEl } from '../../lib/get-el';
+import { lat2pitch, lon2yaw } from '../../lib/transforms';
+import { TimeMachine } from '../../plugins/time-machine/time-machine';
 
 export const darkClouds = () => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent

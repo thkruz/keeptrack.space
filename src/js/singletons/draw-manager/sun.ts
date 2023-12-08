@@ -173,7 +173,7 @@ export class Sun {
   }
 
   public initGodrays() {
-    this.godrays.program = GlUtils.createProgram(this.gl_, this.shaders_.godrays.vert, this.shaders_.godrays.frag, this.attribs_, this.uniforms_);
+    this.godrays.program = GlUtils.createProgram(this.gl_, this.shaders_.godrays.vert, this.shaders_.godrays.frag, this.godrays.attribs, this.godrays.uniforms);
     this.initGodraysBuffers_();
     this.initGodraysVao_();
     this.initGodraysTextures_();

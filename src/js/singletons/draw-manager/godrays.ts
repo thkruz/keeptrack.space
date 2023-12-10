@@ -44,6 +44,9 @@ export class Godrays {
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer) {
     if (!this.isLoaded_ || settingsManager.isDisableGodrays) return;
+    // Calculate sun position immediately before drawing godrays
+    const screenPosition = this.getScreenCoords_(pMatrix, camMatrix);
+    if (isNaN(screenPosition[0]) || isNaN(screenPosition[1])) return;
 
     const gl = this.gl_;
     gl.useProgram(this.mesh.program);
@@ -55,8 +58,6 @@ export class Godrays {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
 
-    // Calculate sun position immediately before drawing godrays
-    const screenPosition = this.getScreenCoords_(pMatrix, camMatrix);
     gl.uniform2f(this.mesh.material.uniforms.u_sunPosition, screenPosition[0], screenPosition[1]);
     gl.uniform2f(this.mesh.material.uniforms.u_resolution, gl.canvas.width, gl.canvas.height);
 
@@ -137,11 +138,7 @@ export class Godrays {
 
   private shaders_ = {
     frag: keepTrackApi.glsl`
-      precision highp float;
-
-      // our texture
       uniform sampler2D u_sampler;
-
       uniform vec2 u_sunPosition;
 
       // the texCoords passed in from the vertex shader.

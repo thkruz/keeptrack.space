@@ -46,7 +46,7 @@ export class BufferGeometry {
 
   static id = -1;
   indexLength: number;
-  attributes: Record<string, BufferAttribute> = {};
+  attributes: Record<string, BufferAttribute>;
   gl: WebGL2RenderingContext;
   vao: WebGLVertexArrayObject;
 
@@ -57,6 +57,7 @@ export class BufferGeometry {
     this.id = BufferGeometry.id++;
     this.uuid = uuidv4();
     this.type = type;
+    this.attributes = attributes || {};
     this.setAttributes(attributes);
   }
 
@@ -109,6 +110,16 @@ export class BufferGeometry {
     Object.keys(attributes).forEach((key) => {
       this.setAttribute(key, attributes[key]);
     });
+  }
+
+  clone() {
+    const clone = new BufferGeometry();
+    clone.attributes = this.attributes;
+    clone.index = this.index;
+    clone.indexLength = this.indexLength;
+    clone.combinedBuffer = this.combinedBuffer;
+    clone.localMvMatrix = this.localMvMatrix;
+    return clone;
   }
 
   rotateX(radians: number) {

@@ -28,6 +28,18 @@ export class ShaderMaterial extends Material {
 
     this.gl = gl;
     this.uniforms = parameters?.uniforms || {};
+    this.uniforms = {
+      ...this.uniforms,
+      ...{
+        modelMatrix: null,
+        modelViewMatrix: null,
+        projectionMatrix: null,
+        viewMatrix: null,
+        normalMatrix: null,
+        cameraPosition: null,
+      },
+    };
+
     this.vertexShader = parameters?.vertexShader || '';
     this.fragmentShader = parameters?.fragmentShader || '';
     this.map = parameters?.map || null;

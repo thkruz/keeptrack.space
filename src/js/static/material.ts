@@ -13,7 +13,7 @@ export class Material {
   id: number;
   uuid: string;
   type: string;
-  uniforms: any;
+  uniforms: Record<string, WebGLUniformLocation> = {};
   vertexShader: string;
   fragmentShader: string;
   gl: WebGL2RenderingContext;

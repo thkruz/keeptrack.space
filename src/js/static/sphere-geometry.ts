@@ -1,3 +1,4 @@
+import { BufferAttribute } from './buffer-attribute';
 import { BufferGeometry, GeometryParams } from './buffer-geometry';
 
 interface SphereGeometryParams extends GeometryParams {
@@ -63,11 +64,43 @@ export class SphereGeometry extends BufferGeometry {
    */
   constructor(
     gl: WebGL2RenderingContext,
-    { radius, widthSegments, heightSegments, attributes, isSkipTexture = false, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI }: SphereGeometryParams
+    {
+      radius,
+      widthSegments,
+      heightSegments,
+      attributes = {},
+      isSkipTexture = false,
+      phiStart = 0,
+      phiLength = Math.PI * 2,
+      thetaStart = 0,
+      thetaLength = Math.PI,
+    }: SphereGeometryParams
   ) {
     super({
       type: 'SphereGeometry',
-      attributes,
+      attributes: {
+        ...{
+          position: {
+            location: 0,
+            vertices: 3,
+            stride: Float32Array.BYTES_PER_ELEMENT * 8,
+            offset: 0,
+          } as BufferAttribute,
+          normal: {
+            location: 1,
+            vertices: 3,
+            stride: Float32Array.BYTES_PER_ELEMENT * 8,
+            offset: Float32Array.BYTES_PER_ELEMENT * 3,
+          } as BufferAttribute,
+          uv: {
+            location: 2,
+            vertices: 2,
+            stride: Float32Array.BYTES_PER_ELEMENT * 8,
+            offset: Float32Array.BYTES_PER_ELEMENT * 6,
+          } as BufferAttribute,
+          ...attributes,
+        },
+      },
     });
     this.gl = gl;
     this.radius = radius;

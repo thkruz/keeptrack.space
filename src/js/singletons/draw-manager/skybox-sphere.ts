@@ -49,7 +49,7 @@ export class SkyBoxSphere {
   };
 
   private gl_: WebGL2RenderingContext;
-  private isLoaded_: boolean;
+  private isTexturesReady_: boolean;
   private isReadyBoundaries_ = false;
   private isReadyConstellations_ = false;
   private isReadyGraySkybox_ = false;
@@ -107,7 +107,7 @@ export class SkyBoxSphere {
   }
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer): void {
-    if (!this.isLoaded_ || settingsManager.isDisableSkybox) return;
+    if (!this.isTexturesReady_ || settingsManager.isDisableSkybox) return;
 
     // Make sure there is something to draw
     if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations && !this.settings_.isGraySkybox) return;
@@ -117,7 +117,22 @@ export class SkyBoxSphere {
     gl.useProgram(this.program_);
     if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    // Set the uniforms
+    this.setUniforms_(gl, pMatrix, camMatrix);
+
+    gl.bindVertexArray(this.vao_);
+    gl.blendFunc(gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_COLOR);
+    gl.enable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+
+    gl.drawElements(gl.TRIANGLES, this.vertCount_, gl.UNSIGNED_SHORT, 0);
+
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.bindVertexArray(null);
+  }
+
+  private setUniforms_(gl: WebGL2RenderingContext, pMatrix: mat4, camMatrix: mat4) {
     gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
@@ -169,18 +184,6 @@ export class SkyBoxSphere {
 
       gl.uniform1f(this.uniforms_.u_fMilkyWay, milkyWayMul);
     }
-
-    gl.bindVertexArray(this.vao_);
-    gl.blendFunc(gl.ONE_MINUS_SRC_COLOR, gl.ONE_MINUS_SRC_COLOR);
-    gl.enable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
-
-    gl.drawElements(gl.TRIANGLES, this.vertCount_, gl.UNSIGNED_SHORT, 0);
-
-    gl.enable(gl.DEPTH_TEST);
-    gl.disable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.bindVertexArray(null);
   }
 
   public async init(settings: SettingsManager, gl: WebGL2RenderingContext): Promise<void> {
@@ -191,8 +194,6 @@ export class SkyBoxSphere {
     this.initTextures_();
     this.initBuffers_();
     this.initVao_();
-
-    this.isLoaded_ = true;
   }
 
   public update(): void {
@@ -271,34 +272,34 @@ export class SkyBoxSphere {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertIndex), gl.STATIC_DRAW);
   }
 
-  private initTexture_(src: string, texture: WebGLTexture): void {
-    const img = new Image();
-    img.onload = () => {
-      GlUtils.bindImageToTexture(this.gl_, texture, img);
-    };
-    img.src = src;
-  }
-
   private initTextures_(): void {
     if (this.settings_.isDrawMilkyWay && !this.isReadyMilkyWay_) {
-      this.textureMilkyWay_ = this.gl_.createTexture();
-      this.initTexture_(SkyBoxSphere.getSrcMilkyWay(this.settings_), this.textureMilkyWay_);
-      this.isReadyMilkyWay_ = true;
+      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcMilkyWay(this.settings_)).then((texture) => {
+        this.textureMilkyWay_ = texture;
+        this.isReadyMilkyWay_ = true;
+        this.isTexturesReady_ = true;
+      });
     }
     if (this.settings_.isDrawConstellationBoundaries && !this.isReadyBoundaries_) {
-      this.textureBoundaries_ = this.gl_.createTexture();
-      this.initTexture_(SkyBoxSphere.getSrcBoundaries(this.settings_), this.textureBoundaries_);
-      this.isReadyBoundaries_ = true;
+      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcBoundaries(this.settings_)).then((texture) => {
+        this.textureBoundaries_ = texture;
+        this.isReadyBoundaries_ = true;
+        this.isTexturesReady_ = true;
+      });
     }
     if (this.settings_.isDrawNasaConstellations && !this.isReadyConstellations_) {
-      this.textureConstellations_ = this.gl_.createTexture();
-      this.initTexture_(SkyBoxSphere.getSrcConstellations(this.settings_), this.textureConstellations_);
-      this.isReadyConstellations_ = true;
+      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcConstellations(this.settings_)).then((texture) => {
+        this.textureConstellations_ = texture;
+        this.isReadyConstellations_ = true;
+        this.isTexturesReady_ = true;
+      });
     }
     if (this.settings_.isGraySkybox && !this.isReadyGraySkybox_) {
-      this.textureGraySkybox_ = this.gl_.createTexture();
-      this.initTexture_(SkyBoxSphere.getSrcGraySkybox(this.settings_), this.textureGraySkybox_);
-      this.isReadyGraySkybox_ = true;
+      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcGraySkybox(this.settings_)).then((texture) => {
+        this.textureGraySkybox_ = texture;
+        this.isReadyGraySkybox_ = true;
+        this.isTexturesReady_ = true;
+      });
     }
   }
 
@@ -333,12 +334,7 @@ export class SkyBoxSphere {
    */
   private shaders_ = {
     frag: keepTrackApi.glsl`#version 300 es
-        #ifdef GL_FRAGMENT_PRECISION_HIGH
-          precision highp float;
-        #else
-          precision mediump float;
-        #endif
-
+        precision highp float;
         uniform sampler2D u_texMilkyWay;
         uniform sampler2D u_texBoundaries;
         uniform sampler2D u_texConstellations;
@@ -367,6 +363,7 @@ export class SkyBoxSphere {
         }
         `,
     vert: keepTrackApi.glsl`#version 300 es
+        precision highp float;
         uniform mat4 u_pMatrix;
         uniform mat4 u_camMatrix;
         uniform mat4 u_mvMatrix;

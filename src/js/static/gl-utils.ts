@@ -1,7 +1,17 @@
 import { mat4 } from 'gl-matrix';
+// import 'webgl-lint';
 import { BufferAttribute } from './buffer-attribute';
 
 export abstract class GlUtils {
+  static isWebglLintEnabled = false;
+
+  static tagObject(gl: WebGL2RenderingContext, obj, tag?: string) {
+    if (GlUtils.isWebglLintEnabled && tag) {
+      const ext = gl.getExtension('GMAN_debug_helper');
+      ext.tagObject(obj, tag);
+    }
+  }
+
   static readonly PLANE_DIRECTIONS = {
     'z': [0, 1, 2, 1, -1, 1],
     '-z': [0, 1, 2, -1, -1, -1],
@@ -59,17 +69,46 @@ export abstract class GlUtils {
   }
 
   /**
+   * Init a texture and load an image.
+   */
+  static async initTexture(gl: WebGL2RenderingContext, url: string): Promise<WebGLTexture> {
+    const texture = gl.createTexture();
+    const img = new Image();
+    img.src = url;
+    img.decode().then(() => {
+      GlUtils.bindImageToTexture(gl, texture, img);
+    });
+    return texture;
+  }
+
+  /**
+   * Deteremine if a number is a power of 2.
+   */
+  static isPowerOf2(value: number): boolean {
+    return (value & (value - 1)) == 0;
+  }
+
+  /**
    * Binds an image to a texture.
    */
-  public static bindImageToTexture(gl: WebGL2RenderingContext, texture: WebGLTexture, img: HTMLImageElement) {
+  public static async bindImageToTexture(gl: WebGL2RenderingContext, texture: WebGLTexture, img: HTMLImageElement): Promise<void> {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+    if (GlUtils.isPowerOf2(img.width) && GlUtils.isPowerOf2(img.height)) {
+      // Yes, it's a power of 2. Generate mips.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.generateMipmap(gl.TEXTURE_2D);
+    } else {
+      console.warn(`Texture ${img.src} is not power of 2!`);
+      // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
   }
 
   /**
@@ -160,8 +199,9 @@ export abstract class GlUtils {
     return buffer;
   }
 
-  static createProgram(gl: WebGL2RenderingContext, vertShader: string, fragShader: string, attribs: any, uniforms: any) {
+  static createProgram(gl: WebGL2RenderingContext, vertShader: string, fragShader: string, attribs: any, uniforms: any, name?: string) {
     const program = GlUtils.createProgramFromCode(gl, vertShader, fragShader);
+    GlUtils.tagObject(gl, program, name);
     gl.useProgram(program);
 
     GlUtils.assignAttributes(attribs, gl, program, Object.keys(attribs));

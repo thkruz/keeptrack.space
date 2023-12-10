@@ -150,6 +150,7 @@ export class DotsManager {
     if (!this.isReady || !settingsManager.cruncherReady) return;
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     if (!colorSchemeManagerInstance.colorBuffer) return;
+    if (!pMvCamMatrix) return;
 
     const gl = keepTrackApi.getDrawManager().gl;
 

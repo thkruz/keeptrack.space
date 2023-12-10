@@ -139,7 +139,7 @@ export class Earth {
         fragmentShader: this.shaders_.frag,
         glslVersion: GLSL3,
       });
-      this.mesh = new Mesh(this.gl_, geometry, material);
+      this.mesh = new Mesh(this.gl_, geometry, material, 'earth');
 
       this.initVaoVisible();
       this.initVaoOcclusion();
@@ -278,6 +278,8 @@ export class Earth {
 
     gl.bindVertexArray(this.vaoOcclusion_);
 
+    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getDrawManager().pMvCamMatrix);
+
     // no reason to render 100000s of pixels when
     // we're only going to read one
     if (!this.settings_.isMobileModeEnabled) {
@@ -397,10 +399,10 @@ export class Earth {
   }
 
   private initTextures_(): void {
-    this.initTextureDay_();
-    this.initTextureNight_();
-    this.initTextureBump_();
-    this.initTextureSpec_();
+    if (!this.textureDay_) this.initTextureDay_();
+    if (!this.textureNight_) this.initTextureNight_();
+    if (!this.textureBump_) this.initTextureBump_();
+    if (!this.textureSpec_) this.initTextureSpec_();
   }
 
   initVaoOcclusion() {
@@ -410,15 +412,17 @@ export class Earth {
     this.vaoOcclusion_ = gl.createVertexArray();
     gl.bindVertexArray(this.vaoOcclusion_);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
+
+    // gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
     // Disable color vertex so that the earth is drawn black
     // TODO: Figure out why this is in the earth class
     gl.disableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_color.location); // IMPORTANT!
 
     // Only Enable Position Attribute
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
     gl.enableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_position.location);
     this.mesh.geometry.attributes.aVertexPosition.bindToArrayBuffer(gl);
+    gl.vertexAttribPointer(dotsManagerInstance.programs.picking.attribs.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
@@ -428,14 +432,13 @@ export class Earth {
 
   private initVaoVisible() {
     const gl = this.gl_;
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+
     this.mesh.geometry.vao = gl.createVertexArray();
     gl.bindVertexArray(this.mesh.geometry.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
     gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexPosition.location);
     this.mesh.geometry.attributes.aVertexPosition.bindToArrayBuffer(gl);
-    gl.vertexAttribPointer(dotsManagerInstance.programs.picking.attribs.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
 
     gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexNormal.location);
     this.mesh.geometry.attributes.aVertexNormal.bindToArrayBuffer(gl);

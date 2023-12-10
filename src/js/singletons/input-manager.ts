@@ -82,7 +82,15 @@ export class InputManager {
     gl.deleteSync(sync);
 
     gl.bindBuffer(target, buffer);
-    gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset, length);
+
+    if (dstOffset && length) {
+      gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset, length);
+    } else if (dstOffset) {
+      gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset);
+    } else {
+      gl.getBufferSubData(target, srcByteOffset, dstBuffer);
+    }
+
     gl.bindBuffer(target, null);
 
     return dstBuffer;
@@ -480,10 +488,8 @@ export class InputManager {
 
   /* istanbul ignore next */
   public async readPixelsAsync(x: number, y: number, w: number, h: number, format: number, type: number, dstBuffer: Uint8Array) {
+    const gl = keepTrackApi.getDrawManager().gl;
     try {
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-
-      const { gl } = drawManagerInstance;
       const buf = gl.createBuffer();
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buf);
       gl.bufferData(gl.PIXEL_PACK_BUFFER, dstBuffer.byteLength, gl.STREAM_READ);
@@ -493,11 +499,10 @@ export class InputManager {
       await InputManager.getBufferSubDataAsync(gl, gl.PIXEL_PACK_BUFFER, buf, 0, dstBuffer);
 
       gl.deleteBuffer(buf);
-      // eslint-disable-next-line require-atomic-updates
       this.isAsyncWorking = true;
     } catch (error) {
-      // eslint-disable-next-line require-atomic-updates
       this.isAsyncWorking = false;
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     }
   }
 

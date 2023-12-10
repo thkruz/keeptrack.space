@@ -49,6 +49,7 @@ export class Sun {
 
   draw(earthLightDirection: vec3, pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null) {
     if (!this.isLoaded_) return;
+    if (isNaN(camMatrix[0])) return;
     const gl = this.gl_;
 
     gl.useProgram(this.mesh.program);
@@ -102,7 +103,7 @@ export class Sun {
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
-    this.mesh = new Mesh(this.gl_, geometry, material);
+    this.mesh = new Mesh(this.gl_, geometry, material, 'sun');
     this.mesh.geometry.initVao(this.mesh.program);
 
     this.isLoaded_ = true;
@@ -129,7 +130,6 @@ export class Sun {
 
   private shaders_ = {
     frag: keepTrackApi.glsl`
-        precision highp float;
         uniform vec3 u_lightDir;
 
         in vec3 v_normal;
@@ -149,8 +149,7 @@ export class Sun {
             float g = 1.0 * a;
             float b = 0.9 * a;
             fragColor = vec4(vec3(r,g,b), a);
-        }
-        `,
+        }`,
     vert: keepTrackApi.glsl`
         in vec3 a_position;
         in vec3 a_normal;
@@ -169,7 +168,6 @@ export class Sun {
             gl_Position = u_pMatrix * u_camMatrix * position;
             v_dist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
             v_normal = u_nMatrix * a_normal;
-        }
-      `,
+        }`,
   };
 }

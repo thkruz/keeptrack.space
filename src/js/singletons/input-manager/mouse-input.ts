@@ -514,12 +514,7 @@ export class MouseInput {
       case 'line-sat-sun-rmb':
         lineManagerInstance.create(
           LineTypes.REF_TO_SAT,
-          [
-            this.clickedSat,
-            drawManagerInstance.sceneManager.sun.drawPosition[0],
-            drawManagerInstance.sceneManager.sun.drawPosition[1],
-            drawManagerInstance.sceneManager.sun.drawPosition[2],
-          ],
+          [this.clickedSat, drawManagerInstance.sceneManager.sun.position[0], drawManagerInstance.sceneManager.sun.position[1], drawManagerInstance.sceneManager.sun.position[2]],
           'o'
         );
         break;

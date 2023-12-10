@@ -64,7 +64,7 @@ export class BufferGeometry {
   /**
    * Initialize the vertex array object
    */
-  initVao(program: WebGLProgram) {
+  initVao({ program }: { program: WebGLProgram }) {
     const gl = this.gl;
 
     gl.useProgram(program);

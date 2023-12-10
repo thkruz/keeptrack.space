@@ -2,6 +2,7 @@ import { DEG2RAD } from '@app/js/lib/constants';
 import { SettingsManager } from '@app/js/settings/settings';
 import { BufferAttribute } from '@app/js/static/buffer-attribute';
 import { GlUtils } from '@app/js/static/gl-utils';
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { mat3, mat4 } from 'gl-matrix';
 import { keepTrackApi } from './../../keepTrackApi';
 /* eslint-disable no-useless-escape */
@@ -190,7 +191,7 @@ export class SkyBoxSphere {
     this.gl_ = gl;
     this.settings_ = settings;
 
-    this.program_ = GlUtils.createProgram(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_);
+    this.program_ = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
     this.initTextures_();
     this.initBuffers_();
     this.initVao_();

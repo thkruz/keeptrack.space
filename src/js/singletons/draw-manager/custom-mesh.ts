@@ -1,4 +1,5 @@
 import { BufferAttribute } from '@app/js/static/buffer-attribute';
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { mat3, mat4 } from 'gl-matrix';
 import * as Ootk from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -163,7 +164,7 @@ export class CustomMesh {
 
   private initProgram_() {
     const gl = this.gl_;
-    this.program_ = GlUtils.createProgramFromCode(gl, this.shaders_.vert, this.shaders_.frag);
+    this.program_ = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
     this.gl_.useProgram(this.program_);
 
     // Assign Attributes

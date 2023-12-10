@@ -6,7 +6,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General License as published by the Free Software
@@ -229,11 +229,9 @@ export abstract class SatMath {
     const distanceToSatellite = rae.rng; //This is in KM
 
     let phaseAngle = Math.acos(
-      <number>(
-        numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.position.x, -sat.position.y + sun.position.y, -sat.position.z + sun.position.z])
-      ) /
+      <number>numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.eci.x, -sat.position.y + sun.eci.y, -sat.position.z + sun.eci.z]) /
         (Math.sqrt(Math.pow(-sat.position.x, 2) + Math.pow(-sat.position.y, 2) + Math.pow(-sat.position.z, 2)) *
-          Math.sqrt(Math.pow(-sat.position.x + sun.position.x, 2) + Math.pow(-sat.position.y + sun.position.y, 2) + Math.pow(-sat.position.z + sun.position.z, 2)))
+          Math.sqrt(Math.pow(-sat.position.x + sun.eci.x, 2) + Math.pow(-sat.position.y + sun.eci.y, 2) + Math.pow(-sat.position.z + sun.eci.z, 2)))
     );
 
     // The object is likely eclipsing the sun

@@ -15,7 +15,7 @@ import { Sun } from './sun';
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General License as published by the Free Software
@@ -49,7 +49,7 @@ export class Godrays {
     if (isNaN(screenPosition[0]) || isNaN(screenPosition[1])) return;
 
     const gl = this.gl_;
-    gl.useProgram(this.mesh.program);
+    this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
     gl.depthMask(false);
@@ -81,7 +81,7 @@ export class Godrays {
           offset: 0,
           stride: Float32Array.BYTES_PER_ELEMENT * 4,
         }),
-        a_texCoord: new BufferAttribute({
+        uv: new BufferAttribute({
           location: 1,
           vertices: 2,
           offset: Float32Array.BYTES_PER_ELEMENT * 2,
@@ -101,7 +101,21 @@ export class Godrays {
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
-    this.mesh = new Mesh(this.gl_, geometry, material);
+    this.mesh = new Mesh(this.gl_, geometry, material, {
+      name: 'godrays',
+      precision: 'highp',
+      disabledUniforms: {
+        modelMatrix: true,
+        modelViewMatrix: true,
+        projectionMatrix: true,
+        viewMatrix: true,
+        normalMatrix: true,
+        cameraPosition: true,
+      },
+      disabledAttributes: {
+        normal: true,
+      },
+    });
     this.mesh.geometry.initVao(this.mesh.program);
     this.initFrameBuffer_();
 
@@ -109,7 +123,7 @@ export class Godrays {
   }
 
   private getScreenCoords_(pMatrix: mat4, camMatrix: mat4): vec2 {
-    const posVec4 = vec4.fromValues(this.sun_.drawPosition[0], this.sun_.drawPosition[1], this.sun_.drawPosition[2], 1);
+    const posVec4 = vec4.fromValues(this.sun_.position[0], this.sun_.position[1], this.sun_.position[2], 1);
 
     vec4.transformMat4(posVec4, posVec4, camMatrix);
     vec4.transformMat4(posVec4, posVec4, pMatrix);
@@ -186,7 +200,6 @@ export class Godrays {
     `,
     vert: keepTrackApi.glsl`
       in vec2 a_position;
-      in vec2 a_texCoord;
 
       uniform vec2 u_resolution;
 
@@ -206,7 +219,7 @@ export class Godrays {
 
         // pass the texCoord to the fragment shader
         // The GPU will interpolate this value between points.
-        v_texCoord = a_texCoord;
+        v_texCoord = uv;
       }
     `,
   };

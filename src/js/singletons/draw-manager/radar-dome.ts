@@ -1,3 +1,4 @@
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { mat3, mat4 } from 'gl-matrix';
 import * as Ootk from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -83,7 +84,7 @@ export class RadarDome {
   async init(gl: WebGL2RenderingContext): Promise<void> {
     this.gl_ = gl;
 
-    this.program_ = GlUtils.createProgram(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_);
+    this.program_ = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
     this.initBuffers_();
     this.initVao_();
     this.isLoaded_ = true;

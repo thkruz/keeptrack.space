@@ -4,7 +4,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -44,17 +44,17 @@ export class Earth {
   private isNightTextureReady_ = false;
   private isSpecularTextureReady_ = false;
   private isTexturesReady_ = false;
-  private mvMatrix_: mat4;
-  private nMatrix_: mat3 = mat3.create();
+  private modelViewMatrix_: mat4;
+  private normalMatrix_: mat3 = mat3.create();
   private settings_: SettingsManager;
   private textureBump_: WebGLTexture;
   private textureDay_: WebGLTexture;
   private textureNight_: WebGLTexture;
   private textureSpec_: WebGLTexture;
-  private uPCamMatrix_: mat4 = mat4.create();
   private vaoOcclusion_: WebGLVertexArrayObject;
   isHiResReady: boolean;
   isUseHiRes: boolean;
+  /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   mesh: Mesh;
 
@@ -74,7 +74,7 @@ export class Earth {
     occlusionPrgm.attrSetup(this.mesh.geometry.getCombinedBuffer());
 
     // Set the uniforms
-    occlusionPrgm.uniformSetup(this.mvMatrix_, pMatrix, camMatrix);
+    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -130,16 +130,19 @@ export class Earth {
           uNightMap: <WebGLUniformLocation>null,
           uBumpMap: <WebGLUniformLocation>null,
           uSpecMap: <WebGLUniformLocation>null,
-          uCamPos: <WebGLUniformLocation>null,
-          uPCamMatrix: <WebGLUniformLocation>null,
-          uMvMatrix: <WebGLUniformLocation>null,
-          uNormalMatrix: <WebGLUniformLocation>null,
         },
         vertexShader: this.shaders_.vert,
         fragmentShader: this.shaders_.frag,
         glslVersion: GLSL3,
       });
-      this.mesh = new Mesh(this.gl_, geometry, material, 'earth');
+      this.mesh = new Mesh(this.gl_, geometry, material, {
+        name: 'earth',
+        precision: 'highp',
+        disabledUniforms: {
+          modelMatrix: true,
+          viewMatrix: true,
+        },
+      });
 
       this.initVaoVisible();
       this.initVaoOcclusion();
@@ -178,9 +181,10 @@ export class Earth {
     this.lightDirection = SatMath.getSunDirection(j);
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
-    this.mvMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
-    mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, gmst);
-    mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
+    this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
+    // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
+    mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
+    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
     // Update the aurora glow
     this.glowNumber_ += 0.0025 * this.glowDirection_;
@@ -278,7 +282,7 @@ export class Earth {
 
     gl.bindVertexArray(this.vaoOcclusion_);
 
-    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getDrawManager().pMvCamMatrix);
+    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getDrawManager().projectionCameraMatrix);
 
     // no reason to render 100000s of pixels when
     // we're only going to read one
@@ -306,28 +310,27 @@ export class Earth {
 
   private drawColoredEarth_(tgtBuffer: WebGLFramebuffer, altNightTexBind: (gl: WebGL2RenderingContext, textureNight: WebGLTexture, textureDay: WebGLTexture) => void) {
     const gl = this.gl_;
-    // Change to the earth shader
-    gl.useProgram(this.mesh.program);
-    // Change to the main drawing buffer
+    this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    // Set the uniforms
-    gl.uniform1f(this.mesh.material.uniforms.uGlow, this.glowNumber_);
-    gl.uniform3fv(this.mesh.material.uniforms.uCamPos, keepTrackApi.getMainCamera().getForwardVector());
-    gl.uniformMatrix3fv(this.mesh.material.uniforms.uNormalMatrix, false, this.nMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.uMvMatrix, false, this.mvMatrix_);
-    mat4.mul(this.uPCamMatrix_, keepTrackApi.getDrawManager().pMatrix, keepTrackApi.getMainCamera().camMatrix);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.uPCamMatrix, false, this.uPCamMatrix_);
-    gl.uniform3fv(this.mesh.material.uniforms.uLightDirection, this.lightDirection);
-    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAtmosphere, this.settings_.isDrawAtmosphere ? 1.0 : 0.0);
-    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, this.settings_.isDrawAurora ? 1.0 : 0.0);
-
-    // Set the textures
+    this.setUniforms_(gl);
     this.setTextures_(gl, altNightTexBind);
 
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
+  }
+
+  private setUniforms_(gl: WebGL2RenderingContext) {
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getDrawManager().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
+    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+
+    gl.uniform1f(this.mesh.material.uniforms.uGlow, this.glowNumber_);
+    gl.uniform3fv(this.mesh.material.uniforms.uLightDirection, this.lightDirection);
+    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAtmosphere, this.settings_.isDrawAtmosphere ? 1.0 : 0.0);
+    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, this.settings_.isDrawAurora ? 1.0 : 0.0);
   }
 
   private initTextureBump_(): void {
@@ -609,24 +612,19 @@ export class Earth {
     in vec3 aVertexNormal;
     in vec2 aTexCoord;
 
-    uniform vec3 uCamPos;
-    uniform mat4 uPCamMatrix;
-    uniform mat4 uMvMatrix;
-    uniform mat3 uNormalMatrix;
-
     out vec2 vUv;
     out vec3 vNormal;
     out vec3 vWorldPos;
     out vec3 vVertToCamera;
 
     void main(void) {
-        vec4 worldPosition = uMvMatrix * vec4(aVertexPosition, 1.0);
+        vec4 worldPosition = modelViewMatrix * vec4(aVertexPosition, 1.0);
         vWorldPos = worldPosition.xyz;
-        vNormal = uNormalMatrix * aVertexNormal;
+        vNormal = normalMatrix * aVertexNormal;
         vUv = aTexCoord;
-        vVertToCamera = normalize(vec3(uCamPos) - worldPosition.xyz);
+        vVertToCamera = normalize(vec3(cameraPosition) - worldPosition.xyz);
 
-        gl_Position = uPCamMatrix * worldPosition;
+        gl_Position = projectionMatrix * worldPosition;
     }
     `,
   };

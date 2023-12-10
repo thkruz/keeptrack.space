@@ -9,7 +9,6 @@ import { StereoMapPlugin } from '../plugins/stereo-map/stereo-map';
 import { watchlistPlugin } from '../plugins/watchlist/watchlist';
 import { SettingsManager } from '../settings/settings';
 import { CatalogSource } from '../static/catalog-loader';
-import { GlUtils } from '../static/gl-utils';
 import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
@@ -39,8 +38,8 @@ export interface DrawManager {
   isUpdateTimeThrottle: boolean;
   lastSelectedSat: number;
   meshManager: MeshManager;
-  pMatrix: mat4;
-  pMvCamMatrix: mat4;
+  projectionMatrix: mat4;
+  projectionCameraMatrix: mat4;
   postProcessingManager: PostProcessingManager;
   sat: SatObject;
   sat2: SatObject;
@@ -73,7 +72,7 @@ export interface DrawManager {
   setCanvasSize(height: number, width: number): void;
   setCursor(cursor: 'default' | 'pointer' | 'grab' | 'grabbing'): void;
   startWithOrbits(): Promise<void>;
-  updateLoop(): void;
+  update(): void;
 }
 
 export class StandardDrawManager implements DrawManager {
@@ -113,8 +112,8 @@ export class StandardDrawManager implements DrawManager {
   /**
    * Main source of projection matrix for rest of the application
    */
-  public pMatrix: mat4;
-  public pMvCamMatrix: mat4;
+  public projectionMatrix: mat4;
+  public projectionCameraMatrix: mat4;
   public postProcessingManager: PostProcessingManager;
   public sat: SatObject;
   public sat2: SatObject;
@@ -179,12 +178,6 @@ export class StandardDrawManager implements DrawManager {
   private isAltCanvasSize_: boolean = false;
 
   public draw(dotsManager: DotsManager) {
-    // Validation
-    if (!this.pMatrix) {
-      console.error('pMatrix is undefined - retrying');
-      this.pMatrix = StandardDrawManager.calculatePMatrix(this.gl);
-    }
-
     if (keepTrackApi.methods.altCanvasResize()) {
       this.resizeCanvas(true);
       this.isAltCanvasSize_ = true;
@@ -193,14 +186,13 @@ export class StandardDrawManager implements DrawManager {
       this.isAltCanvasSize_ = false;
     }
 
-    this.pMvCamMatrix = GlUtils.createPMvCamMatrix(mat4.create(), this.pMatrix, keepTrackApi.getMainCamera().camMatrix);
+    // Apply the camera matrix
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
 
     // Actually draw things now that math is done
     this.clearFrameBuffers(dotsManager.pickingFrameBuffer, this.sceneManager.godrays.frameBuffer);
 
-    // Sun, and Moon
     this.drawOptionalScenery(keepTrackApi.getMainCamera());
-
     this.sceneManager.earth.draw(this.postProcessingManager.curBuffer, keepTrackApi.callbacks.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null);
   }
 
@@ -212,11 +204,11 @@ export class StandardDrawManager implements DrawManager {
 
       if (settingsManager.isDrawSun) {
         // Draw the Sun to the Godrays Frame Buffer
-        this.sceneManager.sun.draw(this.sceneManager.earth.lightDirection, this.pMatrix, mainCameraInstance.camMatrix, this.sceneManager.godrays.frameBuffer);
+        this.sceneManager.sun.draw(this.sceneManager.earth.lightDirection, this.sceneManager.godrays.frameBuffer);
 
         // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
         this.sceneManager.earth.drawOcclusion(
-          this.pMatrix,
+          this.projectionMatrix,
           mainCameraInstance.camMatrix,
           this?.postProcessingManager?.programs?.occlusion,
           this.sceneManager?.godrays?.frameBuffer
@@ -226,15 +218,15 @@ export class StandardDrawManager implements DrawManager {
           catalogManagerInstance.selectedSat !== -1 &&
           keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera
         ) {
-          this.meshManager.drawOcclusion(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.programs.occlusion, this.sceneManager.godrays.frameBuffer);
+          this.meshManager.drawOcclusion(this.projectionMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.programs.occlusion, this.sceneManager.godrays.frameBuffer);
         }
         // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
         // todo: this should be a dynamic buffer not hardcoded to bufffer two
         this.postProcessingManager.curBuffer = null;
-        this.sceneManager.godrays.draw(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
+        this.sceneManager.godrays.draw(this.projectionMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
       }
 
-      this.sceneManager.skybox.draw(this.pMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
+      this.sceneManager.skybox.draw(this.projectionMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
 
       // Apply two pass gaussian blur to the godrays to smooth them out
       // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
@@ -247,7 +239,7 @@ export class StandardDrawManager implements DrawManager {
 
       // Draw the moon
       if (!settingsManager.isDisableMoon) {
-        this.sceneManager.moon.draw(this.sceneManager.sun.drawPosition, this.pMatrix, mainCameraInstance.camMatrix);
+        this.sceneManager.moon.draw(this.sceneManager.sun.position);
       }
 
       keepTrackApi.methods.drawOptionalScenery();
@@ -493,7 +485,7 @@ export class StandardDrawManager implements DrawManager {
     z: number;
     error: boolean;
   } {
-    const pMatrix = this.pMatrix;
+    const pMatrix = this.projectionMatrix;
     const camMatrix = keepTrackApi.getMainCamera().camMatrix;
     const screenPos = { x: 0, y: 0, z: 0, error: false };
     try {
@@ -535,7 +527,7 @@ export class StandardDrawManager implements DrawManager {
         // but make sure we have set this at least once to trigger
         const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
 
-        if (!settingsManager.isMobileModeEnabled || isKeyboardOut || this.isRotationEvent_ || !this.pMatrix) {
+        if (!settingsManager.isMobileModeEnabled || isKeyboardOut || this.isRotationEvent_ || !this.projectionMatrix) {
           this.setCanvasSize(vh, vw);
           this.isRotationEvent_ = false;
         } else {
@@ -552,7 +544,7 @@ export class StandardDrawManager implements DrawManager {
     }
 
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    this.pMatrix = StandardDrawManager.calculatePMatrix(gl);
+    this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
     this.isPostProcessingResizeNeeded = true;
 
     // Fix the gpu picker texture size if it has already been created
@@ -573,6 +565,9 @@ export class StandardDrawManager implements DrawManager {
     this.isPostProcessingResizeNeeded = false;
   }
 
+  /**
+   * Calculate changes related to satellites objects
+   */
   public satCalculate() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
@@ -641,39 +636,35 @@ export class StandardDrawManager implements DrawManager {
   public async startWithOrbits(): Promise<void> {
     if (this.settings_.startWithOrbitsDisplayed) {
       const groupsManagerInstance = keepTrackApi.getGroupsManager();
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
       // All Orbits
-      groupsManagerInstance.groupList['debris'] = groupsManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');
+      groupsManagerInstance.groupList.debris = groupsManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');
       groupsManagerInstance.selectGroup(groupsManagerInstance.groupList['debris']);
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true); // force color recalc
-      groupsManagerInstance.groupList['debris'].updateOrbits(orbitManagerInstance);
+      groupsManagerInstance.groupList.debris.updateOrbits();
       this.settings_.isOrbitOverlayVisible = true;
     }
   }
 
-  public updateLoop(): void {
+  public update(): void {
+    this.validateProjectionMatrix_();
+
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    // Calculate changes related to satellites objects
     this.satCalculate();
-
-    // Calculate camera changes needed since last draw
     keepTrackApi.getMainCamera().update(this.dt);
 
     // If in satellite view the orbit buffer needs to be updated every time
-    if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE && catalogManagerInstance.selectedSat !== -1) {
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      orbitManagerInstance.updateOrbitBuffer(catalogManagerInstance.lastSelectedSat());
+    if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE && keepTrackApi.getCatalogManager().selectedSat !== -1) {
+      keepTrackApi.getOrbitManager().updateOrbitBuffer(catalogManagerInstance.lastSelectedSat());
     }
 
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
     this.gmst = gmst;
-    this.sceneManager.sun.update(j);
 
-    // Update Earth Direction
+    this.sceneManager.sun.update(j);
     this.sceneManager.earth.update(gmst, j);
     this.sceneManager.moon.update(timeManagerInstance.simulationTimeObj, gmst);
     this.sceneManager.skybox.update();
@@ -687,6 +678,30 @@ export class StandardDrawManager implements DrawManager {
     // ]);
 
     keepTrackApi.methods.updateLoop();
+  }
+
+  private validateProjectionMatrix_() {
+    if (!this.projectionMatrix) {
+      console.error('projectionMatrix is undefined - retrying');
+      this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (isNaN(this.projectionMatrix[i])) {
+        console.error('projectionMatrix is NaN - retrying');
+        this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
+      }
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (this.projectionMatrix[i] !== 0) {
+        break;
+      }
+      if (i === 15) {
+        console.error('projectionMatrix is all zeros - retrying');
+        this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
+      }
+    }
   }
 }
 

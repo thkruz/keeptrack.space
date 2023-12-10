@@ -1,8 +1,8 @@
 // Shaders should NOT be modified
 /* eslint-disable no-useless-escape */
 
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
-import { GlUtils } from '../../static/gl-utils';
 import { postProcessingShaderCode } from '../../lib/post-processing-shader-code';
 
 enum ProgramType {
@@ -104,7 +104,7 @@ export class PostProcessingManager {
     // this.programs.smaaBlend = this.createProgram(this.shaderCode.smaaBlend.vert, this.shaderCode.smaaBlend.frag);
     // this.programs.smaaBlend = this.setupSmaaBlend(gl, this.programs.smaaBlend);
 
-    this.programs.occlusion.program = GlUtils.createProgramFromCode(this.gl_, this.shaderCode.occlusion.vert, this.shaderCode.occlusion.frag);
+    this.programs.occlusion.program = new WebGlProgramHelper(this.gl_, this.shaderCode.occlusion.vert, this.shaderCode.occlusion.frag).program;
     this.gl_.useProgram(this.programs.occlusion.program);
     this.setupOcclusion();
 

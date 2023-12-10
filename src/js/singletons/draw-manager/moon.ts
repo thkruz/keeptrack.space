@@ -4,7 +4,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -25,36 +25,48 @@ import { Mesh } from '@app/js/static/mesh';
 import { ShaderMaterial } from '@app/js/static/shader-material';
 import { SphereGeometry } from '@app/js/static/sphere-geometry';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import * as Ootk from 'ootk';
-import { Degrees, Kilometers, Radians } from 'ootk';
+import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Radians, Transforms, Utils } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { GlUtils } from '../../static/gl-utils';
-import { errorManagerInstance } from '../errorManager';
 
 export class Moon {
+  /** The radius of the moon. */
   private readonly DRAW_RADIUS = 2500;
+  /** The distance scalar for the moon. */
   private readonly SCALAR_DISTANCE = 200000;
+  /** The number of height segments for the moon. */
   private readonly NUM_HEIGHT_SEGS = 16;
+  /** The number of width segments for the moon. */
   private readonly NUM_WIDTH_SEGS = 16;
 
+  /** The WebGL context. */
   private gl_: WebGL2RenderingContext;
+  /** Whether the moon has been loaded. */
   private isLoaded_ = false;
-  private modelViewMatrix = <mat4>null;
-  private normalMatrix = mat3.create();
+  /** The model view matrix. */
+  private modelViewMatrix_ = <mat4>null;
+  /** The normal matrix. */
+  private normalMatrix_ = mat3.create();
 
+  /** The position of the moon in WebGL coordinates. */
   position = [0, 0, 0] as vec3;
-  eci: Ootk.EciVec3;
+  /** The position of the moon in ECI coordinates. */
+  eci: EciVec3;
+  /** The mesh for the moon. */
   mesh: Mesh;
 
-  draw(sunPosition: vec3, pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  /**
+   * This is run once per frame to render the moon.
+   */
+  draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer = null) {
     if (!this.isLoaded_ || settingsManager.isDisableMoon) return;
     const gl = this.gl_;
 
-    gl.useProgram(this.mesh.program);
-    if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    this.mesh.program.use();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    this.setUniforms_(gl, pMatrix, camMatrix, sunPosition);
+    this.setUniforms_(gl, sunPosition);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
@@ -64,16 +76,21 @@ export class Moon {
     gl.bindVertexArray(null);
   }
 
-  private setUniforms_(gl: WebGL2RenderingContext, pMatrix: mat4, camMatrix: mat4, sunPosition: vec3) {
-    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix);
-    const uPCamMatrix = mat4.mul(mat4.create(), pMatrix, camMatrix);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, uPCamMatrix);
+  /**
+   * This is run once per session to initialize the moon.
+   */
+  private setUniforms_(gl: WebGL2RenderingContext, sunPosition: vec3) {
+    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getDrawManager().projectionCameraMatrix);
     gl.uniform3fv(this.mesh.material.uniforms.sunPos, vec3.fromValues(sunPosition[0] * 100, sunPosition[1] * 100, sunPosition[2] * 100));
     gl.uniform1f(this.mesh.material.uniforms.drawPosition, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
     gl.uniform1i(this.mesh.material.uniforms.sampler, 0);
   }
 
+  /**
+   * This is run once per session to initialize the moon.
+   */
   async init(gl: WebGL2RenderingContext): Promise<void> {
     this.gl_ = gl;
 
@@ -94,22 +111,32 @@ export class Moon {
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
-    this.mesh = new Mesh(gl, geometry, material, 'moon');
+    this.mesh = new Mesh(gl, geometry, material, {
+      name: 'moon',
+      precision: 'highp',
+      disabledUniforms: {
+        modelMatrix: true,
+        viewMatrix: true,
+        cameraPosition: true,
+      },
+    });
     this.mesh.geometry.initVao(this.mesh.program);
     this.isLoaded_ = true;
   }
 
-  update(simTime: Date, gmst: Ootk.GreenwichMeanSiderealTime) {
+  /**
+   * This is run once per frame to update the moon.
+   */
+  update(simTime: Date, gmst: GreenwichMeanSiderealTime) {
     if (!this.isLoaded_) return;
 
-    const rae = Ootk.Utils.MoonMath.getMoonPosition(simTime, <Degrees>0, <Degrees>0);
-    this.eci = Ootk.Transforms.ecf2eci(
+    const rae = Utils.MoonMath.getMoonPosition(simTime, <Degrees>0, <Degrees>0);
+    this.eci = Transforms.ecf2eci(
       CoordinateTransforms.rae2ecf(<Degrees>(180 + rae.az * RAD2DEG), <Degrees>(rae.el * RAD2DEG), rae.rng as Kilometers, <Radians>0, <Radians>0, <Kilometers>0),
       gmst
     );
 
     if (!this.eci.x || !this.eci.y || !this.eci.z) {
-      errorManagerInstance.debug('Moon position is undefined.');
       return;
     }
 
@@ -118,11 +145,12 @@ export class Moon {
     this.position[1] = this.eci.y * scaleFactor;
     this.position[2] = this.eci.z * scaleFactor;
 
-    this.modelViewMatrix = mat4.clone(this.mesh.geometry.localMvMatrix);
-    mat4.translate(this.modelViewMatrix, this.modelViewMatrix, this.position);
-    mat3.normalFromMat4(this.normalMatrix, this.modelViewMatrix);
+    this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
+    mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
+    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
 
+  /** The shaders for the moon. */
   private shaders_ = {
     frag: keepTrackApi.glsl`
       uniform sampler2D sampler;

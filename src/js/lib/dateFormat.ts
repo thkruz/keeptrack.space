@@ -7,7 +7,7 @@
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2007-2009 Steven Levithan <stevenlevithan.com>
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * This file includes enhancements by:
  * Scott Trenda <scott.trenda.net>
@@ -258,7 +258,7 @@ export const dateFormat = function (date: string | Date, mask: string, utc: bool
     TT: H < 12 ? 'AM' : 'PM',
     Z: utc ? 'UTC' : (String(date).match(timezone) || ['']).pop().replace(timezoneClip, ''),
     o: (o > 0 ? '-' : '+') + pad(Math.floor(Math.abs(o) / 60) * 100 + (Math.abs(o) % 60), 4),
-    S: ['th', 'st', 'nd', 'rd'][(d % 10 > 3 || d % 100 - d % 10 === 10) ? 0 : (d % 10)],
+    S: ['th', 'st', 'nd', 'rd'][d % 10 > 3 || (d % 100) - (d % 10) === 10 ? 0 : d % 10],
   };
 
   return mask.replace(token, function ($0) {

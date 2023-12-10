@@ -159,9 +159,9 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           LineTypes.REF_TO_SAT,
           [
             keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name),
-            drawManagerInstance.sceneManager.sun.drawPosition[0],
-            drawManagerInstance.sceneManager.sun.drawPosition[1],
-            drawManagerInstance.sceneManager.sun.drawPosition[2],
+            drawManagerInstance.sceneManager.sun.position[0],
+            drawManagerInstance.sceneManager.sun.position[1],
+            drawManagerInstance.sceneManager.sun.position[2],
           ],
           'o'
         );

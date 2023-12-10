@@ -6,7 +6,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -356,10 +356,10 @@ theodore.kruczek at gmail dot com.
     drawManagerInstance.draw(dotsManagerInstance);
 
     // Draw Dots
-    dotsManagerInstance.draw(drawManagerInstance.pMvCamMatrix, drawManagerInstance.postProcessingManager.curBuffer);
+    dotsManagerInstance.draw(drawManagerInstance.projectionCameraMatrix, drawManagerInstance.postProcessingManager.curBuffer);
 
     orbitManagerInstance.draw(
-      drawManagerInstance.pMatrix,
+      drawManagerInstance.projectionMatrix,
       keepTrackApi.getMainCamera().camMatrix,
       drawManagerInstance.postProcessingManager.curBuffer,
       hoverManagerInstance,
@@ -375,10 +375,14 @@ theodore.kruczek at gmail dot com.
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if (catalogManagerInstance.selectedSat !== -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride && keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera) {
-        drawManagerInstance.meshManager.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
+        drawManagerInstance.meshManager.draw(drawManagerInstance.projectionMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
       }
 
-      drawManagerInstance.sceneManager.searchBox.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
+      drawManagerInstance.sceneManager.searchBox.draw(
+        drawManagerInstance.projectionMatrix,
+        keepTrackApi.getMainCamera().camMatrix,
+        drawManagerInstance.postProcessingManager.curBuffer
+      );
     }
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
@@ -558,7 +562,7 @@ theodore.kruczek at gmail dot com.
       }, 500);
     }
 
-    drawManagerInstance.updateLoop();
+    drawManagerInstance.update();
 
     // Update Colors
     // NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore

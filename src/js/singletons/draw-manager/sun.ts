@@ -1,22 +1,10 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { BufferAttribute } from '@app/js/static/buffer-attribute';
-import { GLSL3 } from '@app/js/static/material';
-import { Mesh } from '@app/js/static/mesh';
-import { SatMath } from '@app/js/static/sat-math';
-import { ShaderMaterial } from '@app/js/static/shader-material';
-import { SphereGeometry } from '@app/js/static/sphere-geometry';
-import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EciVec3, Kilometers } from 'ootk';
-/* eslint-disable no-useless-escape */
-/* eslint-disable camelcase */
-
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General License as published by the Free Software
@@ -31,42 +19,62 @@ import { EciVec3, Kilometers } from 'ootk';
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
+import { keepTrackApi } from '@app/js/keepTrackApi';
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
+import { GLSL3 } from '@app/js/static/material';
+import { Mesh } from '@app/js/static/mesh';
+import { SatMath } from '@app/js/static/sat-math';
+import { ShaderMaterial } from '@app/js/static/shader-material';
+import { SphereGeometry } from '@app/js/static/sphere-geometry';
+import { mat3, mat4, vec3 } from 'gl-matrix';
+import { EciVec3, Kilometers } from 'ootk';
 
 export class Sun {
+  /** The radius of the sun. */
   private readonly DRAW_RADIUS = 1500;
+  /** The number of height segments for the sun. */
   private readonly NUM_HEIGHT_SEGS = 32;
+  /** The number of width segments for the sun. */
   private readonly NUM_WIDTH_SEGS = 32;
+  /** The distance scalar for the sun. */
   private readonly SCALAR_DISTANCE = 220000;
 
-  mesh: Mesh;
+  /** The WebGL context. */
   private gl_: WebGL2RenderingContext;
+  /** Whether the sun has been loaded. */
   private isLoaded_ = false;
-  private mvMatrix_: mat4;
-  private nMatrix_ = mat3.create();
-  private positionModifier_ = [0, 0, 0];
-  position: EciVec3;
-  drawPosition = [0, 0, 0] as vec3;
+  /** The model view matrix. */
+  private modelViewMatrix_: mat4;
+  /** The normal matrix. */
+  private normalMatrix_ = mat3.create();
 
-  draw(earthLightDirection: vec3, pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null) {
+  /** The position of the sun in ECI coordinates. */
+  eci: EciVec3;
+  /** The mesh for the sun. */
+  mesh: Mesh;
+  /** The position of the sun in WebGL coordinates. */
+  position = [0, 0, 0] as vec3;
+
+  /**
+   * This is run once per frame to render the sun.
+   */
+  draw(earthLightDirection: vec3, tgtBuffer: WebGLFramebuffer = null) {
     if (!this.isLoaded_) return;
-    if (isNaN(camMatrix[0])) return;
     const gl = this.gl_;
 
-    gl.useProgram(this.mesh.program);
+    this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    gl.uniformMatrix3fv(this.mesh.material.uniforms.u_nMatrix, false, this.nMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.u_mvMatrix, false, this.mvMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.u_pMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.u_camMatrix, false, camMatrix);
-    gl.uniform3fv(this.mesh.material.uniforms.u_lightDir, earthLightDirection);
-    gl.uniform1f(this.mesh.material.uniforms.u_sunDistance, Math.sqrt(this.drawPosition[0] ** 2 + this.drawPosition[1] ** 2 + this.drawPosition[2] ** 2));
+    this.setUniforms_(earthLightDirection);
 
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
   }
 
+  /**
+   * This is run once per session to initialize the sun.
+   */
   async init(gl: WebGL2RenderingContext): Promise<void> {
     this.gl_ = gl;
 
@@ -76,13 +84,13 @@ export class Sun {
       heightSegments: this.NUM_HEIGHT_SEGS,
       isSkipTexture: true,
       attributes: {
-        a_position: new BufferAttribute({
+        position: new BufferAttribute({
           location: 0,
           vertices: 3,
           stride: Float32Array.BYTES_PER_ELEMENT * 6,
           offset: 0,
         }),
-        a_normal: new BufferAttribute({
+        normal: new BufferAttribute({
           location: 1,
           vertices: 3,
           stride: Float32Array.BYTES_PER_ELEMENT * 6,
@@ -92,45 +100,67 @@ export class Sun {
     });
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
-        u_nMatrix: <WebGLUniformLocation>null,
-        u_mvMatrix: <WebGLUniformLocation>null,
-        u_pMatrix: <WebGLUniformLocation>null,
-        u_camMatrix: <WebGLUniformLocation>null,
-        u_lightDir: <WebGLUniformLocation>null,
-        u_sunDistance: <WebGLUniformLocation>null,
+        lightDirection: <WebGLUniformLocation>null,
+        sunDistance: <WebGLUniformLocation>null,
       },
       vertexShader: this.shaders_.vert,
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
-    this.mesh = new Mesh(this.gl_, geometry, material, 'sun');
+    this.mesh = new Mesh(this.gl_, geometry, material, {
+      name: 'sun',
+      precision: 'highp',
+      disabledUniforms: {
+        modelMatrix: true,
+        viewMatrix: true,
+        cameraPosition: true,
+      },
+      disabledAttributes: {
+        uv: true,
+      },
+    });
     this.mesh.geometry.initVao(this.mesh.program);
 
     this.isLoaded_ = true;
   }
 
+  /**
+   * This is run once per frame to update the sun's position.
+   */
   update(j: number) {
-    this.calculatePosition_(j);
-
-    this.mvMatrix_ = mat4.create();
-    mat4.identity(this.mvMatrix_);
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, this.drawPosition);
-    mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
-  }
-
-  private calculatePosition_(j: number) {
     const eci = SatMath.getSunDirection(j);
-    this.position = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
+    this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
-    this.drawPosition[0] = (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE + this.positionModifier_[0];
-    this.drawPosition[1] = (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE + this.positionModifier_[1];
-    this.drawPosition[2] = (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE + this.positionModifier_[2];
+    this.position[0] = (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE;
+    this.position[1] = (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE;
+    this.position[2] = (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE;
+
+    this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
+    mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
+    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
 
+  /**
+   * This is run once per frame to set the uniforms for the sun.
+   */
+  private setUniforms_(earthLightDirection: vec3) {
+    const gl = this.gl_;
+    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getDrawManager().projectionCameraMatrix);
+    gl.uniform3fv(this.mesh.material.uniforms.lightDirection, earthLightDirection);
+    gl.uniform1f(this.mesh.material.uniforms.sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
+  }
+
+  /**
+   * The shaders for the sun.
+   *
+   * NOTE: Keep these at the bottom of the file to ensure proper syntax highlighting.
+   */
   private shaders_ = {
     frag: keepTrackApi.glsl`
-        uniform vec3 u_lightDir;
+        uniform vec3 lightDirection;
 
         in vec3 v_normal;
         in float v_dist2;
@@ -143,7 +173,7 @@ export class Sun {
             discard;
             }
 
-            float a = max(dot(v_normal, -u_lightDir), 0.1);
+            float a = max(dot(v_normal, -lightDirection), 0.1);
             // Set colors
             float r = 1.0 * a;
             float g = 1.0 * a;
@@ -151,23 +181,17 @@ export class Sun {
             fragColor = vec4(vec3(r,g,b), a);
         }`,
     vert: keepTrackApi.glsl`
-        in vec3 a_position;
-        in vec3 a_normal;
-
-        uniform mat4 u_pMatrix;
-        uniform mat4 u_camMatrix;
-        uniform mat4 u_mvMatrix;
-        uniform mat3 u_nMatrix;
-        uniform float u_sunDistance;
+        uniform float sunDistance;
 
         out vec3 v_normal;
         out float v_dist2;
 
         void main(void) {
-            vec4 position = u_mvMatrix * vec4(a_position / 1.6, 1.0);
-            gl_Position = u_pMatrix * u_camMatrix * position;
-            v_dist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
-            v_normal = u_nMatrix * a_normal;
+            vec4 worldPosition = modelViewMatrix * vec4(position / 1.6, 1.0);
+            v_dist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / sunDistance;
+            v_normal = normalMatrix * normal;
+
+            gl_Position = projectionMatrix * worldPosition;
         }`,
   };
 }

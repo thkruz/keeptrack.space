@@ -593,7 +593,7 @@ export class MeshManager {
 
       const drawManagerInstance = keepTrackApi.getDrawManager();
 
-      this.currentMeshObject.inSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.position);
+      this.currentMeshObject.inSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.eci);
       this.currentMeshObject.nadirYaw = null;
 
       if (settingsManager.meshOverride) {

@@ -1,4 +1,3 @@
-import { mat4 } from 'gl-matrix';
 // import 'webgl-lint';
 import { BufferAttribute } from './buffer-attribute';
 
@@ -199,71 +198,6 @@ export abstract class GlUtils {
     return buffer;
   }
 
-  static createProgram(gl: WebGL2RenderingContext, vertShader: string, fragShader: string, attribs: any, uniforms: any, name?: string) {
-    const program = GlUtils.createProgramFromCode(gl, vertShader, fragShader);
-    GlUtils.tagObject(gl, program, name);
-    gl.useProgram(program);
-
-    GlUtils.assignAttributes(attribs, gl, program, Object.keys(attribs));
-    GlUtils.assignUniforms(uniforms, gl, program, Object.keys(uniforms));
-
-    return program;
-  }
-
-  /**
-   * Creates a fragment shader from a string.
-   */
-  public static createFragmentShader(gl: WebGL2RenderingContext, source: string): WebGLShader {
-    const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragShader, source);
-    gl.compileShader(fragShader);
-    if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
-      throw new Error('Fragment shader compilation failed: ' + gl.getShaderInfoLog(fragShader));
-    }
-    return fragShader;
-  }
-
-  public static createPMvCamMatrix(modelViewMatrix: mat4, projectionMatrix: mat4, cameraMatrix: mat4): mat4 {
-    mat4.mul(modelViewMatrix, modelViewMatrix, projectionMatrix);
-    mat4.mul(modelViewMatrix, modelViewMatrix, cameraMatrix);
-    return modelViewMatrix;
-  }
-
-  /**
-   * Creates a WebGL program from a vertex and fragment shader.
-   */
-  public static createProgramFromShader(gl: WebGL2RenderingContext, vertShader: WebGLShader, fragShader: WebGLShader): WebGLProgram {
-    const program = gl.createProgram();
-    gl.attachShader(program, vertShader);
-    gl.attachShader(program, fragShader);
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      const info = gl.getProgramInfoLog(program);
-      throw new Error('Could not compile WebGL program. \n\n' + info);
-    }
-    return program;
-  }
-
-  /**
-   * Creates a WebGL program from a vertex and fragment shader code.
-   */
-  public static createProgramFromCode(gl: WebGL2RenderingContext, vertCode: string, fragCode: string): WebGLProgram {
-    const vertShader = GlUtils.createVertexShader(gl, vertCode);
-    const fragShader = GlUtils.createFragmentShader(gl, fragCode);
-
-    const program = gl.createProgram();
-    gl.attachShader(program, vertShader);
-    gl.attachShader(program, fragShader);
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      const info = gl.getProgramInfoLog(program);
-      throw new Error('Could not compile WebGL program. \n\n' + info);
-    }
-    return program;
-  }
-
   static createRadarDomeVertices(minRange: number, maxRange: number, minEl: number, maxEl: number, minAz: number, maxAz: number) {
     const combinedArray = [];
     const indices = [];
@@ -414,19 +348,6 @@ export abstract class GlUtils {
       }
     }
     return { combinedArray, vertIndex };
-  }
-
-  /**
-   * Creates a vertex shader from a string.
-   */
-  public static createVertexShader(gl: WebGL2RenderingContext, source: string): WebGLShader {
-    const vertShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertShader, source);
-    gl.compileShader(vertShader);
-    if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
-      throw new Error('Vertex shader compilation failed: ' + gl.getShaderInfoLog(vertShader));
-    }
-    return vertShader;
   }
 
   public static crossProduct(a: number[], b: number[]): number[] {

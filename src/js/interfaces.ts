@@ -589,7 +589,7 @@ export type ColorRuleSet = (sat: SatObject, params?: any) => ColorInformation;
 export interface GroupsManager {
   clearSelect: () => void;
   createGroup: (type: GroupType, data: any, name?: string) => ObjectGroup;
-  groupList: ObjectGroup[];
+  groupList: Record<string, ObjectGroup>;
   selectGroup: (group: ObjectGroup) => void;
   selectedGroup: ObjectGroup;
   stopUpdatingInViewSoon: boolean;

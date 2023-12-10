@@ -1,6 +1,6 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2020, Theodore Kruczek
+(c) 2016-2023, Theodore Kruczek
 
 advice-module.js manages all recommended actions to the user in a semi-tutorial
 manner. It works closely with ui.js

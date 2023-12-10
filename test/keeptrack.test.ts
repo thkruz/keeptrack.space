@@ -92,7 +92,7 @@ describe('code_snippet', () => {
   // Tests that the constructor initializes all necessary objects and settings correctly.
   it('test_constructor_initializes_objects', () => {
     const drawManagerInstance = keepTrackApi.getDrawManager();
-    drawManagerInstance.updateLoop = jest.fn();
+    drawManagerInstance.update = jest.fn();
     keepTrackApi.getMainCamera().draw = jest.fn();
 
     const initializationTest = () => {
@@ -123,11 +123,11 @@ describe('code_snippet', () => {
     const keepTrack = new KeepTrack(<any>settingsOverride);
     const drawManagerInstance = keepTrackApi.getDrawManager();
     keepTrack.init().then(() => {
-      drawManagerInstance.updateLoop = jest.fn();
+      drawManagerInstance.update = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();
       settingsManager.cruncherReady = true;
       keepTrack.gameLoop();
-      expect(drawManagerInstance.updateLoop).toHaveBeenCalled();
+      expect(drawManagerInstance.update).toHaveBeenCalled();
       expect(keepTrackApi.getMainCamera().draw).toHaveBeenCalled();
     });
   });

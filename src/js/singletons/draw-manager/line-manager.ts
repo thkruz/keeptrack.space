@@ -5,12 +5,12 @@ import { SpaceObjectType } from '@app/js/lib/space-object-type';
 
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { BufferAttribute } from '@app/js/static/buffer-attribute';
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { keepTrackContainer } from '../../container';
 import { EciArr3 } from '../../interfaces';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
-import { GlUtils } from '../../static/gl-utils';
 import { SensorMath } from '../../static/sensor-math';
 import { DrawManager } from '../draw-manager';
 import { Line } from './line-manager/line';
@@ -476,13 +476,13 @@ export class LineManager {
 
   draw(drawManager: DrawManager, inViewData: Int8Array, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null): void {
     const gl = this.gl_;
-    const { gmst, pMatrix } = drawManager;
+    const { gmst, projectionMatrix } = drawManager;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
 
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, projectionMatrix);
 
     gl.enableVertexAttribArray(this.attribs_.a_position.location); // Enable
 
@@ -666,7 +666,7 @@ export class LineManager {
 
   init() {
     this.gl_ = keepTrackApi.getDrawManager().gl;
-    this.program = GlUtils.createProgram(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_);
+    this.program = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
   }
 
   removeStars(): boolean {

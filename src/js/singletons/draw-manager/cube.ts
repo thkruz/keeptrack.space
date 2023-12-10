@@ -1,5 +1,6 @@
 import { SatObject } from '@app/js/interfaces';
 import { BufferAttribute } from '@app/js/static/buffer-attribute';
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import * as Ootk from 'ootk';
 import { Kilometers } from 'ootk';
@@ -195,7 +196,7 @@ export class Box {
 
   private initProgram_() {
     const gl = this.gl_;
-    this.program_ = GlUtils.createProgramFromCode(gl, this.shaders_.vert, this.shaders_.frag);
+    this.program_ = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag).program;
     this.gl_.useProgram(this.program_);
 
     // Assign Attributes

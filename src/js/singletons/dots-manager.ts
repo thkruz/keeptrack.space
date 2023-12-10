@@ -7,6 +7,7 @@ import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { BufferAttribute } from '../static/buffer-attribute';
+import { WebGlProgramHelper } from '../static/webgl-program';
 import { CameraType } from './camera';
 import { DrawManager } from './draw-manager';
 
@@ -309,13 +310,13 @@ export class DotsManager {
     this.settings_ = settings;
 
     this.initShaders_();
-    this.programs.dots.program = GlUtils.createProgram(
+    this.programs.dots.program = new WebGlProgramHelper(
       drawManagerInstance.gl,
       this.shaders_.dots.vert,
       this.shaders_.dots.frag,
       this.programs.dots.attribs,
       this.programs.dots.uniforms
-    );
+    ).program;
 
     // Make buffers for satellite positions and size -- color and pickability are created in ColorScheme class
     this.buffers.position = drawManagerInstance.gl.createBuffer();
@@ -352,7 +353,7 @@ export class DotsManager {
    */
   initProgramPicking() {
     const gl = keepTrackApi.getDrawManager().gl;
-    this.programs.picking.program = GlUtils.createProgramFromCode(gl, this.shaders_.picking.vert, this.shaders_.picking.frag);
+    this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
     GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvCamMatrix']);

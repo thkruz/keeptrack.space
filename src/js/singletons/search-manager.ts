@@ -11,7 +11,7 @@ import { TopMenu } from '../plugins/top-menu/top-menu';
 import { LegendManager } from '../static/legend-manager';
 import { UrlManager } from '../static/url-manager';
 
-interface SearchResult {
+export interface SearchResult {
   isBus: any;
   satId: number;
   type: SpaceObjectType;

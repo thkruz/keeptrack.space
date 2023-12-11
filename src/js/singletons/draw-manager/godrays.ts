@@ -80,7 +80,7 @@ export class Godrays {
           offset: 0,
           stride: Float32Array.BYTES_PER_ELEMENT * 4,
         }),
-        uv: new BufferAttribute({
+        a_texCoord: new BufferAttribute({
           location: 1,
           vertices: 2,
           offset: Float32Array.BYTES_PER_ELEMENT * 2,
@@ -199,6 +199,7 @@ export class Godrays {
     `,
     vert: keepTrackApi.glsl`
       in vec2 a_position;
+      in vec2 a_texCoord;
 
       uniform vec2 u_resolution;
 
@@ -218,7 +219,7 @@ export class Godrays {
 
         // pass the texCoord to the fragment shader
         // The GPU will interpolate this value between points.
-        v_texCoord = uv;
+        v_texCoord = a_texCoord;
       }
     `,
   };

@@ -42,7 +42,7 @@ export class Astronomy extends KeepTrackPlugin {
   bottomIconCallback = (): void => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const drawManagerInstance = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
     if (this.isMenuButtonEnabled) {
       if (!this.verifySensorSelected()) return;

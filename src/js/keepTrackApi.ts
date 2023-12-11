@@ -20,13 +20,14 @@ import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
 import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
 import { DotsManager } from './singletons/dots-manager';
-import { DrawManager } from './singletons/draw-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
 import { errorManagerInstance } from './singletons/errorManager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
+import { Scene } from './singletons/scene';
 import { StarManager } from './singletons/starManager';
 import { TimeManager } from './singletons/time-manager';
+import { WebGLRenderer } from './singletons/webgl-renderer';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
 
@@ -278,7 +279,8 @@ export const keepTrackApi = {
   rmbMenuItems: <rmbMenuItem[]>[],
   getSoundManager: () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager),
   getStarManager: () => keepTrackContainer.get<StarManager>(Singletons.StarManager),
-  getDrawManager: () => keepTrackContainer.get<DrawManager>(Singletons.DrawManager),
+  getRenderer: () => keepTrackContainer.get<WebGLRenderer>(Singletons.WebGLRenderer),
+  getScene: () => keepTrackContainer.get<Scene>(Singletons.Scene),
   getCatalogManager: () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager),
   getSensorManager: () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager),
   getUiManager: () => keepTrackContainer.get<UiManager>(Singletons.UiManager),

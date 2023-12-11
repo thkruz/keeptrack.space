@@ -582,9 +582,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   }
 
   public init(): void {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
 
-    this.gl_ = drawManagerInstance.gl;
+    this.gl_ = renderer.gl;
     this.colorTheme = settingsManager.colors || {
       transparent: [0, 0, 0, 0] as rgbaArray,
       inFOV: [0.0, 1.0, 0.0, 1.0] as rgbaArray,
@@ -650,8 +650,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
 
     this.resetObjectTypeFlags();
-    this.colorBuffer = drawManagerInstance.gl.createBuffer();
-    this.pickableBuffer = drawManagerInstance.gl.createBuffer();
+    this.colorBuffer = renderer.gl.createBuffer();
+    this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
     keepTrackApi.register({

@@ -127,17 +127,12 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       }
 
       // Draw Line to Sun from Sensor
-      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const scene = keepTrackApi.getScene();
       keepTrackApi
         .getLineManager()
         .create(
           LineTypes.REF_TO_SAT,
-          [
-            keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name),
-            drawManagerInstance.sceneManager.moon.position[0],
-            drawManagerInstance.sceneManager.moon.position[1],
-            drawManagerInstance.sceneManager.moon.position[2],
-          ],
+          [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.moon.position[0], scene.moon.position[1], scene.moon.position[2]],
           'w'
         );
     });
@@ -152,17 +147,12 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       }
 
       // Draw Line to Sun from Sensor
-      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const scene = keepTrackApi.getScene();
       keepTrackApi
         .getLineManager()
         .create(
           LineTypes.REF_TO_SAT,
-          [
-            keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name),
-            drawManagerInstance.sceneManager.sun.position[0],
-            drawManagerInstance.sceneManager.sun.position[1],
-            drawManagerInstance.sceneManager.sun.position[2],
-          ],
+          [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.sun.position[0], scene.sun.position[1], scene.sun.position[2]],
           'o'
         );
     });

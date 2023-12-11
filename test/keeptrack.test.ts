@@ -3,9 +3,9 @@ import { keepTrackApi } from '@app/js/keepTrackApi';
 import { keepTrackContainer } from '../src/js/container';
 import { SatObject, Singletons } from '../src/js/interfaces';
 import { StandardCatalogManager } from '../src/js/singletons/catalog-manager';
-import { StandardDrawManager } from '../src/js/singletons/draw-manager';
 import { StandardOrbitManager } from '../src/js/singletons/orbitManager';
 import { StandardUiManager } from '../src/js/singletons/uiManager';
+import { WebGLRenderer } from '../src/js/singletons/webgl-renderer';
 import { CatalogLoader } from '../src/js/static/catalog-loader';
 import { KeepTrack } from './../src/js/keeptrack';
 import { mockCameraManager, setupDefaultHtml } from './environment/standard-env';
@@ -41,7 +41,7 @@ Additional aspects:
 
 const setupStandardEnvironment = () => {
   setupDefaultHtml();
-  const drawManagerInstance = new StandardDrawManager();
+  const drawManagerInstance = new WebGLRenderer();
   const catalogManagerInstance = new StandardCatalogManager();
   const orbitManagerInstance = new StandardOrbitManager();
   const uiManagerInstance = new StandardUiManager();
@@ -70,9 +70,9 @@ const setupStandardEnvironment = () => {
   // Pretend webGl works
   drawManagerInstance.gl = global.mocks.glMock;
   // Pretend we have a working canvas
-  drawManagerInstance['canvas'] = <any>{ style: { cursor: 'default' } };
+  drawManagerInstance['domElement'] = <any>{ style: { cursor: 'default' } };
 
-  keepTrackContainer.registerSingleton(Singletons.DrawManager, drawManagerInstance);
+  keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, drawManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
@@ -91,7 +91,7 @@ describe('code_snippet', () => {
 
   // Tests that the constructor initializes all necessary objects and settings correctly.
   it('test_constructor_initializes_objects', () => {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const drawManagerInstance = keepTrackApi.getRenderer();
     drawManagerInstance.update = jest.fn();
     keepTrackApi.getMainCamera().draw = jest.fn();
 
@@ -106,8 +106,8 @@ describe('code_snippet', () => {
 
   // Test that error messages are displayed on the loading screen in case of errors.
   it('test_error_messages_displayed_on_loading_screen', () => {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    drawManagerInstance.loadScene = () => {
+    const scene = keepTrackApi.getScene();
+    scene.loadScene = () => {
       throw new Error('Test error');
     };
 
@@ -121,7 +121,7 @@ describe('code_snippet', () => {
   // Tests that the game loop updates and draws the application correctly.
   it('test_game_loop_updates_and_draws_application', () => {
     const keepTrack = new KeepTrack(<any>settingsOverride);
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const drawManagerInstance = keepTrackApi.getRenderer();
     keepTrack.init().then(() => {
       drawManagerInstance.update = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();

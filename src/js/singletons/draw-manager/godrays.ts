@@ -36,7 +36,6 @@ export class Godrays {
   private sun_: Sun;
   private gl_: WebGL2RenderingContext;
   private isLoaded_ = false;
-  frameBuffer: WebGLFramebuffer;
   /**
    * TODO: Verify we need a render buffer for godrays
    */
@@ -139,8 +138,8 @@ export class Godrays {
 
   private initFrameBuffer_(): void {
     const gl = this.gl_;
-    this.frameBuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer);
+    keepTrackApi.getScene().frameBuffers.godrays = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.godrays);
 
     this.renderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderBuffer);

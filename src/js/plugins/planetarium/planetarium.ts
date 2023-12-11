@@ -40,7 +40,7 @@ export class Planetarium extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   bottomIconCallback = (): void => {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
     if (this.isMenuButtonEnabled) {
       if (!this.verifySensorSelected()) return;
@@ -74,7 +74,7 @@ export class Planetarium extends KeepTrackPlugin {
       keepTrackApi.getMainCamera().isPanReset = true;
       keepTrackApi.getMainCamera().isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
-      drawManagerInstance.glInit();
+      renderer.glInit();
       uiManagerInstance.hideSideMenus();
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View

@@ -743,7 +743,7 @@ export enum Singletons {
   LineManager = 'LineManager',
   StarManager = 'StarManager',
   TimeManager = 'TimeManager',
-  DrawManager = 'DrawManager',
+  WebGLRenderer = 'DrawManager',
   DotsManager = 'DotsManager',
   SensorManager = 'SensorManager',
   SelectSatManager = 'SelectSatManager',
@@ -752,4 +752,5 @@ export enum Singletons {
   SensorMath = 'SensorMathManager',
   MainCamera = 'MainCamera',
   PersistenceManager = 'PersistenceManager',
+  Scene = 'Scene',
 }

@@ -12,7 +12,7 @@ import { keepTrackContainer } from '../../container';
 import { EciArr3 } from '../../interfaces';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { SensorMath } from '../../static/sensor-math';
-import { DrawManager } from '../draw-manager';
+import { WebGLRenderer } from '../webgl-renderer';
 import { Line } from './line-manager/line';
 
 export enum LineTypes {
@@ -474,9 +474,9 @@ export class LineManager {
     }
   }
 
-  draw(drawManager: DrawManager, inViewData: Int8Array, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null): void {
+  draw(renderer: WebGLRenderer, inViewData: Int8Array, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null): void {
     const gl = this.gl_;
-    const { gmst, projectionMatrix } = drawManager;
+    const { gmst, projectionMatrix } = renderer;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
@@ -665,7 +665,7 @@ export class LineManager {
   }
 
   init() {
-    this.gl_ = keepTrackApi.getDrawManager().gl;
+    this.gl_ = keepTrackApi.getRenderer().gl;
     this.program = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
   }
 

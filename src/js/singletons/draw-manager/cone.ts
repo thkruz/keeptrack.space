@@ -16,8 +16,7 @@ import { CoordinateTransforms } from '../../static/coordinate-transforms';
 const offsetDistance = RADIUS_OF_EARTH + 80 + 1;
 
 export const init = async () => {
-  const drawManagerInstance = keepTrackApi.getDrawManager();
-  const { gl } = drawManagerInstance;
+  const { gl } = keepTrackApi.getRenderer();
 
   initProgram(gl);
   initBuffers(gl);
@@ -151,11 +150,10 @@ export const update = (position: Kilometers[]) => {
 
 export const draw = function (pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
   const catalogManagerInstance = keepTrackApi.getCatalogManager();
-  const drawManagerInstance = keepTrackApi.getDrawManager();
 
   if (catalogManagerInstance.selectedSat === -1) return;
 
-  const { gl } = drawManagerInstance;
+  const { gl } = keepTrackApi.getRenderer();
 
   cone.pMatrix = pMatrix;
   cone.camMatrix = camMatrix;

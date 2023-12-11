@@ -61,7 +61,7 @@ export class HoverManager {
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
     if (this.satHoverBoxDOM.style.display === 'none' || !settingsManager.enableHoverOverlay) return false;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
 
     if (catalogManagerInstance.isStarManagerLoaded) {
       const starManager = keepTrackApi.getStarManager();
@@ -69,7 +69,7 @@ export class HoverManager {
     }
 
     this.satHoverBoxDOM.style.display = 'none';
-    drawManagerInstance.setCursor('default');
+    renderer.setCursor('default');
     return true;
   }
 
@@ -78,10 +78,10 @@ export class HoverManager {
       // NOTE: The radar mesurement logic breaks if you call it a SatObject
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const renderer = keepTrackApi.getRenderer();
 
       const sat = catalogManagerInstance.getSat(id);
-      const satScreenPositionArray = drawManagerInstance.getScreenCoords(sat);
+      const satScreenPositionArray = renderer.getScreenCoords(sat);
 
       if (
         satScreenPositionArray.error ||
@@ -120,7 +120,7 @@ export class HoverManager {
       };
       Object.assign(this.satHoverBoxDOM.style, style);
 
-      drawManagerInstance.setCursor('pointer');
+      renderer.setCursor('pointer');
     }
   }
 
@@ -143,11 +143,11 @@ export class HoverManager {
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
       this.satHoverBoxDOM.style.display = 'none';
 
-      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const renderer = keepTrackApi.getRenderer();
       if (satId !== -1) {
-        drawManagerInstance.setCursor('pointer');
+        renderer.setCursor('pointer');
       } else {
-        drawManagerInstance.setCursor('default');
+        renderer.setCursor('default');
       }
       return true;
     }
@@ -196,7 +196,7 @@ export class HoverManager {
 
   private satObj_(sat: SatObject) {
     if (!settingsManager.enableHoverOverlay) return;
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     // Use this as a default if no UI
@@ -224,18 +224,13 @@ export class HoverManager {
         this.satHoverBoxNode2.textContent = `Launched: ${year}`;
       }
 
-      if (
-        catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].lat != null &&
-        settingsManager.isShowNextPass &&
-        drawManagerInstance.isShowDistance
-      ) {
+      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && settingsManager.isShowNextPass && renderer.isShowDistance) {
         if (catalogManagerInstance.selectedSat !== -1) {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat) + SensorMath.distanceString(sat, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
         } else {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat);
         }
-      } else if (drawManagerInstance.isShowDistance) {
+      } else if (renderer.isShowDistance) {
         this.showRicOrEci_(sat);
       } else if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && settingsManager.isShowNextPass) {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);
@@ -316,15 +311,15 @@ export class HoverManager {
 
   private showRicOrEci_(sat: SatObject) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
 
-    drawManagerInstance.sat2 = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
-    if (typeof drawManagerInstance.sat2 !== 'undefined' && drawManagerInstance.sat2 !== null && sat !== drawManagerInstance.sat2) {
-      const ric = CoordinateTransforms.sat2ric(sat, drawManagerInstance.sat2);
+    renderer.sat2 = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+    if (typeof renderer.sat2 !== 'undefined' && renderer.sat2 !== null && sat !== renderer.sat2) {
+      const ric = CoordinateTransforms.sat2ric(sat, renderer.sat2);
       this.satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
       this.showRicDistAndVel_(ric);
     } else {
-      this.satHoverBoxNode2.innerHTML = `${sat.sccNum}${SensorMath.distanceString(sat, drawManagerInstance.sat2)}`;
+      this.satHoverBoxNode2.innerHTML = `${sat.sccNum}${SensorMath.distanceString(sat, renderer.sat2)}`;
       this.showEciDistAndVel_(sat);
     }
   }
@@ -387,7 +382,7 @@ export class HoverManager {
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const gl = keepTrackApi.getDrawManager().gl;
+    const gl = keepTrackApi.getRenderer().gl;
 
     this.hoveringSat = i;
     if (i === this.lasthoveringSat) return;

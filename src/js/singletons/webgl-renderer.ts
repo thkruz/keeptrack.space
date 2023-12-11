@@ -1,10 +1,9 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
-import { mat4, vec4 } from 'gl-matrix';
+import { mat4, vec2, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
-import { SelectSatManager } from '../plugins/select-sat-manager/select-sat-manager';
 import { StereoMapPlugin } from '../plugins/stereo-map/stereo-map';
 import { watchlistPlugin } from '../plugins/watchlist/watchlist';
 import { SettingsManager } from '../settings/settings';
@@ -12,70 +11,15 @@ import { CatalogSource } from '../static/catalog-loader';
 import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
-import { DotsManager } from './dots-manager';
-import { Box as SearchBox } from './draw-manager/cube';
-import { Earth } from './draw-manager/earth';
-import { Godrays } from './draw-manager/godrays';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { MeshManager } from './draw-manager/mesh-manager';
-import { Moon } from './draw-manager/moon';
 import { PostProcessingManager } from './draw-manager/post-processing';
-import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
+import { errorManagerInstance } from './errorManager';
 import { GroupType } from './object-group';
+import { Scene } from './scene';
 
-export interface DrawManager {
-  canvas: HTMLCanvasElement;
-  demoModeSatellite: any;
-  dt: Milliseconds;
-  dtAdjusted: Milliseconds;
-  gl: WebGL2RenderingContext;
-  gmst: GreenwichMeanSiderealTime;
-  isDrawOrbitsAbove: boolean;
-  isNeedPostProcessing: boolean;
-  isPostProcessingResizeNeeded: boolean;
-  isShowDistance: boolean;
-  isUpdateTimeThrottle: boolean;
-  lastSelectedSat: number;
-  meshManager: MeshManager;
-  projectionMatrix: mat4;
-  projectionCameraMatrix: mat4;
-  postProcessingManager: PostProcessingManager;
-  sat: SatObject;
-  sat2: SatObject;
-  sceneManager: {
-    earth: Earth;
-    moon: Moon;
-    sun: Sun;
-    skybox: SkyBoxSphere;
-    searchBox: SearchBox;
-  };
-  selectSatManager: SelectSatManager;
-  sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
-
-  clearFrameBuffers(pickFb: WebGLFramebuffer, godFb: WebGLFramebuffer): void;
-  draw(dotsManager: DotsManager): void;
-  drawOptionalScenery(mainCameraInstance: Camera): void;
-  glInit(): Promise<WebGL2RenderingContext>;
-  init(settings: SettingsManager): Promise<void>;
-  loadScene(): Promise<void>;
-  orbitsAbove(): void;
-  getScreenCoords(sat: SatObject): {
-    x: number;
-    y: number;
-    z: number;
-    error: boolean;
-  };
-  resizeCanvas(): void;
-  resizePostProcessingTexture(gl: WebGL2RenderingContext, sun: Sun, postProcessingManagerRef: PostProcessingManager): void;
-  satCalculate(): void;
-  setCanvasSize(height: number, width: number): void;
-  setCursor(cursor: 'default' | 'pointer' | 'grab' | 'grabbing'): void;
-  startWithOrbits(): Promise<void>;
-  update(): void;
-}
-
-export class StandardDrawManager implements DrawManager {
+export class WebGLRenderer {
   private hoverBoxOnSatMiniElements_ = null;
   private isRotationEvent_: boolean;
   private isSatMiniBoxInUse_ = false;
@@ -84,52 +28,45 @@ export class StandardDrawManager implements DrawManager {
   private satLabelModeLastTime_ = 0;
   private satMiniBox_: HTMLDivElement;
   private settings_: SettingsManager;
+  private isContextLost_ = false;
 
-  public canvas: HTMLCanvasElement;
-  public demoModeSatellite: any;
+  /** A canvas where the renderer draws its output. */
+  domElement: HTMLCanvasElement;
+  demoModeSatellite: any;
   /** The number of milliseconds since the last draw event
    *
    *  Use this for all ui interactions that are agnostic to propagation rate
    */
-  public dt: Milliseconds;
+  dt: Milliseconds;
   /** The number of milliseconds since the last draw event multiplied by propagation rate
    *
    *  Use this for all time calculations involving position and velocity
    */
-  public dtAdjusted: Milliseconds;
+  dtAdjusted: Milliseconds;
   /**
    * Main source of glContext for rest of the application
    */
-  public gl: WebGL2RenderingContext;
-  public gmst: GreenwichMeanSiderealTime;
-  public isDrawOrbitsAbove: boolean;
-  public isNeedPostProcessing: boolean;
-  public isPostProcessingResizeNeeded: boolean;
-  public isShowDistance = false;
-  public isUpdateTimeThrottle: boolean;
-  public lastSelectedSat: number;
-  public meshManager = new MeshManager();
+  gl: WebGL2RenderingContext;
+  gmst: GreenwichMeanSiderealTime;
+  isDrawOrbitsAbove: boolean;
+  isPostProcessingResizeNeeded: boolean;
+  isShowDistance = false;
+  isUpdateTimeThrottle: boolean;
+  lastSelectedSat: number;
+  meshManager = new MeshManager();
   /**
    * Main source of projection matrix for rest of the application
    */
-  public projectionMatrix: mat4;
-  public projectionCameraMatrix: mat4;
-  public postProcessingManager: PostProcessingManager;
-  public sat: SatObject;
-  public sat2: SatObject;
-  public sceneManager = {
-    earth: new Earth(),
-    moon: new Moon(),
-    sun: new Sun(),
-    godrays: new Godrays(),
-    skybox: new SkyBoxSphere(),
-    searchBox: new SearchBox(),
-  };
+  projectionMatrix: mat4;
+  projectionCameraMatrix: mat4;
+  postProcessingManager: PostProcessingManager;
+  sat: SatObject;
+  sat2: SatObject;
 
-  public selectSatManager = keepTrackApi.getSelectSatManager();
-  public sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
+  selectSatManager = keepTrackApi.getSelectSatManager();
+  sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
 
-  public static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
+  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
     const pMatrix = mat4.create();
     mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
 
@@ -139,7 +76,7 @@ export class StandardDrawManager implements DrawManager {
     return pMatrix;
   }
 
-  public static getCanvasInfo(): { vw: number; vh: number } {
+  static getCanvasInfo(): { vw: number; vh: number } {
     // Using minimum allows the canvas to be full screen without fighting with scrollbars
     const cw = document.documentElement.clientWidth || 0;
     const iw = window.innerWidth || 0;
@@ -149,35 +86,11 @@ export class StandardDrawManager implements DrawManager {
     return { vw, vh };
   }
 
-  public clearFrameBuffers(pickFb: WebGLFramebuffer, godFb: WebGLFramebuffer): void {
-    const gl = this.gl;
-    // NOTE: clearColor is set here because two different colors are used. If you set it during
-    // frameBuffer init then the wrong color will be applied (this can break gpuPicking)
-    gl.bindFramebuffer(gl.FRAMEBUFFER, pickFb);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    // Clear all post processing frame buffers
-    /* istanbul ignore next */
-    if (this.isNeedPostProcessing) {
-      this.postProcessingManager.clearAll();
-    }
-    // Clear the godrays Frame Buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, godFb);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    // Switch back to the canvas
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    // Only needed when doing post processing - otherwise just stay where we are
-    // Setup Initial Frame Buffer for Offscreen Drawing
-    // gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
-  }
-
   private isAltCanvasSize_: boolean = false;
 
-  public draw(dotsManager: DotsManager) {
+  render(scene: Scene, camera: Camera): void {
+    if (this.isContextLost_) return;
+
     if (keepTrackApi.methods.altCanvasResize()) {
       this.resizeCanvas(true);
       this.isAltCanvasSize_ = true;
@@ -189,70 +102,36 @@ export class StandardDrawManager implements DrawManager {
     // Apply the camera matrix
     this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
 
-    // Actually draw things now that math is done
-    this.clearFrameBuffers(dotsManager.pickingFrameBuffer, this.sceneManager.godrays.frameBuffer);
-
-    this.drawOptionalScenery(keepTrackApi.getMainCamera());
-    this.sceneManager.earth.draw(this.postProcessingManager.curBuffer, keepTrackApi.callbacks.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null);
+    scene.render(this, camera);
   }
 
-  public drawOptionalScenery(mainCameraInstance: Camera) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  private resetGLState_() {
+    const gl = this.gl;
 
-    if (!settingsManager.isDrawLess) {
-      if (this.isPostProcessingResizeNeeded) this.resizePostProcessingTexture(this.gl, this.sceneManager.sun, this.postProcessingManager);
-
-      if (settingsManager.isDrawSun) {
-        // Draw the Sun to the Godrays Frame Buffer
-        this.sceneManager.sun.draw(this.sceneManager.earth.lightDirection, this.sceneManager.godrays.frameBuffer);
-
-        // Draw a black earth and possible black satellite mesh on top of the sun in the godrays frame buffer
-        this.sceneManager.earth.drawOcclusion(
-          this.projectionMatrix,
-          mainCameraInstance.camMatrix,
-          this?.postProcessingManager?.programs?.occlusion,
-          this.sceneManager?.godrays?.frameBuffer
-        );
-        if (
-          !settingsManager.modelsOnSatelliteViewOverride &&
-          catalogManagerInstance.selectedSat !== -1 &&
-          keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera
-        ) {
-          this.meshManager.drawOcclusion(this.projectionMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.programs.occlusion, this.sceneManager.godrays.frameBuffer);
-        }
-        // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
-        // todo: this should be a dynamic buffer not hardcoded to bufffer two
-        this.postProcessingManager.curBuffer = null;
-        this.sceneManager.godrays.draw(this.projectionMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
-      }
-
-      this.sceneManager.skybox.draw(this.projectionMatrix, mainCameraInstance.camMatrix, this.postProcessingManager.curBuffer);
-
-      // Apply two pass gaussian blur to the godrays to smooth them out
-      // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
-      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
-      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
-      // postProcessingManager.switchFrameBuffer();
-      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
-      // // After second pass apply the results to the canvas
-      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
-
-      // Draw the moon
-      if (!settingsManager.isDisableMoon) {
-        this.sceneManager.moon.draw(this.sceneManager.sun.position);
-      }
-
-      keepTrackApi.methods.drawOptionalScenery();
-    }
-
-    this.postProcessingManager.curBuffer = null;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.useProgram(null);
   }
 
-  public async glInit(): Promise<WebGL2RenderingContext> {
+  private onContextLost_(e: WebGLContextEvent) {
+    e.preventDefault(); // allows the context to be restored
+    errorManagerInstance.info('WebGL Context Lost');
+    this.isContextLost_ = true;
+  }
+
+  private onContextRestore_() {
+    errorManagerInstance.info('WebGL Context Restored');
+    this.resetGLState_();
+    this.isContextLost_ = false;
+  }
+
+  async glInit(): Promise<WebGL2RenderingContext> {
     // Ensure the canvas is available
-    this.canvas ??= isThisNode() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas');
+    this.domElement ??= isThisNode() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas');
 
-    if (!this.canvas) {
+    if (!this.domElement) {
       throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
     }
 
@@ -261,21 +140,15 @@ export class StandardDrawManager implements DrawManager {
     });
 
     // Try to prevent crashes
-    if (this.canvas.addEventListener) {
-      this.canvas.addEventListener('webglcontextlost', (e) => {
-        console.debug(e);
-        e.preventDefault(); // allows the context to be restored
-      });
-      this.canvas.addEventListener('webglcontextrestored', (e) => {
-        console.debug(e);
-        this.glInit();
-      });
+    if (this.domElement?.addEventListener) {
+      this.domElement.addEventListener('webglcontextlost', this.onContextLost_.bind(this));
+      this.domElement.addEventListener('webglcontextrestored', this.onContextRestore_.bind(this));
     }
 
     let gl: WebGL2RenderingContext;
     gl = isThisNode()
       ? global.mocks.glMock
-      : this.canvas.getContext('webgl2', {
+      : this.domElement.getContext('webgl2', {
           alpha: false,
           premultipliedAlpha: false,
           desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
@@ -304,7 +177,7 @@ export class StandardDrawManager implements DrawManager {
     return gl;
   }
 
-  public async init(settings: SettingsManager): Promise<void> {
+  async init(settings: SettingsManager): Promise<void> {
     this.settings_ = settings;
 
     this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
@@ -316,30 +189,10 @@ export class StandardDrawManager implements DrawManager {
       this.isRotationEvent_ = true;
     });
 
-    this.sceneManager.earth.reloadEarthHiResTextures();
+    keepTrackApi.getScene().earth.reloadEarthHiResTextures();
   }
 
-  public async loadScene(): Promise<void> {
-    // Make this public
-    try {
-      // await tools.init();
-      await this.sceneManager.earth.init(settingsManager, this.gl);
-      keepTrackApi.methods.drawManagerLoadScene();
-      await this.sceneManager.sun.init(this.gl);
-      if (!settingsManager.isDisableMoon) {
-        await this.sceneManager.moon.init(this.gl);
-      }
-      await this.sceneManager.searchBox.init(this.gl);
-      if (!settingsManager.isDisableSkybox) {
-        await this.sceneManager.skybox.init(settingsManager, this.gl);
-      }
-      // await sceneManager.cone.init();
-    } catch (error) {
-      console.debug(error);
-    }
-  }
-
-  public orbitsAbove() {
+  orbitsAbove() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -479,7 +332,7 @@ export class StandardDrawManager implements DrawManager {
     }
   }
 
-  public getScreenCoords(sat: SatObject): {
+  getScreenCoords(sat: SatObject): {
     x: number;
     y: number;
     z: number;
@@ -511,9 +364,9 @@ export class StandardDrawManager implements DrawManager {
     return screenPos;
   }
 
-  public resizeCanvas(isForcedResize: boolean = false) {
+  resizeCanvas(isForcedResize: boolean = false) {
     const gl = this.gl;
-    const { vw, vh } = StandardDrawManager.getCanvasInfo();
+    const { vw, vh } = WebGLRenderer.getCanvasInfo();
 
     // If taking a screenshot then resize no matter what to get high resolution
     if ((!isForcedResize && gl.canvas.width != vw) || gl.canvas.height != vh) {
@@ -521,8 +374,8 @@ export class StandardDrawManager implements DrawManager {
       if (settingsManager.isAutoResizeCanvas) {
         // If this is a cellphone avoid the keyboard forcing resizes but
         // always resize on rotation
-        const oldWidth = this.canvas.width;
-        const oldHeight = this.canvas.height;
+        const oldWidth = this.domElement.width;
+        const oldHeight = this.domElement.height;
         // Changes more than 35% of height but not due to rotation are likely the keyboard! Ignore them
         // but make sure we have set this at least once to trigger
         const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
@@ -543,8 +396,8 @@ export class StandardDrawManager implements DrawManager {
       this.setCanvasSize(settingsManager.hiResHeight, settingsManager.hiResWidth);
     }
 
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
+    gl.viewport(0, 0, this.domElement.width, this.domElement.height);
+    this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
     this.isPostProcessingResizeNeeded = true;
 
     // Fix the gpu picker texture size if it has already been created
@@ -552,13 +405,16 @@ export class StandardDrawManager implements DrawManager {
     if (dotsManagerInstance.isReady) dotsManagerInstance.initProgramPicking();
   }
 
-  public resizePostProcessingTexture(gl: WebGL2RenderingContext, sun: Sun, postProcessingManagerRef: PostProcessingManager): void {
+  /**
+   * @deprecated
+   */
+  resizePostProcessingTexture(gl: WebGL2RenderingContext, sun: Sun, postProcessingManagerRef: PostProcessingManager): void {
     if (typeof gl === 'undefined' || gl === null) throw new Error('gl is undefined or null');
     if (typeof sun === 'undefined' || sun === null) throw new Error('sun is undefined or null');
     if (typeof postProcessingManagerRef === 'undefined' || postProcessingManagerRef === null) throw new Error('postProcessingManager is undefined or null');
 
     // Post Processing Texture Needs Scaled
-    this.sceneManager.godrays?.init(gl, sun);
+    keepTrackApi.getScene().godrays?.init(gl, sun);
     postProcessingManagerRef.init(gl);
 
     // Reset Flag now that textures are reinitialized
@@ -568,7 +424,7 @@ export class StandardDrawManager implements DrawManager {
   /**
    * Calculate changes related to satellites objects
    */
-  public satCalculate() {
+  satCalculate() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
@@ -591,7 +447,7 @@ export class StandardDrawManager implements DrawManager {
       keepTrackApi.getMainCamera().snapToSat(this.sat, timeManagerInstance.simulationTimeObj);
       if (this.sat.missile) orbitManagerInstance.setSelectOrbit(this.sat.id);
 
-      this.sceneManager.searchBox.update(this.sat, timeManagerInstance.selectedDate);
+      keepTrackApi.getScene().searchBox.update(this.sat, timeManagerInstance.selectedDate);
     } else {
       // Reset the selected satellite if no satellite is selected
       this.sat = <SatObject>{
@@ -601,7 +457,7 @@ export class StandardDrawManager implements DrawManager {
         static: false,
       };
 
-      this.sceneManager.searchBox.update(null);
+      keepTrackApi.getScene().searchBox.update(null);
     }
 
     if (catalogManagerInstance.selectedSat !== this.lastSelectedSat) {
@@ -624,16 +480,16 @@ export class StandardDrawManager implements DrawManager {
     }
   }
 
-  public setCanvasSize(height: number, width: number) {
-    this.canvas.width = width;
-    this.canvas.height = height;
+  setCanvasSize(height: number, width: number) {
+    this.domElement.width = width;
+    this.domElement.height = height;
   }
 
   setCursor(cursor: 'default' | 'pointer' | 'grab' | 'grabbing') {
-    this.canvas.style.cursor = cursor;
+    this.domElement.style.cursor = cursor;
   }
 
-  public async startWithOrbits(): Promise<void> {
+  async startWithOrbits(): Promise<void> {
     if (this.settings_.startWithOrbitsDisplayed) {
       const groupsManagerInstance = keepTrackApi.getGroupsManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -647,7 +503,7 @@ export class StandardDrawManager implements DrawManager {
     }
   }
 
-  public update(): void {
+  update(): void {
     this.validateProjectionMatrix_();
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -664,10 +520,7 @@ export class StandardDrawManager implements DrawManager {
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
     this.gmst = gmst;
 
-    this.sceneManager.sun.update(j);
-    this.sceneManager.earth.update(gmst, j);
-    this.sceneManager.moon.update(timeManagerInstance.simulationTimeObj, gmst);
-    this.sceneManager.skybox.update();
+    keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj, gmst, j);
 
     this.orbitsAbove(); //this.sensorPos is set here for the Camera Manager
 
@@ -680,16 +533,44 @@ export class StandardDrawManager implements DrawManager {
     keepTrackApi.methods.updateLoop();
   }
 
+  getCurrentViewport(target?: vec4): vec4 {
+    const gl = this.gl;
+    vec4.set(target ?? vec4.create(), 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    return target;
+  }
+
+  getDrawingBufferSize(target?: vec2): vec2 {
+    const gl = this.gl;
+    vec2.set(target ?? vec2.create(), gl.drawingBufferWidth, gl.drawingBufferHeight);
+    return target;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getPixelRatio(): number {
+    return window.devicePixelRatio;
+  }
+
+  getActiveMipmapLevel(): number {
+    const gl = this.gl;
+    const activeTexture = gl.getParameter(gl.TEXTURE_BINDING_2D);
+    const activeTextureLevel = gl.getTexParameter(activeTexture, gl.TEXTURE_MAX_LEVEL);
+    return activeTextureLevel;
+  }
+
+  getContext(): WebGL2RenderingContext {
+    return this.gl;
+  }
+
   private validateProjectionMatrix_() {
     if (!this.projectionMatrix) {
       console.error('projectionMatrix is undefined - retrying');
-      this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
+      this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
     }
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(this.projectionMatrix[i])) {
         console.error('projectionMatrix is NaN - retrying');
-        this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
+        this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
       }
     }
 
@@ -699,7 +580,7 @@ export class StandardDrawManager implements DrawManager {
       }
       if (i === 15) {
         console.error('projectionMatrix is all zeros - retrying');
-        this.projectionMatrix = StandardDrawManager.calculatePMatrix(this.gl);
+        this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
       }
     }
   }

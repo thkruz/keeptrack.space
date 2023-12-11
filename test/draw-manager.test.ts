@@ -1,13 +1,13 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { CameraType } from '@app/js/singletons/camera';
-import { DrawManager, StandardDrawManager } from '@app/js/singletons/draw-manager';
+import { Renderer, WebGLRenderer } from '@app/js/singletons/webgl-renderer';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 
 describe('drawManager', () => {
-  let drawManagerInstance: DrawManager;
+  let drawManagerInstance: Renderer;
   beforeEach(() => {
-    drawManagerInstance = new StandardDrawManager();
+    drawManagerInstance = new WebGLRenderer();
   });
   // Should process getScreenCoords
   it('process_get_screen_coords', () => {

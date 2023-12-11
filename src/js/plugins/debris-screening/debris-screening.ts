@@ -151,17 +151,15 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   onVisClick(): void {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
     const uVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-u`)).value);
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);
     const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value);
 
-    drawManagerInstance.sceneManager.searchBox.setCubeSize(<Kilometers>uVal, <Kilometers>vVal, <Kilometers>wVal);
+    keepTrackApi.getScene().searchBox.setCubeSize(<Kilometers>uVal, <Kilometers>vVal, <Kilometers>wVal);
   }
 
   static onClearVisClick(): void {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    drawManagerInstance.sceneManager.searchBox.setCubeSize(<Kilometers>0, <Kilometers>0, <Kilometers>0);
+    keepTrackApi.getScene().searchBox.setCubeSize(<Kilometers>0, <Kilometers>0, <Kilometers>0);
   }
 
   onFormSubmit(): void {

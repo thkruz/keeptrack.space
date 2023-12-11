@@ -432,7 +432,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       keepTrackApi.getMainCamera().isPanReset = true;
       keepTrackApi.getMainCamera().isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
-      keepTrackApi.getDrawManager().glInit();
+      keepTrackApi.getRenderer().glInit();
       const uiManagerInstance = keepTrackApi.getUiManager();
       uiManagerInstance.hideSideMenus();
       const orbitManagerInstance = keepTrackApi.getOrbitManager();

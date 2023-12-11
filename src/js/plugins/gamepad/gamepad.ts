@@ -248,15 +248,15 @@ export class GamepadPlugin {
     const zoomIn = this.currentController.buttons[7].value;
 
     if (zoomOut === 0 && zoomIn === 0) return; // Not Zooming
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
 
     let zoomTarget = keepTrackApi.getMainCamera().zoomLevel();
     switch (keepTrackApi.getMainCamera().cameraType) {
       case CameraType.DEFAULT:
       case CameraType.OFFSET:
       case CameraType.FIXED_TO_SAT:
-        zoomTarget += (zoomOut / 500) * drawManagerInstance.dt;
-        zoomTarget -= (zoomIn / 500) * drawManagerInstance.dt;
+        zoomTarget += (zoomOut / 500) * renderer.dt;
+        zoomTarget -= (zoomIn / 500) * renderer.dt;
         keepTrackApi.getMainCamera().zoomTarget = zoomTarget;
         keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
         keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
@@ -272,10 +272,10 @@ export class GamepadPlugin {
       case CameraType.PLANETARIUM:
       case CameraType.ASTRONOMY:
         if (zoomOut !== 0) {
-          keepTrackApi.getMainCamera().fpsVertSpeed += (zoomOut * 2) ** 3 * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().fpsVertSpeed += (zoomOut * 2) ** 3 * renderer.dt * settingsManager.cameraMovementSpeed;
         }
         if (zoomIn !== 0) {
-          keepTrackApi.getMainCamera().fpsVertSpeed -= (zoomIn * 2) ** 3 * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().fpsVertSpeed -= (zoomIn * 2) ** 3 * renderer.dt * settingsManager.cameraMovementSpeed;
         }
         break;
     }
@@ -287,7 +287,7 @@ export class GamepadPlugin {
 
     if (x > this.deadzone || x < -this.deadzone || y > this.deadzone || y < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
-      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const drawManagerInstance = keepTrackApi.getRenderer();
       settingsManager.lastGamepadMovement = Date.now();
 
       switch (keepTrackApi.getMainCamera().cameraType) {
@@ -319,7 +319,7 @@ export class GamepadPlugin {
 
     const x = this.currentController.axes[2];
     const y = this.currentController.axes[3];
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const drawManagerInstance = keepTrackApi.getRenderer();
 
     keepTrackApi.getMainCamera().isLocalRotateOverride = false;
     if (y > this.deadzone || y < -this.deadzone || x > this.deadzone || x < -this.deadzone) {

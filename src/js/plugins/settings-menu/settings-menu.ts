@@ -612,7 +612,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
     if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
-      keepTrackApi.getDrawManager().sceneManager.earth.reloadEarthHiResTextures();
+      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
     }
     settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
     settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;
@@ -634,8 +634,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
 
     if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-      drawManagerInstance.sceneManager.skybox.init(settingsManager, drawManagerInstance.gl);
+      keepTrackApi.getScene().skybox.init(settingsManager, keepTrackApi.getRenderer().gl);
     }
 
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;

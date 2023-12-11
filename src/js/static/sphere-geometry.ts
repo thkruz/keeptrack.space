@@ -80,24 +80,24 @@ export class SphereGeometry extends BufferGeometry {
       type: 'SphereGeometry',
       attributes: {
         ...{
-          position: {
+          position: new BufferAttribute({
             location: 0,
             vertices: 3,
             stride: Float32Array.BYTES_PER_ELEMENT * 8,
             offset: 0,
-          } as BufferAttribute,
-          normal: {
+          }),
+          normal: new BufferAttribute({
             location: 1,
             vertices: 3,
             stride: Float32Array.BYTES_PER_ELEMENT * 8,
             offset: Float32Array.BYTES_PER_ELEMENT * 3,
-          } as BufferAttribute,
-          uv: {
+          }),
+          uv: new BufferAttribute({
             location: 2,
             vertices: 2,
             stride: Float32Array.BYTES_PER_ELEMENT * 8,
             offset: Float32Array.BYTES_PER_ELEMENT * 6,
-          } as BufferAttribute,
+          }),
           ...attributes,
         },
       },

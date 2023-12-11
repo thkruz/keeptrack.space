@@ -148,7 +148,7 @@ export class Sun {
     const gl = this.gl_;
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getDrawManager().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
     gl.uniform3fv(this.mesh.material.uniforms.lightDirection, earthLightDirection);
     gl.uniform1f(this.mesh.material.uniforms.sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
   }
@@ -188,7 +188,7 @@ export class Sun {
 
         void main(void) {
             vec4 worldPosition = modelViewMatrix * vec4(position / 1.6, 1.0);
-            v_dist2 = distance(position.xyz,vec3(0.0,0.0,0.0)) / sunDistance;
+            v_dist2 = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / sunDistance;
             v_normal = normalMatrix * normal;
 
             gl_Position = projectionMatrix * worldPosition;

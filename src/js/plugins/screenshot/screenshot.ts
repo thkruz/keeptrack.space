@@ -134,8 +134,7 @@ export class Screenshot extends KeepTrackPlugin {
   }
 
   private static watermarkedDataUrl(text: string) {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    const canvas = drawManagerInstance.canvas;
+    const canvas = keepTrackApi.getRenderer().domElement;
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');

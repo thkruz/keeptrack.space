@@ -27,6 +27,8 @@ export enum LineTypes {
   SAT_TO_MISL = 'misl',
   CENTER_OF_EARTH_TO_REF = 'ref',
   REF_TO_REF = 'ref2',
+  SENSOR_TO_SUN = 'SENSOR_TO_SUN',
+  SENSOR_TO_MOON = 'SENSOR_TO_MOON',
 }
 export type LineColors = 'r' | 'o' | 'y' | 'g' | 'b' | 'c' | 'p' | 'w' | [number, number, number, number];
 
@@ -125,6 +127,10 @@ export class LineManager {
       case LineTypes.CENTER_OF_EARTH_TO_SAT:
         this.createSat_(value as [number], color);
         break;
+      case LineTypes.SENSOR_TO_SUN:
+      case LineTypes.SENSOR_TO_MOON:
+        this.createSat2_(value as [number, number, number, number], color, type);
+        break;
       case LineTypes.REF_TO_SAT:
         this.createSat2_(value as [number, number, number, number], color);
         break;
@@ -158,6 +164,8 @@ export class LineManager {
       default:
         break;
     }
+
+    keepTrackApi.methods.onLineAdded();
   }
 
   /**
@@ -232,7 +240,7 @@ export class LineManager {
   /**
    * Reference Point to Satellite
    */
-  private createSat2_(value: [number, number, number, number], color: [number, number, number, number]) {
+  private createSat2_(value: [number, number, number, number], color: [number, number, number, number], type: LineTypes = LineTypes.REF_TO_SAT) {
     const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
     if (!sat?.position?.x) {
       console.debug(`No Satellite Position Available for Line`);
@@ -241,11 +249,11 @@ export class LineManager {
     }
     this.drawLineList.push({
       line: new Line(this.gl_, this.attribs_, this.uniforms_),
-      sat: sat,
+      sat,
       ref: [value[1], value[2], value[3]],
       ref2: [sat.position.x, sat.position.y, sat.position.z],
-      color: color,
-      type: LineTypes.REF_TO_SAT,
+      color,
+      type,
     });
   }
 

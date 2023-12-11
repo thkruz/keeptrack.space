@@ -58,7 +58,8 @@ export type KeepTrackApiRegisterParams = {
     | ((sensor: SensorObject) => void)
     | ((gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => void)
     | ((sensor: SensorObject | string, staticNum: number) => void)
-    | ((watchlistList: number[]) => void);
+    | ((watchlistList: number[]) => void)
+    | ((lineManager: LineManager) => void);
 };
 
 /**
@@ -180,6 +181,7 @@ export const keepTrackApi = {
     endOfDraw: [],
     onWatchlistUpdated: [],
     staticOffsetChange: [],
+    onLineAdded: [],
   },
   methods: {
     onHelpMenuClick: () => {
@@ -269,6 +271,9 @@ export const keepTrackApi = {
     staticOffsetChange: (staticOffset: number) => {
       keepTrackApi.callbacks.staticOffsetChange.forEach((cb: any) => cb.cb(staticOffset));
     },
+    onLineAdded: () => {
+      keepTrackApi.callbacks.onLineAdded.forEach((cb: any) => cb.cb(keepTrackApi.getLineManager()));
+    },
   },
   loadedPlugins: <KeepTrackPlugin[]>[],
   getPlugin: (pluginClass: Constructor<KeepTrackPlugin>) => {
@@ -343,6 +348,10 @@ export enum KeepTrackApiEvents {
    * Run in the staticOffset setter of TimeManager instance with parameters (staticOffset: number)
    */
   staticOffsetChange = 'staticOffsetChange',
+  /**
+   * Runs when a line is added to the line manager
+   */
+  onLineAdded = 'onLineAdded',
 }
 
 /**

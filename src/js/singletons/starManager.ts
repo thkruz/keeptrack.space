@@ -1,9 +1,9 @@
 /* /////////////////////////////////////////////////////////////////////////////
 
-(c) 2016-2020, Theodore Kruczek
+(c) 2016-2023, Theodore Kruczek
 http://keeptrack.space
 
-All code is Copyright © 2016-2020 by Theodore Kruczek. All rights reserved.
+All code is Copyright © 2016-2023 by Theodore Kruczek. All rights reserved.
 No part of this web site may be reproduced, published, distributed, displayed,
 performed, copied or stored for or private use, without written
 permission of the author.

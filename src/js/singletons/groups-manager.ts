@@ -9,7 +9,7 @@ import { GroupsManager } from '@app/js/interfaces';
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -26,7 +26,7 @@ import { GroupsManager } from '@app/js/interfaces';
  */
 
 export class StandardGroupManager implements GroupsManager {
-  groupList: ObjectGroup[] = [];
+  groupList: Record<string, ObjectGroup> = {};
   selectedGroup: ObjectGroup = null;
   stopUpdatingInViewSoon: boolean;
 
@@ -87,6 +87,6 @@ export class StandardGroupManager implements GroupsManager {
   init() {
     this.selectedGroup = null;
     this.stopUpdatingInViewSoon = false;
-    this.groupList = [];
+    this.groupList = {};
   }
 }

@@ -7,6 +7,7 @@ import { Camera } from '@app/js/singletons/camera';
 import { DotsManager } from '@app/js/singletons/dots-manager';
 import { StandardGroupManager } from '@app/js/singletons/groups-manager';
 import { InputManager } from '@app/js/singletons/input-manager';
+import { Scene } from '@app/js/singletons/scene';
 import { SearchManager } from '@app/js/singletons/search-manager';
 import { starManager } from '@app/js/singletons/starManager';
 import { TimeManager } from '@app/js/singletons/time-manager';
@@ -16,8 +17,8 @@ import { keepTrackContainer } from '../../src/js/container';
 import { Constructor, Singletons } from '../../src/js/interfaces';
 import { StandardCatalogManager } from '../../src/js/singletons/catalog-manager';
 import { StandardColorSchemeManager } from '../../src/js/singletons/color-scheme-manager';
-import { StandardDrawManager } from '../../src/js/singletons/draw-manager';
 import { StandardOrbitManager } from '../../src/js/singletons/orbitManager';
+import { WebGLRenderer } from '../../src/js/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
@@ -25,11 +26,19 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   settingsManager.init();
   window.settingsManager = settingsManager;
   (global as any).settingsManager = settingsManager;
+  // Mock the Image class with a mock decode method and the ability to create new Image objects.
+  // eslint-disable-next-line no-native-reassign, no-global-assign
+  Image = jest.fn().mockImplementation(() => ({
+    decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
+  }));
   setupDefaultHtml();
 
   clearAllCallbacks();
 
-  const drawManagerInstance = new StandardDrawManager();
+  const renderer = new WebGLRenderer();
+  const scene = new Scene({
+    gl: global.mocks.glMock,
+  });
   const catalogManagerInstance = new StandardCatalogManager();
   const orbitManagerInstance = new StandardOrbitManager();
   orbitManagerInstance.orbitWorker = {
@@ -52,14 +61,15 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   } as any;
 
   // Pretend webGl works
-  drawManagerInstance.gl = global.mocks.glMock;
+  renderer.gl = global.mocks.glMock;
   // Pretend we have a working canvas
-  drawManagerInstance['canvas'] = <any>{ style: { cursor: 'default' } };
+  renderer['domElement'] = <any>{ style: { cursor: 'default' } };
 
   const inputManagerInstance = new InputManager();
   const groupManagerInstance = new StandardGroupManager();
 
-  keepTrackContainer.registerSingleton(Singletons.DrawManager, drawManagerInstance);
+  keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, renderer);
+  keepTrackContainer.registerSingleton(Singletons.Scene, scene);
   keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);

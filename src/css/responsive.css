@@ -1,4 +1,4 @@
-/* Desktops */
+/* Desktops Only */
 @media (min-width: 1301px) {
   #fullscreen-icon {
     display: none;
@@ -264,110 +264,8 @@
     padding-left: 25px;
   }
 }
-/* Desktops */
 
-/* Tablets */
-@media (min-width: 695px) and (max-width: 1300px) {
-  .side-menu-parent {
-    position: absolute;
-    width: 280px;
-  }
-  .side-menu {
-    position: relative;
-    background: var(--colorTertiaryDarken2);
-    color: white;
-    top: calc(var(--top-menu-height) * 2);
-    bottom: 100px;
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    z-index: 10;
-    padding: 0px 5px 275px 0px;
-    border-width: 0px 5px 0px 0px;
-    border-color: var(--colorTertiaryDarken3);
-    border-style: solid;
-  }
-  #membership-menu {
-    width: 450px !important;
-  }
-  #lookanglesmultisite-menu {
-    width: 450px;
-  }
-  #dops-menu {
-    width: 400px;
-  }
-  #menu-satellite-collision,
-  #menu-find-sat {
-    display: inline;
-  }
-  #sat-infobox {
-    display: none;
-    background: var(--colorTertiaryDarken2);
-    cursor: default;
-    position: absolute;
-    top: 60%;
-    bottom: 0px;
-    margin-top: 25px;
-    padding: 0 10px 0px 10px;
-    right: 0px;
-    border-top: 5px;
-    border-top-color: var(--colorTertiaryDarken3);
-    border-top-style: solid;
-    overflow: auto;
-  }
-  #sat-infobox:after {
-    content: '';
-    height: 120px;
-    display: block;
-  }
-  .sat-infobox-fullsize {
-    padding: 0 10px 0px 10px !important;
-  }
-  .sat-info-value {
-    float: right;
-    width: 65%;
-    height: 20px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  footer {
-    margin-top: -100px;
-    position: absolute;
-    bottom: 0px;
-    height: 120px;
-    width: 100%;
-  }
-  #bottom-icons-container {
-    width: 100%;
-    height: 120px;
-  }
-  #footer-toggle-wrapper {
-    width: 100%;
-    /* bottom: 120px; */
-    z-index: 1;
-    position: relative;
-  }
-  .footer-slide-down {
-    bottom: -115px !important;
-    height: 120px !important;
-    top: auto !important;
-  }
-  .footer-slide-trans {
-    transition: 1s;
-  }
-  .footer-slide-up {
-    bottom: 0px !important;
-    top: auto !important;
-  }
-  .ui-timepicker-div dl dd div {
-    width: 60px !important;
-    margin-left: -35px !important;
-  }
-}
-/* Tablets */
-
-/* Non-Desktops */
+/* Smaller than Normal Desktop */
 @media (max-width: 1300px) {
   #demo-logo {
     font-size: 5vh;
@@ -562,9 +460,108 @@
     width: 0px;
   }
 }
-/* Non-Desktops */
 
-/* Large Cellphones */
+/* Tablets */
+@media (min-width: 695px) and (max-width: 1300px) {
+  .side-menu-parent {
+    position: absolute;
+    width: 280px;
+  }
+  .side-menu {
+    position: relative;
+    background: var(--colorTertiaryDarken2);
+    color: white;
+    top: calc(var(--top-menu-height) * 2);
+    bottom: 100px;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 10;
+    padding: 0px 5px 275px 0px;
+    border-width: 0px 5px 0px 0px;
+    border-color: var(--colorTertiaryDarken3);
+    border-style: solid;
+  }
+  #membership-menu {
+    width: 450px !important;
+  }
+  #lookanglesmultisite-menu {
+    width: 450px;
+  }
+  #dops-menu {
+    width: 400px;
+  }
+  #menu-satellite-collision,
+  #menu-find-sat {
+    display: inline;
+  }
+  #sat-infobox {
+    display: none;
+    background: var(--colorTertiaryDarken2);
+    cursor: default;
+    position: absolute;
+    top: 60%;
+    bottom: 0px;
+    margin-top: 25px;
+    padding: 0 10px 0px 10px;
+    right: 0px;
+    border-top: 5px;
+    border-top-color: var(--colorTertiaryDarken3);
+    border-top-style: solid;
+    overflow: auto;
+  }
+  #sat-infobox:after {
+    content: '';
+    height: 120px;
+    display: block;
+  }
+  .sat-infobox-fullsize {
+    padding: 0 10px 0px 10px !important;
+  }
+  .sat-info-value {
+    float: right;
+    width: 65%;
+    height: 20px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  footer {
+    margin-top: -100px;
+    position: absolute;
+    bottom: 0px;
+    height: 120px;
+    width: 100%;
+  }
+  #bottom-icons-container {
+    width: 100%;
+    height: 120px;
+  }
+  #footer-toggle-wrapper {
+    width: 100%;
+    /* bottom: 120px; */
+    z-index: 1;
+    position: relative;
+  }
+  .footer-slide-down {
+    bottom: -115px !important;
+    height: 120px !important;
+    top: auto !important;
+  }
+  .footer-slide-trans {
+    transition: 1s;
+  }
+  .footer-slide-up {
+    bottom: 0px !important;
+    top: auto !important;
+  }
+  .ui-timepicker-div dl dd div {
+    width: 60px !important;
+    margin-left: -35px !important;
+  }
+}
+
+/* Large Cellphones or Smaller */
 @media (max-width: 694px) {
   :root {
     --bottom-icon-width: 100px;
@@ -592,6 +589,10 @@
 
   .sat-infobox-links {
     display: none;
+  }
+
+  .sat-info-row {
+    justify-content: space-between;
   }
 
   #sat-infobox {
@@ -682,9 +683,8 @@
     border-radius: 0px !important;
   }
 }
-/* Large Cellphones */
 
-/* Small Cellphones */
+/* Only Small Cellphones */
 @media (max-width: 320px) {
   #search {
     padding-bottom: 5px;
@@ -701,4 +701,3 @@
     width: 0px;
   }
 }
-/* Small Cellphones */

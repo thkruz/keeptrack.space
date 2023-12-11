@@ -643,7 +643,7 @@ export class StandardCatalogManager implements CatalogManager {
     if (settingsManager.isDisableSelectSat) return;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const { gl } = keepTrackApi.getDrawManager();
+    const { gl } = keepTrackApi.getRenderer();
 
     if (i === this.lastSelectedSat()) return;
 

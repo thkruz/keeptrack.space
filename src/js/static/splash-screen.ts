@@ -20,8 +20,7 @@ export abstract class SplashScreen {
 
   static hideSplashScreen() {
     // Don't wait if we are running Jest
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    if (drawManagerInstance.sceneManager.earth.isUseHiRes && drawManagerInstance.sceneManager.earth.isHiResReady !== true) {
+    if (keepTrackApi.getScene().earth.isUseHiRes && keepTrackApi.getScene().earth.isHiResReady !== true) {
       setTimeout(function () {
         SplashScreen.hideSplashScreen();
       }, 100);

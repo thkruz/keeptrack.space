@@ -16,7 +16,7 @@ import { TimeMachine } from '../time-machine/time-machine';
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -66,10 +66,24 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <h5 class="center-align">General Settings</h5>
             <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide notional satellites">
+                <input id="settings-notionalSats" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Notional Satellites
+              </label>
+            </div>
+            <div class="switch row">
               <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide LEO satellites">
                 <input id="settings-leoSats" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show LEO Satellites
+              </label>
+            </div>
+            <div class="switch row">
+              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Starlink satellites">
+                <input id="settings-starlinkSats" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Starlink Satellites
               </label>
             </div>
             <div class="switch row">
@@ -427,7 +441,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
 
     switch (e.target?.id) {
+      case 'settings-notionalSats':
       case 'settings-leoSats':
+      case 'settings-starlinkSats':
       case 'settings-heoSats':
       case 'settings-meoSats':
       case 'settings-geoSats':
@@ -479,7 +495,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   static syncOnLoad() {
+    (<HTMLInputElement>getEl('settings-notionalSats')).checked = settingsManager.isShowNotionalSats;
     (<HTMLInputElement>getEl('settings-leoSats')).checked = settingsManager.isShowLeoSats;
+    (<HTMLInputElement>getEl('settings-starlinkSats')).checked = settingsManager.isShowStarlinkSats;
     (<HTMLInputElement>getEl('settings-heoSats')).checked = settingsManager.isShowHeoSats;
     (<HTMLInputElement>getEl('settings-meoSats')).checked = settingsManager.isShowMeoSats;
     (<HTMLInputElement>getEl('settings-geoSats')).checked = settingsManager.isShowGeoSats;
@@ -509,6 +527,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_STARLINK_SATS, settingsManager.isShowStarlinkSats.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HEO_SATS, settingsManager.isShowHeoSats.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MEO_SATS, settingsManager.isShowMeoSats.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GEO_SATS, settingsManager.isShowGeoSats.toString());
@@ -573,7 +592,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     keepTrackApi.getSoundManager()?.play('button');
 
+    settingsManager.isShowNotionalSats = (<HTMLInputElement>getEl('settings-notionalSats')).checked;
     settingsManager.isShowLeoSats = (<HTMLInputElement>getEl('settings-leoSats')).checked;
+    settingsManager.isShowStarlinkSats = (<HTMLInputElement>getEl('settings-starlinkSats')).checked;
     settingsManager.isShowHeoSats = (<HTMLInputElement>getEl('settings-heoSats')).checked;
     settingsManager.isShowMeoSats = (<HTMLInputElement>getEl('settings-meoSats')).checked;
     settingsManager.isShowGeoSats = (<HTMLInputElement>getEl('settings-geoSats')).checked;
@@ -591,7 +612,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
     if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
-      keepTrackApi.getDrawManager().sceneManager.earth.reloadEarthHiResTextures();
+      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
     }
     settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
     settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;
@@ -613,8 +634,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
 
     if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-      drawManagerInstance.sceneManager.skybox.init(settingsManager, drawManagerInstance.gl);
+      keepTrackApi.getScene().skybox.init(settingsManager, keepTrackApi.getRenderer().gl);
     }
 
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;

@@ -4,7 +4,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -43,27 +43,32 @@ export class Earth {
   private isNightTextureReady_ = false;
   private isSpecularTextureReady_ = false;
   private isTexturesReady_ = false;
-  private mvMatrix_: mat4;
-  private nMatrix_: mat3 = mat3.create();
+  private modelViewMatrix_: mat4;
+  private normalMatrix_: mat3 = mat3.create();
   private settings_: SettingsManager;
   private textureBump_: WebGLTexture;
   private textureDay_: WebGLTexture;
   private textureNight_: WebGLTexture;
   private textureSpec_: WebGLTexture;
-  private uPCamMatrix_: mat4 = mat4.create();
   private vaoOcclusion_: WebGLVertexArrayObject;
-  private vaoVisible_: WebGLVertexArrayObject;
   isHiResReady: boolean;
   isUseHiRes: boolean;
+  /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   mesh: Mesh;
 
-  draw(tgtBuffer: WebGLFramebuffer, altNightTexBind?: (gl: WebGL2RenderingContext, textureNight: WebGLTexture, textureDay: WebGLTexture) => void) {
+  /**
+   * This is run once per frame to render the earth.
+   */
+  draw(tgtBuffer: WebGLFramebuffer) {
     if (!this.isTexturesReady_) return;
-    this.drawColoredEarth_(tgtBuffer, altNightTexBind);
+    this.drawColoredEarth_(tgtBuffer);
     this.drawBlackGpuPickingEarth_();
   }
 
+  /**
+   * This is run once per frame to render the earth in godrays buffer.
+   */
   drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
     const gl = this.gl_;
     // Change to the earth shader
@@ -74,7 +79,7 @@ export class Earth {
     occlusionPrgm.attrSetup(this.mesh.geometry.getCombinedBuffer());
 
     // Set the uniforms
-    occlusionPrgm.uniformSetup(this.mvMatrix_, pMatrix, camMatrix);
+    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -83,10 +88,9 @@ export class Earth {
     // occlusionPrgm.attrOff(occlusionPrgm);
   }
 
-  forceLoaded(): void {
-    this.isTexturesReady_ = true;
-  }
-
+  /**
+   * This is run once per session to initialize the earth.
+   */
   async init(settings: SettingsManager, gl?: WebGL2RenderingContext): Promise<void> {
     try {
       if (!gl && !this.gl_) throw new Error('No WebGL context found');
@@ -98,12 +102,6 @@ export class Earth {
         radius: RADIUS_OF_EARTH,
         widthSegments: this.settings_.earthNumLatSegs,
         heightSegments: this.settings_.earthNumLonSegs,
-        isSkipTexture: false,
-        attributes: {
-          aVertexPosition: 0,
-          aVertexNormal: 0,
-          aTexCoord: 0,
-        },
       });
       const material = new ShaderMaterial(this.gl_, {
         uniforms: {
@@ -115,24 +113,30 @@ export class Earth {
           uNightMap: <WebGLUniformLocation>null,
           uBumpMap: <WebGLUniformLocation>null,
           uSpecMap: <WebGLUniformLocation>null,
-          uCamPos: <WebGLUniformLocation>null,
-          uPCamMatrix: <WebGLUniformLocation>null,
-          uMvMatrix: <WebGLUniformLocation>null,
-          uNormalMatrix: <WebGLUniformLocation>null,
         },
         vertexShader: this.shaders_.vert,
         fragmentShader: this.shaders_.frag,
         glslVersion: GLSL3,
       });
-      this.mesh = new Mesh(this.gl_, geometry, material);
+      this.mesh = new Mesh(this.gl_, geometry, material, {
+        name: 'earth',
+        precision: 'highp',
+        disabledUniforms: {
+          modelMatrix: true,
+          viewMatrix: true,
+        },
+      });
 
-      this.initVaoVisible();
+      this.initVaoVisible_();
       this.initVaoOcclusion_();
     } catch (error) {
       console.debug(error);
     }
   }
 
+  /**
+   * Helper function to load the high resolution earth textures.
+   */
   async loadHiRes(texture: WebGLTexture, src: string): Promise<void> {
     try {
       const img = new Image();
@@ -153,19 +157,27 @@ export class Earth {
     }
   }
 
+  /**
+   * This is run once per session to initialize the high resolution earth textures.
+   * It can be run multiple times to reload the textures.
+   */
   reloadEarthHiResTextures() {
     this.init(settingsManager, this.gl_);
     this.loadHiRes(this.textureDay_, Earth.getSrcHiResDay_(this.settings_));
     this.loadHiRes(this.textureNight_, Earth.getSrcHiResNight_(this.settings_));
   }
 
+  /**
+   * This is run once per frame to update the earth.
+   */
   update(gmst: GreenwichMeanSiderealTime, j: number): void {
     this.lightDirection = SatMath.getSunDirection(j);
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
-    this.mvMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
-    mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, gmst);
-    mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
+    this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
+    // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
+    mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
+    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
     // Update the aurora glow
     this.glowNumber_ += 0.0025 * this.glowDirection_;
@@ -252,6 +264,9 @@ export class Earth {
     return src;
   }
 
+  /**
+   * This is run once per frame to render a black earth in the GPU picking buffer.
+   */
   private drawBlackGpuPickingEarth_() {
     const gl = this.gl_;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -259,9 +274,11 @@ export class Earth {
     // Switch to GPU Picking Shader
     gl.useProgram(dotsManagerInstance.programs.picking.program);
     // Switch to the GPU Picking Frame Buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManagerInstance.pickingFrameBuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
 
     gl.bindVertexArray(this.vaoOcclusion_);
+
+    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
 
     // no reason to render 100000s of pixels when
     // we're only going to read one
@@ -287,30 +304,35 @@ export class Earth {
     // gl.disableVertexAttribArray(dotsManagerInstance.pickingProgram.aPos);
   }
 
-  private drawColoredEarth_(tgtBuffer: WebGLFramebuffer, altNightTexBind: (gl: WebGL2RenderingContext, textureNight: WebGLTexture, textureDay: WebGLTexture) => void) {
+  /**
+   * This is run once per frame to render the earth.
+   */
+  private drawColoredEarth_(tgtBuffer: WebGLFramebuffer) {
     const gl = this.gl_;
-    // Change to the earth shader
-    gl.useProgram(this.mesh.program);
-    // Change to the main drawing buffer
+    this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    // Set the uniforms
+    this.setUniforms_(gl);
+    this.setTextures_(gl);
+
+    gl.bindVertexArray(this.mesh.geometry.vao);
+    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
+    gl.bindVertexArray(null);
+  }
+
+  /**
+   * This is run once per frame to set the uniforms for the earth.
+   */
+  private setUniforms_(gl: WebGL2RenderingContext) {
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
+    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+
     gl.uniform1f(this.mesh.material.uniforms.uGlow, this.glowNumber_);
-    gl.uniform3fv(this.mesh.material.uniforms.uCamPos, keepTrackApi.getMainCamera().getForwardVector());
-    gl.uniformMatrix3fv(this.mesh.material.uniforms.uNormalMatrix, false, this.nMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.uMvMatrix, false, this.mvMatrix_);
-    mat4.mul(this.uPCamMatrix_, keepTrackApi.getDrawManager().pMatrix, keepTrackApi.getMainCamera().camMatrix);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.uPCamMatrix, false, this.uPCamMatrix_);
     gl.uniform3fv(this.mesh.material.uniforms.uLightDirection, this.lightDirection);
     gl.uniform1f(this.mesh.material.uniforms.uIsDrawAtmosphere, this.settings_.isDrawAtmosphere ? 1.0 : 0.0);
     gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, this.settings_.isDrawAurora ? 1.0 : 0.0);
-
-    // Set the textures
-    this.setTextures_(gl, altNightTexBind);
-
-    gl.bindVertexArray(this.vaoVisible_);
-    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
-    gl.bindVertexArray(null);
   }
 
   private initTextureBump_(): void {
@@ -382,12 +404,15 @@ export class Earth {
   }
 
   private initTextures_(): void {
-    this.initTextureDay_();
-    this.initTextureNight_();
-    this.initTextureBump_();
-    this.initTextureSpec_();
+    if (!this.textureDay_) this.initTextureDay_();
+    if (!this.textureNight_) this.initTextureNight_();
+    if (!this.textureBump_) this.initTextureBump_();
+    if (!this.textureSpec_) this.initTextureSpec_();
   }
 
+  /**
+   * This is run once per session to initialize the earth occulsion vao.
+   */
   private initVaoOcclusion_() {
     const gl = this.gl_;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -395,15 +420,17 @@ export class Earth {
     this.vaoOcclusion_ = gl.createVertexArray();
     gl.bindVertexArray(this.vaoOcclusion_);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
+
+    // gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
     // Disable color vertex so that the earth is drawn black
     // TODO: Figure out why this is in the earth class
-    gl.disableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_color); // IMPORTANT!
+    gl.disableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_color.location); // IMPORTANT!
 
     // Only Enable Position Attribute
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
-    gl.enableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_position);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aVertexPosition, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
+    gl.enableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_position.location);
+    this.mesh.geometry.attributes.position.bindToArrayBuffer(gl);
+    gl.vertexAttribPointer(dotsManagerInstance.programs.picking.attribs.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
@@ -411,22 +438,24 @@ export class Earth {
     gl.bindVertexArray(null);
   }
 
-  private initVaoVisible() {
+  /**
+   * This is run once per session to initialize the earth vao.
+   */
+  private initVaoVisible_() {
     const gl = this.gl_;
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    this.vaoVisible_ = gl.createVertexArray();
-    gl.bindVertexArray(this.vaoVisible_);
+
+    this.mesh.geometry.vao = gl.createVertexArray();
+    gl.bindVertexArray(this.mesh.geometry.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexPosition);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aVertexPosition, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
-    gl.vertexAttribPointer(dotsManagerInstance.programs.picking.attribs.a_position, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
+    gl.enableVertexAttribArray(this.mesh.geometry.attributes.position.location);
+    this.mesh.geometry.attributes.position.bindToArrayBuffer(gl);
 
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aVertexNormal);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aVertexNormal, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 3);
+    gl.enableVertexAttribArray(this.mesh.geometry.attributes.normal.location);
+    this.mesh.geometry.attributes.normal.bindToArrayBuffer(gl);
 
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.aTexCoord);
-    gl.vertexAttribPointer(this.mesh.geometry.attributes.aTexCoord, 2, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, Float32Array.BYTES_PER_ELEMENT * 6);
+    gl.enableVertexAttribArray(this.mesh.geometry.attributes.uv.location);
+    this.mesh.geometry.attributes.uv.bindToArrayBuffer(gl);
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
@@ -434,13 +463,19 @@ export class Earth {
     gl.bindVertexArray(null);
   }
 
+  /**
+   * This is run after each texture is loaded to determine if all textures are loaded.
+   */
   private onImageLoaded_(): void {
     if (this.isDayTextureReady_ && this.isNightTextureReady_ && this.isBumpTextureReady_ && this.isSpecularTextureReady_) {
       this.isTexturesReady_ = true;
     }
   }
 
-  private setTextures_(gl: WebGL2RenderingContext, altNightTexBind: (gl: WebGL2RenderingContext, textureNight: WebGLTexture, textureDay: WebGLTexture) => void) {
+  /**
+   * This is run once per frame to set the textures for the earth.
+   */
+  private setTextures_(gl: WebGL2RenderingContext) {
     // Day Map
     gl.uniform1i(this.mesh.material.uniforms.uDayMap, 0);
     gl.activeTexture(gl.TEXTURE0);
@@ -451,6 +486,7 @@ export class Earth {
     gl.activeTexture(gl.TEXTURE1);
 
     // If there are no callbacks, just use the night texture
+    const altNightTexBind = keepTrackApi.callbacks.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null;
     if (!altNightTexBind) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureNight_);
     } else {
@@ -485,8 +521,6 @@ export class Earth {
    */
   private shaders_ = {
     frag: keepTrackApi.glsl`
-    precision highp float;
-
     uniform float uGlow;
     uniform vec3 uLightDirection;
     uniform float uIsDrawAtmosphere;
@@ -586,29 +620,19 @@ export class Earth {
     }
     `,
     vert: keepTrackApi.glsl`
-    precision highp float;
-    in vec3 aVertexPosition;
-    in vec3 aVertexNormal;
-    in vec2 aTexCoord;
-
-    uniform vec3 uCamPos;
-    uniform mat4 uPCamMatrix;
-    uniform mat4 uMvMatrix;
-    uniform mat3 uNormalMatrix;
-
     out vec2 vUv;
     out vec3 vNormal;
     out vec3 vWorldPos;
     out vec3 vVertToCamera;
 
     void main(void) {
-        vec4 worldPosition = uMvMatrix * vec4(aVertexPosition, 1.0);
+        vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
         vWorldPos = worldPosition.xyz;
-        vNormal = uNormalMatrix * aVertexNormal;
-        vUv = aTexCoord;
-        vVertToCamera = normalize(vec3(uCamPos) - worldPosition.xyz);
+        vNormal = normalMatrix * normal;
+        vUv = uv;
+        vVertToCamera = normalize(vec3(cameraPosition) - worldPosition.xyz);
 
-        gl_Position = uPCamMatrix * worldPosition;
+        gl_Position = projectionMatrix * worldPosition;
     }
     `,
   };

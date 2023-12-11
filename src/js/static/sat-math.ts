@@ -6,7 +6,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General License as published by the Free Software
@@ -628,6 +628,11 @@ export abstract class SatMath {
   }
 
   /**
+   * Keeps the last 1 sun direction calculations in memory to avoid unnecessary calculations.
+   */
+  static sunDirectionCache: { jd: number; sunDirection: EciArr3 } = { jd: null, sunDirection: null };
+
+  /**
     Calculates the direction of the sun in the sky based on the Julian date.
     The function returns an array of three numbers representing the x, y, and z components of the sun's direction vector.
    * @param jd Julian Day
@@ -635,6 +640,7 @@ export abstract class SatMath {
    */
   static getSunDirection(jd: number): EciArr3 {
     if (!jd) throw new Error('Julian date is required');
+    if (jd === SatMath.sunDirectionCache.jd) return SatMath.sunDirectionCache.sunDirection;
 
     const n = jd - 2451545;
     let L = 280.46 + 0.9856474 * n; // mean longitude of sun
@@ -665,6 +671,8 @@ export abstract class SatMath {
     const y = DISTANCE_TO_SUN * Math.cos(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
     const z = DISTANCE_TO_SUN * Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
+    // Update cache
+    SatMath.sunDirectionCache = { jd, sunDirection: [x, y, z] };
     return [x, y, z];
   }
 

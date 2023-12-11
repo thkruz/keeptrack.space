@@ -76,76 +76,6 @@ export class MeshManager {
 
   private sccNumIss_ = '25544';
   private sccNumTianhe_ = '48274';
-  private shader_ = {
-    frag: `#version 300 es
-    precision mediump float;
-
-    in vec3 vLightDirection;
-    in float vInSun;
-    in vec3 vTransformedNormal;
-    in vec2 vTextureCoord;
-    in vec4 vPosition;
-    in vec3 vAmbient;
-    in vec3 vDiffuse;
-    in vec3 vSpecular;
-    in float vSpecularExponent;
-
-    out vec4 fragColor;
-
-    void main(void) {
-      float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
-
-      vec3 ambientColor = vDiffuse * 0.1;
-      vec3 dirColor = vDiffuse * vAmbient * lightAmt * (min(vInSun,1.0) * 0.2);
-      vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.2);
-
-      vec3 color = ambientColor + dirColor + specColor;
-
-      fragColor = vec4(color, 1.0);
-    }
-  `,
-    vert: `#version 300 es
-    in vec3 aVertexPosition;
-    in vec3 aVertexNormal;
-    in vec3 aSpecular;
-    in float aSpecularExponent;
-    in vec3 aAmbient;
-    in vec3 aDiffuse;
-    in vec2 aTextureCoord;
-
-    uniform mat4 uPMatrix;
-    uniform mat4 uCamMatrix;
-    uniform mat4 uMvMatrix;
-    uniform mat3 uNormalMatrix;
-    uniform vec3 uLightDirection;
-    uniform float uInSun;
-
-    out vec2 vTextureCoord;
-    out vec3 vTransformedNormal;
-    out vec4 vPosition;
-    out vec3 vLightDirection;
-    out float vInSun;
-
-    out vec3 vAmbient;
-    out vec3 vDiffuse;
-    out vec3 vSpecular;
-    out float vSpecularExponent;
-
-    void main(void) {
-      vLightDirection = uLightDirection;
-      vAmbient = aAmbient;
-      vDiffuse = aDiffuse;
-      vSpecular = aSpecular;
-      vSpecularExponent = aSpecularExponent;
-      vInSun = uInSun;
-
-      vPosition = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
-      gl_Position = uPMatrix * vPosition;
-      vTextureCoord = aTextureCoord;
-      vTransformedNormal  = uNormalMatrix * aVertexNormal;
-    }
-  `,
-  };
 
   private uniforms_ = {
     uPMatrix: <WebGLUniformLocation>null,
@@ -232,6 +162,9 @@ export class MeshManager {
     debris2: null,
   };
 
+  mvMatrix_: mat4;
+  nMatrix_: mat3;
+
   public checkIfNameKnown(name: string): boolean {
     // TODO: Currently all named models aim at nadir - that isn't always true
 
@@ -269,62 +202,17 @@ export class MeshManager {
 
     const gl = this.gl_;
 
-    // Move the mesh to its location in world space
-    const mvMatrix = mat4.create();
-    mat4.identity(mvMatrix);
-    mat4.translate(mvMatrix, mvMatrix, vec3.fromValues(this.currentMeshObject.position.x, this.currentMeshObject.position.y, this.currentMeshObject.position.z));
-
-    // Rotate the Satellite to Face Nadir if needed
-    if (this.currentMeshObject.nadirYaw !== null) {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const sat = catalogManagerInstance.getSat(this.currentMeshObject.id);
-      const drawPosition = vec3.fromValues(sat.position.x, sat.position.y, sat.position.z);
-
-      // Calculate a position to look at along the satellite's velocity vector
-      const lookAtPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
-
-      const up = vec3.normalize(vec3.create(), drawPosition);
-
-      mat4.targetTo(mvMatrix, drawPosition, lookAtPos, up);
-
-      // TODO: Remove this code and the nadirYaw property from MeshObject
-      // Rotate the mesh to face nadir
-      // mat4.rotateZ(mvMatrix, mvMatrix, this.currentMeshObject.nadirYaw);
-    }
-
-    // Scale the mvMatrix to 1/5 (models are too big)
-    if (this.currentMeshObject.sccNum !== '25544') {
-      mat4.scale(mvMatrix, mvMatrix, vec3.fromValues(0.2, 0.2, 0.2));
-    } else {
-      mat4.scale(mvMatrix, mvMatrix, vec3.fromValues(0.05, 0.05, 0.05));
-    }
-
-    // Allow Manual Rotation of Meshes
-    mat4.rotateX(mvMatrix, mvMatrix, settingsManager.meshRotation.x * DEG2RAD);
-    mat4.rotateY(mvMatrix, mvMatrix, settingsManager.meshRotation.y * DEG2RAD);
-    mat4.rotateZ(mvMatrix, mvMatrix, settingsManager.meshRotation.z * DEG2RAD);
-
-    // Assign the normal matrix the opposite of the mvMatrix
-    const nMatrix = mat3.create();
-    mat3.normalFromMat4(nMatrix, mvMatrix);
-
     gl.enable(gl.BLEND);
-
-    // Use the mesh shader program
     gl.useProgram(this.program_);
-
-    // Determine where we are drawing
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    // Assign uniforms
     gl.uniform3fv(this.uniforms_.uLightDirection, this.earthLightDirection_);
-    gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, <Float32Array>(<unknown>nMatrix));
-    gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, <Float32Array>(<unknown>mvMatrix));
+    gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, this.nMatrix_);
+    gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(this.uniforms_.uCamMatrix, false, camMatrix);
     gl.uniform1f(this.uniforms_.uInSun, this.currentMeshObject.inSun);
 
-    // Assign vertex buffer
     gl.bindBuffer(gl.ARRAY_BUFFER, this.currentMeshObject.model.mesh.vertexBuffer);
     this.changeVertexAttribArrays(true);
     this.applyAttributePointers_(this.currentMeshObject.model);
@@ -332,7 +220,6 @@ export class MeshManager {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.currentMeshObject.model.mesh.indexBuffer);
     gl.drawElements(gl.TRIANGLES, this.currentMeshObject.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-    // disable attributes
     this.changeVertexAttribArrays(false);
     gl.disable(gl.BLEND);
   }
@@ -344,28 +231,6 @@ export class MeshManager {
     const gl = this.gl_;
 
     try {
-      // Move the mesh to its location in world space
-      const mvMatrix = mat4.create();
-      mat4.identity(mvMatrix);
-      mat4.translate(mvMatrix, mvMatrix, vec3.fromValues(this.currentMeshObject.position.x, this.currentMeshObject.position.y, this.currentMeshObject.position.z));
-
-      // Rotate the Satellite to Face Nadir if needed
-      if (this.currentMeshObject.nadirYaw !== null) {
-        mat4.rotateZ(mvMatrix, mvMatrix, this.currentMeshObject.nadirYaw);
-      }
-
-      // Scale the mvMatrix to 1/5 (models are too big)
-      if (this.currentMeshObject.sccNum !== '25544') {
-        mat4.scale(mvMatrix, mvMatrix, vec3.fromValues(0.2, 0.2, 0.2));
-      } else {
-        mat4.scale(mvMatrix, mvMatrix, vec3.fromValues(0.05, 0.05, 0.05));
-      }
-
-      // Allow Manual Rotation of Meshes
-      mat4.rotateX(mvMatrix, mvMatrix, settingsManager.meshRotation.x * DEG2RAD);
-      mat4.rotateY(mvMatrix, mvMatrix, settingsManager.meshRotation.y * DEG2RAD);
-      mat4.rotateZ(mvMatrix, mvMatrix, settingsManager.meshRotation.z * DEG2RAD);
-
       // Change to the earth shader
       gl.useProgram(occlusionPrgm.program);
       // Change to the main drawing buffer
@@ -374,7 +239,7 @@ export class MeshManager {
       occlusionPrgm.attrSetup(this.currentMeshObject.model.mesh.vertexBuffer, 80);
 
       // Set the uniforms
-      occlusionPrgm.uniformSetup(mvMatrix, pMatrix, camMatrix);
+      occlusionPrgm.uniformSetup(this.mvMatrix_, pMatrix, camMatrix);
 
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.currentMeshObject.model.mesh.indexBuffer);
       gl.drawElements(gl.TRIANGLES, this.currentMeshObject.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
@@ -578,12 +443,52 @@ export class MeshManager {
     this.currentMeshObject.model = model;
   }
 
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
-  // prettier-ignore
-  public update(selectedDate: Date, sat: SatObject) { // NOSONAR
+  update(selectedDate: Date, sat: SatObject) {
+    this.updateModel_(selectedDate, sat);
+
+    // Move the mesh to its location in world space
+    this.mvMatrix_ = mat4.create();
+    mat4.identity(this.mvMatrix_);
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(this.currentMeshObject.position.x, this.currentMeshObject.position.y, this.currentMeshObject.position.z));
+
+    // Rotate the Satellite to Face Nadir if needed
+    if (this.currentMeshObject.nadirYaw !== null) {
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const sat = catalogManagerInstance.getSat(this.currentMeshObject.id);
+      const drawPosition = vec3.fromValues(sat.position.x, sat.position.y, sat.position.z);
+
+      // Calculate a position to look at along the satellite's velocity vector
+      const lookAtPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
+
+      const up = vec3.normalize(vec3.create(), drawPosition);
+
+      mat4.targetTo(this.mvMatrix_, drawPosition, lookAtPos, up);
+
+      // TODO: Remove this code and the nadirYaw property from MeshObject
+      // Rotate the mesh to face nadir
+      // mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.nadirYaw);
+    }
+
+    // Scale the this.mvMatrix_ to 1/5 (models are too big)
+    if (this.currentMeshObject.sccNum !== '25544') {
+      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.2, 0.2, 0.2));
+    } else {
+      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.05, 0.05, 0.05));
+    }
+
+    // Allow Manual Rotation of Meshes
+    mat4.rotateX(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.x * DEG2RAD);
+    mat4.rotateY(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.y * DEG2RAD);
+    mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.z * DEG2RAD);
+
+    // Assign the normal matrix the opposite of the this.mvMatrix_
+    this.nMatrix_ = mat3.create();
+    mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
+  }
+
+  private updateModel_(selectedDate: Date, sat: SatObject) {
     try {
-      this.currentMeshObject.id = (typeof sat?.id !== 'undefined') ? sat.id : -1;
+      this.currentMeshObject.id = typeof sat?.id !== 'undefined' ? sat.id : -1;
       this.currentMeshObject.static = sat?.static || false;
 
       if (typeof this.currentMeshObject.id == 'undefined' || this.currentMeshObject.id == -1 || this.currentMeshObject.static) return;
@@ -591,9 +496,7 @@ export class MeshManager {
 
       this.updatePosition(sat.position);
 
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-
-      this.currentMeshObject.inSun = SatMath.calculateIsInSun(sat, drawManagerInstance.sceneManager.sun.eci);
+      this.currentMeshObject.inSun = SatMath.calculateIsInSun(sat, keepTrackApi.getScene().sun.eci);
       this.currentMeshObject.nadirYaw = null;
 
       if (settingsManager.meshOverride) {
@@ -770,4 +673,75 @@ export class MeshManager {
       // console.debug(error);
     }
   }
+
+  private shader_ = {
+    frag: keepTrackApi.glsl`#version 300 es
+    precision mediump float;
+
+    in vec3 vLightDirection;
+    in float vInSun;
+    in vec3 vTransformedNormal;
+    in vec2 vTextureCoord;
+    in vec4 vPosition;
+    in vec3 vAmbient;
+    in vec3 vDiffuse;
+    in vec3 vSpecular;
+    in float vSpecularExponent;
+
+    out vec4 fragColor;
+
+    void main(void) {
+      float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
+
+      vec3 ambientColor = vDiffuse * 0.1;
+      vec3 dirColor = vDiffuse * vAmbient * lightAmt * (min(vInSun,1.0) * 0.2);
+      vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.2);
+
+      vec3 color = ambientColor + dirColor + specColor;
+
+      fragColor = vec4(color, 1.0);
+    }
+  `,
+    vert: keepTrackApi.glsl`#version 300 es
+    in vec3 aVertexPosition;
+    in vec3 aVertexNormal;
+    in vec3 aSpecular;
+    in float aSpecularExponent;
+    in vec3 aAmbient;
+    in vec3 aDiffuse;
+    in vec2 aTextureCoord;
+
+    uniform mat4 uPMatrix;
+    uniform mat4 uCamMatrix;
+    uniform mat4 uMvMatrix;
+    uniform mat3 uNormalMatrix;
+    uniform vec3 uLightDirection;
+    uniform float uInSun;
+
+    out vec2 vTextureCoord;
+    out vec3 vTransformedNormal;
+    out vec4 vPosition;
+    out vec3 vLightDirection;
+    out float vInSun;
+
+    out vec3 vAmbient;
+    out vec3 vDiffuse;
+    out vec3 vSpecular;
+    out float vSpecularExponent;
+
+    void main(void) {
+      vLightDirection = uLightDirection;
+      vAmbient = aAmbient;
+      vDiffuse = aDiffuse;
+      vSpecular = aSpecular;
+      vSpecularExponent = aSpecularExponent;
+      vInSun = uInSun;
+
+      vPosition = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
+      gl_Position = uPMatrix * vPosition;
+      vTextureCoord = aTextureCoord;
+      vTransformedNormal  = uNormalMatrix * aVertexNormal;
+    }
+  `,
+  };
 }

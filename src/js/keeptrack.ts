@@ -6,7 +6,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -54,7 +54,6 @@ import { StandardCatalogManager } from './singletons/catalog-manager';
 import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
 import { DemoManager } from './singletons/demo-mode';
 import { DotsManager } from './singletons/dots-manager';
-import { DrawManager, StandardDrawManager } from './singletons/draw-manager';
 import { LineManager, lineManagerInstance } from './singletons/draw-manager/line-manager';
 import { ErrorManager, errorManagerInstance } from './singletons/errorManager';
 import { StandardGroupManager } from './singletons/groups-manager';
@@ -62,8 +61,10 @@ import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
 import { mobileManager } from './singletons/mobileManager';
 import { StandardOrbitManager } from './singletons/orbitManager';
+import { Scene } from './singletons/scene';
 import { TimeManager } from './singletons/time-manager';
 import { StandardUiManager } from './singletons/uiManager';
+import { WebGLRenderer } from './singletons/webgl-renderer';
 import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SatMath } from './static/sat-math';
@@ -91,7 +92,7 @@ export class KeepTrack {
   orbitManager: OrbitManager;
   catalogManager: CatalogManager;
   timeManager: TimeManager;
-  drawManager: DrawManager;
+  renderer: WebGLRenderer;
   sensorManager: SensorManager;
   uiManager: UiManager;
   inputManager: InputManager;
@@ -123,8 +124,12 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
     const timeManagerInstance = new TimeManager();
     keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
-    const drawManagerInstance = new StandardDrawManager();
-    keepTrackContainer.registerSingleton(Singletons.DrawManager, drawManagerInstance);
+    const rendererInstance = new WebGLRenderer();
+    keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, rendererInstance);
+    const sceneInstance = new Scene({
+      gl: keepTrackApi.getRenderer().gl,
+    });
+    keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
     const sensorManagerInstance = new StandardSensorManager();
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
     const dotsManagerInstance = new DotsManager();
@@ -150,7 +155,7 @@ export class KeepTrack {
     this.orbitManager = orbitManagerInstance;
     this.catalogManager = catalogManagerInstance;
     this.timeManager = timeManagerInstance;
-    this.drawManager = drawManagerInstance;
+    this.renderer = rendererInstance;
     this.sensorManager = sensorManagerInstance;
     this.uiManager = uiManagerInstance;
     this.inputManager = inputManagerInstance;
@@ -342,57 +347,24 @@ theodore.kruczek at gmail dot com.
   }
 
   private draw_(dt?: Milliseconds) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const hoverManagerInstance = keepTrackApi.getHoverManager();
+    const renderer = keepTrackApi.getRenderer();
+    const camera = keepTrackApi.getMainCamera();
 
-    keepTrackApi.getMainCamera().draw(drawManagerInstance.sat, drawManagerInstance.sensorPos);
-
-    drawManagerInstance.draw(dotsManagerInstance);
-
-    // Draw Dots
-    dotsManagerInstance.draw(drawManagerInstance.pMvCamMatrix, drawManagerInstance.postProcessingManager.curBuffer);
-
-    orbitManagerInstance.draw(
-      drawManagerInstance.pMatrix,
-      keepTrackApi.getMainCamera().camMatrix,
-      drawManagerInstance.postProcessingManager.curBuffer,
-      hoverManagerInstance,
-      colorSchemeManagerInstance,
-      keepTrackApi.getMainCamera()
-    );
-
-    // Draw a cone
-    // this.sceneManager.cone.draw(this.pMatrix, mainCamera.camMatrix);
-
-    lineManagerInstance.draw(drawManagerInstance, dotsManagerInstance.inViewData, keepTrackApi.getMainCamera().camMatrix, null);
-
-    // Draw Satellite Model if a satellite is selected and meshManager is loaded
-    if (catalogManagerInstance.selectedSat !== -1) {
-      if (!settingsManager.modelsOnSatelliteViewOverride && keepTrackApi.getMainCamera().camDistBuffer <= keepTrackApi.getMainCamera().thresholdForCloseCamera) {
-        drawManagerInstance.meshManager.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
-      }
-
-      drawManagerInstance.sceneManager.searchBox.draw(drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix, drawManagerInstance.postProcessingManager.curBuffer);
-    }
+    camera.draw(renderer.sat, renderer.sensorPos);
+    renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
-      orbitManagerInstance.updateAllVisibleOrbits(uiManagerInstance);
+      keepTrackApi.getOrbitManager().updateAllVisibleOrbits(keepTrackApi.getUiManager());
       this.inputManager.update(dt);
 
       // Only update hover if we are not on mobile
       if (!settingsManager.isMobileModeEnabled) {
-        hoverManagerInstance.setHoverId(this.inputManager.mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+        keepTrackApi.getHoverManager().setHoverId(this.inputManager.mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
       }
     }
 
     // If Demo Mode do stuff
-    if (settingsManager.isDemoModeOn && sensorManagerInstance?.currentSensors[0]?.lat !== null) {
+    if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
       this.demoManager.update();
     }
 
@@ -404,7 +376,8 @@ theodore.kruczek at gmail dot com.
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
       const timeManagerInstance = keepTrackApi.getTimeManager();
-      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const renderer = keepTrackApi.getRenderer();
+      const sceneInstance = keepTrackApi.getScene();
       const dotsManagerInstance = keepTrackApi.getDotsManager();
       const uiManagerInstance = keepTrackApi.getUiManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -442,9 +415,10 @@ theodore.kruczek at gmail dot com.
       SplashScreen.loadStr(SplashScreen.msg.dots);
       // MobileManager.checkMobileMode();
       // We need to know if we are on a small screen before starting webgl
-      await drawManagerInstance.glInit();
+      await renderer.glInit();
 
-      drawManagerInstance.loadScene();
+      sceneInstance.init(renderer.gl);
+      sceneInstance.loadScene();
 
       dotsManagerInstance.init(settingsManager);
 
@@ -457,7 +431,7 @@ theodore.kruczek at gmail dot com.
 
       lineManagerInstance.init();
 
-      orbitManagerInstance.init(lineManagerInstance, drawManagerInstance.gl);
+      orbitManagerInstance.init(lineManagerInstance, renderer.gl);
 
       uiManagerInstance.init();
 
@@ -467,8 +441,8 @@ theodore.kruczek at gmail dot com.
 
       this.inputManager.init();
 
-      await drawManagerInstance.init(settingsManager);
-      drawManagerInstance.meshManager.init(drawManagerInstance.gl, drawManagerInstance.sceneManager.earth.lightDirection);
+      await renderer.init(settingsManager);
+      renderer.meshManager.init(renderer.gl, sceneInstance.earth.lightDirection);
 
       // Now that everything is loaded, start rendering to thg canvas
       this.gameLoop();
@@ -540,11 +514,11 @@ theodore.kruczek at gmail dot com.
 
   private update_(dt?: Milliseconds) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    drawManagerInstance.dt = dt;
-    drawManagerInstance.dtAdjusted = <Milliseconds>(Math.min(drawManagerInstance.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
+    renderer.dt = dt;
+    renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
 
     // Display it if that settings is enabled
     if (this.isShowFPS) console.log(KeepTrack.getFps_(dt));
@@ -558,7 +532,7 @@ theodore.kruczek at gmail dot com.
       }, 500);
     }
 
-    drawManagerInstance.updateLoop();
+    renderer.update();
 
     // Update Colors
     // NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore

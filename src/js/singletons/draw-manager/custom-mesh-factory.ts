@@ -15,8 +15,8 @@ export class CustomMeshFactory {
   createCustomMesh(vertexList: Float32Array) {
     const customMesh = new CustomMesh();
 
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    customMesh.init(drawManagerInstance.gl, vertexList);
+    const renderer = keepTrackApi.getRenderer();
+    customMesh.init(renderer.gl, vertexList);
     customMesh.id = this.customMeshes_.length;
     this.customMeshes_.push(customMesh);
     return customMesh;
@@ -49,8 +49,8 @@ export class CustomMeshFactory {
   createRadarDome() {
     const radarDome = new RadarDome();
 
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    radarDome.init(drawManagerInstance.gl);
+    const renderer = keepTrackApi.getRenderer();
+    radarDome.init(renderer.gl);
     radarDome.id = this.customMeshes_.length;
     this.customMeshes_.push(radarDome);
     return radarDome;

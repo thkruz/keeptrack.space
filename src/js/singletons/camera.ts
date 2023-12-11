@@ -4,7 +4,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -267,8 +267,8 @@ export class Camera {
   /**
    * TODO: This should be moved to another class
    */
-  public static earthHitTest(gl: WebGL2RenderingContext, pickingFrameBuffer: WebGLFramebuffer, pickReadPixelBuffer: Float32Array, x: number, y: number): boolean {
-    gl.bindFramebuffer(gl.FRAMEBUFFER, pickingFrameBuffer);
+  public static earthHitTest(gl: WebGL2RenderingContext, gpuPickingFrameBuffer: WebGLFramebuffer, pickReadPixelBuffer: Float32Array, x: number, y: number): boolean {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, gpuPickingFrameBuffer);
     gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickReadPixelBuffer);
     return pickReadPixelBuffer[0] === 0 && pickReadPixelBuffer[1] === 0 && pickReadPixelBuffer[2] === 0;
   }
@@ -322,11 +322,11 @@ export class Camera {
     }
 
     if (this.cameraType === CameraType.MAX_CAMERA_TYPES) {
-      const drawManagerInstance = keepTrackApi.getDrawManager();
+      const renderer = keepTrackApi.getRenderer();
 
       this.isLocalRotateReset = true;
       this.settings_.fieldOfView = 0.6;
-      drawManagerInstance.glInit();
+      renderer.glInit();
       if (catalogManagerInstance.selectedSat !== -1) {
         this.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
@@ -386,8 +386,7 @@ export class Camera {
       // getEl('fov-text').innerHTML = 'FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg';
       if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
       if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-      drawManagerInstance.glInit();
+      keepTrackApi.getRenderer().glInit();
     }
   }
 

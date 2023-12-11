@@ -6,6 +6,7 @@ import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { GroupType } from '@app/js/singletons/object-group';
 import { StringExtractor } from '@app/js/static/string-extractor';
 
+import { SearchResult } from '@app/js/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class CountriesMenu extends KeepTrackPlugin {
@@ -127,7 +128,7 @@ export class CountriesMenu extends KeepTrackPlugin {
         .reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id).sccNum},`, '')
         .slice(0, -1);
       uiManagerInstance.searchManager.fillResultBox(
-        groupManagerInstance.groupList[groupName].objects.map((id: number) => ({ satId: id })),
+        groupManagerInstance.groupList[groupName].objects.map((id: number) => <SearchResult>{ satId: id }),
         catalogManagerInstance
       );
     }

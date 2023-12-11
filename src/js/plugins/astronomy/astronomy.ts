@@ -7,7 +7,7 @@
  * of a view on the earth.
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -42,7 +42,7 @@ export class Astronomy extends KeepTrackPlugin {
   bottomIconCallback = (): void => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const drawManagerInstance = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
     if (this.isMenuButtonEnabled) {
       if (!this.verifySensorSelected()) return;

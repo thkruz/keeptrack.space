@@ -1,10 +1,11 @@
 import { mat4, vec3 } from 'gl-matrix';
 import { v4 as uuidv4 } from 'uuid';
+import { BufferAttribute } from './buffer-attribute';
 import { GlUtils } from './gl-utils';
 
 export interface GeometryParams {
   type?: string;
-  attributes?: Record<string, number>;
+  attributes?: Record<string, BufferAttribute>;
 }
 
 export class BufferGeometry {
@@ -45,8 +46,9 @@ export class BufferGeometry {
 
   static id = -1;
   indexLength: number;
-  attributes: Record<string, number> = {};
+  attributes: Record<string, BufferAttribute>;
   gl: WebGL2RenderingContext;
+  vao: WebGLVertexArrayObject;
 
   /**
    * Create a new instance of {@link BufferGeometry}
@@ -55,7 +57,32 @@ export class BufferGeometry {
     this.id = BufferGeometry.id++;
     this.uuid = uuidv4();
     this.type = type;
+    this.attributes = attributes || {};
     this.setAttributes(attributes);
+  }
+
+  /**
+   * Initialize the vertex array object
+   */
+  initVao({ program }: { program: WebGLProgram }) {
+    const gl = this.gl;
+
+    gl.useProgram(program);
+
+    this.vao = gl.createVertexArray();
+    gl.bindVertexArray(this.vao);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.combinedBuffer);
+
+    for (const key in this.attributes) {
+      const attribute = this.attributes[key];
+      gl.enableVertexAttribArray(attribute.location);
+      gl.vertexAttribPointer(attribute.location, attribute.vertices, gl.FLOAT, false, attribute.stride, attribute.offset);
+    }
+
+    if (this.index) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index);
+
+    gl.bindVertexArray(null);
   }
 
   setCombinedBuffer(gl: WebGL2RenderingContext, array: number[]) {
@@ -75,14 +102,24 @@ export class BufferGeometry {
     return this.index;
   }
 
-  setAttribute(name: string, value: number) {
+  setAttribute(name: string, value: BufferAttribute) {
     this.attributes[name] = value;
   }
 
-  setAttributes(attributes: any) {
+  setAttributes(attributes: Record<string, BufferAttribute>) {
     Object.keys(attributes).forEach((key) => {
       this.setAttribute(key, attributes[key]);
     });
+  }
+
+  clone() {
+    const clone = new BufferGeometry();
+    clone.attributes = this.attributes;
+    clone.index = this.index;
+    clone.indexLength = this.indexLength;
+    clone.combinedBuffer = this.combinedBuffer;
+    clone.localMvMatrix = this.localMvMatrix;
+    return clone;
   }
 
   rotateX(radians: number) {

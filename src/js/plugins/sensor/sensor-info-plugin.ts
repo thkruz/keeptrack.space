@@ -1,7 +1,7 @@
 import radioTowerPng from '@app/img/icons/radio-tower.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
 import { getEl } from '@app/js/lib/get-el';
-import { LineTypes } from '@app/js/singletons/draw-manager/line-manager';
+import { LineManager, LineTypes } from '@app/js/singletons/draw-manager/line-manager';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
@@ -9,6 +9,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   bottomIconCallback: () => void = () => {
     this.getSensorInfo();
+    this.checkIfLinesVisible_(keepTrackApi.getLineManager());
   };
 
   bottomIconElementName = 'sensor-info-icon';
@@ -78,6 +79,9 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   };
 
   static PLUGIN_NAME = 'Sensor Info';
+  private isSunLineVisible_ = false;
+  private isMonnLineVisible_ = false;
+
   constructor() {
     super(SensorInfoPlugin.PLUGIN_NAME);
   }
@@ -112,59 +116,121 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        SensorInfoPlugin.addSensorToSunBtnListener_();
-        SensorInfoPlugin.addSensorToMoonBtnListener();
+        this.addSensorToSunBtnListener_();
+        this.addSensorToMoonBtnListener();
+      },
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onLineAdded,
+      cbName: this.PLUGIN_NAME,
+      cb: (lineManager: LineManager) => {
+        this.checkIfLinesVisible_(lineManager);
       },
     });
   }
 
-  private static addSensorToMoonBtnListener() {
-    getEl('sensor-moon-btn').addEventListener('click', () => {
-      // Prevent Multiple Sensors
-      const sensors = keepTrackApi.getSensorManager().currentSensors;
-      if (sensors.length !== 1) {
-        keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
+  private checkIfLinesVisible_(lineManager: LineManager) {
+    this.isSunLineVisible_ = lineManager.drawLineList.some((line) => {
+      if (line.type === LineTypes.SENSOR_TO_SUN) {
+        return true;
       }
+      return false;
+    });
 
-      // Draw Line to Sun from Sensor
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-      keepTrackApi
-        .getLineManager()
-        .create(
-          LineTypes.REF_TO_SAT,
-          [
-            keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name),
-            drawManagerInstance.sceneManager.moon.drawPosition[0],
-            drawManagerInstance.sceneManager.moon.drawPosition[1],
-            drawManagerInstance.sceneManager.moon.drawPosition[2],
-          ],
-          'w'
-        );
+    if (this.isSunLineVisible_) {
+      getEl('sensor-sun-btn').textContent = 'Remove Line to Sun  \u25B6';
+      this.isSunLineVisible_ = true;
+    } else {
+      getEl('sensor-sun-btn').textContent = 'Add Line to Sun  \u25B6';
+      this.isSunLineVisible_ = false;
+    }
+
+    this.isMonnLineVisible_ = lineManager.drawLineList.some((line) => {
+      if (line.type === LineTypes.SENSOR_TO_MOON) {
+        return true;
+      }
+      return false;
+    });
+
+    if (this.isMonnLineVisible_) {
+      getEl('sensor-moon-btn').textContent = 'Remove Line to Moon  \u25B6';
+      this.isMonnLineVisible_ = true;
+    } else {
+      getEl('sensor-moon-btn').textContent = 'Add Line to Moon  \u25B6';
+      this.isMonnLineVisible_ = false;
+    }
+  }
+
+  private addSensorToMoonBtnListener() {
+    getEl('sensor-moon-btn').addEventListener('click', () => {
+      if (this.isMonnLineVisible_) {
+        const lineManager = keepTrackApi.getLineManager();
+        for (const line of lineManager.drawLineList) {
+          if (line.type === LineTypes.SENSOR_TO_MOON) {
+            lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
+            getEl('sensor-moon-btn').textContent = 'Add Line to Moon  \u25B6';
+            this.isMonnLineVisible_ = false;
+            return;
+          }
+        }
+      } else {
+        // Prevent Multiple Sensors
+        const sensors = keepTrackApi.getSensorManager().currentSensors;
+        if (sensors.length !== 1) {
+          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
+        }
+
+        // Draw Line to Sun from Sensor
+        const scene = keepTrackApi.getScene();
+        keepTrackApi
+          .getLineManager()
+          .create(
+            LineTypes.SENSOR_TO_MOON,
+            [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.moon.position[0], scene.moon.position[1], scene.moon.position[2]],
+            'w'
+          );
+
+        // Change Button Text
+        getEl('sensor-moon-btn').textContent = 'Remove Line to Moon  \u25B6';
+        this.isMonnLineVisible_ = true;
+      }
     });
   }
 
-  private static addSensorToSunBtnListener_() {
+  private addSensorToSunBtnListener_() {
     getEl('sensor-sun-btn').addEventListener('click', () => {
-      // Prevent Multiple Sensors
-      const sensors = keepTrackApi.getSensorManager().currentSensors;
-      if (sensors.length !== 1) {
-        keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
-      }
+      if (this.isSunLineVisible_) {
+        const lineManager = keepTrackApi.getLineManager();
+        for (const line of lineManager.drawLineList) {
+          if (line.type === LineTypes.SENSOR_TO_SUN) {
+            lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
+            getEl('sensor-sun-btn').textContent = 'Add Line to Sun  \u25B6';
+            this.isSunLineVisible_ = false;
+            return;
+          }
+        }
+      } else {
+        // Prevent Multiple Sensors
+        const sensors = keepTrackApi.getSensorManager().currentSensors;
+        if (sensors.length !== 1) {
+          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
+        }
 
-      // Draw Line to Sun from Sensor
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-      keepTrackApi
-        .getLineManager()
-        .create(
-          LineTypes.REF_TO_SAT,
-          [
-            keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name),
-            drawManagerInstance.sceneManager.sun.drawPosition[0],
-            drawManagerInstance.sceneManager.sun.drawPosition[1],
-            drawManagerInstance.sceneManager.sun.drawPosition[2],
-          ],
-          'o'
-        );
+        // Draw Line to Sun from Sensor
+        const scene = keepTrackApi.getScene();
+        keepTrackApi
+          .getLineManager()
+          .create(
+            LineTypes.SENSOR_TO_SUN,
+            [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.sun.position[0], scene.sun.position[1], scene.sun.position[2]],
+            'o'
+          );
+
+        // Change Button Text
+        getEl('sensor-sun-btn').textContent = 'Remove Line to Sun  \u25B6';
+        this.isSunLineVisible_ = true;
+      }
     });
   }
 

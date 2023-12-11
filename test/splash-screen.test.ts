@@ -21,9 +21,9 @@ describe('SplashScreen_class', () => {
     const checkMobileModeSpy = jest.spyOn(MobileManager, 'checkMobileMode');
     const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
     const hideSplashScreenSpy = jest.spyOn(SplashScreen, 'hideSplashScreen');
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    drawManagerInstance.sceneManager.earth.isUseHiRes = true;
-    drawManagerInstance.sceneManager.earth.isHiResReady = true;
+    const drawManagerInstance = keepTrackApi.getRenderer();
+    keepTrackApi.getScene().earth.isUseHiRes = true;
+    keepTrackApi.getScene().earth.isHiResReady = true;
     SplashScreen.hideSplashScreen();
     expect(getElSpy).toHaveBeenCalledTimes(2);
     expect(checkMobileModeSpy).toHaveBeenCalled();
@@ -37,9 +37,9 @@ describe('SplashScreen_class', () => {
     const checkMobileModeSpy = jest.spyOn(MobileManager, 'checkMobileMode');
     const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
     const hideSplashScreenSpy = jest.spyOn(SplashScreen, 'hideSplashScreen');
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    drawManagerInstance.sceneManager.earth.isUseHiRes = true;
-    drawManagerInstance.sceneManager.earth.isHiResReady = false;
+    const drawManagerInstance = keepTrackApi.getRenderer();
+    keepTrackApi.getScene().earth.isUseHiRes = true;
+    keepTrackApi.getScene().earth.isHiResReady = false;
     SplashScreen.hideSplashScreen();
     expect(getElSpy).toHaveBeenCalledTimes(2);
     expect(checkMobileModeSpy).toHaveBeenCalled();
@@ -59,9 +59,9 @@ describe('SplashScreen_class', () => {
     const getElSpy = jest.spyOn(getEl, 'getEl').mockReturnValue({ style: { display: '' } } as HTMLElement);
     const checkMobileModeSpy = jest.spyOn(MobileManager, 'checkMobileMode');
     const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    drawManagerInstance.sceneManager.earth.isUseHiRes = true;
-    drawManagerInstance.sceneManager.earth.isHiResReady = true;
+    const drawManagerInstance = keepTrackApi.getRenderer();
+    keepTrackApi.getScene().earth.isUseHiRes = true;
+    keepTrackApi.getScene().earth.isHiResReady = true;
     SplashScreen.hideSplashScreen();
     expect(getElSpy).toHaveBeenCalled();
     expect(checkMobileModeSpy).toHaveBeenCalled();

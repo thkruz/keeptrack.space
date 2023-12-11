@@ -589,7 +589,7 @@ export type ColorRuleSet = (sat: SatObject, params?: any) => ColorInformation;
 export interface GroupsManager {
   clearSelect: () => void;
   createGroup: (type: GroupType, data: any, name?: string) => ObjectGroup;
-  groupList: ObjectGroup[];
+  groupList: Record<string, ObjectGroup>;
   selectGroup: (group: ObjectGroup) => void;
   selectedGroup: ObjectGroup;
   stopUpdatingInViewSoon: boolean;
@@ -743,7 +743,7 @@ export enum Singletons {
   LineManager = 'LineManager',
   StarManager = 'StarManager',
   TimeManager = 'TimeManager',
-  DrawManager = 'DrawManager',
+  WebGLRenderer = 'DrawManager',
   DotsManager = 'DotsManager',
   SensorManager = 'SensorManager',
   SelectSatManager = 'SelectSatManager',
@@ -752,4 +752,5 @@ export enum Singletons {
   SensorMath = 'SensorMathManager',
   MainCamera = 'MainCamera',
   PersistenceManager = 'PersistenceManager',
+  Scene = 'Scene',
 }

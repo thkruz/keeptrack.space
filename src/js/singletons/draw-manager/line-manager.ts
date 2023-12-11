@@ -4,14 +4,15 @@ import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 
 import { keepTrackApi } from '@app/js/keepTrackApi';
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { keepTrackContainer } from '../../container';
 import { EciArr3 } from '../../interfaces';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
-import { GlUtils } from '../../static/gl-utils';
 import { SensorMath } from '../../static/sensor-math';
-import { DrawManager } from '../draw-manager';
+import { WebGLRenderer } from '../webgl-renderer';
 import { Line } from './line-manager/line';
 
 export enum LineTypes {
@@ -26,6 +27,8 @@ export enum LineTypes {
   SAT_TO_MISL = 'misl',
   CENTER_OF_EARTH_TO_REF = 'ref',
   REF_TO_REF = 'ref2',
+  SENSOR_TO_SUN = 'SENSOR_TO_SUN',
+  SENSOR_TO_MOON = 'SENSOR_TO_MOON',
 }
 export type LineColors = 'r' | 'o' | 'y' | 'g' | 'b' | 'c' | 'p' | 'w' | [number, number, number, number];
 
@@ -57,7 +60,12 @@ export type LineTask = {
 
 export class LineManager {
   private attribs_ = {
-    a_position: 0,
+    a_position: new BufferAttribute({
+      location: 0,
+      vertices: 4,
+      offset: 0,
+      stride: 0,
+    }),
   };
 
   private gl_: WebGL2RenderingContext;
@@ -119,6 +127,10 @@ export class LineManager {
       case LineTypes.CENTER_OF_EARTH_TO_SAT:
         this.createSat_(value as [number], color);
         break;
+      case LineTypes.SENSOR_TO_SUN:
+      case LineTypes.SENSOR_TO_MOON:
+        this.createSat2_(value as [number, number, number, number], color, type);
+        break;
       case LineTypes.REF_TO_SAT:
         this.createSat2_(value as [number, number, number, number], color);
         break;
@@ -152,6 +164,8 @@ export class LineManager {
       default:
         break;
     }
+
+    keepTrackApi.methods.onLineAdded();
   }
 
   /**
@@ -226,7 +240,7 @@ export class LineManager {
   /**
    * Reference Point to Satellite
    */
-  private createSat2_(value: [number, number, number, number], color: [number, number, number, number]) {
+  private createSat2_(value: [number, number, number, number], color: [number, number, number, number], type: LineTypes = LineTypes.REF_TO_SAT) {
     const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
     if (!sat?.position?.x) {
       console.debug(`No Satellite Position Available for Line`);
@@ -235,11 +249,11 @@ export class LineManager {
     }
     this.drawLineList.push({
       line: new Line(this.gl_, this.attribs_, this.uniforms_),
-      sat: sat,
+      sat,
       ref: [value[1], value[2], value[3]],
       ref2: [sat.position.x, sat.position.y, sat.position.z],
-      color: color,
-      type: LineTypes.REF_TO_SAT,
+      color,
+      type,
     });
   }
 
@@ -468,17 +482,17 @@ export class LineManager {
     }
   }
 
-  draw(drawManager: DrawManager, inViewData: Int8Array, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null): void {
+  draw(renderer: WebGLRenderer, inViewData: Int8Array, camMatrix: mat4, tgtBuffer: WebGLFramebuffer = null): void {
     const gl = this.gl_;
-    const { gmst, pMatrix } = drawManager;
+    const { gmst, projectionMatrix } = renderer;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
 
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, projectionMatrix);
 
-    gl.enableVertexAttribArray(this.attribs_.a_position); // Enable
+    gl.enableVertexAttribArray(this.attribs_.a_position.location); // Enable
 
     if (this.drawLineList.length == 0) return;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -647,7 +661,7 @@ export class LineManager {
       }
     }
 
-    gl.disableVertexAttribArray(this.attribs_.a_position); // Reset
+    gl.disableVertexAttribArray(this.attribs_.a_position.location); // Reset
   }
 
   drawWhenSelected(): void {
@@ -659,8 +673,8 @@ export class LineManager {
   }
 
   init() {
-    this.gl_ = keepTrackApi.getDrawManager().gl;
-    this.program = GlUtils.createProgram(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_);
+    this.gl_ = keepTrackApi.getRenderer().gl;
+    this.program = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
   }
 
   removeStars(): boolean {
@@ -680,10 +694,10 @@ export class LineManager {
   setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
     const gl = this.gl_;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.vertexAttribPointer(this.attribs_.a_position, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(this.attribs_.a_position);
+    gl.vertexAttribPointer(this.attribs_.a_position.location, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.attribs_.a_position.location);
     gl.drawArrays(gl.LINE_STRIP, 0, segments);
-    gl.disableVertexAttribArray(this.attribs_.a_position);
+    gl.disableVertexAttribArray(this.attribs_.a_position.location);
   }
 
   setColorUniforms(color: vec4) {

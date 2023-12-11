@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import { EciArr3 } from '@app/js/interfaces';
+import { BufferAttribute } from '@app/js/static/buffer-attribute';
 import { vec4 } from 'gl-matrix';
 import { GlUtils } from '../../../static/gl-utils';
 
@@ -9,9 +10,7 @@ import { GlUtils } from '../../../static/gl-utils';
  * It requires a precompiled shader program and its attributes to work.
  */
 export class Line {
-  private attribs_ = {
-    a_position: 0,
-  };
+  private attribs_: { a_position: BufferAttribute };
 
   private gl_: WebGL2RenderingContext;
   private uniforms_: { u_color: WebGLUniformLocation; u_camMatrix: WebGLUniformLocation; u_pMatrix: WebGLUniformLocation };
@@ -20,7 +19,7 @@ export class Line {
   constructor(
     gl: WebGL2RenderingContext,
     attribs: {
-      a_position: number;
+      a_position: BufferAttribute;
     },
     uniforms: {
       u_color: WebGLUniformLocation;
@@ -48,7 +47,7 @@ export class Line {
     gl.uniform4fv(this.uniforms_.u_color, color);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf_);
-    gl.vertexAttribPointer(this.attribs_.a_position, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this.attribs_.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.drawArrays(gl.LINES, 0, 2);
   }

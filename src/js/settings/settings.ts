@@ -2,7 +2,7 @@
 // /////////////////////////////////////////////////////////////////////////////
 
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
+import { SettingsPresets } from './presets/presets';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
@@ -170,6 +171,15 @@ export class SettingsManager {
    * Determines whether or not to show LEO satellites in the application.
    */
   isShowLeoSats = true;
+  /**
+   * Determines whether or not to show Notional satellites in the application.
+   * Notional satellites are satellites that haven't launched yet.
+   */
+  isShowNotionalSats = true;
+  /**
+   * Determines whether or not to show Starlink satellites in the application.
+   */
+  isShowStarlinkSats = true;
   /**
    * Determines whether or not payloads should be displayed.
    */
@@ -975,9 +985,17 @@ export class SettingsManager {
   hiresMilkWay = false;
 
   loadPersistedSettings() {
+    const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
+    if (isShowNotionalSatsString !== null) {
+      this.isShowNotionalSats = isShowNotionalSatsString === 'true';
+    }
     const leoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_LEO_SATS);
     if (leoSatsString !== null) {
       this.isShowLeoSats = leoSatsString === 'true';
+    }
+    const starlinkSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_STARLINK_SATS);
+    if (starlinkSatsString !== null) {
+      this.isShowStarlinkSats = starlinkSatsString === 'true';
     }
     const heoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_HEO_SATS);
     if (heoSatsString !== null) {
@@ -1291,197 +1309,28 @@ export class SettingsManager {
           case 'preset':
             switch (val) {
               case 'ops-center':
-                this.politicalImages = true;
-                this.isDrawSun = false;
-                this.isDisableStars = true;
-                this.isDrawAtmosphere = false;
-                this.isDrawAurora = false;
-                this.isShowRocketBodies = false;
-                this.isShowDebris = false;
-                this.isDrawBumpMap = false;
-                this.isDrawSpecMap = false;
-                this.isDrawMilkyWay = false;
-                this.isGraySkybox = false;
-                this.isLoadLastMap = false;
+                SettingsPresets.loadPresetOpsCenter(this);
                 break;
               case 'education':
-                this.isShowSplashScreen = true;
-                this.isEPFL = true;
-                this.disableAllPlugins();
-                this.plugins.gamepad = true;
-                this.isLoadLastMap = false;
-                this.isShowRocketBodies = true;
-                this.isShowDebris = true;
-                this.isShowPayloads = true;
-                this.isShowAgencies = false;
-                this.lowresImages = true;
-                this.isAllowRightClick = false;
-                this.isDisableSelectSat = true;
-                this.isDisableSensors = true;
-                this.isDisableControlSites = true;
-                this.isDisableLaunchSites = true;
-                this.isLoadLastSensor = false;
-                this.colors.rocketBody = [0.5, 0.5, 0.5, 1];
-                this.colors.unknown = [0.5, 0.5, 0.5, 1];
-                this.colors.pink = [0.5, 0.5, 0.5, 1];
+                SettingsPresets.loadPresetEducation(this);
                 break;
               case 'outreach':
-                this.satShader.minSize = 30.0;
-                this.limitSats = '25544';
-                this.disableAllPlugins();
-                this.isDisableStars = true;
-                this.maxAnalystSats = 1;
-                this.maxMissiles = 1;
-                this.maxFieldOfViewMarkers = 1;
-                this.noMeshManager = false;
-                this.isLoadLastMap = false;
-                this.isShowRocketBodies = true;
-                this.isShowDebris = true;
-                this.isShowPayloads = true;
-                this.isShowAgencies = false;
-                this.nasaImages = true;
-                this.isAllowRightClick = false;
-                this.isDisableSelectSat = false;
-                this.isDisableSensors = true;
-                this.isDisableControlSites = true;
-                this.isDisableLaunchSites = true;
-                this.isLoadLastSensor = false;
-                this.onLoadCb = () => {
-                  const groupManagerInstance = keepTrackApi.getGroupsManager();
-                  const sccNumGroup = groupManagerInstance.createGroup(9, [25544]);
-                  groupManagerInstance.selectGroup(sccNumGroup);
-                  sccNumGroup.updateOrbits();
-                  keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
-                };
+                SettingsPresets.loadPresetOutreach(this);
                 break;
               case 'debris':
-                this.disableAllPlugins();
-                this.isDisableStars = true;
-                this.maxAnalystSats = 1;
-                this.maxMissiles = 1;
-                this.maxFieldOfViewMarkers = 1;
-                this.noMeshManager = true;
-                this.isLoadLastMap = false;
-                this.isShowRocketBodies = true;
-                this.isShowDebris = true;
-                this.isShowPayloads = false;
-                this.isShowAgencies = false;
-                this.lowresImages = true;
-                this.isAllowRightClick = false;
-                this.isDisableSelectSat = false;
-                this.isDisableSensors = true;
-                this.isDisableControlSites = true;
-                this.isDisableLaunchSites = true;
-                this.isLoadLastSensor = false;
-                this.colors.rocketBody = [0.5, 0.5, 0.5, 1];
-                this.colors.unknown = [0.5, 0.5, 0.5, 1];
-                this.colors.pink = [0.5, 0.5, 0.5, 1];
-                this.maxOribtsDisplayedDesktopAll = 100000;
-                this.maxOribtsDisplayed = 100000;
-                this.searchLimit = 100000;
-                this.onLoadCb = () => {
-                  const groupManagerInstance = keepTrackApi.getGroupsManager();
-                  const allSats = groupManagerInstance.createGroup(0, null);
-                  groupManagerInstance.selectGroup(allSats);
-                  allSats.updateOrbits();
-                  keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
-                };
+                SettingsPresets.loadPresetDebris(this);
                 break;
               case 'dark-clouds':
                 // load ./darkClouds.ts and then run it
-                import('./darkClouds').then((module) => {
+                import('./presets/darkClouds').then((module) => {
                   module.darkClouds();
                 });
                 break;
               case 'facsat2':
-                this.facsat2();
+                SettingsPresets.loadPresetFacSat2(this);
                 break;
               case 'altitudes':
-                this.maxAnalystSats = 1;
-                this.maxMissiles = 1;
-                this.maxFieldOfViewMarkers = 1;
-                // this.isNotionalDebris = true;
-                this.isEnableExtendedCatalog = true;
-                this.isShowAgencies = false;
-                this.isDisableLaunchSites = true;
-                this.isDisableControlSites = true;
-                this.isDisableSensors = true;
-                this.colors.transparent = [1, 1, 1, 0.4];
-                this.colors.rocketBody = [0.5, 0.5, 0.5, 1];
-                this.colors.unknown = [0.5, 0.5, 0.5, 1];
-                this.colors.pink = [0.5, 0.5, 0.5, 1];
-                this.colors.notional = [0.5, 0.5, 0.5, 1];
-                this.colors.deselected = [1, 1, 1, 0.4];
-                this.selectedColor = [0, 0, 0, 0];
-                this.selectedColorFallback = [0, 0, 0, 0];
-                this.maxNotionalDebris = 0.5 * 1000000; // 2.5 million
-                this.isDrawOrbits = false;
-                this.searchLimit = 100000;
-                this.isEPFL = true;
-                this.isDisableExtraCatalog = false;
-                this.offline = true;
-                this.timeMachineDelay = <Milliseconds>1325;
-                this.maxZoomDistance = <Kilometers>2000000;
-                this.satShader.minSize = 8.0;
-                this.isDisableAsciiCatalog = true;
-                this.plugins.videoDirector = true;
-                this.zFar = 1250000.0;
-                this.isDisableMoon = true;
-
-                this.hiresMilkWay = true;
-                this.earthNumLatSegs = 128;
-                this.earthNumLonSegs = 128;
-                this.hiresImages = true;
-
-                this.autoZoomSpeed = 0.001;
-                this.autoRotateSpeed = 0.000015;
-
-                this.timeMachineString = (yearStr) => {
-                  window.M.Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
-                  const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
-                  const english = `In ${yearPrefix}${yearStr}`;
-                  // const french = `En ${yearPrefix}${yearStr}`;
-                  // const german = `Im ${yearPrefix}${yearStr}`;
-
-                  const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
-                  const debrisSpan = `<span style="color: rgb(150, 150, 150);">Debris </span>`;
-                  document.getElementById('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
-                  return `${english}`;
-                };
-                this.onLoadCb = () => {
-                  // Create div for textOverlay
-                  const textOverlay = document.createElement('div');
-                  textOverlay.id = 'textOverlay';
-                  document.body.appendChild(textOverlay);
-
-                  // Update CSS
-                  const toastCss = `
-                    .toast,
-                    .toast-container {
-                      display: none !important;
-                    }
-                  `;
-                  const style = document.createElement('style');
-                  style.type = 'text/css';
-                  style.appendChild(document.createTextNode(toastCss));
-                  document.head.appendChild(style);
-
-                  document.getElementById('textOverlay').style.cssText = `
-                    border-radius: 2px;
-                    bottom: 75px;
-                    right: 150px;
-                    width: auto;
-                    position: absolute;
-                    min-height: 48px;
-                    line-height: 2.5em !important;
-                    background-color: rgb(0, 0, 0) !important;
-                    padding: 10px 55px !important;
-                    font-size: 1.8rem !important;
-                    font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-                    font-weight: 300;
-                    color: white;
-                  }`;
-                };
+                SettingsPresets.loadPresetAltitudes_(this);
                 break;
               default:
                 break;
@@ -1590,45 +1439,6 @@ export class SettingsManager {
         }
       }
     }
-  }
-
-  private facsat2() {
-    this.isDisableKeyboard = true;
-    this.isShowLogo = true;
-    this.isShowSplashScreen = false;
-    this.maxAnalystSats = 1;
-    this.maxMissiles = 1;
-    this.maxFieldOfViewMarkers = 1;
-    this.isShowSplashScreen = true;
-    this.isEPFL = true;
-    this.disableAllPlugins();
-    this.isLoadLastMap = false;
-    this.isShowRocketBodies = true;
-    this.isShowDebris = true;
-    this.isShowPayloads = true;
-    this.isShowAgencies = false;
-    this.lowresImages = true;
-    this.isAllowRightClick = false;
-    this.isDisableSensors = true;
-    this.isDisableControlSites = true;
-    this.isDisableLaunchSites = true;
-    this.isLoadLastSensor = false;
-    this.colors.payload = [0.2, 1.0, 0.0, 0.1];
-    this.colors.rocketBody = [0.5, 0.5, 0.5, 0.1];
-    this.colors.debris = [0.5, 0.5, 0.5, 0.1];
-    this.colors.unknown = [0.5, 0.5, 0.5, 0.1];
-    this.colors.pink = [0.5, 0.5, 0.5, 0.1];
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'satFromSettings',
-      cb: () => {
-        keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
-        setTimeout(() => {
-          keepTrackApi.getSelectSatManager().selectSat(keepTrackApi.getCatalogManager().getIdFromObjNum(43721));
-          this.isDisableSelectSat = true;
-        }, 5000);
-      },
-    });
   }
 
   /**
@@ -1771,7 +1581,7 @@ export class SettingsManager {
         this.installDirectory = './';
         break;
       case 'poderespacial.fac.mil.co':
-        this.facsat2();
+        SettingsPresets.loadPresetFacSat2(this);
         break;
       default:
         this.installDirectory = '/';

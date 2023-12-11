@@ -4,7 +4,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -582,9 +582,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   }
 
   public init(): void {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
 
-    this.gl_ = drawManagerInstance.gl;
+    this.gl_ = renderer.gl;
     this.colorTheme = settingsManager.colors || {
       transparent: [0, 0, 0, 0] as rgbaArray,
       inFOV: [0.0, 1.0, 0.0, 1.0] as rgbaArray,
@@ -650,8 +650,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
 
     this.resetObjectTypeFlags();
-    this.colorBuffer = drawManagerInstance.gl.createBuffer();
-    this.pickableBuffer = drawManagerInstance.gl.createBuffer();
+    this.colorBuffer = renderer.gl.createBuffer();
+    this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
     keepTrackApi.register({
@@ -1247,30 +1247,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       let colors: ColorInformation = null;
       satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
 
-      if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
-      if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || (satData[i].apogee >= 6000 && satData[i].perigee < 6000))) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
-      if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
-      if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
+      colors = StandardColorSchemeManager.getColorIfDisabledSat_(satData, i, colors);
       colors ??= this.currentColorScheme(satData[i], params);
 
       this.colorData[i * 4] = colors.color[0]; // R
@@ -1289,30 +1266,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       let colors: ColorInformation = null;
-      if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
-      if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || (satData[i].apogee >= 6000 && satData[i].perigee < 6000))) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
-      if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
-      if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
-        colors = {
-          color: [0, 0, 0, 0],
-          pickable: Pickable.No,
-        };
-      }
+      colors = StandardColorSchemeManager.getColorIfDisabledSat_(satData, i, colors);
       colors ??= this.currentColorScheme(satData[i], params);
 
       this.colorData[i * 4] = colors.color[0]; // R
@@ -1321,6 +1275,46 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       this.colorData[i * 4 + 3] = colors.color[3]; // A
       this.pickableData[i] = colors.pickable;
     }
+  }
+
+  private static getColorIfDisabledSat_(satData: SatObject[], i: number, colors: ColorInformation) {
+    if (!settingsManager.isShowNotionalSats && satData[i].type === SpaceObjectType.NOTIONAL) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowStarlinkSats && satData[i].name.includes('STARLINK')) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || (satData[i].apogee >= 6000 && satData[i].perigee < 6000))) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    return colors;
   }
 
   private calculateParams_() {

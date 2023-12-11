@@ -2,6 +2,7 @@ import { SatObject } from '@app/js/interfaces';
 import { RAD2DEG } from '@app/js/lib/constants';
 import { saveCsv } from '@app/js/lib/saveVariable';
 import { saveAs } from 'file-saver';
+import { keepTrackApi } from '../keepTrackApi';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export class CatalogExporter {
@@ -53,6 +54,20 @@ export class CatalogExporter {
       // DEBUG:
       // console.warn('Failed to Export TLEs!');
     }
+  }
+
+  static exportSatInFov2Csv(satData: SatObject[]) {
+    const data = satData
+      .filter((sat: SatObject) => keepTrackApi.getDotsManager().inViewData?.[sat.id] === 1 && sat.sccNum && typeof sat.TLE1 != 'undefined' && typeof sat.TLE2 != 'undefined')
+      .map((sat: SatObject) => ({
+        satId: sat.sccNum,
+        name: sat.name,
+        country: sat.country,
+        apogee: sat.apogee,
+        perigee: sat.perigee,
+      }));
+
+    saveCsv(data, 'satInView');
   }
 
   static exportTle2Txt(satData: SatObject[], numberOfLines = 2, isDeleteAnalysts = true) {

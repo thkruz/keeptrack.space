@@ -128,8 +128,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
               if (getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = this.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
               if (getEl('sat-elevation')) getEl('sat-elevation').innerHTML = this.currentTEARR.el.toFixed(1) + '°';
               if (getEl('sat-range')) getEl('sat-range').innerHTML = this.currentTEARR.rng.toFixed(2) + ' km';
-              const drawManagerInstance = keepTrackApi.getDrawManager();
-              const sun = drawManagerInstance.sceneManager.sun;
+              const sun = keepTrackApi.getScene().sun;
               if (getEl('sat-vmag'))
                 if (isMissileObject(sat)) {
                   getEl('sat-vmag').innerHTML = 'N/A';

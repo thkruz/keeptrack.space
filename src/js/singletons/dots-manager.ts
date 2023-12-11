@@ -6,8 +6,10 @@ import { mat4 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
+import { BufferAttribute } from '../static/buffer-attribute';
+import { WebGlProgramHelper } from '../static/webgl-program';
 import { CameraType } from './camera';
-import { DrawManager } from './draw-manager';
+import { WebGLRenderer } from './webgl-renderer';
 
 declare module '@app/js/interfaces' {
   interface SatShader {
@@ -60,7 +62,6 @@ export class DotsManager {
     pickability: <WebGLBuffer>null,
   };
 
-  pickingFrameBuffer: WebGLFramebuffer;
   pickingRenderBuffer: WebGLRenderbuffer;
   pickingTexture: WebGLTexture;
   positionData: Float32Array;
@@ -68,10 +69,26 @@ export class DotsManager {
     dots: {
       program: <WebGLProgram>null,
       attribs: {
-        a_position: 0,
-        a_color: 0,
-        a_star: 0,
-        a_pickable: 0,
+        a_position: new BufferAttribute({
+          location: 0,
+          vertices: 3,
+          offset: 0,
+        }),
+        a_color: new BufferAttribute({
+          location: 1,
+          vertices: 4,
+          offset: 0,
+        }),
+        a_star: new BufferAttribute({
+          location: 2,
+          vertices: 1,
+          offset: 0,
+        }),
+        a_pickable: new BufferAttribute({
+          location: 3,
+          vertices: 1,
+          offset: 0,
+        }),
       },
       uniforms: {
         u_pMvCamMatrix: <WebGLUniformLocation>null,
@@ -83,9 +100,21 @@ export class DotsManager {
     picking: {
       program: <WebGLProgram>null,
       attribs: {
-        a_position: 0,
-        a_color: 0,
-        a_pickable: 0,
+        a_position: new BufferAttribute({
+          location: 0,
+          vertices: 3,
+          offset: 0,
+        }),
+        a_color: new BufferAttribute({
+          location: 1,
+          vertices: 4,
+          offset: 0,
+        }),
+        a_pickable: new BufferAttribute({
+          location: 2,
+          vertices: 1,
+          offset: 0,
+        }),
       },
       uniforms: {
         u_pMvCamMatrix: <WebGLUniformLocation>null,
@@ -121,8 +150,9 @@ export class DotsManager {
     if (!this.isReady || !settingsManager.cruncherReady) return;
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     if (!colorSchemeManagerInstance.colorBuffer) return;
+    if (!pMvCamMatrix) return;
 
-    const gl = keepTrackApi.getDrawManager().gl;
+    const gl = keepTrackApi.getRenderer().gl;
 
     gl.useProgram(this.programs.dots.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
@@ -139,7 +169,7 @@ export class DotsManager {
     gl.bindVertexArray(this.programs.dots.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
-    gl.enableVertexAttribArray(this.programs.dots.attribs.a_position);
+    gl.enableVertexAttribArray(this.programs.dots.attribs.a_position.location);
     // Buffering data here reduces the need to bind the buffer twice!
     // Either allocate and assign the data to the buffer
     if (!this.positionBufferOneTime_) {
@@ -149,7 +179,7 @@ export class DotsManager {
       // Or just update it if we have already allocated it - the length won't change
       gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.positionData);
     }
-    gl.vertexAttribPointer(this.programs.dots.attribs.a_position, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this.programs.dots.attribs.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
     // DEBUG:
     // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -177,10 +207,10 @@ export class DotsManager {
     if (!this.isReady || !settingsManager.cruncherReady) return;
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     if (!colorSchemeManagerInstance.colorBuffer) return;
-    const gl = keepTrackApi.getDrawManager().gl;
+    const gl = keepTrackApi.getRenderer().gl;
 
     gl.useProgram(this.programs.picking.program);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.pickingFrameBuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
 
@@ -275,21 +305,21 @@ export class DotsManager {
    * @param settings - The user settings to use for initialization.
    */
   init(settings: SettingsManager) {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
     this.settings_ = settings;
 
     this.initShaders_();
-    this.programs.dots.program = GlUtils.createProgram(
-      drawManagerInstance.gl,
+    this.programs.dots.program = new WebGlProgramHelper(
+      renderer.gl,
       this.shaders_.dots.vert,
       this.shaders_.dots.frag,
       this.programs.dots.attribs,
       this.programs.dots.uniforms
-    );
+    ).program;
 
     // Make buffers for satellite positions and size -- color and pickability are created in ColorScheme class
-    this.buffers.position = drawManagerInstance.gl.createBuffer();
-    this.buffers.size = drawManagerInstance.gl.createBuffer();
+    this.buffers.position = renderer.gl.createBuffer();
+    this.buffers.size = renderer.gl.createBuffer();
 
     this.initProgramPicking();
   }
@@ -321,14 +351,14 @@ export class DotsManager {
    * creates a framebuffer, texture, and renderbuffer for picking, and initializes a pixel buffer.
    */
   initProgramPicking() {
-    const gl = keepTrackApi.getDrawManager().gl;
-    this.programs.picking.program = GlUtils.createProgramFromCode(gl, this.shaders_.picking.vert, this.shaders_.picking.frag);
+    const gl = keepTrackApi.getRenderer().gl;
+    this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
     GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvCamMatrix']);
 
-    this.pickingFrameBuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.pickingFrameBuffer);
+    keepTrackApi.getScene().frameBuffers.gpuPicking = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
 
     this.pickingTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.pickingTexture);
@@ -352,7 +382,7 @@ export class DotsManager {
    * Initializes the vertex array objects for the dots and picking programs.
    */
   initVao(): void {
-    const gl = keepTrackApi.getDrawManager().gl;
+    const gl = keepTrackApi.getRenderer().gl;
 
     // Dots Program
     this.programs.dots.vao = gl.createVertexArray();
@@ -360,12 +390,12 @@ export class DotsManager {
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
-    gl.enableVertexAttribArray(this.programs.dots.attribs.a_color);
-    gl.vertexAttribPointer(this.programs.dots.attribs.a_color, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.dots.attribs.a_color.location);
+    gl.vertexAttribPointer(this.programs.dots.attribs.a_color.location, 4, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.size);
-    gl.enableVertexAttribArray(this.programs.dots.attribs.a_star);
-    gl.vertexAttribPointer(this.programs.dots.attribs.a_star, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.dots.attribs.a_star.location);
+    gl.vertexAttribPointer(this.programs.dots.attribs.a_star.location, 1, gl.UNSIGNED_BYTE, false, 0, 0);
 
     gl.bindVertexArray(null);
 
@@ -374,16 +404,16 @@ export class DotsManager {
     gl.bindVertexArray(this.programs.picking.vao);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
-    gl.enableVertexAttribArray(this.programs.picking.attribs.a_position);
-    gl.vertexAttribPointer(this.programs.picking.attribs.a_position, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.picking.attribs.a_position.location);
+    gl.vertexAttribPointer(this.programs.picking.attribs.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pickingBuffers.color);
-    gl.enableVertexAttribArray(this.programs.picking.attribs.a_color);
-    gl.vertexAttribPointer(this.programs.picking.attribs.a_color, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.picking.attribs.a_color.location);
+    gl.vertexAttribPointer(this.programs.picking.attribs.a_color.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.pickableBuffer);
-    gl.enableVertexAttribArray(this.programs.picking.attribs.a_pickable);
-    gl.vertexAttribPointer(this.programs.picking.attribs.a_pickable, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.picking.attribs.a_pickable.location);
+    gl.vertexAttribPointer(this.programs.picking.attribs.a_pickable.location, 1, gl.UNSIGNED_BYTE, false, 0, 0);
 
     gl.bindVertexArray(null);
   }
@@ -422,8 +452,8 @@ export class DotsManager {
       this.pickingColorData.push(byteB / 255.0);
     }
 
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    this.pickingBuffers.color = GlUtils.createArrayBuffer(drawManagerInstance.gl, new Float32Array(this.pickingColorData));
+    const renderer = keepTrackApi.getRenderer();
+    this.pickingBuffers.color = GlUtils.createArrayBuffer(renderer.gl, new Float32Array(this.pickingColorData));
   }
 
   /**
@@ -567,8 +597,8 @@ export class DotsManager {
     */
 
     this.satDataLenInDraw_ = satSetLen;
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    if (!settingsManager.lowPerf && drawManagerInstance.dtAdjusted > settingsManager.minimumDrawDt) {
+    const renderer = keepTrackApi.getRenderer();
+    if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
       // Don't Interpolate Static Objects
       this.satDataLenInDraw_ -= settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData;
       // Flat Array of X, Y, and Z so times by 3
@@ -580,10 +610,10 @@ export class DotsManager {
       // NOTE: We were using satDataLenInDraw3 but markers don't have velocity and neither do missiles (3 DOF as of 7/4/2022)
       if (this.isAlternateVelocity) {
         // Update half of the positions based on velocity
-        this.updateVelocitiesAlt_(drawManagerInstance, selectedSat);
+        this.updateVelocitiesAlt_(renderer, selectedSat);
       } else {
         // Update half of the positions based on velocity
-        this.updateVelocities_(drawManagerInstance, selectedSat);
+        this.updateVelocities_(renderer, selectedSat);
       }
 
       // TODO: This doesn't interpolate the position of the selected satellite
@@ -599,9 +629,9 @@ export class DotsManager {
       // Always do the selected satellite in the most accurate way
       if (selectedSat === -1) return;
 
-      this.positionData[selectedSat * 3] += this.velocityData[selectedSat * 3] * drawManagerInstance.dtAdjusted;
-      this.positionData[selectedSat * 3 + 1] += this.velocityData[selectedSat * 3 + 1] * drawManagerInstance.dtAdjusted;
-      this.positionData[selectedSat * 3 + 2] += this.velocityData[selectedSat * 3 + 2] * drawManagerInstance.dtAdjusted;
+      this.positionData[selectedSat * 3] += this.velocityData[selectedSat * 3] * renderer.dtAdjusted;
+      this.positionData[selectedSat * 3 + 1] += this.velocityData[selectedSat * 3 + 1] * renderer.dtAdjusted;
+      this.positionData[selectedSat * 3 + 2] += this.velocityData[selectedSat * 3 + 2] * renderer.dtAdjusted;
 
       // TODO: WebWorker for this?
       // const { gmst } = calculateTimeVariables(timeManager.simulationTimeObj);
@@ -625,7 +655,7 @@ export class DotsManager {
    * @param selectedSat The index of the selected satellite.
    */
   updateSizeBuffer(bufferLen: number = 3, selectedSat: number = -1) {
-    const gl = keepTrackApi.getDrawManager().gl;
+    const gl = keepTrackApi.getRenderer().gl;
 
     if (!this.sizeBufferOneTime) {
       this.sizeData = new Int8Array(bufferLen);
@@ -792,39 +822,39 @@ export class DotsManager {
 
   /**
    * Updates second half of the velocities of the orbital satellites based on the given `drawManagerInstance` and `selectedSat`.
-   * @param drawManagerInstance - The DrawManager instance.
+   * @param renderer - The DrawManager instance.
    * @param selectedSat - The selected satellite.
    */
-  private updateVelocitiesAlt_(drawManagerInstance: DrawManager, selectedSat: number) {
+  private updateVelocitiesAlt_(renderer: WebGLRenderer, selectedSat: number) {
     for (this.drawI_ = 0; this.drawI_ < Math.ceil(this.orbitalSats3_ / 2); this.drawI_++) {
-      this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
+      this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (renderer.dtAdjusted + this.lastDrawDt);
     }
     // If you updated the selected sat, undo it
     if (selectedSat * 3 < Math.ceil(this.orbitalSats3_ / 2)) {
-      this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
+      this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (renderer.dtAdjusted + this.lastDrawDt);
+      this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (renderer.dtAdjusted + this.lastDrawDt);
+      this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (renderer.dtAdjusted + this.lastDrawDt);
     }
     this.isAlternateVelocity = false;
-    this.lastDrawDt = drawManagerInstance.dtAdjusted;
+    this.lastDrawDt = renderer.dtAdjusted;
   }
 
   /**
    * Updates half the velocities of the orbital satellites based on the given `drawManagerInstance` and `selectedSat`.
-   * @param drawManagerInstance - The DrawManager instance.
+   * @param renderer - The DrawManager instance.
    * @param selectedSat - The selected satellite.
    */
-  private updateVelocities_(drawManagerInstance: DrawManager, selectedSat: number) {
+  private updateVelocities_(renderer: WebGLRenderer, selectedSat: number) {
     for (this.drawI_ = Math.floor(this.orbitalSats3_ / 2); this.drawI_ < this.orbitalSats3_; this.drawI_++) {
-      this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
+      this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (renderer.dtAdjusted + this.lastDrawDt);
     }
     // If you updated the selected sat, undo it
     if (selectedSat * 3 >= Math.floor(this.orbitalSats3_ / 2)) {
-      this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
+      this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (renderer.dtAdjusted + this.lastDrawDt);
+      this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (renderer.dtAdjusted + this.lastDrawDt);
+      this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (renderer.dtAdjusted + this.lastDrawDt);
     }
     this.isAlternateVelocity = true;
-    this.lastDrawDt = drawManagerInstance.dtAdjusted;
+    this.lastDrawDt = renderer.dtAdjusted;
   }
 }

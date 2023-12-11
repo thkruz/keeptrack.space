@@ -5,8 +5,8 @@ import { lon2yaw } from '@app/js/lib/transforms';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
 
+import { WebGlProgramHelper } from '@app/js/static/webgl-program';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
-import { GlUtils } from '../../static/gl-utils';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -16,8 +16,7 @@ import { GlUtils } from '../../static/gl-utils';
 const offsetDistance = RADIUS_OF_EARTH + 80 + 1;
 
 export const init = async () => {
-  const drawManagerInstance = keepTrackApi.getDrawManager();
-  const { gl } = drawManagerInstance;
+  const { gl } = keepTrackApi.getRenderer();
 
   initProgram(gl);
   initBuffers(gl);
@@ -37,16 +36,16 @@ export const init = async () => {
   cone.isLoaded = true;
 };
 export const initProgram = (gl: WebGL2RenderingContext) => {
-  cone.program = <any>GlUtils.createProgramFromCode(gl, shaders.cone.vert, shaders.cone.frag);
+  cone.program = new WebGlProgramHelper(gl, shaders.cone.vert, shaders.cone.frag);
   gl.useProgram(cone.program);
 
   // Assign Attributes
-  cone.program.a_position = gl.getAttribLocation(cone.program, 'a_position');
-  cone.program.a_normal = gl.getAttribLocation(cone.program, 'a_normal');
-  cone.program.u_pMatrix = gl.getUniformLocation(cone.program, 'u_pMatrix');
-  cone.program.u_camMatrix = gl.getUniformLocation(cone.program, 'u_camMatrix');
-  cone.program.u_mvMatrix = gl.getUniformLocation(cone.program, 'u_mvMatrix');
-  cone.program.u_nMatrix = gl.getUniformLocation(cone.program, 'u_nMatrix');
+  cone.geometry.attributes.a_position = gl.getAttribLocation(cone.program, 'a_position');
+  cone.geometry.attributes.a_normal = gl.getAttribLocation(cone.program, 'a_normal');
+  cone.material.uniforms.u_pMatrix = gl.getUniformLocation(cone.program, 'u_pMatrix');
+  cone.material.uniforms.u_camMatrix = gl.getUniformLocation(cone.program, 'u_camMatrix');
+  cone.material.uniforms.u_mvMatrix = gl.getUniformLocation(cone.program, 'u_mvMatrix');
+  cone.material.uniforms.u_nMatrix = gl.getUniformLocation(cone.program, 'u_nMatrix');
   // cone.program.u_drawPosition = gl.getUniformLocation(cone.program, 'u_drawPosition');
 };
 
@@ -109,12 +108,12 @@ export const initVao = (gl: WebGL2RenderingContext) => {
   gl.bindVertexArray(cone.vao);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, cone.buffers.vertPosBuf);
-  gl.enableVertexAttribArray(cone.program.a_position);
-  gl.vertexAttribPointer(cone.program.a_position, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(cone.geometry.attributes.a_position);
+  gl.vertexAttribPointer(cone.geometry.attributes.a_position, 3, gl.FLOAT, false, 0, 0);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, cone.buffers.vertNormBuf);
-  gl.enableVertexAttribArray(cone.program.a_normal);
-  gl.vertexAttribPointer(cone.program.a_normal, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(cone.geometry.attributes.a_normal);
+  gl.vertexAttribPointer(cone.geometry.attributes.a_normal, 3, gl.FLOAT, false, 0, 0);
 
   // Select the vertex indicies buffer
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cone.buffers.vertIndexBuf);
@@ -151,24 +150,23 @@ export const update = (position: Kilometers[]) => {
 
 export const draw = function (pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
   const catalogManagerInstance = keepTrackApi.getCatalogManager();
-  const drawManagerInstance = keepTrackApi.getDrawManager();
 
   if (catalogManagerInstance.selectedSat === -1) return;
 
-  const { gl } = drawManagerInstance;
+  const { gl } = keepTrackApi.getRenderer();
 
   cone.pMatrix = pMatrix;
   cone.camMatrix = camMatrix;
   if (!cone.isLoaded) return;
 
-  gl.useProgram(cone.program);
+  gl.useProgram(cone.program.program);
   if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
   // Set the uniforms
-  gl.uniformMatrix3fv(cone.program.u_nMatrix, false, cone.nMatrix);
-  gl.uniformMatrix4fv(cone.program.u_mvMatrix, false, cone.mvMatrix);
-  gl.uniformMatrix4fv(cone.program.u_pMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(cone.program.u_camMatrix, false, camMatrix);
+  gl.uniformMatrix3fv(cone.material.uniforms.u_nMatrix, false, cone.nMatrix);
+  gl.uniformMatrix4fv(cone.material.uniforms.u_mvMatrix, false, cone.mvMatrix);
+  gl.uniformMatrix4fv(cone.material.uniforms.u_pMatrix, false, pMatrix);
+  gl.uniformMatrix4fv(cone.material.uniforms.u_camMatrix, false, camMatrix);
 
   gl.bindVertexArray(cone.vao);
 
@@ -223,6 +221,7 @@ const shaders = {
 };
 export type ConeObject = typeof cone;
 export const cone = {
+  program: <WebGlProgramHelper>null,
   vao: <WebGLVertexArrayObject>null,
   buffers: {
     vertCount: 0,
@@ -231,14 +230,19 @@ export const cone = {
     vertNormBuf: <WebGLBuffer>null,
     vertIndexBuf: <WebGLBuffer>null,
   },
-  program: {
-    a_position: <number>null,
-    a_normal: <number>null,
-    u_pMatrix: <WebGLUniformLocation>null,
-    u_camMatrix: <WebGLUniformLocation>null,
-    u_mvMatrix: <WebGLUniformLocation>null,
-    u_nMatrix: <WebGLUniformLocation>null,
-    u_drawPosition: <WebGLUniformLocation>null,
+  geometry: {
+    attributes: {
+      a_position: <number>null,
+      a_normal: <number>null,
+    },
+  },
+  material: {
+    uniforms: {
+      u_nMatrix: <WebGLUniformLocation>null,
+      u_pMatrix: <WebGLUniformLocation>null,
+      u_camMatrix: <WebGLUniformLocation>null,
+      u_mvMatrix: <WebGLUniformLocation>null,
+    },
   },
   camMatrix: mat4.create(),
   mvMatrix: mat4.create(),

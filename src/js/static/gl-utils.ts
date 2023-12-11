@@ -1,6 +1,16 @@
-import { mat4 } from 'gl-matrix';
+// import 'webgl-lint';
+import { BufferAttribute } from './buffer-attribute';
 
 export abstract class GlUtils {
+  static isWebglLintEnabled = false;
+
+  static tagObject(gl: WebGL2RenderingContext, obj, tag?: string) {
+    if (GlUtils.isWebglLintEnabled && tag) {
+      const ext = gl.getExtension('GMAN_debug_helper');
+      ext.tagObject(obj, tag);
+    }
+  }
+
   static readonly PLANE_DIRECTIONS = {
     'z': [0, 1, 2, 1, -1, 1],
     '-z': [0, 1, 2, -1, -1, -1],
@@ -25,9 +35,9 @@ export abstract class GlUtils {
   /**
    * Assigns attributes to an attribute object.
    */
-  public static assignAttributes(attribs: any, gl: WebGL2RenderingContext, program: WebGLProgram, attributes: string[]): void {
+  public static assignAttributes(attribs: Record<string, BufferAttribute>, gl: WebGL2RenderingContext, program: WebGLProgram, attributes: string[]): void {
     attributes.forEach((attribute) => {
-      attribs[attribute] = gl.getAttribLocation(program, attribute);
+      attribs[attribute].location = gl.getAttribLocation(program, attribute);
     });
   }
 
@@ -58,17 +68,47 @@ export abstract class GlUtils {
   }
 
   /**
+   * Init a texture and load an image.
+   */
+  static async initTexture(gl: WebGL2RenderingContext, url: string): Promise<WebGLTexture> {
+    const texture = gl.createTexture();
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = url;
+    img.onload = () => {
+      GlUtils.bindImageToTexture(gl, texture, img);
+    };
+    return texture;
+  }
+
+  /**
+   * Deteremine if a number is a power of 2.
+   */
+  static isPowerOf2(value: number): boolean {
+    return (value & (value - 1)) == 0;
+  }
+
+  /**
    * Binds an image to a texture.
    */
-  public static bindImageToTexture(gl: WebGL2RenderingContext, texture: WebGLTexture, img: HTMLImageElement) {
+  public static async bindImageToTexture(gl: WebGL2RenderingContext, texture: WebGLTexture, img: HTMLImageElement): Promise<void> {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+    if (GlUtils.isPowerOf2(img.width) && GlUtils.isPowerOf2(img.height)) {
+      // Yes, it's a power of 2. Generate mips.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.generateMipmap(gl.TEXTURE_2D);
+    } else {
+      console.warn(`Texture ${img.src} is not power of 2!`);
+      // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    }
   }
 
   /**
@@ -157,70 +197,6 @@ export abstract class GlUtils {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
     return buffer;
-  }
-
-  static createProgram(gl: WebGL2RenderingContext, vertShader: string, fragShader: string, attribs: any, uniforms: any) {
-    const program = GlUtils.createProgramFromCode(gl, vertShader, fragShader);
-    gl.useProgram(program);
-
-    GlUtils.assignAttributes(attribs, gl, program, Object.keys(attribs));
-    GlUtils.assignUniforms(uniforms, gl, program, Object.keys(uniforms));
-
-    return program;
-  }
-
-  /**
-   * Creates a fragment shader from a string.
-   */
-  public static createFragmentShader(gl: WebGL2RenderingContext, source: string): WebGLShader {
-    const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragShader, source);
-    gl.compileShader(fragShader);
-    if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
-      throw new Error('Fragment shader compilation failed: ' + gl.getShaderInfoLog(fragShader));
-    }
-    return fragShader;
-  }
-
-  public static createPMvCamMatrix(modelViewMatrix: mat4, projectionMatrix: mat4, cameraMatrix: mat4): mat4 {
-    mat4.mul(modelViewMatrix, modelViewMatrix, projectionMatrix);
-    mat4.mul(modelViewMatrix, modelViewMatrix, cameraMatrix);
-    return modelViewMatrix;
-  }
-
-  /**
-   * Creates a WebGL program from a vertex and fragment shader.
-   */
-  public static createProgramFromShader(gl: WebGL2RenderingContext, vertShader: WebGLShader, fragShader: WebGLShader): WebGLProgram {
-    const program = gl.createProgram();
-    gl.attachShader(program, vertShader);
-    gl.attachShader(program, fragShader);
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      const info = gl.getProgramInfoLog(program);
-      throw new Error('Could not compile WebGL program. \n\n' + info);
-    }
-    return program;
-  }
-
-  /**
-   * Creates a WebGL program from a vertex and fragment shader code.
-   */
-  public static createProgramFromCode(gl: WebGL2RenderingContext, vertCode: string, fragCode: string): WebGLProgram {
-    const vertShader = GlUtils.createVertexShader(gl, vertCode);
-    const fragShader = GlUtils.createFragmentShader(gl, fragCode);
-
-    const program = gl.createProgram();
-    gl.attachShader(program, vertShader);
-    gl.attachShader(program, fragShader);
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      const info = gl.getProgramInfoLog(program);
-      throw new Error('Could not compile WebGL program. \n\n' + info);
-    }
-    return program;
   }
 
   static createRadarDomeVertices(minRange: number, maxRange: number, minEl: number, maxEl: number, minAz: number, maxAz: number) {
@@ -373,19 +349,6 @@ export abstract class GlUtils {
       }
     }
     return { combinedArray, vertIndex };
-  }
-
-  /**
-   * Creates a vertex shader from a string.
-   */
-  public static createVertexShader(gl: WebGL2RenderingContext, source: string): WebGLShader {
-    const vertShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertShader, source);
-    gl.compileShader(vertShader);
-    if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
-      throw new Error('Vertex shader compilation failed: ' + gl.getShaderInfoLog(vertShader));
-    }
-    return vertShader;
   }
 
   public static crossProduct(a: number[], b: number[]): number[] {

@@ -24,7 +24,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -48,7 +48,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   sideMenuElementHtml = keepTrackApi.html`
   <div id="analysis-menu" class="side-menu-parent start-hidden text-select">
     <div id="analysis-inner-menu" class="side-menu">
-      <h5 class="center-align">Analysis Menu</h5>
+      <h5 class="center-align">Export Catalog</h5>
       <div class="divider"></div>
       <div class="row"></div>
       <!-- <form id="analysis-form">
@@ -120,6 +120,16 @@ export class AnalysisMenu extends KeepTrackPlugin {
         <center>
           <button id="export-catalog-csv-btn" class="btn btn-ui waves-effect waves-light">
             Export Catalog CSV &#9658;
+        </button>
+        </center>
+      </div>
+      <h5 class="center-align">Find Objects</h5>
+      <div class="divider"></div>
+      <div class="row"></div>
+      <div class="row">
+        <center>
+          <button id="export-sat-fov-csv-btn" class="btn btn-ui waves-effect waves-light">
+            Export Satellites in FOV &#9658;
         </button>
         </center>
       </div>
@@ -195,6 +205,10 @@ export class AnalysisMenu extends KeepTrackPlugin {
         const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
         getEl('export-catalog-csv-btn')?.addEventListener('click', () => {
           CatalogExporter.exportTle2Csv(satData);
+        });
+
+        getEl('export-sat-fov-csv-btn')?.addEventListener('click', () => {
+          CatalogExporter.exportSatInFov2Csv(satData);
         });
 
         getEl('export-catalog-txt-2a')?.addEventListener('click', () => {

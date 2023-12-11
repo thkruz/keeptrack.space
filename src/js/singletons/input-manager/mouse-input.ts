@@ -411,7 +411,6 @@ export class MouseInput {
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    const drawManagerInstance = keepTrackApi.getDrawManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -514,12 +513,7 @@ export class MouseInput {
       case 'line-sat-sun-rmb':
         lineManagerInstance.create(
           LineTypes.REF_TO_SAT,
-          [
-            this.clickedSat,
-            drawManagerInstance.sceneManager.sun.drawPosition[0],
-            drawManagerInstance.sceneManager.sun.drawPosition[1],
-            drawManagerInstance.sceneManager.sun.drawPosition[2],
-          ],
+          [this.clickedSat, keepTrackApi.getScene().sun.position[0], keepTrackApi.getScene().sun.position[1], keepTrackApi.getScene().sun.position[2]],
           'o'
         );
         break;
@@ -552,32 +546,32 @@ export class MouseInput {
         MouseInput.resetCurrentEarthTexture();
         settingsManager.blueImages = true;
         MouseInput.saveMapToLocalStorage('blue');
-        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'earth-nasa-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.nasaImages = true;
         MouseInput.saveMapToLocalStorage('nasa');
-        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'earth-trusat-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.trusatImages = true;
         MouseInput.saveMapToLocalStorage('trusat');
-        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'earth-low-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.lowresImages = true;
         MouseInput.saveMapToLocalStorage('low');
-        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'earth-high-rmb':
         showLoading(() => {
           MouseInput.resetCurrentEarthTexture();
           settingsManager.hiresImages = true;
           MouseInput.saveMapToLocalStorage('high');
-          drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         });
         break;
       case 'earth-high-no-clouds-rmb':
@@ -585,20 +579,20 @@ export class MouseInput {
           MouseInput.resetCurrentEarthTexture();
           settingsManager.hiresNoCloudsImages = true;
           MouseInput.saveMapToLocalStorage('high-nc');
-          drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         });
         break;
       case 'earth-vec-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.vectorImages = true;
         MouseInput.saveMapToLocalStorage('vec');
-        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'earth-political-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.politicalImages = true;
         MouseInput.saveMapToLocalStorage('political'); // TODO: Verify this
-        drawManagerInstance.sceneManager.earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'clear-screen-rmb':
         if (keepTrackApi.getPlugin(TimeMachine)) {

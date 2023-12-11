@@ -7,7 +7,7 @@
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2022 Heather Kruczek
+ * @Copyright (C) 2020-2023 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -36,9 +36,14 @@ export const ZOOM_EXP = 3;
 
 /**
  * Half the number of radians in a circle.
- * @deprecated Use TAU instead.
+ * @deprecated Use HALF_TAU instead.
  */
 export const PI = <Radians>Math.PI;
+
+/**
+ * Half the number of radians in a circle.
+ */
+export const HALF_TAU = <Radians>Math.PI;
 
 /**
  * The number of radians in a circle.

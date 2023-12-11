@@ -82,7 +82,15 @@ export class InputManager {
     gl.deleteSync(sync);
 
     gl.bindBuffer(target, buffer);
-    gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset, length);
+
+    if (dstOffset && length) {
+      gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset, length);
+    } else if (dstOffset) {
+      gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset);
+    } else {
+      gl.getBufferSubData(target, srcByteOffset, dstBuffer);
+    }
+
     gl.bindBuffer(target, null);
 
     return dstBuffer;
@@ -165,15 +173,15 @@ export class InputManager {
   }
 
   public static unProject(x: number, y: number): [number, number, number] {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
-    const { gl } = drawManagerInstance;
+    const renderer = keepTrackApi.getRenderer();
+    const { gl } = renderer;
 
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
     const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
     const screenVec = <vec4>[glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
     const comboPMat = mat4.create();
-    mat4.mul(comboPMat, drawManagerInstance.pMatrix, keepTrackApi.getMainCamera().camMatrix);
+    mat4.mul(comboPMat, renderer.projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
     const invMat = mat4.create();
     mat4.invert(invMat, comboPMat);
     const worldVec = <[number, number, number, number]>(<unknown>vec4.create());
@@ -189,12 +197,12 @@ export class InputManager {
    * @returns The ID of the satellite at the given screen coordinates.
    */
   public getSatIdFromCoord(x: number, y: number): number {
-    const drawManagerInstance = keepTrackApi.getDrawManager();
+    const renderer = keepTrackApi.getRenderer();
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const { gl } = drawManagerInstance;
+    const { gl } = renderer;
 
     // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile
-    gl.bindFramebuffer(gl.FRAMEBUFFER, dotsManagerInstance.pickingFrameBuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
     if (!isThisNode() && this.isAsyncWorking && !settingsManager.isDisableAsyncReadPixels) {
       this.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
     }
@@ -480,10 +488,8 @@ export class InputManager {
 
   /* istanbul ignore next */
   public async readPixelsAsync(x: number, y: number, w: number, h: number, format: number, type: number, dstBuffer: Uint8Array) {
+    const gl = keepTrackApi.getRenderer().gl;
     try {
-      const drawManagerInstance = keepTrackApi.getDrawManager();
-
-      const { gl } = drawManagerInstance;
       const buf = gl.createBuffer();
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buf);
       gl.bufferData(gl.PIXEL_PACK_BUFFER, dstBuffer.byteLength, gl.STREAM_READ);
@@ -493,11 +499,10 @@ export class InputManager {
       await InputManager.getBufferSubDataAsync(gl, gl.PIXEL_PACK_BUFFER, buf, 0, dstBuffer);
 
       gl.deleteBuffer(buf);
-      // eslint-disable-next-line require-atomic-updates
       this.isAsyncWorking = true;
     } catch (error) {
-      // eslint-disable-next-line require-atomic-updates
       this.isAsyncWorking = false;
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     }
   }
 

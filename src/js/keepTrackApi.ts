@@ -20,13 +20,14 @@ import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
 import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
 import { DotsManager } from './singletons/dots-manager';
-import { DrawManager } from './singletons/draw-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
 import { errorManagerInstance } from './singletons/errorManager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
+import { Scene } from './singletons/scene';
 import { StarManager } from './singletons/starManager';
 import { TimeManager } from './singletons/time-manager';
+import { WebGLRenderer } from './singletons/webgl-renderer';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
 
@@ -57,7 +58,8 @@ export type KeepTrackApiRegisterParams = {
     | ((sensor: SensorObject) => void)
     | ((gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => void)
     | ((sensor: SensorObject | string, staticNum: number) => void)
-    | ((watchlistList: number[]) => void);
+    | ((watchlistList: number[]) => void)
+    | ((lineManager: LineManager) => void);
 };
 
 /**
@@ -179,6 +181,7 @@ export const keepTrackApi = {
     endOfDraw: [],
     onWatchlistUpdated: [],
     staticOffsetChange: [],
+    onLineAdded: [],
   },
   methods: {
     onHelpMenuClick: () => {
@@ -268,6 +271,9 @@ export const keepTrackApi = {
     staticOffsetChange: (staticOffset: number) => {
       keepTrackApi.callbacks.staticOffsetChange.forEach((cb: any) => cb.cb(staticOffset));
     },
+    onLineAdded: () => {
+      keepTrackApi.callbacks.onLineAdded.forEach((cb: any) => cb.cb(keepTrackApi.getLineManager()));
+    },
   },
   loadedPlugins: <KeepTrackPlugin[]>[],
   getPlugin: (pluginClass: Constructor<KeepTrackPlugin>) => {
@@ -278,7 +284,8 @@ export const keepTrackApi = {
   rmbMenuItems: <rmbMenuItem[]>[],
   getSoundManager: () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager),
   getStarManager: () => keepTrackContainer.get<StarManager>(Singletons.StarManager),
-  getDrawManager: () => keepTrackContainer.get<DrawManager>(Singletons.DrawManager),
+  getRenderer: () => keepTrackContainer.get<WebGLRenderer>(Singletons.WebGLRenderer),
+  getScene: () => keepTrackContainer.get<Scene>(Singletons.Scene),
   getCatalogManager: () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager),
   getSensorManager: () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager),
   getUiManager: () => keepTrackContainer.get<UiManager>(Singletons.UiManager),
@@ -341,6 +348,10 @@ export enum KeepTrackApiEvents {
    * Run in the staticOffset setter of TimeManager instance with parameters (staticOffset: number)
    */
   staticOffsetChange = 'staticOffsetChange',
+  /**
+   * Runs when a line is added to the line manager
+   */
+  onLineAdded = 'onLineAdded',
 }
 
 /**

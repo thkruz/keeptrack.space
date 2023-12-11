@@ -73,10 +73,11 @@ export abstract class GlUtils {
   static async initTexture(gl: WebGL2RenderingContext, url: string): Promise<WebGLTexture> {
     const texture = gl.createTexture();
     const img = new Image();
+    img.decoding = 'async';
     img.src = url;
-    img.decode().then(() => {
+    img.onload = () => {
       GlUtils.bindImageToTexture(gl, texture, img);
-    });
+    };
     return texture;
   }
 

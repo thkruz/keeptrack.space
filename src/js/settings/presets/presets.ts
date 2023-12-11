@@ -18,7 +18,7 @@ export class SettingsPresets {
     settings.colors.unknown = [0.5, 0.5, 0.5, 1];
     settings.colors.pink = [0.5, 0.5, 0.5, 1];
     settings.colors.notional = [0.5, 0.5, 0.5, 1];
-    settings.colors.deselected = [1, 1, 1, 0.4];
+    settings.colors.deselected = [0, 0, 0, 0];
     settings.selectedColor = [0, 0, 0, 0];
     settings.selectedColorFallback = [0, 0, 0, 0];
     settings.maxNotionalDebris = 0.5 * 1000000; // 2.5 million

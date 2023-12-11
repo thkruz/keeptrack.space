@@ -49,7 +49,7 @@ export class CollissionsPlugin extends KeepTrackPlugin {
   }
 
   bottomIconCallback: () => void = () => {
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       this.parseCollisionData_();
     }
   };

@@ -18,8 +18,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
   dependencies: string[] = [DateTimeManager.PLUGIN_NAME];
 
   bottomIconCallback: () => void = () => {
-    if (this.isMenuButtonEnabled) {
-      if (keepTrackApi.getPlugin(Planetarium)?.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
+      if (keepTrackApi.getPlugin(Planetarium)?.isMenuButtonActive) {
         getClass('sensor-top-link').forEach((el) => {
           el.style.display = 'none';
         });
@@ -186,7 +186,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   }
 
   sensorListContentClick(sensorClick: string) {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     if (typeof sensorClick == 'undefined') {
@@ -420,7 +420,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   }
 
   resetSensorButtonClick() {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
     getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');

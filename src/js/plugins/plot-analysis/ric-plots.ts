@@ -25,7 +25,7 @@ export class RicPlot extends KeepTrackPlugin {
       keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', 'critical');
       return;
     }
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     this.createPlot(RicPlot.getPlotData(), getEl(this.plotCanvasId));
   };
@@ -60,7 +60,7 @@ export class RicPlot extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (!sat || keepTrackApi.getCatalogManager().selectedSat === -1) {
-          if (this.isMenuButtonEnabled) this.hideSideMenus();
+          if (this.isMenuButtonActive) this.hideSideMenus();
           this.setBottomIconToDisabled();
         } else {
           this.setBottomIconToEnabled();
@@ -73,7 +73,7 @@ export class RicPlot extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (!sat || keepTrackApi.getCatalogManager().secondarySat === -1) {
-          if (this.isMenuButtonEnabled) this.hideSideMenus();
+          if (this.isMenuButtonActive) this.hideSideMenus();
           this.setBottomIconToDisabled();
         } else {
           this.setBottomIconToEnabled();
@@ -84,7 +84,7 @@ export class RicPlot extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     // Delete any old charts and start fresh
     if (this.chart) {

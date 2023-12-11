@@ -11,7 +11,7 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
     if (window.location.hostname === 'localhost') {
       keepTrackApi.getUiManager().toast('This feature is a static table when in offline mode.', 'caution');
     }

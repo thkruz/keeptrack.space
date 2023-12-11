@@ -42,7 +42,7 @@ export class Planetarium extends KeepTrackPlugin {
   bottomIconCallback = (): void => {
     const renderer = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       if (!this.verifySensorSelected()) return;
 
       keepTrackApi.getMainCamera().cameraType = CameraType.PLANETARIUM; // Activate Planetarium Camera Mode

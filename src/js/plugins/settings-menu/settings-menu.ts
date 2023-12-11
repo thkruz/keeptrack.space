@@ -649,7 +649,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     // TODO: These settings buttons should be inside the plugins themselves
     // Stop Time Machine
     if (keepTrackApi.getPlugin(TimeMachine)) {
-      keepTrackApi.getPlugin(TimeMachine).isMenuButtonEnabled = false;
+      keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive = false;
     }
 
     // if (orbitManagerInstance.isTimeMachineRunning) {

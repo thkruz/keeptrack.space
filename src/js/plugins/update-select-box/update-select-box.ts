@@ -102,7 +102,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
 
           if (
             settingsManager.plugins?.stereoMap &&
-            keepTrackApi.getPlugin(StereoMapPlugin)?.isMenuButtonEnabled &&
+            keepTrackApi.getPlugin(StereoMapPlugin)?.isMenuButtonActive &&
             timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
           ) {
             (<StereoMapPlugin>keepTrackApi.getPlugin(StereoMapPlugin)).updateMap();

@@ -17,7 +17,7 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 
 export class NewLaunch extends KeepTrackPlugin {
   bottomIconCallback = () => {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
     if (!this.verifySatelliteSelected()) {
       return;
     }

@@ -89,7 +89,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   test(`${pluginName}_turned_off_by_default`, () => {
     const plugin = new Plugin();
     plugin.init();
-    expect(plugin.isMenuButtonEnabled).toBe(false);
+    expect(plugin.isMenuButtonActive).toBe(false);
   });
 
   // Tests that other bottom icons being clicked are ignored

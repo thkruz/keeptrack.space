@@ -15,7 +15,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   bottomIconLabel = 'View DOPs';
   bottomIconImg = gpsPng;
   bottomIconCallback = (): void => {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     showLoading(DopsPlugin.updateSideMenu);
   };
@@ -106,7 +106,7 @@ export class DopsPlugin extends KeepTrackPlugin {
       }
       case 'dops-24dops-rmb': {
         const latLon = keepTrackApi.getInputManager().mouse.latLon;
-        if (!this.isMenuButtonEnabled) {
+        if (!this.isMenuButtonActive) {
           (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
           (<HTMLInputElement>getEl('dops-alt')).value = '0';

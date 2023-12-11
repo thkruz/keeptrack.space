@@ -33,7 +33,7 @@ export class SettingsPresets {
     settings.isDisableAsciiCatalog = true;
     settings.plugins.videoDirector = true;
     settings.zFar = 1250000.0;
-    settings.isDisableMoon = true;
+    settings.isDisableMoon = false;
 
     settings.hiresMilkWay = true;
     settings.earthNumLatSegs = 128;
@@ -41,7 +41,7 @@ export class SettingsPresets {
     settings.hiresImages = true;
 
     settings.autoZoomSpeed = 0.001;
-    settings.autoRotateSpeed = 0.000015;
+    settings.autoRotateSpeed = 0.000025;
 
     settings.timeMachineString = (yearStr) => {
       window.M.Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)

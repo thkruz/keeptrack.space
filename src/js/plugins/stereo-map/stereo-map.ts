@@ -51,7 +51,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
   bottomIconImg = mapPng;
   bottomIconLabel: string = 'Stereo Map';
   bottomIconCallback: () => void = () => {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
     this.updateMap();
   };
 
@@ -159,7 +159,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
       const sensorManagerInstance = keepTrackApi.getSensorManager();
 
       if (catalogManagerInstance.selectedSat === -1) return;
-      if (!this.isMenuButtonEnabled) return;
+      if (!this.isMenuButtonActive) return;
 
       const map2d = <HTMLCanvasElement>getEl('map-2d');
       const ctx = map2d.getContext('2d');
@@ -335,7 +335,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
   }
 
   onCruncherMessage(): void {
-    if (this.isMenuButtonEnabled || this.isMapUpdateOverride) {
+    if (this.isMenuButtonActive || this.isMapUpdateOverride) {
       this.satCrunchNow = Date.now();
       if (this.satCrunchNow > settingsManager.lastMapUpdateTime + 30000 || this.isMapUpdateOverride) {
         this.updateMap();

@@ -71,7 +71,7 @@ export class SensorFov extends KeepTrackPlugin {
         } else {
           getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = true;
-          this.isMenuButtonEnabled = false;
+          this.isMenuButtonActive = false;
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },

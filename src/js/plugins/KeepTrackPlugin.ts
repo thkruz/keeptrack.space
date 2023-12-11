@@ -42,9 +42,9 @@ export class KeepTrackPlugin {
    */
   isJsAdded: boolean;
   /**
-   * Whether the plugin's menu button is enabled.
+   * Whether the plugin's menu button is currently active.
    */
-  isMenuButtonEnabled: boolean;
+  isMenuButtonActive: boolean;
 
   /**
    * The name of the bottom icon element to select.
@@ -158,7 +158,7 @@ export class KeepTrackPlugin {
     this.PLUGIN_NAME = pluginName;
     this.isJsAdded = false;
     this.isHtmlAdded = false;
-    this.isMenuButtonEnabled = false;
+    this.isMenuButtonActive = false;
   }
 
   /**
@@ -365,7 +365,7 @@ export class KeepTrackPlugin {
   }
 
   setBottomIconToUnselected(): void {
-    this.isMenuButtonEnabled = false;
+    this.isMenuButtonActive = false;
     getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
   }
 
@@ -474,11 +474,11 @@ export class KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (iconName: string): void => {
         if (iconName === this.bottomIconElementName) {
-          if (this.isMenuButtonEnabled) {
+          if (this.isMenuButtonActive) {
             if (this.sideMenuElementName || this.isForceHideSideMenus) {
               this.hideSideMenus();
             }
-            this.isMenuButtonEnabled = false;
+            this.isMenuButtonActive = false;
             getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
           } else {
             // Verifiy that the user has selected a sensor and/or satellite if required
@@ -498,7 +498,7 @@ export class KeepTrackPlugin {
               }
 
               // Show the bottom icon as selected
-              this.isMenuButtonEnabled = true;
+              this.isMenuButtonActive = true;
               getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconSelectedClassString);
             }
           }
@@ -515,7 +515,7 @@ export class KeepTrackPlugin {
       keepTrackApi.getUiManager().searchManager.searchToggle(false);
     }
     keepTrackApi.getUiManager().hideSideMenus();
-    this.isMenuButtonEnabled = false;
+    this.isMenuButtonActive = false;
   }
 
   openSideMenu() {
@@ -565,7 +565,7 @@ export class KeepTrackPlugin {
       event: 'onHelpMenuClick',
       cbName: `${this.PLUGIN_NAME}`,
       cb: (): boolean => {
-        if (this.isMenuButtonEnabled) {
+        if (this.isMenuButtonActive) {
           adviceManagerInstance.showAdvice(helpTitle, helpText);
           return true;
         }
@@ -586,7 +586,7 @@ export class KeepTrackPlugin {
       cb: (): void => {
         slideOutLeft(getEl(sideMenuElementName), 1000);
         getEl(bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
-        this.isMenuButtonEnabled = false;
+        this.isMenuButtonActive = false;
       },
     });
   }

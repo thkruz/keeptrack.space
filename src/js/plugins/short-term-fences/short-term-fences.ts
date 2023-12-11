@@ -146,7 +146,7 @@ export class ShortTermFences extends KeepTrackPlugin {
   }
 
   closeAndDisable(): void {
-    this.isMenuButtonEnabled = false;
+    this.isMenuButtonActive = false;
     this.setBottomIconToUnselected();
     this.setBottomIconToDisabled();
     keepTrackApi.getUiManager().hideSideMenus();
@@ -223,7 +223,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     keepTrackApi.getUiManager().hideSideMenus();
     slideInRight(getEl('stf-menu'), 1000);
-    this.isMenuButtonEnabled = true;
+    this.isMenuButtonActive = true;
     this.setBottomIconToSelected();
   }
 }

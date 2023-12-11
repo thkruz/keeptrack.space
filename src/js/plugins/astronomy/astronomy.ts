@@ -44,7 +44,7 @@ export class Astronomy extends KeepTrackPlugin {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const drawManagerInstance = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       if (!this.verifySensorSelected()) return;
 
       if (catalogManagerInstance.isStarManagerLoaded) {

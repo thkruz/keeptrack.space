@@ -10,7 +10,7 @@ import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       const sensorManagerInstance = keepTrackApi.getSensorManager();
       if (sensorManagerInstance.isSensorSelected()) {
         (<HTMLInputElement>getEl('cs-lat')).value = sensorManagerInstance.currentSensors[0].lat.toString();

@@ -571,7 +571,7 @@ export class StandardCatalogManager implements CatalogManager {
   }
 
   public lastSelectedSat(id?: number): number {
-    this.lastSelectedSat_ = id >= 0 ? id : this.lastSelectedSat_;
+    this.lastSelectedSat_ = id >= -1 ? id : this.lastSelectedSat_;
     return this.lastSelectedSat_;
   }
 

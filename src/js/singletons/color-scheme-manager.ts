@@ -1514,7 +1514,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       if (
         uiManagerInstance.searchManager.getCurrentSearch() === '' &&
         watchlistTransform !== 'translateX(0px)' &&
-        !keepTrackApi.getPlugin(TimeMachine).isMenuButtonEnabled &&
+        !keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive &&
         !(<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning
       ) {
         if (this.currentColorScheme === this.groupCountries) {

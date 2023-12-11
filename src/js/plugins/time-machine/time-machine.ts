@@ -16,7 +16,7 @@ export class TimeMachine extends KeepTrackPlugin {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       LegendManager.change('timeMachine');
       keepTrackApi.getUiManager().searchManager.hideResults();
       getEl('menu-time-machine').classList.add('bmenu-item-selected');
@@ -65,7 +65,7 @@ export class TimeMachine extends KeepTrackPlugin {
 
   playNextSatellite(runCount: number, year: number) {
     if (!this.isTimeMachineRunning) {
-      if (this.isMenuButtonEnabled) this.setBottomIconToUnselected();
+      if (this.isMenuButtonActive) this.setBottomIconToUnselected();
       return;
     }
     const groupManagerInstance = keepTrackApi.getGroupsManager();
@@ -108,9 +108,9 @@ export class TimeMachine extends KeepTrackPlugin {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     if (runCount !== this.historyOfSatellitesRunCount) return;
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
     settingsManager.colors.transparent = <[number, number, number, number]>orbitManagerInstance.tempTransColor;
-    this.isMenuButtonEnabled = false;
+    this.isMenuButtonActive = false;
     this.isTimeMachineRunning = false;
     groupManagerInstance.clearSelect();
     colorSchemeManagerInstance.setColorScheme(colorSchemeManager.default, true);

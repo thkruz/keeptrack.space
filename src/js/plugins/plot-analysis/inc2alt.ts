@@ -49,7 +49,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     // Delete any old charts and start fresh
     if (!this.chart) {

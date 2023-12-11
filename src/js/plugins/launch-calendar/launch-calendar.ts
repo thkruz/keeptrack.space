@@ -35,7 +35,7 @@ export class LaunchCalendar extends KeepTrackPlugin {
   bottomIconLabel = 'Launch Calendar';
 
   bottomIconCallback = () => {
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       settingsManager.isPreventColorboxClose = true;
       setTimeout(function () {
         settingsManager.isPreventColorboxClose = false;
@@ -55,8 +55,8 @@ export class LaunchCalendar extends KeepTrackPlugin {
   }
 
   private closeColorbox_() {
-    if (this.isMenuButtonEnabled) {
-      this.isMenuButtonEnabled = false;
+    if (this.isMenuButtonActive) {
+      this.isMenuButtonActive = false;
       getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
     }
   }

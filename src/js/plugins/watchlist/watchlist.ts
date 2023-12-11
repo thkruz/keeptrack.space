@@ -49,7 +49,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
   bottomIconCallback = () => {
     // The accounts for clicking the button again before the animation is done
-    if (!this.isMenuButtonEnabled) {
+    if (!this.isMenuButtonActive) {
       return;
     }
 

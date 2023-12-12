@@ -661,7 +661,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
         LegendManager.change(cachedColorScheme);
         if (cachedColorScheme) {
-          this.currentColorScheme = this[cachedColorScheme];
+          const possibleColorScheme = this[cachedColorScheme];
+          this.currentColorScheme = possibleColorScheme ? possibleColorScheme : this.default;
         }
 
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -1003,8 +1004,10 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     try {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
-      settingsManager.setCurrentColorScheme(scheme); // Deprecated
-      this.currentColorScheme = scheme;
+      scheme ??= this.default;
+      const possibleColorScheme = this[scheme.name];
+      this.currentColorScheme = possibleColorScheme ? possibleColorScheme : this.default;
+      settingsManager.setCurrentColorScheme(this.currentColorScheme); // Deprecated
       this.calculateColorBuffers(isForceRecolor);
       dotsManagerInstance.buffers.color = this.colorBuffer;
       dotsManagerInstance.buffers.pickability = this.pickableBuffer;

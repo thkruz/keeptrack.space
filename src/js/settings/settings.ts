@@ -1605,8 +1605,12 @@ export class SettingsManager {
    * @deprecated
    * Sets the current color scheme in the settings only.
    */
-  setCurrentColorScheme(_val: any): void {
-    this.currentColorScheme = _val;
+  setCurrentColorScheme(val: any): void {
+    if (!val) {
+      console.warn('Settings Manager: Invalid color scheme');
+      return;
+    }
+    this.currentColorScheme = val;
   }
 }
 

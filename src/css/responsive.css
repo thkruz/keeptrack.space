@@ -572,15 +572,16 @@
   }
 
   #datetime {
-    height: 40px;
+    width: 80%;
+    height: 50px;
   }
 
   #datetime-text {
     width: 111px;
     padding: 0px;
     border-width: 0px;
-    height: 40px;
-    top: -4px;
+    height: 50px;
+    top: 0px;
   }
 
   #jday {

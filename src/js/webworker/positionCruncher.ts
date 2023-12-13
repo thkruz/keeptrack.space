@@ -1200,6 +1200,7 @@ export const sendDataToSatSet = () => {
   }
 
   try {
+    // TODO: Explore SharedArrayBuffer Options
     postMessage(postMessageArray);
     // Send Velocity Separate to avoid CPU Overload on Main Thread
     postMessage(<PositionCruncherOutgoingMsg>{

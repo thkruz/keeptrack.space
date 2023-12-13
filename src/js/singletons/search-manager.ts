@@ -50,8 +50,13 @@ export class SearchManager {
   /**
    * Returns the current search string entered by the user.
    */
-  public getCurrentSearch(): string {
-    return this.resultsOpen_ ? (<HTMLInputElement>getEl('search')).value : '';
+  static getCurrentSearch(): string {
+    const searchDom = <HTMLInputElement>getEl('search');
+    if (searchDom) {
+      return searchDom.value;
+    } else {
+      return '';
+    }
   }
 
   public isResultsOpen(): boolean {
@@ -113,7 +118,10 @@ export class SearchManager {
       return;
     }
 
-    (<HTMLInputElement>getEl('search')).value = searchString;
+    const searchDom = <HTMLInputElement>getEl('search');
+    if (searchDom) {
+      searchDom.value = searchString;
+    }
 
     // Don't search for things until at least the minimum characters
     // are typed otherwise there are just too many search results.
@@ -439,9 +447,12 @@ export class SearchManager {
       getEl('legend-icon').classList?.add('top-menu-icons-search-on');
       getEl('sound-icon').classList?.add('top-menu-icons-search-on');
 
-      const curSearch = (<HTMLInputElement>getEl('search')).value;
-      if (curSearch.length > settingsManager.minimumSearchCharacters) {
-        this.doSearch(curSearch);
+      const searchDom = <HTMLInputElement>getEl('search');
+      if (searchDom) {
+        const curSearch = searchDom.value;
+        if (curSearch.length > settingsManager.minimumSearchCharacters) {
+          this.doSearch(curSearch);
+        }
       }
     } else {
       this.isSearchOpen = false;

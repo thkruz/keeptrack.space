@@ -1,10 +1,11 @@
 import { GetSatType, SatObject } from '@app/js/interfaces';
 import { isSatObject, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { CameraType } from '@app/js/singletons/camera';
 
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { SearchManager } from '@app/js/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 
@@ -32,7 +33,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   checkIfSelectSatVisible() {
     if (keepTrackApi.getPlugin(TopMenu)) {
-      const searchVal = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
+      const searchVal = SearchManager.getCurrentSearch();
 
       // Base CSS Style based on if the search box is open or not
       let cssStyle = searchVal.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
@@ -214,7 +215,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (curVal !== searchBoxHeight + 'px') {
         rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
       }
-      getEl('sat-infobox').style.display = 'block';
+      showEl('sat-infobox');
     }
   }
 
@@ -224,7 +225,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       (id) => {
         const el = getEl(id, true);
         if (!el) return;
-        el.parentElement.style.display = 'none';
+        hideEl(el.parentElement.id);
       }
     );
 

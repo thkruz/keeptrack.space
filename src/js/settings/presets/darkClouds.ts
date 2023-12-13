@@ -12,6 +12,7 @@ export const darkClouds = () => {
 
   settingsManager.disableAllPlugins();
   settingsManager.plugins.timeMachine = true;
+  settingsManager.plugins.topMenu = false;
 
   settingsManager.isDisableAsciiCatalog = true;
 

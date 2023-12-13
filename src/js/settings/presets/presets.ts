@@ -15,6 +15,18 @@ export class SettingsPresets {
     settings.isStarlinkOnly = true;
     settings.isEnableJscCatalog = false;
 
+    settings.isShowAgencies = false;
+    settings.isAllowRightClick = false;
+    settings.isDisableSelectSat = true;
+    settings.isDisableSensors = true;
+    settings.isDisableControlSites = true;
+    settings.isDisableLaunchSites = true;
+    settings.isLoadLastSensor = false;
+    settings.isShowNotionalSats = false;
+
+    settings.isEPFL = true;
+    settings.disableAllPlugins();
+
     settings.onLoadCb = () => {
       keepTrackApi.getUiManager().searchManager.doSearch('starlink');
     };
@@ -168,6 +180,7 @@ export class SettingsPresets {
     settings.isShowDebris = true;
     settings.isShowPayloads = true;
     settings.isShowAgencies = false;
+    settings.isShowNotionalSats = false;
     settings.lowresImages = true;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = true;
@@ -201,6 +214,7 @@ export class SettingsPresets {
     settings.isDisableControlSites = true;
     settings.isDisableLaunchSites = true;
     settings.isLoadLastSensor = false;
+    settings.isEnableJscCatalog = false;
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
       const sccNumGroup = groupManagerInstance.createGroup(9, [25544]);
@@ -228,6 +242,7 @@ export class SettingsPresets {
     settings.lowresImages = true;
     settings.isAllowRightClick = false;
     settings.isDisableSensors = true;
+    settings.isEnableJscCatalog = false;
     settings.isDisableControlSites = true;
     settings.isDisableLaunchSites = true;
     settings.isLoadLastSensor = false;

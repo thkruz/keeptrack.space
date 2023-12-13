@@ -336,8 +336,6 @@ export class Camera {
     }
   }
 
-  public thresholdForCloseCamera = <Kilometers>500;
-
   public zoomWheel(delta: number): void {
     if (delta < 0) {
       this.isZoomIn = true;
@@ -354,12 +352,12 @@ export class Camera {
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
       this.earthCenteredLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
-    } else if (this.camDistBuffer < this.thresholdForCloseCamera || this.zoomLevel_ == -1) {
+    } else if (this.camDistBuffer < settingsManager.nearZoomLevel || this.zoomLevel_ == -1) {
       // Zooming Out
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
       this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 15); // delta is +/- 100
-      this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.settings_.minDistanceFromSatellite), this.thresholdForCloseCamera);
-    } else if (this.camDistBuffer >= this.thresholdForCloseCamera) {
+      this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.settings_.minDistanceFromSatellite), settingsManager.nearZoomLevel);
+    } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
       // Zooming In
       settingsManager.selectedColor = [0, 0, 0, 0];
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
@@ -373,7 +371,7 @@ export class Camera {
 
       if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
         this.camZoomSnappedOnSat = true;
-        this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.thresholdForCloseCamera), this.settings_.minDistanceFromSatellite);
+        this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), this.settings_.minDistanceFromSatellite);
       }
     }
 

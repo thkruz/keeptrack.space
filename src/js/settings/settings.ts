@@ -290,7 +290,7 @@ export class SettingsManager {
   /**
    * Distance from satellite when we switch to close camera mode
    */
-  nearZoomLevel = <Kilometers>5000;
+  nearZoomLevel = <Kilometers>300;
   isPreventColorboxClose = false;
   isDayNightToggle = false;
   isUseHigherFOVonMobile = null;

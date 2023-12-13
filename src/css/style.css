@@ -1419,3 +1419,54 @@ input:focus {
   height: 100%;
   border: none;
 }
+
+/****************************************************
+ * Tooltip Styles
+ ****************************************************/
+
+/* Add this attribute to the element that needs a tooltip */
+[data-tooltip] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Hide the tooltip content by default */
+[data-tooltip]:before,
+[data-tooltip]:after {
+  visibility: hidden;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Position tooltip above all other elements */
+[data-tooltip]:before {
+  z-index: 9999;
+  position: absolute;
+  display: block;
+  width: 120px;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  overflow: visible;
+
+  background-color: #1f3347;
+  text-align: center;
+  padding: 5px;
+  border-width: 5px;
+  border-color: var(--colorTertiaryDarken3);
+  border-style: solid;
+  color: #ffffff;
+  content: attr(data-tooltip);
+}
+
+/* Show tooltip content on hover */
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  visibility: visible;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}

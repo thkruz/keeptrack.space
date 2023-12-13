@@ -103,7 +103,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       }, 500);
     }
 
-    SatInfoBoxCore.updateOrbitData(sat);
+    this.updateOrbitData(sat);
   }
 
   private static nearObjectsLinkClick(distance: number = 100): void {
@@ -171,7 +171,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [catalogManagerInstance.selectedSat, catalogManagerInstance.secondarySat], 'b');
   }
 
-  private static updateOrbitData = (sat: SatObject): void => {
+  private updateOrbitData = (sat: SatObject): void => {
     if (!sat.missile && typeof sat.staticNum === 'undefined') {
       getEl('sat-apogee').innerHTML = sat.apogee.toFixed(0) + ' km';
       getEl('sat-perigee').innerHTML = sat.perigee.toFixed(0) + ' km';
@@ -211,16 +211,22 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       elsetAgeDom.dataset.tooltip = 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString();
     }
 
-    getEl('sat-add-remove-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
-    getEl('all-objects-link').addEventListener('click', SatInfoBoxCore.allObjectsLink);
-    getEl('near-orbits-link').addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
-    getEl('near-objects-link1').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
-    getEl('near-objects-link2').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(200));
-    getEl('near-objects-link4').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(400));
-    getEl('sun-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSun);
-    getEl('nadir-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToEarth);
-    getEl('sec-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSat);
+    if (!this.isTopLinkEventListenersAdded) {
+      getEl('sat-add-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
+      getEl('sat-remove-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
+      getEl('all-objects-link').addEventListener('click', SatInfoBoxCore.allObjectsLink);
+      getEl('near-orbits-link').addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
+      getEl('near-objects-link1').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
+      getEl('near-objects-link2').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(200));
+      getEl('near-objects-link4').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(400));
+      getEl('sun-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSun);
+      getEl('nadir-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToEarth);
+      getEl('sec-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSat);
+      this.isTopLinkEventListenersAdded = true;
+    }
   };
+
+  isTopLinkEventListenersAdded = false;
 
   secondaryData = (sat: SatObject): void => {
     if (sat === null || typeof sat === 'undefined') return;
@@ -289,15 +295,16 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
 
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
     if (watchlistPlugin) {
-      getEl('sat-add-remove-watchlist').style.display = 'block';
-
       if (watchlistPlugin.isOnWatchlist(sat.id)) {
-        (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = removePng;
+        getEl('sat-remove-watchlist').style.display = 'block';
+        getEl('sat-add-watchlist').style.display = 'none';
       } else {
-        (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = addPng;
+        getEl('sat-add-watchlist').style.display = 'block';
+        getEl('sat-remove-watchlist').style.display = 'none';
       }
     } else {
-      getEl('sat-add-remove-watchlist').style.display = 'none';
+      getEl('sat-add-watchlist').style.display = 'none';
+      getEl('sat-remove-watchlist').style.display = 'none';
     }
 
     SatInfoBoxCore.updateSatType(sat);
@@ -503,7 +510,8 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
               <div id="sat-info-top-links">
                 <div id="sat-info-title" class="center-text sat-info-section-header">
-                  <img id="sat-add-remove-watchlist" src="${addPng}"/>
+                  <img id="sat-add-watchlist" src="${addPng}"/>
+                  <img id="sat-remove-watchlist" src="${removePng}"/>
                   <span id="sat-info-title-name">
                     This is a title
                   </span>
@@ -733,21 +741,17 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         const rcs = historicRcs.map((rcs_) => parseFloat(rcs_)).reduce((a, b) => a + b, 0) / historicRcs.length;
         satRcsEl.innerHTML = `H-Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(rcs).toFixed(2) + ' dBsm (Historical Estimate)');
-        window.M.Tooltip.init(satRcsEl);
       } else if (sat.length && sat.diameter && sat.span && sat.shape) {
         const rcs = SatMath.estimateRcs(parseFloat(sat.length), parseFloat(sat.diameter), parseFloat(sat.span), sat.shape);
         satRcsEl.innerHTML = `Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
-        window.M.Tooltip.init(satRcsEl);
       } else {
         satRcsEl.innerHTML = `Unknown`;
         satRcsEl.setAttribute('data-tooltip', 'Unknown');
-        window.M.Tooltip.init(satRcsEl);
       }
     } else {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
       satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(parseFloat(sat.rcs)).toFixed(2) + ' dBsm');
-      window.M.Tooltip.init(satRcsEl);
     }
   }
 

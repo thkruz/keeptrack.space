@@ -983,6 +983,10 @@ export class SettingsManager {
    * Use 16K textures for the Milky Way
    */
   hiresMilkWay = false;
+  /**
+   * When set to true, only load satellites with the name "Starlink"
+   */
+  isStarlinkOnly = false;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
@@ -1331,6 +1335,9 @@ export class SettingsManager {
                 break;
               case 'altitudes':
                 SettingsPresets.loadPresetAltitudes_(this);
+                break;
+              case 'starlink':
+                SettingsPresets.loadPresetStarlink(this);
                 break;
               default:
                 break;

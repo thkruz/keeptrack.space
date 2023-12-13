@@ -3,6 +3,23 @@ import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 
 export class SettingsPresets {
+  static loadPresetStarlink(settings: SettingsManager) {
+    settings.maxAnalystSats = 1;
+    settings.maxMissiles = 1;
+    settings.maxFieldOfViewMarkers = 1;
+    // settings.isNotionalDebris = true;
+    settings.isEnableExtendedCatalog = false;
+    settings.searchLimit = 6500;
+    settings.isDisableExtraCatalog = true;
+    settings.isDisableAsciiCatalog = true;
+    settings.isStarlinkOnly = true;
+    settings.isEnableJscCatalog = false;
+
+    settings.onLoadCb = () => {
+      keepTrackApi.getUiManager().searchManager.doSearch('starlink');
+    };
+  }
+
   static loadPresetAltitudes_(settings: SettingsManager) {
     settings.maxAnalystSats = 1;
     settings.maxMissiles = 1;

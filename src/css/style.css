@@ -1447,8 +1447,6 @@ input:focus {
   position: absolute;
   display: block;
   width: 120px;
-  bottom: 150%;
-  left: 50%;
   margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
   overflow: visible;
 
@@ -1460,6 +1458,24 @@ input:focus {
   border-style: solid;
   color: #ffffff;
   content: attr(data-tooltip);
+}
+
+[data-tooltip][data-position='bottom']:before {
+  bottom: -100%;
+  left: 50%;
+}
+[data-tooltip][data-position='top']:before {
+  bottom: 125%;
+  top: auto;
+  left: 50%;
+}
+[data-tooltip][data-position='left']:before {
+  right: 100%;
+  left: auto;
+}
+[data-tooltip][data-position='right']:before {
+  left: 100%;
+  right: auto;
 }
 
 /* Show tooltip content on hover */

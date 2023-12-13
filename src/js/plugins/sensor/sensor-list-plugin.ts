@@ -151,7 +151,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
           getEl('sat-info-top-links').insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`
-                  <div id="sensors-in-fov-link" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                  <div id="sensors-in-fov-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                         data-tooltip="Visualize Sensor Coverage">Show All Sensors with FOV...</div>
                 `
           );

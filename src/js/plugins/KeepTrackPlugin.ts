@@ -361,21 +361,26 @@ export class KeepTrackPlugin {
   }
 
   setBottomIconToSelected(): void {
+    if (this.isMenuButtonActive) return;
+    this.isMenuButtonActive = true;
     getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
   }
 
   setBottomIconToUnselected(): void {
+    if (!this.isMenuButtonActive) return;
     this.isMenuButtonActive = false;
     getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
   }
 
   setBottomIconToDisabled(): void {
+    if (this.isIconDisabled) return;
     this.setBottomIconToUnselected();
     this.isIconDisabled = true;
     getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
   }
 
   setBottomIconToEnabled(): void {
+    if (!this.isIconDisabled) return;
     this.isIconDisabled = false;
     getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
   }

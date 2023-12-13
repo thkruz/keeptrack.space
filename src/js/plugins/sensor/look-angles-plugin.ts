@@ -76,11 +76,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
                 </label>
                 </div>
                 <div class="input-field col s6">
-                <input id="look-angles-length" value="2" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated" />
+                <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated" />
                 <label for="look-anglesLength" class="active">Length (Days)</label>
                 </div>
                 <div class="input-field col s6">
-                <input id="look-angles-interval" value="30" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles" />
+                <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles" />
                 <label for="look-anglesInterval" class="active">Interval</label>
                 </div>
                 <div class="row"></div>

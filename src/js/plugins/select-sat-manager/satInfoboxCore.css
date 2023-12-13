@@ -17,7 +17,8 @@
   margin: 0px 25px;
 }
 
-#sat-add-remove-watchlist {
+#sat-add-watchlist,
+#sat-remove-watchlist {
   width: 15px;
   height: 15px;
   cursor: pointer;

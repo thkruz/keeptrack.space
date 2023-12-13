@@ -71,40 +71,40 @@ export const uiManagerInit = () => {
           <div class="switch row">
             <h6 class="center-align">Observation 1</h5>
             <div class="input-field col s12">
-              <input value="1653098333497" id="obfit-t1" type="text" class="tooltipped" data-position="right"
+              <input value="1653098333497" id="obfit-t1" type="text" data-position="right"
                 data-delay="50" data-tooltip="Time in Unix Time">
               <label for="obfit-t" class="active">Time</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="1977.3758544921875" id="obfit-x1" type="text" class="tooltipped" data-position="right"
+              <input value="1977.3758544921875" id="obfit-x1" type="text" data-position="right"
                 data-delay="50" data-tooltip="X">
               <label for="obfit-lat" class="active">X</label>
             </div>
             <div class="input-field col s4">
-              <input value="5811.54248046875" id="obfit-y1" type="text" class="tooltipped" data-position="right"
+              <input value="5811.54248046875" id="obfit-y1" type="text" data-position="right"
                 data-delay="50" data-tooltip="Y">
               <label for="obfit-lat" class="active">Y</label>
             </div><div class="input-field col s4">
-              <input value="3240.01123046875" id="obfit-z1" type="text" class="tooltipped" data-position="right"
+              <input value="3240.01123046875" id="obfit-z1" type="text" data-position="right"
                 data-delay="50" data-tooltip="Z">
               <label for="obfit-lat" class="active">Z</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="-7.044088363647461" id="obfit-xd1" type="text" class="tooltipped" data-position="right"
+              <input value="-7.044088363647461" id="obfit-xd1" type="text" data-position="right"
               data-delay="50" data-tooltip="X Dot">
               <label for="obfit-lat" class="active">X Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="0.5667343735694885" id="obfit-yd1" type="text" class="tooltipped" data-position="right"
+              <input value="0.5667343735694885" id="obfit-yd1" type="text" data-position="right"
                 data-delay="50" data-tooltip="Y Dot">
               <label for="obfit-lat" class="active">Y Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="2.7424800395965576" id="obfit-zd1" type="text" class="tooltipped" data-position="right"
+              <input value="2.7424800395965576" id="obfit-zd1" type="text" data-position="right"
                 data-delay="50" data-tooltip="Z Dot">
               <label for="obfit-lat" class="active">Z Dot</label>
             </div>
@@ -112,40 +112,40 @@ export const uiManagerInit = () => {
           <div class="switch row">
             <h6 class="center-align">Observation 2 (Optional)</h5>
             <div class="input-field col s12">
-              <input value="" id="obfit-t2" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-t2" type="text" data-position="right"
                 data-delay="50" data-tooltip="Time in Unix Time">
               <label for="obfit-t" class="active">Time</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="" id="obfit-x2" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-x2" type="text" data-position="right"
                 data-delay="50" data-tooltip="X">
               <label for="obfit-lat" class="active">X</label>
             </div>
             <div class="input-field col s4">
-              <input value="" id="obfit-y2" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-y2" type="text" data-position="right"
                 data-delay="50" data-tooltip="Y">
               <label for="obfit-lat" class="active">Y</label>
             </div><div class="input-field col s4">
-              <input value="" id="obfit-z2" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-z2" type="text" data-position="right"
                 data-delay="50" data-tooltip="Z">
               <label for="obfit-lat" class="active">Z</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="" id="obfit-xd2" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-xd2" type="text" data-position="right"
               data-delay="50" data-tooltip="X Dot">
               <label for="obfit-lat" class="active">X Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="" id="obfit-yd2" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-yd2" type="text" data-position="right"
                 data-delay="50" data-tooltip="Y Dot">
               <label for="obfit-lat" class="active">Y Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="" id="obfit-zd2" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-zd2" type="text" data-position="right"
                 data-delay="50" data-tooltip="Z Dot">
               <label for="obfit-lat" class="active">Z Dot</label>
             </div>
@@ -153,40 +153,40 @@ export const uiManagerInit = () => {
           <div class="switch row">
             <h6 class="center-align">Observation 3 (Optional)</h5>
             <div class="input-field col s12">
-              <input value="" id="obfit-t3" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-t3" type="text" data-position="right"
                 data-delay="50" data-tooltip="Time in Unix Time">
               <label for="obfit-t" class="active">Time</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="" id="obfit-x3" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-x3" type="text" data-position="right"
                 data-delay="50" data-tooltip="X">
               <label for="obfit-lat" class="active">X</label>
             </div>
             <div class="input-field col s4">
-              <input value="" id="obfit-y3" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-y3" type="text" data-position="right"
                 data-delay="50" data-tooltip="Y">
               <label for="obfit-lat" class="active">Y</label>
             </div><div class="input-field col s4">
-              <input value="" id="obfit-z3" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-z3" type="text" data-position="right"
                 data-delay="50" data-tooltip="Z">
               <label for="obfit-lat" class="active">Z</label>
             </div>
           </div>
           <div class="switch row">
             <div class="input-field col s4">
-              <input value="" id="obfit-xd3" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-xd3" type="text" data-position="right"
               data-delay="50" data-tooltip="X Dot">
               <label for="obfit-lat" class="active">X Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="" id="obfit-yd3" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-yd3" type="text" data-position="right"
                 data-delay="50" data-tooltip="Y Dot">
               <label for="obfit-lat" class="active">Y Dot</label>
             </div>
             <div class="input-field col s4">
-              <input value="" id="obfit-zd3" type="text" class="tooltipped" data-position="right"
+              <input value="" id="obfit-zd3" type="text" data-position="right"
                 data-delay="50" data-tooltip="Z Dot">
               <label for="obfit-lat" class="active">Z Dot</label>
             </div>

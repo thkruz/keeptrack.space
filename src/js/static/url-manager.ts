@@ -1,6 +1,7 @@
 import { GetSatType } from '@app/js/interfaces';
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { getEl } from '../lib/get-el';
+import { SearchManager } from '../singletons/search-manager';
 
 export abstract class UrlManager {
   static parseGetVariables() {
@@ -21,7 +22,7 @@ export abstract class UrlManager {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (!uiManagerInstance.searchManager) return;
-    const currentSearch = uiManagerInstance.searchManager.getCurrentSearch();
+    const currentSearch = SearchManager.getCurrentSearch();
 
     if (settingsManager.isDisableUrlBar) return;
 

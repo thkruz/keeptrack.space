@@ -187,21 +187,21 @@ export const onmessageProcessing = (m: {
       }
     }
 
-    // TODO: figure out how this transferable buffer works
     postMessageProcessing({ pointsOut, satId });
   }
 };
 
-export const postMessageProcessing = (data: { pointsOut: any; satId: any }) => {
-  const { pointsOut, satId } = data;
+interface OrbitCruncherMessageWorker {
+  pointsOut: Float32Array;
+  satId: number;
+}
+export const postMessageProcessing = ({ pointsOut, satId }: OrbitCruncherMessageWorker) => {
   try {
-    postMessage(
-      {
-        pointsOut: pointsOut.buffer,
-        satId,
-      },
-      <any>[pointsOut.buffer]
-    );
+    // TODO: Explore SharedArrayBuffer Options
+    postMessage({
+      pointsOut: pointsOut,
+      satId,
+    } as OrbitCruncherMessageWorker);
   } catch (e) {
     // If Jest isn't running then throw the error
     if (!process) throw e;

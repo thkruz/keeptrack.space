@@ -1,5 +1,5 @@
 import multiSitePng from '@app/img/icons/multi-site.png';
-import { GetSatType, SatObject, SensorObject } from '@app/js/interfaces';
+import { SatObject, SensorObject } from '@app/js/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
 import { MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
 import { dateFormat } from '@app/js/lib/dateFormat';
@@ -16,8 +16,13 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   isRequireSensorSelected: boolean = false;
 
   bottomIconCallback: () => void = () => {
-    this.refreshSideMenuData();
+    const sat = keepTrackApi.getCatalogManager().getSelectedSat();
+    this.refreshSideMenuData(sat);
   };
+
+  lookanglesLength = 1; // Days
+  lookanglesInterval = <Seconds>30;
+  disabledSensors: SensorObject[] = [];
 
   bottomIconElementName = 'multi-site-look-angles-icon';
   bottomIconLabel = 'Multi-Site Looks';
@@ -88,18 +93,23 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (this.isMenuButtonEnabled && (!sat?.TLE1 || !keepTrackApi.getSensorManager().isSensorSelected())) {
-          this.setBottomIconToDisabled();
-          this.closeSideMenu();
-          return;
-        } else {
-          this.setBottomIconToEnabled();
-          if (this.isMenuButtonEnabled) {
-            this.refreshSideMenuData();
-          }
-        }
+        this.checkIfCanBeEnabled_(sat);
       },
     });
+  }
+
+  private checkIfCanBeEnabled_(sat: SatObject) {
+    if (sat?.TLE1 && keepTrackApi.getSensorManager().isSensorSelected()) {
+      this.setBottomIconToEnabled();
+      if (this.isMenuButtonActive && sat) {
+        this.refreshSideMenuData(sat);
+      }
+    } else {
+      if (this.isMenuButtonActive) {
+        this.closeSideMenu();
+      }
+      this.setBottomIconToDisabled();
+    }
   }
 
   addJs(): void {
@@ -108,16 +118,14 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.staticOffsetChange,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        this.refreshSideMenuData();
+        const sat = keepTrackApi.getCatalogManager().getSelectedSat();
+        this.refreshSideMenuData(sat);
       },
     });
   }
 
-  disabledSensors: SensorObject[] = [];
-
-  refreshSideMenuData() {
-    if (this.isMenuButtonEnabled) {
-      const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+  private refreshSideMenuData(sat: SatObject) {
+    if (this.isMenuButtonActive) {
       if (sat) {
         showLoading(() => {
           const sensorListDom = getEl('multi-site-look-angles-sensor-list');
@@ -141,7 +149,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
                 this.disabledSensors.push(sensor);
               }
 
-              this.getlookanglesMultiSite(
+              this.getlookanglesMultiSite_(
                 sat,
                 allSensors.filter((s) => !this.disabledSensors.includes(s))
               );
@@ -150,7 +158,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
             sensorListDom.appendChild(document.createTextNode(' '));
           }
 
-          this.getlookanglesMultiSite(
+          this.getlookanglesMultiSite_(
             sat,
             allSensors.filter((s) => !this.disabledSensors.includes(s))
           );
@@ -159,10 +167,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     }
   }
 
-  lookanglesLength = 1; // Days
-  lookanglesInterval = <Seconds>30;
-
-  public getlookanglesMultiSite(sat: SatObject, sensors?: SensorObject[]): void {
+  private getlookanglesMultiSite_(sat: SatObject, sensors?: SensorObject[]): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
@@ -208,7 +213,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
     isResetToDefault ? sensorManagerInstance.setCurrentSensor(sensorManagerInstance.defaultSensor) : sensorManagerInstance.setCurrentSensor(tempSensor);
 
-    MultiSiteLookAnglesPlugin.populateMultiSiteTable(multiSiteArray);
+    MultiSiteLookAnglesPlugin.populateMultiSiteTable_(multiSiteArray);
   }
 
   private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: SensorObject): TearrData {
@@ -234,7 +239,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     }
   }
 
-  static populateMultiSiteTable(multiSiteArray: TearrData[]) {
+  private static populateMultiSiteTable_(multiSiteArray: TearrData[]) {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
 

@@ -29,3 +29,21 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement => {
   return null;
   // DEBUG: Use this code for finding bad requests
 };
+
+/**
+ * Shows the element with the specified ID by setting its display style to 'block'.
+ * @param id - The ID of the element to show.
+ */
+export const showEl = (id: string) => {
+  const el = getEl(id, true);
+  if (el) el.style.display = 'block';
+};
+
+/**
+ * Hides the element with the specified ID.
+ * @param id - The ID of the element to hide.
+ */
+export const hideEl = (id: string) => {
+  const el = getEl(id, true);
+  if (el) el.style.display = 'none';
+};

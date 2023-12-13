@@ -76,11 +76,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
                 </label>
                 </div>
                 <div class="input-field col s6">
-                <input id="look-angles-length" value="2" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated" />
+                <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated" />
                 <label for="look-anglesLength" class="active">Length (Days)</label>
                 </div>
                 <div class="input-field col s6">
-                <input id="look-angles-interval" value="30" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles" />
+                <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles" />
                 <label for="look-anglesInterval" class="active">Interval</label>
                 </div>
                 <div class="row"></div>
@@ -101,12 +101,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('look-angles-length').addEventListener('change', () => {
-          this.lookanglesLength = parseInt(<string>(<HTMLInputElement>getEl('look-angles-length')).value);
+          this.lookanglesLength = parseInt((<HTMLInputElement>getEl('look-angles-length')).value);
           this.refreshSideMenuData();
         });
 
         getEl('look-angles-interval').addEventListener('change', () => {
-          this.lookanglesInterval = parseInt(<string>(<HTMLInputElement>getEl('look-angles-interval')).value);
+          this.lookanglesInterval = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
           this.refreshSideMenuData();
         });
 
@@ -115,6 +115,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         });
 
         getEl('settings-riseset').addEventListener('change', this.settingsRisesetChange.bind(this));
+
+        const sat = keepTrackApi.getCatalogManager().getSelectedSat();
+        this.checkIfCanBeEnabled_(sat);
       },
     });
 
@@ -122,18 +125,31 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (this.isMenuButtonEnabled && (!sat?.TLE1 || !keepTrackApi.getSensorManager().isSensorSelected())) {
-          this.setBottomIconToDisabled();
-          this.closeSideMenu();
-          return;
-        } else {
-          this.setBottomIconToEnabled();
-          if (this.isMenuButtonEnabled && sat) {
-            this.getlookangles(sat);
-          }
-        }
+        this.checkIfCanBeEnabled_(sat);
       },
     });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.resetSensor,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        this.checkIfCanBeEnabled_(null);
+      },
+    });
+  }
+
+  private checkIfCanBeEnabled_(sat: SatObject) {
+    if (sat?.TLE1 && keepTrackApi.getSensorManager().isSensorSelected()) {
+      this.setBottomIconToEnabled();
+      if (this.isMenuButtonActive && sat) {
+        this.getlookangles(sat);
+      }
+    } else {
+      if (this.isMenuButtonActive) {
+        this.closeSideMenu();
+      }
+      this.setBottomIconToDisabled();
+    }
   }
 
   addJs(): void {
@@ -148,7 +164,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   }
 
   refreshSideMenuData = (): void => {
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       showLoading(() => {
         const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
         this.getlookangles(sat);
@@ -212,27 +228,27 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tdR.appendChild(document.createTextNode('Rng'));
       tdR.setAttribute('style', 'text-decoration: underline');
 
-      for (let i = 0; i < looksArray.length; i++) {
+      for (const lookEl of looksArray) {
         if (tbl.rows.length > 0) {
           const tr = tbl.insertRow();
           tr.setAttribute('class', 'link');
 
           tdT = tr.insertCell();
-          tdT.appendChild(document.createTextNode(dateFormat(looksArray[i].time, 'isoDateTime', false)));
+          tdT.appendChild(document.createTextNode(dateFormat(lookEl.time, 'isoDateTime', false)));
 
           // Create click listener
           tdT.addEventListener('click', () => {
-            timeManagerInstance.changeStaticOffset(new Date(dateFormat(looksArray[i].time, 'isoDateTime', false) + 'z').getTime() - timeManagerInstance.realTime);
+            timeManagerInstance.changeStaticOffset(new Date(dateFormat(lookEl.time, 'isoDateTime', false) + 'z').getTime() - timeManagerInstance.realTime);
             timeManagerInstance.calculateSimulationTime();
             keepTrackApi.methods.updateDateTime(new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
           });
 
           tdE = tr.insertCell();
-          tdE.appendChild(document.createTextNode(looksArray[i].el.toFixed(1)));
+          tdE.appendChild(document.createTextNode(lookEl.el.toFixed(1)));
           tdA = tr.insertCell();
-          tdA.appendChild(document.createTextNode(looksArray[i].az.toFixed(0)));
+          tdA.appendChild(document.createTextNode(lookEl.az.toFixed(0)));
           tdR = tr.insertCell();
-          tdR.appendChild(document.createTextNode(looksArray[i].rng.toFixed(0)));
+          tdR.appendChild(document.createTextNode(lookEl.rng.toFixed(0)));
         }
       }
     })();

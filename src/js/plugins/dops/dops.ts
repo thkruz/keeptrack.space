@@ -15,7 +15,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   bottomIconLabel = 'View DOPs';
   bottomIconImg = gpsPng;
   bottomIconCallback = (): void => {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     showLoading(DopsPlugin.updateSideMenu);
   };
@@ -38,24 +38,20 @@ export class DopsPlugin extends KeepTrackPlugin {
       <form id="dops-form">
         <div class="switch row">
           <h5 class="center-align">DOP Table</h5>
-          <div class="input-field col s3">
-            <input value="41" id="dops-lat" type="text" class="tooltipped" data-position="right"
-              data-delay="50" data-tooltip="Latitude in Degrees">
+          <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="Latitude in Degrees">
+            <input value="41" id="dops-lat" type="text">
             <label for="dops-lat" class="active">Latitude</label>
           </div>
-          <div class="input-field col s3">
-            <input value="-71" id="dops-lon" type="text" class="tooltipped" data-position="right"
-              data-delay="50" data-tooltip="Longitude in Degrees">
+          <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="Longitude in Degrees">
+            <input value="-71" id="dops-lon" type="text">
             <label for="dops-lon" class="active">Longitude</label>
           </div>
-          <div class="input-field col s3">
-            <input value="-71" id="dops-alt" type="text" class="tooltipped" data-position="right"
-              data-delay="50" data-tooltip="Altitude in KM">
+          <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="Altitude in KM">
+            <input value="-71" id="dops-alt" type="text">
             <label for="dops-lon" class="active">Altitude</label>
           </div>
-          <div class="input-field col s3">
-            <input value="15" id="dops-el" type="text" class="tooltipped" data-position="right"
-              data-delay="50" data-tooltip="Minimum Elevation for GPS Lock">
+          <div class="input-field col s3" data-position="bottom" data-offset="60" data-tooltip="Minimum Elevation for GPS Lock">
+            <input value="15" id="dops-el" type="text">
             <label for="dops-el" class="active">Mask</label>
           </div>
         </div>
@@ -106,7 +102,7 @@ export class DopsPlugin extends KeepTrackPlugin {
       }
       case 'dops-24dops-rmb': {
         const latLon = keepTrackApi.getInputManager().mouse.latLon;
-        if (!this.isMenuButtonEnabled) {
+        if (!this.isMenuButtonActive) {
           (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
           (<HTMLInputElement>getEl('dops-alt')).value = '0';

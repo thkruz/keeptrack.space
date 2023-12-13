@@ -1,5 +1,3 @@
-import addPng from '@app/img/add.png';
-import removePng from '@app/img/remove.png';
 import { MissileObject, SatObject, SensorObject } from '@app/js/interfaces';
 import { KeepTrackApiEvents, isMissileObject, isSatObject, isSensorObject, keepTrackApi } from '@app/js/keepTrackApi';
 import { DEG2RAD, cKmPerMs } from '@app/js/lib/constants';
@@ -102,7 +100,7 @@ export class UpdateSatManager extends KeepTrackPlugin {
 
           if (
             settingsManager.plugins?.stereoMap &&
-            keepTrackApi.getPlugin(StereoMapPlugin)?.isMenuButtonEnabled &&
+            keepTrackApi.getPlugin(StereoMapPlugin)?.isMenuButtonActive &&
             timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
           ) {
             (<StereoMapPlugin>keepTrackApi.getPlugin(StereoMapPlugin)).updateMap();
@@ -232,9 +230,11 @@ export class UpdateSatManager extends KeepTrackPlugin {
         const addRemoveWatchlistDom = getEl('sat-add-remove-watchlist');
         if (addRemoveWatchlistDom) {
           if (isOnList) {
-            (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = removePng;
+            (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'block';
+            (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'none';
           } else {
-            (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = addPng;
+            (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'block';
+            (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'none';
           }
         }
       },

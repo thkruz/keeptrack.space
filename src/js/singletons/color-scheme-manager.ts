@@ -661,7 +661,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
         LegendManager.change(cachedColorScheme);
         if (cachedColorScheme) {
-          this.currentColorScheme = this[cachedColorScheme];
+          const possibleColorScheme = this[cachedColorScheme];
+          this.currentColorScheme = possibleColorScheme ? possibleColorScheme : this.default;
         }
 
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -1003,8 +1004,10 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     try {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
-      settingsManager.setCurrentColorScheme(scheme); // Deprecated
-      this.currentColorScheme = scheme;
+      scheme ??= this.default;
+      const possibleColorScheme = this[scheme.name];
+      this.currentColorScheme = possibleColorScheme ? possibleColorScheme : this.default;
+      settingsManager.setCurrentColorScheme(this.currentColorScheme); // Deprecated
       this.calculateColorBuffers(isForceRecolor);
       dotsManagerInstance.buffers.color = this.colorBuffer;
       dotsManagerInstance.buffers.pickability = this.pickableBuffer;
@@ -1506,15 +1509,13 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
   private preValidateColorScheme_(isForceRecolor: boolean = false) {
     if (this.currentColorScheme === this.group || this.currentColorScheme === this.groupCountries) {
-      const uiManagerInstance = keepTrackApi.getUiManager();
-
       const watchlistMenu = getEl('watchlist-menu');
       const watchlistTransform = watchlistMenu?.style.transform || '';
 
       if (
-        uiManagerInstance.searchManager.getCurrentSearch() === '' &&
+        keepTrackApi.getUiManager().searchManager.getCurrentSearch() === '' &&
         watchlistTransform !== 'translateX(0px)' &&
-        !keepTrackApi.getPlugin(TimeMachine).isMenuButtonEnabled &&
+        !keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive &&
         !(<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning
       ) {
         if (this.currentColorScheme === this.groupCountries) {

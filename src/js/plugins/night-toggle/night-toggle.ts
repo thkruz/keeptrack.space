@@ -19,7 +19,7 @@ export class NightToggle extends KeepTrackPlugin {
       event: KeepTrackApiEvents.nightToggle,
       cbName: this.PLUGIN_NAME,
       cb: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture): void => {
-        if (!this.isMenuButtonEnabled) {
+        if (!this.isMenuButtonActive) {
           gl.bindTexture(gl.TEXTURE_2D, nightTexture);
         } else {
           gl.bindTexture(gl.TEXTURE_2D, texture);

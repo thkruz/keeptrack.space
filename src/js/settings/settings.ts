@@ -290,7 +290,7 @@ export class SettingsManager {
   /**
    * Distance from satellite when we switch to close camera mode
    */
-  nearZoomLevel = <Kilometers>5000;
+  nearZoomLevel = <Kilometers>300;
   isPreventColorboxClose = false;
   isDayNightToggle = false;
   isUseHigherFOVonMobile = null;
@@ -983,6 +983,10 @@ export class SettingsManager {
    * Use 16K textures for the Milky Way
    */
   hiresMilkWay = false;
+  /**
+   * When set to true, only load satellites with the name "Starlink"
+   */
+  isStarlinkOnly = false;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
@@ -1332,6 +1336,9 @@ export class SettingsManager {
               case 'altitudes':
                 SettingsPresets.loadPresetAltitudes_(this);
                 break;
+              case 'starlink':
+                SettingsPresets.loadPresetStarlink(this);
+                break;
               default:
                 break;
             }
@@ -1605,8 +1612,12 @@ export class SettingsManager {
    * @deprecated
    * Sets the current color scheme in the settings only.
    */
-  setCurrentColorScheme(_val: any): void {
-    this.currentColorScheme = _val;
+  setCurrentColorScheme(val: any): void {
+    if (!val) {
+      console.warn('Settings Manager: Invalid color scheme');
+      return;
+    }
+    this.currentColorScheme = val;
   }
 }
 

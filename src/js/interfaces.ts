@@ -658,6 +658,7 @@ export interface OrbitManager {
   changeOrbitBufferData(satId: number, TLE1?: string, TLE2?: string): void;
   clearHoverOrbit(): void;
   clearInViewOrbit(): void;
+  drawOrbitsSettingChanged(): void;
   clearSelectOrbit(isSecondary?: boolean): void;
   draw(
     pMatrix: mat4,

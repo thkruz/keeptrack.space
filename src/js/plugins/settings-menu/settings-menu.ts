@@ -66,182 +66,182 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <h5 class="center-align">General Settings</h5>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide notional satellites">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide notional satellites">
                 <input id="settings-notionalSats" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show Notional Satellites
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide LEO satellites">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide LEO satellites">
                 <input id="settings-leoSats" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show LEO Satellites
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Starlink satellites">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Starlink satellites">
                 <input id="settings-starlinkSats" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show Starlink Satellites
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide HEO satellites">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide HEO satellites">
                 <input id="settings-heoSats" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show HEO Satellites
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide MEO satellites">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide MEO satellites">
                 <input id="settings-meoSats" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show MEO Satellites
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide GEO satellites">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide GEO satellites">
                 <input id="settings-geoSats" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show GEO Satellites
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Payloads">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Payloads">
                 <input id="settings-showPayloads" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show Payloads
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Rocket Bodies">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Rocket Bodies">
                 <input id="settings-showRocketBodies" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show Rocket Bodies
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Debris">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Debris">
                 <input id="settings-showDebris" type="checkbox" checked/>
                 <span class="lever"></span>
                 Show Debris
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide Agencies">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Agencies">
                 <input id="settings-showAgencies" type="checkbox"/>
                 <span class="lever"></span>
                 Show Agencies
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable this to hide orbit lines">
+              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide orbit lines">
                 <input id="settings-drawOrbits" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw Orbits
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Enable this to show where a satellite was instead of where it is going">
+              <label data-position="top" data-delay="50" data-tooltip="Enable this to show where a satellite was instead of where it is going">
                 <input id="settings-drawTrailingOrbits" type="checkbox"/>
                 <span class="lever"></span>
                 Draw Trailing Orbits
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
+              <label data-position="top" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
                 <input id="settings-drawEcf" type="checkbox" />
                 <span class="lever"></span>
                 Draw Orbits in ECF
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Draw lines from sensor to satellites when in FOV">
+              <label data-position="top" data-delay="50" data-tooltip="Draw lines from sensor to satellites when in FOV">
                 <input id="settings-isDrawInCoverageLines" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw FOV Lines
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Draw the Sun">
+              <label data-position="top" data-delay="50" data-tooltip="Draw the Sun">
                 <input id="settings-drawSun" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw the Sun
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Hides Earth Textures">
+              <label data-position="top" data-delay="50" data-tooltip="Hides Earth Textures">
                 <input id="settings-drawBlackEarth" type="checkbox"/>
                 <span class="lever"></span>
                 Draw Black Earth
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide the Atmosphere">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide the Atmosphere">
                 <input id="settings-drawAtmosphere" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw Atmosphere
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable to hide the Aurora">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide the Aurora">
                 <input id="settings-drawAurora" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw Aurora
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Change the Skybox to Gray">
+              <label data-position="top" data-delay="50" data-tooltip="Change the Skybox to Gray">
                 <input id="settings-graySkybox" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw Gray Background
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Draw Milky Way in Background">
+              <label data-position="top" data-delay="50" data-tooltip="Draw Milky Way in Background">
                 <input id="settings-drawMilkyWay" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw the Milky Way
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Display ECI Coordinates on Hover">
+              <label data-position="top" data-delay="50" data-tooltip="Display ECI Coordinates on Hover">
                 <input id="settings-eciOnHover" type="checkbox"/>
                 <span class="lever"></span>
                 Display ECI on Hover
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
+              <label data-position="top" data-delay="50" data-tooltip="Non-selectable satellites will be hidden instead of grayed out.">
                 <input id="settings-hos" type="checkbox" />
                 <span class="lever"></span>
                 Hide Other Satellites
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
+              <label data-position="top" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
                 <input id="settings-demo-mode" type="checkbox" />
                 <span class="lever"></span>
                 Enable Demo Mode
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
+              <label data-position="top" data-delay="50" data-tooltip="Small text labels will appear next to all satellites in FOV.">
                 <input id="settings-sat-label-mode" type="checkbox" checked />
                 <span class="lever"></span>
                 Enable Satellite Label Mode
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Time will freeze as you rotate the camera.">
+              <label data-position="top" data-delay="50" data-tooltip="Time will freeze as you rotate the camera.">
                 <input id="settings-freeze-drag" type="checkbox" />
                 <span class="lever"></span>
                 Enable Freeze Time on Click
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Time Machine stop showing toast messages.">
+              <label data-position="top" data-delay="50" data-tooltip="Time Machine stop showing toast messages.">
                 <input id="settings-time-machine-toasts" type="checkbox" />
                 <span class="lever"></span>
                 Disable Time Machine Toasts
@@ -298,11 +298,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           <div id="settings-opt">
             <h5 class="center-align">Settings Overrides</h5>
             <div class="input-field col s12">
-              <input value="150" id="maxSearchSats" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="Maximum satellites to display in search" />
+              <input value="150" id="maxSearchSats" type="text" data-position="top" data-delay="50" data-tooltip="Maximum satellites to display in search" />
               <label for="maxSearchSats" class="active">Maximum Satellites in Search</label>
             </div>
             <div class="input-field col s12">
-              <input value="30" id="satFieldOfView" type="text" class="tooltipped" data-position="right" data-delay="50" data-tooltip="What is the satellite's field of view in degrees" />
+              <input value="30" id="satFieldOfView" type="text" data-position="top" data-delay="50" data-tooltip="What is the satellite's field of view in degrees" />
               <label for="satFieldOfView" class="active">Satellite Field of View</label>
             </div>
             <div class="row"></div>
@@ -614,7 +614,12 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
       keepTrackApi.getScene().earth.reloadEarthHiResTextures();
     }
+
+    const isDrawOrbitsChanged = settingsManager.isDrawOrbits !== (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
     settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
+    if (isDrawOrbitsChanged) {
+      keepTrackApi.getOrbitManager().drawOrbitsSettingChanged();
+    }
     settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;
 
     if (keepTrackApi.getOrbitManager().orbitWorker) {
@@ -649,7 +654,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     // TODO: These settings buttons should be inside the plugins themselves
     // Stop Time Machine
     if (keepTrackApi.getPlugin(TimeMachine)) {
-      keepTrackApi.getPlugin(TimeMachine).isMenuButtonEnabled = false;
+      keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive = false;
     }
 
     // if (orbitManagerInstance.isTimeMachineRunning) {
@@ -679,7 +684,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       uiManagerInstance.toast('Invalid max search sats value!', 'critical');
     } else {
       settingsManager.searchLimit = maxSearchSats;
-      uiManagerInstance.searchManager.doSearch(uiManagerInstance.searchManager.getCurrentSearch());
+      uiManagerInstance.searchManager.doSearch(keepTrackApi.getUiManager().searchManager.getCurrentSearch());
     }
 
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);

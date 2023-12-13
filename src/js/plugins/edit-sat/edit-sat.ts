@@ -131,7 +131,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
   bottomIconImg = editPng;
   bottomIconLabel = 'Edit Satellite';
   bottomIconCallback: () => void = (): void => {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
     EditSatPlugin.populateSideMenu();
   };
 
@@ -205,7 +205,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
         break;
       case 'edit-sat-rmb':
         keepTrackApi.getCatalogManager().setSelectedSat(clickedSat);
-        if (!this.isMenuButtonEnabled) {
+        if (!this.isMenuButtonActive) {
           keepTrackApi.getUiManager().bottomIconPress(<HTMLElement>{ id: 'menu-editSat' });
         }
         break;

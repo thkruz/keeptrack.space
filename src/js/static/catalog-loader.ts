@@ -510,7 +510,9 @@ export class CatalogLoader {
     return year + '-' + rest;
   }
 
-  private static processAllSats_(resp: SatObject[], i: number, catalogManagerInstance: CatalogManager, tempSatData: any[], notionalSatNum: number) {
+  private static processAllSats_(resp: SatObject[], i: number, catalogManagerInstance: CatalogManager, tempSatData: any[], notionalSatNum: number): void {
+    if (settingsManager.isStarlinkOnly && resp[i].name.indexOf('STARLINK') === -1) return;
+
     const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
     resp[i].intlDes = intlDes;
     catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = i;

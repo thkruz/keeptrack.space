@@ -37,7 +37,7 @@ export class OrbitReferences extends KeepTrackPlugin {
           getEl('sat-info-top-links').insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`
-                <div id="orbit-references-link" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                <div id="orbit-references-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                       data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
               `
           );

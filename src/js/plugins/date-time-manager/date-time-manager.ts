@@ -67,13 +67,12 @@ export class DateTimeManager extends KeepTrackPlugin {
 
   uiManagerInit() {
     const NavWrapper = getEl('nav-wrapper');
-    NavWrapper &&
-      NavWrapper.insertAdjacentHTML(
-        'beforeend',
-        keepTrackApi.html`
-          <ul id="nav-mobile">
-            <li id="jday"></li>
-            <div id="${this.divContainerId}" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Time Menu">
+    NavWrapper?.insertAdjacentHTML(
+      'afterbegin',
+      keepTrackApi.html`
+          <div id="nav-mobile">
+            <div id="jday"></div>
+            <div id="${this.divContainerId}" data-position="bottom" data-delay="50" data-tooltip="Time Menu">
               <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
               <div id="datetime-input">
                 <form id="datetime-input-form">
@@ -81,9 +80,9 @@ export class DateTimeManager extends KeepTrackPlugin {
                 </form>
               </div>
             </div>
-          </ul>
+        </div>
           `
-      );
+    );
   }
 
   uiManagerFinal() {

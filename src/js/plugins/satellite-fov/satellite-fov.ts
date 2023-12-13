@@ -36,7 +36,7 @@ declare module '@app/js/interfaces' {
 
 export class SatelliteFov extends KeepTrackPlugin {
   bottomIconCallback = () => {
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       this.enableFovView_();
       settingsManager.isSatOverflyModeOn = true;
     } else {

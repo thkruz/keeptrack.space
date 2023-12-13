@@ -32,7 +32,7 @@ import { GlUtils } from '../../static/gl-utils';
 
 export class Moon {
   /** The radius of the moon. */
-  private readonly DRAW_RADIUS = 2500;
+  private readonly DRAW_RADIUS = 2000;
   /** The distance scalar for the moon. */
   private readonly SCALAR_DISTANCE = 200000;
   /** The number of height segments for the moon. */

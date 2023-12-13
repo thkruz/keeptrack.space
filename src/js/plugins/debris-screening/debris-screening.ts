@@ -12,7 +12,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   bottomIconCallback = () => {
     if (!this.verifySatelliteSelected()) return;
 
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       const sat: SatObject = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY);

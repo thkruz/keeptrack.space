@@ -65,28 +65,28 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
               <label for="video-director-rotateSpeed" class="active">Rotate Speed</label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Rotate Camera to the Left">
+              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera to the Left">
                 <input id="video-director-rotateL" type="checkbox" checked/>
                 <span class="lever"></span>
                 Rotate Camera Left
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Rotate Camera to the Right">
+              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera to the Right">
                 <input id="video-director-rotateR" type="checkbox"/>
                 <span class="lever"></span>
                 Rotate Camera Right
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Rotate Camera Up">
+              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera Up">
                 <input id="video-director-rotateU" type="checkbox"/>
                 <span class="lever"></span>
                 Rotate Camera Up
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Rotate Camera Down">
+              <label data-position="top" data-delay="50" data-tooltip="Rotate Camera Down">
                 <input id="video-director-rotateD" type="checkbox"/>
                 <span class="lever"></span>
                 Rotate Camera Down
@@ -97,28 +97,28 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
               <label for="video-director-panSpeed" class="active">Pan Speed</label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Pan Camera Left">
+              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Left">
                 <input id="video-director-panL" type="checkbox"/>
                 <span class="lever"></span>
                 Pan Camera Left
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Pan Camera Right">
+              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Right">
                 <input id="video-director-panR" type="checkbox"/>
                 <span class="lever"></span>
                 Pan Camera Right
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Pan Camera Up">
+              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Up">
                 <input id="video-director-panU" type="checkbox"/>
                 <span class="lever"></span>
                 Pan Camera Up
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Pan Camera Down">
+              <label data-position="top" data-delay="50" data-tooltip="Pan Camera Down">
                 <input id="video-director-panD" type="checkbox"/>
                 <span class="lever"></span>
                 Pan Camera Down
@@ -129,21 +129,21 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
               <label for="video-director-zoomSpeed" class="active">Zoom Speed</label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Zoom Camera In">
+              <label data-position="top" data-delay="50" data-tooltip="Zoom Camera In">
                 <input id="video-director-zoomIn" type="checkbox"/>
                 <span class="lever"></span>
                 Zoom Camera In
               </label>
             </div>
             <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Zoom Camera Out">
+              <label data-position="top" data-delay="50" data-tooltip="Zoom Camera Out">
                 <input id="video-director-zoomOut" type="checkbox"/>
                 <span class="lever"></span>
                 Zoom Camera Out
               </label>
           </div>
           <div class="switch row">
-              <label class="tooltipped" data-position="right" data-delay="50" data-tooltip="Disable Selected Satellite Dot">
+              <label data-position="top" data-delay="50" data-tooltip="Disable Selected Satellite Dot">
                 <input id="video-director-selectedColor" type="checkbox"/>
                 <span class="lever"></span>
                 Disable Selected Satellite Dot

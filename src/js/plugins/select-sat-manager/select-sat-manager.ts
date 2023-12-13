@@ -1,7 +1,6 @@
 import { GetSatType, SatObject } from '@app/js/interfaces';
 import { isSatObject, keepTrackApi } from '@app/js/keepTrackApi';
-import { fadeIn, fadeOut } from '@app/js/lib/fade';
-import { getEl } from '@app/js/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/js/lib/get-el';
 import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { CameraType } from '@app/js/singletons/camera';
 
@@ -122,7 +121,10 @@ export class SelectSatManager extends KeepTrackPlugin {
 
       const rootElement = document.querySelector(':root') as HTMLElement;
       rootElement.style.setProperty('--search-box-bottom', `0px`);
-      fadeOut(getEl('sat-infobox', true));
+      const satInfoBoxDom = getEl('sat-infobox', true);
+      if (satInfoBoxDom) {
+        satInfoBoxDom.style.display = 'none';
+      }
 
       // Add Grey Out
       getEl('menu-satview', true)?.classList.add('bmenu-item-disabled');
@@ -207,8 +209,12 @@ export class SelectSatManager extends KeepTrackPlugin {
       // NOTE: This has to come after keepTrackApi.methods.selectSatData in catalogManagerInstance.setSelectedSat.
       const rootElement = document.querySelector(':root') as HTMLElement;
       const searchBoxHeight = getEl('sat-infobox')?.clientHeight;
-      rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
-      fadeIn(getEl('sat-infobox'));
+      // get --search-box-bottom
+      const curVal = rootElement.style.getPropertyValue('--search-box-bottom');
+      if (curVal !== searchBoxHeight + 'px') {
+        rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
+      }
+      showEl('sat-infobox');
     }
   }
 
@@ -218,7 +224,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       (id) => {
         const el = getEl(id, true);
         if (!el) return;
-        el.parentElement.style.display = 'none';
+        hideEl(el.parentElement.id);
       }
     );
 

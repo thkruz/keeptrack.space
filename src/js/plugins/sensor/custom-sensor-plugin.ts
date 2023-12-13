@@ -10,7 +10,7 @@ import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {
-    if (this.isMenuButtonEnabled) {
+    if (this.isMenuButtonActive) {
       const sensorManagerInstance = keepTrackApi.getSensorManager();
       if (sensorManagerInstance.isSensorSelected()) {
         (<HTMLInputElement>getEl('cs-lat')).value = sensorManagerInstance.currentSensors[0].lat.toString();
@@ -31,15 +31,15 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         <div class="row">
             <h5 class="center-align">Custom Sensor</h5>
             <form id="customSensor">
-            <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
+            <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
                 <input id="cs-lat" type="text" value="0" />
                 <label for="cs-lat" class="active">Latitude</label>
             </div>
-            <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
+            <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
                 <input id="cs-lon" type="text" value="0" />
                 <label for="cs-lon" class="active">Longitude</label>
             </div>
-            <div class="input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
+            <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
                 <input id="cs-hei" type="text" value="0" />
                 <label for="cs-hei" class="active">Elevation Above Sea Level (Km)</label>
             </div>
@@ -52,34 +52,34 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
                 </select>
                 <label>Type of Sensor</label>
             </div>
-            <div class="switch row tooltipped" data-position="right" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
+            <div class="switch row" data-position="top" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
                 <label>
                 <input id="cs-telescope" type="checkbox" checked="false" />
                 <span class="lever"></span>
                 Telescope
                 </label>
             </div>
-            <div id="cs-minaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
+            <div id="cs-minaz-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
                 <input id="cs-minaz" type="text" value="0" />
                 <label for="cs-minaz" class="active">Minimum Azimuth</label>
             </div>
-            <div id="cs-maxaz-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
+            <div id="cs-maxaz-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
                 <input id="cs-maxaz" type="text" value="360" />
                 <label for="cs-maxaz" class="active">Maximum Azimuth</label>
             </div>
-            <div id="cs-minel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
+            <div id="cs-minel-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
                 <input id="cs-minel" type="text" value="10" />
                 <label for="cs-minel" class="active">Minimum Elevation</label>
             </div>
-            <div id="cs-maxel-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
+            <div id="cs-maxel-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
                 <input id="cs-maxel" type="text" value="90" />
                 <label for="cs-maxel" class="active">Maximum Elevation</label>
             </div>
-            <div id="cs-minrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
+            <div id="cs-minrange-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
                 <input id="cs-minrange" type="text" value="100" />
                 <label for="cs-minrange" class="active">Minimum Range</label>
             </div>
-            <div id="cs-maxrange-div" class="start-hidden input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
+            <div id="cs-maxrange-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
                 <input id="cs-maxrange" type="text" value="50000" />
                 <label for="cs-maxrange" class="active">Maximum Range</label>
             </div>

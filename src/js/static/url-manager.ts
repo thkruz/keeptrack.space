@@ -21,7 +21,7 @@ export abstract class UrlManager {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (!uiManagerInstance.searchManager) return;
-    const currentSearch = uiManagerInstance.searchManager.getCurrentSearch();
+    const currentSearch = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
 
     if (settingsManager.isDisableUrlBar) return;
 

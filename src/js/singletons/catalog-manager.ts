@@ -571,7 +571,7 @@ export class StandardCatalogManager implements CatalogManager {
   }
 
   public lastSelectedSat(id?: number): number {
-    this.lastSelectedSat_ = id >= 0 ? id : this.lastSelectedSat_;
+    this.lastSelectedSat_ = id >= -1 ? id : this.lastSelectedSat_;
     return this.lastSelectedSat_;
   }
 
@@ -656,6 +656,7 @@ export class StandardCatalogManager implements CatalogManager {
     // If Old Select Sat Picked Color it Correct Color
     const lastSelectedObject = this.lastSelectedSat();
     if (lastSelectedObject !== -1) {
+      colorSchemeManagerInstance.currentColorScheme ??= colorSchemeManagerInstance.default;
       const newColor = colorSchemeManagerInstance.currentColorScheme(this.getSat(lastSelectedObject)).color;
       colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
       colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 1] = newColor[1]; // G

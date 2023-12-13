@@ -73,6 +73,10 @@ html body {
 #nav-wrapper {
   background: var(--colorTertiaryDarken3);
   z-index: 3;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
 }
 
 #nav-footer-toggle {
@@ -907,7 +911,7 @@ ul li {
   font-family: 'Roboto Mono', monospace;
   font-size: 20px;
   display: block;
-  padding-left: 10px;
+  padding: 0px 10px;
 }
 
 #datetime {
@@ -968,6 +972,12 @@ input:focus {
   align-items: center;
   font-size: 20px;
   font-family: 'Roboto Mono', monospace;
+}
+
+#nav-mobile2 {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 #sensor-selected:hover,
@@ -1408,4 +1418,71 @@ input:focus {
   width: 100%;
   height: 100%;
   border: none;
+}
+
+/****************************************************
+ * Tooltip Styles
+ ****************************************************/
+
+/* Add this attribute to the element that needs a tooltip */
+[data-tooltip] {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+}
+
+/* Hide the tooltip content by default */
+[data-tooltip]:before,
+[data-tooltip]:after {
+  visibility: hidden;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Position tooltip above all other elements */
+[data-tooltip]:before {
+  z-index: 9999;
+  position: absolute;
+  display: block;
+  width: 120px;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  overflow: visible;
+
+  background-color: #1f3347;
+  text-align: center;
+  padding: 5px;
+  border-width: 5px;
+  border-color: var(--colorTertiaryDarken3);
+  border-style: solid;
+  color: #ffffff;
+  content: attr(data-tooltip);
+}
+
+[data-tooltip][data-position='bottom']:before {
+  bottom: -100%;
+  left: 50%;
+}
+[data-tooltip][data-position='top']:before {
+  bottom: 125%;
+  top: auto;
+  left: 50%;
+}
+[data-tooltip][data-position='left']:before {
+  right: 100%;
+  left: auto;
+}
+[data-tooltip][data-position='right']:before {
+  left: 100%;
+  right: auto;
+}
+
+/* Show tooltip content on hover */
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after {
+  visibility: visible;
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';
+  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
 }

@@ -16,7 +16,7 @@ export class EcfPlot extends KeepTrackPlugin {
   bottomIconLabel = 'ECF Plots';
   bottomIconImg = scatterPlotPng3;
   bottomIconCallback = () => {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     this.createPlot(EcfPlot.getPlotData(), getEl(this.plotCanvasId));
   };
@@ -64,7 +64,7 @@ export class EcfPlot extends KeepTrackPlugin {
         } else {
           this.setBottomIconToDisabled();
         }
-        if (!this.isMenuButtonEnabled) return;
+        if (!this.isMenuButtonActive) return;
 
         // This runs if the menu is open
         if (!sat) {
@@ -78,7 +78,7 @@ export class EcfPlot extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     // Delete any old charts and start fresh
     if (this.chart) {

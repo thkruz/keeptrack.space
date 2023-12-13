@@ -1,9 +1,9 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
+import { Milliseconds } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
-import { Milliseconds } from 'ootk';
 
 describe('TimeMachine_class', () => {
   let timeMachinePlugin: TimeMachine;
@@ -25,7 +25,7 @@ describe('TimeMachine_class', () => {
     settingsManager.timeMachineDelay = <Milliseconds>0;
     keepTrackApi.methods.bottomMenuClick(timeMachinePlugin.bottomIconElementName);
     jest.advanceTimersByTime(1000);
-    expect(timeMachinePlugin.isMenuButtonEnabled).toBe(true);
+    expect(timeMachinePlugin.isMenuButtonActive).toBe(true);
     jest.advanceTimersByTime(10000);
   }, 15000);
 });

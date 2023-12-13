@@ -10,6 +10,13 @@ import { LineManager } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import { HoverManager } from './hover-manager';
 
+export interface OrbitCruncherMessageMain {
+  data: {
+    pointsOut: number[];
+    satId: number;
+  };
+}
+
 /* export const setOrbit = function (satId: number) {
 let sat = catalogManagerInstance.getSat(satId: number);
 mat4.identity(mat4.create());
@@ -40,20 +47,20 @@ export class StandardOrbitManager implements OrbitManager {
   private gl_: WebGL2RenderingContext;
   private hoverOrbitBuf_: WebGLBuffer;
   private inProgress_ = <boolean[]>[];
-  private initialized_ = false;
+  private isInitialized_ = false;
   private lineManagerInstance_: LineManager;
   private secondaryOrbitBuf_: WebGLBuffer;
   private secondarySelectId_ = -1;
   private selectOrbitBuf_: WebGLBuffer;
-  private updateAllThrottle = 0;
+  private updateAllThrottle_ = 0;
 
   orbitWorker = null;
   playNextSatellite = null;
   tempTransColor: [number, number, number, number] = [0, 0, 0, 0];
 
   addInViewOrbit(satId: number): void {
-    for (let i = 0; i < this.currentInView_.length; i++) {
-      if (satId === this.currentInView_[i]) return;
+    for (const inViewSatId of this.currentInView_) {
+      if (satId === inViewSatId) return;
     }
     this.currentInView_.push(satId);
     this.updateOrbitBuffer(satId);
@@ -95,7 +102,7 @@ export class StandardOrbitManager implements OrbitManager {
     colorSchemeManagerInstance: ColorSchemeManager,
     mainCameraInstance: Camera
   ): void {
-    if (!this.initialized_) return;
+    if (!this.isInitialized_) return;
     const gl = this.gl_;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
@@ -133,44 +140,26 @@ export class StandardOrbitManager implements OrbitManager {
     }
   }
 
+  drawOrbitsSettingChanged(): void {
+    // We may have skipped initialization on boot and now need to do it
+    if (!this.isInitialized_) {
+      this.init(this.lineManagerInstance_, this.gl_);
+    }
+  }
+
   init(lineManagerInstance: LineManager, gl: WebGL2RenderingContext, orbitWorker?: Worker): void {
+    this.lineManagerInstance_ = lineManagerInstance;
+    this.gl_ = gl;
+
     if (!settingsManager.isDrawOrbits) return;
 
     this.tempTransColor = settingsManager.colors.transparent;
-
-    this.lineManagerInstance_ = lineManagerInstance;
-    this.gl_ = gl;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // See if we are running jest right now for testing
-    if (isThisNode()) {
-      if (typeof orbitWorker !== 'undefined') {
-        this.orbitWorker = orbitWorker;
-      } else {
-        this.orbitWorker = {
-          postMessage: () => {
-            // This is intentional
-          },
-        } as any;
-      }
-    } else {
-      if (typeof Worker === 'undefined') {
-        throw new Error('Your browser does not support web workers.');
-      }
-      try {
-        this.orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
-      } catch (error) {
-        // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
-        if (window.location.href.indexOf('file://') === 0) {
-          getEl('loader-text').innerText =
-            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.';
-        } else {
-          errorManagerInstance.error(error, 'OrbitManager.init', 'Failed to create orbit web worker!');
-        }
-      }
-    }
+    this.startCruncher_(orbitWorker);
 
-    this.orbitWorker.onmessage = this.workerOnMessage.bind(this);
+    this.orbitWorker.onmessage = this.workerOnMessage_.bind(this);
 
     this.selectOrbitBuf_ = this.gl_.createBuffer();
     this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, this.selectOrbitBuf_);
@@ -198,9 +187,38 @@ export class StandardOrbitManager implements OrbitManager {
       satData: satDataString,
       numSegs: settingsManager.orbitSegments,
     });
-    this.initialized_ = true;
+    this.isInitialized_ = true;
 
     keepTrackApi.methods.orbitManagerInit();
+  }
+
+  private startCruncher_(orbitWorker?: Worker) {
+    if (isThisNode()) {
+      if (typeof orbitWorker !== 'undefined') {
+        this.orbitWorker = orbitWorker;
+      } else {
+        this.orbitWorker = {
+          postMessage: () => {
+            // This is intentional
+          },
+        } as any;
+      }
+    } else {
+      if (typeof Worker === 'undefined') {
+        throw new Error('Your browser does not support web workers.');
+      }
+      try {
+        this.orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+      } catch (error) {
+        // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
+        if (window.location.href.startsWith('file://')) {
+          getEl('loader-text').innerText =
+            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.';
+        } else {
+          errorManagerInstance.error(error, 'OrbitManager.init', 'Failed to create orbit web worker!');
+        }
+      }
+    }
   }
 
   removeInViewOrbit(satId: number): void {
@@ -232,9 +250,9 @@ export class StandardOrbitManager implements OrbitManager {
     if (uiManagerInstance.searchManager.isResultsOpen() && !settingsManager.disableUI && !settingsManager.lowPerf) {
       const currentSearchSats = uiManagerInstance.searchManager.getLastResultGroup()?.objects;
       if (typeof currentSearchSats !== 'undefined') {
-        if (this.updateAllThrottle >= currentSearchSats.length) this.updateAllThrottle = 0;
-        for (let i = 0; this.updateAllThrottle < currentSearchSats.length && i < 5; this.updateAllThrottle++, i++) {
-          this.updateOrbitBuffer(currentSearchSats[this.updateAllThrottle]);
+        if (this.updateAllThrottle_ >= currentSearchSats.length) this.updateAllThrottle_ = 0;
+        for (let i = 0; this.updateAllThrottle_ < currentSearchSats.length && i < 5; this.updateAllThrottle_++, i++) {
+          this.updateOrbitBuffer(currentSearchSats[this.updateAllThrottle_]);
         }
       }
     }
@@ -353,11 +371,12 @@ export class StandardOrbitManager implements OrbitManager {
       // gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
       groupManagerInstance.selectedGroup.objects.forEach((id: number) => {
         if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) return; // Skip hover and select objects
-        if (typeof colorSchemeManagerInstance.colorData[id * 4] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
-        if (typeof colorSchemeManagerInstance.colorData[id * 4 + 1] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
-        if (typeof colorSchemeManagerInstance.colorData[id * 4 + 2] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
-        if (typeof colorSchemeManagerInstance.colorData[id * 4 + 3] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
         if (!satData[id].active) return; // Skip inactive objects
+
+        for (let i = 0; id < 4; id++) {
+          if (typeof colorSchemeManagerInstance.colorData[id * i] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
+        }
+
         if (keepTrackApi.getCatalogManager().selectedSat !== id) {
           // if color is black, we probably have old data, so recalculate color buffers
           if (
@@ -390,6 +409,7 @@ export class StandardOrbitManager implements OrbitManager {
             // throw new Error(`color buffer for ${id} isn't visible`);
           }
         }
+
         this.lineManagerInstance_.setColorUniforms([
           colorSchemeManagerInstance.colorData[id * 4],
           colorSchemeManagerInstance.colorData[id * 4 + 1],
@@ -448,7 +468,7 @@ export class StandardOrbitManager implements OrbitManager {
     }
   }
 
-  private workerOnMessage(m: any): void {
+  private workerOnMessage_(m: OrbitCruncherMessageMain): void {
     let satId = m.data.satId;
     let pointsOut = new Float32Array(m.data.pointsOut);
     const gl = this.gl_;

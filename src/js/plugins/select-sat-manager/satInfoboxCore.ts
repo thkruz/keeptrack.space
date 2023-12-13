@@ -11,7 +11,6 @@ import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/
 import { SearchManager } from '@app/js/singletons/search-manager';
 import { CatalogSource } from '@app/js/static/catalog-loader';
 import { CatalogSearch } from '@app/js/static/catalog-search';
-import { FormatTle } from '@app/js/static/format-tle';
 import { SatMath } from '@app/js/static/sat-math';
 import { StringExtractor } from '@app/js/static/string-extractor';
 import Draggabilly from 'draggabilly';
@@ -103,7 +102,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       }, 500);
     }
 
-    SatInfoBoxCore.updateOrbitData(sat);
+    this.updateOrbitData(sat);
   }
 
   private static nearObjectsLinkClick(distance: number = 100): void {
@@ -171,7 +170,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [catalogManagerInstance.selectedSat, catalogManagerInstance.secondarySat], 'b');
   }
 
-  private static updateOrbitData = (sat: SatObject): void => {
+  private updateOrbitData = (sat: SatObject): void => {
     if (!sat.missile && typeof sat.staticNum === 'undefined') {
       getEl('sat-apogee').innerHTML = sat.apogee.toFixed(0) + ' km';
       getEl('sat-perigee').innerHTML = sat.perigee.toFixed(0) + ' km';
@@ -211,16 +210,22 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       elsetAgeDom.dataset.tooltip = 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString();
     }
 
-    getEl('sat-add-remove-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
-    getEl('all-objects-link').addEventListener('click', SatInfoBoxCore.allObjectsLink);
-    getEl('near-orbits-link').addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
-    getEl('near-objects-link1').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
-    getEl('near-objects-link2').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(200));
-    getEl('near-objects-link4').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(400));
-    getEl('sun-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSun);
-    getEl('nadir-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToEarth);
-    getEl('sec-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSat);
+    if (!this.isTopLinkEventListenersAdded) {
+      getEl('sat-add-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
+      getEl('sat-remove-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
+      getEl('all-objects-link').addEventListener('click', SatInfoBoxCore.allObjectsLink);
+      getEl('near-orbits-link').addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
+      getEl('near-objects-link1').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
+      getEl('near-objects-link2').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(200));
+      getEl('near-objects-link4').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(400));
+      getEl('sun-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSun);
+      getEl('nadir-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToEarth);
+      getEl('sec-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSat);
+      this.isTopLinkEventListenersAdded = true;
+    }
   };
+
+  isTopLinkEventListenersAdded = false;
 
   secondaryData = (sat: SatObject): void => {
     if (sat === null || typeof sat === 'undefined') return;
@@ -289,15 +294,16 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
 
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
     if (watchlistPlugin) {
-      getEl('sat-add-remove-watchlist').style.display = 'block';
-
       if (watchlistPlugin.isOnWatchlist(sat.id)) {
-        (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = removePng;
+        getEl('sat-remove-watchlist').style.display = 'block';
+        getEl('sat-add-watchlist').style.display = 'none';
       } else {
-        (<HTMLImageElement>getEl('sat-add-remove-watchlist')).src = addPng;
+        getEl('sat-add-watchlist').style.display = 'block';
+        getEl('sat-remove-watchlist').style.display = 'none';
       }
     } else {
-      getEl('sat-add-remove-watchlist').style.display = 'none';
+      getEl('sat-add-watchlist').style.display = 'none';
+      getEl('sat-remove-watchlist').style.display = 'none';
     }
 
     SatInfoBoxCore.updateSatType(sat);
@@ -318,8 +324,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       } else {
         const satObjNumDom = getEl('sat-objnum');
         satObjNumDom.innerHTML = sat.sccNum;
-        satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
-        window.M.Tooltip.init(satObjNumDom);
+        // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
       getEl('sat-altid').innerHTML = sat.altId || 'N/A';
@@ -406,17 +411,17 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       keepTrackApi.html`
             <div class="sat-info-section-header">Object Data</div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Type of Object">Type</div>
               <div class="sat-info-value" id="sat-type">PAYLOAD</div>
             </div>
             <div class="sat-info-row sat-only-info">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Country That Owns the Object">Country</div>
               <div class="sat-info-value" id="sat-country">COUNTRY</div>
             </div>
             <div class="sat-info-row" id="sat-site-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Location Where Object Launched From">Launch Site</div>
               <div class="sat-info-value">
                 <div id="sat-site">SITE</div>
@@ -424,12 +429,12 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
               </div>
               </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Space Lift Vehicle That Launched Object">Rocket</div>
               <div class="sat-info-value menu-selectable" id="sat-vehicle">VEHICLE</div>
             </div>
             <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Configuration of the Rocket">
               Configuration
             </div>
@@ -438,14 +443,14 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Radar Cross Section - How reflective the object is to a radar">
               RCS
             </div>
-            <div class="sat-info-value tooltipped" data-position="top" data-delay="50" id="sat-rcs">NO DATA</div>
+            <div class="sat-info-value" data-position="top" data-delay="50" id="sat-rcs">NO DATA</div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Standard Magnitude - Smaller Numbers Are Brighter">
               Standard Mag
             </div>
@@ -464,28 +469,28 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
           <div id="secondary-sat-info">
             <div class="sat-info-section-header">Secondary Satellite</div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Linear Distance from Secondary Satellite">
                 Linear
               </div>
               <div class="sat-info-value" id="sat-sec-dist">xxxx km</div>
             </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Radial Distance">
                 Radial
               </div>
               <div class="sat-info-value" id="sat-sec-rad">XX deg</div>
             </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="In-Track Distance from Secondary Satellite">
                 In-Track
               </div>
               <div class="sat-info-value" id="sat-sec-intrack">XX deg</div>
             </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Cross-Track Distance from Secondary Satellite">
                 Cross-Track
               </div>
@@ -503,39 +508,40 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
               <div id="sat-info-top-links">
                 <div id="sat-info-title" class="center-text sat-info-section-header">
-                  <img id="sat-add-remove-watchlist" src="${addPng}"/>
+                  <img id="sat-add-watchlist" src="${addPng}"/>
+                  <img id="sat-remove-watchlist" src="${removePng}"/>
                   <span id="sat-info-title-name">
                     This is a title
                   </span>
                 </div>
-                <div id="all-objects-link" class="link sat-infobox-links sat-only-info tooltipped" data-position="top" data-delay="50"
+                <div id="all-objects-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
                 data-tooltip="Find Related Objects">Find all objects from this launch...</div>
-                <div id="near-orbits-link" class="link sat-infobox-links sat-only-info tooltipped" data-position="top" data-delay="50"
+                <div id="near-orbits-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
                 data-tooltip="Find Objects in Orbital Plane">Find all objects near this orbit...</div>
-                <div id="near-objects-link1" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                <div id="near-objects-link1" class="link sat-infobox-links" data-position="top" data-delay="50"
                 data-tooltip="Find Nearby Objects">Find all objects within 100km...</div>
-                <div id="near-objects-link2" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                <div id="near-objects-link2" class="link sat-infobox-links" data-position="top" data-delay="50"
                 data-tooltip="Find Nearby Objects">Find all objects within 200km...</div>
-                <div id="near-objects-link4" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                <div id="near-objects-link4" class="link sat-infobox-links" data-position="top" data-delay="50"
                 data-tooltip="Find Nearby Objects">Find all objects within 400km...</div>
-                <div id="sun-angle-link" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                <div id="sun-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                 data-tooltip="Visualize Angle to Sun">Draw sat to sun line...</div>
-                <div id="nadir-angle-link" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                <div id="nadir-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                 data-tooltip="Visualize Angle to Earth">Draw sat to nadir line...</div>
-                <div id="sec-angle-link" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+                <div id="sec-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                 data-tooltip="Visualize Angle to Secondary Satellite">Draw sat to second sat line...</div>
               </div>
               <div id="sat-identifier-data">
                 <div class="sat-info-section-header">Identifiers</div>
                 <div class="sat-info-row sat-only-info">
-                  <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                  <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="International Designator - Launch Year, Launch Number, and Piece Designator">COSPAR</div>
                   <div class="sat-info-value" id="sat-intl-des">xxxx-xxxA</div>
                 </div>
                 <div class="sat-info-row sat-only-info">
-                  <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                  <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="USSF Catalog Number - Originally North American Air Defense (NORAD)">NORAD</div>
-                  <div class="sat-info-value tooltipped" id="sat-objnum" data-position="top" data-delay="50">99999</div>
+                  <div class="sat-info-value" id="sat-objnum" data-position="top" data-delay="50">99999</div>
                 </div>
                 <div class="sat-info-row sat-only-info">
                   <div class="sat-info-key">Alt Name</div>
@@ -556,84 +562,84 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
               </div>
               <div class="sat-info-section-header">Orbit Data</div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Highest Point in the Orbit">
                   Apogee
                 </div>
                 <div class="sat-info-value" id="sat-apogee">xxx km</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Lowest Point in the Orbit">
                   Perigee
                 </div>
                 <div class="sat-info-value" id="sat-perigee">xxx km</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Angle Measured from Equator on the Ascending Node">
                   Inclination
                 </div>
                 <div class="sat-info-value" id="sat-inclination">xxx.xx</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="How Circular the Orbit Is (0 is a Circle)">
                   Eccentricity
                 </div>
                 <div class="sat-info-value" id="sat-eccentricity">x.xx</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Where it Rises Above the Equator">
                   Right Asc.
                 </div>
                 <div class="sat-info-value" id="sat-raan">x.xx</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Where the Lowest Part of the Orbit Is">
                   Arg of Perigee
                 </div>
                 <div class="sat-info-value" id="sat-argPe">x.xx</div>
               </div>
               <div class="sat-info-row">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Current Latitude Over Earth">
                   Latitude
                 </div>
                 <div class="sat-info-value" id="sat-latitude">x.xx</div>
               </div>
               <div class="sat-info-row">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Current Longitude Over Earth">
                   Longitude
                 </div>
                 <div class="sat-info-value" id="sat-longitude">x.xx</div>
               </div>
               <div class="sat-info-row">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Current Altitude Above Sea Level">
                   Altitude
                 </div>
                 <div class="sat-info-value" id="sat-altitude">xxx km</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Time for One Complete Revolution Around Earth">
                   Period
                 </div>
                 <div class="sat-info-value" id="sat-period">xxx min</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Current Velocity of the Satellite (Higher the Closer to Earth it Is)">
                   Velocity
                 </div>
                 <div class="sat-info-value" id="sat-velocity">xxx km/s</div>
               </div>
               <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
                   Age of ELSET
                 </div>
@@ -733,21 +739,17 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         const rcs = historicRcs.map((rcs_) => parseFloat(rcs_)).reduce((a, b) => a + b, 0) / historicRcs.length;
         satRcsEl.innerHTML = `H-Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(rcs).toFixed(2) + ' dBsm (Historical Estimate)');
-        window.M.Tooltip.init(satRcsEl);
       } else if (sat.length && sat.diameter && sat.span && sat.shape) {
         const rcs = SatMath.estimateRcs(parseFloat(sat.length), parseFloat(sat.diameter), parseFloat(sat.span), sat.shape);
         satRcsEl.innerHTML = `Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('data-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
-        window.M.Tooltip.init(satRcsEl);
       } else {
         satRcsEl.innerHTML = `Unknown`;
         satRcsEl.setAttribute('data-tooltip', 'Unknown');
-        window.M.Tooltip.init(satRcsEl);
       }
     } else {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
       satRcsEl.setAttribute('data-tooltip', SatMath.mag2db(parseFloat(sat.rcs)).toFixed(2) + ' dBsm');
-      window.M.Tooltip.init(satRcsEl);
     }
   }
 
@@ -794,7 +796,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         <div id="sat-mission-data">
           <div class="sat-info-section-header">Mission</div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Primary User of the Satellite">
               User
             </div>
@@ -803,7 +805,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Main Function of the Satellite">
               Purpose
             </div>
@@ -812,7 +814,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Contractor Who Built the Satellite">
               Contractor
             </div>
@@ -821,7 +823,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Mass at Lift Off">
               Lift Mass
             </div>
@@ -830,7 +832,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50" data-tooltip="Unfueled Mass">
+            <div class="sat-info-key" data-position="top" data-delay="50" data-tooltip="Unfueled Mass">
               Dry Mass
             </div>
             <div class="sat-info-value" id="sat-dryMass">
@@ -838,7 +840,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="How Long the Satellite was Expected to be Operational">
               Life Expectancy
             </div>
@@ -847,7 +849,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Satellite Bus">
               Bus
             </div>
@@ -856,7 +858,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Primary Payload">
               Payload
             </div>
@@ -865,7 +867,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Primary Motor">
               Motor
             </div>
@@ -874,7 +876,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Length in Meters">
               Length
             </div>
@@ -883,7 +885,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Diameter in Meters">
               Diameter
             </div>
@@ -892,7 +894,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Span in Meters">
               Span
             </div>
@@ -901,7 +903,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Description of Shape">
               Shape
             </div>
@@ -910,7 +912,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
             </div>
           </div>
           <div class="sat-info-row sat-only-info">
-            <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Power of the Satellite">
               Power
             </div>
@@ -1147,56 +1149,56 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
           <div id="sensor-sat-info">
           <div class="sat-info-section-header">Sensor Data</div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Distance from the Sensor">
                 Range
               </div>
               <div class="sat-info-value" id="sat-range">xxxx km</div>
             </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Angle (Left/Right) from the Sensor">
                 Azimuth
               </div>
               <div class="sat-info-value" id="sat-azimuth">XX deg</div>
             </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Angle (Up/Down) from the Sensor">
                 Elevation
               </div>
               <div class="sat-info-value" id="sat-elevation">XX deg</div>
             </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Linear Width at Target's Range">
                 Beam Width
               </div>
               <div class="sat-info-value" id="sat-beamwidth">xxxx km</div>
             </div>
             <div class="sat-info-row">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Time for RF/Light to Reach Target and Back">
                 Max Tmx Time
               </div>
               <div class="sat-info-value" id="sat-maxTmx">xxxx ms</div>
             </div>
             <div class="sat-info-row sat-only-info">
-              <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Does the Sun Impact the Sensor">
                 Sun
               </div>
               <div class="sat-info-value" id="sat-sun">Sun Stuff</div>
             </div>
             <div class="sat-info-row sat-only-info">
-                <div class="sat-info-key tooltipped" data-position="top" data-delay="50"
+                <div class="sat-info-key" data-position="top" data-delay="50"
                   data-tooltip="Visual Magnitude (Lower numbers are brighter)">
                   Vis Mag
                 </div>
                 <div class="sat-info-value" id="sat-vmag">xx.x</div>
               </div>
             <div id="sat-info-nextpass-row" class="sat-info-row sat-only-info">
-              <div id="sat-info-nextpass" class="sat-info-key tooltipped" data-position="top" data-delay="50"
+              <div id="sat-info-nextpass" class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Next Time in Coverage">
                 Next Pass
               </div>

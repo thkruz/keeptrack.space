@@ -33,27 +33,27 @@ export class ShortTermFences extends KeepTrackPlugin {
       <div class="row">
         <h5 class="center-align">Short Term Fence</h5>
         <form id="stfForm">
-          <div id="stf-az-div" class=" input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Search Center Azimuth Point in degrees (ex: 50)">
+          <div id="stf-az-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Azimuth Point in degrees (ex: 50)">
             <input id="stf-az" type="text" value="50" />
             <label for="stf-az" class="active">Center Azimuth</label>
           </div>
-          <div id="stf-azExt-div" class=" input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in degrees (ex: 4)">
+          <div id="stf-azExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in degrees (ex: 4)">
             <input id="stf-azExt" type="text" value="4" />
             <label for="stf-azExt" class="active">Azimuth Extent</label>
           </div>
-          <div id="stf-el-div" class=" input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Search Center Elevation Point in degrees (ex: 20)">
+          <div id="stf-el-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Elevation Point in degrees (ex: 20)">
             <input id="stf-el" type="text" value="20" />
             <label for="stf-el" class="active">Center Elevation</label>
           </div>
-          <div id="stf-elExt-div" class=" input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in degrees (ex: 4)">
+          <div id="stf-elExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in degrees (ex: 4)">
             <input id="stf-elExt" type="text" value="4" />
             <label for="stf-elExt" class="active">Elevation Extent</label>
           </div>
-          <div id="stf-rng-div" class=" input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Search Center Range Point in kilometers (ex: 1000)">
+          <div id="stf-rng-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Range Point in kilometers (ex: 1000)">
             <input id="stf-rng" type="text" value="1000" />
             <label for="stf-rng" class="active">Center Range</label>
           </div>
-          <div id="stf-rngExt-div" class=" input-field col s12 tooltipped" data-position="right" data-delay="50" data-tooltip="Total Extent Outside of Center Range in kilometers (ex: 100)">
+          <div id="stf-rngExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Range in kilometers (ex: 100)">
             <input id="stf-rngExt" type="text" value="100" />
             <label for="stf-rngExt" class="active">Range Extent</label>
           </div>
@@ -94,7 +94,7 @@ export class ShortTermFences extends KeepTrackPlugin {
           getEl('sat-info-top-links').insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`
-            <div id="stf-on-object-link" class="link sat-infobox-links tooltipped" data-position="top" data-delay="50"
+            <div id="stf-on-object-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
             `
           );
@@ -146,7 +146,7 @@ export class ShortTermFences extends KeepTrackPlugin {
   }
 
   closeAndDisable(): void {
-    this.isMenuButtonEnabled = false;
+    this.isMenuButtonActive = false;
     this.setBottomIconToUnselected();
     this.setBottomIconToDisabled();
     keepTrackApi.getUiManager().hideSideMenus();
@@ -223,7 +223,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     keepTrackApi.getUiManager().hideSideMenus();
     slideInRight(getEl('stf-menu'), 1000);
-    this.isMenuButtonEnabled = true;
+    this.isMenuButtonActive = true;
     this.setBottomIconToSelected();
   }
 }

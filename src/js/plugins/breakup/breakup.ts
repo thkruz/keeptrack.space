@@ -133,7 +133,7 @@ export class Breakup extends KeepTrackPlugin {
   The larger the variation the bigger the spread in the simulated breakup. The default variations are sufficient to simulate a breakup with a reasonable spread.`;
 
   private updateSccNumInMenu_() {
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
     const sat: SatObject = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
     (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
   }
@@ -157,13 +157,13 @@ export class Breakup extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
         if (!sat?.TLE1) {
-          if (this.isMenuButtonEnabled) {
+          if (this.isMenuButtonActive) {
             this.closeSideMenu();
           }
           this.setBottomIconToUnselected();
           this.setBottomIconToDisabled();
         } else if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
-          if (this.isMenuButtonEnabled) {
+          if (this.isMenuButtonActive) {
             this.closeSideMenu();
             errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
           }
@@ -171,7 +171,7 @@ export class Breakup extends KeepTrackPlugin {
           this.setBottomIconToDisabled();
         } else {
           this.setBottomIconToEnabled();
-          if (this.isMenuButtonEnabled) {
+          if (this.isMenuButtonActive) {
             this.updateSccNumInMenu_();
           }
         }

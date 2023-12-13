@@ -34,7 +34,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       return;
     }
 
-    if (!this.isMenuButtonEnabled) return;
+    if (!this.isMenuButtonActive) return;
 
     if (watchlistPlugin.watchlistList.length === 0 && !watchlistPlugin.isWatchlistChanged) {
       keepTrackApi.getUiManager().toast(`Add Satellites to Watchlist!`, 'caution');
@@ -246,7 +246,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   private updateNextPassOverlay_(isForceUpdate = false) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    if (this.nextPassArray.length <= 0 && !this.isMenuButtonEnabled) return;
+    if (this.nextPassArray.length <= 0 && !this.isMenuButtonActive) return;
     // TODO: This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
     const mainCameraInstance = keepTrackApi.getMainCamera();

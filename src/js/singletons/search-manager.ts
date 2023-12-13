@@ -431,13 +431,13 @@ export class SearchManager {
 
     if ((!this.isSearchOpen && !this.forceClose) || this.forceOpen) {
       this.isSearchOpen = true;
-      getEl('search-holder').classList.remove('search-slide-up');
-      getEl('search-holder').classList.add('search-slide-down');
-      getEl('search-icon').classList.add('search-icon-search-on');
-      getEl('fullscreen-icon').classList.add('top-menu-icons-search-on');
-      getEl('tutorial-icon').classList.add('top-menu-icons-search-on');
-      getEl('legend-icon').classList.add('top-menu-icons-search-on');
-      getEl('sound-icon').classList.add('top-menu-icons-search-on');
+      getEl('search-holder').classList?.remove('search-slide-up');
+      getEl('search-holder').classList?.add('search-slide-down');
+      getEl('search-icon').classList?.add('search-icon-search-on');
+      getEl('fullscreen-icon').classList?.add('top-menu-icons-search-on');
+      getEl('tutorial-icon').classList?.add('top-menu-icons-search-on');
+      getEl('legend-icon').classList?.add('top-menu-icons-search-on');
+      getEl('sound-icon').classList?.add('top-menu-icons-search-on');
 
       const curSearch = (<HTMLInputElement>getEl('search')).value;
       if (curSearch.length > settingsManager.minimumSearchCharacters) {
@@ -445,14 +445,14 @@ export class SearchManager {
       }
     } else {
       this.isSearchOpen = false;
-      getEl('search-holder').classList.remove('search-slide-down');
-      getEl('search-holder').classList.add('search-slide-up');
-      getEl('search-icon').classList.remove('search-icon-search-on');
+      getEl('search-holder').classList?.remove('search-slide-down');
+      getEl('search-holder').classList?.add('search-slide-up');
+      getEl('search-icon').classList?.remove('search-icon-search-on');
       setTimeout(function () {
-        getEl('fullscreen-icon').classList.remove('top-menu-icons-search-on');
-        getEl('tutorial-icon').classList.remove('top-menu-icons-search-on');
-        getEl('legend-icon').classList.remove('top-menu-icons-search-on');
-        getEl('sound-icon').classList.remove('top-menu-icons-search-on');
+        getEl('fullscreen-icon').classList?.remove('top-menu-icons-search-on');
+        getEl('tutorial-icon').classList?.remove('top-menu-icons-search-on');
+        getEl('legend-icon').classList?.remove('top-menu-icons-search-on');
+        getEl('sound-icon').classList?.remove('top-menu-icons-search-on');
       }, 500);
       this.uiManager_.hideSideMenus();
       this.hideResults();

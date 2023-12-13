@@ -5,7 +5,6 @@ import { SpaceObjectType } from '@app/js/lib/space-object-type';
 import { CameraType } from '@app/js/singletons/camera';
 
 import { errorManagerInstance } from '@app/js/singletons/errorManager';
-import { SearchManager } from '@app/js/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 
@@ -33,7 +32,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   checkIfSelectSatVisible() {
     if (keepTrackApi.getPlugin(TopMenu)) {
-      const searchVal = SearchManager.getCurrentSearch();
+      const searchVal = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
 
       // Base CSS Style based on if the search box is open or not
       let cssStyle = searchVal.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';

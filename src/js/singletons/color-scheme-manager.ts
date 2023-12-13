@@ -31,7 +31,6 @@ import { getDayOfYear } from '../lib/transforms';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { PersistenceManager, StorageKey } from './persistence-manager';
-import { SearchManager } from './search-manager';
 
 export class StandardColorSchemeManager implements ColorSchemeManager {
   private readonly DOTS_PER_CALC = 450;
@@ -1514,7 +1513,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       const watchlistTransform = watchlistMenu?.style.transform || '';
 
       if (
-        SearchManager.getCurrentSearch() === '' &&
+        keepTrackApi.getUiManager().searchManager.getCurrentSearch() === '' &&
         watchlistTransform !== 'translateX(0px)' &&
         !keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive &&
         !(<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning

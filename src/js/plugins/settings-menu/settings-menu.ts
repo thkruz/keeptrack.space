@@ -5,7 +5,6 @@ import { rgbCss } from '@app/js/lib/rgbCss';
 
 import { parseRgba } from '@app/js/lib/rgba';
 import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
-import { SearchManager } from '@app/js/singletons/search-manager';
 import { LegendManager } from '@app/js/static/legend-manager';
 import $ from 'jquery'; // TODO: Remove Color Picker
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -685,7 +684,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       uiManagerInstance.toast('Invalid max search sats value!', 'critical');
     } else {
       settingsManager.searchLimit = maxSearchSats;
-      uiManagerInstance.searchManager.doSearch(SearchManager.getCurrentSearch());
+      uiManagerInstance.searchManager.doSearch(keepTrackApi.getUiManager().searchManager.getCurrentSearch());
     }
 
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);

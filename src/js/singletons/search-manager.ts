@@ -50,13 +50,15 @@ export class SearchManager {
   /**
    * Returns the current search string entered by the user.
    */
-  static getCurrentSearch(): string {
-    const searchDom = <HTMLInputElement>getEl('search');
-    if (searchDom) {
-      return searchDom.value;
-    } else {
-      return '';
+  getCurrentSearch(): string {
+    if (this.resultsOpen_) {
+      const searchDom = <HTMLInputElement>getEl('search', true);
+      if (searchDom) {
+        return searchDom.value;
+      }
     }
+
+    return '';
   }
 
   public isResultsOpen(): boolean {

@@ -366,6 +366,8 @@ export class WebGLRenderer {
 
   resizeCanvas(isForcedResize: boolean = false) {
     const gl = this.gl;
+    if (!gl.canvas) return; // Avoids errors when the canvas is not available
+
     const { vw, vh } = WebGLRenderer.getCanvasInfo();
 
     // If taking a screenshot then resize no matter what to get high resolution

@@ -1,0 +1,59 @@
+#logo {
+  position: absolute;
+  display: block;
+  color: white;
+  font-family: nasalization, sans-serif;
+  font-size: large;
+  bottom: 2%;
+  width: 100%;
+  text-align: center;
+  z-index: 1000;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+#sat-hoverbox {
+  text-align: center;
+  padding: 20px !important;
+}
+
+#sat-hoverbox1,
+#sat-hoverbox2,
+#sat-hoverbox3 {
+  display: block;
+  margin: -5px;
+}
+
+body,
+#keeptrack-canvas {
+  overflow: hidden;
+}
+
+.toast,
+.toast-container {
+  display: none !important;
+}
+
+#textOverlay {
+  border-radius: 2px;
+  bottom: 75px;
+  right: 150px;
+  width: auto;
+  position: absolute;
+  min-height: 48px;
+  line-height: 2.5em !important;
+  background-color: rgb(255, 255, 25) !important;
+  padding: 10px 55px !important;
+  font-size: 1.8rem !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-weight: 300;
+  color: #000000;
+}

@@ -1,0 +1,1 @@
+C:\Windows\System32\cmd.exe /C start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" --allow-file-access-from-files " "%CD%/index.html"

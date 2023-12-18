@@ -19,7 +19,6 @@ export const generateConfig = (env, isWatch) => {
   switch (env) {
     case 'embed':
     case 'embedDev':
-    case 'lib':
       // this is for embedding the app in a web page
       baseConfig = getEmbedConfig(baseConfig);
       break;
@@ -39,7 +38,7 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // Add source map if in these modes
-  if (env === 'development' || env === 'test' || env === 'embedDev' || env === 'lib') {
+  if (env === 'development' || env === 'test' || env === 'embedDev') {
     baseConfig = {
       ...baseConfig,
       ...{
@@ -66,13 +65,7 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // split entry points main, webworkers, and possibly analysis tools
-  if (env === 'lib') {
-    const mainConfig = getLibConfig(baseConfig, dirName, 'lib/keepTrack', 'keepTrack/');
-    const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'lib/keepTrack/', 'keepTrack/');
-
-    webpackConfig.push(mainConfig);
-    webpackConfig.push(webWorkerConfig);
-  } else if (env !== 'embed' && env !== 'embedDev') {
+  if (env !== 'embed' && env !== 'embedDev') {
     const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
     const analysisConfig = getAnalysisConfig(baseConfig, dirName);
@@ -147,7 +140,7 @@ const getBaseConfig = (dirName) => ({
         exclude: [/node_modules/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
         options: {
           transpileOnly: false,
-          configFile: "tsconfig.build.json"
+          configFile: 'tsconfig.build.json',
         },
       },
       {
@@ -234,7 +227,7 @@ const getMainConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
   ...{
     name: 'MainFiles',
     entry: {
-      main: ['./src/js/main.ts'],
+      main: ['./src/main.ts'],
     },
     output: {
       // Add hash to the end of the file name if not embeded
@@ -245,32 +238,13 @@ const getMainConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
   },
 });
 
-const getLibConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
-  ...baseConfig,
-  ...{
-    name: 'KeepTrackLibrary',
-    entry: {
-      start: ['./src/js/start.ts'],
-    },
-    output: {
-      filename: `[name].js`,
-      path: `${dirName}/../${subFolder}/js`,
-      library: {
-        name: 'KeepTrackCode',
-        type: 'window',
-        export: ['startKeepTrack'],
-      },
-    },
-  },
-});
-
 const getWebWorkerConfig = (baseConfig, dirName, subFolder, pubPath) => ({
   ...baseConfig,
   ...{
     name: 'WebWorkers',
     entry: {
-      positionCruncher: ['./src/js/webworker/positionCruncher.ts'],
-      orbitCruncher: ['./src/js/webworker/orbitCruncher.ts'],
+      positionCruncher: ['./src/webworker/positionCruncher.ts'],
+      orbitCruncher: ['./src/webworker/orbitCruncher.ts'],
     },
     output: {
       filename: '[name].js',

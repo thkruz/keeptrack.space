@@ -3,7 +3,7 @@ version = 1
 test_patterns = ["*.test.js"]
 
 exclude_patterns = [
-  "src/js/lib/external/*",
+  "src/lib/external/*",
   "*mSat.js*",
   "*/offline/*",
   ]

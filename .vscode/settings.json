@@ -21,7 +21,7 @@
     // "src/tle/**": true,
     // "src/offline/**": true,
     // "src/admin/**": true,
-    // "src/js/lib/**": true,
+    // "src/lib/**": true,
     // "tsconfig.json": true
   },
   "files.watcherExclude": {
@@ -33,7 +33,7 @@
     "src/tle/**": true,
     "src/offline/**": true,
     "src/admin/**": true,
-    "src/js/lib/**": true,
+    "src/lib/**": true,
     "tsconfig.json": true
   },
   "[yaml]": {

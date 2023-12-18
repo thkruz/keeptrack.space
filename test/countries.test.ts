@@ -1,8 +1,8 @@
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { StandardGroupManager } from '@app/js/singletons/groups-manager';
-import { keepTrackContainer } from '../src/js/container';
-import { Singletons } from '../src/js/interfaces';
-import { CountriesMenu } from './../src/js/plugins/countries/countries';
+import { keepTrackContainer } from '../src/container';
+import { Singletons } from '../src/interfaces';
+import { CountriesMenu } from './../src/plugins/countries/countries';
 import { defaultSat } from './environment/apiMocks';
 import { mockUiManager, setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';

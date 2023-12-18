@@ -32,8 +32,8 @@ pids
 *.pid.lock
 
 # Dependency directories
-node_modules/
-jspm_packages/
+node_modules
+jspm_packages
 
 # Optional npm cache directory
 .npm
@@ -60,34 +60,26 @@ jspm_packages/
 
 
 # Large Production Files
-src/social
-src/social/*
-src/textures-extra
-src/radarData/radar*
-src/admin
-src/tle/2006*
-src/tle/TLE.json.bak
-src/tle/mw*
-src/tle/retr*
-src/tle/trus*
-src/tle/TLEAltNemo*
+public/social
+public/social/*
+public/textures-extra
+public/radarData/radar*
+public/tle/2006*
+public/tle/TLE.json.bak
+public/tle/mw*
+public/tle/retr*
+public/tle/trus*
+public/tle/TLEAltNemo*
 .notes.js
 classfd.tle
-src/audio/samples
+public/audio/samples
 
 # Jest Coverage
 coverage/
 
-# Offline Only
-src/offline
-
 # Build Folder
 dist
 embed
-
-# Work In Progress
-src/js/wip/
-src/js/satSet/radarDataManager.js
 
 # nyc Output
 .nyc_output
@@ -102,11 +94,11 @@ key.pem
 .cache/server.pem
 
 # TLE History
-src/analysis/sathist/*.json
+public/analysis/sathist/*.json
 
 # Extended TLE
-src/tle/tle4.js
-src/tle/TLE2.json.bak
+public/tle/tle4.js
+public/tle/TLE2.json.bak
 
 # Custom Builds
 custom-builds

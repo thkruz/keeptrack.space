@@ -1,30 +1,14 @@
+import { cpSync } from 'fs';
 import webpack from 'webpack';
-import { copyFilesAndFolders, copySettingsFiles } from './lib/copyFilesAndFolders.mjs';
+import { copySettingsFiles } from './lib/copyPublicFolder.mjs';
 import { setupEmbedFolders } from './lib/setupFolders.mjs';
 import { generateConfig } from './webpack.mjs';
-
-const reqDirs = ['tle'];
-const optDirs = ['meshes'];
-const reqFiles = [
-  'css/embed.css',
-  'textures/moon-1024.jpg',
-  'textures/earthmap512.jpg',
-  'textures/earthmap16k.jpg',
-  'textures/earthlights512.jpg',
-  'textures/earthlights16k.jpg',
-  'textures/earthbump8k.jpg',
-  'textures/earthspec8k.jpg',
-  'textures/earthmap4k.jpg',
-  'textures/earthlights4k.jpg',
-  'textures/skybox8k.jpg',
-];
-const optFiles = [];
 
 console.clear();
 console.log('Copy static files...'); // NOSONAR
 
 setupEmbedFolders();
-copyFilesAndFolders(reqDirs, reqFiles, optDirs, optFiles, 'embed/keepTrack');
+cpSync('./public', './embed/keepTrack', { recursive: true });
 copySettingsFiles('embed/keepTrack');
 
 const myArgs = process.argv.slice(2);

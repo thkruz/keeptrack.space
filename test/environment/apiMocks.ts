@@ -5,8 +5,8 @@ import { DEG2RAD } from '@app/js/lib/constants';
 import { ZoomValue } from '@app/js/singletons/camera';
 import { CatalogSource } from '@app/js/static/catalog-loader';
 import { Degrees, Kilometers, Milliseconds, Sgp4 } from 'ootk';
-import { SatObject, SensorObject } from '../../src/js/interfaces';
-import { SpaceObjectType } from '../../src/js/lib/space-object-type';
+import { SatObject, SensorObject } from '../../src/interfaces';
+import { SpaceObjectType } from '../../src/lib/space-object-type';
 declare const jest: any;
 
 const fakeTimeObj = new Date(2022, 0, 1);

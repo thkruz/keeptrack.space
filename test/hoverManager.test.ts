@@ -2,9 +2,9 @@
 
 import { keepTrackApi } from '@app/js/keepTrackApi';
 import { Renderer } from '@app/js/singletons/webgl-renderer';
-import { keepTrackContainer } from '../src/js/container';
-import { CatalogManager, OrbitManager, Singletons } from '../src/js/interfaces';
-import { HoverManager } from '../src/js/singletons/hover-manager';
+import { keepTrackContainer } from '../src/container';
+import { CatalogManager, OrbitManager, Singletons } from '../src/interfaces';
+import { HoverManager } from '../src/singletons/hover-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 
 // tell ts to ignore rule ts2341

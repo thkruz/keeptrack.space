@@ -13,12 +13,12 @@ import { starManager } from '@app/js/singletons/starManager';
 import { TimeManager } from '@app/js/singletons/time-manager';
 import { SensorMath } from '@app/js/static/sensor-math';
 import { mat4 } from 'gl-matrix';
-import { keepTrackContainer } from '../../src/js/container';
-import { Constructor, Singletons } from '../../src/js/interfaces';
-import { StandardCatalogManager } from '../../src/js/singletons/catalog-manager';
-import { StandardColorSchemeManager } from '../../src/js/singletons/color-scheme-manager';
-import { StandardOrbitManager } from '../../src/js/singletons/orbitManager';
-import { WebGLRenderer } from '../../src/js/singletons/webgl-renderer';
+import { keepTrackContainer } from '../../src/container';
+import { Constructor, Singletons } from '../../src/interfaces';
+import { StandardCatalogManager } from '../../src/singletons/catalog-manager';
+import { StandardColorSchemeManager } from '../../src/singletons/color-scheme-manager';
+import { StandardOrbitManager } from '../../src/singletons/orbitManager';
+import { WebGLRenderer } from '../../src/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {

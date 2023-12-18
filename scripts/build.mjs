@@ -1,39 +1,25 @@
-import { copyFilesAndFolders, copySettingsFiles } from './lib/copyFilesAndFolders.mjs';
-
+import { cpSync, mkdirSync, rmSync } from 'fs';
 import webpack from 'webpack';
 import generateConstVersion from './lib/constVersion.mjs';
-import { setupDistFolders } from './lib/setupFolders.mjs';
 import { updateTime } from './lib/updateTime.mjs';
 import { generateConfig } from './webpack.mjs';
 
 console.clear();
-console.log('Copying files...'); // NOSONAR
 
-const reqDirs = ['meshes', 'offline', 'php', 'radarData', 'res', 'simulation', 'textures', 'tle', 'img'];
-const optDirs = [''];
-
-const reqFiles = [
-  'README.txt',
-  'KeepTrack.bat',
-  'KeepTrack.lnk',
-  'Chrome With Local Files.lnk',
-  'config.html',
-  'index.html',
-  'manifest.webmanifest',
-  'serviceWorker.js',
-  'SOCRATES.html',
-];
-const optFiles = [];
+// Print current working directory
+console.log('Current working directory: ' + process.cwd()); // NOSONAR
 
 console.log('Removing old files...'); // NOSONAR
-setupDistFolders();
+// Remove all files in dist
+rmSync('./dist', { recursive: true });
+mkdirSync('./dist');
 
 console.log('Copy static files...'); // NOSONAR
-copyFilesAndFolders(reqDirs, reqFiles, optDirs, optFiles, 'dist');
-copySettingsFiles('dist');
+cpSync('./public', './dist', { recursive: true, preserveTimestamps: true });
+cpSync('./src/settings/settingsOverride.js', './dist/settings/settingsOverride.js', { preserveTimestamps: true });
 
 console.log('Updating version number...'); // NOSONAR
-generateConstVersion('./package.json', 'src/js/settings/version.js');
+generateConstVersion('./package.json', 'src/settings/version.js');
 
 console.log('Updating last update time...'); // NOSONAR
 updateTime();

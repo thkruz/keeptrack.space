@@ -1,0 +1,92 @@
+<ifmodule mod_mime.c>
+  Addtype text/plain .obj
+  Addtype text/plain .mtl
+</ifmodule>
+
+# custom error pages
+ ErrorDocument 401 /res/error.html?error=401
+ ErrorDocument 403 /res/error.html?error=403
+ ErrorDocument 404 /res/error.html?error=404
+ ErrorDocument 500 /res/error.html?error=500
+
+<ifModule mod_headers.c>
+  Header set Connection keep-alive
+</ifModule>
+
+##### Optimize default expiration time - BEGIN
+<ifModule mod_expires.c>
+    ## Enable expiration control
+    ExpiresActive On
+
+    ## CSS and JS expiration: 1 week after request
+    ExpiresByType text/css "now plus 1 week"
+    ExpiresByType application/javascript "now plus 1 week"
+    ExpiresByType application/x-javascript "now plus 1 week"
+
+    ## Image files expiration: 1 month after request
+    ExpiresByType image/jpeg "now plus 1 month"
+    ExpiresByType image/png "now plus 1 month"
+    ExpiresByType image/svg+xml "now plus 1 month"
+    ExpiresByType image/x-icon "now plus 1 month"
+    ExpiresByType image/ico "now plus 1 month"
+    ExpiresByType image/icon "now plus 1 month"
+    ExpiresByType text/ico "now plus 1 month"
+    ExpiresByType application/ico "now plus 1 month"
+
+    ## Font files expiration: 1 week after request
+    ExpiresByType application/x-font-ttf "now plus 1 week"
+    ExpiresByType application/x-font-opentype "now plus 1 week"
+    ExpiresByType application/x-font-woff "now plus 1 week"
+    ExpiresByType font/woff2 "now plus 1 week"
+    ExpiresByType image/svg+xml "now plus 1 week"
+
+</ifModule>
+##### Optimize default expiration time - END
+
+<IfModule mod_brotli.c>
+        AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/x-javascript application/javascript application/json application/x-font-ttf application/vnd.ms-fontobject image/x-icon
+        BrotliFilterNote Input brotli_input_info
+        BrotliFilterNote Output brotli_output_info
+        BrotliFilterNote Ratio brotli_ratio_info
+        LogFormat '"%r" %{brotli_output_info}n/%{brotli_input_info}n (%{brotli_ratio_info}n%%)' brotli
+        CustomLog "|${APACHE_ROOT}/bin/rotatelogs ${APACHE_LOG_DIR}/brotli_log.%Y%m%d 86400" brotli
+
+        #Don't compress content which is already compressed
+        SetEnvIfNoCase Request_URI \
+        \.(gif|jpe?g|png|swf|woff|woff2) no-brotli dont-vary
+
+        # Make sure proxies don't deliver the wrong content
+        Header append Vary Accept-Encoding env=!dont-vary
+</IfModule>
+
+<ifModule mod_deflate.c>
+  # Compress HTML, CSS, JavaScript, Text, XML and fonts
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/json
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+  AddOutputFilterByType DEFLATE application/x-font
+  AddOutputFilterByType DEFLATE application/x-font-opentype
+  AddOutputFilterByType DEFLATE application/x-font-otf
+  AddOutputFilterByType DEFLATE application/x-font-truetype
+  AddOutputFilterByType DEFLATE application/x-font-ttf
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE font/opentype
+  AddOutputFilterByType DEFLATE font/otf
+  AddOutputFilterByType DEFLATE font/ttf
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE image/x-icon
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+
+  # Remove browser bugs (only needed for really old browsers)
+  BrowserMatch ^Mozilla/4 gzip-only-text/html
+  BrowserMatch ^Mozilla/4\.0[678] no-gzip
+  BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+  Header append Vary User-Agent
+</ifModule>

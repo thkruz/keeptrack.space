@@ -1,9 +1,9 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DateTimeManager } from '@app/js/plugins/date-time-manager/date-time-manager';
-import { SatInfoBoxCore } from '@app/js/plugins/select-sat-manager/satInfoboxCore';
-import { SelectSatManager } from '@app/js/plugins/select-sat-manager/select-sat-manager';
-import { TopMenu } from '@app/js/plugins/top-menu/top-menu';
-import { UpdateSatManager } from '@app/js/plugins/update-select-box/update-select-box';
+import { keepTrackApi } from '@app//keepTrackApi';
+import { DateTimeManager } from '@app//plugins/date-time-manager/date-time-manager';
+import { SatInfoBoxCore } from '@app//plugins/select-sat-manager/satInfoboxCore';
+import { SelectSatManager } from '@app//plugins/select-sat-manager/select-sat-manager';
+import { TopMenu } from '@app//plugins/top-menu/top-menu';
+import { UpdateSatManager } from '@app//plugins/update-select-box/update-select-box';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';

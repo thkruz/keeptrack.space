@@ -29,7 +29,6 @@ describe('plugins', () => {
       colorsMenu: true,
       shortTermFences: true,
       orbitReferences: true,
-      externalSources: true,
       analysis: true,
       plotAnalysis: true,
       sensorFov: true,

@@ -1,10 +1,10 @@
 /**
-* This is the tsconfig extension that is used by the IDE.
-*/
+ * This is the tsconfig extension that is used by the IDE.
+ */
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
+    "noEmit": true
   },
   "include": [
     "src/**/*.ts",
@@ -21,24 +21,9 @@
     "test/**/*.png",
     "test/**/*.mp3",
     "test/**/*.jpg",
-    "src/analysis/js/analysis-tools.js"
+    "src/analysis/js/analysis-tools.js",
+    "public/serviceWorker.js"
   ],
-  "exclude": [
-    "node_modules/**/*",
-    "dist/**/*",
-    "src/admin/**/*",
-    "embed/**/*",
-    "lib/**/*",
-    "coverage/**/*",
-    "tsconfig.json",
-    "src/tools/**/*",
-    "src/js/plugins/startAnalytics.js"
-  ],
-  "filesGlob": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.png",
-    "src/**/*.jpg",
-    "!**/node_modules/**"
-  ]
+  "exclude": ["node_modules/**/*", "dist/**/*", "src/admin/**/*", "embed/**/*", "lib/**/*", "coverage/**/*", "tsconfig.json", "src/tools/**/*", "src/plugins/startAnalytics.js"],
+  "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.png", "src/**/*.jpg", "!**/node_modules/**"]
 }

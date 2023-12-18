@@ -1,0 +1,28 @@
+/* Always */
+#nextLaunch-menu {
+  display: block;
+}
+#nextLaunch-table tbody tr td {
+  padding: 5px 5px;
+}
+
+/* Cell Phone Only */
+@media (max-width: 694px) {
+  #nextLaunch-menu {
+    width: 100%;
+  }
+}
+
+/* Tablet Only */
+@media (min-width: 695px) and (max-width: 1300px) {
+  #nextLaunch-menu {
+    width: 625px;
+  }
+}
+
+/* Desktop Only */
+@media (min-width: 1301px) {
+  #nextLaunch-menu {
+    width: 625px;
+  }
+}

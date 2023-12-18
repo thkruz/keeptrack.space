@@ -27,7 +27,7 @@ const jestConfig: JestConfigWithTsJest = {
     '^@css(.*)$': '<rootDir>/src/css/$1',
   },
   coverageReporters: ['lcov', 'html', 'text'],
-  coveragePathIgnorePatterns: ['/node_modules/', '/src/js/lib/external/', '/test/', '/dist/'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/src/lib/external/', '/test/', '/dist/'],
 };
 
 export default jestConfig;

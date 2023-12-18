@@ -81,6 +81,7 @@
     "@testing-library/jest-dom": "^6.1.3",
     "@testing-library/user-event": "^14.5.1",
     "@types/agent-base": "^4.2.2",
+    "@types/file-saver": "^2.0.7",
     "@types/jest": "^29.5.5",
     "@types/jquery": "^3.5.14",
     "@types/jquery.colorbox": "^1.4.32",
@@ -88,6 +89,7 @@
     "@types/materialize-css": "^1.0.11",
     "@types/node": "^20.7.0",
     "@types/numeric": "^1.2.2",
+    "@types/papaparse": "^5.3.14",
     "@types/webgl2": "^0.0.10",
     "@typescript-eslint/eslint-plugin": "^6.7.3",
     "@typescript-eslint/parser": "^6.7.3",
@@ -139,7 +141,6 @@
   "dependencies": {
     "@materializecss/materialize": "^1.1.0-alpha",
     "axios": "^1.6.1",
-    "chart.js": "^4.4.0",
     "draggabilly": "^3.0.0",
     "draggy": "^1.6.6",
     "echarts": "^5.4.3",

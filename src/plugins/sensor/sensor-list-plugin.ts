@@ -1,5 +1,4 @@
 import { sensors } from '@app/catalogs/sensors';
-import radarPng from '@app/img/icons/radar.png';
 import { SatObject, SensorObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getClass } from '@app/lib/get-class';
@@ -9,6 +8,7 @@ import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { LegendManager } from '@app/static/legend-manager';
 import { SensorMath } from '@app/static/sensor-math';
+import radarPng from '@public/img/icons/radar.png';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { Planetarium } from '../planetarium/planetarium';

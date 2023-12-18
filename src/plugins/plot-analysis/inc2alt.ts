@@ -1,10 +1,10 @@
-import scatterPlotPng from '@app/img/icons/scatter-plot.png';
 import { EChartsData, GetSatType, SatObject } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { MILLISECONDS2DAYS, RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { jday } from '@app/lib/transforms';
 import { SatMath } from '@app/static/sat-math';
+import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { Sgp4, SpaceObjectType, Transforms } from 'ootk';

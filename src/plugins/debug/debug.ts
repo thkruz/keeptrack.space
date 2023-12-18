@@ -2,8 +2,8 @@ import * as gremlins from 'gremlins.js';
 
 import { getEl } from '@app/lib/get-el';
 
-import debugPng from '@app/img/icons/debug.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import debugPng from '@public/img/icons/debug.png';
 
 import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import eruda from 'eruda';

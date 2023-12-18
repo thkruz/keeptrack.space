@@ -23,9 +23,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import cameraPng from '@app/img/icons/camera.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { Classification } from '@app/static/classification';
+import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class Screenshot extends KeepTrackPlugin {

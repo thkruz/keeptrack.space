@@ -1,5 +1,5 @@
-import collissionsPng from '@app/img/icons/socrates.png';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import collissionsPng from '@public/img/icons/socrates.png';
 
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';

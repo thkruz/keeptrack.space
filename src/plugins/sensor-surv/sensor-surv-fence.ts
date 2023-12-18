@@ -20,10 +20,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import fencePng from '@app/img/icons/fence.png';
 import { CatalogManager, SensorObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import fencePng from '@public/img/icons/fence.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 declare module '@app/interfaces' {

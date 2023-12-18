@@ -1,9 +1,9 @@
-import timeMachinePng from '@app/img/icons/time-machine.png';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { LegendManager } from '@app/static/legend-manager';
+import timeMachinePng from '@public/img/icons/time-machine.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TimeMachine extends KeepTrackPlugin {

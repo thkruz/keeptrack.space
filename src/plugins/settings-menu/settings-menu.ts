@@ -1,7 +1,7 @@
-import settingsPng from '@app/img/icons/settings.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { rgbCss } from '@app/lib/rgbCss';
+import settingsPng from '@public/img/icons/settings.png';
 
 import { parseRgba } from '@app/lib/rgba';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';

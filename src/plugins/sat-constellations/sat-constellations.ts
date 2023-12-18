@@ -1,11 +1,11 @@
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 
-import satChngPng from '@app/img/icons/satchng.png';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { GroupType } from '@app/singletons/object-group';
+import satChngPng from '@public/img/icons/satchng.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatConstellations extends KeepTrackPlugin {

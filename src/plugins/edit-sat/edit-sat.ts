@@ -1,10 +1,10 @@
-import editPng from '@app/img/icons/edit.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import editPng from '@public/img/icons/edit.png';
 import { saveAs } from 'file-saver';
 
 import { GetSatType } from '@app/interfaces';

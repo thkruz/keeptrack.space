@@ -6,12 +6,12 @@ import { showLoading } from '@app/lib/showLoading';
 
 import { SatMath } from '@app/static/sat-math';
 
-import analysisPng from '@app/img/icons/analysis.png';
 import { DEG2RAD, MINUTES_PER_DAY, TAU } from '@app/lib/constants';
 import { getUnique } from '@app/lib/get-unique';
 import { saveCsv } from '@app/lib/saveVariable';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
+import analysisPng from '@public/img/icons/analysis.png';
 import { EciVec3, Kilometers, Radians, SatelliteRecord } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

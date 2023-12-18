@@ -1,8 +1,8 @@
-import searchPng from '@app/img/icons/search.png';
 import { SatObject, SensorObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
+import searchPng from '@public/img/icons/search.png';
 
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';

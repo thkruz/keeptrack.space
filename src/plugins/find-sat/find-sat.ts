@@ -1,9 +1,9 @@
-import findSatPng from '@app/img/icons/find2.png';
 import { SatObject } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import findSatPng from '@public/img/icons/find2.png';
 
 import { countryCodeList, countryNameList } from '@app/catalogs/countries';
 import { SensorMath } from '@app/static/sensor-math';

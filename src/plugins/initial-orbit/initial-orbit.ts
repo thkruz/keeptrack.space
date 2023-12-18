@@ -1,9 +1,9 @@
-import iodPng from '@app/img/icons/iod.png';
 import { UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import { omManager } from '@app/plugins/initial-orbit/om-manager';
+import iodPng from '@public/img/icons/iod.png';
 
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import { helpBodyTextInitOrbit, helpTitleTextInitOrbit } from './help';

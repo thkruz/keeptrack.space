@@ -1,10 +1,10 @@
-import breakupPng from '@app/img/icons/breakup.png';
 import { GetSatType, SatObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import breakupPng from '@public/img/icons/breakup.png';
 
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';

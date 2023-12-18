@@ -1,8 +1,8 @@
-import scatterPlotPng3 from '@app/img/icons/scatter-plot3.png';
 import { EChartsData, SatObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
+import scatterPlotPng3 from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';

@@ -1,4 +1,3 @@
-import infoPng from '@app/img/icons/info.png';
 import { GetSatType, SatObject, SatPassTimes } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { MILLISECONDS_PER_DAY } from '@app/lib/constants';
@@ -9,6 +8,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath } from '@app/static/sensor-math';
+import infoPng from '@public/img/icons/info.png';
 import { Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin, watchlistPlugin } from './watchlist';

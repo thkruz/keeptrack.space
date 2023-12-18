@@ -20,11 +20,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import sat3Png from '@app/img/icons/sat3.png';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
 import { CameraType } from '@app/singletons/camera';
+import sat3Png from '@public/img/icons/sat3.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {

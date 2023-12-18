@@ -1,4 +1,3 @@
-import multiSitePng from '@app/img/icons/multi-site.png';
 import { SatObject, SensorObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { MINUTES_PER_DAY, TAU } from '@app/lib/constants';
@@ -8,6 +7,7 @@ import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
 import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
+import multiSitePng from '@public/img/icons/multi-site.png';
 import { Degrees, Kilometers, SatelliteRecord, Seconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { StandardSensorManager } from './sensorManager';

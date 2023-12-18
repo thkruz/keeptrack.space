@@ -24,14 +24,14 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import mapPng from '@app/img/icons/map.png';
-import radar1 from '@app/img/radar-1.png';
-import redSquare from '@app/img/red-square.png';
-import satellite2 from '@app/img/satellite-2.png';
-import yellowSquare from '@app/img/yellow-square.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import mapPng from '@public/img/icons/map.png';
+import radar1 from '@public/img/radar-1.png';
+import redSquare from '@public/img/red-square.png';
+import satellite2 from '@public/img/satellite-2.png';
+import yellowSquare from '@public/img/yellow-square.png';
 
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';

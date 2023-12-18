@@ -1,7 +1,7 @@
-import gpsPng from '@app/img/icons/gps.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
+import gpsPng from '@public/img/icons/gps.png';
 
 import { CatalogManager, GroupsManager, SatObject } from '@app/interfaces';
 import { GroupType } from '@app/singletons/object-group';

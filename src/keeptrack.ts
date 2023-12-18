@@ -28,13 +28,13 @@
 
 /* eslint-disable no-unreachable */
 
-import issJpg from '@app/img/wallpaper/iss.jpg';
-import missionControlJpg from '@app/img/wallpaper/mission-control.jpg';
-import rocketJpg from '@app/img/wallpaper/rocket.jpg';
-import rocket2Jpg from '@app/img/wallpaper/rocket2.jpg';
-import rocket3Jpg from '@app/img/wallpaper/rocket3.jpg';
-import telescopeJpg from '@app/img/wallpaper/telescope.jpg';
-import thuleJpg from '@app/img/wallpaper/thule.jpg';
+import issJpg from '@public/img/wallpaper/iss.jpg';
+import missionControlJpg from '@public/img/wallpaper/mission-control.jpg';
+import rocketJpg from '@public/img/wallpaper/rocket.jpg';
+import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
+import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
+import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
+import thuleJpg from '@public/img/wallpaper/thule.jpg';
 
 import eruda from 'eruda';
 import erudaFps from 'eruda-fps';

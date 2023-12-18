@@ -1,9 +1,9 @@
-import missilePng from '@app/img/icons/missile.png';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
+import missilePng from '@public/img/icons/missile.png';
 
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 

@@ -1,5 +1,3 @@
-import addPng from '@app/img/add.png';
-import removePng from '@app/img/remove.png';
 import { GetSatType, SatObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
@@ -13,6 +11,8 @@ import { CatalogSource } from '@app/static/catalog-loader';
 import { CatalogSearch } from '@app/static/catalog-search';
 import { SatMath } from '@app/static/sat-math';
 import { StringExtractor } from '@app/static/string-extractor';
+import addPng from '@public/img/add.png';
+import removePng from '@public/img/remove.png';
 import Draggabilly from 'draggabilly';
 import * as Ootk from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

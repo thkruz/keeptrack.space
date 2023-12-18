@@ -1,6 +1,6 @@
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 
-import dayNightPng from '@app/img/icons/day-night.png';
+import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class NightToggle extends KeepTrackPlugin {

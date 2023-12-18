@@ -1,13 +1,13 @@
-import fullscreenIconPng from '@app/img/fullscreen-icon.png';
-import helpPng from '@app/img/help.png';
-import findPng from '@app/img/icons/find.png';
-import githubPng from '@app/img/icons/github.png';
-import soundOffPng from '@app/img/icons/sound-off.png';
-import soundOnPng from '@app/img/icons/sound-on.png';
-import layersIconPng from '@app/img/layers-icon.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
+import fullscreenIconPng from '@public/img/fullscreen-icon.png';
+import helpPng from '@public/img/help.png';
+import findPng from '@public/img/icons/find.png';
+import githubPng from '@public/img/icons/github.png';
+import soundOffPng from '@public/img/icons/sound-off.png';
+import soundOnPng from '@public/img/icons/sound-on.png';
+import layersIconPng from '@public/img/layers-icon.png';
 import { errorManagerInstance } from '../../singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

@@ -2,8 +2,8 @@ import { openColorbox } from '@app/lib/colorbox';
 import { getEl } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
-import photoManagerPng from '@app/img/icons/photoManager.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import photoManagerPng from '@public/img/icons/photoManager.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatellitePhotos extends KeepTrackPlugin {

@@ -1,10 +1,10 @@
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 
-import flagPng from '@app/img/icons/flag.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
+import flagPng from '@public/img/icons/flag.png';
 
 import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

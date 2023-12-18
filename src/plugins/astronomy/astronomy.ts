@@ -27,9 +27,9 @@ import { SensorObject } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
-import constellationPng from '@app/img/icons/constellation.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { LegendManager } from '@app/static/legend-manager';
+import constellationPng from '@public/img/icons/constellation.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
 

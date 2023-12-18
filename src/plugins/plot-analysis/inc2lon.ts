@@ -1,9 +1,9 @@
-import scatterPlotPng from '@app/img/icons/scatter-plot.png';
 import { EChartsData, GetSatType, SatObject } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { SpaceObjectType } from 'ootk';

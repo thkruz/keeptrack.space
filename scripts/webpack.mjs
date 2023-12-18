@@ -89,33 +89,31 @@ const getBaseConfig = (dirName) => ({
     extensions: ['.ts', '.js'],
     alias: {
       '@app': `${dirName}/../src`,
-      '@css': `${dirName}/../src/css`,
+      '@public': `${dirName}/../public`,
+      '@css': `${dirName}/../public/css`,
     },
   },
   module: {
     rules: [
       {
-        // eslint-disable-next-line prefer-named-capture-group
-        test: /\.(png|svg|jpg|jpeg|gif)$/iu,
-        include: [/src/u],
+        test: /\.(?:png|svg|jpg|jpeg|gif)$/iu,
+        include: [/src/u, /public/u],
         type: 'asset/resource',
         generator: {
           filename: '../img/[name][ext]',
         },
       },
       {
-        // eslint-disable-next-line prefer-named-capture-group
-        test: /\.(mp3)$/iu,
-        include: [/src/u],
+        test: /\.(?:mp3)$/iu,
+        include: [/src/u, /public/u],
         type: 'asset/resource',
         generator: {
           filename: '../audio/[name][ext]',
         },
       },
       {
-        // eslint-disable-next-line prefer-named-capture-group
-        test: /\.(woff2|woff|ttf|eot)$/iu,
-        include: [/src/u],
+        test: /\.(?:woff2|woff|ttf|eot)$/iu,
+        include: [/src/u, /public/u],
         type: 'asset/resource',
         generator: {
           filename: '../fonts/[name][ext]',
@@ -123,7 +121,7 @@ const getBaseConfig = (dirName) => ({
       },
       {
         test: /\.css$/iu,
-        include: [/src/u],
+        include: [/src/u, /public/u],
         use: ['style-loader', 'css-loader'],
         generator: {
           filename: './css/[name][ext]',
@@ -146,8 +144,7 @@ const getBaseConfig = (dirName) => ({
       {
         test: /\.m?js$/u,
         include: [/src/u],
-        // eslint-disable-next-line prefer-named-capture-group
-        exclude: [/(node_modules|bower_components)/u, /\dist/u, /\coverage/u, /\settings\.js/iu, /\.test\.jsx?$/u],
+        exclude: [/(?:node_modules|bower_components)/u, /\dist/u, /\coverage/u, /\settings\.js/iu, /\.test\.jsx?$/u],
         use: {
           loader: 'babel-loader',
         },
@@ -177,15 +174,14 @@ const getNonEmbedConfig = (baseConfig, env) => {
     }),
     new HtmlWebpackPlugin({
       filename: '../index.html',
-      template: './src/index.html',
+      template: './public/index.html',
     }),
     new CleanTerminalPlugin({
       beforeCompile: true,
     })
   );
   baseConfig.module.rules.push({
-    // eslint-disable-next-line prefer-named-capture-group
-    test: /\.(woff|woff2|eot|ttf|otf)$/iu,
+    test: /\.(?:woff|woff2|eot|ttf|otf)$/iu,
     include: [/src/u],
     type: 'asset/resource',
   });

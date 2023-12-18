@@ -1,6 +1,6 @@
-import settingsPng from '@app/img/icons/settings.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import settingsPng from '@public/img/icons/settings.png';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

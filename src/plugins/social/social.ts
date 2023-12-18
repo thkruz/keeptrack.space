@@ -1,6 +1,6 @@
-import githubPng from '@app/img/icons/github.png';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import githubPng from '@public/img/icons/github.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SocialMedia extends KeepTrackPlugin {

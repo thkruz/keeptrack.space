@@ -20,10 +20,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import sat2Png from '@app/img/icons/sat2.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import sat2Png from '@public/img/icons/sat2.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 declare module '@app/interfaces' {

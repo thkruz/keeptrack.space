@@ -20,10 +20,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import fovPng from '@app/img/icons/fov.png';
 import { SensorObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import fovPng from '@public/img/icons/fov.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 declare module '@app/interfaces' {

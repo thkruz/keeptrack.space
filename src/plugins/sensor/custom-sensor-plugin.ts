@@ -1,9 +1,9 @@
-import customPng from '@app/img/icons/custom.png';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { ZoomValue } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
+import customPng from '@public/img/icons/custom.png';
 import { Degrees, Kilometers, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';

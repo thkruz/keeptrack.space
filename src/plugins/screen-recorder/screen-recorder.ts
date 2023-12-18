@@ -1,6 +1,6 @@
-import recorderPng from '@app/img/icons/video.png';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import recorderPng from '@public/img/icons/video.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { StreamManager } from './stream-manager';
 

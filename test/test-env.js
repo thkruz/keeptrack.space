@@ -14,7 +14,7 @@ fakeTime.setUTCHours(0, 0, 0, 0);
 jest.useFakeTimers().setSystemTime(fakeTime.getTime());
 
 // eslint-disable-next-line no-sync
-const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.html'), 'utf8').toString();
+const documentHTML = fs.readFileSync(path.resolve(__dirname, '../public/index.html'), 'utf8').toString();
 const body = '<body>';
 const bodyEnd = '</body>';
 const docBody = documentHTML.substring(documentHTML.indexOf(body) + body.length, documentHTML.indexOf(bodyEnd));

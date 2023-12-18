@@ -1,4 +1,3 @@
-import calendar2Png from '@app/img/icons/calendar2.png';
 import { LaunchInfoObject } from '@app/interfaces';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
@@ -7,6 +6,7 @@ import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { truncateString } from '@app/lib/truncate-string';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import calendar2Png from '@public/img/icons/calendar2.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {

@@ -1,4 +1,3 @@
-import rocketPng from '@app/img/icons/rocket.png';
 import { GetSatType, SatObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { RAD2DEG } from '@app/lib/constants';
@@ -6,6 +5,7 @@ import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
+import rocketPng from '@public/img/icons/rocket.png';
 
 import { SatMath } from '@app/static/sat-math';
 

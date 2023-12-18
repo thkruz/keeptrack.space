@@ -23,9 +23,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import addPng from '@app/img/add.png';
-import watchlistPng from '@app/img/icons/watchlist.png';
-import removePng from '@app/img/remove.png';
 import { GetSatType, SatObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
@@ -35,6 +32,9 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { CatalogSource } from '@app/static/catalog-loader';
 import { isThisNode } from '@app/static/isThisNode';
+import addPng from '@public/img/add.png';
+import watchlistPng from '@public/img/icons/watchlist.png';
+import removePng from '@public/img/remove.png';
 import saveAs from 'file-saver';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

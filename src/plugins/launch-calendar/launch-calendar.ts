@@ -27,7 +27,7 @@ import { getEl } from '@app/lib/get-el';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-import calendarPng from '@app/img/icons/calendar.png';
+import calendarPng from '@public/img/icons/calendar.png';
 
 export class LaunchCalendar extends KeepTrackPlugin {
   bottomIconElementName = 'menu-launches';

@@ -1,8 +1,8 @@
 /* */
 
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DEG2RAD } from '@app/js/lib/constants';
-import { OBJ } from '@app/js/lib/external/webgl-obj-loader.js';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { DEG2RAD } from '@app/lib/constants';
+import { OBJ } from '@app/lib/external/webgl-obj-loader.js';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Kilometers, Radians, TleLine1, TleLine2 } from 'ootk';
 import { SatObject } from '../../interfaces';

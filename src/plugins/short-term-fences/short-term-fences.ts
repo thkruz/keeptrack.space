@@ -1,12 +1,12 @@
 import searchPng from '@app/img/icons/search.png';
-import { SatObject, SensorObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
+import { SatObject, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { slideInRight, slideOutLeft } from '@app/lib/slide';
 
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
-import { SatMath } from '@app/js/static/sat-math';
-import { SensorMath } from '@app/js/static/sensor-math';
+import { errorManagerInstance } from '@app/singletons/errorManager';
+import { SatMath } from '@app/static/sat-math';
+import { SensorMath } from '@app/static/sensor-math';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBoxCore } from '../select-sat-manager/satInfoboxCore';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

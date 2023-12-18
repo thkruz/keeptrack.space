@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SatObject } from '@app/js/interfaces';
+import { SatObject } from '@app/interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 import { SatMath } from '../static/sat-math';
 

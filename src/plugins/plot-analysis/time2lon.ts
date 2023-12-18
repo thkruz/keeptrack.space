@@ -1,9 +1,9 @@
 import linePlotPng from '@app/img/icons/line-plot.png';
-import { EChartsData, GetSatType, SatObject } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { RAD2DEG } from '@app/js/lib/constants';
-import { getEl } from '@app/js/lib/get-el';
-import { SatMathApi } from '@app/js/singletons/sat-math-api';
+import { EChartsData, GetSatType, SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { RAD2DEG } from '@app/lib/constants';
+import { getEl } from '@app/lib/get-el';
+import { SatMathApi } from '@app/singletons/sat-math-api';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { SpaceObjectType } from 'ootk';

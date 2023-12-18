@@ -20,8 +20,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { OrbitManager, SatObject, SatShader } from '@app/js/interfaces';
-import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/js/lib/constants';
+import { OrbitManager, SatObject, SatShader } from '@app/interfaces';
+import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/lib/constants';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -33,7 +33,7 @@ import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
 import { errorManagerInstance } from './errorManager';
 
-declare module '@app/js/interfaces' {
+declare module '@app/interfaces' {
   interface SatShader {
     largeObjectMaxZoom: number;
     largeObjectMinZoom: number;

@@ -14,7 +14,7 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { constellations } from '../catalogs/constellations';
 import { isThisNode } from '../static/isThisNode';
 import { LineTypes, lineManagerInstance } from './draw-manager/line-manager';

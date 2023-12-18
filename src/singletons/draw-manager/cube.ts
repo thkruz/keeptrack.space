@@ -1,6 +1,6 @@
-import { SatObject } from '@app/js/interfaces';
-import { BufferAttribute } from '@app/js/static/buffer-attribute';
-import { WebGlProgramHelper } from '@app/js/static/webgl-program';
+import { SatObject } from '@app/interfaces';
+import { BufferAttribute } from '@app/static/buffer-attribute';
+import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import * as Ootk from 'ootk';
 import { Kilometers } from 'ootk';

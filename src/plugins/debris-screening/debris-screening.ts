@@ -1,10 +1,10 @@
 import aboutPng from '@app/img/icons/about.png';
-import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
-import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
-import { SatMath } from '@app/js/static/sat-math';
+import { GetSatType, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
+import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import { SatMath } from '@app/static/sat-math';
 import { EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

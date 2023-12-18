@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getDayOfYear } from '@app/js/lib/transforms';
-import { CameraType } from '@app/js/singletons/camera';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getDayOfYear } from '@app/lib/transforms';
+import { CameraType } from '@app/singletons/camera';
 import { RadarDataObject, SatObject, SensorObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';

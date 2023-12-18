@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SensorMath } from '@app/js/static/sensor-math';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SensorMath } from '@app/static/sensor-math';
 import numeric from 'numeric';
 import { ControlSiteObject } from '../../catalogs/control-sites';
 import { SatObject, SensorObject } from '../../interfaces';

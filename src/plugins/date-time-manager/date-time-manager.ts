@@ -1,8 +1,8 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { getDayOfYear } from '@app/js/lib/transforms';
-import { isThisNode } from '@app/js/static/isThisNode';
-import { UrlManager } from '@app/js/static/url-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { getDayOfYear } from '@app/lib/transforms';
+import { isThisNode } from '@app/static/isThisNode';
+import { UrlManager } from '@app/static/url-manager';
 import $ from 'jquery';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';

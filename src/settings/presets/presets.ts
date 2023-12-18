@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 

@@ -1,4 +1,4 @@
-import { LookAnglesPlugin } from '@app/js/plugins/sensor/look-angles-plugin';
+import { LookAnglesPlugin } from '@app/plugins/sensor/look-angles-plugin';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 

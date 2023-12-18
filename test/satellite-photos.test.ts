@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SatellitePhotos } from '@app/js/plugins/satellite-photos/satellite-photos';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 

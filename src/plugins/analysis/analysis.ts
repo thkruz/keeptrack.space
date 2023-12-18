@@ -1,17 +1,17 @@
-import { lookanglesRow, SatObject, SensorObject } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
+import { lookanglesRow, SatObject, SensorObject } from '@app/interfaces';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { clickAndDragWidth } from '@app/lib/click-and-drag';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
 
-import { SatMath } from '@app/js/static/sat-math';
+import { SatMath } from '@app/static/sat-math';
 
 import analysisPng from '@app/img/icons/analysis.png';
-import { DEG2RAD, MINUTES_PER_DAY, TAU } from '@app/js/lib/constants';
-import { getUnique } from '@app/js/lib/get-unique';
-import { saveCsv } from '@app/js/lib/saveVariable';
-import { CatalogExporter } from '@app/js/static/catalog-exporter';
-import { CatalogSearch } from '@app/js/static/catalog-search';
+import { DEG2RAD, MINUTES_PER_DAY, TAU } from '@app/lib/constants';
+import { getUnique } from '@app/lib/get-unique';
+import { saveCsv } from '@app/lib/saveVariable';
+import { CatalogExporter } from '@app/static/catalog-exporter';
+import { CatalogSearch } from '@app/static/catalog-search';
 import { EciVec3, Kilometers, Radians, SatelliteRecord } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

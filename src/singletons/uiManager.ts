@@ -25,9 +25,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { loadJquery } from '@app/js/singletons/ui-manager/jquery';
+import { ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
 import { sensors } from '../catalogs/sensors';

@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { NightToggle } from '@app/js/plugins/night-toggle/night-toggle';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 

@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { Camera } from '@app/js/singletons/camera';
-import { UrlManager } from '@app/js/static/url-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { Camera } from '@app/singletons/camera';
+import { UrlManager } from '@app/static/url-manager';
 import { MouseInput } from './mouse-input';
 
 export interface TapTouchEvent {

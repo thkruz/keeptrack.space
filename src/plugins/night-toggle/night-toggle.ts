@@ -1,4 +1,4 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 
 import dayNightPng from '@app/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

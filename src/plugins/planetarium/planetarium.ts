@@ -23,13 +23,13 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SensorObject } from '@app/js/interfaces';
-import { getEl } from '@app/js/lib/get-el';
-import { CameraType } from '@app/js/singletons/camera';
+import { SensorObject } from '@app/interfaces';
+import { getEl } from '@app/lib/get-el';
+import { CameraType } from '@app/singletons/camera';
 
 import planetariumPng from '@app/img/icons/planetarium.png';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { LegendManager } from '@app/js/static/legend-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { LegendManager } from '@app/static/legend-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
 

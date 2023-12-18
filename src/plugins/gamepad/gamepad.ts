@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import { SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { CameraType } from '@app/js/singletons/camera';
+import { SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { CameraType } from '@app/singletons/camera';
 import { Radians } from 'ootk';
 
 export class GamepadPlugin {

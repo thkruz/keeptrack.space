@@ -1,7 +1,7 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { OrbitReferences } from '@app/js/plugins/orbit-references/orbit-references';
-import { SatInfoBoxCore } from '@app/js/plugins/select-sat-manager/satInfoboxCore';
-import { SelectSatManager } from '@app/js/plugins/select-sat-manager/select-sat-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { OrbitReferences } from '@app/plugins/orbit-references/orbit-references';
+import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';

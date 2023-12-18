@@ -1,11 +1,11 @@
-import { SatObject } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DEG2RAD, RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { lon2yaw } from '@app/js/lib/transforms';
+import { SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { DEG2RAD, RADIUS_OF_EARTH } from '@app/lib/constants';
+import { lon2yaw } from '@app/lib/transforms';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
 
-import { WebGlProgramHelper } from '@app/js/static/webgl-program';
+import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */

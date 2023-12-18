@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { loadCorePlugins } from '@app/js/plugins/plugins';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { loadCorePlugins } from '@app/plugins/plugins';
 
 describe('plugins', () => {
   it('should be able to initialize all plugins', () => {

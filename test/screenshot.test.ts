@@ -1,4 +1,4 @@
-import { Screenshot } from '@app/js/plugins/screenshot/screenshot';
+import { Screenshot } from '@app/plugins/screenshot/screenshot';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite } from './generic-tests';
 

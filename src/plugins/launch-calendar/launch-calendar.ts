@@ -22,8 +22,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { openColorbox } from '@app/js/lib/colorbox';
-import { getEl } from '@app/js/lib/get-el';
+import { openColorbox } from '@app/lib/colorbox';
+import { getEl } from '@app/lib/get-el';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

@@ -1,5 +1,5 @@
-import { DateTimeManager } from '@app/js/plugins/date-time-manager/date-time-manager';
-import { TopMenu } from '@app/js/plugins/top-menu/top-menu';
+import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
 

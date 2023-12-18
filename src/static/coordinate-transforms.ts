@@ -1,4 +1,4 @@
-import { EciArr3, SatObject, SensorObject } from '@app/js/interfaces';
+import { EciArr3, SatObject, SensorObject } from '@app/interfaces';
 import { mat3, vec3 } from 'gl-matrix';
 import { Degrees, EciVec3, Kilometers, Radians, Transforms } from 'ootk';
 import { DEG2RAD, RAD2DEG } from '../lib/constants';

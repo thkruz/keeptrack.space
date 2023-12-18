@@ -1,4 +1,4 @@
-import { isThisNode } from '@app/js/static/isThisNode';
+import { isThisNode } from '@app/static/isThisNode';
 import { expect } from '@jest/globals';
 import { SatObject } from '../src/interfaces';
 import { keepTrackApi } from '../src/keepTrackApi';

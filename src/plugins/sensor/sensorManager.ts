@@ -23,20 +23,20 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { sensors } from '@app/js/catalogs/sensors';
-import { openColorbox } from '@app/js/lib/colorbox';
-import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { getEl } from '@app/js/lib/get-el';
-import { spaceObjType2Str } from '@app/js/lib/spaceObjType2Str';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { sensors } from '@app/catalogs/sensors';
+import { openColorbox } from '@app/lib/colorbox';
+import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
+import { getEl } from '@app/lib/get-el';
+import { spaceObjType2Str } from '@app/lib/spaceObjType2Str';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
-import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
-import { ZoomValue } from '@app/js/singletons/camera';
-import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
-import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
-import { LegendManager } from '@app/js/static/legend-manager';
-import { SatMath } from '@app/js/static/sat-math';
-import { TearrData } from '@app/js/static/sensor-math';
+import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { ZoomValue } from '@app/singletons/camera';
+import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
+import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { LegendManager } from '@app/static/legend-manager';
+import { SatMath } from '@app/static/sat-math';
+import { TearrData } from '@app/static/sensor-math';
 import { Degrees, GreenwichMeanSiderealTime, Kilometers, Radians } from 'ootk';
 import { SensorManager, SensorObject } from '../../interfaces';
 import { keepTrackApi } from '../../keepTrackApi';

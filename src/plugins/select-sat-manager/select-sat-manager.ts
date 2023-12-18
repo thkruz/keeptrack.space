@@ -1,10 +1,10 @@
-import { GetSatType, SatObject } from '@app/js/interfaces';
-import { isSatObject, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/js/lib/get-el';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { CameraType } from '@app/js/singletons/camera';
+import { GetSatType, SatObject } from '@app/interfaces';
+import { isSatObject, keepTrackApi } from '@app/keepTrackApi';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
+import { SpaceObjectType } from '@app/lib/space-object-type';
+import { CameraType } from '@app/singletons/camera';
 
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 

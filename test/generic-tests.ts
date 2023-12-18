@@ -1,8 +1,8 @@
-import { Constructor } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { KeepTrackPlugin } from '@app/js/plugins/KeepTrackPlugin';
-import { SettingsManager } from '@app/js/settings/settings';
+import { Constructor } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
+import { SettingsManager } from '@app/settings/settings';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {

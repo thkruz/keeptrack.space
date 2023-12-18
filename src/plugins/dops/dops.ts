@@ -1,12 +1,12 @@
 import gpsPng from '@app/img/icons/gps.png';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
 
-import { CatalogManager, GroupsManager, SatObject } from '@app/js/interfaces';
-import { GroupType } from '@app/js/singletons/object-group';
-import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
-import { DopMath } from '@app/js/static/dop-math';
+import { CatalogManager, GroupsManager, SatObject } from '@app/interfaces';
+import { GroupType } from '@app/singletons/object-group';
+import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import { DopMath } from '@app/static/dop-math';
 import { Degrees, Kilometers } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

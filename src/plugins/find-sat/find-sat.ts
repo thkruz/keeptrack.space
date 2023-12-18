@@ -1,12 +1,12 @@
 import findSatPng from '@app/img/icons/find2.png';
-import { SatObject } from '@app/js/interfaces';
-import { getEl } from '@app/js/lib/get-el';
-import { getUnique } from '@app/js/lib/get-unique';
-import { hideLoading, showLoading } from '@app/js/lib/showLoading';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { SatObject } from '@app/interfaces';
+import { getEl } from '@app/lib/get-el';
+import { getUnique } from '@app/lib/get-unique';
+import { hideLoading, showLoading } from '@app/lib/showLoading';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
-import { countryCodeList, countryNameList } from '@app/js/catalogs/countries';
-import { SensorMath } from '@app/js/static/sensor-math';
+import { countryCodeList, countryNameList } from '@app/catalogs/countries';
+import { SensorMath } from '@app/static/sensor-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

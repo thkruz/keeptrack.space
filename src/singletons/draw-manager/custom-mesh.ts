@@ -1,5 +1,5 @@
-import { BufferAttribute } from '@app/js/static/buffer-attribute';
-import { WebGlProgramHelper } from '@app/js/static/webgl-program';
+import { BufferAttribute } from '@app/static/buffer-attribute';
+import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat3, mat4 } from 'gl-matrix';
 import * as Ootk from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';

@@ -26,15 +26,15 @@
 import addPng from '@app/img/add.png';
 import watchlistPng from '@app/img/icons/watchlist.png';
 import removePng from '@app/img/remove.png';
-import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
-import { getEl } from '@app/js/lib/get-el';
-import { LineTypes } from '@app/js/singletons/draw-manager/line-manager';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
-import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
-import { CatalogSource } from '@app/js/static/catalog-loader';
-import { isThisNode } from '@app/js/static/isThisNode';
+import { GetSatType, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { clickAndDragWidth } from '@app/lib/click-and-drag';
+import { getEl } from '@app/lib/get-el';
+import { LineTypes } from '@app/singletons/draw-manager/line-manager';
+import { errorManagerInstance } from '@app/singletons/errorManager';
+import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { CatalogSource } from '@app/static/catalog-loader';
+import { isThisNode } from '@app/static/isThisNode';
 import saveAs from 'file-saver';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

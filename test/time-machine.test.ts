@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Milliseconds } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';

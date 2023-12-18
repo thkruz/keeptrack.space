@@ -1,6 +1,6 @@
-import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { Camera, CameraType } from '@app/js/singletons/camera';
-import { SatMath } from '@app/js/static/sat-math';
+import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
+import { Camera, CameraType } from '@app/singletons/camera';
+import { SatMath } from '@app/static/sat-math';
 import { GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 

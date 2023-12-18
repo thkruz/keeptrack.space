@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 
 export const helpTitleTextMissile = `Missile Menu`;
 

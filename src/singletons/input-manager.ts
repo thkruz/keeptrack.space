@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { RADIUS_OF_EARTH } from '@app/lib/constants';
+import { SpaceObjectType } from '@app/lib/space-object-type';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { KeepTrack } from '../keeptrack';

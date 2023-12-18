@@ -1,18 +1,18 @@
 import editPng from '@app/img/icons/edit.png';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { RAD2DEG } from '@app/js/lib/constants';
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
-import { StringPad } from '@app/js/lib/stringPad';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { RAD2DEG } from '@app/lib/constants';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
+import { StringPad } from '@app/lib/stringPad';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { saveAs } from 'file-saver';
 
-import { GetSatType } from '@app/js/interfaces';
-import { OrbitFinder } from '@app/js/singletons/orbit-finder';
-import { TimeManager } from '@app/js/singletons/time-manager';
-import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
-import { FormatTle } from '@app/js/static/format-tle';
-import { SatMath, StringifiedNumber } from '@app/js/static/sat-math';
+import { GetSatType } from '@app/interfaces';
+import { OrbitFinder } from '@app/singletons/orbit-finder';
+import { TimeManager } from '@app/singletons/time-manager';
+import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import { FormatTle } from '@app/static/format-tle';
+import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 

@@ -1,5 +1,5 @@
-import { SensorObject } from '@app/js/interfaces';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { SensorObject } from '@app/interfaces';
+import { SpaceObjectType } from '@app/lib/space-object-type';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { ZoomValue } from '../singletons/camera';
 

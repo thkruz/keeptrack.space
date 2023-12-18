@@ -1,10 +1,10 @@
-import { MissileObject, SensorObject, ToastMsgType } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DEG2RAD, MILLISECONDS2DAYS, RAD2DEG, RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { MissileObject, SensorObject, ToastMsgType } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { DEG2RAD, MILLISECONDS2DAYS, RAD2DEG, RADIUS_OF_EARTH } from '@app/lib/constants';
+import { SpaceObjectType } from '@app/lib/space-object-type';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missileData';
 
-import { jday } from '@app/js/lib/transforms';
+import { jday } from '@app/lib/transforms';
 import { Kilometers, Radians, Sgp4, Transforms } from 'ootk';
 import { UpdateSatManager } from '../update-select-box/update-select-box';
 

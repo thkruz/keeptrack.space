@@ -18,8 +18,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SensorGeolocation } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
+import { SensorGeolocation } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';

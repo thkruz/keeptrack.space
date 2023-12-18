@@ -1,6 +1,6 @@
 import settingsPng from '@app/img/icons/settings.png';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -26,7 +26,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/js/interfaces' {
+declare module '@app/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;

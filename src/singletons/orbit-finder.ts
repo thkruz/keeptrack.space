@@ -1,4 +1,4 @@
-import { SatObject } from '@app/js/interfaces';
+import { SatObject } from '@app/interfaces';
 import { Degrees, EciVec3, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2, Transforms } from 'ootk';
 import { RAD2DEG } from '../lib/constants';
 import { StringPad } from '../lib/stringPad';

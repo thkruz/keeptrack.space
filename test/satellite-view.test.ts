@@ -1,9 +1,9 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons, UiManager } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { SatelliteViewPlugin } from '@app/js/plugins/satellite-view/satellite-view';
-import { Camera, CameraType } from '@app/js/singletons/camera';
+import { keepTrackContainer } from '@app/container';
+import { Singletons, UiManager } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
+import { Camera, CameraType } from '@app/singletons/camera';
 import { mockCameraManager, mockUiManager } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 

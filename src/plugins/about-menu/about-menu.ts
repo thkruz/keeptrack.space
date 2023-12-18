@@ -1,5 +1,5 @@
 import aboutPng from '@app/img/icons/about.png';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 /**

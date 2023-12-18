@@ -1,4 +1,4 @@
-import { FindSatPlugin } from '@app/js/plugins/find-sat/find-sat';
+import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 

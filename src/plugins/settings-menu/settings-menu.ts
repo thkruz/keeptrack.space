@@ -1,11 +1,11 @@
 import settingsPng from '@app/img/icons/settings.png';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { rgbCss } from '@app/js/lib/rgbCss';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { rgbCss } from '@app/lib/rgbCss';
 
-import { parseRgba } from '@app/js/lib/rgba';
-import { PersistenceManager, StorageKey } from '@app/js/singletons/persistence-manager';
-import { LegendManager } from '@app/js/static/legend-manager';
+import { parseRgba } from '@app/lib/rgba';
+import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { LegendManager } from '@app/static/legend-manager';
 import $ from 'jquery'; // TODO: Remove Color Picker
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TimeMachine } from '../time-machine/time-machine';
@@ -32,7 +32,7 @@ import { TimeMachine } from '../time-machine/time-machine';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/js/interfaces' {
+declare module '@app/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;

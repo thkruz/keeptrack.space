@@ -1,7 +1,7 @@
 import { keepTrackApi } from '../keepTrackApi';
 import { GroupType, ObjectGroup } from './object-group';
 
-import { GroupsManager } from '@app/js/interfaces';
+import { GroupsManager } from '@app/interfaces';
 
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////

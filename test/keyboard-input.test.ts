@@ -1,4 +1,4 @@
-import { KeyboardInput } from '@app/js/singletons/input-manager/keyboard-input';
+import { KeyboardInput } from '@app/singletons/input-manager/keyboard-input';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
 

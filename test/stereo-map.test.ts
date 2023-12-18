@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { StereoMapPlugin } from '@app/js/plugins/stereo-map/stereo-map';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { StereoMapPlugin } from '@app/plugins/stereo-map/stereo-map';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';

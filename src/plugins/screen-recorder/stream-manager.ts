@@ -1,5 +1,5 @@
-import { MediaRecorderOptions } from '@app/js/interfaces';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { MediaRecorderOptions } from '@app/interfaces';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
 export class StreamManager {
   static readonly BIT_RATE_30_MBPS = 30000000;

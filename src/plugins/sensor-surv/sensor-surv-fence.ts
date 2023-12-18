@@ -21,12 +21,12 @@
  */
 
 import fencePng from '@app/img/icons/fence.png';
-import { CatalogManager, SensorObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
+import { CatalogManager, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-declare module '@app/js/interfaces' {
+declare module '@app/interfaces' {
   interface UserSettings {
     isSatOverflyModeOn: boolean;
     isShowSurvFence: boolean;

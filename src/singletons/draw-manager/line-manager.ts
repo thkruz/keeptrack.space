@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
-import { GetSatType, SatObject, Singletons } from '@app/js/interfaces';
-import { DEG2RAD, RAD2DEG } from '@app/js/lib/constants';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { GetSatType, SatObject, Singletons } from '@app/interfaces';
+import { DEG2RAD, RAD2DEG } from '@app/lib/constants';
+import { SpaceObjectType } from '@app/lib/space-object-type';
 
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { BufferAttribute } from '@app/js/static/buffer-attribute';
-import { WebGlProgramHelper } from '@app/js/static/webgl-program';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { BufferAttribute } from '@app/static/buffer-attribute';
+import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { keepTrackContainer } from '../../container';

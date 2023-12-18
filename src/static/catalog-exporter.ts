@@ -1,6 +1,6 @@
-import { SatObject } from '@app/js/interfaces';
-import { RAD2DEG } from '@app/js/lib/constants';
-import { saveCsv } from '@app/js/lib/saveVariable';
+import { SatObject } from '@app/interfaces';
+import { RAD2DEG } from '@app/lib/constants';
+import { saveCsv } from '@app/lib/saveVariable';
 import { saveAs } from 'file-saver';
 import { keepTrackApi } from '../keepTrackApi';
 import { errorManagerInstance } from '../singletons/errorManager';

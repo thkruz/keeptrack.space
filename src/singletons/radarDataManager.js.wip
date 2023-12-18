@@ -1,6 +1,6 @@
-import { DEG2RAD } from '@app/js/lib/constants';
-import { timeManager } from '@app/js/timeManager/timeManager';
-import { jday } from '@app/js/timeManager/transforms';
+import { DEG2RAD } from '@app/lib/constants';
+import { timeManager } from '@app/timeManager/timeManager';
+import { jday } from '@app/timeManager/transforms';
 import { keepTrackApi } from '../api/keepTrackApi';
 
 var satellite, sensorManager, catalogManagerInstance, satCruncher;

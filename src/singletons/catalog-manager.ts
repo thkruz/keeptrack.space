@@ -26,7 +26,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { SatelliteRecord, Sgp4 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
@@ -47,7 +47,7 @@ import { LineTypes, lineManagerInstance } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import { StandardUiManager } from './uiManager';
 // TODO: FUTURE FEATURE
-// import { radarDataManager } from '@app/js/catalogManagerInstance/radarDataManager.js';
+// import { radarDataManager } from '@app/catalogManagerInstance/radarDataManager.js';
 
 // prettier-ignore
 /*
@@ -74,7 +74,7 @@ import { StandardUiManager } from './uiManager';
 // };
 */
 
-declare module '@app/js/interfaces' {
+declare module '@app/interfaces' {
   interface SatCruncherMessageData {
   extraData?: string;
   extraUpdate?: boolean;

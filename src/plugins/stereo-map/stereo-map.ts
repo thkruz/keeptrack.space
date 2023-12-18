@@ -29,12 +29,12 @@ import radar1 from '@app/img/radar-1.png';
 import redSquare from '@app/img/red-square.png';
 import satellite2 from '@app/img/satellite-2.png';
 import yellowSquare from '@app/img/yellow-square.png';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
-import { SatMathApi } from '@app/js/singletons/sat-math-api';
-import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
+import { SatMathApi } from '@app/singletons/sat-math-api';
+import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 const earthImg = new Image();

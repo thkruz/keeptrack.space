@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/api/keepTrackApi';
-import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
+import { keepTrackApi } from '@app/api/keepTrackApi';
+import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import * as glm from 'gl-matrix';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
@@ -158,9 +158,9 @@ const shaders = {
       #else
         precision mediump float;
       #endif
-  
+
       out vec4 fragColor;
-  
+
       void main(void) {
           fragColor = vec4(0.0, 0.2, 0.8, 0.2);
       }
@@ -171,9 +171,9 @@ const shaders = {
       uniform mat4 u_mvMatrix;
       uniform mat3 u_nMatrix;
       uniform float u_drawPosition;
-      
+
       in vec3 a_position;
-    
+
       void main(void) {
           vec4 position = u_mvMatrix * vec4(a_position, 1.0);
           gl_Position = u_pMatrix * u_camMatrix * position;

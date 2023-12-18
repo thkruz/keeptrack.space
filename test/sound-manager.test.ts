@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SoundManager } from '@app/js/plugins/sounds/sound-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { standardPluginSuite } from './generic-tests';
 
 describe('Sound Manager', () => {

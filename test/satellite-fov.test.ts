@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SatelliteFov } from '@app/js/plugins/satellite-fov/satellite-fov';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';

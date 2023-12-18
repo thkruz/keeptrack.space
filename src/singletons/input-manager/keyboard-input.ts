@@ -1,7 +1,7 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { DebugMenuPlugin } from '@app/js/plugins/debug/debug';
-import { Camera, CameraType } from '@app/js/singletons/camera';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { DebugMenuPlugin } from '@app/plugins/debug/debug';
+import { Camera, CameraType } from '@app/singletons/camera';
 import eruda from 'eruda';
 import { KeyEvent } from '../input-manager';
 

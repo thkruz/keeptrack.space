@@ -1,11 +1,11 @@
-import { SatObject } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { RAD2DEG } from '@app/js/lib/constants';
-import { getEl } from '@app/js/lib/get-el';
-import { StringPad } from '@app/js/lib/stringPad';
+import { SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { RAD2DEG } from '@app/lib/constants';
+import { getEl } from '@app/lib/get-el';
+import { StringPad } from '@app/lib/stringPad';
 
-import { FormatTle } from '@app/js/static/format-tle';
-import { StringifiedNumber } from '@app/js/static/sat-math';
+import { FormatTle } from '@app/static/format-tle';
+import { StringifiedNumber } from '@app/static/sat-math';
 import { Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBoxCore } from '../select-sat-manager/satInfoboxCore';

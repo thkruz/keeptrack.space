@@ -1,10 +1,10 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
-import { GetSatType } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
-import { Camera, CameraType } from '@app/js/singletons/camera';
-import { UrlManager } from '@app/js/static/url-manager';
+import { GetSatType } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { TimeMachine } from '@app/plugins/time-machine/time-machine';
+import { Camera, CameraType } from '@app/singletons/camera';
+import { UrlManager } from '@app/static/url-manager';
 import { Kilometers } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';

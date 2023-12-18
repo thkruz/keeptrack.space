@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { ClassificationBar } from '@app/js/plugins/classification-bar/classification-bar';
-import { ClassificationString } from '@app/js/static/classification';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { ClassificationBar } from '@app/plugins/classification-bar/classification-bar';
+import { ClassificationString } from '@app/static/classification';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginInit, standardPluginSuite } from './generic-tests';
 

@@ -1,8 +1,8 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SensorFov } from '@app/js/plugins/sensor-fov/sensor-fov';
-import { StandardSensorManager } from '@app/js/plugins/sensor/sensorManager';
+import { keepTrackContainer } from '@app/container';
+import { Singletons } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
+import { StandardSensorManager } from '@app/plugins/sensor/sensorManager';
 import { defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

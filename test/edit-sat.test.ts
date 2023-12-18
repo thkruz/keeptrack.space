@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { EditSatPlugin } from '@app/js/plugins/edit-sat/edit-sat';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { EditSatPlugin } from '@app/plugins/edit-sat/edit-sat';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

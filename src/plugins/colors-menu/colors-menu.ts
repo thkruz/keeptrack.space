@@ -1,9 +1,9 @@
 import colorsPng from '@app/img/icons/colors.png';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
-import { waitForCruncher } from '@app/js/lib/waitForCruncher';
-import { LegendManager } from '@app/js/static/legend-manager';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
+import { waitForCruncher } from '@app/lib/waitForCruncher';
+import { LegendManager } from '@app/static/legend-manager';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class ColorMenu extends KeepTrackPlugin {

@@ -1,9 +1,9 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { BufferAttribute } from '@app/js/static/buffer-attribute';
-import { FlatGeometry } from '@app/js/static/flat-geometry';
-import { GLSL3 } from '@app/js/static/material';
-import { Mesh } from '@app/js/static/mesh';
-import { ShaderMaterial } from '@app/js/static/shader-material';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { BufferAttribute } from '@app/static/buffer-attribute';
+import { FlatGeometry } from '@app/static/flat-geometry';
+import { GLSL3 } from '@app/static/material';
+import { Mesh } from '@app/static/mesh';
+import { ShaderMaterial } from '@app/static/shader-material';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { Sun } from './sun';
 /* eslint-disable no-useless-escape */

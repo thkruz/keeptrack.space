@@ -1,8 +1,8 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { SatInfoBoxCore } from '@app/js/plugins/select-sat-manager/satInfoboxCore';
-import { SelectSatManager } from '@app/js/plugins/select-sat-manager/select-sat-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { SpaceObjectType } from '@app/lib/space-object-type';
+import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';

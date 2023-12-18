@@ -1,8 +1,8 @@
-import { GeolocationPosition } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
-import { StandardUiManager } from '@app/js/singletons/uiManager';
-import { UiGeolocation } from '@app/js/static/ui-manager-geolocation';
+import { GeolocationPosition } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import { StandardUiManager } from '@app/singletons/uiManager';
+import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { defaultSensor } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
 

@@ -1,4 +1,4 @@
-import { SettingsManager } from '@app/js/settings/settings';
+import { SettingsManager } from '@app/settings/settings';
 
 interface JQuery<HTMLElement> {
   effect: any;

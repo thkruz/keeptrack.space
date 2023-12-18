@@ -1,7 +1,7 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SatInfoBoxCore } from '@app/js/plugins/select-sat-manager/satInfoboxCore';
-import { SelectSatManager } from '@app/js/plugins/select-sat-manager/select-sat-manager';
-import { ShortTermFences } from '@app/js/plugins/short-term-fences/short-term-fences';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fences';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';

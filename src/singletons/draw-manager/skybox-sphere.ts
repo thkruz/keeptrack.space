@@ -1,10 +1,10 @@
-import { DEG2RAD } from '@app/js/lib/constants';
-import { SettingsManager } from '@app/js/settings/settings';
-import { GlUtils } from '@app/js/static/gl-utils';
-import { GLSL3 } from '@app/js/static/material';
-import { Mesh } from '@app/js/static/mesh';
-import { ShaderMaterial } from '@app/js/static/shader-material';
-import { SphereGeometry } from '@app/js/static/sphere-geometry';
+import { DEG2RAD } from '@app/lib/constants';
+import { SettingsManager } from '@app/settings/settings';
+import { GlUtils } from '@app/static/gl-utils';
+import { GLSL3 } from '@app/static/material';
+import { Mesh } from '@app/static/mesh';
+import { ShaderMaterial } from '@app/static/shader-material';
+import { SphereGeometry } from '@app/static/sphere-geometry';
 import { mat3, mat4 } from 'gl-matrix';
 import { keepTrackApi } from './../../keepTrackApi';
 /* eslint-disable no-useless-escape */

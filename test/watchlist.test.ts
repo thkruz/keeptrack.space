@@ -1,7 +1,7 @@
-import { WatchlistPlugin } from '@app//plugins/watchlist/watchlist';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml } from './environment/standard-env';
-import { standardPluginSuite, standardPluginMenuButtonTests, standardClickTests, websiteInit } from './generic-tests';
-import { keepTrackApi } from '@app//keepTrackApi';
+import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('WatchlistPlugin_class', () => {
   let watchlistPlugin: WatchlistPlugin;

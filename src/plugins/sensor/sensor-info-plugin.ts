@@ -1,7 +1,7 @@
 import radioTowerPng from '@app/img/icons/radio-tower.png';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { LineManager, LineTypes } from '@app/js/singletons/draw-manager/line-manager';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { LineManager, LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {

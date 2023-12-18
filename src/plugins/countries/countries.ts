@@ -1,12 +1,12 @@
-import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
-import { getEl } from '@app/js/lib/get-el';
+import { clickAndDragWidth } from '@app/lib/click-and-drag';
+import { getEl } from '@app/lib/get-el';
 
 import flagPng from '@app/img/icons/flag.png';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { GroupType } from '@app/js/singletons/object-group';
-import { StringExtractor } from '@app/js/static/string-extractor';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { GroupType } from '@app/singletons/object-group';
+import { StringExtractor } from '@app/static/string-extractor';
 
-import { SearchResult } from '@app/js/singletons/search-manager';
+import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class CountriesMenu extends KeepTrackPlugin {

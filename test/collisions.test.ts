@@ -1,5 +1,5 @@
-import { getEl } from '@app/js/lib/get-el';
-import { CollissionsPlugin } from '@app/js/plugins/collisions/collisions';
+import { getEl } from '@app/lib/get-el';
+import { CollissionsPlugin } from '@app/plugins/collisions/collisions';
 import { readFileSync } from 'fs';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

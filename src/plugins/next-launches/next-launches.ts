@@ -1,12 +1,12 @@
 import calendar2Png from '@app/img/icons/calendar2.png';
-import { LaunchInfoObject } from '@app/js/interfaces';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
-import { openColorbox } from '@app/js/lib/colorbox';
-import { dateFormat } from '@app/js/lib/dateFormat';
-import { getEl } from '@app/js/lib/get-el';
-import { saveCsv } from '@app/js/lib/saveVariable';
-import { truncateString } from '@app/js/lib/truncate-string';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { LaunchInfoObject } from '@app/interfaces';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { openColorbox } from '@app/lib/colorbox';
+import { dateFormat } from '@app/lib/dateFormat';
+import { getEl } from '@app/lib/get-el';
+import { saveCsv } from '@app/lib/saveVariable';
+import { truncateString } from '@app/lib/truncate-string';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {

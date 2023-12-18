@@ -1,6 +1,6 @@
-import { SatConstellationString, SatLinkManager } from '@app/js/singletons/catalog-manager/satLinkManager';
-import { LineManager } from '@app/js/singletons/draw-manager/line-manager';
-import { TimeManager } from '@app/js/singletons/time-manager';
+import { SatConstellationString, SatLinkManager } from '@app/singletons/catalog-manager/satLinkManager';
+import { LineManager } from '@app/singletons/draw-manager/line-manager';
+import { TimeManager } from '@app/singletons/time-manager';
 
 describe('SatLinkManager', () => {
   let satLinkManager: SatLinkManager;

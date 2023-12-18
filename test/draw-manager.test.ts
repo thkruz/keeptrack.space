@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { CameraType } from '@app/js/singletons/camera';
-import { Renderer, WebGLRenderer } from '@app/js/singletons/webgl-renderer';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { CameraType } from '@app/singletons/camera';
+import { Renderer, WebGLRenderer } from '@app/singletons/webgl-renderer';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 

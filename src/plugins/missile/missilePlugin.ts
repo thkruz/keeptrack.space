@@ -1,11 +1,11 @@
 import missilePng from '@app/img/icons/missile.png';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { clickAndDragWidth } from '@app/js/lib/click-and-drag';
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
-import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { clickAndDragWidth } from '@app/lib/click-and-drag';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
+import { slideInRight, slideOutLeft } from '@app/lib/slide';
 
-import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
+import { adviceManagerInstance } from '@app/singletons/adviceManager';
 
 import { helpBodyTextMissile, helpTitleTextMissile } from './help';
 import { missileManager, missileManager as missileManagerInstance } from './missileManager';

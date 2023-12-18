@@ -1,15 +1,15 @@
 import breakupPng from '@app/img/icons/breakup.png';
-import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
-import { StringPad } from '@app/js/lib/stringPad';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { GetSatType, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
+import { StringPad } from '@app/lib/stringPad';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
-import { OrbitFinder } from '@app/js/singletons/orbit-finder';
-import { TimeManager } from '@app/js/singletons/time-manager';
-import { CoordinateTransforms } from '@app/js/static/coordinate-transforms';
-import { SatMath } from '@app/js/static/sat-math';
+import { OrbitFinder } from '@app/singletons/orbit-finder';
+import { TimeManager } from '@app/singletons/time-manager';
+import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import { SatMath } from '@app/static/sat-math';
 import { SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 

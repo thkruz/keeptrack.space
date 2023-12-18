@@ -1,17 +1,17 @@
 import rocketPng from '@app/img/icons/rocket.png';
-import { GetSatType, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { RAD2DEG } from '@app/js/lib/constants';
-import { getEl } from '@app/js/lib/get-el';
-import { hideLoading, showLoadingSticky } from '@app/js/lib/showLoading';
-import { StringPad } from '@app/js/lib/stringPad';
-import { waitForCruncher } from '@app/js/lib/waitForCruncher';
+import { GetSatType, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { RAD2DEG } from '@app/lib/constants';
+import { getEl } from '@app/lib/get-el';
+import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
+import { StringPad } from '@app/lib/stringPad';
+import { waitForCruncher } from '@app/lib/waitForCruncher';
 
-import { SatMath } from '@app/js/static/sat-math';
+import { SatMath } from '@app/static/sat-math';
 
-import { launchSites } from '@app/js/catalogs/launch-sites';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
-import { OrbitFinder } from '@app/js/singletons/orbit-finder';
+import { launchSites } from '@app/catalogs/launch-sites';
+import { errorManagerInstance } from '@app/singletons/errorManager';
+import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { SatelliteRecord, Sgp4 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 

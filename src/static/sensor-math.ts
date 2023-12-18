@@ -1,4 +1,4 @@
-import { SatObject, SatPassTimes, SensorObject } from '@app/js/interfaces';
+import { SatObject, SatPassTimes, SensorObject } from '@app/interfaces';
 import { Degrees, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Transforms } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, TAU } from '../lib/constants';

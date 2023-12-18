@@ -1,11 +1,11 @@
 import iodPng from '@app/img/icons/iod.png';
-import { UiManager } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { slideInRight, slideOutLeft } from '@app/js/lib/slide';
-import { omManager } from '@app/js/plugins/initial-orbit/om-manager';
+import { UiManager } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { slideInRight, slideOutLeft } from '@app/lib/slide';
+import { omManager } from '@app/plugins/initial-orbit/om-manager';
 
-import { adviceManagerInstance } from '@app/js/singletons/adviceManager';
+import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import { helpBodyTextInitOrbit, helpTitleTextInitOrbit } from './help';
 
 let isObfitMenuOpen = false;

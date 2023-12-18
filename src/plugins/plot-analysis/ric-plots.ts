@@ -1,8 +1,8 @@
 import scatterPlotPng4 from '@app/img/icons/scatter-plot4.png';
-import { EChartsData, SatObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { SatMathApi } from '@app/js/singletons/sat-math-api';
+import { EChartsData, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { SatMathApi } from '@app/singletons/sat-math-api';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

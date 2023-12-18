@@ -1,7 +1,7 @@
-import { MissileObject } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { RADIUS_OF_EARTH } from '@app/js/lib/constants';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { MissileObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { RADIUS_OF_EARTH } from '@app/lib/constants';
+import { SpaceObjectType } from '@app/lib/space-object-type';
 import { Kilometers, Meters } from 'ootk';
 import { missileManager } from './missileManager';
 

@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { NewLaunch } from '@app/js/plugins/new-launch/new-launch';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

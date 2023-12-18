@@ -1,4 +1,4 @@
-import { SatObject } from '@app/js/interfaces';
+import { SatObject } from '@app/interfaces';
 import numeric from 'numeric';
 import { AzEl, Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { DEG2RAD, MILLISECONDS_PER_SECOND, RAD2DEG } from '../lib/constants';

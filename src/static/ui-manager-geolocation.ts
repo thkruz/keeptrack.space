@@ -1,4 +1,4 @@
-import { GeolocationPosition, SensorGeolocation, SensorObject } from '@app/js/interfaces';
+import { GeolocationPosition, SensorGeolocation, SensorObject } from '@app/interfaces';
 import { Degrees, Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';

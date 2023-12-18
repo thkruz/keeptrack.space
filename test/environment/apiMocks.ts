@@ -1,9 +1,9 @@
 // @ts-nocheck
 
-import { Operators } from '@app/js/catalogs/sensors';
-import { DEG2RAD } from '@app/js/lib/constants';
-import { ZoomValue } from '@app/js/singletons/camera';
-import { CatalogSource } from '@app/js/static/catalog-loader';
+import { Operators } from '@app/catalogs/sensors';
+import { DEG2RAD } from '@app/lib/constants';
+import { ZoomValue } from '@app/singletons/camera';
+import { CatalogSource } from '@app/static/catalog-loader';
 import { Degrees, Kilometers, Milliseconds, Sgp4 } from 'ootk';
 import { SatObject, SensorObject } from '../../src/interfaces';
 import { SpaceObjectType } from '../../src/lib/space-object-type';

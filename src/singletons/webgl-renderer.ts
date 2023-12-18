@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';

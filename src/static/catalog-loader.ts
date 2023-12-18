@@ -1,8 +1,8 @@
-import { CatalogManager, RadarDataObject, SatObject, SensorObject } from '@app/js/interfaces';
-import { getEl } from '@app/js/lib/get-el';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { StringPad } from '@app/js/lib/stringPad';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { CatalogManager, RadarDataObject, SatObject, SensorObject } from '@app/interfaces';
+import { getEl } from '@app/lib/get-el';
+import { SpaceObjectType } from '@app/lib/space-object-type';
+import { StringPad } from '@app/lib/stringPad';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
 import { Tle, TleLine1, TleLine2 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';

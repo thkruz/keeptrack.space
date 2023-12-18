@@ -31,13 +31,13 @@
 
 'use strict';
 
-import { SatObject } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { EARTHS_GRAV_CONST } from '@app/js/lib/constants';
-import { StandardCatalogManager } from '@app/js/singletons/catalog-manager';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
-import { TimeManager } from '@app/js/singletons/time-manager';
-import { SatMath } from '@app/js/static/sat-math';
+import { SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { EARTHS_GRAV_CONST } from '@app/lib/constants';
+import { StandardCatalogManager } from '@app/singletons/catalog-manager';
+import { errorManagerInstance } from '@app/singletons/errorManager';
+import { TimeManager } from '@app/singletons/time-manager';
+import { SatMath } from '@app/static/sat-math';
 import { Sgp4 } from 'ootk';
 
 // Constants

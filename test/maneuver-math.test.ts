@@ -12,8 +12,8 @@ Fields:
 - None of the fields are directly used in the methods of this class, but it uses fields from other classes such as CatalogManager, TimeManager, SensorManager, and SatMath.
  */
 
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { ManueverMath } from '@app/js/static/maneuver-math';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { ManueverMath } from '@app/static/maneuver-math';
 import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';

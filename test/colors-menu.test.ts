@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { ColorMenu } from '@app/js/plugins/colors-menu/colors-menu';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { ColorMenu } from '@app/plugins/colors-menu/colors-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite, websiteInit } from './generic-tests';
 

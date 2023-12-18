@@ -1,8 +1,8 @@
 import collissionsPng from '@app/img/icons/socrates.png';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
-import { getEl } from '@app/js/lib/get-el';
-import { showLoading } from '@app/js/lib/showLoading';
+import { getEl } from '@app/lib/get-el';
+import { showLoading } from '@app/lib/showLoading';
 import { keepTrackApi } from '../../keepTrackApi';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 

@@ -1,6 +1,6 @@
-import { SatObject } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
+import { SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { SpaceObjectType, TleLine1 } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 

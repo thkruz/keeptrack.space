@@ -17,10 +17,10 @@ import whoosh5Mp3 from '@app/audio/whoosh5.mp3';
 import whoosh6Mp3 from '@app/audio/whoosh6.mp3';
 import whoosh7Mp3 from '@app/audio/whoosh7.mp3';
 import whoosh8Mp3 from '@app/audio/whoosh8.mp3';
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
+import { keepTrackContainer } from '@app/container';
+import { Singletons } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SoundManager extends KeepTrackPlugin {

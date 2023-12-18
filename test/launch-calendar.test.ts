@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { createColorbox } from '@app/js/lib/colorbox';
-import { LaunchCalendar } from '@app/js/plugins/launch-calendar/launch-calendar';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { createColorbox } from '@app/lib/colorbox';
+import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 

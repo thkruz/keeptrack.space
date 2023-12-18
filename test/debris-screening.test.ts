@@ -1,4 +1,4 @@
-import { DebrisScreening } from '@app/js/plugins/debris-screening/debris-screening';
+import { DebrisScreening } from '@app/plugins/debris-screening/debris-screening';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 

@@ -1,4 +1,4 @@
-import { SatObject } from '@app/js/interfaces';
+import { SatObject } from '@app/interfaces';
 import { SatelliteRecord, Sgp4, TleLine1, TleLine2, Transforms } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { StringPad } from '../lib/stringPad';

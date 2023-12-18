@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { StandardGroupManager } from '@app/js/singletons/groups-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { StandardGroupManager } from '@app/singletons/groups-manager';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
 import { CountriesMenu } from './../src/plugins/countries/countries';

@@ -1,6 +1,6 @@
 import { Milliseconds } from 'ootk';
 
-import { SatObject } from '@app/js/interfaces';
+import { SatObject } from '@app/interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 
 export class DemoManager {

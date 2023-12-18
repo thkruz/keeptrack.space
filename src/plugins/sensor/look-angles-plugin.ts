@@ -1,11 +1,11 @@
 import lookanglesPng from '@app/img/icons/lookangles.png';
-import { GetSatType, SatObject, SensorObject } from '@app/js/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { dateFormat } from '@app/js/lib/dateFormat';
-import { getEl } from '@app/js/lib/get-el';
-import { saveCsv } from '@app/js/lib/saveVariable';
-import { showLoading } from '@app/js/lib/showLoading';
-import { SensorMath, TearrData } from '@app/js/static/sensor-math';
+import { GetSatType, SatObject, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { dateFormat } from '@app/lib/dateFormat';
+import { getEl } from '@app/lib/get-el';
+import { saveCsv } from '@app/lib/saveVariable';
+import { showLoading } from '@app/lib/showLoading';
+import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 export class LookAnglesPlugin extends KeepTrackPlugin {
   isRequireSatelliteSelected: boolean = true;

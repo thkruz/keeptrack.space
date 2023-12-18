@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
+import { SpaceObjectType } from '@app/lib/space-object-type';
 import { Degrees, Minutes } from 'ootk';
 import { SatObject } from '../interfaces';
 import { DEG2RAD } from '../lib/constants';

@@ -21,12 +21,12 @@
  */
 
 import sat2Png from '@app/img/icons/sat2.png';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-declare module '@app/js/interfaces' {
+declare module '@app/interfaces' {
   interface UserSettings {
     isSatOverflyModeOn: boolean;
     isShowSurvFence: boolean;

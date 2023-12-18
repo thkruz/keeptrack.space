@@ -1,4 +1,4 @@
-import { NextLaunchesPlugin } from '@app/js/plugins/next-launches/next-launches';
+import { NextLaunchesPlugin } from '@app/plugins/next-launches/next-launches';
 import { readFileSync } from 'fs';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';

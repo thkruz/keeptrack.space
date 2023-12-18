@@ -1,5 +1,5 @@
-import { GetSatType } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { GetSatType } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '../lib/get-el';
 
 export abstract class UrlManager {

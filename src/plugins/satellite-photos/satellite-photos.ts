@@ -1,9 +1,9 @@
-import { openColorbox } from '@app/js/lib/colorbox';
-import { getEl } from '@app/js/lib/get-el';
-import { lat2pitch, lon2yaw } from '@app/js/lib/transforms';
+import { openColorbox } from '@app/lib/colorbox';
+import { getEl } from '@app/lib/get-el';
+import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
 import photoManagerPng from '@app/img/icons/photoManager.png';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/js/keepTrackApi';
+import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatellitePhotos extends KeepTrackPlugin {

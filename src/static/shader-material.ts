@@ -1,4 +1,4 @@
-import { GlUtils } from '@app/js/static/gl-utils';
+import { GlUtils } from '@app/static/gl-utils';
 import { Material, MaterialParameters } from './material';
 
 export interface ShaderMaterialParameters extends MaterialParameters {

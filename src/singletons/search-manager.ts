@@ -1,8 +1,8 @@
 import { CatalogObject, MissileObject, SensorObject } from './../interfaces';
 /* */
 
-import { CatalogManager, SatObject, UiManager } from '@app/js/interfaces';
-import { GroupType, ObjectGroup } from '@app/js/singletons/object-group';
+import { CatalogManager, SatObject, UiManager } from '@app/interfaces';
+import { GroupType, ObjectGroup } from '@app/singletons/object-group';
 import { SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';

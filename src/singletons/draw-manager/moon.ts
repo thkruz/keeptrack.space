@@ -19,11 +19,11 @@
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
-import { RAD2DEG } from '@app/js/lib/constants';
-import { GLSL3 } from '@app/js/static/material';
-import { Mesh } from '@app/js/static/mesh';
-import { ShaderMaterial } from '@app/js/static/shader-material';
-import { SphereGeometry } from '@app/js/static/sphere-geometry';
+import { RAD2DEG } from '@app/lib/constants';
+import { GLSL3 } from '@app/static/material';
+import { Mesh } from '@app/static/mesh';
+import { ShaderMaterial } from '@app/static/shader-material';
+import { SphereGeometry } from '@app/static/sphere-geometry';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Radians, Transforms, Utils } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';

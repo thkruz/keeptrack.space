@@ -1,4 +1,4 @@
-import { DopList, DopMath } from '@app/js/static/dop-math';
+import { DopList, DopMath } from '@app/static/dop-math';
 import { AzEl, Degrees, Kilometers } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';

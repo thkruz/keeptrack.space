@@ -1,10 +1,10 @@
-import { CatalogManager, GetSatType, SatCruncherMessageData, SatObject } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DEG2RAD } from '@app/js/lib/constants';
-import { SpaceObjectType } from '@app/js/lib/space-object-type';
-import { StandardCatalogManager } from '@app/js/singletons/catalog-manager';
-import { CatalogExporter } from '@app/js/static/catalog-exporter';
-import { CatalogSearch } from '@app/js/static/catalog-search';
+import { CatalogManager, GetSatType, SatCruncherMessageData, SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { DEG2RAD } from '@app/lib/constants';
+import { SpaceObjectType } from '@app/lib/space-object-type';
+import { StandardCatalogManager } from '@app/singletons/catalog-manager';
+import { CatalogExporter } from '@app/static/catalog-exporter';
+import { CatalogSearch } from '@app/static/catalog-search';
 import { defaultSat } from './environment/apiMocks';
 
 // Test calcSatrec function

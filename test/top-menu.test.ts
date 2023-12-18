@@ -1,9 +1,9 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { soundManagerPlugin } from '@app/js/plugins/sounds/sound-manager';
-import { TopMenu } from '@app/js/plugins/top-menu/top-menu';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { keepTrackContainer } from '@app/container';
+import { Singletons } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 

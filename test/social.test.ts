@@ -1,5 +1,5 @@
-import { SocialMedia } from '@app/js/plugins/social/social';
-import { TopMenu } from '@app/js/plugins/top-menu/top-menu';
+import { SocialMedia } from '@app/plugins/social/social';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 

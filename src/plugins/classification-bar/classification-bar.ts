@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { Classification, ClassificationString } from '@app/js/static/classification';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { Classification, ClassificationString } from '@app/static/classification';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class ClassificationBar extends KeepTrackPlugin {

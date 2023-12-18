@@ -11,7 +11,7 @@ import { WebGlProgramHelper } from '../static/webgl-program';
 import { CameraType } from './camera';
 import { WebGLRenderer } from './webgl-renderer';
 
-declare module '@app/js/interfaces' {
+declare module '@app/interfaces' {
   interface SatShader {
     maxSize: number;
     minSize: number;

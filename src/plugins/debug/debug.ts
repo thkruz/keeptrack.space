@@ -1,11 +1,11 @@
 import * as gremlins from 'gremlins.js';
 
-import { getEl } from '@app/js/lib/get-el';
+import { getEl } from '@app/lib/get-el';
 
 import debugPng from '@app/img/icons/debug.png';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 
-import { LineTypes, lineManagerInstance } from '@app/js/singletons/draw-manager/line-manager';
+import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';

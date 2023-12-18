@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { EciArr3 } from '@app/js/interfaces';
-import { BufferAttribute } from '@app/js/static/buffer-attribute';
+import { EciArr3 } from '@app/interfaces';
+import { BufferAttribute } from '@app/static/buffer-attribute';
 import { vec4 } from 'gl-matrix';
 import { GlUtils } from '../../../static/gl-utils';
 

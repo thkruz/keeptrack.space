@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { ScreenRecorder } from '@app/js/plugins/screen-recorder/screen-recorder';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
 

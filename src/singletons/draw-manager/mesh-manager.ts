@@ -2,9 +2,9 @@
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DEG2RAD } from '@app/lib/constants';
-import { OBJ } from '@app/lib/external/webgl-obj-loader.js';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Kilometers, Radians, TleLine1, TleLine2 } from 'ootk';
+import { MeshMap, OBJ } from 'webgl-obj-loader';
 import { SatObject } from '../../interfaces';
 import { SpaceObjectType } from '../../lib/space-object-type';
 import { SatMath } from '../../static/sat-math';
@@ -417,7 +417,7 @@ export class MeshManager {
 
       let p = OBJ.downloadModels(this.fileList_);
 
-      p.then((models: any[]) => {
+      p.then((models: MeshMap) => {
         // DEBUG:
         // for (var [name, mesh] of Object.entries(models)) {
         //   console.debug('Name:', name);
@@ -642,13 +642,13 @@ export class MeshManager {
     gl.useProgram(this.program_);
 
     this.attribs_ = {
-      aVertexPosition: OBJ.Layout.POSITION.key,
-      aVertexNormal: OBJ.Layout.NORMAL.key,
-      aTextureCoord: OBJ.Layout.UV.key,
-      aAmbient: OBJ.Layout.AMBIENT.key,
-      aDiffuse: OBJ.Layout.DIFFUSE.key,
-      aSpecular: OBJ.Layout.SPECULAR.key,
-      aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key,
+      aVertexPosition: OBJ.Layout.POSITION.key as unknown as number,
+      aVertexNormal: OBJ.Layout.NORMAL.key as unknown as number,
+      aTextureCoord: OBJ.Layout.UV.key as unknown as number,
+      aAmbient: OBJ.Layout.AMBIENT.key as unknown as number,
+      aDiffuse: OBJ.Layout.DIFFUSE.key as unknown as number,
+      aSpecular: OBJ.Layout.SPECULAR.key as unknown as number,
+      aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key as unknown as number,
     };
 
     this.uniforms_.uPMatrix = gl.getUniformLocation(this.program_, 'uPMatrix');

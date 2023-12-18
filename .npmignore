@@ -102,7 +102,7 @@ key.pem
 .cache/server.pem
 
 # TLE History
-src/analysis/sathist/*.json
+public/analysis/sathist/*.json
 
 # Custom Builds
 custom-builds

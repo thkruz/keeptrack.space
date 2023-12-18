@@ -159,6 +159,7 @@
     "resizable": "^1.2.1",
     "ts-node": "^10.9.1",
     "urlon": "^3.1.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "webgl-obj-loader": "^2.0.8"
   }
 }

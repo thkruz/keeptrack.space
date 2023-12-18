@@ -21,8 +21,10 @@
     "test/**/*.png",
     "test/**/*.mp3",
     "test/**/*.jpg",
-    "src/analysis/js/analysis-tools.js",
-    "public/serviceWorker.js"
+    "public/analysis/js/analysis-tools.js",
+    "public/serviceWorker.js",
+    "public/settings/settingsOverride.js",
+    "public/settings/settingsOverrideEmbed.js"
   ],
   "exclude": ["node_modules/**/*", "dist/**/*", "src/admin/**/*", "embed/**/*", "lib/**/*", "coverage/**/*", "tsconfig.json", "src/tools/**/*", "src/plugins/startAnalytics.js"],
   "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.png", "src/**/*.jpg", "!**/node_modules/**"]

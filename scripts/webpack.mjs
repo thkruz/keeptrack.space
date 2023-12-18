@@ -68,11 +68,11 @@ export const generateConfig = (env, isWatch) => {
   if (env !== 'embed' && env !== 'embedDev') {
     const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
-    const analysisConfig = getAnalysisConfig(baseConfig, dirName);
+    // const analysisConfig = getAnalysisConfig(baseConfig, dirName);
 
     webpackConfig.push(mainConfig);
     webpackConfig.push(webWorkerConfig);
-    webpackConfig.push(analysisConfig);
+    // webpackConfig.push(analysisConfig);
   } else {
     const mainConfig = getMainConfig(baseConfig, dirName, 'embed/keepTrack', 'keepTrack/');
     const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'embed/keepTrack/', 'keepTrack/');
@@ -250,28 +250,28 @@ const getWebWorkerConfig = (baseConfig, dirName, subFolder, pubPath) => ({
   },
 });
 
-const getAnalysisConfig = (baseConfig, dirName) => ({
-  ...baseConfig,
-  ...{
-    name: 'Libraries',
-    entry: {
-      'analysis-tools': ['./src/analysis/js/analysis-tools.js'],
-    },
-    plugins: [
-      new webpack.ProvidePlugin({
-        '$': 'jquery',
-        'jQuery': 'jquery',
-        'windows.jQuery': 'jquery',
-      }),
-      new HtmlWebpackPlugin({
-        filename: '../index.html',
-        template: './src/analysis/index.html',
-      }),
-    ],
-    output: {
-      filename: '[name].js',
-      path: dirName + '/../dist/analysis/js/',
-      publicPath: './js/',
-    },
-  },
-});
+// const getAnalysisConfig = (baseConfig, dirName) => ({
+//   ...baseConfig,
+//   ...{
+//     name: 'Libraries',
+//     entry: {
+//       'analysis-tools': ['./public/analysis/js/analysis-tools.js'],
+//     },
+//     plugins: [
+//       new webpack.ProvidePlugin({
+//         '$': 'jquery',
+//         'jQuery': 'jquery',
+//         'windows.jQuery': 'jquery',
+//       }),
+//       new HtmlWebpackPlugin({
+//         filename: '../index.html',
+//         template: './public/analysis/index.html',
+//       }),
+//     ],
+//     output: {
+//       filename: '[name].js',
+//       path: dirName + '/../dist/analysis/js/',
+//       publicPath: './js/',
+//     },
+//   },
+// });

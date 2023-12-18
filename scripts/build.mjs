@@ -16,7 +16,6 @@ mkdirSync('./dist');
 
 console.log('Copy static files...'); // NOSONAR
 cpSync('./public', './dist', { recursive: true, preserveTimestamps: true });
-cpSync('./src/settings/settingsOverride.js', './dist/settings/settingsOverride.js', { preserveTimestamps: true });
 
 console.log('Updating version number...'); // NOSONAR
 generateConstVersion('./package.json', 'src/settings/version.js');

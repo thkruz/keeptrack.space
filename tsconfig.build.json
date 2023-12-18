@@ -21,7 +21,7 @@
     "test/**/*.png",
     "test/**/*.mp3",
     "test/**/*.jpg",
-    "src/analysis/js/analysis-tools.js"
+    "public/analysis/js/analysis-tools.js"
   ],
   "exclude": [
     "node_modules/**/*",

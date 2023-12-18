@@ -366,7 +366,11 @@ export class WebGLRenderer {
 
   resizeCanvas(isForcedResize: boolean = false) {
     const gl = this.gl;
-    if (!gl.canvas) return; // Avoids errors when the canvas is not available
+    if (!gl.canvas) {
+      // We lost the canvas - try to get it again
+      this.glInit();
+      return;
+    }
 
     const { vw, vh } = WebGLRenderer.getCanvasInfo();
 

@@ -32,7 +32,6 @@ import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
 
 declare global {
-  // eslint-disable-next-line no-unused-vars
   interface Window {
     settingsManager: SettingsManager;
     jQuery: unknown;

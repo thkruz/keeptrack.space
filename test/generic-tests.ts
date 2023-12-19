@@ -172,7 +172,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     keepTrackApi.getCatalogManager().satData = [];
     keepTrackApi.getCatalogManager().selectSat(-1);
-    console.warn(keepTrackApi.getCatalogManager().selectedSat);
+    // console.warn(keepTrackApi.getCatalogManager().selectedSat);
   });
 
   // Tests that clicking on the bottom icon toggles with satellite and sensor

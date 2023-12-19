@@ -20,6 +20,7 @@
 
 import { SensorGeolocation } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { ColorSchemeColorMap } from '@app/singletons/color-scheme-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
@@ -79,7 +80,8 @@ export class SettingsManager {
     videoDirector: true,
   };
 
-  colors = null;
+  colors: ColorSchemeColorMap;
+
   /**
    * Delay before advancing in Time Machine mode
    */
@@ -243,7 +245,11 @@ export class SettingsManager {
    * Allow Right Click Menu
    */
   isAllowRightClick = true;
-  onLoadCb = null;
+  /**
+   * Callback function that is called when the settings are loaded.
+   */
+  // eslint-disable-next-line class-methods-use-this
+  onLoadCb = () => {};
   /**
    * Disables Toasts During Time Machine
    */
@@ -986,6 +992,10 @@ export class SettingsManager {
    * When set to true, only load satellites with the name "Starlink"
    */
   isStarlinkOnly = false;
+  /**
+   * Indicates whether the splash screen is enabled.
+   */
+  isSplashScreenEnabled = true;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
@@ -1153,9 +1163,12 @@ export class SettingsManager {
   private setColorSettings() {
     this.selectedColorFallback = this.selectedColor;
 
-    this.colors = null;
+    this.colors = {} as ColorSchemeColorMap;
     try {
-      this.colors = JSON.parse(PersistenceManager.getInstance().getItem(StorageKey.THIS_COLORS));
+      const jsonString = PersistenceManager.getInstance().getItem(StorageKey.THIS_COLORS);
+      if (jsonString) {
+        this.colors = JSON.parse(jsonString);
+      }
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
@@ -1355,7 +1368,19 @@ export class SettingsManager {
               cbName: 'satFromSettings',
               cb: () => {
                 setTimeout(() => {
-                  keepTrackApi.getSelectSatManager().selectSat(keepTrackApi.getCatalogManager().getIdFromObjNum(parseInt(val)));
+                  if (typeof val === 'string') {
+                    const objNum = parseInt(val);
+                    if (objNum >= 0) {
+                      const id = keepTrackApi.getCatalogManager().getIdFromObjNum(objNum) as number;
+                      if (id >= 0) {
+                        keepTrackApi.getSelectSatManager().selectSat(id);
+                      } else {
+                        keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, 'error');
+                      }
+                    } else {
+                      keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, 'error');
+                    }
+                  }
                 }, 2000);
               },
             });

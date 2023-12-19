@@ -86,6 +86,8 @@ export abstract class LegendManager {
 
   static change(menu: string) {
     const legendHoverDom = getEl('legend-hover-menu');
+    if (!legendHoverDom) return;
+
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -117,7 +119,7 @@ export abstract class LegendManager {
   private static setColors_(colorSchemeManagerInstance: StandardColorSchemeManager) {
     LegendManager.legendClassList.forEach((selector) => {
       const elementFromClass = <HTMLElement>document.querySelector(selector);
-      if (elementFromClass) {
+      if (elementFromClass && settingsManager.colors) {
         elementFromClass.style.background = rgbCss(settingsManager.colors[selector.split('-')[1]]);
       }
       colorSchemeManagerInstance.objectTypeFlags[selector.split('-')[1]] = true;

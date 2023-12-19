@@ -214,9 +214,11 @@ export class InputManager {
   }
 
   public init(): void {
-    getEl('rmb-wrapper').insertAdjacentHTML(
-      'beforeend',
-      keepTrackApi.html`
+    const rmbWrapperDom = getEl('rmb-wrapper');
+    if (rmbWrapperDom) {
+      rmbWrapperDom.insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
       <div id="right-btn-menu" class="right-btn-menu">
         <ul id="right-btn-menu-ul" class='dropdown-contents'>
           <li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>
@@ -226,111 +228,111 @@ export class InputManager {
         </ul>
       </div>
       `
-    );
+      );
+      // Append any other menus before putting the reset/clear options
+      keepTrackApi.methods.rightBtnMenuAdd();
 
-    // Append any other menus before putting the reset/clear options
-    keepTrackApi.methods.rightBtnMenuAdd();
+      // Now add the reset/clear options
+      getEl('right-btn-menu-ul').insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
+        <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
+        <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
+        <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
+        `
+      );
 
-    // Now add the reset/clear options
-    getEl('right-btn-menu-ul').insertAdjacentHTML(
-      'beforeend',
-      keepTrackApi.html`
-      <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
-      <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
-      <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
+      getEl('rmb-wrapper').insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
+        <div id="view-rmb-menu" class="right-btn-menu">
+          <ul class='dropdown-contents'>
+            <li id="view-info-rmb"><a href="#">Earth Info</a></li>
+            <li id="view-sensor-info-rmb"><a href="#">Sensor Info</a></li>
+            <li id="view-sat-info-rmb"><a href="#">Satellite Info</a></li>
+            <li id="view-related-sats-rmb"><a href="#">Related Satellites</a></li>
+          </ul>
+        </div>
+        <div id="draw-rmb-menu" class="right-btn-menu">
+          <ul class='dropdown-contents'>
+            <li id="line-eci-axis-rmb"><a href="#">ECI Axes</a></li>
+            <li id="line-eci-xgrid-rmb"><a href="#">X Axes Grid</a></li>
+            <li id="line-eci-ygrid-rmb"><a href="#">Y Axes Grid</a></li>
+            <li id="line-eci-zgrid-rmb"><a href="#">Z Axes Grid</a></li>
+            <li id="line-earth-sat-rmb"><a href="#">Earth to Satellite</a></li>
+            <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
+            <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
+            <li id="line-sat-sun-rmb"><a href="#">Satellite to Sun</a></li>
+          </ul>
+        </div>
+        <div id="create-rmb-menu" class="right-btn-menu">
+          <ul class='dropdown-contents'>
+            <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
+            <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
+          </ul>
+        </div>
+        <div id="earth-rmb-menu" class="right-btn-menu">
+          <ul class='dropdown-contents'>
+            <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
+            <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
+            <li id="earth-trusat-rmb"><a href="#">TruSat Map</a></li>
+            <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
+            <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
+            <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
+            <li id="earth-political-rmb"><a href="#">Political Map</a></li>
+          </ul>
+        </div>
       `
-    );
+      );
 
-    getEl('rmb-wrapper').insertAdjacentHTML(
-      'beforeend',
-      keepTrackApi.html`
-      <div id="view-rmb-menu" class="right-btn-menu">
-        <ul class='dropdown-contents'>
-          <li id="view-info-rmb"><a href="#">Earth Info</a></li>
-          <li id="view-sensor-info-rmb"><a href="#">Sensor Info</a></li>
-          <li id="view-sat-info-rmb"><a href="#">Satellite Info</a></li>
-          <li id="view-related-sats-rmb"><a href="#">Related Satellites</a></li>
-        </ul>
-      </div>
-      <div id="draw-rmb-menu" class="right-btn-menu">
-        <ul class='dropdown-contents'>
-          <li id="line-eci-axis-rmb"><a href="#">ECI Axes</a></li>
-          <li id="line-eci-xgrid-rmb"><a href="#">X Axes Grid</a></li>
-          <li id="line-eci-ygrid-rmb"><a href="#">Y Axes Grid</a></li>
-          <li id="line-eci-zgrid-rmb"><a href="#">Z Axes Grid</a></li>
-          <li id="line-earth-sat-rmb"><a href="#">Earth to Satellite</a></li>
-          <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
-          <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
-          <li id="line-sat-sun-rmb"><a href="#">Satellite to Sun</a></li>
-        </ul>
-      </div>
-      <div id="create-rmb-menu" class="right-btn-menu">
-        <ul class='dropdown-contents'>
-          <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
-          <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
-        </ul>
-      </div>
-      <div id="earth-rmb-menu" class="right-btn-menu">
-        <ul class='dropdown-contents'>
-          <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
-          <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
-          <li id="earth-trusat-rmb"><a href="#">TruSat Map</a></li>
-          <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
-          <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
-          <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
-          <li id="earth-political-rmb"><a href="#">Political Map</a></li>
-        </ul>
-      </div>
-    `
-    );
+      keepTrackApi.rmbMenuItems.push({
+        elementIdL1: 'view-rmb',
+        elementIdL2: 'view-rmb-menu',
+        order: 1,
+        isRmbOnEarth: false,
+        isRmbOffEarth: false,
+        isRmbOnSat: true,
+      });
 
-    keepTrackApi.rmbMenuItems.push({
-      elementIdL1: 'view-rmb',
-      elementIdL2: 'view-rmb-menu',
-      order: 1,
-      isRmbOnEarth: false,
-      isRmbOffEarth: false,
-      isRmbOnSat: true,
-    });
+      keepTrackApi.rmbMenuItems.push({
+        elementIdL1: 'draw-rmb',
+        elementIdL2: 'draw-rmb-menu',
+        order: 5,
+        isRmbOnEarth: true,
+        isRmbOffEarth: true,
+        isRmbOnSat: false,
+      });
 
-    keepTrackApi.rmbMenuItems.push({
-      elementIdL1: 'draw-rmb',
-      elementIdL2: 'draw-rmb-menu',
-      order: 5,
-      isRmbOnEarth: true,
-      isRmbOffEarth: true,
-      isRmbOnSat: false,
-    });
+      keepTrackApi.rmbMenuItems.push({
+        elementIdL1: 'create-rmb',
+        elementIdL2: 'create-rmb-menu',
+        order: 10,
+        isRmbOnEarth: true,
+        isRmbOffEarth: false,
+        isRmbOnSat: false,
+      });
 
-    keepTrackApi.rmbMenuItems.push({
-      elementIdL1: 'create-rmb',
-      elementIdL2: 'create-rmb-menu',
-      order: 10,
-      isRmbOnEarth: true,
-      isRmbOffEarth: false,
-      isRmbOnSat: false,
-    });
+      keepTrackApi.rmbMenuItems.push({
+        elementIdL1: 'earth-rmb',
+        elementIdL2: 'earth-rmb-menu',
+        order: 15,
+        isRmbOnEarth: true,
+        isRmbOffEarth: false,
+        isRmbOnSat: false,
+      });
 
-    keepTrackApi.rmbMenuItems.push({
-      elementIdL1: 'earth-rmb',
-      elementIdL2: 'earth-rmb-menu',
-      order: 15,
-      isRmbOnEarth: true,
-      isRmbOffEarth: false,
-      isRmbOnSat: false,
-    });
-
-    // sort document.getElementById('rmb-wrapper').children by order in rmbMenuItems
-    const rmbWrapper = getEl('right-btn-menu-ul');
-    const rmbWrapperChildren = rmbWrapper.children;
-    const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
-    rmbWrapperChildrenArray.sort((a, b) => {
-      const aOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
-      const bOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
-      return aOrder - bOrder;
-    });
-    rmbWrapper.innerHTML = '';
-    rmbWrapperChildrenArray.forEach((child) => rmbWrapper.appendChild(child));
+      // sort document.getElementById('rmb-wrapper').children by order in rmbMenuItems
+      const rmbWrapper = getEl('right-btn-menu-ul');
+      const rmbWrapperChildren = rmbWrapper.children;
+      const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
+      rmbWrapperChildrenArray.sort((a, b) => {
+        const aOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
+        const bOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
+        return aOrder - bOrder;
+      });
+      rmbWrapper.innerHTML = '';
+      rmbWrapperChildrenArray.forEach((child) => rmbWrapper.appendChild(child));
+    }
 
     const canvasDOM = <HTMLCanvasElement>getEl('keeptrack-canvas');
 

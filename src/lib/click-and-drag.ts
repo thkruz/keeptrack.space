@@ -3,28 +3,27 @@ interface ClickDragOptions {
   maxWidth?: number;
 }
 
-export const clickAndDragWidth = (el: HTMLElement, options: ClickDragOptions = {}): void => {
+export const clickAndDragWidth = (el: HTMLElement | null, options: ClickDragOptions = {}): void => {
   if (!el) return;
 
-  const minWidth = options.minWidth || 280;
-  const maxWidth = options.maxWidth || 450;
+  const minWidth = options.minWidth ?? 280;
+  const maxWidth = options.maxWidth ?? 450;
 
   let width = el.style.width ? parseInt(el.style.width) : el.clientWidth;
   width = width < minWidth ? minWidth : width;
   width = width > maxWidth ? maxWidth : width;
   el.style.width = `${width}px`;
 
-  let lastUpdate = Date.now();
-
   settingsManager.isDragging = false;
 
   // create new element on right edge
   const edgeEl = createElWidth_(el);
 
-  addEventsWidth_(edgeEl, el, width, minWidth, maxWidth, lastUpdate);
+  addEventsWidth_(edgeEl, el, width, minWidth, maxWidth);
 };
 
 export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback?: () => void): void => {
+  if (!el) return;
   settingsManager.isDragging = false;
 
   // create new element on right edge
@@ -33,7 +32,7 @@ export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback
   addEventsHeight_(edgeEl, el, callback, maxHeight);
 };
 
-const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number, lastUpdate: number) => {
+const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number) => {
   let startX: number;
   let startWidth: number;
   edgeEl.addEventListener('mousedown', (e: MouseEvent) => {
@@ -64,11 +63,9 @@ const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number,
         width = width < minWidth ? minWidth : width;
         width = width > maxWidth ? maxWidth : width;
         el.style.width = `${width}px`;
-        lastUpdate = Date.now();
       });
     }
   });
-  return { startX, startWidth, width, lastUpdate };
 };
 
 const createElWidth_ = (el: HTMLElement) => {
@@ -84,8 +81,7 @@ const createElWidth_ = (el: HTMLElement) => {
   return edgeEl;
 };
 
-const addEventsHeight_ = (edgeEl: HTMLDivElement, el: HTMLElement, callback: () => void, maxHeight?: number) => {
-  let lastUpdate = Date.now();
+const addEventsHeight_ = (edgeEl: HTMLDivElement, el: HTMLElement, callback?: () => void, maxHeight?: number) => {
   let startY: number;
   let startHeight: number;
   let height: number;
@@ -118,11 +114,9 @@ const addEventsHeight_ = (edgeEl: HTMLDivElement, el: HTMLElement, callback: () 
         height = maxHeight ? Math.min(height, maxHeight) : height;
         height = height < 0 ? 0 : height;
         el.style.height = `${height}px`;
-        lastUpdate = Date.now();
       });
     }
   });
-  return { startY, startHeight, height, lastUpdate };
 };
 
 const createElHeight_ = (el: HTMLElement) => {

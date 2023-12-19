@@ -64,7 +64,7 @@ export class PersistenceManager {
 
       if (!Object.values(StorageKey).includes(key as StorageKey)) {
         // Delete any keys that are not in the StorageKey enum
-        this.storage_.removeItem(key);
+        this.storage_.removeItem(key as string);
       }
     }
   }
@@ -86,6 +86,11 @@ export class PersistenceManager {
     } catch {
       errorManagerInstance.debug(`Failed to save to local storage: ${key}=${value}`);
     }
+  }
+
+  removeItem(key: string): void {
+    PersistenceManager.verifyKey_(key);
+    this.storage_.removeItem(key);
   }
 
   private static verifyKey_(key: string) {

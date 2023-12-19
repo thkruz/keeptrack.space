@@ -326,7 +326,7 @@ export interface SensorObject {
   lon: Degrees;
   name: string;
   observerGd?: {
-    lat: Radians;
+    lat: Radians | null;
     lon: Radians;
     alt: Kilometers;
   };
@@ -604,11 +604,17 @@ export interface CatalogManager {
   isLaunchSiteManagerLoaded: boolean;
   isSensorManagerLoaded: boolean;
   isStarManagerLoaded: boolean;
-  launchSites: SatObject[];
+  launchSites: {
+    [key: string]: {
+      name: string;
+      lat: number;
+      lon: number;
+    };
+  };
   missileSats: number;
   missileSet: MissileObject[];
   numSats: number;
-  orbitDensity: number[];
+  orbitDensity: number[][];
   orbitDensityMax: number;
   orbitalSats: number;
   radarDataSet: RadarDataObject[];
@@ -699,7 +705,7 @@ export interface SensorManager {
   removeStf(sensor?: SensorObject): void;
   resetSensorSelected(): void;
   setCurrentSensor(sensor: SensorObject[] | null): void;
-  setSensor(selectedSensor: SensorObject | string, staticNum?: number): void;
+  setSensor(selectedSensor: SensorObject | string | null, staticNum?: number): void;
   updateCruncherOnCustomSensors(): void;
   verifySensors(sensors: SensorObject[]): SensorObject[];
   calculateSensorPos(now: Date, sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };

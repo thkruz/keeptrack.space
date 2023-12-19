@@ -6,10 +6,20 @@ import { fileURLToPath } from 'url';
 import webpack from 'webpack';
 import WebpackBar from 'webpackbar';
 
+/**
+ *
+ * @param {*} env
+ * @param {*} isWatch
+ * @returns {webpack.Configuration}
+ */
 export const generateConfig = (env, isWatch) => {
   const fileName = fileURLToPath(import.meta.url);
   const dirName = dirname(fileName);
 
+  /**
+   * Configuration options for Webpack.
+   * @type {webpack.Configuration[]}
+   */
   const webpackConfig = [];
   env = env === 'test' ? 'development' : env;
   env = typeof env === 'undefined' ? 'production' : env;
@@ -84,6 +94,11 @@ export const generateConfig = (env, isWatch) => {
   return webpackConfig;
 };
 
+/**
+ * Returns the base configuration for webpack.
+ * @param {string} dirName - The directory name.
+ * @returns {webpack.Configuration} - The base configuration object.
+ */
 const getBaseConfig = (dirName) => ({
   resolve: {
     extensions: ['.ts', '.js'],
@@ -161,6 +176,12 @@ const getBaseConfig = (dirName) => ({
   ],
 });
 
+/**
+ * Returns a modified webpack configuration object for non-embed mode.
+ * @param {webpack.Configuration} baseConfig - The base webpack configuration object.
+ * @param {string} env - The environment mode.
+ * @returns {webpack.Configuration} - The modified webpack configuration object.
+ */
 const getNonEmbedConfig = (baseConfig, env) => {
   baseConfig.mode = env;
   baseConfig.experiments = {
@@ -188,9 +209,15 @@ const getNonEmbedConfig = (baseConfig, env) => {
   return baseConfig;
 };
 
+/**
+ * Returns the configuration object for embedding.
+ *
+ * @param {webpack.Configuration} baseConfig - The base configuration object.
+ * @returns {webpack.Configuration} - The configuration object for embedding.
+ */
 const getEmbedConfig = (baseConfig) => {
   const embedOnly = {
-    mode: 'production',
+    mode: 'development',
     experiments: {
       topLevelAwait: true,
     },
@@ -207,10 +234,6 @@ const getEmbedConfig = (baseConfig) => {
       'jQuery': 'jquery',
       'windows.jQuery': 'jquery',
     }),
-    new HtmlWebpackPlugin({
-      filename: '../../example.html',
-      template: './src/embed.html',
-    }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     })
@@ -218,6 +241,15 @@ const getEmbedConfig = (baseConfig) => {
   return baseConfig;
 };
 
+/**
+ * Returns the main configuration object for webpack.
+ *
+ * @param {webpack.Configuration} baseConfig - The base configuration object.
+ * @param {string} dirName - The directory name.
+ * @param {string} subFolder - The subfolder name.
+ * @param {string} [pubPath=''] - The public path.
+ * @returns {webpack.Configuration} - The main configuration object.
+ */
 const getMainConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
   ...baseConfig,
   ...{
@@ -230,10 +262,21 @@ const getMainConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
       filename: `[name]${subFolder === 'dist' ? '.[contenthash]' : ''}.js`,
       path: `${dirName}/../${subFolder}/js`,
       publicPath: `./${pubPath}js/`,
+      library: 'keepTrack',
+      libraryExport: 'default',
     },
   },
 });
 
+/**
+ * Returns the WebWorker configuration object.
+ *
+ * @param {webpack.Configuration} baseConfig - The base configuration object.
+ * @param {string} dirName - The directory name.
+ * @param {string} subFolder - The subfolder name.
+ * @param {string} pubPath - The public path.
+ * @returns {webpack.Configuration} - The WebWorker configuration object.
+ */
 const getWebWorkerConfig = (baseConfig, dirName, subFolder, pubPath) => ({
   ...baseConfig,
   ...{

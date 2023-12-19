@@ -14,6 +14,7 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
   }
 
   const colorboxDom = getEl('colorbox-div');
+  if (!colorboxDom) return;
 
   const handleClick = () => {
     closeColorbox();
@@ -29,7 +30,7 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
     } else {
       setupIframeColorbox_(url);
     }
-    slideInRight(getEl('colorbox-container'), 1000, null);
+    slideInRight(getEl('colorbox-container'), 1000);
   }, 2000);
 };
 
@@ -67,7 +68,7 @@ export const createColorbox = () => {
   img.style.width = '100%';
   img.style.height = '100%';
   img.style.objectFit = 'cover';
-  getEl('colorbox-container').appendChild(img);
+  getEl('colorbox-container')?.appendChild(img);
   isColorBoxReady = true;
 };
 
@@ -75,7 +76,12 @@ export const createColorbox = () => {
  * Sets the colorbox to display an iframe
  */
 const setupIframeColorbox_ = (url: string) => {
-  getEl('colorbox-container').style.width = '100%';
+  const colorboxContainerDom = getEl('colorbox-container');
+  if (!colorboxContainerDom) {
+    console.warn('Colorbox container not found!');
+    return;
+  }
+  colorboxContainerDom.style.width = '100%';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'block';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).src = url;
   (<HTMLImageElement>getEl('colorbox-img')).style.display = 'none';
@@ -85,8 +91,14 @@ const setupIframeColorbox_ = (url: string) => {
  * Sets the colorbox to display an image
  */
 const setupImageColorbox_ = (url: string) => {
-  getEl('colorbox-container').style.width = '45%';
-  getEl('colorbox-container').style.transform = 'translateX(-200%)';
+  const colorboxContainerDom = getEl('colorbox-container');
+  if (!colorboxContainerDom) {
+    console.warn('Colorbox container not found!');
+    return;
+  }
+
+  colorboxContainerDom.style.width = '45%';
+  colorboxContainerDom.style.transform = 'translateX(-200%)';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'none';
   (<HTMLImageElement>getEl('colorbox-img')).style.display = 'block';
   (<HTMLImageElement>getEl('colorbox-img')).src = url;

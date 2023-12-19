@@ -3,7 +3,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4 } from 'gl-matrix';
 import { ColorSchemeManager, GetSatType, MissileParams, OrbitManager, SatObject, UiManager } from '../interfaces';
-import { getEl } from '../lib/get-el';
+import { setInnerHtml } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 import { Camera, CameraType } from './camera';
 import { LineManager } from './draw-manager/line-manager';
@@ -54,7 +54,7 @@ export class StandardOrbitManager implements OrbitManager {
   private selectOrbitBuf_: WebGLBuffer;
   private updateAllThrottle_ = 0;
 
-  orbitWorker = null;
+  orbitWorker: Worker;
   playNextSatellite = null;
   tempTransColor: [number, number, number, number] = [0, 0, 0, 0];
 
@@ -152,6 +152,7 @@ export class StandardOrbitManager implements OrbitManager {
     this.gl_ = gl;
 
     if (!settingsManager.isDrawOrbits) return;
+    if (!settingsManager.colors) return;
 
     this.tempTransColor = settingsManager.colors.transparent;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -161,15 +162,15 @@ export class StandardOrbitManager implements OrbitManager {
 
     this.orbitWorker.onmessage = this.workerOnMessage_.bind(this);
 
-    this.selectOrbitBuf_ = this.gl_.createBuffer();
+    this.selectOrbitBuf_ = this.gl_.createBuffer() as WebGLBuffer;
     this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, this.selectOrbitBuf_);
     this.gl_.bufferData(this.gl_.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), this.gl_.DYNAMIC_DRAW);
 
-    this.secondaryOrbitBuf_ = this.gl_.createBuffer();
+    this.secondaryOrbitBuf_ = this.gl_.createBuffer() as WebGLBuffer;
     this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, this.secondaryOrbitBuf_);
     this.gl_.bufferData(this.gl_.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), this.gl_.DYNAMIC_DRAW);
 
-    this.hoverOrbitBuf_ = this.gl_.createBuffer();
+    this.hoverOrbitBuf_ = this.gl_.createBuffer() as WebGLBuffer;
     this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, this.hoverOrbitBuf_);
     this.gl_.bufferData(this.gl_.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), this.gl_.DYNAMIC_DRAW);
 
@@ -212,8 +213,10 @@ export class StandardOrbitManager implements OrbitManager {
       } catch (error) {
         // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
         if (window.location.href.startsWith('file://')) {
-          getEl('loader-text').innerText =
-            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.';
+          setInnerHtml(
+            'loader-text',
+            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
+          );
         } else {
           errorManagerInstance.error(error, 'OrbitManager.init', 'Failed to create orbit web worker!');
         }
@@ -222,7 +225,7 @@ export class StandardOrbitManager implements OrbitManager {
   }
 
   removeInViewOrbit(satId: number): void {
-    let r = null;
+    let r: number | null = null;
     for (let i = 0; i < this.currentInView_.length; i++) {
       if (satId === this.currentInView_[i]) {
         r = i;
@@ -333,7 +336,7 @@ export class StandardOrbitManager implements OrbitManager {
 
   private allocateBuffer(): WebGLBuffer {
     const gl = this.gl_;
-    let buf = gl.createBuffer();
+    let buf = gl.createBuffer() as WebGLBuffer;
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
     return buf;
@@ -427,7 +430,7 @@ export class StandardOrbitManager implements OrbitManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const hoverId = hoverManagerInstance.getHoverId();
-    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !catalogManagerInstance.getSat(hoverId, GetSatType.EXTRA_ONLY).static) {
+    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !catalogManagerInstance.getSat(hoverId, GetSatType.EXTRA_ONLY)?.static) {
       // avoid z-fighting
       if (typeof colorSchemeManagerInstance.colorData[hoverId * 4] === 'undefined') throw new Error(`color buffer for ${hoverId} not valid`);
       if (typeof colorSchemeManagerInstance.colorData[hoverId * 4 + 1] === 'undefined') throw new Error(`color buffer for ${hoverId} not valid`);
@@ -454,7 +457,7 @@ export class StandardOrbitManager implements OrbitManager {
 
   private drawPrimaryObjectOrbit() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    if (this.currentSelectId_ !== -1 && !catalogManagerInstance.getSat(this.currentSelectId_, GetSatType.EXTRA_ONLY).static) {
+    if (this.currentSelectId_ !== -1 && !catalogManagerInstance.getSat(this.currentSelectId_, GetSatType.EXTRA_ONLY)?.static) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor);
       this.writePathToGpu(this.currentSelectId_);
     }
@@ -462,7 +465,7 @@ export class StandardOrbitManager implements OrbitManager {
 
   private drawSecondaryObjectOrbit(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    if (this.secondarySelectId_ !== -1 && !catalogManagerInstance.getSat(this.secondarySelectId_, GetSatType.EXTRA_ONLY).static) {
+    if (this.secondarySelectId_ !== -1 && !catalogManagerInstance.getSat(this.secondarySelectId_, GetSatType.EXTRA_ONLY)?.static) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor2);
       this.writePathToGpu(this.secondarySelectId_);
     }

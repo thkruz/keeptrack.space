@@ -19,6 +19,8 @@ export abstract class SplashScreen {
   static textElId = 'loader-text';
 
   static hideSplashScreen() {
+    if (!settingsManager.isSplashScreenEnabled) return;
+
     // Don't wait if we are running Jest
     if (keepTrackApi.getScene().earth.isUseHiRes && keepTrackApi.getScene().earth.isHiResReady !== true) {
       setTimeout(function () {

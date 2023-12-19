@@ -26,7 +26,7 @@
 import { sensors } from '@app/catalogs/sensors';
 import { openColorbox } from '@app/lib/colorbox';
 import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
-import { getEl } from '@app/lib/get-el';
+import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { spaceObjType2Str } from '@app/lib/spaceObjType2Str';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 
@@ -44,16 +44,16 @@ import { keepTrackApi } from '../../keepTrackApi';
 export class StandardSensorManager implements SensorManager {
   // TODO: Merge empty and default
   private readonly emptySensor: SensorObject = {
-    id: null,
+    id: -1,
     observerGd: {
-      lat: <Radians>null,
+      lat: null,
       lon: <Radians>0,
       alt: <Kilometers>0,
     },
-    alt: null,
+    alt: <Kilometers>0,
     country: '',
-    lat: null,
-    lon: null,
+    lat: <Degrees>0,
+    lon: <Degrees>0,
     name: '',
     uiName: '',
     system: '',
@@ -84,9 +84,10 @@ export class StandardSensorManager implements SensorManager {
 
   addSecondarySensor(sensor: SensorObject): void {
     // If there is no primary sensor, make this the primary sensor
-    if (!this.currentSensors[0].lat) {
+    const primarySensor = this.currentSensors[0];
+    if (primarySensor && !primarySensor.lat) {
       this.currentSensors.push(sensor);
-      this.setSensor(sensor, null);
+      this.setSensor(sensor);
     } else {
       this.secondarySensors.push(sensor);
     }
@@ -95,7 +96,7 @@ export class StandardSensorManager implements SensorManager {
   }
 
   /** Sensors that are currently selected/active */
-  currentSensors = <SensorObject[]>null;
+  currentSensors: SensorObject[] = [];
   customSensors = <SensorObject[]>[];
   // UI Stuff
   isCustomSensorMenuOpen = false;
@@ -133,39 +134,29 @@ export class StandardSensorManager implements SensorManager {
 
   static drawFov(sensor: SensorObject) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const sensorObj = catalogManagerInstance.getSensorFromSensorName(sensor.name);
+    if (!sensorObj) {
+      errorManagerInstance.warn('Sensor not found');
+      return;
+    }
+
     switch (sensor.objName) {
       case 'COD':
       case 'BLE':
       case 'CLR':
       case 'THL':
-        lineManagerInstance.create(
-          LineTypes.SENSOR_SCAN_HORIZON,
-          [catalogManagerInstance.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange],
-          'c'
-        );
-        lineManagerInstance.create(
-          LineTypes.SENSOR_SCAN_HORIZON,
-          [catalogManagerInstance.getSensorFromSensorName(sensor.name), sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange],
-          'c'
-        );
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
         break;
       case 'FYL':
         // TODO: Find actual face directions
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [catalogManagerInstance.getSensorFromSensorName(sensor.name), 300, 60, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [catalogManagerInstance.getSensorFromSensorName(sensor.name), 60, 180, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(
-          LineTypes.SENSOR_SCAN_HORIZON,
-          [catalogManagerInstance.getSensorFromSensorName(sensor.name), 180, 300, sensor.obsminel, sensor.obsmaxrange],
-          'c'
-        );
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, 300, 60, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, 60, 180, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, 180, 300, sensor.obsminel, sensor.obsmaxrange], 'c');
         break;
       case 'CDN':
         // NOTE: This will be a bit more complicated later
-        lineManagerInstance.create(
-          LineTypes.SENSOR_SCAN_HORIZON,
-          [catalogManagerInstance.getSensorFromSensorName(sensor.name), sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange],
-          'c'
-        );
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
         break;
       default:
         errorManagerInstance.warn('Sensor not found');
@@ -222,7 +213,7 @@ export class StandardSensorManager implements SensorManager {
 
     // Return to default settings with nothing 'inview'
     StandardSensorManager.updateSensorUiStyling(null);
-    this.setSensor(null, null); // Pass staticNum to identify which sensor the user clicked
+    this.setSensor(null); // Pass staticNum to identify which sensor the user clicked
     if (settingsManager.currentColorScheme == colorSchemeManagerInstance.default) {
       LegendManager.change('default');
     }
@@ -266,6 +257,7 @@ export class StandardSensorManager implements SensorManager {
     // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
     if (sensor === null) {
       this.currentSensors[0] = this.emptySensor;
+      sensor = this.currentSensors;
       console.warn(this.currentSensors[0]);
     } else if (sensor[0] != null) {
       this.currentSensors = sensor;
@@ -274,29 +266,32 @@ export class StandardSensorManager implements SensorManager {
     }
 
     this.currentSensors = sensor.map((s) => {
+      const lat = s.lat ? s.lat * DEG2RAD : null;
+      const lon = s.lon ? s.lon * DEG2RAD : null;
+
       s.observerGd = {
         // Array to calculate look angles in propagate()
-        lat: <Radians>(s.lat * DEG2RAD),
-        lon: <Radians>(s.lon * DEG2RAD),
+        lat: <Radians>lat,
+        lon: <Radians>lon,
         alt: s.alt,
       };
       return s;
     });
   }
 
-  static getSensorFromStaticNum(staticNum: number): SensorObject {
-    if (typeof staticNum === 'undefined') return null;
-
-    for (const sensor in sensors) {
-      if (sensors[sensor].staticNum === staticNum) {
-        return sensors[sensor];
+  static getSensorFromStaticNum(staticNum: number | null | undefined): SensorObject | null {
+    if (staticNum && staticNum >= 0) {
+      for (const sensor in sensors) {
+        if (sensors[sensor].staticNum === staticNum) {
+          return sensors[sensor];
+        }
       }
     }
 
     return null;
   }
 
-  setSensor(selectedSensor: SensorObject | string, staticNum?: number): void {
+  setSensor(selectedSensor: SensorObject | string | null, staticNum?: number): void {
     if (!selectedSensor) {
       selectedSensor = StandardSensorManager.getSensorFromStaticNum(staticNum);
     }
@@ -377,12 +372,19 @@ export class StandardSensorManager implements SensorManager {
 
       if (sensorInfoTitleDom) {
         sensorInfoTitleDom.innerHTML = "<a href=''>" + this.currentSensors[0].name + '</a>';
-        sensorInfoTitleDom.addEventListener('click', () => {
-          openColorbox(this.currentSensors[0].url);
-        });
+        const url = this.currentSensors[0]?.url;
+        if (url && url.length > 0) {
+          sensorInfoTitleDom.addEventListener('click', () => {
+            openColorbox(url);
+          });
+        }
 
-        getEl('sensor-type').innerHTML = spaceObjType2Str(this.currentSensors[0].type);
-        getEl('sensor-country').innerHTML = this.currentSensors[0].country;
+        if (this.currentSensors[0].type) {
+          setInnerHtml('sensor-type', spaceObjType2Str(this.currentSensors[0].type));
+        } else {
+          setInnerHtml('sensor-type', 'Unknown Sensor');
+        }
+        setInnerHtml('sensor-country', this.currentSensors[0].country);
       }
 
       this.sensorTitle = this.currentSensors[0].name;
@@ -403,12 +405,19 @@ export class StandardSensorManager implements SensorManager {
 
           if (sensorInfoTitleDom) {
             sensorInfoTitleDom.innerHTML = "<a href=''>" + this.currentSensors[0].name + '</a>';
-            sensorInfoTitleDom.addEventListener('click', () => {
-              openColorbox(this.currentSensors[0].url);
-            });
+            const url = this.currentSensors[0].url;
+            if (url && url.length > 0) {
+              sensorInfoTitleDom.addEventListener('click', () => {
+                openColorbox(url);
+              });
+            }
 
-            getEl('sensor-type').innerHTML = spaceObjType2Str(this.currentSensors[0].type);
-            getEl('sensor-country').innerHTML = this.currentSensors[0].country;
+            if (this.currentSensors[0].type) {
+              setInnerHtml('sensor-type', spaceObjType2Str(this.currentSensors[0].type));
+            } else {
+              setInnerHtml('sensor-type', 'Unknown Sensor');
+            }
+            setInnerHtml('sensor-country', this.currentSensors[0].country);
           }
 
           this.sensorTitle = this.currentSensors[0].name;
@@ -453,7 +462,7 @@ export class StandardSensorManager implements SensorManager {
     });
   }
 
-  static updateSensorUiStyling(sensors: SensorObject[]) {
+  static updateSensorUiStyling(sensors: SensorObject[] | null) {
     try {
       if (typeof sensors == 'undefined' || sensors == null) {
         const resetSensorTextDOM = getEl('reset-sensor-text', true);
@@ -477,7 +486,7 @@ export class StandardSensorManager implements SensorManager {
     }
   }
 
-  verifySensors(sensors: SensorObject[]): SensorObject[] {
+  verifySensors(sensors: SensorObject[] | undefined): SensorObject[] {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensors == 'undefined' || sensors == null) {
       if (typeof this.currentSensors == 'undefined') {
@@ -489,11 +498,17 @@ export class StandardSensorManager implements SensorManager {
     // If sensor's observerGd is not set try to set it using it parameters
     if (typeof sensors[0].observerGd == 'undefined') {
       try {
-        sensors[0].observerGd = {
-          alt: sensors[0].alt,
-          lat: <Radians>(sensors[0].lat * DEG2RAD),
-          lon: <Radians>(sensors[0].lon * DEG2RAD),
-        };
+        const lat = sensors[0].lat;
+        const lon = sensors[0].lon;
+        if (lat && lon) {
+          sensors[0].observerGd = {
+            alt: sensors[0].alt,
+            lat: <Radians>(lat * DEG2RAD),
+            lon: <Radians>(lon * DEG2RAD),
+          };
+        } else {
+          throw new Error('observerGd is not set and could not be guessed.');
+        }
       } catch (e) {
         throw new Error('observerGd is not set and could not be guessed.');
       }
@@ -504,6 +519,9 @@ export class StandardSensorManager implements SensorManager {
   public calculateSensorPos(now: Date, sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
     sensors = this.verifySensors(sensors);
     const sensor = sensors[0];
+    if (!sensor) {
+      throw new Error('Sensor not found');
+    }
 
     const { gmst } = SatMath.calculateTimeVariables(now);
 

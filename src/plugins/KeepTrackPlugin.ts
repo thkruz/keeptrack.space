@@ -50,36 +50,36 @@ export class KeepTrackPlugin {
    * The name of the bottom icon element to select.
    * @example 'menu-day-night'
    */
-  bottomIconElementName: string = null;
+  bottomIconElementName: string;
 
   /**
    * The label of the bottom icon element.
    * @example 'Countries'
    */
-  bottomIconLabel: string = null;
+  bottomIconLabel: string;
 
   /**
    * The name of the side menu element to show.
    * @example 'countries-menu'
    */
-  sideMenuElementName: string = null;
+  sideMenuElementName: string;
 
   /**
    * The html to use for the side menu.
    */
-  sideMenuElementHtml: string = null;
+  sideMenuElementHtml: string;
 
   /**
    * The title of the help dialog.
    * @example 'Countries Menu'
    */
-  helpTitle: string = null;
+  helpTitle: string;
 
   /**
    * The body of the help dialog.
    * @example 'The countries menu allows you to...'
    */
-  helpBody: string = null;
+  helpBody: string;
 
   /**
    * Whether the bottom icon is disabled by default.
@@ -89,13 +89,13 @@ export class KeepTrackPlugin {
   /**
    * The image to use for the bottom icon.
    */
-  bottomIconImg: Module = null;
+  bottomIconImg: Module;
 
   /**
    * The singleton values for the plugin if it is registered as a singleton.
    * @deprecated
    */
-  singletonValue: Singletons = null;
+  singletonValue: Singletons;
 
   /**
    * The callback to run when the bottom icon is clicked.
@@ -419,7 +419,7 @@ export class KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl(KeepTrackPlugin.sideMenuContainerId).insertAdjacentHTML('beforeend', sideMenuHtml);
+        getEl(KeepTrackPlugin.sideMenuContainerId)?.insertAdjacentHTML('beforeend', sideMenuHtml);
       },
     });
   }
@@ -429,7 +429,7 @@ export class KeepTrackPlugin {
    * @param callback The callback function to run when the bottom icon is clicked. This is run
    * even if the bottom icon is disabled.
    */
-  registerBottomMenuClicked(callback: () => void = null) {
+  registerBottomMenuClicked(callback: () => void = () => {}) {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
       keepTrackApi.register({
         event: KeepTrackApiEvents.selectSatData,

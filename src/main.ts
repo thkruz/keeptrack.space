@@ -42,3 +42,5 @@ window.keepTrack = keepTrack;
 KeepTrack.initCss().then(() => {
   keepTrack.init();
 });
+
+export default keepTrack;

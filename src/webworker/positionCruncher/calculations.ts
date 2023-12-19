@@ -99,7 +99,14 @@ export const isInFov = (lookangles: RangeAzEl, sensor: SensorObjectCruncher): on
   return 0;
 };
 
-export const setupTimeVariables = (dynamicOffsetEpoch, staticOffset, propRate, isSunlightView, isMultiSensor, sensor: SensorObjectCruncher) => {
+export const setupTimeVariables = (
+  dynamicOffsetEpoch: number,
+  staticOffset: number,
+  propRate: number,
+  isSunlightView: boolean,
+  isMultiSensor: boolean,
+  sensor: SensorObjectCruncher
+) => {
   const now = propTime(dynamicOffsetEpoch, staticOffset, propRate);
 
   const j =

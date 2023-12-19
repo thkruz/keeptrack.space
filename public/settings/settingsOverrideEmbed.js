@@ -96,6 +96,7 @@ const settingsOverride = {
   isAutoResizeCanvas: false,
   isDisableAsciiCatalog: true,
   isLoadLastMap: false,
+  isSplashScreenEnabled: false,
 
   plugins: {
     debug: false,

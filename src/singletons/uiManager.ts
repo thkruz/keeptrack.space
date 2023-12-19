@@ -25,7 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
+import { ColorInformation, ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
@@ -35,7 +35,7 @@ import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
 import { closeColorbox } from '../lib/colorbox';
 import { MILLISECONDS_PER_SECOND } from '../lib/constants';
 import { getClass } from '../lib/get-class';
-import { getEl } from '../lib/get-el';
+import { getEl, hideEl, setInnerHtml, showEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { LegendManager } from '../static/legend-manager';
@@ -53,20 +53,20 @@ export class StandardUiManager implements UiManager {
 
   // materializecss/materialize goes to window.M, but we want a local reference
   M = window.M;
-  bottomIconPress = null;
-  hideSideMenus = null;
+  bottomIconPress: (el: HTMLElement) => void;
+  hideSideMenus: () => void;
   isAnalysisMenuOpen = false;
   isCurrentlyTyping = false;
   isUiVisible = false;
   lastBoxUpdateTime = 0;
-  lastColorScheme = null;
+  lastColorScheme: { (sat: SatObject, params?: any): ColorInformation; (sat: SatObject, params?: any): ColorInformation; name?: any };
   lastNextPassCalcSatId = 0;
-  lastNextPassCalcSensorShortName = null;
+  lastNextPassCalcSensorShortName: string;
   lastToast: string;
-  lookAtLatLon = null;
+  lookAtLatLon: any;
   searchManager: SearchManager;
   updateInterval = 1000;
-  updateNextPassOverlay = null;
+  updateNextPassOverlay: (arg0: boolean) => void;
   hoverSatId = -1;
 
   static fullscreenToggle() {
@@ -95,8 +95,8 @@ export class StandardUiManager implements UiManager {
     (function _httpsCheck() {
       if (location.protocol !== 'https:') {
         try {
-          getEl('cs-geolocation').style.display = 'none';
-          getEl('geolocation-btn').style.display = 'none';
+          hideEl('cs-geolocation');
+          hideEl('geolocation-btn');
         } catch {
           // Intended to catch errors when the page is not loaded yet
         }
@@ -116,7 +116,7 @@ export class StandardUiManager implements UiManager {
           <span id="sat-hoverbox3"></span>
         </div>`;
 
-        getEl('keeptrack-canvas').parentElement.append(hoverboxDOM);
+        getEl('keeptrack-canvas')?.parentElement?.append(hoverboxDOM);
       } catch {
         /* istanbul ignore next */
         console.debug('document.createElement() failed!');
@@ -125,7 +125,9 @@ export class StandardUiManager implements UiManager {
   }
 
   static reloadLastSensor() {
-    const currentSensor = JSON.parse(PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR));
+    const json = PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
+    if (!json) return;
+    const currentSensor = JSON.parse(json);
     // istanbul ignore next
     if (currentSensor !== null) {
       try {
@@ -147,7 +149,7 @@ export class StandardUiManager implements UiManager {
           }
         }
       } catch {
-        PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, null);
+        PersistenceManager.getInstance().removeItem(StorageKey.CURRENT_SENSOR);
       }
     }
   }
@@ -274,14 +276,14 @@ export class StandardUiManager implements UiManager {
       getEl('nav-footer')?.classList.add('footer-slide-trans');
       getEl('nav-footer')?.classList.remove('footer-slide-up');
       getEl('nav-footer')?.classList.add('footer-slide-down');
-      getEl('nav-footer-toggle').innerHTML = '&#x25B2;';
+      setInnerHtml('nav-footer-toggle', '&#x25B2;');
     } else {
       this.isFooterVisible_ = true;
       getEl('sat-infobox')?.classList.remove('sat-infobox-fullsize');
       getEl('nav-footer')?.classList.add('footer-slide-trans');
       getEl('nav-footer')?.classList.remove('footer-slide-down');
       getEl('nav-footer')?.classList.add('footer-slide-up');
-      getEl('nav-footer-toggle').innerHTML = '&#x25BC;';
+      setInnerHtml('nav-footer-toggle', '&#x25BC;');
     }
     // After 1 second the transition should be complete so lets stop moving slowly
     setTimeout(() => {
@@ -291,14 +293,14 @@ export class StandardUiManager implements UiManager {
 
   hideUi() {
     if (this.isUiVisible) {
-      getEl('keeptrack-header').style.display = 'none';
-      getEl('ui-wrapper').style.display = 'none';
-      getEl('nav-footer').style.display = 'none';
+      hideEl('keeptrack-header');
+      hideEl('ui-wrapper');
+      hideEl('nav-footer');
       this.isUiVisible = false;
     } else {
-      getEl('keeptrack-header').style.display = 'block';
-      getEl('ui-wrapper').style.display = 'block';
-      getEl('nav-footer').style.display = 'block';
+      showEl('keeptrack-header');
+      showEl('ui-wrapper');
+      showEl('nav-footer');
       this.isUiVisible = true;
     }
   }
@@ -309,7 +311,7 @@ export class StandardUiManager implements UiManager {
 
     this.searchManager = new SearchManager(this);
 
-    if (settingsManager.isShowLogo) getEl('demo-logo').classList.remove('start-hidden');
+    if (settingsManager.isShowLogo) getEl('demo-logo')?.classList.remove('start-hidden');
 
     keepTrackApi.methods.uiManagerInit();
 
@@ -322,7 +324,7 @@ export class StandardUiManager implements UiManager {
   }
 
   initMenuController() {
-    getEl('legend-hover-menu').addEventListener('click', (e: any) => {
+    getEl('legend-hover-menu')?.addEventListener('click', (e: any) => {
       if (e.target.classList[1]) {
         this.legendHoverMenuClick(e.target.classList[1]);
       }
@@ -331,21 +333,20 @@ export class StandardUiManager implements UiManager {
     getEl('legend-menu')?.addEventListener('click', () => {
       if (settingsManager.legendMenuOpen) {
         // Closing Legend Menu
-        getEl('legend-hover-menu').style.display = 'none';
-        getEl('legend-icon').classList.remove('bmenu-item-selected');
+        hideEl('legend-hover-menu');
+        getEl('legend-icon')?.classList.remove('bmenu-item-selected');
         settingsManager.legendMenuOpen = false;
       } else {
         // Opening Legend Menu
 
-        if (getEl('legend-hover-menu').innerHTML.length === 0) {
+        if (getEl('legend-hover-menu')?.innerHTML.length === 0) {
           // TODO: Figure out why it is empty sometimes
           errorManagerInstance.debug('Legend Menu is Empty');
           LegendManager.change('default');
         }
 
-        getEl('legend-hover-menu').style.display = 'block';
-        const LegendIcon = getEl('legend-icon');
-        LegendIcon && LegendIcon.classList.add('bmenu-item-selected');
+        showEl('legend-hover-menu');
+        getEl('legend-icon')?.classList.add('bmenu-item-selected');
         this.searchManager.hideResults();
         settingsManager.legendMenuOpen = true;
       }
@@ -389,9 +390,10 @@ export class StandardUiManager implements UiManager {
 
     getEl('nav-footer-toggle')?.addEventListener('click', () => {
       this.footerToggle();
-      if (parseInt(window.getComputedStyle(getEl('nav-footer')).bottom.replace('px', '')) < 0) {
+      const navFooterDom = getEl('nav-footer');
+      if (navFooterDom && parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
         setTimeout(() => {
-          const bottomHeight = getEl('bottom-icons-container').offsetHeight;
+          const bottomHeight = getEl('bottom-icons-container')?.offsetHeight;
           document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
         }, 1000); // Wait for the footer to be fully visible.
       } else {
@@ -423,22 +425,13 @@ export class StandardUiManager implements UiManager {
       this.isCurrentlyTyping = false;
     });
 
-    getEl('search-results')?.addEventListener('click', function (evt: Event) {
-      let satId: number;
-      // must be '.search-result' class
-      if ((<HTMLElement>evt.target).classList.contains('search-result')) {
-        satId = parseInt((<HTMLElement>evt.target).dataset.objId);
-      } else if ((<HTMLElement>evt.target).parentElement.classList.contains('search-result')) {
-        satId = parseInt((<HTMLElement>evt.target).parentElement?.dataset.objId);
-      } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
-        satId = parseInt((<HTMLElement>evt.target).parentElement.parentElement.dataset.objId);
-      } else {
-        return;
-      }
+    getEl('search-results')?.addEventListener('click', (evt: Event) => {
+      let satId = StandardUiManager.getSatIdFromSearchResults_(evt);
+      if (isNaN(satId) || satId === -1) return;
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const sat = catalogManagerInstance.getSat(satId);
-      if (sat.type === SpaceObjectType.STAR) {
+      if (sat?.type === SpaceObjectType.STAR) {
         catalogManagerInstance.panToStar(sat);
       } else {
         catalogManagerInstance.setSelectedSat(satId);
@@ -446,17 +439,8 @@ export class StandardUiManager implements UiManager {
     });
 
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
-      let satId: number;
-      // must be '.search-result' class
-      if ((<HTMLElement>evt.target).classList.contains('search-result')) {
-        satId = parseInt((<HTMLElement>evt.target).dataset.objId);
-      } else if ((<HTMLElement>evt.target).parentElement.classList.contains('search-result')) {
-        satId = parseInt((<HTMLElement>evt.target).parentElement?.dataset.objId);
-      } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
-        satId = parseInt((<HTMLElement>evt.target).parentElement.parentElement.dataset.objId);
-      } else {
-        return;
-      }
+      let satId = StandardUiManager.getSatIdFromSearchResults_(evt);
+      if (isNaN(satId) || satId === -1) return;
 
       keepTrackApi.getHoverManager().setHoverId(satId);
       this.hoverSatId = satId;
@@ -467,19 +451,34 @@ export class StandardUiManager implements UiManager {
     });
 
     getEl('search')?.addEventListener('input', () => {
-      const searchStr = <string>(<HTMLInputElement>getEl('search')).value;
+      const searchStr = (<HTMLInputElement>getEl('search')).value;
       this.doSearch(searchStr);
     });
   }
 
-  legendHoverMenuClick(legendType?: string) {
+  private static getSatIdFromSearchResults_(evt: Event) {
+    let satId = -1;
+    if ((<HTMLElement>evt.target).classList.contains('search-result')) {
+      const satIdStr = (<HTMLElement>evt.target).dataset.objId;
+      satId = satIdStr ? parseInt(satIdStr) : -1;
+    } else if ((<HTMLElement>evt.target).parentElement?.classList.contains('search-result')) {
+      const satIdStr = (<HTMLElement>evt.target).parentElement?.dataset.objId;
+      satId = satIdStr ? parseInt(satIdStr) : -1;
+    } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
+      const satIdStr = (<HTMLElement>evt.target).parentElement?.parentElement?.dataset.objId;
+      satId = satIdStr ? parseInt(satIdStr) : -1;
+    }
+    return satId;
+  }
+
+  legendHoverMenuClick(legendType: string) {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     console.log(this.isUiVisible);
     const slug = legendType.split('-')[1];
 
     if (slug.startsWith('velocity')) {
-      let colorString: [number, number, number, number] = null;
+      let colorString: [number, number, number, number];
       switch (slug) {
         case 'velocityFast':
           colorString = [0.75, 0.75, 0, 1];
@@ -511,7 +510,12 @@ export class StandardUiManager implements UiManager {
       } else {
         colorSchemeManagerInstance.objectTypeFlags[slug] = true;
         getClass(`legend-${slug}-box`).forEach((el) => {
-          el.style.background = rgbCss(settingsManager.colors[slug]);
+          const color = settingsManager.colors?.[slug];
+          if (!color) {
+            errorManagerInstance.debug(`Color not found for ${slug}`);
+          } else {
+            el.style.background = rgbCss(color);
+          }
         });
       }
     }
@@ -532,10 +536,15 @@ export class StandardUiManager implements UiManager {
     const BottomIcons = getEl('bottom-icons');
     BottomIcons?.addEventListener('click', (evt: Event) => {
       if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
-      if ((<HTMLElement>evt.target).parentElement.id === 'bottom-icons') {
+      if ((<HTMLElement>evt.target).parentElement?.id === 'bottom-icons') {
         this.bottomIconPress(<HTMLElement>evt.target);
       } else {
-        this.bottomIconPress((<HTMLElement>evt.target).parentElement);
+        const parentElement = (<HTMLElement>evt.target).parentElement;
+        if (!parentElement) {
+          errorManagerInstance.debug('parentElement is null');
+        } else {
+          this.bottomIconPress(parentElement);
+        }
       }
     });
     this.hideSideMenus = () => {
@@ -550,7 +559,7 @@ export class StandardUiManager implements UiManager {
     this.activeToastList_.push(toastMsg);
   }
 
-  private activeToastList_ = [];
+  private activeToastList_: any[] = [];
 
   /**
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks
@@ -560,22 +569,29 @@ export class StandardUiManager implements UiManager {
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
       keepTrackApi.methods.updateSelectBox(sat);
-      lastBoxUpdateTime = realTime;
+      keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
     }
   }
 
   private static initBottomMenuResizing_() {
     // Allow Resizing the bottom menu
-    const maxHeight = getEl('bottom-icons') !== null ? getEl('bottom-icons').offsetHeight : 0;
-    clickAndDragHeight(getEl('bottom-icons-container'), maxHeight, () => {
-      let bottomHeight = getEl('bottom-icons-container').offsetHeight;
-      document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
-      if (window.getComputedStyle(getEl('nav-footer')).bottom !== '0px') {
-        document.documentElement.style.setProperty('--bottom-menu-top', '0px');
-      } else {
-        bottomHeight = getEl('bottom-icons-container').offsetHeight;
-        document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
-      }
-    });
+    const maxHeight = getEl('bottom-icons') !== null ? getEl('bottom-icons')?.offsetHeight : 0;
+    const bottomIconsContainerDom = getEl('bottom-icons-container');
+
+    if (!bottomIconsContainerDom) {
+      errorManagerInstance.debug('bottomIconsContainerDom is null');
+    } else {
+      clickAndDragHeight(bottomIconsContainerDom, maxHeight, () => {
+        let bottomHeight = bottomIconsContainerDom.offsetHeight;
+        document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
+        const navFooterDom = getEl('nav-footer');
+        if (navFooterDom && window.getComputedStyle(navFooterDom).bottom !== '0px') {
+          document.documentElement.style.setProperty('--bottom-menu-top', '0px');
+        } else {
+          bottomHeight = bottomIconsContainerDom.offsetHeight;
+          document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+        }
+      });
+    }
   }
 }

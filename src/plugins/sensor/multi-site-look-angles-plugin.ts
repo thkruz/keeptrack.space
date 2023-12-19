@@ -5,6 +5,7 @@ import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
@@ -128,11 +129,19 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     if (this.isMenuButtonActive) {
       if (sat) {
         showLoading(() => {
+          // TODO: This should be a class property that persists between refreshes
           const sensorListDom = getEl('multi-site-look-angles-sensor-list');
-          sensorListDom.innerHTML = ''; // TODO: This should be a class property that persists between refreshes
+          if (!sensorListDom) {
+            errorManagerInstance.warn('Could not find sensor list dom');
+            return;
+          }
 
-          const allSensors = [];
+          sensorListDom.innerHTML = '';
+
+          const allSensors: SensorObject[] = [];
           for (const sensor of keepTrackApi.getSensorManager().sensorListUS) {
+            if (!sensor.shortName) continue;
+
             const sensorButton = document.createElement('button');
             sensorButton.classList.add('btn', 'btn-ui', 'waves-effect', 'waves-light');
             if (this.disabledSensors.includes(sensor)) sensorButton.classList.add('btn-red');
@@ -277,7 +286,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       tdR = tr.insertCell();
       tdR.appendChild(document.createTextNode(entry.rng.toFixed(0)));
       tdS = tr.insertCell();
-      tdS.appendChild(document.createTextNode(sensor.shortName));
+      tdS.appendChild(document.createTextNode(sensor.shortName ?? ''));
       // TODO: Future feature
       tr.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());

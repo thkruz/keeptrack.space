@@ -42,7 +42,7 @@ import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { CatalogManager, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
-import { getEl } from './lib/get-el';
+import { getEl, hideEl } from './lib/get-el';
 import { getUnique } from './lib/get-unique';
 import { saveCsv, saveVariable } from './lib/saveVariable';
 import { StandardSensorManager } from './plugins/sensor/sensorManager';
@@ -167,7 +167,7 @@ export class KeepTrack {
     return KeepTrack.getFps_(dt) > minimumFps;
   }
 
-  gameLoop(timestamp?: Milliseconds): void {
+  gameLoop(timestamp = <Milliseconds>0): void {
     requestAnimationFrame(this.gameLoop.bind(this));
     const dt = <Milliseconds>(timestamp - this.lastGameLoopTimestamp_);
     this.lastGameLoopTimestamp_ = timestamp;
@@ -176,7 +176,10 @@ export class KeepTrack {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
       if (this.catalogManager.selectedSat !== -1) {
-        keepTrackApi.getUiManager().updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, this.catalogManager.getSat(this.catalogManager.selectedSat));
+        const selectedSat = this.catalogManager.getSelectedSat();
+        if (selectedSat) {
+          keepTrackApi.getUiManager().updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, selectedSat);
+        }
       }
     }
   }
@@ -296,11 +299,14 @@ export class KeepTrack {
     // Randomly load a splash screen - not a vulnerability
     const image = KeepTrack.splashScreenImgList_[Math.floor(Math.random() * KeepTrack.splashScreenImgList_.length)];
     const loadingDom = document.getElementById('loading-screen');
-
-    loadingDom.style.backgroundImage = `url(${image})`;
-    loadingDom.style.backgroundSize = 'cover';
-    loadingDom.style.backgroundPosition = 'center';
-    loadingDom.style.backgroundRepeat = 'no-repeat';
+    if (loadingDom) {
+      loadingDom.style.backgroundImage = `url(${image})`;
+      loadingDom.style.backgroundSize = 'cover';
+      loadingDom.style.backgroundPosition = 'center';
+      loadingDom.style.backgroundRepeat = 'no-repeat';
+    } else {
+      errorManagerInstance.debug('Failed to load splash screen');
+    }
 
     // Preload the rest of the images after 30 seconds
     setTimeout(() => {
@@ -346,7 +352,7 @@ theodore.kruczek at gmail dot com.
     if (!isThisNode()) console.warn(error);
   }
 
-  private draw_(dt?: Milliseconds) {
+  private draw_(dt = <Milliseconds>0) {
     const renderer = keepTrackApi.getRenderer();
     const camera = keepTrackApi.getMainCamera();
 
@@ -462,30 +468,33 @@ theodore.kruczek at gmail dot com.
       // Create Container Div
       // NOTE: This needs to be done before uiManagerFinal
       if (settingsManager.plugins.debug) {
-        getEl('ui-wrapper').innerHTML += '<div id="eruda"></div>';
+        const uiWrapperDom = getEl('ui-wrapper');
+        if (uiWrapperDom) {
+          uiWrapperDom.innerHTML += '<div id="eruda"></div>';
+        }
       }
 
       // Update any CSS now that we know what is loaded
       keepTrackApi.methods.uiManagerFinal();
 
       if (settingsManager.plugins.debug) {
-        eruda.init({
-          autoScale: false,
-          container: getEl('eruda'),
-          useShadowDom: false,
-          tool: ['console', 'elements'],
-        });
-        eruda.add(erudaFps);
-
-        // Hide Eruda
-        try {
-          (<HTMLDivElement>(<unknown>document.getElementsByClassName('eruda-entry-btn')[0])).style.display = 'none';
-          (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.top = 'var(--top-menu-height)';
-          (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.height = '80%';
-          (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.width = '60%';
-          (<HTMLDivElement>(<unknown>document.getElementById('eruda'))).style.left = '20%';
-        } catch {
-          // Eruda might not be there
+        const erudaDom = getEl('eruda');
+        if (erudaDom) {
+          eruda.init({
+            autoScale: false,
+            container: erudaDom,
+            useShadowDom: false,
+            tool: ['console', 'elements'],
+          });
+          eruda.add(erudaFps);
+          const erudaEntryButtonDoms = document.getElementsByClassName('eruda-entry-btn');
+          if (erudaEntryButtonDoms.length > 0) {
+            hideEl(erudaEntryButtonDoms[0] as HTMLElement);
+          }
+          erudaDom.style.top = 'var(--top-menu-height)';
+          erudaDom.style.height = '80%';
+          erudaDom.style.width = '60%';
+          erudaDom.style.left = '20%';
         }
       }
 
@@ -512,7 +521,7 @@ theodore.kruczek at gmail dot com.
     }
   }
 
-  private update_(dt?: Milliseconds) {
+  private update_(dt = <Milliseconds>0) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const renderer = keepTrackApi.getRenderer();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -521,7 +530,7 @@ theodore.kruczek at gmail dot com.
     renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
 
     // Display it if that settings is enabled
-    if (this.isShowFPS) console.log(KeepTrack.getFps_(dt));
+    if (this.isShowFPS) console.log(KeepTrack.getFps_(renderer.dt));
 
     // Update official time for everyone else
     if (!this.isUpdateTimeThrottle_) {

@@ -366,12 +366,14 @@ export class Camera {
 
       // calculate camera distance from target
       const target = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
-      const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
-      const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
+      if (target) {
+        const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
+        const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
 
-      if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
-        this.camZoomSnappedOnSat = true;
-        this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), this.settings_.minDistanceFromSatellite);
+        if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
+          this.camZoomSnappedOnSat = true;
+          this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), this.settings_.minDistanceFromSatellite);
+        }
       }
     }
 
@@ -404,7 +406,7 @@ export class Camera {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  public draw(target: SatObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
+  public draw(target?: SatObject | null, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
     target ??= <SatObject>{
       id: -1,
       missile: false,
@@ -464,6 +466,7 @@ export class Camera {
       case CameraType.PLANETARIUM: {
         // Pitch is the opposite of the angle to the latitude
         // Yaw is 90 degrees to the left of the angle to the longitude
+        if (!sensorPos) throw new Error('Sensor Position is undefined');
         this.drawPlanetarium_(sensorPos);
         break;
       }
@@ -474,6 +477,7 @@ export class Camera {
       case CameraType.ASTRONOMY: {
         // Pitch is the opposite of the angle to the latitude
         // Yaw is 90 degrees to the left of the angle to the longitude
+        if (!sensorPos) throw new Error('Sensor Position is undefined');
         this.drawAstronomy_(sensorPos);
         break;
       }
@@ -1062,7 +1066,7 @@ export class Camera {
     mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x, -sensorPos.y, -sensorPos.z]);
   }
 
-  private drawPreValidate_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
+  private drawPreValidate_(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null) {
     if (
       Number.isNaN(this.camPitch) ||
       Number.isNaN(this.camYaw) ||

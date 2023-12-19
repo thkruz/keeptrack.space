@@ -25,7 +25,7 @@
  */
 
 import numeric from 'numeric';
-import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, LlaVec3, Minutes, Radians, SatelliteRecord, Sgp4, Transforms, Utils } from 'ootk';
+import { Degrees, EcfVec3, EciVec3, GreenwichMeanSiderealTime, Kilometers, LlaVec3, Minutes, Radians, RaeVec3, SatelliteRecord, Sgp4, Transforms, Utils } from 'ootk';
 import { SensorObjectCruncher } from '../interfaces';
 import { DEG2RAD, GROUND_BUFFER_DISTANCE, HALF_TAU, RAD2DEG, RADIUS_OF_EARTH, RADIUS_OF_SUN, STAR_DISTANCE, TAU } from '../lib/constants';
 import { SpaceObjectType } from '../lib/space-object-type';
@@ -453,7 +453,8 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
   }
 
   let lookangles;
-  let lat, lon;
+  let lat: Radians;
+  let lon: Radians;
   let pos;
   let satSelPosEcf, satSelPos, satSelGeodetic: LlaVec3, satHeight, satSelPosEarth, deltaLat, deltaLatInt, deltaLon, deltaLonInt;
 
@@ -466,9 +467,9 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
       if (!isShowSatOverfly) continue;
       // Find the ECI position of the Selected Satellite
       satSelPosEcf = {
-        x: satPos[satelliteSelected[snum] * 3],
-        y: satPos[satelliteSelected[snum] * 3 + 1],
-        z: satPos[satelliteSelected[snum] * 3 + 2],
+        x: satPos[satelliteSelected[snum] * 3] as Kilometers,
+        y: satPos[satelliteSelected[snum] * 3 + 1] as Kilometers,
+        z: satPos[satelliteSelected[snum] * 3 + 2] as Kilometers,
       };
       satSelPos = Transforms.ecf2eci(satSelPosEcf, gmst);
 
@@ -482,7 +483,7 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
       if (satHeight > 7000 || selectedSatFOV >= 90) deltaLatInt = 2;
       if (satelliteSelected.length > 1) deltaLatInt = 2;
       for (deltaLat = -60; deltaLat < 60; deltaLat += deltaLatInt) {
-        lat = Math.max(Math.min(Math.round(satSelGeodetic.lat * RAD2DEG) + deltaLat, 90), -90) * DEG2RAD;
+        lat = (Math.max(Math.min(Math.round(satSelGeodetic.lat * RAD2DEG) + deltaLat, 90), -90) * DEG2RAD) as Radians;
         if (lat > 90) continue;
 
         if (satHeight < 2500 && selectedSatFOV <= 60) {
@@ -498,7 +499,7 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
           // //////////
           // Add Long
           // //////////
-          lon = satSelGeodetic.lon + deltaLon * DEG2RAD;
+          lon = (satSelGeodetic.lon + deltaLon * DEG2RAD) as Radians;
           satSelPosEarth = createLatLonAlt(lat, lon, <Kilometers>15);
           // Find the Az/El of the position on the earth
           lookangles = Transforms.ecf2rae(satSelPosEarth, satSelPosEcf);
@@ -519,7 +520,7 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
           // Minus Long
           // //////////
           if (deltaLon === 0 || deltaLon === 180) continue; // Don't Draw Two Dots On the Center Line
-          lon = satSelGeodetic.lon - deltaLon * DEG2RAD;
+          lon = (satSelGeodetic.lon - deltaLon * DEG2RAD) as Radians;
           satSelPosEarth = createLatLonAlt(lat, lon, <Kilometers>15);
           // Find the Az/El of the position on the earth
           lookangles = Transforms.ecf2rae(satSelPosEarth, satSelPosEcf);
@@ -638,7 +639,8 @@ export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): vo
 
 export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunEci: any, j: number, isSunExclusion: boolean): boolean => {
   let semiDiamEarth, semiDiamSun, theta;
-  let positionEcf, lookangles;
+  let positionEcf: EcfVec3;
+  let lookangles: RaeVec3;
 
   // Skip reentries
   if (satCache[i].skip) return false;
@@ -721,8 +723,8 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
     satVel[i * 3 + 1] = 0;
     satVel[i * 3 + 2] = 0;
 
-    positionEcf = 0;
-    lookangles = 0;
+    positionEcf = null;
+    lookangles = null;
   }
 
   if (isSunlightView) {

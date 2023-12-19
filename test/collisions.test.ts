@@ -17,7 +17,7 @@ describe('CollissionsPlugin_class', () => {
             text: () =>
               new Promise((resolve) => {
                 // use readFileSync to load SOCRATES.htm
-                const socrates = readFileSync('./src/SOCRATES.html', 'utf8');
+                const socrates = readFileSync('./public/SOCRATES.html', 'utf8');
                 resolve(socrates);
               }),
           } as Response);

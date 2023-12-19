@@ -9,7 +9,7 @@ import { isThisNode } from '../static/isThisNode';
  * @returns The HTML element with the specified ID, or null if it is not found.
  * @throws An error if the element is not found and `isExpectedMissing` is set to `false`.
  */
-export const getEl = (id: string, isExpectedMissing = false): HTMLElement => {
+export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null => {
   const el = document.getElementById(id);
   if (el) return el;
   // if (isThisNode()) {
@@ -30,6 +30,14 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement => {
   // DEBUG: Use this code for finding bad requests
 };
 
+export const setInnerHtml = (id: string, html: string) => {
+  const el = getEl(id);
+  if (!el && settingsManager.plugins.debug) {
+    console.error(`Element with id ${id} not found!`);
+  }
+  if (el) el.innerHTML = html;
+};
+
 /**
  * Shows the element with the specified ID by setting its display style to 'block'.
  * @param id - The ID of the element to show.
@@ -43,7 +51,16 @@ export const showEl = (id: string) => {
  * Hides the element with the specified ID.
  * @param id - The ID of the element to hide.
  */
-export const hideEl = (id: string) => {
-  const el = getEl(id, true);
-  if (el) el.style.display = 'none';
+export const hideEl = (id: string | HTMLElement) => {
+  if (typeof id === 'object') {
+    id.style.display = 'none';
+    return;
+  }
+
+  if (typeof id === 'string') {
+    const el = getEl(id, true);
+    if (el) el.style.display = 'none';
+  }
+
+  console.warn(`Element with id ${id} not found!`);
 };

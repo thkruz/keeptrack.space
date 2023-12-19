@@ -1,6 +1,6 @@
 import * as gremlins from 'gremlins.js';
 
-import { getEl } from '@app/lib/get-el';
+import { getEl, setInnerHtml } from '@app/lib/get-el';
 
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
@@ -95,7 +95,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: (): void => {
-        getEl('debug-console').addEventListener('click', () => {
+        getEl('debug-console')?.addEventListener('click', () => {
           if (this.isErudaVisible) {
             eruda.hide();
             this.isErudaVisible = false;
@@ -105,11 +105,11 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           }
         });
 
-        getEl('debug-gremlins').addEventListener('click', () => {
+        getEl('debug-gremlins')?.addEventListener('click', () => {
           this.runGremlins();
         });
 
-        getEl('debug-cam-to-sat').addEventListener('click', () => {
+        getEl('debug-cam-to-sat')?.addEventListener('click', () => {
           const camera = keepTrackApi.getMainCamera();
           if (camera) {
             const selectedSat = keepTrackApi.getCatalogManager().selectedSat;
@@ -124,7 +124,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           }
         });
 
-        getEl('debug-cam-to-center').addEventListener('click', () => {
+        getEl('debug-cam-to-center')?.addEventListener('click', () => {
           const camera = keepTrackApi.getMainCamera();
           if (camera) {
             const position = camera.getCameraPosition();
@@ -152,18 +152,22 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getSat(selectedSat) : null;
 
           const position = camera.getCameraPosition(sat?.position);
-          getEl('debug-camera-position-x').innerHTML = `X: ${position[0].toFixed(2)}`;
-          getEl('debug-camera-position-y').innerHTML = `Y: ${position[1].toFixed(2)}`;
-          getEl('debug-camera-position-z').innerHTML = `Z: ${position[2].toFixed(2)}`;
-          getEl('debug-camera-distance-from-earth').innerHTML = `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`;
+          setInnerHtml('debug-camera-position-x', `X: ${position[0].toFixed(2)}`);
+          setInnerHtml('debug-camera-position-y', `Y: ${position[1].toFixed(2)}`);
+          setInnerHtml('debug-camera-position-z', `Z: ${position[2].toFixed(2)}`);
+          setInnerHtml('debug-camera-distance-from-earth', `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`);
           this.lastCameraUpdate = <Milliseconds>new Date().getTime();
         }
         if (keepTrackApi.getCatalogManager().selectedSat >= 0) {
           const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat);
+          if (!sat) {
+            console.warn('Satellite not found');
+            return;
+          }
           const position = sat.position;
-          getEl('debug-sat-position-x').innerHTML = `X: ${position.x.toFixed(2)}`;
-          getEl('debug-sat-position-y').innerHTML = `Y: ${position.y.toFixed(2)}`;
-          getEl('debug-sat-position-z').innerHTML = `Z: ${position.z.toFixed(2)}`;
+          setInnerHtml('debug-sat-position-x', `X: ${position.x.toFixed(2)}`);
+          setInnerHtml('debug-sat-position-y', `Y: ${position.y.toFixed(2)}`);
+          setInnerHtml('debug-sat-position-z', `Z: ${position.z.toFixed(2)}`);
         }
       },
     });
@@ -230,10 +234,16 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   }
 
   runGremlins() {
-    getEl('nav-footer').style.height = '200px';
-    getEl('nav-footer-toggle').style.display = 'none';
-    getEl('bottom-icons-container').style.height = '200px';
-    getEl('bottom-icons').style.height = '200px';
+    // If any of the required elements are missing then throw an error
+    if (!getEl('nav-footer')) throw new Error('nav-footer is missing');
+    if (!getEl('nav-footer-toggle')) throw new Error('nav-footer-toggle is missing');
+    if (!getEl('bottom-icons-container')) throw new Error('bottom-icons-container is missing');
+    if (!getEl('bottom-icons')) throw new Error('bottom-icons is missing');
+
+    (<HTMLElement>getEl('nav-footer')).style.height = '200px';
+    (<HTMLElement>getEl('nav-footer-toggle')).style.display = 'none';
+    (<HTMLElement>getEl('bottom-icons-container')).style.height = '200px';
+    (<HTMLElement>getEl('bottom-icons')).style.height = '200px';
     this.startGremlins();
   }
 }

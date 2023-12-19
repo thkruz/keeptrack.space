@@ -254,7 +254,7 @@ export const keepTrackApi = {
     resetSensor: () => {
       keepTrackApi.callbacks.resetSensor.forEach((cb: any) => cb.cb());
     },
-    setSensor: (sensor: SensorObject | string, id: number) => {
+    setSensor: (sensor: SensorObject | string | null, id?: number) => {
       keepTrackApi.callbacks.setSensor.forEach((cb: any) => cb.cb(sensor, id));
     },
     changeSensorMarkers: (caller: string) => {

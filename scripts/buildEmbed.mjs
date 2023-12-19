@@ -1,15 +1,18 @@
-import { cpSync } from 'fs';
+import { cpSync, rmSync } from 'fs';
 import webpack from 'webpack';
-import { copySettingsFiles } from './lib/copyPublicFolder.mjs';
-import { setupEmbedFolders } from './lib/setupFolders.mjs';
 import { generateConfig } from './webpack.mjs';
 
 console.clear();
 console.log('Copy static files...'); // NOSONAR
 
-setupEmbedFolders();
-cpSync('./public', './embed/keepTrack', { recursive: true });
-copySettingsFiles('embed/keepTrack');
+console.log('Removing old files...'); // NOSONAR
+rmSync('./embed', { recursive: true });
+
+for (const dir of ['audio', 'css', 'img', 'meshes', 'textures', 'tle']) {
+  cpSync(`./public/${dir}`, `./embed/keepTrack/${dir}`, { recursive: true });
+}
+cpSync('./public/settings/settingsOverrideEmbed.js', './embed/keepTrack/settings/settingsOverride.js');
+cpSync('./public/example.html', './embed/index.html');
 
 const myArgs = process.argv.slice(2);
 const env = myArgs[0];

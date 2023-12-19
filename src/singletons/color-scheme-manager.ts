@@ -1592,13 +1592,16 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const selSat = catalogManagerInstance.selectedSat;
-    // Selected satellites are always one color so forget whatever we just did
-    this.colorData[selSat * 4] = settingsManager.selectedColor[0]; // R
-    this.colorData[selSat * 4 + 1] = settingsManager.selectedColor[1]; // G
-    this.colorData[selSat * 4 + 2] = settingsManager.selectedColor[2]; // B
-    this.colorData[selSat * 4 + 3] = settingsManager.selectedColor[3]; // A
+    if (selSat !== -1) {
+      // Selected satellites are always one color so forget whatever we just did
+      this.colorData[selSat * 4] = settingsManager.selectedColor[0]; // R
+      this.colorData[selSat * 4 + 1] = settingsManager.selectedColor[1]; // G
+      this.colorData[selSat * 4 + 2] = settingsManager.selectedColor[2]; // B
+      this.colorData[selSat * 4 + 3] = settingsManager.selectedColor[3]; // A
+    }
 
     const hovSat = keepTrackApi.getHoverManager().hoveringSat;
+    if (hovSat === -1 || hovSat === selSat) return;
     // Hover satellites are always one color so forget whatever we just did
     // We check this last so you can hover over the selected satellite
     this.colorData[hovSat * 4] = settingsManager.hoverColor[0]; // R

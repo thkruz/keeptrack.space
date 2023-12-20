@@ -505,6 +505,13 @@ export class DotsManager {
 
     sat.velocity ??= { total: 0, x: 0, y: 0, z: 0 };
 
+    // Fix for https://github.com/thkruz/keeptrack.space/issues/834
+    // TODO: Remove this once we figure out why this is happening
+    // @ts-ignore
+    if (sat.velocity === 0) {
+      sat.velocity = { total: 0, x: 0, y: 0, z: 0 };
+    }
+
     const isChanged = sat.velocity.x !== this.velocityData[i * 3] || sat.velocity.y !== this.velocityData[i * 3 + 1] || sat.velocity.z !== this.velocityData[i * 3 + 2];
     sat.velocity.x = this.velocityData[i * 3] || 0;
     sat.velocity.y = this.velocityData[i * 3 + 1] || 0;

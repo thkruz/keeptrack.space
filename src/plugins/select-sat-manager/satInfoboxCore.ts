@@ -2,7 +2,7 @@ import { GetSatType, MissileObject, SatObject, SensorObject } from '@app/interfa
 import { KeepTrackApiEvents, isMissileObject, isSatObject, isSensorObject, keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, cKmPerMs } from '@app/lib/constants';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 import { getDayOfYear } from '@app/lib/transforms';
 import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
@@ -229,9 +229,11 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
           }
 
           if (catalogManagerInstance.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
-            getEl('secondary-sat-info').style.display = 'block';
+            showEl('secondary-sat-info');
+            showEl('sec-angle-link', 'flex');
           } else if (catalogManagerInstance.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
-            getEl('secondary-sat-info').style.display = 'none';
+            hideEl('secondary-sat-info');
+            hideEl('sec-angle-link');
           }
 
           if (catalogManagerInstance.secondarySat !== -1 && isSatObject(sat)) {

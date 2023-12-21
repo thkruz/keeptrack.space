@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
@@ -34,14 +35,14 @@ describe('SatellitePhotos_class', () => {
 describe('SatellitePhotos_test_links', () => {
   const tempSatellitePhotosPlugin = new SatellitePhotos();
   websiteInit(tempSatellitePhotosPlugin);
-  const links = Array.from(document.getElementById('sat-photo-menu-content').getElementsByTagName('li')).map((li) => li.id);
+  const links = Array.from(getEl('sat-photo-menu-content').getElementsByTagName('li')).map((li) => li.id);
 
   let satellitePhotosPlugin: SatellitePhotos;
   beforeEach(() => {
     setupStandardEnvironment();
     satellitePhotosPlugin = new SatellitePhotos();
     websiteInit(satellitePhotosPlugin);
-    document.body.innerHTML += '<div id="colorbox-div"></div>';
+    keepTrackApi.containerRoot.innerHTML += '<div id="colorbox-div"></div>';
     keepTrackApi.getCatalogManager = jest.fn().mockReturnValue({
       selectSat: jest.fn(),
       getSatFromObjNum: jest.fn().mockReturnValue({
@@ -52,8 +53,8 @@ describe('SatellitePhotos_test_links', () => {
 
   links.forEach((link) => {
     it(`should have a working link to ${link}`, () => {
-      expect(document.getElementById(link)).toBeTruthy();
-      expect(() => document.getElementById(link).click()).not.toThrow();
+      expect(getEl(link)).toBeTruthy();
+      expect(() => getEl(link).click()).not.toThrow();
     });
   });
 });

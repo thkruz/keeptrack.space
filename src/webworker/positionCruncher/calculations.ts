@@ -77,7 +77,9 @@ export const checkSunExclusion = (
     : [false, sunECI];
 };
 
-export const isInFov = (lookangles: RangeAzEl, sensor: SensorObjectCruncher): oneOrZero => {
+export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RangeAzEl): oneOrZero => {
+  if (!lookangles) return 0;
+
   const az = lookangles.az * RAD2DEG;
   const el = lookangles.el * RAD2DEG;
   const rng = lookangles.rng;

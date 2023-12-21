@@ -9,7 +9,7 @@ import * as catalogLoader from '@app/static/catalog-loader';
 import { Singletons } from '@app/interfaces';
 import { keepTrackContainer } from '../container';
 import { KeepTrackApiEvents, KeepTrackApiRegisterParams } from '../keepTrackApi';
-import { getEl } from '../lib/get-el';
+import { getEl, hideEl, showEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { aboutMenuPlugin } from './about-menu/about-menu';
 import { analysisMenuPlugin } from './analysis/analysis';
@@ -229,6 +229,9 @@ export const uiManagerFinal = (plugins: any): void => {
 
   if (getEl('bottom-icons') && getEl('bottom-icons').innerText == '') {
     getEl('nav-footer').style.visibility = 'hidden';
+    hideEl('nav-footer');
+  } else {
+    showEl('nav-footer');
   }
 
   const bottomContainer = getEl('bottom-icons-container');

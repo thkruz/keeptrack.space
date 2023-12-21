@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { ClassificationBar } from '@app/plugins/classification-bar/classification-bar';
 import { ClassificationString } from '@app/static/classification';
 import { setupMinimumHtml } from './environment/standard-env';
@@ -15,7 +16,7 @@ describe('classification_bar_plugin', () => {
 
   it('process_init', () => {
     standardPluginInit(ClassificationBar);
-    expect(document.getElementById('classification-string')).toBe(null);
+    expect(getEl('classification-string', true)).toBe(null);
   });
 
   it('process_init_with_settings_classification', () => {
@@ -28,12 +29,12 @@ describe('classification_bar_plugin', () => {
       expect(() => keepTrackApi.callbacks.uiManagerInit.forEach((callback) => callback.cb())).not.toThrow();
       expect(() => keepTrackApi.callbacks.uiManagerFinal.forEach((callback) => callback.cb())).not.toThrow();
 
-      expect(document.getElementById('classification-string').innerHTML).toBe(testClassificationStr);
+      expect(getEl('classification-string').innerHTML).toBe(testClassificationStr);
     });
   });
 
   it('process_no_classification_container', () => {
-    expect(() => classificationPlugin.updateClassificationString('Unclassified')).not.toThrow();
+    expect(() => classificationPlugin.updateString('Unclassified')).not.toThrow();
   });
 
   it('process_update_classification_unofficial_string', () => {

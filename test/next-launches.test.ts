@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { NextLaunchesPlugin } from '@app/plugins/next-launches/next-launches';
 import { readFileSync } from 'fs';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -18,7 +19,7 @@ describe('NextLaunches_class', () => {
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
   });
   beforeEach(() => {
-    document.body.innerHTML = '';
+    keepTrackApi.containerRoot.innerHTML = '';
     setupStandardEnvironment();
 
     global.fetch = jest.fn().mockImplementation(async () => ({

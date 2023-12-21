@@ -140,7 +140,8 @@ export class SettingsManager {
    */
   isGlobalErrorTrapOn = true;
   /**
-   * Determines whether or not the splash screen should be displayed.
+   * Determines whether or not the splash screen images should be displayed.
+   * The text and version number still appear.
    */
   isShowSplashScreen = true;
   isNotionalDebris = false;
@@ -433,7 +434,10 @@ export class SettingsManager {
    * Shows an overlay with object information
    */
   enableHoverOverlay = true;
-  enableLimitedUI = false;
+  /**
+   * Indicates whether the fallback css is enabled. This only loads if isDisableCss is true.
+   */
+  enableLimitedUI = true;
   /**
    * @deprecated
    * The maximum value for the field of view setting.
@@ -993,9 +997,15 @@ export class SettingsManager {
    */
   isStarlinkOnly = false;
   /**
-   * Indicates whether the splash screen is enabled.
+   * Indicates whether to show confidence levels when hovering over an object.
    */
-  isSplashScreenEnabled = true;
+  isShowConfidenceLevels = true;
+  divContainer: HTMLDivElement;
+  /**
+   * The initial zoom level for the camera.
+   * 0 = earth and 1 = max distance from earth
+   */
+  initZoomLevel: number;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
@@ -1081,6 +1091,10 @@ export class SettingsManager {
     const eciOnHoverString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ECI_ON_HOVER);
     if (eciOnHoverString !== null) {
       this.isEciOnHover = eciOnHoverString === 'true';
+    }
+    const isShowConfidenceLevelsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
+    if (isShowConfidenceLevelsString !== null) {
+      this.isShowConfidenceLevels = isShowConfidenceLevelsString === 'true';
     }
     const demoModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEMO_MODE);
     if (demoModeOnString !== null) {
@@ -1574,7 +1588,12 @@ export class SettingsManager {
     // override values in this with overrides
     for (const key of Object.keys(overrides)) {
       if (key in this) {
-        this[key] = overrides[key];
+        if (key === 'colors' || key === 'plugins') {
+          // Merge the colors object
+          this[key] = { ...this[key], ...overrides[key] };
+        } else {
+          this[key] = overrides[key];
+        }
       }
     }
   }

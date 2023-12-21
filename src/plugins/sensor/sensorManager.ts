@@ -37,41 +37,11 @@ import { PersistenceManager, StorageKey } from '@app/singletons/persistence-mana
 import { LegendManager } from '@app/static/legend-manager';
 import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
-import { Degrees, GreenwichMeanSiderealTime, Kilometers, Radians } from 'ootk';
+import { GreenwichMeanSiderealTime, Radians } from 'ootk';
 import { SensorManager, SensorObject } from '../../interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
 
 export class StandardSensorManager implements SensorManager {
-  // TODO: Merge empty and default
-  private readonly emptySensor: SensorObject = {
-    id: -1,
-    observerGd: {
-      lat: null,
-      lon: <Radians>0,
-      alt: <Kilometers>0,
-    },
-    alt: <Kilometers>0,
-    country: '',
-    lat: <Degrees>0,
-    lon: <Degrees>0,
-    name: '',
-    uiName: '',
-    system: '',
-    operator: '',
-    obsmaxaz: <Degrees>0,
-    obsmaxel: <Degrees>0,
-    obsmaxrange: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsminel: <Degrees>0,
-    obsminrange: <Kilometers>0,
-    objName: '',
-    staticNum: 0,
-    volume: false,
-    zoom: ZoomValue.GEO,
-  };
-
-  lastMultiSiteArray: TearrData[];
-
   readonly defaultSensor = <SensorObject[]>[
     {
       observerGd: {
@@ -81,6 +51,8 @@ export class StandardSensorManager implements SensorManager {
       },
     },
   ];
+
+  lastMultiSiteArray: TearrData[];
 
   addSecondarySensor(sensor: SensorObject): void {
     // If there is no primary sensor, make this the primary sensor
@@ -256,7 +228,7 @@ export class StandardSensorManager implements SensorManager {
     // TODO: This function is totally redundant to setSensor. There should be
     // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
     if (sensor === null) {
-      this.currentSensors[0] = this.emptySensor;
+      this.currentSensors = structuredClone(this.defaultSensor);
       sensor = this.currentSensors;
       console.warn(this.currentSensors[0]);
     } else if (sensor[0] != null) {

@@ -20,7 +20,7 @@ describe('TimeMachine_class', () => {
     websiteInit(timeMachinePlugin);
     keepTrackApi.getCatalogManager().getSat = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
     keepTrackApi.getCatalogManager().satData = Array(50).fill({ ...defaultSat, isInGroup: true });
-    document.body.innerHTML += '<div id="search-results"></div>';
+    keepTrackApi.containerRoot.innerHTML += '<div id="search-results"></div>';
 
     settingsManager.timeMachineDelay = <Milliseconds>0;
     keepTrackApi.methods.bottomMenuClick(timeMachinePlugin.bottomIconElementName);

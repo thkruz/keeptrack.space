@@ -1,14 +1,17 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { isThisNode } from '../static/isThisNode';
 
 export const getClass = (id: string): HTMLElement[] => {
-  const els = <HTMLElement[]>Array.from(document.getElementsByClassName(id));
-  if (els.length) return els;
+  const els = Array.from(keepTrackApi.containerRoot.querySelectorAll(id));
+
+  if (els.length) return els as HTMLElement[];
+
   if (isThisNode()) {
     // Create an empty DIV and send that back
     // TODO - This is a hack. Tests should provide the right environment.
     const el = document.createElement('div');
     el.id = id;
-    document.body.appendChild(el);
+    keepTrackApi.containerRoot.appendChild(el);
     return [<HTMLElement>(<unknown>el)];
   }
   return [];

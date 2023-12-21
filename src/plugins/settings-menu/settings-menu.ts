@@ -220,6 +220,13 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
             <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Show confidence levels for satellite's element sets.">
+                <input id="settings-confidence-levels" type="checkbox" />
+                <span class="lever"></span>
+                Show Confidence Levels
+              </label>
+            </div>
+            <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Every 3 seconds a new satellite will be selected from FOV">
                 <input id="settings-demo-mode" type="checkbox" />
                 <span class="lever"></span>
@@ -463,6 +470,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-graySkybox':
       case 'settings-eciOnHover':
       case 'settings-hos':
+      case 'settings-confidence-levels':
       case 'settings-demo-mode':
       case 'settings-sat-label-mode':
       case 'settings-freeze-drag':
@@ -517,6 +525,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('settings-graySkybox')).checked = settingsManager.isGraySkybox;
     (<HTMLInputElement>getEl('settings-eciOnHover')).checked = settingsManager.isEciOnHover;
     (<HTMLInputElement>getEl('settings-hos')).checked = settingsManager.colors.transparent[3] === 0;
+    (<HTMLInputElement>getEl('settings-confidence-levels')).checked = settingsManager.isShowConfidenceLevels;
     (<HTMLInputElement>getEl('settings-demo-mode')).checked = settingsManager.isDemoModeOn;
     (<HTMLInputElement>getEl('settings-sat-label-mode')).checked = settingsManager.isSatLabelModeOn;
     (<HTMLInputElement>getEl('settings-freeze-drag')).checked = settingsManager.isFreezePropRateOnDrag;
@@ -547,6 +556,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, settingsManager.isSatLabelModeOn.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
@@ -645,6 +655,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
     const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;
     settingsManager.colors.transparent = isHOSChecked ? [1.0, 1.0, 1.0, 0] : [1.0, 1.0, 1.0, 0.1];
+    settingsManager.isShowConfidenceLevels = (<HTMLInputElement>getEl('settings-confidence-levels')).checked;
     settingsManager.isDemoModeOn = (<HTMLInputElement>getEl('settings-demo-mode')).checked;
     settingsManager.isSatLabelModeOn = (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
     settingsManager.isShowNextPass = (<HTMLInputElement>getEl('settings-snp')).checked;

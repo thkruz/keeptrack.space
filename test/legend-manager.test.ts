@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
 import { settingsManager } from '../src/settings/settings';
@@ -34,7 +35,7 @@ describe('LegendManager_class', () => {
   };
 
   beforeEach(() => {
-    window.document.body.innerHTML = ``;
+    keepTrackApi.containerRoot.innerHTML = ``;
     keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
   });
 
@@ -44,7 +45,7 @@ describe('LegendManager_class', () => {
     const menu = 'rcs';
     const legendHoverDom = document.createElement('div');
     legendHoverDom.id = 'legend-hover-menu';
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     // Act
     LegendManager.change(menu);
@@ -61,7 +62,7 @@ describe('LegendManager_class', () => {
     const menu = 'default';
     const legendHoverDom = document.createElement('div');
     legendHoverDom.id = 'legend-hover-menu';
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     // Act
     LegendManager.change(menu);
@@ -77,7 +78,7 @@ describe('LegendManager_class', () => {
     const menu = 'invalid';
     const legendHoverDom = document.createElement('div');
     legendHoverDom.id = 'legend-hover-menu';
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     // Act
     LegendManager.change(menu);
@@ -93,7 +94,7 @@ describe('LegendManager_class', () => {
     const menu = null;
     const legendHoverDom = document.createElement('div');
     legendHoverDom.id = 'legend-hover-menu';
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     // Act
     LegendManager.change(<string>(<unknown>menu));
@@ -109,16 +110,16 @@ describe('LegendManager_class', () => {
     const menu = 'rcs';
     const legendHoverDom = document.createElement('div');
     legendHoverDom.id = 'legend-hover-menu';
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     // Act
     LegendManager.change(menu);
 
     // Assert
-    expect((document.querySelector('.legend-rcsSmall-box') as HTMLElement).style.background).toEqual('rgba(255, 102, 0, 0.6)');
-    expect((document.querySelector('.legend-rcsMed-box') as HTMLElement).style.background).toEqual('rgb(51, 102, 255)');
-    expect((document.querySelector('.legend-rcsLarge-box') as HTMLElement).style.background).toEqual('rgba(0, 255, 0, 0.6)');
-    expect((document.querySelector('.legend-rcsUnknown-box') as HTMLElement).style.background).toEqual('rgba(255, 255, 0, 0.6)');
+    expect((keepTrackApi.containerRoot.querySelector('.legend-rcsSmall-box') as HTMLElement).style.background).toEqual('rgba(255, 102, 0, 0.6)');
+    expect((keepTrackApi.containerRoot.querySelector('.legend-rcsMed-box') as HTMLElement).style.background).toEqual('rgb(51, 102, 255)');
+    expect((keepTrackApi.containerRoot.querySelector('.legend-rcsLarge-box') as HTMLElement).style.background).toEqual('rgba(0, 255, 0, 0.6)');
+    expect((keepTrackApi.containerRoot.querySelector('.legend-rcsUnknown-box') as HTMLElement).style.background).toEqual('rgba(255, 255, 0, 0.6)');
   });
 
   // Tests that the velocity color is set for the legend
@@ -136,15 +137,15 @@ describe('LegendManager_class', () => {
     const velocityFastClass = document.createElement('div');
     velocityFastClass.classList.add('legend-velocityFast-box');
     legendHoverDom.appendChild(velocityFastClass);
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     // Act
     LegendManager.change(menu);
 
     // Assert
-    expect((document.querySelector('.legend-velocitySlow-box') as HTMLElement).style.background).toEqual('rgb(255, 0, 0)');
-    expect((document.querySelector('.legend-velocityMed-box') as HTMLElement).style.background).toEqual('rgb(191, 64, 0)');
-    expect((document.querySelector('.legend-velocityFast-box') as HTMLElement).style.background).toEqual('rgb(191, 191, 0)');
+    expect((keepTrackApi.containerRoot.querySelector('.legend-velocitySlow-box') as HTMLElement).style.background).toEqual('rgb(255, 0, 0)');
+    expect((keepTrackApi.containerRoot.querySelector('.legend-velocityMed-box') as HTMLElement).style.background).toEqual('rgb(191, 64, 0)');
+    expect((keepTrackApi.containerRoot.querySelector('.legend-velocityFast-box') as HTMLElement).style.background).toEqual('rgb(191, 191, 0)');
     expect(colorSchemeManagerInstance.objectTypeFlags.velocitySlow).toBe(true);
     expect(colorSchemeManagerInstance.objectTypeFlags.velocityMed).toBe(true);
     expect(colorSchemeManagerInstance.objectTypeFlags.velocityFast).toBe(true);
@@ -154,7 +155,7 @@ describe('LegendManager_class', () => {
   it('test_change_legend_menu_cleared', () => {
     const legendHoverDom = document.createElement('div');
     legendHoverDom.id = 'legend-hover-menu';
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     LegendManager.change('clear');
 
@@ -165,7 +166,7 @@ describe('LegendManager_class', () => {
   it('test_change_sensor_selected', () => {
     const legendHoverDom = document.createElement('div');
     legendHoverDom.id = 'legend-hover-menu';
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
 
     const catalogManagerInstance = {
       isSensorManagerLoaded: true,
@@ -207,7 +208,7 @@ describe('LegendManager_class', () => {
     const velocityFastClass = document.createElement('div');
     velocityFastClass.classList.add('legend-velocityFast-box');
     legendHoverDom.appendChild(velocityFastClass);
-    document.body.appendChild(legendHoverDom);
+    keepTrackApi.containerRoot.appendChild(legendHoverDom);
     settingsManager.colors = <any>{
       velocity: [1, 0, 0, 1],
     };
@@ -220,9 +221,9 @@ describe('LegendManager_class', () => {
     expect(objectTypeFlags.velocitySlow).toBe(true);
     expect(objectTypeFlags.velocityMed).toBe(true);
     expect(objectTypeFlags.velocityFast).toBe(true);
-    const velocitySlowBox = document.querySelector('.legend-velocitySlow-box') as HTMLElement | null;
-    const velocityMedBox = document.querySelector('.legend-velocityMed-box') as HTMLElement | null;
-    const velocityFastBox = document.querySelector('.legend-velocityFast-box') as HTMLElement | null;
+    const velocitySlowBox = keepTrackApi.containerRoot.querySelector('.legend-velocitySlow-box') as HTMLElement | null;
+    const velocityMedBox = keepTrackApi.containerRoot.querySelector('.legend-velocityMed-box') as HTMLElement | null;
+    const velocityFastBox = keepTrackApi.containerRoot.querySelector('.legend-velocityFast-box') as HTMLElement | null;
     expect(velocitySlowBox?.style.background).toBe('rgb(255, 0, 0)');
     expect(velocityMedBox?.style.background).toBe('rgb(191, 64, 0)');
     expect(velocityFastBox?.style.background).toBe('rgb(191, 191, 0)');

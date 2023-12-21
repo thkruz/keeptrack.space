@@ -1,4 +1,4 @@
-import { GetSatType, SatObject } from '@app/interfaces';
+import { GetSatType, SatObject, SensorObject } from '@app/interfaces';
 import { isSatObject, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { SpaceObjectType } from '@app/lib/space-object-type';
@@ -137,20 +137,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
         if (!sat.static) {
           keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
-        } else if (typeof sat.staticNum !== 'undefined' && !settingsManager.isMobileModeEnabled) {
-          // No sensor manager on mobile
-          sensorManagerInstance.setSensor(null, sat.staticNum);
-
-          if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
-          const timeManagerInstance = keepTrackApi.getTimeManager();
-          keepTrackApi
-            .getMainCamera()
-            .lookAtLatLon(
-              sensorManagerInstance.currentSensors[0].lat,
-              sensorManagerInstance.currentSensors[0].lon,
-              sensorManagerInstance.currentSensors[0].zoom,
-              timeManagerInstance.selectedDate
-            );
+        } else if (typeof sat.staticNum !== 'undefined') {
+          keepTrackApi.methods.sensorDotSelected(sat as SensorObject);
         }
       }
       this.isselectedSatNegativeOne = false;

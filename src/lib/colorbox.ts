@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from './get-el';
 import { showLoading } from './showLoading';
 import { slideInRight, slideOutLeft } from './slide';
@@ -56,7 +57,7 @@ export const closeColorbox = (): void => {
 export const createColorbox = () => {
   const colorboxDiv = document.createElement('div');
   colorboxDiv.id = 'colorbox-div';
-  document.body.appendChild(colorboxDiv);
+  keepTrackApi.containerRoot.appendChild(colorboxDiv);
   const colorboxContainer = document.createElement('div');
   colorboxContainer.id = 'colorbox-container';
   colorboxDiv.appendChild(colorboxContainer);

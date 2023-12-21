@@ -1,5 +1,6 @@
 import { GeolocationPosition } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { StandardUiManager } from '@app/singletons/uiManager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
@@ -15,7 +16,7 @@ describe('uiManager', () => {
 
   // Should process getsensorinfo
   it('process_getsensorinfo', () => {
-    document.body.innerHTML = `
+    keepTrackApi.containerRoot.innerHTML = `
     <div id="sensor-latitude"></div>
     <div id="sensor-longitude"></div>
     <div id="sensor-minazimuth"></div>
@@ -36,7 +37,7 @@ describe('uiManager', () => {
 
   // Should process updateSensorPosition
   it('process_updateSensorPosition', () => {
-    document.body.innerHTML = `
+    keepTrackApi.containerRoot.innerHTML = `
       <input id="cs-lat" />
       <input id="cs-lon" />
       <input id="cs-hei" />
@@ -67,11 +68,11 @@ describe('uiManager', () => {
         },
       })
     ).not.toThrow();
-    expect((<HTMLInputElement>document.getElementById('cs-lat')).value).toBe('22');
-    expect((<HTMLInputElement>document.getElementById('cs-lon')).value).toBe('22');
-    expect((<HTMLInputElement>document.getElementById('cs-hei')).value).toBe('0.022');
+    expect((<HTMLInputElement>getEl('cs-lat')).value).toBe('22');
+    expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
+    expect((<HTMLInputElement>getEl('cs-hei')).value).toBe('0.022');
 
-    document.body.innerHTML = ``;
+    keepTrackApi.containerRoot.innerHTML = ``;
     disableConsoleErrors();
     expect(() =>
       UiGeolocation.updateSensorPosition({
@@ -109,7 +110,7 @@ describe('uiManager', () => {
   // Should process footerToggle and hideUi
   it('process_footerToggle_hideUi', () => {
     setupMinimumHtml();
-    document.body.innerHTML += `
+    keepTrackApi.containerRoot.innerHTML += `
     <div id="sat-infobox"></div>
     <div id="nav-footer"></div>
     <div id="nav-footer-toggle"></div>
@@ -125,7 +126,7 @@ describe('uiManager', () => {
   // Should process initMenuController
   it('process_initMenuController', () => {
     setupStandardEnvironment();
-    document.body.innerHTML += `
+    keepTrackApi.containerRoot.innerHTML += `
     <div id="legend-menu"></div>
     <div id="legend-hover-menu"></div>
     <div id="legend-icon"></div>
@@ -141,7 +142,7 @@ describe('uiManager', () => {
     setupStandardEnvironment();
     const uiManagerInstance = new StandardUiManager();
 
-    document.body.innerHTML += `
+    keepTrackApi.containerRoot.innerHTML += `
     <div id="save-rmb-menu"></div>
     <div id="view-rmb-menu"></div>
     <div id="create-rmb-menu"></div>
@@ -163,10 +164,9 @@ describe('uiManager', () => {
   // Should process postStart
   it('process_postStart', () => {
     setupStandardEnvironment();
-    document.body.innerHTML += `
+    keepTrackApi.containerRoot.innerHTML += `
     <div id="editSat"></div>
     <div id="cs-geolocation"></div>
-    <div id="geolocation-btn"></div>
     <div id="es-ecen"></div>
     <div id="es-day"></div>
     <div id="es-inc"></div>

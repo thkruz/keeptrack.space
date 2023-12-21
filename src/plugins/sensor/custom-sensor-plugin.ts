@@ -1,7 +1,11 @@
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl } from '@app/lib/get-el';
+import { slideInRight } from '@app/lib/slide';
+import { triggerSubmit } from '@app/lib/trigger-submit';
+import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { ZoomValue } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { LegendManager } from '@app/static/legend-manager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import customPng from '@public/img/icons/custom.png';
 import { Degrees, Kilometers, SpaceObjectType } from 'ootk';
@@ -97,6 +101,84 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         </div>
     </div>`;
 
+  rmbL1ElementName = 'create-rmb';
+  rmbL1Html = keepTrackApi.html`
+  <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Create &#x27A4;</a></li>`;
+
+  isRmbOnEarth = true;
+  isRmbOffEarth = false;
+  isRmbOnSat = false;
+  rmbMenuOrder = 10;
+
+  rmbL2ElementName = 'create-rmb-menu';
+  rmbL2Html = keepTrackApi.html`
+  <ul class='dropdown-contents'>
+    <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
+    <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
+  </ul>`;
+
+  // eslint-disable-next-line class-methods-use-this
+  rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const mouseInputInstance = keepTrackApi.getInputManager().mouse;
+
+    switch (targetId) {
+      case 'create-observer-rmb':
+        slideInRight(getEl('custom-sensor-menu'), 1000);
+        getEl('custom-sensor-icon').classList.add('bmenu-item-selected');
+        sensorManagerInstance.isCustomSensorMenuOpen = true;
+        if (!(<HTMLInputElement>getEl('cs-telescope')).checked) {
+          getEl('cs-telescope').click();
+        }
+        (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
+        (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
+        (<HTMLInputElement>getEl('cs-hei')).value = '0';
+        (<HTMLInputElement>getEl('cs-type')).value = 'Observer';
+        triggerSubmit(<HTMLFormElement>getEl('customSensor'));
+        catalogManagerInstance.satCruncher.postMessage({
+          isSunlightView: true,
+        });
+        LegendManager.change('sunlight');
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);
+        waitForCruncher(
+          catalogManagerInstance.satCruncher,
+          () => {
+            colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
+          },
+          (data: any) => data.satInSun
+        );
+        break;
+      case 'create-sensor-rmb':
+        slideInRight(getEl('custom-sensor-menu'), 1000);
+        getEl('custom-sensor-icon').classList.add('bmenu-item-selected');
+        sensorManagerInstance.isCustomSensorMenuOpen = true;
+        if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
+          getEl('cs-telescope').click();
+        }
+        (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
+        (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
+        (<HTMLInputElement>getEl('cs-hei')).value = '0';
+        (<HTMLInputElement>getEl('cs-type')).value = 'Phased Array Radar';
+        (<HTMLInputElement>getEl('cs-minaz')).value = '0';
+        (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
+        (<HTMLInputElement>getEl('cs-minel')).value = '10';
+        (<HTMLInputElement>getEl('cs-maxel')).value = '90';
+        (<HTMLInputElement>getEl('cs-minrange')).value = '0';
+        (<HTMLInputElement>getEl('cs-maxrange')).value = '5556';
+        triggerSubmit(<HTMLFormElement>getEl('customSensor'));
+        LegendManager.change('default');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
+        uiManagerInstance.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        catalogManagerInstance.satCruncher.postMessage({
+          isSunlightView: false,
+        });
+        break;
+    }
+  };
+
   dragOptions: clickDragOptions = {
     isDraggable: true,
   };
@@ -119,17 +201,26 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
+
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
+        CustomSensorPlugin.httpsCheck_();
         CustomSensorPlugin.addCustomSensorFormSubmitListener();
         CustomSensorPlugin.addTelescopeClickListener_();
         CustomSensorPlugin.addCustomSensorBtnCLickListener_();
         CustomSensorPlugin.addClearCustomSensorListener_();
-        CustomSensorPlugin.addUseGeolocationListener_();
       },
     });
+  }
+
+  private static httpsCheck_() {
+    if (location.protocol !== 'https:') {
+      hideEl('cs-geolocation');
+    } else {
+      CustomSensorPlugin.addUseGeolocationListener_();
+    }
   }
 
   private static addCustomSensorFormSubmitListener() {

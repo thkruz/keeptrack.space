@@ -1,6 +1,7 @@
 import { keepTrackContainer } from '@app/container';
 import { Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -23,7 +24,7 @@ describe('TopMenu_class', () => {
     topMenu.init();
     keepTrackApi.methods.uiManagerInit();
     keepTrackApi.methods.uiManagerFinal();
-    const soundBtn = document.getElementById('sound-btn') as HTMLAnchorElement;
+    const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     errorManagerInstance.warn = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.SoundManager, null);
     soundBtn.click();
@@ -37,8 +38,8 @@ describe('TopMenu_class', () => {
     keepTrackApi.methods.uiManagerInit();
     keepTrackApi.methods.uiManagerFinal();
 
-    const soundBtn = document.getElementById('sound-btn') as HTMLAnchorElement;
-    const soundIcon = document.getElementById('sound-icon') as HTMLImageElement;
+    const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
+    const soundIcon = getEl('sound-icon') as HTMLImageElement;
     keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerPlugin);
     const soundManager = keepTrackApi.getSoundManager();
     soundBtn.click();

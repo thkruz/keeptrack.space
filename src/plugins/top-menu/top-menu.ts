@@ -31,9 +31,6 @@ export class TopMenu extends KeepTrackPlugin {
               <div id="nav-wrapper" class="nav-wrapper">
                 <ul id="nav-mobile2" class="right">
                   <li>
-                    <a id="geolocation-btn" class="start-hidden" href="#!"><i class="material-icons">location_on</i></a>
-                  </li>
-                  <li>
                     <a id="sound-btn" class="top-menu-btns bmenu-item-selected">
                       <div class="top-menu-icons">
                         <img id="sound-icon"
@@ -89,7 +86,7 @@ export class TopMenu extends KeepTrackPlugin {
           `
         );
 
-        getEl('keeptrack-main-container').insertAdjacentHTML(
+        keepTrackApi.containerRoot.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
             <div id="help-outer-container" class="valign">

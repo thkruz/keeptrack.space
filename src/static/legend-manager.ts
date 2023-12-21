@@ -118,9 +118,11 @@ export abstract class LegendManager {
 
   private static setColors_(colorSchemeManagerInstance: StandardColorSchemeManager) {
     LegendManager.legendClassList.forEach((selector) => {
-      const elementFromClass = <HTMLElement>document.querySelector(selector);
+      const elementFromClass = document.querySelector(selector);
       if (elementFromClass && settingsManager.colors) {
-        elementFromClass.style.background = rgbCss(settingsManager.colors[selector.split('-')[1]]);
+        const rgba = settingsManager.colors[selector.split('-')[1]];
+        if (!rgba) return;
+        (<HTMLElement>elementFromClass).style.background = rgbCss(rgba);
       }
       colorSchemeManagerInstance.objectTypeFlags[selector.split('-')[1]] = true;
     });

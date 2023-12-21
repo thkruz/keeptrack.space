@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { Screenshot } from '@app/plugins/screenshot/screenshot';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite } from './generic-tests';
@@ -15,7 +16,7 @@ describe('Screenshot_class', () => {
 
   // test if the screenshot can be taken
   it('should take a screenshot', () => {
-    document.body.appendChild = jest.fn();
+    keepTrackApi.containerRoot.appendChild = jest.fn();
     document.createElement = jest.fn(() => ({
       click: jest.fn(),
       getContext: jest.fn(() => ({

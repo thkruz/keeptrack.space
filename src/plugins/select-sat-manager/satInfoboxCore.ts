@@ -211,16 +211,16 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     }
 
     if (!this.isTopLinkEventListenersAdded) {
-      getEl('sat-add-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
-      getEl('sat-remove-watchlist').addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
-      getEl('all-objects-link').addEventListener('click', SatInfoBoxCore.allObjectsLink);
-      getEl('near-orbits-link').addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
-      getEl('near-objects-link1').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
-      getEl('near-objects-link2').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(200));
-      getEl('near-objects-link4').addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(400));
-      getEl('sun-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSun);
-      getEl('nadir-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToEarth);
-      getEl('sec-angle-link').addEventListener('click', SatInfoBoxCore.drawLineToSat);
+      getEl('sat-add-watchlist')?.addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
+      getEl('sat-remove-watchlist')?.addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
+      getEl('all-objects-link')?.addEventListener('click', SatInfoBoxCore.allObjectsLink);
+      getEl('near-orbits-link')?.addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
+      getEl('near-objects-link1')?.addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
+      getEl('near-objects-link2')?.addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(200));
+      getEl('near-objects-link4')?.addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(400));
+      getEl('sun-angle-link')?.addEventListener('click', SatInfoBoxCore.drawLineToSun);
+      getEl('nadir-angle-link')?.addEventListener('click', SatInfoBoxCore.drawLineToEarth);
+      getEl('sec-angle-link')?.addEventListener('click', SatInfoBoxCore.drawLineToSat);
       this.isTopLinkEventListenersAdded = true;
     }
   };
@@ -514,16 +514,21 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
                     This is a title
                   </span>
                 </div>
-                <div id="all-objects-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
-                data-tooltip="Find Related Objects">Find all objects from this launch...</div>
-                <div id="near-orbits-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
-                data-tooltip="Find Objects in Orbital Plane">Find all objects near this orbit...</div>
-                <div id="near-objects-link1" class="link sat-infobox-links" data-position="top" data-delay="50"
-                data-tooltip="Find Nearby Objects">Find all objects within 100km...</div>
-                <div id="near-objects-link2" class="link sat-infobox-links" data-position="top" data-delay="50"
-                data-tooltip="Find Nearby Objects">Find all objects within 200km...</div>
-                <div id="near-objects-link4" class="link sat-infobox-links" data-position="top" data-delay="50"
-                data-tooltip="Find Nearby Objects">Find all objects within 400km...</div>
+                ${
+                  getEl('search')
+                    ? keepTrackApi.html`
+                  <div id="all-objects-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
+                  data-tooltip="Find Related Objects">Find all objects from this launch...</div>
+                  <div id="near-orbits-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
+                  data-tooltip="Find Objects in Orbital Plane">Find all objects near this orbit...</div>
+                  <div id="near-objects-link1" class="link sat-infobox-links" data-position="top" data-delay="50"
+                  data-tooltip="Find Nearby Objects">Find all objects within 100km...</div>
+                  <div id="near-objects-link2" class="link sat-infobox-links" data-position="top" data-delay="50"
+                  data-tooltip="Find Nearby Objects">Find all objects within 200km...</div>
+                  <div id="near-objects-link4" class="link sat-infobox-links" data-position="top" data-delay="50"
+                  data-tooltip="Find Nearby Objects">Find all objects within 400km...</div>`
+                    : ''
+                }
                 <div id="sun-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                 data-tooltip="Visualize Angle to Sun">Draw sat to sun line...</div>
                 <div id="nadir-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
@@ -652,12 +657,11 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     // Create a Sat Info Box Initializing Script
     if (!settingsManager.isMobileModeEnabled) {
       const draggie = new Draggabilly(getEl('sat-infobox'), {
-        containment: document.body,
+        containment: keepTrackApi.containerRoot,
       });
       draggie.on('dragStart', () => {
         getEl('sat-infobox').style.height = '600px';
-        const rootElement = document.querySelector(':root') as HTMLElement;
-        rootElement.style.setProperty('--search-box-bottom', `0px`);
+        keepTrackApi.containerRoot.style.setProperty('--search-box-bottom', `0px`);
         getEl('sat-infobox').classList.remove('satinfo-fixed');
       });
     }
@@ -669,9 +673,8 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         satInfobox.classList.remove('satinfo-fixed');
         satInfobox.removeAttribute('style');
         satInfobox.style.display = 'block';
-        const rootElement = document.querySelector(':root') as HTMLElement;
         const searchBoxHeight = satInfobox.clientHeight;
-        rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
+        keepTrackApi.containerRoot.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
       }
     });
   }
@@ -766,7 +769,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
 
   private static updateSatMissionData(sat: SatObject) {
     if (!sat.missile) {
-      (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'flex';
+      (<HTMLElement>keepTrackApi.containerRoot.querySelector('.sat-only-info')).style.display = 'flex';
       getEl('sat-user').innerHTML = sat?.owner && sat?.owner !== '' ? sat?.owner : 'Unknown';
       getEl('sat-purpose').innerHTML = sat?.purpose && sat?.purpose !== '' ? sat?.purpose : 'Unknown';
       getEl('sat-contractor').innerHTML = sat?.manufacturer && sat?.manufacturer !== '' ? sat?.manufacturer : 'Unknown';
@@ -785,7 +788,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       getEl('sat-span').innerHTML = sat?.span && sat?.span !== '' ? sat?.span + ' m' : 'Unknown';
       getEl('sat-shape').innerHTML = sat?.shape && sat?.shape !== '' ? sat?.shape : 'Unknown';
     } else {
-      (<HTMLElement>document.querySelector('.sat-only-info')).style.display = 'none';
+      (<HTMLElement>keepTrackApi.containerRoot.querySelector('.sat-only-info')).style.display = 'none';
     }
   }
 
@@ -1083,7 +1086,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       }
     }
 
-    const satOnlyInfoDom = document.querySelector<HTMLElement>('.sat-only-info');
+    const satOnlyInfoDom = keepTrackApi.containerRoot.querySelector<HTMLElement>('.sat-only-info');
     if (!sat.missile) {
       satOnlyInfoDom.style.display = 'flex';
     } else {

@@ -23,6 +23,7 @@ import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
   const settingsManager = new SettingsManager();
+  settingsManager.isShowSplashScreen = true;
   settingsManager.init();
   window.settingsManager = settingsManager;
   (global as any).settingsManager = settingsManager;
@@ -31,6 +32,8 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Image = jest.fn().mockImplementation(() => ({
     decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
   }));
+  keepTrackApi.containerRoot = null;
+  document.body.innerHTML = `<div id="keeptrack-root"></div>`;
   setupDefaultHtml();
 
   clearAllCallbacks();
@@ -40,10 +43,15 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     gl: global.mocks.glMock,
   });
   const catalogManagerInstance = new StandardCatalogManager();
+  catalogManagerInstance.satCruncher = {
+    postMessage: jest.fn(),
+    addEventListener: jest.fn(),
+  } as unknown as Worker;
   const orbitManagerInstance = new StandardOrbitManager();
   orbitManagerInstance.orbitWorker = {
-    postMessage: jest.fn() as any,
-  };
+    postMessage: jest.fn(),
+    addEventListener: jest.fn(),
+  } as unknown as Worker;
   orbitManagerInstance['gl_'] = global.mocks.glMock;
   const colorSchemeManagerInstance = new StandardColorSchemeManager();
   const dotsManagerInstance = new DotsManager();
@@ -146,11 +154,11 @@ export const standardSelectSat = () => {
   keepTrackApi.getCatalogManager().selectSat(0);
 };
 export const setupMinimumHtml = () => {
-  document.body.innerHTML = `
+  keepTrackApi.containerRoot.innerHTML = `
+  <div id="keeptrack-root">
     <div id="keeptrack-header"></div>
-    <div id="keeptrack-main-container">
-      <div id="${KeepTrackPlugin.bottomIconsContainerId}"></div>
-    </div>`;
+    <div id="${KeepTrackPlugin.bottomIconsContainerId}"></div>
+  </div>`;
 };
 
 export const mockUiManager = {
@@ -266,7 +274,7 @@ export const mockCameraManager = <Camera>(<unknown>{
 export const setupDefaultHtml = () => {
   keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
   KeepTrack.getDefaultBodyHtml();
-  document.body.innerHTML += `
+  keepTrackApi.containerRoot.innerHTML += `
     <input id="search"></input>
     <div id="search-holder"></div>
     <div id="search-icon"></div>

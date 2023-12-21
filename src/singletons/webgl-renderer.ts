@@ -78,10 +78,10 @@ export class WebGLRenderer {
 
   static getCanvasInfo(): { vw: number; vh: number } {
     // Using minimum allows the canvas to be full screen without fighting with scrollbars
-    const cw = document.documentElement.clientWidth || 0;
+    const cw = keepTrackApi.containerRoot.clientWidth || document.documentElement.clientWidth || 0;
     const iw = window.innerWidth || 0;
     const vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-    const vh = Math.min(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const vh = Math.min(keepTrackApi.containerRoot.clientHeight || document.documentElement.clientHeight || 0, window.innerHeight || 0);
 
     return { vw, vh };
   }

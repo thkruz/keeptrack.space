@@ -149,7 +149,7 @@ describe('calcSatrec', () => {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     dotsManagerInstance.sizeData = new Int8Array([0, 1, 2, 3, 4, 5, 6, 7]);
 
-    document.body.innerHTML = `<div id="menu-lookangles" class="bmenu-item-disabled"></div>
+    keepTrackApi.containerRoot.innerHTML = `<div id="menu-lookangles" class="bmenu-item-disabled"></div>
     <div id="menu-lookanglesmultisite" class="bmenu-item-disabled"></div>
     <div id="menu-satview" class="bmenu-item-disabled"></div>
     <div id="menu-map" class="bmenu-item-disabled"></div>

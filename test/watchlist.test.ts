@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml } from './environment/standard-env';
 import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
@@ -41,20 +42,20 @@ describe('WatchlistPlugin_form', () => {
   it('should add satellites to watchlist-new element', () => {
     // Step 1: Add satellites '1,5,25544' to watchlist-new element
     const satellites = '1,1,5,5,25544,25544';
-    const watchlistNewElement = <HTMLInputElement>document.getElementById('watchlist-new');
+    const watchlistNewElement = <HTMLInputElement>getEl('watchlist-new');
     if (watchlistNewElement) {
       watchlistNewElement.value = satellites;
     }
 
     // Step 2: Click add button
-    const addButton = document.getElementById('watchlist-add');
+    const addButton = getEl('watchlist-add');
     if (addButton) {
       addButton.click();
     }
 
     // Step 3: Click remove button
     // get first img by class "watchlist-remove"
-    const removeButton = <HTMLImageElement>document.querySelector('img.watchlist-remove');
+    const removeButton = <HTMLImageElement>keepTrackApi.containerRoot.querySelector('img.watchlist-remove');
     if (removeButton) {
       removeButton.click();
     }

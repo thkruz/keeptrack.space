@@ -5,7 +5,7 @@ import { SpaceObjectType } from '@app/lib/space-object-type';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { KeepTrack } from '../keeptrack';
-import { getEl } from '../lib/get-el';
+import { getEl, hideEl, showEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 
 import { lineManagerInstance } from './draw-manager/line-manager';
@@ -144,18 +144,16 @@ export class InputManager {
 
   hidePopUps() {
     if (settingsManager.isPreventColorboxClose) return;
-    const rightBtnMenuDOM = getEl('right-btn-menu');
-    rightBtnMenuDOM.style.display = 'none';
+    hideEl('right-btn-menu');
     InputManager.clearRMBSubMenu();
     this.isRmbMenuOpen = false;
   }
 
   static clearRMBSubMenu = () => {
     keepTrackApi.rmbMenuItems.forEach((item) => {
-      getEl(item.elementIdL2).style.display = 'none';
+      hideEl(item.elementIdL2);
     });
-    const colorsDom = getEl('colors-rmb-menu');
-    if (colorsDom) colorsDom.style.display = 'none';
+    hideEl('colors-rmb-menu');
   };
 
   static showDropdownSubMenu(rightBtnMenuDOM: HTMLElement, rightBtnDOM: HTMLElement, canvasDOM: HTMLCanvasElement, element1?: HTMLElement) {
@@ -223,7 +221,6 @@ export class InputManager {
         <ul id="right-btn-menu-ul" class='dropdown-contents'>
           <li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>
           <li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>
-          <li class="rmb-menu-item" id="create-rmb"><a href="#">Create &#x27A4;</a></li>
           <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>
         </ul>
       </div>
@@ -265,12 +262,6 @@ export class InputManager {
             <li id="line-sat-sun-rmb"><a href="#">Satellite to Sun</a></li>
           </ul>
         </div>
-        <div id="create-rmb-menu" class="right-btn-menu">
-          <ul class='dropdown-contents'>
-            <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
-            <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
-          </ul>
-        </div>
         <div id="earth-rmb-menu" class="right-btn-menu">
           <ul class='dropdown-contents'>
             <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
@@ -304,15 +295,6 @@ export class InputManager {
       });
 
       keepTrackApi.rmbMenuItems.push({
-        elementIdL1: 'create-rmb',
-        elementIdL2: 'create-rmb-menu',
-        order: 10,
-        isRmbOnEarth: true,
-        isRmbOffEarth: false,
-        isRmbOnSat: false,
-      });
-
-      keepTrackApi.rmbMenuItems.push({
         elementIdL1: 'earth-rmb',
         elementIdL2: 'earth-rmb-menu',
         order: 15,
@@ -321,7 +303,7 @@ export class InputManager {
         isRmbOnSat: false,
       });
 
-      // sort document.getElementById('rmb-wrapper').children by order in rmbMenuItems
+      // sort getEl('rmb-wrapper').children by order in rmbMenuItems
       const rmbWrapper = getEl('right-btn-menu-ul');
       const rmbWrapperChildren = rmbWrapper.children;
       const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
@@ -385,38 +367,29 @@ export class InputManager {
     let numMenuItems = 2;
 
     keepTrackApi.rmbMenuItems.forEach((item) => {
-      const dom = getEl(item.elementIdL1);
-      if (dom) dom.style.display = 'none';
+      hideEl(item.elementIdL1);
     });
 
-    getEl('clear-lines-rmb').style.display = 'none';
+    hideEl('clear-lines-rmb');
 
     // View
-    getEl('view-info-rmb').style.display = 'none';
-    getEl('view-sensor-info-rmb').style.display = 'none';
-    getEl('view-sat-info-rmb').style.display = 'none';
-    getEl('view-related-sats-rmb').style.display = 'none';
-
-    // Create
-    getEl('create-observer-rmb').style.display = 'none';
-    getEl('create-sensor-rmb').style.display = 'none';
+    hideEl('view-info-rmb');
+    hideEl('view-sensor-info-rmb');
+    hideEl('view-sat-info-rmb');
+    hideEl('view-related-sats-rmb');
 
     // Draw
-    getEl('line-eci-axis-rmb').style.display = 'none';
-    getEl('line-sensor-sat-rmb').style.display = 'none';
-    getEl('line-earth-sat-rmb').style.display = 'none';
-    getEl('line-sat-sat-rmb').style.display = 'none';
-    getEl('line-sat-sun-rmb').style.display = 'none';
+    hideEl('line-eci-axis-rmb');
+    hideEl('line-sensor-sat-rmb');
+    hideEl('line-earth-sat-rmb');
+    hideEl('line-sat-sat-rmb');
+    hideEl('line-sat-sun-rmb');
 
     // Earth
-    const earthLowRmb = getEl('earth-low-rmb');
-    if (earthLowRmb) earthLowRmb.style.display = 'none';
-    const earthHighRmb = getEl('earth-high-rmb');
-    if (earthHighRmb) earthHighRmb.style.display = 'none';
-    const earthVecRmb = getEl('earth-vec-rmb');
-    if (earthVecRmb) earthVecRmb.style.display = 'none';
-    const earthPoliticalRmb = getEl('earth-political-rmb');
-    if (earthPoliticalRmb) earthPoliticalRmb.style.display = 'none';
+    hideEl('earth-low-rmb');
+    hideEl('earth-high-rmb');
+    hideEl('earth-vec-rmb');
+    hideEl('earth-political-rmb');
 
     if (lineManagerInstance.drawLineList.length > 0) {
       getEl('clear-lines-rmb').style.display = 'block';
@@ -429,8 +402,8 @@ export class InputManager {
       if (typeof sat == 'undefined' || sat == null) return;
 
       if (!sat.static) {
-        getEl('view-sat-info-rmb').style.display = 'block';
-        getEl('view-related-sats-rmb').style.display = 'block';
+        showEl('view-sat-info-rmb');
+        showEl('view-related-sats-rmb');
 
         if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && sensorManagerInstance.whichRadar !== 'CUSTOM') {
           getEl('line-sensor-sat-rmb').style.display = 'block';

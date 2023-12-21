@@ -21,6 +21,7 @@ import { Camera } from './singletons/camera';
 import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
 import { DotsManager } from './singletons/dots-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
+import { MeshManager } from './singletons/draw-manager/mesh-manager';
 import { errorManagerInstance } from './singletons/errorManager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
@@ -149,6 +150,7 @@ export const keepTrackApi = {
   html: html,
   glsl: glsl,
   register: register,
+  containerRoot: <HTMLDivElement>null,
   initializeKeepTrack: null,
   unregister: unregister,
   isInitialized: false,
@@ -181,6 +183,7 @@ export const keepTrackApi = {
     onWatchlistUpdated: [],
     staticOffsetChange: [],
     onLineAdded: [],
+    sensorDotSelected: [],
   },
   methods: {
     onHelpMenuClick: () => {
@@ -273,6 +276,9 @@ export const keepTrackApi = {
     onLineAdded: () => {
       keepTrackApi.callbacks.onLineAdded.forEach((cb: any) => cb.cb(keepTrackApi.getLineManager()));
     },
+    sensorDotSelected: (sensor: SensorObject) => {
+      keepTrackApi.callbacks.sensorDotSelected.forEach((cb: any) => cb.cb(sensor));
+    },
   },
   loadedPlugins: <KeepTrackPlugin[]>[],
   getPlugin: (pluginClass: Constructor<KeepTrackPlugin>) => {
@@ -299,11 +305,13 @@ export const keepTrackApi = {
   getHoverManager: () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager),
   getSelectSatManager: () => keepTrackContainer.get<SelectSatManager>(Singletons.SelectSatManager),
   getMainCamera: () => keepTrackContainer.get<Camera>(Singletons.MainCamera),
+  getMeshManager: () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager),
 };
 
 /**
  * Enum containing the registrable events used in the KeepTrack API.
  */
+
 export enum KeepTrackApiEvents {
   onHelpMenuClick = 'onHelpMenuClick',
   /**
@@ -328,6 +336,9 @@ export enum KeepTrackApiEvents {
   drawOptionalScenery = 'drawOptionalScenery',
   updateLoop = 'updateLoop',
   rmbMenuActions = 'rmbMenuActions',
+  /**
+   * Runs during inputManager.init immediately before adding the clear lines and clear screen buttons
+   */
   rightBtnMenuAdd = 'rightBtnMenuAdd',
   updateDateTime = 'updateDateTime',
   uiManagerFinal = 'uiManagerFinal',
@@ -351,6 +362,10 @@ export enum KeepTrackApiEvents {
    * Runs when a line is added to the line manager
    */
   onLineAdded = 'onLineAdded',
+  /**
+   * Runs when a sensor dot is selected but not when a sensor is selected from the sensor menu
+   */
+  sensorDotSelected = 'sensorDotSelected',
 }
 
 /**

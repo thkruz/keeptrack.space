@@ -1,6 +1,6 @@
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
-import { getEl } from '../../lib/get-el';
+import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
 import { lat2pitch, lon2yaw } from '../../lib/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 
@@ -72,17 +72,17 @@ export const darkClouds = () => {
     // const german = `Im ${yearPrefix}${yearStr}`;
     const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
     const debrisSpan = `<span style="color: rgb(255, 255, 35);">Debris </span>`;
-    document.getElementById('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+    getEl('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
     return `${english}`;
   };
 
   settingsManager.onLoadCb = () => {
-    getEl('nav-footer').style.display = 'none';
+    hideEl('nav-footer');
 
     // Create div for textOverlay
     const textOverlay = document.createElement('div');
     textOverlay.id = 'textOverlay';
-    document.body.appendChild(textOverlay);
+    keepTrackApi.containerRoot.appendChild(textOverlay);
 
     // Update CSS
     const toastCss = `
@@ -96,7 +96,7 @@ export const darkClouds = () => {
     style.appendChild(document.createTextNode(toastCss));
     document.head.appendChild(style);
 
-    document.getElementById('textOverlay').style.cssText = `
+    getEl('textOverlay').style.cssText = `
                     border-radius: 2px;
                     bottom: 125px;
                     right: 150px;
@@ -137,7 +137,7 @@ export const darkClouds = () => {
     // Initialize
     settingsManager.lastInteractionTime = Date.now() - RESTART_ROTATE_TIME * 1000 + 1000;
     const allSatsGroup = keepTrackApi.getGroupsManager().createGroup(0, null); // All Satellites
-    document.getElementById('textOverlay').innerHTML = 'Building Buffers';
+    setInnerHtml('textOverlay', 'Building Buffers');
 
     // Show All Orbits first to build buffers
     keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
@@ -176,7 +176,7 @@ export const darkClouds = () => {
             // yearGroup.updateOrbits(orbitManager, orbitManager);
             // satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
             setTimeout(() => {
-              document.getElementById('textOverlay').innerHTML = 'Present Day';
+              setInnerHtml('textOverlay', 'Present Day');
             }, 0);
           }
         }

@@ -55,8 +55,8 @@ export class DateTimeManager extends KeepTrackPlugin {
     keepTrackApi.methods.updateDateTime(new Date(keepTrackApi.getTimeManager().simulationTimeObj));
 
     if (!this.isEditTimeOpen) {
-      const datetimeInput = document.getElementById('datetime-input');
-      const datetimeInputTb = document.getElementById(this.dateTimeInputTbId);
+      const datetimeInput = getEl('datetime-input');
+      const datetimeInputTb = getEl(this.dateTimeInputTbId);
       if (datetimeInput && datetimeInputTb) {
         datetimeInput.style.display = 'block';
         datetimeInputTb.focus();

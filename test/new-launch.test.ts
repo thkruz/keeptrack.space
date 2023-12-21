@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
@@ -29,7 +30,7 @@ describe('NewLaunch_form', () => {
   });
 
   it('should have a form and buttons', () => {
-    expect(document.getElementById(`${newLaunchPlugin.sideMenuElementName}-form`)).toBeDefined();
+    expect(getEl(`${newLaunchPlugin.sideMenuElementName}-form`)).toBeDefined();
   });
 
   it('should have working buttons', () => {
@@ -38,18 +39,18 @@ describe('NewLaunch_form', () => {
     keepTrackApi.getCatalogManager().selectedSat = defaultSat.id;
     keepTrackApi.getCatalogManager().satData = Array(50).fill({ ...defaultSat, isInGroup: true });
     keepTrackApi.getCatalogManager().isLaunchSiteManagerLoaded = true;
-    keepTrackApi.getCatalogManager().launchSites = [
-      {
+    keepTrackApi.getCatalogManager().launchSites = {
+      CAS: {
         name: 'CAS',
         lat: 0,
         lon: 0,
-      } as any,
-    ];
+      },
+    };
 
     keepTrackApi.methods.selectSatData(defaultSat, defaultSat.id);
     keepTrackApi.methods.bottomMenuClick(newLaunchPlugin.bottomIconElementName);
 
-    expect(() => document.getElementById(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
+    expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
     jest.advanceTimersByTime(1000);
   });
 });

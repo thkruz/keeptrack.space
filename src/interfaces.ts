@@ -760,4 +760,5 @@ export enum Singletons {
   MainCamera = 'MainCamera',
   PersistenceManager = 'PersistenceManager',
   Scene = 'Scene',
+  MeshManager = 'MeshManager',
 }

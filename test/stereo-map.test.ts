@@ -6,7 +6,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-te
 
 describe('StereoMapPlugin_class', () => {
   beforeEach(() => {
-    document.body.innerHTML = '';
+    keepTrackApi.containerRoot.innerHTML = '';
     setupStandardEnvironment();
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;

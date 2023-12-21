@@ -8,7 +8,7 @@ import { standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('ShortTermFences_class', () => {
   beforeAll(() => {
-    document.body.innerHTML = '';
+    keepTrackApi.containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager, SatInfoBoxCore]);
   });
 

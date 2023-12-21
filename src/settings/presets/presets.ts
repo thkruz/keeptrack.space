@@ -1,4 +1,5 @@
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 
@@ -80,14 +81,14 @@ export class SettingsPresets {
       // const german = `Im ${yearPrefix}${yearStr}`;
       const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
       const debrisSpan = `<span style="color: rgb(150, 150, 150);">Debris </span>`;
-      document.getElementById('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+      setInnerHtml('textOverlay', `${satellitesSpan} and ${debrisSpan} ${english}`);
       return `${english}`;
     };
     settings.onLoadCb = () => {
       // Create div for textOverlay
       const textOverlay = document.createElement('div');
       textOverlay.id = 'textOverlay';
-      document.body.appendChild(textOverlay);
+      keepTrackApi.containerRoot.appendChild(textOverlay);
 
       // Update CSS
       const toastCss = `
@@ -101,7 +102,7 @@ export class SettingsPresets {
       style.appendChild(document.createTextNode(toastCss));
       document.head.appendChild(style);
 
-      document.getElementById('textOverlay').style.cssText = `
+      getEl('textOverlay').style.cssText = `
                     border-radius: 2px;
                     bottom: 75px;
                     right: 150px;

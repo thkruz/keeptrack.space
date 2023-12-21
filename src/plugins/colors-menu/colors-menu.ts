@@ -62,13 +62,8 @@ The various themes can change the colors based on the objects' orbits, objects' 
     <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
   </ul>`;
 
+  // eslint-disable-next-line class-methods-use-this
   rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
-    try {
-      super.rmbCallback(targetId);
-    } catch {
-      // do nothing
-    }
-
     switch (targetId) {
       case 'colors-default-rmb':
         ColorMenu.colorsMenuClick('default');
@@ -111,8 +106,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        document
-          .getElementById('colors-menu')
+        getEl('colors-menu')
           .querySelectorAll('li')
           .forEach((element) => {
             element.addEventListener('click', function () {

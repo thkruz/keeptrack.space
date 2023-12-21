@@ -159,7 +159,7 @@ export class Screenshot extends KeepTrackPlugin {
       tempCtx.fillText(classificationstr, cw / 2 - textWidth, 34);
     }
 
-    document.body.appendChild(tempCanvas);
+    keepTrackApi.containerRoot.appendChild(tempCanvas);
     let image = tempCanvas.toDataURL();
     tempCanvas.parentNode.removeChild(tempCanvas);
     return image;

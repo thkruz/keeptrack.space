@@ -60,6 +60,7 @@ export const hideEl = (id: string | HTMLElement) => {
   if (typeof id === 'string') {
     const el = getEl(id, true);
     if (el) el.style.display = 'none';
+    return;
   }
 
   console.warn(`Element with id ${id} not found!`);

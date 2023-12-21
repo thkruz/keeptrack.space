@@ -44,7 +44,7 @@ export class MeshManager {
   private earthLightDirection_: vec3;
   private fileList_: { obj: string; mtl: string }[] = [];
   private gl_: WebGL2RenderingContext;
-  private isReady_ = false;
+  isReady = false;
   private meshList_: string[] = [];
   private meshes_ = {};
   private numOfWarnings_: number;
@@ -190,8 +190,8 @@ export class MeshManager {
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) {
     // Meshes aren't finished loading
-    if (settingsManager.disableUI || settingsManager.isDrawLess) return;
-    if (!this.isReady_) return;
+    if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
+    if (!this.isReady) return;
     if (typeof this.currentMeshObject.id == 'undefined' || typeof this.currentMeshObject.model == 'undefined' || this.currentMeshObject.id == -1 || this.currentMeshObject.static)
       return;
 
@@ -364,7 +364,7 @@ export class MeshManager {
 
   public async init(gl: WebGL2RenderingContext, earthLightDirection: vec3): Promise<void> {
     try {
-      if (settingsManager.disableUI || settingsManager.isDrawLess) return;
+      if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
 
       this.gl_ = gl;
       this.earthLightDirection_ = earthLightDirection;
@@ -426,7 +426,7 @@ export class MeshManager {
         this.meshes_ = models;
         this.initShaders();
         this.initBuffers();
-        this.isReady_ = true;
+        this.isReady = true;
         // eslint-disable-next-line no-unused-vars
       }).catch(() => {
         // DEBUG:

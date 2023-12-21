@@ -114,7 +114,7 @@ describe('code_snippet', () => {
     const keepTrack = new KeepTrack(<any>settingsOverride);
     keepTrack.init().then(() => {
       // const error = new Error('Test error');
-      // expect(document.getElementById('loader-text')?.innerHTML).toEqual(error.message);
+      // expect(getEl('loader-text')?.innerHTML).toEqual(error.message);
     });
   });
 

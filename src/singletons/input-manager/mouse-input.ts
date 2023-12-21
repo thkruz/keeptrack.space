@@ -9,9 +9,6 @@ import { Kilometers } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
 import { showLoading } from '../../lib/showLoading';
-import { slideInRight } from '../../lib/slide';
-import { triggerSubmit } from '../../lib/trigger-submit';
-import { waitForCruncher } from '../../lib/waitForCruncher';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { LegendManager } from '../../static/legend-manager';
 import { LineTypes, lineManagerInstance } from '../draw-manager/line-manager';
@@ -81,8 +78,6 @@ export class MouseInput {
   }
 
   public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {
-    getEl('create-observer-rmb').style.display = 'block';
-    getEl('create-sensor-rmb').style.display = 'block';
     getEl('line-eci-axis-rmb').style.display = 'block';
     keepTrackApi.rmbMenuItems
       .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
@@ -112,17 +107,17 @@ export class MouseInput {
     return numMenuItems;
   }
 
-  public canvasMouseMove(evt: MouseEvent, mainCameraInstance: Camera, canvasDOM: HTMLCanvasElement): void {
+  public canvasMouseMove(evt: MouseEvent, mainCameraInstance: Camera): void {
     if (this.mouseMoveTimeout === -1) {
       this.mouseMoveTimeout = window.setTimeout(() => {
-        this.canvasMouseMoveFire(mainCameraInstance, evt, canvasDOM);
+        this.canvasMouseMoveFire(mainCameraInstance, evt);
       }, 16);
     }
   }
 
-  public canvasMouseMoveFire(mainCameraInstance: Camera, evt: MouseEvent, canvasDOM: HTMLCanvasElement) {
-    mainCameraInstance.mouseX = evt.clientX - (canvasDOM.scrollLeft - window.scrollX);
-    mainCameraInstance.mouseY = evt.clientY - (canvasDOM.scrollTop - window.scrollY);
+  public canvasMouseMoveFire(mainCameraInstance: Camera, evt: MouseEvent) {
+    mainCameraInstance.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
+    mainCameraInstance.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
     if (
       mainCameraInstance.isDragging &&
       mainCameraInstance.screenDragPoint[0] !== mainCameraInstance.mouseX &&
@@ -201,6 +196,12 @@ export class MouseInput {
       evt.preventDefault();
     }
 
+    const isFullScreen = keepTrackApi.containerRoot.clientWidth === window.innerWidth && keepTrackApi.containerRoot.clientHeight === window.innerHeight;
+    const { isCtrlPressed, isShiftPressed } = keepTrackApi.getInputManager().keyboard;
+    if (!isFullScreen && !isCtrlPressed && !isShiftPressed) {
+      return;
+    }
+
     let delta = evt.deltaY;
     if (evt.deltaMode === 1) {
       delta *= 33.3333333;
@@ -212,13 +213,11 @@ export class MouseInput {
   init(canvasDOM: HTMLCanvasElement) {
     const rightBtnMenuDOM = getEl('right-btn-menu');
     const satHoverBoxDOM = getEl('sat-hoverbox');
-    const rightBtnCreateMenuDOM = getEl('create-rmb-menu');
     const rightBtnDrawMenuDOM = getEl('draw-rmb-menu');
     const rightBtnEarthMenuDOM = getEl('earth-rmb-menu');
     const resetCameraDOM = getEl('reset-camera-rmb');
     const clearScreenDOM = getEl('clear-screen-rmb');
     const clearLinesDOM = getEl('clear-lines-rmb');
-    const rightBtnCreateDOM = getEl('create-rmb');
     const rightBtnDrawDOM = getEl('draw-rmb');
     const rightBtnEarthDOM = getEl('earth-rmb');
 
@@ -229,24 +228,24 @@ export class MouseInput {
         }
       };
 
-      window.addEventListener('mousewheel', stopWheelZoom, { passive: false });
-      window.addEventListener('DOMMouseScroll', stopWheelZoom, { passive: false });
+      keepTrackApi.containerRoot.addEventListener('mousewheel', stopWheelZoom, { passive: false });
+      keepTrackApi.containerRoot.addEventListener('DOMMouseScroll', stopWheelZoom, { passive: false });
     }
 
     if (settingsManager.disableWindowScroll || settingsManager.disableNormalEvents) {
-      window.addEventListener(
-        'scroll',
-        function () {
-          window.scrollTo(0, 0);
-          return false;
-        },
-        { passive: false }
-      );
+      // window.addEventListener(
+      //   'scroll',
+      //   function () {
+      //     window.scrollTo(0, 0);
+      //     return false;
+      //   },
+      //   { passive: false }
+      // );
     }
 
     this.mouseMoveTimeout = -1;
     canvasDOM.addEventListener('mousemove', (e) => {
-      this.canvasMouseMove(e, keepTrackApi.getMainCamera(), canvasDOM);
+      this.canvasMouseMove(e, keepTrackApi.getMainCamera());
       settingsManager.lastInteractionTime = Date.now();
     });
 
@@ -276,10 +275,6 @@ export class MouseInput {
         });
       }
 
-      const rightBtnCreateDOMDropdown = () => {
-        InputManager.clearRMBSubMenu();
-        InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnCreateMenuDOM, canvasDOM);
-      };
       const rightBtnDrawDOMDropdown = () => {
         InputManager.clearRMBSubMenu();
         InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnDrawMenuDOM, canvasDOM);
@@ -292,7 +287,7 @@ export class MouseInput {
       // Create Event Listeners for Right Menu Buttons
       keepTrackApi.rmbMenuItems
         .map(({ elementIdL2 }) => getEl(elementIdL2))
-        .concat([rightBtnCreateMenuDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
+        .concat([rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
             this.rmbMenuActions(e);
@@ -310,16 +305,6 @@ export class MouseInput {
         el2?.addEventListener('mouseleave', () => {
           el2.style.display = 'none';
         });
-      });
-
-      rightBtnCreateDOM?.addEventListener('mouseenter', () => {
-        rightBtnCreateDOMDropdown();
-      });
-      rightBtnCreateDOM?.addEventListener('click', () => {
-        rightBtnCreateDOMDropdown();
-      });
-      rightBtnCreateMenuDOM?.addEventListener('mouseleave', () => {
-        rightBtnCreateMenuDOM.style.display = 'none';
       });
 
       rightBtnDrawDOM?.addEventListener('mouseenter', () => {
@@ -445,31 +430,6 @@ export class MouseInput {
         var searchStr = intldes.slice(0, 8);
         uiManagerInstance.doSearch(searchStr);
         break;
-      case 'create-sensor-rmb':
-        slideInRight(getEl('custom-sensor-menu'), 1000);
-        getEl('custom-sensor-icon').classList.add('bmenu-item-selected');
-        sensorManagerInstance.isCustomSensorMenuOpen = true;
-        if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
-          getEl('cs-telescope').click();
-        }
-        (<HTMLInputElement>getEl('cs-lat')).value = this.latLon.lat.toString();
-        (<HTMLInputElement>getEl('cs-lon')).value = this.latLon.lon.toString();
-        (<HTMLInputElement>getEl('cs-hei')).value = '0';
-        (<HTMLInputElement>getEl('cs-type')).value = 'Phased Array Radar';
-        (<HTMLInputElement>getEl('cs-minaz')).value = '0';
-        (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
-        (<HTMLInputElement>getEl('cs-minel')).value = '10';
-        (<HTMLInputElement>getEl('cs-maxel')).value = '90';
-        (<HTMLInputElement>getEl('cs-minrange')).value = '0';
-        (<HTMLInputElement>getEl('cs-maxrange')).value = '5556';
-        triggerSubmit(<HTMLFormElement>getEl('customSensor'));
-        LegendManager.change('default');
-        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-        uiManagerInstance.colorSchemeChangeAlert(settingsManager.currentColorScheme);
-        catalogManagerInstance.satCruncher.postMessage({
-          isSunlightView: false,
-        });
-        break;
       case 'set-sec-sat-rmb':
         catalogManagerInstance.setSecondarySat(this.clickedSat);
         break;
@@ -515,31 +475,6 @@ export class MouseInput {
           LineTypes.REF_TO_SAT,
           [this.clickedSat, keepTrackApi.getScene().sun.position[0], keepTrackApi.getScene().sun.position[1], keepTrackApi.getScene().sun.position[2]],
           'o'
-        );
-        break;
-      case 'create-observer-rmb':
-        slideInRight(getEl('custom-sensor-menu'), 1000);
-        getEl('custom-sensor-icon').classList.add('bmenu-item-selected');
-        sensorManagerInstance.isCustomSensorMenuOpen = true;
-        if (!(<HTMLInputElement>getEl('cs-telescope')).checked) {
-          getEl('cs-telescope').click();
-        }
-        (<HTMLInputElement>getEl('cs-lat')).value = this.latLon.lat.toString();
-        (<HTMLInputElement>getEl('cs-lon')).value = this.latLon.lon.toString();
-        (<HTMLInputElement>getEl('cs-hei')).value = '0';
-        (<HTMLInputElement>getEl('cs-type')).value = 'Observer';
-        triggerSubmit(<HTMLFormElement>getEl('customSensor'));
-        catalogManagerInstance.satCruncher.postMessage({
-          isSunlightView: true,
-        });
-        LegendManager.change('sunlight');
-        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);
-        waitForCruncher(
-          catalogManagerInstance.satCruncher,
-          () => {
-            colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
-          },
-          (data: any) => data.satInSun
         );
         break;
       case 'earth-blue-rmb':

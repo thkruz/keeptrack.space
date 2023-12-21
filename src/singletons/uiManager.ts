@@ -30,7 +30,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
-import { sensors } from '../catalogs/sensors';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
 import { closeColorbox } from '../lib/colorbox';
 import { MILLISECONDS_PER_SECOND } from '../lib/constants';
@@ -42,7 +41,6 @@ import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
 import { errorManagerInstance } from './errorManager';
 import { MobileManager } from './mobileManager';
-import { PersistenceManager, StorageKey } from './persistence-manager';
 import { SearchManager } from './search-manager';
 
 export class StandardUiManager implements UiManager {
@@ -92,17 +90,6 @@ export class StandardUiManager implements UiManager {
       });
     }, 0);
 
-    (function _httpsCheck() {
-      if (location.protocol !== 'https:') {
-        try {
-          hideEl('cs-geolocation');
-          hideEl('geolocation-btn');
-        } catch {
-          // Intended to catch errors when the page is not loaded yet
-        }
-      }
-    })();
-
     // Enable Satbox Overlay
     if (settingsManager.enableHoverOverlay) {
       try {
@@ -120,36 +107,6 @@ export class StandardUiManager implements UiManager {
       } catch {
         /* istanbul ignore next */
         console.debug('document.createElement() failed!');
-      }
-    }
-  }
-
-  static reloadLastSensor() {
-    const json = PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
-    if (!json) return;
-    const currentSensor = JSON.parse(json);
-    // istanbul ignore next
-    if (currentSensor !== null) {
-      try {
-        const sensorManagerInstance = keepTrackApi.getSensorManager();
-
-        // If there is a staticnum set use that
-        if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
-          sensorManagerInstance.setSensor(null, currentSensor[1]);
-          LegendManager.change('default');
-        } else {
-          // If the sensor is a string, load that collection of sensors
-          if (typeof currentSensor[0].objName == 'undefined') {
-            sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
-            LegendManager.change('default');
-          } else {
-            // Seems to be a single sensor without a staticnum, load that
-            sensorManagerInstance.setSensor(sensors[currentSensor[0].objName], currentSensor[1]);
-            LegendManager.change('default');
-          }
-        }
-      } catch {
-        PersistenceManager.getInstance().removeItem(StorageKey.CURRENT_SENSOR);
       }
     }
   }

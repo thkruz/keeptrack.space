@@ -294,7 +294,7 @@ export class KeepTrackPlugin {
     this.isJsAdded = true;
   }
 
-  registerRmbCallback(callback: (targetId: string, clickedSat?: number) => void): void {
+  registerRmbCallback(callback: (targetId: string, clickedSatId?: number) => void): void {
     keepTrackApi.register({
       event: KeepTrackApiEvents.rmbMenuActions,
       cbName: this.PLUGIN_NAME,

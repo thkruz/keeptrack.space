@@ -223,7 +223,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       this.onFileChanged_(evt);
 
       // Reset file input
-      (<HTMLInputElement>document.getElementById('watchlist-file')).value = '';
+      (<HTMLInputElement>getEl('watchlist-file')).value = '';
     });
   }
 

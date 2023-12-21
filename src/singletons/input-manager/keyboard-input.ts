@@ -15,8 +15,6 @@ export class KeyboardInput {
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    const bodyDOM = window;
-
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.ctrlKey === true || e.metaKey === true) this.isCtrlPressed = true;
       if (e.shiftKey === true) this.isShiftPressed = true;
@@ -27,14 +25,14 @@ export class KeyboardInput {
     });
 
     if (!settingsManager.disableUI) {
-      bodyDOM.addEventListener('keypress', (e: Event) => {
+      keepTrackApi.containerRoot.addEventListener('keypress', (e: Event) => {
         this.keyHandler(<KeyboardEvent>e);
       });
-      bodyDOM.addEventListener('keydown', (e: Event) => {
+      keepTrackApi.containerRoot.addEventListener('keydown', (e: Event) => {
         if (uiManagerInstance.isCurrentlyTyping) return;
         this.keyDownHandler(<KeyboardEvent>e);
       });
-      bodyDOM.addEventListener('keyup', (e: Event) => {
+      keepTrackApi.containerRoot.addEventListener('keyup', (e: Event) => {
         if (uiManagerInstance.isCurrentlyTyping) return;
         this.keyUpHandler(<KeyboardEvent>e);
       });

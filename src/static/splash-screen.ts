@@ -1,5 +1,5 @@
 import { keepTrackApi } from '../keepTrackApi';
-import { getEl } from '../lib/get-el';
+import { getEl, hideEl, setInnerHtml, showEl } from '../lib/get-el';
 import { MobileManager } from '../singletons/mobileManager';
 
 export abstract class SplashScreen {
@@ -18,9 +18,24 @@ export abstract class SplashScreen {
 
   static textElId = 'loader-text';
 
-  static hideSplashScreen() {
-    if (!settingsManager.isSplashScreenEnabled) return;
+  /**
+   * Initializes the loading screen and appends it to the specified root DOM element.
+   * @param rootDom The root DOM element to which the loading screen will be appended.
+   */
+  static initLoadingScreen(rootDom: HTMLElement) {
+    rootDom.innerHTML += keepTrackApi.html`
+      <div id="loading-screen" class="valign-wrapper full-loader">
+        <div id="logo-inner-container" class="valign">
+          <div style="display: flex;">
+            <span id="logo-text" class="logo-font">KEEP TRACK</span>
+            <span id="logo-text-version" class="logo-font">8</span>
+          </div>
+          <span id="loader-text">Downloading Science...</span>
+        </div>
+      </div>`;
+  }
 
+  static hideSplashScreen() {
     // Don't wait if we are running Jest
     if (keepTrackApi.getScene().earth.isUseHiRes && keepTrackApi.getScene().earth.isHiResReady !== true) {
       setTimeout(function () {
@@ -30,22 +45,22 @@ export abstract class SplashScreen {
     }
 
     // Display content when loading is complete.
-    getEl('canvas-holder').style.display = 'block';
+    showEl('canvas-holder');
 
     MobileManager.checkMobileMode();
 
     if (settingsManager.isMobileModeEnabled) {
       SplashScreen.loadStr('Attempting to Math');
-      getEl('loading-screen').style.display = 'none';
+      hideEl('loading-screen');
     } else {
       // Loading Screen Resized and Hidden
       setTimeout(function () {
-        getEl('loading-screen').classList.remove('full-loader');
-        getEl('loading-screen').classList.add('mini-loader-container');
-        getEl('logo-inner-container').classList.add('mini-loader');
-        getEl('logo-text').innerHTML = '';
-        getEl('logo-text-version').innerHTML = '';
-        getEl('loading-screen').style.display = 'none';
+        getEl('loading-screen')?.classList.remove('full-loader');
+        getEl('loading-screen')?.classList.add('mini-loader-container');
+        getEl('logo-inner-container')?.classList.add('mini-loader');
+        setInnerHtml('logo-text', '');
+        setInnerHtml('logo-text-version', '');
+        hideEl('loading-screen');
         SplashScreen.loadStr(SplashScreen.msg.math);
       }, 100);
     }

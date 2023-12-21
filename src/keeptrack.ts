@@ -185,62 +185,64 @@ export class KeepTrack {
   }
 
   static getDefaultBodyHtml(): void {
-    const bodyDOM = document.getElementsByTagName('body')[0];
+    const containerDom = settingsManager.divContainer ?? document.getElementById('keeptrack-root');
+    if (!containerDom) throw new Error('Failed to find container');
 
-    bodyDOM.innerHTML = keepTrackApi.html`
-      <div id="loading-screen" class="valign-wrapper full-loader">
-          <div id="logo-inner-container" class="valign">
-            <div style="display: flex;">
-              <span id="logo-text" class="logo-font">KEEP TRACK</span>
-              <span id="logo-text-version" class="logo-font">8</span>
+    // If no current shadow DOM, create one - this is mainly for testing
+    if (!keepTrackApi.containerRoot) {
+      keepTrackApi.containerRoot = containerDom as unknown as HTMLDivElement;
+    }
+
+    SplashScreen.initLoadingScreen(keepTrackApi.containerRoot);
+
+    keepTrackApi.containerRoot.id = 'keeptrack-root';
+    keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
+      <header>
+        <div id="keeptrack-header"></div>
+      </header>
+      <main>
+        <div id="rmb-wrapper"></div>
+
+        <div id="canvas-holder">
+          <canvas id="keeptrack-canvas"></canvas>
+          <div id="ui-wrapper">
+            <div id="sat-hoverbox">
+              <span id="sat-hoverbox1"></span>
+              <br />
+              <span id="sat-hoverbox2"></span>
+              <br />
+              <span id="sat-hoverbox3"></span>
             </div>
-            <span id="loader-text">Downloading Science...</span>
+            <div id="sat-minibox"></div>
+
+            <div id="legend-hover-menu" class="start-hidden"></div>
+            <aside id="left-menus"></aside>
           </div>
         </div>
-        <div id="keeptrack-main-container">
-          <header>
-            <div id="keeptrack-header"></div>
-          </header>
-          <main>
-            <div id="rmb-wrapper"></div>
-
-            <div id="canvas-holder">
-              <canvas id="keeptrack-canvas"></canvas>
-              <div id="ui-wrapper">
-                <div id="sat-hoverbox">
-                  <span id="sat-hoverbox1"></span>
-                  <br />
-                  <span id="sat-hoverbox2"></span>
-                  <br />
-                  <span id="sat-hoverbox3"></span>
-                </div>
-                <div id="sat-minibox"></div>
-
-                <div id="legend-hover-menu" class="start-hidden"></div>
-                <aside id="left-menus"></aside>
-              </div>
-            </div>
-            <figcaption id="info-overlays">
-              <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
-              <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
-              <div id="demo-logo" class="logo-font start-hidden">
-                <a href="https://keeptrack.space" target="_blank" style="color: white !important;">
-                Powered by KeepTrack.space
-                </a>
-              </div>
-            </figcaption>
-          </main>
-          <footer id="nav-footer" class="page-footer resizable">
-            <div id="footer-handle" class="ui-resizable-handle ui-resizable-n"></div>
-            <div id="footer-toggle-wrapper">
-              <div id="nav-footer-toggle">&#x25BC;</div>
-            </div>
-            <div id="bottom-icons-container">
-              <div id="bottom-icons"></div>
-            </div>
-          </footer>
+        <figcaption id="info-overlays">
+          <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
+          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
+          <div id="demo-logo" class="logo-font start-hidden">
+            <a href="https://keeptrack.space" target="_blank" style="color: white !important;">
+            Powered by KeepTrack.space
+            </a>
+          </div>
+        </figcaption>
+      </main>
+      <footer id="nav-footer" class="page-footer resizable">
+        <div id="footer-handle" class="ui-resizable-handle ui-resizable-n"></div>
+        <div id="footer-toggle-wrapper">
+          <div id="nav-footer-toggle">&#x25BC;</div>
         </div>
-      `;
+        <div id="bottom-icons-container">
+          <div id="bottom-icons"></div>
+        </div>
+      </footer>`;
+
+    if (!settingsManager.isShowSplashScreen) {
+      // hideEl('loading-screen');
+      // hideEl('nav-footer');
+    }
   }
 
   private static getFps_(dt: Milliseconds): number {
@@ -266,7 +268,7 @@ export class KeepTrack {
         import(/* webpackMode: "eager" */ '@css/materialize-local.css').catch(() => {
           // This is intentional
         });
-        import(/* webpackMode: "eager" */ '@app/lib/external/colorPick.css').catch(() => {
+        import(/* webpackMode: "eager" */ '@css/colorPick.css').catch(() => {
           // This is intentional
         });
         import(/* webpackMode: "eager" */ '@css/jquery-ui.min.css').catch(() => {
@@ -298,7 +300,7 @@ export class KeepTrack {
   private static loadSplashScreen_(): void {
     // Randomly load a splash screen - not a vulnerability
     const image = KeepTrack.splashScreenImgList_[Math.floor(Math.random() * KeepTrack.splashScreenImgList_.length)];
-    const loadingDom = document.getElementById('loading-screen');
+    const loadingDom = getEl('loading-screen');
     if (loadingDom) {
       loadingDom.style.backgroundImage = `url(${image})`;
       loadingDom.style.backgroundSize = 'cover';
@@ -487,7 +489,7 @@ theodore.kruczek at gmail dot com.
             tool: ['console', 'elements'],
           });
           eruda.add(erudaFps);
-          const erudaEntryButtonDoms = document.getElementsByClassName('eruda-entry-btn');
+          const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
           if (erudaEntryButtonDoms.length > 0) {
             hideEl(erudaEntryButtonDoms[0] as HTMLElement);
           }

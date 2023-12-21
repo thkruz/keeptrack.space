@@ -6,6 +6,7 @@ import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { SensorMath } from '@app/static/sensor-math';
 import radarPng from '@public/img/icons/radar.png';
@@ -180,6 +181,43 @@ export class SensorListPlugin extends KeepTrackPlugin {
           getEl('reset-sensor-button').style.display = 'none';
         } else {
           getEl('reset-sensor-button').style.display = 'block';
+        }
+      },
+    });
+  }
+
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.sensorDotSelected,
+      cbName: this.PLUGIN_NAME,
+      cb: (sat: SensorObject) => {
+        if (settingsManager.isMobileModeEnabled) return;
+
+        const sensorManagerInstance = keepTrackApi.getSensorManager();
+        // No sensor manager on mobile
+        sensorManagerInstance.setSensor(null, sat.staticNum);
+
+        if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
+        const timeManagerInstance = keepTrackApi.getTimeManager();
+        keepTrackApi
+          .getMainCamera()
+          .lookAtLatLon(
+            sensorManagerInstance.currentSensors[0].lat,
+            sensorManagerInstance.currentSensors[0].lon,
+            sensorManagerInstance.currentSensors[0].zoom,
+            timeManagerInstance.selectedDate
+          );
+      },
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onCruncherReady,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
+          SensorListPlugin.reloadLastSensor();
         }
       },
     });
@@ -417,6 +455,34 @@ export class SensorListPlugin extends KeepTrackPlugin {
         },
       ],
     });
+  }
+
+  static reloadLastSensor() {
+    const json = PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
+    if (!json) return;
+    const currentSensor = JSON.parse(json);
+    // istanbul ignore next
+    if (currentSensor !== null) {
+      try {
+        const sensorManagerInstance = keepTrackApi.getSensorManager();
+
+        // If there is a staticnum set use that
+        if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
+          sensorManagerInstance.setSensor(null, currentSensor[1]);
+          LegendManager.change('default');
+          // If the sensor is a string, load that collection of sensors
+        } else if (typeof currentSensor[0].objName == 'undefined') {
+          sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
+          LegendManager.change('default');
+        } else {
+          // Seems to be a single sensor without a staticnum, load that
+          sensorManagerInstance.setSensor(sensors[currentSensor[0].objName], currentSensor[1]);
+          LegendManager.change('default');
+        }
+      } catch {
+        PersistenceManager.getInstance().removeItem(StorageKey.CURRENT_SENSOR);
+      }
+    }
   }
 
   resetSensorButtonClick() {

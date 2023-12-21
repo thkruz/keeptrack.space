@@ -117,8 +117,8 @@ export class Camera {
   /**
    * Percentage of the distance to maxZoomDistance from the minZoomDistance
    */
-  private zoomLevel_ = 0.6925;
-  private zoomTarget_ = 0.6925;
+  private zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
+  private zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
 
   public camAngleSnappedOnSat = false;
   public camMatrix = mat4.create().fill(0);

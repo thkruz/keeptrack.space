@@ -7,7 +7,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 
 describe('EditSatPlugin_class', () => {
   beforeEach(() => {
-    document.body.innerHTML = '';
+    keepTrackApi.containerRoot.innerHTML = '';
     setupStandardEnvironment();
   });
 
@@ -18,7 +18,7 @@ describe('EditSatPlugin_class', () => {
     const editSatPlugin = new EditSatPlugin();
     websiteInit(editSatPlugin);
     standardSelectSat();
-    const button = <HTMLButtonElement>document.querySelector('button[type="submit"]');
+    const button = <HTMLButtonElement>keepTrackApi.containerRoot.querySelector('button[type="submit"]');
     button.click();
   });
 

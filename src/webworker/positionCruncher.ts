@@ -624,7 +624,7 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
     satCache[i].skip = true;
   }
   const rae = Transforms.ecf2rae(sensor.observerGd, positionEcf);
-  satInView[i] = isInFov(rae, sensor);
+  satInView[i] = isInFov(sensor, rae);
   return true;
 };
 export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): void => {
@@ -640,7 +640,7 @@ export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): vo
 export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunEci: any, j: number, isSunExclusion: boolean): boolean => {
   let semiDiamEarth, semiDiamSun, theta;
   let positionEcf: EcfVec3;
-  let lookangles: RaeVec3;
+  let rae: RaeVec3;
 
   // Skip reentries
   if (satCache[i].skip) return false;
@@ -705,7 +705,7 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
 
     // Skip Calculating Lookangles if No Sensor is Selected
     if (sensor.observerGd?.lat !== null && !isMultiSensor) {
-      lookangles = Transforms.ecf2rae(sensor.observerGd, Transforms.eci2ecf(pv.position, gmst));
+      rae = Transforms.ecf2rae(sensor.observerGd, Transforms.eci2ecf(pv.position, gmst));
     }
   } catch (e) {
     // This is probably a reentry and should be skipped from now on.
@@ -724,7 +724,7 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
     satVel[i * 3 + 2] = 0;
 
     positionEcf = null;
-    lookangles = null;
+    rae = null;
   }
 
   if (isSunlightView) {
@@ -772,15 +772,15 @@ export const updateSatellite = (i: number, gmst: GreenwichMeanSiderealTime, sunE
           };
           try {
             positionEcf = Transforms.eci2ecf(pv.position, gmst); // pv.position is called positionEci originally
-            lookangles = Transforms.ecf2rae(sensor.observerGd, positionEcf);
+            rae = Transforms.ecf2rae(sensor.observerGd, positionEcf);
           } catch (e) {
             continue;
           }
-          satInView[i] = isInFov(lookangles, sensor);
+          satInView[i] = isInFov(sensor, rae);
         }
       }
     } else if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
-      satInView[i] = isInFov(lookangles, sensor);
+      satInView[i] = isInFov(sensor, rae);
     }
   }
 

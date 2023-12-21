@@ -45,7 +45,6 @@ import { CameraType } from './camera';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
 import { LineTypes, lineManagerInstance } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
-import { StandardUiManager } from './uiManager';
 // TODO: FUTURE FEATURE
 // import { radarDataManager } from '@app/catalogManagerInstance/radarDataManager.js';
 
@@ -639,10 +638,6 @@ export class StandardCatalogManager implements CatalogManager {
       }
 
       UrlManager.parseGetVariables();
-
-      if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
-        StandardUiManager.reloadLastSensor();
-      }
 
       // Run any functions registered with the API
       keepTrackApi.methods.onCruncherReady();

@@ -36,6 +36,7 @@ export enum StorageKey {
   SETTINGS_DRAW_AURORA = 'keepTrack-settings-drawAurora',
   SETTINGS_DRAW_SUN = 'keepTrack-settings-drawSun',
   SETTINGS_NOTIONAL_SATS = 'keepTrack-settings-notionalSats',
+  SETTINGS_CONFIDENCE_LEVELS = 'keepTrack-settings-confidenceLevels',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;

@@ -1,4 +1,5 @@
 import { MediaRecorderOptions } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 
 export class StreamManager {
@@ -95,10 +96,10 @@ export class StreamManager {
     a.style.display = 'none';
     a.href = url;
     a.download = name;
-    document.body.appendChild(a);
+    keepTrackApi.containerRoot.appendChild(a);
     a.click();
     setTimeout(() => {
-      document.body.removeChild(a);
+      keepTrackApi.containerRoot.removeChild(a);
       window.URL.revokeObjectURL(url);
     }, 100);
   }

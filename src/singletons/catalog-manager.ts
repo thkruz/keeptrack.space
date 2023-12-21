@@ -728,8 +728,14 @@ export class StandardCatalogManager implements CatalogManager {
   setSecondarySat(id: number): void {
     if (settingsManager.isDisableSelectSat) return;
     this.secondarySat = id;
-    if (!(this.secondarySatObj?.id === id)) {
+    if (this.secondarySatObj?.id !== id) {
       this.secondarySatObj = this.getSat(id);
+    }
+
+    if (this.secondarySat === this.selectedSat) {
+      this.selectedSat = -1;
+      this.setSelectedSat(-1);
+      keepTrackApi.getOrbitManager().clearSelectOrbit(false);
     }
 
     keepTrackApi.methods.setSecondarySat(this.secondarySatObj, id);
@@ -738,6 +744,11 @@ export class StandardCatalogManager implements CatalogManager {
   setSelectedSat(id: number): void {
     if (settingsManager.isDisableSelectSat || id === null) return;
     this.selectedSat = id;
+
+    if (this.selectedSat === this.secondarySat && this.selectedSat !== -1) {
+      this.setSecondarySat(-1);
+      keepTrackApi.getOrbitManager().clearSelectOrbit(true);
+    }
 
     UrlManager.updateURL();
   }

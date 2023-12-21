@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
-import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
@@ -11,7 +11,7 @@ describe('UpdateSatManager_class', () => {
   beforeEach(() => {
     // Mock DateTimeManager uiManagerFinal to prevent errors
     DateTimeManager.prototype.uiManagerFinal = jest.fn();
-    setupStandardEnvironment([TopMenu, SelectSatManager, SatInfoBoxCore, DateTimeManager]);
+    setupStandardEnvironment([TopMenu, SelectSatManager, SatInfoBox, DateTimeManager]);
   });
 
   standardPluginSuite(SelectSatManager, 'SelectSatManager');

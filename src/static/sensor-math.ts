@@ -1,5 +1,5 @@
 import { SatObject, SatPassTimes, SensorObject } from '@app/interfaces';
-import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { Degrees, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Transforms } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, TAU } from '../lib/constants';
@@ -160,7 +160,7 @@ export class SensorMath {
     // Calculate if same beam
     let sameBeamStr = '';
     try {
-      const satInfoBoxCorePlugin = <SatInfoBoxCore>keepTrackApi.getPlugin(SatInfoBoxCore);
+      const satInfoBoxCorePlugin = <SatInfoBox>keepTrackApi.getPlugin(SatInfoBox);
       if (satInfoBoxCorePlugin.currentTEARR?.inView) {
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 

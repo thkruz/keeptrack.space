@@ -8,12 +8,12 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath } from '@app/static/sensor-math';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SatInfoBoxCore } from '../select-sat-manager/satInfoboxCore';
+import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 
 export class ShortTermFences extends KeepTrackPlugin {
-  dependencies: string[] = [SatInfoBoxCore.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
+  dependencies: string[] = [SatInfoBox.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
   bottomIconElementName = 'stf-bottom-icon';
   bottomIconLabel = 'Short Term Fence';
   bottomIconImg = searchPng;

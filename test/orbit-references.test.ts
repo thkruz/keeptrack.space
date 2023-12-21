@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { OrbitReferences } from '@app/plugins/orbit-references/orbit-references';
-import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -11,7 +11,7 @@ import { standardPluginSuite } from './generic-tests';
 describe('OrbitReferences', () => {
   beforeEach(() => {
     keepTrackApi.containerRoot.innerHTML = '';
-    setupStandardEnvironment([SelectSatManager, SatInfoBoxCore]);
+    setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
   standardPluginSuite(OrbitReferences, 'OrbitReferences');
 

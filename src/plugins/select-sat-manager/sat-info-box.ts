@@ -22,10 +22,10 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missileManager';
 import { StereoMapPlugin } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
-import './satInfoboxCore.css';
+import './sat-info-box.css';
 import { SelectSatManager } from './select-sat-manager';
 
-export class SatInfoBoxCore extends KeepTrackPlugin {
+export class SatInfoBox extends KeepTrackPlugin {
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
 
   isorbitalDataLoaded = false;
@@ -35,7 +35,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   issatMissionDataLoaded = false;
   isintelDataLoaded = false;
 
-  static PLUGIN_NAME = 'SatInfoBoxCore';
+  static PLUGIN_NAME = 'SatInfoBox';
   currentTEARR = <TearrData>{
     az: 0,
     el: 0,
@@ -48,7 +48,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   };
 
   constructor() {
-    super(SatInfoBoxCore.PLUGIN_NAME);
+    super(SatInfoBox.PLUGIN_NAME);
   }
 
   addHtml(): void {
@@ -100,7 +100,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_objectData`,
-      cb: SatInfoBoxCore.updateObjectData,
+      cb: SatInfoBox.updateObjectData,
     });
   }
 
@@ -312,7 +312,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat === null || typeof sat === 'undefined') return;
 
     if (!this.isorbitalDataLoaded) {
-      SatInfoBoxCore.createOrbitalData();
+      SatInfoBox.createOrbitalData();
       this.isorbitalDataLoaded = true;
 
       // Give the DOM time load and then redo
@@ -422,7 +422,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
         elsetAgeDom.innerHTML = `${daysold} Days`;
       }
 
-      SatInfoBoxCore.updateConfidenceDom(sat);
+      SatInfoBox.updateConfidenceDom(sat);
 
       elsetAgeDom.dataset.position = 'left';
       elsetAgeDom.dataset.delay = '50';
@@ -430,16 +430,16 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     }
 
     if (!this.isTopLinkEventListenersAdded) {
-      getEl('sat-add-watchlist')?.addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
-      getEl('sat-remove-watchlist')?.addEventListener('click', SatInfoBoxCore.addRemoveWatchlist);
-      getEl('all-objects-link')?.addEventListener('click', SatInfoBoxCore.allObjectsLink);
-      getEl('near-orbits-link')?.addEventListener('click', SatInfoBoxCore.nearOrbitsLink);
-      getEl('near-objects-link1')?.addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(100));
-      getEl('near-objects-link2')?.addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(200));
-      getEl('near-objects-link4')?.addEventListener('click', () => SatInfoBoxCore.nearObjectsLinkClick(400));
-      getEl('sun-angle-link')?.addEventListener('click', SatInfoBoxCore.drawLineToSun);
-      getEl('nadir-angle-link')?.addEventListener('click', SatInfoBoxCore.drawLineToEarth);
-      getEl('sec-angle-link')?.addEventListener('click', SatInfoBoxCore.drawLineToSat);
+      getEl('sat-add-watchlist')?.addEventListener('click', SatInfoBox.addRemoveWatchlist);
+      getEl('sat-remove-watchlist')?.addEventListener('click', SatInfoBox.addRemoveWatchlist);
+      getEl('all-objects-link')?.addEventListener('click', SatInfoBox.allObjectsLink);
+      getEl('near-orbits-link')?.addEventListener('click', SatInfoBox.nearOrbitsLink);
+      getEl('near-objects-link1')?.addEventListener('click', () => SatInfoBox.nearObjectsLinkClick(100));
+      getEl('near-objects-link2')?.addEventListener('click', () => SatInfoBox.nearObjectsLinkClick(200));
+      getEl('near-objects-link4')?.addEventListener('click', () => SatInfoBox.nearObjectsLinkClick(400));
+      getEl('sun-angle-link')?.addEventListener('click', SatInfoBox.drawLineToSun);
+      getEl('nadir-angle-link')?.addEventListener('click', SatInfoBox.drawLineToEarth);
+      getEl('sec-angle-link')?.addEventListener('click', SatInfoBox.drawLineToSat);
       this.isTopLinkEventListenersAdded = true;
     }
   };
@@ -450,7 +450,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat === null || typeof sat === 'undefined') return;
 
     if (!this.issecondaryDataLoaded) {
-      SatInfoBoxCore.createSecondaryData();
+      SatInfoBox.createSecondaryData();
       this.issecondaryDataLoaded = true;
     }
   };
@@ -496,11 +496,11 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat === null || typeof sat === 'undefined') return;
 
     if (!this.islaunchDataLoaded) {
-      SatInfoBoxCore.createLaunchData();
+      SatInfoBox.createLaunchData();
       this.islaunchDataLoaded = true;
     }
 
-    SatInfoBoxCore.updateLaunchData(sat);
+    SatInfoBox.updateLaunchData(sat);
   }
 
   static updateObjectData = (sat: SatObject): void => {
@@ -525,7 +525,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       getEl('sat-remove-watchlist').style.display = 'none';
     }
 
-    SatInfoBoxCore.updateSatType(sat);
+    SatInfoBox.updateSatType(sat);
 
     // TODO:
     // getEl('edit-satinfo-link').innerHTML = "<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>";
@@ -550,13 +550,13 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
       getEl('sat-source').innerHTML = sat.source || CatalogSource.USSF;
     }
 
-    SatInfoBoxCore.updateRcsData(sat);
+    SatInfoBox.updateRcsData(sat);
   };
 
   private static updateLaunchData(sat: SatObject) {
-    SatInfoBoxCore.updateCountryCorrelationTable(sat);
-    let { missileLV, satLvString }: { missileLV: string; satLvString: string } = SatInfoBoxCore.updateLaunchSiteCorrelationTable(sat);
-    SatInfoBoxCore.updateLaunchVehicleCorrelationTable(sat, missileLV, satLvString);
+    SatInfoBox.updateCountryCorrelationTable(sat);
+    let { missileLV, satLvString }: { missileLV: string; satLvString: string } = SatInfoBox.updateLaunchSiteCorrelationTable(sat);
+    SatInfoBox.updateLaunchVehicleCorrelationTable(sat, missileLV, satLvString);
 
     getEl('sat-configuration').innerHTML = sat.configuration !== '' ? sat.configuration : 'Unknown';
   }
@@ -889,7 +889,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     const satInfobox = getEl('sat-infobox');
     satInfobox.addEventListener('mousedown', (e: any) => {
       if (e.button === 2) {
-        SatInfoBoxCore.resetMenuLocation_(satInfobox);
+        SatInfoBox.resetMenuLocation_(satInfobox);
       }
     });
   }
@@ -983,11 +983,11 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat === null || typeof sat === 'undefined') return;
 
     if (!this.issatMissionDataLoaded) {
-      SatInfoBoxCore.createSatMissionData();
+      SatInfoBox.createSatMissionData();
       this.issatMissionDataLoaded = true;
     }
 
-    SatInfoBoxCore.updateSatMissionData(sat);
+    SatInfoBox.updateSatMissionData(sat);
   };
 
   private static updateSatMissionData(sat: SatObject) {
@@ -1154,12 +1154,12 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   intelData = (sat: SatObject, satId?: number): void => {
     if (satId !== -1) {
       if (!this.isintelDataLoaded) {
-        SatInfoBoxCore.createIntelData();
+        SatInfoBox.createIntelData();
         this.isintelDataLoaded = true;
-        SatInfoBoxCore.resetMenuLocation_(getEl('sat-infobox'));
+        SatInfoBox.resetMenuLocation_(getEl('sat-infobox'));
       }
 
-      SatInfoBoxCore.updateIntelData(sat);
+      SatInfoBox.updateIntelData(sat);
     }
   };
 
@@ -1289,11 +1289,11 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     if (sat === null || typeof sat === 'undefined' || !settingsManager.plugins.sensor) return;
 
     if (!this.issensorInfoLoaded) {
-      SatInfoBoxCore.createSensorInfo();
+      SatInfoBox.createSensorInfo();
       this.issensorInfoLoaded = true;
     }
 
-    SatInfoBoxCore.updateSensorInfo(sat);
+    SatInfoBox.updateSensorInfo(sat);
   }
 
   private static updateSensorInfo(sat: SatObject) {
@@ -1437,4 +1437,4 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
   }
 }
 
-export const satInfoBoxCorePlugin = new SatInfoBoxCore();
+export const satInfoBoxCorePlugin = new SatInfoBox();

@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
-import { satInfoBoxCorePlugin } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { satInfoBoxCorePlugin } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSat, defaultSensor } from './environment/apiMocks';

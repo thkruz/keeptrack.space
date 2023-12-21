@@ -44,7 +44,7 @@ import { satellitePhotosPlugin } from './satellite-photos/satellite-photos';
 import { screenRecorderPlugin } from './screen-recorder/screen-recorder';
 import { StreamManager } from './screen-recorder/stream-manager';
 import { screenshotPlugin } from './screenshot/screenshot';
-import { satInfoBoxCorePlugin } from './select-sat-manager/satInfoboxCore';
+import { satInfoBoxCorePlugin } from './select-sat-manager/sat-info-box';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { sensorFovPlugin } from './sensor-fov/sensor-fov';
 import { sensorSurvFencePlugin } from './sensor-surv/sensor-surv-fence';

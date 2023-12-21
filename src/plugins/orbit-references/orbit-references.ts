@@ -8,13 +8,13 @@ import { FormatTle } from '@app/static/format-tle';
 import { StringifiedNumber } from '@app/static/sat-math';
 import { Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SatInfoBoxCore } from '../select-sat-manager/satInfoboxCore';
+import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class OrbitReferences extends KeepTrackPlugin {
   doOnce = false;
   isReferenceSatsActive = false;
-  dependencies: string[] = [SatInfoBoxCore.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
+  dependencies: string[] = [SatInfoBox.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
   static PLUGIN_NAME = 'Orbit References';
 
   constructor() {

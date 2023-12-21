@@ -10,7 +10,6 @@ import { TopMenu } from '../top-menu/top-menu';
 
 /**
  * This is the class that manages the selection of objects.
- * It should update the UI on initial selection of a satellite/missile.
  */
 export class SelectSatManager extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Select Sat Manager';

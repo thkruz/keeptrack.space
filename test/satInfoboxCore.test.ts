@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SpaceObjectType } from '@app/lib/space-object-type';
-import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -12,11 +12,11 @@ describe('SatInfoBoxCore_class', () => {
     setupStandardEnvironment([SelectSatManager]);
   });
 
-  standardPluginSuite(SatInfoBoxCore, 'SatInfoBoxCore');
+  standardPluginSuite(SatInfoBox, 'SatInfoBoxCore');
 
   describe('Clicking Orbit Data Links', () => {
     beforeEach(() => {
-      const satInfoBoxCorePlugin = new SatInfoBoxCore();
+      const satInfoBoxCorePlugin = new SatInfoBox();
       websiteInit(satInfoBoxCorePlugin);
       keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
       keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
@@ -54,7 +54,7 @@ describe('SatInfoBoxCore_class', () => {
 
   describe('Various Types of Objects', () => {
     beforeEach(() => {
-      const satInfoBoxCorePlugin = new SatInfoBoxCore();
+      const satInfoBoxCorePlugin = new SatInfoBox();
       websiteInit(satInfoBoxCorePlugin);
       keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
       keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;

@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
+import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fences';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
@@ -9,7 +9,7 @@ import { standardPluginSuite, websiteInit } from './generic-tests';
 describe('ShortTermFences_class', () => {
   beforeAll(() => {
     keepTrackApi.containerRoot.innerHTML = '';
-    setupStandardEnvironment([SelectSatManager, SatInfoBoxCore]);
+    setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
 
   standardPluginSuite(ShortTermFences, 'ShortTermFences');

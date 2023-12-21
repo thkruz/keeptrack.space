@@ -39,12 +39,13 @@ export const setInnerHtml = (id: string, html: string) => {
 };
 
 /**
- * Shows the element with the specified ID by setting its display style to 'block'.
+ * Shows the element with the specified ID by changing its display style.
  * @param id - The ID of the element to show.
+ * @param value - The value to set for the display style (default: 'block').
  */
-export const showEl = (id: string) => {
+export const showEl = (id: string, value = 'block') => {
   const el = getEl(id, true);
-  if (el) el.style.display = 'block';
+  if (el) el.style.display = value;
 };
 
 /**

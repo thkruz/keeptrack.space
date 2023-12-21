@@ -34,13 +34,6 @@ files.forEach((file) => {
   }
 });
 
-files = readdirSync('./public/examples/settings', { withFileTypes: true });
-files.forEach((file) => {
-  if (!file.isDirectory()) {
-    cpSync(`./public/examples/settings/${file.name}`, `./dist/settings/${file.name}`);
-  }
-});
-
 ['audio', 'css', 'img', 'meshes', 'res', 'settings', 'simulation', 'textures', 'tle'].forEach((dir) => {
   cpSync(`public/${dir}`, `dist/${dir}`, { recursive: true, preserveTimestamps: true });
 });

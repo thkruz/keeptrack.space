@@ -25,14 +25,14 @@ export class KeyboardInput {
     });
 
     if (!settingsManager.disableUI) {
-      keepTrackApi.containerRoot.addEventListener('keypress', (e: Event) => {
+      window.addEventListener('keypress', (e: Event) => {
         this.keyHandler(<KeyboardEvent>e);
       });
-      keepTrackApi.containerRoot.addEventListener('keydown', (e: Event) => {
+      window.addEventListener('keydown', (e: Event) => {
         if (uiManagerInstance.isCurrentlyTyping) return;
         this.keyDownHandler(<KeyboardEvent>e);
       });
-      keepTrackApi.containerRoot.addEventListener('keyup', (e: Event) => {
+      window.addEventListener('keyup', (e: Event) => {
         if (uiManagerInstance.isCurrentlyTyping) return;
         this.keyUpHandler(<KeyboardEvent>e);
       });

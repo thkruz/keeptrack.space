@@ -14,8 +14,12 @@ console.log('Current working directory: ' + process.cwd()); // NOSONAR
 
 console.log('Removing old files...'); // NOSONAR
 // Remove all files in dist
-rmSync('./dist', { recursive: true });
-mkdirSync('./dist');
+try {
+  rmSync('./dist', { recursive: true });
+  mkdirSync('./dist');
+} catch {
+  // This will fail if the folder doesn't exist
+}
 
 console.log('Copy static files...'); // NOSONAR
 // Get a list of all files (not folders) in the public folder

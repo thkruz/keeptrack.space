@@ -32,7 +32,6 @@ export class MobileManager {
             settingsManager.plugins[key] = false;
           });
           settingsManager.plugins.satInfoboxCore = true;
-          settingsManager.plugins.updateSelectBoxCore = true;
           settingsManager.plugins.topMenu = true;
           settingsManager.plugins.datetime = true;
           settingsManager.plugins.soundManager = true;

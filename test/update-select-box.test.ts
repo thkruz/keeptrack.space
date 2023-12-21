@@ -3,7 +3,6 @@ import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manage
 import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { UpdateSatManager } from '@app/plugins/update-select-box/update-select-box';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
@@ -15,7 +14,7 @@ describe('UpdateSatManager_class', () => {
     setupStandardEnvironment([TopMenu, SelectSatManager, SatInfoBoxCore, DateTimeManager]);
   });
 
-  standardPluginSuite(UpdateSatManager, 'UpdateSatManager');
+  standardPluginSuite(SelectSatManager, 'SelectSatManager');
 });
 
 describe('SatInfoBoxCore_class2', () => {
@@ -27,8 +26,6 @@ describe('SatInfoBoxCore_class2', () => {
     keepTrackApi.isInitialized = true;
     const selectSatManager = new SelectSatManager();
     selectSatManager.init();
-    const updateSatManager = new UpdateSatManager();
-    updateSatManager.init();
     keepTrackApi.methods.uiManagerInit();
     keepTrackApi.methods.uiManagerFinal();
     keepTrackApi.methods.uiManagerOnReady();

@@ -91,7 +91,6 @@ const settingsOverride = {
   plugins: {
     debug: false,
     satInfoboxCore: false,
-    updateSelectBoxCore: false,
     aboutManager: false,
     collisions: false,
     dops: false,

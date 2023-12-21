@@ -6,7 +6,7 @@ import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, gl
 
 import { jday } from '@app/lib/transforms';
 import { Kilometers, Radians, Sgp4, Transforms } from 'ootk';
-import { UpdateSatManager } from '../update-select-box/update-select-box';
+import { SatInfoBoxCore } from '../select-sat-manager/satInfoboxCore';
 
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
 const missileArray: any[] = [];
@@ -663,9 +663,9 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: SensorObject[]
     }
   }
 
-  const updateSelectBoxPlugin = <UpdateSatManager>keepTrackApi.getPlugin(UpdateSatManager);
-  if (updateSelectBoxPlugin) {
-    updateSelectBoxPlugin.currentTEARR = currentTEARR;
+  const satInfoBoxCorePlugin = <SatInfoBoxCore>keepTrackApi.getPlugin(SatInfoBoxCore);
+  if (satInfoBoxCorePlugin) {
+    satInfoBoxCorePlugin.currentTEARR = currentTEARR;
   }
 
   return currentTEARR;

@@ -34,7 +34,6 @@ export class SettingsManager {
   plugins = {
     debug: false,
     satInfoboxCore: true,
-    updateSelectBoxCore: true,
     aboutManager: false,
     collisions: true,
     dops: false,

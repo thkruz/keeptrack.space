@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { getDayOfYear } from '@app/lib/transforms';
 import { isThisNode } from '@app/static/isThisNode';
@@ -9,7 +9,7 @@ import { TopMenu } from '../top-menu/top-menu';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 
 export class DateTimeManager extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Top Menu';
+  static PLUGIN_NAME = 'Date Time Manager';
   dependencies = [TopMenu.PLUGIN_NAME];
   isEditTimeOpen = false;
   divContainerId = 'datetime';
@@ -22,21 +22,30 @@ export class DateTimeManager extends KeepTrackPlugin {
     super.init();
 
     keepTrackApi.register({
-      event: 'uiManagerInit',
-      cbName: 'datetime',
+      event: KeepTrackApiEvents.uiManagerInit,
+      cbName: this.PLUGIN_NAME,
       cb: this.uiManagerInit.bind(this),
     });
 
     keepTrackApi.register({
-      event: 'uiManagerFinal',
-      cbName: 'datetime',
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
       cb: this.uiManagerFinal.bind(this),
     });
 
     keepTrackApi.register({
-      event: 'updateDateTime',
-      cbName: 'datetime',
+      event: KeepTrackApiEvents.updateDateTime,
+      cbName: this.PLUGIN_NAME,
       cb: this.updateDateTime.bind(this),
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.updateSelectBox,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
+        getEl('jday').innerHTML = jday.toString();
+      },
     });
   }
 

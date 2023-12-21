@@ -58,7 +58,6 @@ import { shortTermFencesPlugin } from './short-term-fences/short-term-fences';
 import { socialMediaPlugin } from './social/social';
 import { stereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
-import { updateSatManagerPlugin } from './update-select-box/update-select-box';
 import { videoDirectorPlugin } from './video-director/video-director';
 import { watchlistPlugin } from './watchlist/watchlist';
 import { watchlistOverlayPlugin } from './watchlist/watchlist-overlay';
@@ -67,7 +66,6 @@ export type KeepTrackPlugins = {
   videoDirector?: boolean;
   debrisScreening?: boolean;
   satInfoboxCore?: boolean;
-  updateSelectBoxCore?: boolean;
   findSat?: boolean;
   collisions?: boolean;
   satelliteFov?: boolean;
@@ -136,7 +134,6 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     if (plugins.satInfoboxCore) satInfoBoxCorePlugin.init();
 
     // Core Features
-    if (plugins.updateSelectBoxCore) updateSatManagerPlugin.init();
     if (plugins.datetime) dateTimeManagerPlugin.init();
     if (plugins.social) socialMediaPlugin.init();
 

@@ -6,7 +6,6 @@ describe('plugins', () => {
     loadCorePlugins(keepTrackApi, {
       debug: false,
       satInfoboxCore: true,
-      updateSelectBoxCore: true,
       aboutManager: true,
       collisions: true,
       dops: true,

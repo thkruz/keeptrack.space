@@ -1,9 +1,9 @@
 import { SatObject, SatPassTimes, SensorObject } from '@app/interfaces';
+import { SatInfoBoxCore } from '@app/plugins/select-sat-manager/satInfoboxCore';
 import { Degrees, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Transforms } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, TAU } from '../lib/constants';
 import { dateFormat } from '../lib/dateFormat';
-import { UpdateSatManager } from '../plugins/update-select-box/update-select-box';
 import { SatMath } from './sat-math';
 
 export type TearrData = {
@@ -160,12 +160,12 @@ export class SensorMath {
     // Calculate if same beam
     let sameBeamStr = '';
     try {
-      const updateSelectBoxPlugin = <UpdateSatManager>keepTrackApi.getPlugin(UpdateSatManager);
-      if (updateSelectBoxPlugin.currentTEARR?.inView) {
+      const satInfoBoxCorePlugin = <SatInfoBoxCore>keepTrackApi.getPlugin(SatInfoBoxCore);
+      if (satInfoBoxCorePlugin.currentTEARR?.inView) {
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-        if (parseFloat(distanceApart) < updateSelectBoxPlugin.currentTEARR?.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)) {
-          if (updateSelectBoxPlugin.currentTEARR?.rng < sensorManagerInstance.currentSensors[0].obsmaxrange && updateSelectBoxPlugin.currentTEARR?.rng > 0) {
+        if (parseFloat(distanceApart) < satInfoBoxCorePlugin.currentTEARR?.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)) {
+          if (satInfoBoxCorePlugin.currentTEARR?.rng < sensorManagerInstance.currentSensors[0].obsmaxrange && satInfoBoxCorePlugin.currentTEARR?.rng > 0) {
             sameBeamStr = ' (Within One Beam)';
           }
         }

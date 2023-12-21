@@ -1,7 +1,7 @@
 import { isThisNode } from '@app/static/isThisNode';
 import { expect } from '@jest/globals';
 import { SatObject } from '../src/interfaces';
-import { keepTrackApi } from '../src/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '../src/keepTrackApi';
 import { defaultSat } from './environment/apiMocks';
 
 test(`keepTrackApi Unit Testing`, () => {
@@ -14,7 +14,7 @@ test(`keepTrackApi Unit Testing`, () => {
   }).toThrow(Error);
 
   keepTrackApi.register({
-    event: 'selectSatData',
+    event: KeepTrackApiEvents.selectSatData,
     cbName: 'test',
     cb: () => console.log('test'),
   });
@@ -24,10 +24,10 @@ test(`keepTrackApi Unit Testing`, () => {
   }).toThrow(Error);
 
   expect(() => {
-    keepTrackApi.unregister({ event: 'selectSatData', cbName: 'test2' });
+    keepTrackApi.unregister({ event: KeepTrackApiEvents.selectSatData, cbName: 'test2' });
   }).toThrow(Error);
 
-  keepTrackApi.unregister({ event: 'selectSatData', cbName: 'test' });
+  keepTrackApi.unregister({ event: KeepTrackApiEvents.selectSatData, cbName: 'test' });
 
   keepTrackApi.register({
     event: 'updateSelectBox',
@@ -96,7 +96,7 @@ test(`keepTrackApi Unit Testing`, () => {
   });
 
   keepTrackApi.register({
-    event: 'updateLoop',
+    event: KeepTrackApiEvents.updateLoop,
     cbName: 'test',
     cb: () => console.log('test'),
   });
@@ -126,7 +126,7 @@ test(`keepTrackApi Unit Testing`, () => {
   });
 
   keepTrackApi.register({
-    event: 'selectSatData',
+    event: KeepTrackApiEvents.selectSatData,
     cbName: 'test',
     cb: (sat, satId) => console.log(`${sat} - ${satId}`),
   });

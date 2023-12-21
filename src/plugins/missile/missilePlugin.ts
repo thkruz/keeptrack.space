@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -538,7 +538,7 @@ export const init = (): void => {
 
   // Missile oribts have to be updated every draw or they quickly become innacurate
   keepTrackApi.register({
-    event: 'updateLoop',
+    event: KeepTrackApiEvents.updateLoop,
     cbName: 'updateMissileOrbits',
     cb: updateLoop,
   });

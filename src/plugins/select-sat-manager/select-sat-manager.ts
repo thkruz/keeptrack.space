@@ -1,5 +1,5 @@
 import { GetSatType, SatObject, SensorObject } from '@app/interfaces';
-import { isSatObject, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, isSatObject, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 import { CameraType } from '@app/singletons/camera';
@@ -13,9 +13,9 @@ import { TopMenu } from '../top-menu/top-menu';
  * It should update the UI on initial selection of a satellite/missile.
  */
 export class SelectSatManager extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Select Sat Manager';
   lastCssStyle = '';
   isselectedSatNegativeOne = false;
-  static PLUGIN_NAME = 'Select Sat Manager';
 
   constructor() {
     super(SelectSatManager.PLUGIN_NAME);
@@ -24,8 +24,8 @@ export class SelectSatManager extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      event: 'updateLoop',
-      cbName: 'selectSatManager',
+      event: KeepTrackApiEvents.updateLoop,
+      cbName: SelectSatManager.PLUGIN_NAME,
       cb: this.checkIfSelectSatVisible.bind(this),
     });
   }

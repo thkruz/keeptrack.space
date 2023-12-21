@@ -1,5 +1,5 @@
 import { SatObject } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { StringPad } from '@app/lib/stringPad';
@@ -25,7 +25,7 @@ export class OrbitReferences extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: 'selectSatData',
+      event: KeepTrackApiEvents.selectSatData,
       cbName: 'orbitReferences',
       cb: (sat: SatObject) => {
         // Skip this if there is no satellite object because the menu isn't open

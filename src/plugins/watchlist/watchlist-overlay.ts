@@ -94,7 +94,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      event: 'updateLoop',
+      event: KeepTrackApiEvents.updateLoop,
       cbName: 'watchlist',
       cb: this.updateLoop.bind(this),
     });

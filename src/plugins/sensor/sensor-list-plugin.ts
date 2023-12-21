@@ -140,7 +140,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      event: 'selectSatData',
+      event: KeepTrackApiEvents.selectSatData,
       cbName: 'sensor',
       cb: (sat: SatObject) => {
         // Skip this if there is no satellite object because the menu isn't open

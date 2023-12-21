@@ -16,6 +16,9 @@
   --bottom-icon-height: 75px;
   --bottom-icon-img-size: 40px;
   --top-menu-height: 0px;
+}
+
+#keeptrack-container {
   --search-box-bottom: 0px;
 }
 
@@ -57,7 +60,7 @@ a,
   background: rgba(0, 0, 0, 0.2);
 }
 
-html body {
+#keeptrack-root {
   margin: 0;
   position: absolute;
   width: 100%;

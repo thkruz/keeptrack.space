@@ -200,14 +200,18 @@
 /* Thin */
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoThin.woff2') format('woff2'), url('../fonts/RobotoThin.woff') format('woff');
+  src:
+    url('../fonts/RobotoThin.woff2') format('woff2'),
+    url('../fonts/RobotoThin.woff') format('woff');
   font-weight: 200;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoThinItalic.woff2') format('woff2'), url('../fonts/RobotoThinItalic.woff') format('woff');
+  src:
+    url('../fonts/RobotoThinItalic.woff2') format('woff2'),
+    url('../fonts/RobotoThinItalic.woff') format('woff');
   font-weight: 200;
   font-style: italic;
 }
@@ -215,14 +219,18 @@
 /* Light */
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoLight.woff2') format('woff2'), url('../fonts/RobotoLight.woff') format('woff');
+  src:
+    url('../fonts/RobotoLight.woff2') format('woff2'),
+    url('../fonts/RobotoLight.woff') format('woff');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto Light';
-  src: url('../fonts/RobotoLight.woff2') format('woff2'), url('../fonts/RobotoLight.woff') format('woff');
+  src:
+    url('../fonts/RobotoLight.woff2') format('woff2'),
+    url('../fonts/RobotoLight.woff') format('woff');
   font-weight: 300;
   font-style: normal;
 }
@@ -237,7 +245,9 @@
 /* Regular */
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoRegular.woff2') format('woff2'), url('../fonts/RobotoRegular.woff') format('woff');
+  src:
+    url('../fonts/RobotoRegular.woff2') format('woff2'),
+    url('../fonts/RobotoRegular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
 }
@@ -245,14 +255,18 @@
 /* Medium */
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoMedium.woff2') format('woff2'), url('../fonts/RobotoMedium.woff') format('woff');
+  src:
+    url('../fonts/RobotoMedium.woff2') format('woff2'),
+    url('../fonts/RobotoMedium.woff') format('woff');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoMediumItalic.woff2') format('woff2'), url('../fonts/RobotoMediumItalic.woff') format('woff');
+  src:
+    url('../fonts/RobotoMediumItalic.woff2') format('woff2'),
+    url('../fonts/RobotoMediumItalic.woff') format('woff');
   font-weight: 500;
   font-style: italic;
 }
@@ -260,14 +274,18 @@
 /* Bold */
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoBold.woff2') format('woff2'), url('../fonts/RobotoBold.woff') format('woff');
+  src:
+    url('../fonts/RobotoBold.woff2') format('woff2'),
+    url('../fonts/RobotoBold.woff') format('woff');
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoBoldItalic.woff2') format('woff2'), url('../fonts/RobotoBoldItalic.woff') format('woff');
+  src:
+    url('../fonts/RobotoBoldItalic.woff2') format('woff2'),
+    url('../fonts/RobotoBoldItalic.woff') format('woff');
   font-weight: 600;
   font-style: italic;
 }
@@ -275,21 +293,27 @@
 /* Black */
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoBlack.woff2') format('woff2'), url('../fonts/RobotoBlack.woff') format('woff');
+  src:
+    url('../fonts/RobotoBlack.woff2') format('woff2'),
+    url('../fonts/RobotoBlack.woff') format('woff');
   font-weight: 800;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto';
-  src: url('../fonts/RobotoBlackItalic.woff2') format('woff2'), url('../fonts/RobotoBlackItalic.woff') format('woff');
+  src:
+    url('../fonts/RobotoBlackItalic.woff2') format('woff2'),
+    url('../fonts/RobotoBlackItalic.woff') format('woff');
   font-weight: 800;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'Roboto Mono';
-  src: url('../fonts/roboto-mono-regular.woff2') format('woff2'), url('../fonts/roboto-mono-regular.woff') format('woff');
+  src:
+    url('../fonts/roboto-mono-regular.woff2') format('woff2'),
+    url('../fonts/roboto-mono-regular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
 }
@@ -1031,7 +1055,16 @@ li.dark-theme {
 h1,
 h2,
 h3 {
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-weight: 400;
   color: var(--defaultText);
@@ -1167,7 +1200,16 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-size: 1rem;
   color: white;
@@ -1267,7 +1309,16 @@ label {
   border-radius: 3px;
   border-radius: var(--buttonBorderRadius);
   color: var(--buttonTextColor);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-size: 1rem;
   white-space: nowrap;
@@ -1560,7 +1611,16 @@ label {
   color: var(--colorCritical);
   font-size: 0.875rem;
   font-size: var(--fontSizeMD);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-weight: bold;
   margin: 0;
@@ -1576,7 +1636,16 @@ label {
   color: var(--secondaryText);
   font-size: 0.875rem;
   font-size: var(--fontSizeMD);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-weight: normal;
   letter-spacing: 0.5px;
@@ -1592,7 +1661,16 @@ label {
   color: var(--colorCritical);
   font-size: 0.875rem;
   font-size: var(--fontSizeMD);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-weight: bold;
 }
@@ -1631,7 +1709,16 @@ label {
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-size: 1rem;
   font-size: var(--fontSize);
@@ -1678,7 +1765,16 @@ label {
   border: 1px solid transparent;
   border: 1px solid var(--inputBorderColor);
   border-radius: 3px;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-size: 1rem;
   font-size: var(--fontSize, 1rem);
@@ -1695,7 +1791,16 @@ label {
 .rux-form-field textarea:-ms-input-placeholder {
   font-size: 1rem;
   font-weight: normal;
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
 }
 
@@ -1964,7 +2069,16 @@ label {
   border-radius: 3px;
   border-radius: var(--buttonBorderRadius);
   color: var(--inputDark);
-  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif;
   font-family: var(--fontFamily);
   font-weight: normal;
   font-size: 1rem;

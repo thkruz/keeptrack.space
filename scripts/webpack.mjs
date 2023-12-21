@@ -1,5 +1,6 @@
 /* eslint-disable no-process-env */
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
+import { readdirSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -8,7 +9,7 @@ import WebpackBar from 'webpackbar';
 
 /**
  *
- * @param {*} env
+ * @param {'development' | 'production'} env
  * @param {*} isWatch
  * @returns {webpack.Configuration}
  */
@@ -21,17 +22,11 @@ export const generateConfig = (env, isWatch) => {
    * @type {webpack.Configuration[]}
    */
   const webpackConfig = [];
-  env = env === 'test' ? 'development' : env;
-  env = typeof env === 'undefined' ? 'production' : env;
+  env ??= 'production';
 
   let baseConfig = getBaseConfig(dirName);
 
   switch (env) {
-    case 'embed':
-    case 'embedDev':
-      // this is for embedding the app in a web page
-      baseConfig = getEmbedConfig(baseConfig);
-      break;
     case 'development':
     case 'production':
     default:
@@ -48,7 +43,7 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // Add source map if in these modes
-  if (env === 'development' || env === 'test' || env === 'embedDev') {
+  if (env === 'development') {
     baseConfig = {
       ...baseConfig,
       ...{
@@ -63,7 +58,7 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // Minimize if in these modes
-  if (env === 'production' || env === 'embed') {
+  if (env === 'production') {
     baseConfig = {
       ...baseConfig,
       ...{
@@ -75,21 +70,35 @@ export const generateConfig = (env, isWatch) => {
   }
 
   // split entry points main, webworkers, and possibly analysis tools
-  if (env !== 'embed' && env !== 'embedDev') {
-    const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
-    const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
-    // const analysisConfig = getAnalysisConfig(baseConfig, dirName);
+  const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
+  webpackConfig.push(mainConfig);
 
-    webpackConfig.push(mainConfig);
-    webpackConfig.push(webWorkerConfig);
-    // webpackConfig.push(analysisConfig);
-  } else {
-    const mainConfig = getMainConfig(baseConfig, dirName, 'embed/keepTrack', 'keepTrack/');
-    const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'embed/keepTrack/', 'keepTrack/');
+  const exampleConfig = getMainConfig(baseConfig, dirName, 'dist', '../../');
+  exampleConfig.plugins = [
+    new webpack.ProvidePlugin({
+      '$': 'jquery',
+      'jQuery': 'jquery',
+      'windows.jQuery': 'jquery',
+    }),
+    new CleanTerminalPlugin({
+      beforeCompile: true,
+    }),
+  ];
+  const examples = readdirSync(`./public/examples`, { withFileTypes: true });
+  examples.forEach((example) => {
+    if (!example.isDirectory()) {
+      exampleConfig.plugins.push(
+        new HtmlWebpackPlugin({
+          filename: `../examples/${example.name}`,
+          template: `./public/examples/${example.name}`,
+        })
+      );
+    }
+  });
+  webpackConfig.push(exampleConfig);
 
-    webpackConfig.push(mainConfig);
-    webpackConfig.push(webWorkerConfig);
-  }
+  const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
+  webpackConfig.push(webWorkerConfig);
 
   return webpackConfig;
 };
@@ -193,12 +202,12 @@ const getNonEmbedConfig = (baseConfig, env) => {
       'jQuery': 'jquery',
       'windows.jQuery': 'jquery',
     }),
+    new CleanTerminalPlugin({
+      beforeCompile: true,
+    }),
     new HtmlWebpackPlugin({
       filename: '../index.html',
       template: './public/index.html',
-    }),
-    new CleanTerminalPlugin({
-      beforeCompile: true,
     })
   );
   baseConfig.module.rules.push({
@@ -206,38 +215,6 @@ const getNonEmbedConfig = (baseConfig, env) => {
     include: [/src/u],
     type: 'asset/resource',
   });
-  return baseConfig;
-};
-
-/**
- * Returns the configuration object for embedding.
- *
- * @param {webpack.Configuration} baseConfig - The base configuration object.
- * @returns {webpack.Configuration} - The configuration object for embedding.
- */
-const getEmbedConfig = (baseConfig) => {
-  const embedOnly = {
-    mode: 'development',
-    experiments: {
-      topLevelAwait: true,
-    },
-  };
-
-  baseConfig = {
-    ...baseConfig,
-    ...embedOnly,
-  };
-
-  baseConfig.plugins.push(
-    new webpack.ProvidePlugin({
-      '$': 'jquery',
-      'jQuery': 'jquery',
-      'windows.jQuery': 'jquery',
-    }),
-    new webpack.optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    })
-  );
   return baseConfig;
 };
 
@@ -262,8 +239,6 @@ const getMainConfig = (baseConfig, dirName, subFolder, pubPath = '') => ({
       filename: `[name]${subFolder === 'dist' ? '.[contenthash]' : ''}.js`,
       path: `${dirName}/../${subFolder}/js`,
       publicPath: `./${pubPath}js/`,
-      library: 'keepTrack',
-      libraryExport: 'default',
     },
   },
 });
@@ -293,28 +268,4 @@ const getWebWorkerConfig = (baseConfig, dirName, subFolder, pubPath) => ({
   },
 });
 
-// const getAnalysisConfig = (baseConfig, dirName) => ({
-//   ...baseConfig,
-//   ...{
-//     name: 'Libraries',
-//     entry: {
-//       'analysis-tools': ['./public/analysis/js/analysis-tools.js'],
-//     },
-//     plugins: [
-//       new webpack.ProvidePlugin({
-//         '$': 'jquery',
-//         'jQuery': 'jquery',
-//         'windows.jQuery': 'jquery',
-//       }),
-//       new HtmlWebpackPlugin({
-//         filename: '../index.html',
-//         template: './public/analysis/index.html',
-//       }),
-//     ],
-//     output: {
-//       filename: '[name].js',
-//       path: dirName + '/../dist/analysis/js/',
-//       publicPath: './js/',
-//     },
-//   },
-// });
+export default () => generateConfig('development', false);

@@ -10,7 +10,7 @@
   --colorTertiaryDarken4: rgb(8, 13, 18);
 }
 
-body {
+#keeptrack-root {
   overflow: hidden;
   font-family: 'Open Sans', sans-serif;
   color: white;
@@ -43,6 +43,7 @@ body {
   z-index: 101;
   text-align: center;
   background: #274059;
+  color: white;
 }
 
 .full-loader {
@@ -93,29 +94,47 @@ body {
 
 #logo-text {
   display: block;
-  font-size: 8em;
-  text-shadow: 0px 0px 8px rgb(0 0 0), 0px 0px 8px rgb(0 0 0);
+  font-size: 9vh;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
 }
 
 #logo-text-version {
   display: block;
-  font-size: 8em;
+  font-size: 9vh;
   padding-left: 50px;
-  text-shadow: 0px 0px 8px rgb(0 0 0), 0px 0px 8px rgb(0 0 0);
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
   color: var(--colorPrimaryLighten2) !important;
 }
 
 #sponsor-text {
   display: block;
   font-size: 2em;
-  text-shadow: 0px 0px 8px rgb(0 0 0), 0px 0px 8px rgb(0 0 0);
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
 }
 
 #sponsor-img {
   background: white;
   border-radius: 10px;
   padding: 5px;
-  box-shadow: 0px 0px 8px rgb(0 0 0), 0px 0px 8px rgb(0 0 0);
+  box-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+@font-face {
+  font-family: 'nasalization';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    url('fonts/nasalization-rg.woff2') format('woff2'),
+    url('fonts/nasalization-rg.woff') format('woff'),
+    url('fonts/nasalization-rg.ttf') format('truetype');
 }
 
 .logo-font {
@@ -136,7 +155,9 @@ body {
 #loader-text {
   display: block;
   line-height: 50px;
-  text-shadow: 0px 0px 8px rgb(0 0 0), 0px 0px 8px rgb(0 0 0);
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
 }
 
 #mobile-start-button {

@@ -3,9 +3,14 @@
   font-weight: 400;
   font-style: normal;
   src: url('fonts/Varela-Round-regular/Varela-Round-regular.eot');
-  src: url('fonts/Varela-Round-regular/Varela-Round-regular.eot?#iefix') format('embedded-opentype'), local('Varela Round Regular'), local('Varela-Round-regular'),
-    url('fonts/Varela-Round-regular/Varela-Round-regular.woff2') format('woff2'), url('fonts/Varela-Round-regular/Varela-Round-regular.woff') format('woff'),
-    url('fonts/Varela-Round-regular/Varela-Round-regular.ttf') format('truetype'), url('fonts/Varela-Round-regular/Varela-Round-regular.svg#VarelaRound') format('svg');
+  src:
+    url('fonts/Varela-Round-regular/Varela-Round-regular.eot?#iefix') format('embedded-opentype'),
+    local('Varela Round Regular'),
+    local('Varela-Round-regular'),
+    url('fonts/Varela-Round-regular/Varela-Round-regular.woff2') format('woff2'),
+    url('fonts/Varela-Round-regular/Varela-Round-regular.woff') format('woff'),
+    url('fonts/Varela-Round-regular/Varela-Round-regular.ttf') format('truetype'),
+    url('fonts/Varela-Round-regular/Varela-Round-regular.svg#VarelaRound') format('svg');
 }
 
 @font-face {
@@ -13,7 +18,10 @@
   font-style: normal;
   font-weight: 400;
   src: url('fonts/droid/droid-sans-v6-latin-regular.eot'); /* IE9 Compat Modes */
-  src: local('Open Sans'), local('DroidSans'), url('fonts/droid/droid-sans-v6-latin-regular.eot?#iefix') format('embedded-opentype'),
+  src:
+    local('Open Sans'),
+    local('DroidSans'),
+    url('fonts/droid/droid-sans-v6-latin-regular.eot?#iefix') format('embedded-opentype'),
     /* IE6-IE8 */ url('fonts/droid/droid-sans-v6-latin-regular.woff2') format('woff2'),
     /* Super Modern Browsers */ url('fonts/droid/droid-sans-v6-latin-regular.woff') format('woff'),
     /* Modern Browsers */ url('fonts/droid/droid-sans-v6-latin-regular.ttf') format('truetype'),
@@ -28,8 +36,12 @@
   font-style: normal;
   font-weight: 400;
   src: url('fonts/material-icons/material-icons.eot'); /* For IE6-8 */
-  src: local('Material Icons'), local('MaterialIcons-Regular'), url('fonts/material-icons/material-icons.woff2') format('woff2'),
-    url('fonts/material-icons/material-icons.woff') format('woff'), url('fonts/material-icons/material-icons.ttf') format('truetype');
+  src:
+    local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url('fonts/material-icons/material-icons.woff2') format('woff2'),
+    url('fonts/material-icons/material-icons.woff') format('woff'),
+    url('fonts/material-icons/material-icons.ttf') format('truetype');
 }
 
 .material-icons {
@@ -72,7 +84,10 @@
   font-family: 'nasalization';
   font-style: normal;
   font-weight: 400;
-  src: url('fonts/nasalization-rg.woff2') format('woff2'), url('fonts/nasalization-rg.woff') format('woff'), url('fonts/nasalization-rg.ttf') format('truetype');
+  src:
+    url('fonts/nasalization-rg.woff2') format('woff2'),
+    url('fonts/nasalization-rg.woff') format('woff'),
+    url('fonts/nasalization-rg.ttf') format('truetype');
 }
 
 .ui-icon {

@@ -64,7 +64,7 @@ const settingsOverride = {
     datetime: true,
     social: true,
     topMenu: true,
-    classificationBar: true,
+    classificationBar: false,
     soundManager: true,
     gamepad: true,
     scenarioCreator: false,

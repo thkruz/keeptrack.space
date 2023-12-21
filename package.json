@@ -24,8 +24,6 @@
   "scripts": {
     "build": "node ./scripts/build.mjs production",
     "build:watch": "node ./scripts/build.mjs development --watch",
-    "build:embed": "node ./scripts/buildEmbed.mjs embed",
-    "build:embedDev": "node ./scripts/buildEmbed.mjs embedDev --watch",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs -o ./docs/CHANGELOG.md",
     "cypress:open": "cypress open",
     "lcov": "node ./scripts/openLcov.mjs",
@@ -133,7 +131,6 @@
     "webgl-mock": "^0.1.7",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1",
     "webpackbar": "^5.0.2",
     "worker-loader": "^3.0.8"
   },

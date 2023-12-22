@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';
@@ -60,8 +61,6 @@ export class WebGLRenderer {
   projectionMatrix: mat4;
   projectionCameraMatrix: mat4;
   postProcessingManager: PostProcessingManager;
-  sat: SatObject;
-  sat2: SatObject;
 
   selectSatManager = keepTrackApi.getSelectSatManager();
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
@@ -435,13 +434,13 @@ export class WebGLRenderer {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const selectSatManager = keepTrackApi.getSelectSatManager();
+    const selectSatManager = keepTrackApi.getPlugin(SelectSatManager);
 
-    if (catalogManagerInstance.selectedSat !== -1) {
-      this.sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
-      if (!this.sat) {
+    if (selectSatManager.selectedSat !== -1) {
+      selectSatManager.primarySatObj = catalogManagerInstance.getSat(selectSatManager.selectedSat);
+      if (!selectSatManager.primarySatObj) {
         // Reset the selected sat if it is not found
-        this.sat = <SatObject>{
+        selectSatManager.primarySatObj = <SatObject>{
           id: -1,
           missile: false,
           type: SpaceObjectType.UNKNOWN,
@@ -449,14 +448,14 @@ export class WebGLRenderer {
         };
         return;
       }
-      this.meshManager.update(timeManagerInstance.selectedDate, this.sat);
-      keepTrackApi.getMainCamera().snapToSat(this.sat, timeManagerInstance.simulationTimeObj);
-      if (this.sat.missile) orbitManagerInstance.setSelectOrbit(this.sat.id);
+      this.meshManager.update(timeManagerInstance.selectedDate, selectSatManager.primarySatObj);
+      keepTrackApi.getMainCamera().snapToSat(selectSatManager.primarySatObj, timeManagerInstance.simulationTimeObj);
+      if (selectSatManager.primarySatObj.missile) orbitManagerInstance.setSelectOrbit(selectSatManager.primarySatObj.id);
 
-      keepTrackApi.getScene().searchBox.update(this.sat, timeManagerInstance.selectedDate);
+      keepTrackApi.getScene().searchBox.update(selectSatManager.primarySatObj, timeManagerInstance.selectedDate);
     } else {
       // Reset the selected satellite if no satellite is selected
-      this.sat = <SatObject>{
+      selectSatManager.primarySatObj = <SatObject>{
         id: -1,
         missile: false,
         type: SpaceObjectType.UNKNOWN,
@@ -466,23 +465,27 @@ export class WebGLRenderer {
       keepTrackApi.getScene().searchBox.update(null);
     }
 
-    if (catalogManagerInstance.selectedSat !== this.lastSelectedSat) {
-      if (catalogManagerInstance.selectedSat === -1 && !selectSatManager.isselectedSatNegativeOne) orbitManagerInstance.clearSelectOrbit();
+    if (selectSatManager.selectedSat !== this.lastSelectedSat) {
+      if (selectSatManager.selectedSat === -1 && selectSatManager.lastSelectedSat_ !== -1) orbitManagerInstance.clearSelectOrbit();
       // WARNING: This is probably here on purpose - but it is getting called twice
       // THIS IS WHAT ACTUALLY SELECTS A SATELLITE, MOVES THE CAMERA, ETC!
-      selectSatManager.selectSat(catalogManagerInstance.selectedSat);
-      if (catalogManagerInstance.selectedSat !== -1) {
-        orbitManagerInstance.setSelectOrbit(catalogManagerInstance.selectedSat);
-        if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && keepTrackApi.getDotsManager().inViewData?.[this.sat.id] === 1) {
+      selectSatManager.selectSat(selectSatManager.selectedSat);
+      if (selectSatManager.selectedSat !== -1) {
+        orbitManagerInstance.setSelectOrbit(selectSatManager.selectedSat);
+        if (
+          catalogManagerInstance.isSensorManagerLoaded &&
+          sensorManagerInstance.currentSensors[0].lat != null &&
+          keepTrackApi.getDotsManager().inViewData?.[selectSatManager.selectedSat] === 1
+        ) {
           lineManagerInstance.drawWhenSelected();
-          lineManagerInstance.updateLineToSat(catalogManagerInstance.selectedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
+          lineManagerInstance.updateLineToSat(selectSatManager.selectedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
         }
-        if (settingsManager.plugins.stereoMap) (<StereoMapPlugin>keepTrackApi.getPlugin(StereoMapPlugin)).updateMap();
+        if (settingsManager.plugins.stereoMap) keepTrackApi.getPlugin(StereoMapPlugin).updateMap();
       } else {
         lineManagerInstance.drawWhenSelected();
       }
-      this.lastSelectedSat = catalogManagerInstance.selectedSat;
-      catalogManagerInstance.lastSelectedSat(catalogManagerInstance.selectedSat);
+      this.lastSelectedSat = selectSatManager.selectedSat;
+      selectSatManager.lastSelectedSat(selectSatManager.selectedSat);
     }
   }
 
@@ -511,16 +514,17 @@ export class WebGLRenderer {
 
   update(): void {
     this.validateProjectionMatrix_();
-
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     this.satCalculate();
     keepTrackApi.getMainCamera().update(this.dt);
 
     // If in satellite view the orbit buffer needs to be updated every time
-    if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE && keepTrackApi.getCatalogManager().selectedSat !== -1) {
-      keepTrackApi.getOrbitManager().updateOrbitBuffer(catalogManagerInstance.lastSelectedSat());
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    if (selectSatManagerInstance) {
+      if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE && selectSatManagerInstance.selectedSat !== -1) {
+        keepTrackApi.getOrbitManager().updateOrbitBuffer(selectSatManagerInstance.lastSelectedSat());
+      }
     }
 
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);

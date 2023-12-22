@@ -281,9 +281,10 @@ export const keepTrackApi = {
     },
   },
   loadedPlugins: <KeepTrackPlugin[]>[],
-  getPlugin: (pluginClass: Constructor<KeepTrackPlugin>) => {
-    if (keepTrackApi.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass))
-      return keepTrackApi.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin instanceof pluginClass);
+  getPlugin: <T extends KeepTrackPlugin>(pluginClass: Constructor<T>): T | null => {
+    if (keepTrackApi.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass)) {
+      return keepTrackApi.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin instanceof pluginClass) as T;
+    }
     return null;
   },
   rmbMenuItems: <rmbMenuItem[]>[],

@@ -12,24 +12,27 @@ import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class OrbitReferences extends KeepTrackPlugin {
-  doOnce = false;
-  isReferenceSatsActive = false;
-  dependencies: string[] = [SatInfoBox.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
   static PLUGIN_NAME = 'Orbit References';
+  dependencies: string[] = [SatInfoBox.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
 
   constructor() {
     super(OrbitReferences.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  doOnce = false;
+  isReferenceSatsActive = false;
 
   addHtml(): void {
     super.addHtml();
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: 'orbitReferences',
-      cb: (sat: SatObject) => {
+      cbName: this.PLUGIN_NAME,
+      cb: (sat?: SatObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (sat === null || typeof sat === 'undefined') {
+        if (!sat) {
           return;
         }
 
@@ -52,7 +55,7 @@ export class OrbitReferences extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // Determine which satellite is selected
-    const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+    const sat = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
     let satNum = catalogManagerInstance.analSatSet[0].id + 20000; // Find Analyst satellite 10,000
     let searchStr = '';
 

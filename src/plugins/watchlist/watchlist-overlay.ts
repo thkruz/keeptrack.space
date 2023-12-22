@@ -11,24 +11,28 @@ import { SensorMath } from '@app/static/sensor-math';
 import infoPng from '@public/img/icons/info.png';
 import { Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin, watchlistPlugin } from './watchlist';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
-  private readonly OVERLAY_CALC_LENGTH_IN_DAYS = 0.5;
+  static readonly PLUGIN_NAME = 'Watchlist Overlay';
 
+  constructor() {
+    super(WatchlistOverlay.PLUGIN_NAME);
+  }
+
+  private readonly OVERLAY_CALC_LENGTH_IN_DAYS = 0.5;
   private infoOverlayDOMHtmlStrArr = [];
   private lastSensorId: number;
   private lastSimTimeWhenCalc: number;
   private nextPassArray: SatPassTimes[] = [];
-
-  static readonly PLUGIN_NAME = 'Watchlist Overlay';
 
   bottomIconCallback = () => {
     if (!this.verifySensorSelected()) {
       return;
     }
 
-    if ((<WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin)).watchlistList.length === 0) {
+    if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
       keepTrackApi.getUiManager().toast(`Add Satellites to Watchlist!`, 'caution');
       shake(getEl('menu-info-overlay'));
       return;
@@ -75,10 +79,6 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   sideMenuElementName = 'info-overlay-menu';
 
-  constructor() {
-    super(WatchlistOverlay.PLUGIN_NAME);
-  }
-
   static uiManagerFinal() {
     getEl('info-overlay-content').addEventListener('click', (evt: Event) => {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -86,7 +86,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       const objNum = parseInt((<HTMLElement>evt.target).textContent.split(':')[0]);
       const satId = catalogManagerInstance.getIdFromObjNum(objNum);
       if (satId !== null) {
-        catalogManagerInstance.setSelectedSat(satId);
+        keepTrackApi.getPlugin(SelectSatManager).setSelectedSat(satId);
       }
     });
   }
@@ -252,7 +252,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     const mainCameraInstance = keepTrackApi.getMainCamera();
     if (
       (Date.now() > this.lastOverlayUpdateTime * 1 + 10000 &&
-        keepTrackApi.getCatalogManager().selectedSat === -1 &&
+        (!keepTrackApi.getPlugin(SelectSatManager) || keepTrackApi.getPlugin(SelectSatManager)?.selectedSat === -1) &&
         !mainCameraInstance.isDragging &&
         mainCameraInstance.zoomLevel() < mainCameraInstance.zoomTarget + 0.01 &&
         mainCameraInstance.zoomLevel() > mainCameraInstance.zoomTarget - 0.01) ||

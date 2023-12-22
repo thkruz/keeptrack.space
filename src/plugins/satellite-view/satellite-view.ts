@@ -26,8 +26,18 @@ import { shake } from '@app/lib/shake';
 import { CameraType } from '@app/singletons/camera';
 import sat3Png from '@public/img/icons/sat3.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Satellite View';
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(SatelliteViewPlugin.PLUGIN_NAME);
+    this.selectSatManager_ = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconElementName = 'menu-satview';
   bottomIconLabel = 'Satellite View';
   bottomIconImg = sat3Png;
@@ -38,25 +48,17 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
       uiManagerInstance.hideSideMenus();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT; // Back to normal Camera Mode
       getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+    } else if (this.selectSatManager_.selectedSat !== -1) {
+      keepTrackApi.getMainCamera().cameraType = CameraType.SATELLITE; // Activate Satellite Camera Mode
+      getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
     } else {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      if (catalogManagerInstance.selectedSat !== -1) {
-        keepTrackApi.getMainCamera().cameraType = CameraType.SATELLITE; // Activate Satellite Camera Mode
-        getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
-      } else {
-        const uiManagerInstance = keepTrackApi.getUiManager();
-        uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
-        shake(getEl(this.bottomIconElementName));
-      }
+      const uiManagerInstance = keepTrackApi.getUiManager();
+      uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
+      shake(getEl(this.bottomIconElementName));
     }
   };
 
   lastLongAudioTime = 0;
-
-  constructor() {
-    const PLUGIN_NAME = 'Satellite View';
-    super(PLUGIN_NAME);
-  }
 }
 
 export const satelliteViewPlugin = new SatelliteViewPlugin();

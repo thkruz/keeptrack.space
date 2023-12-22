@@ -7,15 +7,25 @@ import { SatMath } from '@app/static/sat-math';
 import aboutPng from '@public/img/icons/about.png';
 import { EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class DebrisScreening extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Debris Screening';
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(DebrisScreening.PLUGIN_NAME);
+    this.selectSatManager_ = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconCallback = () => {
     if (!this.verifySatelliteSelected()) return;
 
     if (this.isMenuButtonActive) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-      const sat: SatObject = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY);
+      const sat: SatObject = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
       (<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value = sat.sccNum;
     }
   };
@@ -110,11 +120,6 @@ export class DebrisScreening extends KeepTrackPlugin {
   helpImage = keepTrackApi.html`<img src="${aboutPng}" />
   `;
 
-  constructor() {
-    const PLUGIN_NAME = 'Debris Screening';
-    super(PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
 
@@ -191,7 +196,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
       for (let idx = 0; idx < possibleSats.length; idx++) {
         const sat2 = keepTrackApi.getCatalogManager().getSat(possibleSats[idx], GetSatType.SKIP_POS_VEL);
-        if (!sat2 || !sat2.satrec) continue;
+        if (!sat2?.satrec) continue;
 
         const { m } = SatMath.calculateTimeVariables(now, sat2.satrec);
         const sat2Sv = Sgp4.propagate(sat2.satrec, m) as { position: EciVec3; velocity: EciVec3 };

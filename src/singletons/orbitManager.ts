@@ -1,6 +1,7 @@
 /* */
 
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { ColorSchemeManager, GetSatType, MissileParams, OrbitManager, SatObject, UiManager } from '../interfaces';
 import { setInnerHtml } from '../lib/get-el';
@@ -104,7 +105,7 @@ export class StandardOrbitManager implements OrbitManager {
   ): void {
     if (!this.isInitialized_) return;
     const gl = this.gl_;
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const selectSatManagerInstance = keepTrackApi.getSelectSatManager();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.lineManagerInstance_.program);
@@ -129,14 +130,14 @@ export class StandardOrbitManager implements OrbitManager {
     gl.disable(gl.BLEND);
     gl.enable(gl.DEPTH_TEST);
 
-    if (catalogManagerInstance.selectedSat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
+    if (selectSatManagerInstance?.selectedSat > -1 && settingsManager.enableConstantSelectedSatRedraw) {
       this.clearSelectOrbit(false);
-      this.setSelectOrbit(catalogManagerInstance.selectedSat, false);
+      this.setSelectOrbit(selectSatManagerInstance?.selectedSat, false);
     }
 
-    if (catalogManagerInstance.secondarySat !== -1 && settingsManager.enableConstantSelectedSatRedraw) {
+    if (selectSatManagerInstance?.secondarySat > -1 && settingsManager.enableConstantSelectedSatRedraw) {
       this.clearSelectOrbit(true);
-      this.setSelectOrbit(catalogManagerInstance.secondarySat, true);
+      this.setSelectOrbit(selectSatManagerInstance?.secondarySat, true);
     }
   }
 
@@ -380,7 +381,7 @@ export class StandardOrbitManager implements OrbitManager {
           if (typeof colorSchemeManagerInstance.colorData[id * i] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
         }
 
-        if (keepTrackApi.getCatalogManager().selectedSat !== id) {
+        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== id) {
           // if color is black, we probably have old data, so recalculate color buffers
           if (
             settingsManager.isShowLeoSats &&

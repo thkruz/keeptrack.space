@@ -596,7 +596,6 @@ export interface GroupsManager {
 }
 export type CatalogObject = SatObject & RadarDataObject & MissileObject & SensorObject;
 export interface CatalogManager {
-  getSelectedSat(): SatObject;
   analSatSet: SatObject[];
   cosparIndex: { [key: string]: number };
   fieldOfViewSet: SatObject[];
@@ -624,9 +623,6 @@ export interface CatalogManager {
   satExtraData: undefined;
   satLinkManager: SatLinkManager;
   sccIndex: { [key: string]: number };
-  secondarySat: number;
-  secondarySatObj: SatObject;
-  selectedSat: number;
   sensorMarkerArray: number[];
   starIndex1: number;
   starIndex2: number;
@@ -647,13 +643,8 @@ export interface CatalogManager {
   init(satCruncherOveride?: Worker): Promise<void>;
   initObjects(): void;
   insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string): any;
-  lastSelectedSat(id?: number): number;
   satCruncherOnMessage({ data }: { data: SatCruncherMessageData }): void;
-  selectSat(i: number): void;
   setSat(i: number, sat: SatObject): void;
-  setSecondarySat(id: number): void;
-  setSelectedSat(id: number): void;
-  switchPrimarySecondary(): void;
 }
 
 export interface OrbitManager {

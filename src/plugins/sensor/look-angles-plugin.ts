@@ -7,7 +7,17 @@ import { showLoading } from '@app/lib/showLoading';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import lookanglesPng from '@public/img/icons/lookangles.png';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class LookAnglesPlugin extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Look Angles';
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(LookAnglesPlugin.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   isRequireSatelliteSelected: boolean = true;
   isRequireSensorSelected: boolean = true;
 
@@ -37,7 +47,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     <br><br>
     The search range can be modified by changing the length and interval options.`;
 
-  static PLUGIN_NAME = 'Look Angles';
   /**
    * Flag to determine if the look angles should only show rise and set times
    */
@@ -54,10 +63,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
    * The last look angles array
    */
   lastlooksArray: TearrData[];
-
-  constructor() {
-    super(LookAnglesPlugin.PLUGIN_NAME);
-  }
 
   sideMenuElementName: string = 'look-angles-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -116,7 +121,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
         getEl('settings-riseset').addEventListener('change', this.settingsRisesetChange.bind(this));
 
-        const sat = keepTrackApi.getCatalogManager().getSelectedSat();
+        const sat = this.selectSatManager_.getSelectedSat();
         this.checkIfCanBeEnabled_(sat);
       },
     });
@@ -166,7 +171,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   refreshSideMenuData = (): void => {
     if (this.isMenuButtonActive) {
       showLoading(() => {
-        const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+        const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
         this.getlookangles(sat);
       });
     }
@@ -268,5 +273,3 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     this.refreshSideMenuData();
   }
 }
-
-export const lookAnglesPlugin = new LookAnglesPlugin();

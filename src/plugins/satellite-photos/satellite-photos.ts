@@ -5,6 +5,7 @@ import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatellitePhotos extends KeepTrackPlugin {
   bottomIconElementName = 'menu-sat-photos';
@@ -77,7 +78,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
     // DISCOVR is at the L1 Lagrange point, so we can't select it in KeepTrack
     // Instead we will rotate the camera to look at the Earth using the coordinates of the DISCOVR satellite in dscovrLoaded
-    keepTrackApi.getCatalogManager().selectSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     request.send();
   }
 
@@ -114,13 +115,13 @@ export class SatellitePhotos extends KeepTrackPlugin {
   };
 
   static loadPic(satId: number, url: string): void {
-    keepTrackApi.getCatalogManager().selectSat(keepTrackApi.getCatalogManager().getSatFromObjNum(satId).id);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().getSatFromObjNum(satId).id);
     keepTrackApi.getMainCamera().changeZoom(0.7);
     SatellitePhotos.colorbox(url);
   }
 
   static himawari8(): void {
-    keepTrackApi.getCatalogManager().selectSat(keepTrackApi.getCatalogManager().getSatFromObjNum(40267).id);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().getSatFromObjNum(40267).id);
     keepTrackApi.getMainCamera().changeZoom(0.7);
 
     // Propagation time minus 30 minutes so that the pictures have time to become available

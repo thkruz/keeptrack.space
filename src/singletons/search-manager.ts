@@ -82,7 +82,7 @@ export class SearchManager {
 
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];
-      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length, catalogManagerInstance.selectedSat);
+      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length);
 
       if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group) {
         colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
@@ -114,7 +114,7 @@ export class SearchManager {
     if (searchString.length === 0) {
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];
-      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length, catalogManagerInstance.selectedSat);
+      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
       return;

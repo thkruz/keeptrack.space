@@ -44,19 +44,19 @@ import { satellitePhotosPlugin } from './satellite-photos/satellite-photos';
 import { screenRecorderPlugin } from './screen-recorder/screen-recorder';
 import { StreamManager } from './screen-recorder/stream-manager';
 import { screenshotPlugin } from './screenshot/screenshot';
-import { satInfoBoxCorePlugin } from './select-sat-manager/sat-info-box';
+import { SatInfoBox } from './select-sat-manager/sat-info-box';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { sensorFovPlugin } from './sensor-fov/sensor-fov';
 import { sensorSurvFencePlugin } from './sensor-surv/sensor-surv-fence';
 import { sensorCustomPlugin } from './sensor/custom-sensor-plugin';
-import { lookAnglesPlugin } from './sensor/look-angles-plugin';
+import { LookAnglesPlugin } from './sensor/look-angles-plugin';
 import { multiSiteLookAnglesPlugin } from './sensor/multi-site-look-angles-plugin';
 import { sensorInfoPlugin } from './sensor/sensor-info-plugin';
 import { sensorListPlugin } from './sensor/sensor-list-plugin';
 import { settingsMenuPlugin } from './settings-menu/settings-menu';
 import { shortTermFencesPlugin } from './short-term-fences/short-term-fences';
 import { socialMediaPlugin } from './social/social';
-import { stereoMapPlugin } from './stereo-map/stereo-map';
+import { StereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { videoDirectorPlugin } from './video-director/video-director';
 import { watchlistPlugin } from './watchlist/watchlist';
@@ -131,7 +131,10 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     keepTrackContainer.registerSingleton<SelectSatManager>(Singletons.SelectSatManager, selectSatManagerInstance);
 
     if (plugins.topMenu) topMenuPlugin.init();
-    if (plugins.satInfoboxCore) satInfoBoxCorePlugin.init();
+    if (plugins.satInfoboxCore) {
+      const satInfoBoxCorePlugin = new SatInfoBox();
+      satInfoBoxCorePlugin.init();
+    }
 
     // Core Features
     if (plugins.datetime) dateTimeManagerPlugin.init();
@@ -143,6 +146,7 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
       sensorListPlugin.init();
       sensorInfoPlugin.init();
       sensorCustomPlugin.init();
+      const lookAnglesPlugin = new LookAnglesPlugin();
       lookAnglesPlugin.init();
       multiSiteLookAnglesPlugin.init();
     }
@@ -162,7 +166,10 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     // if (plugins.satChanges) satChanges.init();
     if (plugins.initialOrbit) initialOrbit.init();
     if (plugins.missile) missile.init();
-    if (plugins.stereoMap) stereoMapPlugin.init();
+    if (plugins.stereoMap) {
+      const stereoMapPlugin = new StereoMapPlugin();
+      stereoMapPlugin.init();
+    }
     if (plugins.sensorFov) sensorFovPlugin.init();
     if (plugins.sensorSurv) sensorSurvFencePlugin.init();
     if (plugins.satelliteView) satelliteViewPlugin.init();

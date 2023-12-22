@@ -5,6 +5,7 @@ import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { LegendManager } from '@app/static/legend-manager';
 import colorsPng from '@public/img/icons/colors.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Color Menu';
@@ -124,7 +125,9 @@ The various themes can change the colors based on the objects' orbits, objects' 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    catalogManagerInstance.setSelectedSat(-1); // clear selected sat
+    // If selecteSatManager is loaded, clear selected sat
+    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1); // clear selected sat
+
     if (colorName !== 'sunlight') {
       catalogManagerInstance.satCruncher.postMessage({
         isSunlightView: false,

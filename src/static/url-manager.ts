@@ -1,5 +1,6 @@
 import { GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { getEl } from '../lib/get-el';
 
 export abstract class UrlManager {
@@ -19,6 +20,7 @@ export abstract class UrlManager {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
+    const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
 
     if (!uiManagerInstance.searchManager) return;
     const currentSearch = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
@@ -29,14 +31,16 @@ export abstract class UrlManager {
     let url = arr[0];
     const paramSlices = [];
 
-    if (catalogManagerInstance.selectedSat !== -1 && typeof catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum != 'undefined') {
+    if (selectSatManagerInstance?.selectedSat !== -1 && typeof catalogManagerInstance.getSat(selectSatManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum != 'undefined') {
       // TODO: This doesn't work for VIMPEL objects
-      const scc = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum;
+      const scc = catalogManagerInstance.getSat(selectSatManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum;
       if (scc !== '') paramSlices.push('sat=' + scc);
     }
+
     if (currentSearch !== '') {
       paramSlices.push('search=' + currentSearch);
     }
+
     if (timeManagerInstance.propRate < 0.99 || timeManagerInstance.propRate > 1.01) {
       paramSlices.push('rate=' + timeManagerInstance.propRate);
     }
@@ -81,7 +85,7 @@ export abstract class UrlManager {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.getIdFromIntlDes(val.toUpperCase());
         if (urlSatId !== null && catalogManagerInstance.getSat(urlSatId).active) {
-          catalogManagerInstance.setSelectedSat(urlSatId);
+          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(urlSatId);
         } else {
           uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
         }
@@ -98,7 +102,7 @@ export abstract class UrlManager {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.getIdFromObjNum(parseInt(val));
         if (urlSatId !== null) {
-          catalogManagerInstance.setSelectedSat(urlSatId);
+          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(urlSatId);
         } else {
           uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
         }

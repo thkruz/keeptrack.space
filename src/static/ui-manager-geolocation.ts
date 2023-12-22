@@ -1,4 +1,5 @@
 import { GeolocationPosition, SensorGeolocation, SensorObject } from '@app/interfaces';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -37,7 +38,7 @@ export class UiGeolocation {
 
     StandardSensorManager.updateSensorUiStyling(<SensorObject[]>(<unknown>[sensorInfo]));
 
-    catalogManagerInstance.setSelectedSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
     const mainCameraInstance = keepTrackApi.getMainCamera();
     maxrange > 6000 ? mainCameraInstance.changeZoom(ZoomValue.GEO) : mainCameraInstance.changeZoom(ZoomValue.LEO);
     mainCameraInstance.camSnap(lat2pitch(lat), lon2yaw(lon, timeManagerInstance.simulationTimeObj));

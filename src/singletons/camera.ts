@@ -22,6 +22,7 @@
 
 import { OrbitManager, SatObject, SatShader } from '@app/interfaces';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/lib/constants';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -296,6 +297,7 @@ export class Camera {
   public changeCameraType(orbitManager: OrbitManager) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
     if (this.cameraType === CameraType.PLANETARIUM) {
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
@@ -303,7 +305,7 @@ export class Camera {
 
     this.cameraType++;
 
-    if (this.cameraType == CameraType.FIXED_TO_SAT && catalogManagerInstance.selectedSat == -1) {
+    if ((this.cameraType == CameraType.FIXED_TO_SAT && !selectSatManagerInstance) || selectSatManagerInstance?.selectedSat === -1) {
       this.cameraType++;
     }
     if (this.cameraType == CameraType.FPS) {
@@ -313,7 +315,7 @@ export class Camera {
       this.cameraType++;
     }
 
-    if (this.cameraType === CameraType.SATELLITE && catalogManagerInstance.selectedSat === -1) {
+    if (this.cameraType === CameraType.SATELLITE && selectSatManagerInstance?.selectedSat === -1) {
       this.cameraType++;
     }
 
@@ -327,7 +329,7 @@ export class Camera {
       this.isLocalRotateReset = true;
       this.settings_.fieldOfView = 0.6;
       renderer.glInit();
-      if (catalogManagerInstance.selectedSat !== -1) {
+      if (selectSatManagerInstance?.selectedSat > -1) {
         this.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
       } else {
@@ -347,8 +349,8 @@ export class Camera {
       this.autoRotate(false);
     }
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    if (settingsManager.isZoomStopsSnappedOnSat || catalogManagerInstance.selectedSat == -1) {
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
       this.earthCenteredLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
@@ -365,7 +367,7 @@ export class Camera {
       this.camZoomSnappedOnSat = false;
 
       // calculate camera distance from target
-      const target = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+      const target = selectSatManagerInstance.getSelectedSat();
       if (target) {
         const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
         const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
@@ -406,7 +408,8 @@ export class Camera {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  public draw(target?: SatObject | null, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+  public draw(target?: SatObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+    // TODO: This should be handled better
     target ??= <SatObject>{
       id: -1,
       missile: false,
@@ -1322,7 +1325,6 @@ export class Camera {
     if (this.isScreenPan || this.isWorldPan || this.isPanReset) {
       // If user is actively moving
       if (this.isScreenPan || this.isWorldPan) {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
         this.camPitchSpeed = 0;
         this.camYawSpeed = 0;
         this.panDif_.x = this.screenDragPoint[0] - this.mouseX;
@@ -1330,7 +1332,7 @@ export class Camera {
         this.panDif_.z = this.screenDragPoint[1] - this.mouseY;
 
         // Slow down the panning if a satellite is selected
-        if (catalogManagerInstance.selectedSat !== -1) {
+        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
           this.panDif_.x /= 30;
           this.panDif_.y /= 30;
           this.panDif_.z /= 30;

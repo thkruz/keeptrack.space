@@ -5,6 +5,7 @@ import { lon2yaw } from '@app/lib/transforms';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
 
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 /* eslint-disable no-useless-escape */
@@ -125,10 +126,10 @@ export const initVao = (gl: WebGL2RenderingContext) => {
  * Render Loop Code
  * ***************************************************************************/
 export const update = (position: Kilometers[]) => {
-  const catalogManagerInstance = keepTrackApi.getCatalogManager();
-  const timeManagerInstance = keepTrackApi.getTimeManager();
+  const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+  if (!selectSatManagerInstance || selectSatManagerInstance.selectedSat === -1) return;
 
-  if (catalogManagerInstance.selectedSat === -1) return;
+  const timeManagerInstance = keepTrackApi.getTimeManager();
 
   cone.mvMatrix = mat4.create();
   cone.nMatrix = mat3.create();
@@ -149,9 +150,8 @@ export const update = (position: Kilometers[]) => {
 };
 
 export const draw = function (pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-  const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-  if (catalogManagerInstance.selectedSat === -1) return;
+  const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+  if (!selectSatManagerInstance || selectSatManagerInstance.selectedSat === -1) return;
 
   const { gl } = keepTrackApi.getRenderer();
 

@@ -7,6 +7,7 @@ import { getEl } from '../lib/get-el';
 import { shake } from '../lib/shake';
 import { slideInRight, slideOutLeft } from '../lib/slide';
 import { errorManagerInstance } from '../singletons/errorManager';
+import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 
 export interface clickDragOptions {
   isDraggable?: boolean;
@@ -406,7 +407,8 @@ export class KeepTrackPlugin {
 
   verifySatelliteSelected(): boolean {
     const searchDom = getEl('search', true);
-    if (keepTrackApi.getCatalogManager().selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === '')) {
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
       errorManagerInstance.warn(`Select a Satellite First!`);
       shake(getEl(this.bottomIconElementName));
       return false;

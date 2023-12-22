@@ -157,14 +157,15 @@ export class SensorListPlugin extends KeepTrackPlugin {
                 `
           );
           getEl('sensors-in-fov-link').addEventListener('click', () => {
-            const catalogManagerInstance = keepTrackApi.getCatalogManager();
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            if (!selectSatManagerInstance) return;
 
             Object.keys(sensors).forEach((key) => {
               const sensor = sensors[key];
-              const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+              const sat = selectSatManagerInstance.getSelectedSat();
               const tearr = SensorMath.getTearr(sat, [sensor]);
               if (tearr.inView) {
-                keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, catalogManagerInstance.getSensorFromSensorName(sensor.name)], 'g');
+                keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
               }
             });
           });
@@ -260,7 +261,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
 
     // Deselect any satellites
-    keepTrackApi.getCatalogManager().setSelectedSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
 
     try {
       keepTrackApi

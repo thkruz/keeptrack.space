@@ -33,7 +33,6 @@ import { launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';
 import { stars } from '../catalogs/stars';
 import { CatalogManager, GetSatType, RadarDataObject, SatCruncherMessageData, SatObject } from '../interfaces';
-import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { StringPad } from '../lib/stringPad';
 import { isThisNode } from '../static/isThisNode';
@@ -99,8 +98,6 @@ export class StandardCatalogManager implements CatalogManager {
   private static readonly TEMPLATE_TLE2_BEGINNING = '2 ';
   private static readonly TEMPLATE_TLE2_ENDING = ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477';
 
-  private lastSelectedSat_ = -1;
-
   analSatSet = [];
   cosparIndex: { [key: string]: number } = {};
   fieldOfViewSet = [];
@@ -129,9 +126,6 @@ export class StandardCatalogManager implements CatalogManager {
   satExtraData;
   satLinkManager: SatLinkManager;
   sccIndex: { [key: string]: number } = {};
-  secondarySat = -1;
-  secondarySatObj: SatObject;
-  selectedSat = -1;
   sensorMarkerArray: number[] = [];
   starIndex1 = 0;
   starIndex2 = 0;
@@ -398,8 +392,6 @@ export class StandardCatalogManager implements CatalogManager {
         }
       }
 
-      this.registerKeyboardEvents_();
-
       this.satCruncher.onmessage = this.satCruncherOnMessage.bind(this);
       this.gotExtraData = false;
       // TODO: FUTURE FEATURE
@@ -485,7 +477,6 @@ export class StandardCatalogManager implements CatalogManager {
         i++;
       }
     }
-    this.isSensorManagerLoaded = true; // TODO: Why is this always true?
 
     // Create Launch Sites
     if (!settingsManager.isDisableLaunchSites) {
@@ -582,11 +573,6 @@ export class StandardCatalogManager implements CatalogManager {
     }
   }
 
-  lastSelectedSat(id?: number): number {
-    this.lastSelectedSat_ = id >= -1 ? id : this.lastSelectedSat_;
-    return this.lastSelectedSat_;
-  }
-
   satCruncherOnMessage({ data: mData }: { data: SatCruncherMessageData }) {
     if (!mData) return;
 
@@ -646,70 +632,6 @@ export class StandardCatalogManager implements CatalogManager {
     }
   }
 
-  // TODO: Move this to Higher Level
-  selectSat(i: number): void {
-    if (settingsManager.isDisableSelectSat) return;
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const { gl } = keepTrackApi.getRenderer();
-
-    if (i === this.lastSelectedSat()) return;
-
-    this.satCruncher.postMessage({
-      typ: 'satelliteSelected',
-      satelliteSelected: [i],
-    });
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
-    // If Old Select Sat Picked Color it Correct Color
-    const lastSelectedObject = this.lastSelectedSat();
-    if (lastSelectedObject !== -1) {
-      colorSchemeManagerInstance.currentColorScheme ??= colorSchemeManagerInstance.default;
-      const newColor = colorSchemeManagerInstance.currentColorScheme(this.getSat(lastSelectedObject)).color;
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 1] = newColor[1]; // G
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 2] = newColor[2]; // B
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 3] = newColor[3]; // A
-      gl.bufferSubData(gl.ARRAY_BUFFER, lastSelectedObject * 4 * 4, new Float32Array(newColor));
-
-      if (!settingsManager.lastSearchResults.includes(lastSelectedObject)) {
-        dotsManagerInstance.sizeData[lastSelectedObject] = 0.0;
-        gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManagerInstance.sizeData);
-      }
-    }
-    // If New Select Sat Picked Color it
-    if (i !== -1) {
-      // if error then log i
-      if (i > colorSchemeManagerInstance.colorData.length / 4) {
-        console.error('i is greater than colorData length');
-        console.error(i);
-      }
-      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
-
-      dotsManagerInstance.sizeData[i] = 1.0;
-      gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManagerInstance.sizeData);
-    }
-
-    this.setSelectedSat(i);
-
-    if (this.isSensorManagerLoaded && keepTrackApi.getSensorManager().isSensorSelected()) {
-      getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
-    }
-    getEl('menu-lookanglesmultisite', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-satview', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-map', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-editSat', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-breakup', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-plot-analysis', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-plot-analysis2', true)?.classList.remove('bmenu-item-disabled');
-
-    keepTrackApi.methods.selectSatData(this.getSat(i), i);
-  }
-
   setSat(i: number, sat: SatObject): void {
     // TODO: This shouldnt ever happen
     if (!this.satData) return; // Cant set a satellite without a catalog
@@ -719,38 +641,6 @@ export class StandardCatalogManager implements CatalogManager {
 
   getSatsFromSatData(): SatObject[] {
     return <SatObject[]>this.satData;
-  }
-
-  getSelectedSat(): SatObject {
-    return this.getSat(this.selectedSat);
-  }
-
-  setSecondarySat(id: number): void {
-    if (settingsManager.isDisableSelectSat) return;
-    this.secondarySat = id;
-    if (this.secondarySatObj?.id !== id) {
-      this.secondarySatObj = this.getSat(id);
-    }
-
-    if (this.secondarySat === this.selectedSat) {
-      this.selectedSat = -1;
-      this.setSelectedSat(-1);
-      keepTrackApi.getOrbitManager().clearSelectOrbit(false);
-    }
-
-    keepTrackApi.methods.setSecondarySat(this.secondarySatObj, id);
-  }
-
-  setSelectedSat(id: number): void {
-    if (settingsManager.isDisableSelectSat || id === null) return;
-    this.selectedSat = id;
-
-    if (this.selectedSat === this.secondarySat && this.selectedSat !== -1) {
-      this.setSecondarySat(-1);
-      keepTrackApi.getOrbitManager().clearSelectOrbit(true);
-    }
-
-    UrlManager.updateURL();
   }
 
   panToStar(c: SatObject): void {
@@ -771,34 +661,5 @@ export class StandardCatalogManager implements CatalogManager {
     lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
     keepTrackApi.getMainCamera().cameraType = CameraType.OFFSET;
     keepTrackApi.getMainCamera().lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
-  }
-
-  switchPrimarySecondary(): void {
-    const _primary = this.selectedSat;
-    const _secondary = this.secondarySat;
-    this.setSecondarySat(_primary);
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    if (_primary !== -1) {
-      orbitManagerInstance.setSelectOrbit(_primary, true);
-    } else {
-      orbitManagerInstance.clearSelectOrbit(true);
-    }
-    this.setSelectedSat(_secondary);
-  }
-
-  private registerKeyboardEvents_() {
-    const inputManagerInstance = keepTrackApi.getInputManager();
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: ']',
-      callback: () => {
-        this.switchPrimarySecondary();
-      },
-    });
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: '{',
-      callback: () => {
-        this.switchPrimarySecondary();
-      },
-    });
   }
 }

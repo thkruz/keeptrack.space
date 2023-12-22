@@ -2,6 +2,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { UrlManager } from '@app/static/url-manager';
@@ -163,10 +164,10 @@ export class MouseInput {
         // Left Mouse Button Clicked
         if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
           if (this.clickedSat !== -1 && !catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY).static) {
-            catalogManagerInstance.setSelectedSat(this.clickedSat);
+            keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
           }
         } else {
-          catalogManagerInstance.setSelectedSat(this.clickedSat);
+          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
         }
       }
       if (evt.button === 2) {
@@ -418,10 +419,10 @@ export class MouseInput {
         uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, 'normal', true);
         break;
       case 'view-sat-info-rmb':
-        catalogManagerInstance.setSelectedSat(this.clickedSat);
+        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
         break;
       case 'view-sensor-info-rmb':
-        catalogManagerInstance.setSelectedSat(this.clickedSat);
+        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
         getEl('menu-sensor-info').click();
         break;
       case 'view-related-sats-rmb':
@@ -431,7 +432,7 @@ export class MouseInput {
         uiManagerInstance.doSearch(searchStr);
         break;
       case 'set-sec-sat-rmb':
-        catalogManagerInstance.setSecondarySat(this.clickedSat);
+        keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
         break;
       case 'reset-camera-rmb':
         if (keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
@@ -468,7 +469,7 @@ export class MouseInput {
         lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.clickedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name)], 'p');
         break;
       case 'line-sat-sat-rmb':
-        lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.clickedSat, catalogManagerInstance.selectedSat], 'b');
+        lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.clickedSat, keepTrackApi.getPlugin(SelectSatManager)?.selectedSat], 'b');
         break;
       case 'line-sat-sun-rmb':
         lineManagerInstance.create(
@@ -555,7 +556,7 @@ export class MouseInput {
           LegendManager.change('countries');
         }
 
-        catalogManagerInstance.setSelectedSat(-1);
+        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
         break;
       default:
         keepTrackApi.methods.rmbMenuActions(targetId, this.clickedSat);

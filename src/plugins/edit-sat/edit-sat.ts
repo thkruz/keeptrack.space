@@ -15,11 +15,16 @@ import { FormatTle } from '@app/static/format-tle';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class EditSatPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Edit Sat';
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
   constructor() {
     super(EditSatPlugin.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
   isRequireSatelliteSelected: boolean = true;
@@ -132,7 +137,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
   bottomIconLabel = 'Edit Satellite';
   bottomIconCallback: () => void = (): void => {
     if (!this.isMenuButtonActive) return;
-    EditSatPlugin.populateSideMenu();
+    this.populateSideMenu();
   };
 
   dragOptions: clickDragOptions = {
@@ -145,7 +150,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'editSat',
       cb: () => {
-        getEl('editSat-newTLE').addEventListener('click', EditSatPlugin.editSatNewTleClick);
+        getEl('editSat-newTLE').addEventListener('click', this.editSatNewTleClick.bind(this));
 
         getEl('editSat').addEventListener('submit', function (e: Event) {
           e.preventDefault();
@@ -198,13 +203,13 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
     switch (targetId) {
       case 'set-pri-sat-rmb':
-        keepTrackApi.getCatalogManager().selectSat(clickedSat);
+        this.selectSatManager_.selectSat(clickedSat);
         break;
       case 'set-sec-sat-rmb':
-        keepTrackApi.getCatalogManager().setSecondarySat(clickedSat);
+        this.selectSatManager_.setSecondarySat(clickedSat);
         break;
       case 'edit-sat-rmb':
-        keepTrackApi.getCatalogManager().setSelectedSat(clickedSat);
+        this.selectSatManager_.setSelectedSat(clickedSat);
         if (!this.isMenuButtonActive) {
           keepTrackApi.getUiManager().bottomIconPress(<HTMLElement>{ id: 'menu-editSat' });
         }
@@ -270,8 +275,8 @@ export class EditSatPlugin extends KeepTrackPlugin {
     }
   }
 
-  static populateSideMenu() {
-    const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+  populateSideMenu() {
+    const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
     (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value = sat.sccNum;
 
     const inc: string = StringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
@@ -293,11 +298,11 @@ export class EditSatPlugin extends KeepTrackPlugin {
     (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
   }
 
-  static editSatNewTleClick() {
-    showLoading(EditSatPlugin.editSatNewTleClickFadeIn);
+  editSatNewTleClick() {
+    showLoading(this.editSatNewTleClickFadeIn);
   }
 
-  static editSatNewTleClickFadeIn() {
+  editSatNewTleClickFadeIn() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -351,7 +356,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
       //
       // Reload Menu with new TLE
       //
-      const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+      const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
       (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value = sat.sccNum;
 
       const inc: string = StringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);

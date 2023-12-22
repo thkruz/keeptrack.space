@@ -12,15 +12,25 @@ import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Breakup extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Breakup';
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(Breakup.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconElementName = 'menu-breakup';
   bottomIconLabel = 'Create Breakup';
   bottomIconImg = breakupPng;
   private readonly maxDifApogeeVsPerigee_ = 1000;
 
   bottomIconCallback = (): void => {
-    const sat: SatObject = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+    const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
     if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
       this.closeSideMenu();
@@ -29,12 +39,6 @@ export class Breakup extends KeepTrackPlugin {
     }
     this.updateSccNumInMenu_();
   };
-
-  static PLUGIN_NAME = 'Breakup';
-
-  constructor() {
-    super(Breakup.PLUGIN_NAME);
-  }
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
@@ -134,7 +138,7 @@ export class Breakup extends KeepTrackPlugin {
 
   private updateSccNumInMenu_() {
     if (!this.isMenuButtonActive) return;
-    const sat: SatObject = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+    const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
     (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
   }
 

@@ -45,6 +45,7 @@ import { keepTrackApi } from './keepTrackApi';
 import { getEl, hideEl } from './lib/get-el';
 import { getUnique } from './lib/get-unique';
 import { saveCsv, saveVariable } from './lib/saveVariable';
+import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { StandardSensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager } from './settings/settings';
 import { VERSION } from './settings/version.js';
@@ -175,11 +176,9 @@ export class KeepTrack {
     if (settingsManager.cruncherReady) {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
-      if (this.catalogManager.selectedSat !== -1) {
-        const selectedSat = this.catalogManager.getSelectedSat();
-        if (selectedSat) {
-          keepTrackApi.getUiManager().updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, selectedSat);
-        }
+
+      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
+        keepTrackApi.getUiManager().updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, keepTrackApi.getPlugin(SelectSatManager).getSelectedSat());
       }
     }
   }
@@ -358,7 +357,7 @@ theodore.kruczek at gmail dot com.
     const renderer = keepTrackApi.getRenderer();
     const camera = keepTrackApi.getMainCamera();
 
-    camera.draw(renderer.sat, renderer.sensorPos);
+    camera.draw(keepTrackApi.getPlugin(SelectSatManager).getSelectedSat(), renderer.sensorPos);
     renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {

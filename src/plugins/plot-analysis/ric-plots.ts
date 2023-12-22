@@ -11,23 +11,31 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 type EChartsOption = echarts.EChartsOption;
 
 export class RicPlot extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'RIC Plot';
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(RicPlot.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconElementName = 'ric-plots-bottom-icon';
   bottomIconLabel = 'RIC Plot';
   bottomIconImg = scatterPlotPng4;
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
-    if (keepTrackApi.getCatalogManager().selectedSat === -1) {
+    if (this.selectSatManager_.selectedSat === -1) {
       keepTrackApi.getUiManager().toast('Select a Satellite First!', 'critical');
       return;
     }
-    if (!keepTrackApi.getCatalogManager().secondarySatObj) {
+    if (!this.selectSatManager_.secondarySatObj) {
       keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', 'critical');
       return;
     }
     if (!this.isMenuButtonActive) return;
 
-    this.createPlot(RicPlot.getPlotData(), getEl(this.plotCanvasId));
+    this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
   };
 
   plotCanvasId = 'plot-analysis-chart-ric';
@@ -47,11 +55,6 @@ export class RicPlot extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  static PLUGIN_NAME = 'RIC Plot';
-  constructor() {
-    super(RicPlot.PLUGIN_NAME);
-  }
-
   addHtml(): void {
     super.addHtml();
 
@@ -59,7 +62,7 @@ export class RicPlot extends KeepTrackPlugin {
       event: KeepTrackApiEvents.setSecondarySat,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (!sat || keepTrackApi.getCatalogManager().selectedSat === -1) {
+        if (!sat || this.selectSatManager_.selectedSat === -1) {
           if (this.isMenuButtonActive) this.hideSideMenus();
           this.setBottomIconToDisabled();
         } else {
@@ -72,7 +75,7 @@ export class RicPlot extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: SatObject) => {
-        if (!sat || keepTrackApi.getCatalogManager().secondarySat === -1) {
+        if (!sat || this.selectSatManager_.secondarySat === -1) {
           if (this.isMenuButtonActive) this.hideSideMenus();
           this.setBottomIconToDisabled();
         } else {
@@ -217,17 +220,16 @@ export class RicPlot extends KeepTrackPlugin {
     return app;
   }
 
-  static getPlotData(): EChartsData {
+  getPlotData(): EChartsData {
     const NUMBER_OF_ORBITS = 1;
     const NUMBER_OF_POINTS = 100;
 
     const data = [] as EChartsData;
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    if (catalogManagerInstance.selectedSat === -1 || catalogManagerInstance.secondarySat === -1) return [];
+    if (this.selectSatManager_.selectedSat === -1 || this.selectSatManager_.secondarySat === -1) return [];
 
-    const satP = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
-    const satS = catalogManagerInstance.secondarySatObj;
+    const satP = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat);
+    const satS = this.selectSatManager_.secondarySatObj;
     data.push({ name: satP.name, value: [[0, 0, 0]] });
     data.push({ name: satS.name, value: SatMathApi.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, NUMBER_OF_ORBITS).map((point) => [point.x, point.y, point.z]) });
 

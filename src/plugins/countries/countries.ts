@@ -8,8 +8,14 @@ import flagPng from '@public/img/icons/flag.png';
 
 import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class CountriesMenu extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Countries Menu';
+  constructor() {
+    super(CountriesMenu.PLUGIN_NAME);
+  }
+
   bottomIconElementName = 'menu-countries-icon';
   bottomIconImg = flagPng;
   bottomIconLabel = 'Countries';
@@ -70,11 +76,6 @@ export class CountriesMenu extends KeepTrackPlugin {
   helpTitle = `Countries Menu`;
   helpBody = keepTrackApi.html`The Countries Menu allows you to filter the satellites by country of origin.`;
 
-  static PLUGIN_NAME = 'Countries Menu';
-  constructor() {
-    super(CountriesMenu.PLUGIN_NAME);
-  }
-
   addJs() {
     super.addJs();
 
@@ -132,7 +133,9 @@ export class CountriesMenu extends KeepTrackPlugin {
         catalogManagerInstance
       );
     }
-    catalogManagerInstance.setSelectedSat(-1); // Clear selected sat
+
+    // If a selectSat plugin exists, deselect the selected satellite
+    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
 
     // Close Menus
     if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(true);

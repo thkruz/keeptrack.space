@@ -14,15 +14,25 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { SatelliteRecord, Sgp4 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class NewLaunch extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'New Launch';
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(NewLaunch.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) return;
     if (!this.verifySatelliteSelected()) {
       return;
     }
 
-    const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+    const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
     (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
   };
@@ -247,11 +257,6 @@ export class NewLaunch extends KeepTrackPlugin {
     );
   };
 
-  static PLUGIN_NAME = 'New Launch';
-  constructor() {
-    super(NewLaunch.PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
@@ -259,7 +264,7 @@ export class NewLaunch extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl(this.sideMenuElementName + '-form').addEventListener('change', () => {
-          const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat, GetSatType.EXTRA_ONLY);
+          const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
           this.preValidate_(sat);
         });
       },

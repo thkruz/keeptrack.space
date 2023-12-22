@@ -1,3 +1,4 @@
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { GreenwichMeanSiderealTime } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
@@ -76,7 +77,7 @@ export class Scene {
         // Draw a black mesh on top of the sun in the godrays frame buffer
         if (
           !settingsManager.modelsOnSatelliteViewOverride &&
-          keepTrackApi.getCatalogManager().selectedSat !== -1 &&
+          keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1 &&
           keepTrackApi.getMainCamera().camDistBuffer <= settingsManager.nearZoomLevel
         ) {
           renderer.meshManager.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
@@ -111,7 +112,6 @@ export class Scene {
 
   // eslint-disable-next-line class-methods-use-this
   renderOpaque(renderer: WebGLRenderer, camera: Camera): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
@@ -131,7 +131,7 @@ export class Scene {
     keepTrackApi.getLineManager().draw(renderer, dotsManagerInstance.inViewData, camera.camMatrix, null);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
-    if (catalogManagerInstance.selectedSat !== -1) {
+    if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
         renderer.meshManager.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
       }
@@ -140,9 +140,7 @@ export class Scene {
 
   // eslint-disable-next-line class-methods-use-this
   renderTransparent(renderer: WebGLRenderer, camera: Camera): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    if (catalogManagerInstance.selectedSat !== -1) {
+    if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
       this.searchBox.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
     }
   }

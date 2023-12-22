@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Camera } from '@app/singletons/camera';
 import { UrlManager } from '@app/static/url-manager';
 import { MouseInput } from './mouse-input';
@@ -180,8 +181,11 @@ export class TouchInput {
     keepTrackApi.getMainCamera().autoRotate(false);
 
     // Select Satellite
-    const satId = keepTrackApi.getInputManager().getSatIdFromCoord(evt.x, evt.y);
-    keepTrackApi.getCatalogManager().setSelectedSat(satId);
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    if (selectSatManagerInstance) {
+      const satId = keepTrackApi.getInputManager().getSatIdFromCoord(evt.x, evt.y);
+      selectSatManagerInstance.setSelectedSat(satId);
+    }
   }
 
   pan(evt: PanTouchEvent) {

@@ -7,6 +7,7 @@ import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { GroupType } from '@app/singletons/object-group';
 import satChngPng from '@public/img/icons/satchng.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatConstellations extends KeepTrackPlugin {
   bottomIconImg = satChngPng;
@@ -156,7 +157,8 @@ export class SatConstellations extends KeepTrackPlugin {
       .reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id).sccNum},`, '')
       .slice(0, -1);
 
-    catalogManagerInstance.setSelectedSat(-1); // Clear selected sat
+    // If SelectSatManager is enabled, deselect the selected sat
+    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].objects.map((id: number) => catalogManagerInstance.getSat(id).sccNum).join(','));

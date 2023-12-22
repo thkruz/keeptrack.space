@@ -36,16 +36,22 @@ import yellowSquare from '@public/img/yellow-square.png';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 const earthImg = new Image();
 
 export class StereoMapPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Stereo Map';
-  satCrunchNow = 0;
-  isMapUpdateOverride = false;
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
   constructor() {
     super(StereoMapPlugin.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  satCrunchNow = 0;
+  isMapUpdateOverride = false;
 
   bottomIconElementName: string = 'menu-map';
   bottomIconImg = mapPng;
@@ -158,14 +164,14 @@ export class StereoMapPlugin extends KeepTrackPlugin {
       const timeManagerInstance = keepTrackApi.getTimeManager();
       const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-      if (catalogManagerInstance.selectedSat === -1) return;
+      if (this.selectSatManager_.selectedSat === -1) return;
       if (!this.isMenuButtonActive) return;
 
       const map2d = <HTMLCanvasElement>getEl('map-2d');
       const ctx = map2d.getContext('2d');
       // const canvasDistanceFromTop = map2d.getBoundingClientRect().top;
 
-      const sat = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+      const sat = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
       const lla = CoordinateTransforms.eci2lla(sat.position, timeManagerInstance.simulationTimeObj);
       let map = {
         x: ((lla.lon + 180) / 360) * settingsManager.mapWidth,
@@ -359,5 +365,3 @@ export class StereoMapPlugin extends KeepTrackPlugin {
     }
   }
 }
-
-export const stereoMapPlugin = new StereoMapPlugin();

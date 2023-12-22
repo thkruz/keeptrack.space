@@ -11,13 +11,23 @@ import { TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
 import { Degrees, Kilometers, SatelliteRecord, Seconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StandardSensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Multi Site Look Angles';
+  dependencies = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(MultiSiteLookAnglesPlugin.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   isRequireSatelliteSelected: boolean = true;
   isRequireSensorSelected: boolean = false;
 
   bottomIconCallback: () => void = () => {
-    const sat = keepTrackApi.getCatalogManager().getSelectedSat();
+    const sat = this.selectSatManager_.getSelectedSat();
     this.refreshSideMenuData(sat);
   };
 
@@ -47,11 +57,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     The csv file will contain look angles for all sensors.
     <br><br>
     Clicking on a row in the table will select the sensor and change the simulation time to the time of the look angle.`;
-
-  static PLUGIN_NAME = 'Multi Site Look Angles';
-  constructor() {
-    super(MultiSiteLookAnglesPlugin.PLUGIN_NAME);
-  }
 
   sideMenuElementName: string = 'multi-site-look-angles-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -119,7 +124,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.staticOffsetChange,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        const sat = keepTrackApi.getCatalogManager().getSelectedSat();
+        const sat = this.selectSatManager_.getSelectedSat();
         this.refreshSideMenuData(sat);
       },
     });

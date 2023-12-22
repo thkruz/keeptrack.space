@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getDayOfYear } from '@app/lib/transforms';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
 import { RadarDataObject, SatObject, SensorObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
@@ -53,7 +54,7 @@ export class HoverManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     this.satHoverBoxNode1.textContent = sat.name;
-    this.satHoverBoxNode2.innerHTML = sat.country + SensorMath.distanceString(sat, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
+    this.satHoverBoxNode2.innerHTML = sat.country + SensorMath.distanceString(sat, catalogManagerInstance.getSat(keepTrackApi.getSensorManager().currentSensors[0]?.id)) + '';
     this.satHoverBoxNode3.textContent = '';
   }
 
@@ -129,7 +130,8 @@ export class HoverManager {
 
     let launchSite = StringExtractor.extractLaunchSite(sat.name);
     this.satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
-    this.satHoverBoxNode2.innerHTML = spaceObjType2Str(sat.type) + SensorMath.distanceString(sat, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
+    this.satHoverBoxNode2.innerHTML =
+      spaceObjType2Str(sat.type) + SensorMath.distanceString(sat, catalogManagerInstance.getSat(keepTrackApi.getSensorManager().currentSensors[0]?.id)) + '';
     this.satHoverBoxNode3.textContent = '';
   }
 
@@ -225,8 +227,8 @@ export class HoverManager {
       }
 
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && settingsManager.isShowNextPass && renderer.isShowDistance) {
-        if (catalogManagerInstance.selectedSat !== -1) {
-          this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat) + SensorMath.distanceString(sat, catalogManagerInstance.getSat(catalogManagerInstance.selectedSat)) + '';
+        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
+          this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat) + SensorMath.distanceString(sat, keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat()) + '';
         } else {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat);
         }
@@ -310,16 +312,13 @@ export class HoverManager {
   }
 
   private showRicOrEci_(sat: SatObject) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const renderer = keepTrackApi.getRenderer();
-
-    renderer.sat2 = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
-    if (typeof renderer.sat2 !== 'undefined' && renderer.sat2 !== null && sat !== renderer.sat2) {
-      const ric = CoordinateTransforms.sat2ric(sat, renderer.sat2);
+    const sat2 = keepTrackApi.getPlugin(SelectSatManager)?.secondarySatObj;
+    if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
+      const ric = CoordinateTransforms.sat2ric(sat, sat2);
       this.satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
       this.showRicDistAndVel_(ric);
     } else {
-      this.satHoverBoxNode2.innerHTML = `${sat.sccNum}${SensorMath.distanceString(sat, renderer.sat2)}`;
+      this.satHoverBoxNode2.innerHTML = `${sat.sccNum}${SensorMath.distanceString(sat, sat2)}`;
       this.showEciDistAndVel_(sat);
     }
   }
@@ -389,8 +388,10 @@ export class HoverManager {
     if (i !== -1 && catalogManagerInstance.satData[i].type === SpaceObjectType.STAR) return;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
+
+    const primarySatId = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
     // If Old Select Sat Picked Color it Correct Color
-    if (this.lasthoveringSat !== -1 && this.lasthoveringSat !== catalogManagerInstance.selectedSat) {
+    if (this.lasthoveringSat !== -1 && this.lasthoveringSat !== primarySatId) {
       const newColor = colorSchemeManagerInstance.currentColorScheme(catalogManagerInstance.getSat(this.lasthoveringSat)).color;
       colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4] = newColor[0]; // R
       colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 1] = newColor[1]; // G
@@ -400,7 +401,7 @@ export class HoverManager {
       gl.bufferSubData(gl.ARRAY_BUFFER, this.lasthoveringSat * 4 * 4, new Float32Array(newColor));
     }
     // If New Hover Sat Picked Color it
-    if (this.hoveringSat !== -1 && this.hoveringSat !== catalogManagerInstance.selectedSat) {
+    if (this.hoveringSat !== -1 && this.hoveringSat !== primarySatId) {
       gl.bufferSubData(gl.ARRAY_BUFFER, this.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
     }
     this.lasthoveringSat = this.hoveringSat;

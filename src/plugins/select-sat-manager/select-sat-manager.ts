@@ -1,12 +1,14 @@
-import { GetSatType, SatObject, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, isSatObject, keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
+import { GetSatType, MissileObject, SatObject, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { getEl, showEl } from '@app/lib/get-el';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 import { CameraType } from '@app/singletons/camera';
 
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { UrlManager } from '@app/static/url-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
+import { SatInfoBox } from './sat-info-box';
 
 /**
  * This is the class that manages the selection of objects.
@@ -14,7 +16,11 @@ import { TopMenu } from '../top-menu/top-menu';
 export class SelectSatManager extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Select Sat Manager';
   lastCssStyle = '';
-  isselectedSatNegativeOne = false;
+  selectedSat = -1;
+  primarySatObj: SatObject | MissileObject;
+  secondarySat = -1;
+  secondarySatObj: SatObject | MissileObject;
+  lastSelectedSat_ = -1;
 
   constructor() {
     super(SelectSatManager.PLUGIN_NAME);
@@ -22,6 +28,9 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
+
+    this.registerKeyboardEvents_();
+
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateLoop,
       cbName: SelectSatManager.PLUGIN_NAME,
@@ -31,14 +40,13 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   checkIfSelectSatVisible() {
     if (keepTrackApi.getPlugin(TopMenu)) {
-      const searchVal = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
+      const currentSearch = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
 
       // Base CSS Style based on if the search box is open or not
-      let cssStyle = searchVal.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
+      let cssStyle = currentSearch.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
 
       // If a satellite is selected on a desktop computer then shrink the search box
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      if (window.innerWidth > 1000 && catalogManagerInstance.selectedSat !== -1) cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
+      if (window.innerWidth > 1000 && this.selectedSat !== -1) cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
 
       // Avoid unnecessary dom updates
       if (cssStyle !== this.lastCssStyle && getEl(TopMenu.SEARCH_RESULT_ID)) {
@@ -89,8 +97,8 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
     // Don't select -1 twice
-    if (!(satId === -1 && this.isselectedSatNegativeOne)) {
-      catalogManagerInstance.selectSat(satId);
+    if (!(satId === -1 && this.selectedSat === -1)) {
+      this.selectSat2(satId);
     }
 
     // If deselecting an object
@@ -114,9 +122,8 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     // If we deselect an object but had previously selected one then disable/hide stuff
-    if (satId === -1 && !this.isselectedSatNegativeOne) {
+    if (satId === -1 && this.lastSelectedSat() !== -1) {
       keepTrackApi.getMainCamera().exitFixedToSat();
-      this.isselectedSatNegativeOne = true;
 
       const rootElement = document.querySelector(':root') as HTMLElement;
       rootElement.style.setProperty('--search-box-bottom', `0px`);
@@ -140,12 +147,11 @@ export class SelectSatManager extends KeepTrackPlugin {
           keepTrackApi.methods.sensorDotSelected(sat as SensorObject);
         }
       }
-      this.isselectedSatNegativeOne = false;
-      catalogManagerInstance.setSelectedSat(satId);
+      this.setSelectedSat(satId);
       sat = catalogManagerInstance.getSat(satId, GetSatType.EXTRA_ONLY);
       if (!sat) return;
       if (sat.type === SpaceObjectType.STAR) {
-        this.selectSat(-1);
+        this.selectSat2(-1);
         return;
       }
       if (sat.static) {
@@ -156,13 +162,13 @@ export class SelectSatManager extends KeepTrackPlugin {
         // Todo: Needs to run uiManager.getsensorinfo();
 
         // if (catalogManagerInstance.isSensorManagerLoaded) sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
-        catalogManagerInstance.setSelectedSat(-1);
+        this.setSelectedSat(-1);
         getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
-        if (catalogManagerInstance.selectedSat !== -1) {
+        if (this.selectedSat !== -1) {
           getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
         }
         return;
@@ -182,15 +188,10 @@ export class SelectSatManager extends KeepTrackPlugin {
       getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
     }
 
-    catalogManagerInstance.setSelectedSat(satId);
+    this.setSelectedSat(satId);
 
-    if (sat) {
-      if (isSatObject(sat)) {
-        SelectSatManager.setSatInfoBoxSatellite_();
-      } else {
-        SelectSatManager.setSatInfoBoxMissile_();
-      }
-    }
+    // If sat info box is loaded then update it
+    (<SatInfoBox>keepTrackApi.getPlugin(SatInfoBox))?.selectSat(sat);
 
     if (satId !== -1) {
       // NOTE: This has to come after keepTrackApi.methods.selectSatData in catalogManagerInstance.setSelectedSat.
@@ -205,37 +206,132 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
   }
 
-  private static setSatInfoBoxMissile_() {
-    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
-    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
-      (id) => {
-        const el = getEl(id, true);
-        if (!el) return;
-        hideEl(el.parentElement.id);
-      }
-    );
-
-    const satMissionData = getEl('sat-mission-data', true);
-    if (satMissionData) satMissionData.style.display = 'none';
-
-    const satIdentifierData = getEl('sat-identifier-data', true);
-    if (satIdentifierData) satIdentifierData.style.display = 'none';
+  lastSelectedSat(id?: number): number {
+    this.lastSelectedSat_ = id >= -1 ? id : this.lastSelectedSat_;
+    return this.lastSelectedSat_;
   }
 
-  private static setSatInfoBoxSatellite_() {
-    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
-    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
-      (id) => {
-        const el = getEl(id, true);
-        if (!el) return;
-        el.parentElement.style.display = 'flex';
+  selectSat2(i: number): void {
+    if (settingsManager.isDisableSelectSat) return;
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const { gl } = keepTrackApi.getRenderer();
+
+    if (i === this.lastSelectedSat()) return;
+
+    keepTrackApi.getCatalogManager().satCruncher.postMessage({
+      typ: 'satelliteSelected',
+      satelliteSelected: [i],
+    });
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
+    // If Old Select Sat Picked Color it Correct Color
+    const lastSelectedObject = this.lastSelectedSat();
+    if (lastSelectedObject !== -1) {
+      colorSchemeManagerInstance.currentColorScheme ??= colorSchemeManagerInstance.default;
+      const newColor = colorSchemeManagerInstance.currentColorScheme(keepTrackApi.getCatalogManager().getSat(lastSelectedObject)).color;
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 1] = newColor[1]; // G
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 2] = newColor[2]; // B
+      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 3] = newColor[3]; // A
+      gl.bufferSubData(gl.ARRAY_BUFFER, lastSelectedObject * 4 * 4, new Float32Array(newColor));
+
+      if (!settingsManager.lastSearchResults.includes(lastSelectedObject)) {
+        dotsManagerInstance.sizeData[lastSelectedObject] = 0.0;
+        gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManagerInstance.sizeData);
       }
-    );
+    }
+    // If New Select Sat Picked Color it
+    if (i !== -1) {
+      // if error then log i
+      if (i > colorSchemeManagerInstance.colorData.length / 4) {
+        console.error('i is greater than colorData length');
+        console.error(i);
+      }
+      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
 
-    const satMissionData = getEl('sat-mission-data', true);
-    if (satMissionData) satMissionData.style.display = 'block';
+      dotsManagerInstance.sizeData[i] = 1.0;
+      gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManagerInstance.sizeData);
+    }
 
-    const satIdentifierData = getEl('sat-identifier-data', true);
-    if (satIdentifierData) satIdentifierData.style.display = 'block';
+    this.setSelectedSat(i);
+
+    if (keepTrackApi.getSensorManager().isSensorSelected()) {
+      getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
+    }
+    getEl('menu-lookanglesmultisite', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-satview', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-map', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-editSat', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-breakup', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-plot-analysis', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-plot-analysis2', true)?.classList.remove('bmenu-item-disabled');
+
+    keepTrackApi.methods.selectSatData(keepTrackApi.getCatalogManager().getSat(i), i);
+  }
+
+  getSelectedSat(type = GetSatType.DEFAULT): SatObject {
+    return keepTrackApi.getCatalogManager().getSat(this.selectedSat, type);
+  }
+
+  setSecondarySat(id: number): void {
+    if (settingsManager.isDisableSelectSat) return;
+    this.secondarySat = id;
+    if (this.secondarySatObj?.id !== id) {
+      this.secondarySatObj = keepTrackApi.getCatalogManager().getSat(id);
+    }
+
+    if (this.secondarySat === this.selectedSat) {
+      this.selectedSat = -1;
+      this.setSelectedSat(-1);
+      keepTrackApi.getOrbitManager().clearSelectOrbit(false);
+    }
+
+    keepTrackApi.methods.setSecondarySat(this.secondarySatObj, id);
+  }
+
+  setSelectedSat(id: number): void {
+    if (settingsManager.isDisableSelectSat || id === null) return;
+    this.selectedSat = id;
+
+    if (this.selectedSat === this.secondarySat && this.selectedSat !== -1) {
+      this.setSecondarySat(-1);
+      keepTrackApi.getOrbitManager().clearSelectOrbit(true);
+    }
+
+    UrlManager.updateURL();
+  }
+
+  switchPrimarySecondary(): void {
+    const _primary = this.selectedSat;
+    const _secondary = this.secondarySat;
+    this.setSecondarySat(_primary);
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    if (_primary !== -1) {
+      orbitManagerInstance.setSelectOrbit(_primary, true);
+    } else {
+      orbitManagerInstance.clearSelectOrbit(true);
+    }
+    this.setSelectedSat(_secondary);
+  }
+
+  private registerKeyboardEvents_() {
+    const inputManagerInstance = keepTrackApi.getInputManager();
+    inputManagerInstance.keyboard.registerKeyDownEvent({
+      key: ']',
+      callback: () => {
+        this.switchPrimarySecondary();
+      },
+    });
+    inputManagerInstance.keyboard.registerKeyDownEvent({
+      key: '{',
+      callback: () => {
+        this.switchPrimarySecondary();
+      },
+    });
   }
 }

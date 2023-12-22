@@ -11,14 +11,22 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 type EChartsOption = echarts.EChartsOption;
 
 export class EcfPlot extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'ECF Plots';
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(EcfPlot.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconElementName = 'ecf-plots-bottom-icon';
   bottomIconLabel = 'ECF Plots';
   bottomIconImg = scatterPlotPng3;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) return;
 
-    this.createPlot(EcfPlot.getPlotData(), getEl(this.plotCanvasId));
+    this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
   };
 
   plotCanvasId = 'plot-analysis-chart-ecf';
@@ -46,11 +54,6 @@ export class EcfPlot extends KeepTrackPlugin {
     maxWidth: 1200,
   };
 
-  static PLUGIN_NAME = 'ECF Plots';
-  constructor() {
-    super(EcfPlot.PLUGIN_NAME);
-  }
-
   addHtml(): void {
     super.addHtml();
 
@@ -70,7 +73,7 @@ export class EcfPlot extends KeepTrackPlugin {
         if (!sat) {
           this.hideSideMenus();
         } else {
-          this.createPlot(EcfPlot.getPlotData(), getEl(this.plotCanvasId));
+          this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
         }
       },
     });
@@ -212,20 +215,20 @@ export class EcfPlot extends KeepTrackPlugin {
     return app;
   }
 
-  static getPlotData(): EChartsData {
+  getPlotData(): EChartsData {
     const NUMBER_OF_POINTS = 100;
     const data = [] as EChartsData;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    const curSatObj = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat);
+    const curSatObj = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
     data.push({ name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
 
-    const secSatObj = catalogManagerInstance.secondarySatObj;
+    const secSatObj = this.selectSatManager_.secondarySatObj;
     if (secSatObj) {
       data.push({ name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
     }
 
-    const lastSatId = catalogManagerInstance.lastSelectedSat();
+    const lastSatId = this.selectSatManager_.lastSelectedSat();
     if (lastSatId !== -1) {
       const lastSatObj = catalogManagerInstance.getSat(lastSatId);
       data.push({ name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });

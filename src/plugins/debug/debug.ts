@@ -9,6 +9,7 @@ import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/lin
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Debug Menu';
@@ -112,8 +113,8 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
         getEl('debug-cam-to-sat')?.addEventListener('click', () => {
           const camera = keepTrackApi.getMainCamera();
           if (camera) {
-            const selectedSat = keepTrackApi.getCatalogManager().selectedSat;
-            if (selectedSat === -1) return;
+            const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+            if (!selectedSat || selectedSat === -1) return;
 
             const sat = keepTrackApi.getCatalogManager().getSat(selectedSat);
             if (sat) {
@@ -147,8 +148,10 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       cb: (): void => {
         if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) return;
         const camera = keepTrackApi.getMainCamera();
-        if (camera) {
-          const selectedSat = keepTrackApi.getCatalogManager().selectedSat;
+        const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+
+        if (camera && selectSatManagerInstance) {
+          const selectedSat = selectSatManagerInstance.selectedSat;
           const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getSat(selectedSat) : null;
 
           const position = camera.getCameraPosition(sat?.position);
@@ -158,8 +161,8 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           setInnerHtml('debug-camera-distance-from-earth', `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`);
           this.lastCameraUpdate = <Milliseconds>new Date().getTime();
         }
-        if (keepTrackApi.getCatalogManager().selectedSat >= 0) {
-          const sat = keepTrackApi.getCatalogManager().getSat(keepTrackApi.getCatalogManager().selectedSat);
+        if (selectSatManagerInstance.selectedSat >= 0) {
+          const sat = keepTrackApi.getCatalogManager().getSat(selectSatManagerInstance.selectedSat);
           if (!sat) {
             console.warn('Satellite not found');
             return;

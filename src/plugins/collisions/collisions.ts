@@ -5,6 +5,7 @@ import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { keepTrackApi } from '../../keepTrackApi';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 interface CollisionEvent {
   sat1: string;
@@ -16,6 +17,11 @@ interface CollisionEvent {
 }
 
 export class CollissionsPlugin extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'collisions';
+  constructor() {
+    super(CollissionsPlugin.PLUGIN_NAME);
+  }
+
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = collissionsPng;
   bottomIconLabel: string = 'Collisions';
@@ -42,11 +48,6 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     minWidth: 350,
     maxWidth: 500,
   };
-
-  static PLUGIN_NAME = 'collisions';
-  constructor() {
-    super(CollissionsPlugin.PLUGIN_NAME);
-  }
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
@@ -82,7 +83,9 @@ export class CollissionsPlugin extends KeepTrackPlugin {
       cbName: 'collisions',
       cb: () => {
         if (this.socratesOnSatCruncher !== null) {
-          keepTrackApi.getCatalogManager().setSelectedSat(this.socratesOnSatCruncher);
+          // If selectedSatManager is loaded, set the selected sat to the one that was just added
+          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.socratesOnSatCruncher);
+
           this.socratesOnSatCruncher = null;
         }
       },

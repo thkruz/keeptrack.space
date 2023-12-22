@@ -13,7 +13,15 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 
 export class ShortTermFences extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Short Term Fences';
   dependencies: string[] = [SatInfoBox.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(ShortTermFences.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconElementName = 'stf-bottom-icon';
   bottomIconLabel = 'Short Term Fence';
   bottomIconImg = searchPng;
@@ -72,11 +80,6 @@ export class ShortTermFences extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
-
-  static PLUGIN_NAME = 'Short Term Fences';
-  constructor() {
-    super(ShortTermFences.PLUGIN_NAME);
-  }
 
   addHtml(): void {
     super.addHtml();
@@ -205,7 +208,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     sensorManagerInstance.addStf(stfSensor);
 
-    (keepTrackApi.getPlugin(SensorFov) as SensorFov)?.enableFovView();
+    keepTrackApi.getPlugin(SensorFov)?.enableFovView();
   }
 
   stfOnObjectLinkClick() {
@@ -215,7 +218,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     // Update TEARR
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const tearr = SensorMath.getTearr(catalogManagerInstance.getSat(catalogManagerInstance.selectedSat), sensorManagerInstance.currentSensors);
+    const tearr = SensorMath.getTearr(catalogManagerInstance.getSat(this.selectSatManager_.selectedSat), sensorManagerInstance.currentSensors);
 
     (<HTMLInputElement>getEl('stf-az')).value = tearr.az.toFixed(1);
     (<HTMLInputElement>getEl('stf-el')).value = tearr.el.toFixed(1);

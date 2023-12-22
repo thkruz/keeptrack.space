@@ -27,6 +27,7 @@ import { SpaceObjectType } from '../lib/space-object-type';
 import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { getDayOfYear } from '../lib/transforms';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
@@ -1589,10 +1590,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   }
 
   private setSelectedAndHoverBuffer_() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    const selSat = catalogManagerInstance.selectedSat;
-    if (selSat !== -1) {
+    const selSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+    if (selSat > -1) {
       // Selected satellites are always one color so forget whatever we just did
       this.colorData[selSat * 4] = settingsManager.selectedColor[0]; // R
       this.colorData[selSat * 4 + 1] = settingsManager.selectedColor[1]; // G

@@ -25,8 +25,14 @@ import { WatchlistPlugin } from '../watchlist/watchlist';
 import './sat-info-box.css';
 import { SelectSatManager } from './select-sat-manager';
 
+/**
+ * This class controls all the functionality of the satellite info box.
+ * There are select events and update events that are registered to the keepTrackApi.
+ */
 export class SatInfoBox extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'SatInfoBox';
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
 
   isorbitalDataLoaded = false;
   issecondaryDataLoaded = false;
@@ -35,7 +41,6 @@ export class SatInfoBox extends KeepTrackPlugin {
   issatMissionDataLoaded = false;
   isintelDataLoaded = false;
 
-  static PLUGIN_NAME = 'SatInfoBox';
   currentTEARR = <TearrData>{
     az: 0,
     el: 0,
@@ -49,6 +54,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   constructor() {
     super(SatInfoBox.PLUGIN_NAME);
+    this.selectSatManager_ = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
   }
 
   addHtml(): void {
@@ -136,7 +142,7 @@ export class SatInfoBox extends KeepTrackPlugin {
                     'error',
                     true
                   );
-                keepTrackApi.getSelectSatManager().selectSat(-1);
+                this.selectSatManager_.selectSat(-1);
                 return;
               }
             }
@@ -228,18 +234,18 @@ export class SatInfoBox extends KeepTrackPlugin {
             if (getEl('sat-maxTmx')) getEl('sat-maxTmx').parentElement.style.display = 'none';
           }
 
-          if (catalogManagerInstance.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
+          if (this.selectSatManager_.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
             showEl('secondary-sat-info');
             showEl('sec-angle-link', 'flex');
-          } else if (catalogManagerInstance.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
+          } else if (this.selectSatManager_.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
             hideEl('secondary-sat-info');
             hideEl('sec-angle-link');
           }
 
-          if (catalogManagerInstance.secondarySat !== -1 && isSatObject(sat)) {
+          if (this.selectSatManager_.secondarySat !== -1 && isSatObject(sat)) {
             sat = <SatObject>sat;
-            const ric = CoordinateTransforms.sat2ric(catalogManagerInstance.secondarySatObj, sat);
-            const dist = SensorMath.distanceString(sat, catalogManagerInstance.secondarySatObj).split(' ')[2];
+            const ric = CoordinateTransforms.sat2ric(this.selectSatManager_.secondarySatObj, sat);
+            const dist = SensorMath.distanceString(sat, this.selectSatManager_.secondarySatObj).split(' ')[2];
             getEl('sat-sec-dist').innerHTML = `${dist} km`;
             getEl('sat-sec-rad').innerHTML = `${ric.position[0].toFixed(2)}km`;
             getEl('sat-sec-intrack').innerHTML = `${ric.position[1].toFixed(2)}km`;
@@ -253,7 +259,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               // If we didn't just calculate next pass time for this satellite and sensor combination do it
               // TODO: Make new logic for this to allow it to be updated while selected
               if (
-                (catalogManagerInstance.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
+                (this.selectSatManager_.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
                   sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
                 !isMissileObject(sat)
               ) {
@@ -268,7 +274,7 @@ export class SatInfoBox extends KeepTrackPlugin {
                 //sun.getXYZ();
                 //lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
               }
-              uiManagerInstance.lastNextPassCalcSatId = catalogManagerInstance.selectedSat;
+              uiManagerInstance.lastNextPassCalcSatId = this.selectSatManager_.selectedSat;
               uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0].objName;
             } else if (getEl('sat-nextpass')) {
               getEl('sat-nextpass').innerHTML = 'Unavailable';
@@ -288,7 +294,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       cb: (watchlistList: number[]) => {
         let isOnList = false;
         watchlistList.forEach((satId) => {
-          if (satId === keepTrackApi.getCatalogManager().selectedSat) {
+          if (satId === this.selectSatManager_.selectedSat) {
             isOnList = true;
           }
         });
@@ -324,13 +330,13 @@ export class SatInfoBox extends KeepTrackPlugin {
     this.updateOrbitData(sat);
   }
 
-  private static nearObjectsLinkClick(distance: number = 100): void {
+  private nearObjectsLinkClick(distance: number = 100): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    if (catalogManagerInstance.selectedSat === -1) {
+    if (this.selectSatManager_.selectedSat === -1) {
       return;
     }
-    const sat = catalogManagerInstance.selectedSat;
+    const sat = this.selectSatManager_.selectedSat;
     const SCCs = [];
     let pos = catalogManagerInstance.getSat(sat, GetSatType.POSITION_ONLY).position;
     const posXmin = pos.x - distance;
@@ -354,39 +360,37 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.getUiManager().doSearch((<HTMLInputElement>getEl('search')).value.toString());
   }
 
-  private static nearOrbitsLink() {
+  private nearOrbitsLink() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.getSatsFromSatData(), catalogManagerInstance.getSat(catalogManagerInstance.selectedSat));
+    const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.getSatsFromSatData(), catalogManagerInstance.getSat(this.selectSatManager_.selectedSat));
     const searchStr = SearchManager.doArraySearch(catalogManagerInstance, nearbyObjects);
     keepTrackApi.getUiManager().searchManager.doSearch(searchStr, false);
   }
 
-  private static allObjectsLink(): void {
+  private allObjectsLink(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    if (catalogManagerInstance.selectedSat === -1) {
+    if (this.selectSatManager_.selectedSat === -1) {
       return;
     }
-    const intldes = catalogManagerInstance.getSat(catalogManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).intlDes;
+    const intldes = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY).intlDes;
     const searchStr = intldes.slice(0, 8);
     keepTrackApi.getUiManager().doSearch(searchStr);
     (<HTMLInputElement>getEl('search')).value = searchStr;
   }
 
-  private static drawLineToSun() {
+  private drawLineToSun() {
     const sun = keepTrackApi.getScene().sun;
-    lineManagerInstance.create(LineTypes.REF_TO_SAT, [keepTrackApi.getCatalogManager().selectedSat, sun.position[0], sun.position[1], sun.position[2]], 'o');
+    lineManagerInstance.create(LineTypes.REF_TO_SAT, [this.selectSatManager_.selectedSat, sun.position[0], sun.position[1], sun.position[2]], 'o');
   }
 
-  private static drawLineToEarth() {
-    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_SAT, [keepTrackApi.getCatalogManager().selectedSat], 'p');
+  private drawLineToEarth() {
+    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_SAT, [this.selectSatManager_.selectedSat], 'p');
   }
 
-  private static drawLineToSat() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    if (catalogManagerInstance.secondarySat == -1) keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', 'caution');
-    lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [catalogManagerInstance.selectedSat, catalogManagerInstance.secondarySat], 'b');
+  private drawLineToSat() {
+    if (this.selectSatManager_.secondarySat == -1) keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', 'caution');
+    lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.selectSatManager_.selectedSat, this.selectSatManager_.secondarySat], 'b');
   }
 
   private updateOrbitData = (sat: SatObject): void => {
@@ -430,16 +434,16 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
 
     if (!this.isTopLinkEventListenersAdded) {
-      getEl('sat-add-watchlist')?.addEventListener('click', SatInfoBox.addRemoveWatchlist);
-      getEl('sat-remove-watchlist')?.addEventListener('click', SatInfoBox.addRemoveWatchlist);
-      getEl('all-objects-link')?.addEventListener('click', SatInfoBox.allObjectsLink);
-      getEl('near-orbits-link')?.addEventListener('click', SatInfoBox.nearOrbitsLink);
-      getEl('near-objects-link1')?.addEventListener('click', () => SatInfoBox.nearObjectsLinkClick(100));
-      getEl('near-objects-link2')?.addEventListener('click', () => SatInfoBox.nearObjectsLinkClick(200));
-      getEl('near-objects-link4')?.addEventListener('click', () => SatInfoBox.nearObjectsLinkClick(400));
-      getEl('sun-angle-link')?.addEventListener('click', SatInfoBox.drawLineToSun);
-      getEl('nadir-angle-link')?.addEventListener('click', SatInfoBox.drawLineToEarth);
-      getEl('sec-angle-link')?.addEventListener('click', SatInfoBox.drawLineToSat);
+      getEl('sat-add-watchlist')?.addEventListener('click', this.addRemoveWatchlist.bind(this));
+      getEl('sat-remove-watchlist')?.addEventListener('click', this.addRemoveWatchlist.bind(this));
+      getEl('all-objects-link')?.addEventListener('click', this.allObjectsLink.bind(this));
+      getEl('near-orbits-link')?.addEventListener('click', this.nearOrbitsLink.bind(this));
+      getEl('near-objects-link1')?.addEventListener('click', () => this.nearObjectsLinkClick(100));
+      getEl('near-objects-link2')?.addEventListener('click', () => this.nearObjectsLinkClick(200));
+      getEl('near-objects-link4')?.addEventListener('click', () => this.nearObjectsLinkClick(400));
+      getEl('sun-angle-link')?.addEventListener('click', this.drawLineToSun.bind(this));
+      getEl('nadir-angle-link')?.addEventListener('click', this.drawLineToEarth.bind(this));
+      getEl('sec-angle-link')?.addEventListener('click', this.drawLineToSat.bind(this));
       this.isTopLinkEventListenersAdded = true;
     }
   };
@@ -455,10 +459,10 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   };
 
-  private static addRemoveWatchlist() {
+  private addRemoveWatchlist() {
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
     if (watchlistPlugin) {
-      const id = keepTrackApi.getCatalogManager().selectedSat;
+      const id = this.selectSatManager_.selectedSat;
 
       if (watchlistPlugin.isOnWatchlist(id)) {
         watchlistPlugin.removeSat(id);
@@ -1435,6 +1439,49 @@ export class SatInfoBox extends KeepTrackPlugin {
           `
     );
   }
-}
 
-export const satInfoBoxCorePlugin = new SatInfoBox();
+  // eslint-disable-next-line class-methods-use-this
+  selectSat(sat?: SatObject): void {
+    if (sat) {
+      if (isSatObject(sat)) {
+        SatInfoBox.setSatInfoBoxSatellite_();
+      } else {
+        SatInfoBox.setSatInfoBoxMissile_();
+      }
+    }
+  }
+
+  private static setSatInfoBoxMissile_() {
+    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
+    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
+      (id) => {
+        const el = getEl(id, true);
+        if (!el) return;
+        hideEl(el.parentElement.id);
+      }
+    );
+
+    const satMissionData = getEl('sat-mission-data', true);
+    if (satMissionData) satMissionData.style.display = 'none';
+
+    const satIdentifierData = getEl('sat-identifier-data', true);
+    if (satIdentifierData) satIdentifierData.style.display = 'none';
+  }
+
+  private static setSatInfoBoxSatellite_() {
+    // TODO: There is an interdependency with SatCoreInfoBox and SelectSatManager.
+    ['sat-apogee', 'sat-perigee', 'sat-inclination', 'sat-eccentricity', 'sat-raan', 'sat-argPe', 'sat-stdmag', 'sat-configuration', 'sat-elset-age', 'sat-period'].forEach(
+      (id) => {
+        const el = getEl(id, true);
+        if (!el) return;
+        el.parentElement.style.display = 'flex';
+      }
+    );
+
+    const satMissionData = getEl('sat-mission-data', true);
+    if (satMissionData) satMissionData.style.display = 'block';
+
+    const satIdentifierData = getEl('sat-identifier-data', true);
+    if (satIdentifierData) satIdentifierData.style.display = 'block';
+  }
+}

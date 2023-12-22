@@ -11,7 +11,15 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Time2LonPlots extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Time vs Lon Plots';
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
+  private selectSatManager_: SelectSatManager;
+
+  constructor() {
+    super(Time2LonPlots.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
   bottomIconElementName = 'time2lon-plots-bottom-icon';
   bottomIconLabel = 'Time vs Lon Plot';
   bottomIconImg = linePlotPng;
@@ -37,11 +45,6 @@ export class Time2LonPlots extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  static PLUGIN_NAME = 'Time vs Lon Plots';
-  constructor() {
-    super(Time2LonPlots.PLUGIN_NAME);
-  }
-
   addHtml(): void {
     super.addHtml();
   }
@@ -56,8 +59,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
         if ((event.data as any)?.id) {
-          const catalogManagerInstance = keepTrackApi.getCatalogManager();
-          catalogManagerInstance.selectSat((event.data as any).id);
+          this.selectSatManager_.selectSat((event.data as any).id);
         }
       });
     }

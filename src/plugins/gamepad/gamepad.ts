@@ -3,6 +3,7 @@ import { SatObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
 import { Radians } from 'ootk';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class GamepadPlugin {
   PLUGIN_NAME = 'Gamepad';
@@ -133,13 +134,13 @@ export class GamepadPlugin {
   private btnA_() {
     if (settingsManager.isLimitedGamepadControls) return;
     console.log('A');
-    keepTrackApi.getCatalogManager().selectSat(keepTrackApi.getHoverManager().hoveringSat);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getHoverManager().hoveringSat);
   }
 
   private btnB_() {
     if (settingsManager.isLimitedGamepadControls) return;
     console.log('B');
-    keepTrackApi.getCatalogManager().selectSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     keepTrackApi.getMainCamera().zoomTarget = 0.8;
   }
 
@@ -165,14 +166,16 @@ export class GamepadPlugin {
     if (settingsManager.isLimitedGamepadControls) return;
     console.log('Left Bumper');
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const satId = catalogManagerInstance.selectedSat - 1;
+    const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+    if (!selectSatManagerInstance) return;
+
+    const satId = selectSatManagerInstance.selectedSat - 1;
     if (satId >= 0) {
-      catalogManagerInstance.selectSat(satId);
+      selectSatManagerInstance.selectSat(satId);
     } else {
-      const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+      const activeSats = <SatObject[]>keepTrackApi.getCatalogManager().satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
       const lastSatId = activeSats[activeSats.length - 1].id;
-      catalogManagerInstance.selectSat(lastSatId);
+      selectSatManagerInstance.selectSat(lastSatId);
     }
   }
 
@@ -180,14 +183,16 @@ export class GamepadPlugin {
     if (settingsManager.isLimitedGamepadControls) return;
     console.log('Right Bumper');
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+    const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+    if (!selectSatManagerInstance) return;
+
+    const activeSats = <SatObject[]>keepTrackApi.getCatalogManager().satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
     const lastSatId = activeSats[activeSats.length - 1].id;
-    const satId = catalogManagerInstance.selectedSat + 1;
+    const satId = selectSatManagerInstance.selectedSat + 1;
     if (satId <= lastSatId) {
-      catalogManagerInstance.selectSat(satId);
+      selectSatManagerInstance.selectSat(satId);
     } else {
-      catalogManagerInstance.selectSat(0);
+      selectSatManagerInstance.selectSat(0);
     }
   }
 

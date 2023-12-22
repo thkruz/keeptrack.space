@@ -141,7 +141,7 @@ export class SensorMath {
     return tearr;
   }
 
-  static distanceString(hoverSat: SatObject, selectedSat: SatObject): string {
+  static distanceString(hoverSat: SatObject, selectedSat?: SatObject): string {
     // Sanity Check
     if (hoverSat == null || selectedSat == null) return '';
 

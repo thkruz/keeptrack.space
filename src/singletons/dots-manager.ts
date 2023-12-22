@@ -2,6 +2,7 @@ import { SatCruncherMessageData, SatObject } from '../interfaces';
 import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -331,7 +332,7 @@ export class DotsManager {
   initBuffers(colorBuffer: WebGLBuffer) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     this.setupPickingBuffer(catalogManagerInstance.satData.length);
-    this.updateSizeBuffer(catalogManagerInstance.satData.length, catalogManagerInstance.selectedSat);
+    this.updateSizeBuffer(catalogManagerInstance.satData.length);
     this.initColorBuffer(colorBuffer);
     this.initVao(); // Needs ColorBuffer first
   }
@@ -548,7 +549,7 @@ export class DotsManager {
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const satSetLen = catalogManagerInstance.satData.length;
-    const selectedSat = catalogManagerInstance.selectedSat;
+    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
 
     /*
       // If we have radar data -- let's update that first
@@ -634,11 +635,11 @@ export class DotsManager {
       // }
 
       // Always do the selected satellite in the most accurate way
-      if (selectedSat === -1) return;
-
-      this.positionData[selectedSat * 3] += this.velocityData[selectedSat * 3] * renderer.dtAdjusted;
-      this.positionData[selectedSat * 3 + 1] += this.velocityData[selectedSat * 3 + 1] * renderer.dtAdjusted;
-      this.positionData[selectedSat * 3 + 2] += this.velocityData[selectedSat * 3 + 2] * renderer.dtAdjusted;
+      if (selectedSat > -1) {
+        this.positionData[selectedSat * 3] += this.velocityData[selectedSat * 3] * renderer.dtAdjusted;
+        this.positionData[selectedSat * 3 + 1] += this.velocityData[selectedSat * 3 + 1] * renderer.dtAdjusted;
+        this.positionData[selectedSat * 3 + 2] += this.velocityData[selectedSat * 3 + 2] * renderer.dtAdjusted;
+      }
 
       // TODO: WebWorker for this?
       // const { gmst } = calculateTimeVariables(timeManager.simulationTimeObj);
@@ -659,9 +660,8 @@ export class DotsManager {
   /**
    * Updates the size buffer used for rendering the dots.
    * @param bufferLen The length of the buffer.
-   * @param selectedSat The index of the selected satellite.
    */
-  updateSizeBuffer(bufferLen: number = 3, selectedSat: number = -1) {
+  updateSizeBuffer(bufferLen: number = 3) {
     const gl = keepTrackApi.getRenderer().gl;
 
     if (!this.sizeBufferOneTime) {
@@ -678,7 +678,8 @@ export class DotsManager {
       }
     }
 
-    if (selectedSat !== -1) {
+    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+    if (selectedSat > -1) {
       this.sizeData[selectedSat] = 1.0;
     }
 
@@ -832,12 +833,12 @@ export class DotsManager {
    * @param renderer - The DrawManager instance.
    * @param selectedSat - The selected satellite.
    */
-  private updateVelocitiesAlt_(renderer: WebGLRenderer, selectedSat: number) {
+  private updateVelocitiesAlt_(renderer: WebGLRenderer, selectedSat?: number) {
     for (this.drawI_ = 0; this.drawI_ < Math.ceil(this.orbitalSats3_ / 2); this.drawI_++) {
       this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (renderer.dtAdjusted + this.lastDrawDt);
     }
     // If you updated the selected sat, undo it
-    if (selectedSat * 3 < Math.ceil(this.orbitalSats3_ / 2)) {
+    if (selectedSat && selectedSat * 3 < Math.ceil(this.orbitalSats3_ / 2)) {
       this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (renderer.dtAdjusted + this.lastDrawDt);
       this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (renderer.dtAdjusted + this.lastDrawDt);
       this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (renderer.dtAdjusted + this.lastDrawDt);
@@ -851,12 +852,12 @@ export class DotsManager {
    * @param renderer - The DrawManager instance.
    * @param selectedSat - The selected satellite.
    */
-  private updateVelocities_(renderer: WebGLRenderer, selectedSat: number) {
+  private updateVelocities_(renderer: WebGLRenderer, selectedSat?: number) {
     for (this.drawI_ = Math.floor(this.orbitalSats3_ / 2); this.drawI_ < this.orbitalSats3_; this.drawI_++) {
       this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (renderer.dtAdjusted + this.lastDrawDt);
     }
     // If you updated the selected sat, undo it
-    if (selectedSat * 3 >= Math.floor(this.orbitalSats3_ / 2)) {
+    if (selectedSat && selectedSat * 3 >= Math.floor(this.orbitalSats3_ / 2)) {
       this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (renderer.dtAdjusted + this.lastDrawDt);
       this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (renderer.dtAdjusted + this.lastDrawDt);
       this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (renderer.dtAdjusted + this.lastDrawDt);

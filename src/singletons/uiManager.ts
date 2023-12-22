@@ -27,6 +27,7 @@
 
 import { ColorInformation, ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
@@ -391,7 +392,7 @@ export class StandardUiManager implements UiManager {
       if (sat?.type === SpaceObjectType.STAR) {
         catalogManagerInstance.panToStar(sat);
       } else {
-        catalogManagerInstance.setSelectedSat(satId);
+        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(satId);
       }
     });
 

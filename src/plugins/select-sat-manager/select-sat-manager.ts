@@ -67,7 +67,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     let sat: SatObject | any;
 
     // If selecting an object
-    if (satId !== -1) {
+    if (satId > -1) {
       // Get the satellite object
       sat = catalogManagerInstance.getSat(satId);
       // Selecting a star does nothing
@@ -191,7 +191,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.setSelectedSat(satId);
 
     // If sat info box is loaded then update it
-    (<SatInfoBox>keepTrackApi.getPlugin(SatInfoBox))?.selectSat(sat);
+    keepTrackApi.getPlugin(SatInfoBox)?.selectSat(sat);
 
     if (satId !== -1) {
       // NOTE: This has to come after keepTrackApi.methods.selectSatData in catalogManagerInstance.setSelectedSat.

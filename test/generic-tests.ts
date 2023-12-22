@@ -2,6 +2,7 @@ import { Constructor } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
@@ -155,7 +156,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     const plugin = new Plugin();
     websiteInit(plugin);
     keepTrackApi.getCatalogManager().satData = [defaultSat];
-    keepTrackApi.getCatalogManager().selectSat(0);
+    keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
     expect(toggleButton).toBeDefined();
@@ -171,7 +172,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     }
 
     keepTrackApi.getCatalogManager().satData = [];
-    keepTrackApi.getCatalogManager().selectSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager).selectSat(-1);
     // console.warn(keepTrackApi.getCatalogManager().selectedSat);
   });
 
@@ -181,7 +182,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     websiteInit(plugin);
     keepTrackApi.getSensorManager().setSensor(defaultSensor, 0);
     keepTrackApi.getCatalogManager().satData = [defaultSat];
-    keepTrackApi.getCatalogManager().selectSat(0);
+    keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
     expect(toggleButton).toBeDefined();

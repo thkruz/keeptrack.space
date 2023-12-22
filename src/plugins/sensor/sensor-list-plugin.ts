@@ -13,6 +13,7 @@ import radarPng from '@public/img/icons/radar.png';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { Planetarium } from '../planetarium/planetarium';
+import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SensorListPlugin extends KeepTrackPlugin {
@@ -148,7 +149,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
           return;
         }
 
-        if (keepTrackApi.getPlugin(SelectSatManager) !== null && !this.isSensorLinksAdded) {
+        if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
           getEl('sat-info-top-links').insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`

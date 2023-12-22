@@ -1,5 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { StandardGroupManager } from '@app/singletons/groups-manager';
+import { ObjectGroup } from '@app/singletons/object-group';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
 import { CountriesMenu } from './../src/plugins/countries/countries';
@@ -15,7 +17,7 @@ describe('CountriesMenu_class', () => {
       groupName: 'Argentina',
       objects: [],
       updateIsInGroup: jest.fn(),
-    };
+    } as unknown as ObjectGroup;
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, mockGroupsManager);
   });
 
@@ -45,15 +47,21 @@ describe('CountriesMenu_class', () => {
   it('test_group_selected_fills_result_box_and_clears_selected_sat', () => {
     settingsManager.searchLimit = 10;
     const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     // const uiManagerInstance = mockUiManager;
     // uiManagerInstance.searchManager.fillResultBox = jest.fn();
-    catalogManagerInstance.setSelectedSat = jest.fn();
-    groupManagerInstance.groupList['Argentina'] = { objects: [0, 1], updateIsInGroup: jest.fn(), updateOrbits: jest.fn(), clear: jest.fn() };
+    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    groupManagerInstance.groupList['Argentina'] = {
+      objects: [0, 1],
+      updateIsInGroup: jest.fn(),
+      updateOrbits: jest.fn(),
+      clear: jest.fn(),
+      hasObject: jest.fn(),
+      createGroupByCountry_: jest.fn(),
+    } as unknown as ObjectGroup;
     keepTrackApi.getCatalogManager().getSat = () => defaultSat;
     CountriesMenu['groupSelected_']('Argentina');
     // expect(uiManagerInstance.searchManager.fillResultBox).toHaveBeenCalled();
-    expect(catalogManagerInstance.setSelectedSat).toHaveBeenCalledWith(-1);
+    expect(keepTrackApi.getPlugin(SelectSatManager).setSelectedSat).toHaveBeenCalledWith(-1);
   });
 
   // Tests that countryMenuClick_ creates group if it doesn't exist
@@ -61,7 +69,7 @@ describe('CountriesMenu_class', () => {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     groupManagerInstance.selectGroup = jest.fn();
     groupManagerInstance.createGroup = jest.fn();
-    groupManagerInstance.groupList = [];
+    groupManagerInstance.groupList = [] as unknown as Record<string, ObjectGroup>;
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
 
     CountriesMenu['countryMenuClick_']('Argentina');

@@ -3,6 +3,7 @@ import { Singletons, UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { mockCameraManager, mockUiManager } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
@@ -32,6 +33,8 @@ describe('SatelliteViewPlugin_class', () => {
 
     mockUiManager.toast = jest.fn();
     keepTrackContainer.registerSingleton<UiManager>(Singletons.UiManager, mockUiManager);
+    const selectSatManager = new SelectSatManager();
+    selectSatManager.init();
   });
 
   standardPluginSuite(SatelliteViewPlugin, 'SatelliteViewPlugin');
@@ -51,12 +54,11 @@ describe('SatelliteViewPlugin_class', () => {
   it('test_bottomMenuClick_callback_no_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    catalogManagerInstance.selectedSat = -1;
+    keepTrackApi.getPlugin(SelectSatManager).selectedSat = -1;
     plugin.init();
     keepTrackApi.methods.uiManagerInit();
     keepTrackApi.methods.uiManagerFinal();
-    keepTrackContainer.registerSingleton<Camera>(Singletons.CameraManager, mockCameraManager);
+    keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
     keepTrackApi.methods.bottomMenuClick('menu-satview');
     expect(uiManagerInstance.toast).toHaveBeenCalledWith('Select a Satellite First!', 'caution');
   });
@@ -65,12 +67,11 @@ describe('SatelliteViewPlugin_class', () => {
   it('test_bottomMenuClick_callback_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    catalogManagerInstance.selectedSat = 1;
+    keepTrackApi.getPlugin(SelectSatManager).selectedSat = 1;
     plugin.init();
     keepTrackApi.methods.uiManagerInit();
     keepTrackApi.methods.uiManagerFinal();
-    keepTrackContainer.registerSingleton<Camera>(Singletons.CameraManager, mockCameraManager);
+    keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
     keepTrackApi.methods.bottomMenuClick('menu-satview');
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
@@ -79,13 +80,12 @@ describe('SatelliteViewPlugin_class', () => {
   it('test_bottomMenuClick_callback_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    catalogManagerInstance.selectedSat = 1;
+    keepTrackApi.getPlugin(SelectSatManager).selectedSat = 1;
     plugin.init();
     keepTrackApi.methods.uiManagerInit();
     keepTrackApi.methods.uiManagerFinal();
     const tempMockCamera = { ...mockCameraManager, cameraType: CameraType.SATELLITE } as Camera;
-    keepTrackContainer.registerSingleton<Camera>(Singletons.CameraManager, tempMockCamera);
+    keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, tempMockCamera);
     keepTrackApi.methods.bottomMenuClick('menu-satview');
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });

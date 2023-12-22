@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Breakup } from '@app/plugins/breakup/breakup';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import * as OrbitFinderFile from '@app/singletons/orbit-finder';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from './environment/standard-env';
@@ -7,8 +8,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 
 describe('Breakup_class', () => {
   beforeEach(() => {
-    setupStandardEnvironment();
-    keepTrackApi.getCatalogManager().selectedSat = 1;
+    setupStandardEnvironment([SelectSatManager]);
     window.M.AutoInit = jest.fn();
   });
 

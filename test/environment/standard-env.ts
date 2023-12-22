@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { StandardSensorManager } from '@app/plugins/sensor/sensorManager';
 import { SettingsManager } from '@app/settings/settings';
 import { Camera } from '@app/singletons/camera';
@@ -96,7 +97,8 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   // Setup a mock catalog
   keepTrackApi.getCatalogManager().satData = [defaultSat, { ...defaultSat, ...{ id: 1, sccNum: '11' } }];
-  catalogManagerInstance.selectedSat = -1;
+  const selectSatManager = new SelectSatManager();
+  selectSatManager.init();
   catalogManagerInstance.staticSet = [defaultSensor];
 
   window.M = {
@@ -151,7 +153,7 @@ export const standardSelectSat = () => {
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getCatalogManager().getSat = () => defaultSat;
-  keepTrackApi.getCatalogManager().selectSat(0);
+  keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 };
 export const setupMinimumHtml = () => {
   keepTrackApi.containerRoot.innerHTML = `

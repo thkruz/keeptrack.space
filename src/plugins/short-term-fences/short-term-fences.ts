@@ -93,7 +93,7 @@ export class ShortTermFences extends KeepTrackPlugin {
           return;
         }
 
-        if (!this.isAddStfLinksOnce) {
+        if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
           getEl('sat-info-top-links').insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`

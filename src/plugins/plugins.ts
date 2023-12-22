@@ -14,7 +14,7 @@ import { errorManagerInstance } from '../singletons/errorManager';
 import { aboutMenuPlugin } from './about-menu/about-menu';
 import { analysisMenuPlugin } from './analysis/analysis';
 import { astronomyPlugin } from './astronomy/astronomy';
-import { breakupPlugin } from './breakup/breakup';
+import { Breakup } from './breakup/breakup';
 import { classificationBarPlugin } from './classification-bar/classification-bar';
 import { collissionsPlugin } from './collisions/collisions';
 import { colorMenuPlugin } from './colors-menu/colors-menu';
@@ -159,7 +159,10 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     if (plugins.shortTermFences) shortTermFencesPlugin.init();
     if (plugins.orbitReferences) orbitReferencesPlugin.init();
     if (plugins.collisions) collissionsPlugin.init();
-    if (plugins.breakup) breakupPlugin.init();
+    if (plugins.breakup) {
+      const breakupPlugin = new Breakup();
+      breakupPlugin.init();
+    }
     if (plugins.debrisScreening) debrisScreeningPlugin.init();
     if (plugins.editSat) editSatPlugin.init();
     if (plugins.newLaunch) newLaunchPlugin.init();

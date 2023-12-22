@@ -139,6 +139,7 @@ export class Breakup extends KeepTrackPlugin {
   private updateSccNumInMenu_() {
     if (!this.isMenuButtonActive) return;
     const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+    if (!sat) return;
     (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
   }
 
@@ -320,5 +321,3 @@ export class Breakup extends KeepTrackPlugin {
     keepTrackApi.getUiManager().doSearch(`${mainsat.sccNum},Analyst`);
   }
 }
-
-export const breakupPlugin = new Breakup();

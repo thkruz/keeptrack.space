@@ -2,6 +2,7 @@ import { CatalogManager, GetSatType, SatCruncherMessageData, SatObject } from '@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DEG2RAD } from '@app/lib/constants';
 import { SpaceObjectType } from '@app/lib/space-object-type';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { StandardCatalogManager } from '@app/singletons/catalog-manager';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
@@ -134,37 +135,6 @@ describe('calcSatrec', () => {
     expect(result).toStrictEqual(defaultSat);
   });
 
-  // should allow select sat
-  it('process_select_sat', () => {
-    catalogManagerInstance.satData = [defaultSat, { ...defaultSat, id: 1 }];
-    catalogManagerInstance.satCruncher = {
-      postMessage: jest.fn(),
-      terminate: jest.fn(),
-    } as any;
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    colorSchemeManagerInstance.colorData = new Float32Array([0, 1, 2, 3, 4, 5, 6, 7]);
-    colorSchemeManagerInstance.currentColorScheme = colorSchemeManagerInstance.default;
-    colorSchemeManagerInstance.init();
-
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    dotsManagerInstance.sizeData = new Int8Array([0, 1, 2, 3, 4, 5, 6, 7]);
-
-    keepTrackApi.containerRoot.innerHTML = `<div id="menu-lookangles" class="bmenu-item-disabled"></div>
-    <div id="menu-lookanglesmultisite" class="bmenu-item-disabled"></div>
-    <div id="menu-satview" class="bmenu-item-disabled"></div>
-    <div id="menu-map" class="bmenu-item-disabled"></div>
-    <div id="menu-editSat" class="bmenu-item-disabled"></div>
-    <div id="menu-sat-fov" class="bmenu-item-disabled"></div>
-    <div id="menu-newLaunch" class="bmenu-item-disabled"></div>
-    <div id="menu-breakup" class="bmenu-item-disabled"></div>
-    <div id="search-holder" class="bmenu-item-disabled"></div>
-    <div id="search-icon" class="bmenu-item-disabled"></div>`;
-
-    expect(() => catalogManagerInstance.selectSat(1)).not.toThrow();
-    catalogManagerInstance.lastSelectedSat(1);
-    expect(() => catalogManagerInstance.selectSat(0)).not.toThrow();
-  });
-
   // Should allow setSat
   it('process_set_sat', () => {
     catalogManagerInstance.satData = [defaultSat];
@@ -174,14 +144,14 @@ describe('calcSatrec', () => {
   // Should allow set secondary
   it('process_set_secondary', () => {
     catalogManagerInstance.satData = [defaultSat];
-    expect(() => catalogManagerInstance.setSecondarySat(0)).not.toThrow();
+    expect(() => keepTrackApi.getPlugin(SelectSatManager).setSecondarySat(0)).not.toThrow();
   });
 
   // Should allow switch primary
   it('process_switch_primary', () => {
     catalogManagerInstance.satData = [defaultSat];
-    expect(() => catalogManagerInstance.switchPrimarySecondary()).not.toThrow();
-    expect(() => catalogManagerInstance.switchPrimarySecondary()).not.toThrow();
+    expect(() => keepTrackApi.getPlugin(SelectSatManager).switchPrimarySecondary()).not.toThrow();
+    expect(() => keepTrackApi.getPlugin(SelectSatManager).switchPrimarySecondary()).not.toThrow();
   });
 
   // Should insertNewAnalystSatellite

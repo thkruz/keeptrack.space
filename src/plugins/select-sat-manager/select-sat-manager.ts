@@ -188,6 +188,8 @@ export class SelectSatManager extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SatInfoBox)?.selectSat(sat);
 
     if (satId !== -1) {
+      showEl('sat-infobox');
+
       const satInfoBoxDom = getEl('sat-infobox');
       // Get the height of the DOM
       const searchBoxHeight = satInfoBoxDom?.getBoundingClientRect().height ?? 0;
@@ -196,7 +198,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (curVal !== searchBoxHeight + bottomMenuTopVar + 'px') {
         document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
       }
-      showEl('sat-infobox');
     }
   }
 

@@ -318,7 +318,10 @@ export class SearchManager {
             patlen: searchStringIn.length,
             satId: sat.id,
           });
-          break;
+
+          if (searchStringIn.length === 5) {
+            break;
+          }
         }
       }
     });

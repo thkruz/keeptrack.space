@@ -1,12 +1,12 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { StereoMapPlugin } from '../plugins/stereo-map/stereo-map';
-import { watchlistPlugin } from '../plugins/watchlist/watchlist';
 import { SettingsManager } from '../settings/settings';
 import { CatalogSource } from '../static/catalog-loader';
 import { isThisNode } from '../static/isThisNode';
@@ -194,11 +194,12 @@ export class WebGLRenderer {
   orbitsAbove() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const watchlistPluginInstance = keepTrackApi.getPlugin(WatchlistPlugin);
 
     if (
       keepTrackApi.getMainCamera().cameraType == CameraType.ASTRONOMY ||
       keepTrackApi.getMainCamera().cameraType == CameraType.PLANETARIUM ||
-      watchlistPlugin?.watchlistInViewList?.length > 0
+      watchlistPluginInstance?.watchlistInViewList?.length > 0
     ) {
       this.sensorPos = sensorManagerInstance.calculateSensorPos(timeManagerInstance.simulationTimeObj, sensorManagerInstance.currentSensors);
       if (!this.isDrawOrbitsAbove) {
@@ -208,7 +209,7 @@ export class WebGLRenderer {
         return;
       }
       // Previously called showOrbitsAbove();
-      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPlugin?.watchlistInViewList?.length === 0)) {
+      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPluginInstance?.watchlistInViewList?.length === 0)) {
         if (this.isSatMiniBoxInUse_) {
           this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
           this.hoverBoxOnSatMiniElements_.innerHTML = '';
@@ -281,7 +282,7 @@ export class WebGLRenderer {
 
         if (!dotsManagerInstance.inViewData) return;
 
-        watchlistPlugin.watchlistList.forEach((id: number) => {
+        watchlistPluginInstance?.watchlistList.forEach((id: number) => {
           sat = catalogManagerInstance.getSat(id, GetSatType.POSITION_ONLY);
           if (dotsManagerInstance.inViewData[id] === 0) return;
           const satScreenPositionArray = this.getScreenCoords(sat);
@@ -322,7 +323,7 @@ export class WebGLRenderer {
     }
 
     // Hide satMiniBoxes When Not in Use
-    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPlugin?.watchlistInViewList?.length === 0)) {
+    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPluginInstance?.watchlistInViewList?.length === 0)) {
       if (this.isSatMiniBoxInUse_) {
         this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
         this.satMiniBox_.innerHTML = '';
@@ -472,11 +473,7 @@ export class WebGLRenderer {
       selectSatManager.selectSat(selectSatManager.selectedSat);
       if (selectSatManager.selectedSat !== -1) {
         orbitManagerInstance.setSelectOrbit(selectSatManager.selectedSat);
-        if (
-          catalogManagerInstance.isSensorManagerLoaded &&
-          sensorManagerInstance.currentSensors[0].lat != null &&
-          keepTrackApi.getDotsManager().inViewData?.[selectSatManager.selectedSat] === 1
-        ) {
+        if (sensorManagerInstance.isSensorSelected() && keepTrackApi.getDotsManager().inViewData?.[selectSatManager.selectedSat] === 1) {
           lineManagerInstance.drawWhenSelected();
           lineManagerInstance.updateLineToSat(selectSatManager.selectedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
         }

@@ -248,5 +248,3 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     getEl('sensor-maxrange').innerHTML = firstSensor.obsmaxrange.toString();
   }
 }
-
-export const sensorInfoPlugin = new SensorInfoPlugin();

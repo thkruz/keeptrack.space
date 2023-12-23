@@ -211,8 +211,6 @@ export class HoverManager {
       country = country.length > 0 ? country : 'Unknown';
       this.satHoverBoxNode3.textContent = country;
     } else {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
       let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
       // eslint-disable-next-line no-nested-ternary
       const color = confidenceScore >= 7 ? 'green' : confidenceScore >= 4 ? 'orange' : 'red';
@@ -226,7 +224,7 @@ export class HoverManager {
         this.satHoverBoxNode2.textContent = `Launched: ${year}`;
       }
 
-      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && settingsManager.isShowNextPass && renderer.isShowDistance) {
+      if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && renderer.isShowDistance) {
         if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat) + SensorMath.distanceString(sat, keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat()) + '';
         } else {
@@ -234,7 +232,7 @@ export class HoverManager {
         }
       } else if (renderer.isShowDistance) {
         this.showRicOrEci_(sat);
-      } else if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && settingsManager.isShowNextPass) {
+      } else if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass) {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);
       } else if (settingsManager.isEciOnHover) {
         this.showEciVel_(sat);

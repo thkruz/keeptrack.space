@@ -68,38 +68,32 @@ export class SatInfoBox extends KeepTrackPlugin {
       cb: this.orbitalData.bind(this),
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.PLUGIN_NAME}_secondaryData`,
-      cb: this.secondaryData.bind(this),
-    });
-
     // Register sensor data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_sensorInfo`,
-      cb: this.sensorInfo.bind(this),
+      cb: SatInfoBox.updateSensorInfo.bind(this),
     });
 
     // Register launch data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_launchData`,
-      cb: this.launchData.bind(this),
+      cb: SatInfoBox.updateLaunchData.bind(this),
     });
 
     // Register mission data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_satMissionData`,
-      cb: this.satMissionData.bind(this),
+      cb: SatInfoBox.updateSatMissionData.bind(this),
     });
 
     // Register intel data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_intelData`,
-      cb: this.intelData.bind(this),
+      cb: SatInfoBox.updateIntelData.bind(this),
     });
 
     // Register object data
@@ -107,6 +101,12 @@ export class SatInfoBox extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_objectData`,
       cb: SatInfoBox.updateObjectData,
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
+      cb: this.uiManagerFinal_.bind(this),
     });
   }
 
@@ -123,7 +123,6 @@ export class SatInfoBox extends KeepTrackPlugin {
         sat = <SatObject | MissileObject>sat;
 
         try {
-          const catalogManagerInstance = keepTrackApi.getCatalogManager();
           const timeManagerInstance = keepTrackApi.getTimeManager();
           const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -146,11 +145,9 @@ export class SatInfoBox extends KeepTrackPlugin {
                 return;
               }
             }
-            if (catalogManagerInstance.isSensorManagerLoaded) {
-              SensorMath.getTearr(sat, sensorManagerInstance.currentSensors, timeManagerInstance.simulationTimeObj);
-              const currentTearr = SensorMath.getTearData(timeManagerInstance.simulationTimeObj, sat.satrec, sensorManagerInstance.currentSensors, false);
-              this.currentTEARR = currentTearr; // TODO: Make SatMath 100% static
-            }
+            SensorMath.getTearr(sat, sensorManagerInstance.currentSensors, timeManagerInstance.simulationTimeObj);
+            const currentTearr = SensorMath.getTearData(timeManagerInstance.simulationTimeObj, sat.satrec, sensorManagerInstance.currentSensors, false);
+            this.currentTEARR = currentTearr; // TODO: Make SatMath 100% static
           } else {
             // Is Missile
             this.currentTEARR = missileManager.getMissileTEARR(<MissileObject>sat);
@@ -191,47 +188,39 @@ export class SatInfoBox extends KeepTrackPlugin {
             }
           }
 
-          if (catalogManagerInstance.isSensorManagerLoaded) {
-            if (this.currentTEARR.inView) {
-              if (getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = this.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
-              if (getEl('sat-elevation')) getEl('sat-elevation').innerHTML = this.currentTEARR.el.toFixed(1) + '°';
-              if (getEl('sat-range')) getEl('sat-range').innerHTML = this.currentTEARR.rng.toFixed(2) + ' km';
-              const sun = keepTrackApi.getScene().sun;
-              if (getEl('sat-vmag'))
-                if (isMissileObject(sat)) {
-                  getEl('sat-vmag').innerHTML = 'N/A';
-                } else {
-                  sat = <SatObject>sat;
-                  getEl('sat-vmag').innerHTML = SatMath.calculateVisMag(sat, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj, sun).toFixed(2);
-                }
-              const beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth
-                ? (this.currentTEARR.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2) + ' km'
-                : 'Unknown';
-              if (getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = beamwidthString;
-              if (getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = ((this.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
-            } else {
-              if (getEl('sat-vmag')) getEl('sat-vmag').innerHTML = 'Out of FOV';
-              if (getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = 'Out of FOV';
-              if (getEl('sat-azimuth')) getEl('sat-azimuth').title = 'Azimuth: ' + this.currentTEARR.az.toFixed(0) + '°';
-
-              const elevationDom = getEl('sat-elevation');
-              if (elevationDom) elevationDom.innerHTML = 'Out of FOV';
-              if (elevationDom) elevationDom.title = 'Elevation: ' + this.currentTEARR.el.toFixed(1) + '°';
-
-              const rangeDom = getEl('sat-range');
-              if (rangeDom) rangeDom.innerHTML = 'Out of FOV';
-              if (rangeDom) rangeDom.title = 'Range: ' + this.currentTEARR.rng.toFixed(2) + ' km';
-              const beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth ? sensorManagerInstance.currentSensors[0].beamwidth + '°' : 'Unknown';
-              if (getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = 'Out of FOV';
-              if (getEl('sat-beamwidth')) getEl('sat-beamwidth').title = beamwidthString;
-              if (getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = 'Out of FOV';
-            }
+          if (this.currentTEARR.inView) {
+            if (getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = this.currentTEARR.az.toFixed(0) + '°'; // Convert to Degrees
+            if (getEl('sat-elevation')) getEl('sat-elevation').innerHTML = this.currentTEARR.el.toFixed(1) + '°';
+            if (getEl('sat-range')) getEl('sat-range').innerHTML = this.currentTEARR.rng.toFixed(2) + ' km';
+            const sun = keepTrackApi.getScene().sun;
+            if (getEl('sat-vmag'))
+              if (isMissileObject(sat)) {
+                getEl('sat-vmag').innerHTML = 'N/A';
+              } else {
+                sat = <SatObject>sat;
+                getEl('sat-vmag').innerHTML = SatMath.calculateVisMag(sat, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj, sun).toFixed(2);
+              }
+            const beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth
+              ? (this.currentTEARR.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2) + ' km'
+              : 'Unknown';
+            if (getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = beamwidthString;
+            if (getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = ((this.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
           } else {
-            if (getEl('sat-azimuth')) getEl('sat-azimuth').parentElement.style.display = 'none';
-            if (getEl('sat-elevation')) getEl('sat-elevation').parentElement.style.display = 'none';
-            if (getEl('sat-range')) getEl('sat-range').parentElement.style.display = 'none';
-            if (getEl('sat-beamwidth')) getEl('sat-beamwidth').parentElement.style.display = 'none';
-            if (getEl('sat-maxTmx')) getEl('sat-maxTmx').parentElement.style.display = 'none';
+            if (getEl('sat-vmag')) getEl('sat-vmag').innerHTML = 'Out of FOV';
+            if (getEl('sat-azimuth')) getEl('sat-azimuth').innerHTML = 'Out of FOV';
+            if (getEl('sat-azimuth')) getEl('sat-azimuth').title = 'Azimuth: ' + this.currentTEARR.az.toFixed(0) + '°';
+
+            const elevationDom = getEl('sat-elevation');
+            if (elevationDom) elevationDom.innerHTML = 'Out of FOV';
+            if (elevationDom) elevationDom.title = 'Elevation: ' + this.currentTEARR.el.toFixed(1) + '°';
+
+            const rangeDom = getEl('sat-range');
+            if (rangeDom) rangeDom.innerHTML = 'Out of FOV';
+            if (rangeDom) rangeDom.title = 'Range: ' + this.currentTEARR.rng.toFixed(2) + ' km';
+            const beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth ? sensorManagerInstance.currentSensors[0].beamwidth + '°' : 'Unknown';
+            if (getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = 'Out of FOV';
+            if (getEl('sat-beamwidth')) getEl('sat-beamwidth').title = beamwidthString;
+            if (getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = 'Out of FOV';
           }
 
           if (this.selectSatManager_.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
@@ -252,35 +241,31 @@ export class SatInfoBox extends KeepTrackPlugin {
             getEl('sat-sec-crosstrack').innerHTML = `${ric.position[2].toFixed(2)}km`;
           }
 
-          if (catalogManagerInstance.isSensorManagerLoaded) {
-            if (sensorManagerInstance.isSensorSelected()) {
-              const uiManagerInstance = keepTrackApi.getUiManager();
+          if (sensorManagerInstance.isSensorSelected()) {
+            const uiManagerInstance = keepTrackApi.getUiManager();
 
-              // If we didn't just calculate next pass time for this satellite and sensor combination do it
-              // TODO: Make new logic for this to allow it to be updated while selected
-              if (
-                (this.selectSatManager_.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
-                  sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
-                !isMissileObject(sat)
-              ) {
-                sat = <SatObject>sat;
-                if (sat.perigee > sensorManagerInstance.currentSensors[0].obsmaxrange) {
-                  if (getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = 'Beyond Max Range';
-                } else if (getEl('sat-nextpass')) {
-                  getEl('sat-nextpass').innerHTML = SensorMath.nextpass(sat, sensorManagerInstance.currentSensors, 2, 5);
-                }
-
-                // IDEA: Code isInSun()
-                //sun.getXYZ();
-                //lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
+            // If we didn't just calculate next pass time for this satellite and sensor combination do it
+            // TODO: Make new logic for this to allow it to be updated while selected
+            if (
+              (this.selectSatManager_.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
+                sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
+              !isMissileObject(sat)
+            ) {
+              sat = <SatObject>sat;
+              if (sat.perigee > sensorManagerInstance.currentSensors[0].obsmaxrange) {
+                if (getEl('sat-nextpass')) getEl('sat-nextpass').innerHTML = 'Beyond Max Range';
+              } else if (getEl('sat-nextpass')) {
+                getEl('sat-nextpass').innerHTML = SensorMath.nextpass(sat, sensorManagerInstance.currentSensors, 2, 5);
               }
-              uiManagerInstance.lastNextPassCalcSatId = this.selectSatManager_.selectedSat;
-              uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0].objName;
-            } else if (getEl('sat-nextpass')) {
-              getEl('sat-nextpass').innerHTML = 'Unavailable';
+
+              // IDEA: Code isInSun()
+              //sun.getXYZ();
+              //lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
             }
+            uiManagerInstance.lastNextPassCalcSatId = this.selectSatManager_.selectedSat;
+            uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0].objName;
           } else if (getEl('sat-nextpass')) {
-            getEl('sat-nextpass').parentElement.style.display = 'none';
+            getEl('sat-nextpass').innerHTML = 'Unavailable';
           }
         } catch (e) {
           errorManagerInstance.debug('Error updating satellite info!');
@@ -313,19 +298,43 @@ export class SatInfoBox extends KeepTrackPlugin {
     });
   }
 
-  orbitalData(sat: SatObject): void {
-    // Only show orbital data if it is available
-    if (sat === null || typeof sat === 'undefined') return;
-
+  private uiManagerFinal_(): void {
     if (!this.isorbitalDataLoaded) {
       SatInfoBox.createOrbitalData();
       this.isorbitalDataLoaded = true;
-
-      // Give the DOM time load and then redo
-      setTimeout(() => {
-        this.orbitalData(sat);
-      }, 500);
     }
+    if (!this.issecondaryDataLoaded) {
+      SatInfoBox.createSecondaryData();
+      this.issecondaryDataLoaded = true;
+    }
+
+    if (!this.issensorInfoLoaded) {
+      SatInfoBox.createSensorInfo();
+      this.issensorInfoLoaded = true;
+    }
+
+    if (!this.islaunchDataLoaded) {
+      SatInfoBox.createLaunchData();
+      this.islaunchDataLoaded = true;
+    }
+
+    if (!this.issatMissionDataLoaded) {
+      SatInfoBox.createSatMissionData();
+      this.issatMissionDataLoaded = true;
+    }
+
+    if (!this.isintelDataLoaded) {
+      SatInfoBox.createIntelData();
+      this.isintelDataLoaded = true;
+    }
+
+    // Now that is is loaded, reset the sizing and location
+    SatInfoBox.resetMenuLocation(getEl('sat-infobox'), false);
+  }
+
+  orbitalData(sat: SatObject): void {
+    // Only show orbital data if it is available
+    if (sat === null || typeof sat === 'undefined') return;
 
     this.updateOrbitData(sat);
   }
@@ -404,7 +413,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       const periodDom = getEl('sat-period');
       periodDom.innerHTML = sat.period.toFixed(2) + ' min';
-      periodDom.dataset.position = 'left';
+      periodDom.dataset.position = 'top';
       periodDom.dataset.delay = '50';
       periodDom.dataset.tooltip = 'Mean Motion: ' + (MINUTES_PER_DAY / sat.period).toFixed(2);
 
@@ -428,7 +437,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       SatInfoBox.updateConfidenceDom(sat);
 
-      elsetAgeDom.dataset.position = 'left';
+      elsetAgeDom.dataset.position = 'top';
       elsetAgeDom.dataset.delay = '50';
       elsetAgeDom.dataset.tooltip = 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString();
     }
@@ -449,15 +458,6 @@ export class SatInfoBox extends KeepTrackPlugin {
   };
 
   isTopLinkEventListenersAdded = false;
-
-  secondaryData = (sat: SatObject): void => {
-    if (sat === null || typeof sat === 'undefined') return;
-
-    if (!this.issecondaryDataLoaded) {
-      SatInfoBox.createSecondaryData();
-      this.issecondaryDataLoaded = true;
-    }
-  };
 
   private addRemoveWatchlist() {
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
@@ -494,17 +494,6 @@ export class SatInfoBox extends KeepTrackPlugin {
       confidenceDom.innerHTML = text;
       confidenceDom.style.color = color;
     }
-  }
-
-  launchData(sat: SatObject): void {
-    if (sat === null || typeof sat === 'undefined') return;
-
-    if (!this.islaunchDataLoaded) {
-      SatInfoBox.createLaunchData();
-      this.islaunchDataLoaded = true;
-    }
-
-    SatInfoBox.updateLaunchData(sat);
   }
 
   static updateObjectData = (sat: SatObject): void => {
@@ -557,7 +546,9 @@ export class SatInfoBox extends KeepTrackPlugin {
     SatInfoBox.updateRcsData(sat);
   };
 
-  private static updateLaunchData(sat: SatObject) {
+  private static updateLaunchData(sat?: SatObject) {
+    if (sat === null || typeof sat === 'undefined') return;
+
     SatInfoBox.updateCountryCorrelationTable(sat);
     let { missileLV, satLvString }: { missileLV: string; satLvString: string } = SatInfoBox.updateLaunchSiteCorrelationTable(sat);
     SatInfoBox.updateLaunchVehicleCorrelationTable(sat, missileLV, satLvString);
@@ -884,7 +875,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       });
       draggie.on('dragStart', () => {
         getEl('sat-infobox').style.height = '600px';
-        keepTrackApi.containerRoot.style.setProperty('--search-box-bottom', `0px`);
+        document.documentElement.style.setProperty('--search-box-bottom', `0px`);
         getEl('sat-infobox').classList.remove('satinfo-fixed');
       });
     }
@@ -893,17 +884,22 @@ export class SatInfoBox extends KeepTrackPlugin {
     const satInfobox = getEl('sat-infobox');
     satInfobox.addEventListener('mousedown', (e: any) => {
       if (e.button === 2) {
-        SatInfoBox.resetMenuLocation_(satInfobox);
+        SatInfoBox.resetMenuLocation(satInfobox);
       }
     });
   }
 
-  private static resetMenuLocation_(satInfobox: HTMLElement) {
-    satInfobox.classList.remove('satinfo-fixed');
-    satInfobox.removeAttribute('style');
-    satInfobox.style.display = 'block';
-    const searchBoxHeight = satInfobox.clientHeight;
-    keepTrackApi.containerRoot.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
+  static resetMenuLocation(satInfoboxDom: HTMLElement, isShow = true) {
+    satInfoboxDom.classList.remove('satinfo-fixed');
+    satInfoboxDom.removeAttribute('style');
+
+    if (isShow) {
+      satInfoboxDom.style.display = 'block';
+    }
+
+    const searchBoxHeight = satInfoboxDom?.getBoundingClientRect().height ?? 0;
+    const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
+    document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
   }
 
   private static updateSatType(sat: SatObject) {
@@ -983,20 +979,13 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  satMissionData = (sat: SatObject): void => {
+  private static updateSatMissionData(sat?: SatObject) {
     if (sat === null || typeof sat === 'undefined') return;
 
-    if (!this.issatMissionDataLoaded) {
-      SatInfoBox.createSatMissionData();
-      this.issatMissionDataLoaded = true;
-    }
-
-    SatInfoBox.updateSatMissionData(sat);
-  };
-
-  private static updateSatMissionData(sat: SatObject) {
     if (!sat.missile) {
-      (<HTMLElement>keepTrackApi.containerRoot.querySelector('.sat-only-info')).style.display = 'flex';
+      keepTrackApi.containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
+        (<HTMLElement>el).style.display = 'flex';
+      });
       getEl('sat-user').innerHTML = sat?.owner && sat?.owner !== '' ? sat?.owner : 'Unknown';
       getEl('sat-purpose').innerHTML = sat?.purpose && sat?.purpose !== '' ? sat?.purpose : 'Unknown';
       getEl('sat-contractor').innerHTML = sat?.manufacturer && sat?.manufacturer !== '' ? sat?.manufacturer : 'Unknown';
@@ -1155,19 +1144,9 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
-  intelData = (sat: SatObject, satId?: number): void => {
-    if (satId !== -1) {
-      if (!this.isintelDataLoaded) {
-        SatInfoBox.createIntelData();
-        this.isintelDataLoaded = true;
-        SatInfoBox.resetMenuLocation_(getEl('sat-infobox'));
-      }
-
-      SatInfoBox.updateIntelData(sat);
-    }
-  };
-
   private static updateIntelData(sat: SatObject) {
+    if (!sat) return;
+
     if (typeof sat.TTP != 'undefined') {
       getEl('sat-ttp-wrapper').style.display = 'block';
       getEl('sat-ttp').innerHTML = sat.TTP;
@@ -1289,41 +1268,23 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
-  sensorInfo(sat: SatObject): void {
-    if (sat === null || typeof sat === 'undefined' || !settingsManager.plugins.sensor) return;
-
-    if (!this.issensorInfoLoaded) {
-      SatInfoBox.createSensorInfo();
-      this.issensorInfoLoaded = true;
-    }
-
-    SatInfoBox.updateSensorInfo(sat);
-  }
-
   private static updateSensorInfo(sat: SatObject) {
+    if (sat === null || typeof sat === 'undefined' || !settingsManager.plugins.sensor) return;
     const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // If we are using the sensor manager plugin then we should hide the sensor to satellite
     // info when there is no sensor selected
     if (settingsManager.plugins.sensor) {
       if (sensorManagerInstance.isSensorSelected()) {
-        getEl('sensor-sat-info').style.display = 'block';
+        showEl('sensor-sat-info');
       } else {
-        getEl('sensor-sat-info').style.display = 'none';
+        hideEl('sensor-sat-info');
       }
     }
 
-    const satOnlyInfoDom = keepTrackApi.containerRoot.querySelector<HTMLElement>('.sat-only-info');
-    if (!sat.missile) {
-      satOnlyInfoDom.style.display = 'flex';
-    } else {
-      satOnlyInfoDom.style.display = 'none';
-    }
-
-    if (!catalogManagerInstance.isSensorManagerLoaded || !sensorManagerInstance.currentSensors[0].lat) {
+    if (!sensorManagerInstance.currentSensors[0]?.lat) {
       const satSunDom = getEl('sat-sun');
-      if (satSunDom) satSunDom.style.display = 'none';
+      if (satSunDom) satSunDom.parentElement.style.display = 'none';
     } else {
       const timeManagerInstance = keepTrackApi.getTimeManager();
       const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);
@@ -1340,10 +1301,10 @@ export class SatInfoBox extends KeepTrackPlugin {
       // If No Sensor, then Ignore Sun Exclusion
       const satSunDom = getEl('sat-sun');
       if (sensorManagerInstance.currentSensors[0].lat === null) {
-        if (satSunDom) satSunDom.style.display = 'none';
+        if (satSunDom) satSunDom.parentElement.style.display = 'none';
         return;
       } else if (satSunDom) {
-        satSunDom.style.display = 'block';
+        satSunDom.parentElement.style.display = 'flex';
       }
 
       // If Radar Selected, then Say the Sun Doesn't Matter

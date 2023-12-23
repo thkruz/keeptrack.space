@@ -2,6 +2,7 @@ import { CatalogObject, MissileObject, SensorObject } from './../interfaces';
 /* */
 
 import { CatalogManager, SatObject, UiManager } from '@app/interfaces';
+import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
 import { SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -286,7 +287,7 @@ export class SearchManager {
 
   private static doNumOnlySearch_(searchString: string) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const results = [];
+    let results = [];
 
     // Split string into array using comma
     let searchList = searchString.split(/,/u).filter((str) => str.length > 0);
@@ -304,7 +305,8 @@ export class SearchManager {
       for (; i < satData.length; i++) {
         const sat = satData[i];
         if (results.length >= settingsManager.searchLimit) break;
-        if (parseInt(sat.sccNum) > parseInt(searchStringIn)) break;
+        // TODO: This wont work because of partial searches
+        // if (parseInt(sat.sccNum) > parseInt(searchStringIn)) break;
 
         if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
           // Ignore Notional Satellites unless all 6 characters are entered
@@ -320,6 +322,9 @@ export class SearchManager {
         }
       }
     });
+
+    // Remove any duplicates in results
+    results = results.filter((result, index, self) => index === self.findIndex((t) => t.satId === result.satId));
 
     return results;
   }
@@ -411,6 +416,10 @@ export class SearchManager {
       html += '</div></div>';
       return html;
     }, '');
+
+    const satInfoboxDom = getEl('sat-infobox');
+    if (satInfoboxDom) SatInfoBox.resetMenuLocation(satInfoboxDom, false);
+
     slideInDown(getEl('search-results'), 1000);
     this.resultsOpen_ = true;
 

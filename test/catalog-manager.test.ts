@@ -42,6 +42,9 @@ describe('calcSatrec', () => {
 
   // should search for objects in similar orbits
   it('search_for_similar_orbits', () => {
+    const selectSataManagerInstance = new SelectSatManager();
+    selectSataManagerInstance.init();
+
     defaultSat.period = 100;
     const matchSat = { ...defaultSat, id: 1, period: 99 };
     const nonmatchSat = { ...defaultSat, id: 2, period: 200 };
@@ -49,7 +52,7 @@ describe('calcSatrec', () => {
     const nonmatchSat3 = { ...defaultSat, id: 4, raan: 200 * DEG2RAD };
     const nonmatchSat4 = { ...defaultSat, id: 5, static: true };
 
-    catalogManagerInstance.selectedSat = defaultSat.id;
+    selectSataManagerInstance.selectedSat = defaultSat.id;
     catalogManagerInstance.satData = [defaultSat, matchSat, nonmatchSat, nonmatchSat2, nonmatchSat3, nonmatchSat4];
     const satData = CatalogSearch.findObjsByOrbit(<SatObject[]>(<unknown>catalogManagerInstance.satData), defaultSat);
     expect(satData).toStrictEqual([0, 1]);

@@ -295,7 +295,6 @@ export class Camera {
   }
 
   public changeCameraType(orbitManager: OrbitManager) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
@@ -311,7 +310,7 @@ export class Camera {
     if (this.cameraType == CameraType.FPS) {
       this.resetFpsPos_();
     }
-    if (this.cameraType === CameraType.PLANETARIUM && (!catalogManagerInstance.isSensorManagerLoaded || !sensorManagerInstance.isSensorSelected())) {
+    if (this.cameraType === CameraType.PLANETARIUM && !sensorManagerInstance.isSensorSelected()) {
       this.cameraType++;
     }
 
@@ -319,7 +318,7 @@ export class Camera {
       this.cameraType++;
     }
 
-    if (this.cameraType === CameraType.ASTRONOMY && (!catalogManagerInstance.isSensorManagerLoaded || !sensorManagerInstance.isSensorSelected())) {
+    if (this.cameraType === CameraType.ASTRONOMY && !sensorManagerInstance.isSensorSelected()) {
       this.cameraType++;
     }
 

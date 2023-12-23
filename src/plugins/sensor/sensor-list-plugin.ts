@@ -512,5 +512,3 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
   }
 }
-
-export const sensorListPlugin = new SensorListPlugin();

@@ -48,19 +48,19 @@ import { SatInfoBox } from './select-sat-manager/sat-info-box';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { sensorFovPlugin } from './sensor-fov/sensor-fov';
 import { sensorSurvFencePlugin } from './sensor-surv/sensor-surv-fence';
-import { sensorCustomPlugin } from './sensor/custom-sensor-plugin';
+import { CustomSensorPlugin } from './sensor/custom-sensor-plugin';
 import { LookAnglesPlugin } from './sensor/look-angles-plugin';
-import { multiSiteLookAnglesPlugin } from './sensor/multi-site-look-angles-plugin';
-import { sensorInfoPlugin } from './sensor/sensor-info-plugin';
-import { sensorListPlugin } from './sensor/sensor-list-plugin';
+import { MultiSiteLookAnglesPlugin } from './sensor/multi-site-look-angles-plugin';
+import { SensorInfoPlugin } from './sensor/sensor-info-plugin';
+import { SensorListPlugin } from './sensor/sensor-list-plugin';
 import { settingsMenuPlugin } from './settings-menu/settings-menu';
 import { shortTermFencesPlugin } from './short-term-fences/short-term-fences';
 import { socialMediaPlugin } from './social/social';
 import { StereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { videoDirectorPlugin } from './video-director/video-director';
-import { watchlistPlugin } from './watchlist/watchlist';
-import { watchlistOverlayPlugin } from './watchlist/watchlist-overlay';
+import { WatchlistPlugin } from './watchlist/watchlist';
+import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
 export type KeepTrackPlugins = {
   videoDirector?: boolean;
@@ -131,10 +131,7 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     keepTrackContainer.registerSingleton<SelectSatManager>(Singletons.SelectSatManager, selectSatManagerInstance);
 
     if (plugins.topMenu) topMenuPlugin.init();
-    if (plugins.satInfoboxCore) {
-      const satInfoBoxCorePlugin = new SatInfoBox();
-      satInfoBoxCorePlugin.init();
-    }
+    if (plugins.satInfoboxCore) new SatInfoBox().init();
 
     // Core Features
     if (plugins.datetime) dateTimeManagerPlugin.init();
@@ -143,16 +140,15 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     // UI Menu
     if (plugins.classificationBar) classificationBarPlugin.init();
     if (plugins.sensor) {
-      sensorListPlugin.init();
-      sensorInfoPlugin.init();
-      sensorCustomPlugin.init();
-      const lookAnglesPlugin = new LookAnglesPlugin();
-      lookAnglesPlugin.init();
-      multiSiteLookAnglesPlugin.init();
+      new SensorListPlugin().init();
+      new SensorInfoPlugin().init();
+      new CustomSensorPlugin().init();
+      new LookAnglesPlugin().init();
+      new MultiSiteLookAnglesPlugin().init();
     }
     if (plugins.watchlist) {
-      watchlistPlugin.init();
-      watchlistOverlayPlugin.init();
+      new WatchlistPlugin().init();
+      new WatchlistOverlay().init();
     }
     if (plugins.nextLaunch) nextLaunchesPlugin.init();
     if (plugins.findSat) findSatPlugin.init();

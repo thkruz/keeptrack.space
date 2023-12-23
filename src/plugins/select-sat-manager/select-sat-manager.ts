@@ -125,8 +125,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (satId === -1 && this.lastSelectedSat() !== -1) {
       keepTrackApi.getMainCamera().exitFixedToSat();
 
-      const rootElement = document.querySelector(':root') as HTMLElement;
-      rootElement.style.setProperty('--search-box-bottom', `0px`);
+      document.documentElement.style.setProperty('--search-box-bottom', `0px`);
       const satInfoBoxDom = getEl('sat-infobox', true);
       if (satInfoBoxDom) {
         satInfoBoxDom.style.display = 'none';
@@ -157,11 +156,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (sat.static) {
         if (typeof sat.staticNum == 'undefined') return;
         sat = catalogManagerInstance.getSat(satId);
-        // if (catalogManagerInstance.isSensorManagerLoaded) sensorManagerInstance.setSensor(null, sat.staticNum); // Pass staticNum to identify which sensor the user clicked
-
-        // Todo: Needs to run uiManager.getsensorinfo();
-
-        // if (catalogManagerInstance.isSensorManagerLoaded) sensorManager.curSensorPositon = [sat.position.x, sat.position.y, sat.position.z];
         this.setSelectedSat(-1);
         getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
@@ -177,7 +171,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
       keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
 
-      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.isSensorSelected()) {
+      if (sensorManagerInstance.isSensorSelected()) {
         getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
       }
 
@@ -194,13 +188,13 @@ export class SelectSatManager extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SatInfoBox)?.selectSat(sat);
 
     if (satId !== -1) {
-      // NOTE: This has to come after keepTrackApi.methods.selectSatData in catalogManagerInstance.setSelectedSat.
-      const rootElement = document.querySelector(':root') as HTMLElement;
-      const searchBoxHeight = getEl('sat-infobox')?.clientHeight;
-      // get --search-box-bottom
-      const curVal = rootElement.style.getPropertyValue('--search-box-bottom');
-      if (curVal !== searchBoxHeight + 'px') {
-        rootElement.style.setProperty('--search-box-bottom', `${searchBoxHeight}px`);
+      const satInfoBoxDom = getEl('sat-infobox');
+      // Get the height of the DOM
+      const searchBoxHeight = satInfoBoxDom?.getBoundingClientRect().height ?? 0;
+      const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
+      const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
+      if (curVal !== searchBoxHeight + bottomMenuTopVar + 'px') {
+        document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
       }
       showEl('sat-infobox');
     }

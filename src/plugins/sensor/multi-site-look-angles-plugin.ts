@@ -300,5 +300,3 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     }
   }
 }
-
-export const multiSiteLookAnglesPlugin = new MultiSiteLookAnglesPlugin();

@@ -355,5 +355,3 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     return <Degrees>parseFloat(str);
   }
 }
-
-export const sensorCustomPlugin = new CustomSensorPlugin();

@@ -405,7 +405,7 @@ export class InputManager {
         showEl('view-sat-info-rmb');
         showEl('view-related-sats-rmb');
 
-        if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].lat != null && sensorManagerInstance.whichRadar !== 'CUSTOM') {
+        if (sensorManagerInstance.isSensorSelected() && sensorManagerInstance.whichRadar !== 'CUSTOM') {
           getEl('line-sensor-sat-rmb').style.display = 'block';
         }
 

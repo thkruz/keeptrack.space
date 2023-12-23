@@ -455,5 +455,3 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     evt.preventDefault();
   }
 }
-
-export const watchlistPlugin = new WatchlistPlugin();

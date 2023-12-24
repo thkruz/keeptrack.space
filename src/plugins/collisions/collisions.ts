@@ -114,9 +114,12 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     keepTrackApi.getTimeManager().changeStaticOffset(this.collisionList[row].toca.getTime() - now.getTime() - 1000 * 30);
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
-    keepTrackApi.getUiManager().doSearch(`${this.collisionList[row].sat1},${this.collisionList[row].sat2}`);
+    const sat1 = this.collisionList[row].sat1.padStart(5, '0');
+    const sat2 = this.collisionList[row].sat2.padStart(5, '0');
+
+    keepTrackApi.getUiManager().doSearch(`${sat1},${sat2}`);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    this.socratesOnSatCruncher = catalogManagerInstance.getIdFromObjNum(parseInt(this.collisionList[row].sat1));
+    this.socratesOnSatCruncher = catalogManagerInstance.getIdFromObjNum(parseInt(sat1));
   }
 
   private processSocratesHtm(socratesHTM: Document): void {

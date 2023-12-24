@@ -53,7 +53,11 @@ export abstract class UrlManager {
       url += '?' + paramSlices.join('&');
     }
 
-    window.history.replaceState(null, '', url);
+    if (url !== window.location.href) {
+      setTimeout(() => {
+        window.history.replaceState(null, '', url);
+      }, 100);
+    }
   }
 
   /**

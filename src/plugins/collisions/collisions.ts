@@ -26,14 +26,17 @@ interface CollisionEvent {
   maxProb: number;
 }
 
-export class CollissionsPlugin extends KeepTrackPlugin {
+export class Collissions extends KeepTrackPlugin {
   static PLUGIN_NAME = 'collisions';
 
   constructor() {
-    super(CollissionsPlugin.PLUGIN_NAME);
+    super(Collissions.PLUGIN_NAME);
   }
 
   private readonly collisionDataSrc = './tle/SOCRATES.json';
+  private selectSatIdOnCruncher_: number | null = null;
+  private collisionList_ = <CollisionEvent[]>[];
+
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = collissionsPng;
   bottomIconLabel: string = 'Collisions';
@@ -42,7 +45,7 @@ export class CollissionsPlugin extends KeepTrackPlugin {
   <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
     <div id="socrates-content" class="side-menu">
       <div class="row">
-        <h5 class="center-align">Possible collisions</h5>
+        <h5 class="center-align">Possible Collisions</h5>
         <table id="socrates-table" class="center-align"></table>
       </div>
     </div>
@@ -53,8 +56,6 @@ export class CollissionsPlugin extends KeepTrackPlugin {
   <br><br>
   Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision.`;
 
-  private socratesOnSatCruncher: number | null = null;
-  collisionList = <CollisionEvent[]>[];
   dragOptions: clickDragOptions = {
     isDraggable: true,
     minWidth: 500,
@@ -67,7 +68,30 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     }
   };
 
-  private uiManagerFinal() {
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
+      cb: this.uiManagerFinal_.bind(this),
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onCruncherMessage,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        if (this.selectSatIdOnCruncher_ !== null) {
+          // If selectedSatManager is loaded, set the selected sat to the one that was just added
+          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.selectSatIdOnCruncher_);
+
+          this.selectSatIdOnCruncher_ = null;
+        }
+      },
+    });
+  }
+
+  private uiManagerFinal_() {
     getEl(this.sideMenuElementName).addEventListener('click', (evt: any) => {
       showLoading(() => {
         const el = <HTMLElement>evt.target.parentElement;
@@ -81,38 +105,15 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     });
   }
 
-  public addJs(): void {
-    super.addJs();
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
-      cb: this.uiManagerFinal.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.PLUGIN_NAME,
-      cb: () => {
-        if (this.socratesOnSatCruncher !== null) {
-          // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.socratesOnSatCruncher);
-
-          this.socratesOnSatCruncher = null;
-        }
-      },
-    });
-  }
-
   private parseCollisionData_() {
-    if (this.collisionList.length === 0) {
+    if (this.collisionList_.length === 0) {
       // Only generate the table if receiving the -1 argument for the first time
       fetch(this.collisionDataSrc).then((response) => {
         response.json().then((collisionList: CollisionEvent[]) => {
-          this.collisionList = collisionList;
+          this.collisionList_ = collisionList;
           this.createTable_();
 
-          if (this.collisionList.length === 0) {
+          if (this.collisionList_.length === 0) {
             errorManagerInstance.warn('No collisions data found!');
           }
         });
@@ -122,15 +123,15 @@ export class CollissionsPlugin extends KeepTrackPlugin {
 
   private eventClicked_(row: number) {
     const now = new Date();
-    keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList[row].toca).getTime() - now.getTime() - 1000 * 30);
+    keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].toca).getTime() - now.getTime() - 1000 * 30);
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
-    const sat1 = this.collisionList[row].sat1.padStart(5, '0');
-    const sat2 = this.collisionList[row].sat2.padStart(5, '0');
+    const sat1 = this.collisionList_[row].sat1.padStart(5, '0');
+    const sat2 = this.collisionList_[row].sat2.padStart(5, '0');
 
     keepTrackApi.getUiManager().doSearch(`${sat1},${sat2}`);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    this.socratesOnSatCruncher = catalogManagerInstance.getIdFromSccNum(parseInt(sat1));
+    this.selectSatIdOnCruncher_ = catalogManagerInstance.getIdFromSccNum(parseInt(sat1));
   }
 
   private createTable_(): void {
@@ -138,7 +139,7 @@ export class CollissionsPlugin extends KeepTrackPlugin {
       const tbl = <HTMLTableElement>getEl('socrates-table'); // Identify the table to update
       tbl.innerHTML = ''; // Clear the table from old object data
 
-      CollissionsPlugin.createHeaders_(tbl);
+      Collissions.createHeaders_(tbl);
 
       this.createBody_(tbl);
     } catch (e) {
@@ -147,7 +148,7 @@ export class CollissionsPlugin extends KeepTrackPlugin {
   }
 
   private createBody_(tbl: HTMLTableElement) {
-    for (let i = 0; i < this.collisionList.length; i++) {
+    for (let i = 0; i < this.collisionList_.length; i++) {
       this.createRow_(tbl, i);
     }
   }
@@ -169,12 +170,12 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     tr.setAttribute('data-row', i.toString());
 
     // Populate the table with the data
-    CollissionsPlugin.createCell_(tr, this.collisionList[i].toca.slice(0, 19).replace('T', ' '));
-    CollissionsPlugin.createCell_(tr, this.collisionList[i].sat1);
-    CollissionsPlugin.createCell_(tr, this.collisionList[i].sat2);
-    CollissionsPlugin.createCell_(tr, this.collisionList[i].maxProb.toString());
-    CollissionsPlugin.createCell_(tr, this.collisionList[i].minRng.toString());
-    CollissionsPlugin.createCell_(tr, this.collisionList[i].relSpeed.toString());
+    Collissions.createCell_(tr, this.collisionList_[i].toca.slice(0, 19).replace('T', ' '));
+    Collissions.createCell_(tr, this.collisionList_[i].sat1);
+    Collissions.createCell_(tr, this.collisionList_[i].sat2);
+    Collissions.createCell_(tr, this.collisionList_[i].maxProb.toFixed(3));
+    Collissions.createCell_(tr, this.collisionList_[i].minRng.toString());
+    Collissions.createCell_(tr, this.collisionList_[i].relSpeed.toFixed(2));
     return tr;
   }
 
@@ -183,5 +184,3 @@ export class CollissionsPlugin extends KeepTrackPlugin {
     cell.appendChild(document.createTextNode(text));
   }
 }
-
-export const collissionsPlugin = new CollissionsPlugin();

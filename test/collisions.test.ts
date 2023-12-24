@@ -1,14 +1,14 @@
 import { getEl } from '@app/lib/get-el';
-import { CollissionsPlugin } from '@app/plugins/collisions/collisions';
+import { Collissions } from '@app/plugins/collisions/collisions';
 import { readFileSync } from 'fs';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('CollissionsPlugin_class', () => {
-  let satConstellationsPlugin: CollissionsPlugin;
+  let satConstellationsPlugin: Collissions;
   beforeEach(() => {
     setupDefaultHtml();
-    satConstellationsPlugin = new CollissionsPlugin();
+    satConstellationsPlugin = new Collissions();
     global.fetch = jest.fn().mockImplementation(
       () =>
         new Promise((resolve) => {
@@ -25,13 +25,13 @@ describe('CollissionsPlugin_class', () => {
     );
   });
 
-  standardPluginSuite(CollissionsPlugin, 'CollissionsPlugin');
-  standardPluginMenuButtonTests(CollissionsPlugin, 'CollissionsPlugin');
+  standardPluginSuite(Collissions, 'CollissionsPlugin');
+  standardPluginMenuButtonTests(Collissions, 'CollissionsPlugin');
 
   it('should have clickable objects', () => {
     websiteInit(satConstellationsPlugin);
     getEl('socrates-menu').click();
-    satConstellationsPlugin.collisionList = [
+    satConstellationsPlugin.collisionList_ = [
       {
         toca: new Date(),
       } as any,

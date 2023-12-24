@@ -16,7 +16,7 @@ import { analysisMenuPlugin } from './analysis/analysis';
 import { astronomyPlugin } from './astronomy/astronomy';
 import { Breakup } from './breakup/breakup';
 import { classificationBarPlugin } from './classification-bar/classification-bar';
-import { collissionsPlugin } from './collisions/collisions';
+import { Collissions } from './collisions/collisions';
 import { colorMenuPlugin } from './colors-menu/colors-menu';
 import { dateTimeManagerPlugin } from './date-time-manager/date-time-manager';
 import { debrisScreeningPlugin } from './debris-screening/debris-screening';
@@ -154,10 +154,11 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     if (plugins.findSat) findSatPlugin.init();
     if (plugins.shortTermFences) shortTermFencesPlugin.init();
     if (plugins.orbitReferences) orbitReferencesPlugin.init();
-    if (plugins.collisions) collissionsPlugin.init();
+    if (plugins.collisions) {
+      new Collissions().init();
+    }
     if (plugins.breakup) {
-      const breakupPlugin = new Breakup();
-      breakupPlugin.init();
+      new Breakup().init();
     }
     if (plugins.debrisScreening) debrisScreeningPlugin.init();
     if (plugins.editSat) editSatPlugin.init();

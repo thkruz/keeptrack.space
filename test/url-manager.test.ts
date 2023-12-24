@@ -28,7 +28,7 @@ describe('UrlManager_class', () => {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
-    catalogManagerInstance.getIdFromObjNum = (objNum: number) => objNum;
+    catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -98,7 +98,7 @@ describe('UrlManager_class', () => {
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     uiManagerInstance.toast = jest.fn();
     keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
-    catalogManagerInstance.getIdFromObjNum = () => null;
+    catalogManagerInstance.getIdFromSccNum = () => null;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -124,7 +124,7 @@ describe('UrlManager_class', () => {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
-    catalogManagerInstance.getIdFromObjNum = (objNum: number) => objNum;
+    catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -153,7 +153,7 @@ describe('UrlManager_class', () => {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
-    catalogManagerInstance.getIdFromObjNum = (objNum: number) => objNum;
+    catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 

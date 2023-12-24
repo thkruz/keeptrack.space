@@ -44,7 +44,7 @@ export abstract class ManueverMath {
     }
     var TLE1 = TLEs[0];
     var TLE2 = TLEs[1];
-    satId = catalogManagerInstance.getIdFromObjNum(80000);
+    satId = catalogManagerInstance.getIdFromSccNum(80000);
     var sat = catalogManagerInstance.getSat(satId);
     sat = origsat;
     let iTLE1 = '1 ' + 80000 + TLE1.substr(7);
@@ -123,7 +123,7 @@ export abstract class ManueverMath {
       for (let raanTemp = -1; raanTemp <= 1; raanTemp++) {
         for (let meanMoTemp = 0.95; meanMoTemp <= 1.05; meanMoTemp += 0.05) {
           if (ManueverMath.createManeuverAnalyst(sat.id, incTemp, meanMoTemp, raanTemp)) {
-            let minDistArrayTemp = SatMath.findClosestApproachTime(catalogManagerInstance.getSatFromObjNum(80000), sat2, propLength);
+            let minDistArrayTemp = SatMath.findClosestApproachTime(catalogManagerInstance.getSatFromSccNum(80000), sat2, propLength);
             if (minDistArrayTemp.dist < minDistArray.dist) {
               minDistArray = minDistArrayTemp;
               // let closestInc = incTemp;

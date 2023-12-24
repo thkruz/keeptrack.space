@@ -299,7 +299,7 @@ om.svs2analyst = async (svs: StateVector[], timeManager: TimeManager) => {
   const catalogManagerInstance = keepTrackApi.getCatalogManager();
   om.iod(svs, timeManager)
     .then((tles: { tle1: string; tle2: string }) => {
-      catalogManagerInstance.insertNewAnalystSatellite(tles.tle1, tles.tle2, catalogManagerInstance.getIdFromObjNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
+      catalogManagerInstance.insertNewAnalystSatellite(tles.tle1, tles.tle2, catalogManagerInstance.getIdFromSccNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
       // searchBox.doSearch('100500', false);
     })
     .catch((error) => {

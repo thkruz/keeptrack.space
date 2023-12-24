@@ -150,7 +150,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const _watchlistInViewList = [];
       for (let i = 0; i < newWatchlist.length; i++) {
-        const sat = catalogManagerInstance.getSat(catalogManagerInstance.getIdFromObjNum(newWatchlist[i]), GetSatType.EXTRA_ONLY);
+        const sat = catalogManagerInstance.getSat(catalogManagerInstance.getIdFromSccNum(newWatchlist[i]), GetSatType.EXTRA_ONLY);
         if (sat !== null) {
           newWatchlist[i] = sat.id;
           _watchlistInViewList.push(false);
@@ -357,7 +357,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   private onAddEvent_() {
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
     sats.forEach((satNum: string) => {
-      const id = keepTrackApi.getCatalogManager().getIdFromObjNum(parseInt(satNum));
+      const id = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt(satNum));
 
       if (id === null) {
         errorManagerInstance.warn(`Sat ${id} not found!`);
@@ -417,7 +417,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     this.watchlistInViewList = [];
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     for (let i = 0; i < newWatchlist.length; i++) {
-      const sat = catalogManagerInstance.getSat(catalogManagerInstance.getIdFromObjNum(newWatchlist[i]), GetSatType.EXTRA_ONLY);
+      const sat = catalogManagerInstance.getSat(catalogManagerInstance.getIdFromSccNum(newWatchlist[i]), GetSatType.EXTRA_ONLY);
       if (sat !== null && sat.id > 0) {
         newWatchlist[i] = sat.id;
         this.watchlistInViewList.push(false);

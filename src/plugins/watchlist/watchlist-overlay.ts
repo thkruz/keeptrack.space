@@ -85,10 +85,10 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     getEl('info-overlay-content').addEventListener('click', (evt: Event) => {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-      const objNum = parseInt((<HTMLElement>evt.target).textContent.split(':')[0]);
-      const satId = catalogManagerInstance.getIdFromObjNum(objNum);
-      if (satId !== null) {
-        keepTrackApi.getPlugin(SelectSatManager).setSelectedSat(satId);
+      const sccNum = parseInt((<HTMLElement>evt.target).textContent.split(':')[0]);
+      const id = catalogManagerInstance.getIdFromSccNum(sccNum);
+      if (id !== null) {
+        keepTrackApi.getPlugin(SelectSatManager).setSelectedSat(id);
       }
     });
   }

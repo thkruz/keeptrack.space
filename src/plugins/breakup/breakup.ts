@@ -188,7 +188,7 @@ export class Breakup extends KeepTrackPlugin {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    let satId = catalogManagerInstance.getIdFromObjNum(parseInt((<HTMLInputElement>getEl('hc-scc')).value));
+    let satId = catalogManagerInstance.getIdFromSccNum(parseInt((<HTMLInputElement>getEl('hc-scc')).value));
     const mainsat: SatObject = catalogManagerInstance.getSat(satId);
     const origsat = mainsat;
 
@@ -240,7 +240,7 @@ export class Breakup extends KeepTrackPlugin {
     let i = 0;
     for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
       if (i >= breakupCount) break;
-      satId = catalogManagerInstance.getIdFromObjNum(90000 + i);
+      satId = catalogManagerInstance.getIdFromSccNum(90000 + i);
       catalogManagerInstance.getSat(satId); // TODO: This may be unnecessary needs tested
       let sat = origsat;
       // Is this needed? -- let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7) ??
@@ -281,7 +281,7 @@ export class Breakup extends KeepTrackPlugin {
         const meanmoStr = StringPad.pad0(meanmo.toFixed(8), 11);
         if (meanmoStr.length !== 11) throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTLE2}`);
 
-        satId = catalogManagerInstance.getIdFromObjNum(80000 + i);
+        satId = catalogManagerInstance.getIdFromSccNum(80000 + i);
         iTLE1 = `1 ${80000 + i}` + iTLE1.substr(7);
         iTLE2 = `2 ${80000 + i} ${incStr} ${iTLE2.substr(17, 35)}${meanmoStr}${iTLE2.substr(63)}`;
 

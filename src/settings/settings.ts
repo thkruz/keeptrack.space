@@ -1382,9 +1382,9 @@ export class SettingsManager {
               cb: () => {
                 setTimeout(() => {
                   if (typeof val === 'string') {
-                    const objNum = parseInt(val);
-                    if (objNum >= 0) {
-                      const id = keepTrackApi.getCatalogManager().getIdFromObjNum(objNum) as number;
+                    const sccNum = parseInt(val);
+                    if (sccNum >= 0) {
+                      const id = keepTrackApi.getCatalogManager().getIdFromSccNum(sccNum);
                       if (id >= 0) {
                         keepTrackApi.getSelectSatManager().selectSat(id);
                       } else {

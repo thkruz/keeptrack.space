@@ -566,7 +566,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     for (const satId of satArray) {
       try {
         if (typeof satId == 'undefined' || satId == null || satId === '' || satId === ' ') continue;
-        const sat = keepTrackApi.getCatalogManager().getSatFromObjNum(parseInt(satId));
+        const sat = keepTrackApi.getCatalogManager().getSatFromSccNum(parseInt(satId));
         const satPasses = AnalysisMenu.findBestPass(sat, [sensor]);
         for (const pass of satPasses) {
           passes.push(pass);

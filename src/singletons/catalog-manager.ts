@@ -183,7 +183,7 @@ export class StandardCatalogManager implements CatalogManager {
    * If a satellite number does not have a corresponding ID, it is not included in the returned array.
    */
   convertSatnumArrayToIdArray(satnumArray: number[]): number[] {
-    return <number[]>satnumArray.map((satnum) => this.getIdFromObjNum(satnum, false) ?? null).filter((id) => id !== null);
+    return satnumArray.map((satnum) => this.getIdFromSccNum(satnum, false) ?? null).filter((id) => id !== null);
   }
 
   cruncherExtraData(mData: SatCruncherMessageData) {
@@ -270,7 +270,7 @@ export class StandardCatalogManager implements CatalogManager {
   /**
    * This method is used to get the ID from the object number.
    *
-   * @param {number} objNum - The object number for which the ID is to be found.
+   * @param {number} sccNum - The NORAD satellite catalog number.
    * @param {boolean} isExtensiveSearch - A flag to determine if an extensive search should be performed. Default is true.
    *
    * @returns {number | null} - Returns the ID if found, otherwise returns null.
@@ -279,13 +279,14 @@ export class StandardCatalogManager implements CatalogManager {
    * If the object number does not exist in the `sccIndex` and `isExtensiveSearch` is true, it performs an extensive search in the `satData`.
    * If the object number is found in the `satData`, it returns the index as the ID. If not found, it returns null.
    */
-  getIdFromObjNum(objNum: number, isExtensiveSearch = true): number | null {
-    if (typeof this.sccIndex?.[`${objNum}`] !== 'undefined') {
-      return this.sccIndex[`${objNum}`];
+  getIdFromSccNum(sccNum: number, isExtensiveSearch = true): number | null {
+    const satBySccIndex = this.sccIndex[`'${sccNum}'`];
+    if (typeof satBySccIndex !== 'undefined') {
+      return this.sccIndex[`${sccNum}`];
     } else if (isExtensiveSearch) {
       for (let i = 0; i < this.satData.length; i++) {
         const sat = this.satData[i];
-        if (sat && parseInt(sat.sccNum as string) == objNum) return i;
+        if (sat && parseInt(sat.sccNum) == sccNum) return i;
       }
     }
     return null;
@@ -339,11 +340,11 @@ export class StandardCatalogManager implements CatalogManager {
   /**
    * Retrieves a satellite object based on its object number.
    *
-   * @param objNum - The object number of the satellite.
+   * @param sccNum - The object number of the satellite.
    * @returns The satellite object if found, null otherwise.
    */
-  getSatFromObjNum(objNum: number): SatObject | null {
-    return this.getSat(this.getIdFromObjNum(objNum));
+  getSatFromSccNum(sccNum: number): SatObject | null {
+    return this.getSat(this.getIdFromSccNum(sccNum));
   }
 
   getSensorFromSensorName(sensorName: string): number | null {

@@ -104,7 +104,7 @@ export abstract class UrlManager {
       cb: () => {
         const uiManagerInstance = keepTrackApi.getUiManager();
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const urlSatId = catalogManagerInstance.getIdFromObjNum(parseInt(val));
+        const urlSatId = catalogManagerInstance.getIdFromSccNum(parseInt(val));
         if (urlSatId !== null) {
           keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(urlSatId);
         } else {

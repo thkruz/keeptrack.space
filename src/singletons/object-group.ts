@@ -76,7 +76,7 @@ export class ObjectGroup {
       case GroupType.SCC_NUM:
         this.objects = data
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sccNum: number) => keepTrackApi.getCatalogManager().getIdFromObjNum(sccNum))
+          .map((sccNum: number) => keepTrackApi.getCatalogManager().getIdFromSccNum(sccNum))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.ID_LIST:

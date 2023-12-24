@@ -249,9 +249,8 @@ export class EditSatPlugin extends KeepTrackPlugin {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     const object = JSON.parse(<string>evt.target.result);
-    const scc = parseInt(StringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
-    const satId = keepTrackApi.getCatalogManager().getIdFromObjNum(scc);
-    const sat = keepTrackApi.getCatalogManager().getSat(satId, GetSatType.EXTRA_ONLY);
+    const sccNum = parseInt(StringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
+    const sat = keepTrackApi.getCatalogManager().getSatFromSccNum(sccNum);
 
     let satrec: SatelliteRecord;
     try {
@@ -308,7 +307,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
     try {
       // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-      const satId = keepTrackApi.getCatalogManager().getIdFromObjNum(parseInt((<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value));
+      const satId = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt((<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value));
       const mainsat = keepTrackApi.getCatalogManager().getSat(satId);
 
       // Launch Points are the Satellites Current Location
@@ -388,7 +387,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
     getEl(`${EditSatPlugin.elementPrefix}-error`).style.display = 'none';
     const scc = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value;
-    const satId = catalogManagerInstance.getIdFromObjNum(parseInt(scc));
+    const satId = catalogManagerInstance.getIdFromSccNum(parseInt(scc));
     if (satId === null) {
       errorManagerInstance.info('Not a Real Satellite');
     }
@@ -436,7 +435,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
     try {
       const scc = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value;
-      const satId = catalogManagerInstance.getIdFromObjNum(parseInt(scc));
+      const satId = catalogManagerInstance.getIdFromSccNum(parseInt(scc));
       const sat = catalogManagerInstance.getSat(satId, GetSatType.EXTRA_ONLY);
       const sat2 = {
         TLE1: sat.TLE1,

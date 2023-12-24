@@ -258,7 +258,7 @@ export class SettingsPresets {
       cb: () => {
         keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
         setTimeout(() => {
-          keepTrackApi.getSelectSatManager().selectSat(keepTrackApi.getCatalogManager().getIdFromObjNum(43721));
+          keepTrackApi.getSelectSatManager().selectSat(keepTrackApi.getCatalogManager().getIdFromSccNum(43721));
           settings.isDisableSelectSat = true;
         }, 5000);
       },

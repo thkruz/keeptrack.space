@@ -150,9 +150,9 @@ export class NewLaunch extends KeepTrackPlugin {
 
     showLoadingSticky();
 
-    const scc = (<HTMLInputElement>getEl('nl-scc')).value;
-    const satId = catalogManagerInstance.getIdFromObjNum(parseInt(scc));
-    let sat = catalogManagerInstance.getSat(satId);
+    const sccNum = (<HTMLInputElement>getEl('nl-scc')).value;
+    const id = catalogManagerInstance.getIdFromSccNum(parseInt(sccNum));
+    let sat = catalogManagerInstance.getSat(id);
 
     const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
     const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
@@ -231,14 +231,14 @@ export class NewLaunch extends KeepTrackPlugin {
     if (SatMath.altitudeCheck(satrec, simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
         typ: 'satEdit',
-        id: satId,
+        id: id,
         active: true,
         TLE1: TLE1,
         TLE2: TLE2,
       });
 
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
+      orbitManagerInstance.changeOrbitBufferData(id, TLE1, TLE2);
     } else {
       uiManagerInstance.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
     }

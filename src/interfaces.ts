@@ -635,10 +635,10 @@ export interface CatalogManager {
   cruncherExtraData(mData: SatCruncherMessageData): void;
   cruncherExtraUpdate(mData: SatCruncherMessageData): void;
   getIdFromIntlDes(intlDes: string): number | null;
-  getIdFromObjNum(objNum: number, isExtensiveSearch?: boolean): number | null;
+  getIdFromSccNum(sccNum: number, isExtensiveSearch?: boolean): number | null;
   getIdFromStarName(starName: string, starIndex1: number, starIndex2: number): number | null;
   getSat(i: number | null, type?: GetSatType): SatObject | null;
-  getSatFromObjNum(objNum: number): SatObject | null;
+  getSatFromSccNum(sccNum: number): SatObject | null;
   getSensorFromSensorName(sensorName: string): number | null;
   init(satCruncherOveride?: Worker): Promise<void>;
   initObjects(): void;

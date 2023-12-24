@@ -168,7 +168,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   onFormSubmit(): void {
-    let satId = keepTrackApi.getCatalogManager().getIdFromObjNum(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
+    let satId = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
 
     const uVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-u`)).value);
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);

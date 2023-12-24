@@ -27,7 +27,7 @@ import { findSatPlugin } from './find-sat/find-sat';
 import { gamepadPluginInstance } from './gamepad/gamepad';
 import { omManager } from './initial-orbit/om-manager';
 import { launchCalendarPlugin } from './launch-calendar/launch-calendar';
-import { newLaunchPlugin } from './new-launch/new-launch';
+import { NewLaunch } from './new-launch/new-launch';
 import { nextLaunchesPlugin } from './next-launches/next-launches';
 import { nightTogglePlugin } from './night-toggle/night-toggle';
 import { orbitReferencesPlugin } from './orbit-references/orbit-references';
@@ -161,7 +161,9 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     }
     if (plugins.debrisScreening) debrisScreeningPlugin.init();
     if (plugins.editSat) editSatPlugin.init();
-    if (plugins.newLaunch) newLaunchPlugin.init();
+    if (plugins.newLaunch) {
+      new NewLaunch().init();
+    }
     // if (plugins.satChanges) satChanges.init();
     if (plugins.initialOrbit) initialOrbit.init();
     if (plugins.missile) missile.init();

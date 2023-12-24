@@ -160,6 +160,7 @@ export class KeepTrackPlugin {
     this.isJsAdded = false;
     this.isHtmlAdded = false;
     this.isMenuButtonActive = false;
+    this.checkDependencies();
   }
 
   /**
@@ -180,7 +181,6 @@ export class KeepTrackPlugin {
    * @returns void
    */
   init(): void {
-    this.checkDependencies();
     this.addHtml();
     this.addJs();
 

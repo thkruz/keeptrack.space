@@ -1,3 +1,5 @@
+import { Degrees } from 'ootk';
+
 export const launchSites = {
   AFETR: {
     name: 'AFETR',
@@ -166,7 +168,6 @@ export const launchSites = {
   },
 
   // Non-CSpOC
-
   AMH: {
     name: 'AMH',
     lat: 58.5107,
@@ -178,4 +179,4 @@ export const launchSites = {
     lat: -2.373056,
     lon: -44.396389,
   },
-};
+} as unknown as { [key: string]: { name: string; lat: Degrees; lon: Degrees } };

@@ -606,8 +606,8 @@ export interface CatalogManager {
   launchSites: {
     [key: string]: {
       name: string;
-      lat: number;
-      lon: number;
+      lat: Degrees;
+      lon: Degrees;
     };
   };
   missileSats: number;

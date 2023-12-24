@@ -12,7 +12,7 @@ import { SatMath } from '@app/static/sat-math';
 import { launchSites } from '@app/catalogs/launch-sites';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { SatelliteRecord, Sgp4 } from 'ootk';
+import { Degrees, SatelliteRecord, Sgp4 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -156,7 +156,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
     const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
-    let launchLat: number, launchLon: number;
+    let launchLat: Degrees, launchLon: Degrees;
 
     if (catalogManagerInstance.isLaunchSiteManagerLoaded) {
       for (const launchSite in catalogManagerInstance.launchSites) {
@@ -170,7 +170,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
     if (launchLon > 180) {
       // if West not East
-      launchLon -= 360; // Convert from 0-360 to -180-180
+      launchLon = (launchLon - 360) as Degrees; // Convert from 0-360 to -180-180
     }
 
     // if (sat.inclination * RAD2DEG < launchLat) {
@@ -236,6 +236,7 @@ export class NewLaunch extends KeepTrackPlugin {
         TLE1: TLE1,
         TLE2: TLE2,
       });
+
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
     } else {
@@ -247,12 +248,14 @@ export class NewLaunch extends KeepTrackPlugin {
       () => {
         this.isDoingCalculations = false;
         hideLoading();
+
+        keepTrackApi.getUiManager().searchManager.doSearch(sat.sccNum);
       },
       (data) => typeof data.satPos !== 'undefined',
       () => {
         this.isDoingCalculations = false;
         hideLoading();
-        uiManagerInstance.toast(`Cruncher failed to meet requirement after two tries! Is this launch even possible?`, 'critical');
+        uiManagerInstance.toast(`Cruncher failed to meet requirement after multiple tries! Is this launch even possible?`, 'critical');
       }
     );
   };
@@ -304,5 +307,3 @@ export class NewLaunch extends KeepTrackPlugin {
     }
   }
 }
-
-export const newLaunchPlugin = new NewLaunch();

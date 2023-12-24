@@ -5,7 +5,7 @@ import { hideLoading, showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import findSatPng from '@public/img/icons/find2.png';
 
-import { countryCodeList, countryNameList } from '@app/catalogs/countries';
+import { countryCodeList, countryMapList, countryNameList } from '@app/catalogs/countries';
 import { SensorMath } from '@app/static/sensor-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { RAD2DEG } from '../../lib/constants';
@@ -138,7 +138,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
     if (isValidArgPe) res = FindSatPlugin.checkArgPe(res, argPe - argPeMarg, argPe + argPeMarg);
     if (isValidPeriod) res = FindSatPlugin.checkPeriod(res, period - periodMarg, period + periodMarg);
     if (isValidRcs) res = FindSatPlugin.checkRcs(res, rcs - rcsMarg, rcs + rcsMarg);
-    if (countryCode !== 'All') res = res.filter((sat: SatObject) => countryCode.split('|').includes(sat.country));
+    if (countryCode !== 'All') {
+      let country = countryCode.split('|').map((code) => countryMapList[code]);
+      // Remove duplicates and undefined
+      country = country.filter((item, index) => item && country.indexOf(item) === index);
+      res = res.filter((sat: SatObject) => country.includes(sat.country));
+    }
     if (bus !== 'All') res = res.filter((sat: SatObject) => sat.bus === bus);
     if (shape !== 'All') res = res.filter((sat: SatObject) => sat.shape === shape);
 

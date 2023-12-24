@@ -284,7 +284,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           }
         });
 
-        const addRemoveWatchlistDom = getEl('sat-add-remove-watchlist');
+        const addRemoveWatchlistDom = getEl('sat-add-watchlist');
         if (addRemoveWatchlistDom) {
           if (isOnList) {
             (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'block';

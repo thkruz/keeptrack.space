@@ -1,4 +1,4 @@
-import { GetSatType, SatObject } from '@app/interfaces';
+import { CatalogManager, GetSatType, SatObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -136,13 +136,6 @@ export class Breakup extends KeepTrackPlugin {
   </ul>
   The larger the variation the bigger the spread in the simulated breakup. The default variations are sufficient to simulate a breakup with a reasonable spread.`;
 
-  private updateSccNumInMenu_() {
-    if (!this.isMenuButtonActive) return;
-    const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-    if (!sat) return;
-    (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
-  }
-
   addHtml(): void {
     super.addHtml();
 
@@ -152,7 +145,7 @@ export class Breakup extends KeepTrackPlugin {
       cb: () => {
         getEl('breakup').addEventListener('submit', (e: Event) => {
           e.preventDefault();
-          showLoading(() => this.onSubmit());
+          showLoading(() => this.onSubmit_());
         });
       },
     });
@@ -184,22 +177,27 @@ export class Breakup extends KeepTrackPlugin {
     });
   }
 
-  onSubmit(): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+  private updateSccNumInMenu_() {
+    if (!this.isMenuButtonActive) return;
+    const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+    if (!sat) return;
+    (<HTMLInputElement>getEl('hc-scc')).value = sat.sccNum;
+  }
+
+  private onSubmit_(): void {
+    const { simulationTimeObj } = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    let satId = catalogManagerInstance.getIdFromSccNum(parseInt((<HTMLInputElement>getEl('hc-scc')).value));
+    const { satId, breakupCount, rascVariation, incVariation, meanmoVariation } = Breakup.getFormData_(catalogManagerInstance);
     const mainsat: SatObject = catalogManagerInstance.getSat(satId);
     const origsat = mainsat;
 
     // Launch Points are the Satellites Current Location
-    const lla = CoordinateTransforms.eci2lla(mainsat.position, timeManagerInstance.simulationTimeObj);
+    const lla = CoordinateTransforms.eci2lla(mainsat.position, simulationTimeObj);
     const launchLat = lla.lat;
     const launchLon = lla.lon;
 
-    const simulationTimeObj = timeManagerInstance.simulationTimeObj;
-
-    const upOrDown = SatMath.getDirection(mainsat, timeManagerInstance.simulationTimeObj);
+    const upOrDown = SatMath.getDirection(mainsat, simulationTimeObj);
     if (upOrDown === 'Error') {
       errorManagerInstance.warn('Cannot calculate direction of satellite. Try again later.');
     }
@@ -227,10 +225,6 @@ export class Breakup extends KeepTrackPlugin {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
 
-    const meanmoVariation = parseFloat(<string>(<HTMLInputElement>getEl('hc-per')).value);
-    const incVariation = parseFloat(<string>(<HTMLInputElement>getEl('hc-inc')).value);
-    const rascVariation = parseFloat(<string>(<HTMLInputElement>getEl('hc-raan')).value);
-    const breakupCount = parseInt(<string>(<HTMLInputElement>getEl('hc-count')).value);
     const eVariation = 0.00015;
     const origEcc = mainsat.eccentricity;
 
@@ -240,7 +234,7 @@ export class Breakup extends KeepTrackPlugin {
     let i = 0;
     for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
       if (i >= breakupCount) break;
-      satId = catalogManagerInstance.getIdFromSccNum(90000 + i);
+      const satId = catalogManagerInstance.getIdFromSccNum(90000 + i);
       catalogManagerInstance.getSat(satId); // TODO: This may be unnecessary needs tested
       let sat = origsat;
       // Is this needed? -- let iTLE1 = '1 ' + (80000 + i) + TLE1.substr(7) ??
@@ -281,7 +275,7 @@ export class Breakup extends KeepTrackPlugin {
         const meanmoStr = StringPad.pad0(meanmo.toFixed(8), 11);
         if (meanmoStr.length !== 11) throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTLE2}`);
 
-        satId = catalogManagerInstance.getIdFromSccNum(80000 + i);
+        const satId = catalogManagerInstance.getIdFromSccNum(80000 + i);
         iTLE1 = `1 ${80000 + i}` + iTLE1.substr(7);
         iTLE2 = `2 ${80000 + i} ${incStr} ${iTLE2.substr(17, 35)}${meanmoStr}${iTLE2.substr(63)}`;
 
@@ -304,7 +298,7 @@ export class Breakup extends KeepTrackPlugin {
           return;
         }
 
-        if (SatMath.altitudeCheck(satrec, timeManagerInstance.simulationTimeObj) > 1) {
+        if (SatMath.altitudeCheck(satrec, simulationTimeObj) > 1) {
           catalogManagerInstance.satCruncher.postMessage({
             typ: 'satEdit',
             id: satId,
@@ -319,5 +313,14 @@ export class Breakup extends KeepTrackPlugin {
     }
 
     keepTrackApi.getUiManager().doSearch(`${mainsat.sccNum},Analyst`);
+  }
+
+  private static getFormData_(catalogManagerInstance: CatalogManager) {
+    const satId = catalogManagerInstance.getIdFromSccNum(parseInt((<HTMLInputElement>getEl('hc-scc')).value));
+    const meanmoVariation = parseFloat((<HTMLInputElement>getEl('hc-per')).value);
+    const incVariation = parseFloat((<HTMLInputElement>getEl('hc-inc')).value);
+    const rascVariation = parseFloat((<HTMLInputElement>getEl('hc-raan')).value);
+    const breakupCount = parseInt((<HTMLInputElement>getEl('hc-count')).value);
+    return { satId, breakupCount, rascVariation, incVariation, meanmoVariation };
   }
 }

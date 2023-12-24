@@ -35,7 +35,7 @@ describe('Breakup_class', () => {
             rotateOrbitToLatLon: () => [defaultSat.TLE1, defaultSat.TLE2],
           }) as any
       );
-      expect(() => breakupPlugin.onSubmit()).not.toThrow();
+      expect(() => breakupPlugin.onSubmit_()).not.toThrow();
     });
   });
 });

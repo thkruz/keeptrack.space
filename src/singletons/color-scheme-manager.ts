@@ -97,6 +97,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   pickableBuffer: WebGLBuffer;
   pickableBufferOneTime: boolean;
   pickableData: Int8Array;
+  lastSavedColorSchemeName_ = '';
 
   static apogee(sat: SatObject): ColorInformation {
     return {
@@ -199,7 +200,11 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
       // Note the colorscheme for next time
       this.lastColorScheme = this.currentColorScheme;
-      PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.name);
+
+      if (this.lastSavedColorSchemeName_ !== this.currentColorScheme.name) {
+        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.name);
+        this.lastSavedColorSchemeName_ = this.currentColorScheme.name;
+      }
 
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 

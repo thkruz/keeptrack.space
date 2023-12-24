@@ -579,12 +579,14 @@ export class StandardCatalogManager implements CatalogManager {
     if (mData.badObjectId) {
       if (mData.badObjectId >= 0) {
         // Mark the satellite as inactive
-        const id = this.getIdFromObjNum(mData.badObjectId);
+        const id = mData.badObjectId;
         if (id !== null) {
           this.satData[id].active = false;
           // (<any>window).decayedSats = (<any>window).decayedSats || [];
           // (<any>window).decayedSats.push(this.satData[id].sccNum);
-          errorManagerInstance.debug(`Satellite ${mData.badObjectId} is inactive due to bad TLE`);
+          errorManagerInstance.debug(
+            `Object ${mData.badObjectId} is inactive due to bad TLE\nSatellite ${this.satData[id].sccNum}\n${this.satData[id].TLE1}\n${this.satData[id].TLE2}`
+          );
         }
       } else {
         // console.debug(`Bad sat number: ${mData.badObjectId}`);

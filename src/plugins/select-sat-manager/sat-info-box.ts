@@ -1401,14 +1401,30 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
+  /**
+   * Selects a satellite, missile, or sensor object and updates the satellite info box accordingly.
+   *
+   * @param sat - The satellite, missile, or sensor object to be selected.
+   */
   // eslint-disable-next-line class-methods-use-this
-  selectSat(sat?: SatObject): void {
+  selectSat(sat?: SatObject | MissileObject | SensorObject): void {
     if (sat) {
       if (isSatObject(sat)) {
         SatInfoBox.setSatInfoBoxSatellite_();
       } else {
         SatInfoBox.setSatInfoBoxMissile_();
       }
+    }
+
+    showEl('sat-infobox');
+
+    const satInfoBoxDom = getEl('sat-infobox');
+    // Get the height of the DOM
+    const searchBoxHeight = satInfoBoxDom?.getBoundingClientRect().height ?? 0;
+    const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
+    const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
+    if (curVal !== searchBoxHeight + bottomMenuTopVar + 'px') {
+      document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
     }
   }
 

@@ -27,7 +27,7 @@
  */
 
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SatelliteRecord, Sgp4 } from 'ootk';
+import { Degrees, SatelliteRecord, Sgp4 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';
@@ -109,8 +109,8 @@ export class StandardCatalogManager implements CatalogManager {
   launchSites: {
     [key: string]: {
       name: string;
-      lat: number;
-      lon: number;
+      lat: Degrees;
+      lon: Degrees;
     };
   } = {};
 
@@ -306,8 +306,8 @@ export class StandardCatalogManager implements CatalogManager {
    *
    * @returns {SatObject | null} - Returns the satellite object if found, otherwise returns null. The returned object may contain different data depending on the 'type' parameter.
    */
-  getSat(i: number | null, type: GetSatType = GetSatType.DEFAULT): SatObject | null {
-    if (i === null) {
+  getSat(i: number | null | undefined, type: GetSatType = GetSatType.DEFAULT): SatObject | null {
+    if (!(i > -1)) {
       errorManagerInstance.debug('getSat: i is null');
       return null;
     }
@@ -488,7 +488,7 @@ export class StandardCatalogManager implements CatalogManager {
           name: launchSite.name,
           lat: launchSite.lat,
           lon: launchSite.lon,
-          alt: launchSite.alt,
+          // alt: launchSite.alt,
         });
       }
       this.launchSites = launchSites;

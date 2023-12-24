@@ -191,7 +191,7 @@ export const keepTrackApi = {
         return;
       }
     },
-    selectSatData: (sat: SatObject, satId: number) => {
+    selectSatData: (sat: SatObject | MissileObject | SensorObject, satId: number) => {
       keepTrackApi.getSoundManager()?.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
     },

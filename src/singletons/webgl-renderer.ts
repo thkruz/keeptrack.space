@@ -53,7 +53,6 @@ export class WebGLRenderer {
   isPostProcessingResizeNeeded: boolean;
   isShowDistance = false;
   isUpdateTimeThrottle: boolean;
-  lastSelectedSat: number;
   meshManager = new MeshManager();
   /**
    * Main source of projection matrix for rest of the application
@@ -466,8 +465,8 @@ export class WebGLRenderer {
       keepTrackApi.getScene().searchBox.update(null);
     }
 
-    if (selectSatManager.selectedSat !== this.lastSelectedSat) {
-      if (selectSatManager.selectedSat === -1 && selectSatManager.lastSelectedSat_ !== -1) orbitManagerInstance.clearSelectOrbit();
+    if (selectSatManager.selectedSat !== selectSatManager.lastSelectedSat()) {
+      if (selectSatManager.selectedSat === -1 && selectSatManager.lastSelectedSat() !== -1) orbitManagerInstance.clearSelectOrbit();
       // WARNING: This is probably here on purpose - but it is getting called twice
       // THIS IS WHAT ACTUALLY SELECTS A SATELLITE, MOVES THE CAMERA, ETC!
       selectSatManager.selectSat(selectSatManager.selectedSat);
@@ -481,8 +480,6 @@ export class WebGLRenderer {
       } else {
         lineManagerInstance.drawWhenSelected();
       }
-      this.lastSelectedSat = selectSatManager.selectedSat;
-      selectSatManager.lastSelectedSat(selectSatManager.selectedSat);
     }
   }
 

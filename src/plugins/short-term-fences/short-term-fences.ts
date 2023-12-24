@@ -26,7 +26,7 @@ export class ShortTermFences extends KeepTrackPlugin {
   bottomIconLabel = 'Short Term Fence';
   bottomIconImg = searchPng;
   isRequireSensorSelected = true;
-  isIconDisabledOnLoad = true;
+  // isIconDisabledOnLoad = true;
   isAddStfLinksOnce = false;
 
   helpTitle = `Short Term Fences (STF) Menu`;

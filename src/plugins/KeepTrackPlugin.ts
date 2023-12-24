@@ -391,10 +391,12 @@ export class KeepTrackPlugin {
    */
   isRequireSensorSelected: boolean = false;
 
-  verifySensorSelected(): boolean {
+  verifySensorSelected(isMakeToast = true): boolean {
     if (!keepTrackApi.getSensorManager().isSensorSelected()) {
-      errorManagerInstance.warn(`Select a Sensor First!`);
-      shake(getEl(this.bottomIconElementName));
+      if (isMakeToast) {
+        errorManagerInstance.warn(`Select a Sensor First!`);
+        shake(getEl(this.bottomIconElementName));
+      }
       return false;
     }
     return true;

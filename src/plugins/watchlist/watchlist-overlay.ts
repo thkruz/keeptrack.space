@@ -178,7 +178,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   private onWatchlistUpdated_(watchlistList: number[]) {
     if (watchlistList.length === 0) {
       this.setBottomIconToDisabled();
-    } else if (this.verifySensorSelected()) {
+    } else if (this.verifySensorSelected(false)) {
       this.setBottomIconToEnabled();
     }
   }

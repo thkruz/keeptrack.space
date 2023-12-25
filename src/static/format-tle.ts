@@ -31,7 +31,7 @@ export abstract class FormatTle {
     // Only applies to 6 digit numbers
     if (sccNum.length < 6) return sccNum;
 
-    if (RegExp(/[A-Z]/iu, 'u').exec(sccNum[0])) {
+    if (RegExp(/[A-Z]/iu, 'u').test(sccNum[0])) {
       return sccNum;
     } else {
       // Extract the trailing 4 digits
@@ -49,7 +49,7 @@ export abstract class FormatTle {
   }
 
   static convertA5to6Digit(sccNum: string): string {
-    if (RegExp(/[A-Z]/iu, 'u').exec(sccNum[0])) {
+    if (RegExp(/[A-Z]/iu, 'u').test(sccNum[0])) {
       // Extract the trailing 4 digits
       const rest = sccNum.slice(1, 5);
 

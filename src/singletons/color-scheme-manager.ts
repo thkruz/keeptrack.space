@@ -1361,6 +1361,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     switch (sat.country) {
       case 'United States of America':
       case 'United States':
+      case 'USA':
       case 'US':
         if (this.objectTypeFlags.countryUS === false) {
           return {

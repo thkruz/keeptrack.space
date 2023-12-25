@@ -1,8 +1,14 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { isThisNode } from '../static/isThisNode';
 
+/**
+ * Retrieves an array of HTMLElements with the specified class name.
+ *
+ * Do not include the . in the class name.
+ *
+ */
 export const getClass = (id: string): HTMLElement[] => {
-  const els = Array.from(keepTrackApi.containerRoot.querySelectorAll(id));
+  const els = Array.from(keepTrackApi.containerRoot.querySelectorAll(`.${id}`));
 
   if (els.length) return els as HTMLElement[];
 

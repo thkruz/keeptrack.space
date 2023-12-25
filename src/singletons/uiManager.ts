@@ -216,6 +216,9 @@ export class StandardUiManager implements UiManager {
       case 'neighbors':
         this.toast(`Color Scheme Changed to Orbit Density`, 'normal', false);
         break;
+      case 'confidence':
+        this.toast(`Color Scheme Changed to Confidence`, 'normal', false);
+        break;
       default:
         this.toast(`Color Scheme Changed to ${newScheme.name}`, 'normal', false);
         console.debug(`${newScheme.name} missing from alert list!`);

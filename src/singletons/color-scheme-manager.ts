@@ -508,19 +508,25 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
         color: this.colorTheme.transparent,
         pickable: Pickable.No,
       };
+    }
+
+    if (keepTrackApi.getDotsManager().inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
+      return {
+        color: this.colorTheme.inFOV,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (this.objectTypeFlags.satGEO === false) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
     } else {
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      if (dotsManagerInstance.inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
-        return {
-          color: this.colorTheme.inFOV,
-          pickable: Pickable.Yes,
-        };
-      } else {
-        return {
-          color: this.colorTheme.satGEO,
-          pickable: Pickable.Yes,
-        };
-      }
+      return {
+        color: this.colorTheme.satGEO,
+        pickable: Pickable.Yes,
+      };
     }
   }
 
@@ -714,25 +720,30 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    var ap = sat.apogee;
-    if (ap > 2000) {
+    if (sat.apogee > 2000) {
       return {
         color: this.colorTheme.transparent,
         pickable: Pickable.No,
       };
+    }
+
+    if (keepTrackApi.getDotsManager().inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
+      return {
+        color: this.colorTheme.inFOV,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (this.objectTypeFlags.satLEO === false) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
     } else {
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      if (dotsManagerInstance.inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
-        return {
-          color: this.colorTheme.inFOV,
-          pickable: Pickable.Yes,
-        };
-      } else {
-        return {
-          color: this.colorTheme.satLEO,
-          pickable: Pickable.Yes,
-        };
-      }
+      return {
+        color: this.colorTheme.satLEO,
+        pickable: Pickable.Yes,
+      };
     }
   }
 

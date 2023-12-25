@@ -1,13 +1,11 @@
 import { BufferGeometry, GeometryParams } from './buffer-geometry';
 
-interface FlatGeometryParams extends GeometryParams {}
-
 export class FlatGeometry extends BufferGeometry {
   /**
    * Some objects don't need texture mapping
    */
   isSkipTexture: boolean;
-  constructor(gl: WebGL2RenderingContext, { attributes }: FlatGeometryParams) {
+  constructor(gl: WebGL2RenderingContext, { attributes }: GeometryParams) {
     super({
       type: 'FlatGeometry',
       attributes,

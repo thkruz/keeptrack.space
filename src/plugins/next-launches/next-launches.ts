@@ -1,4 +1,3 @@
-import { LaunchInfoObject } from '@app/interfaces';
 import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -8,6 +7,26 @@ import { truncateString } from '@app/lib/truncate-string';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+
+export interface LaunchInfoObject {
+  agency: string;
+  agencyURL: string;
+  country: string;
+  location: string;
+  locationURL: string;
+  mission: string;
+  missionName: string;
+  missionType: string;
+  missionURL: string;
+  name: string;
+  rocket: string;
+  rocketConfig: string;
+  rocketFamily: string;
+  rocketURL: string;
+  updated: Date;
+  windowEnd: Date;
+  windowStart: Date;
+}
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {

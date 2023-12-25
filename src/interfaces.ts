@@ -123,59 +123,6 @@ export interface Colors {
   version: string;
 }
 
-export interface LaunchInfoObject {
-  agency: string;
-  agencyURL: string;
-  country: string;
-  location: string;
-  locationURL: string;
-  mission: string;
-  missionName: string;
-  missionType: string;
-  missionURL: string;
-  name: string;
-  rocket: string;
-  rocketConfig: string;
-  rocketFamily: string;
-  rocketURL: string;
-  updated: Date;
-  windowEnd: Date;
-  windowStart: Date;
-}
-
-export interface MediaRecorderOptions {
-  audio: boolean;
-  video: {
-    cursor: string;
-  };
-}
-
-export interface UiInputInterface {
-  canvasClick: any;
-  canvasMouseDown: any;
-  canvasMouseMove: any;
-  canvasMouseUp: any;
-  canvasTouchEnd: any;
-  canvasTouchMove: any;
-  canvasTouchStart: any;
-  canvasWheel: any;
-  clientWaitAsync: any;
-  getBufferSubDataAsync: any;
-  getEarthScreenPoint: any;
-  getSatIdFromCoord: any;
-  getSatIdFromCoordAlt: any;
-  init: any;
-  isAsyncWorking: boolean;
-  isMouseMoving: boolean;
-  isStartedOnCanvas: boolean;
-  mouseMoveTimeout: any;
-  mouseSat: any;
-  openRmbMenu: any;
-  readPixelsAsync: any;
-  rmbMenuActions: any;
-  unProject: any;
-}
-
 export interface SatCruncherMessageData {
   data: {
     typ?: string;
@@ -398,19 +345,6 @@ export interface SensorObjectCruncher {
   zoom: string;
 }
 
-export interface InView {
-  inView: boolean;
-}
-
-export interface CatalogSearches {
-  bus(satData: SatObject[], text: string): SatObject[];
-  name(satData: SatObject[], regex: RegExp): SatObject[];
-  shape(satData: SatObject[], text: string): SatObject[];
-  type(satData: SatObject[], type: SpaceObjectType): SatObject[];
-  year(satData: SatObject[], yr: number): SatObject[];
-  yearOrLess(satData: SatObject[], yr: number): SatObject[];
-}
-
 export type lookanglesRow = {
   sortTime: number;
   scc: string;
@@ -434,59 +368,6 @@ export type SatPassTimes = {
   sat: SatObject;
   time: Date;
 };
-
-export interface SoundManager {
-  isMute: boolean;
-  sounds: any;
-  voices: any[];
-
-  loadVoices(): void;
-  play(arg0: string): void;
-  speak(arg0: string): void;
-}
-
-export interface SatChngObject {
-  SCC: number;
-  date: Date;
-  inc: number;
-  meanmo: number;
-}
-
-export interface SatChangePlugin {
-  satChngTable: SatChngObject[];
-}
-
-export interface PhotoManager {}
-
-export interface MapManager {
-  isMapMenuOpen: any;
-  options: any;
-  satCrunchNow: number;
-
-  braun(arg0: { lon: any; lat: any }, arg1: { meridian: number; latLimit: number }): any;
-  updateMap();
-}
-
-export interface SensorFovPlugin {
-  enableFovView: any;
-}
-export interface AdviceManager {
-  showAdvice(header: string, text: string): void;
-}
-
-export interface GamepadPlugin {
-  buttonsPressedHistory: number[];
-  currentState: any;
-  getController: any;
-  index: number;
-  settings: any;
-  vibrate: any;
-}
-
-export interface SocratesPlugin {
-  socratesObjOne: any;
-  socratesObjTwo: any;
-}
 
 export type ToastMsgType = 'standby' | 'normal' | 'caution' | 'serious' | 'critical' | 'error';
 
@@ -584,6 +465,14 @@ export type ColorRuleSet = (sat: SatObject, params?: any) => ColorInformation;
 
 /************************************************************
  * Singletons
+ *
+ * Using these interfaces will allow us to create replaceable
+ * singletons. In the future, we can create new classes that
+ * implement these interfaces and replace the singletons with
+ * the new classes. Example: A new class that implements the
+ * CatalogManager interface but is more resource intensive
+ * for better accuracy.
+ *
  * **********************************************************/
 
 export interface GroupsManager {

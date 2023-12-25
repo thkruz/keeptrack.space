@@ -1,4 +1,3 @@
-import { SatChngObject } from '@app/interfaces';
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -16,6 +15,13 @@ import './components/sat-changes.css';
 // ////////////////////////////////////////////////////////////////////////////
 
 /* istanbul ignore file */
+
+export interface SatChngObject {
+  SCC: number;
+  date: Date;
+  inc: number;
+  meanmo: number;
+}
 
 let issatChngMenuOpen = false;
 

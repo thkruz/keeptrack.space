@@ -11,10 +11,10 @@ import {
   SensorManager,
   SensorObject,
   Singletons,
-  SoundManager,
   UiManager,
 } from './interfaces';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
+import { SoundManager } from './plugins/sounds/sound-manager';
 import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
 import { StandardColorSchemeManager } from './singletons/color-scheme-manager';

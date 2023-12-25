@@ -1,6 +1,12 @@
-import { MediaRecorderOptions } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+
+export interface MediaRecorderOptions {
+  audio: boolean;
+  video: {
+    cursor: string;
+  };
+}
 
 export class StreamManager {
   static readonly BIT_RATE_30_MBPS = 30000000;

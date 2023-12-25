@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { EditSatPlugin } from '@app/plugins/edit-sat/edit-sat';
+import { EditSat } from '@app/plugins/edit-sat/edit-sat';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
@@ -11,11 +11,11 @@ describe('EditSatPlugin_class', () => {
     setupStandardEnvironment();
   });
 
-  standardPluginSuite(EditSatPlugin);
-  standardPluginMenuButtonTests(EditSatPlugin);
+  standardPluginSuite(EditSat);
+  standardPluginMenuButtonTests(EditSat);
 
   it('should submit the form', () => {
-    const editSatPlugin = new EditSatPlugin();
+    const editSatPlugin = new EditSat();
     websiteInit(editSatPlugin);
     standardSelectSat();
     const button = <HTMLButtonElement>keepTrackApi.containerRoot.querySelector('button[type="submit"]');
@@ -23,7 +23,7 @@ describe('EditSatPlugin_class', () => {
   });
 
   it('should create new TLE at Epoch', () => {
-    const editSatPlugin = new EditSatPlugin();
+    const editSatPlugin = new EditSat();
     websiteInit(editSatPlugin);
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
@@ -36,7 +36,7 @@ describe('EditSatPlugin_class', () => {
   });
 
   it('should save TLE', () => {
-    const editSatPlugin = new EditSatPlugin();
+    const editSatPlugin = new EditSat();
     websiteInit(editSatPlugin);
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);

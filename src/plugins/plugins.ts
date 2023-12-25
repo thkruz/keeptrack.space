@@ -21,7 +21,7 @@ import { DateTimeManager } from './date-time-manager/date-time-manager';
 import { DebrisScreening } from './debris-screening/debris-screening';
 import { DebugMenuPlugin } from './debug/debug';
 import { dopsPlugin } from './dops/dops';
-import { EditSatPlugin } from './edit-sat/edit-sat';
+import { EditSat } from './edit-sat/edit-sat';
 import { gamepadPluginInstance } from './gamepad/gamepad';
 import { omManager } from './initial-orbit/om-manager';
 import { launchCalendarPlugin } from './launch-calendar/launch-calendar';
@@ -138,7 +138,7 @@ export const loadPlugins = async (keepTrackApi: { register?: (params: KeepTrackA
     if (plugins.collisions) new Collissions().init();
     if (plugins.breakup) new Breakup().init();
     if (plugins.debrisScreening) new DebrisScreening().init();
-    if (plugins.editSat) new EditSatPlugin().init();
+    if (plugins.editSat) new EditSat().init();
     if (plugins.newLaunch) new NewLaunch().init();
     if (plugins.initialOrbit) initialOrbit.init();
     if (plugins.missile) missile.init();

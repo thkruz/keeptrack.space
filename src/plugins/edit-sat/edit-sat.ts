@@ -17,18 +17,19 @@ import { SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
-export class EditSatPlugin extends KeepTrackPlugin {
+export class EditSat extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Edit Sat';
   dependencies = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(EditSatPlugin.PLUGIN_NAME);
+    super(EditSat.PLUGIN_NAME);
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  isRequireSatelliteSelected: boolean = true;
-  isIconDisabledOnLoad: boolean = true;
+  isRequireSatelliteSelected = true;
+  isIconDisabled = true;
+  isIconDisabledOnLoad = true;
 
   helpTitle = `Edit Satellite Menu`;
   helpBody = keepTrackApi.html`The Edit Satellite Menu is used to edit the satellite data.
@@ -63,52 +64,52 @@ export class EditSatPlugin extends KeepTrackPlugin {
         </li>
     </ul>`;
 
-  sideMenuElementName: string = 'editSat-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementName = 'editSat-menu';
+  sideMenuElementHtml = keepTrackApi.html`
     <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
       <div id="editSat-content" class="side-menu">
         <div class="row">
           <h5 class="center-align">Edit Satellite</h5>
           <form id="editSat">
             <div class="input-field col s12">
-              <input disabled value="AAAAA" id="${EditSatPlugin.elementPrefix}-scc" type="text" maxlength="5" />
+              <input disabled value="AAAAA" id="${EditSat.elementPrefix}-scc" type="text" maxlength="5" />
               <label for="disabled" class="active">Satellite SCC#</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AA" id="${EditSatPlugin.elementPrefix}-year" type="text" maxlength="2" />
-              <label for="${EditSatPlugin.elementPrefix}-year" class="active">Epoch Year</label>
+              <input placeholder="AA" id="${EditSat.elementPrefix}-year" type="text" maxlength="2" />
+              <label for="${EditSat.elementPrefix}-year" class="active">Epoch Year</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AAA.AAAAAAAA" id="${EditSatPlugin.elementPrefix}-day" type="text" maxlength="12" />
-              <label for="${EditSatPlugin.elementPrefix}-day" class="active">Epoch Day</label>
+              <input placeholder="AAA.AAAAAAAA" id="${EditSat.elementPrefix}-day" type="text" maxlength="12" />
+              <label for="${EditSat.elementPrefix}-day" class="active">Epoch Day</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${EditSatPlugin.elementPrefix}-inc" type="text" maxlength="8" />
-              <label for="${EditSatPlugin.elementPrefix}-inc" class="active">Inclination</label>
+              <input placeholder="AAA.AAAA" id="${EditSat.elementPrefix}-inc" type="text" maxlength="8" />
+              <label for="${EditSat.elementPrefix}-inc" class="active">Inclination</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${EditSatPlugin.elementPrefix}-rasc" type="text" maxlength="8" />
-              <label for="${EditSatPlugin.elementPrefix}-rasc" class="active">Right Ascension</label>
+              <input placeholder="AAA.AAAA" id="${EditSat.elementPrefix}-rasc" type="text" maxlength="8" />
+              <label for="${EditSat.elementPrefix}-rasc" class="active">Right Ascension</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AA.AAAAAAAA" id="${EditSatPlugin.elementPrefix}-ecen" type="text" maxlength="7" />
-              <label for="${EditSatPlugin.elementPrefix}-ecen" class="active">Eccentricity</label>
+              <input placeholder="AA.AAAAAAAA" id="${EditSat.elementPrefix}-ecen" type="text" maxlength="7" />
+              <label for="${EditSat.elementPrefix}-ecen" class="active">Eccentricity</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AA.AAAAAAAA" id="${EditSatPlugin.elementPrefix}-argPe" type="text" maxlength="8" />
-              <label for="${EditSatPlugin.elementPrefix}-argPe" class="active">Argument of Perigee</label>
+              <input placeholder="AA.AAAAAAAA" id="${EditSat.elementPrefix}-argPe" type="text" maxlength="8" />
+              <label for="${EditSat.elementPrefix}-argPe" class="active">Argument of Perigee</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${EditSatPlugin.elementPrefix}-meana" type="text" maxlength="8" />
-              <label for="${EditSatPlugin.elementPrefix}-meana" class="active">Mean Anomaly</label>
+              <input placeholder="AAA.AAAA" id="${EditSat.elementPrefix}-meana" type="text" maxlength="8" />
+              <label for="${EditSat.elementPrefix}-meana" class="active">Mean Anomaly</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${EditSatPlugin.elementPrefix}-meanmo" type="text" maxlength="11" />
-              <label for="${EditSatPlugin.elementPrefix}-meanmo" class="active">Mean Motion</label>
+              <input placeholder="AAA.AAAA" id="${EditSat.elementPrefix}-meanmo" type="text" maxlength="11" />
+              <label for="${EditSat.elementPrefix}-meanmo" class="active">Mean Motion</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="" id="${EditSatPlugin.elementPrefix}-per" type="text" maxlength="11" />
-              <label for="${EditSatPlugin.elementPrefix}-per" class="active">Period</label>
+              <input placeholder="" id="${EditSat.elementPrefix}-per" type="text" maxlength="11" />
+              <label for="${EditSat.elementPrefix}-per" class="active">Period</label>
             </div>
             <div class="center-align row">
               <button id="editSat-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Update Satellite &#9658;</button>
@@ -125,19 +126,19 @@ export class EditSatPlugin extends KeepTrackPlugin {
             </div>
           </form>
         </div>
-        <div id="${EditSatPlugin.elementPrefix}-error" class="center-align menu-selectable start-hidden">
+        <div id="${EditSat.elementPrefix}-error" class="center-align menu-selectable start-hidden">
           <h6 class="center-align">Error</h6>
         </div>
       </div>
     </div>
     `;
 
-  bottomIconElementName: string = 'editSat-icon';
+  bottomIconElementName = 'editSat-icon';
   bottomIconImg = editPng;
   bottomIconLabel = 'Edit Satellite';
   bottomIconCallback: () => void = (): void => {
     if (!this.isMenuButtonActive) return;
-    this.populateSideMenu();
+    this.populateSideMenu_();
   };
 
   dragOptions: clickDragOptions = {
@@ -154,24 +155,24 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
         getEl('editSat').addEventListener('submit', function (e: Event) {
           e.preventDefault();
-          EditSatPlugin.editSatSubmit();
+          EditSat.editSatSubmit();
         });
 
-        getEl(`${EditSatPlugin.elementPrefix}-per`).addEventListener('change', function () {
+        getEl(`${EditSat.elementPrefix}-per`).addEventListener('change', function () {
           const per = (<HTMLInputElement>getEl('es-per')).value;
           if (per === '') return;
           const meanmo = 1440 / parseFloat(per);
           (<HTMLInputElement>getEl('es-meanmo')).value = meanmo.toFixed(8);
         });
 
-        getEl(`${EditSatPlugin.elementPrefix}-meanmo`).addEventListener('change', function () {
-          const meanmo = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meanmo`)).value;
+        getEl(`${EditSat.elementPrefix}-meanmo`).addEventListener('change', function () {
+          const meanmo = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value;
           if (meanmo === '') return;
           const per = (1440 / parseFloat(meanmo)).toFixed(8);
-          (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-per`)).value = per;
+          (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = per;
         });
 
-        getEl(`editSat-save`).addEventListener('click', EditSatPlugin.editSatSaveClick);
+        getEl(`editSat-save`).addEventListener('click', EditSat.editSatSaveClick);
 
         getEl(`editSat-open`).addEventListener('click', function () {
           getEl(`editSat-file`).click();
@@ -179,23 +180,23 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
         getEl(`editSat-file`).addEventListener('change', function (evt: Event) {
           if (!window.FileReader) return; // Browser is not compatible
-          EditSatPlugin.doReaderActions(evt);
+          EditSat.doReaderActions_(evt);
           evt.preventDefault();
         });
 
-        getEl(`${EditSatPlugin.elementPrefix}-error`).addEventListener('click', function () {
-          getEl(`${EditSatPlugin.elementPrefix}-error`).style.display = 'none';
+        getEl(`${EditSat.elementPrefix}-error`).addEventListener('click', function () {
+          getEl(`${EditSat.elementPrefix}-error`).style.display = 'none';
         });
       },
     });
   }
 
-  static elementPrefix: string = 'es';
+  static elementPrefix = 'es';
 
   isRmbOnSat = true;
   rmbMenuOrder = 2;
-  rmbL1ElementName: string = `edit-rmb`;
-  rmbL1Html: string = keepTrackApi.html`
+  rmbL1ElementName = `edit-rmb`;
+  rmbL1Html = keepTrackApi.html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Edit Sat &#x27A4;</a></li>`;
 
   rmbCallback = (targetId: string, clickedSat?: number): void => {
@@ -219,25 +220,25 @@ export class EditSatPlugin extends KeepTrackPlugin {
     }
   };
 
-  rmbL2ElementName: string = 'edit-rmb-menu';
-  rmbL2Html: string = keepTrackApi.html`
+  rmbL2ElementName = 'edit-rmb-menu';
+  rmbL2Html = keepTrackApi.html`
     <ul class='dropdown-contents'>
       <li id="set-pri-sat-rmb"><a href="#">Set as Primary Sat</a></li>
       <li id="set-sec-sat-rmb"><a href="#">Set as Secondary Sat</a></li>
       <li id="edit-sat-rmb"><a href="#">Edit Satellite</a></li>
     </ul>`;
 
-  static doReaderActions(evt: Event) {
+  private static doReaderActions_(evt: Event) {
     try {
       const reader = new FileReader();
-      reader.onload = EditSatPlugin.readerOnLoad;
+      reader.onload = EditSat.readerOnLoad_;
       reader.readAsText((<any>evt.target).files[0]);
     } catch (e) {
       errorManagerInstance.error(e, 'doReaderActions', 'Error reading file!');
     }
   }
 
-  static readerOnLoad(evt: any) {
+  private static readerOnLoad_(evt: any) {
     if (evt.target.readyState !== 2) return;
     if (evt.target.error) {
       errorManagerInstance.warn('Error while reading file!');
@@ -274,27 +275,24 @@ export class EditSatPlugin extends KeepTrackPlugin {
     }
   }
 
-  populateSideMenu() {
+  private populateSideMenu_() {
     const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value = sat.sccNum;
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
 
-    const inc: string = StringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
+    const inc = (sat.inclination * RAD2DEG).toFixed(4).padStart(8, '0');
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = inc;
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.TLE1.substr(18, 2);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = sat.TLE1.substr(20, 12);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.TLE2.substr(52, 11);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
 
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-inc`)).value = StringPad.pad0(inc, 8);
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-year`)).value = sat.TLE1.substr(18, 2);
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-day`)).value = sat.TLE1.substr(20, 12);
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meanmo`)).value = sat.TLE2.substr(52, 11);
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-per`)).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
+    const rasc = (sat.raan * RAD2DEG).toFixed(4).padStart(8, '0');
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = rasc;
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-    const rasc: string = StringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
-
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-rasc`)).value = StringPad.pad0(rasc, 8);
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
-
-    const argPe: string = StringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
-
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-argPe`)).value = StringPad.pad0(argPe, 8);
-    (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
+    const argPe = (sat.argPe * RAD2DEG).toFixed(4).padStart(8, '0');
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = StringPad.pad0(argPe, 8);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
   }
 
   private editSatNewTleClick_() {
@@ -307,7 +305,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
 
     try {
       // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-      const satId = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt((<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value));
+      const satId = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
       const mainsat = keepTrackApi.getCatalogManager().getSat(satId);
 
       // Launch Points are the Satellites Current Location
@@ -356,51 +354,51 @@ export class EditSatPlugin extends KeepTrackPlugin {
       // Reload Menu with new TLE
       //
       const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value = sat.sccNum;
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
 
-      const inc: string = StringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
+      const inc = (sat.inclination * RAD2DEG).toFixed(4).padStart(8, '0');
 
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-inc`)).value = StringPad.pad0(inc, 8);
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-year`)).value = sat.TLE1.substr(18, 2);
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-day`)).value = sat.TLE1.substr(20, 12);
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meanmo`)).value = sat.TLE2.substr(52, 11);
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-per`)).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = StringPad.pad0(inc, 8);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.TLE1.substr(18, 2);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = sat.TLE1.substr(20, 12);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.TLE2.substr(52, 11);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
 
-      const rasc: string = StringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
+      const rasc = (sat.raan * RAD2DEG).toFixed(4).padStart(8, '0');
 
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-rasc`)).value = StringPad.pad0(rasc, 8);
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = rasc;
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-      const argPe: string = StringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
+      const argPe = (sat.argPe * RAD2DEG).toFixed(4).padStart(8, '0');
 
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-argPe`)).value = StringPad.pad0(argPe, 8);
-      (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = argPe;
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
     } catch (error) {
       errorManagerInstance.warn(error);
     }
   }
 
-  static editSatSubmit() {
+  private static editSatSubmit() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    getEl(`${EditSatPlugin.elementPrefix}-error`).style.display = 'none';
-    const scc = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value;
+    getEl(`${EditSat.elementPrefix}-error`).style.display = 'none';
+    const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
     const satId = catalogManagerInstance.getIdFromSccNum(parseInt(scc));
     if (satId === null) {
       errorManagerInstance.info('Not a Real Satellite');
     }
     const sat = catalogManagerInstance.getSat(satId, GetSatType.EXTRA_ONLY);
     const intl = sat.TLE1.substr(9, 8);
-    let inc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-inc`)).value;
-    let meanmo = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meanmo`)).value;
-    let rasc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-rasc`)).value;
-    const ecen = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-ecen`)).value;
-    let argPe = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-argPe`)).value;
-    let meana = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meana`)).value;
-    const epochyr = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-year`)).value;
-    const epochday = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-day`)).value;
+    let inc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value;
+    let meanmo = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value;
+    let rasc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value;
+    const ecen = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-ecen`)).value;
+    let argPe = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value;
+    let meana = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value;
+    const epochyr = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value;
+    const epochday = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value;
 
     const { TLE1, TLE2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
 
@@ -430,11 +428,11 @@ export class EditSatPlugin extends KeepTrackPlugin {
     }
   }
 
-  static editSatSaveClick(e: Event) {
+  private static editSatSaveClick(e: Event) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     try {
-      const scc = (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-scc`)).value;
+      const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
       const satId = catalogManagerInstance.getIdFromSccNum(parseInt(scc));
       const sat = catalogManagerInstance.getSat(satId, GetSatType.EXTRA_ONLY);
       const sat2 = {

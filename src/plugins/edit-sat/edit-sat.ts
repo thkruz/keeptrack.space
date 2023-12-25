@@ -150,7 +150,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'editSat',
       cb: () => {
-        getEl('editSat-newTLE').addEventListener('click', this.editSatNewTleClick.bind(this));
+        getEl('editSat-newTLE').addEventListener('click', this.editSatNewTleClick_.bind(this));
 
         getEl('editSat').addEventListener('submit', function (e: Event) {
           e.preventDefault();
@@ -211,7 +211,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
       case 'edit-sat-rmb':
         this.selectSatManager_.setSelectedSat(clickedSat);
         if (!this.isMenuButtonActive) {
-          keepTrackApi.getUiManager().bottomIconPress(<HTMLElement>{ id: 'menu-editSat' });
+          keepTrackApi.getUiManager().bottomIconPress(<HTMLElement>{ id: this.bottomIconElementName });
         }
         break;
       default:
@@ -297,11 +297,11 @@ export class EditSatPlugin extends KeepTrackPlugin {
     (<HTMLInputElement>getEl(`${EditSatPlugin.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
   }
 
-  editSatNewTleClick() {
-    showLoading(this.editSatNewTleClickFadeIn);
+  private editSatNewTleClick_() {
+    showLoading(this.editSatNewTleClickFadeIn_.bind(this));
   }
 
-  editSatNewTleClickFadeIn() {
+  private editSatNewTleClickFadeIn_() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -452,5 +452,3 @@ export class EditSatPlugin extends KeepTrackPlugin {
     e.preventDefault();
   }
 }
-
-export const editSatPlugin = new EditSatPlugin();

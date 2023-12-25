@@ -100,21 +100,20 @@ export class SatConstellations extends KeepTrackPlugin {
         }
         break;
       case 'aehf':
-        if (!groupManagerInstance.groupList[groupName])
+        if (!groupManagerInstance.groupList[groupName]) {
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(catalogManagerInstance.satLinkManager.aehf), groupName);
+        }
         showLoading(() => {
           lineManagerInstance.clear();
           catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Aehf, timeManagerInstance);
         });
         break;
       case 'wgs':
-        // WGS also selects DSCS
-        if (!groupManagerInstance.groupList[groupName])
-          groupManagerInstance.createGroup(
-            GroupType.SCC_NUM,
-            catalogManagerInstance.id2satnum(catalogManagerInstance.satLinkManager.wgs.concat(catalogManagerInstance.satLinkManager.dscs)),
-            groupName
-          );
+        if (!groupManagerInstance.groupList[groupName]) {
+          // WGS also selects DSCS
+          const wgs = catalogManagerInstance.satLinkManager.wgs.concat(catalogManagerInstance.satLinkManager.dscs);
+          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(wgs), groupName);
+        }
         showLoading(() => {
           lineManagerInstance.clear();
           catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Wgs, timeManagerInstance);
@@ -122,20 +121,12 @@ export class SatConstellations extends KeepTrackPlugin {
         break;
       case 'starlink':
         if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.NAME_REGEX, /STARLINK/u, groupName);
-        // showLoading(() => {
-        //   lineManagerInstance.clear();
-        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Starlink, timeManagerInstance);
-        // });
         break;
       case 'sbirs': // SBIRS and DSP
         if (!groupManagerInstance.groupList[groupName]) {
           const sbirs = [...catalogManagerInstance.satLinkManager.sbirs, ...catalogManagerInstance.satLinkManager.dsp];
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(sbirs), groupName);
         }
-        // showLoading(() => {
-        //   lineManagerInstance.clear();
-        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Sbirs, timeManagerInstance);
-        // });
         break;
       default:
         throw new Error('Unknown group name: ' + groupName);

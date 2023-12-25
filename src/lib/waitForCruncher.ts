@@ -19,7 +19,6 @@ export const waitForCruncher = (cruncher: Worker, cb: () => void, validationFunc
       if (validationFunc(m.data)) {
         cb();
       } else {
-        console.warn(m.data);
         if (retryCount < 5) {
           waitForCruncher(cruncher, cb, validationFunc, error, retryCount++);
         } else {

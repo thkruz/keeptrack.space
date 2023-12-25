@@ -1,5 +1,6 @@
 import { SatObject, SatPassTimes, SensorObject } from '@app/interfaces';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Degrees, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Transforms } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, TAU } from '../lib/constants';
@@ -105,7 +106,7 @@ export class SensorMath {
     const { m, gmst } = SatMath.calculateTimeVariables(now, sat.satrec);
     let positionEci = <EciVec3>Sgp4.propagate(sat.satrec, m).position;
     if (!positionEci) {
-      console.error('No ECI position for', sat.satrec.satnum, 'at', now);
+      errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${now}`);
       tearr.alt = <Kilometers>0;
       tearr.lon = <Radians>0;
       tearr.lat = <Radians>0;
@@ -116,14 +117,14 @@ export class SensorMath {
 
     try {
       let gpos = Transforms.eci2lla(positionEci, gmst);
-      tearr.alt = <Kilometers>gpos.alt;
+      tearr.alt = gpos.alt;
       tearr.lon = gpos.lon;
       tearr.lat = gpos.lat;
       let positionEcf = Transforms.eci2ecf(positionEci, gmst);
       let lookAngles = Transforms.ecf2rae(sensor.observerGd, positionEcf);
       tearr.az = <Degrees>(lookAngles.az * RAD2DEG);
       tearr.el = <Degrees>(lookAngles.el * RAD2DEG);
-      tearr.rng = <Kilometers>lookAngles.rng;
+      tearr.rng = lookAngles.rng;
     } catch /* istanbul ignore next */ {
       tearr.alt = <Kilometers>0;
       tearr.lon = <Radians>0;

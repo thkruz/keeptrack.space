@@ -12,8 +12,8 @@ import { Degrees, Kilometers, SatelliteRecord, Seconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { StandardSensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
-  isRequireSatelliteSelected: boolean = true;
-  isRequireSensorSelected: boolean = false;
+  isRequireSatelliteSelected = true;
+  isRequireSensorSelected = false;
 
   bottomIconCallback: () => void = () => {
     const sat = keepTrackApi.getCatalogManager().getSelectedSat();
@@ -52,7 +52,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     super(MultiSiteLookAnglesPlugin.PLUGIN_NAME);
   }
 
-  sideMenuElementName: string = 'multi-site-look-angles-menu';
+  sideMenuElementName = 'multi-site-look-angles-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select">
         <div id="multi-site-look-angles-content" class="side-menu">

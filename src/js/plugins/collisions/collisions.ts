@@ -16,10 +16,10 @@ interface CollisionEvent {
 }
 
 export class CollissionsPlugin extends KeepTrackPlugin {
-  bottomIconElementName: string = 'menu-satellite-collision';
+  bottomIconElementName = 'menu-satellite-collision';
   bottomIconImg = collissionsPng;
-  bottomIconLabel: string = 'Collisions';
-  sideMenuElementName: string = 'socrates-menu';
+  bottomIconLabel = 'Collisions';
+  sideMenuElementName = 'socrates-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
     <div id="socrates-content" class="side-menu">

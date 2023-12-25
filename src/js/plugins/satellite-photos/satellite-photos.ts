@@ -10,7 +10,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
   bottomIconElementName = 'menu-sat-photos';
   bottomIconLabel = 'SatellitePhotos';
   bottomIconImg = photoManagerPng;
-  sideMenuElementName: string = 'sat-photo-menu';
+  sideMenuElementName = 'sat-photo-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="sat-photo-menu" class="side-menu-parent start-hidden text-select">
     <div id="sat-photo-menu-content" class="side-menu">

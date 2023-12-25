@@ -47,9 +47,9 @@ export class StereoMapPlugin extends KeepTrackPlugin {
     super(StereoMapPlugin.PLUGIN_NAME);
   }
 
-  bottomIconElementName: string = 'menu-map';
+  bottomIconElementName = 'menu-map';
   bottomIconImg = mapPng;
-  bottomIconLabel: string = 'Stereo Map';
+  bottomIconLabel = 'Stereo Map';
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) return;
     this.updateMap();
@@ -58,7 +58,7 @@ export class StereoMapPlugin extends KeepTrackPlugin {
   helpTitle = `Stereographic Map Menu`;
   helpBody = keepTrackApi.html`The Stereographic Map Menu is used for visualizing satellite ground traces in a stereographic projection.`;
 
-  sideMenuElementName: string = 'map-menu';
+  sideMenuElementName = 'map-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
     <canvas id="map-2d"></canvas>

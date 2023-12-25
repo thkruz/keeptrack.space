@@ -56,7 +56,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     this.updateWatchlist();
   };
 
-  bottomIconElementName: string = 'menu-watchlist';
+  bottomIconElementName = 'menu-watchlist';
   bottomIconImg = watchlistPng;
   bottomIconLabel = 'Watchlist';
   helpBody = keepTrackApi.html`
@@ -106,7 +106,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       </div>
     </div>`;
 
-  sideMenuElementName: string = 'watchlist-menu';
+  sideMenuElementName = 'watchlist-menu';
   watchlistInViewList: boolean[] = [];
   /** List of ids (not scc numbers) */
   watchlistList: number[] = [];

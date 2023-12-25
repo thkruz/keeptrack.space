@@ -42,7 +42,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   bottomIconLabel = 'Sensors';
   bottomIconImg = radarPng;
 
-  sideMenuElementName: string = 'sensor-list-menu';
+  sideMenuElementName = 'sensor-list-menu';
   sideMenuElementHtml: string =
     keepTrackApi.html`
     <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">

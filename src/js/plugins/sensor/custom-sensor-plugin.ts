@@ -24,7 +24,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   bottomIconLabel = 'Custom Sensor';
   bottomIconImg = customPng;
 
-  sideMenuElementName: string = 'custom-sensor-menu';
+  sideMenuElementName = 'custom-sensor-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div id="custom-sensor-menu" class="side-menu-parent start-hidden text-select">
         <div id="customSensor-content" class="side-menu">

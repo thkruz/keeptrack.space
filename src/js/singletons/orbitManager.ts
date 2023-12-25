@@ -79,7 +79,7 @@ export class StandardOrbitManager implements OrbitManager {
     this.currentInView_ = [];
   }
 
-  clearSelectOrbit(isSecondary: boolean = false): void {
+  clearSelectOrbit(isSecondary = false): void {
     const gl = this.gl_;
     if (isSecondary) {
       this.secondarySelectId_ = -1;
@@ -237,7 +237,7 @@ export class StandardOrbitManager implements OrbitManager {
     this.updateOrbitBuffer(satId);
   }
 
-  setSelectOrbit(satId: number, isSecondary: boolean = false): void {
+  setSelectOrbit(satId: number, isSecondary = false): void {
     if (isSecondary) {
       this.secondarySelectId_ = satId;
     } else {

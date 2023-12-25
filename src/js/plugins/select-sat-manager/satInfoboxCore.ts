@@ -105,7 +105,7 @@ export class SatInfoBoxCore extends KeepTrackPlugin {
     this.updateOrbitData(sat);
   }
 
-  private static nearObjectsLinkClick(distance: number = 100): void {
+  private static nearObjectsLinkClick(distance = 100): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (catalogManagerInstance.selectedSat === -1) {

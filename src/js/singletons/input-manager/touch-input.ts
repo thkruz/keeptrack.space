@@ -50,7 +50,7 @@ export class TouchInput {
   /**
    * The distance in pixels that a tap must move to be considered a pan
    */
-  tapMovementThreshold: number = 15;
+  tapMovementThreshold = 15;
   /**
    * The time in ms that a tap must be held for to be considered a press
    */

@@ -8,8 +8,8 @@ import { showLoading } from '@app/js/lib/showLoading';
 import { SensorMath, TearrData } from '@app/js/static/sensor-math';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 export class LookAnglesPlugin extends KeepTrackPlugin {
-  isRequireSatelliteSelected: boolean = true;
-  isRequireSensorSelected: boolean = true;
+  isRequireSatelliteSelected = true;
+  isRequireSensorSelected = true;
 
   bottomIconCallback: () => void = () => {
     this.refreshSideMenuData();
@@ -59,7 +59,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     super(LookAnglesPlugin.PLUGIN_NAME);
   }
 
-  sideMenuElementName: string = 'look-angles-menu';
+  sideMenuElementName = 'look-angles-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div id="look-angles-menu" class="side-menu-parent start-hidden text-select">
         <div id="look-angles-content" class="side-menu">

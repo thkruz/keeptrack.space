@@ -1507,7 +1507,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  private preValidateColorScheme_(isForceRecolor: boolean = false) {
+  private preValidateColorScheme_(isForceRecolor = false) {
     if (this.currentColorScheme === this.group || this.currentColorScheme === this.groupCountries) {
       const watchlistMenu = getEl('watchlist-menu');
       const watchlistTransform = watchlistMenu?.style.transform || '';

@@ -40,7 +40,7 @@ export class Breakup extends KeepTrackPlugin {
     isDraggable: true,
   };
 
-  sideMenuElementName: string = 'breakup-menu';
+  sideMenuElementName = 'breakup-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
     <div id="breakup-content" class="side-menu">

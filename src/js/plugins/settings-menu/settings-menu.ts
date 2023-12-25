@@ -45,11 +45,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     super(SettingsMenuPlugin.PLUGIN_NAME);
   }
 
-  bottomIconElementName: string = 'settings-menu-icon';
+  bottomIconElementName = 'settings-menu-icon';
   bottomIconImg = settingsPng;
-  bottomIconLabel: string = 'Settings Menu';
+  bottomIconLabel = 'Settings Menu';
 
-  sideMenuElementName: string = 'settings-menu';
+  sideMenuElementName = 'settings-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="settings-menu" class="side-menu-parent start-hidden text-select">
     <div id="settings-content" class="side-menu">

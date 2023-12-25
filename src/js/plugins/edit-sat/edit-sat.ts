@@ -22,8 +22,8 @@ export class EditSatPlugin extends KeepTrackPlugin {
     super(EditSatPlugin.PLUGIN_NAME);
   }
 
-  isRequireSatelliteSelected: boolean = true;
-  isIconDisabledOnLoad: boolean = true;
+  isRequireSatelliteSelected = true;
+  isIconDisabledOnLoad = true;
 
   helpTitle = `Edit Satellite Menu`;
   helpBody = keepTrackApi.html`The Edit Satellite Menu is used to edit the satellite data.
@@ -58,7 +58,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
         </li>
     </ul>`;
 
-  sideMenuElementName: string = 'editSat-menu';
+  sideMenuElementName = 'editSat-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
       <div id="editSat-content" class="side-menu">
@@ -127,7 +127,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
     </div>
     `;
 
-  bottomIconElementName: string = 'editSat-icon';
+  bottomIconElementName = 'editSat-icon';
   bottomIconImg = editPng;
   bottomIconLabel = 'Edit Satellite';
   bottomIconCallback: () => void = (): void => {
@@ -185,11 +185,11 @@ export class EditSatPlugin extends KeepTrackPlugin {
     });
   }
 
-  static elementPrefix: string = 'es';
+  static elementPrefix = 'es';
 
   isRmbOnSat = true;
   rmbMenuOrder = 2;
-  rmbL1ElementName: string = `edit-rmb`;
+  rmbL1ElementName = `edit-rmb`;
   rmbL1Html: string = keepTrackApi.html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Edit Sat &#x27A4;</a></li>`;
 
@@ -214,7 +214,7 @@ export class EditSatPlugin extends KeepTrackPlugin {
     }
   };
 
-  rmbL2ElementName: string = 'edit-rmb-menu';
+  rmbL2ElementName = 'edit-rmb-menu';
   rmbL2Html: string = keepTrackApi.html`
     <ul class='dropdown-contents'>
       <li id="set-pri-sat-rmb"><a href="#">Set as Primary Sat</a></li>

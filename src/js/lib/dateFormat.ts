@@ -204,7 +204,7 @@ const pad = function (num: number, length: number): string {
  * @returns A formatted string representing the date according to the specified mask.
  * @throws SyntaxError if the provided date is invalid.
  */
-export const dateFormat = function (date: string | Date, mask: string, utc: boolean = false) {
+export const dateFormat = function (date: string | Date, mask: string, utc = false) {
   if (typeof date === 'string' && !/\d/u.test(date)) {
     mask = date;
     date = null;

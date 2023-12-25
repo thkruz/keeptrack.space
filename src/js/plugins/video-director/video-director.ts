@@ -43,11 +43,11 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     super(VideoDirectorPlugin.PLUGIN_NAME);
   }
 
-  bottomIconElementName: string = 'video-director-icon';
+  bottomIconElementName = 'video-director-icon';
   bottomIconImg = settingsPng;
-  bottomIconLabel: string = 'Video Director';
+  bottomIconLabel = 'Video Director';
 
-  sideMenuElementName: string = 'video-director-menu';
+  sideMenuElementName = 'video-director-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="video-director-menu" class="side-menu-parent start-hidden text-select">
     <div id="video-director-content" class="side-menu">

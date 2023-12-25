@@ -367,7 +367,7 @@ export class InputManager {
     this.keyboard.init();
   }
 
-  public openRmbMenu(clickedSatId: number = -1) {
+  public openRmbMenu(clickedSatId = -1) {
     if (!settingsManager.isAllowRightClick) return;
 
     this.isRmbMenuOpen = true;

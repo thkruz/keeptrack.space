@@ -86,7 +86,7 @@ export class WebGLRenderer {
     return { vw, vh };
   }
 
-  private isAltCanvasSize_: boolean = false;
+  private isAltCanvasSize_ = false;
 
   render(scene: Scene, camera: Camera): void {
     if (this.isContextLost_) return;
@@ -364,7 +364,7 @@ export class WebGLRenderer {
     return screenPos;
   }
 
-  resizeCanvas(isForcedResize: boolean = false) {
+  resizeCanvas(isForcedResize = false) {
     const gl = this.gl;
     const { vw, vh } = WebGLRenderer.getCanvasInfo();
 

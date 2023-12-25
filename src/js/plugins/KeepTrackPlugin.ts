@@ -84,7 +84,7 @@ export class KeepTrackPlugin {
   /**
    * Whether the bottom icon is disabled by default.
    */
-  isIconDisabledOnLoad: boolean = false;
+  isIconDisabledOnLoad = false;
 
   /**
    * The image to use for the bottom icon.
@@ -106,12 +106,12 @@ export class KeepTrackPlugin {
   /**
    * Whether the bottom icon is currently disabled.
    */
-  isIconDisabled: boolean = false;
+  isIconDisabled = false;
 
   /**
    * Whether the side menus must be hidden when the bottom icon is clicked.
    */
-  isForceHideSideMenus: boolean = false;
+  isForceHideSideMenus = false;
 
   /**
    * Level 1 Context Menu Html for Right Mouse Button
@@ -249,22 +249,22 @@ export class KeepTrackPlugin {
     this.isHtmlAdded = true;
   }
 
-  rmbMenuOrder: number = 100;
+  rmbMenuOrder = 100;
 
   /**
    * Whether the context menu opens when earth is clicked
    */
-  isRmbOnEarth: boolean = false;
+  isRmbOnEarth = false;
 
   /**
    * Whether the context menu opens when earth is not clicked (space)
    */
-  isRmbOffEarth: boolean = false;
+  isRmbOffEarth = false;
 
   /**
    * Whether the context menu opens when a satellite is clicked
    */
-  isRmbOnSat: boolean = false;
+  isRmbOnSat = false;
 
   /**
    * Adds the JS for the KeepTrackPlugin.
@@ -388,7 +388,7 @@ export class KeepTrackPlugin {
   /**
    * Requires the user to select a sensor before opening their bottom menu.
    */
-  isRequireSensorSelected: boolean = false;
+  isRequireSensorSelected = false;
 
   verifySensorSelected(): boolean {
     if (!keepTrackApi.getSensorManager().isSensorSelected()) {
@@ -402,7 +402,7 @@ export class KeepTrackPlugin {
   /**
    * Requires the user to select a satellite before opening their bottom menu.
    */
-  isRequireSatelliteSelected: boolean = false;
+  isRequireSatelliteSelected = false;
 
   verifySatelliteSelected(): boolean {
     const searchDom = getEl('search', true);

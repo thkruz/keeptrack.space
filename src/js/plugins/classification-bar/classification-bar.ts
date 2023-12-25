@@ -5,8 +5,8 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class ClassificationBar extends KeepTrackPlugin {
   private classificationString_: ClassificationString;
-  private isClassificationContainerLoaded_: boolean = false;
-  private isExpanded_: boolean = false;
+  private isClassificationContainerLoaded_ = false;
+  private isExpanded_ = false;
 
   constructor() {
     const PLUGIN_NAME = 'Classification';

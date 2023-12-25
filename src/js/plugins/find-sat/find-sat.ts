@@ -165,7 +165,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return res;
   }
 
-  sideMenuElementName: string = 'findByLooks-menu';
+  sideMenuElementName = 'findByLooks-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
     <div id="findByLooks-content" class="side-menu">
@@ -308,9 +308,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  bottomIconElementName: string = 'menu-find-sat';
+  bottomIconElementName = 'menu-find-sat';
   bottomIconImg = findSatPng;
-  bottomIconLabel: string = 'Find Satellite';
+  bottomIconLabel = 'Find Satellite';
 
   helpTitle = `Find Satellite Menu`;
 
@@ -400,7 +400,7 @@ The search will then find all satellites within those inclinations and display t
     });
   }
 
-  static PLUGIN_NAME: string = 'findSat';
+  static PLUGIN_NAME = 'findSat';
   constructor() {
     super(FindSatPlugin.PLUGIN_NAME);
   }

@@ -970,7 +970,7 @@ export class SettingsManager {
   /**
    * Size of the dot for picking purposes
    */
-  pickingDotSize: string = '16.0';
+  pickingDotSize = '16.0';
 
   /**
    * Disable drawing godrays (huge performance hit on mobile)

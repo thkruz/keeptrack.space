@@ -3,7 +3,7 @@ import { getEl } from '../lib/get-el';
 import { clickDragOptions, KeepTrackPlugin } from './KeepTrackPlugin';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
-  isRequireSensorSelected: boolean = true;
+  isRequireSensorSelected = true;
 
   bottomIconCallback: () => void = () => {
     super.bottomIconCallback();
@@ -15,7 +15,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
-  sideMenuElementName: string = 'sensor-info-menu';
+  sideMenuElementName = 'sensor-info-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div id='sensor-info-menu' class='side-menu-parent start-hidden text-select'>
     </div>`;

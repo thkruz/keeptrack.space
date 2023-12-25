@@ -45,7 +45,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     }
   };
 
-  isRequireSatelliteSelected: boolean = true;
+  isRequireSatelliteSelected = true;
 
   bottomIconElementName = 'menu-sat-fov';
   bottomIconLabel = 'Satellite FOV';

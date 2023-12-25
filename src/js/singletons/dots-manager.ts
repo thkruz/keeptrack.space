@@ -654,7 +654,7 @@ export class DotsManager {
    * @param bufferLen The length of the buffer.
    * @param selectedSat The index of the selected satellite.
    */
-  updateSizeBuffer(bufferLen: number = 3, selectedSat: number = -1) {
+  updateSizeBuffer(bufferLen = 3, selectedSat = -1) {
     const gl = keepTrackApi.getRenderer().gl;
 
     if (!this.sizeBufferOneTime) {

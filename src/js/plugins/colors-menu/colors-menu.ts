@@ -9,9 +9,9 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 export class ColorMenu extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Color Menu';
   bottomIconImg = colorsPng;
-  bottomIconElementName: string = 'menu-color-scheme';
-  bottomIconLabel: string = 'Color Schemes';
-  sideMenuElementName: string = 'color-scheme-menu';
+  bottomIconElementName = 'menu-color-scheme';
+  bottomIconLabel = 'Color Schemes';
+  sideMenuElementName = 'color-scheme-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
     <div id="colors-menu" class="side-menu">

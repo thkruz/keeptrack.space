@@ -23,9 +23,9 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     super(NextLaunchesPlugin.PLUGIN_NAME);
   }
 
-  bottomIconElementName: string = 'menu-nextLaunch';
+  bottomIconElementName = 'menu-nextLaunch';
   bottomIconImg = calendar2Png;
-  bottomIconLabel: string = 'Next Launches';
+  bottomIconLabel = 'Next Launches';
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
@@ -36,7 +36,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   helpTitle = `Next Launches Menu`;
   helpBody = keepTrackApi.html`The Next Launches Menu pulls data from <a href="https://thespacedevs.com/" target="_blank">The Space Devs</a> to display upcoming launches.`;
 
-  sideMenuElementName: string = 'nextLaunch-menu';
+  sideMenuElementName = 'nextLaunch-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="nextLaunch-menu" class="side-menu-parent start-hidden text-select">
     <div id="nextLaunch-content" class="side-menu">

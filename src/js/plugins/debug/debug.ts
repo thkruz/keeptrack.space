@@ -27,7 +27,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     maxWidth: 500,
   };
 
-  helpTitle: string = 'Debug Menu';
+  helpTitle = 'Debug Menu';
   helpBody: string = keepTrackApi.html`The Debug Menu is used for debugging the app. It is probably not very useful unless you are assisting me with debugging an issue
   <br><br>
   Open Debug Menu allows you to access the console even when it is blocked by the browser. This is useful for debugging issues that only occur in the browser console.

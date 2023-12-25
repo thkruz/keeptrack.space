@@ -32,7 +32,7 @@ export class NewLaunch extends KeepTrackPlugin {
   bottomIconImg = rocketPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
-  sideMenuElementName: string = 'newLaunch-menu';
+  sideMenuElementName = 'newLaunch-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
     <div id="newLaunch-content" class="side-menu">
@@ -128,7 +128,7 @@ export class NewLaunch extends KeepTrackPlugin {
     isDraggable: true,
   };
 
-  isDoingCalculations: boolean = false;
+  isDoingCalculations = false;
   submitCallback: () => void = () => {
     if (this.isDoingCalculations) return;
     this.isDoingCalculations = true;

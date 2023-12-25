@@ -10,9 +10,9 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SatConstellations extends KeepTrackPlugin {
   bottomIconImg = satChngPng;
-  bottomIconElementName: string = 'menu-constellations';
-  bottomIconLabel: string = 'Constellations';
-  sideMenuElementName: string = 'constellations-menu';
+  bottomIconElementName = 'menu-constellations';
+  bottomIconLabel = 'Constellations';
+  sideMenuElementName = 'constellations-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
     <div id="constellation-menu" class="side-menu">

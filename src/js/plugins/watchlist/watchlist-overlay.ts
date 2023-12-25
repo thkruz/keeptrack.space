@@ -46,7 +46,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     this.openOverlayMenu_();
   };
 
-  bottomIconElementName: string = 'info-overlay-icon';
+  bottomIconElementName = 'info-overlay-icon';
   bottomIconImg = infoPng;
   bottomIconLabel = 'Overlay';
   dependencies = [watchlistPlugin.PLUGIN_NAME];
@@ -66,7 +66,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       Clicking on a satellite in the overlay will center the map on that satellite.
     </p>`;
 
-  helpTitle: string = 'Watchlist Overlay';
+  helpTitle = 'Watchlist Overlay';
   lastOverlayUpdateTime = 0;
   sideMenuElementHtml = keepTrackApi.html`
     <div id="info-overlay-menu" class="side-menu-parent start-hidden text-select">

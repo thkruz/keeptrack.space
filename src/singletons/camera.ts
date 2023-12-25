@@ -354,13 +354,13 @@ export class Camera {
       this.earthCenteredLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
     } else if (this.camDistBuffer < settingsManager.nearZoomLevel || this.zoomLevel_ == -1) {
-      // Zooming Out
-      settingsManager.selectedColor = settingsManager.selectedColorFallback;
+      // Inside camDistBuffer
+      settingsManager.selectedColor = [0, 0, 0, 0];
       this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 15); // delta is +/- 100
       this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.settings_.minDistanceFromSatellite), settingsManager.nearZoomLevel);
     } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
-      // Zooming In
-      settingsManager.selectedColor = [0, 0, 0, 0];
+      // Outside camDistBuffer
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
       this.zoomTarget += delta / 100 / 50 / this.speedModifier; // delta is +/- 100
       this.earthCenteredLastZoom = this.zoomTarget;
       this.camZoomSnappedOnSat = false;

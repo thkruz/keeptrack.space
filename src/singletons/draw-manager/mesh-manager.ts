@@ -192,6 +192,8 @@ export class MeshManager {
     // Meshes aren't finished loading
     if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
     if (!this.isReady) return;
+    // Don't draw meshes if the camera is too far away
+    if (keepTrackApi.getMainCamera().camDistBuffer >= settingsManager.nearZoomLevel) return;
     if (typeof this.currentMeshObject.id == 'undefined' || typeof this.currentMeshObject.model == 'undefined' || this.currentMeshObject.id == -1 || this.currentMeshObject.static)
       return;
 

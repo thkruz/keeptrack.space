@@ -75,6 +75,7 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 export const websiteInit = (plugin: KeepTrackPlugin) => {
   const settingsManager = new SettingsManager();
   settingsManager.init();
+  keepTrackApi.getColorSchemeManager().init();
   window.settingsManager = settingsManager;
   (global as any).settingsManager = settingsManager;
   // clearAllCallbacks();

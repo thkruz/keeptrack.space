@@ -217,23 +217,26 @@ export class SelectSatManager extends KeepTrackPlugin {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color
     const lastSelectedObject = this.lastSelectedSat();
-    if (lastSelectedObject !== -1) {
+    if (lastSelectedObject > -1) {
       colorSchemeManagerInstance.currentColorScheme ??= colorSchemeManagerInstance.default;
-      const newColor = colorSchemeManagerInstance.currentColorScheme(keepTrackApi.getCatalogManager().getSat(lastSelectedObject)).color;
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 1] = newColor[1]; // G
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 2] = newColor[2]; // B
-      colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 3] = newColor[3]; // A
-      gl.bufferSubData(gl.ARRAY_BUFFER, lastSelectedObject * 4 * 4, new Float32Array(newColor));
+      const lastSat = keepTrackApi.getCatalogManager().getSat(lastSelectedObject);
+      if (lastSat) {
+        const newColor = colorSchemeManagerInstance.currentColorScheme(lastSat).color;
+        colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
+        colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 1] = newColor[1]; // G
+        colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 2] = newColor[2]; // B
+        colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 3] = newColor[3]; // A
+        gl.bufferSubData(gl.ARRAY_BUFFER, lastSelectedObject * 4 * 4, new Float32Array(newColor));
 
-      if (!settingsManager.lastSearchResults.includes(lastSelectedObject)) {
-        dotsManagerInstance.sizeData[lastSelectedObject] = 0.0;
-        gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManagerInstance.sizeData);
+        if (!settingsManager.lastSearchResults.includes(lastSelectedObject)) {
+          dotsManagerInstance.sizeData[lastSelectedObject] = 0.0;
+          gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
+          gl.bufferSubData(gl.ARRAY_BUFFER, 0, dotsManagerInstance.sizeData);
+        }
       }
     }
     // If New Select Sat Picked Color it
-    if (i !== -1) {
+    if (i > -1) {
       // if error then log i
       if (i > colorSchemeManagerInstance.colorData.length / 4) {
         console.error('i is greater than colorData length');

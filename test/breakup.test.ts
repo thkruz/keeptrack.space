@@ -23,7 +23,7 @@ describe('Breakup_class', () => {
       keepTrackApi.getCatalogManager = () =>
         ({
           getSat: () => defaultSat,
-          getIdFromObjNum: () => 0,
+          getIdFromSccNum: () => 0,
           satCruncher: {
             postMessage: jest.fn(),
           },
@@ -35,7 +35,7 @@ describe('Breakup_class', () => {
             rotateOrbitToLatLon: () => [defaultSat.TLE1, defaultSat.TLE2],
           }) as any
       );
-      expect(() => breakupPlugin.onSubmit_()).not.toThrow();
+      expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
     });
   });
 });

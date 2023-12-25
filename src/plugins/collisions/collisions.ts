@@ -7,7 +7,7 @@ import { keepTrackApi, KeepTrackApiEvents } from '../../keepTrackApi';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
-interface CollisionEvent {
+export interface CollisionEvent {
   sat1: string;
   sat1Name: string;
   sat1Status: string;

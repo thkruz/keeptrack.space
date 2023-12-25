@@ -118,5 +118,3 @@ export class SensorFov extends KeepTrackPlugin {
     });
   }
 }
-
-export const sensorFovPlugin = new SensorFov();

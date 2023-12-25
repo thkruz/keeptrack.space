@@ -28,5 +28,3 @@ export class NightToggle extends KeepTrackPlugin {
     });
   }
 }
-
-export const nightTogglePlugin = new NightToggle();

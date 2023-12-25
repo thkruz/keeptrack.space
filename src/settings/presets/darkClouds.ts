@@ -1,3 +1,4 @@
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
@@ -122,7 +123,7 @@ export const darkClouds = () => {
     settingsManager.loopTimeMachine = true; // Loop through the years
 
     const startTimeMachine = () => {
-      keepTrackApi.getSelectSatManager().selectSat(-1); // Deselect Any Satellites
+      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       setTimeout(() => {
         (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
         keepTrackApi.getMainCamera().zoomTarget = 0.8; // Reset Zoom to Default

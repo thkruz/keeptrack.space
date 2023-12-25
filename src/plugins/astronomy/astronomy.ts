@@ -97,5 +97,3 @@ export class Astronomy extends KeepTrackPlugin {
     });
   }
 }
-
-export const astronomyPlugin = new Astronomy();

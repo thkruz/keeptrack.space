@@ -90,5 +90,3 @@ export class OrbitReferences extends KeepTrackPlugin {
     this.isReferenceSatsActive = true;
   }
 }
-
-export const orbitReferencesPlugin = new OrbitReferences();

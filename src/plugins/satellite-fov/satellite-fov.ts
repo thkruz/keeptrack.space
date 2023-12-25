@@ -137,5 +137,3 @@ export class SatelliteFov extends KeepTrackPlugin {
     colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
   }
 }
-
-export const satelliteFovPlugin = new SatelliteFov();

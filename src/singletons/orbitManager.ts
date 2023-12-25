@@ -105,7 +105,7 @@ export class StandardOrbitManager implements OrbitManager {
   ): void {
     if (!this.isInitialized_) return;
     const gl = this.gl_;
-    const selectSatManagerInstance = keepTrackApi.getSelectSatManager();
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.lineManagerInstance_.program);
@@ -130,14 +130,16 @@ export class StandardOrbitManager implements OrbitManager {
     gl.disable(gl.BLEND);
     gl.enable(gl.DEPTH_TEST);
 
-    if (selectSatManagerInstance?.selectedSat > -1 && settingsManager.enableConstantSelectedSatRedraw) {
-      this.clearSelectOrbit(false);
-      this.setSelectOrbit(selectSatManagerInstance?.selectedSat, false);
-    }
+    if (settingsManager.enableConstantSelectedSatRedraw) {
+      if (selectSatManagerInstance?.selectedSat > -1) {
+        this.clearSelectOrbit(false);
+        this.setSelectOrbit(selectSatManagerInstance?.selectedSat, false);
+      }
 
-    if (selectSatManagerInstance?.secondarySat > -1 && settingsManager.enableConstantSelectedSatRedraw) {
-      this.clearSelectOrbit(true);
-      this.setSelectOrbit(selectSatManagerInstance?.secondarySat, true);
+      if (selectSatManagerInstance?.secondarySat > -1) {
+        this.clearSelectOrbit(true);
+        this.setSelectOrbit(selectSatManagerInstance?.secondarySat, true);
+      }
     }
   }
 

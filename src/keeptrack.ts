@@ -409,7 +409,7 @@ theodore.kruczek at gmail dot com.
 
       // Load all the plugins now that we have the API initialized
       await import('./plugins/plugins')
-        .then((mod) => mod.loadCorePlugins(keepTrackApi, settingsManager.plugins))
+        .then((mod) => mod.loadPlugins(keepTrackApi, settingsManager.plugins))
         .catch(() => {
           // intentionally left blank
         });

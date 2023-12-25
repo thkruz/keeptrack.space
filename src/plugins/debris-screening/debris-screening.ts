@@ -16,7 +16,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   constructor() {
     super(DebrisScreening.PLUGIN_NAME);
-    this.selectSatManager_ = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
   bottomIconCallback = () => {
@@ -227,5 +227,3 @@ export class DebrisScreening extends KeepTrackPlugin {
     keepTrackApi.getUiManager().doSearch(searchStr);
   }
 }
-
-export const debrisScreeningPlugin = new DebrisScreening();

@@ -118,5 +118,3 @@ export class SensorSurvFence extends KeepTrackPlugin {
     });
   }
 }
-
-export const sensorSurvFencePlugin = new SensorSurvFence();

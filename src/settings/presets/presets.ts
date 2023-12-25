@@ -1,5 +1,6 @@
 import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 
@@ -258,7 +259,7 @@ export class SettingsPresets {
       cb: () => {
         keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
         setTimeout(() => {
-          keepTrackApi.getSelectSatManager().selectSat(keepTrackApi.getCatalogManager().getIdFromSccNum(43721));
+          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().getIdFromSccNum(43721));
           settings.isDisableSelectSat = true;
         }, 5000);
       },

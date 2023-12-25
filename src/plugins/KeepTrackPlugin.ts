@@ -408,9 +408,9 @@ export class KeepTrackPlugin {
   isRequireSatelliteSelected: boolean = false;
 
   verifySatelliteSelected(): boolean {
-    const searchDom = getEl('search', true);
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-    if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
+    // const searchDom = getEl('search', true);
+    // if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
+    if (!(keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1)) {
       errorManagerInstance.warn(`Select a Satellite First!`);
       shake(getEl(this.bottomIconElementName));
       return false;

@@ -228,5 +228,3 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     }
   }
 }
-
-export const nextLaunchesPlugin = new NextLaunchesPlugin();

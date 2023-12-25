@@ -15,7 +15,6 @@ import {
   UiManager,
 } from './interfaces';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
-import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
 import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
@@ -304,7 +303,6 @@ export const keepTrackApi = {
   getSensorMath: () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath),
   getLineManager: () => keepTrackContainer.get<LineManager>(Singletons.LineManager),
   getHoverManager: () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager),
-  getSelectSatManager: () => keepTrackContainer.get<SelectSatManager>(Singletons.SelectSatManager),
   getMainCamera: () => keepTrackContainer.get<Camera>(Singletons.MainCamera),
   getMeshManager: () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager),
 };

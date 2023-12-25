@@ -34,6 +34,12 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
 
 export class Planetarium extends KeepTrackPlugin {
+  static readonly PLUGIN_NAME = 'Planetarium';
+
+  constructor() {
+    super(Planetarium.PLUGIN_NAME);
+  }
+
   bottomIconElementName = 'menu-planetarium';
   bottomIconLabel = 'Planetarium View';
   bottomIconImg = planetariumPng;
@@ -84,11 +90,6 @@ export class Planetarium extends KeepTrackPlugin {
     }
   };
 
-  constructor() {
-    const PLUGIN_NAME = 'Astronomy';
-    super(PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
@@ -106,5 +107,3 @@ export class Planetarium extends KeepTrackPlugin {
     });
   }
 }
-
-export const planetariumPlugin = new Planetarium();

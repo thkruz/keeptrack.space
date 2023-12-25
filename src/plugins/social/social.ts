@@ -35,5 +35,3 @@ export class SocialMedia extends KeepTrackPlugin {
     getEl('nav-mobile2').insertBefore(githubShareElement, getEl('nav-mobile2').firstChild);
   }
 }
-
-export const socialMediaPlugin = new SocialMedia();

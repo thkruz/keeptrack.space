@@ -1,37 +1,35 @@
 import { countriesMenuPlugin } from '@app/plugins/countries/countries';
+import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
 import * as initialOrbit from '@app/plugins/initial-orbit/initial-orbit';
 import * as missile from '@app/plugins/missile/missilePlugin';
-import { satelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
+import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
-import { topMenuPlugin } from '@app/plugins/top-menu/top-menu';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import * as catalogLoader from '@app/static/catalog-loader';
 
-import { Singletons } from '@app/interfaces';
-import { keepTrackContainer } from '../container';
 import { KeepTrackApiEvents, KeepTrackApiRegisterParams } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { aboutMenuPlugin } from './about-menu/about-menu';
 import { analysisMenuPlugin } from './analysis/analysis';
-import { astronomyPlugin } from './astronomy/astronomy';
+import { Astronomy } from './astronomy/astronomy';
 import { Breakup } from './breakup/breakup';
-import { classificationBarPlugin } from './classification-bar/classification-bar';
+import { ClassificationBar } from './classification-bar/classification-bar';
 import { Collissions } from './collisions/collisions';
 import { colorMenuPlugin } from './colors-menu/colors-menu';
-import { dateTimeManagerPlugin } from './date-time-manager/date-time-manager';
-import { debrisScreeningPlugin } from './debris-screening/debris-screening';
-import { debugMenuPlugin } from './debug/debug';
+import { DateTimeManager } from './date-time-manager/date-time-manager';
+import { DebrisScreening } from './debris-screening/debris-screening';
+import { DebugMenuPlugin } from './debug/debug';
 import { dopsPlugin } from './dops/dops';
-import { editSatPlugin } from './edit-sat/edit-sat';
-import { findSatPlugin } from './find-sat/find-sat';
+import { EditSatPlugin } from './edit-sat/edit-sat';
 import { gamepadPluginInstance } from './gamepad/gamepad';
 import { omManager } from './initial-orbit/om-manager';
 import { launchCalendarPlugin } from './launch-calendar/launch-calendar';
 import { NewLaunch } from './new-launch/new-launch';
-import { nextLaunchesPlugin } from './next-launches/next-launches';
-import { nightTogglePlugin } from './night-toggle/night-toggle';
-import { orbitReferencesPlugin } from './orbit-references/orbit-references';
-import { planetariumPlugin } from './planetarium/planetarium';
+import { NextLaunchesPlugin } from './next-launches/next-launches';
+import { NightToggle } from './night-toggle/night-toggle';
+import { OrbitReferences } from './orbit-references/orbit-references';
+import { Planetarium } from './planetarium/planetarium';
 import { ecfPlotsPlugin } from './plot-analysis/ecf-plots';
 import { eciPlotsPlugin } from './plot-analysis/eci-plots';
 import { inc2AltPlotPlugin } from './plot-analysis/inc2alt';
@@ -39,23 +37,23 @@ import { inc2LonPlotPlugin } from './plot-analysis/inc2lon';
 import { ricPlotPlugin } from './plot-analysis/ric-plots';
 import { time2LonPlotsPlugin } from './plot-analysis/time2lon';
 import { satConstellationsPlugin } from './sat-constellations/sat-constellations';
-import { satelliteFovPlugin } from './satellite-fov/satellite-fov';
+import { SatelliteFov } from './satellite-fov/satellite-fov';
 import { satellitePhotosPlugin } from './satellite-photos/satellite-photos';
 import { screenRecorderPlugin } from './screen-recorder/screen-recorder';
 import { StreamManager } from './screen-recorder/stream-manager';
 import { screenshotPlugin } from './screenshot/screenshot';
 import { SatInfoBox } from './select-sat-manager/sat-info-box';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
-import { sensorFovPlugin } from './sensor-fov/sensor-fov';
-import { sensorSurvFencePlugin } from './sensor-surv/sensor-surv-fence';
+import { SensorFov } from './sensor-fov/sensor-fov';
+import { SensorSurvFence } from './sensor-surv/sensor-surv-fence';
 import { CustomSensorPlugin } from './sensor/custom-sensor-plugin';
 import { LookAnglesPlugin } from './sensor/look-angles-plugin';
 import { MultiSiteLookAnglesPlugin } from './sensor/multi-site-look-angles-plugin';
 import { SensorInfoPlugin } from './sensor/sensor-info-plugin';
 import { SensorListPlugin } from './sensor/sensor-list-plugin';
 import { settingsMenuPlugin } from './settings-menu/settings-menu';
-import { shortTermFencesPlugin } from './short-term-fences/short-term-fences';
-import { socialMediaPlugin } from './social/social';
+import { ShortTermFences } from './short-term-fences/short-term-fences';
+import { SocialMedia } from './social/social';
 import { StereoMapPlugin } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { videoDirectorPlugin } from './video-director/video-director';
@@ -116,29 +114,12 @@ export type KeepTrackPlugins = {
 };
 
 // Register all core modules
-export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTrackApiRegisterParams) => void }, plugins: KeepTrackPlugins): Promise<void> => {
+export const loadPlugins = async (keepTrackApi: { register?: (params: KeepTrackApiRegisterParams) => void }, plugins: KeepTrackPlugins): Promise<void> => {
   plugins ??= {};
   try {
-    // Register Catalog Loader
-    // catalogLoader.init();
+    loadCorePlugins_(plugins);
 
-    // Load Debug Plugins
-    if (plugins.debug) debugMenuPlugin.init();
-
-    // Register selectSatData
-    const selectSatManagerInstance = new SelectSatManager();
-    selectSatManagerInstance.init();
-    keepTrackContainer.registerSingleton<SelectSatManager>(Singletons.SelectSatManager, selectSatManagerInstance);
-
-    if (plugins.topMenu) topMenuPlugin.init();
-    if (plugins.satInfoboxCore) new SatInfoBox().init();
-
-    // Core Features
-    if (plugins.datetime) dateTimeManagerPlugin.init();
-    if (plugins.social) socialMediaPlugin.init();
-
-    // UI Menu
-    if (plugins.classificationBar) classificationBarPlugin.init();
+    if (plugins.classificationBar) new ClassificationBar().init();
     if (plugins.sensor) {
       new SensorListPlugin().init();
       new SensorInfoPlugin().init();
@@ -150,36 +131,26 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
       new WatchlistPlugin().init();
       new WatchlistOverlay().init();
     }
-    if (plugins.nextLaunch) nextLaunchesPlugin.init();
-    if (plugins.findSat) findSatPlugin.init();
-    if (plugins.shortTermFences) shortTermFencesPlugin.init();
-    if (plugins.orbitReferences) orbitReferencesPlugin.init();
-    if (plugins.collisions) {
-      new Collissions().init();
-    }
-    if (plugins.breakup) {
-      new Breakup().init();
-    }
-    if (plugins.debrisScreening) debrisScreeningPlugin.init();
-    if (plugins.editSat) editSatPlugin.init();
-    if (plugins.newLaunch) {
-      new NewLaunch().init();
-    }
-    // if (plugins.satChanges) satChanges.init();
+    if (plugins.nextLaunch) new NextLaunchesPlugin().init();
+    if (plugins.findSat) new FindSatPlugin().init();
+    if (plugins.shortTermFences) new ShortTermFences().init();
+    if (plugins.orbitReferences) new OrbitReferences().init();
+    if (plugins.collisions) new Collissions().init();
+    if (plugins.breakup) new Breakup().init();
+    if (plugins.debrisScreening) new DebrisScreening().init();
+    if (plugins.editSat) new EditSatPlugin().init();
+    if (plugins.newLaunch) new NewLaunch().init();
     if (plugins.initialOrbit) initialOrbit.init();
     if (plugins.missile) missile.init();
-    if (plugins.stereoMap) {
-      const stereoMapPlugin = new StereoMapPlugin();
-      stereoMapPlugin.init();
-    }
-    if (plugins.sensorFov) sensorFovPlugin.init();
-    if (plugins.sensorSurv) sensorSurvFencePlugin.init();
-    if (plugins.satelliteView) satelliteViewPlugin.init();
-    if (plugins.satelliteFov) satelliteFovPlugin.init();
-    if (plugins.planetarium) planetariumPlugin.init();
+    if (plugins.stereoMap) new StereoMapPlugin().init();
+    if (plugins.sensorFov) new SensorFov().init();
+    if (plugins.sensorSurv) new SensorSurvFence().init();
+    if (plugins.satelliteView) new SatelliteViewPlugin().init();
+    if (plugins.satelliteFov) new SatelliteFov().init();
+    if (plugins.planetarium) new Planetarium().init();
     // TODO: Fix astronomy plugin
-    if (plugins.astronomy) astronomyPlugin.init();
-    if (plugins.nightToggle) nightTogglePlugin.init();
+    if (plugins.astronomy) new Astronomy().init();
+    if (plugins.nightToggle) new NightToggle().init();
     if (plugins.dops) dopsPlugin.init();
     if (plugins.constellations) satConstellationsPlugin.init();
     if (plugins.countries) countriesMenuPlugin.init();
@@ -198,7 +169,6 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
     if (plugins.plotAnalysis) inc2LonPlotPlugin.init();
     if (plugins.aboutManager) aboutMenuPlugin.init();
     if (plugins.settingsMenu) settingsMenuPlugin.init();
-    // if (plugins.debug) debug.initMenu();
     if (plugins.soundManager) soundManagerPlugin.init();
     if (plugins.gamepad) gamepadPluginInstance.init();
     if (plugins.videoDirector) videoDirectorPlugin.init();
@@ -213,6 +183,16 @@ export const loadCorePlugins = async (keepTrackApi: { register?: (params: KeepTr
   } catch (e) {
     errorManagerInstance.info('Error loading core plugins:' + e.message);
   }
+};
+
+const loadCorePlugins_ = (plugins: KeepTrackPlugins) => {
+  if (plugins.debug) new DebugMenuPlugin().init();
+  new SelectSatManager().init();
+
+  if (plugins.topMenu) new TopMenu().init();
+  if (plugins.satInfoboxCore) new SatInfoBox().init();
+  if (plugins.datetime) new DateTimeManager().init();
+  if (plugins.social) new SocialMedia().init();
 };
 export const uiManagerFinal = (plugins: any): void => {
   const bicDom = getEl('bottom-icons-container');

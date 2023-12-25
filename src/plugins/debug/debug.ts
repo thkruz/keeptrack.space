@@ -250,5 +250,3 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     this.startGremlins();
   }
 }
-
-export const debugMenuPlugin = new DebugMenuPlugin();

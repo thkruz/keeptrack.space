@@ -165,5 +165,3 @@ export class DateTimeManager extends KeepTrackPlugin {
     // radarDataManager.findFirstDataTime();
   }
 }
-
-export const dateTimeManagerPlugin = new DateTimeManager();

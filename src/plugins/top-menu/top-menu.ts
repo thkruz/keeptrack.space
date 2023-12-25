@@ -136,5 +136,3 @@ export class TopMenu extends KeepTrackPlugin {
     });
   };
 }
-
-export const topMenuPlugin = new TopMenu();

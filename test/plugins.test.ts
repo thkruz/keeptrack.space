@@ -1,9 +1,9 @@
 import { keepTrackApi } from '@app/keepTrackApi';
-import { loadCorePlugins } from '@app/plugins/plugins';
+import { loadPlugins } from '@app/plugins/plugins';
 
 describe('plugins', () => {
   it('should be able to initialize all plugins', () => {
-    loadCorePlugins(keepTrackApi, {
+    loadPlugins(keepTrackApi, {
       debug: false,
       satInfoboxCore: true,
       aboutManager: true,

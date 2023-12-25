@@ -230,5 +230,3 @@ export class ShortTermFences extends KeepTrackPlugin {
     this.setBottomIconToSelected();
   }
 }
-
-export const shortTermFencesPlugin = new ShortTermFences();

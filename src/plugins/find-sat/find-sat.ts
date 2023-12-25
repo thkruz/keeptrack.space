@@ -483,5 +483,3 @@ The search will then find all satellites within those inclinations and display t
     return possibles.filter((possible) => parseFloat(possible.R) > minRcs && parseFloat(possible.R) < maxRcs);
   }
 }
-
-export const findSatPlugin = new FindSatPlugin();

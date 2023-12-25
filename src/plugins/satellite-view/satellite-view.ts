@@ -35,7 +35,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
 
   constructor() {
     super(SatelliteViewPlugin.PLUGIN_NAME);
-    this.selectSatManager_ = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
   bottomIconElementName = 'menu-satview';
@@ -60,5 +60,3 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
 
   lastLongAudioTime = 0;
 }
-
-export const satelliteViewPlugin = new SatelliteViewPlugin();

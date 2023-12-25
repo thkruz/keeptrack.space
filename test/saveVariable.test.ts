@@ -69,7 +69,7 @@ describe('code_snippet', () => {
   // Tests that getCircularReplacer returns a replacer function that replaces circular references with null
   it('test_get_circular_replacer', () => {
     const circularObj = { a: 1 };
-    // @ts-ignore
+    // @ts-expect-error
     circularObj.b = circularObj;
     const expected = '{"a":1,"b":null}';
 
@@ -121,7 +121,7 @@ describe('code_snippet', () => {
   // Tests that getCircularReplacer handles circular references in nested objects
   it('test_get_circular_replacer_handles_circular_references_in_nested_objects', () => {
     const obj = { a: 1 };
-    // @ts-ignore
+    // @ts-expect-error
     obj.b = obj;
     const replacer = getCircularReplacer();
     const result = JSON.stringify(obj, replacer);

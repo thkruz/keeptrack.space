@@ -9,7 +9,7 @@ import { HoverManager } from '../src/singletons/hover-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 
 // tell ts to ignore rule ts2341
-// @ts-ignore TS2341
+// @ts-expect-error TS2341
 
 /*
 Code Analysis

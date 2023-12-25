@@ -30,7 +30,7 @@ export interface ControlSiteObject {
   linkGlonass?: boolean;
 }
 
-// @ts-ignore
+// @ts-expect-error
 export const controlSites = [
   {
     Code: 'AAT',

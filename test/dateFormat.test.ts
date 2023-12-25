@@ -67,7 +67,7 @@ describe('dateFormat_function', () => {
   // Tests that the function throws an error with an invalid date object
   it('test_invalid_date_object', () => {
     expect(() => {
-      // @ts-ignore
+      // @ts-expect-error
       dateFormat({}, 'default');
     }).toThrow(SyntaxError);
   });

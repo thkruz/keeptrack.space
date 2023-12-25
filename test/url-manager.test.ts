@@ -16,7 +16,7 @@ describe('UrlManager_class', () => {
   it('test_parse_valid_params', () => {
     const url = 'http://localhost:8080/?sat=25544&search=ISS&rate=1.0&date=1630512000000';
     delete window.location;
-    // @ts-ignore
+    // @ts-expect-error
     window.location = new URL(url);
 
     const expectedSelectedSat = 25544;
@@ -45,7 +45,7 @@ describe('UrlManager_class', () => {
   it('test_parse_valid_params', () => {
     const url = 'http://localhost:8080/?intldes=1988-064A';
     delete window.location;
-    // @ts-ignore
+    // @ts-expect-error
     window.location = new URL(url);
 
     const expectedSelectedSat = 10;
@@ -68,7 +68,7 @@ describe('UrlManager_class', () => {
   it('test_parse_valid_params_sat_not_found', () => {
     const url = 'http://localhost:8080/?intldes=1988-064A';
     delete window.location;
-    // @ts-ignore
+    // @ts-expect-error
     window.location = new URL(url);
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -90,7 +90,7 @@ describe('UrlManager_class', () => {
   it('test_parse_valid_params_sat_not_found2', () => {
     const url = 'http://localhost:8080/?sat=99999';
     delete window.location;
-    // @ts-ignore
+    // @ts-expect-error
     window.location = new URL(url);
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -112,7 +112,7 @@ describe('UrlManager_class', () => {
   it('test_parse_empty_params', () => {
     const url = 'http://localhost:8080/';
     delete window.location;
-    // @ts-ignore
+    // @ts-expect-error
     window.location = new URL(url);
 
     const expectedSelectedSat = 25544;
@@ -141,7 +141,7 @@ describe('UrlManager_class', () => {
   it('test_parse_invalid_params', () => {
     const url = 'http://localhost:8080/?sat=invalid&search=ISS&rate=invalid&date=invalid';
     delete window.location;
-    // @ts-ignore
+    // @ts-expect-error
     window.location = new URL(url);
 
     const expectedSelectedSat = 25544;

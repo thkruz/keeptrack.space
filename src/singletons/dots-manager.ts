@@ -503,7 +503,7 @@ export class DotsManager {
 
     // Fix for https://github.com/thkruz/keeptrack.space/issues/834
     // TODO: Remove this once we figure out why this is happening
-    // @ts-ignore
+    // @ts-expect-error
     if (sat.velocity === 0) {
       sat.velocity = { total: 0, x: 0, y: 0, z: 0 };
     }

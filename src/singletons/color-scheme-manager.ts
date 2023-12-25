@@ -279,7 +279,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   default(sat: SatObject): ColorInformation {
     // NOTE: The order of these checks is important
     // Grab reference to outside managers for their functions
-    // @ts-ignore
+    // @ts-expect-error
     if (sat.type === SpaceObjectType.NOTIONAL && window.noNotional) {
       return {
         color: this.colorTheme.deselected,

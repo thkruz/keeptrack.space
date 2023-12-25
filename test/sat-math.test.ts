@@ -134,7 +134,7 @@ describe('getDirection_method', () => {
     } as SatObject;
     const simulationTime = new Date();
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: 0 });
-    // @ts-ignore
+    // @ts-expect-error
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: 0 }).mockReturnValueOnce({ lat: 10 });
     const direction = SatMath.getDirection(sat, simulationTime);
     expect(direction).toBe('N');
@@ -148,7 +148,7 @@ describe('getDirection_method', () => {
     } as SatObject;
     const simulationTime = new Date();
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: 0 });
-    // @ts-ignore
+    // @ts-expect-error
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: 0 }).mockReturnValueOnce({ lat: -10 });
     const direction = SatMath.getDirection(sat, simulationTime);
     expect(direction).toBe('S');
@@ -162,7 +162,7 @@ describe('getDirection_method', () => {
     } as SatObject;
     const simulationTime = new Date();
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: 0 });
-    // @ts-ignore
+    // @ts-expect-error
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: 0 }).mockReturnValueOnce({ lat: 0 });
     disableConsoleErrors();
     const direction = SatMath.getDirection(sat, simulationTime);
@@ -178,7 +178,7 @@ describe('getDirection_method', () => {
     } as SatObject;
     const simulationTime = new Date();
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: 0 });
-    // @ts-ignore
+    // @ts-expect-error
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: 0 }).mockReturnValueOnce({ lat: null });
     disableConsoleErrors();
     const direction = SatMath.getDirection(sat, simulationTime);
@@ -194,7 +194,7 @@ describe('getDirection_method', () => {
     } as SatObject;
     const simulationTime = new Date();
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: 90 });
-    // @ts-ignore
+    // @ts-expect-error
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: 90 }).mockReturnValueOnce({ lat: 100 });
     const direction = SatMath.getDirection(sat, simulationTime);
     expect(direction).toBe('N');
@@ -208,7 +208,7 @@ describe('getDirection_method', () => {
     } as SatObject;
     const simulationTime = new Date();
     CoordinateTransforms.eci2lla = jest.fn().mockReturnValue({ lat: -90 });
-    // @ts-ignore
+    // @ts-expect-error
     CoordinateTransforms.eci2lla.mockReturnValueOnce({ lat: -90 }).mockReturnValueOnce({ lat: -100 });
     const direction = SatMath.getDirection(sat, simulationTime);
     expect(direction).toBe('S');

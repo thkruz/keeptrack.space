@@ -178,7 +178,7 @@ describe('LegendManager_class', () => {
       resetObjectTypeFlags: jest.fn(),
     };
 
-    // @ts-ignore
+    // @ts-expect-error
     keepTrackContainer.get = jest.fn().mockImplementation((singleton) => {
       if (singleton === Singletons.CatalogManager) {
         return catalogManagerInstance;

@@ -18,29 +18,6 @@ export interface OrbitCruncherMessageMain {
   };
 }
 
-/* export const setOrbit = function (satId: number) {
-let sat = catalogManagerInstance.getSat(satId: number);
-mat4.identity(mat4.create());
-//apply steps in reverse order because matrix multiplication
-// (last multiplied in is first applied to vertex)
-
-//step 5. rotate to RAAN
-mat4.rotateZ(mat4.create(), mat4.create(), sat.raan + Math.PI/2);
-//step 4. incline the plane
-mat4.rotateY(mat4.create(), mat4.create(), -sat.inclination);
-//step 3. rotate to argument of periapsis
-mat4.rotateZ(mat4.create(), mat4.create(), sat.argPe - Math.PI/2);
-//step 2. put earth at the focus
-mat4.translate(mat4.create(), mat4.create(), [sat.semiMajorAxis - sat.apogee - RADIUS_OF_EARTH, 0, 0]);
-//step 1. stretch to ellipse
-mat4.scale(mat4.create(), mat4.create(), [sat.semiMajorAxis, sat.semiMinorAxis, 0]);
-
-};
-
-orbitManager.clearOrbit = function () {
-mat4.identity(mat4.create());
-} */
-
 export class StandardOrbitManager implements OrbitManager {
   private currentInView_ = <number[]>[];
   private currentSelectId_ = -1;
@@ -121,10 +98,10 @@ export class StandardOrbitManager implements OrbitManager {
       this.lineManagerInstance_.setWorldUniforms(camMatrix, pMatrix);
 
       this.drawGroupObjectOrbit(hoverManagerInstance, colorSchemeManagerInstance);
-      this.drawInViewObjectOrbit(mainCameraInstance);
-      this.drawPrimaryObjectOrbit();
-      this.drawSecondaryObjectOrbit();
-      this.drawHoverObjectOrbit(hoverManagerInstance, colorSchemeManagerInstance);
+      this.drawInViewObjectOrbit_(mainCameraInstance);
+      this.drawPrimaryObjectOrbit_();
+      this.drawSecondaryObjectOrbit_();
+      this.drawHoverObjectOrbit_(hoverManagerInstance, colorSchemeManagerInstance);
     }
 
     gl.disable(gl.BLEND);
@@ -146,16 +123,17 @@ export class StandardOrbitManager implements OrbitManager {
   drawOrbitsSettingChanged(): void {
     // We may have skipped initialization on boot and now need to do it
     if (!this.isInitialized_) {
-      this.init(this.lineManagerInstance_, this.gl_);
+      this.init(keepTrackApi.getLineManager(), keepTrackApi.getRenderer().gl);
     }
   }
 
   init(lineManagerInstance: LineManager, gl: WebGL2RenderingContext, orbitWorker?: Worker): void {
-    this.lineManagerInstance_ = lineManagerInstance;
-    this.gl_ = gl;
-
+    if (this.isInitialized_) return; // Only initialize once
     if (!settingsManager.isDrawOrbits) return;
     if (!settingsManager.colors) return;
+
+    this.lineManagerInstance_ = lineManagerInstance;
+    this.gl_ = gl;
 
     this.tempTransColor = settingsManager.colors.transparent;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -165,15 +143,15 @@ export class StandardOrbitManager implements OrbitManager {
 
     this.orbitWorker.onmessage = this.workerOnMessage_.bind(this);
 
-    this.selectOrbitBuf_ = this.gl_.createBuffer() as WebGLBuffer;
+    this.selectOrbitBuf_ = this.gl_.createBuffer();
     this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, this.selectOrbitBuf_);
     this.gl_.bufferData(this.gl_.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), this.gl_.DYNAMIC_DRAW);
 
-    this.secondaryOrbitBuf_ = this.gl_.createBuffer() as WebGLBuffer;
+    this.secondaryOrbitBuf_ = this.gl_.createBuffer();
     this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, this.secondaryOrbitBuf_);
     this.gl_.bufferData(this.gl_.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), this.gl_.DYNAMIC_DRAW);
 
-    this.hoverOrbitBuf_ = this.gl_.createBuffer() as WebGLBuffer;
+    this.hoverOrbitBuf_ = this.gl_.createBuffer();
     this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, this.hoverOrbitBuf_);
     this.gl_.bufferData(this.gl_.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), this.gl_.DYNAMIC_DRAW);
 
@@ -339,7 +317,7 @@ export class StandardOrbitManager implements OrbitManager {
 
   private allocateBuffer(): WebGLBuffer {
     const gl = this.gl_;
-    let buf = gl.createBuffer() as WebGLBuffer;
+    let buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
     return buf;
@@ -349,39 +327,14 @@ export class StandardOrbitManager implements OrbitManager {
 
   private drawGroupObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const colorData = colorSchemeManagerInstance.colorData;
 
     if (groupManagerInstance.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
-      const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
-
-      // DEBUG: Planned future feature
-      // if (sensorManager.currentSensor?.lat) {
-      //   groupsManager.selectedGroup.forEach(function (id) {
-      //     let isInViewSoon = false;
-      //     for (let i = 0; i < orbitManager.inViewSoon.length; i++) {
-      //       if (id === orbitManager.inViewSoon[i]) {
-      //         isInViewSoon = true;
-      //         break;
-      //       }
-      //     }
-      //     if (isInViewSoon) {
-      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitInViewColor);
-      //     } else {
-      //       gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
-      //     }
-      //     gl.bindBuffer(gl.ARRAY_BUFFER, glBuffers[id]);
-      //     gl.vertexAttribPointer(pathShader.aPos, 4, gl.FLOAT, false, 0, 0);
-      //     gl.enableVertexAttribArray(pathShader.aPos);
-      //     gl.drawArrays(gl.LINE_STRIP, 0, settingsManager.orbitSegments + 1);
-      //   });
-      // }
-      // gl.uniform4fv(pathShader.uColor, settingsManager.orbitGroupColor);
       groupManagerInstance.selectedGroup.objects.forEach((id: number) => {
         if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) return; // Skip hover and select objects
-        if (!satData[id].active) return; // Skip inactive objects
+        if (!keepTrackApi.getCatalogManager().getSat(id)?.active) return; // Skip inactive objects
 
-        for (let i = 0; id < 4; id++) {
-          if (typeof colorSchemeManagerInstance.colorData[id * i] === 'undefined') throw new Error(`color buffer for ${id} not valid`);
-        }
+        StandardOrbitManager.checColorBuffersValidity_(id, colorData);
 
         if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== id) {
           // if color is black, we probably have old data, so recalculate color buffers
@@ -390,9 +343,9 @@ export class StandardOrbitManager implements OrbitManager {
             settingsManager.isShowMeoSats &&
             settingsManager.isShowGeoSats &&
             settingsManager.isShowHeoSats &&
-            colorSchemeManagerInstance.colorData[id * 4] <= 0 &&
-            colorSchemeManagerInstance.colorData[id * 4 + 1] <= 0 &&
-            colorSchemeManagerInstance.colorData[id * 4 + 2] <= 0
+            colorData[id * 4] <= 0 &&
+            colorData[id * 4 + 1] <= 0 &&
+            colorData[id * 4 + 2] <= 0
           ) {
             if (this.isCalculateColorLocked) {
               // Prevent unexpected infinite coloring loop!
@@ -409,42 +362,45 @@ export class StandardOrbitManager implements OrbitManager {
               this.isCalculateColorLocked = false;
             }, 2000);
           }
-          if (colorSchemeManagerInstance.colorData[id * 4 + 3] <= 0) {
+          if (colorData[id * 4 + 3] <= 0) {
             return; // Skip transparent objects
             // Debug: This is useful when all objects are supposed to be visible but groups can filter out objects
             // throw new Error(`color buffer for ${id} isn't visible`);
           }
         }
 
-        this.lineManagerInstance_.setColorUniforms([
-          colorSchemeManagerInstance.colorData[id * 4],
-          colorSchemeManagerInstance.colorData[id * 4 + 1],
-          colorSchemeManagerInstance.colorData[id * 4 + 2],
-          colorSchemeManagerInstance.colorData[id * 4 + 3] * settingsManager.orbitGroupAlpha,
-        ]);
-        this.writePathToGpu(id);
+        this.lineManagerInstance_.setColorUniforms([colorData[id * 4], colorData[id * 4 + 1], colorData[id * 4 + 2], colorData[id * 4 + 3] * settingsManager.orbitGroupAlpha]);
+        this.writePathToGpu_(id);
       });
     }
   }
 
-  private drawHoverObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
+  private drawHoverObjectOrbit_(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
     if (settingsManager.isMobileModeEnabled) return; // No hover orbit on mobile
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
     const hoverId = hoverManagerInstance.getHoverId();
-    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !catalogManagerInstance.getSat(hoverId, GetSatType.EXTRA_ONLY)?.static) {
-      // avoid z-fighting
-      if (typeof colorSchemeManagerInstance.colorData[hoverId * 4] === 'undefined') throw new Error(`color buffer for ${hoverId} not valid`);
-      if (typeof colorSchemeManagerInstance.colorData[hoverId * 4 + 1] === 'undefined') throw new Error(`color buffer for ${hoverId} not valid`);
-      if (typeof colorSchemeManagerInstance.colorData[hoverId * 4 + 2] === 'undefined') throw new Error(`color buffer for ${hoverId} not valid`);
-      if (typeof colorSchemeManagerInstance.colorData[hoverId * 4 + 3] === 'undefined') throw new Error(`color buffer for ${hoverId} not valid`);
+    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !keepTrackApi.getCatalogManager().getSat(hoverId, GetSatType.EXTRA_ONLY)?.static) {
+      StandardOrbitManager.checColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
-      this.writePathToGpu(hoverId);
+      this.writePathToGpu_(hoverId);
     }
   }
 
-  private drawInViewObjectOrbit(mainCameraInstance: Camera): void {
+  private static checColorBuffersValidity_(hoverId: number, colorData: Float32Array) {
+    const hoverIdIndex = hoverId * 4;
+    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex, colorData);
+    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex + 1, colorData);
+    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex + 2, colorData);
+    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex + 3, colorData);
+  }
+
+  private static checkColorBufferValidity_(index: number, colorData: Float32Array) {
+    if (typeof colorData[index] === 'undefined') {
+      throw new Error(`color buffer for ${index / 4} not valid`);
+    }
+  }
+
+  private drawInViewObjectOrbit_(mainCameraInstance: Camera): void {
     if (this.currentInView_.length >= 1) {
       // There might be some z-fighting
       if (mainCameraInstance.cameraType == CameraType.PLANETARIUM) {
@@ -453,37 +409,35 @@ export class StandardOrbitManager implements OrbitManager {
         this.lineManagerInstance_.setColorUniforms(settingsManager.orbitInViewColor);
       }
       this.currentInView_.forEach((id) => {
-        this.writePathToGpu(id);
+        this.writePathToGpu_(id);
       });
     }
   }
 
-  private drawPrimaryObjectOrbit() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    if (this.currentSelectId_ !== -1 && !catalogManagerInstance.getSat(this.currentSelectId_, GetSatType.EXTRA_ONLY)?.static) {
+  private drawPrimaryObjectOrbit_() {
+    if (this.currentSelectId_ !== -1 && !keepTrackApi.getCatalogManager().getSat(this.currentSelectId_, GetSatType.EXTRA_ONLY)?.static) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor);
-      this.writePathToGpu(this.currentSelectId_);
+      this.writePathToGpu_(this.currentSelectId_);
     }
   }
 
-  private drawSecondaryObjectOrbit(): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    if (this.secondarySelectId_ !== -1 && !catalogManagerInstance.getSat(this.secondarySelectId_, GetSatType.EXTRA_ONLY)?.static) {
+  private drawSecondaryObjectOrbit_(): void {
+    if (this.secondarySelectId_ !== -1 && !keepTrackApi.getCatalogManager().getSat(this.secondarySelectId_, GetSatType.EXTRA_ONLY)?.static) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor2);
-      this.writePathToGpu(this.secondarySelectId_);
+      this.writePathToGpu_(this.secondarySelectId_);
     }
   }
 
   private workerOnMessage_(m: OrbitCruncherMessageMain): void {
-    let satId = m.data.satId;
-    let pointsOut = new Float32Array(m.data.pointsOut);
+    const satId = m.data.satId;
+    const pointsOut = new Float32Array(m.data.pointsOut);
     const gl = this.gl_;
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
     gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
     this.inProgress_[satId] = false;
   }
 
-  private writePathToGpu(id: number) {
+  private writePathToGpu_(id: number) {
     if (id === -1) return; // no hover object
     if (typeof this.glBuffers_[id] === 'undefined') throw new Error(`orbit buffer ${id} not allocated`);
     this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], settingsManager.orbitSegments + 1);

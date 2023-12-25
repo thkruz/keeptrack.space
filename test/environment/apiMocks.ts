@@ -95,8 +95,7 @@ export const defaultSensor: SensorObject = {
 export const useMockWorkers = (): void => {
   class Worker {
     url: any;
-    // eslint-disable-next-line no-unused-vars
-    onmessage: (msg: any) => { data: {} };
+    onmessage: (msg: any) => { data: object };
     constructor(stringUrl: any) {
       this.url = stringUrl;
       this.onmessage = (msg: any) => {

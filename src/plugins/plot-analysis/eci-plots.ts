@@ -220,7 +220,7 @@ export class EciPlot extends KeepTrackPlugin {
       { name: Z_AXIS, index: 2 },
     ];
 
-    const fieldIndices = schema.reduce(function (obj, item): {} {
+    const fieldIndices = schema.reduce(function (obj, item): object {
       obj[item.name] = item.index;
       return obj;
     }, {});

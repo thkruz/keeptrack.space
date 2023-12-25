@@ -1,5 +1,5 @@
 import { SatObject } from '@app/interfaces';
-import { SatelliteRecord, Sgp4, TleLine1, TleLine2, Transforms } from 'ootk';
+import { Degrees, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2, Transforms } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { StringPad } from '../lib/stringPad';
 import { errorManagerInstance } from '../singletons/errorManager';
@@ -25,7 +25,7 @@ export abstract class ManueverMath {
     var origsat = mainsat;
     // Launch Points are the Satellites Current Location
     var TEARR = SensorMath.getTearr(mainsat, sensorManagerInstance.currentSensors, timeManagerInstance.simulationTimeObj);
-    var launchLat: number, launchLon: number, alt: number;
+    var launchLat: Degrees, launchLon: Degrees, alt: Kilometers;
     launchLat = Transforms.getDegLat(TEARR.lat);
     launchLon = Transforms.getDegLon(TEARR.lon);
     alt = TEARR.alt;
@@ -51,7 +51,7 @@ export abstract class ManueverMath {
     let iTLEs;
     // Ignore argument of perigee for round orbits OPTIMIZE
     if (sat.apogee - sat.perigee < 300) {
-      iTLEs = new OrbitFinder(sat, launchLat, launchLon, upOrDown as 'N' | 'S', timeManagerInstance.simulationTimeObj, 0, rascVariation).rotateOrbitToLatLon();
+      iTLEs = new OrbitFinder(sat, launchLat, launchLon, upOrDown as 'N' | 'S', timeManagerInstance.simulationTimeObj, 0 as Kilometers, rascVariation).rotateOrbitToLatLon();
     } else {
       iTLEs = new OrbitFinder(sat, launchLat, launchLon, upOrDown as 'N' | 'S', timeManagerInstance.simulationTimeObj, alt, rascVariation).rotateOrbitToLatLon();
     }

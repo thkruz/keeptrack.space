@@ -44,7 +44,7 @@ export class OrbitFinder {
   raanCalcResults: PropagationResults;
   argPer: string;
 
-  constructor(sat: SatObject, goalLat: number, goalLon: number, goalDirection: 'N' | 'S', now: Date, goalAlt?: number, raanOffset?: number) {
+  constructor(sat: SatObject, goalLat: Degrees, goalLon: Degrees, goalDirection: 'N' | 'S', now: Date, goalAlt?: Kilometers, raanOffset?: number) {
     this.sat = sat;
     this.now = now;
     this.goalLat = goalLat;

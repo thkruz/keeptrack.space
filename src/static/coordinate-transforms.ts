@@ -1,6 +1,6 @@
 import { EciArr3, SatObject, SensorObject } from '@app/interfaces';
 import { mat3, vec3 } from 'gl-matrix';
-import { Degrees, EciVec3, Kilometers, Radians, Transforms } from 'ootk';
+import { Degrees, EciVec3, Kilometers, LlaVec3, Radians, Transforms } from 'ootk';
 import { DEG2RAD, RAD2DEG } from '../lib/constants';
 import { SatMath } from './sat-math';
 
@@ -89,9 +89,9 @@ export abstract class CoordinateTransforms {
    * @param {Date} simulationTime - Current date and time.
    * @returns {Object} Object containing latitude, longitude and altitude in degrees and kilometers respectively.
    */
-  public static eci2lla(position: EciVec3, simulationTime: Date): { lat: Degrees; lon: Degrees; alt: Kilometers } {
+  public static eci2lla(position: EciVec3, simulationTime: Date): LlaVec3<Degrees, Kilometers> {
     const { gmst } = SatMath.calculateTimeVariables(simulationTime);
-    var latLon = Transforms.eci2lla(position, gmst);
+    const latLon = Transforms.eci2lla(position, gmst);
     let lat = <Degrees>(latLon.lat * RAD2DEG);
     let lon = <Degrees>(latLon.lon * RAD2DEG);
 
@@ -99,10 +99,10 @@ export abstract class CoordinateTransforms {
     lon = lon > 180 ? <Degrees>(lon - 360) : lon;
     lon = lon < -180 ? <Degrees>(lon + 360) : lon;
     return {
-      lat: <Degrees>lat,
-      lon: <Degrees>lon,
-      alt: <Kilometers>latLon.alt,
-    };
+      lat: lat,
+      lon: lon,
+      alt: latLon.alt,
+    } as LlaVec3<Degrees, Kilometers>;
   }
 
   /**

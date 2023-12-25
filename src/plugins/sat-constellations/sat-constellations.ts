@@ -27,7 +27,7 @@ export class SatConstellations extends KeepTrackPlugin {
         <li class="menu-selectable" data-group="GlonassGroup">Glonass Satellites</li>
         <li class="menu-selectable" data-group="aehf">Milstar and AEHF</li>
         <li class="menu-selectable" data-group="wgs">DSCS and WGS</li>
-        <!-- <li class="menu-selectable" data-group="starlink">Starlink</li> -->
+        <li class="menu-selectable" data-group="starlink">Starlink</li>
         <li class="menu-selectable" data-group="sbirs">SBIRS</li>
       </ul>
     </div>
@@ -122,19 +122,20 @@ export class SatConstellations extends KeepTrackPlugin {
         break;
       case 'starlink':
         if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.NAME_REGEX, /STARLINK/u, groupName);
-        showLoading(() => {
-          lineManagerInstance.clear();
-          catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Starlink, timeManagerInstance);
-        });
+        // showLoading(() => {
+        //   lineManagerInstance.clear();
+        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Starlink, timeManagerInstance);
+        // });
         break;
       case 'sbirs': // SBIRS and DSP
         if (!groupManagerInstance.groupList[groupName]) {
-          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(catalogManagerInstance.satLinkManager.sbirs), groupName);
+          const sbirs = [...catalogManagerInstance.satLinkManager.sbirs, ...catalogManagerInstance.satLinkManager.dsp];
+          groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(sbirs), groupName);
         }
-        showLoading(() => {
-          lineManagerInstance.clear();
-          catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Sbirs, timeManagerInstance);
-        });
+        // showLoading(() => {
+        //   lineManagerInstance.clear();
+        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Sbirs, timeManagerInstance);
+        // });
         break;
       default:
         throw new Error('Unknown group name: ' + groupName);

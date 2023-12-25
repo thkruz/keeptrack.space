@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
 import numeric from 'numeric';
 import { ControlSiteObject } from '../../catalogs/control-sites';
@@ -44,7 +44,7 @@ export class SatLinkManager {
     43567,
   ];
 
-  sbirs = [17862, 17868, 17881, 17882, 17884, 17893, 17900, 17906, 17917, 18712];
+  sbirs = [37481, 39120, 43162, 41937, 48618, 53355];
   dsp = [4630, 5204, 5851, 6691, 8482, 8916, 9803, 11397, 12339, 13086, 14930, 15453, 18583, 20066, 20929, 21805, 23435, 24737, 26356, 26880, 28158];
 
   starlink = [
@@ -66,21 +66,30 @@ export class SatLinkManager {
     45575, 45583, 45535, 45543, 45551, 45560, 45568, 45576, 45584, 45536, 45544, 45552, 45561, 45569, 45577, 45585, 45537, 45545, 45553, 45562, 45570, 45578, 45586, 45538, 45546,
   ];
 
-  idToSatnum(): void {
+  private idToSatnum_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     this.aehf = catalogManagerInstance.convertSatnumArrayToIdArray(this.aehf);
     this.dscs = catalogManagerInstance.convertSatnumArrayToIdArray(this.dscs);
     this.wgs = catalogManagerInstance.convertSatnumArrayToIdArray(this.wgs);
     this.iridium = catalogManagerInstance.convertSatnumArrayToIdArray(this.iridium);
     this.galileo = catalogManagerInstance.convertSatnumArrayToIdArray(this.galileo);
-    // DEBUG: Planned future update
-    // this.sbirs = catalogManagerInstance.convertSatnumArrayToIdArray(this.sbirs);
-    // this.dsp = catalogManagerInstance.convertSatnumArrayToIdArray(this.dsp);
+    this.sbirs = catalogManagerInstance.convertSatnumArrayToIdArray(this.sbirs);
+    this.dsp = catalogManagerInstance.convertSatnumArrayToIdArray(this.dsp);
     this.starlink = catalogManagerInstance.convertSatnumArrayToIdArray(this.starlink);
   }
 
   init(controlSiteList: ControlSiteObject[]) {
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onCruncherReady,
+      cbName: 'satLinkManager',
+      cb: () => this.onCruncher_(controlSiteList),
+    });
+  }
+
+  private onCruncher_(controlSiteList: ControlSiteObject[]) {
     try {
+      this.idToSatnum_();
+
       for (let controlSite in controlSiteList) {
         if (controlSiteList[controlSite].linkAehf) {
           this.aehfUsers.push(controlSiteList[controlSite].name);

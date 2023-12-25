@@ -444,8 +444,6 @@ theodore.kruczek at gmail dot com.
 
       dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer);
 
-      catalogManagerInstance?.satLinkManager?.idToSatnum();
-
       this.inputManager.init();
 
       await renderer.init(settingsManager);

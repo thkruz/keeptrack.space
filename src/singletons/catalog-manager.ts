@@ -280,7 +280,7 @@ export class StandardCatalogManager implements CatalogManager {
    * If the object number is found in the `satData`, it returns the index as the ID. If not found, it returns null.
    */
   getIdFromSccNum(sccNum: number, isExtensiveSearch = true): number | null {
-    const satBySccIndex = this.sccIndex[`'${sccNum}'`];
+    const satBySccIndex = this.sccIndex[`${sccNum}`];
     if (typeof satBySccIndex !== 'undefined') {
       return this.sccIndex[`${sccNum}`];
     } else if (isExtensiveSearch) {

@@ -1,7 +1,4 @@
-import { CatalogObject, MissileObject, SensorObject } from './../interfaces';
-/* */
-
-import { CatalogManager, SatObject, UiManager } from '@app/interfaces';
+import { CatalogManager, CatalogObject, MissileObject, SatObject, SensorObject, UiManager } from '@app/interfaces';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
 import { SpaceObjectType } from 'ootk';

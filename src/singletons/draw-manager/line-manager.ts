@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { GetSatType, SatObject, Singletons } from '@app/interfaces';
+import { EciArr3, GetSatType, SatObject, Singletons } from '@app/interfaces';
 import { DEG2RAD, RAD2DEG } from '@app/lib/constants';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 
@@ -9,7 +9,6 @@ import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { keepTrackContainer } from '../../container';
-import { EciArr3 } from '../../interfaces';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { SensorMath } from '../../static/sensor-math';
 import { WebGLRenderer } from '../webgl-renderer';

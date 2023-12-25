@@ -18,6 +18,14 @@ describe('Sound Manager', () => {
 
     for (const sound in sounds) {
       const soundManagerPlugin2 = soundManagerPlugin;
+
+      jest.spyOn(global, 'navigator', 'get').mockReturnValue({
+        userActivation: {
+          isActive: true,
+          hasBeenActive: true,
+        },
+      } as Navigator);
+
       expect(() => soundManagerPlugin2.play(sound)).not.toThrow();
     }
 

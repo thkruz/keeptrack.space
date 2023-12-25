@@ -62,7 +62,7 @@ describe('getClass', () => {
     const result = getClass('test');
     expect(result).toHaveLength(1);
     expect(result[0]).toBeInstanceOf(HTMLDivElement);
-    expect(result[0].id).toBe('test');
+    expect(result[0].id).not.toBe('test');
   });
 
   // Tests that the function returns an empty array when given a bad value

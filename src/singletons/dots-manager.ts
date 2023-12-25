@@ -32,15 +32,10 @@ declare module '@app/interfaces' {
 export class DotsManager {
   readonly PICKING_READ_PIXEL_BUFFER_SIZE = 1;
 
-  private drawI_: number;
-  private isAlternateVelocity = false;
-  private lastDrawDt = 0;
-  private orbitalSats3_: number;
   private pickingColorData: number[] = [];
   // We draw the picking object bigger than the actual dot to make it easier to select objects
   // glsl code - keep as a string
   private positionBufferOneTime_ = false;
-  private satDataLenInDraw_: number;
   private settings_: SettingsManager;
   // Array for which colors go to which ids
   private sizeBufferOneTime: any;
@@ -547,113 +542,9 @@ export class DotsManager {
       return;
     }
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const satSetLen = catalogManagerInstance.satData.length;
-    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
-
-    /*
-      // If we have radar data -- let's update that first
-      if (catalogManagerInstance.radarDataManager.radarData.length > 0) {
-        // Get Time
-        if (timeManager.propRate === 0) {
-          timeManager.simulationTimeObj.setTime(Number(timeManager.dynamicOffsetEpoch) + timeManager.propOffset);
-        } else {
-          timeManager.simulationTimeObj.setTime(Number(timeManager.dynamicOffsetEpoch) + timeManager.propOffset + (Number(timeManager.realTime) - Number(timeManager.dynamicOffsetEpoch)) * timeManager.propRate);
-        }
-        drawPropTime = timeManager.simulationTimeObj * 1;
-
-      // DEBUG:
-      // Find the First Radar Return Time
-      if (catalogManagerInstance.radarDataManager.drawT1 == 0) {
-        for (rrI = 0; rrI < radarDataLen; rrI++) {
-          if (catalogManagerInstance.radarDataManager.radarData[rrI].t > timeManager.realTime - 3000) {
-            catalogManagerInstance.radarDataManager.drawT1 = rrI;
-            break;
-          }
-        }
-      }
-
-      isDidOnce = false;
-      for (this.drawI = catalogManagerInstance.radarDataManager.drawT1; this.drawI < radarDataLen; this.drawI++) {
-        // Don't Exceed Max Radar Data Allocation
-        // if (this.drawI > settingsManager.maxRadarData) break;
-
-        if (catalogManagerInstance.radarDataManager.radarData[this.drawI].t >= drawPropTime - 3000 && catalogManagerInstance.radarDataManager.radarData[this.drawI].t <= drawPropTime + 3000) {
-          if (!isDidOnce) {
-            catalogManagerInstance.radarDataManager.drawT1 = this.drawI;
-            isDidOnce = true;
-          }
-          // Skip if Already done
-          if (this.positionData[(catalogManagerInstance.radarDataManager.satDataStartIndex + this.drawI) * 3] !== 0) continue;
-
-          // Update Radar Marker Position
-          this.positionData[(catalogManagerInstance.radarDataManager.satDataStartIndex + this.drawI) * 3] = catalogManagerInstance.radarDataManager.radarData[this.drawI].x;
-          this.positionData[(catalogManagerInstance.radarDataManager.satDataStartIndex + this.drawI) * 3 + 1] = catalogManagerInstance.radarDataManager.radarData[this.drawI].y;
-          this.positionData[(catalogManagerInstance.radarDataManager.satDataStartIndex + this.drawI) * 3 + 2] = catalogManagerInstance.radarDataManager.radarData[this.drawI].z;
-          // NOTE: satVel could be added later
-        } else {
-          // Reset all positions outside time window
-          this.positionData[(catalogManagerInstance.radarDataManager.satDataStartIndex + this.drawI) * 3] = 0;
-          this.positionData[(catalogManagerInstance.radarDataManager.satDataStartIndex + this.drawI) * 3 + 1] = 0;
-          this.positionData[(catalogManagerInstance.radarDataManager.satDataStartIndex + this.drawI) * 3 + 2] = 0;
-        }
-
-        if (catalogManagerInstance.radarDataManager.radarData[this.drawI].t > drawPropTime + 3000) {
-          break;
-        }
-      }
-    */
-
-    this.satDataLenInDraw_ = satSetLen;
     const renderer = keepTrackApi.getRenderer();
     if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
-      // Don't Interpolate Static Objects
-      this.satDataLenInDraw_ -= settingsManager.maxFieldOfViewMarkers + settingsManager.maxRadarData;
-      // Flat Array of X, Y, and Z so times by 3
-      this.satDataLenInDraw_ = this.satDataLenInDraw_ * 3;
-      // Do we want to treat non-satellites different?
-      this.orbitalSats3_ = catalogManagerInstance.orbitalSats * 3;
-
-      // Interpolate position since last draw by adding the velocity
-      // NOTE: We were using satDataLenInDraw3 but markers don't have velocity and neither do missiles (3 DOF as of 7/4/2022)
-      if (this.isAlternateVelocity) {
-        // Update half of the positions based on velocity
-        this.updateVelocitiesAlt_(renderer, selectedSat);
-      } else {
-        // Update half of the positions based on velocity
-        this.updateVelocities_(renderer, selectedSat);
-      }
-
-      // TODO: This doesn't interpolate the position of the selected satellite
-      // Loop through active missiles and update their positions
-      // const satSetLen = catalogManagerInstance.missileSats;
-      // for (let i = 0; i < 500; i++) {
-      //   const x = satSetLen - 500 + i;
-      //   this.positionData[x * 3] += this.velocityData[x * 3] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
-      //   this.positionData[x * 3 + 1] += this.velocityData[x * 3 + 1] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
-      //   this.positionData[x * 3 + 2] += this.velocityData[x * 3 + 2] * (drawManagerInstance.dtAdjusted + this.lastDrawDt);
-      // }
-
-      // Always do the selected satellite in the most accurate way
-      if (selectedSat > -1) {
-        this.positionData[selectedSat * 3] += this.velocityData[selectedSat * 3] * renderer.dtAdjusted;
-        this.positionData[selectedSat * 3 + 1] += this.velocityData[selectedSat * 3 + 1] * renderer.dtAdjusted;
-        this.positionData[selectedSat * 3 + 2] += this.velocityData[selectedSat * 3 + 2] * renderer.dtAdjusted;
-      }
-
-      // TODO: WebWorker for this?
-      // const { gmst } = calculateTimeVariables(timeManager.simulationTimeObj);
-      // catalogManagerInstance.staticSet
-      //   .filter((object) => object.static && !object.marker && object.type !== SpaceObjectType.STAR)
-      //   .forEach((object) => {
-      //     const cosLat = Math.cos(object.lat * DEG2RAD);
-      //     const sinLat = Math.sin(object.lat * DEG2RAD);
-      //     const cosLon = Math.cos(object.lon * DEG2RAD + gmst);
-      //     const sinLon = Math.sin(object.lon * DEG2RAD + gmst);
-      //     this.positionData[object.id * 3] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * cosLon; // 6371 is radius of earth
-      //     this.positionData[object.id * 3 + 1] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * cosLat * sinLon;
-      //     this.positionData[object.id * 3 + 2] = (RADIUS_OF_EARTH + GROUND_BUFFER_DISTANCE + object.alt) * sinLat;
-      //   });
+      this.updateVelocities_(renderer);
     }
   }
 
@@ -829,40 +720,15 @@ export class DotsManager {
   }
 
   /**
-   * Updates second half of the velocities of the orbital satellites based on the given `drawManagerInstance` and `selectedSat`.
-   * @param renderer - The DrawManager instance.
-   * @param selectedSat - The selected satellite.
+   * Updates the velocities of the dots based on the renderer's time delta and the current position data.
+   * @param renderer - The WebGL renderer used to calculate the time delta.
    */
-  private updateVelocitiesAlt_(renderer: WebGLRenderer, selectedSat?: number) {
-    for (this.drawI_ = 0; this.drawI_ < Math.ceil(this.orbitalSats3_ / 2); this.drawI_++) {
-      this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (renderer.dtAdjusted + this.lastDrawDt);
-    }
-    // If you updated the selected sat, undo it
-    if (selectedSat && selectedSat * 3 < Math.ceil(this.orbitalSats3_ / 2)) {
-      this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (renderer.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (renderer.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (renderer.dtAdjusted + this.lastDrawDt);
-    }
-    this.isAlternateVelocity = false;
-    this.lastDrawDt = renderer.dtAdjusted;
-  }
+  private updateVelocities_(renderer: WebGLRenderer) {
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const orbitalSats3 = catalogManagerInstance.orbitalSats * 3;
 
-  /**
-   * Updates half the velocities of the orbital satellites based on the given `drawManagerInstance` and `selectedSat`.
-   * @param renderer - The DrawManager instance.
-   * @param selectedSat - The selected satellite.
-   */
-  private updateVelocities_(renderer: WebGLRenderer, selectedSat?: number) {
-    for (this.drawI_ = Math.floor(this.orbitalSats3_ / 2); this.drawI_ < this.orbitalSats3_; this.drawI_++) {
-      this.positionData[this.drawI_] += this.velocityData[this.drawI_] * (renderer.dtAdjusted + this.lastDrawDt);
+    for (let i = 0; i < orbitalSats3; i++) {
+      this.positionData[i] += this.velocityData[i] * renderer.dtAdjusted;
     }
-    // If you updated the selected sat, undo it
-    if (selectedSat && selectedSat * 3 >= Math.floor(this.orbitalSats3_ / 2)) {
-      this.positionData[selectedSat * 3] -= this.velocityData[selectedSat * 3] * (renderer.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 1] -= this.velocityData[selectedSat * 3 + 1] * (renderer.dtAdjusted + this.lastDrawDt);
-      this.positionData[selectedSat * 3 + 2] -= this.velocityData[selectedSat * 3 + 2] * (renderer.dtAdjusted + this.lastDrawDt);
-    }
-    this.isAlternateVelocity = true;
-    this.lastDrawDt = renderer.dtAdjusted;
   }
 }

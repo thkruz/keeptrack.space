@@ -151,7 +151,7 @@ export class Moon {
       gmst
     );
 
-    if (this.eci.x && this.eci.y && !this.eci.z) {
+    if (this.eci.x && this.eci.y && this.eci.z) {
       const scaleFactor = this.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));
       this.position[0] = this.eci.x * scaleFactor;
       this.position[1] = this.eci.y * scaleFactor;

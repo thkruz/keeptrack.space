@@ -1,11 +1,13 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
-import { Renderer, WebGLRenderer } from '@app/singletons/webgl-renderer';
+import { Moon } from '@app/singletons/draw-manager/moon';
+import { WebGLRenderer } from '@app/singletons/webgl-renderer';
+import { SatMath } from '@app/static/sat-math';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 
 describe('drawManager', () => {
-  let drawManagerInstance: Renderer;
+  let drawManagerInstance: WebGLRenderer;
   beforeEach(() => {
     drawManagerInstance = new WebGLRenderer();
   });
@@ -25,5 +27,16 @@ describe('drawManager', () => {
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
     drawManagerInstance['satLabelModeLastTime_'] = -1000000000000000000;
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
+  });
+
+  it("should calculate the moon's position", () => {
+    const moon = new Moon();
+    const date = new Date(2023, 1, 1);
+    const { gmst } = SatMath.calculateTimeVariables(date);
+    const updateResults = () => moon['updateEciPosition_'](date, gmst);
+    expect(() => updateResults()).not.toThrow();
+    expect(moon.position[0]).toBeCloseTo(23637.386512679914);
+    expect(moon.position[1]).toBeCloseTo(200000);
+    expect(moon.position[2]).toBeCloseTo(101830.2263725754);
   });
 });

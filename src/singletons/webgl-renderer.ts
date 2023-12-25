@@ -6,7 +6,7 @@ import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
-import { StereoMapPlugin } from '../plugins/stereo-map/stereo-map';
+import { StereoMap } from '../plugins/stereo-map/stereo-map';
 import { SettingsManager } from '../settings/settings';
 import { CatalogSource } from '../static/catalog-loader';
 import { isThisNode } from '../static/isThisNode';
@@ -478,7 +478,7 @@ export class WebGLRenderer {
           lineManagerInstance.drawWhenSelected();
           lineManagerInstance.updateLineToSat(this.selectSatManager_.selectedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
         }
-        if (settingsManager.plugins.stereoMap) keepTrackApi.getPlugin(StereoMapPlugin).updateMap();
+        if (settingsManager.plugins.stereoMap) keepTrackApi.getPlugin(StereoMap).updateMap();
       } else {
         lineManagerInstance.drawWhenSelected();
       }

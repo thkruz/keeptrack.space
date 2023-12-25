@@ -54,7 +54,7 @@ import { SensorListPlugin } from './sensor/sensor-list-plugin';
 import { settingsMenuPlugin } from './settings-menu/settings-menu';
 import { ShortTermFences } from './short-term-fences/short-term-fences';
 import { SocialMedia } from './social/social';
-import { StereoMapPlugin } from './stereo-map/stereo-map';
+import { StereoMap } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
 import { videoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
@@ -142,7 +142,7 @@ export const loadPlugins = async (keepTrackApi: { register?: (params: KeepTrackA
     if (plugins.newLaunch) new NewLaunch().init();
     if (plugins.initialOrbit) initialOrbit.init();
     if (plugins.missile) missile.init();
-    if (plugins.stereoMap) new StereoMapPlugin().init();
+    if (plugins.stereoMap) new StereoMap().init();
     if (plugins.sensorFov) new SensorFov().init();
     if (plugins.sensorSurv) new SensorSurvFence().init();
     if (plugins.satelliteView) new SatelliteViewPlugin().init();

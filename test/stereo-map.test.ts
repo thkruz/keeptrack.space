@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { StereoMapPlugin } from '@app/plugins/stereo-map/stereo-map';
+import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
@@ -16,6 +16,6 @@ describe('StereoMapPlugin_class', () => {
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
   });
 
-  standardPluginSuite(StereoMapPlugin);
-  standardPluginMenuButtonTests(StereoMapPlugin);
+  standardPluginSuite(StereoMap);
+  standardPluginMenuButtonTests(StereoMap);
 });

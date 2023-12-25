@@ -568,13 +568,13 @@ export abstract class SatMath {
    * @param sensor The sensor object.
    * @returns An object containing the latitude, longitude, time, and whether the satellite is in view.
    */
-  static getLlaTimeView(now: Date, sat: SatObject, sensor: SensorObject): { lat: number; lon: number; time: string; inView: boolean } {
+  static getLlaTimeView(now: Date, sat: SatObject, sensor: SensorObject): { lat: Degrees; lon: Degrees; time: string; inView: boolean } {
     const { m, gmst } = SatMath.calculateTimeVariables(now, sat.satrec);
     const positionEci = <EciVec3>Sgp4.propagate(sat.satrec, m).position;
 
     if (!positionEci) {
       console.error('No ECI position for', sat.sccNum, 'at', now);
-      return { lat: 0, lon: 0, time: 'Invalid', inView: false };
+      return { lat: 0 as Degrees, lon: 0 as Degrees, time: 'Invalid', inView: false };
     }
 
     const gpos = Transforms.eci2lla(positionEci, gmst);
@@ -713,7 +713,7 @@ export abstract class SatMath {
    * @param pointPerOrbit The number of points to calculate per orbit (optional, defaults to 256).
    * @returns An object containing the latitude, longitude, time, and whether the satellite is in view.
    */
-  static map(sat: SatObject, i: number, getOffsetTimeObj: (offset: number) => Date, pointPerOrbit: number): { time: string; lat: number; lon: number; inView: boolean } {
+  static map(sat: SatObject, i: number, getOffsetTimeObj: (offset: number) => Date, pointPerOrbit: number): { time: string; lat: Degrees; lon: Degrees; inView: boolean } {
     let offset = ((i * sat.period) / pointPerOrbit) * 60 * 1000; // Offset in seconds (msec * 1000)
     const now = getOffsetTimeObj(offset);
     return SatMathApi.getLlaTimeView(now, sat);

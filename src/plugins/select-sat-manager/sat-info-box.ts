@@ -20,7 +20,7 @@ import Draggabilly from 'draggabilly';
 import * as Ootk from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missileManager';
-import { StereoMapPlugin } from '../stereo-map/stereo-map';
+import { StereoMap } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
 import './sat-info-box.css';
 import { SelectSatManager } from './select-sat-manager';
@@ -167,10 +167,10 @@ export class SatInfoBox extends KeepTrackPlugin {
 
           if (
             settingsManager.plugins?.stereoMap &&
-            keepTrackApi.getPlugin(StereoMapPlugin)?.isMenuButtonActive &&
+            keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
             timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
           ) {
-            (<StereoMapPlugin>keepTrackApi.getPlugin(StereoMapPlugin)).updateMap();
+            (<StereoMap>keepTrackApi.getPlugin(StereoMap)).updateMap();
             settingsManager.lastMapUpdateTime = timeManagerInstance.realTime;
           }
 

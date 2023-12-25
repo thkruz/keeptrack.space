@@ -24,6 +24,7 @@
  */
 
 import { SatObject } from '@app/interfaces';
+import { Degrees } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SatMath } from '../static/sat-math';
 
@@ -50,7 +51,7 @@ export class SatMathApi {
     return SatMath.getLlaOfCurrentOrbit(sat, points, cb);
   }
 
-  static getLlaTimeView(now: Date, sat: SatObject): { lat: number; lon: number; time: string; inView: boolean } {
+  static getLlaTimeView(now: Date, sat: SatObject): { lat: Degrees; lon: Degrees; time: string; inView: boolean } {
     const sensor = keepTrackApi.getSensorManager().currentSensors[0];
     return SatMath.getLlaTimeView(now, sat, sensor);
   }
@@ -60,7 +61,7 @@ export class SatMathApi {
     return SatMath.getRicOfCurrentOrbit(sat, sat2, points, cb, orbits);
   }
 
-  static map(sat: SatObject, i: number, pointPerOrbit = 256): { time: string; lat: number; lon: number; inView: boolean } {
+  static map(sat: SatObject, i: number, pointPerOrbit = 256): { time: string; lat: Degrees; lon: Degrees; inView: boolean } {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
     return SatMath.map(sat, i, cb, pointPerOrbit);
   }

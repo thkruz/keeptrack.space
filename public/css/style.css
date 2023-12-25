@@ -609,32 +609,6 @@ ul {
   width: 15px;
 }
 
-#map-menu {
-  display: none;
-  position: absolute;
-  width: 800px;
-  z-index: 10;
-  left: 0;
-  color: white;
-}
-
-#map-sensor {
-  position: absolute;
-}
-
-#map-sat {
-  z-index: 15;
-}
-
-.map-look {
-  cursor: pointer;
-}
-
-.map-item {
-  position: absolute;
-  z-index: 11;
-}
-
 #iss-stream-menu {
   display: none;
   position: absolute;

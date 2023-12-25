@@ -130,24 +130,33 @@ export class Moon {
   update(simTime: Date, gmst: GreenwichMeanSiderealTime) {
     if (!this.isLoaded_) return;
 
-    const rae = Utils.MoonMath.getMoonPosition(simTime, <Degrees>0, <Degrees>0);
-    this.eci = Transforms.ecf2eci(
-      CoordinateTransforms.rae2ecf(<Degrees>(180 + rae.az * RAD2DEG), <Degrees>(rae.el * RAD2DEG), rae.rng as Kilometers, <Radians>0, <Radians>0, <Kilometers>0),
-      gmst
-    );
-
-    if (!this.eci.x || !this.eci.y || !this.eci.z) {
-      return;
-    }
-
-    const scaleFactor = this.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));
-    this.position[0] = this.eci.x * scaleFactor;
-    this.position[1] = this.eci.y * scaleFactor;
-    this.position[2] = this.eci.z * scaleFactor;
+    this.updateEciPosition_(simTime, gmst);
 
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
     mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
+  }
+
+  /**
+   * Updates the ECI (Earth-Centered Inertial) position of the moon. We calculate the range, azimuth, and elevation of the moon
+   * at lat/lon 0/0, then convert that to ECF (Earth-Centered Fixed) coordinates, then convert that to ECI coordinates.
+   *
+   * @param simTime - The simulation time.
+   * @param gmst - The Greenwich Mean Sidereal Time.
+   */
+  private updateEciPosition_(simTime: Date, gmst: GreenwichMeanSiderealTime) {
+    const rae = Utils.MoonMath.getMoonPosition(simTime, <Degrees>0, <Degrees>0);
+    this.eci = Transforms.ecf2eci(
+      CoordinateTransforms.rae2ecf(<Degrees>(rae.az * RAD2DEG), <Degrees>(rae.el * RAD2DEG), rae.rng as Kilometers, <Radians>0, <Radians>0, <Kilometers>0),
+      gmst
+    );
+
+    if (this.eci.x && this.eci.y && !this.eci.z) {
+      const scaleFactor = this.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));
+      this.position[0] = this.eci.x * scaleFactor;
+      this.position[1] = this.eci.y * scaleFactor;
+      this.position[2] = this.eci.z * scaleFactor;
+    }
   }
 
   /** The shaders for the moon. */

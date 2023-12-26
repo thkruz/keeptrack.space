@@ -34,12 +34,20 @@ export class SatInfoBox extends KeepTrackPlugin {
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
 
-  isorbitalDataLoaded = false;
-  issecondaryDataLoaded = false;
-  issensorInfoLoaded = false;
-  islaunchDataLoaded = false;
-  issatMissionDataLoaded = false;
-  isintelDataLoaded = false;
+  constructor() {
+    super(SatInfoBox.PLUGIN_NAME);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+  }
+
+  private static readonly containerId_ = 'sat-infobox';
+
+  private isorbitalDataLoaded_ = false;
+  private issecondaryDataLoaded_ = false;
+  private issensorInfoLoaded_ = false;
+  private islaunchDataLoaded_ = false;
+  private issatMissionDataLoaded_ = false;
+  private isintelDataLoaded_ = false;
+  private isTopLinkEventListenersAdded_ = false;
 
   currentTEARR = <TearrData>{
     az: 0,
@@ -51,11 +59,6 @@ export class SatInfoBox extends KeepTrackPlugin {
     alt: 0,
     inView: false,
   };
-
-  constructor() {
-    super(SatInfoBox.PLUGIN_NAME);
-    this.selectSatManager_ = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
-  }
 
   addHtml(): void {
     super.addHtml();
@@ -72,35 +75,35 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_sensorInfo`,
-      cb: SatInfoBox.updateSensorInfo.bind(this),
+      cb: SatInfoBox.updateSensorInfo_.bind(this),
     });
 
     // Register launch data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_launchData`,
-      cb: SatInfoBox.updateLaunchData.bind(this),
+      cb: SatInfoBox.updateLaunchData_.bind(this),
     });
 
     // Register mission data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_satMissionData`,
-      cb: SatInfoBox.updateSatMissionData.bind(this),
+      cb: SatInfoBox.updateSatMissionData_.bind(this),
     });
 
     // Register intel data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_intelData`,
-      cb: SatInfoBox.updateIntelData.bind(this),
+      cb: SatInfoBox.updateIntelData_.bind(this),
     });
 
     // Register object data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_objectData`,
-      cb: SatInfoBox.updateObjectData,
+      cb: SatInfoBox.updateObjectData_,
     });
 
     keepTrackApi.register({
@@ -296,50 +299,56 @@ export class SatInfoBox extends KeepTrackPlugin {
         }
       },
     });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.selectSatData,
+      cbName: this.PLUGIN_NAME,
+      cb: SatInfoBox.selectSat_.bind(this),
+    });
   }
 
   private uiManagerFinal_(): void {
-    if (!this.isorbitalDataLoaded) {
-      SatInfoBox.createOrbitalData();
-      this.isorbitalDataLoaded = true;
+    if (!this.isorbitalDataLoaded_) {
+      SatInfoBox.createOrbitalData_();
+      this.isorbitalDataLoaded_ = true;
     }
-    if (!this.issecondaryDataLoaded) {
-      SatInfoBox.createSecondaryData();
-      this.issecondaryDataLoaded = true;
+    if (!this.issecondaryDataLoaded_) {
+      SatInfoBox.createSecondaryData_();
+      this.issecondaryDataLoaded_ = true;
     }
 
-    if (!this.issensorInfoLoaded) {
+    if (!this.issensorInfoLoaded_) {
       SatInfoBox.createSensorInfo();
-      this.issensorInfoLoaded = true;
+      this.issensorInfoLoaded_ = true;
     }
 
-    if (!this.islaunchDataLoaded) {
-      SatInfoBox.createLaunchData();
-      this.islaunchDataLoaded = true;
+    if (!this.islaunchDataLoaded_) {
+      SatInfoBox.createLaunchData_();
+      this.islaunchDataLoaded_ = true;
     }
 
-    if (!this.issatMissionDataLoaded) {
+    if (!this.issatMissionDataLoaded_) {
       SatInfoBox.createSatMissionData();
-      this.issatMissionDataLoaded = true;
+      this.issatMissionDataLoaded_ = true;
     }
 
-    if (!this.isintelDataLoaded) {
+    if (!this.isintelDataLoaded_) {
       SatInfoBox.createIntelData();
-      this.isintelDataLoaded = true;
+      this.isintelDataLoaded_ = true;
     }
 
     // Now that is is loaded, reset the sizing and location
-    SatInfoBox.resetMenuLocation(getEl('sat-infobox'), false);
+    SatInfoBox.resetMenuLocation(getEl(SatInfoBox.containerId_), false);
   }
 
   orbitalData(sat: SatObject): void {
     // Only show orbital data if it is available
     if (sat === null || typeof sat === 'undefined') return;
 
-    this.updateOrbitData(sat);
+    this.updateOrbitData_(sat);
   }
 
-  private nearObjectsLinkClick(distance: number = 100): void {
+  private nearObjectsLinkClick_(distance: number = 100): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (this.selectSatManager_.selectedSat === -1) {
@@ -369,14 +378,14 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.getUiManager().doSearch((<HTMLInputElement>getEl('search')).value.toString());
   }
 
-  private nearOrbitsLink() {
+  private nearOrbitsLink_() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.getSatsFromSatData(), catalogManagerInstance.getSat(this.selectSatManager_.selectedSat));
     const searchStr = SearchManager.doArraySearch(catalogManagerInstance, nearbyObjects);
     keepTrackApi.getUiManager().searchManager.doSearch(searchStr, false);
   }
 
-  private allObjectsLink(): void {
+  private allObjectsLink_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (this.selectSatManager_.selectedSat === -1) {
@@ -388,21 +397,21 @@ export class SatInfoBox extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('search')).value = searchStr;
   }
 
-  private drawLineToSun() {
+  private drawLineToSun_() {
     const sun = keepTrackApi.getScene().sun;
     lineManagerInstance.create(LineTypes.REF_TO_SAT, [this.selectSatManager_.selectedSat, sun.position[0], sun.position[1], sun.position[2]], 'o');
   }
 
-  private drawLineToEarth() {
+  private drawLineToEarth_() {
     lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_SAT, [this.selectSatManager_.selectedSat], 'p');
   }
 
-  private drawLineToSat() {
+  private drawLineToSat_() {
     if (this.selectSatManager_.secondarySat == -1) keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', 'caution');
     lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.selectSatManager_.selectedSat, this.selectSatManager_.secondarySat], 'b');
   }
 
-  private updateOrbitData = (sat: SatObject): void => {
+  private updateOrbitData_ = (sat: SatObject): void => {
     if (!sat.missile && typeof sat.staticNum === 'undefined') {
       getEl('sat-apogee').innerHTML = sat.apogee.toFixed(0) + ' km';
       getEl('sat-perigee').innerHTML = sat.perigee.toFixed(0) + ' km';
@@ -435,31 +444,29 @@ export class SatInfoBox extends KeepTrackPlugin {
         elsetAgeDom.innerHTML = `${daysold} Days`;
       }
 
-      SatInfoBox.updateConfidenceDom(sat);
+      SatInfoBox.updateConfidenceDom_(sat);
 
       elsetAgeDom.dataset.position = 'top';
       elsetAgeDom.dataset.delay = '50';
       elsetAgeDom.dataset.tooltip = 'Epoch Year: ' + sat.TLE1.substr(18, 2).toString() + ' Day: ' + sat.TLE1.substr(20, 8).toString();
     }
 
-    if (!this.isTopLinkEventListenersAdded) {
-      getEl('sat-add-watchlist')?.addEventListener('click', this.addRemoveWatchlist.bind(this));
-      getEl('sat-remove-watchlist')?.addEventListener('click', this.addRemoveWatchlist.bind(this));
-      getEl('all-objects-link')?.addEventListener('click', this.allObjectsLink.bind(this));
-      getEl('near-orbits-link')?.addEventListener('click', this.nearOrbitsLink.bind(this));
-      getEl('near-objects-link1')?.addEventListener('click', () => this.nearObjectsLinkClick(100));
-      getEl('near-objects-link2')?.addEventListener('click', () => this.nearObjectsLinkClick(200));
-      getEl('near-objects-link4')?.addEventListener('click', () => this.nearObjectsLinkClick(400));
-      getEl('sun-angle-link')?.addEventListener('click', this.drawLineToSun.bind(this));
-      getEl('nadir-angle-link')?.addEventListener('click', this.drawLineToEarth.bind(this));
-      getEl('sec-angle-link')?.addEventListener('click', this.drawLineToSat.bind(this));
-      this.isTopLinkEventListenersAdded = true;
+    if (!this.isTopLinkEventListenersAdded_) {
+      getEl('sat-add-watchlist')?.addEventListener('click', this.addRemoveWatchlist_.bind(this));
+      getEl('sat-remove-watchlist')?.addEventListener('click', this.addRemoveWatchlist_.bind(this));
+      getEl('all-objects-link')?.addEventListener('click', this.allObjectsLink_.bind(this));
+      getEl('near-orbits-link')?.addEventListener('click', this.nearOrbitsLink_.bind(this));
+      getEl('near-objects-link1')?.addEventListener('click', () => this.nearObjectsLinkClick_(100));
+      getEl('near-objects-link2')?.addEventListener('click', () => this.nearObjectsLinkClick_(200));
+      getEl('near-objects-link4')?.addEventListener('click', () => this.nearObjectsLinkClick_(400));
+      getEl('sun-angle-link')?.addEventListener('click', this.drawLineToSun_.bind(this));
+      getEl('nadir-angle-link')?.addEventListener('click', this.drawLineToEarth_.bind(this));
+      getEl('sec-angle-link')?.addEventListener('click', this.drawLineToSat_.bind(this));
+      this.isTopLinkEventListenersAdded_ = true;
     }
   };
 
-  isTopLinkEventListenersAdded = false;
-
-  private addRemoveWatchlist() {
+  private addRemoveWatchlist_() {
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
     if (watchlistPlugin) {
       const id = this.selectSatManager_.selectedSat;
@@ -472,7 +479,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private static updateConfidenceDom(sat: SatObject) {
+  private static updateConfidenceDom_(sat: SatObject) {
     let color = '';
     let text = '';
 
@@ -496,7 +503,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  static updateObjectData = (sat: SatObject): void => {
+  private static updateObjectData_ = (sat: SatObject): void => {
     if (sat === null || typeof sat === 'undefined') return;
     if (sat.static || sat.staticNum >= 0) return;
 
@@ -518,7 +525,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       getEl('sat-remove-watchlist').style.display = 'none';
     }
 
-    SatInfoBox.updateSatType(sat);
+    SatInfoBox.updateSatType_(sat);
 
     // TODO:
     // getEl('edit-satinfo-link').innerHTML = "<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>";
@@ -543,20 +550,20 @@ export class SatInfoBox extends KeepTrackPlugin {
       getEl('sat-source').innerHTML = sat.source || CatalogSource.USSF;
     }
 
-    SatInfoBox.updateRcsData(sat);
+    SatInfoBox.updateRcsData_(sat);
   };
 
-  private static updateLaunchData(sat?: SatObject) {
+  private static updateLaunchData_(sat?: SatObject) {
     if (sat === null || typeof sat === 'undefined') return;
 
-    SatInfoBox.updateCountryCorrelationTable(sat);
-    let { missileLV, satLvString }: { missileLV: string; satLvString: string } = SatInfoBox.updateLaunchSiteCorrelationTable(sat);
-    SatInfoBox.updateLaunchVehicleCorrelationTable(sat, missileLV, satLvString);
+    SatInfoBox.updateCountryCorrelationTable_(sat);
+    let { missileLV, satLvString }: { missileLV: string; satLvString: string } = SatInfoBox.updateLaunchSiteCorrelationTable_(sat);
+    SatInfoBox.updateLaunchVehicleCorrelationTable_(sat, missileLV, satLvString);
 
     getEl('sat-configuration').innerHTML = sat.configuration !== '' ? sat.configuration : 'Unknown';
   }
 
-  private static updateLaunchVehicleCorrelationTable(sat: SatObject, missileLV: string, satLvString: string) {
+  private static updateLaunchVehicleCorrelationTable_(sat: SatObject, missileLV: string, satLvString: string) {
     let satVehicleDom = getEl('sat-vehicle');
     // Remove any existing event listeners
     const tempEl = satVehicleDom.cloneNode(true);
@@ -588,7 +595,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     return satLvString;
   }
 
-  private static updateLaunchSiteCorrelationTable(sat: SatObject) {
+  private static updateLaunchSiteCorrelationTable_(sat: SatObject) {
     let siteArr = [];
     let site = {} as any;
     let missileLV: any;
@@ -610,7 +617,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     return { missileLV, satLvString };
   }
 
-  private static updateCountryCorrelationTable(sat: SatObject) {
+  private static updateCountryCorrelationTable_(sat: SatObject) {
     if (sat.country?.length > 4) {
       getEl('sat-country').innerHTML = sat.country;
     } else {
@@ -619,8 +626,8 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private static createLaunchData() {
-    getEl('sat-infobox').insertAdjacentHTML(
+  private static createLaunchData_() {
+    getEl(SatInfoBox.containerId_).insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
             <div class="sat-info-section-header">Object Data</div>
@@ -676,8 +683,8 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
-  private static createSecondaryData() {
-    getEl('sat-infobox').insertAdjacentHTML(
+  private static createSecondaryData_() {
+    getEl(SatInfoBox.containerId_).insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
           <div id="secondary-sat-info">
@@ -715,7 +722,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
-  private static createOrbitalData() {
+  private static createOrbitalData_() {
     getEl('ui-wrapper').insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
@@ -870,18 +877,18 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     // Create a Sat Info Box Initializing Script
     if (!settingsManager.isMobileModeEnabled) {
-      const draggie = new Draggabilly(getEl('sat-infobox'), {
+      const draggie = new Draggabilly(getEl(SatInfoBox.containerId_), {
         containment: keepTrackApi.containerRoot,
       });
       draggie.on('dragStart', () => {
-        getEl('sat-infobox').style.height = '600px';
+        getEl(SatInfoBox.containerId_).style.height = '600px';
         document.documentElement.style.setProperty('--search-box-bottom', `0px`);
-        getEl('sat-infobox').classList.remove('satinfo-fixed');
+        getEl(SatInfoBox.containerId_).classList.remove('satinfo-fixed');
       });
     }
 
     // If right click kill and reinit
-    const satInfobox = getEl('sat-infobox');
+    const satInfobox = getEl(SatInfoBox.containerId_);
     satInfobox.addEventListener('mousedown', (e: any) => {
       if (e.button === 2) {
         SatInfoBox.resetMenuLocation(satInfobox);
@@ -902,7 +909,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
   }
 
-  private static updateSatType(sat: SatObject) {
+  private static updateSatType_(sat: SatObject) {
     switch (sat.type) {
       case SpaceObjectType.UNKNOWN:
         getEl('sat-type').innerHTML = 'TBA';
@@ -933,7 +940,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private static updateRcsData(sat: SatObject) {
+  private static updateRcsData_(sat: SatObject) {
     const satRcsEl = getEl('sat-rcs');
     if (sat.rcs === null || typeof sat.rcs == 'undefined' || sat.rcs === '' || sat.rcs === 'N/A') {
       const historicRcs = keepTrackApi
@@ -979,7 +986,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private static updateSatMissionData(sat?: SatObject) {
+  private static updateSatMissionData_(sat?: SatObject) {
     if (sat === null || typeof sat === 'undefined') return;
 
     if (!sat.missile) {
@@ -1009,7 +1016,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private static createSatMissionData() {
-    getEl('sat-infobox').insertAdjacentHTML(
+    getEl(SatInfoBox.containerId_).insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
         <div id="sat-mission-data">
@@ -1144,7 +1151,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
-  private static updateIntelData(sat: SatObject) {
+  private static updateIntelData_(sat: SatObject) {
     if (!sat) return;
 
     if (typeof sat.TTP != 'undefined') {
@@ -1204,7 +1211,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private static createIntelData() {
-    getEl('sat-infobox').insertAdjacentHTML(
+    getEl(SatInfoBox.containerId_).insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
           <div id="intel-data-section" class="sat-info-section-header">Intel Data</div>
@@ -1268,7 +1275,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
-  private static updateSensorInfo(sat: SatObject) {
+  private static updateSensorInfo_(sat: SatObject) {
     if (sat === null || typeof sat === 'undefined' || !settingsManager.plugins.sensor) return;
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -1335,7 +1342,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private static createSensorInfo() {
-    getEl('sat-infobox').insertAdjacentHTML(
+    getEl(SatInfoBox.containerId_).insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
           <div id="sensor-sat-info">
@@ -1406,25 +1413,24 @@ export class SatInfoBox extends KeepTrackPlugin {
    *
    * @param sat - The satellite, missile, or sensor object to be selected.
    */
-  // eslint-disable-next-line class-methods-use-this
-  selectSat(sat?: SatObject | MissileObject | SensorObject): void {
+  private static selectSat_(sat?: SatObject | MissileObject | SensorObject): void {
     if (sat) {
+      showEl(SatInfoBox.containerId_);
+
+      const satInfoBoxDom = getEl(SatInfoBox.containerId_);
+      // Get the height of the DOM
+      const searchBoxHeight = satInfoBoxDom?.getBoundingClientRect().height ?? 0;
+      const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
+      const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
+      if (curVal !== searchBoxHeight + bottomMenuTopVar + 'px') {
+        document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
+      }
+
       if (isSatObject(sat)) {
         SatInfoBox.setSatInfoBoxSatellite_();
       } else {
         SatInfoBox.setSatInfoBoxMissile_();
       }
-    }
-
-    showEl('sat-infobox');
-
-    const satInfoBoxDom = getEl('sat-infobox');
-    // Get the height of the DOM
-    const searchBoxHeight = satInfoBoxDom?.getBoundingClientRect().height ?? 0;
-    const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
-    const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
-    if (curVal !== searchBoxHeight + bottomMenuTopVar + 'px') {
-      document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTopVar}px`);
     }
   }
 

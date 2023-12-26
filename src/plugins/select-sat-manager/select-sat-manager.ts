@@ -7,6 +7,7 @@ import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { StereoMap } from '../stereo-map/stereo-map';
 import { TopMenu } from '../top-menu/top-menu';
 
 /**
@@ -70,7 +71,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       this.selectSatReset_(sat, satId);
     }
 
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
     this.setSelectedSat(satId);
 
     // Run any other callbacks
@@ -78,6 +78,20 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
+
+    const lineManagerInstance = keepTrackApi.getLineManager();
+    if (satId > -1) {
+      const sensorManagerInstance = keepTrackApi.getSensorManager();
+
+      keepTrackApi.getOrbitManager().setSelectOrbit(satId);
+      if (sensorManagerInstance.isSensorSelected() && keepTrackApi.getDotsManager().inViewData?.[satId] === 1) {
+        lineManagerInstance.drawWhenSelected();
+        lineManagerInstance.updateLineToSat(satId, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
+      }
+      if (settingsManager.plugins.stereoMap) keepTrackApi.getPlugin(StereoMap).updateMap();
+    } else {
+      lineManagerInstance.drawWhenSelected();
+    }
   }
 
   private selectSatChange_(satId: number) {
@@ -85,6 +99,9 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.updateDotSizeAndColor_(satId);
     this.setSelectedSat(satId);
     SelectSatManager.updateBottomMenu_();
+
+    // If deselecting a satellite, clear the selected orbit
+    if (satId === -1 && this.lastSelectedSat_ > -1) keepTrackApi.getOrbitManager().clearSelectOrbit();
 
     UrlManager.updateURL();
   }

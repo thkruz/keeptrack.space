@@ -314,7 +314,7 @@ export const keepTrackApi = {
 export enum KeepTrackApiEvents {
   onHelpMenuClick = 'onHelpMenuClick',
   /**
-   * Run at the end of catalogManager.selectSat with parameters (sat: SatObject, satId: number)
+   * Run at the end of SelectSatManager.selectSat with parameters (sat: SatObject, satId: number)
    */
   selectSatData = 'selectSatData',
   /**

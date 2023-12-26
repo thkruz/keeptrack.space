@@ -6,13 +6,11 @@ import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SpaceObjectType } from '../lib/space-object-type';
-import { StereoMap } from '../plugins/stereo-map/stereo-map';
 import { SettingsManager } from '../settings/settings';
 import { CatalogSource } from '../static/catalog-loader';
 import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
-import { lineManagerInstance } from './draw-manager/line-manager';
 import { MeshManager } from './draw-manager/mesh-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
@@ -429,12 +427,13 @@ export class WebGLRenderer {
 
   /**
    * Calculate changes related to satellites objects
+   *
+   * TODO: Refactor more of this into selectSatManager
    */
   satCalculate() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     if (this.selectSatManager_?.selectedSat > -1) {
       this.selectSatManager_.primarySatObj = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
@@ -467,21 +466,20 @@ export class WebGLRenderer {
       keepTrackApi.getScene().searchBox.update(null);
     }
 
-    if (this.selectSatManager_?.selectedSat !== this.selectSatManager_?.lastSelectedSat()) {
-      if (this.selectSatManager_.selectedSat === -1 && this.selectSatManager_.lastSelectedSat() !== -1) orbitManagerInstance.clearSelectOrbit();
-      // WARNING: This is probably here on purpose - but it is getting called twice
-      // THIS IS WHAT ACTUALLY SELECTS A SATELLITE, MOVES THE CAMERA, ETC!
-      this.selectSatManager_.selectSat(this.selectSatManager_.selectedSat);
-      if (this.selectSatManager_.selectedSat !== -1) {
-        orbitManagerInstance.setSelectOrbit(this.selectSatManager_.selectedSat);
-        if (sensorManagerInstance.isSensorSelected() && keepTrackApi.getDotsManager().inViewData?.[this.selectSatManager_.selectedSat] === 1) {
-          lineManagerInstance.drawWhenSelected();
-          lineManagerInstance.updateLineToSat(this.selectSatManager_.selectedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
-        }
-        if (settingsManager.plugins.stereoMap) keepTrackApi.getPlugin(StereoMap).updateMap();
-      } else {
-        lineManagerInstance.drawWhenSelected();
-      }
+    this.checkIfSelectedSatChanged_();
+  }
+
+  /**
+   * Checks if the selected satellite has changed and performs necessary actions.
+   *
+   * Selecting a satellite is not tied to the mouse click event.
+   */
+  private checkIfSelectedSatChanged_() {
+    const newSat = this.selectSatManager_?.selectedSat;
+    const oldSat = this.selectSatManager_?.lastSelectedSat();
+
+    if (newSat !== oldSat) {
+      this.selectSatManager_.selectSat(newSat);
     }
   }
 

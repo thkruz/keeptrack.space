@@ -65,13 +65,14 @@ declare module '@app/interfaces' {
 export enum CameraType {
   CURRENT = 0,
   DEFAULT = 1,
-  OFFSET = 2,
-  FIXED_TO_SAT = 3,
-  FPS = 4,
-  PLANETARIUM = 5,
-  SATELLITE = 6,
-  ASTRONOMY = 7,
-  MAX_CAMERA_TYPES = 8,
+  FIXED_TO_SAT = 2,
+  FPS = 3,
+  PLANETARIUM = 4,
+  SATELLITE = 5,
+  ASTRONOMY = 6,
+  MAX_CAMERA_TYPES = 7,
+  /** @deprecated */
+  OFFSET = 8,
 }
 
 export enum ZoomValue {
@@ -322,7 +323,7 @@ export class Camera {
       this.cameraType++;
     }
 
-    if (this.cameraType === CameraType.MAX_CAMERA_TYPES) {
+    if (this.cameraType >= CameraType.MAX_CAMERA_TYPES) {
       const renderer = keepTrackApi.getRenderer();
 
       this.isLocalRotateReset = true;
@@ -624,6 +625,9 @@ export class Camera {
       case CameraType.OFFSET:
         uiManagerInstance.toast('Offset Camera Mode', 'standby');
         break;
+      case CameraType.FIXED_TO_SAT:
+        uiManagerInstance.toast('Fixed to Satellite Camera Mode', 'standby');
+        break;
       case CameraType.FPS:
         uiManagerInstance.toast('Free Camera Mode', 'standby');
         break;
@@ -637,6 +641,9 @@ export class Camera {
       case CameraType.ASTRONOMY:
         uiManagerInstance.toast('Astronomy Camera Mode', 'standby');
         LegendManager.change('astronomy');
+        break;
+      default:
+        errorManagerInstance.log(`Invalid Camera Type: ${this.cameraType}`);
         break;
     }
   }

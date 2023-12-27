@@ -24,6 +24,7 @@ export class Scene {
   moon: Moon;
   sun: Sun;
   godrays: Godrays;
+  /** The pizza box shaped search around a satellite. */
   searchBox: Box;
   frameBuffers: {
     gpuPicking: WebGLFramebuffer;

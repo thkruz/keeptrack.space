@@ -64,7 +64,6 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   selectSat(satId: number) {
     if (settingsManager.isDisableSelectSat) return;
-    if (this.selectedSat === this.lastSelectedSat_) return;
 
     const sat = keepTrackApi.getCatalogManager().getSat(satId) as (SatObject & SensorObject) | MissileObject;
 

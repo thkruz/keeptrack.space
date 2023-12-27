@@ -425,18 +425,20 @@ export class WebGLRenderer {
   }
 
   /**
-   * Calculate changes related to satellites objects
+   * Update the primary selected satellite
    */
-  satCalculate() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-
-    this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
+  private updatePrimarySatellite_() {
+    // If this.selectedSat_.selectedSat has changed then select it
+    if (this.selectSatManager_?.selectedSat !== this.selectSatManager_?.lastSelectedSat()) {
+      this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
+    }
 
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
+      const timeManagerInstance = keepTrackApi.getTimeManager();
+
       this.meshManager.update(timeManagerInstance.selectedDate, this.selectSatManager_.primarySatObj);
       keepTrackApi.getMainCamera().snapToSat(this.selectSatManager_.primarySatObj, timeManagerInstance.simulationTimeObj);
       if (this.selectSatManager_.primarySatObj.missile) keepTrackApi.getOrbitManager().setSelectOrbit(this.selectSatManager_.primarySatObj.id);
-
       keepTrackApi.getScene().searchBox.update(this.selectSatManager_.primarySatObj, timeManagerInstance.selectedDate);
     } else {
       keepTrackApi.getScene().searchBox.update(null);
@@ -470,7 +472,7 @@ export class WebGLRenderer {
     this.validateProjectionMatrix_();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    this.satCalculate();
+    this.updatePrimarySatellite_();
     keepTrackApi.getMainCamera().update(this.dt);
 
     // If in satellite view the orbit buffer needs to be updated every time

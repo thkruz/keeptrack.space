@@ -7,7 +7,6 @@ import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { StereoMap } from '../stereo-map/stereo-map';
 import { TopMenu } from '../top-menu/top-menu';
 
 /**
@@ -127,7 +126,6 @@ export class SelectSatManager extends KeepTrackPlugin {
         lineManagerInstance.drawWhenSelected();
         lineManagerInstance.updateLineToSat(satId, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
       }
-      if (settingsManager.plugins.stereoMap) keepTrackApi.getPlugin(StereoMap).updateMap();
     } else {
       lineManagerInstance.drawWhenSelected();
     }

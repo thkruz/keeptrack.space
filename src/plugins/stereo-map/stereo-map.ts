@@ -33,6 +33,7 @@ import redSquare from '@public/img/red-square.png';
 import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
+import { SatObject } from '@app/interfaces';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -175,6 +176,16 @@ export class StereoMap extends KeepTrackPlugin {
       event: KeepTrackApiEvents.onCruncherMessage,
       cbName: this.PLUGIN_NAME,
       cb: this.onCruncherMessage.bind(this),
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.selectSatData,
+      cbName: this.PLUGIN_NAME,
+      cb: (sat: SatObject) => {
+        if (sat) {
+          this.updateMap();
+        }
+      },
     });
   }
 

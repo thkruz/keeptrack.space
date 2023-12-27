@@ -78,6 +78,22 @@ export class SensorFov extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
+      event: KeepTrackApiEvents.sensorDotSelected,
+      cbName: this.PLUGIN_NAME,
+      cb: (sensor: SensorObject): void => {
+        if (sensor) {
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
+          this.isIconDisabled = false;
+        } else {
+          getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
+          this.isIconDisabled = true;
+          this.isMenuButtonActive = false;
+          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
+        }
+      },
+    });
+
+    keepTrackApi.register({
       event: KeepTrackApiEvents.changeSensorMarkers,
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {

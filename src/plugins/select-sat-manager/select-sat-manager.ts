@@ -228,16 +228,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
     keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
 
-    if (keepTrackApi.getSensorManager().isSensorSelected()) {
-      getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
-    }
-
-    getEl('menu-satview', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-editSat', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-map', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
-
     this.setSelectedSat(sat.id);
   }
 

@@ -3,7 +3,7 @@ import { EciArr3, GetSatType, SatObject, Singletons } from '@app/interfaces';
 import { DEG2RAD, RAD2DEG } from '@app/lib/constants';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
@@ -674,6 +674,24 @@ export class LineManager {
   init() {
     this.gl_ = keepTrackApi.getRenderer().gl;
     this.program = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.selectSatData,
+      cbName: 'LineManager',
+      cb: (sat: SatObject) => {
+        if (sat) {
+          const sensorManagerInstance = keepTrackApi.getSensorManager();
+
+          keepTrackApi.getOrbitManager().setSelectOrbit(sat.id);
+          if (sensorManagerInstance.isSensorSelected() && keepTrackApi.getDotsManager().inViewData?.[sat.id] === 1) {
+            this.drawWhenSelected();
+            this.updateLineToSat(sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
+          }
+        } else {
+          this.drawWhenSelected();
+        }
+      },
+    });
   }
 
   removeStars(): boolean {

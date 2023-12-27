@@ -116,19 +116,6 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
-
-    const lineManagerInstance = keepTrackApi.getLineManager();
-    if (satId > -1) {
-      const sensorManagerInstance = keepTrackApi.getSensorManager();
-
-      keepTrackApi.getOrbitManager().setSelectOrbit(satId);
-      if (sensorManagerInstance.isSensorSelected() && keepTrackApi.getDotsManager().inViewData?.[satId] === 1) {
-        lineManagerInstance.drawWhenSelected();
-        lineManagerInstance.updateLineToSat(satId, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name));
-      }
-    } else {
-      lineManagerInstance.drawWhenSelected();
-    }
   }
 
   private selectSensorObject_(sat: SensorObject) {

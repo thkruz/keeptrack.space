@@ -93,6 +93,29 @@
         "close": true
       }
     },
+    {
+      "label": "Github: KeepTrack.Space",
+      "type": "process",
+      "command": "",
+      "windows": {
+        "command": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
+        "args": ["https://github.com/thkruz/keeptrack.space"]
+      },
+      "icon": {
+        "id": "browser",
+        "color": "terminal.ansiRed"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": true
+      }
+    },
     // ////////////////////////////////////////////////
     // Test Tasks
     // ////////////////////////////////////////////////

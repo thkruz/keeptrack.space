@@ -64,5 +64,6 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "thkruz",
     "projectKey": "thkruz_keeptrack.space"
-  }
+  },
+  "task.autoDetect": "off"
 }

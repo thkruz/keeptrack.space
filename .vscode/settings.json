@@ -42,10 +42,10 @@
   },
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "true",
+    "source.fixAll.eslint": "explicit",
     "source.organizeImports": "always",
-    "source.addMissingImports": "true",
-    "source.removeUnusedImports": "true"
+    "source.addMissingImports": "explicit",
+    "source.removeUnusedImports": "explicit"
   },
   "files.eol": "\n",
   "terminal.integrated.profiles.windows": {

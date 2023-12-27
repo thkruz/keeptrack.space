@@ -122,7 +122,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         if (!keepTrackApi.isInitialized) return;
 
         // Ignore if it's not a satellite or a missile
-        if (isSensorObject(sat)) return;
+        if (isSensorObject(sat as SensorObject)) return;
         sat = <SatObject | MissileObject>sat;
 
         try {
@@ -1415,6 +1415,8 @@ export class SatInfoBox extends KeepTrackPlugin {
    */
   private static selectSat_(sat?: SatObject | MissileObject | SensorObject): void {
     if (sat) {
+      if (isSensorObject(sat as SensorObject)) return;
+
       showEl(SatInfoBox.containerId_);
 
       const satInfoBoxDom = getEl(SatInfoBox.containerId_);

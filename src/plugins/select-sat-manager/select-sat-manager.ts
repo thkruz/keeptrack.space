@@ -17,10 +17,17 @@ export class SelectSatManager extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Select Sat Manager';
   lastCssStyle = '';
   selectedSat = -1;
-  primarySatObj: SatObject | MissileObject;
+  private readonly noSatObj_ = <SatObject | MissileObject>{
+    id: -1,
+    missile: false,
+    type: SpaceObjectType.UNKNOWN,
+    static: false,
+  };
+
+  primarySatObj = this.noSatObj_;
   secondarySat = -1;
   secondarySatObj: SatObject | MissileObject;
-  lastSelectedSat_ = -1;
+  private lastSelectedSat_ = -1;
 
   constructor() {
     super(SelectSatManager.PLUGIN_NAME);
@@ -57,21 +64,54 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   selectSat(satId: number) {
     if (settingsManager.isDisableSelectSat) return;
-
-    // Is this a new sat Id?
-    if (satId !== this.lastSelectedSat()) {
-      this.selectSatChange_(satId);
-    }
+    if (this.selectedSat === this.lastSelectedSat_) return;
 
     const sat = keepTrackApi.getCatalogManager().getSat(satId) as (SatObject & SensorObject) | MissileObject;
 
-    if (sat) {
-      this.selectSatObject_(sat);
+    if (!sat) {
+      this.selectSatReset_();
     } else {
-      this.selectSatReset_(sat, satId);
+      // Selecting a non-missile non-sensor object does nothing
+      if ((!sat.active || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') {
+        return;
+      }
+
+      // First thing we need to do is determine what type of SpaceObjectType we have
+      switch (sat.type) {
+        case SpaceObjectType.MECHANICAL:
+        case SpaceObjectType.PHASED_ARRAY_RADAR:
+        case SpaceObjectType.OPTICAL:
+        case SpaceObjectType.OBSERVER:
+        case SpaceObjectType.BISTATIC_RADIO_TELESCOPE:
+        case SpaceObjectType.GROUND_SENSOR_STATION:
+          this.selectSensorObject_(sat as SensorObject);
+          keepTrackApi.getSoundManager()?.play('whoosh');
+          return;
+        case SpaceObjectType.PAYLOAD:
+        case SpaceObjectType.ROCKET_BODY:
+        case SpaceObjectType.DEBRIS:
+        case SpaceObjectType.SPECIAL:
+        case SpaceObjectType.NOTIONAL:
+        case SpaceObjectType.UNKNOWN:
+          this.selectSatObject_(sat);
+          break;
+        case SpaceObjectType.PAYLOAD_OWNER:
+        case SpaceObjectType.PAYLOAD_MANUFACTURER:
+          SelectSatManager.selectOwnerManufacturer_(sat);
+          return;
+        case SpaceObjectType.STAR:
+          return; // Do nothing
+        case SpaceObjectType.BALLISTIC_MISSILE:
+          this.selectSatObject_(sat);
+          break;
+        default:
+          errorManagerInstance.log(`SelectSatManager.selectSat: Unknown SpaceObjectType: ${sat.type}`);
+          return;
+      }
     }
 
-    this.setSelectedSat(satId);
+    // Set the primary sat
+    this.primarySatObj = sat ?? this.noSatObj_;
 
     // Run any other callbacks
     keepTrackApi.methods.selectSatData(sat, sat?.id);
@@ -94,6 +134,37 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
   }
 
+  private selectSensorObject_(sat: SensorObject) {
+    // All sensors should have a staticNum
+    if (typeof sat.staticNum === 'undefined') {
+      errorManagerInstance.log(`SelectSatManager.selectSensorObject_: SensorObject does not have a staticNum: ${sat}`);
+      return;
+    }
+
+    // stop rotation if it is on
+    keepTrackApi.getMainCamera().autoRotate(false);
+    keepTrackApi.getMainCamera().panCurrent = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
+
+    if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
+      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
+      keepTrackApi.methods.sensorDotSelected(sat as unknown as SensorObject);
+    }
+
+    this.setSelectedSat(-1);
+    getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
+    getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
+    if (this.selectedSat !== -1) {
+      getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
+    }
+  }
+
   private selectSatChange_(satId: number) {
     SelectSatManager.updateCruncher_(satId);
     this.updateDotSizeAndColor_(satId);
@@ -106,87 +177,53 @@ export class SelectSatManager extends KeepTrackPlugin {
     UrlManager.updateURL();
   }
 
-  private selectSatReset_(sat: SatObject, satId: number) {
-    if (!sat) {
-      if (satId === null) {
-        errorManagerInstance.debug('SelectSatManager.selectSat: satId is null, did you mean -1?');
-      }
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-      if (
-        colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group ||
-        (typeof (<HTMLInputElement>getEl('search'))?.value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
-      ) {
-        // If group selected
-        getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
-      } else {
-        getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-selected');
-        getEl('menu-sat-fov', true)?.classList.add('bmenu-item-disabled');
-        settingsManager.isSatOverflyModeOn = false;
-        keepTrackApi.getCatalogManager().satCruncher.postMessage({
-          typ: 'isShowSatOverfly',
-          isShowSatOverfly: 'reset',
-        });
-      }
-
-      // Run this ONCE when clicking empty space
-      if (this.lastSelectedSat() !== -1) {
-        keepTrackApi.getMainCamera().exitFixedToSat();
-
-        document.documentElement.style.setProperty('--search-box-bottom', `0px`);
-        const satInfoBoxDom = getEl('sat-infobox', true);
-        if (satInfoBoxDom) {
-          satInfoBoxDom.style.display = 'none';
-        }
-
-        // Add Grey Out
-        getEl('menu-satview', true)?.classList.add('bmenu-item-disabled');
-        getEl('menu-editSat', true)?.classList.add('bmenu-item-disabled');
-        getEl('menu-map', true)?.classList.add('bmenu-item-disabled');
-        getEl('menu-newLaunch', true)?.classList.add('bmenu-item-disabled');
-        getEl('menu-breakup', true)?.classList.add('bmenu-item-disabled');
-      }
+  private selectSatReset_() {
+    if (this.lastSelectedSat() !== -1) {
+      this.selectSatChange_(-1);
     }
+
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    if (
+      colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group ||
+      (typeof (<HTMLInputElement>getEl('search'))?.value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
+    ) {
+      // If group selected
+      getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
+    } else {
+      getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-selected');
+      getEl('menu-sat-fov', true)?.classList.add('bmenu-item-disabled');
+      settingsManager.isSatOverflyModeOn = false;
+      keepTrackApi.getCatalogManager().satCruncher.postMessage({
+        typ: 'isShowSatOverfly',
+        isShowSatOverfly: 'reset',
+      });
+    }
+
+    // Run this ONCE when clicking empty space
+    if (this.lastSelectedSat() !== -1) {
+      keepTrackApi.getMainCamera().exitFixedToSat();
+
+      document.documentElement.style.setProperty('--search-box-bottom', `0px`);
+      const satInfoBoxDom = getEl('sat-infobox', true);
+      if (satInfoBoxDom) {
+        satInfoBoxDom.style.display = 'none';
+      }
+
+      // Add Grey Out
+      getEl('menu-satview', true)?.classList.add('bmenu-item-disabled');
+      getEl('menu-editSat', true)?.classList.add('bmenu-item-disabled');
+      getEl('menu-map', true)?.classList.add('bmenu-item-disabled');
+      getEl('menu-newLaunch', true)?.classList.add('bmenu-item-disabled');
+      getEl('menu-breakup', true)?.classList.add('bmenu-item-disabled');
+    }
+
+    this.setSelectedSat(-1);
   }
 
   private selectSatObject_(sat: (SatObject & SensorObject) | MissileObject) {
-    // Selecting a non-missile non-sensor object does nothing
-    if ((!sat.active || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') {
-      return;
+    if (sat.id !== this.lastSelectedSat()) {
+      this.selectSatChange_(sat.id);
     }
-
-    // First thing we need to do is determine what type of SpaceObjectType we have
-    switch (sat.type) {
-      case SpaceObjectType.MECHANICAL:
-      case SpaceObjectType.PHASED_ARRAY_RADAR:
-      case SpaceObjectType.OPTICAL:
-      case SpaceObjectType.OBSERVER:
-      case SpaceObjectType.BISTATIC_RADIO_TELESCOPE:
-      case SpaceObjectType.GROUND_SENSOR_STATION:
-        // This is a sensor
-        break;
-      case SpaceObjectType.PAYLOAD:
-      case SpaceObjectType.ROCKET_BODY:
-      case SpaceObjectType.DEBRIS:
-      case SpaceObjectType.SPECIAL:
-      case SpaceObjectType.NOTIONAL:
-      case SpaceObjectType.UNKNOWN:
-        // This is a satellite object
-        break;
-      case SpaceObjectType.PAYLOAD_OWNER:
-      case SpaceObjectType.PAYLOAD_MANUFACTURER:
-        SelectSatManager.selectOwnerManufacturer_(sat);
-        break;
-      case SpaceObjectType.STAR:
-        return; // Do nothing
-      case SpaceObjectType.BALLISTIC_MISSILE:
-        // This is a missile object
-        break;
-      default:
-        errorManagerInstance.log(`SelectSatManager.selectSat: Unknown SpaceObjectType: ${sat.type}`);
-        return;
-    }
-
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     // stop rotation if it is on
     keepTrackApi.getMainCamera().autoRotate(false);
@@ -198,33 +235,16 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      if (!sat.static) {
-        keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
-      } else if (typeof sat.staticNum !== 'undefined') {
-        keepTrackApi.methods.sensorDotSelected(sat as unknown as SensorObject);
-      }
+      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
     }
 
     // If we deselect an object but had previously selected one then disable/hide stuff
     this.setSelectedSat(sat.id);
-    if (sat.static) {
-      if (typeof sat.staticNum == 'undefined') return;
-      this.setSelectedSat(-1);
-      getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
-      if (this.selectedSat !== -1) {
-        getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
-      }
-      return;
-    }
     keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
     keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
     keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
 
-    if (sensorManagerInstance.isSensorSelected()) {
+    if (keepTrackApi.getSensorManager().isSensorSelected()) {
       getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
     }
 
@@ -233,6 +253,8 @@ export class SelectSatManager extends KeepTrackPlugin {
     getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-map', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
+
+    this.setSelectedSat(sat.id);
   }
 
   private static selectOwnerManufacturer_(sat: MissileObject | (SatObject & SensorObject)) {

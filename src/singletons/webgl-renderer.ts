@@ -5,7 +5,6 @@ import { mat4, vec2, vec4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType, SatObject } from '../interfaces';
 import { getEl } from '../lib/get-el';
-import { SpaceObjectType } from '../lib/space-object-type';
 import { SettingsManager } from '../settings/settings';
 import { CatalogSource } from '../static/catalog-loader';
 import { isThisNode } from '../static/isThisNode';
@@ -427,59 +426,20 @@ export class WebGLRenderer {
 
   /**
    * Calculate changes related to satellites objects
-   *
-   * TODO: Refactor more of this into selectSatManager
    */
   satCalculate() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    if (this.selectSatManager_?.selectedSat > -1) {
-      this.selectSatManager_.primarySatObj = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
-      if (!this.selectSatManager_.primarySatObj) {
-        // Reset the selected sat if it is not found
-        this.selectSatManager_.primarySatObj = <SatObject>{
-          id: -1,
-          missile: false,
-          type: SpaceObjectType.UNKNOWN,
-          static: false,
-        };
-        return;
-      }
+    this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
+
+    if (this.selectSatManager_?.primarySatObj.id !== -1) {
       this.meshManager.update(timeManagerInstance.selectedDate, this.selectSatManager_.primarySatObj);
       keepTrackApi.getMainCamera().snapToSat(this.selectSatManager_.primarySatObj, timeManagerInstance.simulationTimeObj);
-      if (this.selectSatManager_.primarySatObj.missile) orbitManagerInstance.setSelectOrbit(this.selectSatManager_.primarySatObj.id);
+      if (this.selectSatManager_.primarySatObj.missile) keepTrackApi.getOrbitManager().setSelectOrbit(this.selectSatManager_.primarySatObj.id);
 
       keepTrackApi.getScene().searchBox.update(this.selectSatManager_.primarySatObj, timeManagerInstance.selectedDate);
     } else {
-      // Reset the selected satellite if no satellite is selected
-      if (this.selectSatManager_) {
-        this.selectSatManager_.primarySatObj = <SatObject>{
-          id: -1,
-          missile: false,
-          type: SpaceObjectType.UNKNOWN,
-          static: false,
-        };
-      }
-
       keepTrackApi.getScene().searchBox.update(null);
-    }
-
-    this.checkIfSelectedSatChanged_();
-  }
-
-  /**
-   * Checks if the selected satellite has changed and performs necessary actions.
-   *
-   * Selecting a satellite is not tied to the mouse click event.
-   */
-  private checkIfSelectedSatChanged_() {
-    const newSat = this.selectSatManager_?.selectedSat;
-    const oldSat = this.selectSatManager_?.lastSelectedSat();
-
-    if (newSat !== oldSat) {
-      this.selectSatManager_.selectSat(newSat);
     }
   }
 

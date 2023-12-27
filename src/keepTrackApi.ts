@@ -372,8 +372,7 @@ export enum KeepTrackApiEvents {
  */
 type CatalogObject = SatObject | MissileObject | SensorObject;
 
-export const isSensorObject = (sat: CatalogObject): boolean =>
-  !!((<SensorObject>sat).observerGd?.lat || (<SensorObject>sat).observerGd?.lon || (<SensorObject>sat).observerGd?.alt);
+export const isSensorObject = (sat: SensorObject): boolean => !!sat.objName;
 export const isMissileObject = (sat: CatalogObject): boolean => !!(<MissileObject>sat).missile;
 export const isSatObject = (sat: CatalogObject): boolean => {
   if (!sat) return false;

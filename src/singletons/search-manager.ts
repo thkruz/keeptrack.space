@@ -1,8 +1,9 @@
 import { CatalogManager, CatalogObject, MissileObject, SatObject, SensorObject, UiManager } from '@app/interfaces';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
 import { SpaceObjectType } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
+import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
@@ -29,6 +30,9 @@ export class SearchManager {
   private resultsOpen_ = false;
   private lastResultGroup_ = <ObjectGroup>null;
   private uiManager_: UiManager;
+  private isSearchOpen = false;
+  private forceClose = false;
+  private forceOpen = false;
 
   constructor(uiManager: UiManager) {
     this.uiManager_ = uiManager;
@@ -36,12 +40,70 @@ export class SearchManager {
     const searchResults = document.createElement('div');
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
     uiWrapper.prepend(searchResults);
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: 'Search Manager',
+      cb: this.addListeners_.bind(this),
+    });
+    this.addListeners_();
+  }
+
+  private addListeners_() {
+    getEl('search-results')?.addEventListener('click', (evt: Event) => {
+      let satId = SearchManager.getSatIdFromSearchResults_(evt);
+      if (isNaN(satId) || satId === -1) return;
+
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const sat = catalogManagerInstance.getSat(satId);
+      if (sat?.type === SpaceObjectType.STAR) {
+        catalogManagerInstance.panToStar(sat);
+      } else {
+        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(satId);
+      }
+    });
+
+    getEl('search-results')?.addEventListener('mouseover', (evt) => {
+      let satId = SearchManager.getSatIdFromSearchResults_(evt);
+      if (isNaN(satId) || satId === -1) return;
+
+      keepTrackApi.getHoverManager().setHoverId(satId);
+      this.uiManager_.searchHoverSatId = satId;
+    });
+    getEl('search-results')?.addEventListener('mouseout', () => {
+      keepTrackApi.getHoverManager().setHoverId(-1);
+      this.uiManager_.searchHoverSatId = -1;
+    });
+
+    getEl('search')?.addEventListener('input', () => {
+      const searchStr = (<HTMLInputElement>getEl('search')).value;
+      this.doSearch(searchStr);
+    });
+
+    getEl('search-icon')?.addEventListener('click', () => {
+      this.searchToggle();
+    });
+  }
+
+  private static getSatIdFromSearchResults_(evt: Event) {
+    let satId = -1;
+    if ((<HTMLElement>evt.target).classList.contains('search-result')) {
+      const satIdStr = (<HTMLElement>evt.target).dataset.objId;
+      satId = satIdStr ? parseInt(satIdStr) : -1;
+    } else if ((<HTMLElement>evt.target).parentElement?.classList.contains('search-result')) {
+      const satIdStr = (<HTMLElement>evt.target).parentElement?.dataset.objId;
+      satId = satIdStr ? parseInt(satIdStr) : -1;
+    } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
+      const satIdStr = (<HTMLElement>evt.target).parentElement?.parentElement?.dataset.objId;
+      satId = satIdStr ? parseInt(satIdStr) : -1;
+    }
+    return satId;
   }
 
   /**
    * Returns a boolean indicating whether the search results box is currently open.
    */
-  public getLastResultGroup(): ObjectGroup {
+  getLastResultGroup(): ObjectGroup {
     return this.lastResultGroup_;
   }
 
@@ -59,7 +121,7 @@ export class SearchManager {
     return '';
   }
 
-  public isResultsOpen(): boolean {
+  isResultsOpen(): boolean {
     return this.resultsOpen_;
   }
 
@@ -67,7 +129,7 @@ export class SearchManager {
    * Hides the search results box and clears the selected satellite group.
    * Also updates the color scheme if necessary.
    */
-  public hideResults(): void {
+  hideResults(): void {
     try {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -94,11 +156,11 @@ export class SearchManager {
     }
   }
 
-  public static doArraySearch(catalogManagerInstance: CatalogManager, array: number[]) {
+  static doArraySearch(catalogManagerInstance: CatalogManager, array: number[]) {
     return array.reduce((searchStr, i) => `${searchStr}${(<SatObject>catalogManagerInstance.satData[i])?.sccNum},`, '').slice(0, -1);
   }
 
-  public doSearch(searchString: string, isPreventDropDown?: boolean): void {
+  doSearch(searchString: string, isPreventDropDown?: boolean): void {
     if (searchString == '') {
       this.hideResults();
       return;
@@ -352,7 +414,7 @@ export class SearchManager {
     });
   }
 
-  public fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
+  fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     let satData = catalogManagerInstance.satData;
@@ -433,11 +495,7 @@ export class SearchManager {
     }
   }
 
-  private isSearchOpen = false;
-  private forceClose = false;
-  private forceOpen = false;
-
-  public searchToggle(force?: boolean) {
+  searchToggle(force?: boolean) {
     // Reset Force Options
     this.forceClose = false;
     this.forceOpen = false;

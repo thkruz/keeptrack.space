@@ -509,8 +509,8 @@ export class InputManager {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
       // If we are hovering over a satellite on a menu we don't want to change the mouseSat
-      if (uiManagerInstance.hoverSatId >= 0) {
-        this.mouse.mouseSat = uiManagerInstance.hoverSatId;
+      if (uiManagerInstance.searchHoverSatId >= 0) {
+        this.mouse.mouseSat = uiManagerInstance.searchHoverSatId;
       } else if (!settingsManager.isMobileModeEnabled) {
         this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
       }

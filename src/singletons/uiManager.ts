@@ -27,7 +27,6 @@
 
 import { ColorInformation, ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { Milliseconds } from 'ootk';
@@ -37,7 +36,6 @@ import { MILLISECONDS_PER_SECOND } from '../lib/constants';
 import { getClass } from '../lib/get-class';
 import { getEl, hideEl, setInnerHtml, showEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
-import { SpaceObjectType } from '../lib/space-object-type';
 import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
 import { errorManagerInstance } from './errorManager';
@@ -66,7 +64,7 @@ export class StandardUiManager implements UiManager {
   searchManager: SearchManager;
   updateInterval = 1000;
   updateNextPassOverlay: (arg0: boolean) => void;
-  hoverSatId = -1;
+  searchHoverSatId = -1;
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
@@ -313,33 +311,9 @@ export class StandardUiManager implements UiManager {
       }
     });
 
-    // const MenuSelectable = document.querySelector('.menu-selectable');
-    // MenuSelectable &&
-    //   MenuSelectable.addEventListener('click', () => {
-    //     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    //     if (catalogManagerInstance.selectedSat !== -1) {
-    //       getEl('menu-lookangles').classList.remove('bmenu-item-disabled');
-    //       getEl('menu-satview').classList.remove('bmenu-item-disabled');
-    //     }
-    //   });
-
     // Resizing Listener
     window.addEventListener('resize', () => {
       MobileManager.checkMobileMode();
-      // if (!settingsManager.disableUI) {
-      //   const bodyDOM = getEl('bodyDOM');
-      //   if (keepTrackApi.programs.screenShotManager.checkForQueuedScreenshot()) {
-      //     bodyDOM.style.overflow = 'visible';
-      //     getEl('canvas-holder').style.overflow = 'visible';
-      //     getEl('canvas-holder').style.width = '3840px';
-      //     getEl('canvas-holder').style.height = '2160px';
-      //     bodyDOM.style.width = '3840px';
-      //     bodyDOM.style.height = '2160px';
-      //   } else {
-      //     bodyDOM.style.overflow = 'hidden';
-      //     getEl('canvas-holder').style.overflow = 'hidden';
-      //   }
-      // }
       settingsManager.isResizing = true;
     });
 
@@ -368,10 +342,6 @@ export class StandardUiManager implements UiManager {
   }
 
   private addSearchEventListeners_() {
-    getEl('search-icon')?.addEventListener('click', () => {
-      this.searchManager.searchToggle();
-    });
-
     getEl('search')?.addEventListener('focus', () => {
       this.isCurrentlyTyping = true;
     });
@@ -385,51 +355,6 @@ export class StandardUiManager implements UiManager {
     getEl('ui-wrapper')?.addEventListener('focusout', () => {
       this.isCurrentlyTyping = false;
     });
-
-    getEl('search-results')?.addEventListener('click', (evt: Event) => {
-      let satId = StandardUiManager.getSatIdFromSearchResults_(evt);
-      if (isNaN(satId) || satId === -1) return;
-
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const sat = catalogManagerInstance.getSat(satId);
-      if (sat?.type === SpaceObjectType.STAR) {
-        catalogManagerInstance.panToStar(sat);
-      } else {
-        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(satId);
-      }
-    });
-
-    getEl('search-results')?.addEventListener('mouseover', (evt) => {
-      let satId = StandardUiManager.getSatIdFromSearchResults_(evt);
-      if (isNaN(satId) || satId === -1) return;
-
-      keepTrackApi.getHoverManager().setHoverId(satId);
-      this.hoverSatId = satId;
-    });
-    getEl('search-results')?.addEventListener('mouseout', () => {
-      keepTrackApi.getHoverManager().setHoverId(-1);
-      this.hoverSatId = -1;
-    });
-
-    getEl('search')?.addEventListener('input', () => {
-      const searchStr = (<HTMLInputElement>getEl('search')).value;
-      this.doSearch(searchStr);
-    });
-  }
-
-  private static getSatIdFromSearchResults_(evt: Event) {
-    let satId = -1;
-    if ((<HTMLElement>evt.target).classList.contains('search-result')) {
-      const satIdStr = (<HTMLElement>evt.target).dataset.objId;
-      satId = satIdStr ? parseInt(satIdStr) : -1;
-    } else if ((<HTMLElement>evt.target).parentElement?.classList.contains('search-result')) {
-      const satIdStr = (<HTMLElement>evt.target).parentElement?.dataset.objId;
-      satId = satIdStr ? parseInt(satIdStr) : -1;
-    } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
-      const satIdStr = (<HTMLElement>evt.target).parentElement?.parentElement?.dataset.objId;
-      satId = satIdStr ? parseInt(satIdStr) : -1;
-    }
-    return satId;
   }
 
   legendHoverMenuClick(legendType: string) {

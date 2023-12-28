@@ -607,7 +607,7 @@ export interface UiManager {
   searchManager: SearchManager;
   updateInterval: number;
   updateNextPassOverlay: (boolean) => void;
-  hoverSatId: number;
+  searchHoverSatId: number;
   colorSchemeChangeAlert(newScheme: ColorRuleSet): void;
   doSearch(searchString: string, isPreventDropDown?: boolean): void;
   footerToggle(): void;

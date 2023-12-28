@@ -164,10 +164,10 @@ export class MouseInput {
         // Left Mouse Button Clicked
         if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
           if (this.clickedSat !== -1 && !catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY).static) {
-            keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
+            keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
           }
         } else {
-          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
+          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
         }
       }
       if (evt.button === 2) {

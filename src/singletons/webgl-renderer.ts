@@ -430,7 +430,8 @@ export class WebGLRenderer {
   private updatePrimarySatellite_() {
     // If this.selectedSat_.selectedSat has changed then select it
     if (this.selectSatManager_?.selectedSat !== this.selectSatManager_?.lastSelectedSat()) {
-      this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
+      console.error('selectedSat has changed');
+      // this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
     }
 
     if (this.selectSatManager_?.primarySatObj.id !== -1) {

@@ -35,6 +35,9 @@
         "kind": "build",
         "isDefault": true
       },
+      "runOptions": {
+        "instanceLimit": 1
+      },
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -60,6 +63,9 @@
         "kind": "build",
         "isDefault": false
       },
+      "runOptions": {
+        "instanceLimit": 1
+      },
       "presentation": {
         "echo": true,
         "reveal": "always",
@@ -82,7 +88,6 @@
         "id": "browser",
         "color": "terminal.ansiCyan"
       },
-      "problemMatcher": [],
       "presentation": {
         "echo": false,
         "reveal": "never",
@@ -105,7 +110,6 @@
         "id": "browser",
         "color": "terminal.ansiRed"
       },
-      "problemMatcher": [],
       "presentation": {
         "echo": false,
         "reveal": "never",
@@ -124,8 +128,6 @@
       "command": "npm test",
       "type": "shell",
       "args": [],
-      "isBackground": true,
-      "problemMatcher": [],
       "icon": {
         "id": "beaker",
         "color": "terminal.ansiGreen"
@@ -140,8 +142,6 @@
       "command": "npm run createtest",
       "type": "shell",
       "args": [],
-      "isBackground": true,
-      "problemMatcher": [],
       "icon": {
         "id": "repo-create",
         "color": "terminal.ansiGreen"
@@ -156,8 +156,6 @@
       "command": "npm run lcov",
       "type": "shell",
       "args": [],
-      "isBackground": true,
-      "problemMatcher": [],
       "icon": {
         "id": "file-code",
         "color": "terminal.ansiGreen"

@@ -210,7 +210,7 @@ export class EditSat extends KeepTrackPlugin {
         this.selectSatManager_.setSecondarySat(clickedSat);
         break;
       case 'edit-sat-rmb':
-        this.selectSatManager_.setSelectedSat(clickedSat);
+        this.selectSatManager_.selectSat(clickedSat);
         if (!this.isMenuButtonActive) {
           keepTrackApi.getUiManager().bottomIconPress(<HTMLElement>{ id: this.bottomIconElementName });
         }

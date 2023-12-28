@@ -46,21 +46,12 @@ export class MouseInput {
 
     this.isStartedOnCanvas = true;
 
-    if (keepTrackApi.getMainCamera().speedModifier === 1) {
-      settingsManager.cameraMovementSpeed = 0.003;
-      settingsManager.cameraMovementSpeedMin = 0.005;
-    }
-
     if (evt.button === 2) {
       this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
       this.latLon = CoordinateTransforms.eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, timeManagerInstance.simulationTimeObj);
     }
-    keepTrackApi.getMainCamera().screenDragPoint = [keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY];
-    keepTrackApi.getMainCamera().dragStartPitch = keepTrackApi.getMainCamera().camPitch;
-    keepTrackApi.getMainCamera().dragStartYaw = keepTrackApi.getMainCamera().camYaw;
-    if (evt.button === 0) {
-      keepTrackApi.getMainCamera().isDragging = true;
 
+    if (evt.button === 0) {
       if (settingsManager.isFreezePropRateOnDrag) {
         timeManagerInstance.calculateSimulationTime();
         timeManagerInstance.lastPropRate = timeManagerInstance.propRate * 1;
@@ -68,14 +59,12 @@ export class MouseInput {
         settingsManager.isPropRateChange = true;
       }
     }
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-    if (!settingsManager.disableUI) {
-      keepTrackApi.getMainCamera().autoRotate(false);
-    }
 
     keepTrackApi.getInputManager().hidePopUps();
 
     UrlManager.updateURL();
+
+    keepTrackApi.methods.canvasMouseDown(evt);
   }
 
   public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {

@@ -24,6 +24,7 @@ import { MeshManager } from './singletons/draw-manager/mesh-manager';
 import { errorManagerInstance } from './singletons/errorManager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
+import { PanTouchEvent, TapTouchEvent } from './singletons/input-manager/touch-input';
 import { Scene } from './singletons/scene';
 import { StarManager } from './singletons/starManager';
 import { TimeManager } from './singletons/time-manager';
@@ -183,6 +184,8 @@ export const keepTrackApi = {
     staticOffsetChange: [],
     onLineAdded: [],
     sensorDotSelected: [],
+    canvasMouseDown: [],
+    touchStart: [],
   },
   methods: {
     onHelpMenuClick: () => {
@@ -277,6 +280,12 @@ export const keepTrackApi = {
     sensorDotSelected: (sensor: SensorObject) => {
       keepTrackApi.callbacks.sensorDotSelected.forEach((cb: any) => cb.cb(sensor));
     },
+    canvasMouseDown: (e: MouseEvent) => {
+      keepTrackApi.callbacks.canvasMouseDown.forEach((cb: any) => cb.cb(e));
+    },
+    touchStart: (e: TapTouchEvent | PanTouchEvent) => {
+      keepTrackApi.callbacks.touchStart.forEach((cb: any) => cb.cb(e));
+    },
   },
   loadedPlugins: <KeepTrackPlugin[]>[],
   getPlugin: <T extends KeepTrackPlugin>(pluginClass: Constructor<T>): T | null => {
@@ -364,6 +373,8 @@ export enum KeepTrackApiEvents {
    * Runs when a sensor dot is selected but not when a sensor is selected from the sensor menu
    */
   sensorDotSelected = 'sensorDotSelected',
+  canvasMouseDown = 'canvasMouseDown',
+  touchStart = 'touchStart',
 }
 
 /**

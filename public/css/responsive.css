@@ -502,7 +502,8 @@
     cursor: default;
     position: absolute;
     top: 60%;
-    bottom: var(--bottom-menu-height);
+    bottom: 0;
+    height: 100%;
     margin-top: 25px;
     padding: 0 10px 0px 10px;
     right: 0px;
@@ -598,7 +599,8 @@
     cursor: default;
     position: absolute;
     top: 75%;
-    bottom: var(--bottom-menu-height);
+    bottom: 0;
+    height: 100%;
     margin-top: 25px;
     padding: 0 10px 0px 10px;
     right: 0px;

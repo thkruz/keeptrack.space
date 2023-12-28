@@ -156,21 +156,13 @@ export class TouchInput {
     keepTrackApi.getMainCamera().mouseX = this.touchStartX; // Move this
     keepTrackApi.getMainCamera().mouseY = this.touchStartY; // Move this
 
-    settingsManager.cameraMovementSpeed = Math.max(0.005 * keepTrackApi.getMainCamera().zoomLevel(), settingsManager.cameraMovementSpeedMin);
-    keepTrackApi.getMainCamera().screenDragPoint = [keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY];
-    keepTrackApi.getMainCamera().dragStartPitch = keepTrackApi.getMainCamera().camPitch;
-    keepTrackApi.getMainCamera().dragStartYaw = keepTrackApi.getMainCamera().camYaw;
-    keepTrackApi.getMainCamera().isDragging = true;
-
     // If you hit the canvas hide any popups
     keepTrackApi.getInputManager().hidePopUps();
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-    if (!settingsManager.disableUI) {
-      keepTrackApi.getMainCamera().autoRotate(false);
-    }
 
     // TODO: Make updateUrl() a setting that is disabled by default
     UrlManager.updateURL();
+
+    keepTrackApi.methods.touchStart(evt);
   }
 
   tap(evt: TapTouchEvent) {
@@ -180,12 +172,9 @@ export class TouchInput {
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
     keepTrackApi.getMainCamera().autoRotate(false);
 
-    // Select Satellite
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-    if (selectSatManagerInstance) {
-      const satId = keepTrackApi.getInputManager().getSatIdFromCoord(evt.x, evt.y);
-      selectSatManagerInstance.setSelectedSat(satId);
-    }
+    // Try to select satellite
+    const satId = keepTrackApi.getInputManager().getSatIdFromCoord(evt.x, evt.y);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(satId);
   }
 
   pan(evt: PanTouchEvent) {

@@ -88,7 +88,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       const sccNum = parseInt((<HTMLElement>evt.target).textContent.split(':')[0]);
       const id = catalogManagerInstance.getIdFromSccNum(sccNum);
       if (id !== null) {
-        keepTrackApi.getPlugin(SelectSatManager).setSelectedSat(id);
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
       }
     });
   }

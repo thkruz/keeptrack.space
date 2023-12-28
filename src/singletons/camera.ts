@@ -34,34 +34,11 @@ import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
 import { errorManagerInstance } from './errorManager';
 
-declare module '@app/interfaces' {
-  interface SatShader {
-    largeObjectMaxZoom: number;
-    largeObjectMinZoom: number;
-    maxAllowedSize: number;
-    maxSize: number;
-  }
-  interface UserSettings {
-    autoPanSpeed: {
-      x: number;
-      y: number;
-    };
-    autoRotateSpeed: number;
-    cameraDecayFactor: number;
-    cameraMovementSpeed: number;
-    fieldOfView: number;
-    fpsForwardSpeed: number;
-    fpsSideSpeed: number;
-    fpsVertSpeed: number;
-    isMobileModeEnabled: boolean;
-    maxZoomDistance: Kilometers;
-    minZoomDistance: Kilometers;
-    offsetCameraModeX: number;
-    satShader: SatShader;
-    zoomSpeed: number;
-  }
-}
-
+/**
+ * Represents the different types of cameras available.
+ *
+ * TODO: This should be replaced with different camera classes
+ */
 export enum CameraType {
   CURRENT = 0,
   DEFAULT = 1,
@@ -75,11 +52,15 @@ export enum CameraType {
   OFFSET = 8,
 }
 
+/**
+ * Represents the possible preset zoom values for the camera.
+ */
 export enum ZoomValue {
   LEO = 0.45,
   GEO = 0.82,
   MAX = 1,
 }
+
 export class Camera {
   private camYawTarget_ = <Radians>0;
   private chaseSpeed_ = 0.0005;
@@ -610,6 +591,51 @@ export class Camera {
         this.isAutoPitchYawToTarget = false;
       },
     });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.canvasMouseDown,
+      cbName: 'mainCamera',
+      cb: this.canvasMouseDown_.bind(this),
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.touchStart,
+      cbName: 'mainCamera',
+      cb: this.touchStart_.bind(this),
+    });
+  }
+
+  canvasMouseDown_(evt: MouseEvent) {
+    if (this.speedModifier === 1) {
+      settingsManager.cameraMovementSpeed = 0.003;
+      settingsManager.cameraMovementSpeedMin = 0.005;
+    }
+
+    this.screenDragPoint = [this.mouseX, this.mouseY];
+    this.dragStartPitch = this.camPitch;
+    this.dragStartYaw = this.camYaw;
+
+    if (evt.button === 0) {
+      this.isDragging = true;
+    }
+
+    this.isAutoPitchYawToTarget = false;
+    if (!settingsManager.disableUI) {
+      this.autoRotate(false);
+    }
+  }
+
+  touchStart_() {
+    settingsManager.cameraMovementSpeed = Math.max(0.005 * this.zoomLevel(), settingsManager.cameraMovementSpeedMin);
+    this.screenDragPoint = [this.mouseX, this.mouseY];
+    this.dragStartPitch = this.camPitch;
+    this.dragStartYaw = this.camYaw;
+    this.isDragging = true;
+
+    this.isAutoPitchYawToTarget = false;
+    if (!settingsManager.disableUI) {
+      this.autoRotate(false);
+    }
   }
 
   keyDownC_() {

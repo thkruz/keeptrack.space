@@ -27,7 +27,7 @@ describe('UrlManager_class', () => {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
-    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -35,7 +35,7 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.methods.onKeepTrackReady();
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).setSelectedSat).toHaveBeenCalledWith(expectedSelectedSat);
+    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);
     expect(timeManagerInstance.propRate).toBe(expectedPropRate);
     expect(timeManagerInstance.staticOffset).toBe(expectedStaticOffset);
@@ -52,7 +52,7 @@ describe('UrlManager_class', () => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
-    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.getIdFromIntlDes = () => 10;
     catalogManagerInstance.getSat = () => ({ id: 10, sccNum: '25544', active: true }) as any;
     uiManagerInstance.doSearch = jest.fn();
@@ -61,7 +61,7 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.methods.onKeepTrackReady();
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).setSelectedSat).toHaveBeenCalledWith(expectedSelectedSat);
+    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(expectedSelectedSat);
   });
 
   // Tests that URL parameters valid but satellite not found
@@ -75,7 +75,7 @@ describe('UrlManager_class', () => {
     const uiManagerInstance = keepTrackApi.getUiManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     uiManagerInstance.toast = jest.fn();
-    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.getIdFromIntlDes = () => null;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -97,7 +97,7 @@ describe('UrlManager_class', () => {
     const uiManagerInstance = keepTrackApi.getUiManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     uiManagerInstance.toast = jest.fn();
-    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.getIdFromSccNum = () => null;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -123,7 +123,7 @@ describe('UrlManager_class', () => {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
-    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -131,7 +131,7 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.methods.onKeepTrackReady();
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).setSelectedSat).not.toHaveBeenCalledWith(expectedSelectedSat);
+    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).not.toHaveBeenCalledWith(expectedCurrentSearch);
     expect(timeManagerInstance.propRate).not.toBe(expectedPropRate);
     expect(timeManagerInstance.staticOffset).not.toBe(expectedStaticOffset);
@@ -152,7 +152,7 @@ describe('UrlManager_class', () => {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
-    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -160,7 +160,7 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.methods.onKeepTrackReady();
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).setSelectedSat).not.toHaveBeenCalledWith(expectedSelectedSat);
+    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);
     expect(timeManagerInstance.propRate).not.toBe(expectedPropRate);
     expect(timeManagerInstance.staticOffset).not.toBe(expectedStaticOffset);

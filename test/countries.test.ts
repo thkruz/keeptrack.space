@@ -49,7 +49,7 @@ describe('CountriesMenu_class', () => {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     // const uiManagerInstance = mockUiManager;
     // uiManagerInstance.searchManager.fillResultBox = jest.fn();
-    keepTrackApi.getPlugin(SelectSatManager).setSelectedSat = jest.fn();
+    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     groupManagerInstance.groupList['Argentina'] = {
       objects: [0, 1],
       updateIsInGroup: jest.fn(),
@@ -61,7 +61,7 @@ describe('CountriesMenu_class', () => {
     keepTrackApi.getCatalogManager().getSat = () => defaultSat;
     CountriesMenu['groupSelected_']('Argentina');
     // expect(uiManagerInstance.searchManager.fillResultBox).toHaveBeenCalled();
-    expect(keepTrackApi.getPlugin(SelectSatManager).setSelectedSat).toHaveBeenCalledWith(-1);
+    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(-1);
   });
 
   // Tests that countryMenuClick_ creates group if it doesn't exist

@@ -57,6 +57,7 @@ describe('uiManager', () => {
       <div id="sensor-type">Telescope</div>
       <div id="sensor-info-title">Custom Sensor</div>
       <div id="sensor-country">Custom Sensor</div>
+      <div id="search"></div>
     `;
 
     expect(() =>
@@ -72,7 +73,7 @@ describe('uiManager', () => {
     expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-hei')).value).toBe('0.022');
 
-    keepTrackApi.containerRoot.innerHTML = ``;
+    keepTrackApi.containerRoot.innerHTML = `<div id="search"></div>`;
     disableConsoleErrors();
     expect(() =>
       UiGeolocation.updateSensorPosition({

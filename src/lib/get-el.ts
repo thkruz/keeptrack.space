@@ -24,7 +24,7 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null
   // Return an empty div to avoid errors
   if (isThisNode() && !isExpectedMissing) {
     // console.warn(document.body.innerHTML);
-    throw new Error(`Element with id ${id} not found!`);
+    throw new Error(`Element with id '${id}' not found!`);
   }
   return null;
   // DEBUG: Use this code for finding bad requests

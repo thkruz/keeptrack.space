@@ -160,6 +160,9 @@ export const setupMinimumHtml = () => {
   <div id="keeptrack-root">
     <div id="keeptrack-header"></div>
     <div id="${KeepTrackPlugin.bottomIconsContainerId}"></div>
+    <div id="search"></div>
+    <div id="search-icon"></div>
+    <div id="search-results"></div>
   </div>`;
 };
 
@@ -179,7 +182,7 @@ export const mockUiManager = {
   lastNextPassCalcSatId: 0,
   lastNextPassCalcSensorShortName: '',
   lastToast: '',
-  hoverSatId: -1,
+  searchHoverSatId: -1,
   lookAtLatLon: null,
   searchManager: null,
   updateInterval: 0,

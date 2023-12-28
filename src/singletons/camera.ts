@@ -76,8 +76,9 @@ export enum CameraType {
 }
 
 export enum ZoomValue {
-  GEO = 'geo',
-  LEO = 'leo',
+  LEO = 0.45,
+  GEO = 0.82,
+  MAX = 1,
 }
 export class Camera {
   private camYawTarget_ = <Radians>0;
@@ -122,17 +123,17 @@ export class Camera {
   private zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
   private zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
 
-  public camAngleSnappedOnSat = false;
-  public camMatrix = mat4.create().fill(0);
+  camAngleSnappedOnSat = false;
+  camMatrix = mat4.create().fill(0);
   /**
    * This was used when there was only one camera mode and the camera was always centered on the earth
    * It is the overall pitch of the camera?
    */
-  public camPitch = <Radians>0;
-  public camPitchSpeed = 0;
-  public camPitchTarget = <Radians>0;
-  public camRotateSpeed = 0;
-  public camSnapToSat = {
+  camPitch = <Radians>0;
+  camPitchSpeed = 0;
+  camPitchTarget = <Radians>0;
+  camRotateSpeed = 0;
+  camSnapToSat = {
     pos: {
       x: 0,
       y: 0,
@@ -149,85 +150,85 @@ export class Camera {
    * This was used when there was only one camera mode and the camera was always centered on the earth
    * It is the overall yaw of the camera?
    */
-  public camYaw = <Radians>0;
-  public camYawSpeed = 0;
-  public camZoomSnappedOnSat = false;
-  public cameraType: CameraType = CameraType.DEFAULT;
-  public dragStartPitch = <Radians>0;
-  public dragStartYaw = <Radians>0;
-  public earthCenteredLastZoom = 0.6925;
-  public fpsForwardSpeed = 0;
-  public fpsPitch = <Degrees>0;
-  public fpsPitchRate = 0;
-  public fpsRotate = <Degrees>0;
-  public fpsRotateRate = 0;
-  public fpsRun = 1;
-  public fpsSideSpeed = 0;
-  public fpsVertSpeed = 0;
-  public fpsYaw = <Degrees>0;
-  public fpsYawRate = 0;
-  public ftsPitch = 0;
-  public ftsRotateReset = true;
-  public isAutoPitchYawToTarget = false;
-  public isDragging = false;
-  public isLocalRotateOverride = false;
-  public isLocalRotateReset = true;
-  public isLocalRotateRoll = false;
-  public isLocalRotateYaw = false;
-  public isPanReset = false;
-  public isScreenPan = false;
-  public isWorldPan = false;
-  public isZoomIn = false;
-  public localRotateCurrent = {
+  camYaw = <Radians>0;
+  camYawSpeed = 0;
+  camZoomSnappedOnSat = false;
+  cameraType: CameraType = CameraType.DEFAULT;
+  dragStartPitch = <Radians>0;
+  dragStartYaw = <Radians>0;
+  earthCenteredLastZoom = 0.6925;
+  fpsForwardSpeed = 0;
+  fpsPitch = <Degrees>0;
+  fpsPitchRate = 0;
+  fpsRotate = <Degrees>0;
+  fpsRotateRate = 0;
+  fpsRun = 1;
+  fpsSideSpeed = 0;
+  fpsVertSpeed = 0;
+  fpsYaw = <Degrees>0;
+  fpsYawRate = 0;
+  ftsPitch = 0;
+  ftsRotateReset = true;
+  isAutoPitchYawToTarget = false;
+  isDragging = false;
+  isLocalRotateOverride = false;
+  isLocalRotateReset = true;
+  isLocalRotateRoll = false;
+  isLocalRotateYaw = false;
+  isPanReset = false;
+  isScreenPan = false;
+  isWorldPan = false;
+  isZoomIn = false;
+  localRotateCurrent = {
     pitch: <Radians>0,
     roll: <Radians>0,
     yaw: <Radians>0,
   };
 
-  public localRotateDif = {
+  localRotateDif = {
     pitch: <Radians>0,
     roll: <Radians>0,
     yaw: <Radians>0,
   };
 
-  public localRotateSpeed = {
+  localRotateSpeed = {
     pitch: 0,
     roll: 0,
     yaw: 0,
   };
 
-  public localRotateStartPosition = {
+  localRotateStartPosition = {
     pitch: 0,
     roll: 0,
     yaw: 0,
   };
 
-  public mouseX = 0;
-  public mouseY = 0;
-  public panCurrent = {
+  mouseX = 0;
+  mouseY = 0;
+  panCurrent = {
     x: 0,
     y: 0,
     z: 0,
   };
 
-  public panSpeed = {
+  panSpeed = {
     x: 0,
     y: 0,
     z: 0,
   };
 
-  public panStartPosition = {
+  panStartPosition = {
     x: 0,
     y: 0,
     z: 0,
   };
 
-  public position = <vec3>[0, 0, 0];
-  public screenDragPoint = [0, 0];
-  public settings_: SettingsManager;
-  public speedModifier = 1;
-  public startMouseX = 0;
-  public startMouseY = 0;
+  position = <vec3>[0, 0, 0];
+  screenDragPoint = [0, 0];
+  settings_: SettingsManager;
+  speedModifier = 1;
+  startMouseX = 0;
+  startMouseY = 0;
   camDistBuffer = <Kilometers>0;
 
   constructor() {
@@ -254,11 +255,11 @@ export class Camera {
     });
   }
 
-  public get zoomTarget(): number {
+  get zoomTarget(): number {
     return this.zoomTarget_;
   }
 
-  public set zoomTarget(val: number) {
+  set zoomTarget(val: number) {
     // Clamp to [0.01, 1]
     val = Math.max(val, 0.01);
     val = Math.min(val, 1);
@@ -269,13 +270,13 @@ export class Camera {
   /**
    * TODO: This should be moved to another class
    */
-  public static earthHitTest(gl: WebGL2RenderingContext, gpuPickingFrameBuffer: WebGLFramebuffer, pickReadPixelBuffer: Float32Array, x: number, y: number): boolean {
+  static earthHitTest(gl: WebGL2RenderingContext, gpuPickingFrameBuffer: WebGLFramebuffer, pickReadPixelBuffer: Float32Array, x: number, y: number): boolean {
     gl.bindFramebuffer(gl.FRAMEBUFFER, gpuPickingFrameBuffer);
     gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pickReadPixelBuffer);
     return pickReadPixelBuffer[0] === 0 && pickReadPixelBuffer[1] === 0 && pickReadPixelBuffer[2] === 0;
   }
 
-  public autoRotate(val?: boolean): void {
+  autoRotate(val?: boolean): void {
     if (this.settings_.autoRotateSpeed === 0) this.settings_.autoRotateSpeed = 0.0075;
 
     if (typeof val == 'undefined') {
@@ -285,7 +286,7 @@ export class Camera {
     this.isAutoRotate_ = val;
   }
 
-  public camSnap(pitch: Radians, yaw: Radians): void {
+  camSnap(pitch: Radians, yaw: Radians): void {
     // this.isPanReset = true
     this.camPitchTarget = pitch;
     this.camYawTarget_ = normalizeAngle(yaw);
@@ -295,7 +296,7 @@ export class Camera {
     this.isAutoPitchYawToTarget = true;
   }
 
-  public changeCameraType(orbitManager: OrbitManager) {
+  changeCameraType(orbitManager: OrbitManager) {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
@@ -338,7 +339,7 @@ export class Camera {
     }
   }
 
-  public zoomWheel(delta: number): void {
+  zoomWheel(delta: number): void {
     if (delta < 0) {
       this.isZoomIn = true;
     } else {
@@ -392,15 +393,7 @@ export class Camera {
     }
   }
 
-  public changeZoom(zoom: ZoomValue | number): void {
-    if (zoom === 'geo') {
-      this.zoomTarget = 0.82;
-      return;
-    }
-    if (zoom === 'leo') {
-      this.zoomTarget = 0.45;
-      return;
-    }
+  changeZoom(zoom: ZoomValue | number): void {
     if (typeof zoom !== 'number') throw new Error('Invalid Zoom Value');
     if (zoom > 1 || zoom < 0) throw new Error('Invalid Zoom Value');
     this.zoomTarget = zoom;
@@ -408,7 +401,7 @@ export class Camera {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  public draw(target?: SatObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+  draw(target?: SatObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
     // TODO: This should be handled better
     target ??= <SatObject>{
       id: -1,
@@ -487,7 +480,7 @@ export class Camera {
     }
   }
 
-  public exitFixedToSat(): void {
+  exitFixedToSat(): void {
     if (this.cameraType !== CameraType.FIXED_TO_SAT) return;
 
     const cameraDistance = this.getCameraDistance();
@@ -515,7 +508,7 @@ export class Camera {
     }
   }
 
-  public getZoomFromDistance(distance: Kilometers): number {
+  getZoomFromDistance(distance: Kilometers): number {
     return Math.pow((distance - this.settings_.minZoomDistance) / (this.settings_.maxZoomDistance - this.settings_.minZoomDistance), 1 / ZOOM_EXP);
   }
 
@@ -525,7 +518,7 @@ export class Camera {
    * Zoom level is ALWAYS raised to the power of ZOOM_EXP to ensure that zooming out is faster than zooming in
    * TODO: This should be handled before getting the zoomLevel_ value
    */
-  public getCameraDistance(): Kilometers {
+  getCameraDistance(): Kilometers {
     return <Kilometers>(Math.pow(this.zoomLevel_, ZOOM_EXP) * (this.settings_.maxZoomDistance - this.settings_.minZoomDistance) + this.settings_.minZoomDistance);
   }
 
@@ -534,12 +527,12 @@ export class Camera {
    *
    * Used in RayCasting
    */
-  public getCamPos(): vec3 {
+  getCamPos(): vec3 {
     vec3.transformMat4(this.position, this.position, this.camMatrix);
     return this.position;
   }
 
-  public getDistFromEarth(): Kilometers {
+  getDistFromEarth(): Kilometers {
     const position = this.getCamPos();
     return <Kilometers>Math.sqrt(position[0] ** 2 + position[1] ** 2 + position[2] ** 2);
   }
@@ -581,7 +574,7 @@ export class Camera {
     return radius;
   }
 
-  public getForwardVector(): vec3 {
+  getForwardVector(): vec3 {
     const inverted = mat4.create();
     const forward = vec3.create();
 
@@ -591,7 +584,7 @@ export class Camera {
     return forward;
   }
 
-  public init(settings: SettingsManager) {
+  init(settings: SettingsManager) {
     this.settings_ = settings;
 
     const inputManager = keepTrackApi.getInputManager();
@@ -619,7 +612,7 @@ export class Camera {
     });
   }
 
-  public keyDownC_() {
+  keyDownC_() {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
@@ -656,21 +649,21 @@ export class Camera {
     }
   }
 
-  public keyDownA_() {
+  keyDownA_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsSideSpeed = -settingsManager.fpsSideSpeed;
       this.isFPSSideSpeedLock_ = true;
     }
   }
 
-  public keyDownD_() {
+  keyDownD_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsSideSpeed = settingsManager.fpsSideSpeed;
       this.isFPSSideSpeedLock_ = true;
     }
   }
 
-  public keyDownE_() {
+  keyDownE_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsVertSpeed = settingsManager.fpsVertSpeed;
       this.isFPSVertSpeedLock_ = true;
@@ -680,13 +673,13 @@ export class Camera {
     }
   }
 
-  public keyDownI_() {
+  keyDownI_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
       this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
     }
   }
 
-  public keyDownJ_() {
+  keyDownJ_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
       this.fpsYawRate = -settingsManager.fpsYawRate / this.speedModifier;
     }
@@ -695,13 +688,13 @@ export class Camera {
     }
   }
 
-  public keyDownK_() {
+  keyDownK_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
       this.fpsPitchRate = -settingsManager.fpsPitchRate / this.speedModifier;
     }
   }
 
-  public keyDownL_() {
+  keyDownL_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
       this.fpsYawRate = settingsManager.fpsYawRate / this.speedModifier;
     }
@@ -710,7 +703,7 @@ export class Camera {
     }
   }
 
-  public keyDownQ_() {
+  keyDownQ_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsVertSpeed = -settingsManager.fpsVertSpeed;
       this.isFPSVertSpeedLock_ = true;
@@ -720,24 +713,24 @@ export class Camera {
     }
   }
 
-  public keyDownR_() {
+  keyDownR_() {
     this.autoRotate();
   }
 
-  public keyDownS_() {
+  keyDownS_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
       this.isFPSForwardSpeedLock_ = true;
     }
   }
 
-  public keyDownShiftRight_() {
+  keyDownShiftRight_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsRun = 3;
     }
   }
 
-  public keyDownShift_() {
+  keyDownShift_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsRun = 0.05;
     }
@@ -746,42 +739,42 @@ export class Camera {
     settingsManager.cameraMovementSpeedMin = 0.005 / 8;
   }
 
-  public keyDownW_() {
+  keyDownW_() {
     if (this.cameraType === CameraType.FPS) {
       this.fpsForwardSpeed = settingsManager.fpsForwardSpeed;
       this.isFPSForwardSpeedLock_ = true;
     }
   }
 
-  public keyUpA_() {
+  keyUpA_() {
     if (this.fpsSideSpeed === -settingsManager.fpsSideSpeed) {
       this.isFPSSideSpeedLock_ = false;
     }
   }
 
-  public keyUpD_() {
+  keyUpD_() {
     if (this.fpsSideSpeed === settingsManager.fpsSideSpeed) {
       this.isFPSSideSpeedLock_ = false;
     }
   }
 
-  public keyUpE_() {
+  keyUpE_() {
     if (this.fpsVertSpeed === settingsManager.fpsVertSpeed) {
       this.isFPSVertSpeedLock_ = false;
     }
     this.fpsRotateRate = 0;
   }
 
-  public keyUpI_() {
+  keyUpI_() {
     this.fpsPitchRate = 0;
   }
 
   // Intentionally the same as keyUpI_
-  public keyUpK_() {
+  keyUpK_() {
     this.fpsPitchRate = 0;
   }
 
-  public keyUpJ_() {
+  keyUpJ_() {
     if (this.cameraType === CameraType.ASTRONOMY) {
       this.fpsRotateRate = 0;
     } else {
@@ -790,7 +783,7 @@ export class Camera {
   }
 
   // Intentionally the same as keyUpJ_
-  public keyUpL_() {
+  keyUpL_() {
     if (this.cameraType === CameraType.ASTRONOMY) {
       this.fpsRotateRate = 0;
     } else {
@@ -798,27 +791,27 @@ export class Camera {
     }
   }
 
-  public keyUpQ_() {
+  keyUpQ_() {
     if (this.fpsVertSpeed === -settingsManager.fpsVertSpeed) {
       this.isFPSVertSpeedLock_ = false;
     }
     this.fpsRotateRate = 0;
   }
 
-  public keyUpS_() {
+  keyUpS_() {
     if (this.fpsForwardSpeed === -settingsManager.fpsForwardSpeed) {
       this.isFPSForwardSpeedLock_ = false;
     }
   }
 
-  public keyUpShiftRight_() {
+  keyUpShiftRight_() {
     this.fpsRun = 1;
     settingsManager.cameraMovementSpeed = 0.003;
     settingsManager.cameraMovementSpeedMin = 0.005;
     this.speedModifier = 1;
   }
 
-  public keyUpShift_() {
+  keyUpShift_() {
     this.fpsRun = 1;
     settingsManager.cameraMovementSpeed = 0.003;
     settingsManager.cameraMovementSpeedMin = 0.005;
@@ -828,29 +821,28 @@ export class Camera {
     if (!this.isFPSVertSpeedLock_) this.fpsVertSpeed = 0;
   }
 
-  public keyUpW_() {
+  keyUpW_() {
     if (this.fpsForwardSpeed === settingsManager.fpsForwardSpeed) {
       this.isFPSForwardSpeedLock_ = false;
     }
   }
 
-  public lookAtLatLon(lat: Degrees, lon: Degrees, zoom?: ZoomValue | number, date = keepTrackApi.getTimeManager().simulationTimeObj): void {
-    // Setup some defaults if they aren't passed in
-    zoom ??= <ZoomValue>'leo';
-
-    // Convert the lat/long to a position on the globe and then set the this to look at that position
+  /**
+   * Sets the camera to look at a specific latitude and longitude with a given zoom level.
+   */
+  lookAtLatLon(lat: Degrees, lon: Degrees, zoom: ZoomValue | number, date = keepTrackApi.getTimeManager().simulationTimeObj): void {
     this.changeZoom(zoom);
     this.camSnap(lat2pitch(lat), lon2yaw(lon, date));
   }
 
-  public lookAtPosition(pos: EciVec3, isFaceEarth: boolean, selectedDate: Date): void {
+  lookAtPosition(pos: EciVec3, isFaceEarth: boolean, selectedDate: Date): void {
     const lla = CoordinateTransforms.eci2lla(pos, selectedDate);
     const latModifier = isFaceEarth ? 1 : -1;
     const lonModifier = isFaceEarth ? 0 : 180;
     this.camSnap(lat2pitch(<Degrees>(lla.lat * latModifier)), lon2yaw(<Degrees>(lla.lon + lonModifier), selectedDate));
   }
 
-  public setCameraType(val: CameraType) {
+  setCameraType(val: CameraType) {
     if (typeof val !== 'number') throw new TypeError();
     if (val > 6 || val < 0) throw new RangeError();
 
@@ -865,7 +857,7 @@ export class Camera {
    *
    * Splitting it into subfunctions would not be optimal
    */
-  public snapToSat(sat: SatObject, simulationTime: Date) {
+  snapToSat(sat: SatObject, simulationTime: Date) {
     if (typeof sat === 'undefined' || sat === null || sat.static) return;
 
     if (!sat.position) throw new Error('Satellite position is undefined');
@@ -933,7 +925,7 @@ export class Camera {
   /**
    * Calculate the camera's position and camera matrix
    */
-  public update(dt: Milliseconds) {
+  update(dt: Milliseconds) {
     this.updatePan_(dt);
     this.updateLocalRotation_(dt);
     this.updatePitchYawSpeeds_(dt);
@@ -989,7 +981,7 @@ export class Camera {
     }
   }
 
-  public zoomLevel(): number {
+  zoomLevel(): number {
     return this.zoomLevel_;
   }
 

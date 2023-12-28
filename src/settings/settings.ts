@@ -962,7 +962,7 @@ export class SettingsManager {
   isAutoPanD = false;
   isAutoZoomIn = false;
   isAutoZoomOut = false;
-  autoZoomSpeed = 0.0005;
+  autoZoomSpeed = 0.00002;
   maxNotionalDebris = 100000;
   dotsPerColor: number;
   /**

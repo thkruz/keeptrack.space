@@ -81,7 +81,7 @@ export enum ZoomValue {
 }
 export class Camera {
   private camYawTarget_ = <Radians>0;
-  private chaseSpeed_ = 0.0035;
+  private chaseSpeed_ = 0.0005;
   private earthCenteredPitch_ = <Radians>0;
   private earthCenteredYaw_ = <Radians>0;
   private fpsLastTime_ = <Milliseconds>0;

@@ -129,8 +129,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Agencies">
-                <input id="settings-showAgencies" type="checkbox"/>
+              <label data-position="top" data-delay="50" data-tooltip="Planned feature - This will show agencies on the globe.">
+                <input id="settings-showAgencies" type="checkbox" disabled/>
                 <span class="lever"></span>
                 Show Agencies
               </label>

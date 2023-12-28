@@ -503,16 +503,14 @@ export class StandardCatalogManager implements CatalogManager {
       controlSites
         // Remove any control sites that are closed
         .filter((controlSite) => controlSite.TStop === '')
-        // TODO: Control sites all should have an SpaceObjectType Enum
-        // Until all the control sites have enums ignore the legacy ones
-        .filter((controlSite) => typeof controlSite.type !== 'string')
         // Until all the control sites enums are implemented ignore the odd ones
-        .filter((controlSite) => controlSite.type <= 25)
+        .filter((controlSite) => controlSite.type < SpaceObjectType.MAX_SPACE_OBJECT_TYPE)
         .filter(StringExtractor.controlSiteTypeFilter)
         // Add the static properties to the control site objects
         .map((controlSite) => ({ ...{ static: true }, ...controlSite }))
         // Add the control site objects to the static set
         .forEach((controlSite) => {
+
           this.staticSet.push(controlSite);
         });
     }

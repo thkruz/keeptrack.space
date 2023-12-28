@@ -52,10 +52,11 @@ export const defaultDiv = keepTrackApi.html`
     <div class="Square-Box legend-sensor-box"></div>
     Sensor
   </li>
-  <li>
+  <!-- TODO: This is part of the showAgencies feature that is being worked on -->
+  <!-- <li>
     <div class="Square-Box legend-facility-box"></div>
     Launch Site
-  </li>
+  </li> -->
 </ul>
 `.trim();
 export const planetariumDiv = keepTrackApi.html`

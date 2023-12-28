@@ -4,6 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 import { CameraType } from '@app/singletons/camera';
 
+import { ControlSiteObject } from '@app/catalogs/control-sites';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -64,16 +65,11 @@ export class SelectSatManager extends KeepTrackPlugin {
   selectSat(satId: number) {
     if (settingsManager.isDisableSelectSat) return;
 
-    const sat = keepTrackApi.getCatalogManager().getSat(satId) as (SatObject & SensorObject) | MissileObject;
+    const sat = keepTrackApi.getCatalogManager().getSat(satId) as (SatObject & SensorObject) | MissileObject | ControlSiteObject;
 
     if (!sat) {
       this.selectSatReset_();
     } else {
-      // Selecting a non-missile non-sensor object does nothing
-      if ((!sat.active || typeof sat.active == 'undefined') && typeof sat.staticNum == 'undefined') {
-        return;
-      }
-
       // First thing we need to do is determine what type of SpaceObjectType we have
       switch (sat.type) {
         case SpaceObjectType.MECHANICAL:
@@ -91,16 +87,19 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.SPECIAL:
         case SpaceObjectType.NOTIONAL:
         case SpaceObjectType.UNKNOWN:
-          this.selectSatObject_(sat);
+          this.selectSatObject_(sat as SatObject);
           break;
         case SpaceObjectType.PAYLOAD_OWNER:
+        case SpaceObjectType.SUBORBITAL_PAYLOAD_OPERATOR:
         case SpaceObjectType.PAYLOAD_MANUFACTURER:
-          SelectSatManager.selectOwnerManufacturer_(sat);
+        case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
+        case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
+          SelectSatManager.selectOwnerManufacturer_(sat as ControlSiteObject);
           return;
         case SpaceObjectType.STAR:
           return; // Do nothing
         case SpaceObjectType.BALLISTIC_MISSILE:
-          this.selectSatObject_(sat);
+          this.selectSatObject_(sat as MissileObject);
           break;
         default:
           errorManagerInstance.log(`SelectSatManager.selectSat: Unknown SpaceObjectType: ${sat.type}`);
@@ -108,11 +107,13 @@ export class SelectSatManager extends KeepTrackPlugin {
       }
     }
 
+    const spaceObj = sat as SatObject | MissileObject;
+
     // Set the primary sat
-    this.primarySatObj = sat ?? this.noSatObj_;
+    this.primarySatObj = spaceObj ?? this.noSatObj_;
 
     // Run any other callbacks
-    keepTrackApi.methods.selectSatData(sat, sat?.id);
+    keepTrackApi.methods.selectSatData(spaceObj, spaceObj?.id);
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
@@ -204,7 +205,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.setSelectedSat(-1);
   }
 
-  private selectSatObject_(sat: (SatObject & SensorObject) | MissileObject) {
+  private selectSatObject_(sat: SatObject) {
     if (sat.id !== this.lastSelectedSat()) {
       this.selectSatChange_(sat.id);
     }
@@ -223,7 +224,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     // If we deselect an object but had previously selected one then disable/hide stuff
-    this.setSelectedSat(sat.id);
     keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
     keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
     keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
@@ -231,16 +231,24 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.setSelectedSat(sat.id);
   }
 
-  private static selectOwnerManufacturer_(sat: MissileObject | (SatObject & SensorObject)) {
+  private static selectOwnerManufacturer_(sat: ControlSiteObject) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const searchStr = catalogManagerInstance
       .getSatsFromSatData()
-      .filter((_sat) => _sat.owner === sat.country || _sat.manufacturer === sat.country) // TODO: This might not work anymroe without coutnry codes
+      .filter((_sat) => {
+        const isOwner = _sat.owner === sat.Code;
+        const isManufacturer = _sat.manufacturer === sat.Code; // TODO: This might not work anymroe without coutnry codes
+        return isOwner || isManufacturer;
+      })
       .map((_sat) => _sat.sccNum)
       .join(',');
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    uiManagerInstance.searchManager.doSearch(searchStr);
-    keepTrackApi.getMainCamera().changeZoom(0.9);
+
+    if (searchStr.length === 0) {
+      keepTrackApi.getUiManager().toast('No satellites found for this owner/manufacturer', 'caution', false);
+    } else {
+      keepTrackApi.getUiManager().searchManager.doSearch(searchStr);
+      keepTrackApi.getMainCamera().changeZoom(0.9);
+    }
   }
 
   lastSelectedSat(id?: number): number {

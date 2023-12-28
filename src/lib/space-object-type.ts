@@ -30,4 +30,5 @@ export enum SpaceObjectType {
   ENGINE_MANUFACTURER = 28,
   NOTIONAL = 29,
   FRAGMENT = 30,
+  MAX_SPACE_OBJECT_TYPE = 31,
 }

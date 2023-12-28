@@ -1,4 +1,4 @@
-import { SpaceObjectType } from "@app/lib/space-object-type";
+import { SpaceObjectType } from '@app/lib/space-object-type';
 
 export interface ControlSiteObject {
   linkIridium: any;
@@ -31,7 +31,7 @@ export interface ControlSiteObject {
 }
 
 // @ts-expect-error
-export const controlSites = [
+export const controlSites = <ControlSiteObject[]>[
   {
     Code: 'AAT',
     StateC: 'AAT',

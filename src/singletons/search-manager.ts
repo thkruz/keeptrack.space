@@ -59,7 +59,7 @@ export class SearchManager {
       if (sat?.type === SpaceObjectType.STAR) {
         catalogManagerInstance.panToStar(sat);
       } else {
-        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(satId);
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(satId);
       }
     });
 

@@ -135,7 +135,7 @@ export class CountriesMenu extends KeepTrackPlugin {
     }
 
     // If a selectSat plugin exists, deselect the selected satellite
-    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
 
     // Close Menus
     if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(true);

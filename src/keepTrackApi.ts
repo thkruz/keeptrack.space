@@ -191,7 +191,6 @@ export const keepTrackApi = {
       }
     },
     selectSatData: (sat: SatObject | MissileObject | SensorObject, satId: number) => {
-      keepTrackApi.getSoundManager()?.play('whoosh');
       keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
     },
     setSecondarySat: (sat: SatObject, satId: number) => {

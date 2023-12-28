@@ -419,10 +419,10 @@ export class MouseInput {
         uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, 'normal', true);
         break;
       case 'view-sat-info-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
         break;
       case 'view-sensor-info-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.clickedSat);
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
         getEl('menu-sensor-info').click();
         break;
       case 'view-related-sats-rmb':
@@ -556,7 +556,7 @@ export class MouseInput {
           LegendManager.change('countries');
         }
 
-        keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:
         keepTrackApi.methods.rmbMenuActions(targetId, this.clickedSat);

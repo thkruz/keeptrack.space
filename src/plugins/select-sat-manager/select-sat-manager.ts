@@ -151,6 +151,8 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private selectSatChange_(satId: number) {
+    keepTrackApi.getSoundManager()?.play('whoosh');
+
     SelectSatManager.updateCruncher_(satId);
     this.updateDotSizeAndColor_(satId);
     this.setSelectedSat(satId);

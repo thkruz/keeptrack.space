@@ -83,7 +83,7 @@ export class Collissions extends KeepTrackPlugin {
       cb: () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(this.selectSatIdOnCruncher_);
+          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
           this.selectSatIdOnCruncher_ = null;
         }

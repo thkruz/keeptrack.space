@@ -150,7 +150,7 @@ export class SatConstellations extends KeepTrackPlugin {
       .slice(0, -1);
 
     // If SelectSatManager is enabled, deselect the selected sat
-    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].objects.map((id: number) => catalogManagerInstance.getSat(id).sccNum).join(','));

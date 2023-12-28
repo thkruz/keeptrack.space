@@ -262,7 +262,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
 
     // Deselect any satellites
-    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
 
     try {
       keepTrackApi

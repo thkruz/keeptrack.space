@@ -38,7 +38,7 @@ export class UiGeolocation {
 
     StandardSensorManager.updateSensorUiStyling(<SensorObject[]>(<unknown>[sensorInfo]));
 
-    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1);
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     const mainCameraInstance = keepTrackApi.getMainCamera();
     maxrange > 6000 ? mainCameraInstance.changeZoom(ZoomValue.GEO) : mainCameraInstance.changeZoom(ZoomValue.LEO);
     mainCameraInstance.camSnap(lat2pitch(lat), lon2yaw(lon, timeManagerInstance.simulationTimeObj));

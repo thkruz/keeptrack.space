@@ -89,7 +89,7 @@ export abstract class UrlManager {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.getIdFromIntlDes(val.toUpperCase());
         if (urlSatId !== null && catalogManagerInstance.getSat(urlSatId).active) {
-          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(urlSatId);
+          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {
           uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
         }
@@ -106,7 +106,7 @@ export abstract class UrlManager {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.getIdFromSccNum(parseInt(val));
         if (urlSatId !== null) {
-          keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(urlSatId);
+          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {
           uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
         }

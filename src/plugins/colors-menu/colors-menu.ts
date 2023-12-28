@@ -126,7 +126,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     // If selecteSatManager is loaded, clear selected sat
-    keepTrackApi.getPlugin(SelectSatManager)?.setSelectedSat(-1); // clear selected sat
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // clear selected sat
 
     if (colorName !== 'sunlight') {
       catalogManagerInstance.satCruncher.postMessage({

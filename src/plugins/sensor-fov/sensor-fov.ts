@@ -20,8 +20,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import fovPng from '@public/img/icons/fov.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -64,7 +64,7 @@ export class SensorFov extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject): void => {
+      cb: (sensor: SensorObject | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
@@ -115,7 +115,7 @@ export class SensorFov extends KeepTrackPlugin {
   }
 
   public enableFovView() {
-    keepTrackApi.methods.changeSensorMarkers(this.PLUGIN_NAME);
+    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
     settingsManager.isFOVBubbleModeOn = true;
     settingsManager.isSatOverflyModeOn = false;

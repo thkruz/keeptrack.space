@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { OrbitReferences } from '@app/plugins/orbit-references/orbit-references';
@@ -18,12 +19,12 @@ describe('OrbitReferences', () => {
   it('should_not_throw_error', () => {
     const orbitReferences = new OrbitReferences();
     expect(() => orbitReferences.init()).not.toThrow();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
-    expect(() => keepTrackApi.methods.selectSatData(defaultSat, 0)).not.toThrow();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, 0)).not.toThrow();
 
     keepTrackApi.getCatalogManager().analSatSet = [defaultSat];
-    keepTrackApi.getCatalogManager().selectedSat = 0;
+    keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
     keepTrackApi.getCatalogManager().insertNewAnalystSatellite = () => defaultSat;
     getEl('orbit-references-link').click();
   });

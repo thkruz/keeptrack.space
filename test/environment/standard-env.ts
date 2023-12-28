@@ -34,6 +34,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
   }));
   keepTrackApi.containerRoot = null;
+  keepTrackApi.unregisterAllEvents();
   document.body.innerHTML = `<div id="keeptrack-root"></div>`;
   setupDefaultHtml();
 
@@ -294,7 +295,7 @@ export const setupDefaultHtml = () => {
 };
 
 export const clearAllCallbacks = () => {
-  for (const callback in keepTrackApi.callbacks) {
-    keepTrackApi.callbacks[callback] = [];
+  for (const callback in keepTrackApi.events) {
+    keepTrackApi.events[callback] = [];
   }
 };

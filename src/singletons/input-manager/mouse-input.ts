@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
-import { GetSatType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
@@ -64,7 +64,7 @@ export class MouseInput {
 
     UrlManager.updateURL();
 
-    keepTrackApi.methods.canvasMouseDown(evt);
+    keepTrackApi.runEvent(KeepTrackApiEvents.canvasMouseDown, evt);
   }
 
   public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {
@@ -548,7 +548,7 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:
-        keepTrackApi.methods.rmbMenuActions(targetId, this.clickedSat);
+        keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
 

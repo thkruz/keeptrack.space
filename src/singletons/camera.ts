@@ -20,12 +20,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { OrbitManager, SatObject, SatShader } from '@app/interfaces';
+import { KeepTrackApiEvents, OrbitManager, SatObject, SatShader } from '@app/interfaces';
 import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
-import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
+import { keepTrackApi } from '../keepTrackApi';
 import { SpaceObjectType } from '../lib/space-object-type';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';

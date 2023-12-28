@@ -1,5 +1,5 @@
-import { GetSatType, SatObject, SatPassTimes } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { GetSatType, KeepTrackApiEvents, SatObject, SatPassTimes } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { MILLISECONDS_PER_DAY } from '@app/lib/constants';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';

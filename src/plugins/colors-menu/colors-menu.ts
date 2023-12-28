@@ -1,4 +1,5 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { waitForCruncher } from '@app/lib/waitForCruncher';

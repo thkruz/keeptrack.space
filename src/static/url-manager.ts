@@ -1,4 +1,4 @@
-import { GetSatType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { getEl } from '../lib/get-el';
@@ -20,7 +20,7 @@ export abstract class UrlManager {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
     if (!uiManagerInstance.searchManager) return;
     const currentSearch = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
@@ -82,7 +82,7 @@ export abstract class UrlManager {
 
   private static handleIntldesParam_(val: string) {
     keepTrackApi.register({
-      event: 'onKeepTrackReady',
+      event: KeepTrackApiEvents.onKeepTrackReady,
       cbName: 'getVariableSat',
       cb: () => {
         const uiManagerInstance = keepTrackApi.getUiManager();
@@ -99,7 +99,7 @@ export abstract class UrlManager {
 
   private static handleSatParam_(val: string) {
     keepTrackApi.register({
-      event: 'onKeepTrackReady',
+      event: KeepTrackApiEvents.onKeepTrackReady,
       cbName: 'getVariableSat',
       cb: () => {
         const uiManagerInstance = keepTrackApi.getUiManager();
@@ -115,7 +115,7 @@ export abstract class UrlManager {
   }
 
   private static handleMislParam_(val: string) {
-    var subVal = val.split(',');
+    const subVal = val.split(',');
     (<HTMLSelectElement>getEl('ms-type')).value = subVal[0].toString();
     (<HTMLSelectElement>getEl('ms-attacker')).value = subVal[1].toString();
     (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
@@ -137,7 +137,7 @@ export abstract class UrlManager {
   private static handleRateParam_(val: string) {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    var rate = parseFloat(val);
+    let rate = parseFloat(val);
     if (isNaN(rate)) {
       uiManagerInstance.toast(`Propagation rate of "${rate}" is not a valid float!`, 'caution', true);
       return;

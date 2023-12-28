@@ -2,7 +2,8 @@ import * as gremlins from 'gremlins.js';
 
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
 import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';

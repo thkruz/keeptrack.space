@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { DebugMenuPlugin } from '@app/plugins/debug/debug';
@@ -130,25 +131,25 @@ export class KeyboardInput {
         timeManagerInstance.calculateSimulationTime();
         timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 1000 * 60); // Move back a Minute
         settingsManager.isPropRateChange = true;
-        keepTrackApi.methods.updateDateTime(new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;
       case '.':
         timeManagerInstance.calculateSimulationTime();
         timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 1000 * 60); // Move forward a Minute
         settingsManager.isPropRateChange = true;
-        keepTrackApi.methods.updateDateTime(new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;
       case '<':
         timeManagerInstance.calculateSimulationTime();
         timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 4000 * 60); // Move back 4 Minutes
         settingsManager.isPropRateChange = true;
-        keepTrackApi.methods.updateDateTime(new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;
       case '>':
         timeManagerInstance.calculateSimulationTime();
         timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 4000 * 60); // Move forward 4 Minutes
         settingsManager.isPropRateChange = true;
-        keepTrackApi.methods.updateDateTime(new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;
       case '0':
         timeManagerInstance.calculateSimulationTime();

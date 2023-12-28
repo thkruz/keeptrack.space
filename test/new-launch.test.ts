@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
@@ -49,8 +50,8 @@ describe('NewLaunch_form', () => {
       },
     };
 
-    keepTrackApi.methods.selectSatData(defaultSat, defaultSat.id);
-    keepTrackApi.methods.bottomMenuClick(newLaunchPlugin.bottomIconElementName);
+    keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, defaultSat.id);
+    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
 
     expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
     jest.advanceTimersByTime(1000);

@@ -20,8 +20,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { CatalogManager, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { CatalogManager, KeepTrackApiEvents, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import fencePng from '@public/img/icons/fence.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -68,7 +68,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
   }
 
   private enableSurvView_(catalogManagerInstance: CatalogManager) {
-    keepTrackApi.methods.changeSensorMarkers(this.PLUGIN_NAME);
+    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
     settingsManager.isShowSurvFence = true;
     settingsManager.isSatOverflyModeOn = false;
@@ -94,7 +94,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject): void => {
+      cb: (sensor: SensorObject | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;

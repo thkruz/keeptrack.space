@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { standardPluginSuite } from './generic-tests';
@@ -36,7 +37,7 @@ describe('Sound Manager', () => {
   });
 
   it('should_be_able_to_speak', () => {
-    keepTrackApi.methods.uiManagerInit();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     // Mock SpeechSynthesisUtterance
     global.SpeechSynthesisUtterance = jest.fn(() => ({
       lang: 'en-US',

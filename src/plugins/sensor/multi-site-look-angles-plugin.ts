@@ -1,5 +1,5 @@
-import { SatObject, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { MINUTES_PER_DAY, TAU } from '@app/lib/constants';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';

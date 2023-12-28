@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Astronomy } from '@app/plugins/astronomy/astronomy';
 import { defaultSensor } from './environment/apiMocks';
@@ -7,7 +8,7 @@ describe('astronomy plugin', () => {
   standardPluginSuite(Astronomy);
   standardPluginMenuButtonTests(Astronomy);
 
-  keepTrackApi.methods.setSensor(defaultSensor, 0);
+  keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 0);
   keepTrackApi.getCatalogManager().isStarManagerLoaded = true;
   standardPluginMenuButtonTests(Astronomy);
 });

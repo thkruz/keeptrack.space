@@ -1,5 +1,5 @@
 import { keepTrackContainer } from '@app/container';
-import { Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { StandardSensorManager } from '@app/plugins/sensor/sensorManager';
@@ -21,22 +21,22 @@ describe('SensorFov_class', () => {
   it('test_bottom_menu_click', () => {
     websiteInit(SensorFovPlugin);
 
-    expect(() => keepTrackApi.methods.bottomMenuClick(SensorFovPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
 
     const sensorManagerInstance = new StandardSensorManager();
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
-    expect(() => keepTrackApi.methods.bottomMenuClick(SensorFovPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Test changing sensor
   it('test_change_sensor', () => {
     websiteInit(SensorFovPlugin);
 
-    expect(() => keepTrackApi.methods.setSensor('sensor', 1)).not.toThrow();
-    expect(() => keepTrackApi.methods.setSensor(null, null)).not.toThrow();
-    expect(() => keepTrackApi.methods.setSensor(defaultSensor, 0)).not.toThrow();
-    expect(() => keepTrackApi.methods.setSensor(null, null)).not.toThrow();
-    expect(() => keepTrackApi.methods.setSensor(defaultSensor, 2)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, 'sensor', 1)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 0)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 2)).not.toThrow();
   });
 });

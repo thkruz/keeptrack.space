@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
 import numeric from 'numeric';
 import { ControlSiteObject } from '../../catalogs/control-sites';

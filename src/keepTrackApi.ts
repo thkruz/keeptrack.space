@@ -1,11 +1,13 @@
+/* eslint-disable class-methods-use-this */
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import {
   CatalogManager,
+  CatalogObject,
   ColorSchemeManager,
   Constructor,
   GroupsManager,
-  MissileObject,
+  KeepTrackApiEvents,
   OrbitManager,
   SatObject,
   SensorManager,
@@ -47,77 +49,45 @@ declare global {
   }
 }
 
-export type KeepTrackApiRegisterParams = {
-  event: KeepTrackApiEvents | string;
+type KeepTrackApiEventArguments = {
+  [KeepTrackApiEvents.bottomMenuClick]: [string];
+  [KeepTrackApiEvents.hideSideMenus]: [];
+  [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
+  [KeepTrackApiEvents.orbitManagerInit]: [];
+  [KeepTrackApiEvents.drawManagerLoadScene]: [];
+  [KeepTrackApiEvents.drawOptionalScenery]: [];
+  [KeepTrackApiEvents.updateLoop]: [];
+  [KeepTrackApiEvents.rmbMenuActions]: [string, number];
+  [KeepTrackApiEvents.rightBtnMenuAdd]: [];
+  [KeepTrackApiEvents.updateDateTime]: [Date];
+  [KeepTrackApiEvents.uiManagerFinal]: [];
+  [KeepTrackApiEvents.resetSensor]: [];
+  [KeepTrackApiEvents.setSensor]: [SensorObject | string, number];
+  [KeepTrackApiEvents.changeSensorMarkers]: [string];
+  [KeepTrackApiEvents.altCanvasResize]: [];
+  [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
+  [KeepTrackApiEvents.onWatchlistUpdated]: [number[]];
+  [KeepTrackApiEvents.staticOffsetChange]: [number];
+  [KeepTrackApiEvents.onLineAdded]: [LineManager];
+  [KeepTrackApiEvents.sensorDotSelected]: [SensorObject];
+  [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
+  [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
+  [KeepTrackApiEvents.onCruncherMessage]: [];
+  [KeepTrackApiEvents.onCruncherReady]: [];
+  [KeepTrackApiEvents.onHelpMenuClick]: [];
+  [KeepTrackApiEvents.onKeepTrackReady]: [];
+  [KeepTrackApiEvents.selectSatData]: [SatObject, number];
+  [KeepTrackApiEvents.setSecondarySat]: [SatObject, number];
+  [KeepTrackApiEvents.uiManagerInit]: [];
+  [KeepTrackApiEvents.uiManagerOnReady]: [];
+  [KeepTrackApiEvents.updateSelectBox]: [CatalogObject];
+};
+
+interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
+  event: T;
   cbName: string;
-  cb:
-    | ((iconName: string) => void)
-    | (() => void)
-    | (() => boolean)
-    | ((sat: SatObject, satId: number) => void)
-    | ((sensor: SensorObject) => void)
-    | ((gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => void)
-    | ((sensor: SensorObject | string, staticNum: number) => void)
-    | ((watchlistList: number[]) => void)
-    | ((lineManager: LineManager) => void);
-};
-
-/**
- * Registers a callback function for a specific event.
- * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
- * @param {string} params.cbName - The name of the callback function.
- * @param params.cb - The callback function to register.
- * @throws An error if the event is invalid.
- */
-export const register = (params: KeepTrackApiRegisterParams) => {
-  // If this is a valid callback
-  if (typeof keepTrackApi.callbacks[params.event] !== 'undefined') {
-    // TODO: Pass the parameters to a validation function to ensure they are correct
-    // Add the callback
-    keepTrackApi.callbacks[params.event].push({ name: params.cbName, cb: params.cb });
-  } else {
-    errorManagerInstance.error(new Error(`Invalid callback "${params.event}"!`), 'keepTrackApi.register');
-  }
-};
-export const unregister = (params: { event: string; cbName: string }) => {
-  // If this is a valid callback
-  if (typeof keepTrackApi.callbacks[params.event] !== 'undefined') {
-    for (let i = 0; i < keepTrackApi.callbacks[params.event].length; i++) {
-      if (keepTrackApi.callbacks[params.event][i].name == params.cbName) {
-        keepTrackApi.callbacks[params.event].splice(i, 1);
-        return;
-      }
-    }
-    // If we got this far, it means we couldn't find the callback
-    errorManagerInstance.error(new Error(`Callback "${params.cbName} not found"!`), 'keepTrackApi.unregister');
-  } else {
-    // Couldn't find the method
-    errorManagerInstance.error(new Error(`Invalid callback "${params.event}"!`), 'keepTrackApi.unregister');
-  }
-};
-export const glsl = (literals: TemplateStringsArray, ...placeholders: Array<any>): string => {
-  let str = '';
-  for (let i = 0; i < placeholders.length; i++) {
-    str += literals[i];
-    str += placeholders[i];
-  }
-  str += literals[literals.length - 1];
-  return str;
-};
-
-/** This is not a standard function. It is used in development for formatting template literals.
-example: keepTrackApi.html\`\<div>example\</div>\`
- */
-export const html = (strings: TemplateStringsArray, ...placeholders: any[]) => {
-  for (const placeholder of placeholders) {
-    if (typeof placeholder !== 'string') {
-      errorManagerInstance.error(new Error('Invalid input'), 'keepTrackApi.html');
-    }
-  }
-  return String.raw(strings, ...placeholders);
-};
-
-export type KeepTrackApi = typeof keepTrackApi;
+  cb: (...args: KeepTrackApiEventArguments[T]) => void;
+}
 
 type rmbMenuItem = {
   /**
@@ -146,246 +116,123 @@ type rmbMenuItem = {
   isRmbOnSat: boolean;
 };
 
-export const keepTrackApi = {
-  html: html,
-  glsl: glsl,
-  register: register,
-  containerRoot: <HTMLDivElement>null,
-  initializeKeepTrack: null,
-  unregister: unregister,
-  isInitialized: false,
-  callbacks: {
-    onKeepTrackReady: [],
-    selectSatData: [],
-    setSecondarySat: [],
-    updateSelectBox: [],
-    onCruncherReady: [],
-    onCruncherMessage: [],
-    onHelpMenuClick: [],
-    uiManagerInit: [],
-    uiManagerOnReady: [],
-    bottomMenuClick: [],
-    hideSideMenus: [],
-    nightToggle: [],
-    orbitManagerInit: [],
-    drawManagerLoadScene: [],
-    drawOptionalScenery: [],
-    updateLoop: [],
-    rmbMenuActions: [],
-    rightBtnMenuAdd: [],
-    updateDateTime: [],
-    uiManagerFinal: [],
-    resetSensor: [],
-    setSensor: [],
-    changeSensorMarkers: [],
+export class KeepTrackApi {
+  /**
+   * Unregisters all events in the KeepTrackApi. Used for testing.
+   */
+  unregisterAllEvents() {
+    for (const event of Object.values(KeepTrackApiEvents)) {
+      this.events[event] = [];
+    }
+  }
+
+  containerRoot = <HTMLDivElement>null;
+  isInitialized = false;
+  loadedPlugins = <KeepTrackPlugin[]>[];
+  rmbMenuItems = <rmbMenuItem[]>[];
+  events = <any>{
     altCanvasResize: [],
-    endOfDraw: [],
-    onWatchlistUpdated: [],
-    staticOffsetChange: [],
-    onLineAdded: [],
-    sensorDotSelected: [],
-    canvasMouseDown: [],
-    touchStart: [],
-  },
-  methods: {
-    onHelpMenuClick: () => {
-      if (keepTrackApi.callbacks.onHelpMenuClick.some((cb: { cb: () => boolean }) => cb.cb())) {
-        return;
-      }
-    },
-    selectSatData: (sat: SatObject | MissileObject | SensorObject, satId: number) => {
-      keepTrackApi.callbacks.selectSatData.forEach((cb: any) => cb.cb(sat, satId));
-    },
-    setSecondarySat: (sat: SatObject, satId: number) => {
-      keepTrackApi.callbacks.setSecondarySat.forEach((cb: any) => cb.cb(sat, satId));
-    },
-    onKeepTrackReady: () => {
-      keepTrackApi.callbacks.onKeepTrackReady.forEach((cb: any) => cb.cb());
-    },
-    updateSelectBox: (sat: any) => {
-      keepTrackApi.callbacks.updateSelectBox.forEach((cb: any) => cb.cb(sat));
-    },
-    onCruncherReady: () => {
-      keepTrackApi.callbacks.onCruncherReady.forEach((cb: any) => cb.cb());
-    },
-    onCruncherMessage: () => {
-      keepTrackApi.callbacks.onCruncherMessage.forEach((cb: any) => cb.cb());
-    },
-    uiManagerInit: () => {
-      keepTrackApi.callbacks.uiManagerInit.forEach((cb: any) => cb.cb());
-    },
-    uiManagerOnReady: () => {
-      keepTrackApi.callbacks.uiManagerOnReady.forEach((cb: any) => cb.cb());
-    },
-    bottomMenuClick: (iconName: string) => {
-      try {
-        keepTrackApi.getSoundManager()?.play('genericBeep');
-      } catch {
-        // ignore
-      }
-      keepTrackApi.callbacks.bottomMenuClick.forEach((cb: any) => cb.cb(iconName));
-    },
-    hideSideMenus: () => {
-      keepTrackApi.callbacks.hideSideMenus.forEach((cb: any) => cb.cb());
-    },
+    nightToggle: [],
+  };
+
+  methods = {
     nightToggle: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => {
-      keepTrackApi.callbacks.nightToggle.forEach((cb: any) => cb.cb(gl, nightTexture, texture));
+      this.events.nightToggle.forEach((cb: any) => cb.cb(gl, nightTexture, texture));
     },
-    orbitManagerInit: () => {
-      keepTrackApi.callbacks.orbitManagerInit.forEach((cb: any) => cb.cb());
-    },
-    drawManagerLoadScene: () => {
-      keepTrackApi.callbacks.drawManagerLoadScene.forEach((cb: any) => cb.cb());
-    },
-    drawOptionalScenery: () => {
-      keepTrackApi.callbacks.drawOptionalScenery.forEach((cb: any) => cb.cb());
-    },
-    updateLoop: () => {
-      keepTrackApi.callbacks.updateLoop.forEach((cb: any) => cb.cb());
-    },
-    rmbMenuActions: (menuName: string, satnum = -1) => {
-      keepTrackApi.callbacks.rmbMenuActions.forEach((cb: any) => cb.cb(menuName, satnum));
-    },
-    rightBtnMenuAdd: () => {
-      keepTrackApi.callbacks.rightBtnMenuAdd.forEach((cb: any) => cb.cb());
-    },
-    updateDateTime: (date: Date) => {
-      keepTrackApi.callbacks.updateDateTime.forEach((cb: any) => cb.cb(date));
-    },
-    uiManagerFinal: () => {
-      keepTrackApi.callbacks.uiManagerFinal.forEach((cb: any) => cb.cb());
-    },
-    resetSensor: () => {
-      keepTrackApi.callbacks.resetSensor.forEach((cb: any) => cb.cb());
-    },
-    setSensor: (sensor: SensorObject | string | null, id?: number) => {
-      keepTrackApi.callbacks.setSensor.forEach((cb: any) => cb.cb(sensor, id));
-    },
-    changeSensorMarkers: (caller: string) => {
-      keepTrackApi.callbacks.changeSensorMarkers.forEach((cb: any) => cb.cb(caller));
-    },
-    altCanvasResize: (): boolean => keepTrackApi.callbacks.altCanvasResize.some((cb: any) => cb.cb()),
-    endOfDraw: (dt?: Milliseconds) => {
-      keepTrackApi.callbacks.endOfDraw.forEach((cb: any) => cb.cb(dt));
-    },
-    onWatchlistUpdated: (watchlist: number[]) => {
-      keepTrackApi.callbacks.onWatchlistUpdated.forEach((cb: any) => cb.cb(watchlist));
-    },
-    staticOffsetChange: (staticOffset: number) => {
-      keepTrackApi.callbacks.staticOffsetChange.forEach((cb: any) => cb.cb(staticOffset));
-    },
-    onLineAdded: () => {
-      keepTrackApi.callbacks.onLineAdded.forEach((cb: any) => cb.cb(keepTrackApi.getLineManager()));
-    },
-    sensorDotSelected: (sensor: SensorObject) => {
-      keepTrackApi.callbacks.sensorDotSelected.forEach((cb: any) => cb.cb(sensor));
-    },
-    canvasMouseDown: (e: MouseEvent) => {
-      keepTrackApi.callbacks.canvasMouseDown.forEach((cb: any) => cb.cb(e));
-    },
-    touchStart: (e: TapTouchEvent | PanTouchEvent) => {
-      keepTrackApi.callbacks.touchStart.forEach((cb: any) => cb.cb(e));
-    },
-  },
-  loadedPlugins: <KeepTrackPlugin[]>[],
-  getPlugin: <T extends KeepTrackPlugin>(pluginClass: Constructor<T>): T | null => {
-    if (keepTrackApi.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass)) {
-      return keepTrackApi.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin instanceof pluginClass) as T;
+    altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb: any) => cb.cb()),
+  };
+
+  runEvent<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
+    this.verifyEvent_(event);
+    (<KeepTrackApiRegisterParams<T>[]>this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));
+  }
+
+  /** If the callback does not exist, create it */
+  private verifyEvent_(event: KeepTrackApiEvents) {
+    if (typeof this.events[event] === 'undefined') {
+      this.events[event] = [];
+    }
+  }
+
+  getPlugin<T extends KeepTrackPlugin>(pluginClass: Constructor<T>): T | null {
+    if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass)) {
+      return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin instanceof pluginClass) as T;
     }
     return null;
-  },
-  rmbMenuItems: <rmbMenuItem[]>[],
-  getSoundManager: () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager),
-  getStarManager: () => keepTrackContainer.get<StarManager>(Singletons.StarManager),
-  getRenderer: () => keepTrackContainer.get<WebGLRenderer>(Singletons.WebGLRenderer),
-  getScene: () => keepTrackContainer.get<Scene>(Singletons.Scene),
-  getCatalogManager: () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager),
-  getSensorManager: () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager),
-  getUiManager: () => keepTrackContainer.get<UiManager>(Singletons.UiManager),
-  getInputManager: () => keepTrackContainer.get<InputManager>(Singletons.InputManager),
-  getGroupsManager: () => keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager),
-  getTimeManager: () => keepTrackContainer.get<TimeManager>(Singletons.TimeManager),
-  getOrbitManager: () => keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager),
-  getColorSchemeManager: () => <StandardColorSchemeManager>(<unknown>keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager)),
-  getDotsManager: () => keepTrackContainer.get<DotsManager>(Singletons.DotsManager),
-  getSensorMath: () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath),
-  getLineManager: () => keepTrackContainer.get<LineManager>(Singletons.LineManager),
-  getHoverManager: () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager),
-  getMainCamera: () => keepTrackContainer.get<Camera>(Singletons.MainCamera),
-  getMeshManager: () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager),
-};
+  }
 
-/**
- * Enum containing the registrable events used in the KeepTrack API.
- */
+  /** This is not a standard function. It is used in development for formatting template literals.
+   * example: keepTrackApi.html\`\<div>example\</div>\`
+   * TODO: This should be a static method
+   */
+  // eslint-disable-next-line class-methods-use-this
+  html(strings: TemplateStringsArray, ...placeholders: any[]) {
+    for (const placeholder of placeholders) {
+      if (typeof placeholder !== 'string') {
+        errorManagerInstance.error(new Error('Invalid input'), 'keepTrackApi.html');
+      }
+    }
+    return String.raw(strings, ...placeholders);
+  }
 
-export enum KeepTrackApiEvents {
-  onHelpMenuClick = 'onHelpMenuClick',
-  /**
-   * Run at the end of SelectSatManager.selectSat with parameters (sat: SatObject, satId: number)
+  /** This is not a standard function. It is used in development for formatting template literals.
+   * example: keepTrackApi.glsl\`uniform float example\`
+   * TODO: This should be a static method
    */
-  selectSatData = 'selectSatData',
+  // eslint-disable-next-line class-methods-use-this
+  glsl(literals: TemplateStringsArray, ...placeholders: Array<any>): string {
+    let str = '';
+    for (let i = 0; i < placeholders.length; i++) {
+      str += literals[i];
+      str += placeholders[i];
+    }
+    str += literals[literals.length - 1];
+    return str;
+  }
+
   /**
-   * Run at the end of catalogManager.setSecondarySat with parameters (sat: SatObject, satId: number)
+   * Registers a callback function for a specific event.
+   * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
+   * @param {string} params.cbName - The name of the callback function.
+   * @param params.cb - The callback function to register.
+   * @throws An error if the event is invalid.
    */
-  setSecondarySat = 'setSecondarySat',
-  onKeepTrackReady = 'onKeepTrackReady',
-  updateSelectBox = 'updateSelectBox',
-  onCruncherReady = 'onCruncherReady',
-  onCruncherMessage = 'onCruncherMessage',
-  uiManagerInit = 'uiManagerInit',
-  uiManagerOnReady = 'uiManagerOnReady',
-  bottomMenuClick = 'bottomMenuClick',
-  hideSideMenus = 'hideSideMenus',
-  nightToggle = 'nightToggle',
-  orbitManagerInit = 'orbitManagerInit',
-  drawManagerLoadScene = 'drawManagerLoadScene',
-  drawOptionalScenery = 'drawOptionalScenery',
-  updateLoop = 'updateLoop',
-  rmbMenuActions = 'rmbMenuActions',
-  /**
-   * Runs during inputManager.init immediately before adding the clear lines and clear screen buttons
-   */
-  rightBtnMenuAdd = 'rightBtnMenuAdd',
-  updateDateTime = 'updateDateTime',
-  uiManagerFinal = 'uiManagerFinal',
-  resetSensor = 'resetSensor',
-  /**
-   * Run in the setSensor method of SensorManager instance with parameters (sensor: SensorObject | string, staticId: number)
-   */
-  setSensor = 'setSensor',
-  changeSensorMarkers = 'changeSensorMarkers',
-  altCanvasResize = 'altCanvasResize',
-  endOfDraw = 'endOfDraw',
-  /**
-   * Run in the updateWatchlist method of CatalogManager instance with parameters (watchlist: number[])
-   */
-  onWatchlistUpdated = 'onWatchlistUpdated',
-  /**
-   * Run in the staticOffset setter of TimeManager instance with parameters (staticOffset: number)
-   */
-  staticOffsetChange = 'staticOffsetChange',
-  /**
-   * Runs when a line is added to the line manager
-   */
-  onLineAdded = 'onLineAdded',
-  /**
-   * Runs when a sensor dot is selected but not when a sensor is selected from the sensor menu
-   */
-  sensorDotSelected = 'sensorDotSelected',
-  canvasMouseDown = 'canvasMouseDown',
-  touchStart = 'touchStart',
+  register<T extends KeepTrackApiEvents>(params: { event: T; cbName: string; cb: (...args: KeepTrackApiEventArguments[T]) => void }) {
+    this.verifyEvent_(params.event);
+
+    // Add the callback
+    this.events[params.event].push({ name: params.cbName, cb: params.cb });
+  }
+
+  unregister(params: { event: KeepTrackApiEvents; cbName: string }) {
+    for (let i = 0; i < this.events[params.event].length; i++) {
+      if (this.events[params.event][i].name == params.cbName) {
+        this.events[params.event].splice(i, 1);
+        return;
+      }
+    }
+    // If we got this far, it means we couldn't find the callback
+    errorManagerInstance.error(new Error(`Callback "${params.cbName} not found"!`), 'keepTrackApi.unregister');
+  }
+
+  getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
+  getStarManager = () => keepTrackContainer.get<StarManager>(Singletons.StarManager);
+  getRenderer = () => keepTrackContainer.get<WebGLRenderer>(Singletons.WebGLRenderer);
+  getScene = () => keepTrackContainer.get<Scene>(Singletons.Scene);
+  getCatalogManager = () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
+  getSensorManager = () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
+  getUiManager = () => keepTrackContainer.get<UiManager>(Singletons.UiManager);
+  getInputManager = () => keepTrackContainer.get<InputManager>(Singletons.InputManager);
+  getGroupsManager = () => keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
+  getTimeManager = () => keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
+  getOrbitManager = () => keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
+  getColorSchemeManager = () => <StandardColorSchemeManager>(<unknown>keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager));
+  getDotsManager = () => keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
+  getSensorMath = () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath);
+  getLineManager = () => keepTrackContainer.get<LineManager>(Singletons.LineManager);
+  getHoverManager = () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager);
+  getMainCamera = () => keepTrackContainer.get<Camera>(Singletons.MainCamera);
+  getMeshManager = () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager);
 }
 
-/**
- * Represents an object that can be in the catalog, such as a satellite, missile, or sensor.
- */
-type CatalogObject = SatObject | MissileObject | SensorObject;
-
-export const isSensorObject = (sat: SensorObject): boolean => !!sat.objName;
-export const isMissileObject = (sat: CatalogObject): boolean => !!(<MissileObject>sat).missile;
-export const isSatObject = (sat: CatalogObject): boolean => {
-  if (!sat) return false;
-
-  return !!((<SatObject>sat).sccNum || (<SatObject>sat).intlDes || (<SatObject>sat).TLE1);
-};
+export const keepTrackApi = new KeepTrackApi();

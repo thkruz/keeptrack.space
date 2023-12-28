@@ -486,7 +486,7 @@ export class Earth {
     gl.activeTexture(gl.TEXTURE1);
 
     // If there are no callbacks, just use the night texture
-    const altNightTexBind = keepTrackApi.callbacks.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null;
+    const altNightTexBind = keepTrackApi.events.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null;
     if (!altNightTexBind) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureNight_);
     } else {

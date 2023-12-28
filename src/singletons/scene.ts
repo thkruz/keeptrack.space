@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { GreenwichMeanSiderealTime } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -105,7 +106,7 @@ export class Scene {
         this.moon.draw(this.sun.position);
       }
 
-      keepTrackApi.methods.drawOptionalScenery();
+      keepTrackApi.runEvent(KeepTrackApiEvents.drawOptionalScenery);
     }
 
     renderer.postProcessingManager.curBuffer = null;
@@ -171,7 +172,7 @@ export class Scene {
     try {
       // await tools.init();
       await this.earth.init(settingsManager, this.gl_);
-      keepTrackApi.methods.drawManagerLoadScene();
+      keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
       await keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
       if (!settingsManager.isDisableMoon) {

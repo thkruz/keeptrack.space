@@ -1,9 +1,9 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
-import { CatalogManager, GroupsManager, SatObject } from '@app/interfaces';
+import { CatalogManager, GroupsManager, KeepTrackApiEvents, SatObject } from '@app/interfaces';
 import { GroupType } from '@app/singletons/object-group';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { DopMath } from '@app/static/dop-math';
@@ -107,7 +107,7 @@ export class DopsPlugin extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
           (<HTMLInputElement>getEl('dops-alt')).value = '0';
           (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
-          keepTrackApi.methods.bottomMenuClick(this.bottomIconElementName);
+          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         } else {
           showLoading(DopsPlugin.updateSideMenu);
           this.setBottomIconToEnabled();

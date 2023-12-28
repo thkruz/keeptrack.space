@@ -1,8 +1,9 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { LineManager, LineTypes } from '@app/singletons/draw-manager/line-manager';
 import radioTowerPng from '@public/img/icons/radio-tower.png';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   isRequireSensorSelected: boolean = true;

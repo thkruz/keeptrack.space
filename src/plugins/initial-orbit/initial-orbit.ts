@@ -1,4 +1,4 @@
-import { UiManager } from '@app/interfaces';
+import { KeepTrackApiEvents, UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
@@ -12,32 +12,32 @@ let isObfitMenuOpen = false;
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    event: 'uiManagerInit',
+    event: KeepTrackApiEvents.uiManagerInit,
     cbName: 'initialOrbit',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    event: 'uiManagerFinal',
+    event: KeepTrackApiEvents.uiManagerFinal,
     cbName: 'initialOrbit',
     cb: uiManagerFinal,
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    event: 'bottomMenuClick',
+    event: KeepTrackApiEvents.bottomMenuClick,
     cbName: 'initialOrbit',
     cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
-    event: 'hideSideMenus',
+    event: KeepTrackApiEvents.hideSideMenus,
     cbName: 'initialOrbit',
     cb: hideSideMenus,
   });
 
   keepTrackApi.register({
-    event: 'onHelpMenuClick',
+    event: KeepTrackApiEvents.onHelpMenuClick,
     cbName: 'initialOrbit',
     cb: onHelpMenuClick,
   });

@@ -23,7 +23,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

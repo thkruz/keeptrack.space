@@ -26,8 +26,8 @@ describe('classification_bar_plugin', () => {
       settingsManager.classificationStr = testClassificationStr as ClassificationString;
       expect(() => classificationPlugin.init()).not.toThrow();
 
-      expect(() => keepTrackApi.callbacks.uiManagerInit.forEach((callback) => callback.cb())).not.toThrow();
-      expect(() => keepTrackApi.callbacks.uiManagerFinal.forEach((callback) => callback.cb())).not.toThrow();
+      expect(() => keepTrackApi.events.uiManagerInit.forEach((callback) => callback.cb())).not.toThrow();
+      expect(() => keepTrackApi.events.uiManagerFinal.forEach((callback) => callback.cb())).not.toThrow();
 
       expect(getEl('classification-string').innerHTML).toBe(testClassificationStr);
     });
@@ -41,7 +41,7 @@ describe('classification_bar_plugin', () => {
     settingsManager.classificationStr = 'Test' as ClassificationString;
     expect(() => classificationPlugin.init()).not.toThrow();
 
-    expect(() => keepTrackApi.callbacks.uiManagerInit.forEach((callback) => callback.cb())).not.toThrow();
-    expect(() => keepTrackApi.callbacks.uiManagerFinal.forEach((callback) => callback.cb())).not.toThrow();
+    expect(() => keepTrackApi.events.uiManagerInit.forEach((callback) => callback.cb())).not.toThrow();
+    expect(() => keepTrackApi.events.uiManagerFinal.forEach((callback) => callback.cb())).not.toThrow();
   });
 });

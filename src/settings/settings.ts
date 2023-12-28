@@ -18,8 +18,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SensorGeolocation } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, SensorGeolocation } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-scheme-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';

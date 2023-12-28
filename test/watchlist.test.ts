@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
@@ -21,8 +22,8 @@ describe('WatchlistPlugin_form', () => {
   let watchlistPlugin: WatchlistPlugin;
   beforeEach(() => {
     setupDefaultHtml();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     watchlistPlugin = new WatchlistPlugin();
     window.M = {
       keys: {

@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
@@ -496,7 +497,7 @@ export class WebGLRenderer {
     //   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 2],
     // ]);
 
-    keepTrackApi.methods.updateLoop();
+    keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
   }
 
   getCurrentViewport(target?: vec4): vec4 {

@@ -1,4 +1,5 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import recorderPng from '@public/img/icons/video.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

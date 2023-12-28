@@ -1,5 +1,5 @@
 import { keepTrackContainer } from '@app/container';
-import { Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import beep1Mp3 from '@public/audio/beep1.mp3';
@@ -61,7 +61,7 @@ export class SoundManager extends KeepTrackPlugin {
     keepTrackContainer.registerSingleton<SoundManager>(Singletons.SoundManager, this);
 
     keepTrackApi.register({
-      event: 'uiManagerInit',
+      event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         this.voices = speechSynthesis.getVoices();

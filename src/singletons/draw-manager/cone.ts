@@ -1,5 +1,5 @@
-import { SatObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { DEG2RAD, RADIUS_OF_EARTH } from '@app/lib/constants';
 import { lon2yaw } from '@app/lib/transforms';
 import { mat3, mat4, vec3 } from 'gl-matrix';

@@ -1,5 +1,6 @@
 /* */
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
@@ -171,7 +172,7 @@ export class StandardOrbitManager implements OrbitManager {
     });
     this.isInitialized_ = true;
 
-    keepTrackApi.methods.orbitManagerInit();
+    keepTrackApi.runEvent(KeepTrackApiEvents.orbitManagerInit);
   }
 
   private startCruncher_(orbitWorker?: Worker) {

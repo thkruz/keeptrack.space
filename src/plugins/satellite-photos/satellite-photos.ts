@@ -2,7 +2,8 @@ import { openColorbox } from '@app/lib/colorbox';
 import { getEl } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

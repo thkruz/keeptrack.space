@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl } from '@app/lib/get-el';
 import { slideInRight } from '@app/lib/slide';
 import { triggerSubmit } from '@app/lib/trigger-submit';

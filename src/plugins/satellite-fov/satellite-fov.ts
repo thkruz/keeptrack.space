@@ -20,7 +20,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import sat2Png from '@public/img/icons/sat2.png';
@@ -111,7 +112,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    keepTrackApi.methods.changeSensorMarkers(this.PLUGIN_NAME);
+    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
     settingsManager.isShowSurvFence = false;
     settingsManager.isFOVBubbleModeOn = false;

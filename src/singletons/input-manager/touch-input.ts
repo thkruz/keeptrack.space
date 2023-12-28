@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Camera } from '@app/singletons/camera';
@@ -162,7 +163,7 @@ export class TouchInput {
     // TODO: Make updateUrl() a setting that is disabled by default
     UrlManager.updateURL();
 
-    keepTrackApi.methods.touchStart(evt);
+    keepTrackApi.runEvent(KeepTrackApiEvents.touchStart, evt);
   }
 
   tap(evt: TapTouchEvent) {

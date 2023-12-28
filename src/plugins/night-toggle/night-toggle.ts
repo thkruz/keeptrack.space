@@ -1,4 +1,5 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 
 import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

@@ -483,7 +483,12 @@ export interface GroupsManager {
   selectedGroup: ObjectGroup;
   stopUpdatingInViewSoon: boolean;
 }
-export type CatalogObject = SatObject & RadarDataObject & MissileObject & SensorObject;
+
+/**
+ * Represents an object that can be in the catalog, such as a satellite, missile, or sensor.
+ */
+export type CatalogObject = SatObject | RadarDataObject | MissileObject | SensorObject;
+
 export interface CatalogManager {
   analSatSet: SatObject[];
   cosparIndex: { [key: string]: number };
@@ -641,4 +646,68 @@ export enum Singletons {
   PersistenceManager = 'PersistenceManager',
   Scene = 'Scene',
   MeshManager = 'MeshManager',
+}
+/**
+ * Enum containing the registrable events used in the KeepTrack API.
+ */
+
+export enum KeepTrackApiEvents {
+  onHelpMenuClick = 'onHelpMenuClick',
+  /**
+   * Run at the end of SelectSatManager.selectSat with parameters (sat: SatObject, satId: number)
+   */
+  selectSatData = 'selectSatData',
+  /**
+   * Run at the end of catalogManager.setSecondarySat with parameters (sat: SatObject, satId: number)
+   */
+  setSecondarySat = 'setSecondarySat',
+  onKeepTrackReady = 'onKeepTrackReady',
+  updateSelectBox = 'updateSelectBox',
+  onCruncherReady = 'onCruncherReady',
+  onCruncherMessage = 'onCruncherMessage',
+  uiManagerInit = 'uiManagerInit',
+  uiManagerOnReady = 'uiManagerOnReady',
+  bottomMenuClick = 'bottomMenuClick',
+  hideSideMenus = 'hideSideMenus',
+  nightToggle = 'nightToggle',
+  orbitManagerInit = 'orbitManagerInit',
+  drawManagerLoadScene = 'drawManagerLoadScene',
+  drawOptionalScenery = 'drawOptionalScenery',
+  updateLoop = 'updateLoop',
+  /**
+   * Run as the default case in the rmbMenuActions event with parameters (targetId: string, clickedSat: number)
+   */
+  rmbMenuActions = 'rmbMenuActions',
+  /**
+   * Runs during inputManager.init immediately before adding the clear lines and clear screen buttons
+   */
+  rightBtnMenuAdd = 'rightBtnMenuAdd',
+  updateDateTime = 'updateDateTime',
+  uiManagerFinal = 'uiManagerFinal',
+  resetSensor = 'resetSensor',
+  /**
+   * Run in the setSensor method of SensorManager instance with parameters (sensor: SensorObject | string, staticId: number)
+   */
+  setSensor = 'setSensor',
+  changeSensorMarkers = 'changeSensorMarkers',
+  altCanvasResize = 'altCanvasResize',
+  endOfDraw = 'endOfDraw',
+  /**
+   * Run in the updateWatchlist method of CatalogManager instance with parameters (watchlist: number[])
+   */
+  onWatchlistUpdated = 'onWatchlistUpdated',
+  /**
+   * Run in the staticOffset setter of TimeManager instance with parameters (staticOffset: number)
+   */
+  staticOffsetChange = 'staticOffsetChange',
+  /**
+   * Runs when a line is added to the line manager
+   */
+  onLineAdded = 'onLineAdded',
+  /**
+   * Runs when a sensor dot is selected but not when a sensor is selected from the sensor menu
+   */
+  sensorDotSelected = 'sensorDotSelected',
+  canvasMouseDown = 'canvasMouseDown',
+  touchStart = 'touchStart',
 }

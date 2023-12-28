@@ -1,5 +1,5 @@
-import { GetSatType, SatObject, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { GetSatType, KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
@@ -264,7 +264,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tdT.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(dateFormat(lookAngleRow.time, 'isoDateTime', false) + 'z').getTime() - timeManagerInstance.realTime);
         timeManagerInstance.calculateSimulationTime();
-        keepTrackApi.methods.updateDateTime(new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
       });
 
       tdE = tr.insertCell();

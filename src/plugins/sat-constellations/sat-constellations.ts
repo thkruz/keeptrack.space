@@ -1,6 +1,7 @@
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
@@ -51,7 +52,7 @@ export class SatConstellations extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: 'uiManagerFinal',
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'constellations',
       cb: () => {
         getEl('constellation-menu')

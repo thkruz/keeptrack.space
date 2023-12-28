@@ -25,7 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorInformation, ColorRuleSet, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
+import { ColorInformation, ColorRuleSet, KeepTrackApiEvents, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
@@ -272,7 +272,7 @@ export class StandardUiManager implements UiManager {
 
     if (settingsManager.isShowLogo) getEl('demo-logo')?.classList.remove('start-hidden');
 
-    keepTrackApi.methods.uiManagerInit();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
 
     StandardUiManager.initBottomMenuResizing_();
 
@@ -417,8 +417,8 @@ export class StandardUiManager implements UiManager {
     LegendManager.legendColorsChange();
 
     // Run any plugins code
-    keepTrackApi.methods.uiManagerOnReady();
-    this.bottomIconPress = (el: HTMLElement) => keepTrackApi.methods.bottomMenuClick(el.id);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+    this.bottomIconPress = (el: HTMLElement) => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, el.id);
     const BottomIcons = getEl('bottom-icons');
     BottomIcons?.addEventListener('click', (evt: Event) => {
       if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
@@ -435,7 +435,7 @@ export class StandardUiManager implements UiManager {
     });
     this.hideSideMenus = () => {
       closeColorbox();
-      keepTrackApi.methods.hideSideMenus();
+      keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
     };
   }
 
@@ -454,7 +454,7 @@ export class StandardUiManager implements UiManager {
     if (typeof sat === 'undefined' || sat.static) return;
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
-      keepTrackApi.methods.updateSelectBox(sat);
+      keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, sat);
       keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
     }
   }

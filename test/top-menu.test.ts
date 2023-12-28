@@ -1,5 +1,5 @@
 import { keepTrackContainer } from '@app/container';
-import { Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
@@ -10,8 +10,8 @@ import { standardPluginSuite } from './generic-tests';
 
 describe('TopMenu_class', () => {
   beforeEach(() => {
-    for (const callback in keepTrackApi.callbacks) {
-      keepTrackApi.callbacks[callback] = [];
+    for (const callback in keepTrackApi.events) {
+      keepTrackApi.events[callback] = [];
     }
     setupMinimumHtml();
   });
@@ -22,8 +22,8 @@ describe('TopMenu_class', () => {
   it('test_sound_button_toggle_without_sound_plugin', () => {
     const topMenu = new TopMenu();
     topMenu.init();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     errorManagerInstance.warn = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.SoundManager, null);
@@ -35,8 +35,8 @@ describe('TopMenu_class', () => {
   it('test_sound_button_toggle', () => {
     const topMenu = new TopMenu();
     topMenu.init();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;

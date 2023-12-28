@@ -16,6 +16,7 @@ or mirrored at any other location without the express written permission of the 
 
 ///////////////////////////////////////////////////////////////////////////// */
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
@@ -40,9 +41,10 @@ export class AdviceManager {
     this.tutIconDOM = getEl('tutorial-icon');
 
     this.tutIconDOM.addEventListener('click', function () {
-      keepTrackApi.methods.onHelpMenuClick();
+      keepTrackApi.runEvent(KeepTrackApiEvents.onHelpMenuClick);
     });
 
+    // TODO: This should be registered with the keyboard class
     window.onkeydown = (e: KeyboardEvent) => {
       // If Shift + F1
       if (e.shiftKey && e.code === 'F1') {
@@ -50,7 +52,7 @@ export class AdviceManager {
           this.isAdviceOpen = false;
           this.helpOuterDOM.style.display = 'none';
         } else {
-          keepTrackApi.methods.onHelpMenuClick();
+          keepTrackApi.runEvent(KeepTrackApiEvents.onHelpMenuClick);
         }
       }
     };

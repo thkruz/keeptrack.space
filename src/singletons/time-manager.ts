@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -103,7 +104,7 @@ export class TimeManager {
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();
-    keepTrackApi.methods.staticOffsetChange(this.staticOffset);
+    keepTrackApi.runEvent(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
   }
 
   getOffsetTimeObj(offset: number) {

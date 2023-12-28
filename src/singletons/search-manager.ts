@@ -1,9 +1,10 @@
-import { CatalogManager, CatalogObject, MissileObject, SatObject, SensorObject, UiManager } from '@app/interfaces';
+import { CatalogManager, KeepTrackApiEvents, MissileObject, SatObject, SensorObject, UiManager } from '@app/interfaces';
+import { isMissileObject } from '@app/lib/catalog-object-type-helper';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
 import { SpaceObjectType } from 'ootk';
-import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
+import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
@@ -419,10 +420,10 @@ export class SearchManager {
 
     let satData = catalogManagerInstance.satData;
     getEl('search-results').innerHTML = results.reduce((html, result) => {
-      const sat = <CatalogObject>satData[result.satId];
+      const sat = <SatObject | MissileObject>satData[result.satId];
       html += '<div class="search-result" data-obj-id="' + sat.id + '">';
       html += '<div class="truncate-search">';
-      if (sat.missile) {
+      if (isMissileObject(sat)) {
         html += sat.name;
       } else if (result.isON) {
         // If the name matched - highlight it
@@ -437,7 +438,7 @@ export class SearchManager {
       }
       html += '</div>';
       html += '<div class="search-result-scc">';
-      if (sat.missile) {
+      if (isMissileObject(sat)) {
         html += sat.desc;
       } else if (result.isSccNum) {
         // If the object number matched

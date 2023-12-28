@@ -1,5 +1,5 @@
-import { SatObject, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import searchPng from '@public/img/icons/search.png';
@@ -129,13 +129,13 @@ export class ShortTermFences extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      event: 'resetSensor',
+      event: KeepTrackApiEvents.resetSensor,
       cbName: 'shortTermFences',
       cb: this.closeAndDisable.bind(this),
     });
 
     keepTrackApi.register({
-      event: 'setSensor',
+      event: KeepTrackApiEvents.setSensor,
       cbName: 'shortTermFences',
       cb: (sensor: any, id: number): void => {
         if (sensor == null && id == null) {

@@ -1,7 +1,7 @@
-import { SatObject, SensorObject, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, SatObject, SensorObject, Singletons } from '@app/interfaces';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import Module from 'module';
-import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
+import { keepTrackApi } from '../keepTrackApi';
 import { clickAndDragWidth } from '../lib/click-and-drag';
 import { getEl } from '../lib/get-el';
 import { shake } from '../lib/shake';
@@ -336,7 +336,7 @@ export class KeepTrackPlugin {
    */
   addBottomIcon(icon: Module, isDisabled = false): void {
     keepTrackApi.register({
-      event: 'uiManagerInit',
+      event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const button = document.createElement('div');
@@ -571,7 +571,7 @@ export class KeepTrackPlugin {
    */
   registerHelp(helpTitle: string, helpText: string) {
     keepTrackApi.register({
-      event: 'onHelpMenuClick',
+      event: KeepTrackApiEvents.onHelpMenuClick,
       cbName: `${this.PLUGIN_NAME}`,
       cb: (): boolean => {
         if (this.isMenuButtonActive) {

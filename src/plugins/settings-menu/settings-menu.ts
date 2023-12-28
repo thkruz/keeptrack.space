@@ -1,4 +1,5 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { rgbCss } from '@app/lib/rgbCss';
 import settingsPng from '@public/img/icons/settings.png';

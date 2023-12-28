@@ -1,4 +1,5 @@
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -7,14 +8,13 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import editPng from '@public/img/icons/edit.png';
 import { saveAs } from 'file-saver';
 
-import { GetSatType } from '@app/interfaces';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { FormatTle } from '@app/static/format-tle';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class EditSat extends KeepTrackPlugin {

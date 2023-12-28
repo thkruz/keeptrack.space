@@ -23,8 +23,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, SatObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { GetSatType, KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { LineTypes } from '@app/singletons/draw-manager/line-manager';
@@ -270,7 +270,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     }
     getEl('watchlist-list').innerHTML = watchlistListHTML;
 
-    keepTrackApi.methods.onWatchlistUpdated(this.watchlistList);
+    keepTrackApi.runEvent(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       // No duplicates

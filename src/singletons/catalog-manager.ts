@@ -26,6 +26,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Degrees, SatelliteRecord, Sgp4 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
@@ -607,7 +608,7 @@ export class StandardCatalogManager implements CatalogManager {
     this.updateCruncherBuffers(mData);
 
     // Run any callbacks for a normal position cruncher message
-    keepTrackApi.methods.onCruncherMessage();
+    keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
 
     // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
     if (!settingsManager.cruncherReady && this.satData && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
@@ -626,7 +627,7 @@ export class StandardCatalogManager implements CatalogManager {
       UrlManager.parseGetVariables();
 
       // Run any functions registered with the API
-      keepTrackApi.methods.onCruncherReady();
+      keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherReady);
 
       settingsManager.cruncherReady = true;
     }

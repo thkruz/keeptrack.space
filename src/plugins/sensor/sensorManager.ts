@@ -26,10 +26,11 @@
 import { sensors } from '@app/catalogs/sensors';
 import { openColorbox } from '@app/lib/colorbox';
 import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
-import { getEl, setInnerHtml } from '@app/lib/get-el';
+import { getEl, hideEl, setInnerHtml, showEl } from '@app/lib/get-el';
 import { spaceObjType2Str } from '@app/lib/spaceObjType2Str';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { ZoomValue } from '@app/singletons/camera';
 import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
@@ -106,8 +107,8 @@ export class StandardSensorManager implements SensorManager {
 
   static drawFov(sensor: SensorObject) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const sensorObj = catalogManagerInstance.getSensorFromSensorName(sensor.name);
-    if (!sensorObj) {
+    const sensorId = catalogManagerInstance.getSensorFromSensorName(sensor.name);
+    if (!sensorId) {
       errorManagerInstance.warn('Sensor not found');
       return;
     }
@@ -117,18 +118,18 @@ export class StandardSensorManager implements SensorManager {
       case 'BLE':
       case 'CLR':
       case 'THL':
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
         break;
       case 'FYL':
         // TODO: Find actual face directions
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, 300, 60, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, 60, 180, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, 180, 300, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 300, 60, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 60, 180, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 180, 300, sensor.obsminel, sensor.obsmaxrange], 'c');
         break;
       case 'CDN':
         // NOTE: This will be a bit more complicated later
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorObj, sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
         break;
       default:
         errorManagerInstance.warn('Sensor not found');
@@ -221,7 +222,7 @@ export class StandardSensorManager implements SensorManager {
       colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
     }, 2000);
 
-    keepTrackApi.methods.resetSensor();
+    keepTrackApi.runEvent(KeepTrackApiEvents.resetSensor);
   }
 
   setCurrentSensor(sensor: SensorObject[] | null): void {
@@ -398,7 +399,7 @@ export class StandardSensorManager implements SensorManager {
     }
 
     // Run any callbacks
-    keepTrackApi.methods.setSensor(selectedSensor, staticNum);
+    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, staticNum);
 
     // TODO: Move this to top menu plugin
     // Update UI to reflect new sensor
@@ -436,22 +437,15 @@ export class StandardSensorManager implements SensorManager {
 
   static updateSensorUiStyling(sensors: SensorObject[] | null) {
     try {
-      if (typeof sensors == 'undefined' || sensors == null) {
-        const resetSensorTextDOM = getEl('reset-sensor-text', true);
-        if (resetSensorTextDOM) {
-          resetSensorTextDOM.style.display = 'none';
-        }
-        return;
-      }
-
-      getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
-      getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
-      const resetSensorTextDOM = getEl('reset-sensor-text', true);
-      if (resetSensorTextDOM) {
-        resetSensorTextDOM.style.display = 'block';
+      if (sensors?.[0].objName) {
+        getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
+        getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
+        getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
+        getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
+        getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
+        showEl('reset-sensor-text');
+      } else {
+        hideEl('reset-sensor-text');
       }
     } catch (error) {
       errorManagerInstance.warn('Error updating sensor UI styling');

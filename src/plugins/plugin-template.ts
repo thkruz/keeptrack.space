@@ -1,4 +1,5 @@
-import { keepTrackApi, KeepTrackApiEvents } from '../keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { clickDragOptions, KeepTrackPlugin } from './KeepTrackPlugin';
 

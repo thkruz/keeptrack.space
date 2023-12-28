@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { SpaceObjectType } from '@app/lib/space-object-type';
@@ -227,7 +228,7 @@ export class InputManager {
       `
       );
       // Append any other menus before putting the reset/clear options
-      keepTrackApi.methods.rightBtnMenuAdd();
+      keepTrackApi.runEvent(KeepTrackApiEvents.rightBtnMenuAdd);
 
       // Now add the reset/clear options
       getEl('right-btn-menu-ul').insertAdjacentHTML(

@@ -40,7 +40,7 @@ import eruda from 'eruda';
 import erudaFps from 'eruda-fps';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { CatalogManager, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
+import { CatalogManager, KeepTrackApiEvents, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl, hideEl } from './lib/get-el';
 import { getUnique } from './lib/get-unique';
@@ -375,7 +375,7 @@ theodore.kruczek at gmail dot com.
       this.demoManager.update();
     }
 
-    keepTrackApi.methods.endOfDraw(dt);
+    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, dt);
   }
 
   public async init(): Promise<void> {
@@ -474,7 +474,7 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.methods.uiManagerFinal();
+      keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
 
       if (settingsManager.plugins.debug) {
         const erudaDom = getEl('eruda');
@@ -512,7 +512,7 @@ theodore.kruczek at gmail dot com.
       }
 
       keepTrackApi.isInitialized = true;
-      keepTrackApi.methods.onKeepTrackReady();
+      keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
     } else {
       setTimeout(() => {
         this.postStart_();

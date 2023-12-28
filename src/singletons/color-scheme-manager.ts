@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { ColorInformation, ColorRuleSet, Colors, ColorSchemeManager, Pickable, rgbaArray, SatObject } from '../interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -668,7 +669,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
     // Create the color buffers as soon as the position cruncher is ready
     keepTrackApi.register({
-      event: 'onCruncherReady',
+      event: KeepTrackApiEvents.onCruncherReady,
       cbName: 'colorSchemeManager',
       cb: (): void => {
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);

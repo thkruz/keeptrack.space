@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -512,26 +513,26 @@ export const uiManagerFinal = (): void => {
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    event: 'uiManagerInit',
+    event: KeepTrackApiEvents.uiManagerInit,
     cbName: 'missile',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    event: 'uiManagerFinal',
+    event: KeepTrackApiEvents.uiManagerFinal,
     cbName: 'missile',
     cb: uiManagerFinal,
   });
 
   // Add JavaScript
   keepTrackApi.register({
-    event: 'bottomMenuClick',
+    event: KeepTrackApiEvents.bottomMenuClick,
     cbName: 'missile',
     cb: bottomMenuClick,
   });
 
   keepTrackApi.register({
-    event: 'hideSideMenus',
+    event: KeepTrackApiEvents.hideSideMenus,
     cbName: 'missile',
     cb: hideSideMenus,
   });
@@ -544,7 +545,7 @@ export const init = (): void => {
   });
 
   keepTrackApi.register({
-    event: 'onHelpMenuClick',
+    event: KeepTrackApiEvents.onHelpMenuClick,
     cbName: 'missile',
     cb: onHelpMenuClick,
   });

@@ -24,7 +24,8 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import mapPng from '@public/img/icons/map.png';
@@ -33,7 +34,6 @@ import redSquare from '@public/img/red-square.png';
 import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
-import { SatObject } from '@app/interfaces';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';

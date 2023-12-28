@@ -1,5 +1,5 @@
-import { GetSatType, MissileObject, SatObject, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { GetSatType, KeepTrackApiEvents, MissileObject, SatObject, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 import { CameraType } from '@app/singletons/camera';
@@ -113,7 +113,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.primarySatObj = spaceObj ?? this.noSatObj_;
 
     // Run any other callbacks
-    keepTrackApi.methods.selectSatData(spaceObj, spaceObj?.id);
+    keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
@@ -136,7 +136,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.methods.sensorDotSelected(sat as unknown as SensorObject);
+      keepTrackApi.runEvent(KeepTrackApiEvents.sensorDotSelected, sat as unknown as SensorObject);
     }
 
     this.setSelectedSat(-1);
@@ -338,7 +338,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getOrbitManager().clearSelectOrbit(false);
     }
 
-    keepTrackApi.methods.setSecondarySat(this.secondarySatObj, id);
+    keepTrackApi.runEvent(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
   }
 
   setSelectedSat(id: number): void {

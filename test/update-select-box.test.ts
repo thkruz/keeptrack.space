@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
@@ -26,15 +27,15 @@ describe('SatInfoBoxCore_class2', () => {
     keepTrackApi.isInitialized = true;
     const selectSatManager = new SelectSatManager();
     selectSatManager.init();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
-    keepTrackApi.methods.uiManagerOnReady();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.methods.updateSelectBox(defaultSat)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
 
-    keepTrackApi.methods.setSensor(defaultSensor, 2);
+    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 2);
     keepTrackApi.getCatalogManager().isSensorManagerLoaded = true;
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.methods.updateSelectBox(defaultSat)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
   });
 });

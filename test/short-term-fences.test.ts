@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -44,7 +45,7 @@ describe('ShortTermFences_class', () => {
       expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
 
       keepTrackApi.getCatalogManager().getSat = jest.fn().mockReturnValue(defaultSat);
-      keepTrackApi.getCatalogManager().selectedSat = 0;
+      keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
       expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
     });
   });
@@ -52,7 +53,7 @@ describe('ShortTermFences_class', () => {
   it('should be able to handle setSensor', () => {
     const stf = new ShortTermFences();
     websiteInit(stf);
-    expect(() => keepTrackApi.methods.setSensor(null, null)).not.toThrow();
-    expect(() => keepTrackApi.methods.setSensor(defaultSensor, 1)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
   });
 });

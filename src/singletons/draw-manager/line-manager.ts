@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-import { EciArr3, GetSatType, SatObject, Singletons } from '@app/interfaces';
+import { EciArr3, GetSatType, KeepTrackApiEvents, SatObject, Singletons } from '@app/interfaces';
 import { DEG2RAD, RAD2DEG } from '@app/lib/constants';
 import { SpaceObjectType } from '@app/lib/space-object-type';
 
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
@@ -164,7 +164,7 @@ export class LineManager {
         break;
     }
 
-    keepTrackApi.methods.onLineAdded();
+    keepTrackApi.runEvent(KeepTrackApiEvents.onLineAdded, this);
   }
 
   /**

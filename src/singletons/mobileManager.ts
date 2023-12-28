@@ -1,5 +1,6 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { Kilometers } from 'ootk';
-import { KeepTrackApiEvents, keepTrackApi } from '../keepTrackApi';
+import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 

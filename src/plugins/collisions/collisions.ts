@@ -1,9 +1,10 @@
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import collissionsPng from '@public/img/icons/socrates.png';
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
-import { keepTrackApi, KeepTrackApiEvents } from '../../keepTrackApi';
+import { keepTrackApi } from '../../keepTrackApi';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 

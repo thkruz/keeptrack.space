@@ -1,6 +1,6 @@
 import { sensors } from '@app/catalogs/sensors';
-import { SatObject, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getClass } from '@app/lib/get-class';
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
@@ -54,7 +54,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
             <h5 id="reset-sensor-button" class="center-align menu-selectable">Reset Sensor</h5>
             <li class="divider"></li>
             </ul>
-            <ul>` +
+            <ul id="list-of-sensors">` +
     SensorListPlugin.ssnSensors_() +
     SensorListPlugin.mwSensors_() +
     SensorListPlugin.mdaSensors_() +
@@ -118,7 +118,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('sensor-selected').addEventListener('click', () => {
-          keepTrackApi.methods.bottomMenuClick(this.bottomIconElementName);
+          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         });
 
         getEl('sensor-list-content').addEventListener('click', (e: any) => {
@@ -171,18 +171,6 @@ export class SensorListPlugin extends KeepTrackPlugin {
             });
           });
           this.isSensorLinksAdded = true;
-        }
-      },
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject | string) => {
-        if (!sensor) {
-          getEl('reset-sensor-button').style.display = 'none';
-        } else {
-          getEl('reset-sensor-button').style.display = 'block';
         }
       },
     });

@@ -1117,7 +1117,7 @@ input:focus {
   height: auto !important;
 }
 
-#reset-sensor-text {
+#list-of-sensors li:first-child {
   display: none;
 }
 

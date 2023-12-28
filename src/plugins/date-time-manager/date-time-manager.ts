@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { getDayOfYear } from '@app/lib/transforms';
 import { isThisNode } from '@app/static/isThisNode';
@@ -61,7 +62,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   datetimeTextClick(): void {
-    keepTrackApi.methods.updateDateTime(new Date(keepTrackApi.getTimeManager().simulationTimeObj));
+    keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(keepTrackApi.getTimeManager().simulationTimeObj));
 
     if (!this.isEditTimeOpen) {
       const datetimeInput = getEl('datetime-input');

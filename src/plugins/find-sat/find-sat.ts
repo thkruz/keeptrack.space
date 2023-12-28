@@ -1,4 +1,4 @@
-import { SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
@@ -390,7 +390,7 @@ The search will then find all satellites within those inclinations and display t
     super.addJs();
 
     keepTrackApi.register({
-      event: 'uiManagerInit',
+      event: KeepTrackApiEvents.uiManagerInit,
       cbName: 'findSat',
       cb: () => {
         getEl('fbl-error').addEventListener('click', function () {
@@ -399,7 +399,7 @@ The search will then find all satellites within those inclinations and display t
       },
     });
     keepTrackApi.register({
-      event: 'uiManagerFinal',
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'findSat',
       cb: this.uiManagerFinal.bind(this),
     });

@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import githubPng from '@public/img/icons/github.png';
@@ -13,7 +14,7 @@ export class SocialMedia extends KeepTrackPlugin {
   addHtml() {
     super.addHtml();
     keepTrackApi.register({
-      event: 'uiManagerFinal',
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: SocialMedia.uiManagerFinal_,
     });

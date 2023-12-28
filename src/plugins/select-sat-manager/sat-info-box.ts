@@ -1,5 +1,6 @@
-import { GetSatType, MissileObject, SatObject, SensorObject } from '@app/interfaces';
-import { KeepTrackApiEvents, isMissileObject, isSatObject, isSensorObject, keepTrackApi } from '@app/keepTrackApi';
+import { CatalogObject, GetSatType, KeepTrackApiEvents, MissileObject, SatObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { isMissileObject, isSatObject, isSensorObject } from '@app/lib/catalog-object-type-helper';
 import { openColorbox } from '@app/lib/colorbox';
 import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, cKmPerMs } from '@app/lib/constants';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -118,12 +119,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateSelectBox,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject | SensorObject | MissileObject) => {
+      cb: (obj: CatalogObject) => {
         if (!keepTrackApi.isInitialized) return;
 
         // Ignore if it's not a satellite or a missile
-        if (isSensorObject(sat as SensorObject)) return;
-        sat = <SatObject | MissileObject>sat;
+        if (isSensorObject(obj)) return;
+        let sat = <SatObject | MissileObject>obj;
 
         try {
           const timeManagerInstance = keepTrackApi.getTimeManager();
@@ -1413,9 +1414,9 @@ export class SatInfoBox extends KeepTrackPlugin {
    *
    * @param sat - The satellite, missile, or sensor object to be selected.
    */
-  private static selectSat_(sat?: SatObject | MissileObject | SensorObject): void {
+  private static selectSat_(sat?: CatalogObject): void {
     if (sat) {
-      if (isSensorObject(sat as SensorObject)) return;
+      if (isSensorObject(sat)) return;
 
       showEl(SatInfoBox.containerId_);
 

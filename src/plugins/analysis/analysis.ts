@@ -1,5 +1,5 @@
-import { lookanglesRow, SatObject, SensorObject } from '@app/interfaces';
-import { keepTrackApi, KeepTrackApiEvents } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, lookanglesRow, SatObject, SensorObject } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -186,7 +186,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: 'uiManagerFinal',
+      event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'analysis',
       cb: () => {
         getEl('analysis-bpt')?.addEventListener('submit', function (e: Event) {
@@ -234,7 +234,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject) => {
+      cb: (sensor: SensorObject | string) => {
         AnalysisMenu.setSensor_(sensor);
       },
     });
@@ -612,7 +612,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     }
   }
 
-  private static setSensor_(sensor: SensorObject): void {
+  private static setSensor_(sensor: SensorObject | string): void {
     const submitButtonDom = <HTMLButtonElement>getEl('analysis-bpt-submit');
     if (!sensor) {
       submitButtonDom.disabled = true;

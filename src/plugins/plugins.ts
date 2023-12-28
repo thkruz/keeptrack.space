@@ -7,7 +7,8 @@ import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import * as catalogLoader from '@app/static/catalog-loader';
 
-import { KeepTrackApiEvents, KeepTrackApiRegisterParams } from '../keepTrackApi';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { aboutMenuPlugin } from './about-menu/about-menu';
@@ -114,7 +115,7 @@ export type KeepTrackPlugins = {
 };
 
 // Register all core modules
-export const loadPlugins = async (keepTrackApi: { register?: (params: KeepTrackApiRegisterParams) => void }, plugins: KeepTrackPlugins): Promise<void> => {
+export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugins): Promise<void> => {
   plugins ??= {};
   try {
     loadCorePlugins_(plugins);

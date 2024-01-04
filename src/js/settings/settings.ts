@@ -1330,6 +1330,12 @@ export class SettingsManager {
                   module.darkClouds();
                 });
                 break;
+              case 'million-year':
+                SettingsPresets.loadPresetMillionYear(this);
+                break;
+              case 'million-year2':
+                SettingsPresets.loadPresetMillionYear2(this);
+                break;
               case 'facsat2':
                 SettingsPresets.loadPresetFacSat2(this);
                 break;

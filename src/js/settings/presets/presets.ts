@@ -1,8 +1,96 @@
 import { KeepTrackApiEvents, keepTrackApi } from '@app/js/keepTrackApi';
+import { getEl } from '@app/js/lib/get-el';
+import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 
 export class SettingsPresets {
+  static loadPresetMillionYear(settings: SettingsManager) {
+    settings.maxZoomDistance = <Kilometers>200000;
+    settings.zFar = 600000;
+    settings.isDrawSun = false;
+    settings.isDisableMoon = true;
+    settings.satShader.minSize = 2.0;
+    settings.isDisableSensors = true;
+    settings.isDisableControlSites = true;
+    settings.isDisableLaunchSites = true;
+    settings.isLoadLastSensor = false;
+    settings.isShowNotionalSats = false;
+    settings.maxAnalystSats = 1;
+    settings.maxMissiles = 1;
+    settings.maxFieldOfViewMarkers = 1;
+    settings.isEPFL = true;
+    settings.disableAllPlugins();
+    settings.plugins.timeMachine = true;
+    settings.loopTimeMachine = true;
+    settings.timeMachineDelay = <Milliseconds>6000;
+
+    settings.colors.transparent = [1, 1, 1, 0.4];
+    settings.colors.rocketBody = [0.5, 0.5, 0.5, 1];
+    settings.colors.unknown = [0.5, 0.5, 0.5, 1];
+    settings.colors.pink = [0.5, 0.5, 0.5, 1];
+    settings.colors.notional = [0.5, 0.5, 0.5, 1];
+    settings.colors.deselected = [0, 0, 0, 0];
+    settings.selectedColor = [0, 0, 0, 0];
+    settings.selectedColorFallback = [0, 0, 0, 0];
+    settings.isDrawOrbits = false;
+
+    settings.timeMachineString = (yearStr) => {
+      window.M.Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
+      const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
+      const english = `In ${yearPrefix}${yearStr}`;
+      // const french = `En ${yearPrefix}${yearStr}`;
+      // const german = `Im ${yearPrefix}${yearStr}`;
+      const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
+      const debrisSpan = `<span style="color: rgb(150, 150, 150);">Debris </span>`;
+      document.getElementById('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+      return `${english}`;
+    };
+    settings.onLoadCb = () => {
+      // Create div for textOverlay
+      const textOverlay = document.createElement('div');
+      textOverlay.id = 'textOverlay';
+      document.body.appendChild(textOverlay);
+
+      // Update CSS
+      const toastCss = `
+                    .toast,
+                    .toast-container {
+                      display: none !important;
+                    }
+                  `;
+      const style = document.createElement('style');
+      style.type = 'text/css';
+      style.appendChild(document.createTextNode(toastCss));
+      document.head.appendChild(style);
+
+      document.getElementById('textOverlay').style.cssText = `
+                    border-radius: 2px;
+                    bottom: 75px;
+                    right: 150px;
+                    width: auto;
+                    position: absolute;
+                    min-height: 48px;
+                    line-height: 2rem !important;
+                    background-color: rgb(0, 0, 0) !important;
+                    padding: 10px 10px !important;
+                    font-size: 2rem !important;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+                    font-weight: 300;
+                    color: white;
+                  }`;
+
+      getEl('nav-footer').style.display = 'none';
+      keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive = true;
+      keepTrackApi.getPlugin(TimeMachine).bottomIconCallback();
+    };
+  }
+
+  static loadPresetMillionYear2(settings: SettingsManager) {
+    SettingsPresets.loadPresetMillionYear(settings);
+    settings.isDrawOrbits = true;
+  }
+
   static loadPresetStarlink(settings: SettingsManager) {
     settings.maxAnalystSats = 1;
     settings.maxMissiles = 1;
@@ -50,8 +138,8 @@ export class SettingsPresets {
     settings.colors.deselected = [0, 0, 0, 0];
     settings.selectedColor = [0, 0, 0, 0];
     settings.selectedColorFallback = [0, 0, 0, 0];
-    settings.maxNotionalDebris = 0.5 * 1000000; // 2.5 million
     settings.isDrawOrbits = false;
+    settings.maxNotionalDebris = 0.5 * 1000000; // 2.5 million
     settings.searchLimit = 100000;
     settings.isEPFL = true;
     settings.isDisableExtraCatalog = false;

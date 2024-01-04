@@ -34,7 +34,7 @@
 import { SatObject } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { EARTHS_GRAV_CONST } from '@app/lib/constants';
-import { StandardCatalogManager } from '@app/singletons/catalog-manager';
+import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SatMath } from '@app/static/sat-math';
@@ -91,7 +91,7 @@ om.kp2tle = (kp, epoch, timeManager: TimeManager) => {
   const inc = kp.inclination;
   const raan = kp.raan;
   const ecc = kp.eccentricity;
-  const argpe = kp.argPe;
+  const argpe = kp.argOfPerigee;
   const meana = kp.mo;
   const meanmo = 1440 / kp.period;
   epoch = typeof epoch == 'undefined' || epoch == null ? new Date(timeManager.calculateSimulationTime()) : epoch;
@@ -162,9 +162,9 @@ om.svs2kps = (svs: StateVector[]) => { // NOSONAR
     if (kpList[i].apogee < r.min.apogee) r.min.apogee = kpList[i].apogee;
     if (kpList[i].apogee > r.max.apogee) r.max.apogee = kpList[i].apogee;
     r.avg.apogee += kpList[i].apogee;
-    if (kpList[i].argPe < r.min.argPe) r.min.argPe = kpList[i].argPe;
-    if (kpList[i].argPe > r.max.argPe) r.max.argPe = kpList[i].argPe;
-    r.avg.argPe += kpList[i].argPe;
+    if (kpList[i].argOfPerigee < r.min.argOfPerigee) r.min.argOfPerigee = kpList[i].argOfPerigee;
+    if (kpList[i].argOfPerigee > r.max.argOfPerigee) r.max.argOfPerigee = kpList[i].argOfPerigee;
+    r.avg.argOfPerigee += kpList[i].argOfPerigee;
     if (kpList[i].eccentricity < r.min.eccentricity) r.min.eccentricity = kpList[i].eccentricity;
     if (kpList[i].eccentricity > r.max.eccentricity) r.max.eccentricity = kpList[i].eccentricity;
     r.avg.eccentricity += kpList[i].eccentricity;
@@ -195,7 +195,7 @@ om.svs2kps = (svs: StateVector[]) => { // NOSONAR
   }
 
   r.avg.apogee /= kpList.length;
-  r.avg.argPe /= kpList.length;
+  r.avg.argOfPerigee /= kpList.length;
   r.avg.eccentricity /= kpList.length;
   r.avg.inclination /= kpList.length;
   r.avg.mo /= kpList.length;
@@ -232,7 +232,7 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager) =>
     om.debug.closestApproach = 0;
     const STEPS = settingsManager.fitTleSteps;
     const raanI = (kps.max.raan - kps.min.raan) / STEPS;
-    const argpeI = (kps.max.argPe - kps.min.argPe) / STEPS;
+    const argpeI = (kps.max.argOfPerigee - kps.min.argOfPerigee) / STEPS;
     const meanaI = (kps.max.mo - kps.min.mo) / STEPS;
     // DEBUG:
     // const incI = (kps.max.inclination - kps.min.inclination) / STEPS;
@@ -247,7 +247,7 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager) =>
             inclination: kps.avg.inclination,
             raan: kps.avg.raan + raanI * r,
             eccentricity: kps.avg.eccentricity,
-            argPe: kps.avg.argPe + argpeI * a,
+            argPe: kps.avg.argOfPerigee + argpeI * a,
             mo: kps.avg.mo + (meanaI * m) / 2,
             period: kps.avg.period,
           };
@@ -286,7 +286,7 @@ om.fitTles = async (epoch, svs: StateVector[], kps, timeManager: TimeManager) =>
       inclination: kps.avg.inclination,
       raan: kps.avg.raan + raanI * bestIndicies[1],
       eccentricity: kps.avg.eccentricity,
-      argPe: kps.avg.argPe + argpeI * bestIndicies[2],
+      argPe: kps.avg.argOfPerigee + argpeI * bestIndicies[2],
       mo: kps.avg.mo + meanaI * bestIndicies[3],
       period: kps.avg.period,
     };
@@ -299,7 +299,7 @@ om.svs2analyst = async (svs: StateVector[], timeManager: TimeManager) => {
   const catalogManagerInstance = keepTrackApi.getCatalogManager();
   om.iod(svs, timeManager)
     .then((tles: { tle1: string; tle2: string }) => {
-      catalogManagerInstance.insertNewAnalystSatellite(tles.tle1, tles.tle2, catalogManagerInstance.getIdFromSccNum(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
+      catalogManagerInstance.addAnalystSat(tles.tle1, tles.tle2, catalogManagerInstance.sccNum2Id(100500), '100500'); // TODO: Calculate unused analyst satellite and use that Instead
       // searchBox.doSearch('100500', false);
     })
     .catch((error) => {
@@ -307,7 +307,7 @@ om.svs2analyst = async (svs: StateVector[], timeManager: TimeManager) => {
     });
 };
 
-om.testIod = (catalogManagerInstance: StandardCatalogManager) => {
+om.testIod = (catalogManagerInstance: CatalogManager) => {
   fetch('/metObs.json')
     .then((response) => response.json())
     .then((metObs) => {

@@ -1,9 +1,9 @@
-import { SatObject } from '../interfaces';
+import { DetailedSatellite } from 'ootk';
 import { StringPad } from '../lib/stringPad';
 import { StringifiedNumber } from './sat-math';
 
 export type TleParams = {
-  sat?: SatObject;
+  sat?: DetailedSatellite;
   inc: StringifiedNumber;
   meanmo: StringifiedNumber;
   rasc: StringifiedNumber;
@@ -66,7 +66,7 @@ export abstract class FormatTle {
     }
   }
 
-  static createTle(tleParams: TleParams): { TLE1: string; TLE2: string } {
+  static createTle(tleParams: TleParams): { tle1: string; tle2: string } {
     let { sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc } = tleParams;
     scc = FormatTle.convert6DigitToA5(scc);
     const epochYrStr = StringPad.pad0(epochyr, 2);
@@ -78,7 +78,7 @@ export abstract class FormatTle {
     const meanaStr = FormatTle.meanAnomaly(meana);
     const ecenStr = FormatTle.eccentricity(ecen);
 
-    let TLE1Ending = sat ? sat.TLE1.substring(32, 71) : ' +.00000000 +00000+0 +00000-0 0  9990';
+    let TLE1Ending = sat ? sat.tle1.substring(32, 71) : ' +.00000000 +00000+0 +00000-0 0  9990';
     // Add explicit positive/negative signs
 
     TLE1Ending = TLE1Ending[1] === ' ' ? FormatTle.setCharAt(TLE1Ending, 1, '+') : TLE1Ending;
@@ -86,10 +86,10 @@ export abstract class FormatTle {
     TLE1Ending = TLE1Ending[21] === ' ' ? FormatTle.setCharAt(TLE1Ending, 21, '+') : TLE1Ending;
     TLE1Ending = TLE1Ending[32] === ' ' ? FormatTle.setCharAt(TLE1Ending, 32, '0') : TLE1Ending;
 
-    const TLE1 = '1 ' + scc + 'U ' + intl + ' ' + epochYrStr + epochdayStr + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const TLE2 = '2 ' + scc + ' ' + incStr + ' ' + rascStr + ' ' + ecenStr + ' ' + argPeStr + ' ' + meanaStr + ' ' + meanmoStr + ' 00010';
+    const tle1 = '1 ' + scc + 'U ' + intl + ' ' + epochYrStr + epochdayStr + TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const tle2 = '2 ' + scc + ' ' + incStr + ' ' + rascStr + ' ' + ecenStr + ' ' + argPeStr + ' ' + meanaStr + ' ' + meanmoStr + ' 00010';
 
-    return { TLE1, TLE2 };
+    return { tle1, tle2 };
   }
 
   static eccentricity(ecen: string): string {

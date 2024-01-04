@@ -1,10 +1,8 @@
-import { SensorObject } from '@app/interfaces';
-import { SpaceObjectType } from '@app/lib/space-object-type';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { Degrees, DetailedSensor, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { ZoomValue } from '../singletons/camera';
 
 export interface SensorList {
-  [key: string]: SensorObject;
+  [key: string]: DetailedSensor;
 }
 
 // TODO: Add the aperture size of telescopes as an optional parameter
@@ -30,7 +28,7 @@ export enum Operators {
 }
 
 export const sensors = <SensorList>{
-  CODSFS: {
+  CODSFS: new DetailedSensor({
     objName: 'CODSFS',
     shortName: 'COD',
     id: 0,
@@ -42,12 +40,12 @@ export const sensors = <SensorList>{
     lat: <Degrees>41.754785,
     lon: <Degrees>-70.539151,
     alt: <Kilometers>0.060966,
-    obsminaz: <Degrees>347,
-    obsmaxaz: <Degrees>227,
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>5556,
+    minAz: <Degrees>347,
+    maxAz: <Degrees>227,
+    minEl: <Degrees>3,
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>5556,
     changeObjectInterval: <Milliseconds>1000,
     beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
     linkAehf: true,
@@ -56,9 +54,9 @@ export const sensors = <SensorList>{
     url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
     operator: Operators.USSF,
-    staticNum: 0, // For Testing Only
-  },
-  BLEAFB: {
+    sensorId: 0, // For Testing Only
+  }),
+  BLEAFB: new DetailedSensor({
     objName: 'BLEAFB',
     shortName: 'BLE',
     id: 0,
@@ -70,12 +68,12 @@ export const sensors = <SensorList>{
     lat: <Degrees>39.136064,
     lon: <Degrees>-121.351237,
     alt: <Kilometers>0.112, // Open Street Maps
-    obsminaz: <Degrees>126,
-    obsmaxaz: <Degrees>6,
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>5556,
+    minAz: <Degrees>126,
+    maxAz: <Degrees>6,
+    minEl: <Degrees>3,
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>5556,
     changeObjectInterval: <Milliseconds>1000,
     beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
     linkAehf: true,
@@ -83,8 +81,8 @@ export const sensors = <SensorList>{
     zoom: ZoomValue.LEO,
     country: 'United States',
     operator: Operators.USSF,
-  },
-  CLRSFS: {
+  }),
+  CLRSFS: new DetailedSensor({
     objName: 'CLRSFS',
     shortName: 'CLR',
     id: 0,
@@ -96,12 +94,12 @@ export const sensors = <SensorList>{
     lat: <Degrees>64.290556,
     lon: <Degrees>-149.186944,
     alt: <Kilometers>0.175, // Open Street Maps
-    obsminaz: <Degrees>184,
-    obsmaxaz: <Degrees>64,
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>5556,
+    minAz: <Degrees>184,
+    maxAz: <Degrees>64,
+    minEl: <Degrees>3,
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>5556,
     changeObjectInterval: <Milliseconds>1000,
     beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
     linkAehf: true,
@@ -109,8 +107,8 @@ export const sensors = <SensorList>{
     zoom: ZoomValue.LEO,
     country: 'United States',
     operator: Operators.USSF,
-  },
-  EGLAFB: {
+  }),
+  EGLAFB: new DetailedSensor({
     objName: 'EGLAFB',
     shortName: 'EGL',
     id: 0,
@@ -122,20 +120,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>30.572411,
     lon: <Degrees>-86.214836,
     alt: <Kilometers>0.039, // Open Street Maps
-    obsminaz: <Degrees>120,
-    obsmaxaz: <Degrees>240,
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>105,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>120,
+    maxAz: <Degrees>240,
+    minEl: <Degrees>3,
+    maxEl: <Degrees>105,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>200000,
     changeObjectInterval: <Milliseconds>1000,
     zoom: ZoomValue.GEO,
     beamwidth: <Degrees>1.4, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
     url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte002.en.html',
     country: 'United States',
     operator: Operators.USSF,
-  },
-  RAFFYL: {
+  }),
+  RAFFYL: new DetailedSensor({
     objName: 'RAFFYL',
     shortName: 'FYL',
     id: 0,
@@ -147,12 +145,12 @@ export const sensors = <SensorList>{
     lat: <Degrees>54.361758,
     lon: <Degrees>-0.670051,
     alt: <Kilometers>0.26, // Open Street Maps
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>5556,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>3,
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>5556,
     changeObjectInterval: <Milliseconds>1000,
     beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
     linkAehf: true,
@@ -160,8 +158,8 @@ export const sensors = <SensorList>{
     zoom: ZoomValue.LEO,
     country: 'United Kingdom',
     operator: Operators.RAF,
-  },
-  CAVSFS: {
+  }),
+  CAVSFS: new DetailedSensor({
     objName: 'CAVSFS',
     shortName: 'CAV',
     id: 0,
@@ -172,12 +170,12 @@ export const sensors = <SensorList>{
     lat: <Degrees>48.724567,
     lon: <Degrees>-97.899755,
     alt: <Kilometers>0.352, // Open Street Maps
-    obsminaz: <Degrees>298,
-    obsmaxaz: <Degrees>78,
-    obsminel: <Degrees>1.9,
-    obsmaxel: <Degrees>95,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>3300, // 1,780 Nm http://www.fortwiki.com/Cavalier_Air_Force_Station
+    minAz: <Degrees>298,
+    maxAz: <Degrees>78,
+    minEl: <Degrees>1.9,
+    maxEl: <Degrees>95,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>3300, // 1,780 Nm http://www.fortwiki.com/Cavalier_Air_Force_Station
     changeObjectInterval: <Milliseconds>1000,
     beamwidth: <Degrees>1.2, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
     linkAehf: true,
@@ -186,8 +184,8 @@ export const sensors = <SensorList>{
     country: 'United States',
     volume: true,
     operator: Operators.USSF,
-  },
-  PITSB: {
+  }),
+  PITSB: new DetailedSensor({
     objName: 'PITSB',
     shortName: 'THL',
     id: 0,
@@ -199,12 +197,12 @@ export const sensors = <SensorList>{
     lat: <Degrees>76.570322,
     lon: <Degrees>-68.299211,
     alt: <Kilometers>0.392, // Open Street Maps
-    obsminaz: <Degrees>297,
-    obsmaxaz: <Degrees>177,
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>5556,
+    minAz: <Degrees>297,
+    maxAz: <Degrees>177,
+    minEl: <Degrees>3,
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>5556,
     changeObjectInterval: <Milliseconds>1000,
     beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
     linkAehf: true,
@@ -213,8 +211,8 @@ export const sensors = <SensorList>{
     url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
     country: 'United States',
     operator: Operators.USSF,
-  },
-  COBRADANE: {
+  }),
+  COBRADANE: new DetailedSensor({
     objName: 'COBRADANE',
     shortName: 'CDN',
     id: 0,
@@ -227,18 +225,18 @@ export const sensors = <SensorList>{
     lon: <Degrees>174.092,
     alt: <Kilometers>0.066, // Open Street Maps
     // boresight 319az https://mostlymissiledefense.com/2012/04/12/cobra-dane-radar-april-12-2012/
-    obsminaz: <Degrees>259, // https://www.radartutorial.eu/19.kartei/01.oth/karte003.en.html
-    obsmaxaz: <Degrees>19,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>30,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>14000, // https://mostlymissiledefense.com/2012/04/12/cobra-dane-radar-april-12-2012/
-    obsminaz2: <Degrees>251,
-    obsmaxaz2: <Degrees>27,
-    obsminel2: <Degrees>30,
-    obsmaxel2: <Degrees>80,
-    obsminrange2: <Kilometers>200,
-    obsmaxrange2: <Kilometers>14000,
+    minAz: <Degrees>259, // https://www.radartutorial.eu/19.kartei/01.oth/karte003.en.html
+    maxAz: <Degrees>19,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>30,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>14000, // https://mostlymissiledefense.com/2012/04/12/cobra-dane-radar-april-12-2012/
+    minAz2: <Degrees>251,
+    maxAz2: <Degrees>27,
+    minEl2: <Degrees>30,
+    maxEl2: <Degrees>80,
+    minRng2: <Kilometers>200,
+    maxRng2: <Kilometers>14000,
     changeObjectInterval: <Milliseconds>1000,
     beamwidth: <Degrees>0.6, // https://www.radartutorial.eu/19.kartei/01.oth/karte003.en.html
     linkWgs: true,
@@ -247,8 +245,8 @@ export const sensors = <SensorList>{
     country: 'United States',
     volume: true,
     operator: Operators.USSF,
-  },
-  KWAJALT: {
+  }),
+  KWAJALT: new DetailedSensor({
     objName: 'KWAJALT',
     shortName: 'ALT',
     id: 0,
@@ -260,12 +258,12 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.716667,
     lon: <Degrees>167.733333,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>200000,
     changeObjectInterval: <Milliseconds>20000,
     linkAehf: true,
     linkWgs: true,
@@ -273,8 +271,8 @@ export const sensors = <SensorList>{
     url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte005.en.html',
     country: 'United States',
     operator: Operators.USA,
-  },
-  KWAJGBRP: {
+  }),
+  KWAJGBRP: new DetailedSensor({
     objName: 'KWAJGBRP',
     id: 0,
     name: 'Ground-Based Radar Prototype (GBR-P), Kwajalein Atoll',
@@ -285,20 +283,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.716668,
     lon: <Degrees>167.773334,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
 
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  KWAJMMW: {
+  }),
+  KWAJMMW: new DetailedSensor({
     objName: 'KWAJMMW',
     id: 0,
     name: 'Millimeter Wave Radar, Kwajalein Atoll',
@@ -308,20 +306,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.756668,
     lon: <Degrees>167.773334,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>2500,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>2500,
     changeObjectInterval: <Milliseconds>20000,
 
     zoom: ZoomValue.LEO,
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  KWAJALC: {
+  }),
+  KWAJALC: new DetailedSensor({
     objName: 'KWAJALC',
     id: 0,
     name: 'ALCOR Radar, Kwajalein Atoll',
@@ -332,20 +330,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.716668,
     lon: <Degrees>167.773334,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>2300,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>2300,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
 
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  KWAJTDX: {
+  }),
+  KWAJTDX: new DetailedSensor({
     objName: 'KWAJTDX',
     id: 0,
     name: 'TRADEX Radar, Kwajalein Atoll',
@@ -355,20 +353,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.756668,
     lon: <Degrees>167.733334,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
 
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  KWAJSPF: {
+  }),
+  KWAJSPF: new DetailedSensor({
     objName: 'KWAJSPF',
     shortName: 'SF',
     id: 0,
@@ -380,20 +378,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>8.723, // SDC7-paper1014.pdf
     lon: <Degrees>167.719,
     alt: <Kilometers>0.007,
-    obsminaz: <Degrees>268, // TODO This needs a better system (same as LEO Labs)
-    obsmaxaz: <Degrees>272,
-    obsminel: <Degrees>5, // ??
-    obsmaxel: <Degrees>175, // ??
-    obsminrange: <Kilometers>50,
-    obsmaxrange: <Kilometers>3057.754, // https://www.spaceforce.mil/News/Article/2142648/swinging-for-the-space-fence/
+    minAz: <Degrees>268, // TODO This needs a better system (same as LEO Labs)
+    maxAz: <Degrees>272,
+    minEl: <Degrees>5, // ??
+    maxEl: <Degrees>175, // ??
+    minRng: <Kilometers>50,
+    maxRng: <Kilometers>3057.754, // https://www.spaceforce.mil/News/Article/2142648/swinging-for-the-space-fence/
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>2000,
 
     url: '',
     country: 'United States',
     operator: Operators.USSF,
-  },
-  MITMIL: {
+  }),
+  MITMIL: new DetailedSensor({
     objName: 'MITMIL',
     shortName: 'MIL',
     id: 0,
@@ -404,19 +402,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>42.6233,
     lon: <Degrees>-71.4882,
     alt: <Kilometers>0.131,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://mostlymissiledefense.com/2012/05/05/space-surveillance-sensors-millstone-hill-radar/',
     country: 'United States',
     operator: Operators.MIT,
-  },
-  GEODDSDGC: {
+  }),
+  GEODDSDGC: new DetailedSensor({
     objName: 'GEODDSDGC',
     id: 0,
     name: 'Diego Garcia',
@@ -426,19 +424,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>-7.29648,
     lon: <Degrees>72.390153,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/',
     country: 'United States',
     operator: Operators.USSF,
-  },
-  GEODDSMAU: {
+  }),
+  GEODDSMAU: new DetailedSensor({
     objName: 'GEODDSMAU',
     id: 0,
     name: 'Maui, Hawaii',
@@ -448,19 +446,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>20.70835,
     lon: <Degrees>-156.257595,
     alt: <Kilometers>3.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/',
     country: 'United States',
     operator: Operators.USSF,
-  },
-  GEODDSSOC: {
+  }),
+  GEODDSSOC: new DetailedSensor({
     objName: 'GEODDSSOC',
     id: 0,
     name: 'Socorro, New Mexico',
@@ -470,19 +468,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>33.817233,
     lon: <Degrees>-106.659961,
     alt: <Kilometers>1.24,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: 'https://mostlymissiledefense.com/2012/08/20/space-surveillance-sensors-geodss-ground-based-electro-optical-deep-space-surveillance-system-august-20-2012/',
     country: 'United States',
     operator: Operators.USSF,
-  },
-  RAFASC: {
+  }),
+  RAFASC: new DetailedSensor({
     objName: 'RAFASC',
     shortName: 'ASC',
     id: 0,
@@ -494,19 +492,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>-7.969444,
     lon: <Degrees>-14.393889,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'United States',
     operator: Operators.USSF,
-  },
-  GLBII: {
+  }),
+  GLBII: new DetailedSensor({
     objName: 'GLBII',
     id: 0,
     name: 'Vardø, Norway',
@@ -516,19 +514,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>70.3671,
     lon: <Degrees>31.1271,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Norway',
     operator: Operators.NOR,
-  },
-  HOLCBAND: {
+  }),
+  HOLCBAND: new DetailedSensor({
     objName: 'HOLCBAND',
     id: 0,
     name: 'Holt Naval Communication Station, Australia',
@@ -539,19 +537,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>-21.816195,
     lon: <Degrees>114.165637,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Australia',
     operator: Operators.RAAF,
-  },
-  HOLSST: {
+  }),
+  HOLSST: new DetailedSensor({
     objName: 'HOLSST',
     id: 0,
     name: 'Holt Naval Communication Station, Australia',
@@ -561,22 +559,22 @@ export const sensors = <SensorList>{
     lat: <Degrees>-21.816195,
     lon: <Degrees>114.165637,
     alt: <Kilometers>0.04572, // https://www.osti.gov/servlets/purl/1253293
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>20, // https://amostech.com/TechnicalPapers/2015/SSA/Graham.pdf
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>20, // https://amostech.com/TechnicalPapers/2015/SSA/Graham.pdf
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Australia',
     operator: Operators.RAAF,
-  },
+  }),
   // //////////////
   // TPY-2 RADARS
   // //////////////
-  HARTPY: {
+  HARTPY: new DetailedSensor({
     objName: 'HARTPY',
     id: 0,
     name: 'Har Keren TPY-2, Israel',
@@ -587,19 +585,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>30.995807,
     lon: <Degrees>34.496062,
     alt: <Kilometers>0.173,
-    obsminaz: <Degrees>5,
-    obsmaxaz: <Degrees>125,
-    obsminel: <Degrees>5,
-    obsmaxel: <Degrees>95,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
+    minAz: <Degrees>5,
+    maxAz: <Degrees>125,
+    minEl: <Degrees>5,
+    maxEl: <Degrees>95,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  QTRTPY: {
+  }),
+  QTRTPY: new DetailedSensor({
     objName: 'QTRTPY',
     id: 0,
     name: 'Al Udeid, Qatar',
@@ -610,19 +608,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>25.31598,
     lon: <Degrees>51.146515,
     alt: <Kilometers>0.01,
-    obsminaz: <Degrees>335,
-    obsmaxaz: <Degrees>95,
-    obsminel: <Degrees>0,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
+    minAz: <Degrees>335,
+    maxAz: <Degrees>95,
+    minEl: <Degrees>0,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  KURTPY: {
+  }),
+  KURTPY: new DetailedSensor({
     objName: 'KURTPY',
     id: 0,
     name: 'Kürecik Radar Station, Turkey',
@@ -633,19 +631,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>38.349444,
     lon: <Degrees>37.793611,
     alt: <Kilometers>1.969,
-    obsminaz: <Degrees>40,
-    obsmaxaz: <Degrees>160,
-    obsminel: <Degrees>0,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
+    minAz: <Degrees>40,
+    maxAz: <Degrees>160,
+    minEl: <Degrees>0,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  SHATPY: {
+  }),
+  SHATPY: new DetailedSensor({
     objName: 'SHATPY',
     id: 0,
     name: 'Shariki Communication Site, Japan',
@@ -656,19 +654,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>40.88809,
     lon: <Degrees>140.337698,
     alt: <Kilometers>0.01,
-    obsminaz: <Degrees>230,
-    obsmaxaz: <Degrees>350,
-    obsminel: <Degrees>0,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
+    minAz: <Degrees>230,
+    maxAz: <Degrees>350,
+    minEl: <Degrees>0,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  KCSTPY: {
+  }),
+  KCSTPY: new DetailedSensor({
     objName: 'KCSTPY',
     id: 0,
     name: 'Kyogamisaki Communication Site, Japan',
@@ -679,19 +677,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>35.766667,
     lon: <Degrees>135.195278,
     alt: <Kilometers>0.01,
-    obsminaz: <Degrees>210,
-    obsmaxaz: <Degrees>330,
-    obsminel: <Degrees>0,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
+    minAz: <Degrees>210,
+    maxAz: <Degrees>330,
+    minEl: <Degrees>0,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
-  SBXRDR: {
+  }),
+  SBXRDR: new DetailedSensor({
     objName: 'SBXRDR',
     id: 0,
     name: 'Sea-Based X-Band Radar, Pacific Ocean',
@@ -702,22 +700,22 @@ export const sensors = <SensorList>{
     lat: <Degrees>36.5012,
     lon: <Degrees>169.6941,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>275,
-    obsmaxaz: <Degrees>300,
-    obsminel: <Degrees>0,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>4025,
+    minAz: <Degrees>275,
+    maxAz: <Degrees>300,
+    minEl: <Degrees>0,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>4025,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: '',
     country: 'United States',
     operator: Operators.USA,
-  },
+  }),
   // //////////////////////
   // LEO LABS
   // //////////////////////
-  LEOMSR: {
+  LEOMSR: new DetailedSensor({
     objName: 'LEOMSR',
     id: 0,
     name: 'Midland Space Radar, Texas',
@@ -728,27 +726,27 @@ export const sensors = <SensorList>{
     lat: <Degrees>31.9643,
     lon: <Degrees>-103.233245,
     alt: <Kilometers>0.855,
-    obsminaz: <Degrees>70,
-    obsmaxaz: <Degrees>72,
-    obsminel: <Degrees>30,
-    obsmaxel: <Degrees>91, // 91 to ensure visual overlap
-    obsminrange: <Kilometers>100,
-    obsmaxrange: <Kilometers>1800,
-    obsminaz2: <Degrees>250,
-    obsmaxaz2: <Degrees>252,
-    obsminel2: <Degrees>30,
-    obsmaxel2: <Degrees>91, // 91 to ensure visual overlap
-    obsminrange2: <Kilometers>100,
-    obsmaxrange2: <Kilometers>1800,
+    minAz: <Degrees>70,
+    maxAz: <Degrees>72,
+    minEl: <Degrees>30,
+    maxEl: <Degrees>91, // 91 to ensure visual overlap
+    minRng: <Kilometers>100,
+    maxRng: <Kilometers>1800,
+    minAz2: <Degrees>250,
+    maxAz2: <Degrees>252,
+    minEl2: <Degrees>30,
+    maxEl2: <Degrees>91, // 91 to ensure visual overlap
+    minRng2: <Kilometers>100,
+    maxRng2: <Kilometers>1800,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/msr',
     country: 'United States',
     volume: true,
     operator: Operators.LEOLABS,
-  },
+  }),
 
-  LEOPFISR: {
+  LEOPFISR: new DetailedSensor({
     objName: 'LEOPFISR',
     id: 0,
     name: 'Poker Flat Incoherent Scatter Radar, Alaska',
@@ -759,26 +757,26 @@ export const sensors = <SensorList>{
     lat: <Degrees>65.12992,
     lon: <Degrees>-147.47104,
     alt: <Kilometers>0.23,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>45,
-    obsmaxel: <Degrees>90, // 91 to ensure visual overlap
-    obsminrange: <Kilometers>100,
-    obsmaxrange: <Kilometers>1800,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>45,
+    maxEl: <Degrees>90, // 91 to ensure visual overlap
+    minRng: <Kilometers>100,
+    maxRng: <Kilometers>1800,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/pfisr',
     country: 'United States',
-    // "boresight": { "azimuth": 15.0, "elevation": 74.0 },
+    // "boresight": new DetailedSensor({ "azimuth": 15.0, "elevation": 74.0 }),
     // "transmitFrequency": 450000000.0,
     // "transmitPower": 2000000.0,
     volume: true,
     operator: Operators.LEOLABS,
-  },
+  }),
 
   // TODO: There needs to be a new method for doing FOV when
   // the radar is a fence but not aiming at 90 elevation
-  LEOKSR: {
+  LEOKSR: new DetailedSensor({
     objName: 'LEOKSR',
     id: 0,
     name: 'Kiwi Space Radar, New Zealand',
@@ -789,32 +787,32 @@ export const sensors = <SensorList>{
     lat: <Degrees>-45.03854,
     lon: <Degrees>170.09556,
     alt: <Kilometers>0.6,
-    // obsminaz: <Degrees>(-13 - 45),
-    // obsmaxaz: <Degrees>(-13 + 45),
-    // obsminel: <Degrees>69,
-    // obsmaxel: <Degrees>71,
-    // obsminrange: <Kilometers>100,
-    // obsmaxrange: <Kilometers>1800,
-    // obsminaz2: <Degrees>(167 - 45),
-    // obsmaxaz2: <Degrees>(167 + 45),
-    // obsminel2: <Degrees>69,
-    // obsmaxel2: <Degrees>71,
-    // obsminrange2: <Kilometers>100,
-    // obsmaxrange2: <Kilometers>1800,
-    obsminaz: <Degrees>269,
-    obsmaxaz: <Degrees>271,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>170,
-    obsminrange: <Kilometers>100,
-    obsmaxrange: <Kilometers>3000,
+    // minAz:<Degrees>(-13 - 45),
+    // maxAz: <Degrees>(-13 + 45),
+    // minEl: <Degrees>69,
+    // maxEl: <Degrees>71,
+    // minRng: <Kilometers>100,
+    // maxRng: <Kilometers>1800,
+    // minAz2: <Degrees>(167 - 45),
+    // maxAz2: <Degrees>(167 + 45),
+    // minEl2: <Degrees>69,
+    // maxEl2: <Degrees>71,
+    // minRng2: <Kilometers>100,
+    // maxRng2: <Kilometers>1800,
+    minAz: <Degrees>269,
+    maxAz: <Degrees>271,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>170,
+    minRng: <Kilometers>100,
+    maxRng: <Kilometers>3000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/ksr',
     country: 'United States',
     volume: true,
     operator: Operators.LEOLABS,
-  },
-  LEOCRSR: {
+  }),
+  LEOCRSR: new DetailedSensor({
     objName: 'LEOCRSR',
     id: 0,
     name: 'Costa Rica Space Radar, Costa Rica',
@@ -825,26 +823,26 @@ export const sensors = <SensorList>{
     lat: <Degrees>10.611782670733335, // https://www.radartutorial.eu/19.kartei/02.surv/karte087.en.html
     lon: <Degrees>-85.52869380341954,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>209,
-    obsmaxaz: <Degrees>211,
-    obsminel: <Degrees>20,
-    obsmaxel: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
-    obsminrange: <Kilometers>100,
-    obsmaxrange: <Kilometers>3000,
-    obsminaz2: <Degrees>119,
-    obsmaxaz2: <Degrees>121,
-    obsminel2: <Degrees>20,
-    obsmaxel2: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
-    obsminrange2: <Kilometers>100,
-    obsmaxrange2: <Kilometers>3000,
+    minAz: <Degrees>209,
+    maxAz: <Degrees>211,
+    minEl: <Degrees>20,
+    maxEl: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    minRng: <Kilometers>100,
+    maxRng: <Kilometers>3000,
+    minAz2: <Degrees>119,
+    maxAz2: <Degrees>121,
+    minEl2: <Degrees>20,
+    maxEl2: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    minRng2: <Kilometers>100,
+    maxRng2: <Kilometers>3000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/crsr',
     country: 'United States',
     volume: true,
     operator: Operators.LEOLABS,
-  },
-  LEOAZORES: {
+  }),
+  LEOAZORES: new DetailedSensor({
     objName: 'LEOAZORES',
     id: 0,
     name: 'Azores Space Radar, Azores',
@@ -855,26 +853,26 @@ export const sensors = <SensorList>{
     lat: <Degrees>36.9975,
     lon: <Degrees>-25.1384933,
     alt: <Kilometers>0.198,
-    obsminaz: <Degrees>209,
-    obsmaxaz: <Degrees>211,
-    obsminel: <Degrees>20,
-    obsmaxel: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
-    obsminrange: <Kilometers>100,
-    obsmaxrange: <Kilometers>3000,
-    obsminaz2: <Degrees>119,
-    obsmaxaz2: <Degrees>121,
-    obsminel2: <Degrees>20,
-    obsmaxel2: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
-    obsminrange2: <Kilometers>100,
-    obsmaxrange2: <Kilometers>3000,
+    minAz: <Degrees>209,
+    maxAz: <Degrees>211,
+    minEl: <Degrees>20,
+    maxEl: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    minRng: <Kilometers>100,
+    maxRng: <Kilometers>3000,
+    minAz2: <Degrees>119,
+    maxAz2: <Degrees>121,
+    minEl2: <Degrees>20,
+    maxEl2: <Degrees>180, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    minRng2: <Kilometers>100,
+    maxRng2: <Kilometers>3000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/crsr',
     country: 'United States',
     volume: true,
     operator: Operators.LEOLABS,
-  },
-  LEOWASR: {
+  }),
+  LEOWASR: new DetailedSensor({
     objName: 'LEOWASR',
     id: 0,
     name: 'Western Australia Space Radar, Australia',
@@ -885,25 +883,25 @@ export const sensors = <SensorList>{
     lat: <Degrees>-33.308487,
     lon: <Degrees>116.030608,
     alt: <Kilometers>0.241,
-    obsminaz: <Degrees>119,
-    obsmaxaz: <Degrees>121,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>170, // NOTE: Not sure why this looks correct, but 200 goes into the earth
-    obsminrange: <Kilometers>100,
-    obsmaxrange: <Kilometers>3000,
+    minAz: <Degrees>119,
+    maxAz: <Degrees>121,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>170, // NOTE: Not sure why this looks correct, but 200 goes into the earth
+    minRng: <Kilometers>100,
+    maxRng: <Kilometers>3000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/crsr',
     country: 'United States',
     volume: true,
     operator: Operators.LEOLABS,
-  },
+  }),
   // LEO LABS ARSR on hold as of 2023-11-12 due to national security concerns from Argentina
 
   // //////////////////////
   // ESOC RADARS
   // //////////////////////
-  GRV: {
+  GRV: new DetailedSensor({
     objName: 'GRV',
     id: 0,
     name: 'Grand Réseau Adapté à la Veille Spatiale, France',
@@ -914,20 +912,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>47.347778,
     lon: <Degrees>5.51638,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>90,
-    obsmaxaz: <Degrees>270,
-    obsminel: <Degrees>20,
-    obsmaxel: <Degrees>40,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>1700, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
+    minAz: <Degrees>90,
+    maxAz: <Degrees>270,
+    minEl: <Degrees>20,
+    maxEl: <Degrees>40,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>1700, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'France',
     volume: true,
     operator: Operators.ESA,
-  },
-  TIR: {
+  }),
+  TIR: new DetailedSensor({
     objName: 'TIR',
     id: 0,
     name: 'Wachtberg, Germany',
@@ -938,19 +936,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>50.6166,
     lon: <Degrees>7.1296,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1.5, // http://www.issfd.org/ISSFD_2012/ISSFD23_CRSD2_3.pdf
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>2000, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1.5, // http://www.issfd.org/ISSFD_2012/ISSFD23_CRSD2_3.pdf
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>2000, // http://emits.sso.esa.int/emits-doc/AO5059RD1.pdf
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Germany',
     operator: Operators.ESA,
-  },
-  GES: {
+  }),
+  GES: new DetailedSensor({
     objName: 'GES',
     id: 0,
     name: 'Schmidtenhöhe, Germany',
@@ -961,19 +959,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>50.335711,
     lon: <Degrees>7.6359085,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>1.5,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>3000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>1.5,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>3000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Germany',
     operator: Operators.ESA,
-  },
-  NRC: {
+  }),
+  NRC: new DetailedSensor({
     objName: 'NRC',
     id: 0,
     name: 'Northern Cross Radiotelescope, Italy',
@@ -984,25 +982,25 @@ export const sensors = <SensorList>{
     lat: <Degrees>44.5208,
     lon: <Degrees>11.6469,
     alt: <Kilometers>0.025,
-    obsminaz: <Degrees>89.1,
-    obsmaxaz: <Degrees>90.9,
-    obsminel: <Degrees>45,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>1700,
-    obsminaz2: <Degrees>179.1,
-    obsmaxaz2: <Degrees>180.9,
-    obsminel2: <Degrees>45,
-    obsmaxel2: <Degrees>90,
-    obsminrange2: <Kilometers>0,
-    obsmaxrange2: <Kilometers>1700,
+    minAz: <Degrees>89.1,
+    maxAz: <Degrees>90.9,
+    minEl: <Degrees>45,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>1700,
+    minAz2: <Degrees>179.1,
+    maxAz2: <Degrees>180.9,
+    minEl2: <Degrees>45,
+    maxEl2: <Degrees>90,
+    minRng2: <Kilometers>0,
+    maxRng2: <Kilometers>1700,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Italy',
     operator: Operators.ESA,
-  },
-  PDM: {
+  }),
+  PDM: new DetailedSensor({
     objName: 'PDM',
     id: 0,
     name: 'Pratica di Mare Air Base, Italy',
@@ -1012,19 +1010,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>41.654444, // https://en.wikipedia.org/wiki/Pratica_di_Mare_Air_Base
     lon: <Degrees>12.445,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>5, // 0 seems low - https://amostech.com/TechnicalPapers/2015/Adaptive_Optics_Imaging/DelGenio.pdf
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0, // https://amostech.com/TechnicalPapers/2015/Adaptive_Optics_Imaging/DelGenio.pdf
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>5, // 0 seems low - https://amostech.com/TechnicalPapers/2015/Adaptive_Optics_Imaging/DelGenio.pdf
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0, // https://amostech.com/TechnicalPapers/2015/Adaptive_Optics_Imaging/DelGenio.pdf
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Italy',
     operator: Operators.ITAF,
-  },
-  TRO: {
+  }),
+  TRO: new DetailedSensor({
     objName: 'TRO',
     id: 0,
     name: 'Royal Air Force Troödos, Cyprus',
@@ -1034,19 +1032,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>34.912778,
     lon: <Degrees>32.883889,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>3,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'United Kingdom',
     operator: Operators.UKSA,
-  },
-  Tenerife: {
+  }),
+  Tenerife: new DetailedSensor({
     objName: 'SDT',
     id: 0,
     name: 'ESA Space Debris Telescope, Spain',
@@ -1056,19 +1054,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>28.3,
     lon: <Degrees>-16.5097,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Spain',
     operator: Operators.ESA,
-  },
-  ZimLAT: {
+  }),
+  ZimLAT: new DetailedSensor({
     objName: 'ZimLAT',
     id: 0,
     name: 'Zimmerwald Observatory, Switzerland',
@@ -1078,19 +1076,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>46.877225,
     lon: <Degrees>7.465225,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Switzerland',
     operator: Operators.ESA,
-  },
-  ZimSMART: {
+  }),
+  ZimSMART: new DetailedSensor({
     objName: 'ZimSMART',
     id: 0,
     name: 'Zimmerwald Observatory, Switzerland',
@@ -1100,19 +1098,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>46.876947,
     lon: <Degrees>7.465086,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Switzerland',
     operator: Operators.ESA,
-  },
-  Tromso: {
+  }),
+  Tromso: new DetailedSensor({
     objName: 'Tromso',
     id: 0,
     name: 'Tromso, Norway',
@@ -1123,19 +1121,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>69.586439,
     lon: <Degrees>19.226111,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>30, // https://www.eiscat.se/groups/Operations/ops-manual/ops-manual.htm
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>500,
-    obsmaxrange: <Kilometers>1500,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>30, // https://www.eiscat.se/groups/Operations/ops-manual/ops-manual.htm
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>500,
+    maxRng: <Kilometers>1500,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Norway',
     operator: Operators.EISCAT,
-  },
-  Kiruna: {
+  }),
+  Kiruna: new DetailedSensor({
     objName: 'Kiruna',
     id: 0,
     name: 'Kiruna, Sweden',
@@ -1146,19 +1144,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>67.860778,
     lon: <Degrees>20.433806,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>500,
-    obsmaxrange: <Kilometers>1500,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>500,
+    maxRng: <Kilometers>1500,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Sweden',
     operator: Operators.EISCAT,
-  },
-  Sodankyla: {
+  }),
+  Sodankyla: new DetailedSensor({
     objName: 'Sodankyla',
     id: 0,
     name: 'Sodankyla, Finland',
@@ -1169,19 +1167,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>67.363903,
     lon: <Degrees>26.630417,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>500,
-    obsmaxrange: <Kilometers>1500,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>500,
+    maxRng: <Kilometers>1500,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Finland',
     operator: Operators.EISCAT,
-  },
-  Svalbard: {
+  }),
+  Svalbard: new DetailedSensor({
     objName: 'Svalbard',
     id: 0,
     name: 'Svalbard, Norway',
@@ -1192,22 +1190,22 @@ export const sensors = <SensorList>{
     lat: <Degrees>78.152669,
     lon: <Degrees>16.058706,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>500,
-    obsmaxrange: <Kilometers>1500,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>500,
+    maxRng: <Kilometers>1500,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>20000,
     url: '',
     country: 'Norway',
     operator: Operators.EISCAT,
-  },
+  }),
   // ////////////////////////////////////////////////////////////////////////////////////////////////
   // RUSSIAN RADARS
   // ////////////////////////////////////////////////////////////////////////////////////////////////
-  OLED: {
+  OLED: new DetailedSensor({
     objName: 'OLED',
     id: 0,
     name: 'Olenegorsk, Russia',
@@ -1218,18 +1216,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>68.1141,
     lon: <Degrees>33.9102,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>280, // All Information via russianforces.org
-    obsmaxaz: <Degrees>340,
-    obsminel: <Degrees>5.5,
-    obsmaxel: <Degrees>34.5,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>4600,
+    minAz: <Degrees>280, // All Information via russianforces.org
+    maxAz: <Degrees>340,
+    minEl: <Degrees>5.5,
+    maxEl: <Degrees>34.5,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>4600,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
-  OLEV: {
+  }),
+  OLEV: new DetailedSensor({
     objName: 'OLEV',
     id: 0,
     name: 'Olenegorsk, Russia',
@@ -1240,19 +1238,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>68.090694,
     lon: <Degrees>34.327539,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>250, // All Information via russianforces.org
-    obsmaxaz: <Degrees>10,
-    obsminel: <Degrees>7,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000, // 6000 horizontal, 10000 vertical
+    minAz: <Degrees>250, // All Information via russianforces.org
+    maxAz: <Degrees>10,
+    minEl: <Degrees>7,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000, // 6000 horizontal, 10000 vertical
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
     // Under Contstruction
-  },
-  PEC: {
+  }),
+  PEC: new DetailedSensor({
     objName: 'PEC',
     id: 0,
     name: 'Pechora, Russia',
@@ -1263,19 +1261,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>65.21,
     lon: <Degrees>57.295,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>305, // All Information via russianforces.org
-    obsmaxaz: <Degrees>55,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>55,
-    obsminrange: <Kilometers>300,
-    obsmaxrange: <Kilometers>7200,
+    minAz: <Degrees>305, // All Information via russianforces.org
+    maxAz: <Degrees>55,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>55,
+    minRng: <Kilometers>300,
+    maxRng: <Kilometers>7200,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
+  }),
   // Vorkuta
-  MISD: {
+  MISD: new DetailedSensor({
     objName: 'MISD',
     id: 0,
     name: 'Mishelevka, Russia',
@@ -1286,18 +1284,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>52.8555,
     lon: <Degrees>103.2317,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>41, // All Information via russianforces.org
-    obsmaxaz: <Degrees>219,
-    obsminel: <Degrees>5.5,
-    obsmaxel: <Degrees>34.5,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>4600,
+    minAz: <Degrees>41, // All Information via russianforces.org
+    maxAz: <Degrees>219,
+    minEl: <Degrees>5.5,
+    maxEl: <Degrees>34.5,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>4600,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
-  MISV: {
+  }),
+  MISV: new DetailedSensor({
     // NOTE: There are two co-located here
     objName: 'MISV',
     id: 0,
@@ -1310,18 +1308,18 @@ export const sensors = <SensorList>{
     lon: <Degrees>103.2317,
     alt: <Kilometers>0.0,
     // boresight 130
-    obsminaz: <Degrees>10, // All Information via russianforces.org
-    obsmaxaz: <Degrees>250,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000, // 6000 horizontal, 10000 vertical
+    minAz: <Degrees>10, // All Information via russianforces.org
+    maxAz: <Degrees>250,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000, // 6000 horizontal, 10000 vertical
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
-  LEKV: {
+  }),
+  LEKV: new DetailedSensor({
     objName: 'LEKV',
     id: 0,
     name: 'Lekhtusi, Russia',
@@ -1332,19 +1330,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>60.275458,
     lon: <Degrees>30.546017,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>245,
-    obsmaxaz: <Degrees>355,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000,
+    minAz: <Degrees>245,
+    maxAz: <Degrees>355,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
+  }),
   // Planned Voronezh-SM (Ragozinka-2)
-  ARMV: {
+  ARMV: new DetailedSensor({
     objName: 'ARMV',
     id: 0,
     name: 'Armavir, Russia',
@@ -1356,19 +1354,19 @@ export const sensors = <SensorList>{
     lon: <Degrees>40.983894,
     alt: <Kilometers>0.0,
     // 2 Radars = 240az
-    obsminaz: <Degrees>55, // All Information via russianforces.org
-    obsmaxaz: <Degrees>295,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000,
+    minAz: <Degrees>55, // All Information via russianforces.org
+    maxAz: <Degrees>295,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     zoom: ZoomValue.LEO,
     operator: Operators.RUSSF,
-  },
+  }),
   // Decommissioned???
-  // GAN: {
+  // GAN: new DetailedSensor({
   //   objName: 'GAN',
   //   id: 0,
   //   name: 'Gantsevichi, Russia',
@@ -1378,18 +1376,18 @@ export const sensors = <SensorList>{
   //   lat: <Degrees>52.85,
   //   lon: <Degrees>26.48,
   //   alt: <Kilometers>0.0,
-  //   obsminaz: <Degrees>190, // All Information via russianforces.org
-  //   obsmaxaz: <Degrees>310,
-  //   obsminel: <Degrees>3,
-  //   obsmaxel: <Degrees>80,
-  //   obsminrange: <Kilometers>300,
-  //   obsmaxrange: <Kilometers>6500,
+  //   minAz:<Degrees>190, // All Information via russianforces.org
+  //   maxAz: <Degrees>310,
+  //   minEl: <Degrees>3,
+  //   maxEl: <Degrees>80,
+  //   minRng: <Kilometers>300,
+  //   maxRng: <Kilometers>6500,
   //   zoom: ZoomValue.LEO,
   //   changeObjectInterval: <Milliseconds>1000,
   //   country: 'Russia',
   //   operator: Operators.RUSSF,
-  // },
-  KALV: {
+  // }),
+  KALV: new DetailedSensor({
     objName: 'KALV',
     id: 0,
     name: 'Kaliningrad, Russia', // Pionersky/Kaliningrad
@@ -1401,18 +1399,18 @@ export const sensors = <SensorList>{
     lon: <Degrees>20.18235,
     alt: <Kilometers>0.0,
     // boresight 240
-    obsminaz: <Degrees>180, // All Information via russianforces.org
-    obsmaxaz: <Degrees>300,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000,
+    minAz: <Degrees>180, // All Information via russianforces.org
+    maxAz: <Degrees>300,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
-  BARV: {
+  }),
+  BARV: new DetailedSensor({
     objName: 'BARV',
     id: 0,
     name: 'Barnaul, Russia',
@@ -1423,18 +1421,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>53.139194,
     lon: <Degrees>83.68125,
     alt: <Kilometers>0.0,
-    obsminaz: <Degrees>110, // All Information via russianforces.org
-    obsmaxaz: <Degrees>230,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000,
+    minAz: <Degrees>110, // All Information via russianforces.org
+    maxAz: <Degrees>230,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
-  YENV: {
+  }),
+  YENV: new DetailedSensor({
     objName: 'YENV',
     id: 0,
     name: 'Yeniseysk, Russia',
@@ -1446,18 +1444,18 @@ export const sensors = <SensorList>{
     lon: <Degrees>92.046072,
     alt: <Kilometers>0.0,
     // boresight 240
-    obsminaz: <Degrees>330, // All Information via russianforces.org
-    obsmaxaz: <Degrees>90,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000,
+    minAz: <Degrees>330, // All Information via russianforces.org
+    maxAz: <Degrees>90,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
-  ORSV: {
+  }),
+  ORSV: new DetailedSensor({
     objName: 'ORSV',
     id: 0,
     name: 'Orsk, Russia',
@@ -1469,19 +1467,19 @@ export const sensors = <SensorList>{
     lon: <Degrees>58.95903,
     alt: <Kilometers>0.0,
     // boresight 180 - https://www.janes.com/images/default-source/news-images/bsp_13855-idr-16436.jpg?sfvrsn=aa8c7163_2
-    obsminaz: <Degrees>120, // All Information via russianforces.org
-    obsmaxaz: <Degrees>240,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>70,
-    obsminrange: <Kilometers>250,
-    obsmaxrange: <Kilometers>6000,
+    minAz: <Degrees>120, // All Information via russianforces.org
+    maxAz: <Degrees>240,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>70,
+    minRng: <Kilometers>250,
+    maxRng: <Kilometers>6000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
+  }),
   // Removed from combat alert in 2020
-  // BAL: {
+  // BAL: new DetailedSensor({
   //   objName: 'BAL',
   //   id: 0,
   //   name: 'Balkhash, Russia',
@@ -1492,18 +1490,18 @@ export const sensors = <SensorList>{
   //   lat: <Degrees>46.603076,
   //   lon: <Degrees>74.530985,
   //   alt: <Kilometers>0.0,
-  //   obsminaz: <Degrees>91, // All Information via russianforces.org
-  //   obsmaxaz: <Degrees>151,
-  //   obsminel: <Degrees>5.5,
-  //   obsmaxel: <Degrees>34.5,
-  //   obsminrange: <Kilometers>385,
-  //   obsmaxrange: <Kilometers>4600,
+  //   minAz:<Degrees>91, // All Information via russianforces.org
+  //   maxAz: <Degrees>151,
+  //   minEl: <Degrees>5.5,
+  //   maxEl: <Degrees>34.5,
+  //   minRng: <Kilometers>385,
+  //   maxRng: <Kilometers>4600,
   //   zoom: ZoomValue.LEO,
   //   changeObjectInterval: <Milliseconds>1000,
   //   country: 'Russia',
   //   operator: Operators.RUSSF,
-  // },
-  STO: {
+  // }),
+  STO: new DetailedSensor({
     objName: 'STO',
     id: 0,
     name: 'Storozhevaya, Russia',
@@ -1514,18 +1512,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>43.718331,
     lon: <Degrees>41.226253,
     alt: <Kilometers>2.115,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>5,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>5,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
-  NAK: {
+  }),
+  NAK: new DetailedSensor({
     objName: 'NAK',
     id: 0,
     name: 'Nakhodka, Russia',
@@ -1536,21 +1534,21 @@ export const sensors = <SensorList>{
     lat: <Degrees>42.9357,
     lon: <Degrees>132.576769,
     alt: <Kilometers>0.21,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>0,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>0,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     country: 'Russia',
     operator: Operators.RUSSF,
-  },
+  }),
   // ////////////////////////////////////////////////////////////////////////////////////////////////
   // CHINESE RADARS
   // ////////////////////////////////////////////////////////////////////////////////////////////////
-  // XUA: { // Not operational anymore
+  // XUA: new DetailedSensor({ // Not operational anymore
   //   id: 0,
   //   name: 'Xuanhua, China',
   //   shortName: 'XUA',
@@ -1558,19 +1556,19 @@ export const sensors = <SensorList>{
   //   lat: <Degrees>40.446944,
   //   lon: <Degrees>115.116389,
   //   alt: <Kilometers>1.6,
-  //   obsminaz: <Degrees>300, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-  //   obsmaxaz: <Degrees>60, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
-  //   obsminel: <Degrees>2, // Information via globalsecurity.org
-  //   obsmaxel: <Degrees>80, // Information via globalsecurity.org
-  //   obsminrange: <Kilometers>300,
-  //   obsmaxrange: <Kilometers>3000, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+  //   minAz:<Degrees>300, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+  //   maxAz: <Degrees>60, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
+  //   minEl: <Degrees>2, // Information via globalsecurity.org
+  //   maxEl: <Degrees>80, // Information via globalsecurity.org
+  //   minRng: <Kilometers>300,
+  //   maxRng: <Kilometers>3000, // Information via global ssa sensors amos 2010.pdf (sinodefence.com/special/airdefense/project640.asp)
   //   zoom: ZoomValue.LEO,
   //   changeObjectInterval: <Milliseconds>1000,
   //   country: 'China',
   //
   //
-  // },
-  XIN: {
+  // }),
+  XIN: new DetailedSensor({
     objName: 'XIN',
     id: 0,
     name: 'Korla Site Xingjiang, China', // Korla
@@ -1580,18 +1578,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>41.64131987863126, // https://hfasia.blogspot.com/2017/02/blog-post_50.html
     lon: <Degrees>86.23695312232473,
     alt: <Kilometers>0.993, // https://www.freemaptools.com/elevation-finder.htm
-    obsminaz: <Degrees>0, // https://www.globalsecurity.org/space/world/china/images/xinjiang-radar-image-2018-1-s.jpg
-    obsmaxaz: <Degrees>360, // It is on a rotatable platform
-    obsminel: <Degrees>3, // Assumed same characteristics as AN/FPS-115
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200, // Assumed same characteristics as AN/FPS-115
-    obsmaxrange: <Kilometers>5556, // Assumed same characteristics as AN/FPS-115
+    minAz: <Degrees>0, // https://www.globalsecurity.org/space/world/china/images/xinjiang-radar-image-2018-1-s.jpg
+    maxAz: <Degrees>360, // It is on a rotatable platform
+    minEl: <Degrees>3, // Assumed same characteristics as AN/FPS-115
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200, // Assumed same characteristics as AN/FPS-115
+    maxRng: <Kilometers>5556, // Assumed same characteristics as AN/FPS-115
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'China',
     operator: Operators.PLA,
-  },
-  HEI: {
+  }),
+  HEI: new DetailedSensor({
     objName: 'HEI',
     id: 0,
     name: 'Huanan Heilongjiang, China',
@@ -1602,18 +1600,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>46.528164,
     lon: <Degrees>130.755235,
     alt: <Kilometers>0.241, // https://www.freemaptools.com/elevation-finder.htm
-    obsminaz: <Degrees>135, // X-Band https://www.globalsecurity.org/wmd/world/china/lpar-x.htm
-    obsmaxaz: <Degrees>225, // Assumed +/- 45 degrees
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>65,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>3000,
+    minAz: <Degrees>135, // X-Band https://www.globalsecurity.org/wmd/world/china/lpar-x.htm
+    maxAz: <Degrees>225, // Assumed +/- 45 degrees
+    minEl: <Degrees>3,
+    maxEl: <Degrees>65,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>3000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'China',
     operator: Operators.PLA,
-  },
-  ZHE: {
+  }),
+  ZHE: new DetailedSensor({
     objName: 'ZHE',
     id: 0,
     name: `Lin'an Zhejiang, China`,
@@ -1624,18 +1622,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>30.28661248844618, // https://hfasia.blogspot.com/2017/02/blog-post_50.html
     lon: <Degrees>119.12859385017512,
     alt: <Kilometers>1.342, // https://www.freemaptools.com/elevation-finder.htm
-    obsminaz: <Degrees>60,
-    obsmaxaz: <Degrees>300,
-    obsminel: <Degrees>2,
-    obsmaxel: <Degrees>80,
-    obsminrange: <Kilometers>300,
-    obsmaxrange: <Kilometers>3000,
+    minAz: <Degrees>60,
+    maxAz: <Degrees>300,
+    minEl: <Degrees>2,
+    maxEl: <Degrees>80,
+    minRng: <Kilometers>300,
+    maxRng: <Kilometers>3000,
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'China',
     operator: Operators.PLA,
-  },
-  SHD: {
+  }),
+  SHD: new DetailedSensor({
     objName: 'SHD',
     id: 0,
     name: 'Shandong, China', // P-Band (225 Mhz - 390 Mhz)
@@ -1646,19 +1644,19 @@ export const sensors = <SensorList>{
     lat: <Degrees>36.023072,
     lon: <Degrees>118.093115,
     alt: <Kilometers>0.694, // https://www.freemaptools.com/elevation-finder.htm
-    obsminaz: <Degrees>343.9, // Two Faces Boresight ~163.9 and ~103.9 degrees
+    minAz: <Degrees>343.9, // Two Faces Boresight ~163.9 and ~103.9 degrees
     // https://www.omnicalculator.com/other/azimuth (163.9 degrees if aimed at Taipei)
-    obsmaxaz: <Degrees>223.9, // https://www.defensenews.com/global/asia-pacific/2022/04/18/new-chinese-radar-looks-towards-japan-satellite-image-shows/
-    obsminel: <Degrees>3,
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>5500, // ~10,000 Transceivers
+    maxAz: <Degrees>223.9, // https://www.defensenews.com/global/asia-pacific/2022/04/18/new-chinese-radar-looks-towards-japan-satellite-image-shows/
+    minEl: <Degrees>3,
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>5500, // ~10,000 Transceivers
     zoom: ZoomValue.LEO,
     changeObjectInterval: <Milliseconds>1000,
     country: 'China',
     operator: Operators.PLA,
-  },
-  PMO: {
+  }),
+  PMO: new DetailedSensor({
     objName: 'PMO',
     id: 0,
     name: 'Purple Mountain Observatory, China',
@@ -1668,21 +1666,21 @@ export const sensors = <SensorList>{
     lat: <Degrees>32.064946,
     lon: <Degrees>118.829677,
     alt: <Kilometers>0.267,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     country: 'China',
     operator: Operators.CAS,
-  },
+  }),
   // ////////////////////////////////////////////////////////////////////////////////////////////////
   // OTHER SENSORS
   // ////////////////////////////////////////////////////////////////////////////////////////////////
-  MLS: {
+  MLS: new DetailedSensor({
     objName: 'MLS',
     id: 0,
     name: 'Mount Lemmon Survey, Arizona',
@@ -1692,18 +1690,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>32.442,
     lon: <Degrees>-110.789,
     alt: <Kilometers>2.791,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     country: 'United States',
     operator: Operators.COMMERCIAL,
-  },
-  PO: {
+  }),
+  PO: new DetailedSensor({
     objName: 'PO',
     id: 0,
     name: 'Palomar Mountain Observatory, California',
@@ -1713,18 +1711,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>33.3564,
     lon: <Degrees>-116.865,
     alt: <Kilometers>1.712,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     country: 'United States',
     operator: Operators.CALTECH,
-  },
-  LSO: {
+  }),
+  LSO: new DetailedSensor({
     objName: 'LSO',
     id: 0,
     name: 'La Sagra Observatory, Spain',
@@ -1734,20 +1732,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>37.9839,
     lon: <Degrees>-2.5644,
     alt: <Kilometers>0,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     country: 'Spain',
     operator: Operators.ESA,
-  },
+  }),
 
   // ISON Sensors
-  MAY: {
+  MAY: new DetailedSensor({
     objName: 'MAY',
     id: 0,
     name: 'Remote Astronomical Society Observatory, New Mexico',
@@ -1757,18 +1755,18 @@ export const sensors = <SensorList>{
     lat: <Degrees>32.9039,
     lon: <Degrees>-105.5289,
     alt: <Kilometers>2.225,
-    obsminaz: <Degrees>0,
-    obsmaxaz: <Degrees>360,
-    obsminel: <Degrees>10,
-    obsmaxel: <Degrees>90,
-    obsminrange: <Kilometers>15000,
-    obsmaxrange: <Kilometers>200000,
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>10,
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>15000,
+    maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
     country: 'United States',
     operator: Operators.COMMERCIAL,
-  },
-  ROC: {
+  }),
+  ROC: new DetailedSensor({
     objName: 'ROC',
     id: 0,
     name: 'Leshan , Republic of China (Taiwan)',
@@ -1778,17 +1776,17 @@ export const sensors = <SensorList>{
     lat: <Degrees>24.499,
     lon: <Degrees>121.072,
     alt: <Kilometers>2.6, // https://taiwanenglishnews.com/tag/leshan-radar-station/ (2.6km)
-    obsminaz: <Degrees>0, // Appears to be 3 faced
-    obsmaxaz: <Degrees>360, // https://www.google.com/maps/place/24%C2%B029'45.6%22N+121%C2%B004'15.6%22E/@24.4985462,121.0709751,154m/data=!3m1!1e3!4m5!3m4!1s0x0:0xe0073e890dc05d63!8m2!3d24.496!4d121.071
-    obsminel: <Degrees>-1, // "Tracks surface ships" https://www.globalsecurity.org/military/world/taiwan/air-defense-over.htm
-    obsmaxel: <Degrees>85,
-    obsminrange: <Kilometers>200,
-    obsmaxrange: <Kilometers>5556,
+    minAz: <Degrees>0, // Appears to be 3 faced
+    maxAz: <Degrees>360, // https://www.google.com/maps/place/24%C2%B029'45.6%22N+121%C2%B004'15.6%22E/@24.4985462,121.0709751,154m/data=!3m1!1e3!4m5!3m4!1s0x0:0xe0073e890dc05d63!8m2!3d24.496!4d121.071
+    minEl: <Degrees>-1, // "Tracks surface ships" https://www.globalsecurity.org/military/world/taiwan/air-defense-over.htm
+    maxEl: <Degrees>85,
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>5556,
     changeObjectInterval: <Milliseconds>1000,
 
     zoom: ZoomValue.LEO,
     url: 'https://fas.org/man/eprint/leshan.pdf',
     country: 'Republic of China (Taiwan)',
     operator: Operators.ROC,
-  },
+  }),
 };

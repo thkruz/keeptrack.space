@@ -1,5 +1,5 @@
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
-import { SensorListPlugin } from '@app/plugins/sensor/sensor-list-plugin';
+import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';

@@ -58,7 +58,7 @@ describe('CountriesMenu_class', () => {
       hasObject: jest.fn(),
       createGroupByCountry_: jest.fn(),
     } as unknown as ObjectGroup;
-    keepTrackApi.getCatalogManager().getSat = () => defaultSat;
+    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
     CountriesMenu['groupSelected_']('Argentina');
     // expect(uiManagerInstance.searchManager.fillResultBox).toHaveBeenCalled();
     expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(-1);

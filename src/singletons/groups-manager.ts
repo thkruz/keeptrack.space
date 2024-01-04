@@ -31,16 +31,12 @@ export class StandardGroupManager implements GroupsManager {
   stopUpdatingInViewSoon: boolean;
 
   private changeGroup_(group: ObjectGroup): ObjectGroup {
-    if (this.selectedGroup) {
-      this.selectedGroup.clear();
-    }
-
     this.selectedGroup = group;
     return this.selectedGroup;
   }
 
   selectGroup(group: ObjectGroup): void {
-    this.changeGroup_(group).updateIsInGroup();
+    this.changeGroup_(group);
     group.updateOrbits();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     colorSchemeManagerInstance.setToGroupColorScheme();
@@ -48,8 +44,8 @@ export class StandardGroupManager implements GroupsManager {
     this.stopUpdatingInViewSoon = false;
   }
 
-  selectGroupNoOverlay(group: ObjectGroup): void {
-    this.changeGroup_(group).updateIsInGroup();
+  // eslint-disable-next-line class-methods-use-this
+  selectGroupNoOverlay(): void {
     settingsManager.isGroupOverlayDisabled = true;
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();

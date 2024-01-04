@@ -40,7 +40,7 @@ import eruda from 'eruda';
 import erudaFps from 'eruda-fps';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { CatalogManager, KeepTrackApiEvents, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
+import { KeepTrackApiEvents, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl, hideEl } from './lib/get-el';
 import { getUnique } from './lib/get-unique';
@@ -51,8 +51,8 @@ import { settingsManager } from './settings/settings';
 import { VERSION } from './settings/version.js';
 import { VERSION_DATE } from './settings/versionDate.js';
 import { Camera } from './singletons/camera';
-import { StandardCatalogManager } from './singletons/catalog-manager';
-import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
+import { CatalogManager } from './singletons/catalog-manager';
+import { ColorSchemeManager } from './singletons/color-scheme-manager';
 import { DemoManager } from './singletons/demo-mode';
 import { DotsManager } from './singletons/dots-manager';
 import { LineManager, lineManagerInstance } from './singletons/draw-manager/line-manager';
@@ -84,12 +84,12 @@ export class KeepTrack {
     SatMath: SatMath,
   };
 
-  colorManager: StandardColorSchemeManager;
+  colorManager: ColorSchemeManager;
   demoManager: DemoManager;
   dotsManager: DotsManager;
   errorManager: ErrorManager;
   lineManager: LineManager;
-  colorSchemeManager: StandardColorSchemeManager;
+  colorSchemeManager: ColorSchemeManager;
   orbitManager: OrbitManager;
   catalogManager: CatalogManager;
   timeManager: TimeManager;
@@ -119,7 +119,7 @@ export class KeepTrack {
 
     const orbitManagerInstance = new StandardOrbitManager();
     keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
-    const catalogManagerInstance = new StandardCatalogManager();
+    const catalogManagerInstance = new CatalogManager();
     keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
     const groupManagerInstance = new StandardGroupManager();
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
@@ -137,7 +137,7 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
     const uiManagerInstance = new StandardUiManager();
     keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
-    const colorSchemeManagerInstance = new StandardColorSchemeManager();
+    const colorSchemeManagerInstance = new ColorSchemeManager();
     keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
     const inputManagerInstance = new InputManager();
     keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
@@ -532,9 +532,10 @@ theodore.kruczek at gmail dot com.
     if (this.isShowFPS) console.log(KeepTrack.getFps_(renderer.dt));
 
     // Update official time for everyone else
+    timeManagerInstance.setNow(<Milliseconds>Date.now());
     if (!this.isUpdateTimeThrottle_) {
       this.isUpdateTimeThrottle_ = true;
-      timeManagerInstance.setNow(<Milliseconds>Date.now());
+      timeManagerInstance.setSelectedDate(timeManagerInstance.simulationTimeObj);
       setTimeout(() => {
         this.isUpdateTimeThrottle_ = false;
       }, 500);

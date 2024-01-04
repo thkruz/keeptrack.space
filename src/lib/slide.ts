@@ -39,9 +39,7 @@ export const slideInRight = (el: HTMLElement | null, duration: number, callback?
  */
 
 export const slideOutUp = (el: HTMLElement, duration: number, callback?: () => void): void => {
-  // Avoid errors for now
-  // TODO: Throw an error here
-  if (el === null) return;
+  if (el === null) throw new Error('Element not found!');
 
   if (el.style.display === 'none') return;
   el.style.transition = `transform ${duration / 1000}s ease-in-out`;
@@ -52,9 +50,7 @@ export const slideOutUp = (el: HTMLElement, duration: number, callback?: () => v
 };
 
 export const slideInDown = (el: HTMLElement, duration: number, callback?: () => void): void => {
-  // Avoid errors for now
-  // TODO: Throw an error here
-  if (el === null) return;
+  if (el === null) throw new Error('Element not found!');
 
   el.style.transform = `translateY(-100%)`;
   el.style.transition = `transform 0s ease-in-out`;

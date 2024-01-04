@@ -1,6 +1,5 @@
-import { Milliseconds } from 'ootk';
+import { DetailedSatellite, Milliseconds } from 'ootk';
 
-import { SatObject } from '@app/interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 
 export class DemoManager {
@@ -10,7 +9,7 @@ export class DemoManager {
   public satellite = 0;
 
   public update(): void {
-    const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
+    const satData = keepTrackApi.getCatalogManager().objectCache;
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     const realTime = <Milliseconds>Date.now();
@@ -18,21 +17,19 @@ export class DemoManager {
 
     this.lastTime_ = realTime;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const activeSats = <SatObject[]>catalogManagerInstance.satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+    const activeSats = catalogManagerInstance.objectCache.filter((sat) => sat.isSatellite() && sat.active) as DetailedSatellite[];
     const lastSatId = activeSats[activeSats.length - 1].id;
 
     for (this.satellite; this.satellite < lastSatId; ) {
       if (this.IS_RANDOM_) this.satellite = Math.floor(Math.random() * lastSatId);
 
-      const sat = satData[this.satellite];
+      const sat = satData[this.satellite] as DetailedSatellite;
       if (
-        !sat.TLE1 ||
+        !sat.isSatellite() ||
         colorSchemeManagerInstance.isPayloadOff(sat) ||
         colorSchemeManagerInstance.isRocketBodyOff(sat) ||
         colorSchemeManagerInstance.isDebrisOff(sat) ||
-        colorSchemeManagerInstance.isInViewOff(sat) ||
-        sat.static ||
-        sat.missile
+        colorSchemeManagerInstance.isInViewOff(sat)
       )
         continue;
 

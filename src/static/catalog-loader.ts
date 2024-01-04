@@ -1,10 +1,10 @@
-import { CatalogManager, RadarDataObject, SatObject, SensorObject } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
-import { SpaceObjectType } from '@app/lib/space-object-type';
 import { StringPad } from '@app/lib/stringPad';
+import type { CatalogManager } from '@app/singletons/catalog-manager';
+import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-
-import { Tle, TleLine1, TleLine2 } from 'ootk';
+import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LandObject, Marker, Sensor, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { FormatTle } from './format-tle';
@@ -41,9 +41,90 @@ export enum CatalogSource {
   EXTRA_JSON = 'extra.json',
 }
 
+export interface KeepTrackTLEFile {
+  /** First TLE line */
+  TLE1: TleLine1;
+  /** Second TLE line */
+  TLE2: TleLine2;
+  /** Satellite Bus */
+  bus?: string;
+  /** Lift vehicle configuration */
+  configuration?: string;
+  /** Owner country of the object */
+  country?: string;
+  /** Length of the object in meters */
+  length?: string;
+  /** Size of the object's diameter in meters */
+  diameter?: string;
+  /** Size of the object's width in meters */
+  span?: string;
+  /** Dry mass of the object in kilograms */
+  dryMass?: string;
+  /** Equipment on the object */
+  equipment?: string;
+  /** Date launched into space in YYYY-MM-DD */
+  launchDate?: string;
+  /** Stable Date in YYYY-MM-DD.
+   * This is mainly for identifying fragment creation dates */
+  stableDate?: string;
+  /** Launch mass including fuel in kilograms */
+  launchMass?: string;
+  /** Launch site */
+  launchSite?: string;
+  /** Launch Pad */
+  launchPad?: string;
+  /** Launch vehicle */
+  launchVehicle?: string;
+  /** Lifetime of the object in years */
+  lifetime?: string | number;
+  /** Manufacturer of the object */
+  manufacturer?: string;
+  /** Mission of the object */
+  mission?: string;
+  /** Motor of the object */
+  motor?: string;
+  /** Primary Name of the object */
+  name: string;
+  /** Alternate name of the object */
+  altName?: string;
+  /** Owner of the object */
+  owner?: string;
+  /** Payload of the object */
+  payload?: string;
+  /** Power information */
+  power?: string;
+  /** Purpose of the object */
+  purpose?: string;
+  /** Size of the object in Radar Cross Section (RCS) in meters squared */
+  rcs?: string;
+  /** Shape of the object */
+  shape?: string;
+  /** Current status of the object */
+  status?: string;
+  /** Type of the object */
+  type?: SpaceObjectType;
+  /** Visual magnitude of the object */
+  vmag?: number;
+  /** Used internally only and deleted before saving
+   * @deprecated Not really, but it makes it clear that this is not saved to disk
+   */
+  JCAT?: string;
+  altId?: string;
+  /** This is added in addSccNum_ */
+  sccNum?: string;
+  /** This is added in parseIntlDes_ */
+  intlDes?: string;
+  /** This is added in this file */
+  active?: boolean;
+  /** This is added in this file */
+  source?: CatalogSource;
+  /** This is added in this file */
+  id?: number;
+}
+
 export class CatalogLoader {
-  static filterTLEDatabase(resp: SatObject[], limitSatsArray?: string[], extraSats?: ExtraSat[], asciiCatalog?: AsciiTleSat[] | void, jsCatalog?: JsSat[]): void {
-    let tempSatData: (SatObject | SensorObject | RadarDataObject)[] = [];
+  static filterTLEDatabase(resp: KeepTrackTLEFile[], limitSatsArray?: string[], extraSats?: ExtraSat[], asciiCatalog?: AsciiTleSat[] | void, jsCatalog?: JsSat[]): void {
+    let tempObjData: BaseObject[] = [];
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
@@ -53,33 +134,33 @@ export class CatalogLoader {
 
     let notionalSatNum = 400000; // Start at 400,000 to avoid conflicts with real satellites
     for (let i = 0; i < resp.length; i++) {
-      CatalogLoader.fixMissingZeros_(resp, i);
+      CatalogLoader.addSccNum_(resp, i);
 
       // Check if first digit is a letter
-      resp[i].sccNum = FormatTle.convertA5to6Digit(resp[i].sccNum);
+      resp[i].sccNum = FormatTle.convertA5to6Digit(resp[i]?.sccNum);
 
       if (settingsManager.limitSats === '') {
-        CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempSatData, notionalSatNum);
+        CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
       } else {
-        CatalogLoader.processLimitedSats_(limitSatsArray, resp, i, catalogManagerInstance, tempSatData);
+        CatalogLoader.processLimitedSats_(limitSatsArray, resp, i, catalogManagerInstance, tempObjData);
       }
     }
 
     if (extraSats?.length > 0) {
-      CatalogLoader.processExtraSats_(extraSats, catalogManagerInstance, tempSatData);
+      CatalogLoader.processExtraSats_(extraSats, catalogManagerInstance, tempObjData);
     }
 
     if (asciiCatalog && asciiCatalog?.length > 0) {
-      tempSatData = CatalogLoader.processAsciiCatalog_(asciiCatalog, catalogManagerInstance, tempSatData);
+      tempObjData = CatalogLoader.processAsciiCatalog_(asciiCatalog, catalogManagerInstance, tempObjData);
     }
 
     if (jsCatalog?.length > 0) {
-      CatalogLoader.processJsCatalog_(jsCatalog, catalogManagerInstance, tempSatData);
+      CatalogLoader.processJsCatalog_(jsCatalog, catalogManagerInstance, tempObjData);
     }
 
-    CatalogLoader.addNonSatelliteObjects_(catalogManagerInstance, tempSatData);
+    CatalogLoader.addNonSatelliteObjects_(catalogManagerInstance, tempObjData);
 
-    catalogManagerInstance.satData = tempSatData;
+    catalogManagerInstance.objectCache = tempObjData;
   }
 
   /**
@@ -142,7 +223,7 @@ export class CatalogLoader {
    * @param jsCatalog - A Promise that resolves to an array of JsSat objects.
    */
   static async parse(
-    resp: SatObject[],
+    resp: KeepTrackTLEFile[],
     extraSats: Promise<ExtraSat[]>,
     altCatalog: {
       asciiCatalog: Promise<AsciiTleSat[] | void>;
@@ -162,12 +243,12 @@ export class CatalogLoader {
       CatalogLoader.filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog, jsCatalog);
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      catalogManagerInstance.numSats = catalogManagerInstance.satData.length;
-      const satDataString = CatalogLoader.getSatDataString_(catalogManagerInstance.satData);
+      catalogManagerInstance.numSats = catalogManagerInstance.objectCache.length;
+      const satDataString = CatalogLoader.getSatDataString_(catalogManagerInstance.objectCache);
 
       /** Send satDataString to satCruncher to begin propagation loop */
       catalogManagerInstance.satCruncher.postMessage({
-        typ: 'satdata',
+        typ: CruncerMessageTypes.OBJ_DATA,
         dat: satDataString,
         fieldOfViewSetLength: catalogManagerInstance.fieldOfViewSet.length,
         isLowPerf: settingsManager.lowPerf,
@@ -207,41 +288,49 @@ export class CatalogLoader {
   /**
    * Adds non-satellite objects to the catalog manager instance.
    * @param catalogManagerInstance - The catalog manager instance to add the objects to.
-   * @param tempSatData - An array of temporary satellite data.
+   * @param tempObjData - An array of temporary satellite data.
    */
-  private static addNonSatelliteObjects_(catalogManagerInstance: CatalogManager, tempSatData: (SatObject | SensorObject | RadarDataObject)[]) {
-    catalogManagerInstance.orbitalSats = tempSatData.length + settingsManager.maxAnalystSats;
+  private static addNonSatelliteObjects_(catalogManagerInstance: CatalogManager, tempObjData: BaseObject[]) {
+    catalogManagerInstance.orbitalSats = tempObjData.length + settingsManager.maxAnalystSats;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     dotsManagerInstance.starIndex1 = catalogManagerInstance.starIndex1 + catalogManagerInstance.orbitalSats;
     dotsManagerInstance.starIndex2 = catalogManagerInstance.starIndex2 + catalogManagerInstance.orbitalSats;
 
     let i = 0;
     for (const staticSat of catalogManagerInstance.staticSet) {
-      staticSat.id = tempSatData.length;
-      catalogManagerInstance.staticSet[i].id = tempSatData.length;
+      staticSat.id = tempObjData.length;
+      catalogManagerInstance.staticSet[i].id = tempObjData.length;
       i++;
-      tempSatData.push(staticSat);
+
+      if (staticSat.maxRng) {
+        const sensor = new DetailedSensor({
+          id: tempObjData.length,
+          ...staticSat,
+        });
+        tempObjData.push(sensor);
+      } else {
+        const landObj = new LandObject({
+          id: tempObjData.length,
+          ...staticSat,
+        });
+        tempObjData.push(landObj);
+      }
     }
     for (const analSat of catalogManagerInstance.analSatSet) {
-      analSat.id = tempSatData.length;
-      tempSatData.push(analSat);
-    }
-
-    // TODO: Planned feature
-    // radarDataManager.satDataStartIndex = tempSatData.length + 1;
-    for (const radarData of catalogManagerInstance.radarDataSet) {
-      tempSatData.push(radarData);
+      analSat.id = tempObjData.length;
+      tempObjData.push(analSat);
     }
 
     for (const missileObj of catalogManagerInstance.missileSet) {
-      tempSatData.push(missileObj);
+      tempObjData.push(missileObj);
     }
 
-    catalogManagerInstance.missileSats = tempSatData.length; // This is the start of the missiles index
+    catalogManagerInstance.missileSats = tempObjData.length; // This is the start of the missiles index
 
     for (const fieldOfViewMarker of catalogManagerInstance.fieldOfViewSet) {
-      fieldOfViewMarker.id = tempSatData.length;
-      tempSatData.push(fieldOfViewMarker);
+      fieldOfViewMarker.id = tempObjData.length;
+      const marker = new Marker(fieldOfViewMarker);
+      tempObjData.push(marker);
     }
   }
 
@@ -277,7 +366,7 @@ export class CatalogLoader {
    *
    * TODO: This should be done by the catalog-manager itself
    */
-  private static fixMissingZeros_(resp: SatObject[], i: number) {
+  private static addSccNum_(resp: KeepTrackTLEFile[], i: number) {
     resp[i].sccNum = StringPad.pad0(resp[i].TLE1.substring(2, 7).trim(), 5);
     // Also update TLE1
     resp[i].TLE1 = <TleLine1>(resp[i].TLE1.substring(0, 2) + resp[i].sccNum + resp[i].TLE1.substring(7));
@@ -414,36 +503,47 @@ export class CatalogLoader {
    *
    * There is a lot of extra data that we don't need to send to satCruncher.
    */
-  private static getSatDataString_(satData: any[]) {
+  private static getSatDataString_(objData: BaseObject[]) {
     return JSON.stringify(
-      satData.map((sat) => {
-        const satData = <any>{
-          static: sat.static,
-          missile: sat.missile,
-          isRadarData: sat.isRadarData,
-          lat: sat.lat,
-          lon: sat.lon,
-          alt: sat.alt,
-          latList: sat.latList,
-          lonList: sat.lonList,
-          altList: sat.altList,
-          TLE1: sat.TLE1,
-          TLE2: sat.TLE2,
-          marker: sat.marker,
-        };
+      objData.map((obj) => {
+        let data: CruncherSat;
 
-        if (sat.type === SpaceObjectType.STAR) {
-          satData.isStar = true;
-          satData.ra = sat.ra;
-          satData.dec = sat.dec;
+        // Order matters here
+        if (obj.isSatellite()) {
+          data = {
+            tle1: (obj as DetailedSatellite).tle1,
+            tle2: (obj as DetailedSatellite).tle2,
+            active: obj.active,
+          };
+        } else if (obj.isMissile()) {
+          data = {
+            latList: (obj as MissileObject).latList as Degrees[],
+            lonList: (obj as MissileObject).lonList as Degrees[],
+            altList: (obj as MissileObject).altList as Kilometers[],
+          };
+        } else if (obj.isStar()) {
+          data.ra = (obj as Star).ra;
+          data.dec = (obj as Star).dec;
+        } else if (obj.isMarker()) {
+          data = {
+            isMarker: true,
+          };
+        } else if ((obj as Sensor | LandObject).isStatic()) {
+          data = {
+            lat: (obj as Sensor | LandObject).lat,
+            lon: (obj as Sensor | LandObject).lon,
+            alt: (obj as Sensor | LandObject).alt,
+          };
+        } else {
+          throw new Error('Unknown object type');
         }
 
-        return satData;
+        return data;
       })
     );
   }
 
-  private static makeDebris(notionalDebris: any, meanAnom: number, notionalSatNum: number, tempSatData: any[]) {
+  private static makeDebris(notionalDebris: any, meanAnom: number, notionalSatNum: number, tempSatData: BaseObject[]) {
     const debris = { ...notionalDebris };
     debris.id = tempSatData.length;
     debris.sccNum = notionalSatNum.toString();
@@ -510,7 +610,7 @@ export class CatalogLoader {
     return year + '-' + rest;
   }
 
-  private static processAllSats_(resp: SatObject[], i: number, catalogManagerInstance: CatalogManager, tempSatData: any[], notionalSatNum: number): void {
+  private static processAllSats_(resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: BaseObject[], notionalSatNum: number): void {
     if (settingsManager.isStarlinkOnly && resp[i].name.indexOf('STARLINK') === -1) return;
 
     const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
@@ -519,7 +619,7 @@ export class CatalogLoader {
     catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = i;
     resp[i].active = true;
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
-      resp[i].id = tempSatData.length;
+      resp[i].id = tempObjData.length;
       const source = Tle.getClassification(resp[i].TLE1);
       switch (source) {
         case 'U':
@@ -538,61 +638,76 @@ export class CatalogLoader {
           // Default to USSF for now
           resp[i].source = CatalogSource.USSF;
       }
-      tempSatData.push(resp[i]);
+
+      let rcs: number;
+      rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
+      rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
+      rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
+      rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : null;
+
+      const satellite = new DetailedSatellite({
+        id: tempObjData.length,
+        tle1: resp[i].TLE1,
+        tle2: resp[i].TLE2,
+        ...resp[i],
+        rcs: rcs,
+      });
+
+      tempObjData.push(satellite);
     }
 
     if (settingsManager.isNotionalDebris && resp[i].type === 3) {
-      let notionalDebris = {
+      let notionalDebris = new DetailedSatellite({
         id: 0,
         name: `${resp[i].name} (1cm Notional)`,
-        TLE1: resp[i].TLE1,
-        TLE2: resp[i].TLE2,
+        tle1: resp[i].TLE1,
+        tle2: resp[i].TLE2,
         sccNum: '',
         type: SpaceObjectType.NOTIONAL,
         source: 'Notional',
         active: true,
-      };
+      });
 
       for (let i = 0; i < 8; i++) {
-        if (tempSatData.length > settingsManager.maxNotionalDebris) break;
-        CatalogLoader.makeDebris(notionalDebris, 15 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -15 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 30 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -30 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 45 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -45 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 60 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -60 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 75 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -75 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 90 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -90 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 105 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -105 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 120 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -120 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 135 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -135 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 150 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -150 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 165 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -165 - Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, 180 + Math.random() * 15, notionalSatNum, tempSatData);
-        CatalogLoader.makeDebris(notionalDebris, -180 - Math.random() * 15, notionalSatNum, tempSatData);
+        if (tempObjData.length > settingsManager.maxNotionalDebris) break;
+        CatalogLoader.makeDebris(notionalDebris, 15 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -15 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 30 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -30 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 45 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -45 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 60 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -60 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 75 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -75 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 90 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -90 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 105 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -105 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 120 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -120 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 135 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -135 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 150 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -150 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 165 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -165 - Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, 180 + Math.random() * 15, notionalSatNum, tempObjData);
+        CatalogLoader.makeDebris(notionalDebris, -180 - Math.random() * 15, notionalSatNum, tempObjData);
       }
     }
   }
 
   private static processAsciiCatalogKnown_(catalogManagerInstance: CatalogManager, element: AsciiTleSat, tempSatData: any[]) {
     const i = catalogManagerInstance.sccIndex[`${element.SCC}`];
-    tempSatData[i].TLE1 = element.TLE1;
-    tempSatData[i].TLE2 = element.TLE2;
+    tempSatData[i].tle1 = element.TLE1;
+    tempSatData[i].tle2 = element.TLE2;
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
     tempSatData[i].isExternal = true;
     tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
   }
 
-  private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempSatData: any[], catalogManagerInstance: CatalogManager) {
+  private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempObjData: BaseObject[], catalogManagerInstance: CatalogManager) {
     settingsManager.isExtraSatellitesAdded = true;
 
     if (typeof element.ON == 'undefined') {
@@ -613,17 +728,25 @@ export class CatalogLoader {
       rocket: 'Unknown',
       site: 'Unknown',
       sccNum: sccNum,
-      TLE1: element.TLE1,
-      TLE2: element.TLE2,
+      tle1: element.TLE1,
+      tle2: element.TLE2,
       source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT,
       intlDes: intlDes,
-      typ: 'sat',
-      id: tempSatData.length,
+      typ: 'sat', // TODO: What is this?
+      id: tempObjData.length,
       isExternal: true,
     };
-    catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempSatData.length;
-    catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
-    tempSatData.push(asciiSatInfo);
+    catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempObjData.length;
+    catalogManagerInstance.cosparIndex[`${intlDes}`] = tempObjData.length;
+
+    const satellite = new DetailedSatellite({
+      tle1: asciiSatInfo.tle1,
+      tle2: asciiSatInfo.tle2,
+      ...asciiSatInfo,
+    });
+    satellite.id = tempObjData.length;
+
+    tempObjData.push(satellite);
   }
 
   private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {
@@ -683,22 +806,30 @@ export class CatalogLoader {
           rocket: 'Unknown',
           site: 'Unknown',
           sccNum: element.SCC.toString(),
-          TLE1: element.TLE1,
-          TLE2: element.TLE2,
+          tle1: element.TLE1 as TleLine1,
+          tle2: element.TLE2 as TleLine2,
           source: 'extra.json',
           intlDes: intlDes,
-          typ: 'sat',
+          typ: 'sat', // TODO: What is this?
           id: tempSatData.length,
           vmag: element.vmag,
         };
         catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
         catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
-        tempSatData.push(extrasSatInfo);
+
+        const satellite = new DetailedSatellite({
+          tle1: extrasSatInfo.tle1 as TleLine1,
+          tle2: extrasSatInfo.tle2 as TleLine2,
+          ...extrasSatInfo,
+        });
+        satellite.id = tempSatData.length;
+
+        tempSatData.push(satellite);
       }
     }
   }
 
-  private static processJsCatalog_(jsCatalog: JsSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {
+  private static processJsCatalog_(jsCatalog: JsSat[], catalogManagerInstance: CatalogManager, tempObjData: any[]) {
     errorManagerInstance.debug(`Processing ${settingsManager.isEnableJscCatalog ? 'JSC Vimpel' : 'Extended'} Catalog`);
     // If jsCatalog catalogue
     for (const element of jsCatalog) {
@@ -731,9 +862,17 @@ export class CatalogLoader {
             source: 'JSC Vimpel',
             altId: altId,
             intlDes: '',
-            id: tempSatData.length,
+            id: tempObjData.length,
           };
-          tempSatData.push(jsSatInfo);
+
+          const satellite = new DetailedSatellite({
+            tle1: jsSatInfo.TLE1 as TleLine1,
+            tle2: jsSatInfo.TLE2 as TleLine2,
+            ...jsSatInfo,
+          });
+          satellite.id = tempObjData.length;
+
+          tempObjData.push(satellite);
         } else {
           errorManagerInstance.debug('Skipping non-Vimpel satellite in JSC Vimpel catalog');
         }
@@ -741,7 +880,7 @@ export class CatalogLoader {
     }
   }
 
-  private static processLimitedSats_(limitSatsArray: string[], resp: SatObject[], i: number, catalogManagerInstance: CatalogManager, tempSatData: any[]) {
+  private static processLimitedSats_(limitSatsArray: string[], resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: any[]) {
     let newId = 0;
     for (const limitSat of limitSatsArray) {
       if (resp[i].sccNum === limitSat) {
@@ -770,7 +909,16 @@ export class CatalogLoader {
             // Default to USSF for now
             resp[i].source = CatalogSource.USSF;
         }
-        tempSatData.push(resp[i]);
+
+        const satellite = new DetailedSatellite({
+          id: tempObjData.length,
+          tle1: resp[i].TLE1,
+          tle2: resp[i].TLE2,
+          rcs: parseFloat(resp[i].rcs) as any,
+          ...resp[i],
+        });
+
+        tempObjData.push(satellite);
       }
     }
   }

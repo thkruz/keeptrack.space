@@ -9,7 +9,6 @@ export abstract class SplashScreen {
     science2: 'Found Science...',
     dots: 'Drawing Dots in Space...',
     satIntel: 'Integrating Satellite Intel...',
-    radarData: 'Importing Radar Data...',
     painting: 'Painting the Earth...',
     coloring: 'Coloring Inside the Lines..',
     elsets: 'Locating ELSETs...',

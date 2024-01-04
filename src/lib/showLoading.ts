@@ -1,3 +1,5 @@
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { fadeIn, fadeOut } from './fade';
 import { getEl } from './get-el';
 
@@ -8,10 +10,12 @@ export const showLoading = (callback?: () => void, delay?: number): void => {
   const loading = getEl('loading-screen', true);
   if (!loading) return; // TODO: This is a hack to get around the fact that the loading screen is not always present
 
+  keepTrackApi.getSoundManager().play(SoundNames.LOADING);
+
   fadeIn(loading, 'flex', 500);
   setTimeout(() => {
     if (callback) callback();
-    fadeOut(loading, 500);
+    hideLoading();
   }, delay || 100);
 };
 
@@ -22,5 +26,6 @@ export const showLoadingSticky = (): void => {
 
 export const hideLoading = () => {
   const loading = getEl('loading-screen');
-  fadeOut(loading, 500);
+  fadeOut(loading, 1000);
+  keepTrackApi.getSoundManager().stop(SoundNames.LOADING);
 };

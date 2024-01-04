@@ -9,7 +9,7 @@ describe('SatelliteFov_class', () => {
   beforeEach(() => {
     setupStandardEnvironment();
     satelliteFovPlugin = new SatelliteFov();
-    keepTrackApi.getCatalogManager().getSat = () => defaultSat;
+    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
     keepTrackApi.getCatalogManager().satCruncher = {
       postMessage: jest.fn(),
     } as any;

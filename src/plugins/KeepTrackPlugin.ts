@@ -1,6 +1,7 @@
-import { KeepTrackApiEvents, SatObject, SensorObject, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import Module from 'module';
+import { BaseObject, Sensor } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { clickAndDragWidth } from '../lib/click-and-drag';
 import { getEl } from '../lib/get-el';
@@ -367,15 +368,16 @@ export class KeepTrackPlugin {
     getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
   }
 
-  setBottomIconToUnselected(): void {
+  setBottomIconToUnselected(isHideSideMenus = true): void {
     if (!this.isMenuButtonActive) return;
     this.isMenuButtonActive = false;
+    if (isHideSideMenus) keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
     getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
   }
 
-  setBottomIconToDisabled(): void {
+  setBottomIconToDisabled(isHideSideMenus = true): void {
     if (this.isIconDisabled) return;
-    this.setBottomIconToUnselected();
+    this.setBottomIconToUnselected(isHideSideMenus);
     this.isIconDisabled = true;
     getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
   }
@@ -438,8 +440,8 @@ export class KeepTrackPlugin {
       keepTrackApi.register({
         event: KeepTrackApiEvents.selectSatData,
         cbName: this.PLUGIN_NAME,
-        cb: (sat: SatObject): void => {
-          if (!sat?.TLE1 || !keepTrackApi.getSensorManager().isSensorSelected()) {
+        cb: (obj: BaseObject): void => {
+          if (!obj?.isSatellite() || !keepTrackApi.getSensorManager().isSensorSelected()) {
             this.setBottomIconToDisabled();
             this.setBottomIconToUnselected();
           } else {
@@ -452,8 +454,8 @@ export class KeepTrackPlugin {
       keepTrackApi.register({
         event: KeepTrackApiEvents.selectSatData,
         cbName: this.PLUGIN_NAME,
-        cb: (sat: SatObject): void => {
-          if (!sat) {
+        cb: (obj: BaseObject): void => {
+          if (!obj) {
             this.setBottomIconToDisabled();
             this.setBottomIconToUnselected();
           } else {
@@ -467,8 +469,8 @@ export class KeepTrackPlugin {
       keepTrackApi.register({
         event: KeepTrackApiEvents.setSensor,
         cbName: this.PLUGIN_NAME,
-        cb: (sensor: SensorObject | string, staticNum: number): void => {
-          if (!sensor && !staticNum) {
+        cb: (sensor: Sensor | string, sensorId: number): void => {
+          if (!sensor && !sensorId) {
             this.setBottomIconToDisabled();
             this.setBottomIconToUnselected();
           } else {

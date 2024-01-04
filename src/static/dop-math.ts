@@ -1,7 +1,5 @@
-import { SatObject } from '@app/interfaces';
 import numeric from 'numeric';
-import { AzEl, Degrees, Kilometers, Radians, Transforms } from 'ootk';
-import { DEG2RAD, MILLISECONDS_PER_SECOND, RAD2DEG } from '../lib/constants';
+import { AzEl, DEG2RAD, Degrees, DetailedSatellite, Kilometers, MILLISECONDS_PER_SECOND, RAD2DEG, Radians, ecf2rae, eci2ecf } from 'ootk';
 import { dateFormat } from '../lib/dateFormat';
 import { getEl } from '../lib/get-el';
 import { SatMath } from './sat-math';
@@ -66,7 +64,7 @@ export abstract class DopMath {
    * @returns An object containing the calculated DOP values.
    * @throws An error if the latitude or longitude is undefined.
    */
-  public static getDops(propTime: Date, gpsSatObjects: SatObject[], latDeg: Degrees, lonDeg: Degrees, alt?: Kilometers, gpsElevationMask = <Degrees>10) {
+  public static getDops(propTime: Date, gpsSatObjects: DetailedSatellite[], latDeg: Degrees, lonDeg: Degrees, alt?: Kilometers, gpsElevationMask = <Degrees>10) {
     if (typeof latDeg == 'undefined' || typeof lonDeg == 'undefined') {
       return { pdop: 'N/A', hdop: 'N/A', gdop: 'N/A', vdop: 'N/A', tdop: 'N/A' };
     }
@@ -78,8 +76,8 @@ export abstract class DopMath {
     const { gmst } = SatMath.calculateTimeVariables(propTime);
 
     let inViewList = <AzEl<Degrees>[]>[];
-    gpsSatObjects.forEach((sat: SatObject) => {
-      const lookAngles = Transforms.ecf2rae({ lon: lonRad, lat: latRad, alt: alt }, Transforms.eci2ecf(sat.position, gmst));
+    gpsSatObjects.forEach((sat: DetailedSatellite) => {
+      const lookAngles = ecf2rae({ lon: lonRad, lat: latRad, alt: alt }, eci2ecf(sat.position, gmst));
       const azel = {
         az: (lookAngles.az * RAD2DEG) as Degrees,
         el: (lookAngles.el * RAD2DEG) as Degrees,
@@ -129,7 +127,7 @@ export abstract class DopMath {
     }
   }
 
-  public static getDopsList(getOffsetTimeObj: (offset: number) => Date, gpsSats: SatObject[], lat: Degrees, lon: Degrees, alt: Kilometers, el: Degrees): DopList {
+  public static getDopsList(getOffsetTimeObj: (offset: number) => Date, gpsSats: DetailedSatellite[], lat: Degrees, lon: Degrees, alt: Kilometers, el: Degrees): DopList {
     let dopsResults = [];
     for (let t = 0; t < 1440; t++) {
       const offset = t * 60 * MILLISECONDS_PER_SECOND;

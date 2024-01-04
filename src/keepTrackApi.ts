@@ -1,25 +1,15 @@
 /* eslint-disable class-methods-use-this */
-import { Milliseconds } from 'ootk';
+import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import {
-  CatalogManager,
-  CatalogObject,
-  ColorSchemeManager,
-  Constructor,
-  GroupsManager,
-  KeepTrackApiEvents,
-  OrbitManager,
-  SatObject,
-  SensorManager,
-  SensorObject,
-  Singletons,
-  UiManager,
-} from './interfaces';
+import { Constructor, GroupsManager, KeepTrackApiEvents, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
+import { SoundNames } from './plugins/sounds/SoundNames';
 import { SoundManager } from './plugins/sounds/sound-manager';
 import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
-import { StandardColorSchemeManager } from './singletons/color-scheme-manager';
+import { CatalogManager } from './singletons/catalog-manager';
+import { MissileObject } from './singletons/catalog-manager/MissileObject';
+import { ColorSchemeManager } from './singletons/color-scheme-manager';
 import { DotsManager } from './singletons/dots-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
 import { MeshManager } from './singletons/draw-manager/mesh-manager';
@@ -62,25 +52,25 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.updateDateTime]: [Date];
   [KeepTrackApiEvents.uiManagerFinal]: [];
   [KeepTrackApiEvents.resetSensor]: [];
-  [KeepTrackApiEvents.setSensor]: [SensorObject | string, number];
+  [KeepTrackApiEvents.setSensor]: [DetailedSensor | string, number];
   [KeepTrackApiEvents.changeSensorMarkers]: [string];
   [KeepTrackApiEvents.altCanvasResize]: [];
   [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
   [KeepTrackApiEvents.onWatchlistUpdated]: [number[]];
   [KeepTrackApiEvents.staticOffsetChange]: [number];
   [KeepTrackApiEvents.onLineAdded]: [LineManager];
-  [KeepTrackApiEvents.sensorDotSelected]: [SensorObject];
+  [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
   [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
   [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
   [KeepTrackApiEvents.onCruncherMessage]: [];
   [KeepTrackApiEvents.onCruncherReady]: [];
   [KeepTrackApiEvents.onHelpMenuClick]: [];
   [KeepTrackApiEvents.onKeepTrackReady]: [];
-  [KeepTrackApiEvents.selectSatData]: [SatObject, number];
-  [KeepTrackApiEvents.setSecondarySat]: [SatObject, number];
+  [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number];
+  [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite, number];
   [KeepTrackApiEvents.uiManagerInit]: [];
   [KeepTrackApiEvents.uiManagerOnReady]: [];
-  [KeepTrackApiEvents.updateSelectBox]: [CatalogObject];
+  [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
 };
 
 interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
@@ -144,6 +134,11 @@ export class KeepTrackApi {
 
   runEvent<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
     this.verifyEvent_(event);
+
+    if (event === KeepTrackApiEvents.bottomMenuClick) {
+      keepTrackApi.getSoundManager().play(SoundNames.BEEP);
+    }
+
     (<KeepTrackApiRegisterParams<T>[]>this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));
   }
 
@@ -226,7 +221,7 @@ export class KeepTrackApi {
   getGroupsManager = () => keepTrackContainer.get<GroupsManager>(Singletons.GroupsManager);
   getTimeManager = () => keepTrackContainer.get<TimeManager>(Singletons.TimeManager);
   getOrbitManager = () => keepTrackContainer.get<OrbitManager>(Singletons.OrbitManager);
-  getColorSchemeManager = () => <StandardColorSchemeManager>(<unknown>keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager));
+  getColorSchemeManager = () => keepTrackContainer.get<ColorSchemeManager>(Singletons.ColorSchemeManager);
   getDotsManager = () => keepTrackContainer.get<DotsManager>(Singletons.DotsManager);
   getSensorMath = () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath);
   getLineManager = () => keepTrackContainer.get<LineManager>(Singletons.LineManager);

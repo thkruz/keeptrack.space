@@ -4,6 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import { LineManager, LineTypes } from '@app/singletons/draw-manager/line-manager';
 import radioTowerPng from '@public/img/icons/radio-tower.png';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { SoundNames } from '../sounds/SoundNames';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   isRequireSensorSelected: boolean = true;
@@ -172,6 +173,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
             lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
             getEl('sensor-moon-btn').textContent = 'Add Line to Moon  \u25B6';
             this.isMonnLineVisible_ = false;
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
             return;
           }
         }
@@ -195,6 +197,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         // Change Button Text
         getEl('sensor-moon-btn').textContent = 'Remove Line to Moon  \u25B6';
         this.isMonnLineVisible_ = true;
+        keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
       }
     });
   }
@@ -208,6 +211,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
             lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
             getEl('sensor-sun-btn').textContent = 'Add Line to Sun  \u25B6';
             this.isSunLineVisible_ = false;
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
             return;
           }
         }
@@ -231,6 +235,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         // Change Button Text
         getEl('sensor-sun-btn').textContent = 'Remove Line to Sun  \u25B6';
         this.isSunLineVisible_ = true;
+        keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
       }
     });
   }
@@ -241,11 +246,11 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     const firstSensor = keepTrackApi.getSensorManager().currentSensors[0];
     getEl('sensor-latitude').innerHTML = firstSensor.lat.toString();
     getEl('sensor-longitude').innerHTML = firstSensor.lon.toString();
-    getEl('sensor-minazimuth').innerHTML = firstSensor.obsminaz.toString();
-    getEl('sensor-maxazimuth').innerHTML = firstSensor.obsmaxaz.toString();
-    getEl('sensor-minelevation').innerHTML = firstSensor.obsminel.toString();
-    getEl('sensor-maxelevation').innerHTML = firstSensor.obsmaxel.toString();
-    getEl('sensor-minrange').innerHTML = firstSensor.obsminrange.toString();
-    getEl('sensor-maxrange').innerHTML = firstSensor.obsmaxrange.toString();
+    getEl('sensor-minazimuth').innerHTML = firstSensor.minAz.toString();
+    getEl('sensor-maxazimuth').innerHTML = firstSensor.maxAz.toString();
+    getEl('sensor-minelevation').innerHTML = firstSensor.minEl.toString();
+    getEl('sensor-maxelevation').innerHTML = firstSensor.maxEl.toString();
+    getEl('sensor-minrange').innerHTML = firstSensor.minRng.toString();
+    getEl('sensor-maxrange').innerHTML = firstSensor.maxRng.toString();
   }
 }

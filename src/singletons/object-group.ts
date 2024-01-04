@@ -1,7 +1,8 @@
+import { BaseObject, DetailedSatellite } from 'ootk';
 import { countryMapList } from '../catalogs/countries';
-import { GetSatType, MissileObject, SatObject } from '../interfaces';
 import { CatalogSearch } from '../static/catalog-search';
 import { keepTrackApi } from './../keepTrackApi';
+import { MissileObject } from './catalog-manager/MissileObject';
 
 export enum GroupType {
   ALL = 0,
@@ -18,89 +19,84 @@ export enum GroupType {
 }
 
 export class ObjectGroup {
-  objects: number[] = [];
+  ids: number[] = [];
 
   constructor(type: GroupType, data: any) {
-    const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
+    const objData = keepTrackApi.getCatalogManager().objectCache;
     switch (type) {
       case GroupType.ALL:
-        satData.every((sat) => {
-          if (typeof sat.sccNum !== 'undefined') {
-            this.objects.push(sat.id);
+        objData.every((sat) => {
+          if (sat.isSatellite()) {
+            this.ids.push(sat.id);
           }
           // Stop when we hit the max number of orbits to display
-          return this.objects.length <= Math.min(settingsManager.maxOribtsDisplayed, settingsManager.maxOribtsDisplayedDesktopAll);
+          return this.ids.length <= Math.min(settingsManager.maxOribtsDisplayed, settingsManager.maxOribtsDisplayedDesktopAll);
         });
         break;
       case GroupType.YEAR:
-        this.objects = CatalogSearch.year(satData, data)
+        this.ids = CatalogSearch.year(keepTrackApi.getCatalogManager().getSats(), data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .filter((sat: SatObject) => typeof sat.id !== 'undefined' && !sat.static)
-          .map((sat: SatObject) => sat.id);
+          .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
+          .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.YEAR_OR_LESS:
-        this.objects = CatalogSearch.yearOrLess(satData, data)
+        this.ids = CatalogSearch.yearOrLess(keepTrackApi.getCatalogManager().getSats(), data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .filter((sat: SatObject) => typeof sat.id !== 'undefined' && !sat.static)
-          .map((sat: SatObject) => sat.id);
+          .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
+          .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.INTLDES:
-        this.objects = data
+        this.ids = data
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((intlDes: string) => keepTrackApi.getCatalogManager().getIdFromIntlDes(intlDes))
+          .map((intlDes: string) => keepTrackApi.getCatalogManager().intlDes2id(intlDes))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.NAME_REGEX:
-        this.objects = CatalogSearch.objectName(satData, data)
+        this.ids = CatalogSearch.objectName(objData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sat: SatObject) => sat.id);
+          .map((obj: BaseObject) => obj.id);
         break;
       case GroupType.COUNTRY:
-        this.createGroupByCountry_(data, satData);
+        this.createGroupByCountry_(data, keepTrackApi.getCatalogManager().getSats());
         break;
       case GroupType.COUNTRY_REGEX:
-        this.objects = CatalogSearch.country(satData, data)
+        this.ids = CatalogSearch.country(keepTrackApi.getCatalogManager().getSats(), data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sat: SatObject) => sat.id);
+          .map((obj: BaseObject) => obj.id);
         break;
       case GroupType.SHAPE_REGEX:
-        this.objects = CatalogSearch.shape(satData, data)
+        this.ids = CatalogSearch.shape(keepTrackApi.getCatalogManager().getSats(), data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sat: SatObject) => sat.id);
+          .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.BUS_REGEX:
-        this.objects = CatalogSearch.bus(satData, data)
+        this.ids = CatalogSearch.bus(keepTrackApi.getCatalogManager().getSats(), data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sat: SatObject) => sat.id);
+          .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.SCC_NUM:
-        this.objects = data
+        this.ids = data
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sccNum: number) => keepTrackApi.getCatalogManager().getIdFromSccNum(sccNum))
+          .map((sccNum: number) => keepTrackApi.getCatalogManager().sccNum2Id(sccNum))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.ID_LIST:
-        this.objects = data.slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => id);
+        this.ids = data.slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => id);
         break;
       default:
         throw new Error('Unknown group type');
     }
   }
 
-  hasObject = (id: number) => this.objects.findIndex((id_) => id_ === id) !== -1;
+  hasObject = (id: number) => this.ids.findIndex((id_) => id_ === id) !== -1;
 
   // What calls the orbit buffer when selected a group from the menu.
   updateOrbits = (): this => {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    this.objects.forEach((id) => {
-      if ((<SatObject | MissileObject>keepTrackApi.getCatalogManager().satData[id]).missile) {
-        const missile = <MissileObject>(<unknown>id);
-        orbitManagerInstance.updateOrbitBuffer(missile.id, {
-          missile: true,
-          latList: missile.latList,
-          lonList: missile.lonList,
-          altList: missile.altList,
-        });
+    this.ids.forEach((id) => {
+      const obj = keepTrackApi.getCatalogManager().objectCache[id];
+      if (obj.isMissile()) {
+        orbitManagerInstance.updateOrbitBuffer(obj.id, obj as MissileObject);
       } else {
         orbitManagerInstance.updateOrbitBuffer(id);
       }
@@ -109,38 +105,17 @@ export class ObjectGroup {
     return this;
   };
 
-  private createGroupByCountry_(data: any, satData: SatObject[]) {
+  private createGroupByCountry_(data: any, satData: DetailedSatellite[]) {
     // Map country name to country code
     const expandedData = data.split('|').map((countryName: string) => countryMapList[countryName]);
     // Concat data with expandedData using | as a delimiter
     data = `${data}|${expandedData.join('|')}`;
-    this.objects = satData
-      .filter((sat: SatObject) => data.split('|').includes(sat.country))
+    this.ids = satData
+      .filter((sat: DetailedSatellite) => data.split('|').includes(sat.country))
       // .slice(0, settingsManager.maxOribtsDisplayed)
       // eslint-disable-next-line arrow-body-style
-      .map((sat: SatObject) => {
+      .map((sat: DetailedSatellite) => {
         return sat.id;
       });
-  }
-
-  updateIsInGroup(): this {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    this.objects.forEach((id: number) => {
-      catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY).isInGroup = true;
-    });
-
-    return this;
-  }
-
-  clear(): this {
-    if (this.objects.length === 0) return this;
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    this.objects.forEach((id: number) => {
-      catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY).isInGroup = false;
-    });
-
-    return this;
   }
 }

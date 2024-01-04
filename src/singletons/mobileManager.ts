@@ -82,6 +82,11 @@ export class MobileManager {
           if (typeof settingsManager.enableHoverOverlay == 'undefined') {
             settingsManager.enableHoverOverlay = true;
           }
+
+          settingsManager.isDisableGodrays = false;
+          settingsManager.isDisableSkybox = false;
+          settingsManager.isDisableMoon = false;
+
           settingsManager.isMobileModeEnabled = false;
           settingsManager.cameraMovementSpeed = 0.003;
           settingsManager.cameraMovementSpeedMin = 0.005;

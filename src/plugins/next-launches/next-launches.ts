@@ -8,6 +8,7 @@ import { truncateString } from '@app/lib/truncate-string';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SoundNames } from '../sounds/SoundNames';
 
 export interface LaunchInfoObject {
   agency: string;
@@ -32,9 +33,6 @@ export interface LaunchInfoObject {
 export class NextLaunchesPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) return;
-    if (window.location.hostname === 'localhost') {
-      keepTrackApi.getUiManager().toast('This feature is a static table when in offline mode.', 'caution');
-    }
     this.showTable();
   };
 
@@ -86,6 +84,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('export-launch-info').addEventListener('click', () => {
+          keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
           saveCsv(this.launchList, 'launchList');
         });
       },

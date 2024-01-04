@@ -1,5 +1,5 @@
-import { Degrees, Kilometers, Radians } from 'ootk';
-import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from './constants';
+import { DEG2RAD, Degrees, Kilometers, Radians, TAU } from 'ootk';
+import { RADIUS_OF_EARTH, ZOOM_EXP } from './constants';
 
 /**
  * This function normalizes the angle to be between -TAU/2 and TAU/2.

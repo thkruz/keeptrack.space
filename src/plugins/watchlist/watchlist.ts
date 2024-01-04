@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -36,7 +36,9 @@ import addPng from '@public/img/add.png';
 import watchlistPng from '@public/img/icons/watchlist.png';
 import removePng from '@public/img/remove.png';
 import saveAs from 'file-saver';
+import { DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SoundNames } from '../sounds/SoundNames';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: number[];
@@ -150,7 +152,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const _watchlistInViewList = [];
       for (let i = 0; i < newWatchlist.length; i++) {
-        const sat = catalogManagerInstance.getSat(catalogManagerInstance.getIdFromSccNum(newWatchlist[i]), GetSatType.EXTRA_ONLY);
+        const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(newWatchlist[i]), GetSatType.EXTRA_ONLY);
         if (sat !== null) {
           newWatchlist[i] = sat.id;
           _watchlistInViewList.push(false);
@@ -204,6 +206,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     // Remove button selected on watchlist menu
     getEl('watchlist-list').addEventListener('click', (evt: Event) => {
+      keepTrackApi.getSoundManager().play(SoundNames.CLICK);
       this.removeSat(parseInt((<HTMLElement>evt.target).dataset.satId));
     });
 
@@ -216,6 +219,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     });
 
     getEl('watchlist-open').addEventListener('click', () => {
+      keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
       getEl('watchlist-file').click();
     });
 
@@ -247,7 +251,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     this.isWatchlistChanged = this.isWatchlistChanged != null;
     let watchlistString = '';
     let watchlistListHTML = '';
-    let sat: SatObject;
+    let sat: DetailedSatellite;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     for (let i = 0; i < this.watchlistList.length; i++) {
       sat = catalogManagerInstance.getSat(this.watchlistList[i], GetSatType.EXTRA_ONLY);
@@ -355,9 +359,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * Handles the event when a new satellite is added to the watchlist.
    */
   private onAddEvent_() {
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
     sats.forEach((satNum: string) => {
-      const id = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt(satNum));
+      const id = keepTrackApi.getCatalogManager().sccNum2Id(parseInt(satNum));
 
       if (id === null) {
         errorManagerInstance.warn(`Sat ${id} not found!`);
@@ -381,6 +386,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * Removes the satellites from the watchlist and clears the lines from sensors to satellites.
    */
   private onClearClicked_() {
+    keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     for (const id of this.watchlistList) {
       orbitManagerInstance.removeInViewOrbit(id);
@@ -417,7 +423,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     this.watchlistInViewList = [];
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     for (let i = 0; i < newWatchlist.length; i++) {
-      const sat = catalogManagerInstance.getSat(catalogManagerInstance.getIdFromSccNum(newWatchlist[i]), GetSatType.EXTRA_ONLY);
+      const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(newWatchlist[i]), GetSatType.EXTRA_ONLY);
       if (sat !== null && sat.id > 0) {
         newWatchlist[i] = sat.id;
         this.watchlistInViewList.push(false);
@@ -435,6 +441,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @param evt - The click event object.
    */
   private onSaveClicked_(evt: Event) {
+    keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
     const satIds = [];
 
     for (let i = 0; i < this.watchlistList.length; i++) {

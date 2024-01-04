@@ -1,4 +1,4 @@
-import { SpaceObjectType } from '../lib/space-object-type';
+import { SpaceObjectType } from 'ootk';
 
 const spaceObjTypeToStr = {
   [SpaceObjectType.UNKNOWN]: 'Unknown',
@@ -6,9 +6,6 @@ const spaceObjTypeToStr = {
   [SpaceObjectType.ROCKET_BODY]: 'Rocket Body',
   [SpaceObjectType.DEBRIS]: 'Debris',
   [SpaceObjectType.SPECIAL]: 'Special',
-  [SpaceObjectType.RADAR_MEASUREMENT]: 'Radar Measurement',
-  [SpaceObjectType.RADAR_TRACK]: 'Radar Track',
-  [SpaceObjectType.RADAR_OBJECT]: 'Radar Object',
   [SpaceObjectType.BALLISTIC_MISSILE]: 'Ballistic Missile',
   [SpaceObjectType.STAR]: 'Star',
   [SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION]: 'Intergovernmental Organization',

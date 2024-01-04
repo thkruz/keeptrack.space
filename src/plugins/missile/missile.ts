@@ -1,8 +1,7 @@
-import { MissileObject } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
-import { SpaceObjectType } from '@app/lib/space-object-type';
-import { Kilometers, Meters } from 'ootk';
+import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
+import { Kilometers, Meters, SpaceObjectType } from 'ootk';
 import { missileManager } from './missileManager';
 
 export class Missile {
@@ -839,7 +838,7 @@ export class Missile {
     minAltitude: number;
   }) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const missileObj: MissileObject = <MissileObject>catalogManagerInstance.getSat(MissileObjectNum);
+    const missileObj: MissileObject = catalogManagerInstance.getMissile(MissileObjectNum);
 
     // Dimensions of the rocket
     Length = Length || 17; // (m)
@@ -1156,30 +1155,17 @@ export class Missile {
       return null;
     }
 
-    missileObj.static = false;
     missileObj.altList = AltitudeList;
     missileObj.latList = LatList;
     missileObj.lonList = LongList;
     missileObj.active = true;
-    missileObj.missile = true;
     missileObj.type = SpaceObjectType.UNKNOWN;
     missileObj.id = MissileObjectNum;
     missileObj.name = 'RV_' + missileObj.id;
+    // maxAlt is used for zoom controls
     missileObj.maxAlt = MaxAltitude;
     missileObj.startTime = CurrentTime;
     if (country) missileObj.country = country;
-
-    if (missileObj.apogee) delete missileObj.apogee;
-    if (missileObj.argPe) delete missileObj.argPe;
-    if (missileObj.eccentricity) delete missileObj.eccentricity;
-    if (missileObj.inclination) delete missileObj.inclination;
-    // maxAlt is used for zoom controls
-    if (missileObj.meanMotion) delete missileObj.meanMotion;
-    if (missileObj.perigee) delete missileObj.perigee;
-    if (missileObj.period) delete missileObj.period;
-    if (missileObj.raan) delete missileObj.raan;
-    if (missileObj.semiMajorAxis) delete missileObj.semiMajorAxis;
-    if (missileObj.semiMinorAxis) delete missileObj.semiMinorAxis;
 
     if (MissileDesc) missileObj.desc = MissileDesc;
 

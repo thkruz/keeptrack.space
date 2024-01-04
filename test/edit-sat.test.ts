@@ -28,8 +28,8 @@ describe('EditSatPlugin_class', () => {
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
     toggleButton.click();
-    keepTrackApi.getCatalogManager().getIdFromSccNum = () => 0;
-    keepTrackApi.getCatalogManager().getSat = () => defaultSat;
+    keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
+    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-newTLE');
     button.click();
     jest.advanceTimersByTime(1000);
@@ -41,8 +41,8 @@ describe('EditSatPlugin_class', () => {
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
     toggleButton.click();
-    keepTrackApi.getCatalogManager().getIdFromSccNum = () => 0;
-    keepTrackApi.getCatalogManager().getSat = () => defaultSat;
+    keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
+    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
     const button = getEl(`editSat-save`);
     button.click();
     jest.advanceTimersByTime(1000);

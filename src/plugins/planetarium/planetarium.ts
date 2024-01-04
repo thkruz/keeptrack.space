@@ -23,13 +23,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { LegendManager } from '@app/static/legend-manager';
 import planetariumPng from '@public/img/icons/planetarium.png';
+import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
 
@@ -95,7 +96,7 @@ export class Planetarium extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject | string): void => {
+      cb: (sensor: Sensor | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;

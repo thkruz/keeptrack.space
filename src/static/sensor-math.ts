@@ -1,9 +1,25 @@
-import { SatObject, SatPassTimes, SensorObject } from '@app/interfaces';
+import { SatPassTimes } from '@app/interfaces';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Degrees, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Transforms } from 'ootk';
+import {
+  BaseObject,
+  DEG2RAD,
+  Degrees,
+  DetailedSatellite,
+  DetailedSensor,
+  EciVec3,
+  Kilometers,
+  MINUTES_PER_DAY,
+  RAD2DEG,
+  SatelliteRecord,
+  Sgp4,
+  SpaceObjectType,
+  TAU,
+  ecf2rae,
+  eci2ecf,
+  eci2lla,
+} from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { DEG2RAD, MINUTES_PER_DAY, RAD2DEG, TAU } from '../lib/constants';
 import { dateFormat } from '../lib/dateFormat';
 import { SatMath } from './sat-math';
 
@@ -15,12 +31,12 @@ export type TearrData = {
   time: string;
   inView?: boolean;
   alt?: Kilometers;
-  lat?: Radians;
-  lon?: Radians;
+  lat?: Degrees;
+  lon?: Degrees;
 };
 
 export class SensorMath {
-  static getTearData(now: Date, satrec: SatelliteRecord, sensors: SensorObject[], isRiseSetLookangles = false): TearrData {
+  static getTearData(now: Date, satrec: SatelliteRecord, sensors: DetailedSensor[], isRiseSetLookangles = false): TearrData {
     // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
     const sensor = sensors[0];
 
@@ -91,7 +107,7 @@ export class SensorMath {
     };
   }
 
-  static getTearr(sat: SatObject, sensors: SensorObject[], propTime?: Date): TearrData {
+  static getTearr(sat: DetailedSatellite, sensors: DetailedSensor[], propTime?: Date): TearrData {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const tearr = <TearrData>{}; // Most current TEARR data that is set in satellite object and returned.
@@ -108,27 +124,27 @@ export class SensorMath {
     if (!positionEci) {
       errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${now}`);
       tearr.alt = <Kilometers>0;
-      tearr.lon = <Radians>0;
-      tearr.lat = <Radians>0;
+      tearr.lon = <Degrees>0;
+      tearr.lat = <Degrees>0;
       tearr.az = <Degrees>0;
       tearr.el = <Degrees>0;
       tearr.rng = <Kilometers>0;
     }
 
     try {
-      let gpos = Transforms.eci2lla(positionEci, gmst);
+      let gpos = eci2lla(positionEci, gmst);
       tearr.alt = gpos.alt;
       tearr.lon = gpos.lon;
       tearr.lat = gpos.lat;
-      let positionEcf = Transforms.eci2ecf(positionEci, gmst);
-      let lookAngles = Transforms.ecf2rae(sensor.observerGd, positionEcf);
+      let positionEcf = eci2ecf(positionEci, gmst);
+      let lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
       tearr.az = <Degrees>(lookAngles.az * RAD2DEG);
       tearr.el = <Degrees>(lookAngles.el * RAD2DEG);
       tearr.rng = lookAngles.rng;
     } catch /* istanbul ignore next */ {
       tearr.alt = <Kilometers>0;
-      tearr.lon = <Radians>0;
-      tearr.lat = <Radians>0;
+      tearr.lon = <Degrees>0;
+      tearr.lat = <Degrees>0;
       tearr.az = <Degrees>0;
       tearr.el = <Degrees>0;
       tearr.rng = <Kilometers>0;
@@ -142,21 +158,21 @@ export class SensorMath {
     return tearr;
   }
 
-  static distanceString(hoverSat: SatObject, selectedSat?: SatObject): string {
+  static distanceString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): string {
     // Sanity Check
-    if (hoverSat == null || selectedSat == null) return '';
+    if (hoverSat == null || secondaryObj == null) return '';
 
     // Get Objects
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    hoverSat = catalogManagerInstance.getSat(hoverSat.id);
-    selectedSat = catalogManagerInstance.getSat(selectedSat.id);
+    // const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    // hoverSat = catalogManagerInstance.getObject(hoverSat.id);
+    // selectedSat = catalogManagerInstance.getObject(selectedSat.id);
 
     // Validate Objects
-    if (selectedSat == null || hoverSat == null) return '';
-    if (selectedSat.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) return '';
+    if (secondaryObj == null || hoverSat == null) return '';
+    if (secondaryObj.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) return '';
 
     // Calculate Distance
-    const distanceApart = SatMath.distance(hoverSat.position, selectedSat.position).toFixed(0);
+    const distanceApart = SatMath.distance(hoverSat.position, secondaryObj.position).toFixed(0);
 
     // Calculate if same beam
     let sameBeamStr = '';
@@ -166,7 +182,7 @@ export class SensorMath {
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 
         if (parseFloat(distanceApart) < satInfoBoxCorePlugin.currentTEARR?.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)) {
-          if (satInfoBoxCorePlugin.currentTEARR?.rng < sensorManagerInstance.currentSensors[0].obsmaxrange && satInfoBoxCorePlugin.currentTEARR?.rng > 0) {
+          if (satInfoBoxCorePlugin.currentTEARR?.rng < sensorManagerInstance.currentSensors[0].maxRng && satInfoBoxCorePlugin.currentTEARR?.rng > 0) {
             sameBeamStr = ' (Within One Beam)';
           }
         }
@@ -178,7 +194,7 @@ export class SensorMath {
     return '<br />Range: ' + distanceApart + ' km' + sameBeamStr;
   }
 
-  static getSunTimes(sat: SatObject, sensors?: SensorObject[], searchLength = 2, interval = 30) {
+  static getSunTimes(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength = 2, interval = 30) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -208,17 +224,17 @@ export class SensorMath {
       const distZ = Math.pow(sunZ - eci.z, 2);
       const dist = Math.sqrt(distX + distY + distZ);
 
-      const positionEcf = Transforms.eci2ecf(eci, gmst);
-      const lookAngles = Transforms.ecf2rae(sensor.observerGd, positionEcf);
+      const positionEcf = eci2ecf(eci, gmst);
+      const lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
 
       const az = lookAngles.az * RAD2DEG;
       const el = lookAngles.el * RAD2DEG;
       const rng = lookAngles.rng;
 
-      if (sensor.obsminaz > sensor.obsmaxaz) {
+      if (sensor.minAz > sensor.maxAz) {
         if (
-          ((az >= sensor.obsminaz || az <= sensor.obsmaxaz) && el >= sensor.obsminel && el <= sensor.obsmaxel && rng <= sensor.obsmaxrange && rng >= sensor.obsminrange) ||
-          ((az >= sensor.obsminaz2 || az <= sensor.obsmaxaz2) && el >= sensor.obsminel2 && el <= sensor.obsmaxel2 && rng <= sensor.obsmaxrange2 && rng >= sensor.obsminrange2)
+          ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
+          ((az >= sensor.minAz2 || az <= sensor.maxAz2) && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
         ) {
           if (dist < minDistanceApart) {
             minDistanceApart = dist;
@@ -226,8 +242,8 @@ export class SensorMath {
         }
       } else {
         if (
-          (az >= sensor.obsminaz && az <= sensor.obsmaxaz && el >= sensor.obsminel && el <= sensor.obsmaxel && rng <= sensor.obsmaxrange && rng >= sensor.obsminrange) ||
-          (az >= sensor.obsminaz2 && az <= sensor.obsmaxaz2 && el >= sensor.obsminel2 && el <= sensor.obsmaxel2 && rng <= sensor.obsmaxrange2 && rng >= sensor.obsminrange2)
+          (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
+          (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
         ) {
           if (dist < minDistanceApart) {
             minDistanceApart = dist;
@@ -237,7 +253,7 @@ export class SensorMath {
     }
   }
 
-  static nextNpasses(sat: SatObject, sensors: SensorObject[], searchLength: number, interval: number, numPasses: number): Date[] {
+  static nextNpasses(sat: DetailedSatellite, sensors: DetailedSensor[], searchLength: number, interval: number, numPasses: number): Date[] {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -275,7 +291,7 @@ export class SensorMath {
     return passTimesArray;
   }
 
-  static nextpass(sat: SatObject, sensors?: SensorObject[], searchLength?: number, interval?: number) {
+  static nextpass(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength?: number, interval?: number) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
@@ -310,7 +326,7 @@ export class SensorMath {
     }
   }
 
-  static nextpassList(satArray: SatObject[], interval?: number, days = 7): SatPassTimes[] {
+  static nextpassList(satArray: DetailedSatellite[], interval?: number, days = 7): SatPassTimes[] {
     let nextPassArray: SatPassTimes[] = [];
     const nextNPassesCount = settingsManager ? settingsManager.nextNPassesCount : 1;
     for (const sat of satArray) {

@@ -24,7 +24,7 @@
   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -36,6 +36,7 @@ import yellowSquare from '@public/img/yellow-square.png';
 
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import { BaseObject } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -181,7 +182,7 @@ export class StereoMap extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
+      cb: (sat: BaseObject) => {
         if (sat) {
           this.updateMap();
         }
@@ -333,7 +334,7 @@ export class StereoMap extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    const sat = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
+    const sat = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat);
     const lla = CoordinateTransforms.eci2lla(sat.position, timeManagerInstance.simulationTimeObj);
     const map = {
       x: ((lla.lon + 180) / 360) * settingsManager.mapWidth,

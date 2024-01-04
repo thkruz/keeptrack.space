@@ -24,6 +24,8 @@ declare global {
   module '*.jpg';
   module '*.png';
   declare module '*.mp3';
+  declare module '*.wav';
+  declare module '*.flac';
   interface Window {
     settingsManager: SettingsManager;
     settingsOverride: any;

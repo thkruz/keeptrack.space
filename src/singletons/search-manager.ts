@@ -1,25 +1,34 @@
-import { CatalogManager, KeepTrackApiEvents, MissileObject, SatObject, SensorObject, UiManager } from '@app/interfaces';
-import { isMissileObject } from '@app/lib/catalog-object-type-helper';
+import { KeepTrackApiEvents, UiManager } from '@app/interfaces';
+import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
-import { SpaceObjectType } from 'ootk';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
 import { LegendManager } from '../static/legend-manager';
 import { UrlManager } from '../static/url-manager';
+import { MissileObject } from './catalog-manager/MissileObject';
 
 export interface SearchResult {
-  isBus: any;
-  satId: number;
-  type: SpaceObjectType;
-  isON: boolean;
-  strIndex: number;
-  patlen: number;
-  isSccNum: boolean;
-  isIntlDes: boolean;
+  id: number; // Catalog Index
+  searchType: SearchResultType; // Type of search result
+  strIndex: number; // Index of the search string in the name
+  patlen: number; // Length of the search string
+}
+
+export enum SearchResultType {
+  BUS,
+  ON,
+  SCC,
+  INTLDES,
+  LV,
+  MISSILE,
+  STAR,
 }
 
 /**
@@ -56,9 +65,9 @@ export class SearchManager {
       if (isNaN(satId) || satId === -1) return;
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const sat = catalogManagerInstance.getSat(satId);
-      if (sat?.type === SpaceObjectType.STAR) {
-        catalogManagerInstance.panToStar(sat);
+      const obj = catalogManagerInstance.getObject(satId);
+      if (obj?.type === SpaceObjectType.STAR) {
+        keepTrackApi.getMainCamera().lookAtStar(obj as Star);
       } else {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(satId);
       }
@@ -143,7 +152,7 @@ export class SearchManager {
 
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];
-      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length);
+      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
 
       if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group) {
         colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
@@ -158,7 +167,7 @@ export class SearchManager {
   }
 
   static doArraySearch(catalogManagerInstance: CatalogManager, array: number[]) {
-    return array.reduce((searchStr, i) => `${searchStr}${(<SatObject>catalogManagerInstance.satData[i])?.sccNum},`, '').slice(0, -1);
+    return array.reduce((searchStr, i) => `${searchStr}${(<DetailedSatellite>catalogManagerInstance.objectCache[i])?.sccNum},`, '').slice(0, -1);
   }
 
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
@@ -170,12 +179,12 @@ export class SearchManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const dotsManagerInstance = keepTrackApi.getDotsManager();
 
-    if (catalogManagerInstance.satData.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');
+    if (catalogManagerInstance.objectCache.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');
 
     if (searchString.length === 0) {
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];
-      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length);
+      dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
       return;
@@ -201,7 +210,7 @@ export class SearchManager {
     // Split string into array using comma or space as delimiter
     // let searchList = searchString.split(/(?![0-9]+)\s(?=[0-9]+)|,/u);
 
-    let results = [];
+    let results = <SearchResult[]>[];
     // If so, then do a number only search
     if (/^[0-9,]+$/u.test(searchString)) {
       results = SearchManager.doNumOnlySearch_(searchString);
@@ -214,10 +223,10 @@ export class SearchManager {
     results = results.splice(0, settingsManager.searchLimit);
 
     // Make a group to hilight results
-    const idList = results.map((sat) => sat.satId);
+    const idList = results.map((sat) => sat.id);
     settingsManager.lastSearchResults = idList;
 
-    dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.satData.length);
+    dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
 
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
@@ -236,9 +245,9 @@ export class SearchManager {
       return;
     }
 
-    if (settingsManager.isSatOverflyModeOn) {
+    if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn) {
       catalogManagerInstance.satCruncher.postMessage({
-        typ: 'satelliteSelected',
+        typ: CruncerMessageTypes.SATELLITE_SELECTED,
         satelliteSelected: idList,
       });
     }
@@ -249,7 +258,7 @@ export class SearchManager {
 
   private static doRegularSearch_(searchString: string) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const results = [];
+    const results: SearchResult[] = [];
 
     // Split string into array using comma
     let searchList = searchString.split(/,/u);
@@ -269,10 +278,9 @@ export class SearchManager {
         if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
           results.push({
             strIndex: sat.name.indexOf(searchStringIn),
-            type: sat.type,
-            isON: true,
+            searchType: SearchResultType.ON,
             patlen: len,
-            satId: sat.id,
+            id: sat.id,
           });
           return true; // Prevent's duplicate results
         }
@@ -280,10 +288,9 @@ export class SearchManager {
         if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
           results.push({
             strIndex: sat.bus.indexOf(searchStringIn),
-            type: sat.type,
-            isBus: true,
+            searchType: SearchResultType.BUS,
             patlen: len,
-            satId: sat.id,
+            id: sat.id,
           });
           return true; // Prevent's duplicate results
         }
@@ -293,9 +300,9 @@ export class SearchManager {
         } else if (sat.desc.toUpperCase().indexOf(searchStringIn) !== -1) {
           results.push({
             strIndex: sat.desc.indexOf(searchStringIn),
-            isMissile: true,
+            searchType: SearchResultType.MISSILE,
             patlen: len,
-            satId: sat.id,
+            id: sat.id,
           });
           return true; // Prevent's duplicate results
         } else {
@@ -308,9 +315,9 @@ export class SearchManager {
 
           results.push({
             strIndex: sat.sccNum.indexOf(searchStringIn),
-            isSccNum: true,
+            searchType: SearchResultType.SCC,
             patlen: len,
-            satId: sat.id,
+            id: sat.id,
           });
           return true; // Prevent's duplicate results
         }
@@ -321,9 +328,9 @@ export class SearchManager {
 
           results.push({
             strIndex: sat.intlDes.indexOf(searchStringIn),
-            isIntlDes: true,
+            searchType: SearchResultType.INTLDES,
             patlen: len,
-            satId: sat.id,
+            id: sat.id,
           });
           return true; // Prevent's duplicate results
         }
@@ -331,9 +338,9 @@ export class SearchManager {
         if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
           results.push({
             strIndex: sat.launchVehicle.indexOf(searchStringIn),
-            isLV: true,
+            searchType: SearchResultType.LV,
             patlen: len,
-            satId: sat.id,
+            id: sat.id,
           });
           return true; // Prevent's duplicate results
         }
@@ -347,7 +354,7 @@ export class SearchManager {
 
   private static doNumOnlySearch_(searchString: string) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    let results = [];
+    let results: SearchResult[] = [];
 
     // Split string into array using comma
     let searchList = searchString.split(/,/u).filter((str) => str.length > 0);
@@ -374,9 +381,9 @@ export class SearchManager {
 
           results.push({
             strIndex: sat.sccNum.indexOf(searchStringIn),
-            isSccNum: true,
             patlen: searchStringIn.length,
-            satId: sat.id,
+            id: sat.id,
+            searchType: SearchResultType.SCC,
           });
 
           if (searchStringIn.length === 5) {
@@ -387,28 +394,25 @@ export class SearchManager {
     });
 
     // Remove any duplicates in results
-    results = results.filter((result, index, self) => index === self.findIndex((t) => t.satId === result.satId));
+    results = results.filter((result, index, self) => index === self.findIndex((t) => t.id === result.id));
 
     return results;
   }
 
   private static getSearchableObjects_(catalogManagerInstance: CatalogManager) {
     return (
-      catalogManagerInstance.satData.filter((sat) => {
-        // if ((sat as MissileObject).missile) return false;
-        if ((sat as SensorObject).staticNum) return false; // No sensors
-        if (sat.static) return false; // Skip static dots (Maybe these should be searchable?)
-        if ((sat as SatObject).marker) return false; // skip markers
-        if (settingsManager.isSatOverflyModeOn && sat.type !== SpaceObjectType.PAYLOAD) return false; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
-        if (!(sat as MissileObject).active) return false; // Skip inactive missiles.
-        if ((sat as SatObject).country == 'ANALSAT' && !(sat as SatObject).active) return false; // Skip Fake Analyst satellites
-        if (!sat.name) return false; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
+      catalogManagerInstance.objectCache.filter((obj) => {
+        if (obj.isSensor() || obj.isMarker() || obj.isLandObject() || obj.isStar()) return false; // Skip static dots (Maybe these should be searchable?)
+        if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn && obj.type !== SpaceObjectType.PAYLOAD) return false; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+        if (!(obj as MissileObject).active) return false; // Skip inactive missiles.
+        if ((obj as DetailedSatellite).country == 'ANALSAT' && !obj.active) return false; // Skip Fake Analyst satellites
+        if (!obj.name) return false; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
         return true;
-      }) as (SatObject | MissileObject)[]
+      }) as (DetailedSatellite & MissileObject)[]
     ).sort((a, b) => {
       // Sort by sccNum
-      if (a.sccNum && b.sccNum) {
-        return parseInt(a.sccNum) - parseInt(b.sccNum);
+      if ((a as DetailedSatellite).sccNum && (b as DetailedSatellite).sccNum) {
+        return parseInt((a as DetailedSatellite).sccNum) - parseInt((b as DetailedSatellite).sccNum);
       } else {
         return 0;
       }
@@ -418,64 +422,104 @@ export class SearchManager {
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    let satData = catalogManagerInstance.satData;
+    let satData = catalogManagerInstance.objectCache;
     getEl('search-results').innerHTML = results.reduce((html, result) => {
-      const sat = <SatObject | MissileObject>satData[result.satId];
-      html += '<div class="search-result" data-obj-id="' + sat.id + '">';
+      const obj = <DetailedSatellite | MissileObject>satData[result.id];
+      html += '<div class="search-result" data-obj-id="' + obj.id + '">';
       html += '<div class="truncate-search">';
-      if (isMissileObject(sat)) {
-        html += sat.name;
-      } else if (result.isON) {
+
+      // Left half of search results
+      if (obj.isMissile()) {
+        html += obj.name;
+      } else if (result.searchType === SearchResultType.ON) {
         // If the name matched - highlight it
-        html += sat.name.substring(0, result.strIndex);
+        html += obj.name.substring(0, result.strIndex);
         html += '<span class="search-hilight">';
-        html += sat.name.substring(result.strIndex, result.strIndex + result.patlen);
+        html += obj.name.substring(result.strIndex, result.strIndex + result.patlen);
         html += '</span>';
-        html += sat.name.substring(result.strIndex + result.patlen);
+        html += obj.name.substring(result.strIndex + result.patlen);
       } else {
         // If not, just write the name
-        html += sat.name;
+        html += obj.name;
       }
       html += '</div>';
       html += '<div class="search-result-scc">';
-      if (isMissileObject(sat)) {
-        html += sat.desc;
-      } else if (result.isSccNum) {
-        // If the object number matched
-        result.strIndex = result.strIndex || 0;
-        result.patlen = result.patlen || 5;
 
-        html += sat.sccNum.substring(0, result.strIndex);
-        html += '<span class="search-hilight">';
-        html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
-        html += '</span>';
-        html += sat.sccNum.substring(result.strIndex + result.patlen);
-      } else if (result.isIntlDes) {
-        // If the international designator matched
-        result.strIndex = result.strIndex || 0;
-        result.patlen = result.patlen || 5;
+      // Right half of search results
+      switch (result.searchType) {
+        case SearchResultType.SCC:
+          {
+            const sat = obj as DetailedSatellite;
 
-        html += sat.intlDes.substring(0, result.strIndex);
-        html += '<span class="search-hilight">';
-        html += sat.intlDes.substring(result.strIndex, result.strIndex + result.patlen);
-        html += '</span>';
-        html += sat.intlDes.substring(result.strIndex + result.patlen);
-      } else if (result.isBus) {
-        // If the object number matched
-        result.strIndex = result.strIndex || 0;
-        result.patlen = result.patlen || 5;
+            // If the object number matched
+            result.strIndex = result.strIndex || 0;
+            result.patlen = result.patlen || 5;
 
-        html += sat.bus.substring(0, result.strIndex);
-        html += '<span class="search-hilight">';
-        html += sat.bus.substring(result.strIndex, result.strIndex + result.patlen);
-        html += '</span>';
-        html += sat.bus.substring(result.strIndex + result.patlen);
-      } else if (result.type === SpaceObjectType.STAR) {
-        html += 'Star';
-      } else {
-        // Don't Write the lift vehicle - maybe it should?
-        html += sat.sccNum;
+            html += sat.sccNum.substring(0, result.strIndex);
+            html += '<span class="search-hilight">';
+            html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
+            html += '</span>';
+            html += sat.sccNum.substring(result.strIndex + result.patlen);
+          }
+          break;
+        case SearchResultType.INTLDES:
+          {
+            const sat = obj as DetailedSatellite;
+            // If the international designator matched
+            result.strIndex = result.strIndex || 0;
+            result.patlen = result.patlen || 5;
+
+            html += sat.intlDes.substring(0, result.strIndex);
+            html += '<span class="search-hilight">';
+            html += sat.intlDes.substring(result.strIndex, result.strIndex + result.patlen);
+            html += '</span>';
+            html += sat.intlDes.substring(result.strIndex + result.patlen);
+          }
+          break;
+        case SearchResultType.BUS:
+          {
+            const sat = obj as DetailedSatellite;
+            // If the object number matched
+            result.strIndex = result.strIndex || 0;
+            result.patlen = result.patlen || 5;
+
+            html += sat.bus.substring(0, result.strIndex);
+            html += '<span class="search-hilight">';
+            html += sat.bus.substring(result.strIndex, result.strIndex + result.patlen);
+            html += '</span>';
+            html += sat.bus.substring(result.strIndex + result.patlen);
+          }
+          break;
+        case SearchResultType.LV:
+          {
+            const sat = obj as DetailedSatellite;
+            result.strIndex = result.strIndex || 0;
+            result.patlen = result.patlen || 5;
+
+            html += sat.launchVehicle.substring(0, result.strIndex);
+            html += '<span class="search-hilight">';
+            html += sat.launchVehicle.substring(result.strIndex, result.strIndex + result.patlen);
+            html += '</span>';
+            html += sat.launchVehicle.substring(result.strIndex + result.patlen);
+          }
+          break;
+        case SearchResultType.MISSILE:
+          {
+            const misl = obj as MissileObject;
+            html += misl.desc;
+          }
+          break;
+        case SearchResultType.STAR:
+          html += 'Star';
+          break;
+        default:
+          {
+            const sat = obj as DetailedSatellite;
+            html += sat.sccNum;
+          }
+          break;
       }
+
       html += '</div></div>';
       return html;
     }, '');

@@ -1,12 +1,11 @@
-import { EChartsData, GetSatType, SatObject } from '@app/interfaces';
+import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import linePlotPng from '@public/img/icons/line-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { SpaceObjectType } from 'ootk';
+import { DetailedSatellite, RAD2DEG, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -174,14 +173,17 @@ export class Time2LonPlots extends KeepTrackPlugin {
   }
 
   static getPlotData(): EChartsData {
-    const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
+    const objData = keepTrackApi.getCatalogManager().objectCache;
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const now = timeManagerInstance.simulationTimeObj.getTime();
 
     const data = [] as EChartsData;
-    satData.forEach((sat) => {
-      if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
+    objData.forEach((obj) => {
+      if (obj.type !== SpaceObjectType.PAYLOAD) return;
+
+      let sat = obj as DetailedSatellite;
+
       if (sat.eccentricity > 0.1) return;
       if (sat.period < 1240) return;
       if (sat.period > 1640) return;
@@ -200,7 +202,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
         default:
           return;
       }
-      sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
+      sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
       const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
       const plotData = [];
       plotPoints.forEach((point) => {

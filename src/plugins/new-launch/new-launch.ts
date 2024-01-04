@@ -1,6 +1,5 @@
-import { GetSatType, KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
@@ -12,9 +11,11 @@ import { SatMath } from '@app/static/sat-math';
 import { launchSites } from '@app/catalogs/launch-sites';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { Degrees, SatelliteRecord, Sgp4 } from 'ootk';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { BaseObject, Degrees, DetailedSatellite, RAD2DEG, SatelliteRecord, Sgp4 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 
 export class NewLaunch extends KeepTrackPlugin {
   static PLUGIN_NAME = 'New Launch';
@@ -32,7 +33,7 @@ export class NewLaunch extends KeepTrackPlugin {
       return;
     }
 
-    const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
+    const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
     (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
   };
@@ -151,8 +152,8 @@ export class NewLaunch extends KeepTrackPlugin {
     showLoadingSticky();
 
     const sccNum = (<HTMLInputElement>getEl('nl-scc')).value;
-    const id = catalogManagerInstance.getIdFromSccNum(parseInt(sccNum));
-    let sat = catalogManagerInstance.getSat(id);
+    const id = catalogManagerInstance.sccNum2Id(parseInt(sccNum));
+    let sat = catalogManagerInstance.getObject(id) as DetailedSatellite;
 
     const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
     const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
@@ -216,7 +217,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     uiManagerInstance.toast(`Time is now relative to launch time.`, 'standby');
-    keepTrackApi.getSoundManager()?.play('liftoff');
+    keepTrackApi.getSoundManager()?.play(SoundNames.LIFT_OFF);
 
     // Prevent caching of old TLEs
     sat.satrec = null;
@@ -230,7 +231,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
     if (SatMath.altitudeCheck(satrec, simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
-        typ: 'satEdit',
+        typ: CruncerMessageTypes.SAT_EDIT,
         id: id,
         active: true,
         TLE1: TLE1,
@@ -267,7 +268,8 @@ export class NewLaunch extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl(this.sideMenuElementName + '-form').addEventListener('change', () => {
-          const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
+          const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+          if (!sat.isSatellite()) return;
           this.preValidate_(sat);
         });
       },
@@ -276,8 +278,9 @@ export class NewLaunch extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
-        if (sat) {
+      cb: (obj: BaseObject) => {
+        if (obj?.isSatellite()) {
+          const sat = obj as DetailedSatellite;
           (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
@@ -290,7 +293,7 @@ export class NewLaunch extends KeepTrackPlugin {
     });
   }
 
-  private preValidate_(sat: SatObject): void {
+  private preValidate_(sat: DetailedSatellite): void {
     // Get Current LaunchSiteOptionValue
     const launchSiteOptionValue = (<HTMLInputElement>getEl('nl-facility')).value;
     const lat = launchSites[launchSiteOptionValue].lat;

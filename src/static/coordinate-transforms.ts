@@ -1,7 +1,6 @@
-import { EciArr3, SatObject, SensorObject } from '@app/interfaces';
+import { EciArr3 } from '@app/interfaces';
 import { mat3, vec3 } from 'gl-matrix';
-import { Degrees, EciVec3, Kilometers, LlaVec3, Radians, Transforms } from 'ootk';
-import { DEG2RAD, RAD2DEG } from '../lib/constants';
+import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, Kilometers, LlaVec3, RAD2DEG, Radians, RaeVec3, Sensor, ecf2rae, eci2ecf, eci2lla, lla2ecf } from 'ootk';
 import { SatMath } from './sat-math';
 
 /**
@@ -15,8 +14,8 @@ export abstract class CoordinateTransforms {
    * @returns {Object} Object containing satellite position and velocity vectors in RIC reference frame.
    */
   public static sat2ric(
-    sat: SatObject | { position: EciVec3; velocity: EciVec3 },
-    reference: SatObject | { position: EciVec3; velocity: EciVec3 }
+    sat: DetailedSatellite | { position: EciVec3; velocity: EciVec3 },
+    reference: DetailedSatellite | { position: EciVec3; velocity: EciVec3 }
   ): { position: vec3; velocity: vec3 } {
     const { position, velocity } = sat;
     const r = vec3.fromValues(position.x, position.y, position.z);
@@ -57,7 +56,7 @@ export abstract class CoordinateTransforms {
 
     if (rng < 0) throw new Error('Range cannot be negative');
 
-    const site = Transforms.lla2ecf(geodeticCoords);
+    const site = lla2ecf(geodeticCoords);
     const sitex = site.x;
     const sitey = site.y;
     const sitez = site.z;
@@ -91,18 +90,12 @@ export abstract class CoordinateTransforms {
    */
   public static eci2lla(position: EciVec3, simulationTime: Date): LlaVec3<Degrees, Kilometers> {
     const { gmst } = SatMath.calculateTimeVariables(simulationTime);
-    const latLon = Transforms.eci2lla(position, gmst);
-    let lat = <Degrees>(latLon.lat * RAD2DEG);
-    let lon = <Degrees>(latLon.lon * RAD2DEG);
+    let { lat, lon, alt } = eci2lla(position, gmst);
 
     // Normalize
     lon = lon > 180 ? <Degrees>(lon - 360) : lon;
     lon = lon < -180 ? <Degrees>(lon + 360) : lon;
-    return {
-      lat: lat,
-      lon: lon,
-      alt: latLon.alt,
-    } as LlaVec3<Degrees, Kilometers>;
+    return { lat, lon, alt } as LlaVec3<Degrees, Kilometers>;
   }
 
   /**
@@ -112,15 +105,15 @@ export abstract class CoordinateTransforms {
    * @param {SensorObject} sensor - Sensor object containing observer's geodetic coordinates.
    * @returns {Object} Object containing azimuth, elevation and range in degrees and kilometers respectively.
    */
-  public static eci2rae(now: Date, eci: EciArr3, sensor: SensorObject): { az: Degrees; el: Degrees; rng: Kilometers } {
+  public static eci2rae(now: Date, eci: EciArr3, sensor: Sensor): RaeVec3<Kilometers, Degrees> {
     now = new Date(now);
     const { gmst } = SatMath.calculateTimeVariables(now);
 
-    let positionEcf = Transforms.eci2ecf(<EciVec3>{ x: eci[0], y: eci[1], z: eci[2] }, gmst); // positionEci.position is called positionEci originally
-    let lookAngles = Transforms.ecf2rae(sensor.observerGd, positionEcf);
-    let az = lookAngles.az * RAD2DEG;
-    let el = lookAngles.el * RAD2DEG;
+    let positionEcf = eci2ecf(<EciVec3>{ x: eci[0], y: eci[1], z: eci[2] }, gmst); // positionEci.position is called positionEci originally
+    let lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
+    let az = (lookAngles.az * RAD2DEG) as Degrees;
+    let el = (lookAngles.el * RAD2DEG) as Degrees;
     let rng = lookAngles.rng;
-    return { az: az as Degrees, el: el as Degrees, rng: rng as Kilometers };
+    return { az, el, rng };
   }
 }

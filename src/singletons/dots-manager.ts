@@ -1,15 +1,17 @@
-import { SatCruncherMessageData, SatObject } from '../interfaces';
+import { SatCruncherMessageData } from '../interfaces';
 import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SatMath } from '@app/static/sat-math';
 import { mat4 } from 'gl-matrix';
-import { Kilometers } from 'ootk';
+import { BaseObject, DetailedSatellite, EciVec3, Kilometers, Sgp4, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { BufferAttribute } from '../static/buffer-attribute';
 import { WebGlProgramHelper } from '../static/webgl-program';
 import { CameraType } from './camera';
+import { MissileObject } from './catalog-manager/MissileObject';
 import { WebGLRenderer } from './webgl-renderer';
 
 declare module '@app/interfaces' {
@@ -326,8 +328,8 @@ export class DotsManager {
    */
   initBuffers(colorBuffer: WebGLBuffer) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    this.setupPickingBuffer(catalogManagerInstance.satData.length);
-    this.updateSizeBuffer(catalogManagerInstance.satData.length);
+    this.setupPickingBuffer(catalogManagerInstance.objectCache.length);
+    this.updateSizeBuffer(catalogManagerInstance.objectCache.length);
     this.initColorBuffer(colorBuffer);
     this.initVao(); // Needs ColorBuffer first
   }
@@ -493,39 +495,35 @@ export class DotsManager {
 
   /**
    * Updates the position and velocity of a satellite object based on the data stored in the `positionData` and `velocityData` arrays.
-   * @param sat The satellite object to update.
+   * @param object The satellite object to update.
    * @param i The index of the satellite in the `positionData` and `velocityData` arrays.
    */
-  updatePosVel(sat: SatObject, i: number): void {
+  updatePosVel(object: BaseObject, i: number): void {
     if (!this.velocityData) return;
-
-    sat.velocity ??= { total: 0, x: 0, y: 0, z: 0 };
 
     // Fix for https://github.com/thkruz/keeptrack.space/issues/834
     // TODO: Remove this once we figure out why this is happening
-    // @ts-expect-error
-    if (sat.velocity === 0) {
-      sat.velocity = { total: 0, x: 0, y: 0, z: 0 };
-    }
 
-    const isChanged = sat.velocity.x !== this.velocityData[i * 3] || sat.velocity.y !== this.velocityData[i * 3 + 1] || sat.velocity.z !== this.velocityData[i * 3 + 2];
-    sat.velocity.x = this.velocityData[i * 3] || 0;
-    sat.velocity.y = this.velocityData[i * 3 + 1] || 0;
-    sat.velocity.z = this.velocityData[i * 3 + 2] || 0;
-    if (sat.missile) {
-      const newVel = Math.sqrt(sat.velocity.x ** 2 + sat.velocity.y ** 2 + sat.velocity.z ** 2);
-      if (sat.velocity.total === 0) {
-        sat.velocity.total = newVel;
-      } else {
-        if (isChanged) {
-          sat.velocity.total = sat.velocity.total * 0.9 + newVel * 0.1;
-        }
+    object.velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+    object.totalVelocity = 0;
+
+    const isChanged = object.velocity.x !== this.velocityData[i * 3] || object.velocity.y !== this.velocityData[i * 3 + 1] || object.velocity.z !== this.velocityData[i * 3 + 2];
+    object.velocity.x = (this.velocityData[i * 3] as Kilometers) || (0 as Kilometers);
+    object.velocity.y = (this.velocityData[i * 3 + 1] as Kilometers) || (0 as Kilometers);
+    object.velocity.z = (this.velocityData[i * 3 + 2] as Kilometers) || (0 as Kilometers);
+    if (object.type === SpaceObjectType.BALLISTIC_MISSILE) {
+      const missile = object as MissileObject;
+      const newVel = Math.sqrt(missile.velocity.x ** 2 + missile.velocity.y ** 2 + missile.velocity.z ** 2);
+      if (missile.totalVelocity === 0) {
+        missile.totalVelocity = newVel;
+      } else if (isChanged) {
+        missile.totalVelocity = missile.totalVelocity * 0.9 + newVel * 0.1;
       }
     } else {
-      sat.velocity.total = Math.sqrt(sat.velocity.x ** 2 + sat.velocity.y ** 2 + sat.velocity.z ** 2);
+      object.totalVelocity = Math.sqrt(object.velocity.x ** 2 + object.velocity.y ** 2 + object.velocity.z ** 2);
     }
 
-    sat.position = {
+    object.position = {
       x: <Kilometers>this.positionData[i * 3],
       y: <Kilometers>this.positionData[i * 3 + 1],
       z: <Kilometers>this.positionData[i * 3 + 2],
@@ -544,7 +542,19 @@ export class DotsManager {
 
     const renderer = keepTrackApi.getRenderer();
     if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
-      this.updateVelocities_(renderer);
+      this.interpolatePositions_(renderer);
+      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
+        const obj = keepTrackApi.getCatalogManager().objectCache[keepTrackApi.getPlugin(SelectSatManager)?.selectedSat] as DetailedSatellite | MissileObject;
+        if (obj.isSatellite()) {
+          const sat = obj as DetailedSatellite;
+          const now = keepTrackApi.getTimeManager().simulationTimeObj;
+          if (!sat.satrec) keepTrackApi.getCatalogManager().calcSatrec(sat);
+          const { m } = SatMath.calculateTimeVariables(now, sat.satrec);
+          const pv = Sgp4.propagate(sat.satrec, m);
+          if (!pv) return;
+          sat.position = pv.position as EciVec3<Kilometers>;
+        }
+      }
     }
   }
 
@@ -723,7 +733,7 @@ export class DotsManager {
    * Updates the velocities of the dots based on the renderer's time delta and the current position data.
    * @param renderer - The WebGL renderer used to calculate the time delta.
    */
-  private updateVelocities_(renderer: WebGLRenderer) {
+  private interpolatePositions_(renderer: WebGLRenderer) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitalSats3 = catalogManagerInstance.orbitalSats * 3;
 

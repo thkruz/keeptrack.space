@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
 import { Radians } from 'ootk';
@@ -166,14 +166,14 @@ export class GamepadPlugin {
     if (settingsManager.isLimitedGamepadControls) return;
     console.log('Left Bumper');
 
-    const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
     if (!selectSatManagerInstance) return;
 
     const satId = selectSatManagerInstance.selectedSat - 1;
     if (satId >= 0) {
       selectSatManagerInstance.selectSat(satId);
     } else {
-      const activeSats = <SatObject[]>keepTrackApi.getCatalogManager().satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+      const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
       const lastSatId = activeSats[activeSats.length - 1].id;
       selectSatManagerInstance.selectSat(lastSatId);
     }
@@ -183,10 +183,10 @@ export class GamepadPlugin {
     if (settingsManager.isLimitedGamepadControls) return;
     console.log('Right Bumper');
 
-    const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
     if (!selectSatManagerInstance) return;
 
-    const activeSats = <SatObject[]>keepTrackApi.getCatalogManager().satData.filter((sat) => (<SatObject>sat).TLE1 && (<SatObject>sat).active);
+    const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
     const lastSatId = activeSats[activeSats.length - 1].id;
     const satId = selectSatManagerInstance.selectedSat + 1;
     if (satId <= lastSatId) {

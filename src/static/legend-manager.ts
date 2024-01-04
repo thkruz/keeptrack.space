@@ -1,7 +1,7 @@
+import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
-import { StandardColorSchemeManager } from '../singletons/color-scheme-manager';
 import {
   ageOfElsetDiv,
   astronomyDiv,
@@ -116,7 +116,7 @@ export abstract class LegendManager {
     }
   }
 
-  private static setColors_(colorSchemeManagerInstance: StandardColorSchemeManager) {
+  private static setColors_(colorSchemeManagerInstance: ColorSchemeManager) {
     LegendManager.legendClassList.forEach((selector) => {
       const elementFromClass = document.querySelector(selector);
       if (elementFromClass && settingsManager.colors) {
@@ -128,7 +128,7 @@ export abstract class LegendManager {
     });
   }
 
-  private static setVelocityColor_(colorSchemeManagerInstance: StandardColorSchemeManager) {
+  private static setVelocityColor_(colorSchemeManagerInstance: ColorSchemeManager) {
     const velocitySlowClass = <HTMLElement>document.querySelector('.legend-velocitySlow-box');
     const velocityMedClass = <HTMLElement>document.querySelector('.legend-velocityMed-box');
     const velocityFastClass = <HTMLElement>document.querySelector('.legend-velocityFast-box');

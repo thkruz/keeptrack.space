@@ -63,7 +63,6 @@ jspm_packages
 public/social
 public/social/*
 public/textures-extra
-public/radarData/radar*
 public/tle/2006*
 public/tle/TLE.json.bak
 public/tle/mw*

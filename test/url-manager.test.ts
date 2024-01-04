@@ -28,7 +28,7 @@ describe('UrlManager_class', () => {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
-    catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
+    catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -53,8 +53,8 @@ describe('UrlManager_class', () => {
     const uiManagerInstance = keepTrackApi.getUiManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
-    catalogManagerInstance.getIdFromIntlDes = () => 10;
-    catalogManagerInstance.getSat = () => ({ id: 10, sccNum: '25544', active: true }) as any;
+    catalogManagerInstance.intlDes2id = () => 10;
+    catalogManagerInstance.getObject = () => ({ id: 10, sccNum: '25544', active: true }) as any;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -76,7 +76,7 @@ describe('UrlManager_class', () => {
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     uiManagerInstance.toast = jest.fn();
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
-    catalogManagerInstance.getIdFromIntlDes = () => null;
+    catalogManagerInstance.intlDes2id = () => null;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -98,7 +98,7 @@ describe('UrlManager_class', () => {
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     uiManagerInstance.toast = jest.fn();
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
-    catalogManagerInstance.getIdFromSccNum = () => null;
+    catalogManagerInstance.sccNum2Id = () => null;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -124,7 +124,7 @@ describe('UrlManager_class', () => {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
-    catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
+    catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -153,7 +153,7 @@ describe('UrlManager_class', () => {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
-    catalogManagerInstance.getIdFromSccNum = (objNum: number) => objNum;
+    catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 

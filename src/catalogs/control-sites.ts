@@ -1,8 +1,7 @@
-import { SpaceObjectType } from '@app/lib/space-object-type';
+import { SpaceObjectType } from "ootk";
+import { ControlSite } from "@app/singletons/catalog-manager/ControlSite";
 
-export interface ControlSiteObject {
-  linkIridium: any;
-  linkStarlink: any;
+export interface ControlSiteParams {  
   Code: string;
   // UCode: string;
   StateC: string;
@@ -28,11 +27,12 @@ export interface ControlSiteObject {
   linkGalileo?: boolean;
   linkBeidou?: boolean;
   linkGlonass?: boolean;
+  linkIridium?: boolean;
+  linkStarlink?: boolean;
 }
 
-// @ts-expect-error
-export const controlSites = <ControlSiteObject[]>[
-  {
+export const controlSites = <ControlSite[]>[
+  new ControlSite({
     Code: 'AAT',
     StateC: 'AAT',
     C: 'Government',
@@ -51,8 +51,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADG',
     StateC: 'RU',
     C: 'Government',
@@ -71,8 +71,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AF',
     StateC: 'AF',
     C: 'Government',
@@ -91,8 +91,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AG',
     StateC: 'AG',
     C: 'Government',
@@ -111,8 +111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AG',
     StateC: 'AGUK',
     C: 'Government',
@@ -131,8 +131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AM',
     StateC: 'AM',
     C: 'Government',
@@ -151,8 +151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANTN',
     StateC: 'ANTN',
     C: 'Government',
@@ -171,8 +171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AO',
     StateC: 'AO',
     C: 'Government',
@@ -191,8 +191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AQ',
     StateC: 'AQ',
     C: 'Government',
@@ -211,8 +211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AR',
     StateC: 'AR',
     C: 'Government',
@@ -231,8 +231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARV',
     StateC: 'ARV',
     C: 'Government',
@@ -251,8 +251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AT',
     StateC: 'AT',
     C: 'Government',
@@ -271,8 +271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AU',
     StateC: 'AU',
     C: 'Government',
@@ -291,8 +291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AZ',
     StateC: 'AZ',
     C: 'Government',
@@ -311,8 +311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'B',
     StateC: 'B',
     C: 'Government',
@@ -331,8 +331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BASH',
     StateC: 'RU',
     C: 'Government',
@@ -351,8 +351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAT',
     StateC: 'BAT',
     C: 'Government',
@@ -371,8 +371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BB',
     StateC: 'BB',
     C: 'Government',
@@ -391,8 +391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BB',
     StateC: 'BBUK',
     C: 'Government',
@@ -411,8 +411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BD',
     StateC: 'BD',
     C: 'Government',
@@ -431,8 +431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BG',
     StateC: 'BG',
     C: 'Government',
@@ -451,8 +451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BG',
     StateC: 'BG',
     C: 'Government',
@@ -471,8 +471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BM',
     StateC: 'BM',
     C: 'Government',
@@ -491,8 +491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BO',
     StateC: 'BO',
     C: 'Government',
@@ -511,8 +511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BR',
     StateC: 'BR',
     C: 'Government',
@@ -531,8 +531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BS',
     StateC: 'BS',
     C: 'Government',
@@ -551,8 +551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BT',
     StateC: 'BT',
     C: 'Government',
@@ -571,8 +571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BY',
     StateC: 'BY',
     C: 'Government',
@@ -591,8 +591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CA',
     StateC: 'CA',
     C: 'Government',
@@ -611,8 +611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZR',
     StateC: 'ZR',
     C: 'Government',
@@ -631,8 +631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CH',
     StateC: 'CH',
     C: 'Government',
@@ -651,8 +651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CI',
     StateC: 'CI',
     C: 'Government',
@@ -671,8 +671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CK',
     StateC: 'CK',
     C: 'Government',
@@ -691,8 +691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CL',
     StateC: 'CL',
     C: 'Government',
@@ -711,8 +711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CM',
     StateC: 'CM',
     C: 'Government',
@@ -731,8 +731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN',
     StateC: 'CN',
     C: 'Government',
@@ -751,8 +751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-31',
     StateC: 'CN',
     C: 'Government',
@@ -771,8 +771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-AH',
     StateC: 'CN',
     C: 'Government',
@@ -791,8 +791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-HA',
     StateC: 'CN',
     C: 'Government',
@@ -811,8 +811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-HB',
     StateC: 'CN',
     C: 'Government',
@@ -831,8 +831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-HL',
     StateC: 'CN',
     C: 'Government',
@@ -851,8 +851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-HN',
     StateC: 'CN',
     C: 'Government',
@@ -871,8 +871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-JL',
     StateC: 'CN',
     C: 'Government',
@@ -891,8 +891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-JS',
     StateC: 'CN',
     C: 'Government',
@@ -911,8 +911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-JX',
     StateC: 'CN',
     C: 'Government',
@@ -931,8 +931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-LN',
     StateC: 'CN',
     C: 'Government',
@@ -951,8 +951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-SC',
     StateC: 'CN',
     C: 'Government',
@@ -971,8 +971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-SD',
     StateC: 'CN',
     C: 'Government',
@@ -991,8 +991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CN-SX',
     StateC: 'CN',
     C: 'Government',
@@ -1011,8 +1011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CO',
     StateC: 'CO',
     C: 'Government',
@@ -1031,8 +1031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZR',
     StateC: 'ZR',
     C: 'Government',
@@ -1051,8 +1051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CR',
     StateC: 'CR',
     C: 'Government',
@@ -1071,8 +1071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CZ',
     StateC: 'CZ',
     C: 'Government',
@@ -1091,8 +1091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CZ',
     StateC: 'CZ',
     C: 'Government',
@@ -1111,8 +1111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CU',
     StateC: 'CU',
     C: 'Government',
@@ -1131,8 +1131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CYM',
     StateC: 'CYM',
     C: 'Government',
@@ -1151,8 +1151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CYMRU',
     StateC: 'UK',
     C: 'Government',
@@ -1171,8 +1171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CZ',
     StateC: 'CZ',
     C: 'Government',
@@ -1191,8 +1191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'D',
     StateC: 'D',
     C: 'Government',
@@ -1211,8 +1211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DAG',
     StateC: 'RU',
     C: 'Government',
@@ -1231,8 +1231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DD',
     StateC: 'DD',
     C: 'Government',
@@ -1251,8 +1251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DK',
     StateC: 'DK',
     C: 'Government',
@@ -1271,8 +1271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DML',
     StateC: 'DML',
     C: 'Government',
@@ -1291,8 +1291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'D',
     StateC: 'DR',
     C: 'Government',
@@ -1311,8 +1311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'D',
     StateC: 'DX',
     C: 'Government',
@@ -1331,8 +1331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DZ',
     StateC: 'DZ',
     C: 'Government',
@@ -1351,8 +1351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'E',
     StateC: 'E',
     C: 'Government',
@@ -1371,8 +1371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EC',
     StateC: 'EC',
     C: 'Government',
@@ -1391,8 +1391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EE',
     StateC: 'EE',
     C: 'Government',
@@ -1411,8 +1411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EG',
     StateC: 'EG',
     C: 'Government',
@@ -1431,8 +1431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ENG',
     StateC: 'UK',
     C: 'Government',
@@ -1451,8 +1451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESCN',
     StateC: 'ESCN',
     C: 'Government',
@@ -1471,8 +1471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ET',
     StateC: 'ET',
     C: 'Government',
@@ -1491,8 +1491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'F',
     StateC: 'F',
     C: 'Government',
@@ -1511,8 +1511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FI',
     StateC: 'FI',
     C: 'Government',
@@ -1531,8 +1531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GE',
     StateC: 'GE',
     C: 'Government',
@@ -1551,8 +1551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GH',
     StateC: 'GH',
     C: 'Government',
@@ -1571,8 +1571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GI',
     StateC: 'GI',
     C: 'Government',
@@ -1591,8 +1591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GL',
     StateC: 'GL',
     C: 'Government',
@@ -1611,8 +1611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GR',
     StateC: 'GR',
     C: 'Government',
@@ -1631,8 +1631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GT',
     StateC: 'GT',
     C: 'Government',
@@ -1651,8 +1651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GU',
     StateC: 'GU',
     C: 'Government',
@@ -1671,8 +1671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUF',
     StateC: 'GUF',
     C: 'Government',
@@ -1691,8 +1691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HK',
     StateC: 'HK',
     C: 'Government',
@@ -1711,8 +1711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HK',
     StateC: 'HK',
     C: 'Government',
@@ -1731,8 +1731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HU',
     StateC: 'HU',
     C: 'Government',
@@ -1751,8 +1751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I',
     StateC: 'I',
     C: 'Government',
@@ -1771,8 +1771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-ARAB',
     StateC: 'I-ARAB',
     C: 'Government',
@@ -1791,8 +1791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-CSC',
     StateC: 'I-CSC',
     C: 'Government',
@@ -1811,8 +1811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-CSC',
     StateC: 'I-CSC1',
     C: 'Government',
@@ -1831,8 +1831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-ELDO',
     StateC: 'I-ELDO',
     C: 'Government',
@@ -1851,8 +1851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-ESRO',
     StateC: 'I-ESA',
     C: 'Government',
@@ -1871,8 +1871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-ESRO',
     StateC: 'I-ESRO',
     C: 'Government',
@@ -1891,8 +1891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-EUM',
     StateC: 'I-EUM',
     C: 'Government',
@@ -1911,8 +1911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-EU',
     StateC: 'I-EU',
     C: 'Government',
@@ -1931,8 +1931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-EUT',
     StateC: 'I-EUT',
     C: 'Government',
@@ -1951,8 +1951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-INM',
     StateC: 'I-INM',
     C: 'Government',
@@ -1971,8 +1971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-INT',
     StateC: 'I-INT',
     C: 'Government',
@@ -1991,8 +1991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-ISS',
     StateC: 'I-ISS',
     C: 'Government',
@@ -2011,8 +2011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-NATO',
     StateC: 'I-NATO',
     C: 'Military',
@@ -2031,8 +2031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'I-RASC',
     StateC: 'I-RASC',
     C: 'Government',
@@ -2051,8 +2051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ID',
     StateC: 'ID',
     C: 'Government',
@@ -2071,8 +2071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IE',
     StateC: 'IE',
     C: 'Government',
@@ -2091,8 +2091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IL',
     StateC: 'IL',
     C: 'Government',
@@ -2111,8 +2111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IN',
     StateC: 'IN',
     C: 'Government',
@@ -2131,8 +2131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IN-AP',
     StateC: 'IN',
     C: 'Government',
@@ -2151,8 +2151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IN-HR',
     StateC: 'IN',
     C: 'Government',
@@ -2171,8 +2171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IN-KA',
     StateC: 'IN',
     C: 'Government',
@@ -2191,8 +2191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IN-KL',
     StateC: 'IN',
     C: 'Government',
@@ -2211,8 +2211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IN-PB',
     StateC: 'IN',
     C: 'Government',
@@ -2231,8 +2231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IQ',
     StateC: 'IQ',
     C: 'Government',
@@ -2251,8 +2251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IR',
     StateC: 'IR',
     C: 'Government',
@@ -2271,8 +2271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IS',
     StateC: 'IS',
     C: 'Government',
@@ -2291,8 +2291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'J',
     StateC: 'J',
     C: 'Government',
@@ -2311,8 +2311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JO',
     StateC: 'JO',
     C: 'Government',
@@ -2331,8 +2331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KE',
     StateC: 'KE',
     C: 'Government',
@@ -2351,8 +2351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KI',
     StateC: 'KI',
     C: 'Government',
@@ -2371,8 +2371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KG',
     StateC: 'KG',
     C: 'Government',
@@ -2391,8 +2391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KG',
     StateC: 'KG',
     C: 'Government',
@@ -2411,8 +2411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KH',
     StateC: 'KH',
     C: 'Government',
@@ -2431,8 +2431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KORS',
     StateC: 'KORS',
     C: 'Government',
@@ -2451,8 +2451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KORS',
     StateC: 'KORS',
     C: 'Government',
@@ -2471,8 +2471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KP',
     StateC: 'KP',
     C: 'Government',
@@ -2491,8 +2491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KR',
     StateC: 'KR',
     C: 'Government',
@@ -2511,8 +2511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KW',
     StateC: 'KW',
     C: 'Government',
@@ -2531,8 +2531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KZ',
     StateC: 'KZ',
     C: 'Government',
@@ -2551,8 +2551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'L',
     StateC: 'L',
     C: 'Government',
@@ -2571,8 +2571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LA',
     StateC: 'LA',
     C: 'Government',
@@ -2591,8 +2591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LB',
     StateC: 'LB',
     C: 'Government',
@@ -2611,8 +2611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LK',
     StateC: 'LK',
     C: 'Government',
@@ -2631,8 +2631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LT',
     StateC: 'LT',
     C: 'Government',
@@ -2651,8 +2651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LV',
     StateC: 'LV',
     C: 'Government',
@@ -2671,8 +2671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LY',
     StateC: 'LY',
     C: 'Government',
@@ -2691,8 +2691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MA',
     StateC: 'MA',
     C: 'Government',
@@ -2711,8 +2711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MC',
     StateC: 'MC',
     C: 'Government',
@@ -2731,8 +2731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MD',
     StateC: 'MD',
     C: 'Government',
@@ -2751,8 +2751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MH',
     StateC: 'MH',
     C: 'Government',
@@ -2771,8 +2771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MN',
     StateC: 'MN',
     C: 'Government',
@@ -2791,8 +2791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MR',
     StateC: 'MR',
     C: 'Government',
@@ -2811,8 +2811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MU',
     StateC: 'MU',
     C: 'Government',
@@ -2831,8 +2831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MV',
     StateC: 'MV',
     C: 'Government',
@@ -2851,8 +2851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MX',
     StateC: 'MX',
     C: 'Government',
@@ -2871,8 +2871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MY',
     StateC: 'MY',
     C: 'Government',
@@ -2891,8 +2891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MYM',
     StateC: 'MYM',
     C: 'Government',
@@ -2911,8 +2911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'N',
     StateC: 'N',
     C: 'Government',
@@ -2931,8 +2931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NG',
     StateC: 'NG',
     C: 'Government',
@@ -2951,8 +2951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NL',
     StateC: 'NL',
     C: 'Government',
@@ -2971,8 +2971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NP',
     StateC: 'NP',
     C: 'Government',
@@ -2991,8 +2991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NZ',
     StateC: 'NZ',
     C: 'Government',
@@ -3011,8 +3011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NZRD',
     StateC: 'NZRD',
     C: 'Government',
@@ -3031,8 +3031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'P',
     StateC: 'P',
     C: 'Government',
@@ -3051,8 +3051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PAR',
     StateC: 'PAR',
     C: 'Government',
@@ -3071,8 +3071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PCZ',
     StateC: 'PCZ',
     C: 'Government',
@@ -3091,8 +3091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PE',
     StateC: 'PE',
     C: 'Government',
@@ -3111,8 +3111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PG',
     StateC: 'PG',
     C: 'Government',
@@ -3131,8 +3131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PK',
     StateC: 'PK',
     C: 'Government',
@@ -3151,8 +3151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PH',
     StateC: 'PH',
     C: 'Government',
@@ -3171,8 +3171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PL',
     StateC: 'PL',
     C: 'Government',
@@ -3191,8 +3191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PL',
     StateC: 'PL',
     C: 'Government',
@@ -3211,8 +3211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PR',
     StateC: 'PR',
     C: 'Government',
@@ -3231,8 +3231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PT',
     StateC: 'PT',
     C: 'Government',
@@ -3251,8 +3251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PY',
     StateC: 'PY',
     C: 'Government',
@@ -3271,8 +3271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QA',
     StateC: 'QA',
     C: 'Government',
@@ -3291,8 +3291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RO',
     StateC: 'RO',
     C: 'Government',
@@ -3311,8 +3311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SU',
     StateC: 'RU',
     C: 'Government',
@@ -3331,8 +3331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RW',
     StateC: 'RW',
     C: 'Government',
@@ -3351,8 +3351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'S',
     StateC: 'S',
     C: 'Government',
@@ -3371,8 +3371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SA',
     StateC: 'SA',
     C: 'Government',
@@ -3391,8 +3391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCOT',
     StateC: 'UK',
     C: 'Government',
@@ -3411,8 +3411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SD',
     StateC: 'SD',
     C: 'Government',
@@ -3431,8 +3431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SG',
     StateC: 'SG',
     C: 'Government',
@@ -3451,8 +3451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SH',
     StateC: 'SH',
     C: 'Government',
@@ -3471,8 +3471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SI',
     StateC: 'SI',
     C: 'Government',
@@ -3491,8 +3491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SK',
     StateC: 'SK',
     C: 'Government',
@@ -3511,8 +3511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SR',
     StateC: 'SR',
     C: 'Government',
@@ -3531,8 +3531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SU',
     StateC: 'SU',
     C: 'Government',
@@ -3551,8 +3551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SY',
     StateC: 'SY',
     C: 'Government',
@@ -3571,8 +3571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'T',
     StateC: 'T',
     C: 'Government',
@@ -3591,8 +3591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TC',
     StateC: 'TC',
     C: 'Government',
@@ -3611,8 +3611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TF',
     StateC: 'TF',
     C: 'Government',
@@ -3631,8 +3631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TJ',
     StateC: 'TJ',
     C: 'Government',
@@ -3651,8 +3651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TM',
     StateC: 'TM',
     C: 'Government',
@@ -3671,8 +3671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TN',
     StateC: 'TN',
     C: 'Government',
@@ -3691,8 +3691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TO',
     StateC: 'TO',
     C: 'Government',
@@ -3711,8 +3711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TR',
     StateC: 'TR',
     C: 'Government',
@@ -3731,8 +3731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MH',
     StateC: 'TTPI',
     C: 'Government',
@@ -3751,8 +3751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUVA',
     StateC: 'RU',
     C: 'Government',
@@ -3771,8 +3771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TW',
     StateC: 'TW',
     C: 'Government',
@@ -3791,8 +3791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UA',
     StateC: 'UA',
     C: 'Government',
@@ -3811,8 +3811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAE',
     StateC: 'UAE',
     C: 'Government',
@@ -3831,8 +3831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAE AD',
     StateC: 'UAE',
     C: 'Government',
@@ -3851,8 +3851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAE DB',
     StateC: 'UAE',
     C: 'Government',
@@ -3871,8 +3871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAE SH',
     StateC: 'UAE',
     C: 'Government',
@@ -3891,8 +3891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UK',
     StateC: 'UK',
     C: 'Government',
@@ -3911,8 +3911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UM67',
     StateC: 'UM67',
     C: 'Government',
@@ -3931,8 +3931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UM79',
     StateC: 'UM79',
     C: 'Government',
@@ -3951,8 +3951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'US',
     StateC: 'US',
     C: 'Government',
@@ -3971,8 +3971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UY',
     StateC: 'UY',
     C: 'Government',
@@ -3991,8 +3991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UZ',
     StateC: 'UZ',
     C: 'Government',
@@ -4011,8 +4011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VE',
     StateC: 'VE',
     C: 'Government',
@@ -4031,8 +4031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VN',
     StateC: 'VN',
     C: 'Government',
@@ -4051,8 +4051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YE',
     StateC: 'YE',
     C: 'Government',
@@ -4071,8 +4071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZA',
     StateC: 'ZA',
     C: 'Government',
@@ -4091,8 +4091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZR',
     StateC: 'ZR',
     C: 'Government',
@@ -4111,8 +4111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'X',
     StateC: 'X',
     C: 'Government',
@@ -4131,8 +4131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNK',
     StateC: 'X',
     C: 'Government',
@@ -4151,8 +4151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '1GMR',
     StateC: 'US',
     C: 'Military',
@@ -4171,8 +4171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '1GMS',
     StateC: 'US',
     C: 'Military',
@@ -4191,8 +4191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '1PBS',
     StateC: 'US',
     C: 'Military',
@@ -4211,8 +4211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '69PBS',
     StateC: 'US',
     C: 'Military',
@@ -4231,8 +4231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '1STRAD',
     StateC: 'US',
     C: 'Military',
@@ -4251,8 +4251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '10ADS',
     StateC: 'US',
     C: 'Military',
@@ -4271,8 +4271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '11TMS',
     StateC: 'US',
     C: 'Military',
@@ -4291,8 +4291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '209FA',
     StateC: 'US',
     C: 'Military',
@@ -4311,8 +4311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '21AT',
     StateC: 'CN',
     C: 'Academic',
@@ -4324,15 +4324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.3,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '2GMS',
     StateC: 'US',
     C: 'Military',
@@ -4351,8 +4351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '2SLS',
     StateC: 'US',
     C: 'Military',
@@ -4371,8 +4371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '3GMS',
     StateC: 'US',
     C: 'Military',
@@ -4391,8 +4391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '3SLS',
     StateC: 'US',
     C: 'Military',
@@ -4411,8 +4411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '30FA2',
     StateC: 'US',
     C: 'Military',
@@ -4431,8 +4431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WTR',
     StateC: 'US',
     C: 'Military',
@@ -4451,8 +4451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '36AIS',
     StateC: 'I',
     C: 'Military',
@@ -4471,8 +4471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '321SMW',
     StateC: 'US',
     C: 'Military',
@@ -4491,8 +4491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '341MW',
     StateC: 'US',
     C: 'Military',
@@ -4511,8 +4511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '341MW',
     StateC: 'US',
     C: 'Military',
@@ -4531,8 +4531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '341MW',
     StateC: 'US',
     C: 'Military',
@@ -4551,8 +4551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '351SMW',
     StateC: 'US',
     C: 'Military',
@@ -4571,8 +4571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '4SLS',
     StateC: 'US',
     C: 'Military',
@@ -4591,8 +4591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '40FA',
     StateC: 'US',
     C: 'Military',
@@ -4611,8 +4611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '40FA',
     StateC: 'US',
     C: 'Military',
@@ -4631,8 +4631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '41FA1',
     StateC: 'US',
     C: 'Military',
@@ -4651,8 +4651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '41FA1',
     StateC: 'US',
     C: 'Military',
@@ -4671,8 +4671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '44A2',
     StateC: 'US',
     C: 'Military',
@@ -4691,8 +4691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '44SMW',
     StateC: 'US',
     C: 'Military',
@@ -4711,8 +4711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '4504MTW',
     StateC: 'US',
     C: 'Military',
@@ -4731,8 +4731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '4505M',
     StateC: 'US',
     C: 'Military',
@@ -4751,8 +4751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '91MW',
     StateC: 'US',
     C: 'Military',
@@ -4771,8 +4771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFETR',
     StateC: 'US',
     C: 'Military',
@@ -4791,8 +4791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFETR',
     StateC: 'US',
     C: 'Military',
@@ -4811,8 +4811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFETR',
     StateC: 'US',
     C: 'Military',
@@ -4831,8 +4831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '46FA2',
     StateC: 'US',
     C: 'Military',
@@ -4851,8 +4851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '3GMS',
     StateC: 'US',
     C: 'Military',
@@ -4871,8 +4871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '4WG',
     StateC: 'US',
     C: 'Military',
@@ -4891,8 +4891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '556SMS',
     StateC: 'US',
     C: 'Military',
@@ -4911,8 +4911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AWS',
     StateC: 'US',
     C: 'Military',
@@ -4931,8 +4931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '564SMS',
     StateC: 'US',
     C: 'Military',
@@ -4951,8 +4951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '576FTS',
     StateC: 'US',
     C: 'Military',
@@ -4971,8 +4971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '576SMS',
     StateC: 'US',
     C: 'Military',
@@ -4991,8 +4991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '6555A',
     StateC: 'US',
     C: 'Military',
@@ -5011,8 +5011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '6555A',
     StateC: 'US',
     C: 'Military',
@@ -5031,8 +5031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '6556GMS',
     StateC: 'US',
     C: 'Military',
@@ -5051,8 +5051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '702SMW',
     StateC: 'US',
     C: 'Military',
@@ -5071,8 +5071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '79FA2',
     StateC: 'US',
     C: 'Military',
@@ -5091,8 +5091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '81FA1',
     StateC: 'US',
     C: 'Military',
@@ -5111,8 +5111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '84FA3',
     StateC: 'US',
     C: 'Military',
@@ -5131,8 +5131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '90SW',
     StateC: 'US',
     C: 'Military',
@@ -5151,8 +5151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '90SW',
     StateC: 'US',
     C: 'Military',
@@ -5171,8 +5171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '90SW',
     StateC: 'US',
     C: 'Military',
@@ -5191,8 +5191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '91MW',
     StateC: 'US',
     C: 'Military',
@@ -5211,8 +5211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '91MW',
     StateC: 'US',
     C: 'Military',
@@ -5231,8 +5231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: '9FA3',
     StateC: 'US',
     C: 'Military',
@@ -5251,8 +5251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAFB',
     StateC: 'US',
     C: 'Military',
@@ -5271,8 +5271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AACH',
     StateC: 'D',
     C: 'Academic',
@@ -5291,8 +5291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AACHR',
     StateC: 'D',
     C: 'Academic',
@@ -5311,8 +5311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AACM',
     StateC: 'S',
     C: 'Commercial',
@@ -5331,8 +5331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AADC',
     StateC: 'US',
     C: 'Commercial',
@@ -5351,8 +5351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AAF',
     StateC: 'F',
     C: 'Military',
@@ -5371,8 +5371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AALTO',
     StateC: 'FI',
     C: 'Academic',
@@ -5391,8 +5391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AAMV',
     StateC: 'I',
     C: 'Academic',
@@ -5411,8 +5411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AANII',
     StateC: 'RU',
     C: 'Government',
@@ -5431,8 +5431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AAP',
     StateC: 'SG',
     C: 'Commercial',
@@ -5451,8 +5451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AARH',
     StateC: 'DK',
     C: 'Academic',
@@ -5471,8 +5471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AAU',
     StateC: 'DK',
     C: 'Academic',
@@ -5491,8 +5491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABE',
     StateC: 'BO',
     C: 'Government',
@@ -5511,8 +5511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABAE',
     StateC: 'VE',
     C: 'Government',
@@ -5531,8 +5531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCW',
     StateC: 'UK',
     C: 'Academic',
@@ -5544,15 +5544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -4.07,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABERRY',
     StateC: 'T',
     C: 'Commercial',
@@ -5571,8 +5571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABL',
     StateC: 'US',
     C: 'Military',
@@ -5591,8 +5591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABL',
     StateC: 'US',
     C: 'Commercial',
@@ -5611,8 +5611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMA',
     StateC: 'US',
     C: 'Military',
@@ -5631,8 +5631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMDA',
     StateC: 'US',
     C: 'Military',
@@ -5651,8 +5651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMDA1',
     StateC: 'US',
     C: 'Military',
@@ -5671,8 +5671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -5684,15 +5684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.65,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABS',
     StateC: 'HK',
     C: 'Commercial',
@@ -5711,8 +5711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMI',
     StateC: 'UK',
     C: 'Commercial',
@@ -5724,15 +5724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.11,
     alt: 0,
     Parent: 'ABS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABSB',
     StateC: 'BM',
     C: 'Commercial',
@@ -5744,15 +5744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -64.78,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMSCV',
     StateC: 'US',
     C: 'Commercial',
@@ -5764,15 +5764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.04,
     alt: 0,
     Parent: 'ABS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABS',
     StateC: 'HK',
     C: 'Commercial',
@@ -5791,8 +5791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACAE',
     StateC: 'CR',
     C: 'Academic',
@@ -5811,8 +5811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACAP',
     StateC: 'RU',
     C: 'Commercial',
@@ -5831,8 +5831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACAST',
     StateC: 'CH',
     C: 'Commercial',
@@ -5851,8 +5851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACC',
     StateC: 'US',
     C: 'Military',
@@ -5871,8 +5871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACCIMT',
     StateC: 'LK',
     C: 'Government',
@@ -5891,8 +5891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACE',
     StateC: 'US',
     C: 'Military',
@@ -5911,8 +5911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACES',
     StateC: 'ID',
     C: 'Commercial',
@@ -5931,8 +5931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACES',
     StateC: 'ID',
     C: 'Commercial',
@@ -5944,15 +5944,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 106.82,
     alt: 0,
     Parent: 'INMRL',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACF',
     StateC: 'F',
     C: 'Academic',
@@ -5971,8 +5971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADAST',
     StateC: 'US',
     C: 'Commercial',
@@ -5984,15 +5984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.12,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADD',
     StateC: 'KR',
     C: 'Military',
@@ -6011,8 +6011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADDAH',
     StateC: 'KR',
     C: 'Military',
@@ -6031,8 +6031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADEL',
     StateC: 'AU',
     C: 'Academic',
@@ -6051,8 +6051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CANOP',
     StateC: 'US',
     C: 'Commercial',
@@ -6071,8 +6071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EADS',
     StateC: 'NL',
     C: 'Commercial',
@@ -6091,8 +6091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EADSA',
     StateC: 'F',
     C: 'Commercial',
@@ -6111,8 +6111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -6131,8 +6131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -6151,8 +6151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADSFL',
     StateC: 'US',
     C: 'Commercial',
@@ -6171,8 +6171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AECSG',
     StateC: 'F',
     C: 'Commercial',
@@ -6191,8 +6191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTL',
     StateC: 'D',
     C: 'Commercial',
@@ -6211,8 +6211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORLM',
     StateC: 'F',
     C: 'Commercial',
@@ -6231,8 +6231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASA',
     StateC: 'E',
     C: 'Commercial',
@@ -6251,8 +6251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADSNA',
     StateC: 'US',
     C: 'Commercial',
@@ -6271,8 +6271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FOKKS',
     StateC: 'NL',
     C: 'Commercial',
@@ -6291,8 +6291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOLK',
     StateC: 'D',
     C: 'Commercial',
@@ -6311,8 +6311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARA',
     StateC: 'UK',
     C: 'Commercial',
@@ -6324,15 +6324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -2.19,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MATT',
     StateC: 'F',
     C: 'Commercial',
@@ -6351,8 +6351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADSTI',
     StateC: 'F',
     C: 'Commercial',
@@ -6371,8 +6371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVS',
     StateC: 'UK',
     C: 'Commercial',
@@ -6391,8 +6391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADVSP',
     StateC: 'US',
     C: 'Commercial',
@@ -6411,8 +6411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AE',
     StateC: 'F',
     C: 'Commercial',
@@ -6431,8 +6431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEB',
     StateC: 'BR',
     C: 'Government',
@@ -6451,8 +6451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEC',
     StateC: 'US',
     C: 'Government',
@@ -6471,8 +6471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AECAB',
     StateC: 'US',
     C: 'Commercial',
@@ -6491,8 +6491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AECSG',
     StateC: 'F',
     C: 'Commercial',
@@ -6511,8 +6511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEDC',
     StateC: 'US',
     C: 'Military',
@@ -6531,8 +6531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALPSP',
     StateC: 'US',
     C: 'Commercial',
@@ -6551,8 +6551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORLM',
     StateC: 'F',
     C: 'Commercial',
@@ -6571,8 +6571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORLM',
     StateC: 'F',
     C: 'Commercial',
@@ -6591,8 +6591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCT',
     StateC: 'MX',
     C: 'Government',
@@ -6611,8 +6611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AENUT',
     StateC: 'US',
     C: 'Commercial',
@@ -6631,8 +6631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEP',
     StateC: 'PY',
     C: 'Government',
@@ -6651,8 +6651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AERAR',
     StateC: 'AR',
     C: 'Military',
@@ -6671,8 +6671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIAT',
     StateC: 'I',
     C: 'Commercial',
@@ -6691,8 +6691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AERO',
     StateC: 'US',
     C: 'Military',
@@ -6711,8 +6711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEROA',
     StateC: 'US',
     C: 'Commercial',
@@ -6731,8 +6731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEROA',
     StateC: 'US',
     C: 'Commercial',
@@ -6751,8 +6751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OAKAE',
     StateC: 'US',
     C: 'Commercial',
@@ -6771,8 +6771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEROL',
     StateC: 'US',
     C: 'Commercial',
@@ -6791,8 +6791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEROL',
     StateC: 'US',
     C: 'Commercial',
@@ -6811,8 +6811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AERON',
     StateC: 'F',
     C: 'Government',
@@ -6831,8 +6831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AERON',
     StateC: 'F',
     C: 'Government',
@@ -6851,8 +6851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEROPH',
     StateC: 'US',
     C: 'Commercial',
@@ -6871,8 +6871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AES',
     StateC: 'CA',
     C: 'Government',
@@ -6891,8 +6891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AESCO',
     StateC: 'J',
     C: 'Commercial',
@@ -6911,8 +6911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AE',
     StateC: 'F',
     C: 'Commercial',
@@ -6931,8 +6931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUD',
     StateC: 'F',
     C: 'Commercial',
@@ -6951,8 +6951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNCASO',
     StateC: 'F',
     C: 'Commercial',
@@ -6964,15 +6964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.25,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AETE',
     StateC: 'CA',
     C: 'Military',
@@ -6991,8 +6991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFAD',
     StateC: 'US',
     C: 'Military',
@@ -7011,8 +7011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFADC',
     StateC: 'US',
     C: 'Military',
@@ -7031,8 +7031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFADC',
     StateC: 'US',
     C: 'Military',
@@ -7044,15 +7044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -104.52,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFAL',
     StateC: 'US',
     C: 'Military',
@@ -7071,8 +7071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFAMC',
     StateC: 'US',
     C: 'Military',
@@ -7091,8 +7091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFAPL',
     StateC: 'US',
     C: 'Military',
@@ -7111,8 +7111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WADC',
     StateC: 'US',
     C: 'Military',
@@ -7124,15 +7124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -84.05,
     alt: 0,
     Parent: 'USAF',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -7151,8 +7151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFBSD',
     StateC: 'US',
     C: 'Military',
@@ -7171,8 +7171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFBSD',
     StateC: 'US',
     C: 'Military',
@@ -7191,8 +7191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFBSD',
     StateC: 'US',
     C: 'Military',
@@ -7204,15 +7204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.24,
     alt: 0,
     Parent: 'AFSC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFBSD',
     StateC: 'US',
     C: 'Military',
@@ -7224,15 +7224,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.24,
     alt: 0,
     Parent: 'AFSC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFBSL',
     StateC: 'US',
     C: 'Military',
@@ -7244,15 +7244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: 'AFSC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCER',
     StateC: 'US',
     C: 'Military',
@@ -7271,8 +7271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCFS',
     StateC: 'US',
     C: 'Military',
@@ -7284,15 +7284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.11,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCFS',
     StateC: 'US',
     C: 'Military',
@@ -7304,15 +7304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.11,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCRL',
     StateC: 'US',
     C: 'Military',
@@ -7324,15 +7324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.28,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCRL',
     StateC: 'US',
     C: 'Military',
@@ -7351,8 +7351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCFS',
     StateC: 'US',
     C: 'Military',
@@ -7364,15 +7364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.11,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCRL',
     StateC: 'US',
     C: 'Military',
@@ -7384,15 +7384,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.28,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFETR',
     StateC: 'US',
     C: 'Military',
@@ -7411,8 +7411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFFDL',
     StateC: 'US',
     C: 'Military',
@@ -7431,8 +7431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFFTC',
     StateC: 'US',
     C: 'Military',
@@ -7444,15 +7444,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.88,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFGAF',
     StateC: 'AF',
     C: 'Military',
@@ -7471,8 +7471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCRL',
     StateC: 'US',
     C: 'Military',
@@ -7491,8 +7491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCRL',
     StateC: 'US',
     C: 'Military',
@@ -7511,8 +7511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFGSC',
     StateC: 'US',
     C: 'Military',
@@ -7524,15 +7524,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -93.66,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFIT',
     StateC: 'US',
     C: 'Military',
@@ -7551,8 +7551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFJSC',
     StateC: 'US',
     C: 'Military',
@@ -7571,8 +7571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFLC',
     StateC: 'US',
     C: 'Military',
@@ -7584,15 +7584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -84.05,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFAMC',
     StateC: 'US',
     C: 'Military',
@@ -7611,8 +7611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFMCIT',
     StateC: 'AF',
     C: 'Government',
@@ -7631,8 +7631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFMCSW',
     StateC: 'US',
     C: 'Military',
@@ -7651,8 +7651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HADC',
     StateC: 'US',
     C: 'Military',
@@ -7671,8 +7671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFETR',
     StateC: 'US',
     C: 'Military',
@@ -7691,8 +7691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFOSR',
     StateC: 'US',
     C: 'Military',
@@ -7711,8 +7711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFOTEC',
     StateC: 'US',
     C: 'Military',
@@ -7724,15 +7724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -106.61,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFOTD4',
     StateC: 'US',
     C: 'Military',
@@ -7751,8 +7751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCRL',
     StateC: 'US',
     C: 'Military',
@@ -7764,15 +7764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.28,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFPS',
     StateC: 'US',
     C: 'Military',
@@ -7791,8 +7791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FRC',
     StateC: 'US',
     C: 'Government',
@@ -7804,15 +7804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.88,
     alt: 0,
     Parent: 'NASA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFRCO',
     StateC: 'US',
     C: 'Military',
@@ -7831,8 +7831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFROM',
     StateC: 'US',
     C: 'Military',
@@ -7851,8 +7851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFRL',
     StateC: 'US',
     C: 'Military',
@@ -7871,8 +7871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFORS',
     StateC: 'US',
     C: 'Military',
@@ -7891,8 +7891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCRL',
     StateC: 'US',
     C: 'Military',
@@ -7904,15 +7904,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.28,
     alt: 0,
     Parent: 'AFRL',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFAPL',
     StateC: 'US',
     C: 'Military',
@@ -7931,8 +7931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFRLW',
     StateC: 'US',
     C: 'Military',
@@ -7944,15 +7944,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -84.05,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFRPL',
     StateC: 'US',
     C: 'Military',
@@ -7964,15 +7964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.88,
     alt: 0,
     Parent: 'AFASD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSAM',
     StateC: 'US',
     C: 'Military',
@@ -7984,15 +7984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -98.44,
     alt: 0,
     Parent: 'AFMC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSC',
     StateC: 'US',
     C: 'Military',
@@ -8011,8 +8011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -8031,8 +8031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFBSD',
     StateC: 'US',
     C: 'Military',
@@ -8051,8 +8051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -8071,8 +8071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAFSP',
     StateC: 'US',
     C: 'Military',
@@ -8091,8 +8091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSOC',
     StateC: 'US',
     C: 'Military',
@@ -8111,8 +8111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSPC',
     StateC: 'US',
     C: 'Military',
@@ -8131,8 +8131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -8151,8 +8151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -8171,8 +8171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSTC',
     StateC: 'US',
     C: 'Military',
@@ -8191,8 +8191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFCER',
     StateC: 'US',
     C: 'Military',
@@ -8211,8 +8211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSWC',
     StateC: 'US',
     C: 'Military',
@@ -8231,8 +8231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DASA',
     StateC: 'US',
     C: 'Military',
@@ -8251,8 +8251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFTAC',
     StateC: 'US',
     C: 'Military',
@@ -8271,8 +8271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AWS',
     StateC: 'US',
     C: 'Military',
@@ -8291,8 +8291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -8311,8 +8311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWL',
     StateC: 'US',
     C: 'Military',
@@ -8331,8 +8331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AGHU',
     StateC: 'PL',
     C: 'Academic',
@@ -8351,8 +8351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AGILS',
     StateC: 'SG',
     C: 'Commercial',
@@ -8371,8 +8371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AGSL',
     StateC: 'PG',
     C: 'Commercial',
@@ -8391,8 +8391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHAIL',
     StateC: 'US',
     C: 'Commercial',
@@ -8411,8 +8411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AISTS',
     StateC: 'E',
     C: 'Commercial',
@@ -8431,8 +8431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AJ',
     StateC: 'US',
     C: 'Commercial',
@@ -8451,8 +8451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATLCA',
     StateC: 'US',
     C: 'Unknown',
@@ -8471,8 +8471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AJ',
     StateC: 'US',
     C: 'Commercial',
@@ -8491,8 +8491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AJGC',
     StateC: 'US',
     C: 'Commercial',
@@ -8511,8 +8511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AJGC',
     StateC: 'US',
     C: 'Commercial',
@@ -8524,15 +8524,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -121.3,
     alt: 0,
     Parent: 'GTRC',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RDYNE',
     StateC: 'US',
     C: 'Commercial',
@@ -8551,8 +8551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRC',
     StateC: 'US',
     C: 'Commercial',
@@ -8571,8 +8571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PWFL',
     StateC: 'US',
     C: 'Commercial',
@@ -8591,8 +8591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRC',
     StateC: 'US',
     C: 'Commercial',
@@ -8611,8 +8611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AJSP',
     StateC: 'US',
     C: 'Commercial',
@@ -8631,8 +8631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AJSP',
     StateC: 'US',
     C: 'Commercial',
@@ -8651,8 +8651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AADC',
     StateC: 'US',
     C: 'Commercial',
@@ -8671,8 +8671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AKCMR',
     StateC: 'US',
     C: 'Commercial',
@@ -8691,8 +8691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AKCMR',
     StateC: 'US',
     C: 'Commercial',
@@ -8711,8 +8711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AKCMR',
     StateC: 'US',
     C: 'Commercial',
@@ -8724,15 +8724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -149.9,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALAER',
     StateC: 'US',
     C: 'Commercial',
@@ -8744,15 +8744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.48,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALB',
     StateC: 'CA',
     C: 'Academic',
@@ -8771,8 +8771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALBA',
     StateC: 'UK',
     C: 'Commercial',
@@ -8791,8 +8791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUD',
     StateC: 'F',
     C: 'Commercial',
@@ -8811,8 +8811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUD',
     StateC: 'F',
     C: 'Commercial',
@@ -8831,8 +8831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SELEN',
     StateC: 'I',
     C: 'Commercial',
@@ -8851,8 +8851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALCS',
     StateC: 'US',
     C: 'Military',
@@ -8871,8 +8871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIAT',
     StateC: 'I',
     C: 'Commercial',
@@ -8891,8 +8891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALE',
     StateC: 'J',
     C: 'Commercial',
@@ -8911,8 +8911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIAT',
     StateC: 'I',
     C: 'Commercial',
@@ -8931,8 +8931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SELEN',
     StateC: 'I',
     C: 'Commercial',
@@ -8951,8 +8951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALIEX',
     StateC: 'CN',
     C: 'Commercial',
@@ -8971,8 +8971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALMAN',
     StateC: 'RU',
     C: 'Commercial',
@@ -8991,8 +8991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALPSP',
     StateC: 'US',
     C: 'Commercial',
@@ -9011,8 +9011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ALYAH',
     StateC: 'UAE',
     C: 'Commercial',
@@ -9031,8 +9031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMAD',
     StateC: 'AM',
     C: 'Military',
@@ -9051,8 +9051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMAI',
     StateC: 'US',
     C: 'Commercial',
@@ -9071,8 +9071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMBR',
     StateC: 'BR',
     C: 'Academic',
@@ -9091,8 +9091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMC',
     StateC: 'US',
     C: 'Commercial',
@@ -9111,8 +9111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMCEL',
     StateC: 'US',
     C: 'Commercial',
@@ -9131,8 +9131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMC',
     StateC: 'US',
     C: 'Commercial',
@@ -9151,8 +9151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMA',
     StateC: 'US',
     C: 'Military',
@@ -9164,15 +9164,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.65,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMC',
     StateC: 'US',
     C: 'Commercial',
@@ -9191,8 +9191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMC',
     StateC: 'US',
     C: 'Commercial',
@@ -9211,8 +9211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMDL',
     StateC: 'D',
     C: 'Academic',
@@ -9231,8 +9231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMEA',
     StateC: 'E',
     C: 'Academic',
@@ -9251,8 +9251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMF',
     StateC: 'F',
     C: 'Academic',
@@ -9271,8 +9271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMGU',
     StateC: 'RU',
     C: 'Academic',
@@ -9291,8 +9291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMI',
     StateC: 'I',
     C: 'Military',
@@ -9311,8 +9311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMIL',
     StateC: 'IL',
     C: 'Academic',
@@ -9331,8 +9331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMIRK',
     StateC: 'IR',
     C: 'Academic',
@@ -9351,8 +9351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMIT',
     StateC: 'I',
     C: 'Academic',
@@ -9371,8 +9371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMLU',
     StateC: 'AR',
     C: 'Academic',
@@ -9391,8 +9391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMNA',
     StateC: 'US',
     C: 'Academic',
@@ -9411,8 +9411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMNL',
     StateC: 'NL',
     C: 'Academic',
@@ -9431,8 +9431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMSAT',
     StateC: 'US',
     C: 'Academic',
@@ -9451,8 +9451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Commercial',
@@ -9471,8 +9471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELL',
     StateC: 'US',
     C: 'Commercial',
@@ -9491,8 +9491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMRU',
     StateC: 'RU',
     C: 'Academic',
@@ -9511,8 +9511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMROC',
     StateC: 'US',
     C: 'Commercial',
@@ -9531,8 +9531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMSC',
     StateC: 'US',
     C: 'Commercial',
@@ -9551,8 +9551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMUK',
     StateC: 'UK',
     C: 'Academic',
@@ -9571,8 +9571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMVU',
     StateC: 'IN',
     C: 'Academic',
@@ -9591,8 +9591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AN',
     StateC: 'SU',
     C: 'Government',
@@ -9611,8 +9611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANBEL',
     StateC: 'BY',
     C: 'Government',
@@ -9631,8 +9631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANCZ',
     StateC: 'CZ',
     C: 'Government',
@@ -9644,15 +9644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 14.42,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANDRW',
     StateC: 'US',
     C: 'Commercial',
@@ -9664,15 +9664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.26,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BKSA',
     StateC: 'MY',
     C: 'Government',
@@ -9691,8 +9691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANNAU',
     StateC: 'IN',
     C: 'Academic',
@@ -9711,8 +9711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AN',
     StateC: 'RU',
     C: 'Government',
@@ -9731,8 +9731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANSAL',
     StateC: 'YE',
     C: 'Military',
@@ -9751,8 +9751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANSP',
     StateC: 'US',
     C: 'Commercial',
@@ -9771,8 +9771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANTEL',
     StateC: 'UY',
     C: 'Government',
@@ -9791,8 +9791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANTX',
     StateC: 'IN',
     C: 'Government',
@@ -9811,8 +9811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANUC',
     StateC: 'GH',
     C: 'Academic',
@@ -9831,8 +9831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AOFTB',
     StateC: 'US',
     C: 'Military',
@@ -9844,15 +9844,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -106.42,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AOGD',
     StateC: 'J',
     C: 'Academic',
@@ -9871,8 +9871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMA',
     StateC: 'US',
     C: 'Military',
@@ -9891,8 +9891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMA',
     StateC: 'US',
     C: 'Military',
@@ -9911,8 +9911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APAERO',
     StateC: 'KR',
     C: 'Commercial',
@@ -9931,8 +9931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APAR',
     StateC: 'AR',
     C: 'Academic',
@@ -9944,15 +9944,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -58.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APGC',
     StateC: 'US',
     C: 'Military',
@@ -9971,8 +9971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APL',
     StateC: 'US',
     C: 'Commercial',
@@ -9991,8 +9991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APLS',
     StateC: 'US',
     C: 'Commercial',
@@ -10011,8 +10011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APMT',
     StateC: 'CN',
     C: 'Government',
@@ -10031,8 +10031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RSRS',
     StateC: 'UK',
     C: 'Government',
@@ -10044,15 +10044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.57,
     alt: 0,
     Parent: 'SERC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APRZ',
     StateC: 'US',
     C: 'Academic',
@@ -10071,8 +10071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APSCO',
     StateC: 'CN',
     C: 'Government',
@@ -10091,8 +10091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APSS',
     StateC: 'NZ',
     C: 'Academic',
@@ -10111,8 +10111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APT',
     StateC: 'HK',
     C: 'Commercial',
@@ -10131,8 +10131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APTS',
     StateC: 'CN',
     C: 'Commercial',
@@ -10151,8 +10151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APW',
     StateC: 'D',
     C: 'Academic',
@@ -10171,8 +10171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARAA',
     StateC: 'US',
     C: 'Military',
@@ -10191,8 +10191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARAB',
     StateC: 'SA',
     C: 'Commercial',
@@ -10211,8 +10211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARAD',
     StateC: 'US',
     C: 'Military',
@@ -10231,8 +10231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARC',
     StateC: 'US',
     C: 'Government',
@@ -10251,8 +10251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARDC',
     StateC: 'US',
     C: 'Military',
@@ -10271,8 +10271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARDCA',
     StateC: 'US',
     C: 'Military',
@@ -10291,8 +10291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -10311,8 +10311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGOT',
     StateC: 'I',
     C: 'Commercial',
@@ -10331,8 +10331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GTRC',
     StateC: 'US',
     C: 'Commercial',
@@ -10344,15 +10344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -121.3,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORLM',
     StateC: 'F',
     C: 'Commercial',
@@ -10371,8 +10371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARIU',
     StateC: 'IL',
     C: 'Academic',
@@ -10391,8 +10391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARMAD',
     StateC: 'US',
     C: 'Commercial',
@@ -10411,8 +10411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARMF',
     StateC: 'F',
     C: 'Military',
@@ -10431,8 +10431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARMT',
     StateC: 'CN',
     C: 'Government',
@@ -10451,8 +10451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARPA',
     StateC: 'US',
     C: 'Military',
@@ -10471,8 +10471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARPA',
     StateC: 'US',
     C: 'Military',
@@ -10491,8 +10491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARR',
     StateC: 'N',
     C: 'Government',
@@ -10511,8 +10511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARR',
     StateC: 'N',
     C: 'Government',
@@ -10531,8 +10531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARSAT',
     StateC: 'AR',
     C: 'Commercial',
@@ -10551,8 +10551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARSL',
     StateC: 'SU',
     C: 'Commercial',
@@ -10571,8 +10571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARSL',
     StateC: 'SU',
     C: 'Commercial',
@@ -10591,8 +10591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GIMR',
     StateC: 'US',
     C: 'Military',
@@ -10604,15 +10604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.15,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GIMR',
     StateC: 'US',
     C: 'Military',
@@ -10631,8 +10631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACE',
     StateC: 'US',
     C: 'Military',
@@ -10644,15 +10644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.11,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASAL',
     StateC: 'DZ',
     C: 'Government',
@@ -10671,8 +10671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASBC',
     StateC: 'J',
     C: 'Commercial',
@@ -10684,15 +10684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.75,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASC45',
     StateC: 'US',
     C: 'Military',
@@ -10704,15 +10704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -14.41,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASCO',
     StateC: 'US',
     C: 'Commercial',
@@ -10724,15 +10724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.27,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASE',
     StateC: 'US',
     C: 'Academic',
@@ -10751,8 +10751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASELSN',
     StateC: 'TR',
     C: 'Commercial',
@@ -10771,8 +10771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASES',
     StateC: 'CN',
     C: 'Commercial',
@@ -10791,8 +10791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASES0',
     StateC: 'CN',
     C: 'Commercial',
@@ -10804,15 +10804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 121.47,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORLM',
     StateC: 'F',
     C: 'Commercial',
@@ -10831,8 +10831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASGARD',
     StateC: 'AT',
     C: 'Academic',
@@ -10851,8 +10851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASI',
     StateC: 'I',
     C: 'Government',
@@ -10871,8 +10871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASIA',
     StateC: 'HK',
     C: 'Commercial',
@@ -10891,8 +10891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASID',
     StateC: 'UK',
     C: 'Commercial',
@@ -10911,8 +10911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASL',
     StateC: 'US',
     C: 'Military',
@@ -10931,8 +10931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASPLB',
     StateC: 'B',
     C: 'Commercial',
@@ -10951,8 +10951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTA',
     StateC: 'US',
     C: 'Commercial',
@@ -10971,8 +10971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -10991,8 +10991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -11011,8 +11011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PHILR',
     StateC: 'US',
     C: 'Commercial',
@@ -11031,8 +11031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTRAN',
     StateC: 'US',
     C: 'Commercial',
@@ -11051,8 +11051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTFN',
     StateC: 'D',
     C: 'Commercial',
@@ -11071,8 +11071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTL',
     StateC: 'D',
     C: 'Commercial',
@@ -11091,8 +11091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASA',
     StateC: 'E',
     C: 'Commercial',
@@ -11111,8 +11111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ADSNA',
     StateC: 'US',
     C: 'Commercial',
@@ -11131,8 +11131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOLK',
     StateC: 'D',
     C: 'Commercial',
@@ -11151,8 +11151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTRA',
     StateC: 'US',
     C: 'Commercial',
@@ -11171,8 +11171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VENT',
     StateC: 'US',
     C: 'Commercial',
@@ -11191,8 +11191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTS',
     StateC: 'US',
     C: 'Commercial',
@@ -11211,8 +11211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTSC',
     StateC: 'J',
     C: 'Commercial',
@@ -11231,8 +11231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MATT',
     StateC: 'F',
     C: 'Commercial',
@@ -11251,8 +11251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVS',
     StateC: 'UK',
     C: 'Commercial',
@@ -11271,8 +11271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASU',
     StateC: 'US',
     C: 'Academic',
@@ -11291,8 +11291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATSB',
     StateC: 'MY',
     C: 'Commercial',
@@ -11311,8 +11311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATECH',
     StateC: 'US',
     C: 'Commercial',
@@ -11331,8 +11331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATECHS',
     StateC: 'US',
     C: 'Commercial',
@@ -11351,8 +11351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHABT',
     StateC: 'US',
     C: 'Commercial',
@@ -11364,15 +11364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.73,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATEF',
     StateC: 'F',
     C: 'Commercial',
@@ -11391,8 +11391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATHERM',
     StateC: 'US',
     C: 'Commercial',
@@ -11411,8 +11411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATI',
     StateC: 'US',
     C: 'Commercial',
@@ -11431,8 +11431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATK',
     StateC: 'US',
     C: 'Commercial',
@@ -11451,8 +11451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AECAB',
     StateC: 'US',
     C: 'Commercial',
@@ -11471,8 +11471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABL',
     StateC: 'US',
     C: 'Commercial',
@@ -11491,8 +11491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATKB',
     StateC: 'US',
     C: 'Commercial',
@@ -11504,15 +11504,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.62,
     alt: 0,
     Parent: 'ATK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKE',
     StateC: 'US',
     C: 'Commercial',
@@ -11531,8 +11531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GASL',
     StateC: 'US',
     C: 'Commercial',
@@ -11551,8 +11551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKU',
     StateC: 'US',
     C: 'Commercial',
@@ -11571,8 +11571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HERC',
     StateC: 'US',
     C: 'Commercial',
@@ -11591,8 +11591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATKL',
     StateC: 'US',
     C: 'Commercial',
@@ -11604,15 +11604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -112.55,
     alt: 0,
     Parent: 'ATK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWALES',
     StateC: 'US',
     C: 'Commercial',
@@ -11631,8 +11631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICRC',
     StateC: 'US',
     C: 'Commercial',
@@ -11651,8 +11651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATLA',
     StateC: 'US',
     C: 'Commercial',
@@ -11671,8 +11671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATLC',
     StateC: 'US',
     C: 'Commercial',
@@ -11691,8 +11691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATLCA',
     StateC: 'US',
     C: 'Unknown',
@@ -11704,15 +11704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -92.74,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATLH',
     StateC: 'HU',
     C: 'Commercial',
@@ -11731,8 +11731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELL',
     StateC: 'US',
     C: 'Commercial',
@@ -11744,15 +11744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -79.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEROL',
     StateC: 'US',
     C: 'Commercial',
@@ -11764,15 +11764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATLR',
     StateC: 'US',
     C: 'Commercial',
@@ -11791,8 +11791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATLR',
     StateC: 'US',
     C: 'Commercial',
@@ -11811,8 +11811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Military',
@@ -11824,15 +11824,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.96,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATMIR',
     StateC: 'AT',
     C: 'Government',
@@ -11851,8 +11851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATT',
     StateC: 'US',
     C: 'Commercial',
@@ -11871,8 +11871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATTH',
     StateC: 'US',
     C: 'Commercial',
@@ -11891,8 +11891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATTS',
     StateC: 'US',
     C: 'Commercial',
@@ -11911,8 +11911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUBU',
     StateC: 'US',
     C: 'Academic',
@@ -11931,8 +11931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUCZ',
     StateC: 'CZ',
     C: 'Government',
@@ -11951,8 +11951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUDACY',
     StateC: 'US',
     C: 'Commercial',
@@ -11971,8 +11971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUDISR',
     StateC: 'AU',
     C: 'Government',
@@ -11984,15 +11984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 149.12,
     alt: 0,
     Parent: 'AU',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUINS',
     StateC: 'US',
     C: 'Commercial',
@@ -12011,8 +12011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AURAK',
     StateC: 'UAE',
     C: 'Academic',
@@ -12031,8 +12031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AURFS',
     StateC: 'US',
     C: 'Commercial',
@@ -12051,8 +12051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLSYS',
     StateC: 'US',
     C: 'Commercial',
@@ -12071,8 +12071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUSP',
     StateC: 'AU',
     C: 'Commercial',
@@ -12091,8 +12091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUSS',
     StateC: 'AU',
     C: 'Commercial',
@@ -12111,8 +12111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUT',
     StateC: 'J',
     C: 'Academic',
@@ -12131,8 +12131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AVANTI',
     StateC: 'UK',
     C: 'Commercial',
@@ -12151,8 +12151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AVCO',
     StateC: 'US',
     C: 'Commercial',
@@ -12171,8 +12171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AVIB',
     StateC: 'BR',
     C: 'Commercial',
@@ -12191,8 +12191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BPD',
     StateC: 'I',
     C: 'Commercial',
@@ -12211,8 +12211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SS500',
     StateC: 'DR',
     C: 'Military',
@@ -12231,8 +12231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AWS',
     StateC: 'US',
     C: 'Military',
@@ -12251,8 +12251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AXEL',
     StateC: 'J',
     C: 'Commercial',
@@ -12271,8 +12271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AXIOM',
     StateC: 'US',
     C: 'Commercial',
@@ -12291,8 +12291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AZER',
     StateC: 'AZ',
     C: 'Government',
@@ -12311,8 +12311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AZRITN',
     StateC: 'AZ',
     C: 'Government',
@@ -12324,15 +12324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 49.88,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BABTS',
     StateC: 'RU',
     C: 'Commercial',
@@ -12351,8 +12351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAC',
     StateC: 'UK',
     C: 'Commercial',
@@ -12371,8 +12371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BACB',
     StateC: 'UK',
     C: 'Commercial',
@@ -12391,8 +12391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAC',
     StateC: 'UK',
     C: 'Commercial',
@@ -12411,8 +12411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SANH',
     StateC: 'US',
     C: 'Commercial',
@@ -12424,15 +12424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.46,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVS',
     StateC: 'UK',
     C: 'Commercial',
@@ -12451,8 +12451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAJ',
     StateC: 'CA',
     C: 'Commercial',
@@ -12471,8 +12471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAJ',
     StateC: 'CA',
     C: 'Commercial',
@@ -12491,8 +12491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAJ',
     StateC: 'CA',
     C: 'Commercial',
@@ -12511,8 +12511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BACB',
     StateC: 'UK',
     C: 'Commercial',
@@ -12531,8 +12531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BALL',
     StateC: 'US',
     C: 'Commercial',
@@ -12551,8 +12551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAS',
     StateC: 'UK',
     C: 'Government',
@@ -12571,8 +12571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAUM',
     StateC: 'RU',
     C: 'Academic',
@@ -12591,8 +12591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAYI',
     StateC: 'CN',
     C: 'Academic',
@@ -12611,8 +12611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'REYE',
     StateC: 'D',
     C: 'Commercial',
@@ -12624,15 +12624,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 12.53,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BCCT',
     StateC: 'T',
     C: 'Academic',
@@ -12651,8 +12651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BCSCL',
     StateC: 'BD',
     C: 'Commercial',
@@ -12671,8 +12671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BDSAGR',
     StateC: 'CN',
     C: 'Commercial',
@@ -12691,8 +12691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BENCH',
     StateC: 'US',
     C: 'Commercial',
@@ -12711,8 +12711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BERG',
     StateC: 'N',
     C: 'Academic',
@@ -12731,8 +12731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELINT',
     StateC: 'BY',
     C: 'Commercial',
@@ -12744,15 +12744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 27.57,
     alt: 0,
     Parent: 'ZTZM',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELL',
     StateC: 'US',
     C: 'Commercial',
@@ -12771,8 +12771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELM',
     StateC: 'B',
     C: 'Military',
@@ -12791,8 +12791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELL',
     StateC: 'US',
     C: 'Commercial',
@@ -12811,8 +12811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BENDX',
     StateC: 'US',
     C: 'Commercial',
@@ -12831,8 +12831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BERN',
     StateC: 'CH',
     C: 'Academic',
@@ -12851,8 +12851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BGSAT',
     StateC: 'BGN',
     C: 'Commercial',
@@ -12871,8 +12871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BGU',
     StateC: 'IL',
     C: 'Academic',
@@ -12891,8 +12891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BHSJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -12911,8 +12911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BIGEL',
     StateC: 'US',
     C: 'Commercial',
@@ -12931,8 +12931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BINA',
     StateC: 'MY',
     C: 'Commercial',
@@ -12951,8 +12951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BIR',
     StateC: 'UK',
     C: 'Academic',
@@ -12971,8 +12971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BISME',
     StateC: 'CN',
     C: 'Government',
@@ -12984,15 +12984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: 'CAST',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BIT',
     StateC: 'CN',
     C: 'Academic',
@@ -13011,8 +13011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BKSA',
     StateC: 'MY',
     C: 'Government',
@@ -13031,8 +13031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLCAN',
     StateC: 'US',
     C: 'Commercial',
@@ -13051,8 +13051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLMIT',
     StateC: 'CN',
     C: 'Academic',
@@ -13071,8 +13071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLOR',
     StateC: 'US',
     C: 'Commercial',
@@ -13091,8 +13091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLORH',
     StateC: 'US',
     C: 'Commercial',
@@ -13111,8 +13111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLORTX',
     StateC: 'US',
     C: 'Commercial',
@@ -13131,8 +13131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLOT',
     StateC: 'US',
     C: 'Commercial',
@@ -13151,8 +13151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLS',
     StateC: 'US',
     C: 'Commercial',
@@ -13171,8 +13171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BMWF',
     StateC: 'D',
     C: 'Government',
@@ -13184,15 +13184,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 7.1,
     alt: 0,
     Parent: 'D',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BMWF',
     StateC: 'D',
     C: 'Government',
@@ -13211,8 +13211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BME',
     StateC: 'HU',
     C: 'Academic',
@@ -13231,8 +13231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BMFT',
     StateC: 'D',
     C: 'Government',
@@ -13244,15 +13244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 7.1,
     alt: 0,
     Parent: 'D',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDIO',
     StateC: 'US',
     C: 'Military',
@@ -13271,8 +13271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BMWF',
     StateC: 'D',
     C: 'Government',
@@ -13284,15 +13284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 7.1,
     alt: 0,
     Parent: 'D',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BMWFO',
     StateC: 'AT',
     C: 'Government',
@@ -13311,8 +13311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BMVG',
     StateC: 'D',
     C: 'Military',
@@ -13324,15 +13324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 7.04,
     alt: 0,
     Parent: 'D',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RWI',
     StateC: 'US',
     C: 'Commercial',
@@ -13351,8 +13351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BNC',
     StateC: 'UK',
     C: 'Government',
@@ -13371,8 +13371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BNSC',
     StateC: 'UK',
     C: 'Government',
@@ -13391,8 +13391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BNU',
     StateC: 'CN',
     C: 'Academic',
@@ -13411,8 +13411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BO2',
     StateC: 'US',
     C: 'Commercial',
@@ -13424,15 +13424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.3,
     alt: 0,
     Parent: 'BOE',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOC',
     StateC: 'US',
     C: 'Commercial',
@@ -13451,8 +13451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOC3PF',
     StateC: 'US',
     C: 'Commercial',
@@ -13471,8 +13471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOCH',
     StateC: 'D',
     C: 'Academic',
@@ -13491,8 +13491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RDYNE',
     StateC: 'US',
     C: 'Commercial',
@@ -13511,8 +13511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOE',
     StateC: 'US',
     C: 'Commercial',
@@ -13524,15 +13524,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.3,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSEDD',
     StateC: 'US',
     C: 'Commercial',
@@ -13551,8 +13551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JDA',
     StateC: 'J',
     C: 'Military',
@@ -13564,15 +13564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.74,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSES',
     StateC: 'US',
     C: 'Commercial',
@@ -13591,8 +13591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DACHB',
     StateC: 'US',
     C: 'Commercial',
@@ -13611,8 +13611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOSE',
     StateC: 'US',
     C: 'Commercial',
@@ -13631,8 +13631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOHSV',
     StateC: 'US',
     C: 'Commercial',
@@ -13651,8 +13651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDHSV',
     StateC: 'US',
     C: 'Commercial',
@@ -13671,8 +13671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOKSC',
     StateC: 'US',
     C: 'Commercial',
@@ -13691,8 +13691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOKT',
     StateC: 'US',
     C: 'Commercial',
@@ -13711,8 +13711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOL',
     StateC: 'I',
     C: 'Academic',
@@ -13731,8 +13731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOLK',
     StateC: 'D',
     C: 'Commercial',
@@ -13751,8 +13751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOMI',
     StateC: 'US',
     C: 'Commercial',
@@ -13771,8 +13771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILLES',
     StateC: 'US',
     C: 'Commercial',
@@ -13784,15 +13784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: 'MILLEN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOMIS',
     StateC: 'US',
     C: 'Commercial',
@@ -13811,8 +13811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BONN',
     StateC: 'D',
     C: 'Academic',
@@ -13831,8 +13831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BONUM',
     StateC: 'RU',
     C: 'Commercial',
@@ -13851,8 +13851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOOZA',
     StateC: 'US',
     C: 'Commercial',
@@ -13871,8 +13871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOPBL',
     StateC: 'US',
     C: 'Commercial',
@@ -13891,8 +13891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MCDA',
     StateC: 'US',
     C: 'Commercial',
@@ -13911,8 +13911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOSE',
     StateC: 'US',
     C: 'Commercial',
@@ -13924,15 +13924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.38,
     alt: 0,
     Parent: 'BOE',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAASB',
     StateC: 'US',
     C: 'Commercial',
@@ -13951,8 +13951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOSL',
     StateC: 'US',
     C: 'Commercial',
@@ -13971,8 +13971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOTUL',
     StateC: 'US',
     C: 'Commercial',
@@ -13991,8 +13991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOUT',
     StateC: 'US',
     C: 'Commercial',
@@ -14011,8 +14011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BPD',
     StateC: 'I',
     C: 'Commercial',
@@ -14031,8 +14031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GFW',
     StateC: 'D',
     C: 'Government',
@@ -14044,15 +14044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 6.95,
     alt: 0,
     Parent: 'DFVLR',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BRCTA',
     StateC: 'BR',
     C: 'Military',
@@ -14064,15 +14064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -45.88,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BREC',
     StateC: 'UK',
     C: 'Commercial',
@@ -14091,8 +14091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BREI',
     StateC: 'D',
     C: 'Academic',
@@ -14111,8 +14111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BREM',
     StateC: 'D',
     C: 'Academic',
@@ -14131,8 +14131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BRAC',
     StateC: 'BD',
     C: 'Academic',
@@ -14151,8 +14151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BREC',
     StateC: 'UK',
     C: 'Commercial',
@@ -14171,8 +14171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BAJ',
     StateC: 'CA',
     C: 'Commercial',
@@ -14184,15 +14184,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.14,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BRID',
     StateC: 'ID',
     C: 'Commercial',
@@ -14211,8 +14211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BRIS',
     StateC: 'UK',
     C: 'Academic',
@@ -14231,8 +14231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BRL',
     StateC: 'US',
     C: 'Military',
@@ -14251,8 +14251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BROWN',
     StateC: 'US',
     C: 'Academic',
@@ -14271,8 +14271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BRSW',
     StateC: 'D',
     C: 'Academic',
@@ -14291,8 +14291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CELES',
     StateC: 'US',
     C: 'Commercial',
@@ -14311,8 +14311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BRVCC',
     StateC: 'US',
     C: 'Academic',
@@ -14331,8 +14331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BSAT',
     StateC: 'J',
     C: 'Commercial',
@@ -14351,8 +14351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BSB',
     StateC: 'UK',
     C: 'Commercial',
@@ -14371,8 +14371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GSFC',
     StateC: 'US',
     C: 'Government',
@@ -14391,8 +14391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BREC',
     StateC: 'UK',
     C: 'Commercial',
@@ -14411,8 +14411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASID',
     StateC: 'UK',
     C: 'Commercial',
@@ -14431,8 +14431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVE',
     StateC: 'UK',
     C: 'Commercial',
@@ -14451,8 +14451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BSB',
     StateC: 'UK',
     C: 'Commercial',
@@ -14464,15 +14464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.34,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BSKG',
     StateC: 'US',
     C: 'Commercial',
@@ -14491,8 +14491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUB',
     StateC: 'D',
     C: 'Commercial',
@@ -14511,8 +14511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BSUBY',
     StateC: 'BY',
     C: 'Academic',
@@ -14531,8 +14531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BTDITT',
     StateC: 'BT',
     C: 'Government',
@@ -14551,8 +14551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BTL',
     StateC: 'US',
     C: 'Commercial',
@@ -14571,8 +14571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BTLW',
     StateC: 'US',
     C: 'Commercial',
@@ -14584,15 +14584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.42,
     alt: 0,
     Parent: 'BTL',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BTRC',
     StateC: 'BD',
     C: 'Government',
@@ -14604,15 +14604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 90.4,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BTWK',
     StateC: 'CN',
     C: 'Commercial',
@@ -14631,8 +14631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BU',
     StateC: 'US',
     C: 'Academic',
@@ -14651,8 +14651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUAA',
     StateC: 'CN',
     C: 'Academic',
@@ -14671,8 +14671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUAER',
     StateC: 'US',
     C: 'Military',
@@ -14691,8 +14691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUAERG',
     StateC: 'US',
     C: 'Military',
@@ -14711,8 +14711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUCU',
     StateC: 'RO',
     C: 'Academic',
@@ -14731,8 +14731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BULSAT',
     StateC: 'BGN',
     C: 'Commercial',
@@ -14744,15 +14744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 25.65,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUORD',
     StateC: 'US',
     C: 'Military',
@@ -14764,15 +14764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUSEK',
     StateC: 'US',
     C: 'Commercial',
@@ -14791,8 +14791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUORD',
     StateC: 'US',
     C: 'Military',
@@ -14804,15 +14804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BWB',
     StateC: 'D',
     C: 'Military',
@@ -14831,8 +14831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BWEHR',
     StateC: 'D',
     C: 'Military',
@@ -14851,8 +14851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BWYIC',
     StateC: 'CN',
     C: 'Commercial',
@@ -14871,8 +14871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BYU',
     StateC: 'US',
     C: 'Academic',
@@ -14891,8 +14891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BYXYS',
     StateC: 'CN',
     C: 'Military',
@@ -14904,15 +14904,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.33,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'C360',
     StateC: 'US',
     C: 'Commercial',
@@ -14924,15 +14924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -110.95,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'C3S',
     StateC: 'HU',
     C: 'Commercial',
@@ -14951,8 +14951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CABVS',
     StateC: 'US',
     C: 'Commercial',
@@ -14964,15 +14964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -73.48,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAL',
     StateC: 'US',
     C: 'Academic',
@@ -14991,8 +14991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CALET',
     StateC: 'J',
     C: 'Academic',
@@ -15011,8 +15011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CALG',
     StateC: 'CA',
     C: 'Academic',
@@ -15031,8 +15031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CALP',
     StateC: 'US',
     C: 'Academic',
@@ -15051,8 +15051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CALT',
     StateC: 'CN',
     C: 'Government',
@@ -15071,8 +15071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CALTQ',
     StateC: 'CN',
     C: 'Government',
@@ -15091,8 +15091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAM',
     StateC: 'UK',
     C: 'Academic',
@@ -15111,8 +15111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAMSAT',
     StateC: 'CN',
     C: 'Academic',
@@ -15131,8 +15131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CANON',
     StateC: 'J',
     C: 'Commercial',
@@ -15151,8 +15151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CANOP',
     StateC: 'US',
     C: 'Commercial',
@@ -15171,8 +15171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAPSP',
     StateC: 'US',
     C: 'Commercial',
@@ -15191,8 +15191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAPTU',
     StateC: 'US',
     C: 'Commercial',
@@ -15211,8 +15211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CARDE',
     StateC: 'CA',
     C: 'Military',
@@ -15231,8 +15231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CARDU',
     StateC: 'UK',
     C: 'Academic',
@@ -15251,8 +15251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAREWX',
     StateC: 'US',
     C: 'Commercial',
@@ -15271,8 +15271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CARTH',
     StateC: 'US',
     C: 'Academic',
@@ -15291,8 +15291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAS',
     StateC: 'CN',
     C: 'Government',
@@ -15311,8 +15311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIAG',
     StateC: 'CN',
     C: 'Government',
@@ -15324,15 +15324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASA',
     StateC: 'E',
     C: 'Commercial',
@@ -15351,8 +15351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASA',
     StateC: 'E',
     C: 'Commercial',
@@ -15371,8 +15371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASC',
     StateC: 'CN',
     C: 'Government',
@@ -15391,8 +15391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASC',
     StateC: 'CN',
     C: 'Government',
@@ -15411,8 +15411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHFEN',
     StateC: 'CN',
     C: 'Government',
@@ -15424,15 +15424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: 'CASC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLREC',
     StateC: 'CN',
     C: 'Government',
@@ -15451,8 +15451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLREC',
     StateC: 'CN',
     C: 'Government',
@@ -15471,8 +15471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASDN',
     StateC: 'F',
     C: 'Military',
@@ -15491,8 +15491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIAG',
     StateC: 'CN',
     C: 'Government',
@@ -15504,15 +15504,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASIC',
     StateC: 'CN',
     C: 'Commercial',
@@ -15531,8 +15531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHFEN',
     StateC: 'CN',
     C: 'Government',
@@ -15544,15 +15544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: 'CASIC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASIC4A',
     StateC: 'CN',
     C: 'Government',
@@ -15571,8 +15571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASIE',
     StateC: 'CN',
     C: 'Government',
@@ -15584,15 +15584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.3,
     alt: 0,
     Parent: 'CAS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASIOM',
     StateC: 'CN',
     C: 'Government',
@@ -15611,8 +15611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CAST',
     StateC: 'CN',
     C: 'Government',
@@ -15631,8 +15631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASTBZ',
     StateC: 'CN',
     C: 'Government',
@@ -15651,8 +15651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASTIX',
     StateC: 'CN',
     C: 'Government',
@@ -15671,8 +15671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HTSTL',
     StateC: 'CN',
     C: 'Academic',
@@ -15684,15 +15684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.3,
     alt: 0,
     Parent: 'CASIC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CATAP',
     StateC: 'UK',
     C: 'Commercial',
@@ -15711,8 +15711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CATHU',
     StateC: 'US',
     C: 'Academic',
@@ -15731,8 +15731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CATON',
     StateC: 'CN',
     C: 'Commercial',
@@ -15751,8 +15751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CBKPL',
     StateC: 'PL',
     C: 'Government',
@@ -15771,8 +15771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CBMET',
     StateC: 'AU',
     C: 'Government',
@@ -15791,8 +15791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CCSST',
     StateC: 'CN',
     C: 'Government',
@@ -15804,15 +15804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: 'CAS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CCTV',
     StateC: 'CN',
     C: 'Government',
@@ -15831,8 +15831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CDTI',
     StateC: 'E',
     C: 'Government',
@@ -15851,8 +15851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CEA',
     StateC: 'F',
     C: 'Government',
@@ -15871,8 +15871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRDL',
     StateC: 'US',
     C: 'Military',
@@ -15884,15 +15884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.05,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CEL',
     StateC: 'F',
     C: 'Military',
@@ -15911,8 +15911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CEL',
     StateC: 'F',
     C: 'Military',
@@ -15931,8 +15931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CELES',
     StateC: 'US',
     C: 'Commercial',
@@ -15951,8 +15951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CENTI',
     StateC: 'CN',
     C: 'Commercial',
@@ -15971,8 +15971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRDL',
     StateC: 'US',
     C: 'Military',
@@ -15984,15 +15984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.05,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CERHU',
     StateC: 'HU',
     C: 'Academic',
@@ -16011,8 +16011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CERMA',
     StateC: 'F',
     C: 'Government',
@@ -16031,8 +16031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CERN',
     StateC: 'F',
     C: 'Government',
@@ -16051,8 +16051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CESBIO',
     StateC: 'F',
     C: 'Government',
@@ -16064,15 +16064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 1.47,
     alt: 0,
     Parent: 'TLS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CESIUM',
     StateC: 'US',
     C: 'Commercial',
@@ -16091,8 +16091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CESR',
     StateC: 'F',
     C: 'Government',
@@ -16111,8 +16111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIFTQ',
     StateC: 'E',
     C: 'Government',
@@ -16124,15 +16124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -3.72,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CFCA',
     StateC: 'CA',
     C: 'Military',
@@ -16144,15 +16144,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -75.68,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CFTH',
     StateC: 'F',
     C: 'Commercial',
@@ -16171,8 +16171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CFTH',
     StateC: 'F',
     C: 'Commercial',
@@ -16191,8 +16191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CGS',
     StateC: 'I',
     C: 'Commercial',
@@ -16211,8 +16211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CGS',
     StateC: 'I',
     C: 'Commercial',
@@ -16231,8 +16231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CGSTL',
     StateC: 'CN',
     C: 'Commercial',
@@ -16251,8 +16251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CGSTZ',
     StateC: 'CN',
     C: 'Commercial',
@@ -16271,8 +16271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHAIL',
     StateC: 'US',
     C: 'Commercial',
@@ -16291,8 +16291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHDB',
     StateC: 'CN',
     C: 'Commercial',
@@ -16304,15 +16304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: 'CHIS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHFEN',
     StateC: 'CN',
     C: 'Government',
@@ -16331,8 +16331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHIBA',
     StateC: 'J',
     C: 'Academic',
@@ -16351,8 +16351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHIC',
     StateC: 'US',
     C: 'Academic',
@@ -16371,8 +16371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHIS',
     StateC: 'CN',
     C: 'Commercial',
@@ -16391,8 +16391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHIS',
     StateC: 'CN',
     C: 'Commercial',
@@ -16411,8 +16411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHIS',
     StateC: 'CN',
     C: 'Government',
@@ -16431,8 +16431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHORI',
     StateC: 'CN',
     C: 'Commercial',
@@ -16451,8 +16451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHOSU',
     StateC: 'KR',
     C: 'Academic',
@@ -16471,8 +16471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHUNG',
     StateC: 'TW',
     C: 'Commercial',
@@ -16484,15 +16484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 120.98,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHRMI',
     StateC: 'US',
     C: 'Commercial',
@@ -16511,8 +16511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CHRY',
     StateC: 'US',
     C: 'Commercial',
@@ -16531,8 +16531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIA',
     StateC: 'US',
     C: 'Military',
@@ -16551,8 +16551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIAB',
     StateC: 'US',
     C: 'Military',
@@ -16564,15 +16564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.16,
     alt: 0,
     Parent: 'NRO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIAG',
     StateC: 'CN',
     C: 'Government',
@@ -16584,15 +16584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIEL',
     StateC: 'CA',
     C: 'Commercial',
@@ -16611,8 +16611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIFAS',
     StateC: 'F',
     C: 'Commercial',
@@ -16631,8 +16631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIFTQ',
     StateC: 'E',
     C: 'Government',
@@ -16651,8 +16651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIN',
     StateC: 'US',
     C: 'Academic',
@@ -16671,8 +16671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIOMP',
     StateC: 'CN',
     C: 'Academic',
@@ -16691,8 +16691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CISIR',
     StateC: 'LK',
     C: 'Government',
@@ -16711,8 +16711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIAG',
     StateC: 'CN',
     C: 'Government',
@@ -16724,15 +16724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CISP5',
     StateC: 'CN',
     C: 'Government',
@@ -16744,15 +16744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIT',
     StateC: 'US',
     C: 'Academic',
@@ -16771,8 +16771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CITED',
     StateC: 'AR',
     C: 'Military',
@@ -16791,8 +16791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CITEF',
     StateC: 'AR',
     C: 'Government',
@@ -16811,8 +16811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CLYDE',
     StateC: 'UK',
     C: 'Commercial',
@@ -16831,8 +16831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CLARK',
     StateC: 'US',
     C: 'Commercial',
@@ -16851,8 +16851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COUAL',
     StateC: 'US',
     C: 'Academic',
@@ -16871,8 +16871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CLEM',
     StateC: 'US',
     C: 'Academic',
@@ -16891,8 +16891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CLSR',
     StateC: 'BGN',
     C: 'Academic',
@@ -16911,8 +16911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CLYDE',
     StateC: 'UK',
     C: 'Commercial',
@@ -16931,8 +16931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CMA',
     StateC: 'CN',
     C: 'Government',
@@ -16944,15 +16944,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CMIK',
     StateC: 'KP',
     C: 'Military',
@@ -16971,8 +16971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CMMB',
     StateC: 'HK',
     C: 'Commercial',
@@ -16991,8 +16991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CMSEO',
     StateC: 'CN',
     C: 'Military',
@@ -17011,8 +17011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CMU',
     StateC: 'US',
     C: 'Academic',
@@ -17031,8 +17031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNAE',
     StateC: 'BR',
     C: 'Government',
@@ -17051,8 +17051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNCOS',
     StateC: 'CN',
     C: 'Military',
@@ -17064,15 +17064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNES',
     StateC: 'F',
     C: 'Government',
@@ -17091,8 +17091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNESB',
     StateC: 'F',
     C: 'Government',
@@ -17104,15 +17104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.3,
     alt: 0,
     Parent: 'CNES',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNEST',
     StateC: 'F',
     C: 'Government',
@@ -17131,8 +17131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNET',
     StateC: 'F',
     C: 'Government',
@@ -17151,8 +17151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNIE',
     StateC: 'AR',
     C: 'Government',
@@ -17171,8 +17171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNR',
     StateC: 'I',
     C: 'Government',
@@ -17191,8 +17191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNRS',
     StateC: 'F',
     C: 'Government',
@@ -17211,8 +17211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAI',
     StateC: 'CN',
     C: 'Government',
@@ -17231,8 +17231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNCOS',
     StateC: 'CN',
     C: 'Military',
@@ -17251,8 +17251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIAG',
     StateC: 'CN',
     C: 'Government',
@@ -17271,8 +17271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNTS',
     StateC: 'DZ',
     C: 'Government',
@@ -17284,15 +17284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 3.06,
     alt: 0,
     Parent: 'ASAL',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNU',
     StateC: 'KR',
     C: 'Academic',
@@ -17311,8 +17311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COEP',
     StateC: 'IN',
     C: 'Academic',
@@ -17331,8 +17331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COLE',
     StateC: 'US',
     C: 'Commercial',
@@ -17351,8 +17351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COLE',
     StateC: 'US',
     C: 'Commercial',
@@ -17371,8 +17371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COLE',
     StateC: 'US',
     C: 'Commercial',
@@ -17391,8 +17391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COLC',
     StateC: 'US',
     C: 'Commercial',
@@ -17411,8 +17411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COLC',
     StateC: 'US',
     C: 'Commercial',
@@ -17424,15 +17424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -157.82,
     alt: 0,
     Parent: 'AMCG',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HASTD',
     StateC: 'US',
     C: 'Commercial',
@@ -17451,8 +17451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COM',
     StateC: 'US',
     C: 'Commercial',
@@ -17471,8 +17471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COMAH',
     StateC: 'AR',
     C: 'Academic',
@@ -17491,8 +17491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COMDEV',
     StateC: 'CA',
     C: 'Commercial',
@@ -17511,8 +17511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COMDEV',
     StateC: 'CA',
     C: 'Commercial',
@@ -17531,8 +17531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COMDUK',
     StateC: 'UK',
     C: 'Commercial',
@@ -17544,15 +17544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.81,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNIE',
     StateC: 'AR',
     C: 'Government',
@@ -17564,15 +17564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -58.38,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CITEF',
     StateC: 'AR',
     C: 'Government',
@@ -17591,8 +17591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONCOR',
     StateC: 'CA',
     C: 'Academic',
@@ -17604,15 +17604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -73.56,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONIE',
     StateC: 'E',
     C: 'Government',
@@ -17631,8 +17631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONTF',
     StateC: 'US',
     C: 'Commercial',
@@ -17644,15 +17644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.3,
     alt: 0,
     Parent: 'CONTL',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONTL',
     StateC: 'US',
     C: 'Commercial',
@@ -17664,15 +17664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -84.39,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASCO',
     StateC: 'US',
     C: 'Commercial',
@@ -17691,8 +17691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONTR',
     StateC: 'CH',
     C: 'Commercial',
@@ -17711,8 +17711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONTR',
     StateC: 'CH',
     C: 'Commercial',
@@ -17731,8 +17731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONV',
     StateC: 'US',
     C: 'Commercial',
@@ -17751,8 +17751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDA',
     StateC: 'US',
     C: 'Commercial',
@@ -17764,15 +17764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.14,
     alt: 0,
     Parent: 'GD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONVPO',
     StateC: 'US',
     C: 'Commercial',
@@ -17791,8 +17791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COOP',
     StateC: 'US',
     C: 'Commercial',
@@ -17811,8 +17811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COPERN',
     StateC: 'I-EU',
     C: 'Government',
@@ -17831,8 +17831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CORAT',
     StateC: 'AR',
     C: 'Commercial',
@@ -17851,8 +17851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IIAE',
     StateC: 'AR',
     C: 'Academic',
@@ -17871,8 +17871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CORN',
     StateC: 'US',
     C: 'Academic',
@@ -17891,8 +17891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COSG',
     StateC: 'US',
     C: 'Academic',
@@ -17911,8 +17911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COSM',
     StateC: 'F',
     C: 'Commercial',
@@ -17931,8 +17931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COSMOG',
     StateC: 'US',
     C: 'Commercial',
@@ -17951,8 +17951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COUAL',
     StateC: 'US',
     C: 'Academic',
@@ -17964,15 +17964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -105.27,
     alt: 0,
     Parent: 'UCO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CPUT',
     StateC: 'ZA',
     C: 'Academic',
@@ -17991,8 +17991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRA',
     StateC: 'I',
     C: 'Government',
@@ -18011,8 +18011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DRTE',
     StateC: 'CA',
     C: 'Government',
@@ -18031,8 +18031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRCSS',
     StateC: 'AU',
     C: 'Government',
@@ -18051,8 +18051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRI',
     StateC: 'DK',
     C: 'Commercial',
@@ -18064,15 +18064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 12.43,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRL',
     StateC: 'J',
     C: 'Government',
@@ -18091,8 +18091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRPSM',
     StateC: 'I',
     C: 'Academic',
@@ -18104,15 +18104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 12.52,
     alt: 0,
     Parent: 'ROSAP',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRR',
     StateC: 'CA',
     C: 'Government',
@@ -18131,8 +18131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRR',
     StateC: 'CA',
     C: 'Government',
@@ -18144,15 +18144,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -93.82,
     alt: 0,
     Parent: 'NRCC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRS',
     StateC: 'I',
     C: 'Government',
@@ -18171,8 +18171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRSEA',
     StateC: 'BR',
     C: 'Government',
@@ -18184,15 +18184,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -41.05,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASDN',
     StateC: 'F',
     C: 'Government',
@@ -18211,8 +18211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRTS',
     StateC: 'MA',
     C: 'Government',
@@ -18231,8 +18231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSA',
     StateC: 'CA',
     C: 'Government',
@@ -18251,8 +18251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSAE',
     StateC: 'US',
     C: 'Commercial',
@@ -18264,15 +18264,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.08,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSC',
     StateC: 'US',
     C: 'Commercial',
@@ -18284,15 +18284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.23,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTC',
     StateC: 'US',
     C: 'Commercial',
@@ -18311,8 +18311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSG',
     StateC: 'F',
     C: 'Government',
@@ -18331,8 +18331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSIMP',
     StateC: 'AU',
     C: 'Government',
@@ -18344,15 +18344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 145.1,
     alt: 0,
     Parent: 'CSIRO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSIAR',
     StateC: 'AU',
     C: 'Government',
@@ -18364,15 +18364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 145.1,
     alt: 0,
     Parent: 'CSIRO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSICE',
     StateC: 'J',
     C: 'Military',
@@ -18391,8 +18391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSIMP',
     StateC: 'AU',
     C: 'Government',
@@ -18411,8 +18411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSIR',
     StateC: 'ZA',
     C: 'Government',
@@ -18431,8 +18431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSIRO',
     StateC: 'AU',
     C: 'Government',
@@ -18444,15 +18444,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 149.12,
     alt: 0,
     Parent: 'AU',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSL',
     StateC: 'CSSR',
     C: 'Military',
@@ -18471,8 +18471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CIAG',
     StateC: 'CN',
     C: 'Government',
@@ -18491,8 +18491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSU',
     StateC: 'US',
     C: 'Academic',
@@ -18511,8 +18511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSUG',
     StateC: 'F',
     C: 'Academic',
@@ -18531,8 +18531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSUN',
     StateC: 'US',
     C: 'Academic',
@@ -18551,8 +18551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSXT',
     StateC: 'US',
     C: 'Commercial',
@@ -18571,8 +18571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSZS',
     StateC: 'CN',
     C: 'Commercial',
@@ -18591,8 +18591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSI',
     StateC: 'US',
     C: 'Commercial',
@@ -18611,8 +18611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CTEL',
     StateC: 'CN',
     C: 'Government',
@@ -18624,15 +18624,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CTYK',
     StateC: 'CN',
     C: 'Commercial',
@@ -18651,8 +18651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CUBESP',
     StateC: 'ZA',
     C: 'Commercial',
@@ -18671,8 +18671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CUBIC',
     StateC: 'US',
     C: 'Commercial',
@@ -18691,8 +18691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CULH',
     StateC: 'UK',
     C: 'Government',
@@ -18711,8 +18711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CUNYME',
     StateC: 'US',
     C: 'Academic',
@@ -18731,8 +18731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CURTIN',
     StateC: 'AU',
     C: 'Academic',
@@ -18751,8 +18751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CZHJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -18771,8 +18771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DAAFAR',
     StateC: 'CU',
     C: 'Military',
@@ -18791,8 +18791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DAC',
     StateC: 'US',
     C: 'Commercial',
@@ -18811,8 +18811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DACC',
     StateC: 'US',
     C: 'Commercial',
@@ -18831,8 +18831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DACHB',
     StateC: 'US',
     C: 'Commercial',
@@ -18851,8 +18851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DACM',
     StateC: 'US',
     C: 'Commercial',
@@ -18871,8 +18871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DAPA',
     StateC: 'KR',
     C: 'Military',
@@ -18891,14 +18891,14 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DARA',
     StateC: 'D',
     C: 'Government',
     TStart: '1989',
     TStop: '1997',
-    name: 'Deutsche Agentur f\\"{u}r Raumfahrtangelegenheiten',
+    name: 'Deutsche Agentur f\\"new ControlSite({u}r Raumfahrtangelegenheiten',
     Location: 'Bonn:Oberkassel',
     lat: 50.71,
     lon: 7.17,
@@ -18911,8 +18911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DARE',
     StateC: 'NL',
     C: 'Academic',
@@ -18931,8 +18931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DARPA',
     StateC: 'US',
     C: 'Military',
@@ -18951,8 +18951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DARPA',
     StateC: 'US',
     C: 'Military',
@@ -18971,8 +18971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DART',
     StateC: 'US',
     C: 'Academic',
@@ -18991,8 +18991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DASA',
     StateC: 'US',
     C: 'Military',
@@ -19011,8 +19011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOLK',
     StateC: 'D',
     C: 'Commercial',
@@ -19031,8 +19031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -19051,8 +19051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -19071,8 +19071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -19091,8 +19091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -19111,8 +19111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DASST',
     StateC: 'F',
     C: 'Commercial',
@@ -19131,8 +19131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DAUR',
     StateC: 'RU',
     C: 'Commercial',
@@ -19151,8 +19151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DAWAN',
     StateC: 'CN',
     C: 'Government',
@@ -19171,8 +19171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DBP',
     StateC: 'D',
     C: 'Government',
@@ -19191,8 +19191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICONA',
     StateC: 'US',
     C: 'Commercial',
@@ -19211,8 +19211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICONA',
     StateC: 'US',
     C: 'Commercial',
@@ -19224,15 +19224,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.35,
     alt: 0,
     Parent: 'DISH',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DCA',
     StateC: 'US',
     C: 'Military',
@@ -19251,8 +19251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DDRD',
     StateC: 'IL',
     C: 'Military',
@@ -19271,8 +19271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVE',
     StateC: 'UK',
     C: 'Commercial',
@@ -19291,8 +19291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVS',
     StateC: 'UK',
     C: 'Commercial',
@@ -19311,8 +19311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVT',
     StateC: 'CA',
     C: 'Commercial',
@@ -19331,8 +19331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEIMOS',
     StateC: 'E',
     C: 'Commercial',
@@ -19351,8 +19351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEIMI',
     StateC: 'E',
     C: 'Commercial',
@@ -19364,15 +19364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -4.7,
     alt: 0,
     Parent: 'DEIMOS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DELFT',
     StateC: 'NL',
     C: 'Academic',
@@ -19391,8 +19391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DENV',
     StateC: 'US',
     C: 'Academic',
@@ -19411,8 +19411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAE',
     StateC: 'UK',
     C: 'Military',
@@ -19431,8 +19431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEWC',
     StateC: 'AU',
     C: 'Commercial',
@@ -19451,8 +19451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEYA',
     StateC: 'CN',
     C: 'Government',
@@ -19471,8 +19471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFF',
     StateC: 'F',
     C: 'Academic',
@@ -19491,8 +19491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFH',
     StateC: 'CN',
     C: 'Commercial',
@@ -19511,8 +19511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFH',
     StateC: 'CN',
     C: 'Commercial',
@@ -19531,8 +19531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFHS',
     StateC: 'CN',
     C: 'Commercial',
@@ -19551,8 +19551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFHYT',
     StateC: 'CN',
     C: 'Commercial',
@@ -19571,8 +19571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FRC',
     StateC: 'US',
     C: 'Government',
@@ -19591,8 +19591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFVLR',
     StateC: 'D',
     C: 'Government',
@@ -19611,8 +19611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DMA',
     StateC: 'F',
     C: 'Military',
@@ -19631,8 +19631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CEL',
     StateC: 'F',
     C: 'Military',
@@ -19651,8 +19651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DGGROW',
     StateC: 'I-EU',
     C: 'Government',
@@ -19664,15 +19664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 4.35,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EWAT',
     StateC: 'US',
     C: 'Commercial',
@@ -19691,8 +19691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBI',
     StateC: 'US',
     C: 'Commercial',
@@ -19704,15 +19704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.39,
     alt: 0,
     Parent: 'DGLO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIMG',
     StateC: 'US',
     C: 'Commercial',
@@ -19724,15 +19724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -104.95,
     alt: 0,
     Parent: 'DGLO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DHMC',
     StateC: 'US',
     C: 'Academic',
@@ -19751,8 +19751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DHSST',
     StateC: 'US',
     C: 'Government',
@@ -19771,8 +19771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DCA',
     StateC: 'US',
     C: 'Military',
@@ -19791,8 +19791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DISH',
     StateC: 'US',
     C: 'Commercial',
@@ -19811,8 +19811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DIYS',
     StateC: 'AR',
     C: 'Commercial',
@@ -19831,8 +19831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NKAU',
     StateC: 'UA',
     C: 'Government',
@@ -19851,8 +19851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DKJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -19871,8 +19871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DKJ38',
     StateC: 'CN',
     C: 'Commercial',
@@ -19891,14 +19891,14 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFVLR',
     StateC: 'D',
     C: 'Government',
     TStart: '1989',
     TStop: '1997',
-    name: 'Deutsche Forschungsanstalt f\\"{u}r Luft- und Raumfahrt,',
+    name: 'Deutsche Forschungsanstalt f\\"new ControlSite({u}r Luft- und Raumfahrt,',
     Location: 'Koln',
     lat: 50.94,
     lon: 6.95,
@@ -19911,8 +19911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DFVLR',
     StateC: 'D',
     C: 'Government',
@@ -19931,8 +19931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DLRB',
     StateC: 'D',
     C: 'Government',
@@ -19951,8 +19951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DLRRA',
     StateC: 'D',
     C: 'Government',
@@ -19964,15 +19964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 9.4,
     alt: 0,
     Parent: 'DLR',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DARA',
     StateC: 'D',
     C: 'Government',
@@ -19991,8 +19991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DMA',
     StateC: 'F',
     C: 'Military',
@@ -20011,8 +20011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DMC',
     StateC: 'UK',
     C: 'Commercial',
@@ -20031,8 +20031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DMI',
     StateC: 'DK',
     C: 'Government',
@@ -20051,8 +20051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DASA',
     StateC: 'US',
     C: 'Military',
@@ -20071,8 +20071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DND',
     StateC: 'CA',
     C: 'Military',
@@ -20091,8 +20091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DNE',
     StateC: 'US',
     C: 'Commercial',
@@ -20111,8 +20111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSRI',
     StateC: 'DK',
     C: 'Government',
@@ -20131,8 +20131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DOC',
     StateC: 'US',
     C: 'Government',
@@ -20144,15 +20144,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DOD',
     StateC: 'US',
     C: 'Military',
@@ -20171,8 +20171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEC',
     StateC: 'US',
     C: 'Government',
@@ -20191,8 +20191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORBIT',
     StateC: 'I',
     C: 'Commercial',
@@ -20211,8 +20211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -20231,8 +20231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -20244,15 +20244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 9.48,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DOSAAF',
     StateC: 'SU',
     C: 'Academic',
@@ -20264,15 +20264,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DOSH',
     StateC: 'J',
     C: 'Government',
@@ -20291,8 +20291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DOST',
     StateC: 'PH',
     C: 'Government',
@@ -20311,8 +20311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAE',
     StateC: 'UK',
     C: 'Military',
@@ -20331,8 +20331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DRAP',
     StateC: 'US',
     C: 'Commercial',
@@ -20344,15 +20344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.09,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CARDE',
     StateC: 'CA',
     C: 'Military',
@@ -20371,8 +20371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DRDL',
     StateC: 'IN',
     C: 'Military',
@@ -20391,8 +20391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DRDO',
     StateC: 'IN',
     C: 'Military',
@@ -20411,8 +20411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CARDE',
     StateC: 'CA',
     C: 'Military',
@@ -20431,8 +20431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DREXEL',
     StateC: 'US',
     C: 'Academic',
@@ -20451,8 +20451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DRG',
     StateC: 'D',
     C: 'Commercial',
@@ -20471,8 +20471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DRTE',
     StateC: 'CA',
     C: 'Military',
@@ -20491,8 +20491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSI',
     StateC: 'US',
     C: 'Commercial',
@@ -20511,8 +20511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSIR',
     StateC: 'UK',
     C: 'Government',
@@ -20531,8 +20531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSNC',
     StateC: 'J',
     C: 'Commercial',
@@ -20551,8 +20551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSRI',
     StateC: 'DK',
     C: 'Government',
@@ -20571,8 +20571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSSG',
     StateC: 'US',
     C: 'Commercial',
@@ -20591,8 +20591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WRE',
     StateC: 'AU',
     C: 'Military',
@@ -20611,8 +20611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DTI',
     StateC: 'US',
     C: 'Commercial',
@@ -20631,8 +20631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DTU',
     StateC: 'DK',
     C: 'Academic',
@@ -20651,8 +20651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DTV',
     StateC: 'US',
     C: 'Commercial',
@@ -20671,8 +20671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DTV',
     StateC: 'US',
     C: 'Commercial',
@@ -20684,15 +20684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DTVLA',
     StateC: 'BR',
     C: 'Commercial',
@@ -20711,8 +20711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DUD',
     StateC: 'US',
     C: 'Academic',
@@ -20731,8 +20731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILTEC',
     StateC: 'US',
     C: 'Commercial',
@@ -20751,8 +20751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DUTH',
     StateC: 'GR',
     C: 'Academic',
@@ -20771,8 +20771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FOKKS',
     StateC: 'NL',
     C: 'Commercial',
@@ -20791,8 +20791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DUTEC',
     StateC: 'NL',
     C: 'Commercial',
@@ -20811,8 +20811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DVNG',
     StateC: 'SU',
     C: 'Government',
@@ -20831,8 +20831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DVST',
     StateC: 'TR',
     C: 'Military',
@@ -20851,8 +20851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DYN',
     StateC: 'CA',
     C: 'Commercial',
@@ -20871,8 +20871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DYNT',
     StateC: 'US',
     C: 'Commercial',
@@ -20891,8 +20891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EAC',
     StateC: 'US',
     C: 'Commercial',
@@ -20911,8 +20911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EADS',
     StateC: 'NL',
     C: 'Commercial',
@@ -20931,8 +20931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EADSA',
     StateC: 'F',
     C: 'Commercial',
@@ -20951,8 +20951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -20971,8 +20971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CASA',
     StateC: 'E',
     C: 'Commercial',
@@ -20991,8 +20991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AECSG',
     StateC: 'F',
     C: 'Commercial',
@@ -21011,8 +21011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORLM',
     StateC: 'F',
     C: 'Commercial',
@@ -21031,8 +21031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOLK',
     StateC: 'D',
     C: 'Commercial',
@@ -21051,8 +21051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EARI',
     StateC: 'UK',
     C: 'Commercial',
@@ -21071,8 +21071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DORN',
     StateC: 'D',
     C: 'Commercial',
@@ -21091,8 +21091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ECHO',
     StateC: 'US',
     C: 'Commercial',
@@ -21111,8 +21111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ECHO23',
     StateC: 'UK',
     C: 'Commercial',
@@ -21131,8 +21131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIRION',
     StateC: 'AU',
     C: 'Commercial',
@@ -21151,8 +21151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ECHO',
     StateC: 'US',
     C: 'Commercial',
@@ -21171,8 +21171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ECHOM',
     StateC: 'IE',
     C: 'Commercial',
@@ -21191,8 +21191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ECLIP',
     StateC: 'US',
     C: 'Commercial',
@@ -21211,8 +21211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EXOL',
     StateC: 'D',
     C: 'Commercial',
@@ -21231,8 +21231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRDL',
     StateC: 'US',
     C: 'Military',
@@ -21244,15 +21244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.05,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EDLS',
     StateC: 'US',
     C: 'Commercial',
@@ -21271,8 +21271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EELEC',
     StateC: 'UK',
     C: 'Commercial',
@@ -21291,8 +21291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EER',
     StateC: 'US',
     C: 'Commercial',
@@ -21311,8 +21311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSI',
     StateC: 'US',
     C: 'Commercial',
@@ -21331,8 +21331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EGA',
     StateC: 'EG',
     C: 'Military',
@@ -21351,8 +21351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EGAO',
     StateC: 'EG',
     C: 'Government',
@@ -21371,8 +21371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EGG',
     StateC: 'US',
     C: 'Commercial',
@@ -21391,8 +21391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EGS',
     StateC: 'GE',
     C: 'Commercial',
@@ -21411,8 +21411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GSAEU',
     StateC: 'I-EU',
     C: 'Government',
@@ -21424,15 +21424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.3,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NARSS',
     StateC: 'EG',
     C: 'Government',
@@ -21451,8 +21451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HNS',
     StateC: 'US',
     C: 'Commercial',
@@ -21471,8 +21471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EIAST',
     StateC: 'UAE',
     C: 'Government',
@@ -21491,8 +21491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ELBIT',
     StateC: 'IL',
     C: 'Commercial',
@@ -21511,8 +21511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEIMOS',
     StateC: 'E',
     C: 'Commercial',
@@ -21524,15 +21524,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -3.71,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEIMI',
     StateC: 'E',
     C: 'Commercial',
@@ -21544,15 +21544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -4.7,
     alt: 0,
     Parent: 'ELDE',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ELDEC',
     StateC: 'E',
     C: 'Commercial',
@@ -21571,8 +21571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ELDO',
     StateC: 'I-ELDO',
     C: 'Government',
@@ -21591,8 +21591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ELLT',
     StateC: 'UK',
     C: 'Commercial',
@@ -21611,8 +21611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOSL',
     StateC: 'US',
     C: 'Commercial',
@@ -21631,8 +21631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ELV',
     StateC: 'I',
     C: 'Commercial',
@@ -21651,8 +21651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ELYS',
     StateC: 'US',
     C: 'Commercial',
@@ -21671,8 +21671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMASH',
     StateC: 'RU',
     C: 'Government',
@@ -21691,8 +21691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMAVI',
     StateC: 'CO',
     C: 'Military',
@@ -21711,8 +21711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMBR',
     StateC: 'BR',
     C: 'Government',
@@ -21731,8 +21731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMBR',
     StateC: 'BR',
     C: 'Government',
@@ -21751,8 +21751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMBR',
     StateC: 'BR',
     C: 'Government',
@@ -21764,15 +21764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -43.2,
     alt: 0,
     Parent: 'TELMX',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPARM',
     StateC: 'CA',
     C: 'Commercial',
@@ -21791,8 +21791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ENDUR',
     StateC: 'BGN',
     C: 'Academic',
@@ -21811,8 +21811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EOS',
     StateC: 'US',
     C: 'Commercial',
@@ -21831,8 +21831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EOSAT',
     StateC: 'US',
     C: 'Commercial',
@@ -21851,8 +21851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EOSAU',
     StateC: 'AU',
     C: 'Commercial',
@@ -21871,8 +21871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EPFL',
     StateC: 'CH',
     C: 'Academic',
@@ -21891,8 +21891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EPOS',
     StateC: 'SU',
     C: 'Commercial',
@@ -21911,8 +21911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERAU',
     StateC: 'US',
     C: 'Academic',
@@ -21931,8 +21931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AEC',
     StateC: 'US',
     C: 'Government',
@@ -21951,8 +21951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERDL',
     StateC: 'US',
     C: 'Military',
@@ -21971,8 +21971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -21991,8 +21991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -22011,8 +22011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -22024,15 +22024,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 8.3,
     alt: 0,
     Parent: 'VFW',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERTU',
     StateC: 'EG',
     C: 'Government',
@@ -22044,15 +22044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 30.91,
     alt: 0,
     Parent: 'EG',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESA',
     StateC: 'I-ESA',
     C: 'Government',
@@ -22071,8 +22071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESHAIL',
     StateC: 'QA',
     C: 'Academic',
@@ -22091,8 +22091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESIE',
     StateC: 'F',
     C: 'Academic',
@@ -22111,8 +22111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESL',
     StateC: 'US',
     C: 'Commercial',
@@ -22131,8 +22131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESL',
     StateC: 'US',
     C: 'Commercial',
@@ -22151,8 +22151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFETR',
     StateC: 'US',
     C: 'Military',
@@ -22171,8 +22171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESRO',
     StateC: 'I-ESRO',
     C: 'Government',
@@ -22191,8 +22191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESRWA',
     StateC: 'US',
     C: 'Commercial',
@@ -22204,15 +22204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.33,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESSA',
     StateC: 'US',
     C: 'Government',
@@ -22231,8 +22231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESSP',
     StateC: 'EE',
     C: 'Academic',
@@ -22251,8 +22251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESSTI',
     StateC: 'ET',
     C: 'Government',
@@ -22271,8 +22271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESTEC',
     StateC: 'I-ESA',
     C: 'Government',
@@ -22291,8 +22291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTVE',
     StateC: 'US',
     C: 'Commercial',
@@ -22311,8 +22311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ETAC',
     StateC: 'US',
     C: 'Military',
@@ -22331,8 +22331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ETAC',
     StateC: 'US',
     C: 'Military',
@@ -22344,15 +22344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -89.87,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ETEC',
     StateC: 'BR',
     C: 'Academic',
@@ -22371,8 +22371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUMET',
     StateC: 'I-EUM',
     C: 'Government',
@@ -22391,8 +22391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUPST',
     StateC: 'UK',
     C: 'Commercial',
@@ -22411,8 +22411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EURAS',
     StateC: 'D',
     C: 'Commercial',
@@ -22431,8 +22431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUROK',
     StateC: 'RU',
     C: 'Commercial',
@@ -22451,8 +22451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUROL',
     StateC: 'S',
     C: 'Commercial',
@@ -22471,8 +22471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUROP',
     StateC: 'F',
     C: 'Commercial',
@@ -22484,15 +22484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.22,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUROPK',
     StateC: 'F',
     C: 'Commercial',
@@ -22511,8 +22511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EURSA',
     StateC: 'MC',
     C: 'Commercial',
@@ -22531,8 +22531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EURSG',
     StateC: 'TR',
     C: 'Commercial',
@@ -22551,8 +22551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GSAEU',
     StateC: 'I-EU',
     C: 'Government',
@@ -22571,8 +22571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAMX',
     StateC: 'MX',
     C: 'Commercial',
@@ -22591,8 +22591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUTEL',
     StateC: 'I-EUT',
     C: 'Government',
@@ -22611,8 +22611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EUTEL',
     StateC: 'F',
     C: 'Commercial',
@@ -22631,8 +22631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EWAT',
     StateC: 'US',
     C: 'Commercial',
@@ -22651,8 +22651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EXA',
     StateC: 'EC',
     C: 'Government',
@@ -22671,8 +22671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EXEA',
     StateC: 'CA',
     C: 'Commercial',
@@ -22691,8 +22691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EXEA',
     StateC: 'CA',
     C: 'Commercial',
@@ -22711,8 +22711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EXOL',
     StateC: 'D',
     C: 'Commercial',
@@ -22731,8 +22731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARMAD',
     StateC: 'US',
     C: 'Commercial',
@@ -22751,8 +22751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EXPACE',
     StateC: 'CN',
     C: 'Commercial',
@@ -22771,8 +22771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EXSEED',
     StateC: 'IN',
     C: 'Commercial',
@@ -22791,8 +22791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAB',
     StateC: 'BR',
     C: 'Military',
@@ -22811,8 +22811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FACH',
     StateC: 'CL',
     C: 'Military',
@@ -22831,8 +22831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FACO',
     StateC: 'CO',
     C: 'Military',
@@ -22844,15 +22844,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.07,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAI',
     StateC: 'US',
     C: 'Commercial',
@@ -22871,8 +22871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAIR',
     StateC: 'US',
     C: 'Commercial',
@@ -22891,8 +22891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAIRH',
     StateC: 'US',
     C: 'Commercial',
@@ -22911,8 +22911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAIRH',
     StateC: 'US',
     C: 'Commercial',
@@ -22931,8 +22931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAIRH',
     StateC: 'US',
     C: 'Commercial',
@@ -22951,8 +22951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAIR',
     StateC: 'US',
     C: 'Commercial',
@@ -22971,8 +22971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAKEL',
     StateC: 'SU',
     C: 'Commercial',
@@ -22991,8 +22991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAKEL',
     StateC: 'RU',
     C: 'Commercial',
@@ -23011,8 +23011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FANG',
     StateC: 'CN',
     C: 'Commercial',
@@ -23031,8 +23031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAIC',
     StateC: 'US',
     C: 'Military',
@@ -23044,15 +23044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -84.05,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FATAH',
     StateC: 'IQ',
     C: 'Commercial',
@@ -23071,8 +23071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FBK',
     StateC: 'US',
     C: 'Commercial',
@@ -23084,15 +23084,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.18,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FCCO',
     StateC: 'I',
     C: 'Commercial',
@@ -23104,15 +23104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 7.68,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FFLY',
     StateC: 'US',
     C: 'Commercial',
@@ -23131,8 +23131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FHWN',
     StateC: 'AT',
     C: 'Academic',
@@ -23151,8 +23151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIAN',
     StateC: 'RU',
     C: 'Academic',
@@ -23171,8 +23171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIAT',
     StateC: 'I',
     C: 'Commercial',
@@ -23191,8 +23191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BPD',
     StateC: 'I',
     C: 'Commercial',
@@ -23211,8 +23211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FING',
     StateC: 'UY',
     C: 'Academic',
@@ -23231,8 +23231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APW',
     StateC: 'D',
     C: 'Academic',
@@ -23244,15 +23244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 7.85,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIRES',
     StateC: 'US',
     C: 'Commercial',
@@ -23271,8 +23271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIRES',
     StateC: 'US',
     C: 'Commercial',
@@ -23291,8 +23291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIRMA',
     StateC: 'US',
     C: 'Commercial',
@@ -23311,8 +23311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIT',
     StateC: 'US',
     C: 'Academic',
@@ -23331,8 +23331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOM',
     StateC: 'RU',
     C: 'Government',
@@ -23351,8 +23351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKG',
     StateC: 'D',
     C: 'Military',
@@ -23371,8 +23371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKG1',
     StateC: 'D',
     C: 'Military',
@@ -23391,8 +23391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKGR11',
     StateC: 'D',
     C: 'Military',
@@ -23411,8 +23411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKGR12',
     StateC: 'D',
     C: 'Military',
@@ -23431,8 +23431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKGR13',
     StateC: 'D',
     C: 'Military',
@@ -23451,8 +23451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKG2',
     StateC: 'D',
     C: 'Military',
@@ -23471,8 +23471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKGR21',
     StateC: 'D',
     C: 'Military',
@@ -23491,8 +23491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FKGR22',
     StateC: 'D',
     C: 'Military',
@@ -23511,8 +23511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPFL',
     StateC: 'US',
     C: 'Government',
@@ -23531,8 +23531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPFL',
     StateC: 'US',
     C: 'Government',
@@ -23544,15 +23544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -80.6,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FLEET',
     StateC: 'AU',
     C: 'Commercial',
@@ -23571,8 +23571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FMI',
     StateC: 'DK',
     C: 'Military',
@@ -23591,8 +23591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FMV',
     StateC: 'S',
     C: 'Military',
@@ -23611,8 +23611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FOKK',
     StateC: 'NL',
     C: 'Commercial',
@@ -23631,8 +23631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FOKKS',
     StateC: 'NL',
     C: 'Commercial',
@@ -23651,8 +23651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FOKKS',
     StateC: 'NL',
     C: 'Commercial',
@@ -23671,8 +23671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FOKKS',
     StateC: 'NL',
     C: 'Commercial',
@@ -23691,8 +23691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -23711,8 +23711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AENUT',
     StateC: 'US',
     C: 'Commercial',
@@ -23731,8 +23731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -23751,8 +23751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORNB',
     StateC: 'US',
     C: 'Commercial',
@@ -23771,8 +23771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORNB',
     StateC: 'US',
     C: 'Commercial',
@@ -23784,15 +23784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.9,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTNF',
     StateC: 'N',
     C: 'Government',
@@ -23811,8 +23811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FOSSA',
     StateC: 'E',
     C: 'Commercial',
@@ -23831,8 +23831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FPTU',
     StateC: 'VN',
     C: 'Academic',
@@ -23851,8 +23851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FRANK',
     StateC: 'D',
     C: 'Academic',
@@ -23871,8 +23871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FRASC',
     StateC: 'I',
     C: 'Academic',
@@ -23891,8 +23891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FRC',
     StateC: 'US',
     C: 'Government',
@@ -23911,8 +23911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FREIB',
     StateC: 'D',
     C: 'Academic',
@@ -23931,8 +23931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MNF',
     StateC: 'F',
     C: 'Government',
@@ -23944,15 +23944,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.3,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KGB',
     StateC: 'RU',
     C: 'Military',
@@ -23971,8 +23971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FSU',
     StateC: 'US',
     C: 'Academic',
@@ -23991,8 +23991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FTB',
     StateC: 'US',
     C: 'Military',
@@ -24011,8 +24011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FTB2MB',
     StateC: 'US',
     C: 'Military',
@@ -24031,8 +24031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FTEL',
     StateC: 'F',
     C: 'Commercial',
@@ -24051,8 +24051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUCHS',
     StateC: 'D',
     C: 'Commercial',
@@ -24064,15 +24064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 8.8,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUDAN',
     StateC: 'CN',
     C: 'Academic',
@@ -24091,8 +24091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUKU',
     StateC: 'J',
     C: 'Academic',
@@ -24111,8 +24111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUKUI',
     StateC: 'J',
     C: 'Government',
@@ -24131,8 +24131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUSEI',
     StateC: 'J',
     C: 'Commercial',
@@ -24151,8 +24151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUTA',
     StateC: 'NG',
     C: 'Academic',
@@ -24171,8 +24171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'G2P',
     StateC: 'F',
     C: 'Commercial',
@@ -24191,8 +24191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HGS',
     StateC: 'US',
     C: 'Commercial',
@@ -24204,15 +24204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GABEN',
     StateC: 'NZ',
     C: 'Academic',
@@ -24231,8 +24231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSTUS',
     StateC: 'US',
     C: 'Commercial',
@@ -24251,8 +24251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILTEC',
     StateC: 'US',
     C: 'Commercial',
@@ -24271,8 +24271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAISH',
     StateC: 'RU',
     C: 'Academic',
@@ -24291,8 +24291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAREF',
     StateC: 'F',
     C: 'Academic',
@@ -24304,15 +24304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.3,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GASL',
     StateC: 'US',
     C: 'Commercial',
@@ -24331,8 +24331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GASL',
     StateC: 'US',
     C: 'Commercial',
@@ -24351,8 +24351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GATOM',
     StateC: 'US',
     C: 'Commercial',
@@ -24364,15 +24364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GATOM',
     StateC: 'US',
     C: 'Commercial',
@@ -24384,15 +24384,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GATOM',
     StateC: 'US',
     C: 'Commercial',
@@ -24404,15 +24404,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GATOM',
     StateC: 'US',
     C: 'Commercial',
@@ -24424,15 +24424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GATOM',
     StateC: 'US',
     C: 'Commercial',
@@ -24444,15 +24444,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAU',
     StateC: 'SU',
     C: 'Military',
@@ -24464,15 +24464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: 'MVS',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAU4',
     StateC: 'SU',
     C: 'Military',
@@ -24491,8 +24491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROGAU',
     StateC: 'I',
     C: 'Commercial',
@@ -24511,8 +24511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PROG',
     StateC: 'SU',
     C: 'Commercial',
@@ -24531,8 +24531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAZC',
     StateC: 'RU',
     C: 'Commercial',
@@ -24551,8 +24551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAZC',
     StateC: 'RU',
     C: 'Commercial',
@@ -24571,8 +24571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAI',
     StateC: 'CN',
     C: 'Government',
@@ -24591,8 +24591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GCA',
     StateC: 'US',
     C: 'Commercial',
@@ -24611,8 +24611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GCR',
     StateC: 'US',
     C: 'Commercial',
@@ -24631,8 +24631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GCRG',
     StateC: 'US',
     C: 'Commercial',
@@ -24651,8 +24651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GD',
     StateC: 'US',
     C: 'Commercial',
@@ -24664,15 +24664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.19,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDA',
     StateC: 'US',
     C: 'Commercial',
@@ -24691,8 +24691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDA',
     StateC: 'US',
     C: 'Commercial',
@@ -24711,8 +24711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONV',
     StateC: 'US',
     C: 'Commercial',
@@ -24731,8 +24731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDCLS',
     StateC: 'US',
     C: 'Commercial',
@@ -24751,8 +24751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GCDX',
     StateC: 'CN',
     C: 'Government',
@@ -24771,8 +24771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPA',
     StateC: 'US',
     C: 'Commercial',
@@ -24791,8 +24791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRC',
     StateC: 'US',
     C: 'Commercial',
@@ -24811,8 +24811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONVPO',
     StateC: 'US',
     C: 'Commercial',
@@ -24831,8 +24831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDA',
     StateC: 'US',
     C: 'Commercial',
@@ -24851,8 +24851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GECAP',
     StateC: 'UK',
     C: 'Commercial',
@@ -24871,8 +24871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GECO',
     StateC: 'US',
     C: 'Commercial',
@@ -24884,15 +24884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -73.94,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAEW',
     StateC: 'US',
     C: 'Commercial',
@@ -24911,8 +24911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GEMTS',
     StateC: 'US',
     C: 'Commercial',
@@ -24931,8 +24931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GERSD',
     StateC: 'US',
     C: 'Commercial',
@@ -24951,8 +24951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GTRC',
     StateC: 'US',
     C: 'Commercial',
@@ -24964,15 +24964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -81.67,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GEOOPT',
     StateC: 'US',
     C: 'Commercial',
@@ -24991,8 +24991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GEOST',
     StateC: 'US',
     C: 'Commercial',
@@ -25004,15 +25004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GERSD',
     StateC: 'US',
     C: 'Commercial',
@@ -25031,8 +25031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GESNY',
     StateC: 'US',
     C: 'Commercial',
@@ -25051,8 +25051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GTE',
     StateC: 'US',
     C: 'Commercial',
@@ -25064,15 +25064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.18,
     alt: 0,
     Parent: 'AMC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GEVF',
     StateC: 'US',
     C: 'Commercial',
@@ -25091,8 +25091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBI',
     StateC: 'US',
     C: 'Commercial',
@@ -25111,8 +25111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBI',
     StateC: 'US',
     C: 'Commercial',
@@ -25124,15 +25124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.39,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIMG',
     StateC: 'US',
     C: 'Commercial',
@@ -25144,15 +25144,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -104.95,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GFW',
     StateC: 'D',
     C: 'Government',
@@ -25171,8 +25171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GFZ',
     StateC: 'D',
     C: 'Academic',
@@ -25191,8 +25191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GGPEN',
     StateC: 'AO',
     C: 'Government',
@@ -25211,8 +25211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GHALAM',
     StateC: 'KZ',
     C: 'Commercial',
@@ -25231,8 +25231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GHG',
     StateC: 'CA',
     C: 'Commercial',
@@ -25251,8 +25251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GHJ',
     StateC: 'CN',
     C: 'Government',
@@ -25264,15 +25264,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GHRCE',
     StateC: 'IN',
     C: 'Academic',
@@ -25291,8 +25291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GICZ',
     StateC: 'CZ',
     C: 'Commercial',
@@ -25311,8 +25311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GIMR',
     StateC: 'US',
     C: 'Military',
@@ -25331,8 +25331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GIRD',
     StateC: 'SU',
     C: 'Military',
@@ -25344,15 +25344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GISTDA',
     StateC: 'T',
     C: 'Government',
@@ -25371,8 +25371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GIT',
     StateC: 'US',
     C: 'Academic',
@@ -25391,8 +25391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GK',
     StateC: 'SU',
     C: 'Government',
@@ -25411,8 +25411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GKLS',
     StateC: 'RU',
     C: 'Commercial',
@@ -25431,8 +25431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GKNII',
     StateC: 'SU',
     C: 'Military',
@@ -25451,8 +25451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GLOB',
     StateC: 'US',
     C: 'Commercial',
@@ -25471,8 +25471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GLOB',
     StateC: 'US',
     C: 'Commercial',
@@ -25491,8 +25491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GLOB',
     StateC: 'US',
     C: 'Commercial',
@@ -25511,8 +25511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSEDD',
     StateC: 'US',
     C: 'Commercial',
@@ -25531,8 +25531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GMKK',
     StateC: 'CN',
     C: 'Commercial',
@@ -25551,8 +25551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GMS',
     StateC: 'SU',
     C: 'Government',
@@ -25571,8 +25571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GMSCO',
     StateC: 'CN',
     C: 'Commercial',
@@ -25591,8 +25591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOBBZ',
     StateC: 'I',
     C: 'Academic',
@@ -25611,8 +25611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOBME',
     StateC: 'I',
     C: 'Academic',
@@ -25631,8 +25631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNAE',
     StateC: 'BR',
     C: 'Government',
@@ -25644,15 +25644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -43.2,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKEL',
     StateC: 'US',
     C: 'Commercial',
@@ -25671,8 +25671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOIG',
     StateC: 'SU',
     C: 'Government',
@@ -25691,8 +25691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOL2',
     StateC: 'SU',
     C: 'Military',
@@ -25704,15 +25704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.04,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOMSP',
     StateC: 'DK',
     C: 'Commercial',
@@ -25731,8 +25731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOS',
     StateC: 'D',
     C: 'Commercial',
@@ -25751,8 +25751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOYR',
     StateC: 'US',
     C: 'Commercial',
@@ -25771,8 +25771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GOYRP',
     StateC: 'US',
     C: 'Commercial',
@@ -25791,8 +25791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GPAP',
     StateC: 'I',
     C: 'Commercial',
@@ -25811,8 +25811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Military',
@@ -25824,15 +25824,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.96,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GPI',
     StateC: 'GE',
     C: 'Commercial',
@@ -25851,8 +25851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KS',
     StateC: 'SU',
     C: 'Government',
@@ -25871,8 +25871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LERC',
     StateC: 'US',
     C: 'Government',
@@ -25891,8 +25891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GRI',
     StateC: 'F',
     C: 'Government',
@@ -25911,8 +25911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRON',
     StateC: 'NL',
     C: 'Government',
@@ -25924,15 +25924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 4.48,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GRU',
     StateC: 'SU',
     C: 'Military',
@@ -25951,8 +25951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GRU',
     StateC: 'RU',
     C: 'Military',
@@ -25971,8 +25971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GRUM',
     StateC: 'US',
     C: 'Commercial',
@@ -25991,8 +25991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GSAEU',
     StateC: 'I-EU',
     C: 'Government',
@@ -26011,8 +26011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GSFC',
     StateC: 'US',
     C: 'Government',
@@ -26031,8 +26031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GSOC',
     StateC: 'D',
     C: 'Government',
@@ -26051,8 +26051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GSYU',
     StateC: 'J',
     C: 'Commercial',
@@ -26071,8 +26071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUD',
     StateC: 'F',
     C: 'Commercial',
@@ -26091,8 +26091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GTE',
     StateC: 'US',
     C: 'Commercial',
@@ -26111,8 +26111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GTRC',
     StateC: 'US',
     C: 'Commercial',
@@ -26124,15 +26124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -81.52,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUGK',
     StateC: 'SU',
     C: 'Government',
@@ -26144,15 +26144,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: 'MVD',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'SU',
     C: 'Military',
@@ -26171,8 +26171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'SU',
     C: 'Military',
@@ -26191,8 +26191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUOG',
     StateC: 'CN',
     C: 'Commercial',
@@ -26211,8 +26211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUOX',
     StateC: 'CN',
     C: 'Commercial',
@@ -26231,8 +26231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GURVO',
     StateC: 'SU',
     C: 'Military',
@@ -26251,8 +26251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GWEST',
     StateC: 'US',
     C: 'Commercial',
@@ -26271,8 +26271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GWHYZ',
     StateC: 'CN',
     C: 'Government',
@@ -26291,8 +26291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GYZ',
     StateC: 'CN',
     C: 'Government',
@@ -26311,8 +26311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GZB',
     StateC: 'CN',
     C: 'Government',
@@ -26324,15 +26324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GZB',
     StateC: 'CN',
     C: 'Government',
@@ -26351,8 +26351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAC',
     StateC: 'US',
     C: 'Commercial',
@@ -26371,8 +26371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HACES',
     StateC: 'US',
     C: 'Commercial',
@@ -26384,15 +26384,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: 'HAC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HADC',
     StateC: 'US',
     C: 'Military',
@@ -26411,8 +26411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAFB',
     StateC: 'US',
     C: 'Military',
@@ -26431,8 +26431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAL',
     StateC: 'IN',
     C: 'Commercial',
@@ -26451,8 +26451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAL5',
     StateC: 'US',
     C: 'Academic',
@@ -26471,8 +26471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAM',
     StateC: 'US',
     C: 'Military',
@@ -26491,8 +26491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HANAU',
     StateC: 'KR',
     C: 'Academic',
@@ -26511,8 +26511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HANWHA',
     StateC: 'KR',
     C: 'Commercial',
@@ -26531,8 +26531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAO',
     StateC: 'US',
     C: 'Academic',
@@ -26551,8 +26551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HARB',
     StateC: 'CN',
     C: 'Commercial',
@@ -26571,8 +26571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HARK',
     StateC: 'UA',
     C: 'Commercial',
@@ -26591,8 +26591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HANGSH',
     StateC: 'CN',
     C: 'Commercial',
@@ -26611,8 +26611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HARP',
     StateC: 'CA',
     C: 'Commercial',
@@ -26631,8 +26631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HARR',
     StateC: 'US',
     C: 'Commercial',
@@ -26651,8 +26651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HARR',
     StateC: 'US',
     C: 'Commercial',
@@ -26671,8 +26671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HASTD',
     StateC: 'US',
     C: 'Commercial',
@@ -26691,8 +26691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HASTD',
     StateC: 'US',
     C: 'Commercial',
@@ -26711,8 +26711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAVEL',
     StateC: 'TR',
     C: 'Commercial',
@@ -26731,8 +26731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HAWK',
     StateC: 'US',
     C: 'Academic',
@@ -26751,8 +26751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HBUT',
     StateC: 'CN',
     C: 'Academic',
@@ -26771,8 +26771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HCG',
     StateC: 'US',
     C: 'Commercial',
@@ -26791,8 +26791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HCI',
     StateC: 'US',
     C: 'Commercial',
@@ -26811,8 +26811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HCO',
     StateC: 'US',
     C: 'Academic',
@@ -26831,8 +26831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HCS',
     StateC: 'US',
     C: 'Commercial',
@@ -26844,15 +26844,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: 'HEC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKEL',
     StateC: 'US',
     C: 'Commercial',
@@ -26871,8 +26871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HE360',
     StateC: 'US',
     C: 'Commercial',
@@ -26891,8 +26891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HEAD',
     StateC: 'CN',
     C: 'Commercial',
@@ -26911,8 +26911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HACES',
     StateC: 'US',
     C: 'Commercial',
@@ -26924,15 +26924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANSP',
     StateC: 'US',
     C: 'Commercial',
@@ -26951,8 +26951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HEID',
     StateC: 'D',
     C: 'Academic',
@@ -26971,8 +26971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HELSA',
     StateC: 'GR',
     C: 'Commercial',
@@ -26991,8 +26991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HELSA',
     StateC: 'GR',
     C: 'Commercial',
@@ -27011,8 +27011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HELW',
     StateC: 'CA',
     C: 'Commercial',
@@ -27031,8 +27031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HELWE',
     StateC: 'CA',
     C: 'Commercial',
@@ -27044,15 +27044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -123.1,
     alt: 0,
     Parent: 'ECHOC',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HEMER',
     StateC: 'F',
     C: 'Commercial',
@@ -27071,8 +27071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HEMER',
     StateC: 'F',
     C: 'Commercial',
@@ -27091,8 +27091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HERA',
     StateC: 'US',
     C: 'Commercial',
@@ -27111,8 +27111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPR',
     StateC: 'F',
     C: 'Commercial',
@@ -27131,8 +27131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDP',
     StateC: 'F',
     C: 'Commercial',
@@ -27151,8 +27151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HERC',
     StateC: 'US',
     C: 'Commercial',
@@ -27171,8 +27171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PHILR',
     StateC: 'US',
     C: 'Commercial',
@@ -27191,8 +27191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HERCR',
     StateC: 'US',
     C: 'Commercial',
@@ -27211,8 +27211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HEXI',
     StateC: 'CN',
     C: 'Commercial',
@@ -27231,8 +27231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HEXI',
     StateC: 'CN',
     C: 'Commercial',
@@ -27251,8 +27251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HGS',
     StateC: 'US',
     C: 'Commercial',
@@ -27271,8 +27271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HGS',
     StateC: 'US',
     C: 'Commercial',
@@ -27284,15 +27284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HHJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -27311,8 +27311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HIBER',
     StateC: 'NL',
     C: 'Commercial',
@@ -27331,8 +27331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HIN',
     StateC: 'N',
     C: 'Academic',
@@ -27351,8 +27351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HISD',
     StateC: 'E',
     C: 'Commercial',
@@ -27371,8 +27371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HISP',
     StateC: 'E',
     C: 'Commercial',
@@ -27391,8 +27391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HISPM',
     StateC: 'BR',
     C: 'Commercial',
@@ -27411,8 +27411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HITS',
     StateC: 'CN',
     C: 'Academic',
@@ -27431,8 +27431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HKATG',
     StateC: 'HK',
     C: 'Commercial',
@@ -27451,8 +27451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HKKGF',
     StateC: 'CN',
     C: 'Commercial',
@@ -27471,8 +27471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HKU',
     StateC: 'HK',
     C: 'Academic',
@@ -27491,8 +27491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HNS',
     StateC: 'US',
     C: 'Commercial',
@@ -27511,8 +27511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COOP',
     StateC: 'US',
     C: 'Commercial',
@@ -27524,15 +27524,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DRG',
     StateC: 'D',
     C: 'Academic',
@@ -27551,8 +27551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HOKIT',
     StateC: 'J',
     C: 'Academic',
@@ -27571,8 +27571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HOKK',
     StateC: 'J',
     C: 'Academic',
@@ -27591,8 +27591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HONEY',
     StateC: 'US',
     C: 'Commercial',
@@ -27611,8 +27611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COMDUK',
     StateC: 'UK',
     C: 'Commercial',
@@ -27631,8 +27631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HORT',
     StateC: 'UK',
     C: 'Commercial',
@@ -27651,8 +27651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HORZ',
     StateC: 'US',
     C: 'Commercial',
@@ -27671,8 +27671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HOUS',
     StateC: 'US',
     C: 'Academic',
@@ -27691,8 +27691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HOUW',
     StateC: 'ZA',
     C: 'Commercial',
@@ -27711,8 +27711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HPS',
     StateC: 'D',
     C: 'Commercial',
@@ -27731,8 +27731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HRBS',
     StateC: 'US',
     C: 'Commercial',
@@ -27751,8 +27751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HRBS',
     StateC: 'US',
     C: 'Commercial',
@@ -27771,8 +27771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HQZS',
     StateC: 'CN',
     C: 'Academic',
@@ -27791,8 +27791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSCIL',
     StateC: 'IL',
     C: 'Academic',
@@ -27811,8 +27811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVS',
     StateC: 'UK',
     C: 'Commercial',
@@ -27831,8 +27831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSEDD',
     StateC: 'US',
     C: 'Commercial',
@@ -27851,8 +27851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSES',
     StateC: 'US',
     C: 'Commercial',
@@ -27871,8 +27871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSTM',
     StateC: 'US',
     C: 'Academic',
@@ -27891,8 +27891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HTGC',
     StateC: 'CN',
     C: 'Academic',
@@ -27911,8 +27911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HTSTL',
     StateC: 'CN',
     C: 'Academic',
@@ -27931,8 +27931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUAMI',
     StateC: 'CN',
     C: 'Commercial',
@@ -27951,8 +27951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUAZH',
     StateC: 'CN',
     C: 'Academic',
@@ -27971,8 +27971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUMS',
     StateC: 'US',
     C: 'Commercial',
@@ -27991,8 +27991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUNTE',
     StateC: 'UK',
     C: 'Commercial',
@@ -28004,15 +28004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.49,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUOYAN',
     StateC: 'CN',
     C: 'Commercial',
@@ -28031,8 +28031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDPO',
     StateC: 'US',
     C: 'Commercial',
@@ -28051,8 +28051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HVP',
     StateC: 'DR',
     C: 'Military',
@@ -28071,8 +28071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HXKJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -28091,8 +28091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HXWK',
     StateC: 'CN',
     C: 'Commercial',
@@ -28111,8 +28111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HYD',
     StateC: 'CN',
     C: 'Military',
@@ -28131,8 +28131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEOPS',
     StateC: 'US',
     C: 'Commercial',
@@ -28151,8 +28151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HYSIQ',
     StateC: 'US',
     C: 'Commercial',
@@ -28164,15 +28164,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAA',
     StateC: 'E',
     C: 'Academic',
@@ -28191,8 +28191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IACG',
     StateC: 'SU',
     C: 'Government',
@@ -28211,8 +28211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IADN',
     StateC: 'IL',
     C: 'Military',
@@ -28224,21 +28224,21 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 34.69,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAE',
     StateC: 'BR',
     C: 'Military',
     TStart: '1969 Oct',
     TStop: '',
-    name: "Instituto de Aeronautica e Espa\\'{c}o",
+    name: "Instituto de Aeronautica e Espa\\'new ControlSite({c}o",
     Location: 'Sao Jose dos Campos, Brasil',
     lat: -23.19,
     lon: -45.88,
@@ -28251,8 +28251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAF',
     StateC: 'IL',
     C: 'Military',
@@ -28271,8 +28271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAF',
     StateC: 'IL',
     C: 'Military',
@@ -28291,8 +28291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IADN',
     StateC: 'IL',
     C: 'Military',
@@ -28304,15 +28304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 34.69,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAFE',
     StateC: 'AR',
     C: 'Government',
@@ -28331,8 +28331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAI',
     StateC: 'IL',
     C: 'Commercial',
@@ -28351,8 +28351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAIS',
     StateC: 'IL',
     C: 'Commercial',
@@ -28371,8 +28371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAM',
     StateC: 'SU',
     C: 'Government',
@@ -28391,8 +28391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IAP',
     StateC: 'D',
     C: 'Academic',
@@ -28411,8 +28411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IARI',
     StateC: 'IR',
     C: 'Government',
@@ -28431,8 +28431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IASB',
     StateC: 'B',
     C: 'Academic',
@@ -28451,8 +28451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IBM',
     StateC: 'US',
     C: 'Commercial',
@@ -28464,15 +28464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -82.79,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IBMH',
     StateC: 'US',
     C: 'Commercial',
@@ -28491,8 +28491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IBSI',
     StateC: 'US',
     C: 'Commercial',
@@ -28511,8 +28511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICANS',
     StateC: 'NL',
     C: 'Commercial',
@@ -28531,8 +28531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICEUS',
     StateC: 'US',
     C: 'Commercial',
@@ -28551,8 +28551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICEYE',
     StateC: 'FI',
     C: 'Commercial',
@@ -28571,8 +28571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICO',
     StateC: 'UK',
     C: 'Commercial',
@@ -28591,8 +28591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICO',
     StateC: 'US',
     C: 'Commercial',
@@ -28611,8 +28611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICO',
     StateC: 'US',
     C: 'Commercial',
@@ -28624,15 +28624,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.19,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICONA',
     StateC: 'US',
     C: 'Commercial',
@@ -28651,8 +28651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICST',
     StateC: 'UK',
     C: 'Academic',
@@ -28671,8 +28671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICTQ',
     StateC: 'QA',
     C: 'Government',
@@ -28684,15 +28684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 51.53,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IDF',
     StateC: 'IL',
     C: 'Military',
@@ -28711,8 +28711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IDFN',
     StateC: 'IL',
     C: 'Military',
@@ -28731,8 +28731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IDG',
     StateC: 'RU',
     C: 'Government',
@@ -28751,8 +28751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IDRDL',
     StateC: 'IN',
     C: 'Military',
@@ -28771,8 +28771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IEI',
     StateC: 'IR',
     C: 'Military',
@@ -28784,15 +28784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 51.39,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IEM',
     StateC: 'SU',
     C: 'Government',
@@ -28811,8 +28811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IFAMR',
     StateC: 'D',
     C: 'Government',
@@ -28831,8 +28831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COM',
     StateC: 'US',
     C: 'Commercial',
@@ -28851,8 +28851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IHI',
     StateC: 'J',
     C: 'Commercial',
@@ -28871,8 +28871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IHI',
     StateC: 'J',
     C: 'Commercial',
@@ -28891,8 +28891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NISST',
     StateC: 'J',
     C: 'Commercial',
@@ -28911,8 +28911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUSEI',
     StateC: 'J',
     C: 'Commercial',
@@ -28931,8 +28931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IIAE',
     StateC: 'AR',
     C: 'Government',
@@ -28951,8 +28951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAS',
     StateC: 'J',
     C: 'Academic',
@@ -28964,15 +28964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.68,
     alt: 0,
     Parent: 'TOK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IISTC',
     StateC: 'J',
     C: 'Government',
@@ -28984,15 +28984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 140.12,
     alt: 0,
     Parent: 'TOK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IITB',
     StateC: 'IN',
     C: 'Academic',
@@ -29011,8 +29011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IITK',
     StateC: 'IN',
     C: 'Academic',
@@ -29031,8 +29031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IITM',
     StateC: 'IN',
     C: 'Academic',
@@ -29051,8 +29051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IITMC',
     StateC: 'IN',
     C: 'Academic',
@@ -29071,8 +29071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IK',
     StateC: 'SU',
     C: 'Government',
@@ -29091,8 +29091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IKI',
     StateC: 'SU',
     C: 'Government',
@@ -29111,8 +29111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ILC',
     StateC: 'DK',
     C: 'Government',
@@ -29131,8 +29131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDCLS',
     StateC: 'US',
     C: 'Commercial',
@@ -29151,8 +29151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ILSK',
     StateC: 'RU',
     C: 'Commercial',
@@ -29171,8 +29171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ILSL',
     StateC: 'US',
     C: 'Commercial',
@@ -29191,8 +29191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ILSL',
     StateC: 'US',
     C: 'Commercial',
@@ -29211,8 +29211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDCLS',
     StateC: 'US',
     C: 'Commercial',
@@ -29231,8 +29231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IMAG',
     StateC: 'KORS',
     C: 'Commercial',
@@ -29244,15 +29244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -68.93,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IMAGT',
     StateC: 'IL',
     C: 'Commercial',
@@ -29271,8 +29271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CERMA',
     StateC: 'F',
     C: 'Military',
@@ -29284,15 +29284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.3,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IMAX',
     StateC: 'US',
     C: 'Commercial',
@@ -29311,8 +29311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IMBP',
     StateC: 'SU',
     C: 'Government',
@@ -29331,8 +29331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IMDP',
     StateC: 'IN',
     C: 'Government',
@@ -29351,8 +29351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PIHM',
     StateC: 'PL',
     C: 'Government',
@@ -29364,15 +29364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 21.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IMICAS',
     StateC: 'CN',
     C: 'Government',
@@ -29391,8 +29391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IMIS',
     StateC: 'UK',
     C: 'Military',
@@ -29411,8 +29411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INAF',
     StateC: 'IN',
     C: 'Military',
@@ -29431,8 +29431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INASAN',
     StateC: 'RU',
     C: 'Government',
@@ -29444,15 +29444,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: 'ANRF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INAV',
     StateC: 'IN',
     C: 'Military',
@@ -29464,15 +29464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 77.21,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INAVC',
     StateC: 'IN',
     C: 'Military',
@@ -29491,8 +29491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INCO',
     StateC: 'IN',
     C: 'Government',
@@ -29511,8 +29511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VSSC',
     StateC: 'IN',
     C: 'Government',
@@ -29531,8 +29531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INDO',
     StateC: 'ID',
     C: 'Commercial',
@@ -29551,8 +29551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SINDO',
     StateC: 'ID',
     C: 'Commercial',
@@ -29571,8 +29571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SINDO',
     StateC: 'ID',
     C: 'Commercial',
@@ -29591,8 +29591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INETI',
     StateC: 'P',
     C: 'Academic',
@@ -29611,8 +29611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INFER',
     StateC: 'US',
     C: 'Commercial',
@@ -29631,8 +29631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INFOC',
     StateC: 'US',
     C: 'Commercial',
@@ -29651,8 +29651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INFK',
     StateC: 'RU',
     C: 'Commercial',
@@ -29671,8 +29671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INMAR',
     StateC: 'I-INM',
     C: 'Government',
@@ -29691,8 +29691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INMAR',
     StateC: 'UK',
     C: 'Commercial',
@@ -29711,8 +29711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CNAE',
     StateC: 'BR',
     C: 'Government',
@@ -29731,8 +29731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INPES',
     StateC: 'BR',
     C: 'Government',
@@ -29751,8 +29751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INSP4',
     StateC: 'US',
     C: 'Commercial',
@@ -29771,8 +29771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INSPM',
     StateC: 'UK',
     C: 'Commercial',
@@ -29791,8 +29791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INSSET',
     StateC: 'F',
     C: 'Academic',
@@ -29811,8 +29811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUNTE',
     StateC: 'UK',
     C: 'Commercial',
@@ -29831,8 +29831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INTA',
     StateC: 'E',
     C: 'Government',
@@ -29851,8 +29851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INTEL',
     StateC: 'I-INT',
     C: 'Government',
@@ -29871,8 +29871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INTELB',
     StateC: 'BM',
     C: 'Commercial',
@@ -29891,8 +29891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INTELD',
     StateC: 'US',
     C: 'Commercial',
@@ -29904,15 +29904,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'INTELB',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INTELB',
     StateC: 'L',
     C: 'Commercial',
@@ -29931,8 +29931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INTELD',
     StateC: 'US',
     C: 'Commercial',
@@ -29951,8 +29951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'INVAP',
     StateC: 'AR',
     C: 'Commercial',
@@ -29971,8 +29971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IOS',
     StateC: 'US',
     C: 'Commercial',
@@ -29991,8 +29991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IOWASU',
     StateC: 'US',
     C: 'Academic',
@@ -30011,8 +30011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IPN',
     StateC: 'MX',
     C: 'Academic',
@@ -30031,8 +30031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IPSF',
     StateC: 'US',
     C: 'Academic',
@@ -30051,8 +30051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'APW',
     StateC: 'D',
     C: 'Academic',
@@ -30064,15 +30064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 7.85,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IQ223',
     StateC: 'IQ',
     C: 'Military',
@@ -30091,8 +30091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IQ224',
     StateC: 'IQ',
     C: 'Military',
@@ -30111,8 +30111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IQA',
     StateC: 'IQ',
     C: 'Military',
@@ -30131,8 +30131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOTI',
     StateC: 'IQ',
     C: 'Military',
@@ -30151,8 +30151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IQMOST',
     StateC: 'IQ',
     C: 'Government',
@@ -30171,8 +30171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KGO',
     StateC: 'S',
     C: 'Government',
@@ -30191,8 +30191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UIO',
     StateC: 'S',
     C: 'Government',
@@ -30204,15 +30204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 17.64,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IRGC',
     StateC: 'IR',
     C: 'Military',
@@ -30231,8 +30231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IRID',
     StateC: 'US',
     C: 'Commercial',
@@ -30251,8 +30251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IRID',
     StateC: 'US',
     C: 'Commercial',
@@ -30271,8 +30271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IRMB',
     StateC: 'B',
     C: 'Academic',
@@ -30284,15 +30284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 4.33,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IROST',
     StateC: 'IR',
     C: 'Government',
@@ -30311,8 +30311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IRSA',
     StateC: 'IR',
     C: 'Military',
@@ -30331,8 +30331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IRSS',
     StateC: 'D',
     C: 'Academic',
@@ -30351,8 +30351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISA',
     StateC: 'IL',
     C: 'Government',
@@ -30371,8 +30371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAC',
     StateC: 'IN',
     C: 'Government',
@@ -30391,8 +30391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISACA',
     StateC: 'IN',
     C: 'Government',
@@ -30404,15 +30404,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 72.58,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUPAER',
     StateC: 'F',
     C: 'Academic',
@@ -30431,8 +30431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAEV',
     StateC: 'SU',
     C: 'Commercial',
@@ -30451,8 +30451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAS',
     StateC: 'J',
     C: 'Government',
@@ -30471,8 +30471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAS',
     StateC: 'J',
     C: 'Government',
@@ -30491,8 +30491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAS',
     StateC: 'J',
     C: 'Government',
@@ -30511,8 +30511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAS',
     StateC: 'J',
     C: 'Government',
@@ -30531,8 +30531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISCAS',
     StateC: 'CN',
     C: 'Government',
@@ -30551,8 +30551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISFC',
     StateC: 'IN',
     C: 'Military',
@@ -30571,8 +30571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISIL',
     StateC: 'NL',
     C: 'Commercial',
@@ -30591,8 +30591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISISBV',
     StateC: 'NL',
     C: 'Commercial',
@@ -30611,8 +30611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISKRM',
     StateC: 'RU',
     C: 'Commercial',
@@ -30631,8 +30631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISKRP',
     StateC: 'RU',
     C: 'Commercial',
@@ -30651,8 +30651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISKY',
     StateC: 'CZ',
     C: 'Commercial',
@@ -30671,8 +30671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISPUT',
     StateC: 'SU',
     C: 'Government',
@@ -30691,8 +30691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISRA',
     StateC: 'SD',
     C: 'Government',
@@ -30711,8 +30711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISRO',
     StateC: 'IN',
     C: 'Government',
@@ -30731,8 +30731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VSSC',
     StateC: 'IN',
     C: 'Government',
@@ -30744,15 +30744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 76.87,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IST',
     StateC: 'J',
     C: 'Commercial',
@@ -30771,8 +30771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISTPK',
     StateC: 'PK',
     C: 'Academic',
@@ -30791,8 +30791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ITA',
     StateC: 'BR',
     C: 'Commercial',
@@ -30811,8 +30811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ITBW',
     StateC: 'D',
     C: 'Military',
@@ -30831,8 +30831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ITCR',
     StateC: 'CR',
     C: 'Academic',
@@ -30851,8 +30851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ITRC',
     StateC: 'IR',
     C: 'Government',
@@ -30871,8 +30871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RNII',
     StateC: 'RU',
     C: 'Government',
@@ -30884,15 +30884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.5,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ITT',
     StateC: 'US',
     C: 'Commercial',
@@ -30911,8 +30911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ITUTR',
     StateC: 'TR',
     C: 'Academic',
@@ -30931,8 +30931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IUST',
     StateC: 'IR',
     C: 'Academic',
@@ -30951,8 +30951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IZM',
     StateC: 'SU',
     C: 'Government',
@@ -30971,8 +30971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JNSIC',
     StateC: 'CN',
     C: 'Military',
@@ -30984,15 +30984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 106.9,
     alt: 0,
     Parent: 'CASIC4A',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JARL',
     StateC: 'J',
     C: 'Academic',
@@ -31011,8 +31011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASDA',
     StateC: 'J',
     C: 'Government',
@@ -31031,8 +31031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAL',
     StateC: 'J',
     C: 'Government',
@@ -31051,8 +31051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JBO',
     StateC: 'UK',
     C: 'Academic',
@@ -31071,8 +31071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JCAB',
     StateC: 'J',
     C: 'Government',
@@ -31091,8 +31091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JCSAT',
     StateC: 'J',
     C: 'Commercial',
@@ -31111,8 +31111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JDA',
     StateC: 'J',
     C: 'Military',
@@ -31131,8 +31131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JENA',
     StateC: 'D',
     C: 'Commercial',
@@ -31151,8 +31151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JENA',
     StateC: 'D',
     C: 'Commercial',
@@ -31171,8 +31171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAI',
     StateC: 'CN',
     C: 'Government',
@@ -31191,8 +31191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JHU',
     StateC: 'US',
     C: 'Academic',
@@ -31211,8 +31211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JIHUA',
     StateC: 'CN',
     C: 'Government',
@@ -31231,8 +31231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JIT',
     StateC: 'IN',
     C: 'Academic',
@@ -31251,8 +31251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JIUT',
     StateC: 'CN',
     C: 'Commercial',
@@ -31271,8 +31271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JKY',
     StateC: 'CN',
     C: 'Military',
@@ -31291,8 +31291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JMA',
     StateC: 'J',
     C: 'Government',
@@ -31311,8 +31311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JMASC',
     StateC: 'J',
     C: 'Government',
@@ -31324,15 +31324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.53,
     alt: 0,
     Parent: 'JMA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JMSDF',
     StateC: 'J',
     C: 'Military',
@@ -31351,8 +31351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JMSDMA',
     StateC: 'J',
     C: 'Military',
@@ -31371,8 +31371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JMSDSA',
     StateC: 'J',
     C: 'Military',
@@ -31391,8 +31391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JMSDYO',
     StateC: 'J',
     C: 'Military',
@@ -31411,8 +31411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDAIOC',
     StateC: 'US',
     C: 'Military',
@@ -31424,15 +31424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -104.52,
     alt: 0,
     Parent: 'MDA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JNSIC',
     StateC: 'CN',
     C: 'Military',
@@ -31444,15 +31444,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -106.9,
     alt: 0,
     Parent: 'CASIC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JPL',
     StateC: 'US',
     C: 'Government',
@@ -31471,8 +31471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JPL',
     StateC: 'US',
     C: 'Military',
@@ -31491,8 +31491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JRG',
     StateC: 'KP',
     C: 'Military',
@@ -31511,8 +31511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JCSAT',
     StateC: 'J',
     C: 'Commercial',
@@ -31531,8 +31531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JSC',
     StateC: 'US',
     C: 'Government',
@@ -31551,8 +31551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JSCAO',
     StateC: 'US',
     C: 'Government',
@@ -31571,8 +31571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASDA',
     StateC: 'J',
     C: 'Government',
@@ -31591,8 +31591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USEF',
     StateC: 'J',
     C: 'Commercial',
@@ -31611,8 +31611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JTF7',
     StateC: 'US',
     C: 'Military',
@@ -31631,8 +31631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JUNK',
     StateC: 'D',
     C: 'Commercial',
@@ -31651,8 +31651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JUNO',
     StateC: 'UK',
     C: 'Commercial',
@@ -31671,8 +31671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JUST',
     StateC: 'JO',
     C: 'Academic',
@@ -31691,8 +31691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KACBS',
     StateC: 'SG',
     C: 'Commercial',
@@ -31711,8 +31711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KACST',
     StateC: 'SA',
     C: 'Government',
@@ -31731,8 +31731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAFA',
     StateC: 'KR',
     C: 'Military',
@@ -31751,8 +31751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAGA',
     StateC: 'J',
     C: 'Academic',
@@ -31771,8 +31771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAGO',
     StateC: 'J',
     C: 'Academic',
@@ -31791,8 +31791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAI',
     StateC: 'SU',
     C: 'Commercial',
@@ -31811,8 +31811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAI',
     StateC: 'SU',
     C: 'Commercial',
@@ -31831,8 +31831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAIFW',
     StateC: 'US',
     C: 'Commercial',
@@ -31851,8 +31851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAISR',
     StateC: 'KR',
     C: 'Government',
@@ -31871,8 +31871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAIST',
     StateC: 'KR',
     C: 'Government',
@@ -31891,8 +31891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAIT',
     StateC: 'J',
     C: 'Academic',
@@ -31911,8 +31911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KARI',
     StateC: 'KR',
     C: 'Government',
@@ -31931,8 +31931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRL',
     StateC: 'J',
     C: 'Government',
@@ -31951,8 +31951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAWA',
     StateC: 'J',
     C: 'Commercial',
@@ -31971,8 +31971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAZAF',
     StateC: 'KZ',
     C: 'Military',
@@ -31991,8 +31991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAZK',
     StateC: 'KZ',
     C: 'Government',
@@ -32011,8 +32011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAZNU',
     StateC: 'KZ',
     C: 'Academic',
@@ -32031,8 +32031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAZSOY',
     StateC: 'SU',
     C: 'Government',
@@ -32051,8 +32051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAZSOY',
     StateC: 'SU',
     C: 'Government',
@@ -32071,8 +32071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOMET',
     StateC: 'SU',
     C: 'Government',
@@ -32091,8 +32091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMASH',
     StateC: 'RU',
     C: 'Government',
@@ -32111,8 +32111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMASH',
     StateC: 'RU',
     C: 'Government',
@@ -32131,8 +32131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KBKHA',
     StateC: 'RU',
     C: 'Government',
@@ -32151,8 +32151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KBM',
     StateC: 'SU',
     C: 'Government',
@@ -32171,8 +32171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KBPT',
     StateC: 'SU',
     C: 'Government',
@@ -32191,8 +32191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB23',
     StateC: 'RU',
     C: 'Government',
@@ -32211,8 +32211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KCHT',
     StateC: 'CN',
     C: 'Commercial',
@@ -32231,8 +32231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KCST',
     StateC: 'KP',
     C: 'Military',
@@ -32251,8 +32251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KEIO',
     StateC: 'J',
     C: 'Academic',
@@ -32271,8 +32271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KEPLER',
     StateC: 'CA',
     C: 'Commercial',
@@ -32291,8 +32291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KEPWU',
     StateC: 'CN',
     C: 'Commercial',
@@ -32311,8 +32311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KGB',
     StateC: 'SU',
     C: 'Military',
@@ -32324,15 +32324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KGO',
     StateC: 'S',
     C: 'Government',
@@ -32351,8 +32351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KGO',
     StateC: 'S',
     C: 'Government',
@@ -32371,8 +32371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAEV',
     StateC: 'SU',
     C: 'Government',
@@ -32391,8 +32391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KHRU',
     StateC: 'RU',
     C: 'Government',
@@ -32411,8 +32411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KHRU',
     StateC: 'RU',
     C: 'Government',
@@ -32431,8 +32431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB23',
     StateC: 'RU',
     C: 'Government',
@@ -32451,8 +32451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KHRU',
     StateC: 'RU',
     C: 'Government',
@@ -32471,8 +32471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KHUS',
     StateC: 'KR',
     C: 'Academic',
@@ -32491,8 +32491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KIEL',
     StateC: 'D',
     C: 'Academic',
@@ -32511,8 +32511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KLEO',
     StateC: 'D',
     C: 'Commercial',
@@ -32531,8 +32531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KLEOS',
     StateC: 'L',
     C: 'Commercial',
@@ -32551,8 +32551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB117',
     StateC: 'SU',
     C: 'Commercial',
@@ -32571,8 +32571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARQ',
     StateC: 'US',
     C: 'Commercial',
@@ -32591,8 +32591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KMIT',
     StateC: 'RU',
     C: 'Commercial',
@@ -32611,8 +32611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KMUTNB',
     StateC: 'T',
     C: 'Academic',
@@ -32631,8 +32631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOBE',
     StateC: 'J',
     C: 'Academic',
@@ -32651,8 +32651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOBN',
     StateC: 'DK',
     C: 'Academic',
@@ -32671,8 +32671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOCHI',
     StateC: 'J',
     C: 'Academic',
@@ -32691,8 +32691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOLN',
     StateC: 'D',
     C: 'Academic',
@@ -32711,8 +32711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOMET',
     StateC: 'SU',
     C: 'Commercial',
@@ -32731,8 +32731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KONK',
     StateC: 'HU',
     C: 'Academic',
@@ -32751,8 +32751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOKT',
     StateC: 'RU',
     C: 'Commercial',
@@ -32771,8 +32771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOSMT',
     StateC: 'RU',
     C: 'Commercial',
@@ -32791,8 +32791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KOUKO',
     StateC: 'J',
     C: 'Academic',
@@ -32811,8 +32811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KPA',
     StateC: 'KP',
     C: 'Military',
@@ -32831,8 +32831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JRG',
     StateC: 'KP',
     C: 'Military',
@@ -32851,8 +32851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KPI',
     StateC: 'UA',
     C: 'Academic',
@@ -32871,8 +32871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KPNO',
     StateC: 'US',
     C: 'Academic',
@@ -32891,8 +32891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KQN',
     StateC: 'VN',
     C: 'Military',
@@ -32911,8 +32911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KRAI',
     StateC: 'KR',
     C: 'Commercial',
@@ -32931,8 +32931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KRAK',
     StateC: 'PL',
     C: 'Academic',
@@ -32951,8 +32951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KRAS',
     StateC: 'RU',
     C: 'Commercial',
@@ -32971,8 +32971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KRAT',
     StateC: 'US',
     C: 'Commercial',
@@ -32991,8 +32991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HANAU',
     StateC: 'KR',
     C: 'Academic',
@@ -33011,8 +33011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KRLP',
     StateC: 'PK',
     C: 'Military',
@@ -33031,8 +33031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KS',
     StateC: 'RU',
     C: 'Commercial',
@@ -33051,8 +33051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KSC',
     StateC: 'US',
     C: 'Government',
@@ -33071,8 +33071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KSU',
     StateC: 'SA',
     C: 'Academic',
@@ -33091,8 +33091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KTEL',
     StateC: 'KR',
     C: 'Commercial',
@@ -33111,8 +33111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KTEL',
     StateC: 'KR',
     C: 'Commercial',
@@ -33124,15 +33124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 127.12,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KTH',
     StateC: 'S',
     C: 'Academic',
@@ -33151,8 +33151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KTHR',
     StateC: 'D',
     C: 'Commercial',
@@ -33171,8 +33171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KTRAS',
     StateC: 'RU',
     C: 'Commercial',
@@ -33191,8 +33191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KTSAT',
     StateC: 'KR',
     C: 'Commercial',
@@ -33211,8 +33211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KTU',
     StateC: 'LT',
     C: 'Academic',
@@ -33231,8 +33231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KUBOS',
     StateC: 'IS',
     C: 'Commercial',
@@ -33244,15 +33244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.13,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NKE',
     StateC: 'SU',
     C: 'Commercial',
@@ -33271,8 +33271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'RU',
     C: 'Military',
@@ -33291,8 +33291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KYO',
     StateC: 'J',
     C: 'Academic',
@@ -33311,8 +33311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KYSP',
     StateC: 'US',
     C: 'Academic',
@@ -33331,8 +33331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KYUD',
     StateC: 'J',
     C: 'Academic',
@@ -33351,8 +33351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KYUT',
     StateC: 'J',
     C: 'Academic',
@@ -33371,8 +33371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSEDD',
     StateC: 'US',
     C: 'Commercial',
@@ -33391,8 +33391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSEDD',
     StateC: 'US',
     C: 'Commercial',
@@ -33411,8 +33411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HSEDD',
     StateC: 'US',
     C: 'Commercial',
@@ -33431,8 +33431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LAC',
     StateC: 'US',
     C: 'Commercial',
@@ -33451,8 +33451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LACMA',
     StateC: 'US',
     C: 'Academic',
@@ -33471,8 +33471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LACU',
     StateC: 'UK',
     C: 'Commercial',
@@ -33491,8 +33491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LAMBDA',
     StateC: 'US',
     C: 'Academic',
@@ -33511,8 +33511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LANAST',
     StateC: 'LA',
     C: 'Government',
@@ -33531,8 +33531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LAND',
     StateC: 'CN',
     C: 'Commercial',
@@ -33551,8 +33551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LANDSP',
     StateC: 'CN',
     C: 'Commercial',
@@ -33571,8 +33571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LASL',
     StateC: 'US',
     C: 'Military',
@@ -33591,8 +33591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LAOJV',
     StateC: 'LA',
     C: 'Commercial',
@@ -33604,15 +33604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 102.6,
     alt: 0,
     Parent: 'LANAST',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LAPAN',
     StateC: 'ID',
     C: 'Government',
@@ -33631,8 +33631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LAPANR',
     StateC: 'ID',
     C: 'Government',
@@ -33644,15 +33644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 107.89,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LARC',
     StateC: 'US',
     C: 'Government',
@@ -33671,8 +33671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LARC',
     StateC: 'US',
     C: 'Government',
@@ -33691,8 +33691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LARCNE',
     StateC: 'US',
     C: 'Government',
@@ -33711,8 +33711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LAS',
     StateC: 'F',
     C: 'Academic',
@@ -33731,8 +33731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LASL',
     StateC: 'US',
     C: 'Military',
@@ -33751,8 +33751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AERON',
     StateC: 'F',
     C: 'Government',
@@ -33771,8 +33771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LCFE',
     StateC: 'US',
     C: 'Commercial',
@@ -33791,8 +33791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LCT',
     StateC: 'F',
     C: 'Government',
@@ -33811,8 +33811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LDSE',
     StateC: 'CN',
     C: 'Government',
@@ -33831,8 +33831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LEEDS',
     StateC: 'UK',
     C: 'Academic',
@@ -33851,8 +33851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PMOOS',
     StateC: 'US',
     C: 'Commercial',
@@ -33871,8 +33871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LEID',
     StateC: 'NL',
     C: 'Academic',
@@ -33891,8 +33891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EOS',
     StateC: 'US',
     C: 'Commercial',
@@ -33904,15 +33904,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.13,
     alt: 0,
     Parent: 'LORC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LEOSTL',
     StateC: 'US',
     C: 'Commercial',
@@ -33931,8 +33931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LERC',
     StateC: 'US',
     C: 'Government',
@@ -33951,8 +33951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LFLT',
     StateC: 'CN',
     C: 'Commercial',
@@ -33971,8 +33971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LGAR',
     StateC: 'US',
     C: 'Commercial',
@@ -33991,8 +33991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LIBRE',
     StateC: 'GR',
     C: 'Academic',
@@ -34011,8 +34011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LIDA',
     StateC: 'CN',
     C: 'Commercial',
@@ -34031,8 +34031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LIEGE',
     StateC: 'B',
     C: 'Academic',
@@ -34051,8 +34051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYTC',
     StateC: 'US',
     C: 'Commercial',
@@ -34064,15 +34064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.35,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYTCA',
     StateC: 'CA',
     C: 'Commercial',
@@ -34084,15 +34084,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -75.61,
     alt: 0,
     Parent: 'LIGA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LII',
     StateC: 'RU',
     C: 'Military',
@@ -34111,8 +34111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LINA',
     StateC: 'US',
     C: 'Commercial',
@@ -34131,8 +34131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LINAO',
     StateC: 'DD',
     C: 'Government',
@@ -34151,8 +34151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LINGZ',
     StateC: 'CN',
     C: 'Commercial',
@@ -34171,8 +34171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LINK',
     StateC: 'CN',
     C: 'Commercial',
@@ -34191,8 +34191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LIZH',
     StateC: 'CN',
     C: 'Commercial',
@@ -34211,8 +34211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LKA',
     StateC: 'LT',
     C: 'Academic',
@@ -34231,8 +34231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LRL',
     StateC: 'US',
     C: 'Military',
@@ -34251,8 +34251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LRL',
     StateC: 'US',
     C: 'Military',
@@ -34271,8 +34271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LM',
     StateC: 'US',
     C: 'Commercial',
@@ -34291,8 +34291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTD',
     StateC: 'US',
     C: 'Commercial',
@@ -34311,8 +34311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONV',
     StateC: 'US',
     C: 'Commercial',
@@ -34331,8 +34331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPARL',
     StateC: 'US',
     C: 'Commercial',
@@ -34344,15 +34344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.14,
     alt: 0,
     Parent: 'LM',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMCO',
     StateC: 'US',
     C: 'Commercial',
@@ -34371,8 +34371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COM',
     StateC: 'US',
     C: 'Commercial',
@@ -34384,15 +34384,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'LM',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTVCAM',
     StateC: 'US',
     C: 'Commercial',
@@ -34411,8 +34411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDCLS',
     StateC: 'US',
     C: 'Commercial',
@@ -34431,8 +34431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMCSS',
     StateC: 'US',
     C: 'Commercial',
@@ -34451,8 +34451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAEW',
     StateC: 'US',
     C: 'Commercial',
@@ -34471,8 +34471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMGT',
     StateC: 'US',
     C: 'Commercial',
@@ -34484,15 +34484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.04,
     alt: 0,
     Parent: 'LM',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMKSC',
     StateC: 'US',
     C: 'Commercial',
@@ -34511,8 +34511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMI',
     StateC: 'UK',
     C: 'Commercial',
@@ -34531,8 +34531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUNTE',
     StateC: 'UK',
     C: 'Commercial',
@@ -34544,15 +34544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.49,
     alt: 0,
     Parent: 'LM',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MMMI',
     StateC: 'US',
     C: 'Commercial',
@@ -34571,8 +34571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTV',
     StateC: 'US',
     C: 'Commercial',
@@ -34584,15 +34584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.02,
     alt: 0,
     Parent: 'LM',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMSC',
     StateC: 'US',
     C: 'Commercial',
@@ -34611,8 +34611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMN',
     StateC: 'US',
     C: 'Commercial',
@@ -34631,8 +34631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTO',
     StateC: 'US',
     C: 'Commercial',
@@ -34644,15 +34644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -81.38,
     alt: 0,
     Parent: 'LM',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MMPCO',
     StateC: 'US',
     C: 'Commercial',
@@ -34671,8 +34671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPPLM',
     StateC: 'US',
     C: 'Commercial',
@@ -34691,8 +34691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMSAL',
     StateC: 'US',
     C: 'Commercial',
@@ -34711,8 +34711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SANH',
     StateC: 'US',
     C: 'Commercial',
@@ -34724,15 +34724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.46,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMSC',
     StateC: 'US',
     C: 'Commercial',
@@ -34751,8 +34751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMSCV',
     StateC: 'US',
     C: 'Commercial',
@@ -34771,8 +34771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMSC',
     StateC: 'US',
     C: 'Commercial',
@@ -34791,8 +34791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATECH',
     StateC: 'US',
     C: 'Commercial',
@@ -34804,15 +34804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -80.82,
     alt: 0,
     Parent: 'SHAB',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMSC',
     StateC: 'US',
     C: 'Commercial',
@@ -34831,8 +34831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTD',
     StateC: 'US',
     C: 'Commercial',
@@ -34851,8 +34851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LMT',
     StateC: 'US',
     C: 'Commercial',
@@ -34871,8 +34871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAEW',
     StateC: 'US',
     C: 'Commercial',
@@ -34891,8 +34891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTV',
     StateC: 'US',
     C: 'Commercial',
@@ -34904,15 +34904,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GEVF',
     StateC: 'US',
     C: 'Commercial',
@@ -34931,8 +34931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LOFT',
     StateC: 'US',
     C: 'Commercial',
@@ -34951,8 +34951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -34971,8 +34971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LORC',
     StateC: 'US',
     C: 'Commercial',
@@ -34984,15 +34984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.01,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORI',
     StateC: 'US',
     C: 'Commercial',
@@ -35011,8 +35011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LORC',
     StateC: 'US',
     C: 'Commercial',
@@ -35024,15 +35024,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.01,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPA',
     StateC: 'F',
     C: 'Government',
@@ -35051,8 +35051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPARL',
     StateC: 'US',
     C: 'Commercial',
@@ -35071,8 +35071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GCR',
     StateC: 'US',
     C: 'Commercial',
@@ -35091,8 +35091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPCE',
     StateC: 'F',
     C: 'Academic',
@@ -35104,15 +35104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 1.93,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPI',
     StateC: 'US',
     C: 'Academic',
@@ -35124,15 +35124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPSC',
     StateC: 'IN',
     C: 'Government',
@@ -35151,8 +35151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPSCM',
     StateC: 'IN',
     C: 'Government',
@@ -35171,8 +35171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LPSP',
     StateC: 'F',
     C: 'Government',
@@ -35191,8 +35191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LRBA',
     StateC: 'F',
     C: 'Government',
@@ -35211,8 +35211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LRL',
     StateC: 'US',
     C: 'Military',
@@ -35231,8 +35231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LRPG',
     StateC: 'US',
     C: 'Unknown',
@@ -35251,8 +35251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LRRC',
     StateC: 'US',
     C: 'Unknown',
@@ -35271,8 +35271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LRS',
     StateC: 'LB',
     C: 'Government',
@@ -35291,8 +35291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WRE',
     StateC: 'AU',
     C: 'Military',
@@ -35304,15 +35304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 138.64,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LSK',
     StateC: 'DD',
     C: 'Military',
@@ -35331,8 +35331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATTS',
     StateC: 'US',
     C: 'Commercial',
@@ -35351,8 +35351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LSKYB',
     StateC: 'BR',
     C: 'Commercial',
@@ -35371,8 +35371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LSPHZ',
     StateC: 'CN',
     C: 'Commercial',
@@ -35391,8 +35391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYTC',
     StateC: 'US',
     C: 'Commercial',
@@ -35404,15 +35404,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.01,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYTCA',
     StateC: 'CA',
     C: 'Commercial',
@@ -35424,15 +35424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -75.61,
     alt: 0,
     Parent: 'MSV',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTU',
     StateC: 'S',
     C: 'Academic',
@@ -35451,8 +35451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTV',
     StateC: 'US',
     C: 'Commercial',
@@ -35471,8 +35471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTVCAM',
     StateC: 'US',
     C: 'Commercial',
@@ -35491,8 +35491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTVE',
     StateC: 'US',
     C: 'Commercial',
@@ -35511,8 +35511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTVM',
     StateC: 'US',
     C: 'Commercial',
@@ -35531,8 +35531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTV',
     StateC: 'US',
     C: 'Commercial',
@@ -35544,15 +35544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELM',
     StateC: 'B',
     C: 'Military',
@@ -35571,8 +35571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LUHAN',
     StateC: 'KR',
     C: 'Commercial',
@@ -35591,8 +35591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LULRZ',
     StateC: 'CN',
     C: 'Government',
@@ -35604,15 +35604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 111.15,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LUND',
     StateC: 'S',
     C: 'Academic',
@@ -35631,8 +35631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LUX',
     StateC: 'UK',
     C: 'Academic',
@@ -35651,8 +35651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LUXG',
     StateC: 'L',
     C: 'Commercial',
@@ -35671,8 +35671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LUXS',
     StateC: 'L',
     C: 'Commercial',
@@ -35691,8 +35691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTV',
     StateC: 'US',
     C: 'Commercial',
@@ -35704,15 +35704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.02,
     alt: 0,
     Parent: 'LORC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LVN',
     StateC: 'US',
     C: 'Commercial',
@@ -35731,8 +35731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LW',
     StateC: 'D',
     C: 'Military',
@@ -35751,8 +35751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LYK',
     StateC: 'CN',
     C: 'Commercial',
@@ -35771,8 +35771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UBIQ',
     StateC: 'US',
     C: 'Commercial',
@@ -35791,8 +35791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'M42',
     StateC: 'US',
     C: 'Commercial',
@@ -35811,8 +35811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAEU',
     StateC: 'MYM',
     C: 'Academic',
@@ -35831,8 +35831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAGL',
     StateC: 'HU',
     C: 'Military',
@@ -35851,8 +35851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAI',
     StateC: 'CN',
     C: 'Government',
@@ -35871,8 +35871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAI',
     StateC: 'CN',
     C: 'Government',
@@ -35891,8 +35891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAIMD',
     StateC: 'US',
     C: 'Commercial',
@@ -35911,8 +35911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAIO',
     StateC: 'SU',
     C: 'Government',
@@ -35931,8 +35931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKB385',
     StateC: 'RU',
     C: 'Government',
@@ -35951,8 +35951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MANU',
     StateC: 'UK',
     C: 'Academic',
@@ -35971,8 +35971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAOW',
     StateC: 'CN',
     C: 'Commercial',
@@ -35991,8 +35991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARCO',
     StateC: 'UK',
     C: 'Commercial',
@@ -36011,8 +36011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARINT',
     StateC: 'UAE',
     C: 'Commercial',
@@ -36031,8 +36031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARQ',
     StateC: 'US',
     C: 'Commercial',
@@ -36051,8 +36051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARQO',
     StateC: 'US',
     C: 'Commercial',
@@ -36071,8 +36071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTB',
     StateC: 'US',
     C: 'Commercial',
@@ -36091,8 +36091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTD',
     StateC: 'US',
     C: 'Commercial',
@@ -36111,8 +36111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTO',
     StateC: 'US',
     C: 'Commercial',
@@ -36131,8 +36131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MASDAR',
     StateC: 'UAE',
     C: 'Academic',
@@ -36151,8 +36151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MASDAR',
     StateC: 'UAE',
     C: 'Academic',
@@ -36171,8 +36171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MASTEN',
     StateC: 'US',
     C: 'Commercial',
@@ -36191,8 +36191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MATRA',
     StateC: 'F',
     C: 'Commercial',
@@ -36211,8 +36211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MATT',
     StateC: 'F',
     C: 'Commercial',
@@ -36231,8 +36231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MATV',
     StateC: 'F',
     C: 'Commercial',
@@ -36251,8 +36251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAV',
     StateC: 'US',
     C: 'Commercial',
@@ -36271,8 +36271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDABC',
     StateC: 'CA',
     C: 'Commercial',
@@ -36291,8 +36291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAR',
     StateC: 'CA',
     C: 'Commercial',
@@ -36311,8 +36311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPARM',
     StateC: 'CA',
     C: 'Commercial',
@@ -36331,8 +36331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MAXSJ',
     StateC: 'US',
     C: 'Commercial',
@@ -36351,8 +36351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -36371,8 +36371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MBAK',
     StateC: 'UK',
     C: 'Commercial',
@@ -36391,8 +36391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BOLK',
     StateC: 'D',
     C: 'Commercial',
@@ -36411,8 +36411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ERNO',
     StateC: 'D',
     C: 'Commercial',
@@ -36431,8 +36431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JUNK',
     StateC: 'D',
     C: 'Commercial',
@@ -36451,8 +36451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MBCO',
     StateC: 'J',
     C: 'Commercial',
@@ -36471,8 +36471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EIAST',
     StateC: 'UAE',
     C: 'Government',
@@ -36491,8 +36491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MCDA',
     StateC: 'US',
     C: 'Commercial',
@@ -36511,8 +36511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MCI',
     StateC: 'US',
     C: 'Commercial',
@@ -36531,8 +36531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFMCSW',
     StateC: 'US',
     C: 'Military',
@@ -36551,8 +36551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDIO',
     StateC: 'US',
     C: 'Military',
@@ -36571,8 +36571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DACHB',
     StateC: 'US',
     C: 'Commercial',
@@ -36591,8 +36591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDAIOC',
     StateC: 'US',
     C: 'Military',
@@ -36604,15 +36604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -104.52,
     alt: 0,
     Parent: 'MDA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPARM',
     StateC: 'CA',
     C: 'Commercial',
@@ -36631,8 +36631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDABC',
     StateC: 'CA',
     C: 'Commercial',
@@ -36651,8 +36651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MCDA',
     StateC: 'US',
     C: 'Commercial',
@@ -36671,8 +36671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDATH',
     StateC: 'US',
     C: 'Military',
@@ -36691,8 +36691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDAUK',
     StateC: 'UK',
     C: 'Commercial',
@@ -36711,8 +36711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDC',
     StateC: 'US',
     C: 'Commercial',
@@ -36724,15 +36724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -90.2,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDD',
     StateC: 'DD',
     C: 'Government',
@@ -36751,8 +36751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDDI',
     StateC: 'I',
     C: 'Military',
@@ -36771,8 +36771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDHSV',
     StateC: 'US',
     C: 'Commercial',
@@ -36791,8 +36791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDPE',
     StateC: 'PE',
     C: 'Military',
@@ -36811,8 +36811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAR',
     StateC: 'CA',
     C: 'Commercial',
@@ -36831,8 +36831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MDSSC',
     StateC: 'US',
     C: 'Commercial',
@@ -36851,8 +36851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BINA',
     StateC: 'MY',
     C: 'Commercial',
@@ -36871,8 +36871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MEGS',
     StateC: 'I',
     C: 'Commercial',
@@ -36891,8 +36891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MEI',
     StateC: 'SU',
     C: 'Academic',
@@ -36911,8 +36911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MEISEI',
     StateC: 'J',
     C: 'Commercial',
@@ -36931,8 +36931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MUNIZ',
     StateC: 'US',
     C: 'Commercial',
@@ -36951,8 +36951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MUNIZ',
     StateC: 'US',
     C: 'Commercial',
@@ -36971,8 +36971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MELB',
     StateC: 'AU',
     C: 'Academic',
@@ -36991,8 +36991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MELCO',
     StateC: 'J',
     C: 'Commercial',
@@ -37011,8 +37011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MELSP',
     StateC: 'AU',
     C: 'Academic',
@@ -37024,15 +37024,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 144.96,
     alt: 0,
     Parent: 'MELB',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MESH',
     StateC: 'F',
     C: 'Commercial',
@@ -37051,8 +37051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AES',
     StateC: 'CA',
     C: 'Government',
@@ -37064,15 +37064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -79.49,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'METI',
     StateC: 'J',
     C: 'Government',
@@ -37091,8 +37091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'METP',
     StateC: 'SU',
     C: 'Government',
@@ -37104,15 +37104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MEWTA',
     StateC: 'US',
     C: 'Military',
@@ -37131,8 +37131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MGON',
     StateC: 'SU',
     C: 'Military',
@@ -37151,8 +37151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MGU',
     StateC: 'RU',
     C: 'Academic',
@@ -37171,8 +37171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MHI',
     StateC: 'J',
     C: 'Commercial',
@@ -37191,8 +37191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MHIKO',
     StateC: 'J',
     C: 'Commercial',
@@ -37204,15 +37204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 136.92,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MHIME',
     StateC: 'J',
     C: 'Commercial',
@@ -37231,8 +37231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MHITO',
     StateC: 'J',
     C: 'Commercial',
@@ -37251,8 +37251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMA',
     StateC: 'US',
     C: 'Military',
@@ -37271,8 +37271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICRC',
     StateC: 'US',
     C: 'Commercial',
@@ -37291,8 +37291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICRC',
     StateC: 'US',
     C: 'Commercial',
@@ -37311,8 +37311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICRC',
     StateC: 'US',
     C: 'Commercial',
@@ -37331,8 +37331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICRL',
     StateC: 'IL',
     C: 'Commercial',
@@ -37344,15 +37344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 34.78,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICROC',
     StateC: 'US',
     C: 'Commercial',
@@ -37371,8 +37371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICSG',
     StateC: 'SG',
     C: 'Commercial',
@@ -37391,8 +37391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICSP',
     StateC: 'US',
     C: 'Commercial',
@@ -37411,8 +37411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MICSY',
     StateC: 'US',
     C: 'Commercial',
@@ -37431,8 +37431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MIG',
     StateC: 'SU',
     C: 'Commercial',
@@ -37451,8 +37451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MIHS',
     StateC: 'US',
     C: 'Academic',
@@ -37471,8 +37471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILAN',
     StateC: 'I',
     C: 'Academic',
@@ -37491,8 +37491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFMCSW',
     StateC: 'US',
     C: 'Military',
@@ -37504,15 +37504,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: 'AFSMC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILLEI',
     StateC: 'US',
     C: 'Commercial',
@@ -37531,8 +37531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILLEN',
     StateC: 'US',
     C: 'Commercial',
@@ -37551,8 +37551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILLES',
     StateC: 'US',
     C: 'Commercial',
@@ -37571,8 +37571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MILTEC',
     StateC: 'US',
     C: 'Commercial',
@@ -37591,8 +37591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MINCYT',
     StateC: 'AR',
     C: 'Government',
@@ -37611,8 +37611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MINES',
     StateC: 'F',
     C: 'Academic',
@@ -37631,8 +37631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MINICU',
     StateC: 'US',
     C: 'Commercial',
@@ -37651,8 +37651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MIRC',
     StateC: 'US',
     C: 'Commercial',
@@ -37671,8 +37671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MIRCO',
     StateC: 'NL',
     C: 'Commercial',
@@ -37691,8 +37691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MISU',
     StateC: 'S',
     C: 'Academic',
@@ -37711,8 +37711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MISU',
     StateC: 'S',
     C: 'Academic',
@@ -37724,15 +37724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 18.05,
     alt: 0,
     Parent: 'STO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MIT',
     StateC: 'US',
     C: 'Academic',
@@ -37751,8 +37751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MITLL',
     StateC: 'US',
     C: 'Academic',
@@ -37771,8 +37771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MITT',
     StateC: 'SU',
     C: 'Commercial',
@@ -37791,8 +37791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MKA',
     StateC: 'RU',
     C: 'Commercial',
@@ -37811,8 +37811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MM',
     StateC: 'US',
     C: 'Commercial',
@@ -37831,8 +37831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MMA',
     StateC: 'US',
     C: 'Commercial',
@@ -37851,8 +37851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAEW',
     StateC: 'US',
     C: 'Commercial',
@@ -37871,8 +37871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GDCLS',
     StateC: 'US',
     C: 'Commercial',
@@ -37891,8 +37891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTD',
     StateC: 'US',
     C: 'Commercial',
@@ -37911,8 +37911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAEW',
     StateC: 'US',
     C: 'Commercial',
@@ -37931,8 +37931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MMMI',
     StateC: 'US',
     C: 'Commercial',
@@ -37951,8 +37951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARTO',
     StateC: 'US',
     C: 'Commercial',
@@ -37971,8 +37971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MMPCO',
     StateC: 'US',
     C: 'Commercial',
@@ -37991,8 +37991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONV',
     StateC: 'US',
     C: 'Commercial',
@@ -38011,8 +38011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVS',
     StateC: 'UK',
     C: 'Commercial',
@@ -38031,8 +38031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MATT',
     StateC: 'F',
     C: 'Commercial',
@@ -38051,8 +38051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MATV',
     StateC: 'F',
     C: 'Commercial',
@@ -38071,8 +38071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GEVF',
     StateC: 'US',
     C: 'Commercial',
@@ -38091,8 +38091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MNB',
     StateC: 'UK',
     C: 'Commercial',
@@ -38111,8 +38111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MNF',
     StateC: 'F',
     C: 'Government',
@@ -38131,8 +38131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MVS',
     StateC: 'SU',
     C: 'Military',
@@ -38151,8 +38151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOD',
     StateC: 'UK',
     C: 'Military',
@@ -38171,8 +38171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOL',
     StateC: 'US',
     C: 'Military',
@@ -38191,8 +38191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOLN',
     StateC: 'SU',
     C: 'Commercial',
@@ -38211,8 +38211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOM',
     StateC: 'SU',
     C: 'Military',
@@ -38231,8 +38231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOMENT',
     StateC: 'US',
     C: 'Commercial',
@@ -38251,8 +38251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MONBU',
     StateC: 'J',
     C: 'Government',
@@ -38264,15 +38264,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.75,
     alt: 0,
     Parent: 'J',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MONBU',
     StateC: 'J',
     C: 'Government',
@@ -38284,15 +38284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.75,
     alt: 0,
     Parent: 'J',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MONTP2',
     StateC: 'F',
     C: 'Academic',
@@ -38311,8 +38311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MONTP2',
     StateC: 'F',
     C: 'Academic',
@@ -38331,8 +38331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOOG',
     StateC: 'US',
     C: 'Commercial',
@@ -38344,15 +38344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -78.62,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CSAE',
     StateC: 'US',
     C: 'Commercial',
@@ -38371,8 +38371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BELL',
     StateC: 'US',
     C: 'Commercial',
@@ -38391,8 +38391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Commercial',
@@ -38411,8 +38411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOOREF',
     StateC: 'US',
     C: 'Academic',
@@ -38431,8 +38431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MORF',
     StateC: 'RU',
     C: 'Military',
@@ -38451,8 +38451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMSC',
     StateC: 'US',
     C: 'Commercial',
@@ -38464,15 +38464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.35,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOTO',
     StateC: 'US',
     C: 'Commercial',
@@ -38491,8 +38491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOTOS',
     StateC: 'RU',
     C: 'Unknown',
@@ -38511,8 +38511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOZH',
     StateC: 'RU',
     C: 'Academic',
@@ -38524,15 +38524,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 30.31,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOZH',
     StateC: 'RU',
     C: 'Academic',
@@ -38551,8 +38551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPA',
     StateC: 'MN',
     C: 'Military',
@@ -38571,8 +38571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPAE',
     StateC: 'D',
     C: 'Academic',
@@ -38591,8 +38591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPE',
     StateC: 'D',
     C: 'Academic',
@@ -38611,8 +38611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPIH',
     StateC: 'D',
     C: 'Academic',
@@ -38631,8 +38631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPIK',
     StateC: 'D',
     C: 'Academic',
@@ -38651,8 +38651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPAE',
     StateC: 'D',
     C: 'Academic',
@@ -38664,15 +38664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 9.68,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPSC',
     StateC: 'PH',
     C: 'Commercial',
@@ -38691,8 +38691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPSC',
     StateC: 'PH',
     C: 'Commercial',
@@ -38704,15 +38704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 120.23,
     alt: 0,
     Parent: 'ABS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MPU',
     StateC: 'RU',
     C: 'Academic',
@@ -38731,8 +38731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MRI',
     StateC: 'J',
     C: 'Government',
@@ -38751,8 +38751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MRIC',
     StateC: 'MU',
     C: 'Government',
@@ -38771,8 +38771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MRI',
     StateC: 'J',
     C: 'Government',
@@ -38784,15 +38784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 140.08,
     alt: 0,
     Parent: 'JMA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MRN',
     StateC: 'US',
     C: 'Military',
@@ -38811,8 +38811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSBTR',
     StateC: 'TR',
     C: 'Military',
@@ -38831,8 +38831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JSC',
     StateC: 'US',
     C: 'Government',
@@ -38851,8 +38851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DYN',
     StateC: 'CA',
     C: 'Commercial',
@@ -38871,8 +38871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOL',
     StateC: 'US',
     C: 'Military',
@@ -38891,8 +38891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSFC',
     StateC: 'US',
     C: 'Government',
@@ -38911,8 +38911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSGC',
     StateC: 'US',
     C: 'Academic',
@@ -38931,8 +38931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSSL',
     StateC: 'UK',
     C: 'Academic',
@@ -38951,8 +38951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSU',
     StateC: 'US',
     C: 'Academic',
@@ -38971,8 +38971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSUKY',
     StateC: 'US',
     C: 'Academic',
@@ -38991,8 +38991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSV',
     StateC: 'US',
     C: 'Commercial',
@@ -39011,8 +39011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSVCA',
     StateC: 'CA',
     C: 'Commercial',
@@ -39031,8 +39031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KS',
     StateC: 'SU',
     C: 'Government',
@@ -39051,8 +39051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MTF',
     StateC: 'US',
     C: 'Government',
@@ -39064,15 +39064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -89.6,
     alt: 0,
     Parent: 'NASA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THK',
     StateC: 'US',
     C: 'Commercial',
@@ -39084,15 +39084,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -87.68,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MTU',
     StateC: 'US',
     C: 'Academic',
@@ -39111,8 +39111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MUKD',
     StateC: 'J',
     C: 'Academic',
@@ -39131,8 +39131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MUNIZ',
     StateC: 'US',
     C: 'Commercial',
@@ -39151,8 +39151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MV7',
     StateC: 'SU',
     C: 'Military',
@@ -39171,8 +39171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MVD',
     StateC: 'SU',
     C: 'Government',
@@ -39184,15 +39184,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MVS',
     StateC: 'SU',
     C: 'Military',
@@ -39211,8 +39211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MVS',
     StateC: 'SU',
     C: 'Military',
@@ -39231,8 +39231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MYA',
     StateC: 'SU',
     C: 'Military',
@@ -39251,8 +39251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MYRI',
     StateC: 'AU',
     C: 'Commercial',
@@ -39271,8 +39271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BKSA',
     StateC: 'MY',
     C: 'Government',
@@ -39291,8 +39291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAA',
     StateC: 'US',
     C: 'Commercial',
@@ -39311,8 +39311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAAA',
     StateC: 'US',
     C: 'Commercial',
@@ -39324,15 +39324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.35,
     alt: 0,
     Parent: 'NAA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VULT',
     StateC: 'US',
     C: 'Commercial',
@@ -39351,8 +39351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RDYNE',
     StateC: 'US',
     C: 'Commercial',
@@ -39371,8 +39371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAASB',
     StateC: 'US',
     C: 'Commercial',
@@ -39391,8 +39391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASA',
     StateC: 'US',
     C: 'Government',
@@ -39411,8 +39411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NICS',
     StateC: 'US',
     C: 'Military',
@@ -39424,15 +39424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 4.42,
     alt: 0,
     Parent: 'NATO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KCST',
     StateC: 'KP',
     C: 'Military',
@@ -39451,8 +39451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAFI',
     StateC: 'US',
     C: 'Military',
@@ -39471,8 +39471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAG',
     StateC: 'J',
     C: 'Academic',
@@ -39491,8 +39491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAHU',
     StateC: 'AR',
     C: 'Commercial',
@@ -39511,8 +39511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAHU',
     StateC: 'AR',
     C: 'Commercial',
@@ -39524,15 +39524,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -58.38,
     alt: 0,
     Parent: 'ARSAT',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAIC',
     StateC: 'US',
     C: 'Military',
@@ -39551,8 +39551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAIR',
     StateC: 'KE',
     C: 'Academic',
@@ -39571,8 +39571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAKA',
     StateC: 'J',
     C: 'Commercial',
@@ -39591,8 +39591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAMFI',
     StateC: 'GR',
     C: 'Military',
@@ -39611,8 +39611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAMMO',
     StateC: 'N',
     C: 'Commercial',
@@ -39631,8 +39631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAMTC',
     StateC: 'US',
     C: 'Military',
@@ -39651,8 +39651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAL',
     StateC: 'J',
     C: 'Government',
@@ -39671,8 +39671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NANAV',
     StateC: 'LT',
     C: 'Commercial',
@@ -39691,8 +39691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NANAVU',
     StateC: 'US',
     C: 'Commercial',
@@ -39711,8 +39711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NANR',
     StateC: 'US',
     C: 'Commercial',
@@ -39731,8 +39731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NANSFI',
     StateC: 'US',
     C: 'Commercial',
@@ -39751,8 +39751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TAO',
     StateC: 'J',
     C: 'Government',
@@ -39771,8 +39771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NARSS',
     StateC: 'EG',
     C: 'Government',
@@ -39791,8 +39791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASA',
     StateC: 'US',
     C: 'Government',
@@ -39811,8 +39811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASA',
     StateC: 'US',
     C: 'Government',
@@ -39831,8 +39831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASDA',
     StateC: 'J',
     C: 'Government',
@@ -39851,8 +39851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASDM',
     StateC: 'J',
     C: 'Government',
@@ -39871,8 +39871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAIC',
     StateC: 'US',
     C: 'Military',
@@ -39884,15 +39884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -84.05,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAST',
     StateC: 'NP',
     C: 'Academic',
@@ -39911,8 +39911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NATC',
     StateC: 'US',
     C: 'Military',
@@ -39931,8 +39931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NATO',
     StateC: 'US',
     C: 'Military',
@@ -39951,8 +39951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BUORD',
     StateC: 'US',
     C: 'Military',
@@ -39971,8 +39971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAVAST',
     StateC: 'US',
     C: 'Military',
@@ -39984,15 +39984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -119.12,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAVMAT',
     StateC: 'US',
     C: 'Military',
@@ -40004,15 +40004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAVSEA',
     StateC: 'US',
     C: 'Military',
@@ -40024,15 +40024,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAVSPA',
     StateC: 'US',
     C: 'Military',
@@ -40044,15 +40044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.05,
     alt: 0,
     Parent: 'USN',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAVAST',
     StateC: 'US',
     C: 'Military',
@@ -40064,15 +40064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -119.12,
     alt: 0,
     Parent: 'NAVSPA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAVSPOC',
     StateC: 'US',
     C: 'Military',
@@ -40084,15 +40084,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.05,
     alt: 0,
     Parent: 'NAVSPA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOTS',
     StateC: 'US',
     C: 'Military',
@@ -40111,8 +40111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAXS',
     StateC: 'US',
     C: 'Government',
@@ -40131,8 +40131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NBN',
     StateC: 'AU',
     C: 'Commercial',
@@ -40151,8 +40151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NBS',
     StateC: 'US',
     C: 'Government',
@@ -40171,8 +40171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NBSC',
     StateC: 'US',
     C: 'Government',
@@ -40191,8 +40191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NICS',
     StateC: 'US',
     C: 'Military',
@@ -40211,8 +40211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NCAR',
     StateC: 'US',
     C: 'Government',
@@ -40231,8 +40231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NCKU',
     StateC: 'TW',
     C: 'Academic',
@@ -40251,8 +40251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NCST',
     StateC: 'US',
     C: 'Military',
@@ -40264,15 +40264,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'NRL',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NCU',
     StateC: 'TW',
     C: 'Academic',
@@ -40291,8 +40291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NDAWN',
     StateC: 'MU',
     C: 'Commercial',
@@ -40311,8 +40311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NDRE',
     StateC: 'N',
     C: 'Military',
@@ -40331,8 +40331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NEC',
     StateC: 'J',
     C: 'Commercial',
@@ -40351,8 +40351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NECT',
     StateC: 'J',
     C: 'Commercial',
@@ -40371,8 +40371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NECT',
     StateC: 'J',
     C: 'Commercial',
@@ -40391,8 +40391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NECTF',
     StateC: 'J',
     C: 'Commercial',
@@ -40411,8 +40411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NEC',
     StateC: 'J',
     C: 'Commercial',
@@ -40431,8 +40431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOSHKE',
     StateC: 'J',
     C: 'Commercial',
@@ -40451,8 +40451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NESC',
     StateC: 'US',
     C: 'Government',
@@ -40464,15 +40464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.92,
     alt: 0,
     Parent: 'ESSA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NESCOM',
     StateC: 'PK',
     C: 'Military',
@@ -40484,15 +40484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 73.07,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKNDC',
     StateC: 'PK',
     C: 'Military',
@@ -40511,8 +40511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKPMO',
     StateC: 'PK',
     C: 'Government',
@@ -40531,8 +40531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NESC',
     StateC: 'US',
     C: 'Government',
@@ -40544,15 +40544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.92,
     alt: 0,
     Parent: 'NOAA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NESC',
     StateC: 'US',
     C: 'Government',
@@ -40564,15 +40564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.92,
     alt: 0,
     Parent: 'NOAA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NETAA',
     StateC: 'UK',
     C: 'Commercial',
@@ -40584,15 +40584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 0.13,
     alt: 0,
     Parent: 'ONEWEB',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NEU',
     StateC: 'US',
     C: 'Academic',
@@ -40611,8 +40611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NEWSAT',
     StateC: 'US',
     C: 'Commercial',
@@ -40631,8 +40631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NEWSAU',
     StateC: 'AU',
     C: 'Commercial',
@@ -40644,15 +40644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 144.96,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NFU',
     StateC: 'TW',
     C: 'Academic',
@@ -40671,8 +40671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NGA',
     StateC: 'US',
     C: 'Military',
@@ -40684,15 +40684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.15,
     alt: 0,
     Parent: 'DOD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTA',
     StateC: 'US',
     C: 'Commercial',
@@ -40711,8 +40711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STL',
     StateC: 'US',
     C: 'Commercial',
@@ -40731,8 +40731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AJ',
     StateC: 'US',
     C: 'Commercial',
@@ -40751,8 +40751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NGCOM',
     StateC: 'NG',
     C: 'Commercial',
@@ -40771,8 +40771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OATK',
     StateC: 'US',
     C: 'Commercial',
@@ -40791,8 +40791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABL',
     StateC: 'US',
     C: 'Commercial',
@@ -40811,8 +40811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATKB',
     StateC: 'US',
     C: 'Commercial',
@@ -40824,15 +40824,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.62,
     alt: 0,
     Parent: 'OATK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDCO',
     StateC: 'US',
     C: 'Commercial',
@@ -40851,8 +40851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSC',
     StateC: 'US',
     C: 'Commercial',
@@ -40871,8 +40871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKE',
     StateC: 'US',
     C: 'Commercial',
@@ -40891,8 +40891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GASL',
     StateC: 'US',
     C: 'Commercial',
@@ -40911,8 +40911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPA',
     StateC: 'US',
     C: 'Commercial',
@@ -40931,8 +40931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AECAB',
     StateC: 'US',
     C: 'Commercial',
@@ -40951,8 +40951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HERC',
     StateC: 'US',
     C: 'Commercial',
@@ -40971,8 +40971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKU',
     StateC: 'US',
     C: 'Commercial',
@@ -40984,15 +40984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -112.55,
     alt: 0,
     Parent: 'NGIS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWALES',
     StateC: 'US',
     C: 'Commercial',
@@ -41004,15 +41004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.92,
     alt: 0,
     Parent: 'NGIS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSCW',
     StateC: 'US',
     C: 'Commercial',
@@ -41031,8 +41031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NGNW',
     StateC: 'US',
     C: 'Commercial',
@@ -41051,8 +41051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STL',
     StateC: 'US',
     C: 'Commercial',
@@ -41071,8 +41071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NHK',
     StateC: 'J',
     C: 'Commercial',
@@ -41091,8 +41091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NICP',
     StateC: 'N',
     C: 'Government',
@@ -41111,8 +41111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NICS',
     StateC: 'US',
     C: 'Military',
@@ -41131,8 +41131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIHON',
     StateC: 'J',
     C: 'Academic',
@@ -41151,8 +41151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RNII',
     StateC: 'SU',
     C: 'Government',
@@ -41164,15 +41164,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.5,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIIM',
     StateC: 'SU',
     C: 'Unknown',
@@ -41184,15 +41184,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 60.72,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NII125',
     StateC: 'SU',
     C: 'Commercial',
@@ -41211,8 +41211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSKHM',
     StateC: 'SU',
     C: 'Military',
@@ -41224,15 +41224,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NII88',
     StateC: 'SU',
     C: 'Military',
@@ -41251,8 +41251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NII88A',
     StateC: 'SU',
     C: 'Military',
@@ -41271,8 +41271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIIEM',
     StateC: 'SU',
     C: 'Government',
@@ -41291,8 +41291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIIKP',
     StateC: 'SU',
     C: 'Government',
@@ -41311,8 +41311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIIM',
     StateC: 'SU',
     C: 'Unknown',
@@ -41331,8 +41331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIIKP',
     StateC: 'SU',
     C: 'Government',
@@ -41344,15 +41344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.69,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIIPP',
     StateC: 'SU',
     C: 'Government',
@@ -41371,8 +41371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKB30',
     StateC: 'SU',
     C: 'Military',
@@ -41384,15 +41384,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.5,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RNII',
     StateC: 'SU',
     C: 'Government',
@@ -41404,15 +41404,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.5,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -41424,15 +41424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.65,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -41444,15 +41444,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.65,
     alt: 0,
     Parent: 'USAMC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIKUS',
     StateC: 'US',
     C: 'Commercial',
@@ -41471,8 +41471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NILE',
     StateC: 'EG',
     C: 'Government',
@@ -41491,8 +41491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIMHB',
     StateC: 'BG',
     C: 'Academic',
@@ -41511,8 +41511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NINGX',
     StateC: 'CN',
     C: 'Commercial',
@@ -41531,8 +41531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIPR',
     StateC: 'J',
     C: 'Government',
@@ -41551,8 +41551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIRFI',
     StateC: 'SU',
     C: 'Government',
@@ -41571,8 +41571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NISCA',
     StateC: 'US',
     C: 'Academic',
@@ -41591,8 +41591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUSEI',
     StateC: 'J',
     C: 'Commercial',
@@ -41611,8 +41611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NISST',
     StateC: 'J',
     C: 'Commercial',
@@ -41631,8 +41631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NISSY',
     StateC: 'J',
     C: 'Commercial',
@@ -41644,15 +41644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.63,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NBS',
     StateC: 'US',
     C: 'Government',
@@ -41671,8 +41671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIUTN',
     StateC: 'IN',
     C: 'Academic',
@@ -41691,8 +41691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIVR',
     StateC: 'NL',
     C: 'Government',
@@ -41711,8 +41711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NJU',
     StateC: 'CN',
     C: 'Academic',
@@ -41731,8 +41731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NJUST',
     StateC: 'CN',
     C: 'Academic',
@@ -41751,8 +41751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NKAU',
     StateC: 'UA',
     C: 'Government',
@@ -41771,8 +41771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NKE',
     StateC: 'RU',
     C: 'Commercial',
@@ -41791,8 +41791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MVS',
     StateC: 'SU',
     C: 'Military',
@@ -41811,8 +41811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NLR',
     StateC: 'NL',
     C: 'Unknown',
@@ -41831,8 +41831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAMTC',
     StateC: 'US',
     C: 'Military',
@@ -41851,8 +41851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NMCOL',
     StateC: 'US',
     C: 'Academic',
@@ -41871,8 +41871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NMIC',
     StateC: 'UK',
     C: 'Government',
@@ -41891,8 +41891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NMIT',
     StateC: 'IN',
     C: 'Academic',
@@ -41911,8 +41911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSSA',
     StateC: 'US',
     C: 'Military',
@@ -41924,15 +41924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NMSA',
     StateC: 'AR',
     C: 'Government',
@@ -41951,8 +41951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NMSPA',
     StateC: 'US',
     C: 'Government',
@@ -41971,8 +41971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NMCOL',
     StateC: 'US',
     C: 'Academic',
@@ -41991,8 +41991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NMTECH',
     StateC: 'US',
     C: 'Academic',
@@ -42011,8 +42011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESSA',
     StateC: 'US',
     C: 'Government',
@@ -42031,8 +42031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOBY',
     StateC: 'J',
     C: 'Academic',
@@ -42051,8 +42051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOL',
     StateC: 'US',
     C: 'Military',
@@ -42071,8 +42071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NONAN',
     StateC: 'F',
     C: 'Commercial',
@@ -42091,8 +42091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORD',
     StateC: 'F',
     C: 'Commercial',
@@ -42111,8 +42111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORD',
     StateC: 'F',
     C: 'Commercial',
@@ -42131,8 +42131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORLM',
     StateC: 'F',
     C: 'Commercial',
@@ -42151,8 +42151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORSM',
     StateC: 'F',
     C: 'Commercial',
@@ -42171,8 +42171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORTH',
     StateC: 'US',
     C: 'Commercial',
@@ -42191,8 +42191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMCEL',
     StateC: 'US',
     C: 'Commercial',
@@ -42211,8 +42211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NORTH',
     StateC: 'US',
     C: 'Commercial',
@@ -42231,8 +42231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOTS',
     StateC: 'US',
     C: 'Military',
@@ -42251,8 +42251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOTT',
     StateC: 'UK',
     C: 'Academic',
@@ -42271,8 +42271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOVSU',
     StateC: 'RU',
     C: 'Academic',
@@ -42291,8 +42291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOVTR',
     StateC: 'SU',
     C: 'Commercial',
@@ -42311,8 +42311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPL',
     StateC: 'IN',
     C: 'Government',
@@ -42331,8 +42331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB1',
     StateC: 'SU',
     C: 'Government',
@@ -42351,8 +42351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPOL',
     StateC: 'RU',
     C: 'Government',
@@ -42371,8 +42371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPOL',
     StateC: 'RU',
     C: 'Government',
@@ -42391,8 +42391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB52',
     StateC: 'SU',
     C: 'Military',
@@ -42411,8 +42411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB52',
     StateC: 'SU',
     C: 'Military',
@@ -42431,8 +42431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPOPM',
     StateC: 'SU',
     C: 'Government',
@@ -42451,8 +42451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPOPM',
     StateC: 'RU',
     C: 'Government',
@@ -42471,8 +42471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NKE',
     StateC: 'SU',
     C: 'Commercial',
@@ -42491,8 +42491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NRCC',
     StateC: 'CA',
     C: 'Government',
@@ -42511,8 +42511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NRL',
     StateC: 'US',
     C: 'Military',
@@ -42531,8 +42531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NRLC',
     StateC: 'US',
     C: 'Military',
@@ -42544,15 +42544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NRO',
     StateC: 'US',
     C: 'Military',
@@ -42571,8 +42571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NRO',
     StateC: 'US',
     C: 'Military',
@@ -42591,8 +42591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NROD',
     StateC: 'US',
     C: 'Military',
@@ -42611,8 +42611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSA',
     StateC: 'US',
     C: 'Military',
@@ -42631,8 +42631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSAB',
     StateC: 'S',
     C: 'Commercial',
@@ -42651,8 +42651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSC',
     StateC: 'N',
     C: 'Government',
@@ -42671,8 +42671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NASDA',
     StateC: 'J',
     C: 'Government',
@@ -42691,8 +42691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSF',
     StateC: 'US',
     C: 'Government',
@@ -42711,8 +42711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSIL',
     StateC: 'IN',
     C: 'Commercial',
@@ -42731,8 +42731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSL',
     StateC: 'US',
     C: 'Commercial',
@@ -42751,8 +42751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSLC',
     StateC: 'IL',
     C: 'Commercial',
@@ -42771,8 +42771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSMC',
     StateC: 'CN',
     C: 'Government',
@@ -42791,8 +42791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIVR',
     StateC: 'NL',
     C: 'Government',
@@ -42811,8 +42811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSPO',
     StateC: 'TW',
     C: 'Government',
@@ -42831,8 +42831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSPO',
     StateC: 'TW',
     C: 'Government',
@@ -42851,8 +42851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSRDA',
     StateC: 'NG',
     C: 'Government',
@@ -42871,8 +42871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSROC',
     StateC: 'US',
     C: 'Commercial',
@@ -42891,8 +42891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSS',
     StateC: 'NL',
     C: 'Commercial',
@@ -42911,8 +42911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSSA',
     StateC: 'US',
     C: 'Military',
@@ -42924,15 +42924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSWCPH',
     StateC: 'US',
     C: 'Military',
@@ -42951,8 +42951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSWCWS',
     StateC: 'US',
     C: 'Military',
@@ -42971,8 +42971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTNF',
     StateC: 'N',
     C: 'Government',
@@ -42991,8 +42991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTNU',
     StateC: 'N',
     C: 'Government',
@@ -43011,8 +43011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTOU',
     StateC: 'TW',
     C: 'Academic',
@@ -43031,8 +43031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTSOMZ',
     StateC: 'RU',
     C: 'Government',
@@ -43044,15 +43044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: 'FKA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTT',
     StateC: 'J',
     C: 'Commercial',
@@ -43071,8 +43071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTT',
     StateC: 'J',
     C: 'Commercial',
@@ -43084,15 +43084,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.75,
     alt: 0,
     Parent: 'NTT',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTTDM',
     StateC: 'J',
     C: 'Commercial',
@@ -43111,8 +43111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NTU',
     StateC: 'SG',
     C: 'Academic',
@@ -43131,8 +43131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NUAA',
     StateC: 'CN',
     C: 'Academic',
@@ -43151,8 +43151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NUDTC',
     StateC: 'CN',
     C: 'Commercial',
@@ -43171,8 +43171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NUM',
     StateC: 'MN',
     C: 'Academic',
@@ -43191,8 +43191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NUS',
     StateC: 'SG',
     C: 'Academic',
@@ -43211,8 +43211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NUSC',
     StateC: 'US',
     C: 'Military',
@@ -43231,8 +43231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NUSS',
     StateC: 'J',
     C: 'Government',
@@ -43251,8 +43251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NVART',
     StateC: 'US',
     C: 'Academic',
@@ -43271,8 +43271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NOTS',
     StateC: 'US',
     C: 'Military',
@@ -43291,8 +43291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NWNAZ',
     StateC: 'US',
     C: 'Academic',
@@ -43311,8 +43311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZWO',
     StateC: 'NL',
     C: 'Government',
@@ -43324,15 +43324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 4.32,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NWPU',
     StateC: 'CN',
     C: 'Academic',
@@ -43351,8 +43351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NWU',
     StateC: 'US',
     C: 'Academic',
@@ -43371,8 +43371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NWURKS',
     StateC: 'US',
     C: 'Commercial',
@@ -43391,8 +43391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NYBB2',
     StateC: 'US',
     C: 'Commercial',
@@ -43404,15 +43404,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.01,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NYSH',
     StateC: 'US',
     C: 'Commercial',
@@ -43431,8 +43431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NYU',
     StateC: 'US',
     C: 'Academic',
@@ -43451,8 +43451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'O3B',
     StateC: 'UK',
     C: 'Commercial',
@@ -43471,8 +43471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'O3B',
     StateC: 'UK',
     C: 'Commercial',
@@ -43491,8 +43491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OAKAE',
     StateC: 'US',
     C: 'Commercial',
@@ -43511,8 +43511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OAR',
     StateC: 'US',
     C: 'Military',
@@ -43531,8 +43531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OATK',
     StateC: 'US',
     C: 'Commercial',
@@ -43551,8 +43551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABL',
     StateC: 'US',
     C: 'Commercial',
@@ -43571,8 +43571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATKB',
     StateC: 'US',
     C: 'Commercial',
@@ -43584,15 +43584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.62,
     alt: 0,
     Parent: 'OATK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDCO',
     StateC: 'US',
     C: 'Commercial',
@@ -43611,8 +43611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSC',
     StateC: 'US',
     C: 'Commercial',
@@ -43631,8 +43631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKE',
     StateC: 'US',
     C: 'Commercial',
@@ -43644,15 +43644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -75.83,
     alt: 0,
     Parent: 'OATK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GASL',
     StateC: 'US',
     C: 'Commercial',
@@ -43671,8 +43671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPA',
     StateC: 'US',
     C: 'Commercial',
@@ -43691,8 +43691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AECAB',
     StateC: 'US',
     C: 'Commercial',
@@ -43711,8 +43711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HERC',
     StateC: 'US',
     C: 'Commercial',
@@ -43731,8 +43731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKU',
     StateC: 'US',
     C: 'Commercial',
@@ -43744,15 +43744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -112.55,
     alt: 0,
     Parent: 'OATK',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWALES',
     StateC: 'US',
     C: 'Commercial',
@@ -43771,8 +43771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSCW',
     StateC: 'US',
     C: 'Commercial',
@@ -43791,8 +43791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'POL',
     StateC: 'SU',
     C: 'Commercial',
@@ -43811,8 +43811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OCO',
     StateC: 'US',
     C: 'Military',
@@ -43824,15 +43824,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USA',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OCOS',
     StateC: 'UK',
     C: 'Commercial',
@@ -43851,8 +43851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ODU',
     StateC: 'US',
     C: 'Academic',
@@ -43871,8 +43871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONTR',
     StateC: 'CH',
     C: 'Commercial',
@@ -43891,8 +43891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OFAB',
     StateC: 'US',
     C: 'Commercial',
@@ -43911,8 +43911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OFO',
     StateC: 'CN',
     C: 'Commercial',
@@ -43931,8 +43931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OFX',
     StateC: 'US',
     C: 'Commercial',
@@ -43951,8 +43951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OHB',
     StateC: 'D',
     C: 'Commercial',
@@ -43971,8 +43971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSCS',
     StateC: 'S',
     C: 'Commercial',
@@ -43984,15 +43984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 18,
     alt: 0,
     Parent: 'OHB',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CGS',
     StateC: 'I',
     C: 'Commercial',
@@ -44011,8 +44011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OHIOU',
     StateC: 'US',
     C: 'Academic',
@@ -44031,8 +44031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OIT',
     StateC: 'J',
     C: 'Academic',
@@ -44051,8 +44051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB1',
     StateC: 'SU',
     C: 'Government',
@@ -44071,8 +44071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPOPM',
     StateC: 'SU',
     C: 'Government',
@@ -44091,8 +44091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSSKB',
     StateC: 'SU',
     C: 'Government',
@@ -44111,8 +44111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPOPM',
     StateC: 'SU',
     C: 'Government',
@@ -44131,8 +44131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAZSOY',
     StateC: 'SU',
     C: 'Commercial',
@@ -44151,8 +44151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB117',
     StateC: 'SU',
     C: 'Commercial',
@@ -44171,8 +44171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KBKHA',
     StateC: 'SU',
     C: 'Commercial',
@@ -44191,8 +44191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ISAEV',
     StateC: 'SU',
     C: 'Commercial',
@@ -44211,8 +44211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB23',
     StateC: 'SU',
     C: 'Military',
@@ -44231,8 +44231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NKE',
     StateC: 'SU',
     C: 'Commercial',
@@ -44251,8 +44251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EMASH',
     StateC: 'SU',
     C: 'Commercial',
@@ -44271,8 +44271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB52',
     StateC: 'SU',
     C: 'Military',
@@ -44291,8 +44291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB23',
     StateC: 'SU',
     C: 'Military',
@@ -44304,15 +44304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.5,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YUZH',
     StateC: 'SU',
     C: 'Military',
@@ -44331,8 +44331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'POL',
     StateC: 'SU',
     C: 'Military',
@@ -44344,15 +44344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 73.37,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB9',
     StateC: 'SU',
     C: 'Military',
@@ -44371,8 +44371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KBKHA',
     StateC: 'SU',
     C: 'Commercial',
@@ -44391,8 +44391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKSU',
     StateC: 'US',
     C: 'Academic',
@@ -44411,8 +44411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRC',
     StateC: 'US',
     C: 'Commercial',
@@ -44431,8 +44431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ABMA',
     StateC: 'US',
     C: 'Military',
@@ -44451,8 +44451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OMNIE',
     StateC: 'US',
     C: 'Commercial',
@@ -44464,15 +44464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.06,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OMNISP',
     StateC: 'US',
     C: 'Commercial',
@@ -44491,8 +44491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OMS',
     StateC: 'US',
     C: 'Commercial',
@@ -44504,15 +44504,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -105.22,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OMSUK',
     StateC: 'UK',
     C: 'Commercial',
@@ -44531,8 +44531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSTC',
     StateC: 'US',
     C: 'Military',
@@ -44551,8 +44551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONDAS',
     StateC: 'E',
     C: 'Commercial',
@@ -44564,15 +44564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -3.72,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONERA',
     StateC: 'F',
     C: 'Military',
@@ -44591,8 +44591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONEWEB',
     StateC: 'UK',
     C: 'Commercial',
@@ -44611,8 +44611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONEWUS',
     StateC: 'US',
     C: 'Commercial',
@@ -44624,15 +44624,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -80.6,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONI',
     StateC: 'AU',
     C: 'Military',
@@ -44651,8 +44651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAVMAT',
     StateC: 'US',
     C: 'Military',
@@ -44664,15 +44664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONR',
     StateC: 'US',
     C: 'Military',
@@ -44691,8 +44691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONRS',
     StateC: 'US',
     C: 'Academic',
@@ -44711,8 +44711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONUSJ',
     StateC: 'AR',
     C: 'Academic',
@@ -44731,8 +44731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OPM',
     StateC: 'F',
     C: 'Academic',
@@ -44751,8 +44751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OPNAV',
     StateC: 'US',
     C: 'Military',
@@ -44771,8 +44771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUSS',
     StateC: 'AU',
     C: 'Commercial',
@@ -44791,8 +44791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OPTEV',
     StateC: 'US',
     C: 'Military',
@@ -44811,8 +44811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OPTEV',
     StateC: 'US',
     C: 'Military',
@@ -44831,8 +44831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AUSS',
     StateC: 'AU',
     C: 'Commercial',
@@ -44851,8 +44851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OPU',
     StateC: 'J',
     C: 'Academic',
@@ -44871,8 +44871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OQT',
     StateC: 'L',
     C: 'Commercial',
@@ -44891,8 +44891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OQTR',
     StateC: 'RW',
     C: 'Commercial',
@@ -44911,8 +44911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FTEL',
     StateC: 'F',
     C: 'Commercial',
@@ -44931,8 +44931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBC',
     StateC: 'US',
     C: 'Commercial',
@@ -44951,8 +44951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBI',
     StateC: 'US',
     C: 'Commercial',
@@ -44971,8 +44971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBSK',
     StateC: 'US',
     C: 'Commercial',
@@ -44991,8 +44991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBSKW',
     StateC: 'KW',
     C: 'Commercial',
@@ -45011,8 +45011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBSP',
     StateC: 'UAE',
     C: 'Commercial',
@@ -45031,8 +45031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBTEC',
     StateC: 'US',
     C: 'Commercial',
@@ -45044,15 +45044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -89.4,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZAV47',
     StateC: 'SU',
     C: 'Commercial',
@@ -45071,8 +45071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORL',
     StateC: 'F',
     C: 'Academic',
@@ -45091,8 +45091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORD',
     StateC: 'US',
     C: 'Military',
@@ -45111,8 +45111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -45131,8 +45131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORI',
     StateC: 'US',
     C: 'Commercial',
@@ -45151,8 +45151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORIAS',
     StateC: 'F',
     C: 'Academic',
@@ -45171,8 +45171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORKK',
     StateC: 'RU',
     C: 'Commercial',
@@ -45184,15 +45184,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSAKA',
     StateC: 'J',
     C: 'Academic',
@@ -45211,8 +45211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSC',
     StateC: 'US',
     C: 'Commercial',
@@ -45231,8 +45231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSCAR',
     StateC: 'US',
     C: 'Academic',
@@ -45251,8 +45251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDCO',
     StateC: 'US',
     C: 'Commercial',
@@ -45271,8 +45271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSC',
     StateC: 'US',
     C: 'Commercial',
@@ -45291,8 +45291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FAIR',
     StateC: 'US',
     C: 'Commercial',
@@ -45311,8 +45311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPA',
     StateC: 'US',
     C: 'Commercial',
@@ -45331,8 +45331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DSI',
     StateC: 'US',
     C: 'Commercial',
@@ -45351,8 +45351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSC',
     StateC: 'US',
     C: 'Commercial',
@@ -45371,8 +45371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSCW',
     StateC: 'US',
     C: 'Commercial',
@@ -45391,8 +45391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSLO',
     StateC: 'N',
     C: 'Academic',
@@ -45411,8 +45411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSM',
     StateC: 'MC',
     C: 'Commercial',
@@ -45431,8 +45431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSN',
     StateC: 'US',
     C: 'Commercial',
@@ -45451,8 +45451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSSI',
     StateC: 'KR',
     C: 'Academic',
@@ -45471,8 +45471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSSS',
     StateC: 'US',
     C: 'Commercial',
@@ -45484,15 +45484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -111.94,
     alt: 0,
     Parent: 'WEB',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OSU',
     StateC: 'US',
     C: 'Academic',
@@ -45511,8 +45511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OTEAM',
     StateC: 'J',
     C: 'Commercial',
@@ -45531,8 +45531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OTR',
     StateC: 'D',
     C: 'Commercial',
@@ -45551,8 +45551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OTR',
     StateC: 'D',
     C: 'Commercial',
@@ -45571,8 +45571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OVHO',
     StateC: 'S',
     C: 'Commercial',
@@ -45584,15 +45584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 18,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OX',
     StateC: 'UK',
     C: 'Academic',
@@ -45611,8 +45611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PACSI',
     StateC: 'US',
     C: 'Commercial',
@@ -45631,8 +45631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PAEC',
     StateC: 'PK',
     C: 'Military',
@@ -45644,15 +45644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 73.07,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PAI',
     StateC: 'PL',
     C: 'Government',
@@ -45671,8 +45671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PAN',
     StateC: 'US',
     C: 'Commercial',
@@ -45691,8 +45691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARA',
     StateC: 'UK',
     C: 'Commercial',
@@ -45711,8 +45711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAHU',
     StateC: 'AR',
     C: 'Commercial',
@@ -45731,8 +45731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARD',
     StateC: 'US',
     C: 'Government',
@@ -45751,8 +45751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARIS',
     StateC: 'F',
     C: 'Academic',
@@ -45771,8 +45771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARST',
     StateC: 'US',
     C: 'Commercial',
@@ -45791,8 +45791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PASI',
     StateC: 'PH',
     C: 'Commercial',
@@ -45811,8 +45811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PATRAS',
     StateC: 'GR',
     C: 'Academic',
@@ -45831,8 +45831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PAVKH',
     StateC: 'RU',
     C: 'Commercial',
@@ -45851,8 +45851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ICO',
     StateC: 'US',
     C: 'Commercial',
@@ -45864,15 +45864,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.19,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PEOSS',
     StateC: 'US',
     C: 'Military',
@@ -45884,15 +45884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: 'SPAWAR',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PER',
     StateC: 'ID',
     C: 'Commercial',
@@ -45911,8 +45911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PERC',
     StateC: 'J',
     C: 'Academic',
@@ -45924,15 +45924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 140.03,
     alt: 0,
     Parent: 'CHIBA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PERI',
     StateC: 'KR',
     C: 'Commercial',
@@ -45951,8 +45951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PERM',
     StateC: 'RU',
     C: 'Government',
@@ -45971,8 +45971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PERM',
     StateC: 'RU',
     C: 'Government',
@@ -45991,8 +45991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Military',
@@ -46004,15 +46004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.96,
     alt: 0,
     Parent: 'MOD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PERVK',
     StateC: 'RU',
     C: 'Commercial',
@@ -46031,8 +46031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PESU',
     StateC: 'IN',
     C: 'Academic',
@@ -46051,8 +46051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PFAB',
     StateC: 'US',
     C: 'Commercial',
@@ -46071,8 +46071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PFRR',
     StateC: 'US',
     C: 'Academic',
@@ -46091,8 +46091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PH4',
     StateC: 'US',
     C: 'Commercial',
@@ -46104,15 +46104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.41,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORNB',
     StateC: 'US',
     C: 'Commercial',
@@ -46131,8 +46131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -46151,8 +46151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PHIL',
     StateC: 'NL',
     C: 'Commercial',
@@ -46164,15 +46164,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 5.48,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PHILR',
     StateC: 'US',
     C: 'Commercial',
@@ -46191,8 +46191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORNB',
     StateC: 'US',
     C: 'Commercial',
@@ -46211,8 +46211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -46231,8 +46231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PICA',
     StateC: 'US',
     C: 'Military',
@@ -46244,15 +46244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.54,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PIHM',
     StateC: 'PL',
     C: 'Government',
@@ -46271,8 +46271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PITT',
     StateC: 'US',
     C: 'Academic',
@@ -46291,8 +46291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKAFSC',
     StateC: 'PK',
     C: 'Military',
@@ -46311,8 +46311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKEL',
     StateC: 'US',
     C: 'Commercial',
@@ -46331,8 +46331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKNDC',
     StateC: 'PK',
     C: 'Military',
@@ -46351,8 +46351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKPMO',
     StateC: 'PK',
     C: 'Government',
@@ -46371,8 +46371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKO',
     StateC: 'SU',
     C: 'Military',
@@ -46391,8 +46391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLA',
     StateC: 'CN',
     C: 'Military',
@@ -46411,8 +46411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLA2AC',
     StateC: 'CN',
     C: 'Military',
@@ -46431,8 +46431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLAAF',
     StateC: 'CN',
     C: 'Military',
@@ -46451,8 +46451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COSMOG',
     StateC: 'US',
     C: 'Commercial',
@@ -46471,8 +46471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'REYE',
     StateC: 'D',
     C: 'Commercial',
@@ -46484,15 +46484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 12.53,
     alt: 0,
     Parent: 'PLABS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYBOX',
     StateC: 'US',
     C: 'Commercial',
@@ -46511,8 +46511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'COSMOG',
     StateC: 'US',
     C: 'Commercial',
@@ -46531,8 +46531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLANQ',
     StateC: 'US',
     C: 'Commercial',
@@ -46544,15 +46544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.11,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLANS',
     StateC: 'CN',
     C: 'Military',
@@ -46571,8 +46571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLA2AC',
     StateC: 'CN',
     C: 'Military',
@@ -46591,8 +46591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLRES',
     StateC: 'US',
     C: 'Commercial',
@@ -46611,8 +46611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PLSYS',
     StateC: 'US',
     C: 'Commercial',
@@ -46631,8 +46631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PMOD',
     StateC: 'CH',
     C: 'Academic',
@@ -46644,15 +46644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 9.83,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PMOOS',
     StateC: 'US',
     C: 'Commercial',
@@ -46671,8 +46671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PMR',
     StateC: 'US',
     C: 'Military',
@@ -46691,8 +46691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAMTC',
     StateC: 'US',
     C: 'Military',
@@ -46704,15 +46704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -119.12,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PMW146',
     StateC: 'US',
     C: 'Military',
@@ -46724,15 +46724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: 'PEOSS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PNTV',
     StateC: 'US',
     C: 'Commercial',
@@ -46751,8 +46751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'POL',
     StateC: 'SU',
     C: 'Government',
@@ -46771,8 +46771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'POL',
     StateC: 'SU',
     C: 'Government',
@@ -46791,8 +46791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'POLY',
     StateC: 'F',
     C: 'Academic',
@@ -46811,8 +46811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDP',
     StateC: 'F',
     C: 'Government',
@@ -46831,8 +46831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'POPACS',
     StateC: 'US',
     C: 'Academic',
@@ -46851,8 +46851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PORTO',
     StateC: 'PT',
     C: 'Academic',
@@ -46871,8 +46871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRC',
     StateC: 'UK',
     C: 'Government',
@@ -46884,15 +46884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -1.78,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRC',
     StateC: 'US',
     C: 'Commercial',
@@ -46911,8 +46911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MARQ',
     StateC: 'US',
     C: 'Commercial',
@@ -46931,8 +46931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PRIN',
     StateC: 'US',
     C: 'Academic',
@@ -46951,8 +46951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FUSEI',
     StateC: 'J',
     C: 'Commercial',
@@ -46971,8 +46971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PRIR',
     StateC: 'SU',
     C: 'Government',
@@ -46991,8 +46991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PRL',
     StateC: 'IN',
     C: 'Government',
@@ -47011,8 +47011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PRO',
     StateC: 'SU',
     C: 'Military',
@@ -47031,8 +47031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PROG',
     StateC: 'RU',
     C: 'Government',
@@ -47051,8 +47051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PROG',
     StateC: 'RU',
     C: 'Government',
@@ -47071,8 +47071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PROTO',
     StateC: 'BM',
     C: 'Commercial',
@@ -47091,8 +47091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PROTS',
     StateC: 'US',
     C: 'Commercial',
@@ -47104,15 +47104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.42,
     alt: 0,
     Parent: 'PROTO',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSC',
     StateC: 'US',
     C: 'Commercial',
@@ -47131,8 +47131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSCI',
     StateC: 'US',
     C: 'Commercial',
@@ -47151,8 +47151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSC',
     StateC: 'US',
     C: 'Commercial',
@@ -47171,8 +47171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSN',
     StateC: 'ID',
     C: 'Commercial',
@@ -47191,8 +47191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSNS',
     StateC: 'ID',
     C: 'Commercial',
@@ -47211,8 +47211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSRC',
     StateC: 'US',
     C: 'Commercial',
@@ -47231,8 +47231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSU',
     StateC: 'US',
     C: 'Academic',
@@ -47251,8 +47251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PSUA',
     StateC: 'UA',
     C: 'Military',
@@ -47271,8 +47271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PU',
     StateC: 'RU',
     C: 'Commercial',
@@ -47291,8 +47291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PUCP',
     StateC: 'PE',
     C: 'Academic',
@@ -47311,8 +47311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PUMPK',
     StateC: 'US',
     C: 'Commercial',
@@ -47331,8 +47331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PURDUE',
     StateC: 'US',
     C: 'Academic',
@@ -47351,8 +47351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PUSTEK',
     StateC: 'ID',
     C: 'Commercial',
@@ -47364,15 +47364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 106.82,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PVO',
     StateC: 'SU',
     C: 'Military',
@@ -47391,8 +47391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PWAR',
     StateC: 'PL',
     C: 'Academic',
@@ -47411,8 +47411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTC',
     StateC: 'US',
     C: 'Commercial',
@@ -47431,8 +47431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PWFL',
     StateC: 'US',
     C: 'Commercial',
@@ -47451,8 +47451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RDYNE',
     StateC: 'US',
     C: 'Commercial',
@@ -47471,8 +47471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QB50',
     StateC: 'B',
     C: 'Academic',
@@ -47491,8 +47491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QBUS',
     StateC: 'US',
     C: 'Academic',
@@ -47511,8 +47511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QIANC',
     StateC: 'CN',
     C: 'Commercial',
@@ -47531,8 +47531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAE',
     StateC: 'UK',
     C: 'Commercial',
@@ -47551,8 +47551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VER',
     StateC: 'B',
     C: 'Commercial',
@@ -47571,8 +47571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QMW',
     StateC: 'UK',
     C: 'Academic',
@@ -47584,15 +47584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.04,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QPS',
     StateC: 'J',
     C: 'Commercial',
@@ -47611,8 +47611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QTD',
     StateC: 'CN',
     C: 'Commercial',
@@ -47631,8 +47631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QTK',
     StateC: 'CN',
     C: 'Commercial',
@@ -47651,8 +47651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QTT',
     StateC: 'CN',
     C: 'Commercial',
@@ -47671,8 +47671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QUAFI',
     StateC: 'US',
     C: 'Commercial',
@@ -47691,8 +47691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QUB',
     StateC: 'UK',
     C: 'Academic',
@@ -47711,8 +47711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QUETZ',
     StateC: 'MX',
     C: 'Commercial',
@@ -47731,8 +47731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'QUK',
     StateC: 'CA',
     C: 'Academic',
@@ -47751,8 +47751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAAF',
     StateC: 'AU',
     C: 'Military',
@@ -47771,8 +47771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RACE',
     StateC: 'F',
     C: 'Academic',
@@ -47791,8 +47791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ORBI',
     StateC: 'US',
     C: 'Commercial',
@@ -47804,15 +47804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.39,
     alt: 0,
     Parent: 'MAXAR',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAE',
     StateC: 'UK',
     C: 'Military',
@@ -47831,8 +47831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Military',
@@ -47844,15 +47844,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.96,
     alt: 0,
     Parent: 'RAE',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAF',
     StateC: 'UK',
     C: 'Military',
@@ -47871,8 +47871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAFSO',
     StateC: 'UK',
     C: 'Military',
@@ -47884,15 +47884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -0.75,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAFL',
     StateC: 'IL',
     C: 'Commercial',
@@ -47911,8 +47911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOM',
     StateC: 'RU',
     C: 'Government',
@@ -47931,8 +47931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAL',
     StateC: 'UK',
     C: 'Government',
@@ -47951,8 +47951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAST',
     StateC: 'T',
     C: 'Academic',
@@ -47971,8 +47971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BLCAN',
     StateC: 'US',
     C: 'Commercial',
@@ -47991,8 +47991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTVE',
     StateC: 'US',
     C: 'Commercial',
@@ -48011,8 +48011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAYM',
     StateC: 'US',
     C: 'Commercial',
@@ -48031,8 +48031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAYHSV',
     StateC: 'US',
     C: 'Commercial',
@@ -48044,15 +48044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.59,
     alt: 0,
     Parent: 'RAYTH',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HUMS',
     StateC: 'US',
     C: 'Commercial',
@@ -48071,8 +48071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAYTH',
     StateC: 'US',
     C: 'Commercial',
@@ -48091,8 +48091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RBOW',
     StateC: 'US',
     C: 'Commercial',
@@ -48111,8 +48111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCA',
     StateC: 'US',
     C: 'Commercial',
@@ -48131,8 +48131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAF',
     StateC: 'CA',
     C: 'Military',
@@ -48151,8 +48151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAR',
     StateC: 'CA',
     C: 'Military',
@@ -48171,8 +48171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAV',
     StateC: 'CA',
     C: 'Commercial',
@@ -48191,8 +48191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RDYNE',
     StateC: 'US',
     C: 'Commercial',
@@ -48211,8 +48211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PHILR',
     StateC: 'US',
     C: 'Commercial',
@@ -48231,8 +48231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RDYNN',
     StateC: 'US',
     C: 'Commercial',
@@ -48251,8 +48251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'REAKT',
     StateC: 'FI',
     C: 'Commercial',
@@ -48271,8 +48271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'REP',
     StateC: 'US',
     C: 'Commercial',
@@ -48291,8 +48291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'REP',
     StateC: 'US',
     C: 'Commercial',
@@ -48311,8 +48311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NPOPM',
     StateC: 'RU',
     C: 'Government',
@@ -48331,8 +48331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'REYE',
     StateC: 'D',
     C: 'Commercial',
@@ -48351,8 +48351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GMS',
     StateC: 'RU',
     C: 'Government',
@@ -48371,8 +48371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RHI',
     StateC: 'I',
     C: 'Commercial',
@@ -48384,15 +48384,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 12.49,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RICE',
     StateC: 'US',
     C: 'Academic',
@@ -48411,8 +48411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RIKEN',
     StateC: 'J',
     C: 'Government',
@@ -48431,8 +48431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RIKK',
     StateC: 'J',
     C: 'Academic',
@@ -48451,8 +48451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RIMSAT',
     StateC: 'US',
     C: 'Commercial',
@@ -48471,8 +48471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RIU',
     StateC: 'US',
     C: 'Academic',
@@ -48491,8 +48491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOM',
     StateC: 'RU',
     C: 'Government',
@@ -48511,8 +48511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB1',
     StateC: 'RU',
     C: 'Government',
@@ -48531,8 +48531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NIIKP',
     StateC: 'SU',
     C: 'Government',
@@ -48551,8 +48551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RLABN',
     StateC: 'NZ',
     C: 'Academic',
@@ -48571,8 +48571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RLABU',
     StateC: 'US',
     C: 'Commercial',
@@ -48591,8 +48591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RMAF',
     StateC: 'MA',
     C: 'Military',
@@ -48611,8 +48611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RMD',
     StateC: 'US',
     C: 'Commercial',
@@ -48631,8 +48631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RMI',
     StateC: 'US',
     C: 'Commercial',
@@ -48651,8 +48651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RMILD',
     StateC: 'US',
     C: 'Commercial',
@@ -48671,8 +48671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RMIPL',
     StateC: 'US',
     C: 'Commercial',
@@ -48691,8 +48691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RN',
     StateC: 'UK',
     C: 'Military',
@@ -48711,8 +48711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RNAF',
     StateC: 'NL',
     C: 'Military',
@@ -48731,8 +48731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RNII',
     StateC: 'SU',
     C: 'Government',
@@ -48751,8 +48751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROAF',
     StateC: 'RO',
     C: 'Military',
@@ -48771,8 +48771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROB',
     StateC: 'B',
     C: 'Government',
@@ -48784,15 +48784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 4.33,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROBMS',
     StateC: 'US',
     C: 'Academic',
@@ -48811,8 +48811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROE',
     StateC: 'UK',
     C: 'Government',
@@ -48831,8 +48831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROHR',
     StateC: 'US',
     C: 'Commercial',
@@ -48851,8 +48851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROKN',
     StateC: 'KR',
     C: 'Military',
@@ -48871,8 +48871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROKSN',
     StateC: 'TR',
     C: 'Commercial',
@@ -48891,8 +48891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Military',
@@ -48911,8 +48911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROSAP',
     StateC: 'I',
     C: 'Academic',
@@ -48931,8 +48931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROGAU',
     StateC: 'I',
     C: 'Academic',
@@ -48951,8 +48951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROISS',
     StateC: 'RO',
     C: 'Government',
@@ -48971,8 +48971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MOM',
     StateC: 'RU',
     C: 'Government',
@@ -48984,15 +48984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DOSAAF',
     StateC: 'RU',
     C: 'Academic',
@@ -49011,8 +49011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROWAN',
     StateC: 'US',
     C: 'Academic',
@@ -49031,8 +49031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ROYAL',
     StateC: 'KH',
     C: 'Commercial',
@@ -49044,15 +49044,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 104.92,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPEW',
     StateC: 'UK',
     C: 'Military',
@@ -49071,8 +49071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RPI',
     StateC: 'US',
     C: 'Commercial',
@@ -49091,8 +49091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRC',
     StateC: 'US',
     C: 'Commercial',
@@ -49111,8 +49111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRR',
     StateC: 'CA',
     C: 'Military',
@@ -49131,8 +49131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RRL',
     StateC: 'J',
     C: 'Government',
@@ -49151,8 +49151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RROY',
     StateC: 'UK',
     C: 'Government',
@@ -49171,8 +49171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASID',
     StateC: 'UK',
     C: 'Commercial',
@@ -49191,8 +49191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVE',
     StateC: 'UK',
     C: 'Commercial',
@@ -49211,8 +49211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RSRS',
     StateC: 'UK',
     C: 'Government',
@@ -49231,8 +49231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RSC',
     StateC: 'J',
     C: 'Commercial',
@@ -49251,8 +49251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RSLP',
     StateC: 'US',
     C: 'Military',
@@ -49271,8 +49271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RSP',
     StateC: 'J',
     C: 'Commercial',
@@ -49291,8 +49291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RSQ',
     StateC: 'MU',
     C: 'Commercial',
@@ -49311,8 +49311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RSRS',
     StateC: 'UK',
     C: 'Government',
@@ -49331,8 +49331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RTAF',
     StateC: 'T',
     C: 'Military',
@@ -49351,8 +49351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RTG',
     StateC: 'S',
     C: 'Government',
@@ -49371,8 +49371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RUAF',
     StateC: 'RU',
     C: 'Academic',
@@ -49391,8 +49391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAAB',
     StateC: 'S',
     C: 'Commercial',
@@ -49411,8 +49411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CONTR',
     StateC: 'CH',
     C: 'Commercial',
@@ -49431,8 +49431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RUAGD',
     StateC: 'US',
     C: 'Commercial',
@@ -49451,8 +49451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAL',
     StateC: 'UK',
     C: 'Government',
@@ -49464,15 +49464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -1.29,
     alt: 0,
     Parent: 'SERC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RVSN',
     StateC: 'SU',
     C: 'Military',
@@ -49491,8 +49491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RVSN',
     StateC: 'RU',
     C: 'Military',
@@ -49511,8 +49511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RWI',
     StateC: 'US',
     C: 'Commercial',
@@ -49531,8 +49531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VULT',
     StateC: 'US',
     C: 'Commercial',
@@ -49551,8 +49551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NAASB',
     StateC: 'US',
     C: 'Commercial',
@@ -49571,8 +49571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RWMTI',
     StateC: 'RW',
     C: 'Government',
@@ -49591,8 +49591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'S7',
     StateC: 'RU',
     C: 'Commercial',
@@ -49611,8 +49611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SISP',
     StateC: 'CN',
     C: 'Military',
@@ -49631,8 +49631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'S394I',
     StateC: 'US',
     C: 'Military',
@@ -49651,8 +49651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'S4300',
     StateC: 'US',
     C: 'Military',
@@ -49671,8 +49671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAAB',
     StateC: 'S',
     C: 'Commercial',
@@ -49691,8 +49691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAAB',
     StateC: 'S',
     C: 'Commercial',
@@ -49711,8 +49711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAAB',
     StateC: 'S',
     C: 'Commercial',
@@ -49731,8 +49731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAAB',
     StateC: 'S',
     C: 'Commercial',
@@ -49751,8 +49751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAAB',
     StateC: 'S',
     C: 'Commercial',
@@ -49771,8 +49771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAAF',
     StateC: 'ZA',
     C: 'Military',
@@ -49791,8 +49791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SABCZ',
     StateC: 'CZ',
     C: 'Commercial',
@@ -49811,8 +49811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SABCA',
     StateC: 'B',
     C: 'Commercial',
@@ -49831,8 +49831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAC',
     StateC: 'US',
     C: 'Military',
@@ -49851,8 +49851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAFRAN',
     StateC: 'F',
     C: 'Commercial',
@@ -49871,8 +49871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -49884,15 +49884,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.65,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAFSP',
     StateC: 'US',
     C: 'Military',
@@ -49911,8 +49911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAIC',
     StateC: 'US',
     C: 'Commercial',
@@ -49931,8 +49931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAIUS',
     StateC: 'US',
     C: 'Commercial',
@@ -49951,8 +49951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFBSD',
     StateC: 'US',
     C: 'Military',
@@ -49964,15 +49964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.24,
     alt: 0,
     Parent: 'USAF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -49991,8 +49991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAMX',
     StateC: 'MX',
     C: 'Commercial',
@@ -50011,8 +50011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAND',
     StateC: 'US',
     C: 'Military',
@@ -50031,8 +50031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SANDF',
     StateC: 'ZA',
     C: 'Military',
@@ -50051,8 +50051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SANH',
     StateC: 'US',
     C: 'Commercial',
@@ -50071,8 +50071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SANH',
     StateC: 'US',
     C: 'Commercial',
@@ -50084,15 +50084,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -71.46,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SANJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -50111,8 +50111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SANJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -50131,8 +50131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAND',
     StateC: 'US',
     C: 'Military',
@@ -50151,8 +50151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SAO',
     StateC: 'US',
     C: 'Government',
@@ -50171,8 +50171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SASG',
     StateC: 'UK',
     C: 'Commercial',
@@ -50191,8 +50191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SASGA',
     StateC: 'AU',
     C: 'Commercial',
@@ -50204,15 +50204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 115.86,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SASK',
     StateC: 'CA',
     C: 'Academic',
@@ -50231,8 +50231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SASMAC',
     StateC: 'CN',
     C: 'Government',
@@ -50244,15 +50244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.3,
     alt: 0,
     Parent: 'GCDX',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBA',
     StateC: 'CN',
     C: 'Commercial',
@@ -50271,8 +50271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SATBYUL',
     StateC: 'KR',
     C: 'Commercial',
@@ -50291,8 +50291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SATEL',
     StateC: 'US',
     C: 'Commercial',
@@ -50311,8 +50311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SATELOG',
     StateC: 'AR',
     C: 'Commercial',
@@ -50331,8 +50331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SATGE',
     StateC: 'SG',
     C: 'Commercial',
@@ -50351,8 +50351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SATHYA',
     StateC: 'IN',
     C: 'Academic',
@@ -50371,8 +50371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SATLAN',
     StateC: 'E',
     C: 'Commercial',
@@ -50391,8 +50391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAISR',
     StateC: 'KR',
     C: 'Commercial',
@@ -50411,8 +50411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAISR',
     StateC: 'KR',
     C: 'Commercial',
@@ -50431,8 +50431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SATRV',
     StateC: 'PL',
     C: 'Commercial',
@@ -50451,8 +50451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBA',
     StateC: 'CN',
     C: 'Military',
@@ -50471,8 +50471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBA',
     StateC: 'CN',
     C: 'Military',
@@ -50491,8 +50491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBEL',
     StateC: 'B',
     C: 'Commercial',
@@ -50504,15 +50504,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 5.57,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBRC',
     StateC: 'US',
     C: 'Commercial',
@@ -50531,8 +50531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBRC',
     StateC: 'US',
     C: 'Commercial',
@@ -50544,15 +50544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -119.81,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBRC',
     StateC: 'US',
     C: 'Commercial',
@@ -50564,15 +50564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -119.81,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SBS',
     StateC: 'US',
     C: 'Commercial',
@@ -50591,8 +50591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCAL',
     StateC: 'US',
     C: 'Commercial',
@@ -50611,8 +50611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCC',
     StateC: 'J',
     C: 'Commercial',
@@ -50631,8 +50631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCC',
     StateC: 'J',
     C: 'Commercial',
@@ -50651,8 +50651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRDL',
     StateC: 'US',
     C: 'Military',
@@ -50671,8 +50671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCHJ',
     StateC: 'US',
     C: 'Commercial',
@@ -50691,8 +50691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCO',
     StateC: 'US',
     C: 'Military',
@@ -50711,8 +50711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCSS',
     StateC: 'ZA',
     C: 'Commercial',
@@ -50731,8 +50731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCT',
     StateC: 'MX',
     C: 'Commercial',
@@ -50751,8 +50751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCU',
     StateC: 'US',
     C: 'Commercial',
@@ -50771,8 +50771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDA',
     StateC: 'US',
     C: 'Military',
@@ -50784,15 +50784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.06,
     alt: 0,
     Parent: 'DOD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -50811,8 +50811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDCO',
     StateC: 'US',
     C: 'Commercial',
@@ -50831,8 +50831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDIITI',
     StateC: 'CN',
     C: 'Commercial',
@@ -50851,8 +50851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDIO',
     StateC: 'US',
     C: 'Military',
@@ -50871,8 +50871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDLP',
     StateC: 'CZ',
     C: 'Commercial',
@@ -50891,8 +50891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDP',
     StateC: 'F',
     C: 'Government',
@@ -50911,8 +50911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHAR',
     StateC: 'IN',
     C: 'Government',
@@ -50931,8 +50931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEAL',
     StateC: 'CH',
     C: 'Commercial',
@@ -50951,8 +50951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEALP',
     StateC: 'CYM',
     C: 'Commercial',
@@ -50971,8 +50971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEAL',
     StateC: 'CH',
     C: 'Commercial',
@@ -50991,8 +50991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEALP',
     StateC: 'US',
     C: 'Commercial',
@@ -51011,8 +51011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SECM',
     StateC: 'CN',
     C: 'Academic',
@@ -51031,8 +51031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SECT',
     StateC: 'F',
     C: 'Military',
@@ -51051,8 +51051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEDENA',
     StateC: 'MX',
     C: 'Military',
@@ -51071,8 +51071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEDSH',
     StateC: 'US',
     C: 'Academic',
@@ -51091,8 +51091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEL',
     StateC: 'US',
     C: 'Commercial',
@@ -51111,8 +51111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SELEN',
     StateC: 'I',
     C: 'Commercial',
@@ -51131,8 +51131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SELGR',
     StateC: 'D',
     C: 'Commercial',
@@ -51151,8 +51151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SELM',
     StateC: 'CN',
     C: 'Academic',
@@ -51171,8 +51171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SENER',
     StateC: 'E',
     C: 'Commercial',
@@ -51191,8 +51191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -51204,15 +51204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.65,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEP',
     StateC: 'F',
     C: 'Commercial',
@@ -51231,8 +51231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPR',
     StateC: 'F',
     C: 'Commercial',
@@ -51251,8 +51251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNECBL',
     StateC: 'F',
     C: 'Commercial',
@@ -51271,8 +51271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPR',
     StateC: 'F',
     C: 'Commercial',
@@ -51291,8 +51291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPRV',
     StateC: 'F',
     C: 'Commercial',
@@ -51311,8 +51311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPVR',
     StateC: 'F',
     C: 'Commercial',
@@ -51331,8 +51331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRC',
     StateC: 'UK',
     C: 'Government',
@@ -51344,15 +51344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -1.78,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEREB',
     StateC: 'F',
     C: 'Commercial',
@@ -51371,8 +51371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SES',
     StateC: 'L',
     C: 'Commercial',
@@ -51391,8 +51391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SESA',
     StateC: 'L',
     C: 'Commercial',
@@ -51411,8 +51411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SESBM',
     StateC: 'BM',
     C: 'Commercial',
@@ -51431,8 +51431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SESBR',
     StateC: 'BR',
     C: 'Commercial',
@@ -51451,8 +51451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SESE',
     StateC: 'L',
     C: 'Commercial',
@@ -51471,8 +51471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GECAP',
     StateC: 'UK',
     C: 'Commercial',
@@ -51491,8 +51491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SES',
     StateC: 'L',
     C: 'Commercial',
@@ -51511,8 +51511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEOPS',
     StateC: 'US',
     C: 'Commercial',
@@ -51531,8 +51531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STP',
     StateC: 'US',
     C: 'Military',
@@ -51551,8 +51551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSAB',
     StateC: 'S',
     C: 'Commercial',
@@ -51571,8 +51571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SES',
     StateC: 'L',
     C: 'Commercial',
@@ -51591,8 +51591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SESSL',
     StateC: 'UK',
     C: 'Commercial',
@@ -51611,8 +51611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSS',
     StateC: 'NL',
     C: 'Commercial',
@@ -51631,8 +51631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SESW',
     StateC: 'US',
     C: 'Commercial',
@@ -51651,8 +51651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NSS',
     StateC: 'NL',
     C: 'Commercial',
@@ -51671,8 +51671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMC',
     StateC: 'US',
     C: 'Commercial',
@@ -51691,8 +51691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ANDRW',
     StateC: 'US',
     C: 'Commercial',
@@ -51711,8 +51711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SFLINC',
     StateC: 'US',
     C: 'Commercial',
@@ -51731,8 +51731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SFP',
     StateC: 'US',
     C: 'Government',
@@ -51751,8 +51751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -51771,8 +51771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAI',
     StateC: 'RU',
     C: 'Commercial',
@@ -51791,8 +51791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CLSR',
     StateC: 'BGN',
     C: 'Academic',
@@ -51804,15 +51804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 23.33,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHAB',
     StateC: 'US',
     C: 'Commercial',
@@ -51831,8 +51831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHABH',
     StateC: 'US',
     C: 'Commercial',
@@ -51844,15 +51844,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.12,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHABT',
     StateC: 'US',
     C: 'Commercial',
@@ -51864,15 +51864,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.73,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHANDZ',
     StateC: 'CN',
     C: 'Government',
@@ -51891,8 +51891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHANGT',
     StateC: 'CN',
     C: 'Academic',
@@ -51911,8 +51911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHANT',
     StateC: 'CN',
     C: 'Commercial',
@@ -51931,8 +51931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHAOX',
     StateC: 'CN',
     C: 'Commercial',
@@ -51951,8 +51951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHAR',
     StateC: 'IN',
     C: 'Government',
@@ -51971,8 +51971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHEF',
     StateC: 'UK',
     C: 'Academic',
@@ -51991,8 +51991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SCHJ',
     StateC: 'US',
     C: 'Commercial',
@@ -52011,8 +52011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHIN',
     StateC: 'T',
     C: 'Commercial',
@@ -52031,8 +52031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHINSHU',
     StateC: 'J',
     C: 'Academic',
@@ -52051,8 +52051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHIN',
     StateC: 'T',
     C: 'Commercial',
@@ -52071,8 +52071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHIZ',
     StateC: 'J',
     C: 'Academic',
@@ -52091,8 +52091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIBGAU',
     StateC: 'RU',
     C: 'Academic',
@@ -52111,8 +52111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIENV',
     StateC: 'US',
     C: 'Commercial',
@@ -52131,8 +52131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIET',
     StateC: 'IN',
     C: 'Academic',
@@ -52151,8 +52151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SII',
     StateC: 'US',
     C: 'Commercial',
@@ -52171,8 +52171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SII',
     StateC: 'US',
     C: 'Commercial',
@@ -52191,8 +52191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIL',
     StateC: 'UK',
     C: 'Commercial',
@@ -52211,8 +52211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SILK',
     StateC: 'CYM',
     C: 'Commercial',
@@ -52231,8 +52231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIMED',
     StateC: 'CN',
     C: 'Academic',
@@ -52251,8 +52251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIMIT',
     StateC: 'CN',
     C: 'Academic',
@@ -52264,15 +52264,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 121.47,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIMG',
     StateC: 'US',
     C: 'Commercial',
@@ -52291,8 +52291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'EOSAT',
     StateC: 'US',
     C: 'Commercial',
@@ -52304,15 +52304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -76.86,
     alt: 0,
     Parent: 'SIMG',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SINDO',
     StateC: 'ID',
     C: 'Commercial',
@@ -52331,8 +52331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SINO',
     StateC: 'CN',
     C: 'Commercial',
@@ -52351,8 +52351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIR',
     StateC: 'US',
     C: 'Commercial',
@@ -52371,8 +52371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIRION',
     StateC: 'AU',
     C: 'Commercial',
@@ -52391,8 +52391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIROTS',
     StateC: 'RU',
     C: 'Academic',
@@ -52411,8 +52411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIR',
     StateC: 'US',
     C: 'Commercial',
@@ -52431,8 +52431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SIS',
     StateC: 'RU',
     C: 'Commercial',
@@ -52451,8 +52451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SISE',
     StateC: 'CN',
     C: 'Commercial',
@@ -52471,8 +52471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SISP',
     StateC: 'CN',
     C: 'Military',
@@ -52491,8 +52491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SITAEL',
     StateC: 'I',
     C: 'Commercial',
@@ -52511,8 +52511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SITP',
     StateC: 'CN',
     C: 'Academic',
@@ -52531,8 +52531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SJSU',
     StateC: 'US',
     C: 'Academic',
@@ -52551,8 +52551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SJTU',
     StateC: 'CN',
     C: 'Academic',
@@ -52571,8 +52571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKB30',
     StateC: 'SU',
     C: 'Military',
@@ -52591,8 +52591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKB385',
     StateC: 'SU',
     C: 'Government',
@@ -52611,8 +52611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKB385',
     StateC: 'SU',
     C: 'Government',
@@ -52631,8 +52631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKC',
     StateC: 'US',
     C: 'Academic',
@@ -52651,8 +52651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKI',
     StateC: 'IN',
     C: 'Academic',
@@ -52671,8 +52671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'JCSAT',
     StateC: 'J',
     C: 'Commercial',
@@ -52691,8 +52691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKTEL',
     StateC: 'KR',
     C: 'Commercial',
@@ -52711,8 +52711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUMED',
     StateC: 'KR',
     C: 'Commercial',
@@ -52724,15 +52724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 126.97,
     alt: 0,
     Parent: 'SKTEL',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYBOX',
     StateC: 'US',
     C: 'Commercial',
@@ -52751,8 +52751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYB',
     StateC: 'BR',
     C: 'Commercial',
@@ -52764,15 +52764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -43.2,
     alt: 0,
     Parent: 'DTV',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYFOX',
     StateC: 'CZ',
     C: 'Commercial',
@@ -52791,8 +52791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYM',
     StateC: 'MX',
     C: 'Commercial',
@@ -52811,8 +52811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYNET',
     StateC: 'UK',
     C: 'Military',
@@ -52831,8 +52831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYR',
     StateC: 'UK',
     C: 'Commercial',
@@ -52851,8 +52851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYTC',
     StateC: 'US',
     C: 'Commercial',
@@ -52871,8 +52871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYTCA',
     StateC: 'CA',
     C: 'Commercial',
@@ -52891,8 +52891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MSV',
     StateC: 'US',
     C: 'Commercial',
@@ -52911,8 +52911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLAF',
     StateC: 'SK',
     C: 'Military',
@@ -52931,8 +52931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLAUNCH',
     StateC: 'AU',
     C: 'Commercial',
@@ -52951,8 +52951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLII',
     StateC: 'US',
     C: 'Academic',
@@ -52964,15 +52964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -92.03,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLOBO',
     StateC: 'US',
     C: 'Commercial',
@@ -52991,8 +52991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLPS',
     StateC: 'US',
     C: 'Government',
@@ -53011,8 +53011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLREC',
     StateC: 'CN',
     C: 'Commercial',
@@ -53031,8 +53031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLU',
     StateC: 'US',
     C: 'Academic',
@@ -53051,8 +53051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFWDD',
     StateC: 'US',
     C: 'Military',
@@ -53071,8 +53071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SMCTV',
     StateC: 'US',
     C: 'Military',
@@ -53091,8 +53091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SMCTE',
     StateC: 'US',
     C: 'Military',
@@ -53111,8 +53111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SMCXR',
     StateC: 'US',
     C: 'Military',
@@ -53131,8 +53131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -53151,8 +53151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SMSA',
     StateC: 'US',
     C: 'Military',
@@ -53171,8 +53171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUD',
     StateC: 'F',
     C: 'Commercial',
@@ -53191,8 +53191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNCASO',
     StateC: 'F',
     C: 'Commercial',
@@ -53204,15 +53204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.25,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNECMA',
     StateC: 'F',
     C: 'Commercial',
@@ -53231,8 +53231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNECMA',
     StateC: 'F',
     C: 'Commercial',
@@ -53251,8 +53251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNECDE',
     StateC: 'F',
     C: 'Commercial',
@@ -53271,8 +53271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPR',
     StateC: 'F',
     C: 'Commercial',
@@ -53291,8 +53291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNECBL',
     StateC: 'F',
     C: 'Commercial',
@@ -53311,8 +53311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPR',
     StateC: 'F',
     C: 'Commercial',
@@ -53331,8 +53331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEP',
     StateC: 'F',
     C: 'Commercial',
@@ -53351,8 +53351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SEPVR',
     StateC: 'F',
     C: 'Commercial',
@@ -53371,8 +53371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KAI',
     StateC: 'RU',
     C: 'Commercial',
@@ -53391,8 +53391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SDP',
     StateC: 'F',
     C: 'Commercial',
@@ -53411,8 +53411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNSB',
     StateC: 'S',
     C: 'Government',
@@ -53424,15 +53424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 18,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPDEV',
     StateC: 'US',
     C: 'Commercial',
@@ -53451,8 +53451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNU',
     StateC: 'KR',
     C: 'Academic',
@@ -53471,8 +53471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNVL',
     StateC: 'US',
     C: 'Commercial',
@@ -53491,8 +53491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOCOM',
     StateC: 'US',
     C: 'Military',
@@ -53511,8 +53511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOHLA',
     StateC: 'J',
     C: 'Commercial',
@@ -53531,8 +53531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOKA',
     StateC: 'J',
     C: 'Academic',
@@ -53551,8 +53551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ECHOM',
     StateC: 'IE',
     C: 'Commercial',
@@ -53564,15 +53564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -6.27,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SONY',
     StateC: 'J',
     C: 'Commercial',
@@ -53591,8 +53591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOR',
     StateC: 'US',
     C: 'Military',
@@ -53611,8 +53611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SORUN',
     StateC: 'J',
     C: 'Commercial',
@@ -53631,8 +53631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOSA',
     StateC: 'SK',
     C: 'Academic',
@@ -53651,8 +53651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOSU',
     StateC: 'US',
     C: 'Academic',
@@ -53671,8 +53671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOTI',
     StateC: 'IQ',
     C: 'Military',
@@ -53684,15 +53684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 44.43,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOTON',
     StateC: 'UK',
     C: 'Academic',
@@ -53711,8 +53711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NII125',
     StateC: 'RU',
     C: 'Government',
@@ -53731,8 +53731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SOVA',
     StateC: 'SU',
     C: 'Military',
@@ -53744,15 +53744,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: 'VS',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPA',
     StateC: 'US',
     C: 'Commercial',
@@ -53771,8 +53771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPABD',
     StateC: 'J',
     C: 'Commercial',
@@ -53791,8 +53791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAC',
     StateC: 'J',
     C: 'Government',
@@ -53811,8 +53811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAD',
     StateC: 'US',
     C: 'Commercial',
@@ -53831,8 +53831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAIL',
     StateC: 'IL',
     C: 'Academic',
@@ -53851,8 +53851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAR',
     StateC: 'CA',
     C: 'Commercial',
@@ -53871,8 +53871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEHAVT',
     StateC: 'CA',
     C: 'Commercial',
@@ -53891,8 +53891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPARM',
     StateC: 'CA',
     C: 'Commercial',
@@ -53911,8 +53911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RCAV',
     StateC: 'CA',
     C: 'Commercial',
@@ -53931,8 +53931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAWAR',
     StateC: 'US',
     C: 'Military',
@@ -53951,8 +53951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAWSD',
     StateC: 'US',
     C: 'Military',
@@ -53971,8 +53971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPCOK',
     StateC: 'US',
     C: 'Commercial',
@@ -53991,8 +53991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPCOM',
     StateC: 'US',
     C: 'Commercial',
@@ -54004,15 +54004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.23,
     alt: 0,
     Parent: 'CONTF',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPDEV',
     StateC: 'US',
     C: 'Commercial',
@@ -54031,8 +54031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPER',
     StateC: 'US',
     C: 'Commercial',
@@ -54051,8 +54051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB9',
     StateC: 'SU',
     C: 'Military',
@@ -54064,15 +54064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 60.58,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPFL',
     StateC: 'US',
     C: 'Government',
@@ -54091,8 +54091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPG',
     StateC: 'US',
     C: 'Commercial',
@@ -54111,8 +54111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPHARM',
     StateC: 'IL',
     C: 'Commercial',
@@ -54131,8 +54131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPHARS',
     StateC: 'CL',
     C: 'Commercial',
@@ -54151,8 +54151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NANSFI',
     StateC: 'US',
     C: 'Commercial',
@@ -54171,8 +54171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPIREG',
     StateC: 'UK',
     C: 'Commercial',
@@ -54191,8 +54191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPIREL',
     StateC: 'L',
     C: 'Commercial',
@@ -54211,8 +54211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPLOG',
     StateC: 'US',
     C: 'Commercial',
@@ -54231,8 +54231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPMIC',
     StateC: 'US',
     C: 'Commercial',
@@ -54251,8 +54251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPOG',
     StateC: 'UK',
     C: 'Military',
@@ -54271,8 +54271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPOT',
     StateC: 'F',
     C: 'Commercial',
@@ -54291,8 +54291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPQ',
     StateC: 'US',
     C: 'Academic',
@@ -54311,8 +54311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPQ',
     StateC: 'US',
     C: 'Academic',
@@ -54331,8 +54331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFORS',
     StateC: 'US',
     C: 'Military',
@@ -54351,8 +54351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPSI',
     StateC: 'SI',
     C: 'Academic',
@@ -54371,8 +54371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPUT',
     StateC: 'RU',
     C: 'Commercial',
@@ -54391,8 +54391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPVR',
     StateC: 'US',
     C: 'Commercial',
@@ -54404,15 +54404,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.42,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPX',
     StateC: 'US',
     C: 'Commercial',
@@ -54431,8 +54431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPX',
     StateC: 'US',
     C: 'Commercial',
@@ -54451,8 +54451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPXS',
     StateC: 'US',
     C: 'Commercial',
@@ -54471,8 +54471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPXT',
     StateC: 'US',
     C: 'Commercial',
@@ -54491,8 +54491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPXTX',
     StateC: 'US',
     C: 'Commercial',
@@ -54511,8 +54511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRC',
     StateC: 'UK',
     C: 'Government',
@@ -54531,8 +54531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HARP',
     StateC: 'CA',
     C: 'Commercial',
@@ -54551,8 +54551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRDL',
     StateC: 'US',
     C: 'Military',
@@ -54571,8 +54571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRI',
     StateC: 'US',
     C: 'Commercial',
@@ -54591,8 +54591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRI',
     StateC: 'US',
     C: 'Commercial',
@@ -54611,8 +54611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRI',
     StateC: 'US',
     C: 'Commercial',
@@ -54624,15 +54624,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.18,
     alt: 0,
     Parent: 'STAN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CLSR',
     StateC: 'BG',
     C: 'Academic',
@@ -54644,15 +54644,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 23.33,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRMU',
     StateC: 'IN',
     C: 'Academic',
@@ -54664,15 +54664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 80.04,
     alt: 0,
     Parent: 'ANNAU',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRMU',
     StateC: 'IN',
     C: 'Academic',
@@ -54691,8 +54691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SROE',
     StateC: 'UK',
     C: 'Commercial',
@@ -54711,8 +54711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRON',
     StateC: 'NL',
     C: 'Government',
@@ -54724,15 +54724,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 5.17,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRSES',
     StateC: 'US',
     C: 'Commercial',
@@ -54751,8 +54751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SS500',
     StateC: 'DR',
     C: 'Military',
@@ -54771,8 +54771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RTG',
     StateC: 'S',
     C: 'Government',
@@ -54791,8 +54791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSCO',
     StateC: 'US',
     C: 'Commercial',
@@ -54811,8 +54811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSCS',
     StateC: 'S',
     C: 'Commercial',
@@ -54824,15 +54824,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 18,
     alt: 0,
     Parent: 'SSC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARGMA',
     StateC: 'US',
     C: 'Military',
@@ -54851,8 +54851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSI',
     StateC: 'US',
     C: 'Commercial',
@@ -54871,8 +54871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSICE',
     StateC: 'US',
     C: 'Academic',
@@ -54891,8 +54891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSI',
     StateC: 'US',
     C: 'Commercial',
@@ -54904,15 +54904,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSIM',
     StateC: 'MC',
     C: 'Commercial',
@@ -54931,8 +54931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -54951,8 +54951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FORDA',
     StateC: 'US',
     C: 'Commercial',
@@ -54971,8 +54971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNSPO',
     StateC: 'US',
     C: 'Military',
@@ -54984,15 +54984,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.04,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSTARS',
     StateC: 'US',
     C: 'Commercial',
@@ -55011,8 +55011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSTL',
     StateC: 'UK',
     C: 'Commercial',
@@ -55031,8 +55031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSTL',
     StateC: 'UK',
     C: 'Commercial',
@@ -55051,8 +55051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SSTUS',
     StateC: 'US',
     C: 'Commercial',
@@ -55071,8 +55071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ST2V',
     StateC: 'SG',
     C: 'Commercial',
@@ -55091,8 +55091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STA',
     StateC: 'J',
     C: 'Academic',
@@ -55111,8 +55111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STADK',
     StateC: 'D',
     C: 'Commercial',
@@ -55131,8 +55131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STAN',
     StateC: 'US',
     C: 'Academic',
@@ -55151,8 +55151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STARA',
     StateC: 'US',
     C: 'Commercial',
@@ -55171,8 +55171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STBO',
     StateC: 'ZA',
     C: 'Academic',
@@ -55191,8 +55191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STEAM',
     StateC: 'UK',
     C: 'Commercial',
@@ -55211,8 +55211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STEL',
     StateC: 'SG',
     C: 'Commercial',
@@ -55231,8 +55231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STELEC',
     StateC: 'SG',
     C: 'Commercial',
@@ -55244,15 +55244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 103.8,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STELLT',
     StateC: 'F',
     C: 'Commercial',
@@ -55271,8 +55271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STEN',
     StateC: 'US',
     C: 'Academic',
@@ -55291,8 +55291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'MTF',
     StateC: 'US',
     C: 'Government',
@@ -55304,15 +55304,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -89.6,
     alt: 0,
     Parent: 'NASA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STESS',
     StateC: 'SG',
     C: 'Commercial',
@@ -55331,8 +55331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SRC',
     StateC: 'UK',
     C: 'Government',
@@ -55344,15 +55344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -1.78,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STG',
     StateC: 'US',
     C: 'Government',
@@ -55371,8 +55371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STG',
     StateC: 'US',
     C: 'Government',
@@ -55391,8 +55391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STIOT',
     StateC: 'E',
     C: 'Commercial',
@@ -55411,8 +55411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STL',
     StateC: 'US',
     C: 'Commercial',
@@ -55431,8 +55431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STLC',
     StateC: 'US',
     C: 'Commercial',
@@ -55451,8 +55451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STLC',
     StateC: 'US',
     C: 'Commercial',
@@ -55464,15 +55464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.18,
     alt: 0,
     Parent: 'HCI',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STMS',
     StateC: 'US',
     C: 'Academic',
@@ -55491,8 +55491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STO',
     StateC: 'S',
     C: 'Academic',
@@ -55511,8 +55511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STONE',
     StateC: 'BR',
     C: 'Commercial',
@@ -55531,8 +55531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STP',
     StateC: 'US',
     C: 'Military',
@@ -55551,8 +55551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZAV47',
     StateC: 'SU',
     C: 'Commercial',
@@ -55571,8 +55571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STSM',
     StateC: 'F',
     C: 'Commercial',
@@ -55591,8 +55591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STST',
     StateC: 'US',
     C: 'Commercial',
@@ -55611,8 +55611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SU190',
     StateC: 'SU',
     C: 'Commercial',
@@ -55631,8 +55631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SU523',
     StateC: 'SU',
     C: 'Commercial',
@@ -55651,8 +55651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SU782',
     StateC: 'SU',
     C: 'Commercial',
@@ -55671,8 +55671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUD',
     StateC: 'F',
     C: 'Commercial',
@@ -55691,8 +55691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SNCASO',
     StateC: 'F',
     C: 'Commercial',
@@ -55704,15 +55704,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.25,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPER',
     StateC: 'US',
     C: 'Commercial',
@@ -55731,8 +55731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUI',
     StateC: 'US',
     C: 'Academic',
@@ -55751,8 +55751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUPA',
     StateC: 'PK',
     C: 'Government',
@@ -55771,8 +55771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUPAER',
     StateC: 'F',
     C: 'Academic',
@@ -55791,8 +55791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUPSAT',
     StateC: 'LK',
     C: 'Commercial',
@@ -55804,15 +55804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -79.84,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUPSI',
     StateC: 'CH',
     C: 'Academic',
@@ -55831,8 +55831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SURREY',
     StateC: 'UK',
     C: 'Academic',
@@ -55851,8 +55851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUT',
     StateC: 'IR',
     C: 'Academic',
@@ -55871,8 +55871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SVC',
     StateC: 'US',
     C: 'Commercial',
@@ -55891,8 +55891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SVEC',
     StateC: 'US',
     C: 'Commercial',
@@ -55904,15 +55904,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.38,
     alt: 0,
     Parent: 'HOUS',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWALES',
     StateC: 'US',
     C: 'Commercial',
@@ -55931,8 +55931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWARM',
     StateC: 'US',
     C: 'Commercial',
@@ -55951,8 +55951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWARMX',
     StateC: 'US',
     C: 'Commercial',
@@ -55971,8 +55971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWARNZ',
     StateC: 'NZ',
     C: 'Commercial',
@@ -55991,8 +55991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTD',
     StateC: 'US',
     C: 'Academic',
@@ -56004,15 +56004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -96.8,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWRI',
     StateC: 'US',
     C: 'Academic',
@@ -56031,8 +56031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SWRB',
     StateC: 'US',
     C: 'Academic',
@@ -56051,8 +56051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUSX',
     StateC: 'UK',
     C: 'Academic',
@@ -56071,8 +56071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SYAAF',
     StateC: 'SY',
     C: 'Military',
@@ -56091,8 +56091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SYMC',
     StateC: 'SY',
     C: 'Military',
@@ -56111,8 +56111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SYNSP',
     StateC: 'J',
     C: 'Commercial',
@@ -56131,8 +56131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SYRU',
     StateC: 'US',
     C: 'Academic',
@@ -56151,8 +56151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SZRTC',
     StateC: 'CN',
     C: 'Commercial',
@@ -56171,8 +56171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TAC',
     StateC: 'US',
     C: 'Military',
@@ -56191,8 +56191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'IEM',
     StateC: 'SU',
     C: 'Government',
@@ -56211,8 +56211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TAMA',
     StateC: 'J',
     C: 'Academic',
@@ -56231,8 +56231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TAMU',
     StateC: 'US',
     C: 'Academic',
@@ -56251,8 +56251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TAO',
     StateC: 'J',
     C: 'Academic',
@@ -56271,8 +56271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSCJ',
     StateC: 'J',
     C: 'Academic',
@@ -56284,15 +56284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.75,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TARTU',
     StateC: 'EE',
     C: 'Academic',
@@ -56311,8 +56311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TAU',
     StateC: 'IL',
     C: 'Academic',
@@ -56331,8 +56331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TAYLU',
     StateC: 'US',
     C: 'Academic',
@@ -56351,8 +56351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SKYBOX',
     StateC: 'US',
     C: 'Commercial',
@@ -56371,8 +56371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TBS',
     StateC: 'J',
     C: 'Commercial',
@@ -56391,8 +56391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TCAN',
     StateC: 'CA',
     C: 'Commercial',
@@ -56411,8 +56411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TCAN',
     StateC: 'CA',
     C: 'Commercial',
@@ -56431,8 +56431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TCI',
     StateC: 'US',
     C: 'Commercial',
@@ -56451,8 +56451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CFTH',
     StateC: 'F',
     C: 'Commercial',
@@ -56464,15 +56464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.3,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TECN',
     StateC: 'IL',
     C: 'Academic',
@@ -56491,8 +56491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TEIK',
     StateC: 'J',
     C: 'Academic',
@@ -56511,8 +56511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMIRK',
     StateC: 'IR',
     C: 'Academic',
@@ -56531,8 +56531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TEKEV',
     StateC: 'P',
     C: 'Commercial',
@@ -56544,15 +56544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -9.14,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TELB',
     StateC: 'BR',
     C: 'Commercial',
@@ -56571,8 +56571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TELBR',
     StateC: 'US',
     C: 'Commercial',
@@ -56591,8 +56591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TELD',
     StateC: 'US',
     C: 'Commercial',
@@ -56611,8 +56611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TELED',
     StateC: 'I',
     C: 'Military',
@@ -56631,8 +56631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PER',
     StateC: 'ID',
     C: 'Commercial',
@@ -56651,8 +56651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TELMX',
     StateC: 'MX',
     C: 'Commercial',
@@ -56671,8 +56671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TELTN',
     StateC: 'TN',
     C: 'Commercial',
@@ -56691,8 +56691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TELTRU',
     StateC: 'RU',
     C: 'Commercial',
@@ -56711,8 +56711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TEMIS',
     StateC: 'I',
     C: 'Commercial',
@@ -56731,8 +56731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CRI',
     StateC: 'DK',
     C: 'Commercial',
@@ -56751,8 +56751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TERRN',
     StateC: 'US',
     C: 'Commercial',
@@ -56764,15 +56764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.35,
     alt: 0,
     Parent: 'DISH',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AMSC',
     StateC: 'US',
     C: 'Commercial',
@@ -56791,8 +56791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TERRN',
     StateC: 'US',
     C: 'Commercial',
@@ -56804,15 +56804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.35,
     alt: 0,
     Parent: 'TERRE',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TESLA',
     StateC: 'US',
     C: 'Commercial',
@@ -56831,8 +56831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TETHA',
     StateC: 'US',
     C: 'Commercial',
@@ -56851,8 +56851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TF88',
     StateC: 'US',
     C: 'Military',
@@ -56871,8 +56871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SHIN',
     StateC: 'T',
     C: 'Commercial',
@@ -56891,8 +56891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'FIAT',
     StateC: 'I',
     C: 'Commercial',
@@ -56911,8 +56911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'CFTH',
     StateC: 'F',
     C: 'Commercial',
@@ -56924,15 +56924,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 2.27,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SELEN',
     StateC: 'I',
     C: 'Commercial',
@@ -56951,8 +56951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUD',
     StateC: 'F',
     C: 'Commercial',
@@ -56971,8 +56971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THK',
     StateC: 'US',
     C: 'Commercial',
@@ -56991,8 +56991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THK',
     StateC: 'US',
     C: 'Commercial',
@@ -57011,8 +57011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THK',
     StateC: 'US',
     C: 'Commercial',
@@ -57031,8 +57031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THK',
     StateC: 'US',
     C: 'Commercial',
@@ -57051,8 +57051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKE',
     StateC: 'US',
     C: 'Commercial',
@@ -57071,8 +57071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKU',
     StateC: 'US',
     C: 'Commercial',
@@ -57091,8 +57091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKX',
     StateC: 'US',
     C: 'Commercial',
@@ -57111,8 +57111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THKXM',
     StateC: 'US',
     C: 'Commercial',
@@ -57131,8 +57131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THUR',
     StateC: 'UAE',
     C: 'Commercial',
@@ -57151,8 +57151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'THUR',
     StateC: 'UAE',
     C: 'Commercial',
@@ -57164,15 +57164,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 54.37,
     alt: 0,
     Parent: 'ALYAH',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TIANJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -57191,8 +57191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TIANJU',
     StateC: 'CN',
     C: 'Academic',
@@ -57211,8 +57211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TIFR',
     StateC: 'IN',
     C: 'Government',
@@ -57231,8 +57231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TIGER',
     StateC: 'US',
     C: 'Commercial',
@@ -57251,8 +57251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TIS',
     StateC: 'US',
     C: 'Academic',
@@ -57271,8 +57271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TISPACE',
     StateC: 'TW',
     C: 'Commercial',
@@ -57291,8 +57291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TIT',
     StateC: 'J',
     C: 'Academic',
@@ -57311,8 +57311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TJHS',
     StateC: 'US',
     C: 'Academic',
@@ -57331,8 +57331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TLS',
     StateC: 'F',
     C: 'Academic',
@@ -57351,8 +57351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TMI',
     StateC: 'CA',
     C: 'Commercial',
@@ -57371,8 +57371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TMILES',
     StateC: 'US',
     C: 'Academic',
@@ -57391,8 +57391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TMINUS',
     StateC: 'NL',
     C: 'Commercial',
@@ -57411,8 +57411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TMSAT',
     StateC: 'T',
     C: 'Academic',
@@ -57431,8 +57431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TMTEL',
     StateC: 'TM',
     C: 'Government',
@@ -57451,8 +57451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TMU',
     StateC: 'J',
     C: 'Academic',
@@ -57471,8 +57471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TMU',
     StateC: 'J',
     C: 'Academic',
@@ -57484,15 +57484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.32,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TNO',
     StateC: 'NL',
     C: 'Government',
@@ -57511,8 +57511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TNOR',
     StateC: 'N',
     C: 'Commercial',
@@ -57531,8 +57531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TNSA',
     StateC: 'TM',
     C: 'Government',
@@ -57544,15 +57544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 58.37,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOHO',
     StateC: 'J',
     C: 'Academic',
@@ -57571,8 +57571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOK',
     StateC: 'J',
     C: 'Academic',
@@ -57591,8 +57591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOKAI',
     StateC: 'J',
     C: 'Academic',
@@ -57611,8 +57611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TONG',
     StateC: 'TO',
     C: 'Commercial',
@@ -57631,8 +57631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TORP',
     StateC: 'I',
     C: 'Academic',
@@ -57651,8 +57651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOSH',
     StateC: 'J',
     C: 'Commercial',
@@ -57671,8 +57671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOSHKE',
     StateC: 'J',
     C: 'Commercial',
@@ -57684,15 +57684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 139.7,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOYA',
     StateC: 'J',
     C: 'Academic',
@@ -57711,8 +57711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TOYON',
     StateC: 'US',
     C: 'Commercial',
@@ -57731,8 +57731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TPS',
     StateC: 'US',
     C: 'Academic',
@@ -57751,8 +57751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TPU',
     StateC: 'RU',
     C: 'Academic',
@@ -57771,8 +57771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TRACR',
     StateC: 'US',
     C: 'Commercial',
@@ -57791,8 +57791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TRORB',
     StateC: 'US',
     C: 'Commercial',
@@ -57811,8 +57811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NICP',
     StateC: 'N',
     C: 'Academic',
@@ -57831,8 +57831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STADK',
     StateC: 'D',
     C: 'Commercial',
@@ -57851,8 +57851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'STL',
     StateC: 'US',
     C: 'Commercial',
@@ -57871,8 +57871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ASTA',
     StateC: 'US',
     C: 'Commercial',
@@ -57891,8 +57891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TRWC',
     StateC: 'US',
     C: 'Commercial',
@@ -57911,8 +57911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ESL',
     StateC: 'US',
     C: 'Commercial',
@@ -57931,8 +57931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TRWRC',
     StateC: 'US',
     C: 'Academic',
@@ -57951,8 +57951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSAO',
     StateC: 'RU',
     C: 'Academic',
@@ -57971,8 +57971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSBM',
     StateC: 'RU',
     C: 'Commercial',
@@ -57991,8 +57991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSCJ',
     StateC: 'J',
     C: 'Commercial',
@@ -58011,8 +58011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSCO',
     StateC: 'US',
     C: 'Commercial',
@@ -58024,15 +58024,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.17,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSEPT',
     StateC: 'US',
     C: 'Commercial',
@@ -58051,8 +58051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSHUA',
     StateC: 'CN',
     C: 'Academic',
@@ -58071,8 +58071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ARSL',
     StateC: 'SU',
     C: 'Government',
@@ -58091,8 +58091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSSKB',
     StateC: 'SU',
     C: 'Government',
@@ -58111,8 +58111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB1',
     StateC: 'SU',
     C: 'Government',
@@ -58131,8 +58131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OKB52',
     StateC: 'SU',
     C: 'Military',
@@ -58151,8 +58151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSKHM',
     StateC: 'RU',
     C: 'Military',
@@ -58171,8 +58171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSKY',
     StateC: 'CA',
     C: 'Commercial',
@@ -58191,8 +58191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ATTS',
     StateC: 'US',
     C: 'Commercial',
@@ -58204,15 +58204,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.69,
     alt: 0,
     Parent: 'TCAN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LSKYB',
     StateC: 'BR',
     C: 'Commercial',
@@ -58231,8 +58231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSLKY',
     StateC: 'US',
     C: 'Commercial',
@@ -58251,8 +58251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NII88',
     StateC: 'SU',
     C: 'Government',
@@ -58271,8 +58271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NII88',
     StateC: 'RU',
     C: 'Government',
@@ -58284,15 +58284,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.82,
     alt: 0,
     Parent: 'FKA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSN108',
     StateC: 'SU',
     C: 'Military',
@@ -58311,8 +58311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSN108',
     StateC: 'SU',
     C: 'Military',
@@ -58324,15 +58324,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSPK',
     StateC: 'SU',
     C: 'Military',
@@ -58351,8 +58351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSPK',
     StateC: 'RU',
     C: 'Government',
@@ -58371,8 +58371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSPZ',
     StateC: 'I',
     C: 'Commercial',
@@ -58391,8 +58391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSSKB',
     StateC: 'SU',
     C: 'Commercial',
@@ -58411,8 +58411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSSKB',
     StateC: 'SU',
     C: 'Commercial',
@@ -58431,8 +58431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSUK',
     StateC: 'J',
     C: 'Academic',
@@ -58451,8 +58451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'SU',
     C: 'Military',
@@ -58471,8 +58471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TSUKU',
     StateC: 'J',
     C: 'Academic',
@@ -58491,8 +58491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VTS',
     StateC: 'RU',
     C: 'Military',
@@ -58511,8 +58511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TTU',
     StateC: 'EE',
     C: 'Academic',
@@ -58531,8 +58531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TTY',
     StateC: 'FI',
     C: 'Academic',
@@ -58551,8 +58551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUAF',
     StateC: 'TR',
     C: 'Military',
@@ -58571,8 +58571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUAFA',
     StateC: 'TR',
     C: 'Military',
@@ -58591,8 +58591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUB',
     StateC: 'D',
     C: 'Academic',
@@ -58611,8 +58611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUB1',
     StateC: 'D',
     C: 'Academic',
@@ -58624,15 +58624,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 13.33,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUBI',
     StateC: 'D',
     C: 'Academic',
@@ -58651,8 +58651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUBT',
     StateC: 'TR',
     C: 'Academic',
@@ -58664,15 +58664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 32.87,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUBTK',
     StateC: 'TR',
     C: 'Academic',
@@ -58691,8 +58691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUBTK',
     StateC: 'TR',
     C: 'Academic',
@@ -58711,8 +58711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUC',
     StateC: 'AR',
     C: 'Academic',
@@ -58731,8 +58731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUD',
     StateC: 'D',
     C: 'Academic',
@@ -58751,8 +58751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUG',
     StateC: 'AT',
     C: 'Academic',
@@ -58771,8 +58771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUI',
     StateC: 'US',
     C: 'Commercial',
@@ -58791,8 +58791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUKE',
     StateC: 'SK',
     C: 'Academic',
@@ -58811,8 +58811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TULF',
     StateC: 'TR',
     C: 'Military',
@@ -58831,8 +58831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUM',
     StateC: 'D',
     C: 'Academic',
@@ -58851,8 +58851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUMD',
     StateC: 'MD',
     C: 'Academic',
@@ -58871,8 +58871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUMED',
     StateC: 'KR',
     C: 'Commercial',
@@ -58891,8 +58891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TURAB',
     StateC: 'PR',
     C: 'Commercial',
@@ -58911,8 +58911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TURKP',
     StateC: 'TR',
     C: 'Commercial',
@@ -58931,8 +58931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TURKP',
     StateC: 'TR',
     C: 'Commercial',
@@ -58951,8 +58951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TURKP',
     StateC: 'TR',
     C: 'Commercial',
@@ -58971,8 +58971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUSAS',
     StateC: 'TR',
     C: 'Commercial',
@@ -58991,8 +58991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TUUT',
     StateC: 'TW',
     C: 'Academic',
@@ -59004,15 +59004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 121.61,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TXWC',
     StateC: 'US',
     C: 'Academic',
@@ -59031,8 +59031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TYVAK',
     StateC: 'US',
     C: 'Commercial',
@@ -59051,8 +59051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TYVI',
     StateC: 'I',
     C: 'Commercial',
@@ -59071,8 +59071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TZJ',
     StateC: 'CN',
     C: 'Academic',
@@ -59091,8 +59091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'U9900',
     StateC: 'IL',
     C: 'Military',
@@ -59111,8 +59111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAB',
     StateC: 'US',
     C: 'Academic',
@@ -59131,8 +59131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAC',
     StateC: 'US',
     C: 'Commercial',
@@ -59144,15 +59144,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -72.67,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAEAF',
     StateC: 'UAE',
     C: 'Military',
@@ -59171,8 +59171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAF',
     StateC: 'US',
     C: 'Academic',
@@ -59191,8 +59191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAH',
     StateC: 'US',
     C: 'Academic',
@@ -59211,8 +59211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAHCM',
     StateC: 'US',
     C: 'Academic',
@@ -59231,8 +59231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAP',
     StateC: 'PE',
     C: 'Academic',
@@ -59251,8 +59251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAZ',
     StateC: 'US',
     C: 'Academic',
@@ -59271,8 +59271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UBC',
     StateC: 'CA',
     C: 'Academic',
@@ -59291,8 +59291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UBIQ',
     StateC: 'US',
     C: 'Commercial',
@@ -59311,8 +59311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCAN',
     StateC: 'NZ',
     C: 'Academic',
@@ -59331,8 +59331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCB',
     StateC: 'US',
     C: 'Academic',
@@ -59351,8 +59351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCD',
     StateC: 'US',
     C: 'Academic',
@@ -59364,15 +59364,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -121.75,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCF',
     StateC: 'US',
     C: 'Academic',
@@ -59391,8 +59391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCH',
     StateC: 'CL',
     C: 'Academic',
@@ -59411,8 +59411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCL',
     StateC: 'UK',
     C: 'Academic',
@@ -59431,8 +59431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCLA',
     StateC: 'US',
     C: 'Academic',
@@ -59451,8 +59451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCO',
     StateC: 'US',
     C: 'Academic',
@@ -59471,8 +59471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCSD',
     StateC: 'US',
     C: 'Academic',
@@ -59491,8 +59491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCSFMC',
     StateC: 'US',
     C: 'Academic',
@@ -59511,8 +59511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCW',
     StateC: 'UK',
     C: 'Academic',
@@ -59531,8 +59531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UDAYT',
     StateC: 'US',
     C: 'Academic',
@@ -59551,8 +59551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UDEFA',
     StateC: 'MX',
     C: 'Military',
@@ -59571,8 +59571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UESTC',
     StateC: 'CN',
     C: 'Academic',
@@ -59591,8 +59591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UFA',
     StateC: 'CZ',
     C: 'Academic',
@@ -59611,8 +59611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UFL',
     StateC: 'US',
     C: 'Academic',
@@ -59631,8 +59631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UFSC',
     StateC: 'BR',
     C: 'Academic',
@@ -59651,8 +59651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UFSM',
     StateC: 'BR',
     C: 'Academic',
@@ -59671,8 +59671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UGA',
     StateC: 'US',
     C: 'Academic',
@@ -59691,8 +59691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UGATU',
     StateC: 'RU',
     C: 'Academic',
@@ -59711,8 +59711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UHI',
     StateC: 'US',
     C: 'Academic',
@@ -59731,8 +59731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SUI',
     StateC: 'US',
     C: 'Academic',
@@ -59751,8 +59751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UIO',
     StateC: 'N',
     C: 'Academic',
@@ -59771,8 +59771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UIPRB',
     StateC: 'PR',
     C: 'Academic',
@@ -59791,8 +59791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UITM',
     StateC: 'MY',
     C: 'Academic',
@@ -59811,8 +59811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UIUC',
     StateC: 'US',
     C: 'Academic',
@@ -59831,8 +59831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UKMO',
     StateC: 'UK',
     C: 'Government',
@@ -59851,8 +59851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UKRN',
     StateC: 'UK',
     C: 'Military',
@@ -59871,8 +59871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UKRN',
     StateC: 'UK',
     C: 'Military',
@@ -59891,8 +59891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UKS',
     StateC: 'US',
     C: 'Academic',
@@ -59911,8 +59911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'BNSC',
     StateC: 'UK',
     C: 'Government',
@@ -59931,8 +59931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'RAFSO',
     StateC: 'UK',
     C: 'Military',
@@ -59951,8 +59951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UKTSB',
     StateC: 'UK',
     C: 'Government',
@@ -59971,8 +59971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UKWO',
     StateC: 'UK',
     C: 'Military',
@@ -59991,8 +59991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UKY',
     StateC: 'US',
     C: 'Academic',
@@ -60011,8 +60011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ULAB',
     StateC: 'US',
     C: 'Commercial',
@@ -60031,8 +60031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ULAD',
     StateC: 'US',
     C: 'Commercial',
@@ -60051,8 +60051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ULAL',
     StateC: 'US',
     C: 'Commercial',
@@ -60071,8 +60071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLII',
     StateC: 'US',
     C: 'Academic',
@@ -60091,8 +60091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ULM',
     StateC: 'D',
     C: 'Academic',
@@ -60111,8 +60111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMAL',
     StateC: 'US',
     C: 'Academic',
@@ -60131,8 +60131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMARB',
     StateC: 'SI',
     C: 'Academic',
@@ -60151,8 +60151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMBC',
     StateC: 'US',
     C: 'Academic',
@@ -60171,8 +60171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMBRA',
     StateC: 'US',
     C: 'Commercial',
@@ -60191,8 +60191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMD',
     StateC: 'US',
     C: 'Academic',
@@ -60211,8 +60211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMI',
     StateC: 'US',
     C: 'Academic',
@@ -60231,8 +60231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMIAMI',
     StateC: 'US',
     C: 'Academic',
@@ -60251,8 +60251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UMN',
     StateC: 'US',
     C: 'Academic',
@@ -60271,8 +60271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNAM',
     StateC: 'MX',
     C: 'Academic',
@@ -60291,8 +60291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNB',
     StateC: 'BR',
     C: 'Academic',
@@ -60311,8 +60311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNCW',
     StateC: 'US',
     C: 'Academic',
@@ -60331,8 +60331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNH',
     StateC: 'US',
     C: 'Academic',
@@ -60351,8 +60351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNIPE',
     StateC: 'PE',
     C: 'Academic',
@@ -60371,8 +60371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNIS',
     StateC: 'J',
     C: 'Academic',
@@ -60391,8 +60391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNITS',
     StateC: 'I',
     C: 'Academic',
@@ -60404,15 +60404,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 13.79,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNKCN',
     StateC: 'CN',
     C: 'Commercial',
@@ -60424,15 +60424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'SU',
     C: 'Military',
@@ -60451,8 +60451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'RU',
     C: 'Military',
@@ -60471,8 +60471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNKJ',
     StateC: 'J',
     C: 'Commercial',
@@ -60491,8 +60491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNKUS',
     StateC: 'US',
     C: 'Commercial',
@@ -60511,8 +60511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNKUS1',
     StateC: 'US',
     C: 'Commercial',
@@ -60531,8 +60531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNMC',
     StateC: 'US',
     C: 'Academic',
@@ -60551,8 +60551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAU4',
     StateC: 'SU',
     C: 'Military',
@@ -60571,8 +60571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNSEEN',
     StateC: 'F',
     C: 'Commercial',
@@ -60591,8 +60591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ONUSJ',
     StateC: 'AR',
     C: 'Academic',
@@ -60604,15 +60604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -68.58,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNSW',
     StateC: 'AU',
     C: 'Academic',
@@ -60631,8 +60631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UNSWC',
     StateC: 'AU',
     C: 'Academic',
@@ -60651,8 +60651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SURREY',
     StateC: 'UK',
     C: 'Academic',
@@ -60671,8 +60671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UPAE',
     StateC: 'US',
     C: 'Commercial',
@@ -60691,8 +60691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UPAEP',
     StateC: 'MX',
     C: 'Academic',
@@ -60711,8 +60711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UPC',
     StateC: 'E',
     C: 'Academic',
@@ -60731,8 +60731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UPD',
     StateC: 'PH',
     C: 'Academic',
@@ -60751,8 +60751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UPM',
     StateC: 'E',
     C: 'Academic',
@@ -60771,8 +60771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UPMIM',
     StateC: 'E',
     C: 'Academic',
@@ -60784,15 +60784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -3.73,
     alt: 0,
     Parent: 'UPM',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UQU',
     StateC: 'AU',
     C: 'Academic',
@@ -60811,8 +60811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'DEIMI',
     StateC: 'E',
     C: 'Commercial',
@@ -60831,8 +60831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'URTHE',
     StateC: 'CA',
     C: 'Commercial',
@@ -60851,8 +60851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'URUGUS',
     StateC: 'UY',
     C: 'Commercial',
@@ -60871,8 +60871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'US7A',
     StateC: 'US',
     C: 'Military',
@@ -60891,8 +60891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'US8A',
     StateC: 'US',
     C: 'Military',
@@ -60911,8 +60911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USA',
     StateC: 'US',
     C: 'Military',
@@ -60931,8 +60931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USAF',
     StateC: 'US',
     C: 'Military',
@@ -60951,8 +60951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USAFA',
     StateC: 'US',
     C: 'Military',
@@ -60971,8 +60971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USAIC',
     StateC: 'US',
     C: 'Military',
@@ -60991,8 +60991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'OCO',
     StateC: 'US',
     C: 'Military',
@@ -61004,15 +61004,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USA',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USASC',
     StateC: 'US',
     C: 'Military',
@@ -61024,15 +61024,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -74.05,
     alt: 0,
     Parent: 'USA',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USCG',
     StateC: 'US',
     C: 'Military',
@@ -61051,8 +61051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USCGR',
     StateC: 'US',
     C: 'Military',
@@ -61071,8 +61071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USCLA',
     StateC: 'US',
     C: 'Academic',
@@ -61091,8 +61091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USCMR',
     StateC: 'US',
     C: 'Academic',
@@ -61111,8 +61111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USDI',
     StateC: 'US',
     C: 'Government',
@@ -61131,8 +61131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ACE',
     StateC: 'US',
     C: 'Military',
@@ -61151,8 +61151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USEF',
     StateC: 'J',
     C: 'Commercial',
@@ -61171,8 +61171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USERAR',
     StateC: 'CO',
     C: 'Academic',
@@ -61191,8 +61191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USF',
     StateC: 'US',
     C: 'Academic',
@@ -61211,8 +61211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USGS',
     StateC: 'US',
     C: 'Government',
@@ -61231,8 +61231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USGSR',
     StateC: 'US',
     C: 'Government',
@@ -61244,15 +61244,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.35,
     alt: 0,
     Parent: 'USDI',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USHREP',
     StateC: 'US',
     C: 'Government',
@@ -61271,8 +61271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USIN',
     StateC: 'US',
     C: 'Academic',
@@ -61291,8 +61291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USMA',
     StateC: 'US',
     C: 'Military',
@@ -61311,8 +61311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USMC',
     StateC: 'US',
     C: 'Military',
@@ -61331,8 +61331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USN',
     StateC: 'US',
     C: 'Military',
@@ -61351,8 +61351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNA',
     StateC: 'US',
     C: 'Military',
@@ -61371,8 +61371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNAEG',
     StateC: 'US',
     C: 'Military',
@@ -61391,8 +61391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNB',
     StateC: 'US',
     C: 'Military',
@@ -61411,8 +61411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SPAWAR',
     StateC: 'US',
     C: 'Military',
@@ -61424,15 +61424,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNMYP',
     StateC: 'US',
     C: 'Military',
@@ -61451,8 +61451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNPH',
     StateC: 'US',
     C: 'Military',
@@ -61471,8 +61471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNPS',
     StateC: 'US',
     C: 'Military',
@@ -61491,8 +61491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNROT',
     StateC: 'US',
     C: 'Military',
@@ -61511,8 +61511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNSD',
     StateC: 'US',
     C: 'Military',
@@ -61531,8 +61531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNSP',
     StateC: 'US',
     C: 'Military',
@@ -61544,15 +61544,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'NAVMAT',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNSP',
     StateC: 'US',
     C: 'Military',
@@ -61564,15 +61564,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USNESC',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNSPO',
     StateC: 'US',
     C: 'Military',
@@ -61591,8 +61591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNSSD',
     StateC: 'US',
     C: 'Military',
@@ -61604,15 +61604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNSPO',
     StateC: 'US',
     C: 'Military',
@@ -61624,15 +61624,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.04,
     alt: 0,
     Parent: 'USN',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNTB',
     StateC: 'US',
     C: 'Military',
@@ -61651,8 +61651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNVA',
     StateC: 'US',
     C: 'Military',
@@ -61671,8 +61671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USNYOK',
     StateC: 'US',
     C: 'Military',
@@ -61691,8 +61691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USPS',
     StateC: 'US',
     C: 'Government',
@@ -61711,8 +61711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USSEN',
     StateC: 'US',
     C: 'Government',
@@ -61731,8 +61731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'AFSPC',
     StateC: 'US',
     C: 'Military',
@@ -61751,8 +61751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USSPC',
     StateC: 'US',
     C: 'Military',
@@ -61764,15 +61764,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -104.7,
     alt: 0,
     Parent: 'DOD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USSPC',
     StateC: 'US',
     C: 'Military',
@@ -61784,15 +61784,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -104.7,
     alt: 0,
     Parent: 'DOD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USSPC',
     StateC: 'US',
     C: 'Military',
@@ -61804,15 +61804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.91,
     alt: 0,
     Parent: 'DOD',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USTC',
     StateC: 'CN',
     C: 'Academic',
@@ -61831,8 +61831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USU',
     StateC: 'US',
     C: 'Academic',
@@ -61851,8 +61851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SLII',
     StateC: 'US',
     C: 'Academic',
@@ -61864,15 +61864,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -92.02,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'USYD',
     StateC: 'AU',
     C: 'Academic',
@@ -61891,8 +61891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UT',
     StateC: 'US',
     C: 'Academic',
@@ -61911,8 +61911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTAT',
     StateC: 'CA',
     C: 'Academic',
@@ -61931,8 +61931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTC',
     StateC: 'US',
     C: 'Commercial',
@@ -61951,8 +61951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UAC',
     StateC: 'US',
     C: 'Commercial',
@@ -61964,15 +61964,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -72.67,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'HASTD',
     StateC: 'US',
     C: 'Commercial',
@@ -61991,8 +61991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PKEL',
     StateC: 'US',
     C: 'Commercial',
@@ -62011,8 +62011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTD',
     StateC: 'US',
     C: 'Academic',
@@ -62031,8 +62031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTE',
     StateC: 'EC',
     C: 'Academic',
@@ -62051,8 +62051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'TXWC',
     StateC: 'US',
     C: 'Academic',
@@ -62071,8 +62071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTIAS',
     StateC: 'CA',
     C: 'Academic',
@@ -62091,8 +62091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTIAS0',
     StateC: 'CA',
     C: 'Academic',
@@ -62111,8 +62111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTMB',
     StateC: 'US',
     C: 'Academic',
@@ -62124,15 +62124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -94.83,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTIAS0',
     StateC: 'CA',
     C: 'Academic',
@@ -62151,8 +62151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTR',
     StateC: 'NL',
     C: 'Academic',
@@ -62171,8 +62171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UTR',
     StateC: 'NL',
     C: 'Academic',
@@ -62184,15 +62184,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 5.17,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UUT',
     StateC: 'US',
     C: 'Academic',
@@ -62211,8 +62211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UVA',
     StateC: 'US',
     C: 'Academic',
@@ -62231,8 +62231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UVG',
     StateC: 'GT',
     C: 'Academic',
@@ -62251,8 +62251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UVIE',
     StateC: 'AT',
     C: 'Academic',
@@ -62271,8 +62271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UVSQ',
     StateC: 'F',
     C: 'Academic',
@@ -62291,8 +62291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UVT',
     StateC: 'US',
     C: 'Academic',
@@ -62311,8 +62311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UWA',
     StateC: 'US',
     C: 'Academic',
@@ -62331,8 +62331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UCW',
     StateC: 'UK',
     C: 'Academic',
@@ -62344,15 +62344,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -4.07,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UWI',
     StateC: 'US',
     C: 'Academic',
@@ -62371,8 +62371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'UWO',
     StateC: 'CA',
     C: 'Academic',
@@ -62391,8 +62391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GAU4',
     StateC: 'SU',
     C: 'Military',
@@ -62411,8 +62411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VANDU',
     StateC: 'US',
     C: 'Academic',
@@ -62431,8 +62431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VANST',
     StateC: 'US',
     C: 'Commercial',
@@ -62444,15 +62444,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.16,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VAP',
     StateC: 'US',
     C: 'Academic',
@@ -62471,8 +62471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VAST',
     StateC: 'VN',
     C: 'Government',
@@ -62491,8 +62491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VATP',
     StateC: 'LV',
     C: 'Commercial',
@@ -62511,8 +62511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VSCFA',
     StateC: 'US',
     C: 'Government',
@@ -62531,8 +62531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VDNKH',
     StateC: 'RU',
     C: 'Academic',
@@ -62551,8 +62551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VENT',
     StateC: 'US',
     C: 'Commercial',
@@ -62571,8 +62571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VER',
     StateC: 'B',
     C: 'Commercial',
@@ -62591,8 +62591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VER',
     StateC: 'B',
     C: 'Commercial',
@@ -62611,8 +62611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VFW',
     StateC: 'D',
     C: 'Commercial',
@@ -62631,8 +62631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VFW',
     StateC: 'D',
     C: 'Commercial',
@@ -62651,8 +62651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VFW',
     StateC: 'D',
     C: 'Commercial',
@@ -62671,8 +62671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VGLB',
     StateC: 'US',
     C: 'Commercial',
@@ -62684,15 +62684,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.2,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VGX',
     StateC: 'US',
     C: 'Commercial',
@@ -62711,8 +62711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VGXT',
     StateC: 'US',
     C: 'Commercial',
@@ -62731,8 +62731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VIA',
     StateC: 'US',
     C: 'Commercial',
@@ -62751,8 +62751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VIGO',
     StateC: 'E',
     C: 'Academic',
@@ -62771,8 +62771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VILN',
     StateC: 'LT',
     C: 'Academic',
@@ -62791,8 +62791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VISTE',
     StateC: 'BR',
     C: 'Commercial',
@@ -62804,15 +62804,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -45.88,
     alt: 0,
     Parent: 'TELB',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VITA',
     StateC: 'US',
     C: 'Commercial',
@@ -62831,8 +62831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VKI',
     StateC: 'B',
     C: 'Academic',
@@ -62851,8 +62851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'RU',
     C: 'Military',
@@ -62871,8 +62871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'RU',
     C: 'Military',
@@ -62891,8 +62891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VMF',
     StateC: 'SU',
     C: 'Military',
@@ -62911,8 +62911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VMF',
     StateC: 'RU',
     C: 'Military',
@@ -62931,8 +62931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VNIEM',
     StateC: 'SU',
     C: 'Government',
@@ -62951,8 +62951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VNIEM',
     StateC: 'RU',
     C: 'Government',
@@ -62971,8 +62971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VNIEM',
     StateC: 'RU',
     C: 'Government',
@@ -62991,8 +62991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VNPT',
     StateC: 'VN',
     C: 'Government',
@@ -63011,8 +63011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VNSC',
     StateC: 'VN',
     C: 'Government',
@@ -63031,8 +63031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VOENT',
     StateC: 'RU',
     C: 'Military',
@@ -63051,8 +63051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VVS',
     StateC: 'RU',
     C: 'Military',
@@ -63064,15 +63064,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VORB',
     StateC: 'US',
     C: 'Commercial',
@@ -63091,8 +63091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VORO',
     StateC: 'RU',
     C: 'Unknown',
@@ -63111,8 +63111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VOTK',
     StateC: 'RU',
     C: 'Unknown',
@@ -63131,8 +63131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'LTV',
     StateC: 'US',
     C: 'Commercial',
@@ -63151,8 +63151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VS',
     StateC: 'SU',
     C: 'Military',
@@ -63164,15 +63164,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.62,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VSHE',
     StateC: 'RU',
     C: 'Academic',
@@ -63191,8 +63191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VSSC',
     StateC: 'IN',
     C: 'Government',
@@ -63211,8 +63211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VTC',
     StateC: 'US',
     C: 'Academic',
@@ -63231,8 +63231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VTS',
     StateC: 'SU',
     C: 'Military',
@@ -63251,8 +63251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VTS',
     StateC: 'RU',
     C: 'Military',
@@ -63271,8 +63271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VULT',
     StateC: 'US',
     C: 'Commercial',
@@ -63291,8 +63291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'RU',
     C: 'Military',
@@ -63311,8 +63311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'GUKOS',
     StateC: 'RU',
     C: 'Military',
@@ -63331,8 +63331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VVS',
     StateC: 'SU',
     C: 'Military',
@@ -63351,8 +63351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VVSBG',
     StateC: 'BG',
     C: 'Military',
@@ -63371,8 +63371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VVS',
     StateC: 'RU',
     C: 'Military',
@@ -63391,8 +63391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VX4',
     StateC: 'US',
     C: 'Military',
@@ -63411,8 +63411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'VZLU',
     StateC: 'CZ',
     C: 'Government',
@@ -63431,8 +63431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WADC',
     StateC: 'US',
     C: 'Military',
@@ -63451,8 +63451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WADC',
     StateC: 'US',
     C: 'Military',
@@ -63471,8 +63471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WAKA',
     StateC: 'J',
     C: 'Academic',
@@ -63491,8 +63491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WAML',
     StateC: 'US',
     C: 'Military',
@@ -63511,8 +63511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WARP',
     StateC: 'J',
     C: 'Commercial',
@@ -63531,8 +63531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WASEDA',
     StateC: 'J',
     C: 'Academic',
@@ -63551,8 +63551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WBLU',
     StateC: 'US',
     C: 'Commercial',
@@ -63571,8 +63571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WEB',
     StateC: 'US',
     C: 'Academic',
@@ -63591,8 +63591,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WEBC',
     StateC: 'US',
     C: 'Academic',
@@ -63611,8 +63611,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WEHR',
     StateC: 'DR',
     C: 'Military',
@@ -63631,8 +63631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WEINA',
     StateC: 'CN',
     C: 'Commercial',
@@ -63651,8 +63651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WEISS',
     StateC: 'US',
     C: 'Academic',
@@ -63671,8 +63671,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WELEC',
     StateC: 'US',
     C: 'Commercial',
@@ -63691,8 +63691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER271-1',
     StateC: 'DR',
     C: 'Military',
@@ -63711,8 +63711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER444',
     StateC: 'DR',
     C: 'Military',
@@ -63731,8 +63731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER485',
     StateC: 'DR',
     C: 'Military',
@@ -63751,8 +63751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER485-1',
     StateC: 'DR',
     C: 'Military',
@@ -63771,8 +63771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER485-2',
     StateC: 'DR',
     C: 'Military',
@@ -63791,8 +63791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER485-3',
     StateC: 'DR',
     C: 'Military',
@@ -63811,8 +63811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER500',
     StateC: 'DR',
     C: 'Military',
@@ -63831,8 +63831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER836',
     StateC: 'DR',
     C: 'Military',
@@ -63851,8 +63851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER836-1',
     StateC: 'DR',
     C: 'Military',
@@ -63871,8 +63871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER836-2',
     StateC: 'DR',
     C: 'Military',
@@ -63891,8 +63891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER836-3',
     StateC: 'DR',
     C: 'Military',
@@ -63911,8 +63911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WER902',
     StateC: 'DR',
     C: 'Military',
@@ -63931,8 +63931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'SROE',
     StateC: 'UK',
     C: 'Commercial',
@@ -63951,8 +63951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARD',
     StateC: 'US',
     C: 'Government',
@@ -63971,8 +63971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARD',
     StateC: 'US',
     C: 'Government',
@@ -63991,8 +63991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'PARD',
     StateC: 'US',
     C: 'Government',
@@ -64011,8 +64011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WLOP',
     StateC: 'PL',
     C: 'Military',
@@ -64031,8 +64031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WNI',
     StateC: 'J',
     C: 'Commercial',
@@ -64051,8 +64051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WORSP',
     StateC: 'US',
     C: 'Commercial',
@@ -64071,8 +64071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WORSP',
     StateC: 'US',
     C: 'Commercial',
@@ -64091,8 +64091,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WPI',
     StateC: 'US',
     C: 'Academic',
@@ -64111,8 +64111,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WRE',
     StateC: 'AU',
     C: 'Military',
@@ -64131,8 +64131,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WADC',
     StateC: 'US',
     C: 'Military',
@@ -64151,8 +64151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WTR',
     StateC: 'US',
     C: 'Military',
@@ -64171,8 +64171,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WSMR',
     StateC: 'US',
     C: 'Military',
@@ -64191,8 +64191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WSMR',
     StateC: 'US',
     C: 'Military',
@@ -64211,8 +64211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WTA',
     StateC: 'US',
     C: 'Commercial',
@@ -64231,8 +64231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WTR',
     StateC: 'US',
     C: 'Military',
@@ -64251,8 +64251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WUHAN',
     StateC: 'CN',
     C: 'Academic',
@@ -64271,8 +64271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WUPP',
     StateC: 'D',
     C: 'Academic',
@@ -64291,8 +64291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WURZ',
     StateC: 'D',
     C: 'Academic',
@@ -64311,8 +64311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WUTC',
     StateC: 'US',
     C: 'Commercial',
@@ -64331,8 +64331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WVU',
     StateC: 'US',
     C: 'Academic',
@@ -64351,8 +64351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'WXB',
     StateC: 'US',
     C: 'Government',
@@ -64371,8 +64371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'NESC',
     StateC: 'US',
     C: 'Government',
@@ -64391,8 +64391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'X20',
     StateC: 'US',
     C: 'Military',
@@ -64411,8 +64411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XCK',
     StateC: 'CN',
     C: 'Commercial',
@@ -64431,8 +64431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XCOR',
     StateC: 'US',
     C: 'Commercial',
@@ -64451,8 +64451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XCOR',
     StateC: 'US',
     C: 'Commercial',
@@ -64464,15 +64464,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.17,
     alt: 0,
     Parent: 'XCORT',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XCORT',
     StateC: 'US',
     C: 'Commercial',
@@ -64484,15 +64484,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -102.1,
     alt: 0,
     Parent: '',
-    type: 'Parent Organization of Another Entry',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XCYS',
     StateC: 'CN',
     C: 'Government',
@@ -64511,8 +64511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XIAM',
     StateC: 'CN',
     C: 'Academic',
@@ -64531,8 +64531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XIDI',
     StateC: 'CN',
     C: 'Academic',
@@ -64551,8 +64551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XIDO',
     StateC: 'CN',
     C: 'Commercial',
@@ -64571,8 +64571,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XINWEI',
     StateC: 'CN',
     C: 'Commercial',
@@ -64584,15 +64584,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.38,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XIOPM',
     StateC: 'CN',
     C: 'Government',
@@ -64604,15 +64604,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 108.95,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XJRY',
     StateC: 'CN',
     C: 'Commercial',
@@ -64631,8 +64631,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XMR',
     StateC: 'US',
     C: 'Commercial',
@@ -64651,8 +64651,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XMR',
     StateC: 'US',
     C: 'Commercial',
@@ -64664,15 +64664,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -77.02,
     alt: 0,
     Parent: 'SIRX',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XTAR',
     StateC: 'US',
     C: 'Commercial',
@@ -64691,8 +64691,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XYUN',
     StateC: 'CN',
     C: 'Commercial',
@@ -64711,8 +64711,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'XZTIA',
     StateC: 'CN',
     C: 'Commercial',
@@ -64731,8 +64731,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YAHBR',
     StateC: 'BR',
     C: 'Commercial',
@@ -64751,8 +64751,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YAZMI',
     StateC: 'US',
     C: 'Commercial',
@@ -64771,8 +64771,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YERK',
     StateC: 'US',
     C: 'Academic',
@@ -64791,8 +64791,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YINSGH',
     StateC: 'CN',
     C: 'Commercial',
@@ -64811,8 +64811,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YINHE',
     StateC: 'CN',
     C: 'Commercial',
@@ -64831,8 +64831,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YKVZ',
     StateC: 'RU',
     C: 'Unknown',
@@ -64851,8 +64851,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YONS',
     StateC: 'KR',
     C: 'Academic',
@@ -64871,8 +64871,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YORK',
     StateC: 'CA',
     C: 'Academic',
@@ -64891,8 +64891,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YORKSS',
     StateC: 'US',
     C: 'Commercial',
@@ -64911,8 +64911,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YSP',
     StateC: 'YE',
     C: 'Military',
@@ -64931,8 +64931,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YUZGU',
     StateC: 'RU',
     C: 'Academic',
@@ -64951,8 +64951,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YUZH',
     StateC: 'UA',
     C: 'Commercial',
@@ -64971,8 +64971,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YUZHM',
     StateC: 'UA',
     C: 'Commercial',
@@ -64991,8 +64991,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YWZB',
     StateC: 'CN',
     C: 'Government',
@@ -65011,8 +65011,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZARM',
     StateC: 'D',
     C: 'Academic',
@@ -65031,8 +65031,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KHRU',
     StateC: 'SU',
     C: 'Commercial',
@@ -65051,8 +65051,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZAV47',
     StateC: 'SU',
     C: 'Commercial',
@@ -65071,8 +65071,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZAV88',
     StateC: 'SU',
     C: 'Commercial',
@@ -65084,15 +65084,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.82,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'YUZHM',
     StateC: 'SU',
     C: 'Commercial',
@@ -65104,15 +65104,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 34.98,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZC3B',
     StateC: 'CN',
     C: 'Military',
@@ -65124,15 +65124,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 116.17,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZDFH',
     StateC: 'CN',
     C: 'Commercial',
@@ -65151,8 +65151,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZAV88',
     StateC: 'SU',
     C: 'Commercial',
@@ -65164,15 +65164,15 @@ export const controlSites = <ControlSiteObject[]>[
     lon: 37.82,
     alt: 0,
     Parent: '',
-    type: 'Organization Type Unknown',
+    type: SpaceObjectType.UNKNOWN,
     linkAehf: false,
     linkWgs: false,
     linkGPS: false,
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZFT',
     StateC: 'D',
     C: 'Commercial',
@@ -65191,8 +65191,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZGWK',
     StateC: 'CN',
     C: 'Commercial',
@@ -65211,8 +65211,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZHEJ',
     StateC: 'CN',
     C: 'Academic',
@@ -65231,8 +65231,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZHELZ',
     StateC: 'CN',
     C: 'Commercial',
@@ -65251,8 +65251,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZHIX',
     StateC: 'CN',
     C: 'Commercial',
@@ -65271,8 +65271,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZHONG',
     StateC: 'CN',
     C: 'Academic',
@@ -65291,8 +65291,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZHUORB',
     StateC: 'CN',
     C: 'Commercial',
@@ -65311,8 +65311,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'KHRU',
     StateC: 'SU',
     C: 'Commercial',
@@ -65331,8 +65331,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZIMN',
     StateC: 'US',
     C: 'Commercial',
@@ -65351,8 +65351,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZKXR',
     StateC: 'CN',
     C: 'Commercial',
@@ -65371,8 +65371,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZRWC',
     StateC: 'CN',
     C: 'Commercial',
@@ -65391,8 +65391,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZSU',
     StateC: 'UA',
     C: 'Military',
@@ -65411,8 +65411,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZVEZ',
     StateC: 'SU',
     C: 'Commercial',
@@ -65431,8 +65431,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZWO',
     StateC: 'NL',
     C: 'Government',
@@ -65451,8 +65451,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZZB',
     StateC: 'CN',
     C: 'Military',
@@ -65471,8 +65471,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZTZM',
     StateC: 'BY',
     C: 'Commercial',
@@ -65491,8 +65491,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZXKJ',
     StateC: 'CN',
     C: 'Commercial',
@@ -65511,8 +65511,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZXW',
     StateC: 'CN',
     C: 'Government',
@@ -65531,8 +65531,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZZB',
     StateC: 'CN',
     C: 'Military',
@@ -65551,8 +65551,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     Code: 'ZZWYZ',
     StateC: 'CN',
     C: 'Government',
@@ -65571,14 +65571,14 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
+  }),
 
   // ///////////////////////////////////
   // Additional Locations
   // ///////////////////////////////////
 
   // https://gssc.esa.int/navipedia/images/5/5d/Galileo_s_Global_Ground_Segment.jpg
-  {
+  new ControlSite({
     Code: 'GGS',
     StateC: '',
     C: '',
@@ -65597,9 +65597,9 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: true,
     linkBeidou: false,
     linkGlonass: false,
-  },
+  }),
 
-  {
+  new ControlSite({
     name: 'Ramstein Air Base, Germany',
     type: SpaceObjectType.CONTROL_FACILITY,
     Code: 'RAM',
@@ -65618,8 +65618,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Osan Air Base, South Korea',
     type: SpaceObjectType.CONTROL_FACILITY,
     Code: '',
@@ -65638,8 +65638,8 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Al Udeid Air Base, Qatar',
     type: SpaceObjectType.CONTROL_FACILITY,
     Code: '',
@@ -65658,11 +65658,11 @@ export const controlSites = <ControlSiteObject[]>[
     linkGalileo: false,
     linkBeidou: false,
     linkGlonass: false,
-  },
+  }),
 
   // Starlink Gatways
   // https://www.google.com/maps/d/viewer?mid=1H1x8jZs8vfjy60TvKgpbYs_grargieVw
-  {
+  new ControlSite({
     name: 'Conrad Gateway, Montana', // https://www.esa.int/Applications/Navigation/Galileo/Galileo_IOV_ground_stations_Fucino
     Code: 'CMTG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65678,8 +65678,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -111.945278,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Loring Gateway, Maine',
     Code: 'LMEG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65695,8 +65695,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -67.91952799999999,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Redmon Gateway, Washington',
     Code: 'RWAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65712,8 +65712,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.032139,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Greenville Gateway, Pennsylvania',
     Code: 'GPAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65729,8 +65729,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -80.33322199999999,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Merrillan Gateway, Wisconsin', //https://fcc.report/IBFS/SES-LIC-20190906-01171
     Code: 'GPAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65746,8 +65746,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -80.33322199999999,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Kalama Gateway, Washington',
     Code: 'KWAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65763,8 +65763,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.8082222,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Hawthorne Gateway, California',
     Code: 'HCAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65780,8 +65780,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -118.32811099999999,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Arbuckle Gateway, California',
     Code: 'ACAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65797,8 +65797,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -122.06000000000002,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Beekmantown Gateway, New York',
     Code: 'BNYG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65814,8 +65814,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -75.14151331143981,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Charleston Gateway, Oregon',
     Code: 'CORG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65831,8 +65831,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -124.381194,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Coalville Gateway, Utah',
     Code: 'CUTG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65848,8 +65848,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -111.285,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Panaca Gateway, Nevada',
     Code: 'PNVG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65865,8 +65865,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -114.69269399999999,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Boca Chica Gateway, Texas',
     Code: 'BTXG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65882,8 +65882,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.18274999999998,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'McGregor Gateway, Texas',
     Code: 'MTXG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65899,8 +65899,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.438139,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Litchfield Gateway, Connecticut',
     Code: 'LCTG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65916,8 +65916,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -75.14151331143981,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Warren Gateway, Missouri',
     Code: 'WMOG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65933,8 +65933,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -91.11602799999999,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Nemaha Gateway, Nebraska',
     Code: 'NNEG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65950,8 +65950,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -95.815278,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Manistique Gateway, Michigan',
     Code: 'MMIG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65967,8 +65967,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -86.483583,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Slope County Gateway, North Dakota',
     Code: 'SNDG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -65984,8 +65984,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -103.114583,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Los Angeles Gateway, California',
     Code: 'LCAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66001,8 +66001,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -117.45436100000003,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Cass County Gateway, North Dakota',
     Code: 'CNDG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66018,8 +66018,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.408889,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Prudhoe Bay Gateway, Alaska',
     Code: 'PAKG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66035,8 +66035,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -148.569,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Sanderson Gateway, Texas',
     Code: 'STXG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66052,8 +66052,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -102.89000000000001,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Springer Gateway, Oklahoma',
     Code: 'SOKG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66069,8 +66069,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.213167,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Hitterdal Gateway, Montana',
     Code: 'HMNG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66086,8 +66086,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -96.25802800000001,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Tionesta Gateway, California',
     Code: 'TCAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66103,8 +66103,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -121.32997199999998,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Butte Gateway, Montana',
     Code: 'BMTG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66120,8 +66120,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -112.513194,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Colburn Gateway, Idaho',
     Code: 'CIDG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66137,8 +66137,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -116.43933300000002,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Baxley Gateway, Georgia',
     Code: 'BGAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66154,8 +66154,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -82.26897199999999,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Robertsdale Gateway, Alabama',
     Code: 'RALG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66171,8 +66171,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -87.646,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Roll Gateway, Arizona',
     Code: 'RAZG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66188,8 +66188,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -113.798056,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Prosser Gateway, Washington',
     Code: 'PWAG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66205,8 +66205,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -119.68430499999997,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Vernon Gateway, Utah',
     Code: 'VUTG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66222,8 +66222,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -112.35472200000001,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Inman Gateway, Kansas',
     Code: 'IKSG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66239,8 +66239,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -97.921972,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Evanston Gateway, Wyoming',
     Code: 'EWYG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66256,8 +66256,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -110.842611,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Punta Gorda Gateway, Florida',
     Code: 'PFLG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66273,8 +66273,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -81.762028,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Tracy City Gateway, Tennessee',
     Code: 'TTNG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66290,8 +66290,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -85.666,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Kuparuk Gateway, Alaska',
     Code: 'KAKG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66307,8 +66307,8 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -148.941194,
     alt: 0,
     linkStarlink: true,
-  },
-  {
+  }),
+  new ControlSite({
     name: 'Gaffney Gateway, South Carolina',
     Code: 'GSCG',
     type: SpaceObjectType.CONTROL_FACILITY,
@@ -66324,5 +66324,5 @@ export const controlSites = <ControlSiteObject[]>[
     lon: -81.733083,
     alt: 0,
     linkStarlink: true,
-  },
+  }),
 ];

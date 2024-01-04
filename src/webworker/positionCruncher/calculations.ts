@@ -1,42 +1,8 @@
-import * as Ootk from 'ootk';
-import { Degrees, EcfVec3, Kilometers, Radians } from 'ootk';
+import { Degrees, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, PI, RAD2DEG, Radians, RaeVec3, Sensor, Sgp4, SpaceObjectType, rae2eci } from 'ootk';
 import { SensorObjectCruncher } from '../../interfaces';
-import { DEG2RAD, MILLISECONDS2DAYS, PI, RAD2DEG } from '../../lib/constants';
 import { A } from '../../lib/external/meuusjs';
-import { SpaceObjectType } from '../../lib/space-object-type';
 import { jday } from '../../lib/transforms';
-import { RangeAzEl, defaultGd, oneOrZero } from '../constants';
-
-export const lookAnglesToEcf = (azDeg: Degrees, elDeg: Degrees, rng: Kilometers, obsLat: Radians, obsLong: Radians, obsAlt: Kilometers): EcfVec3 => {
-  // site ecef in meters
-  const geodeticCoords = {
-    lat: obsLat,
-    lon: obsLong,
-    alt: obsAlt,
-  };
-
-  const ecf = Ootk.Transforms.lla2ecf(geodeticCoords);
-
-  // some needed calculations
-  const slat = Math.sin(obsLat);
-  const slon = Math.sin(obsLong);
-  const clat = Math.cos(obsLat);
-  const clon = Math.cos(obsLong);
-
-  const azRad = DEG2RAD * azDeg;
-  const elRad = DEG2RAD * elDeg;
-
-  // az,el,range to sez convertion
-  const south = -rng * Math.cos(elRad) * Math.cos(azRad);
-  const east = rng * Math.cos(elRad) * Math.sin(azRad);
-  const zenith = rng * Math.sin(elRad);
-
-  const x = slat * clon * south + -slon * east + clat * clon * zenith + ecf.x;
-  const y = slat * slon * south + clon * east + clat * slon * zenith + ecf.y;
-  const z = -clat * south + slat * zenith + ecf.z;
-
-  return { x: <Kilometers>x, y: <Kilometers>y, z: <Kilometers>z };
-};
+import { oneOrZero } from '../constants';
 
 /* Returns Current Propagation Time */
 export const propTime = (dynamicOffsetEpoch: number, staticOffset: number, propRate: number) => {
@@ -47,14 +13,14 @@ export const propTime = (dynamicOffsetEpoch: number, staticOffset: number, propR
 };
 
 export const checkSunExclusion = (
-  sensor: SensorObjectCruncher,
+  sensor: Sensor,
   j: number,
-  gmst: Ootk.GreenwichMeanSiderealTime,
+  gmst: GreenwichMeanSiderealTime,
   now: Date
 ): [isSunExclusion: boolean, sunECI: { x: number; y: number; z: number }] => {
   const jdo = new A.JulianDay(j); // now
   const coord = A.EclCoordfromWgs84(0, 0, 0);
-  const coord2 = A.EclCoordfromWgs84(sensor.observerGd.lat * RAD2DEG, sensor.observerGd.lon * RAD2DEG, sensor.observerGd.alt);
+  const coord2 = A.EclCoordfromWgs84(sensor.lat * RAD2DEG, sensor.lon * RAD2DEG, sensor.alt);
 
   // AZ / EL Calculation
   const tp = <{ hz: { az: number; alt: number } }>(<unknown>A.Solar.topocentricPosition(jdo, coord, false));
@@ -71,29 +37,25 @@ export const checkSunExclusion = (
   const sunRange = <Kilometers>((sunR * 149597870700) / 1000); // au to km conversion
 
   // RAE to ECI
-  const sunECI = Ootk.Transforms.ecf2eci(lookAnglesToEcf(sunAz, sunEl, sunRange, <Radians>0, <Radians>0, <Kilometers>0), gmst);
-  return sensor.observerGd !== defaultGd && (sensor.type === SpaceObjectType.OPTICAL || sensor.type === SpaceObjectType.OBSERVER) && sunElRel > -6
-    ? [true, sunECI]
-    : [false, sunECI];
+  const sunECI = rae2eci({ az: sunAz, el: sunEl, rng: sunRange }, { lat: <Degrees>0, lon: <Degrees>0, alt: <Kilometers>0 }, gmst);
+  return sensor && (sensor.type === SpaceObjectType.OPTICAL || sensor.type === SpaceObjectType.OBSERVER) && sunElRel > -6 ? [true, sunECI] : [false, sunECI];
 };
 
-export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RangeAzEl): oneOrZero => {
+export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RaeVec3): oneOrZero => {
   if (!lookangles) return 0;
 
-  const az = lookangles.az * RAD2DEG;
-  const el = lookangles.el * RAD2DEG;
-  const rng = lookangles.rng;
-  if (sensor.obsminaz > sensor.obsmaxaz) {
+  const { az, el, rng } = lookangles;
+  if (sensor.minAz > sensor.maxAz) {
     if (
-      ((az >= sensor.obsminaz || az <= sensor.obsmaxaz) && el >= sensor.obsminel && el <= sensor.obsmaxel && rng <= sensor.obsmaxrange && rng >= sensor.obsminrange) ||
-      ((az >= sensor.obsminaz2 || az <= sensor.obsmaxaz2) && el >= sensor.obsminel2 && el <= sensor.obsmaxel2 && rng <= sensor.obsmaxrange2 && rng >= sensor.obsminrange2)
+      ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
+      ((az >= sensor.minAz2 || az <= sensor.maxAz2) && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
     ) {
       return 1;
     }
   } else {
     if (
-      (az >= sensor.obsminaz && az <= sensor.obsmaxaz && el >= sensor.obsminel && el <= sensor.obsmaxel && rng <= sensor.obsmaxrange && rng >= sensor.obsminrange) ||
-      (az >= sensor.obsminaz2 && az <= sensor.obsmaxaz2 && el >= sensor.obsminel2 && el <= sensor.obsmaxel2 && rng <= sensor.obsmaxrange2 && rng >= sensor.obsminrange2)
+      (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
+      (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
     ) {
       return 1;
     }
@@ -101,14 +63,7 @@ export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RangeAzEl): o
   return 0;
 };
 
-export const setupTimeVariables = (
-  dynamicOffsetEpoch: number,
-  staticOffset: number,
-  propRate: number,
-  isSunlightView: boolean,
-  isMultiSensor: boolean,
-  sensor: SensorObjectCruncher
-) => {
+export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: number, propRate: number, isSunlightView: boolean, sensors: Sensor[] | null) => {
   const now = propTime(dynamicOffsetEpoch, staticOffset, propRate);
 
   const j =
@@ -120,14 +75,15 @@ export const setupTimeVariables = (
       now.getUTCMinutes(),
       now.getUTCSeconds()
     ) +
-    now.getUTCMilliseconds() * MILLISECONDS2DAYS;
+    now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 
-  const gmst = Ootk.Sgp4.gstime(j);
+  const gmst = Sgp4.gstime(j);
 
   let isSunExclusion = false;
   let sunEci = { x: 0, y: 0, z: 0 };
-  if (sensor?.observerGd?.lat && isSunlightView && !isMultiSensor) {
-    [isSunExclusion, sunEci] = checkSunExclusion(sensor, j, gmst, now);
+  if (isSunlightView && sensors.length === 1) {
+    // TODO: Sun exclusion should be calculated for each sensor
+    [isSunExclusion, sunEci] = checkSunExclusion(sensors[0], j, gmst, now);
   }
 
   const j2 =
@@ -139,9 +95,9 @@ export const setupTimeVariables = (
       now.getUTCMinutes(),
       now.getUTCSeconds() + 1
     ) +
-    now.getUTCMilliseconds() * MILLISECONDS2DAYS;
+    now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 
-  const gmstNext = Ootk.Sgp4.gstime(j2);
+  const gmstNext = Sgp4.gstime(j2);
 
   return {
     now,
@@ -159,12 +115,4 @@ export const createLatLonAlt = (lat: Radians, lon: Radians, alt: Kilometers) => 
   alt,
 });
 
-export const isInValidElevation = (lookangles: RangeAzEl, selectedSatFOV: number) => lookangles.el * RAD2DEG > 0 && 90 - lookangles.el * RAD2DEG < selectedSatFOV;
-
-export const isSensorDeepSpace = (mSensor: SensorObjectCruncher[], sensor: SensorObjectCruncher): boolean => {
-  // TODO: This should use the sensors max range instead of sensor type
-  if (mSensor.length > 1 && sensor.type === SpaceObjectType.OPTICAL) return true;
-  if (mSensor.length > 1 && sensor.type === SpaceObjectType.OBSERVER) return true;
-  if (mSensor.length > 1 && sensor.type === SpaceObjectType.MECHANICAL) return true;
-  return false;
-};
+export const isInValidElevation = (rae: RaeVec3<Kilometers, Degrees>, selectedSatFOV: number) => rae.el > 90 - selectedSatFOV;

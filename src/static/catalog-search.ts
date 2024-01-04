@@ -22,10 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SpaceObjectType } from '@app/lib/space-object-type';
-import { Degrees, Minutes } from 'ootk';
-import { SatObject } from '../interfaces';
-import { DEG2RAD } from '../lib/constants';
+import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, Minutes, SpaceObjectType } from 'ootk';
 import { CatalogSource } from './catalog-loader';
 
 /**
@@ -41,7 +38,7 @@ import { CatalogSource } from './catalog-loader';
  * const filteredByCountry = CatalogSearch.country(satData, /USA/);
  *
  * // Finding objects by orbit
- * const similarOrbitObjects = CatalogSearch.findObjsByOrbit(satData, satObject, 2, 5, 0);
+ * const similarOrbitObjects = CatalogSearch.findObjsByOrbit(satData, DetailedSatellite, 2, 5, 0);
  *
  * // Finding reentry objects
  * const reentryObjects = CatalogSearch.findReentry(satData, 100);
@@ -54,13 +51,13 @@ import { CatalogSource } from './catalog-loader';
  */
 export class CatalogSearch {
   /**
-   * Filters the given array of SatObject based on the 'bus' property.
+   * Filters the given array of DetailedSatellite based on the 'bus' property.
    *
-   * @param satData - The array of SatObject to filter.
-   * @param text - The value to compare the 'bus' property of each SatObject against.
-   * @returns An array of SatObject where the 'bus' property matches the given text.
+   * @param satData - The array of DetailedSatellite to filter.
+   * @param text - The value to compare the 'bus' property of each DetailedSatellite against.
+   * @returns An array of DetailedSatellite where the 'bus' property matches the given text.
    */
-  static bus(satData: SatObject[], text: string): SatObject[] {
+  static bus(satData: DetailedSatellite[], text: string): DetailedSatellite[] {
     return this.byProp(satData, 'bus', text);
   }
 
@@ -68,11 +65,11 @@ export class CatalogSearch {
    * Filters the satellite data based on the country name.
    *
    * @static
-   * @param {SatObject[]} satData - The array of satellite data to filter.
+   * @param {DetailedSatellite[]} satData - The array of satellite data to filter.
    * @param {RegExp} regex - The regular expression to match against the country name.
-   * @returns {SatObject[]} The filtered array of satellite data.
+   * @returns {DetailedSatellite[]} The filtered array of satellite data.
    */
-  static country(satData: SatObject[], regex: RegExp): SatObject[] {
+  static country(satData: DetailedSatellite[], regex: RegExp): DetailedSatellite[] {
     return satData.filter((sat) => typeof sat.name === 'string' && sat.country.match(regex));
   }
 
@@ -83,15 +80,21 @@ export class CatalogSearch {
    *
    * If periodMargin is set to 0, the method will use a 10% margin of error for the period value.
    *
-   * @param {SatObject[]} satData - An array of satellite objects to search through.
-   * @param {SatObject} sat - The satellite object to compare other satellites to.
+   * @param {DetailedSatellite[]} satData - An array of satellite objects to search through.
+   * @param {DetailedSatellite} sat - The satellite object to compare other satellites to.
    * @param {Degrees} [incMargin=2] - The margin of error for the inclination value in degrees.
    * @param {Degrees} [raanMargin=5] - The margin of error for the RAAN value in degrees.
    * @param {Minutes} [periodMargin=0] - The margin of error for the period value in minutes.
    *
    * @returns {number[]} - An array of satellite IDs that are in a similar orbit to the given satellite.
    */
-  static findObjsByOrbit(satData: SatObject[], sat: SatObject, incMargin: Degrees = <Degrees>2, raanMargin: Degrees = <Degrees>5, periodMargin: Minutes = <Minutes>0): number[] {
+  static findObjsByOrbit(
+    satData: DetailedSatellite[],
+    sat: DetailedSatellite,
+    incMargin: Degrees = <Degrees>2,
+    raanMargin: Degrees = <Degrees>5,
+    periodMargin: Minutes = <Minutes>0
+  ): number[] {
     const INC_MARGIN = incMargin * DEG2RAD;
     const RAAN_MARGIN = raanMargin * DEG2RAD;
 
@@ -112,7 +115,7 @@ export class CatalogSearch {
 
     return satData
       .filter((s) => {
-        if (s.static) return false;
+        if (s.isStatic()) return false;
         if (s.inclination < minInclination || s.inclination > maxInclination) return false;
         if (sat.raan > 360 - RAAN_MARGIN || sat.raan < RAAN_MARGIN) {
           if (s.raan > maxRaan && s.raan < minRaan) return false;
@@ -136,7 +139,7 @@ export class CatalogSearch {
    *
    * @returns An array of SCC numbers of the top 100 objects with the lowest perigee values.
    */
-  static findReentry(satData: SatObject[], numReturns = 100): string[] {
+  static findReentry(satData: DetailedSatellite[], numReturns = 100): string[] {
     return satData
       .filter((sat) => sat.type === SpaceObjectType.PAYLOAD || sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS)
       .filter((sat) => sat.perigee > 0)
@@ -149,23 +152,23 @@ export class CatalogSearch {
    * Filters the given array of satellite objects based on the provided regular expression.
    * Only the satellite objects with a name that matches the regular expression are returned.
    *
-   * @param satData - An array of satellite objects to filter.
+   * @param objData - An array of satellite objects to filter.
    * @param regex - The regular expression to match against the satellite object names.
    * @returns An array of satellite objects that match the provided regular expression.
    */
-  static objectName(satData: SatObject[], regex: RegExp): SatObject[] {
-    return satData.filter((sat) => typeof sat.name === 'string' && sat.name.match(regex));
+  static objectName(objData: BaseObject[], regex: RegExp): BaseObject[] {
+    return objData.filter((sat) => typeof sat.name === 'string' && sat.name.match(regex));
   }
 
   /**
-   * Filters the given array of SatObject by the 'shape' property.
+   * Filters the given array of DetailedSatellite by the 'shape' property.
    *
    * @static
-   * @param {SatObject[]} satData - The array of SatObject to filter.
-   * @param {string} text - The value to match against the 'shape' property of each SatObject.
-   * @returns {SatObject[]} The filtered array of SatObject.
+   * @param {DetailedSatellite[]} satData - The array of DetailedSatellite to filter.
+   * @param {string} text - The value to match against the 'shape' property of each DetailedSatellite.
+   * @returns {DetailedSatellite[]} The filtered array of DetailedSatellite.
    */
-  static shape(satData: SatObject[], text: string): SatObject[] {
+  static shape(satData: DetailedSatellite[], text: string): DetailedSatellite[] {
     return this.byProp(satData, 'shape', text);
   }
 
@@ -176,7 +179,7 @@ export class CatalogSearch {
    * @param objType - The type of space object to filter the satellite data by.
    * @returns An array of satellite objects that match the provided object type.
    */
-  static type(satData: SatObject[], objType: SpaceObjectType): SatObject[] {
+  static type(satData: DetailedSatellite[], objType: SpaceObjectType): DetailedSatellite[] {
     return satData.filter((sat) => sat.type === objType);
   }
 
@@ -184,13 +187,13 @@ export class CatalogSearch {
    * Filters the satellite data based on the year.
    *
    * @static
-   * @param {SatObject[]} satData - An array of satellite data objects.
+   * @param {DetailedSatellite[]} satData - An array of satellite data objects.
    * @param {number} yr - The year to filter the satellite data by.
-   * @returns {SatObject[]} An array of satellite data objects that were launched in the specified year.
+   * @returns {DetailedSatellite[]} An array of satellite data objects that were launched in the specified year.
    */
-  static year(satData: SatObject[], yr: number): SatObject[] {
+  static year(satData: DetailedSatellite[], yr: number): DetailedSatellite[] {
     return satData.filter((sat) => {
-      const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
+      const tleYear = sat?.tle1?.substring(9, 11) || '-1';
       return parseInt(tleYear) == yr;
     });
   }
@@ -199,14 +202,14 @@ export class CatalogSearch {
    * Filters the satellite data based on the year.
    *
    * This function filters the given satellite data array and returns only those satellites that were launched in the given year or less.
-   * The function uses the Cospar value in TLE1 property of the satellite data to determine the launch year of the satellite.
+   * The function uses the Cospar value in tle1 property of the satellite data to determine the launch year of the satellite.
    *
-   * @param satData - An array of SatObject instances representing the satellite data.
+   * @param satData - An array of DetailedSatellite instances representing the satellite data.
    * @param yr - The year to filter the satellite data by. Only satellites launched in this year or earlier will be included in the returned array.
    *
-   * @returns An array of SatObject instances representing the satellites that were launched in the given year or earlier.
+   * @returns An array of DetailedSatellite instances representing the satellites that were launched in the given year or earlier.
    */
-  static yearOrLess(satData: SatObject[], yr: number) {
+  static yearOrLess(satData: DetailedSatellite[], yr: number) {
     return satData.filter((sat) => {
       if (sat.source === CatalogSource.VIMPEL) return false;
 
@@ -243,7 +246,7 @@ export class CatalogSearch {
         }
       }
 
-      const tleYear = sat?.TLE1?.substring(9, 11) || '-1';
+      const tleYear = sat?.tle1?.substring(9, 11) || '-1';
       if (yr >= 57 && yr < 100) {
         return parseInt(tleYear) <= yr && parseInt(tleYear) >= 57;
       } else {
@@ -253,15 +256,15 @@ export class CatalogSearch {
   }
 
   /**
-   * Filters the given array of SatObject by a specific property and value.
+   * Filters the given array of DetailedSatellite by a specific property and value.
    *
-   * @param {SatObject[]} satData - The array of SatObject to filter.
-   * @param {string} prop - The property of SatObject to filter by.
+   * @param {DetailedSatellite[]} satData - The array of DetailedSatellite to filter.
+   * @param {string} prop - The property of DetailedSatellite to filter by.
    * @param {string} text - The value of the property to match for filtering.
    *
-   * @returns {SatObject[]} The filtered array of SatObject where the specified property equals the given text.
+   * @returns {DetailedSatellite[]} The filtered array of DetailedSatellite where the specified property equals the given text.
    */
-  private static byProp(satData: SatObject[], prop: string, text: string): SatObject[] {
+  private static byProp(satData: DetailedSatellite[], prop: string, text: string): DetailedSatellite[] {
     return satData.filter((sat) => sat[prop] === text);
   }
 }

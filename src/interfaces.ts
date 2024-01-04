@@ -1,10 +1,11 @@
-import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Meters, Milliseconds, Radians, SatelliteRecord, TleLine1, TleLine2, Vec3Flat } from 'ootk';
-import { Camera, ZoomValue } from './singletons/camera';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, Meters, Milliseconds, Radians, SpaceObjectType, Vec3Flat } from 'ootk';
+import { Camera } from './singletons/camera';
 import { GroupType, ObjectGroup } from './singletons/object-group';
 
 import { mat4 } from 'gl-matrix';
-import { SpaceObjectType } from './lib/space-object-type';
-import { SatLinkManager } from './singletons/catalog-manager/satLinkManager';
+import { ZoomValue } from 'ootk/lib/objects/DetailedSensor';
+import { MissileObject } from './singletons/catalog-manager/MissileObject';
+import { ColorSchemeManager } from './singletons/color-scheme-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';
 import { HoverManager } from './singletons/hover-manager';
 import { SearchManager } from './singletons/search-manager';
@@ -42,10 +43,16 @@ export enum GetSatType {
 }
 
 export type MissileParams = {
-  missile: boolean;
-  latList: number[];
-  lonList: number[];
-  altList: number[];
+  desc: string;
+  active: boolean;
+  latList: Degrees[];
+  lonList: Degrees[];
+  altList: Kilometers[];
+  timeList: number[];
+  startTime: number;
+  maxAlt: number;
+  country: string;
+  launchVehicle: string;
 };
 
 export type EChartsData = {
@@ -89,9 +96,6 @@ export interface Colors {
   payload: rgbaArray;
   penumbral: rgbaArray;
   pink: rgbaArray;
-  radarData: rgbaArray;
-  radarDataMissile: rgbaArray;
-  radarDataSatellite: rgbaArray;
   confidenceHi: rgbaArray;
   confidenceLow: rgbaArray;
   confidenceMed: rgbaArray;
@@ -134,181 +138,6 @@ export interface SatCruncherMessageData {
   };
 }
 
-export declare interface BaseObject {
-  id: number;
-  active: boolean;
-  position: EciVec3;
-  type: SpaceObjectType;
-  velocity: {
-    total: number;
-    x: number;
-    y: number;
-    z: number;
-  };
-}
-
-export declare interface SatObject extends BaseObject {
-  TLE1: TleLine1;
-  TLE2: TleLine2;
-  alt?: number;
-  altName?: string;
-  altId: string;
-  apogee: number;
-  argPe: number;
-  az: number;
-  bf?: string;
-  bus?: string;
-  configuration?: string;
-  constellation?: any;
-  country?: string;
-  desc?: string;
-  diameter?: string;
-  dryMass?: string;
-  eccentricity: number;
-  el: number;
-  equipment?: string;
-  /**Degrees */
-  inclination: number;
-  intlDes?: string;
-  launchDate?: string;
-  launchMass?: string;
-  launchSite?: string;
-  launchVehicle?: string;
-  length?: string;
-  lifetime?: string | number;
-  manufacturer?: string;
-  meanMotion: number;
-  mission?: string;
-  motor?: string;
-  name?: string;
-  owner?: string;
-  payload?: string;
-  perigee: number;
-  period: number;
-  pname?: string;
-  power?: string;
-  purpose?: string;
-  raan: number;
-  rae: any;
-  rcs?: string;
-  satrec: any;
-  sccNum?: string;
-  semiMajorAxis: number;
-  semiMinorAxis: number;
-  shape?: string;
-  source: string;
-  span?: string;
-  static?: boolean;
-  status?: string;
-  user?: string;
-  vmag?: number;
-  isInGroup?: boolean;
-  isRadarData?: boolean;
-  lat?: number;
-  lon?: number;
-  marker?: boolean;
-  missile?: boolean;
-  missileComplex?: number;
-  setRAE: any;
-  staticNum: number;
-  ra: number;
-  dec: number;
-  /** @deprecated */
-  TTP?: string;
-  /** @deprecated */
-  associates?: any;
-  /** @deprecated */
-  maneuver?: string;
-  /** @deprecated */
-  FMISSED?: any;
-  /** @deprecated */
-  NOTES?: string;
-  /** @deprecated */
-  ORPO?: string;
-  /** @deprecated */
-}
-
-export interface MissileObject extends SatObject {
-  altList: number[];
-  latList: number[];
-  lonList: number[];
-  maxAlt: number;
-  startTime: number;
-}
-
-export interface RadarDataObject {
-  mId: string;
-  trackId: string;
-  objectId: string;
-  missileObject: string;
-  sccNum: string;
-  rae: any;
-  t: Date;
-  position: EciArr3;
-  rcs: string;
-  azError: any;
-  elError: any;
-  active: boolean;
-  missile: false;
-  missileComplex?: number;
-  name: string;
-  static: true;
-  type: SpaceObjectType.RADAR_MEASUREMENT | SpaceObjectType.RADAR_TRACK | SpaceObjectType.RADAR_OBJECT | SpaceObjectType.UNKNOWN;
-}
-
-export interface SensorObject {
-  /** 3 Letter Designation */
-  shortName?: string;
-  alt: Kilometers;
-  beamwidth?: Degrees;
-  changeObjectInterval?: Milliseconds;
-  country: string;
-  id: number;
-  lat: Degrees;
-  linkAehf?: boolean;
-  linkGalileo?: boolean;
-  linkIridium?: boolean;
-  linkStarlink?: boolean;
-  linkWgs?: boolean;
-  lon: Degrees;
-  name: string;
-  observerGd?: {
-    lat: Radians | null;
-    lon: Radians;
-    alt: Kilometers;
-  };
-  obsmaxaz: Degrees;
-  obsmaxaz2?: Degrees;
-  obsmaxel: Degrees;
-  obsmaxel2?: Degrees;
-  obsmaxrange: Kilometers;
-  obsmaxrange2?: Kilometers;
-  obsminaz: Degrees;
-  obsminaz2?: Degrees;
-  obsminel: Degrees;
-  obsminel2?: Degrees;
-  obsminrange: Kilometers;
-  obsminrange2?: Kilometers;
-  static?: boolean;
-  staticNum?: number;
-  type?: SpaceObjectType;
-  url?: string;
-  volume?: boolean;
-  zoom: ZoomValue;
-  band?: string;
-  // //////////////////////////////////////////
-  // These parts control the UI //
-  // //////////////////////////////////////////
-  /** This is the name of the object in the array */
-  objName: string;
-  /** This is the name of the object in the UI */
-  uiName: string;
-  /** This is the specific system (ex. AN/FPS-132) */
-  system: string;
-  /** This is who operates the sensor */
-  operator: string;
-}
-
 export interface SensorObjectCruncher {
   alt: Kilometers;
   beamwidth?: Degrees;
@@ -324,25 +153,29 @@ export interface SensorObjectCruncher {
     lon: Radians;
     alt: Kilometers;
   };
-  obsmaxaz: Degrees;
-  obsmaxaz2?: Degrees;
-  obsmaxel: Degrees;
-  obsmaxel2?: Degrees;
-  obsmaxrange: Kilometers;
-  obsmaxrange2?: Kilometers;
-  obsminaz: Degrees;
-  obsminaz2?: Degrees;
-  obsminel: Degrees;
-  obsminel2?: Degrees;
-  obsminrange: Kilometers;
-  obsminrange2?: Kilometers;
+  maxAz: Degrees;
+  maxAz2?: Degrees;
+  maxEl: Degrees;
+  maxEl2?: Degrees;
+  maxRng: Kilometers;
+  maxRng2?: Kilometers;
+  minAz: Degrees;
+  minAz2?: Degrees;
+  minEl: Degrees;
+  minEl2?: Degrees;
+  minRng: Kilometers;
+  minRng2?: Kilometers;
   shortName: string;
-  staticNum: number;
+  sensorId: number;
   sun: string;
   type?: SpaceObjectType;
   url?: string;
   volume: boolean;
-  zoom: string;
+  zoom: ZoomValue;
+  objName: string;
+  uiName: string;
+  system: string;
+  operator: string;
 }
 
 export type lookanglesRow = {
@@ -365,7 +198,7 @@ export type lookanglesRow = {
 };
 
 export type SatPassTimes = {
-  sat: SatObject;
+  sat: DetailedSatellite;
   time: Date;
 };
 
@@ -413,7 +246,6 @@ export interface ObjectTypeFlags {
   missileInview: boolean;
   payload: boolean;
   pink: boolean;
-  radarData: boolean;
   rcsLarge: boolean;
   rcsMed: boolean;
   rcsSmall: boolean;
@@ -433,17 +265,6 @@ export interface ObjectTypeFlags {
   velocityMed: boolean;
   velocitySlow: boolean;
 }
-export interface ColorSchemeManager {
-  calculateColorBuffers: (force: boolean) => void;
-  colorBuffer: WebGLBuffer;
-  colorBufferOneTime: boolean;
-  colorData: Float32Array;
-  iSensor: number;
-  pickableBuffer: WebGLBuffer;
-  pickableBufferOneTime: boolean;
-  pickableData: Int8Array;
-  setColorScheme: (scheme: (sat: SatObject, params?: any) => ColorInformation, isForceRecolor?: boolean) => void;
-}
 
 export enum Pickable {
   Yes = 1,
@@ -461,7 +282,7 @@ export interface ColorRuleParams {
   satInView?: Int8Array;
 }
 
-export type ColorRuleSet = (sat: SatObject, params?: any) => ColorInformation;
+export type ColorRuleSet = (obj: BaseObject, params?: any) => ColorInformation;
 
 /************************************************************
  * Singletons
@@ -482,63 +303,6 @@ export interface GroupsManager {
   selectGroup: (group: ObjectGroup) => void;
   selectedGroup: ObjectGroup;
   stopUpdatingInViewSoon: boolean;
-}
-
-/**
- * Represents an object that can be in the catalog, such as a satellite, missile, or sensor.
- */
-export type CatalogObject = SatObject | RadarDataObject | MissileObject | SensorObject;
-
-export interface CatalogManager {
-  analSatSet: SatObject[];
-  cosparIndex: { [key: string]: number };
-  fieldOfViewSet: SatObject[];
-  gotExtraData: boolean;
-  isLaunchSiteManagerLoaded: boolean;
-  isSensorManagerLoaded: boolean;
-  isStarManagerLoaded: boolean;
-  launchSites: {
-    [key: string]: {
-      name: string;
-      lat: Degrees;
-      lon: Degrees;
-    };
-  };
-  missileSats: number;
-  missileSet: MissileObject[];
-  numSats: number;
-  orbitDensity: number[][];
-  orbitDensityMax: number;
-  orbitalSats: number;
-  radarDataSet: RadarDataObject[];
-  satCruncher: Worker;
-  getSatsFromSatData: () => SatObject[];
-  satData: (SatObject | MissileObject | SensorObject | RadarDataObject)[];
-  satExtraData: undefined;
-  satLinkManager: SatLinkManager;
-  sccIndex: { [key: string]: number };
-  sensorMarkerArray: number[];
-  starIndex1: number;
-  starIndex2: number;
-  staticSet: SensorObject[];
-  updateCruncherBuffers: (mData: SatCruncherMessageData) => void;
-  panToStar(c: SatObject): void;
-  calcSatrec(sat: SatObject): SatelliteRecord;
-  id2satnum(satIdArray: number[]): string[];
-  convertSatnumArrayToIdArray(satnumArray: number[]): number[];
-  cruncherExtraData(mData: SatCruncherMessageData): void;
-  cruncherExtraUpdate(mData: SatCruncherMessageData): void;
-  getIdFromIntlDes(intlDes: string): number | null;
-  getIdFromSccNum(sccNum: number, isExtensiveSearch?: boolean): number | null;
-  getIdFromStarName(starName: string, starIndex1: number, starIndex2: number): number | null;
-  getSat(i: number | null, type?: GetSatType): SatObject | null;
-  getSatFromSccNum(sccNum: number): SatObject | null;
-  getSensorFromSensorName(sensorName: string): number | null;
-  init(satCruncherOveride?: Worker): Promise<void>;
-  initObjects(): void;
-  insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string): any;
-  satCruncherOnMessage({ data }: { data: SatCruncherMessageData }): void;
-  setSat(i: number, sat: SatObject): void;
 }
 
 export interface OrbitManager {
@@ -564,36 +328,43 @@ export interface OrbitManager {
   setHoverOrbit(satId: number): void;
   setSelectOrbit(satId: number, isSecondary?: boolean): void;
   updateAllVisibleOrbits(uiManagerInstance: UiManager): void;
-  updateOrbitBuffer(satId: number, missileParams?: MissileParams): void;
+  updateOrbitBuffer(
+    satId: number,
+    missileParams?: {
+      latList: Degrees[];
+      lonList: Degrees[];
+      altList: Kilometers[];
+    }
+  ): void;
 }
 
 export interface SensorManager {
   lastMultiSiteArray: TearrData[];
-  currentSensors: SensorObject[];
-  customSensors: SensorObject[];
-  defaultSensor: SensorObject[];
+  currentSensors: DetailedSensor[];
+  customSensors: DetailedSensor[];
+  defaultSensor: DetailedSensor[];
   isCustomSensorMenuOpen: boolean;
   isLookanglesMenuOpen: boolean;
-  secondarySensors: SensorObject[];
-  sensorListUS: SensorObject[];
+  secondarySensors: DetailedSensor[];
+  sensorListUS: DetailedSensor[];
   sensorTitle: string;
-  stfSensors: SensorObject[];
+  stfSensors: DetailedSensor[];
   /** Deprecated - Stop using this */
   whichRadar: string;
 
-  addSecondarySensor(sensor: SensorObject): void;
-  addStf(sensor: SensorObject): void;
+  addSecondarySensor(sensor: DetailedSensor): void;
+  addStf(sensor: DetailedSensor): void;
   clearSecondarySensors(): void;
   clearStf(): void;
   isSensorSelected(): boolean;
-  removeSecondarySensor(sensor: SensorObject): void;
-  removeStf(sensor?: SensorObject): void;
+  removeSecondarySensor(sensor: DetailedSensor): void;
+  removeStf(sensor?: DetailedSensor): void;
   resetSensorSelected(): void;
-  setCurrentSensor(sensor: SensorObject[] | null): void;
-  setSensor(selectedSensor: SensorObject | string | null, staticNum?: number): void;
+  setCurrentSensor(sensor: DetailedSensor[] | null): void;
+  setSensor(selectedSensor: DetailedSensor | string | null, sensorId?: number): void;
   updateCruncherOnCustomSensors(): void;
-  verifySensors(sensors: SensorObject[]): SensorObject[];
-  calculateSensorPos(now: Date, sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
+  verifySensors(sensors: DetailedSensor[]): DetailedSensor[];
+  calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
 }
 
 export interface UiManager {
@@ -613,7 +384,7 @@ export interface UiManager {
   updateInterval: number;
   updateNextPassOverlay: (boolean) => void;
   searchHoverSatId: number;
-  colorSchemeChangeAlert(newScheme: ColorRuleSet): void;
+  colorSchemeChangeAlert: (scheme: ColorRuleSet) => void;
   doSearch(searchString: string, isPreventDropDown?: boolean): void;
   footerToggle(): void;
   hideUi(): void;
@@ -622,7 +393,7 @@ export interface UiManager {
   legendHoverMenuClick(legendType: string): void;
   onReady(): void;
   toast(toastText: string, type: ToastMsgType, isLong?: boolean): void;
-  updateSelectBox(realTime: Milliseconds, lastBoxUpdateTime: Milliseconds, sat: SatObject): void;
+  updateSelectBox(realTime: Milliseconds, lastBoxUpdateTime: Milliseconds, satOrMislObj: DetailedSatellite | MissileObject): void;
 }
 
 export enum Singletons {
@@ -686,7 +457,7 @@ export enum KeepTrackApiEvents {
   uiManagerFinal = 'uiManagerFinal',
   resetSensor = 'resetSensor',
   /**
-   * Run in the setSensor method of SensorManager instance with parameters (sensor: SensorObject | string, staticId: number)
+   * Run in the setSensor method of SensorManager instance with parameters (sensor: DetailedSensor | string, staticId: number)
    */
   setSensor = 'setSensor',
   changeSensorMarkers = 'changeSensorMarkers',

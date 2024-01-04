@@ -3,11 +3,12 @@ import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
-import { CatalogManager, GroupsManager, KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { GroupsManager, KeepTrackApiEvents } from '@app/interfaces';
+import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { DopMath } from '@app/static/dop-math';
-import { Degrees, Kilometers } from 'ootk';
+import { Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class DopsPlugin extends KeepTrackPlugin {
@@ -86,18 +87,20 @@ export class DopsPlugin extends KeepTrackPlugin {
   rmbCallback = (targetId: string): void => {
     switch (targetId) {
       case 'dops-curdops-rmb': {
-        let latLon = keepTrackApi.getInputManager().mouse.latLon;
-        const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
+        {
+          let latLon = keepTrackApi.getInputManager().mouse.latLon;
+          const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
 
-        if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
-          console.debug('latLon undefined!');
-          latLon = CoordinateTransforms.eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, keepTrackApi.getTimeManager().simulationTimeObj);
+          if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
+            console.debug('latLon undefined!');
+            latLon = CoordinateTransforms.eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, keepTrackApi.getTimeManager().simulationTimeObj);
+          }
+          const gpsSatObjects = DopsPlugin.getGpsSats(keepTrackApi.getCatalogManager(), keepTrackApi.getGroupsManager());
+          const gpsDOP = DopMath.getDops(keepTrackApi.getTimeManager().simulationTimeObj, gpsSatObjects, latLon.lat, latLon.lon, <Kilometers>0, settingsManager.gpsElevationMask);
+          keepTrackApi
+            .getUiManager()
+            .toast(`HDOP: ${gpsDOP.hdop}<br/>VDOP: ${gpsDOP.vdop}<br/>PDOP: ${gpsDOP.pdop}<br/>GDOP: ${gpsDOP.gdop}<br/>TDOP: ${gpsDOP.tdop}`, 'normal', true);
         }
-        const gpsSatObjects = DopsPlugin.getGpsSats(keepTrackApi.getCatalogManager(), keepTrackApi.getGroupsManager());
-        var gpsDOP = DopMath.getDops(keepTrackApi.getTimeManager().simulationTimeObj, gpsSatObjects, latLon.lat, latLon.lon, <Kilometers>0, settingsManager.gpsElevationMask);
-        keepTrackApi
-          .getUiManager()
-          .toast(`HDOP: ${gpsDOP.hdop}<br/>VDOP: ${gpsDOP.vdop}<br/>PDOP: ${gpsDOP.pdop}<br/>GDOP: ${gpsDOP.gdop}<br/>TDOP: ${gpsDOP.tdop}`, 'normal', true);
         break;
       }
       case 'dops-24dops-rmb': {
@@ -144,10 +147,10 @@ export class DopsPlugin extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    const lat = <Degrees>parseFloat(<string>(<HTMLInputElement>getEl('dops-lat')).value);
-    const lon = <Degrees>parseFloat(<string>(<HTMLInputElement>getEl('dops-lon')).value);
-    const alt = <Kilometers>parseFloat(<string>(<HTMLInputElement>getEl('dops-alt')).value);
-    const el = <Degrees>parseFloat(<string>(<HTMLInputElement>getEl('dops-el')).value);
+    const lat = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-lat')).value);
+    const lon = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-lon')).value);
+    const alt = <Kilometers>parseFloat((<HTMLInputElement>getEl('dops-alt')).value);
+    const el = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-el')).value);
     settingsManager.gpsElevationMask = el;
     const gpsSats = DopsPlugin.getGpsSats(catalogManagerInstance, groupManagerInstance);
     const getOffsetTimeObj = (now: number) => timeManagerInstance.getOffsetTimeObj(now);
@@ -155,12 +158,14 @@ export class DopsPlugin extends KeepTrackPlugin {
     DopMath.updateDopsTable(dopsList);
   }
 
-  static getGpsSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager): SatObject[] {
+  static getGpsSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager): DetailedSatellite[] {
     const gpsSats = (groupManagerInstance.groupList['GPSGroup'] ??= groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/iu, 'GPSGroup'));
     const gpsSatObjects = [];
-    gpsSats.objects.forEach((id: number) => {
+    gpsSats.ids.forEach((id: number) => {
       const sat = catalogManagerInstance.getSat(id);
-      gpsSatObjects.push(sat);
+      if (sat) {
+        gpsSatObjects.push(sat);
+      }
     });
     return gpsSatObjects;
   }

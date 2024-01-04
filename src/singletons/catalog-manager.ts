@@ -26,80 +26,53 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { Degrees, SatelliteRecord, Sgp4 } from 'ootk';
+import { FormatTle } from '@app/static/format-tle';
+import { CruncerMessageTypes, ExtraDataMessage } from '@app/webworker/positionCruncher';
+import { BaseObject, Degrees, DetailedSatellite, EciVec3, Kilometers, SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';
 import { stars } from '../catalogs/stars';
-import { CatalogManager, GetSatType, RadarDataObject, SatCruncherMessageData, SatObject } from '../interfaces';
-import { SpaceObjectType } from '../lib/space-object-type';
-import { StringPad } from '../lib/stringPad';
+import { GetSatType, SatCruncherMessageData } from '../interfaces';
 import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { SplashScreen } from '../static/splash-screen';
 import { StringExtractor } from '../static/string-extractor';
 import { UrlManager } from '../static/url-manager';
-import { CameraType } from './camera';
+import { MissileObject } from './catalog-manager/MissileObject';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
-import { LineTypes, lineManagerInstance } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
-// TODO: FUTURE FEATURE
-// import { radarDataManager } from '@app/catalogManagerInstance/radarDataManager.js';
-
-// prettier-ignore
-/*
-// export const updateRadarData = () => {
-//   for (let i = 0; i < radarDataManager.radarData.length; i++) {
-//     try {
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].isRadarData = true;
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].mId = parseInt(radarDataManager.radarData[i].m);
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].t = radarDataManager.radarData[i].t;
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].rcs = parseInt(radarDataManager.radarData[i].rc);
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].trackId = parseInt(radarDataManager.radarData[i].ti);
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].objectId = parseInt(radarDataManager.radarData[i].oi);
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].satId = parseInt(radarDataManager.radarData[i].si);
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].missileComplex = parseInt(radarDataManager.radarData[i].mc);
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].missileObject = parseInt(radarDataManager.radarData[i].mo);
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].azError = radarDataManager.radarData[i].ae;
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].elError = radarDataManager.radarData[i].ee;
-//       catalogManagerInstance.satData[radarDataManager.satDataStartIndex + i].dataType = radarDataManager.radarData[i].dataType;
-//     } catch (e) {
-//       // console.log(radarDataManager.radarData[i]);
-//     }
-//   }
-//   colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
-// };
-*/
 
 declare module '@app/interfaces' {
   interface SatCruncherMessageData {
-  extraData?: string;
-  extraUpdate?: boolean;
-  /**
-   * Object id that is now being skipped by the cruncher
-   * due to a bad TLE. VIMPEL don't have satids so we use the
-   * object id instead.
-   */
-  badObjectId?: number;
-  // JSON string
-  satId?: number;
-  sensorMarkerArray?: number[];
-}
+    extraData?: string;
+    extraUpdate?: boolean;
+    /**
+     * Object id that is now being skipped by the cruncher
+     * due to a bad TLE. VIMPEL don't have satids so we use the
+     * object id instead.
+     */
+    badObjectId?: number;
+    // JSON string
+    satId?: number;
+    sensorMarkerArray?: number[];
+  }
   interface UserSettings {
-  installDirectory: string;
-}
+    installDirectory: string;
+  }
 }
 
-export class StandardCatalogManager implements CatalogManager {
+export class CatalogManager {
   private static readonly TEMPLATE_INTLDES = '58001A';
   private static readonly TEMPLATE_TLE1_BEGINNING = '1 ';
   private static readonly TEMPLATE_TLE1_ENDING = 'U 58002B   17115.48668720 +.00000144 +00000-0 +16234-3 0  9994';
   private static readonly TEMPLATE_TLE2_BEGINNING = '2 ';
-  private static readonly TEMPLATE_TLE2_ENDING = ' 034.2502 167.2636 0042608 222.6554 121.5501 24.84703551080477';
+  private static readonly TEMPLATE_TLE2_ENDING = ' 034.2502 167.2636 0042608 222.6554 121.5501 14.84703551080477';
+  static readonly ANALYST_START_ID = 90000;
 
-  analSatSet = [];
+  analSatSet = <DetailedSatellite[]>[];
   cosparIndex: { [key: string]: number } = {};
   fieldOfViewSet = [];
   gotExtraData = false;
@@ -121,9 +94,8 @@ export class StandardCatalogManager implements CatalogManager {
   orbitDensity: number[][] = [];
   orbitDensityMax = 0;
   orbitalSats: number;
-  radarDataSet = [];
   satCruncher: Worker;
-  satData: SatObject[];
+  objectCache: BaseObject[];
   satExtraData;
   satLinkManager: SatLinkManager;
   sccIndex: { [key: string]: number } = {};
@@ -132,10 +104,6 @@ export class StandardCatalogManager implements CatalogManager {
   starIndex2 = 0;
   staticSet = [];
   updateCruncherBuffers = (mData: SatCruncherMessageData): void => {
-    // We need to wait for the first message to arrive before we can start updating the buffers
-    // this.wait5_++;
-    // if (this.wait5_ <= 5) return;
-
     keepTrackApi.getDotsManager().updateCruncherBuffers(mData);
 
     if (typeof mData?.sensorMarkerArray != 'undefined' && mData?.sensorMarkerArray?.length !== 0) {
@@ -146,8 +114,6 @@ export class StandardCatalogManager implements CatalogManager {
     settingsManager.dotsOnScreen = Math.max(this.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
   };
 
-  wait5_ = 0;
-
   /**
    * Calculates the Satellite Record (satrec) for a given satellite object.
    * If a cached satrec exists, it returns it. Otherwise, it performs and stores
@@ -157,18 +123,18 @@ export class StandardCatalogManager implements CatalogManager {
    * @param {SatObject} sat - The satellite object for which to calculate the satrec.
    * @returns {SatelliteRecord} The calculated or cached Satellite Record.
    */
-  calcSatrec(sat: SatObject): SatelliteRecord {
+  calcSatrec(sat: DetailedSatellite): SatelliteRecord {
     // If cached satrec exists, return it
     if (sat.satrec) {
       return sat.satrec;
     }
 
     // Perform and store sat init calcs
-    const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2);
+    const satrec = Sgp4.createSatrec(sat.tle1, sat.tle2);
 
     // Cache the satrec for later use.
-    if (this.satData[sat.id]) {
-      this.satData[sat.id].satrec = satrec;
+    if (this.objectCache[sat.id]?.isSatellite()) {
+      (this.objectCache[sat.id] as DetailedSatellite).satrec = satrec;
     } else {
       errorManagerInstance.warn('calcSatrec: satId not found in satData');
     }
@@ -183,8 +149,71 @@ export class StandardCatalogManager implements CatalogManager {
    * @returns {number[]} - An array of IDs corresponding to the satellite numbers.
    * If a satellite number does not have a corresponding ID, it is not included in the returned array.
    */
-  convertSatnumArrayToIdArray(satnumArray: number[]): number[] {
-    return satnumArray.map((satnum) => this.getIdFromSccNum(satnum, false) ?? null).filter((id) => id !== null);
+  satnums2ids(satnumArray: number[]): number[] {
+    return satnumArray.map((satnum) => this.sccNum2Id(satnum.toString().padStart(5, '0'), false) ?? null).filter((id) => id !== null);
+  }
+
+  /**
+   * Converts an international designation to its corresponding ID.
+   * @param intlDes The international designation to convert.
+   * @returns The corresponding ID if found, otherwise null.
+   */
+  intlDes2id(intlDes: string): number | null {
+    return typeof this.cosparIndex[`${intlDes}`] !== 'undefined' ? this.cosparIndex[`${intlDes}`] : null;
+  }
+
+  /**
+   * This method is used to get the ID from the object number.
+   *
+   * @param {number} a5Num - The NORAD satellite catalog number.
+   * @param {boolean} isExtensiveSearch - A flag to determine if an extensive search should be performed. Default is true.
+   *
+   * @returns {number | null} - Returns the ID if found, otherwise returns null.
+   *
+   * The method first checks if the object number exists in the `sccIndex`. If it does, it returns the corresponding ID.
+   * If the object number does not exist in the `sccIndex` and `isExtensiveSearch` is true, it performs an extensive search in the `satData`.
+   * If the object number is found in the `satData`, it returns the index as the ID. If not found, it returns null.
+   */
+  sccNum2Id(a5Num: string | number, isExtensiveSearch: boolean = true): number | null {
+    // For backwards compatibility, this method accepts a number or string as the a5Num parameter.
+    if (typeof a5Num === 'number') a5Num = a5Num.toString().padStart(5, '0');
+
+    const satBySccIndex = this.sccIndex[`${a5Num}`];
+    if (typeof satBySccIndex !== 'undefined') {
+      return this.sccIndex[`${a5Num}`];
+    } else if (isExtensiveSearch) {
+      for (let i = 0; i < this.objectCache.length; i++) {
+        const obj = this.objectCache[i];
+        if (obj?.isSatellite() && (obj as DetailedSatellite)?.sccNum === a5Num.toString()) return i;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Retrieves a satellite object based on its object number.
+   *
+   * @param sccNum - The object number of the satellite.
+   * @returns The satellite object if found, null otherwise.
+   */
+  sccNum2Sat(sccNum: number): DetailedSatellite | null {
+    const sat = this.getObject(this.sccNum2Id(sccNum.toString().padStart(5, '0')));
+    if (!sat.isSatellite()) throw new Error(`Object ${sccNum} is not a satellite!`);
+    return sat as DetailedSatellite;
+  }
+
+  /**
+   * @deprecated - Stars are not currently working
+   *
+   * Converts a star name to its corresponding ID within a given range.
+   * @param starName - The name of the star.
+   * @param starIndex1 - The starting index of the range.
+   * @param starIndex2 - The ending index of the range.
+   * @returns The ID of the star if found within the range, otherwise null.
+   */
+  starName2Id(starName: string, starIndex1: number, starIndex2: number): number | null {
+    const i = this.objectCache.slice(starIndex1, starIndex2).findIndex((object) => object?.type === SpaceObjectType.STAR && object?.name === starName);
+    return i === -1 ? null : i + starIndex1;
   }
 
   cruncherExtraData(mData: SatCruncherMessageData) {
@@ -192,7 +221,7 @@ export class StandardCatalogManager implements CatalogManager {
 
     const satExtraData = JSON.parse(mData.extraData);
 
-    if (typeof this.satData === 'undefined') throw new Error('No sat data');
+    if (typeof this.objectCache === 'undefined') throw new Error('No sat data');
     if (typeof satExtraData === 'undefined') throw new Error('No extra data');
 
     for (let i = 0; i < 180; i++) {
@@ -205,30 +234,31 @@ export class StandardCatalogManager implements CatalogManager {
     for (let satCrunchIndex = 0; satCrunchIndex < this.numSats; satCrunchIndex++) {
       try {
         // Static objects lack these values and including them increase the JS heap a lot
-        if (this.satData[satCrunchIndex].static) continue;
-        this.satData[satCrunchIndex].inclination = satExtraData[satCrunchIndex].inclination;
-        this.satData[satCrunchIndex].eccentricity = satExtraData[satCrunchIndex].eccentricity;
-        this.satData[satCrunchIndex].raan = satExtraData[satCrunchIndex].raan;
-        this.satData[satCrunchIndex].argPe = satExtraData[satCrunchIndex].argPe;
-        this.satData[satCrunchIndex].meanMotion = satExtraData[satCrunchIndex].meanMotion;
+        if (!this.objectCache[satCrunchIndex].isSatellite()) continue;
+        const sat = this.objectCache[satCrunchIndex] as DetailedSatellite;
+        sat.inclination = satExtraData[satCrunchIndex].inclination;
+        sat.eccentricity = satExtraData[satCrunchIndex].eccentricity;
+        sat.raan = satExtraData[satCrunchIndex].raan;
+        sat.argOfPerigee = satExtraData[satCrunchIndex].argOfPerigee;
+        sat.meanMotion = satExtraData[satCrunchIndex].meanMotion;
 
-        this.satData[satCrunchIndex].semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
-        this.satData[satCrunchIndex].semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
-        this.satData[satCrunchIndex].apogee = satExtraData[satCrunchIndex].apogee;
-        this.satData[satCrunchIndex].perigee = satExtraData[satCrunchIndex].perigee;
-        this.satData[satCrunchIndex].period = satExtraData[satCrunchIndex].period;
-        this.satData[satCrunchIndex].satrec = this.calcSatrec(this.satData[satCrunchIndex]);
+        sat.semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
+        sat.semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
+        sat.apogee = satExtraData[satCrunchIndex].apogee;
+        sat.perigee = satExtraData[satCrunchIndex].perigee;
+        sat.period = satExtraData[satCrunchIndex].period;
+        sat.satrec = this.calcSatrec(this.objectCache[satCrunchIndex] as DetailedSatellite);
 
-        if (this.satData[satCrunchIndex].type !== SpaceObjectType.PAYLOAD) {
+        if (this.objectCache[satCrunchIndex].type !== SpaceObjectType.PAYLOAD) {
           const inc = Math.round(satExtraData[satCrunchIndex].inclination);
           const per = Math.round(satExtraData[satCrunchIndex].period);
           this.orbitDensity[inc][per] += 1;
         }
 
-        this.satData[satCrunchIndex].velocity = { total: 0, x: 0, y: 0, z: 0 };
+        this.objectCache[satCrunchIndex].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
       } catch (error) {
         if (typeof satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
-        if (typeof this.satData[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
+        if (typeof this.objectCache[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
         // Intentionally left blank
       }
     }
@@ -246,56 +276,27 @@ export class StandardCatalogManager implements CatalogManager {
   cruncherExtraUpdate(mData: SatCruncherMessageData) {
     if (!mData?.extraUpdate) throw new Error('extraUpdate required!');
 
-    const satExtraData = JSON.parse(mData.extraData as string);
-    const satCrunchIndex = mData.satId as number;
+    const satExtraData = JSON.parse(mData.extraData) as ExtraDataMessage[];
+    const satCrunchIndex = mData.satId;
 
-    this.satData[satCrunchIndex].inclination = satExtraData[0].inclination;
-    this.satData[satCrunchIndex].eccentricity = satExtraData[0].eccentricity;
-    this.satData[satCrunchIndex].raan = satExtraData[0].raan;
-    this.satData[satCrunchIndex].argPe = satExtraData[0].argPe;
-    this.satData[satCrunchIndex].meanMotion = satExtraData[0].meanMotion;
+    const sat = this.objectCache[satCrunchIndex] as DetailedSatellite;
 
-    this.satData[satCrunchIndex].semiMajorAxis = satExtraData[0].semiMajorAxis;
-    this.satData[satCrunchIndex].semiMinorAxis = satExtraData[0].semiMinorAxis;
-    this.satData[satCrunchIndex].apogee = satExtraData[0].apogee;
-    this.satData[satCrunchIndex].perigee = satExtraData[0].perigee;
-    this.satData[satCrunchIndex].period = satExtraData[0].period;
-    this.satData[satCrunchIndex].TLE1 = satExtraData[0].TLE1;
-    this.satData[satCrunchIndex].TLE2 = satExtraData[0].TLE2;
-  }
+    sat.inclination = satExtraData[0].inclination;
+    sat.eccentricity = satExtraData[0].eccentricity;
+    sat.raan = satExtraData[0].raan;
+    sat.argOfPerigee = satExtraData[0].argOfPerigee;
+    sat.meanMotion = satExtraData[0].meanMotion;
 
-  getIdFromIntlDes(intlDes: string): number | null {
-    return typeof this.cosparIndex[`${intlDes}`] !== 'undefined' ? this.cosparIndex[`${intlDes}`] : null;
-  }
+    sat.semiMajorAxis = satExtraData[0].semiMajorAxis;
+    sat.semiMinorAxis = satExtraData[0].semiMinorAxis;
+    sat.apogee = satExtraData[0].apogee;
+    sat.perigee = satExtraData[0].perigee;
+    sat.period = satExtraData[0].period;
 
-  /**
-   * This method is used to get the ID from the object number.
-   *
-   * @param {number} sccNum - The NORAD satellite catalog number.
-   * @param {boolean} isExtensiveSearch - A flag to determine if an extensive search should be performed. Default is true.
-   *
-   * @returns {number | null} - Returns the ID if found, otherwise returns null.
-   *
-   * The method first checks if the object number exists in the `sccIndex`. If it does, it returns the corresponding ID.
-   * If the object number does not exist in the `sccIndex` and `isExtensiveSearch` is true, it performs an extensive search in the `satData`.
-   * If the object number is found in the `satData`, it returns the index as the ID. If not found, it returns null.
-   */
-  getIdFromSccNum(sccNum: number, isExtensiveSearch = true): number | null {
-    const satBySccIndex = this.sccIndex[`${sccNum}`];
-    if (typeof satBySccIndex !== 'undefined') {
-      return this.sccIndex[`${sccNum}`];
-    } else if (isExtensiveSearch) {
-      for (let i = 0; i < this.satData.length; i++) {
-        const sat = this.satData[i];
-        if (sat && parseInt(sat.sccNum) == sccNum) return i;
-      }
+    if (satExtraData[0].tle1) {
+      sat.tle1 = satExtraData[0].tle1 as TleLine1;
+      sat.tle2 = satExtraData[0].tle2 as TleLine2;
     }
-    return null;
-  }
-
-  getIdFromStarName(starName: string, starIndex1: number, starIndex2: number): number | null {
-    const i = this.satData.slice(starIndex1, starIndex2).findIndex((object: SatObject) => object?.type === SpaceObjectType.STAR && object?.name === starName);
-    return i === -1 ? null : i + starIndex1;
   }
 
   /**
@@ -303,60 +304,56 @@ export class StandardCatalogManager implements CatalogManager {
    *
    * Optional GetSatType parameter can be used speed up the function by retrieving only the required data.
    *
-   * @param {number | null} i - The index of the satellite in the catalog. If the index is -1 or null, or if the satellite data is not available, the function will return null.
-   * @param {GetSatType} type - An optional parameter that specifies the type of data to retrieve. By default, it retrieves the default satellite data. If set to GetSatType.EXTRA_ONLY, it retrieves only the extra data. If set to GetSatType.POSITION_ONLY, it retrieves only the position data.
-   *
-   * @returns {SatObject | null} - Returns the satellite object if found, otherwise returns null. The returned object may contain different data depending on the 'type' parameter.
    */
-  getSat(i: number | null | undefined, type: GetSatType = GetSatType.DEFAULT): SatObject | null {
+  getObject(i: number | null | undefined, type: GetSatType = GetSatType.DEFAULT): BaseObject | null {
     if (!(i > -1)) {
       errorManagerInstance.debug('getSat: i is null');
       return null;
     }
 
-    if (i == -1 || !this.satData || !this.satData[i]) {
-      if (!isThisNode() && i >= 0 && !this.satData[i]) console.warn(`Satellite ${i} not found`);
+    if (i == -1 || !this.objectCache || !this.objectCache[i]) {
+      if (!isThisNode() && i >= 0 && !this.objectCache[i]) console.warn(`Satellite ${i} not found`);
       return null;
     }
 
     if (type === GetSatType.EXTRA_ONLY) {
-      return this.satData[i];
+      return this.objectCache[i];
     }
 
     if (type === GetSatType.POSITION_ONLY) {
-      this.satData[i].position = keepTrackApi.getDotsManager().getCurrentPosition(i);
-      return this.satData[i];
+      this.objectCache[i].position = keepTrackApi.getDotsManager().getCurrentPosition(i);
+      return this.objectCache[i];
     }
 
     if (this.gotExtraData && type !== GetSatType.SKIP_POS_VEL) {
-      keepTrackApi.getDotsManager().updatePosVel(this.satData[i], i);
+      keepTrackApi.getDotsManager().updatePosVel(this.objectCache[i], i);
     }
 
-    // Update the satrec object
-    if (this.satData[i].TLE1) this.calcSatrec(this.satData[i]);
-
-    return this.satData[i];
+    return this.objectCache[i];
   }
 
-  /**
-   * Retrieves a satellite object based on its object number.
-   *
-   * @param sccNum - The object number of the satellite.
-   * @returns The satellite object if found, null otherwise.
-   */
-  getSatFromSccNum(sccNum: number): SatObject | null {
-    return this.getSat(this.getIdFromSccNum(sccNum));
+  getSat(satId: number, type: GetSatType = GetSatType.DEFAULT): DetailedSatellite | null {
+    const sat = this.getObject(satId, type);
+    if (!sat.isSatellite()) return null;
+    return sat as DetailedSatellite;
   }
 
-  getSensorFromSensorName(sensorName: string): number | null {
-    return this.satData.findIndex(
-      // Find the first static object that isn't a missile or a star
-      (object: SatObject) => (object?.static && !object?.missile && object?.type !== SpaceObjectType.STAR ? object.name === sensorName : false) // Test
-    );
+  getSats(): DetailedSatellite[] {
+    return this.objectCache.filter((obj) => obj?.isSatellite()) as DetailedSatellite[];
+  }
+
+  getMissile(missileId: number): MissileObject | null {
+    const missile = this.getObject(missileId);
+    if (!missile.isMissile()) return null;
+    return missile as MissileObject;
+  }
+
+  getSensorFromSensorName(sensorName: string): number {
+    return this.objectCache.findIndex((object: BaseObject) => object.isSensor() && object.name === sensorName);
   }
 
   id2satnum(satIdArray: number[]) {
-    return satIdArray.map((id) => (this.getSat(id)?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
+    return satIdArray.map((id) => ((<DetailedSatellite>this.getObject(id))?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
   }
 
   async init(satCruncherOveride?: any): Promise<void> {
@@ -384,7 +381,7 @@ export class StandardCatalogManager implements CatalogManager {
           this.satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
         } catch (error) {
           // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
-          if (window.location.href.indexOf('file://') === 0) {
+          if (window.location.href.startsWith('file://')) {
             throw new Error(
               'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
             );
@@ -396,59 +393,49 @@ export class StandardCatalogManager implements CatalogManager {
 
       this.satCruncher.onmessage = this.satCruncherOnMessage.bind(this);
       this.gotExtraData = false;
-      // TODO: FUTURE FEATURE
-      // this.radarDataManager = radarDataManager;
     } catch (error) {
       throw new Error(error);
     }
   }
 
+  getActiveSats(): DetailedSatellite[] {
+    return this.objectCache.filter((obj) => obj.isSatellite() && obj.active) as DetailedSatellite[];
+  }
+
   initObjects() {
     // Create a buffer of missile objects
     for (let i = 0; i < settingsManager.maxMissiles; i++) {
-      this.missileSet.push({
-        static: false,
-        missile: true,
-        active: false,
-        type: SpaceObjectType.UNKNOWN,
-        name: i,
-        latList: [],
-        lonList: [],
-        altList: [],
-        timeList: [],
-      });
-    }
-
-    // Create a buffer of radar data objects
-    for (let i = 0; i < settingsManager.maxRadarData; i++) {
-      const radarDataInfo = <RadarDataObject>{
-        static: true,
-        missile: false,
-        active: false,
-        type: SpaceObjectType.UNKNOWN,
-        name: `Radar Data ${i}`,
-      };
-      this.radarDataSet.push(radarDataInfo);
+      this.missileSet.push(
+        new MissileObject({
+          active: false,
+          type: SpaceObjectType.BALLISTIC_MISSILE,
+          name: 'Missile ' + i,
+          latList: [],
+          lonList: [],
+          altList: [],
+          timeList: [],
+        } as unknown as MissileParams)
+      );
     }
 
     // Create a buffer of analyst satellite objects
     for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
-      const sccNum = (80000 + i).toString();
-      this.analSatSet.push(<SatObject>{
-        static: false,
-        missile: false,
-        active: false,
-        name: 'Analyst Sat ' + i,
-        country: 'ANALSAT',
-        launchVehicle: 'Analyst Satellite',
-        launchSite: 'ANALSAT',
-        sccNum: sccNum,
-        TLE1: `${StandardCatalogManager.TEMPLATE_TLE1_BEGINNING}${sccNum}${StandardCatalogManager.TEMPLATE_TLE1_ENDING}`,
-        TLE2: `${StandardCatalogManager.TEMPLATE_TLE2_BEGINNING}${sccNum}${StandardCatalogManager.TEMPLATE_TLE2_ENDING}`,
-        intlDes: StandardCatalogManager.TEMPLATE_INTLDES,
-        type: SpaceObjectType.PAYLOAD,
-        id: i,
-      });
+      const sccNum = FormatTle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
+      this.analSatSet.push(
+        new DetailedSatellite({
+          active: false,
+          name: 'Analyst Sat ' + i,
+          country: 'ANALSAT',
+          launchVehicle: 'Analyst Satellite',
+          launchSite: 'ANALSAT',
+          sccNum: sccNum,
+          tle1: `${CatalogManager.TEMPLATE_TLE1_BEGINNING}${sccNum}${CatalogManager.TEMPLATE_TLE1_ENDING}` as TleLine1,
+          tle2: `${CatalogManager.TEMPLATE_TLE2_BEGINNING}${sccNum}${CatalogManager.TEMPLATE_TLE2_ENDING}` as TleLine2,
+          intlDes: CatalogManager.TEMPLATE_INTLDES,
+          type: SpaceObjectType.PAYLOAD,
+          id: i,
+        })
+      );
     }
 
     // Create Stars
@@ -473,7 +460,7 @@ export class StandardCatalogManager implements CatalogManager {
     if (!settingsManager.isDisableSensors) {
       let i = 0;
       for (const sensor in sensors) {
-        sensors[sensor].staticNum = i;
+        sensors[sensor].sensorId = i;
         sensors[sensor].static = true;
         this.staticSet.push(sensors[sensor]);
         i++;
@@ -538,7 +525,7 @@ export class StandardCatalogManager implements CatalogManager {
     }
   }
 
-  insertNewAnalystSatellite(TLE1: string, TLE2: string, id: number, sccNum?: string): any {
+  addAnalystSat(TLE1: string, TLE2: string, id: number, sccNum?: string): DetailedSatellite | null {
     if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
     if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
 
@@ -547,29 +534,33 @@ export class StandardCatalogManager implements CatalogManager {
       satrec = Sgp4.createSatrec(TLE1, TLE2);
     } catch (e) {
       errorManagerInstance.error(e, 'catalog-manager.ts', 'Error creating satellite record!');
-      return;
+      return null;
     }
 
     if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
-      this.satCruncher.postMessage({
-        typ: 'satEdit',
+      const m = {
+        typ: CruncerMessageTypes.SAT_EDIT,
         id: id,
         active: true,
-        TLE1: TLE1,
-        TLE2: TLE2,
-      });
+        tle1: TLE1,
+        tle2: TLE2,
+      };
+      this.satCruncher.postMessage(m);
       keepTrackApi.getOrbitManager().changeOrbitBufferData(id, TLE1, TLE2);
-      const sat = this.getSat(id);
+      const sat = this.getObject(id) as DetailedSatellite;
+      if (!sat.isSatellite()) throw new Error(`Object ${id} is not a satellite!`);
+
       sat.active = true;
       sat.type = SpaceObjectType.PAYLOAD; // Default to Satellite
-      sat.sccNum = sccNum || StringPad.pad0(TLE1.substr(2, 5).trim(), 5);
+      sat.sccNum = sccNum || TLE1.substring(2, 7).trim().padStart(5, '0');
       return sat;
     } else {
-      console.debug(TLE1);
-      console.debug(TLE2);
-      keepTrackApi.getUiManager().toast(`New Analyst Satellite is Invalid!`, 'critical');
-      return false;
+      errorManagerInstance.debug(TLE1);
+      errorManagerInstance.debug(TLE2);
+      errorManagerInstance.warn(`New Analyst Satellite is Invalid!`);
     }
+
+    return null;
   }
 
   satCruncherOnMessage({ data: mData }: { data: SatCruncherMessageData }) {
@@ -580,12 +571,11 @@ export class StandardCatalogManager implements CatalogManager {
         // Mark the satellite as inactive
         const id = mData.badObjectId;
         if (id !== null) {
-          this.satData[id].active = false;
+          const sat = this.objectCache[id] as DetailedSatellite;
+          sat.active = false;
           // (<any>window).decayedSats = (<any>window).decayedSats || [];
           // (<any>window).decayedSats.push(this.satData[id].sccNum);
-          errorManagerInstance.debug(
-            `Object ${mData.badObjectId} is inactive due to bad TLE\nSatellite ${this.satData[id].sccNum}\n${this.satData[id].TLE1}\n${this.satData[id].TLE2}`
-          );
+          errorManagerInstance.debug(`Object ${mData.badObjectId} is inactive due to bad TLE\nSatellite ${sat.sccNum}\n${sat.tle1}\n${sat.tle2}`);
         }
       } else {
         // console.debug(`Bad sat number: ${mData.badObjectId}`);
@@ -611,10 +601,10 @@ export class StandardCatalogManager implements CatalogManager {
     keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
 
     // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
-    if (!settingsManager.cruncherReady && this.satData && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
+    if (!settingsManager.cruncherReady && this.objectCache && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
       SplashScreen.hideSplashScreen();
 
-      const stars = this.satData.filter((sat) => sat?.type === SpaceObjectType.STAR);
+      const stars = this.objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);
       if (stars.length > 0) {
         stars.sort((a, b) => a.id - b.id);
         // this is the smallest id
@@ -631,36 +621,5 @@ export class StandardCatalogManager implements CatalogManager {
 
       settingsManager.cruncherReady = true;
     }
-  }
-
-  setSat(i: number, sat: SatObject): void {
-    // TODO: This shouldnt ever happen
-    if (!this.satData) return; // Cant set a satellite without a catalog
-    this.satData[i] = sat;
-    this.satData[i].velocity ??= { total: 0, x: 0, y: 0, z: 0 }; // Set the velocity to 0 if it doesn't exist
-  }
-
-  getSatsFromSatData(): SatObject[] {
-    return <SatObject[]>this.satData;
-  }
-
-  panToStar(c: SatObject): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-
-    // Try with the pname
-    let satId = this.getIdFromStarName(c.name, dotsManagerInstance.starIndex1, dotsManagerInstance.starIndex2);
-    let sat = this.getSat(satId);
-
-    if (sat == null) throw new Error('Star not found');
-
-    lineManagerInstance.clear();
-    if (this.isStarManagerLoaded) {
-      keepTrackApi.getStarManager().isAllConstellationVisible = false;
-    }
-
-    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
-    keepTrackApi.getMainCamera().cameraType = CameraType.OFFSET;
-    keepTrackApi.getMainCamera().lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
   }
 }

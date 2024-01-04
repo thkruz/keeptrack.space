@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import type { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { LegendManager } from '@app/static/legend-manager';
 import timeMachinePng from '@public/img/icons/time-machine.png';
@@ -102,7 +102,7 @@ export class TimeMachine extends KeepTrackPlugin {
     }
   }
 
-  removeSatellite(runCount: number, colorSchemeManager: StandardColorSchemeManager): void {
+  removeSatellite(runCount: number, colorSchemeManager: ColorSchemeManager): void {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();

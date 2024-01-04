@@ -161,8 +161,5 @@ export class DateTimeManager extends KeepTrackPlugin {
     } catch {
       // Ignore
     }
-
-    // TODO: Planned feature
-    // radarDataManager.findFirstDataTime();
   }
 }

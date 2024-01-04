@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, lookanglesRow, SatObject, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents, lookanglesRow } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -6,13 +6,12 @@ import { showLoading } from '@app/lib/showLoading';
 
 import { SatMath } from '@app/static/sat-math';
 
-import { DEG2RAD, MINUTES_PER_DAY, TAU } from '@app/lib/constants';
 import { getUnique } from '@app/lib/get-unique';
 import { saveCsv } from '@app/lib/saveVariable';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
 import analysisPng from '@public/img/icons/analysis.png';
-import { EciVec3, Kilometers, Radians, SatelliteRecord } from 'ootk';
+import { DetailedSatellite, DetailedSensor, EciVec3, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 /**
@@ -202,29 +201,29 @@ export class AnalysisMenu extends KeepTrackPlugin {
           showLoading(AnalysisMenu.findRaBtnClick_);
         });
 
-        const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
+        const objData = keepTrackApi.getCatalogManager().objectCache;
         getEl('export-catalog-csv-btn')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Csv(satData);
+          CatalogExporter.exportTle2Csv(objData);
         });
 
         getEl('export-sat-fov-csv-btn')?.addEventListener('click', () => {
-          CatalogExporter.exportSatInFov2Csv(satData);
+          CatalogExporter.exportSatInFov2Csv(objData);
         });
 
         getEl('export-catalog-txt-2a')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(satData);
+          CatalogExporter.exportTle2Txt(objData);
         });
 
         getEl('export-catalog-txt-2b')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(satData, 2, false);
+          CatalogExporter.exportTle2Txt(objData, 2, false);
         });
 
         getEl('export-catalog-txt-3a')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(satData, 3);
+          CatalogExporter.exportTle2Txt(objData, 3);
         });
 
         getEl('export-catalog-txt-3b')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(satData, 3, false);
+          CatalogExporter.exportTle2Txt(objData, 3, false);
         });
 
         clickAndDragWidth(getEl('analysis-menu'));
@@ -234,7 +233,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject | string) => {
+      cb: (sensor: DetailedSensor | string) => {
         AnalysisMenu.setSensor_(sensor);
       },
     });
@@ -274,7 +273,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return searchStr; // csoListUnique;
   }
 
-  private static getActualCSOs_(csoListUnique: { sat1: SatObject; sat2: SatObject }[], searchRadius: number) {
+  private static getActualCSOs_(csoListUnique: { sat1: DetailedSatellite; sat2: DetailedSatellite }[], searchRadius: number) {
     const csoStrArr = []; // Clear CSO List
 
     // Loop through the possible CSOs
@@ -322,7 +321,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return csoStrArr;
   }
 
-  private static getPossibleCSOs_(satList: SatObject[], searchRadius: number) {
+  private static getPossibleCSOs_(satList: DetailedSatellite[], searchRadius: number) {
     let csoList = [];
     // Loop through all the satellites with valid positions
     for (let i = 0; i < satList.length; i++) {
@@ -357,14 +356,14 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private static getValidSats_() {
-    let satList = <SatObject[]>[];
+    let satList = <DetailedSatellite[]>[];
 
     // Loop through all the satellites
     for (let i = 0; i < keepTrackApi.getCatalogManager().orbitalSats; i++) {
       // Get the satellite
       const sat = keepTrackApi.getCatalogManager().getSat(i);
       // Avoid unnecessary errors
-      if (typeof sat.TLE1 == 'undefined') continue;
+      if (!sat) continue;
       // Only look at satellites in LEO
       // if (sat.apogee > 5556) continue;
       // Find where the satellite is right now
@@ -380,20 +379,14 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return satList;
   }
 
-  static findBestPass(sat: SatObject, sensors: SensorObject[]): lookanglesRow[] {
+  static findBestPass(sat: DetailedSatellite, sensors: DetailedSensor[]): lookanglesRow[] {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     // Check if there is a sensor
-    if (sensors.length <= 0 || !sensors[0] || typeof sensors[0].obsminaz == 'undefined') {
+    if (sensors.length <= 0 || !sensors[0] || typeof sensors[0].minAz == 'undefined') {
       keepTrackApi.getUiManager().toast(`Sensor's format incorrect. Did you select a sensor first?`, 'critical');
       return [];
     }
-    sensors[0].observerGd = {
-      // Array to calculate look angles in propagate()
-      lat: <Radians>(sensors[0].lat * DEG2RAD),
-      lon: <Radians>(sensors[0].lon * DEG2RAD),
-      alt: sensors[0].alt,
-    };
 
     // TOOD: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
     const sensor = sensors[0];
@@ -414,7 +407,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     let sEl = <string | null>null;
     let srng = <string | null>null;
     let sTime = <Date | null>null;
-    let passMinrng = sensor.obsmaxrange; // This is set each look to find minimum rng (start at max rng)
+    let passMinrng = sensor.maxRng; // This is set each look to find minimum rng (start at max rng)
     let passMaxEl = 0;
     let start3 = false;
     let stop3 = false;
@@ -546,7 +539,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
           sEl = null;
           srng = null;
           sTime = null;
-          passMinrng = sensor.obsmaxrange; // This is set each look to find minimum rng
+          passMinrng = sensor.maxRng; // This is set each look to find minimum rng
           passMaxEl = 0;
           start3 = false;
           stop3 = false;
@@ -559,14 +552,14 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return lookanglesTable;
   }
 
-  static findBestPasses(sats: string, sensor: SensorObject) {
+  static findBestPasses(sats: string, sensor: DetailedSensor) {
     sats = sats.replace(/ /gu, ',');
     const satArray = sats.split(',');
     let passes = [];
     for (const satId of satArray) {
       try {
         if (typeof satId == 'undefined' || satId == null || satId === '' || satId === ' ') continue;
-        const sat = keepTrackApi.getCatalogManager().getSatFromSccNum(parseInt(satId));
+        const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(satId));
         const satPasses = AnalysisMenu.findBestPass(sat, [sensor]);
         for (const pass of satPasses) {
           passes.push(pass);
@@ -597,7 +590,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private static findRaBtnClick_() {
-    const searchStr = CatalogSearch.findReentry(<SatObject[]>keepTrackApi.getCatalogManager().satData).join(',');
+    const searchStr = CatalogSearch.findReentry(<DetailedSatellite[]>keepTrackApi.getCatalogManager().objectCache).join(',');
     keepTrackApi.getUiManager().doSearch(searchStr);
   }
 
@@ -612,7 +605,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     }
   }
 
-  private static setSensor_(sensor: SensorObject | string): void {
+  private static setSensor_(sensor: DetailedSensor | string): void {
     const submitButtonDom = <HTMLButtonElement>getEl('analysis-bpt-submit');
     if (!sensor) {
       submitButtonDom.disabled = true;

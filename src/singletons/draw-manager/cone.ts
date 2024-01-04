@@ -1,9 +1,9 @@
-import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { DEG2RAD, RADIUS_OF_EARTH } from '@app/lib/constants';
+import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { lon2yaw } from '@app/lib/transforms';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { Kilometers } from 'ootk';
+import { BaseObject, DEG2RAD, Kilometers } from 'ootk';
 
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
@@ -26,8 +26,8 @@ export const init = async () => {
   keepTrackApi.register({
     event: KeepTrackApiEvents.selectSatData,
     cbName: 'coneInit',
-    cb: (sat: SatObject | null, satId: number) => {
-      if (!sat) return;
+    cb: (obj: BaseObject | null, satId: number) => {
+      if (!obj) return;
       const dotsManagerInstance = keepTrackApi.getDotsManager();
       cone.pos = [dotsManagerInstance.positionData[satId * 3], dotsManagerInstance.positionData[satId * 3 + 1], dotsManagerInstance.positionData[satId * 3 + 2]];
       init();

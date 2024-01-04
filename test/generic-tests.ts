@@ -156,7 +156,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   test(`${pluginName}_toggle_w_satellite`, () => {
     const plugin = new Plugin();
     websiteInit(plugin);
-    keepTrackApi.getCatalogManager().satData = [defaultSat];
+    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
@@ -172,7 +172,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
       expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
 
-    keepTrackApi.getCatalogManager().satData = [];
+    keepTrackApi.getCatalogManager().objectCache = [];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(-1);
     // console.warn(keepTrackApi.getCatalogManager().selectedSat);
   });
@@ -182,7 +182,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     const plugin = new Plugin();
     websiteInit(plugin);
     keepTrackApi.getSensorManager().setSensor(defaultSensor, 0);
-    keepTrackApi.getCatalogManager().satData = [defaultSat];
+    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);

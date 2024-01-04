@@ -20,11 +20,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { CatalogManager, KeepTrackApiEvents, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import fencePng from '@public/img/icons/fence.png';
+import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SatelliteFov } from '../satellite-fov/satellite-fov';
 
 declare module '@app/interfaces' {
   interface UserSettings {
@@ -34,12 +37,18 @@ declare module '@app/interfaces' {
 }
 
 export class SensorSurvFence extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Sensor Surveillance Fence';
+  constructor() {
+    super(SensorSurvFence.PLUGIN_NAME);
+  }
+
+  isShowSurvFence = false;
+
   bottomIconCallback = () => {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    if (settingsManager.isShowSurvFence) {
-      this.disableSurvView_(catalogManagerInstance);
+    if (this.isShowSurvFence) {
+      this.disableSurvView();
     } else {
-      this.enableSurvView_(catalogManagerInstance);
+      this.enableSurvView_();
     }
   };
 
@@ -51,37 +60,34 @@ export class SensorSurvFence extends KeepTrackPlugin {
 
   isRequireSensorSelected = true;
 
-  static PLUGIN_NAME = 'Sensor Surveillance Fence';
-
-  constructor() {
-    super(SensorSurvFence.PLUGIN_NAME);
-    settingsManager.isShowSurvFence = false;
-  }
-
-  private disableSurvView_(catalogManagerInstance: CatalogManager) {
-    settingsManager.isShowSurvFence = false;
-    getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
-    catalogManagerInstance.satCruncher.postMessage({
-      isShowSurvFence: 'disable',
-      isShowFOVBubble: 'reset',
-    });
-  }
-
-  private enableSurvView_(catalogManagerInstance: CatalogManager) {
+  disableSurvView(isTellWorker = true) {
     keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
-    settingsManager.isShowSurvFence = true;
-    settingsManager.isSatOverflyModeOn = false;
+    this.isShowSurvFence = false;
+    this.setBottomIconToUnselected(false);
 
-    getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconSelectedClassString);
+    if (isTellWorker) {
+      keepTrackApi.getCatalogManager().satCruncher.postMessage({
+        markerMode: MarkerMode.OFF,
+        typ: CruncerMessageTypes.UPDATE_MARKERS,
+      });
+    }
+  }
 
-    catalogManagerInstance.satCruncher.postMessage({
-      isShowFOVBubble: 'enable',
-      isShowSurvFence: 'enable',
-    });
-    catalogManagerInstance.satCruncher.postMessage({
-      typ: 'isShowSatOverfly',
-      isShowSatOverfly: 'reset',
+  private enableSurvView_() {
+    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
+    this.setBottomIconToSelected();
+
+    this.isShowSurvFence = true;
+
+    const satFovPlugin = keepTrackApi.getPlugin(SatelliteFov);
+    if (satFovPlugin) {
+      satFovPlugin.isSatOverflyModeOn = false;
+    }
+
+    keepTrackApi.getCatalogManager().satCruncher.postMessage({
+      markerMode: MarkerMode.SURV,
+      typ: CruncerMessageTypes.UPDATE_MARKERS,
     });
   }
 
@@ -94,7 +100,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject | string): void => {
+      cb: (sensor: Sensor | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
@@ -110,7 +116,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject): void => {
+      cb: (sensor: Sensor): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
@@ -128,7 +134,8 @@ export class SensorSurvFence extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
+          this.isShowSurvFence = false;
+          this.setBottomIconToUnselected(false);
         }
       },
     });

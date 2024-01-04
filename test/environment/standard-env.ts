@@ -97,7 +97,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   // Setup a mock catalog
-  keepTrackApi.getCatalogManager().satData = [defaultSat, { ...defaultSat, ...{ id: 1, sccNum: '11' } }];
+  keepTrackApi.getCatalogManager().objectCache = [defaultSat, { ...defaultSat, ...{ id: 1, sccNum: '11' } }];
   const selectSatManager = new SelectSatManager();
   selectSatManager.init();
   catalogManagerInstance.staticSet = [defaultSensor];
@@ -149,11 +149,11 @@ export const enableConsoleErrors = () => {
 };
 
 export const standardSelectSat = () => {
-  keepTrackApi.getCatalogManager().satData = [defaultSat];
+  keepTrackApi.getCatalogManager().objectCache = [defaultSat];
   keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-  keepTrackApi.getCatalogManager().getSat = () => defaultSat;
+  keepTrackApi.getCatalogManager().getObject = () => defaultSat;
   keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 };
 export const setupMinimumHtml = () => {

@@ -1,12 +1,7 @@
-/* */
-
 import { keepTrackApi } from '@app/keepTrackApi';
-import { DEG2RAD } from '@app/lib/constants';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { Kilometers, Radians, TleLine1, TleLine2 } from 'ootk';
+import { DEG2RAD, DetailedSatellite, EciVec3, Kilometers, Radians, SpaceObjectType } from 'ootk';
 import { MeshMap, OBJ } from 'webgl-obj-loader';
-import { SatObject } from '../../interfaces';
-import { SpaceObjectType } from '../../lib/space-object-type';
 import { SatMath } from '../../static/sat-math';
 import { SplashScreen } from '../../static/splash-screen';
 import { errorManagerInstance } from '../errorManager';
@@ -23,7 +18,10 @@ type MeshModel = {
   };
 };
 
-export interface MeshObject extends SatObject {
+export interface MeshObject {
+  id: number;
+  position: EciVec3<Kilometers>;
+  sccNum: string;
   inSun: number;
   model: MeshModel;
   nadirYaw: Radians;
@@ -88,47 +86,12 @@ export class MeshManager {
 
   public calculateNadirYaw_: () => Radians;
   public currentMeshObject: MeshObject = {
-    static: false,
+    id: -1,
+    position: { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>,
+    sccNum: '',
     inSun: 0,
-    nadirYaw: <Radians>0,
     model: null,
-    position: {
-      x: <Kilometers>0,
-      y: <Kilometers>0,
-      z: <Kilometers>0,
-    },
-    id: 0,
-    source: '',
-    altId: '',
-    active: false,
-    apogee: 0,
-    argPe: 0,
-    az: 0,
-    dec: 0,
-    eccentricity: 0,
-    el: 0,
-    inclination: 0,
-    lon: 0,
-    meanMotion: 0,
-    perigee: 0,
-    period: 0,
-    ra: 0,
-    raan: 0,
-    rae: null,
-    satrec: null,
-    semiMajorAxis: 0,
-    semiMinorAxis: 0,
-    setRAE: null,
-    staticNum: 0,
-    TLE1: '' as TleLine1,
-    TLE2: '' as TleLine2,
-    type: SpaceObjectType.UNKNOWN,
-    velocity: {
-      total: 0,
-      x: 0,
-      y: 0,
-      z: 0,
-    },
+    nadirYaw: null,
   };
 
   public models = {
@@ -194,8 +157,7 @@ export class MeshManager {
     if (!this.isReady) return;
     // Don't draw meshes if the camera is too far away
     if (keepTrackApi.getMainCamera().camDistBuffer >= settingsManager.nearZoomLevel) return;
-    if (typeof this.currentMeshObject.id == 'undefined' || typeof this.currentMeshObject.model == 'undefined' || this.currentMeshObject.id == -1 || this.currentMeshObject.static)
-      return;
+    if (typeof this.currentMeshObject.id == 'undefined' || typeof this.currentMeshObject.model == 'undefined' || this.currentMeshObject.id == -1) return;
 
     if (this.currentMeshObject.model === null) {
       errorManagerInstance.debug('Race Condition: Mesh Object Model is null');
@@ -228,7 +190,9 @@ export class MeshManager {
 
   public drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
     if (settingsManager.disableUI || settingsManager.isDrawLess) return;
-    if (typeof this.currentMeshObject?.id == 'undefined' || this.currentMeshObject?.id == -1 || this.currentMeshObject.static) return;
+
+    if (!this.currentMeshObject) return;
+    if (typeof this.currentMeshObject?.id == 'undefined' || this.currentMeshObject?.id == -1) return;
 
     const gl = this.gl_;
 
@@ -255,7 +219,7 @@ export class MeshManager {
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
   // prettier-ignore
-  public getSatelliteModel(sat: SatObject, selectedDate: Date) { // NOSONAR
+  public getSatelliteModel(sat: DetailedSatellite, selectedDate: Date) { // NOSONAR
     if (this.checkIfNameKnown(sat.name)) {
       this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
       return;
@@ -346,15 +310,14 @@ export class MeshManager {
       // Do Nothing
     }
 
-    const rcs = parseFloat(sat.rcs);
     switch (true) {
-      case rcs < 0.1 && rcs > 0.04:
+      case sat.rcs < 0.1 && sat.rcs > 0.04:
         this.currentMeshObject.model = this.models.s1u;
         return;
-      case rcs < 0.22 && rcs >= 0.1:
+      case sat.rcs < 0.22 && sat.rcs >= 0.1:
         this.currentMeshObject.model = this.models.s2u;
         return;
-      case rcs < 0.33 && rcs >= 0.22:
+      case sat.rcs < 0.33 && sat.rcs >= 0.22:
         this.currentMeshObject.model = this.models.s3u;
         return;
       default:
@@ -445,7 +408,9 @@ export class MeshManager {
     this.currentMeshObject.model = model;
   }
 
-  update(selectedDate: Date, sat: SatObject) {
+  update(selectedDate: Date, sat: DetailedSatellite) {
+    if (!sat.isSatellite()) return;
+
     this.updateModel_(selectedDate, sat);
 
     // Move the mesh to its location in world space
@@ -456,7 +421,7 @@ export class MeshManager {
     // Rotate the Satellite to Face Nadir if needed
     if (this.currentMeshObject.nadirYaw !== null) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const sat = catalogManagerInstance.getSat(this.currentMeshObject.id);
+      const sat = catalogManagerInstance.getObject(this.currentMeshObject.id);
       const drawPosition = vec3.fromValues(sat.position.x, sat.position.y, sat.position.z);
 
       // Calculate a position to look at along the satellite's velocity vector
@@ -473,9 +438,9 @@ export class MeshManager {
 
     // Scale the this.mvMatrix_ to 1/5 (models are too big)
     if (this.currentMeshObject.sccNum !== '25544') {
-      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.2, 0.2, 0.2));
+      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.1, 0.1, 0.1));
     } else {
-      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.05, 0.05, 0.05));
+      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.01, 0.01, 0.01));
     }
 
     // Allow Manual Rotation of Meshes
@@ -488,12 +453,11 @@ export class MeshManager {
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
   }
 
-  private updateModel_(selectedDate: Date, sat: SatObject) {
+  private updateModel_(selectedDate: Date, sat: DetailedSatellite) {
     try {
       this.currentMeshObject.id = typeof sat?.id !== 'undefined' ? sat.id : -1;
-      this.currentMeshObject.static = sat?.static || false;
 
-      if (typeof this.currentMeshObject.id == 'undefined' || this.currentMeshObject.id == -1 || this.currentMeshObject.static) return;
+      if (typeof this.currentMeshObject.id == 'undefined' || this.currentMeshObject.id == -1) return;
       if (settingsManager.modelsOnSatelliteViewOverride) return;
 
       this.updatePosition(sat.position);
@@ -544,8 +508,19 @@ export class MeshManager {
     this.currentMeshObject.nadirYaw = yaw;
   }
 
-  public updatePosition(pos: { x: Kilometers; y: Kilometers; z: Kilometers }) {
-    this.currentMeshObject.position = pos;
+  public updatePosition(targetPosition: { x: Kilometers; y: Kilometers; z: Kilometers }) {
+    // Move halfway between the satellite and the target position
+    // This seems to cut down on the jitter. It might be caused by the scale of the meshes
+    // TODO: Explore drawing the world at a much smaller scale vs using the kilometer scale
+    const dx = targetPosition.x - this.currentMeshObject.position.x;
+    const dy = targetPosition.y - this.currentMeshObject.position.y;
+    const dz = targetPosition.z - this.currentMeshObject.position.z;
+
+    this.currentMeshObject.position = {
+      x: this.currentMeshObject.position.x + dx / 2,
+      y: this.currentMeshObject.position.y + dy / 2,
+      z: this.currentMeshObject.position.z + dz / 2,
+    } as EciVec3<Kilometers>;
   }
 
   private applyAttributePointers_(model: any) {

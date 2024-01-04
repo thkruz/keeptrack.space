@@ -58,7 +58,7 @@ export const defaultSat: SatObject = {
     z: 0,
   },
   static: false,
-  staticNum: null,
+  sensorId: null,
   source: CatalogSource.USSF,
 };
 
@@ -75,12 +75,12 @@ export const defaultSensor: SensorObject = {
   lat: <Degrees>41.754785,
   lon: <Degrees>-70.539151,
   alt: <Kilometers>0.060966,
-  obsminaz: <Degrees>347,
-  obsmaxaz: <Degrees>227,
-  obsminel: <Degrees>3,
-  obsmaxel: <Degrees>85,
-  obsminrange: <Kilometers>200,
-  obsmaxrange: <Kilometers>5556,
+  minAz: <Degrees>347,
+  maxAz: <Degrees>227,
+  minEl: <Degrees>3,
+  maxEl: <Degrees>85,
+  minRng: <Kilometers>200,
+  maxRng: <Kilometers>5556,
   changeObjectInterval: <Milliseconds>1000,
   beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
   linkAehf: true,
@@ -89,7 +89,7 @@ export const defaultSensor: SensorObject = {
   url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
   country: 'United States',
   operator: Operators.USSF,
-  staticNum: 0, // For Testing Only
+  sensorId: 0, // For Testing Only
 };
 
 export const useMockWorkers = (): void => {
@@ -462,9 +462,6 @@ export const keepTrackApiStubs = {
         id: 0,
       },
       analSatSet: [defaultSat],
-      radarDataSet: {
-        id: 0,
-      },
       missileSet: {
         id: 0,
       },

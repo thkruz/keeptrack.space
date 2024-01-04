@@ -1,4 +1,5 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -143,22 +144,6 @@ export class TimeManager {
 
     // NOTE: This should be the only regular call to calculateSimulationTime!!
     this.calculateSimulationTime();
-    this.setSelectedDate(this.simulationTimeObj);
-
-    // Passing datetimeInput eliminates needing jQuery in main module
-    if (
-      this.lastTime - this.simulationTimeObj.getTime() < 300 &&
-      ((<DateTimeManager>keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
-    ) {
-      if (settingsManager.plugins.datetime) {
-        if (this.datetimeInputDOM == null) {
-          this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
-        }
-        if (this.datetimeInputDOM !== null) {
-          this.datetimeInputDOM.value = this.selectedDate.toISOString().slice(0, 10) + ' ' + this.selectedDate.toISOString().slice(11, 19);
-        }
-      }
-    }
   }
 
   setSelectedDate(selectedDate: Date) {
@@ -194,6 +179,21 @@ export class TimeManager {
       const jday = getDayOfYear(this.simulationTimeObj);
       getEl('jday').innerHTML = jday.toString();
     }
+
+    // Passing datetimeInput eliminates needing jQuery in main module
+    if (
+      this.lastTime - this.simulationTimeObj.getTime() < 300 &&
+      ((<DateTimeManager>keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
+    ) {
+      if (settingsManager.plugins.datetime) {
+        if (this.datetimeInputDOM == null) {
+          this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
+        }
+        if (this.datetimeInputDOM !== null) {
+          this.datetimeInputDOM.value = this.selectedDate.toISOString().slice(0, 10) + ' ' + this.selectedDate.toISOString().slice(11, 19);
+        }
+      }
+    }
   }
 
   synchronize() {
@@ -201,7 +201,7 @@ export class TimeManager {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     const message = {
-      typ: 'offset',
+      typ: CruncerMessageTypes.OFFSET,
       staticOffset: this.staticOffset,
       dynamicOffsetEpoch: this.dynamicOffsetEpoch,
       propRate: this.propRate,

@@ -21,8 +21,6 @@ const listOfSatsToTest = [
   { ...defaultSat, ...{ static: true, type: SpaceObjectType.STAR, vmag: 3 } },
   { ...defaultSat, ...{ static: true, type: SpaceObjectType.LAUNCH_FACILITY } },
   { ...defaultSat, ...{ marker: true } },
-  { ...defaultSat, ...{ isRadarData: true } },
-  { ...defaultSat, ...{ missileComplex: 1 } },
   { ...defaultSat, ...{ sccNum: '1' } },
   { ...defaultSat, ...{ country: 'ANALSAT' } },
   { ...defaultSat, ...{ country: 'US' } },

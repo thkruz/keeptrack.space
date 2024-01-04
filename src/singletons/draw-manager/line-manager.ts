@@ -1,13 +1,11 @@
 /* eslint-disable camelcase */
-import { EciArr3, GetSatType, KeepTrackApiEvents, SatObject, Singletons } from '@app/interfaces';
-import { DEG2RAD, RAD2DEG } from '@app/lib/constants';
-import { SpaceObjectType } from '@app/lib/space-object-type';
+import { EciArr3, GetSatType, KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians, SpaceObjectType, Star, ecf2eci, ecf2rae, eci2ecf, lla2ecf } from 'ootk';
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
-import { Degrees, Kilometers, Radians, Transforms } from 'ootk';
 import { keepTrackContainer } from '../../container';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { SensorMath } from '../../static/sensor-math';
@@ -33,8 +31,8 @@ export type LineColors = 'r' | 'o' | 'y' | 'g' | 'b' | 'c' | 'p' | 'w' | [number
 
 export type LineTask = {
   line: Line;
-  sat?: SatObject;
-  sat2?: SatObject;
+  sat?: DetailedSatellite;
+  sat2?: DetailedSatellite;
   star1?: string;
   star2?: string;
   star1ID?: number;
@@ -68,8 +66,8 @@ export class LineManager {
   };
 
   private gl_: WebGL2RenderingContext;
-  private tempStar1_: SatObject;
-  private tempStar2_: SatObject;
+  private tempStar1_: Star;
+  private tempStar2_: Star;
   private uniforms_ = {
     u_color: <WebGLUniformLocation>null,
     u_camMatrix: <WebGLUniformLocation>null,
@@ -197,8 +195,8 @@ export class LineManager {
    * Satellite to Missile
    */
   private createMisl_(value: [number, number], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
-    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
+    const sat2 = keepTrackApi.getCatalogManager().getObject(value[1]) as DetailedSatellite;
     if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -220,7 +218,7 @@ export class LineManager {
    * Center of the Earth to the Satellite
    */
   private createSat_(value: [number], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
     if (!sat?.position?.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -240,7 +238,7 @@ export class LineManager {
    * Reference Point to Satellite
    */
   private createSat2_(value: [number, number, number, number], color: [number, number, number, number], type: LineTypes = LineTypes.REF_TO_SAT) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
     if (!sat?.position?.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -260,8 +258,8 @@ export class LineManager {
    * Sensor to Satellite When in View of Currently Selected Sensor
    */
   private createSat3_(value: [number, number], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
-    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
+    const sat2 = keepTrackApi.getCatalogManager().getObject(value[1]) as DetailedSatellite;
 
     if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
       console.debug(`No Satellite Position Available for Line`);
@@ -286,8 +284,8 @@ export class LineManager {
    * Sensor to Satellite When in View of Currently Selected Sensor and Satellite Selected
    */
   private createSat4_(value: [number, number], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
-    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
+    const sat2 = keepTrackApi.getCatalogManager().getObject(value[1]) as DetailedSatellite;
     if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -311,8 +309,8 @@ export class LineManager {
    * One Sensor to Satellite
    */
   private createSat5_(value: [number, number], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
-    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
+    const sat2 = keepTrackApi.getCatalogManager().getObject(value[1]) as DetailedSatellite;
     if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -336,8 +334,8 @@ export class LineManager {
    * Multiple Sensors to Satellite
    */
   private createSat6_(value: [number, number], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
-    const sat2 = keepTrackApi.getCatalogManager().getSat(value[1]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
+    const sat2 = keepTrackApi.getCatalogManager().getObject(value[1]) as DetailedSatellite;
     if (!sat || !sat2 || !sat.position || !sat.position.x || !sat2.position || !sat2.position.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -362,7 +360,7 @@ export class LineManager {
    * Scanning Satellite to Reference Points on Earth in FOV
    */
   private createScan_(value: [number], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
     if (!sat?.position?.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -386,7 +384,7 @@ export class LineManager {
    * Scanning Satellite to Reference Points on Earth in FOV
    */
   private createScan2_(value: [number, Degrees, Degrees, Degrees, Kilometers], color: [number, number, number, number]) {
-    const sat = keepTrackApi.getCatalogManager().getSat(value[0]);
+    const sat = keepTrackApi.getCatalogManager().getObject(value[0]) as DetailedSatellite;
     if (!sat?.position?.x) {
       console.debug(`No Satellite Position Available for Line`);
       console.debug(sat);
@@ -500,14 +498,14 @@ export class LineManager {
       try {
         if (typeof this.drawLineList[i].sat != 'undefined' && this.drawLineList[i].sat != null && typeof this.drawLineList[i].sat.id != 'undefined') {
           // At least One Satellite
-          this.drawLineList[i].sat = catalogManagerInstance.getSat(this.drawLineList[i].sat.id, GetSatType.POSITION_ONLY);
+          this.drawLineList[i].sat = catalogManagerInstance.getObject(this.drawLineList[i].sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
           if (typeof this.drawLineList[i].sat2 != 'undefined' && this.drawLineList[i].sat2 != null) {
             // Satellite and Static
             if (typeof this.drawLineList[i].sat2.name != 'undefined') {
               if (typeof this.drawLineList[i].sat2.id == 'undefined' && this.drawLineList[i].sat2 != null) {
                 this.drawLineList[i].sat2.id = catalogManagerInstance.getSensorFromSensorName(this.drawLineList[i].sat2.name);
               }
-              this.drawLineList[i].sat2 = catalogManagerInstance.getSat(this.drawLineList[i].sat2.id);
+              this.drawLineList[i].sat2 = catalogManagerInstance.getObject(this.drawLineList[i].sat2.id) as DetailedSatellite;
               if (
                 (!this.drawLineList[i].isCalculateIfInFOV && this.drawLineList[i].isOnlyInFOV && !inViewData[this.drawLineList[i].sat.id]) ||
                 !settingsManager.isDrawInCoverageLines
@@ -533,7 +531,7 @@ export class LineManager {
               );
             } else {
               // Two Satellites
-              this.drawLineList[i].sat2 = catalogManagerInstance.getSat(this.drawLineList[i].sat2.id, GetSatType.POSITION_ONLY);
+              this.drawLineList[i].sat2 = catalogManagerInstance.getObject(this.drawLineList[i].sat2.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
               this.drawLineList[i].line.update(
                 [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z],
                 [this.drawLineList[i].sat2.position.x, this.drawLineList[i].sat2.position.y, this.drawLineList[i].sat2.position.z]
@@ -555,11 +553,11 @@ export class LineManager {
                 }
 
                 const lla = { lat: <Radians>(this.drawLineList[i].lat * DEG2RAD), lon: <Radians>(this.drawLineList[i].lon * DEG2RAD), alt: <Kilometers>0.05 };
-                const ecf = Transforms.eci2ecf(this.drawLineList[i].sat.position, 0);
-                const rae = Transforms.ecf2rae(lla, ecf);
+                const ecf = eci2ecf(this.drawLineList[i].sat.position, 0);
+                const rae = ecf2rae(lla, ecf);
                 const el = rae.el * RAD2DEG;
                 if (el > settingsManager.lineScanMinEl) {
-                  const pos = Transforms.lla2ecf(lla);
+                  const pos = lla2ecf(lla);
                   this.drawLineList[i].line.update(
                     [pos.x, pos.y, pos.z],
                     [this.drawLineList[i].sat.position.x, this.drawLineList[i].sat.position.y, this.drawLineList[i].sat.position.z]
@@ -594,14 +592,15 @@ export class LineManager {
               }
               // Calculate ECI for that RAE coordinate
               // Adding 30km to altitude to avoid clipping the earth
-              const pos = Transforms.ecf2eci(
+              const lla = this.drawLineList[i].sat.lla(keepTrackApi.getTimeManager().simulationTimeObj);
+              const pos = ecf2eci(
                 CoordinateTransforms.rae2ecf(
-                  <Degrees>this.drawLineList[i].az,
-                  <Degrees>this.drawLineList[i].minEl,
-                  <Kilometers>this.drawLineList[i].maxRng,
-                  <Radians>(this.drawLineList[i].sat.lat * DEG2RAD),
-                  <Radians>(this.drawLineList[i].sat.lon * DEG2RAD),
-                  <Kilometers>(this.drawLineList[i].sat.alt + 30)
+                  this.drawLineList[i].az,
+                  this.drawLineList[i].minEl,
+                  this.drawLineList[i].maxRng,
+                  <Radians>(lla.lat * DEG2RAD),
+                  <Radians>(lla.lon * DEG2RAD),
+                  <Kilometers>(lla.alt + 30)
                 ),
                 gmst
               );
@@ -631,13 +630,13 @@ export class LineManager {
           const starIdx2 = dotsManagerInstance.starIndex2;
 
           if (typeof this.drawLineList[i].star1ID == 'undefined') {
-            this.drawLineList[i].star1ID = catalogManagerInstance.getIdFromStarName(this.drawLineList[i].star1, starIdx1, starIdx2);
+            this.drawLineList[i].star1ID = catalogManagerInstance.starName2Id(this.drawLineList[i].star1, starIdx1, starIdx2);
           }
           if (typeof this.drawLineList[i].star2ID == 'undefined') {
-            this.drawLineList[i].star2ID = catalogManagerInstance.getIdFromStarName(this.drawLineList[i].star2, starIdx1, starIdx2);
+            this.drawLineList[i].star2ID = catalogManagerInstance.starName2Id(this.drawLineList[i].star2, starIdx1, starIdx2);
           }
-          this.tempStar1_ = catalogManagerInstance.getSat(this.drawLineList[i].star1ID, GetSatType.POSITION_ONLY);
-          this.tempStar2_ = catalogManagerInstance.getSat(this.drawLineList[i].star2ID, GetSatType.POSITION_ONLY);
+          this.tempStar1_ = catalogManagerInstance.getObject(this.drawLineList[i].star1ID, GetSatType.POSITION_ONLY) as Star;
+          this.tempStar2_ = catalogManagerInstance.getObject(this.drawLineList[i].star2ID, GetSatType.POSITION_ONLY) as Star;
           this.drawLineList[i].line.update(
             [this.tempStar1_.position.x, this.tempStar1_.position.y, this.tempStar1_.position.z],
             [this.tempStar2_.position.x, this.tempStar2_.position.y, this.tempStar2_.position.z]
@@ -678,7 +677,7 @@ export class LineManager {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: 'LineManager',
-      cb: (sat: SatObject) => {
+      cb: (sat: BaseObject) => {
         if (sat) {
           const sensorManagerInstance = keepTrackApi.getSensorManager();
 

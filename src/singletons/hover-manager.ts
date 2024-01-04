@@ -1,14 +1,13 @@
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getDayOfYear } from '@app/lib/transforms';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
-import { RadarDataObject, SatObject, SensorObject } from '../interfaces';
+import { DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType, Star } from 'ootk';
+import { RIC } from 'ootk/lib/coordinate/RIC';
 import { getEl } from '../lib/get-el';
-import { SpaceObjectType } from '../lib/space-object-type';
 import { spaceObjType2Str } from '../lib/spaceObjType2Str';
-import { CoordinateTransforms } from '../static/coordinate-transforms';
 import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
+import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 
 export class HoverManager {
@@ -50,11 +49,12 @@ export class HoverManager {
     }
   }
 
-  private controlFacility_(sat: SatObject) {
+  private controlFacility_(obj: LandObject) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    this.satHoverBoxNode1.textContent = sat.name;
-    this.satHoverBoxNode2.innerHTML = sat.country + SensorMath.distanceString(sat, catalogManagerInstance.getSat(keepTrackApi.getSensorManager().currentSensors[0]?.id)) + '';
+    this.satHoverBoxNode1.textContent = obj.name;
+    this.satHoverBoxNode2.innerHTML =
+      obj.country + SensorMath.distanceString(obj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor) + '';
     this.satHoverBoxNode3.textContent = '';
   }
 
@@ -81,8 +81,8 @@ export class HoverManager {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const renderer = keepTrackApi.getRenderer();
 
-      const sat = catalogManagerInstance.getSat(id);
-      const satScreenPositionArray = renderer.getScreenCoords(sat);
+      const obj = catalogManagerInstance.getObject(id);
+      const satScreenPositionArray = renderer.getScreenCoords(obj);
 
       if (
         satScreenPositionArray.error ||
@@ -101,14 +101,12 @@ export class HoverManager {
 
       this.init();
 
-      if (sat.static || sat.type === SpaceObjectType.RADAR_MEASUREMENT) {
-        this.staticObj_(sat);
-      } else if (sat.missile) {
-        this.missile_(sat);
-      } else if (sat.TLE1) {
-        this.satObj_(sat);
+      if (obj.isMissile()) {
+        this.missile_(obj as MissileObject);
+      } else if (obj.isSatellite()) {
+        this.satObj_(obj as DetailedSatellite);
       } else {
-        this.staticObj_(sat);
+        this.staticObj_(obj as LandObject);
       }
 
       screenX ??= satScreenPositionArray.x;
@@ -125,18 +123,20 @@ export class HoverManager {
     }
   }
 
-  private launchFacility_(sat: SatObject) {
+  private launchFacility_(landObj: LandObject) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    let launchSite = StringExtractor.extractLaunchSite(sat.name);
+    let launchSite = StringExtractor.extractLaunchSite(landObj.name);
     this.satHoverBoxNode1.textContent = launchSite.site + ', ' + launchSite.sitec;
     this.satHoverBoxNode2.innerHTML =
-      spaceObjType2Str(sat.type) + SensorMath.distanceString(sat, catalogManagerInstance.getSat(keepTrackApi.getSensorManager().currentSensors[0]?.id)) + '';
+      spaceObjType2Str(landObj.type) +
+      SensorMath.distanceString(landObj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor) +
+      '';
     this.satHoverBoxNode3.textContent = '';
   }
 
-  private missile_(sat: SatObject) {
-    this.satHoverBoxNode1.innerHTML = sat.name + '<br >' + sat.desc + '';
+  private missile_(missile: MissileObject) {
+    this.satHoverBoxNode1.innerHTML = missile.name + '<br >' + missile.desc + '';
     this.satHoverBoxNode2.textContent = '';
     this.satHoverBoxNode3.textContent = '';
   }
@@ -156,47 +156,7 @@ export class HoverManager {
     return false;
   }
 
-  /** TODO: Implement a RadarDataObject to replace SatObject */
-  private radarData_(sat: RadarDataObject) {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-
-    this.satHoverBoxNode1.innerHTML = 'Measurement: ' + sat.mId + '</br>Track: ' + sat.trackId + '</br>Object: ' + sat.objectId;
-    if (sat.missileComplex !== -1) {
-      this.satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Missile Complex: ' + sat.missileComplex);
-      this.satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Missile Object: ' + sat.missileObject);
-    }
-    if (Number(sat.sccNum) !== -1) this.satHoverBoxNode1.insertAdjacentHTML('beforeend', '</br>Satellite: ' + sat.sccNum);
-    if (typeof sat.rae == 'undefined' && sensorManagerInstance.currentSensors !== sensorManagerInstance.defaultSensor) {
-      sat.rae = CoordinateTransforms.eci2rae(sat.t, sat.position, sensorManagerInstance.currentSensors[0]);
-    }
-    if (sensorManagerInstance.currentSensors !== sensorManagerInstance.defaultSensor) {
-      let measurementDate = new Date(sat.t);
-      this.satHoverBoxNode2.innerHTML =
-        `JDAY: ${getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}` +
-        '</br>' +
-        'R: ' +
-        sat.rae.range.toFixed(2) +
-        ' A: ' +
-        sat.rae.az.toFixed(2) +
-        ' E: ' +
-        sat.rae.el.toFixed(2);
-    } else {
-      let measurementDate = new Date(sat.t);
-      this.satHoverBoxNode2.innerHTML = `JDAY: ${getDayOfYear(measurementDate)} - ${measurementDate.toLocaleString('en-GB', { timeZone: 'UTC' }).slice(-8)}`;
-    }
-    this.satHoverBoxNode3.innerHTML =
-      'RCS: ' +
-      parseFloat(sat.rcs).toFixed(2) +
-      ' m^2 (' +
-      (10 ** (parseFloat(sat.rcs) / 10)).toFixed(2) +
-      ' dBsm)</br>Az Error: ' +
-      sat.azError.toFixed(2) +
-      '° El Error: ' +
-      sat.elError.toFixed(2) +
-      '°';
-  }
-
-  private satObj_(sat: SatObject) {
+  private satObj_(sat: DetailedSatellite) {
     if (!settingsManager.enableHoverOverlay) return;
     const renderer = keepTrackApi.getRenderer();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -211,7 +171,7 @@ export class HoverManager {
       country = country.length > 0 ? country : 'Unknown';
       this.satHoverBoxNode3.textContent = country;
     } else {
-      let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
+      let confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
       // eslint-disable-next-line no-nested-ternary
       const color = confidenceScore >= 7 ? 'green' : confidenceScore >= 4 ? 'orange' : 'red';
       this.satHoverBoxNode1.innerHTML = keepTrackApi.html`<span>${sat.name}</span><span style='color:${color};'> (${confidenceScore.toString()})</span>`;
@@ -226,7 +186,8 @@ export class HoverManager {
 
       if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && renderer.isShowDistance) {
         if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
-          this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat) + SensorMath.distanceString(sat, keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat()) + '';
+          this.satHoverBoxNode3.innerHTML =
+            SensorMath.nextpass(sat) + SensorMath.distanceString(sat, keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat() as DetailedSatellite) + '';
         } else {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat);
         }
@@ -248,7 +209,7 @@ export class HoverManager {
     }
   }
 
-  private showEciDistAndVel_(sat: SatObject) {
+  private showEciDistAndVel_(sat: DetailedSatellite) {
     if (settingsManager.isEciOnHover) {
       this.satHoverBoxNode3.innerHTML =
         'X: ' +
@@ -275,7 +236,7 @@ export class HoverManager {
     }
   }
 
-  private showEciVel_(sat: SatObject) {
+  private showEciVel_(sat: DetailedSatellite) {
     this.satHoverBoxNode3.innerHTML =
       'X: ' +
       sat.position.x.toFixed(2) +
@@ -303,16 +264,16 @@ export class HoverManager {
     }
   }
 
-  private showRicDistAndVel_(ric: { position: import('gl-matrix').vec3; velocity: import('gl-matrix').vec3 }) {
+  private showRicDistAndVel_(ric: RIC) {
     this.satHoverBoxNode3.innerHTML =
       `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
       `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
   }
 
-  private showRicOrEci_(sat: SatObject) {
+  private showRicOrEci_(sat: DetailedSatellite) {
     const sat2 = keepTrackApi.getPlugin(SelectSatManager)?.secondarySatObj;
     if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
-      const ric = CoordinateTransforms.sat2ric(sat, sat2);
+      const ric = sat2.getRIC(sat, keepTrackApi.getTimeManager().simulationTimeObj);
       this.satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
       this.showRicDistAndVel_(ric);
     } else {
@@ -321,7 +282,7 @@ export class HoverManager {
     }
   }
 
-  private star_(sat: SatObject) {
+  private star_(sat: Star) {
     const constellationName = keepTrackApi.getStarManager().findStarsConstellation(sat.name);
     if (constellationName !== null) {
       this.satHoverBoxNode1.innerHTML = sat.name + '</br>' + constellationName;
@@ -336,19 +297,16 @@ export class HoverManager {
     }
   }
 
-  private staticObj_(sat: SatObject | RadarDataObject) {
-    if (sat.type === SpaceObjectType.LAUNCH_FACILITY) {
-      this.launchFacility_(sat);
-    } else if (sat.type === SpaceObjectType.RADAR_MEASUREMENT) {
-      // TODO: This is a broken mess but only used offline
-      this.radarData_(sat as RadarDataObject);
-    } else if (sat.type === SpaceObjectType.CONTROL_FACILITY) {
-      this.controlFacility_(sat);
-    } else if (sat.type === SpaceObjectType.STAR) {
-      this.star_(sat);
+  private staticObj_(obj: DetailedSensor | LandObject | Star) {
+    if (obj.type === SpaceObjectType.LAUNCH_FACILITY) {
+      this.launchFacility_(obj as LandObject);
+    } else if (obj.type === SpaceObjectType.CONTROL_FACILITY) {
+      this.controlFacility_(obj as LandObject);
+    } else if (obj.type === SpaceObjectType.STAR) {
+      this.star_(obj as Star);
     } else {
       // It is a Sensor at this point
-      const sensor = <SensorObject>(<unknown>sat);
+      const sensor = obj as DetailedSensor;
       this.satHoverBoxNode1.textContent = sensor.name;
       const isTelescope = sensor.type === SpaceObjectType.OPTICAL;
       this.satHoverBoxNode2.textContent = sensor.country;
@@ -363,7 +321,7 @@ export class HoverManager {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     this.currentHoverId = id;
-    if (id !== -1 && catalogManagerInstance.satData[id]?.type !== SpaceObjectType.STAR) {
+    if (id !== -1 && catalogManagerInstance.objectCache[id]?.type !== SpaceObjectType.STAR) {
       orbitManagerInstance.setHoverOrbit(id);
     } else {
       orbitManagerInstance.clearHoverOrbit();
@@ -383,14 +341,14 @@ export class HoverManager {
 
     this.hoveringSat = i;
     if (i === this.lasthoveringSat) return;
-    if (i !== -1 && catalogManagerInstance.satData[i].type === SpaceObjectType.STAR) return;
+    if (i !== -1 && catalogManagerInstance.objectCache[i].type === SpaceObjectType.STAR) return;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
 
     const primarySatId = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
     // If Old Select Sat Picked Color it Correct Color
     if (this.lasthoveringSat !== -1 && this.lasthoveringSat !== primarySatId) {
-      const newColor = colorSchemeManagerInstance.currentColorScheme(catalogManagerInstance.getSat(this.lasthoveringSat)).color;
+      const newColor = colorSchemeManagerInstance.currentColorScheme(catalogManagerInstance.getObject(this.lasthoveringSat)).color;
       colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4] = newColor[0]; // R
       colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 1] = newColor[1]; // G
       colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 2] = newColor[2]; // B

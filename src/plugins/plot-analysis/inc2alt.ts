@@ -1,13 +1,12 @@
-import { EChartsData, GetSatType, SatObject } from '@app/interfaces';
+import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { MILLISECONDS2DAYS, RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { jday } from '@app/lib/transforms';
 import { SatMath } from '@app/static/sat-math';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { Sgp4, SpaceObjectType, Transforms } from 'ootk';
+import { DetailedSatellite, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -181,17 +180,17 @@ export class Inc2AltPlots extends KeepTrackPlugin {
   }
 
   static getPlotData(): EChartsData {
-    const satData = <SatObject[]>keepTrackApi.getCatalogManager().satData;
-
     const china = [];
     const usa = [];
     const russia = [];
     const other = [];
 
-    satData.forEach((sat) => {
-      if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
+    keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
+      if (obj.type !== SpaceObjectType.PAYLOAD) return;
+
+      let sat = obj as DetailedSatellite;
       if (sat.period > 250) return;
-      sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
+      sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
       const now = keepTrackApi.getTimeManager().simulationTimeObj;
       let j = jday(
         now.getUTCFullYear(),
@@ -201,9 +200,9 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         now.getUTCMinutes(),
         now.getUTCSeconds()
       ); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS2DAYS;
+      j += now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
       const gmst = Sgp4.gstime(j);
-      sat = { ...sat, ...Transforms.eci2lla(sat.position, gmst) };
+      sat = { ...sat, ...eci2lla(sat.position, gmst) } as unknown as DetailedSatellite;
 
       if (SatMath.getAlt(sat.position, gmst) < 80) return; // TODO: USE THIS FOR FINDING DECAYS!
 

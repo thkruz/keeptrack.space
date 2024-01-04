@@ -1,12 +1,11 @@
-import { EChartsData, GetSatType, SatObject } from '@app/interfaces';
+import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { SpaceObjectType } from 'ootk';
+import { DetailedSatellite, RAD2DEG, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -185,33 +184,37 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     const russia = [];
     const other = [];
 
-    (<SatObject[]>keepTrackApi.getCatalogManager().satData).forEach((sat) => {
-      if (!sat.TLE1 || sat.type !== SpaceObjectType.PAYLOAD) return;
+    keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
+      if (obj.type !== SpaceObjectType.PAYLOAD) return;
+      const sat = obj as DetailedSatellite;
       if (sat.eccentricity > 0.1) return;
       if (sat.period < 1240) return;
       if (sat.period > 1640) return;
       if (sat.inclination * RAD2DEG > 17) return;
-      sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
-      sat = { ...sat, ...CoordinateTransforms.eci2lla(sat.position, keepTrackApi.getTimeManager().simulationTimeObj) };
+
+      // Update Position
+      sat.position = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY).position;
+      const lla = CoordinateTransforms.eci2lla(sat.position, keepTrackApi.getTimeManager().simulationTimeObj);
+
       switch (sat.country) {
         case 'United States of America':
         case 'United States':
         case 'US':
-          usa.push([sat.inclination * RAD2DEG, sat.lon, sat.period, sat.name, sat.id]);
+          usa.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
           return;
         case 'Russian Federation':
         case 'CIS':
         case 'Russia':
-          russia.push([sat.inclination * RAD2DEG, sat.lon, sat.period, sat.name, sat.id]);
+          russia.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
           return;
         case 'China':
         case `China, People's Republic of`:
         case `Hong Kong Special Administrative Region, China`:
         case 'China (Republic)':
-          china.push([sat.inclination * RAD2DEG, sat.lon, sat.period, sat.name, sat.id]);
+          china.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
           return;
         default:
-          other.push([sat.inclination * RAD2DEG, sat.lon, sat.period, sat.name, sat.id]);
+          other.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
           return;
       }
     });

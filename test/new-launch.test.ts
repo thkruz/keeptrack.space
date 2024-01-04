@@ -38,9 +38,9 @@ describe('NewLaunch_form', () => {
 
   it('should have working buttons', () => {
     websiteInit(newLaunchPlugin);
-    keepTrackApi.getCatalogManager().getSat = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
+    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
     keepTrackApi.getPlugin(SelectSatManager).selectedSat = defaultSat.id;
-    keepTrackApi.getCatalogManager().satData = Array(50).fill({ ...defaultSat, isInGroup: true });
+    keepTrackApi.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true });
     keepTrackApi.getCatalogManager().isLaunchSiteManagerLoaded = true;
     keepTrackApi.getCatalogManager().launchSites = {
       CAS: {

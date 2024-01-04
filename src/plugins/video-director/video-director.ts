@@ -4,6 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import settingsPng from '@public/img/icons/settings.png';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SoundNames } from '../sounds/SoundNames';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -172,7 +173,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
         getEl('video-director-form').addEventListener('change', VideoDirectorPlugin.onFormChange);
         getEl('video-director-form').addEventListener('submit', VideoDirectorPlugin.onSubmit);
         getEl('video-director-rotate').addEventListener('click', () => {
-          keepTrackApi.getSoundManager()?.play('button');
+          keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
           keepTrackApi.getMainCamera().autoRotate(true);
         });
       },
@@ -195,10 +196,10 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
       case 'video-director-zoomOut':
         if ((<HTMLInputElement>getEl(e.target.id)).checked) {
           // Play sound for enabling option
-          keepTrackApi.getSoundManager()?.play('toggleOn');
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           // Play sound for disabling option
-          keepTrackApi.getSoundManager()?.play('toggleOff');
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
         break;
       default:
@@ -272,7 +273,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
     e.preventDefault();
 
-    keepTrackApi.getSoundManager()?.play('button');
+    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
     settingsManager.isAutoRotateR = (<HTMLInputElement>getEl('video-director-rotateR')).checked;
     settingsManager.isAutoRotateL = (<HTMLInputElement>getEl('video-director-rotateL')).checked;

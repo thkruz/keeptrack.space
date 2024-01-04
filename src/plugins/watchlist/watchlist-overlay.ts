@@ -1,6 +1,5 @@
-import { GetSatType, KeepTrackApiEvents, SatObject, SatPassTimes } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, SatPassTimes } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { MILLISECONDS_PER_DAY } from '@app/lib/constants';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
@@ -9,7 +8,7 @@ import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/lin
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath } from '@app/static/sensor-math';
 import infoPng from '@public/img/icons/info.png';
-import { Sgp4 } from 'ootk';
+import { DetailedSatellite, MILLISECONDS_PER_DAY, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
@@ -86,7 +85,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
       const sccNum = parseInt((<HTMLElement>evt.target).textContent.split(':')[0]);
-      const id = catalogManagerInstance.getIdFromSccNum(sccNum);
+      const id = catalogManagerInstance.sccNum2Id(sccNum);
       if (id !== null) {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
       }
@@ -127,10 +126,10 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
   }
 
-  private updateFovLinesMulti_(sat: SatObject, i: number) {
+  private updateFovLinesMulti_(sat: DetailedSatellite, i: number) {
     keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[i]);
     for (const sensor of keepTrackApi.getSensorManager().currentSensors) {
-      const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+      const satrec = Sgp4.createSatrec(sat.tle1, sat.tle2); // perform and store sat init calcs
       const rae = SatMath.getRae(keepTrackApi.getTimeManager().simulationTimeObj, satrec, sensor);
       const isInFov = SatMath.checkIsInView(sensor, rae);
       if (!isInFov) continue;
@@ -138,7 +137,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
   }
 
-  private updateFovLinesSingle_(sat: SatObject, i: number) {
+  private updateFovLinesSingle_(sat: DetailedSatellite, i: number) {
     const inView = keepTrackApi.getDotsManager().inViewData[sat.id];
     const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -197,7 +196,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       showLoading(() => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-        const satArray: SatObject[] = [];
+        const satArray: DetailedSatellite[] = [];
         for (const id of this.watchlistPlugin_.watchlistList) {
           satArray.push(catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY));
         }

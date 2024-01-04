@@ -1,33 +1,31 @@
-import { SatObject } from '@app/interfaces';
-import { RAD2DEG } from '@app/lib/constants';
 import { saveCsv } from '@app/lib/saveVariable';
 import { saveAs } from 'file-saver';
+import { BaseObject, DetailedSatellite, RAD2DEG } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export class CatalogExporter {
-  static exportTle2Csv(satData: SatObject[], isDeleteAnalysts = true) {
+  static exportTle2Csv(objData: BaseObject[], isDeleteAnalysts = true) {
     try {
       const catalogTLE2 = [];
-      const satOnlyData = satData.filter((sat: SatObject) => sat.sccNum && typeof sat.TLE1 != 'undefined' && typeof sat.TLE2 != 'undefined');
+      const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
 
       if (satOnlyData.length == 0) {
         errorManagerInstance.info('No TLE data to export');
         return;
       }
 
-      satOnlyData.sort((a: SatObject, b: SatObject) => parseInt(a.sccNum) - parseInt(b.sccNum));
-      for (let s = 0; s < satOnlyData.length; s++) {
-        const sat = <SatObject>satOnlyData[s];
-        if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
+      satOnlyData.sort((a, b) => parseInt(a.sccNum) - parseInt(b.sccNum));
+      for (const sat of satOnlyData) {
+        if (typeof sat.tle1 == 'undefined' || typeof sat.tle2 == 'undefined') {
           continue;
         }
         if (isDeleteAnalysts && sat.country == 'ANALSAT') continue;
         catalogTLE2.push({
           satId: sat.sccNum,
           name: sat.name,
-          TLE1: sat.TLE1,
-          TLE2: sat.TLE2,
+          tle1: sat.tle1,
+          tle2: sat.tle2,
           inclination: sat.inclination * RAD2DEG,
           eccentricity: sat.eccentricity,
           period: sat.period,
@@ -56,34 +54,36 @@ export class CatalogExporter {
     }
   }
 
-  static exportSatInFov2Csv(satData: SatObject[]) {
-    const data = satData
-      .filter((sat: SatObject) => keepTrackApi.getDotsManager().inViewData?.[sat.id] === 1 && sat.sccNum && typeof sat.TLE1 != 'undefined' && typeof sat.TLE2 != 'undefined')
-      .map((sat: SatObject) => ({
-        satId: sat.sccNum,
-        name: sat.name,
-        country: sat.country,
-        apogee: sat.apogee,
-        perigee: sat.perigee,
-      }));
+  static exportSatInFov2Csv(objData: BaseObject[]) {
+    const data = objData
+      .filter((obj) => obj.isSatellite() && (obj as DetailedSatellite).tle1 && keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1)
+      .map((obj) => {
+        const sat = obj as DetailedSatellite;
+        return {
+          satId: sat.sccNum,
+          name: sat.name,
+          country: sat.country,
+          apogee: sat.apogee,
+          perigee: sat.perigee,
+        };
+      });
 
     saveCsv(data, 'satInView');
   }
 
-  static exportTle2Txt(satData: SatObject[], numberOfLines = 2, isDeleteAnalysts = true) {
+  static exportTle2Txt(objData: BaseObject[], numberOfLines = 2, isDeleteAnalysts = true) {
     try {
       const catalogTLE2 = [];
-      const satOnlyData = satData.filter((sat: SatObject) => sat.sccNum && typeof sat.TLE1 != 'undefined' && typeof sat.TLE2 != 'undefined');
+      const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
 
       if (satOnlyData.length == 0) {
         errorManagerInstance.info('No TLE data to export');
         return;
       }
 
-      satOnlyData.sort((a: SatObject, b: SatObject) => parseInt(a.sccNum) - parseInt(b.sccNum));
-      for (let s = 0; s < satOnlyData.length; s++) {
-        const sat = satOnlyData[s];
-        if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
+      satOnlyData.sort((a, b) => parseInt(a.sccNum) - parseInt(b.sccNum));
+      for (const sat of satOnlyData) {
+        if (typeof sat.tle1 == 'undefined' || typeof sat.tle2 == 'undefined') {
           continue;
         }
         if (isDeleteAnalysts && sat.country == 'ANALSAT') continue;
@@ -91,15 +91,15 @@ export class CatalogExporter {
           catalogTLE2.push(sat.name);
         }
 
-        if (sat.TLE1.includes('NO TLE')) {
+        if (sat.tle1.includes('NO TLE')) {
           console.log(sat.sccNum);
         }
-        if (sat.TLE2.includes('NO TLE')) {
+        if (sat.tle2.includes('NO TLE')) {
           console.log(sat.sccNum);
         }
 
-        catalogTLE2.push(sat.TLE1);
-        catalogTLE2.push(sat.TLE2);
+        catalogTLE2.push(sat.tle1);
+        catalogTLE2.push(sat.tle2);
       }
       const catalogTLE2Str = catalogTLE2.join('\n');
       const blob = new Blob([catalogTLE2Str], {

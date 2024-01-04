@@ -1,9 +1,7 @@
-import { SatObject } from '@app/interfaces';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import * as Ootk from 'ootk';
-import { Kilometers } from 'ootk';
+import { BaseObject, EciVec3, Kilometers } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { GlUtils } from '../../static/gl-utils';
 
@@ -110,7 +108,7 @@ export class Box {
   private vao: WebGLVertexArrayObject;
 
   public drawPosition = [0, 0, 0] as vec3;
-  public eci: Ootk.EciVec3;
+  public eci: EciVec3;
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     if (!this.isLoaded_) return;
@@ -154,25 +152,25 @@ export class Box {
     this.isLoaded_ = true;
   }
 
-  public update(sat: SatObject, _selectedDate?: Date) {
+  public update(obj: BaseObject, _selectedDate?: Date) {
     if (!this.isLoaded_) return;
-    if (!sat || !sat.position) {
+    if (!obj?.position) {
       this.drawPosition[0] = 0;
       this.drawPosition[1] = 0;
       this.drawPosition[2] = 0;
       return;
     }
 
-    this.drawPosition[0] = sat.position.x;
-    this.drawPosition[1] = sat.position.y;
-    this.drawPosition[2] = sat.position.z;
+    this.drawPosition[0] = obj.position.x;
+    this.drawPosition[1] = obj.position.y;
+    this.drawPosition[2] = obj.position.z;
 
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
     mat4.translate(this.mvMatrix_, this.mvMatrix_, this.drawPosition);
 
     // Calculate a position to look at along the satellite's velocity vector
-    const lookAtPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
+    const lookAtPos = [obj.position.x + obj.velocity.x, obj.position.y + obj.velocity.y, obj.position.z + obj.velocity.z];
 
     // Normalize an up vector to the satellite's position from the center of the earth
     const up = vec3.normalize(vec3.create(), this.drawPosition);

@@ -1,12 +1,13 @@
-import { GeolocationPosition, SensorGeolocation, SensorObject } from '@app/interfaces';
+import { GeolocationPosition, SensorGeolocation } from '@app/interfaces';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, Kilometers } from 'ootk';
+import { Degrees, DetailedSensor, Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { lat2pitch, lon2yaw } from '../lib/transforms';
 import { StandardSensorManager } from '../plugins/sensor/sensorManager';
 import { ZoomValue } from '../singletons/camera';
 import { errorManagerInstance } from '../singletons/errorManager';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 
 export class UiGeolocation {
   static updateSensorPosition(position: GeolocationPosition): void {
@@ -22,21 +23,20 @@ export class UiGeolocation {
       lat,
       lon,
       alt,
-      obsminaz: minaz,
-      obsmaxaz: maxaz,
-      obsminel: minel,
-      obsmaxel: maxel,
-      obsminrange: minrange,
-      obsmaxrange: maxrange,
-    };
+      minAz: minaz,
+      maxAz: maxaz,
+      minEl: minel,
+      maxEl: maxel,
+      minRng: minrange,
+      maxRng: maxrange,
+    } as DetailedSensor;
 
     catalogManagerInstance.satCruncher.postMessage({
-      typ: 'sensor',
-      setlatlong: true,
+      typ: CruncerMessageTypes.SENSOR,
       sensor: sensorInfo,
     });
 
-    StandardSensorManager.updateSensorUiStyling(<SensorObject[]>(<unknown>[sensorInfo]));
+    StandardSensorManager.updateSensorUiStyling([sensorInfo]);
 
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     const mainCameraInstance = keepTrackApi.getMainCamera();

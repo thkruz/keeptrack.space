@@ -4,6 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { LegendManager } from '@app/static/legend-manager';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import colorsPng from '@public/img/icons/colors.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -132,6 +133,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
     if (colorName !== 'sunlight') {
       catalogManagerInstance.satCruncher.postMessage({
         isSunlightView: false,
+        typ: CruncerMessageTypes.SUNLIGHT_VIEW,
       });
     }
     switch (colorName) {
@@ -153,6 +155,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
       case 'sunlight':
         catalogManagerInstance.satCruncher.postMessage({
           isSunlightView: true,
+          typ: CruncerMessageTypes.SUNLIGHT_VIEW,
         });
         LegendManager.change('sunlight');
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);

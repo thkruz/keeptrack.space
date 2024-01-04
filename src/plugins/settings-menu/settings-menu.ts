@@ -7,8 +7,11 @@ import settingsPng from '@public/img/icons/settings.png';
 import { parseRgba } from '@app/lib/rgba';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
+import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import $ from 'jquery'; // TODO: Remove Color Picker
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SoundNames } from '../sounds/SoundNames';
 import { TimeMachine } from '../time-machine/time-machine';
 
 /**
@@ -479,10 +482,10 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-snp':
         if ((<HTMLInputElement>getEl(e.target.id)).checked) {
           // Play sound for enabling option
-          keepTrackApi.getSoundManager()?.play('toggleOn');
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           // Play sound for disabling option
-          keepTrackApi.getSoundManager()?.play('toggleOff');
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
         break;
       default:
@@ -601,7 +604,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    keepTrackApi.getSoundManager()?.play('button');
+    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
     settingsManager.isShowNotionalSats = (<HTMLInputElement>getEl('settings-notionalSats')).checked;
     settingsManager.isShowLeoSats = (<HTMLInputElement>getEl('settings-leoSats')).checked;
@@ -636,10 +639,14 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (keepTrackApi.getOrbitManager().orbitWorker) {
       if (settingsManager.isDrawTrailingOrbits) {
         keepTrackApi.getOrbitManager().orbitWorker.postMessage({
-          orbitType: 2,
+          typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
+          orbitType: OrbitDrawTypes.TRAIL,
         });
       } else {
-        keepTrackApi.getOrbitManager().orbitWorker.postMessage({ orbitType: 1 });
+        keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+          typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
+          orbitType: OrbitDrawTypes.ORBIT,
+        });
       }
     }
     // Must come after the above checks
@@ -685,7 +692,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       uiManagerInstance.toast('Invalid field of view value!', 'critical');
     } else {
       keepTrackApi.getCatalogManager().satCruncher.postMessage({
-        typ: 'isShowSatOverfly',
+        typ: CruncerMessageTypes.IS_UPDATE_SATELLITE_OVERFLY,
         selectedSatFOV: newFieldOfView,
       });
     }

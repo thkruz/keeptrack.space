@@ -10,6 +10,7 @@ import flagPng from '@public/img/icons/flag.png';
 import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 
 export class CountriesMenu extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Countries Menu';
@@ -88,7 +89,7 @@ export class CountriesMenu extends KeepTrackPlugin {
           .querySelectorAll('li')
           .forEach((element) => {
             element.addEventListener('click', function () {
-              keepTrackApi.getSoundManager()?.play('toggleOn');
+              keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
               CountriesMenu.countryMenuClick_(this.getAttribute('data-group'));
             });
           });
@@ -121,16 +122,14 @@ export class CountriesMenu extends KeepTrackPlugin {
     groupManagerInstance.selectGroup(groupManagerInstance.groupList[groupName]);
 
     // Populate searchDOM with a search string separated by commas - minus the last one
-    if (groupManagerInstance.groupList[groupName].objects.length < settingsManager.searchLimit) {
+    if (groupManagerInstance.groupList[groupName].ids.length < settingsManager.searchLimit) {
       uiManagerInstance.searchManager.doSearch(
-        groupManagerInstance.groupList[groupName].objects.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id).sccNum},`, '').slice(0, -1)
+        groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1)
       );
     } else {
-      searchDOM.value = groupManagerInstance.groupList[groupName].objects
-        .reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id).sccNum},`, '')
-        .slice(0, -1);
+      searchDOM.value = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
       uiManagerInstance.searchManager.fillResultBox(
-        groupManagerInstance.groupList[groupName].objects.map((id: number) => <SearchResult>{ satId: id }),
+        groupManagerInstance.groupList[groupName].ids.map((id: number) => <SearchResult>{ id: id }),
         catalogManagerInstance
       );
     }

@@ -116,13 +116,13 @@ export class SatellitePhotos extends KeepTrackPlugin {
   };
 
   static loadPic(satId: number, url: string): void {
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().getIdFromSccNum(satId));
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(satId));
     keepTrackApi.getMainCamera().changeZoom(0.7);
     SatellitePhotos.colorbox(url);
   }
 
   static himawari8(): void {
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().getIdFromSccNum(40267));
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(40267));
     keepTrackApi.getMainCamera().changeZoom(0.7);
 
     // Propagation time minus 30 minutes so that the pictures have time to become available

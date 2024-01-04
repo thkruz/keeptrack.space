@@ -1,0 +1,37 @@
+#reset-sensor-button {
+  margin: 10px 0px;
+}
+
+#reset-sensor-text {
+  text-align: center;
+}
+
+#list-of-sensors li:first-child {
+  display: none;
+}
+
+#sensor-list-content ul li {
+  padding: 2px !important;
+  overflow: hidden !important;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+/* First span goes left */
+#sensor-list-content ul li span:first-child {
+  float: left;
+  text-align: left;
+}
+
+/* Second span is centered */
+#sensor-list-content ul li span:nth-child(2) {
+  text-align: center;
+}
+
+/* Third span goes right */
+#sensor-list-content ul li span:last-child {
+  float: right;
+  text-align: right;
+}

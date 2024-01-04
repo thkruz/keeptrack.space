@@ -184,7 +184,7 @@ export const getSatChngJson = (json: any) => {
 
   // 20 rows max
   for (let i = 0; i < Math.min(_satChngTable.length, 20); i++) {
-    const sat = catalogManagerInstance.getSatFromSccNum(_satChngTable[i].SCC);
+    const sat = catalogManagerInstance.sccNum2Sat(_satChngTable[i].SCC);
 
     // Skip Decays
     if (sat === null) continue;

@@ -2,9 +2,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
-import { SpaceObjectType } from '@app/lib/space-object-type';
 import { mat4, vec3, vec4 } from 'gl-matrix';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { KeepTrack } from '../keeptrack';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
@@ -399,10 +398,10 @@ export class InputManager {
 
     if (this.mouse.mouseSat !== -1 || clickedSatId !== -1) {
       if (typeof this.mouse.clickedSat == 'undefined') return;
-      const sat = catalogManagerInstance.getSat(this.mouse.clickedSat);
+      const sat = catalogManagerInstance.getObject(this.mouse.clickedSat);
       if (typeof sat == 'undefined' || sat == null) return;
 
-      if (!sat.static) {
+      if (!sat.isStatic()) {
         showEl('view-sat-info-rmb');
         showEl('view-related-sats-rmb');
 

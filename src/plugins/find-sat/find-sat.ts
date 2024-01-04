@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
@@ -6,72 +6,99 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import findSatPng from '@public/img/icons/find2.png';
 
 import { countryCodeList, countryMapList, countryNameList } from '@app/catalogs/countries';
-import { SensorMath } from '@app/static/sensor-math';
+import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, RAD2DEG, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
-import { RAD2DEG } from '../../lib/constants';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 
 export interface SearchSatParams {
-  argPe: number;
-  argPeMarg: number;
-  az: number;
-  azMarg: number;
+  argPe: Degrees;
+  argPeMarg: Degrees;
+  az: Degrees;
+  azMarg: Degrees;
   bus: string;
   countryCode: string;
-  el: number;
-  elMarg: number;
-  inc: number;
-  incMarg: number;
+  el: Degrees;
+  elMarg: Degrees;
+  inc: Degrees;
+  incMarg: Degrees;
   objType: number;
   payload: string;
-  period: number;
-  periodMarg: number;
-  raan: number;
-  raanMarg: number;
+  period: Minutes;
+  periodMarg: Minutes;
+  raan: Degrees;
+  raanMarg: Degrees;
   rcs: number;
   rcsMarg: number;
-  rng: number;
-  rngMarg: number;
+  rng: Kilometers;
+  rngMarg: Kilometers;
   shape: string;
 }
 
-interface SearchResults extends SatObject {
-  inView: boolean;
-  rng: number;
-}
-
 export class FindSatPlugin extends KeepTrackPlugin {
-  private lastResults = <SearchResults[]>[];
+  private lastResults = <DetailedSatellite[]>[];
 
-  public static checkAz(posAll: SearchResults[], min: number, max: number) {
-    return posAll.filter((pos) => pos.az >= min && pos.az <= max);
+  dragOptions: clickDragOptions = {
+    isDraggable: true,
+    minWidth: 500,
+    maxWidth: 700,
+  };
+
+  public static checkAz(posAll: DetailedSatellite[], min: number, max: number) {
+    return posAll.filter((pos) => {
+      if (!pos.isSatellite() && !pos.isMissile()) return false;
+
+      const rae = eci2rae(
+        keepTrackApi.getTimeManager().simulationTimeObj,
+        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        keepTrackApi.getSensorManager().currentSensors[0]
+      );
+      return rae.az >= min && rae.az <= max;
+    });
   }
 
-  public static checkEl(posAll: SearchResults[], min: number, max: number) {
-    return posAll.filter((pos) => pos.el >= min && pos.el <= max);
+  public static checkEl(posAll: DetailedSatellite[], min: number, max: number) {
+    return posAll.filter((pos) => {
+      if (!pos.isSatellite() && !pos.isMissile()) return false;
+
+      const rae = eci2rae(
+        keepTrackApi.getTimeManager().simulationTimeObj,
+        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        keepTrackApi.getSensorManager().currentSensors[0]
+      );
+      return rae.el >= min && rae.el <= max;
+    });
   }
 
-  public static checkInview(posAll: SearchResults[]) {
+  public static checkInview(posAll: DetailedSatellite[]) {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
   }
 
-  public static checkObjtype(posAll: SearchResults[], objtype: number) {
+  public static checkObjtype(posAll: DetailedSatellite[], objtype: number) {
     return posAll.filter((pos) => pos.type === objtype);
   }
 
-  public static checkRange(posAll: SearchResults[], min: number, max: number) {
-    return posAll.filter((pos) => pos.rng >= min && pos.rng <= max);
+  public static checkRange(posAll: DetailedSatellite[], min: number, max: number) {
+    return posAll.filter((pos) => {
+      if (!pos.isSatellite() && !pos.isMissile()) return false;
+
+      const rae = eci2rae(
+        keepTrackApi.getTimeManager().simulationTimeObj,
+        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        keepTrackApi.getSensorManager().currentSensors[0]
+      );
+      return rae.rng >= min && rae.rng <= max;
+    });
   }
 
-  public static limitPossibles(possibles: any[], limit: number): any[] {
+  public static limitPossibles(possibles: DetailedSatellite[], limit: number): DetailedSatellite[] {
     const uiManagerInstance = keepTrackApi.getUiManager();
     if (possibles.length >= limit) uiManagerInstance.toast(`Too many results, limited to ${limit}`, 'serious');
     possibles = possibles.slice(0, limit);
     return possibles;
   }
 
-  public static searchSats(searchParams: SearchSatParams): SearchResults[] {
+  public static searchSats(searchParams: SearchSatParams): DetailedSatellite[] {
     let { az, el, rng, countryCode, inc, azMarg, elMarg, rngMarg, incMarg, period, periodMarg, rcs, rcsMarg, objType, raan, raanMarg, argPe, argPeMarg, bus, shape, payload } =
       searchParams;
 
@@ -87,14 +114,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const isSpecificBus = bus !== 'All';
     const isSpecificShape = shape !== 'All';
     const isSpecificPayload = payload !== 'All';
-    azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : 5;
-    elMarg = !isNaN(elMarg) && isFinite(elMarg) ? elMarg : 5;
-    rngMarg = !isNaN(rngMarg) && isFinite(rngMarg) ? rngMarg : 200;
-    incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : 1;
-    periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : 0.5;
+    azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : (5 as Degrees);
+    elMarg = !isNaN(elMarg) && isFinite(elMarg) ? elMarg : (5 as Degrees);
+    rngMarg = !isNaN(rngMarg) && isFinite(rngMarg) ? rngMarg : (200 as Kilometers);
+    incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : (1 as Degrees);
+    periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : (0.5 as Minutes);
     rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
-    raanMarg = !isNaN(raanMarg) && isFinite(raanMarg) ? raanMarg : 1;
-    argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : 1;
+    raanMarg = !isNaN(raanMarg) && isFinite(raanMarg) ? raanMarg : (1 as Degrees);
+    argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : (1 as Degrees);
 
     if (
       !isValidEl &&
@@ -113,23 +140,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
       throw new Error('No Search Criteria Entered');
     }
 
-    let res = keepTrackApi
-      .getCatalogManager()
-      .getSatsFromSatData()
-      .filter((sat: SatObject) => !sat.static && !sat.missile && sat.active)
-      .map((sat: SatObject) => {
-        const sensorManagerInstance = keepTrackApi.getSensorManager();
-        if (sensorManagerInstance.currentSensors?.length > 0) {
-          const tearr = SensorMath.getTearr(sat, sensorManagerInstance.currentSensors);
-          return <SearchResults>{ ...sat, az: tearr.az, el: tearr.el, rng: tearr.rng, inView: tearr.inView };
-        } else {
-          return <SearchResults>sat;
-        }
-      });
+    let res = keepTrackApi.getCatalogManager().getSats();
 
     res = !isValidInc && !isValidPeriod && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview(res) : res;
 
     res = objType !== 0 ? FindSatPlugin.checkObjtype(res, objType) : res;
+
     if (isValidAz) res = FindSatPlugin.checkAz(res, az - azMarg, az + azMarg);
     if (isValidEl) res = FindSatPlugin.checkEl(res, el - elMarg, el + elMarg);
     if (isValidRange) res = FindSatPlugin.checkRange(res, rng - rngMarg, rng + rngMarg);
@@ -142,15 +158,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
       let country = countryCode.split('|').map((code) => countryMapList[code]);
       // Remove duplicates and undefined
       country = country.filter((item, index) => item && country.indexOf(item) === index);
-      res = res.filter((sat: SatObject) => country.includes(sat.country));
+      res = res.filter((obj: BaseObject) => country.includes((obj as DetailedSatellite).country));
     }
-    if (bus !== 'All') res = res.filter((sat: SatObject) => sat.bus === bus);
-    if (shape !== 'All') res = res.filter((sat: SatObject) => sat.shape === shape);
+    if (bus !== 'All') res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).bus === bus);
+    if (shape !== 'All') res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).shape === shape);
 
     if (payload !== 'All') {
       res = res.filter(
-        (sat: SatObject) =>
-          sat.payload
+        (obj: BaseObject) =>
+          (obj as DetailedSatellite).payload
             ?.split(' ')[0]
             ?.split('-')[0]
             ?.replace(/[^a-zA-Z]/gu, '') === payload
@@ -160,8 +176,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
     res = FindSatPlugin.limitPossibles(res, settingsManager.searchLimit);
 
     let result = '';
-    res.forEach((sat: SatObject, i: number) => {
-      result += i < res.length - 1 ? `${sat.sccNum},` : `${sat.sccNum}`;
+    res.forEach((obj: BaseObject, i: number) => {
+      result += i < res.length - 1 ? `${(obj as DetailedSatellite).sccNum},` : `${(obj as DetailedSatellite).sccNum}`;
     });
 
     (<HTMLInputElement>getEl('search')).value = result;
@@ -223,81 +239,82 @@ export class FindSatPlugin extends KeepTrackPlugin {
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="xxx.x" id="fbl-azimuth" type="text">
-              <label for="fbl-azimuth" class="active">Azimuth</label>
+              <label for="fbl-azimuth" class="active">Azimuth (deg)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input placeholder="5" id="fbl-azimuth-margin" type="text">
-              <label for="fbl-azimuth-margin "class="active">Margin</label>
+              <label for="fbl-azimuth-margin "class="active">Margin (deg)</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="XX.X" id="fbl-elevation" type="text">
-              <label for="fbl-elevation "class="active">Elevation</label>
+              <label for="fbl-elevation "class="active">Elevation (deg)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input placeholder="5" id="fbl-elevation-margin" type="text">
-              <label for="fbl-elevation-margin "class="active">Margin</label>
+              <label for="fbl-elevation-margin "class="active">Margin (deg)</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="xxxx.x" id="fbl-range" type="text">
-              <label for="fbl-range "class="active">Range</label>
+              <label for="fbl-range "class="active">Range (km)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input placeholder="500" id="fbl-range-margin" type="text">
-              <label for="fbl-range-margin "class="active">Margin</label>
+              <label for="fbl-range-margin "class="active">Margin (km)</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="XX.X" id="fbl-inc" type="text">
-              <label for="fbl-inc "class="active">Inclination</label>
+              <label for="fbl-inc "class="active">Inclination (deg)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input value="0.5" placeholder="0.5" id="fbl-inc-margin" type="text">
-              <label for="fbl-inc-margin "class="active">Margin</label>
+              <label for="fbl-inc-margin "class="active">Margin (deg)</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="XX.X" id="fbl-period" type="text">
-              <label for="fbl-period "class="active">Period</label>
+              <label for="fbl-period "class="active">Period (min)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input value="10" placeholder="10" id="fbl-period-margin" type="text">
-              <label for="fbl-period-margin "class="active">Margin</label>
+              <label for="fbl-period-margin "class="active">Margin (min)</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="XX.X" id="fbl-rcs" type="text">
-              <label for="fbl-rcs "class="active">RCS</label>
+              <!-- RCS in meters squared -->
+              <label for="fbl-rcs "class="active">RCS (m<sup>2</sup>)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input value="10" placeholder="10" id="fbl-rcs-margin" type="text">
-              <label for="fbl-rcs-margin "class="active">Margin</label>
+              <label for="fbl-rcs-margin "class="active">Margin (m<sup>2</sup>)</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="XX.X" id="fbl-raan" type="text">
-              <label for="fbl-raan "class="active">Right Ascension</label>
+              <label for="fbl-raan "class="active">Right Ascension (deg)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input value="0.5" placeholder="0.5" id="fbl-raan-margin" type="text">
-              <label for="fbl-raan-margin "class="active">Margin</label>
+              <label for="fbl-raan-margin "class="active">Margin (deg)</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
               <input placeholder="XX.X" id="fbl-argPe" type="text">
-              <label for="fbl-argPe "class="active">Arg of Perigee</label>
+              <label for="fbl-argPe "class="active">Arg of Perigee (deg)</label>
             </div>
             <div class="input-field col s12 m6 l6">
               <input value="0.5" placeholder="0.5" id="fbl-argPe-margin" type="text">
-              <label for="fbl-argPe-margin "class="active">Margin</label>
+              <label for="fbl-argPe-margin "class="active">Margin (deg)</label>
             </div>
           </div>
           <div class="center-align">
@@ -375,7 +392,7 @@ The search will then find all satellites within those inclinations and display t
         payload,
         shape,
       };
-      this.lastResults = FindSatPlugin.searchSats(searchParams);
+      this.lastResults = FindSatPlugin.searchSats(searchParams as SearchSatParams);
       if (this.lastResults.length === 0) {
         uiManagerInstance.toast(`No Satellites Found`, 'critical');
       }
@@ -415,7 +432,7 @@ The search will then find all satellites within those inclinations and display t
   }
 
   public uiManagerFinal() {
-    const satData = keepTrackApi.getCatalogManager().getSatsFromSatData();
+    const satData = keepTrackApi.getCatalogManager().objectCache;
 
     getEl('findByLooks-form').addEventListener('submit', (e: Event) => {
       e.preventDefault();
@@ -425,7 +442,7 @@ The search will then find all satellites within those inclinations and display t
       });
     });
 
-    getUnique(satData.filter((obj: SatObject) => obj.bus).map((obj) => obj.bus))
+    getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.bus).map((obj) => (obj as DetailedSatellite).bus))
       // Sort using lower case
       .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
       .forEach((bus) => {
@@ -436,7 +453,7 @@ The search will then find all satellites within those inclinations and display t
       getEl('fbl-country').insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
     });
 
-    getUnique(satData.filter((obj: SatObject) => obj.shape).map((obj) => obj.shape))
+    getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.shape).map((obj) => (obj as DetailedSatellite).shape))
       // Sort using lower case
       .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
       .forEach((shape) => {
@@ -444,9 +461,9 @@ The search will then find all satellites within those inclinations and display t
       });
 
     const payloadPartials = satData
-      .filter((obj: SatObject) => obj.payload)
+      .filter((obj: BaseObject) => (obj as DetailedSatellite)?.payload)
       .map((obj) =>
-        obj.payload
+        (obj as DetailedSatellite).payload
           .split(' ')[0]
           .split('-')[0]
           .replace(/[^a-zA-Z]/gu, '')
@@ -463,23 +480,23 @@ The search will then find all satellites within those inclinations and display t
       });
   }
 
-  private static checkArgPe(possibles: any[], min: number, max: number) {
-    return possibles.filter((possible) => possible.argPe * RAD2DEG < max && possible.argPe * RAD2DEG > min);
+  private static checkArgPe(possibles: DetailedSatellite[], min: number, max: number) {
+    return possibles.filter((possible) => possible.argOfPerigee * RAD2DEG < max && possible.argOfPerigee * RAD2DEG > min);
   }
 
-  private static checkInc(possibles: any[], min: number, max: number) {
+  private static checkInc(possibles: DetailedSatellite[], min: number, max: number) {
     return possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
   }
 
-  private static checkPeriod(possibles: any[], minPeriod: number, maxPeriod: number) {
+  private static checkPeriod(possibles: DetailedSatellite[], minPeriod: number, maxPeriod: number) {
     return possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
   }
 
-  private static checkRaan(possibles: any[], min: number, max: number) {
+  private static checkRaan(possibles: DetailedSatellite[], min: number, max: number) {
     return possibles.filter((possible) => possible.raan * RAD2DEG < max && possible.raan * RAD2DEG > min);
   }
 
-  private static checkRcs(possibles: any[], minRcs: number, maxRcs: number) {
-    return possibles.filter((possible) => parseFloat(possible.R) > minRcs && parseFloat(possible.R) < maxRcs);
+  private static checkRcs(possibles: DetailedSatellite[], minRcs: number, maxRcs: number) {
+    return possibles.filter((possible) => possible.rcs > minRcs && possible.rcs < maxRcs);
   }
 }

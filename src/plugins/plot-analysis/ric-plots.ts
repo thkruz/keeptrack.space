@@ -1,10 +1,11 @@
-import { EChartsData, KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { EChartsData, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import scatterPlotPng4 from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -61,8 +62,8 @@ export class RicPlot extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSecondarySat,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
-        if (!sat || this.selectSatManager_.selectedSat === -1) {
+      cb: (obj: BaseObject) => {
+        if (!obj || this.selectSatManager_.selectedSat === -1) {
           if (this.isMenuButtonActive) this.hideSideMenus();
           this.setBottomIconToDisabled();
         } else {
@@ -74,8 +75,8 @@ export class RicPlot extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
-        if (!sat || this.selectSatManager_.secondarySat === -1) {
+      cb: (obj: BaseObject) => {
+        if (!obj || this.selectSatManager_.secondarySat === -1) {
           if (this.isMenuButtonActive) this.hideSideMenus();
           this.setBottomIconToDisabled();
         } else {
@@ -228,7 +229,7 @@ export class RicPlot extends KeepTrackPlugin {
 
     if (this.selectSatManager_.selectedSat === -1 || this.selectSatManager_.secondarySat === -1) return [];
 
-    const satP = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat);
+    const satP = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
     const satS = this.selectSatManager_.secondarySatObj;
     data.push({ name: satP.name, value: [[0, 0, 0]] });
     data.push({ name: satS.name, value: SatMathApi.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, NUMBER_OF_ORBITS).map((point) => [point.x, point.y, point.z]) });

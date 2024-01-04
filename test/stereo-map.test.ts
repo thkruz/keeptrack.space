@@ -12,7 +12,7 @@ describe('StereoMapPlugin_class', () => {
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-    keepTrackApi.getCatalogManager().satData = [defaultSat];
+    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
   });
 

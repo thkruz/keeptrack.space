@@ -3,6 +3,7 @@
 import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { UrlManager } from '@app/static/url-manager';
@@ -152,7 +153,7 @@ export class MouseInput {
 
         // Left Mouse Button Clicked
         if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
-          if (this.clickedSat !== -1 && !catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY).static) {
+          if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY).isStatic()) {
             keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
           }
         } else {
@@ -321,32 +322,32 @@ export class MouseInput {
     if (!settingsManager.disableCameraControls) {
       // prettier-ignore
       window.addEventListener('mousedown', (evt) => {
-                // Camera Manager Events
-                // Middle Mouse Button MMB
-                if (evt.button === 1) {
-                    keepTrackApi.getMainCamera().localRotateStartPosition = keepTrackApi.getMainCamera().localRotateCurrent;
-                    if (this.keyboard_.isShiftPressed) {
-                        keepTrackApi.getMainCamera().isLocalRotateRoll = true;
-                        keepTrackApi.getMainCamera().isLocalRotateYaw = false;
-                    } else {
-                        keepTrackApi.getMainCamera().isLocalRotateRoll = false;
-                        keepTrackApi.getMainCamera().isLocalRotateYaw = true;
-                    }
-                    evt.preventDefault();
-                }
+        // Camera Manager Events
+        // Middle Mouse Button MMB
+        if (evt.button === 1) {
+          keepTrackApi.getMainCamera().localRotateStartPosition = keepTrackApi.getMainCamera().localRotateCurrent;
+          if (this.keyboard_.isShiftPressed) {
+            keepTrackApi.getMainCamera().isLocalRotateRoll = true;
+            keepTrackApi.getMainCamera().isLocalRotateYaw = false;
+          } else {
+            keepTrackApi.getMainCamera().isLocalRotateRoll = false;
+            keepTrackApi.getMainCamera().isLocalRotateYaw = true;
+          }
+          evt.preventDefault();
+        }
 
-                // Right Mouse Button RMB
-                if (evt.button === 2 && (this.keyboard_.isShiftPressed || this.keyboard_.isCtrlPressed)) {
-                    keepTrackApi.getMainCamera().panStartPosition = keepTrackApi.getMainCamera().panCurrent;
-                    if (this.keyboard_.isShiftPressed) {
-                        keepTrackApi.getMainCamera().isScreenPan = false;
-                        keepTrackApi.getMainCamera().isWorldPan = true;
-                    } else {
-                        keepTrackApi.getMainCamera().isScreenPan = true;
-                        keepTrackApi.getMainCamera().isWorldPan = false;
-                    }
-                }
-            });
+        // Right Mouse Button RMB
+        if (evt.button === 2 && (this.keyboard_.isShiftPressed || this.keyboard_.isCtrlPressed)) {
+          keepTrackApi.getMainCamera().panStartPosition = keepTrackApi.getMainCamera().panCurrent;
+          if (this.keyboard_.isShiftPressed) {
+            keepTrackApi.getMainCamera().isScreenPan = false;
+            keepTrackApi.getMainCamera().isWorldPan = true;
+          } else {
+            keepTrackApi.getMainCamera().isScreenPan = true;
+            keepTrackApi.getMainCamera().isWorldPan = false;
+          }
+        }
+      });
     }
 
     if (!settingsManager.disableCameraControls) {
@@ -415,10 +416,12 @@ export class MouseInput {
         getEl('menu-sensor-info').click();
         break;
       case 'view-related-sats-rmb':
-        var intldes = catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY).intlDes;
-        if (typeof intldes == 'undefined') uiManagerInstance.toast(`Time 1 is Invalid!`, 'serious');
-        var searchStr = intldes.slice(0, 8);
-        uiManagerInstance.doSearch(searchStr);
+        {
+          const intldes = catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY)?.intlDes;
+          if (!intldes) uiManagerInstance.toast(`Time 1 is Invalid!`, 'serious');
+          const searchStr = intldes.slice(0, 8);
+          uiManagerInstance.doSearch(searchStr);
+        }
         break;
       case 'set-sec-sat-rmb':
         keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
@@ -551,6 +554,7 @@ export class MouseInput {
         keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
 
     getEl('right-btn-menu').style.display = 'none';
     InputManager.clearRMBSubMenu();

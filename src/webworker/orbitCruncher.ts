@@ -1,17 +1,32 @@
-import * as Ootk from 'ootk';
-import { DEG2RAD, RADIUS_OF_EARTH, TAU } from '../lib/constants';
+import { ObjDataJson } from '@app/singletons/orbitManager';
+import { DEG2RAD, Degrees, EciVec3, Kilometers, Sgp4, TAU, ecf2eci } from 'ootk';
+import { RADIUS_OF_EARTH } from '../lib/constants';
 import { jday } from '../lib/transforms';
+import { OrbitCruncherCachedObject } from './constants';
 import { propTime } from './positionCruncher/calculations';
 
 let dynamicOffsetEpoch: number;
 let staticOffset = 0;
 let propRate = 1.0;
 
+export enum OrbitCruncherType {
+  INIT,
+  UPDATE,
+  CHANGE_ORBIT_TYPE,
+  MISSILE_UPDATE,
+  SATELLITE_UPDATE,
+}
+
+export enum OrbitDrawTypes {
+  ORBIT,
+  TRAIL,
+}
+
 /** CONSTANTS */
 
-const satCache = [];
-let NUM_SEGS: number;
-let orbitType = 1;
+const objCache = [] as OrbitCruncherCachedObject[];
+let numberOfSegments: number;
+let orbitType = OrbitDrawTypes.ORBIT;
 let orbitFadeFactor = 1.0;
 
 // Handles Incomming Messages to sat-cruncher from main thread
@@ -22,85 +37,93 @@ try {
   if (!process) throw e;
 }
 
-// prettier-ignore
 export const onmessageProcessing = (m: {
   data: {
-    missile?: any;
-    catalogManagerInstance?: any;
-    satId?: number;
-    isUpdate?: boolean;
-    orbitType?: number;
+    typ: OrbitCruncherType;
+    id?: number;
+    // Init Only
+    objData?: string;
+    numSegs: number;
+    orbitFadeFactor?: number;
+    // Change Orbit Type Only
+    orbitType?: OrbitDrawTypes.ORBIT;
+    // Satellite Update Only
+    tle1?: string;
+    tle2?: string;
+    // Missile Update Only
+    latList: Degrees[];
+    lonList: Degrees[];
+    altList: Kilometers[];
+    // Both Updates
     dynamicOffsetEpoch?: number;
     staticOffset?: number;
     propRate?: number;
-    isInit?: boolean;
-    satData?: string;
-    TLE1?: string;
-    TLE2?: string;
     isEcfOutput?: boolean;
-    numSegs: number;
-    orbitFadeFactor?: string;
   };
-}) => { // NOSONAR
-  if (m.data.isUpdate) {
-    // Add Satellites
-    if (!m.data.missile && m.data.satId < 99999) {
-      satCache[m.data.satId] = Ootk.Sgp4.createSatrec(m.data.TLE1, m.data.TLE2);
-    }
-    // Add Missiles
-    if (m.data.missile) {
-      satCache[m.data.satId] = m.data;
-    }
-    // Don't Add Anything Else
+}) => {
+  switch (m.data.typ) {
+    case OrbitCruncherType.INIT:
+      orbitFadeFactor = m.data.orbitFadeFactor;
+      numberOfSegments = m.data.numSegs;
+      break;
+    case OrbitCruncherType.SATELLITE_UPDATE:
+      // If new orbit
+      if (m.data.tle1) {
+        objCache[m.data.id].satrec = Sgp4.createSatrec(m.data.tle1, m.data.tle2);
+      }
+      break;
+    case OrbitCruncherType.MISSILE_UPDATE:
+      // If new orbit
+      if (m.data.latList) {
+        objCache[m.data.id].latList = m.data.latList;
+        objCache[m.data.id].lonList = m.data.lonList;
+        objCache[m.data.id].altList = m.data.altList;
+      }
+      // Don't Add Anything Else
+      break;
+    case OrbitCruncherType.CHANGE_ORBIT_TYPE:
+      orbitType = m.data.orbitType;
+      return;
   }
 
-  if (m.data.orbitType) {
-    orbitType = m.data.orbitType;
-  }
-
-  dynamicOffsetEpoch = typeof m.data.dynamicOffsetEpoch !== 'undefined' ? m.data.dynamicOffsetEpoch : dynamicOffsetEpoch;
-  staticOffset = typeof m.data.staticOffset !== 'undefined' ? m.data.staticOffset : staticOffset;
-  propRate = typeof m.data.propRate !== 'undefined' ? m.data.propRate : propRate;
-
-  if (m.data.isInit) {
-    const satData = JSON.parse(m.data.satData);
-    orbitFadeFactor = JSON.parse(m.data.orbitFadeFactor);
-    const sLen = satData.length - 1;
+  if (m.data.typ === OrbitCruncherType.INIT) {
+    const objData = JSON.parse(m.data.objData) as ObjDataJson[];
+    const sLen = objData.length - 1;
     let i = -1;
     while (i < sLen) {
       i++;
-      delete satData[i]['id'];
-      if (satData[i].static || satData[i].missile) {
-        satCache[i] = satData[i];
+      if (objData[i].missile) {
+        objCache[i] = objData[i];
+      } else if (objData[i].ignore) {
+        objCache[i] = { ignore: true };
+      } else if (objData[i].tle1) {
+        objCache[i] = {
+          satrec: Sgp4.createSatrec(objData[i].tle1, objData[i].tle2),
+        };
       } else {
-        satCache[i] = Ootk.Sgp4.createSatrec(satData[i].TLE1, satData[i].TLE2);
+        throw new Error('Invalid Object Data');
       }
     }
-
-    NUM_SEGS = m.data.numSegs;
   }
 
-  // NOTE: Without "typeof" vanguard 1 is falsly
-  if (typeof m.data.satId !== 'undefined') {
+  if (m.data.typ === OrbitCruncherType.SATELLITE_UPDATE || m.data.typ === OrbitCruncherType.MISSILE_UPDATE) {
     // TODO: figure out how to calculate the orbit points on constant
     // position slices, not timeslices (ugly perigees on HEOs)
 
-    const satId = m.data.satId;
+    dynamicOffsetEpoch = m.data.dynamicOffsetEpoch;
+    staticOffset = m.data.staticOffset;
+    propRate = m.data.propRate;
+
+    const id = m.data.id;
     const isEcfOutput = m.data.isEcfOutput || false;
-    const pointsOut = new Float32Array((NUM_SEGS + 1) * 4);
+    const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
 
-    const nowDate = propTime(dynamicOffsetEpoch, staticOffset, propRate);
-    const nowJ =
-      jday(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, nowDate.getUTCDate(), nowDate.getUTCHours(), nowDate.getUTCMinutes(), nowDate.getUTCSeconds()) +
-      nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-    const now = (nowJ - satCache[satId].jdsatepoch) * 1440.0; // in minutes
-
-    const len = NUM_SEGS + 1;
+    const len = numberOfSegments + 1;
     let i = 0;
     // Calculate Missile Orbits
-    if (satCache[satId].missile) {
+    if (objCache[id].missile) {
       while (i < len) {
-        const missile = satCache[satId];
+        const missile = objCache[id];
 
         if (missile.latList?.length === 0) {
           pointsOut[i * 4] = 0;
@@ -109,85 +132,35 @@ export const onmessageProcessing = (m: {
           pointsOut[i * 4 + 3] = 0;
           i++;
         } else {
-          const x = Math.round(missile.altList.length * (i / NUM_SEGS));
-
-          const missileTime = propTime(dynamicOffsetEpoch, staticOffset, propRate);
-          const j =
-            jday(
-              missileTime.getUTCFullYear(),
-              missileTime.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
-              missileTime.getUTCDate(),
-              missileTime.getUTCHours(),
-              missileTime.getUTCMinutes(),
-              missileTime.getUTCSeconds()
-            ) +
-            missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-          const gmst = Ootk.Sgp4.gstime(j);
-
-          const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
-          const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
-          const cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
-          const sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
-
-          pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
-          pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
-          pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
-          pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
+          drawMissileSegment_(missile, i, pointsOut, len);
           i++;
         }
       }
     } else {
-      // Calculate Satellite Orbits
-      const period = (2 * Math.PI) / satCache[satId].no; // convert rads/min to min
-      const timeslice = period / NUM_SEGS;
-      let p: any;
+      const nowDate = propTime(dynamicOffsetEpoch, staticOffset, propRate);
+      const nowJ =
+        jday(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, nowDate.getUTCDate(), nowDate.getUTCHours(), nowDate.getUTCMinutes(), nowDate.getUTCSeconds()) +
+        nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+      const now = (nowJ - objCache[id].satrec.jdsatepoch) * 1440.0; // in minutes
 
-      if (orbitType === 1) {
+      // Calculate Satellite Orbits
+      const period = (2 * Math.PI) / objCache[id].satrec.no; // convert rads/min to min
+      const timeslice = period / numberOfSegments;
+
+      if (orbitType === OrbitDrawTypes.ORBIT) {
         while (i < len) {
-          const t = now + i * timeslice;
-          p = Ootk.Sgp4.propagate(satCache[satId], t)?.position;
-          // eslint-disable-next-line no-constant-condition
-          if (isEcfOutput) {
-            p = Ootk.Transforms.ecf2eci(p, (-i * timeslice * TAU) / period);
-          }
-          if (p?.x && p?.y && p?.z) {
-            pointsOut[i * 4] = p.x;
-            pointsOut[i * 4 + 1] = p.y;
-            pointsOut[i * 4 + 2] = p.z;
-            pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
-          } else {
-            pointsOut[i * 4] = 0;
-            pointsOut[i * 4 + 1] = 0;
-            pointsOut[i * 4 + 2] = 0;
-            pointsOut[i * 4 + 3] = 0;
-          }
+          drawOrbitSegment_(now, i, timeslice, id, isEcfOutput, period, pointsOut, len);
           i++;
         }
-      } else if (orbitType === 2) {
+      } else if (orbitType === OrbitDrawTypes.TRAIL) {
         while (i < len) {
-          const t = now - i * timeslice;
-          p = Ootk.Sgp4.propagate(satCache[satId], t)?.position;
-          // eslint-disable-next-line no-constant-condition
-          if (isEcfOutput) {
-            p = Ootk.Transforms.ecf2eci(p, (-i * timeslice * TAU) / period);
-          }
-          if (p?.x && p?.y && p?.z) {
-            pointsOut[i * 4] = p.x;
-            pointsOut[i * 4 + 1] = p.y;
-            pointsOut[i * 4 + 2] = p.z;
-            pointsOut[i * 4 + 3] = (i < len / 40) ? Math.min(orbitFadeFactor * ((len / 40) / (2 * (i + 1))), 1.0) : 0.0;
-          } else {
-            pointsOut[i * 4] = 0;
-            pointsOut[i * 4 + 1] = 0;
-            pointsOut[i * 4 + 2] = 0;
-            pointsOut[i * 4 + 3] = 0;
-          }
+          drawOrbitSegmentTrail_(now, i, timeslice, id, isEcfOutput, period, pointsOut, len);
           i++;
         }
       }
     }
 
-    postMessageProcessing({ pointsOut, satId });
+    postMessageProcessing({ pointsOut, satId: id });
   }
 };
 
@@ -206,4 +179,73 @@ export const postMessageProcessing = ({ pointsOut, satId }: OrbitCruncherMessage
     // If Jest isn't running then throw the error
     if (!process) throw e;
   }
+};
+
+const drawMissileSegment_ = (missile: OrbitCruncherCachedObject, i: number, pointsOut: Float32Array, len: number) => {
+  const x = Math.round(missile.altList.length * (i / numberOfSegments));
+
+  const missileTime = propTime(dynamicOffsetEpoch, staticOffset, propRate);
+  const j =
+    jday(
+      missileTime.getUTCFullYear(),
+      missileTime.getUTCMonth() + 1, // Note, this function requires months in range 1-12.
+      missileTime.getUTCDate(),
+      missileTime.getUTCHours(),
+      missileTime.getUTCMinutes(),
+      missileTime.getUTCSeconds()
+    ) +
+    missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
+  const gmst = Sgp4.gstime(j);
+
+  const cosLat = Math.cos(missile.latList[x] * DEG2RAD);
+  const sinLat = Math.sin(missile.latList[x] * DEG2RAD);
+  const cosLon = Math.cos(missile.lonList[x] * DEG2RAD + gmst);
+  const sinLon = Math.sin(missile.lonList[x] * DEG2RAD + gmst);
+
+  pointsOut[i * 4] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * cosLon;
+  pointsOut[i * 4 + 1] = (RADIUS_OF_EARTH + missile.altList[x]) * cosLat * sinLon;
+  pointsOut[i * 4 + 2] = (RADIUS_OF_EARTH + missile.altList[x]) * sinLat;
+  pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
+};
+
+const drawOrbitSegmentTrail_ = (now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean, period: number, pointsOut: Float32Array, len: number) => {
+  const t = now + i * timeslice;
+  let sv = Sgp4.propagate(objCache[id].satrec, t);
+  if (!sv) {
+    pointsOut[i * 4] = 0;
+    pointsOut[i * 4 + 1] = 0;
+    pointsOut[i * 4 + 2] = 0;
+    pointsOut[i * 4 + 3] = 0;
+    return;
+  }
+
+  let pos = sv.position as EciVec3;
+  if (isEcfOutput) {
+    pos = ecf2eci(pos, (-i * timeslice * TAU) / period);
+  }
+  pointsOut[i * 4] = pos.x;
+  pointsOut[i * 4 + 1] = pos.y;
+  pointsOut[i * 4 + 2] = pos.z;
+  pointsOut[i * 4 + 3] = i < len / 40 ? Math.min(orbitFadeFactor * (len / 40 / (2 * (i + 1))), 1.0) : 0.0;
+};
+
+const drawOrbitSegment_ = (now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean, period: number, pointsOut: Float32Array, len: number) => {
+  const t = now + i * timeslice;
+  let sv = Sgp4.propagate(objCache[id].satrec, t);
+  if (!sv) {
+    pointsOut[i * 4] = 0;
+    pointsOut[i * 4 + 1] = 0;
+    pointsOut[i * 4 + 2] = 0;
+    pointsOut[i * 4 + 3] = 0;
+    return;
+  }
+
+  let pos = sv.position as EciVec3;
+  if (isEcfOutput) {
+    pos = ecf2eci(pos, (-i * timeslice * TAU) / period);
+  }
+  pointsOut[i * 4] = pos.x;
+  pointsOut[i * 4 + 1] = pos.y;
+  pointsOut[i * 4 + 2] = pos.z;
+  pointsOut[i * 4 + 3] = Math.min(orbitFadeFactor * (len / (i + 1)), 1.0);
 };

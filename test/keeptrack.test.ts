@@ -58,7 +58,7 @@ const setupStandardEnvironment = () => {
   jest.spyOn(CatalogLoader, 'load').mockImplementation(async () => {
     // Setup a mock catalog
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    catalogManagerInstance['satData'] = [<SatObject>{ id: 0, type: 1 }, <SatObject>{ id: 1, type: 1 }];
+    catalogManagerInstance['objectCache'] = [<SatObject>{ id: 0, type: 1 }, <SatObject>{ id: 1, type: 1 }];
     catalogManagerInstance.satCruncher = {
       postMessage: jest.fn(),
       terminate: jest.fn(),

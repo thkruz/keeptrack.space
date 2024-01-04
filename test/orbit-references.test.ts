@@ -25,7 +25,7 @@ describe('OrbitReferences', () => {
 
     keepTrackApi.getCatalogManager().analSatSet = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
-    keepTrackApi.getCatalogManager().insertNewAnalystSatellite = () => defaultSat;
+    keepTrackApi.getCatalogManager().addAnalystSat = () => defaultSat;
     getEl('orbit-references-link').click();
   });
 });

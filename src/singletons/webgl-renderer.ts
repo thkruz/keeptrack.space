@@ -3,8 +3,8 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { mat4, vec2, vec4 } from 'gl-matrix';
-import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
-import { GetSatType, SatObject } from '../interfaces';
+import { BaseObject, DetailedSatellite, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { GetSatType } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SettingsManager } from '../settings/settings';
 import { CatalogSource } from '../static/catalog-loader';
@@ -222,7 +222,7 @@ export class WebGLRenderer {
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.clearInViewOrbit();
 
-      let sat: SatObject;
+      let obj: BaseObject;
       this.labelCount_ = 0;
 
       this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
@@ -236,10 +236,10 @@ export class WebGLRenderer {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
-          sat = catalogManagerInstance.getSat(i, GetSatType.POSITION_ONLY);
+          obj = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY);
 
-          if (sat.static) continue;
-          if (sat.missile) continue;
+          if (!obj.isSatellite()) continue;
+          const sat = <DetailedSatellite>obj;
           if (keepTrackApi.getColorSchemeManager().isPayloadOff(sat)) continue;
           if (keepTrackApi.getColorSchemeManager().isRocketBodyOff(sat)) continue;
           if (keepTrackApi.getColorSchemeManager().isDebrisOff(sat)) continue;
@@ -281,9 +281,9 @@ export class WebGLRenderer {
         if (!dotsManagerInstance.inViewData) return;
 
         watchlistPluginInstance?.watchlistList.forEach((id: number) => {
-          sat = catalogManagerInstance.getSat(id, GetSatType.POSITION_ONLY);
+          const obj = catalogManagerInstance.getObject(id, GetSatType.POSITION_ONLY) as DetailedSatellite;
           if (dotsManagerInstance.inViewData[id] === 0) return;
-          const satScreenPositionArray = this.getScreenCoords(sat);
+          const satScreenPositionArray = this.getScreenCoords(obj);
           if (satScreenPositionArray.error) return;
           if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') return;
           if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) return;
@@ -292,10 +292,10 @@ export class WebGLRenderer {
           // if (!settingsManager.enableHoverOverlay) continue
           this.satHoverMiniDOM_ = document.createElement('div');
           this.satHoverMiniDOM_.id = 'sat-minibox-' + id;
-          if (sat.source === CatalogSource.VIMPEL) {
-            this.satHoverMiniDOM_.textContent = `JSC${sat.altId}`;
+          if (obj.source === CatalogSource.VIMPEL) {
+            this.satHoverMiniDOM_.textContent = `JSC${obj.altId}`;
           } else {
-            this.satHoverMiniDOM_.textContent = sat.sccNum;
+            this.satHoverMiniDOM_.textContent = obj.sccNum;
           }
 
           // Draw Orbits
@@ -330,7 +330,7 @@ export class WebGLRenderer {
     }
   }
 
-  getScreenCoords(sat: SatObject): {
+  getScreenCoords(obj: BaseObject): {
     x: number;
     y: number;
     z: number;
@@ -340,8 +340,8 @@ export class WebGLRenderer {
     const camMatrix = keepTrackApi.getMainCamera().camMatrix;
     const screenPos = { x: 0, y: 0, z: 0, error: false };
     try {
-      let pos = sat.position;
-      if (!pos) throw new Error(`No Position for Sat ${sat.id}`);
+      let pos = obj.position;
+      if (!pos) throw new Error(`No Position for Sat ${obj.id}`);
 
       const posVec4 = <[number, number, number, number]>vec4.fromValues(pos.x, pos.y, pos.z, 1);
 
@@ -438,9 +438,9 @@ export class WebGLRenderer {
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
       const timeManagerInstance = keepTrackApi.getTimeManager();
 
-      this.meshManager.update(timeManagerInstance.selectedDate, this.selectSatManager_.primarySatObj);
+      this.meshManager.update(timeManagerInstance.selectedDate, this.selectSatManager_.primarySatObj as DetailedSatellite);
       keepTrackApi.getMainCamera().snapToSat(this.selectSatManager_.primarySatObj, timeManagerInstance.simulationTimeObj);
-      if (this.selectSatManager_.primarySatObj.missile) keepTrackApi.getOrbitManager().setSelectOrbit(this.selectSatManager_.primarySatObj.id);
+      if (this.selectSatManager_.primarySatObj.isMissile()) keepTrackApi.getOrbitManager().setSelectOrbit(this.selectSatManager_.primarySatObj.id);
       keepTrackApi.getScene().searchBox.update(this.selectSatManager_.primarySatObj, timeManagerInstance.selectedDate);
     } else {
       keepTrackApi.getScene().searchBox.update(null);

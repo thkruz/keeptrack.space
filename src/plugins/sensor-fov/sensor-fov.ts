@@ -20,29 +20,26 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import fovPng from '@public/img/icons/fov.png';
+import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
-declare module '@app/interfaces' {
-  interface UserSettings {
-    isSatOverflyModeOn: boolean;
-    isShowSurvFence: boolean;
-    isFOVBubbleModeOn: boolean;
-  }
-}
-
 export class SensorFov extends KeepTrackPlugin {
-  bottomIconCallback = () => {
-    if (!this.verifySensorSelected()) {
-      return;
-    }
+  static PLUGIN_NAME = 'Sensor Field of View';
+  constructor() {
+    super(SensorFov.PLUGIN_NAME);
+  }
 
-    if (settingsManager.isFOVBubbleModeOn && !settingsManager.isShowSurvFence) {
-      this.disableFovView_();
-    } else if (!settingsManager.isFOVBubbleModeOn) {
+  isFovBubbleModeOn = false;
+
+  bottomIconCallback = () => {
+    if (this.isFovBubbleModeOn) {
+      this.disableFovView();
+    } else {
       this.enableFovView();
     }
   };
@@ -52,11 +49,7 @@ export class SensorFov extends KeepTrackPlugin {
   bottomIconImg = fovPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
-
-  constructor() {
-    const PLUGIN_NAME = 'Sensor Field of View';
-    super(PLUGIN_NAME);
-  }
+  isRequireSensorSelected = true;
 
   addJs(): void {
     super.addJs();
@@ -64,7 +57,7 @@ export class SensorFov extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject | string): void => {
+      cb: (sensor: Sensor | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
@@ -80,7 +73,7 @@ export class SensorFov extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
       cbName: this.PLUGIN_NAME,
-      cb: (sensor: SensorObject): void => {
+      cb: (sensor: Sensor): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
@@ -98,39 +91,36 @@ export class SensorFov extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
+          this.isFovBubbleModeOn = false;
+          this.setBottomIconToUnselected(false);
         }
       },
     });
   }
 
-  private disableFovView_() {
-    settingsManager.isFOVBubbleModeOn = false;
-    this.setBottomIconToUnselected();
+  disableFovView(isTellWorker = true) {
+    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
-    keepTrackApi.getCatalogManager().satCruncher.postMessage({
-      isShowFOVBubble: 'reset',
-      isShowSurvFence: 'disable',
-    });
+    this.isFovBubbleModeOn = false;
+    this.setBottomIconToUnselected(false);
+
+    if (isTellWorker) {
+      keepTrackApi.getCatalogManager().satCruncher.postMessage({
+        typ: CruncerMessageTypes.UPDATE_MARKERS,
+        markerMode: MarkerMode.OFF,
+      });
+    }
   }
 
   public enableFovView() {
     keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
-    settingsManager.isFOVBubbleModeOn = true;
-    settingsManager.isSatOverflyModeOn = false;
-    settingsManager.isShowSurvFence = false;
-
+    this.isFovBubbleModeOn = true;
     this.setBottomIconToSelected();
 
     keepTrackApi.getCatalogManager().satCruncher.postMessage({
-      isShowFOVBubble: 'enable',
-      isShowSurvFence: 'disable',
-    });
-
-    keepTrackApi.getCatalogManager().satCruncher.postMessage({
-      typ: 'isShowSatOverfly',
-      isShowSatOverfly: 'reset',
+      typ: CruncerMessageTypes.UPDATE_MARKERS,
+      markerMode: MarkerMode.FOV,
     });
   }
 }

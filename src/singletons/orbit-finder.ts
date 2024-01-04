@@ -1,6 +1,4 @@
-import { SatObject } from '@app/interfaces';
-import { Degrees, EciVec3, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2, Transforms } from 'ootk';
-import { RAD2DEG } from '../lib/constants';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, RAD2DEG, SatelliteRecord, Sgp4, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { StringPad } from '../lib/stringPad';
 import { SatMath } from '../static/sat-math';
 
@@ -34,7 +32,7 @@ export class OrbitFinder {
   raanOffset: number;
   lastLat: number;
   currentDirection: 'N' | 'S';
-  sat: SatObject;
+  sat: DetailedSatellite;
   goalDirection: string;
   goalLon: number;
   goalLat: number;
@@ -44,7 +42,7 @@ export class OrbitFinder {
   raanCalcResults: PropagationResults;
   argPer: string;
 
-  constructor(sat: SatObject, goalLat: Degrees, goalLon: Degrees, goalDirection: 'N' | 'S', now: Date, goalAlt?: Kilometers, raanOffset?: number) {
+  constructor(sat: DetailedSatellite, goalLat: Degrees, goalLon: Degrees, goalDirection: 'N' | 'S', now: Date, goalAlt?: Kilometers, raanOffset?: number) {
     this.sat = sat;
     this.now = now;
     this.goalLat = goalLat;
@@ -92,7 +90,7 @@ export class OrbitFinder {
       return ['Error', 'Failed to find a solution for Right Ascension of Ascending Node'];
     }
 
-    return [this.sat.TLE1, this.sat.TLE2];
+    return [this.sat.tle1, this.sat.tle2];
   }
 
   private argPerCalcLoop(): PropagationResults {
@@ -160,16 +158,16 @@ export class OrbitFinder {
 
   /** Parse some values used in creating new TLEs */
   private parseTle() {
-    this.intl = this.sat.TLE1.substring(9, 17);
-    this.epochyr = this.sat.TLE1.substring(18, 20);
-    this.epochday = this.sat.TLE1.substring(20, 32);
-    this.meanmo = this.sat.TLE2.substring(52, 63);
-    this.argPer = StringPad.pad0((this.sat.argPe * RAD2DEG).toFixed(4), 8);
+    this.intl = this.sat.tle1.substring(9, 17);
+    this.epochyr = this.sat.tle1.substring(18, 20);
+    this.epochday = this.sat.tle1.substring(20, 32);
+    this.meanmo = this.sat.tle2.substring(52, 63);
+    this.argPer = StringPad.pad0((this.sat.argOfPerigee * RAD2DEG).toFixed(4), 8);
     this.inc = StringPad.pad0((this.sat.inclination * RAD2DEG).toFixed(4), 8);
     this.ecen = this.sat.eccentricity.toFixed(7).substring(2, 9);
     // Disregarding the first and second derivatives of mean motion
     // Just keep whatever was in the original TLE
-    this.TLE1Ending = this.sat.TLE1.substring(32, 71);
+    this.TLE1Ending = this.sat.tle1.substring(32, 71);
   }
 
   /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 520 Degrees */
@@ -216,24 +214,24 @@ export class OrbitFinder {
   private meanACalc(meana: number, now: Date): PropagationResults {
     const sat = this.sat;
 
-    let satrec = sat.satrec || Sgp4.createSatrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+    let satrec = sat.satrec || Sgp4.createSatrec(sat.tle1, sat.tle2); // perform and store sat init calcs
 
     meana = meana / 10;
     const meanaStr = StringPad.pad0(meana.toFixed(4), 8);
 
     const raan = StringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
 
-    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0((sat.argPe * RAD2DEG).toFixed(4), 8);
+    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0((sat.argOfPerigee * RAD2DEG).toFixed(4), 8);
 
-    const _TLE1Ending = sat.TLE1.substring(32, 71);
-    const TLE1 = '1 ' + sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + _TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const TLE2 = '2 ' + sat.sccNum + ' ' + this.inc + ' ' + raan + ' ' + this.ecen + ' ' + argPe + ' ' + meanaStr + ' ' + this.meanmo + '    10';
+    const _TLE1Ending = sat.tle1.substring(32, 71);
+    const tle1 = '1 ' + sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + _TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const tle2 = '2 ' + sat.sccNum + ' ' + this.inc + ' ' + raan + ' ' + this.ecen + ' ' + argPe + ' ' + meanaStr + ' ' + this.meanmo + '    10';
 
-    satrec = Sgp4.createSatrec(TLE1, TLE2);
+    satrec = Sgp4.createSatrec(tle1, tle2);
     const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.MeanAnomaly);
     if (results === PropagationResults.Success) {
-      sat.TLE1 = TLE1 as TleLine1;
-      sat.TLE2 = TLE2 as TleLine2;
+      sat.tle1 = tle1 as TleLine1;
+      sat.tle2 = tle2 as TleLine2;
       this.newMeana = meanaStr;
     }
     return results;
@@ -245,12 +243,9 @@ export class OrbitFinder {
     if (isNaN(positionEci.x) || isNaN(positionEci.y) || isNaN(positionEci.z)) {
       return PropagationResults.Error;
     }
-    const gpos = Transforms.eci2lla(positionEci, gmst);
+    const gpos = eci2lla(positionEci, gmst);
 
-    let { lat: latRad, lon: lonRad, alt } = gpos;
-    const latDeg = Transforms.getDegLat(latRad);
-    const lonDeg = Transforms.getDegLon(lonRad);
-
+    let { lat: latDeg, lon: lonDeg, alt } = gpos;
     // Set it the first time
     this.lastLat = this.lastLat ? this.lastLat : latDeg;
 
@@ -328,12 +323,12 @@ export class OrbitFinder {
     const raanStr = StringPad.pad0(raan.toFixed(4), 8);
 
     // If we adjusted argPe use the new one - otherwise use the old one
-    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0((this.sat.argPe * RAD2DEG).toFixed(4), 8);
+    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0((this.sat.argOfPerigee * RAD2DEG).toFixed(4), 8);
 
-    const TLE1 = '1 ' + this.sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + this.TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const TLE2 = '2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + raanStr + ' ' + this.ecen + ' ' + argPe + ' ' + this.newMeana + ' ' + this.meanmo + '    10';
+    const tle1 = '1 ' + this.sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + this.TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const tle2 = '2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + raanStr + ' ' + this.ecen + ' ' + argPe + ' ' + this.newMeana + ' ' + this.meanmo + '    10';
 
-    const satrec = Sgp4.createSatrec(TLE1, TLE2);
+    const satrec = Sgp4.createSatrec(tle1, tle2);
     const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.RightAscensionOfAscendingNode);
 
     // If we have a good guess of the raan, we can use it, but need to apply the offset to the original raan
@@ -346,8 +341,8 @@ export class OrbitFinder {
 
       const _TLE2 = '2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + _raanStr + ' ' + this.ecen + ' ' + argPe + ' ' + this.newMeana + ' ' + this.meanmo + '    10';
 
-      this.sat.TLE1 = TLE1 as TleLine1;
-      this.sat.TLE2 = _TLE2 as TleLine2;
+      this.sat.tle1 = tle1 as TleLine1;
+      this.sat.tle2 = _TLE2 as TleLine2;
     }
     return results;
   }
@@ -363,17 +358,17 @@ export class OrbitFinder {
     argPe = StringPad.pad0((parseFloat(argPe) / 10).toFixed(4), 8);
 
     // Create the new TLEs
-    const TLE1 = ('1 ' + this.sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + this.TLE1Ending) as TleLine1;
-    const TLE2 = ('2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + raan + ' ' + this.ecen + ' ' + argPe + ' ' + meana + ' ' + this.meanmo + '    10') as TleLine2;
+    const tle1 = ('1 ' + this.sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + this.TLE1Ending) as TleLine1;
+    const tle2 = ('2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + raan + ' ' + this.ecen + ' ' + argPe + ' ' + meana + ' ' + this.meanmo + '    10') as TleLine2;
 
     // Calculate the orbit
-    const satrec = Sgp4.createSatrec(TLE1, TLE2);
+    const satrec = Sgp4.createSatrec(tle1, tle2);
 
     // Check the orbit
     const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.ArgumentOfPerigee);
     if (results === PropagationResults.Success) {
-      this.sat.TLE1 = TLE1;
-      this.sat.TLE2 = TLE2;
+      this.sat.tle1 = tle1;
+      this.sat.tle2 = tle2;
       this.newArgPer = argPe;
     }
     return results;

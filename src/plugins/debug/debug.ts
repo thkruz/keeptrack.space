@@ -117,7 +117,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
             const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
             if (!selectedSat || selectedSat === -1) return;
 
-            const sat = keepTrackApi.getCatalogManager().getSat(selectedSat);
+            const sat = keepTrackApi.getCatalogManager().getObject(selectedSat);
             if (sat) {
               const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
               const position = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
@@ -153,7 +153,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
         if (camera && selectSatManagerInstance) {
           const selectedSat = selectSatManagerInstance.selectedSat;
-          const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getSat(selectedSat) : null;
+          const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getObject(selectedSat) : null;
 
           const position = camera.getCameraPosition(sat?.position);
           setInnerHtml('debug-camera-position-x', `X: ${position[0].toFixed(2)}`);
@@ -163,7 +163,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           this.lastCameraUpdate = <Milliseconds>new Date().getTime();
         }
         if (selectSatManagerInstance.selectedSat >= 0) {
-          const sat = keepTrackApi.getCatalogManager().getSat(selectSatManagerInstance.selectedSat);
+          const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat);
           if (!sat) {
             console.warn('Satellite not found');
             return;

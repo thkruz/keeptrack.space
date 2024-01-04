@@ -20,18 +20,19 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, OrbitManager, SatObject, SatShader } from '@app/interfaces';
-import { DEG2RAD, RADIUS_OF_EARTH, TAU, ZOOM_EXP } from '@app/lib/constants';
+import { KeepTrackApiEvents, OrbitManager, SatShader } from '@app/interfaces';
+import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
+import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { SpaceObjectType } from '../lib/space-object-type';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';
 import { CoordinateTransforms } from '../static/coordinate-transforms';
 import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
+import { MissileObject } from './catalog-manager/MissileObject';
+import { LineTypes } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 
 /**
@@ -382,14 +383,14 @@ export class Camera {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  draw(target?: SatObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+  draw(target?: DetailedSatellite | MissileObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
     // TODO: This should be handled better
-    target ??= <SatObject>{
+    target ??= <DetailedSatellite>(<unknown>{
       id: -1,
       missile: false,
       type: SpaceObjectType.UNKNOWN,
       static: false,
-    };
+    });
 
     let gmst: GreenwichMeanSiderealTime;
     if (!sensorPos?.gmst) {
@@ -868,6 +869,28 @@ export class Camera {
     this.camSnap(lat2pitch(<Degrees>(lla.lat * latModifier)), lon2yaw(<Degrees>(lla.lon + lonModifier), selectedDate));
   }
 
+  lookAtStar(c: Star): void {
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const lineManagerInstance = keepTrackApi.getLineManager();
+
+    // Try with the pname
+    let satId = catalogManagerInstance.starName2Id(c.name, dotsManagerInstance.starIndex1, dotsManagerInstance.starIndex2);
+    let sat = catalogManagerInstance.getObject(satId);
+
+    if (sat == null) throw new Error('Star not found');
+
+    lineManagerInstance.clear();
+    if (catalogManagerInstance.isStarManagerLoaded) {
+      keepTrackApi.getStarManager().isAllConstellationVisible = false;
+    }
+
+    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
+    this.cameraType = CameraType.DEFAULT; // Earth will block the view of the star
+    this.lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
+  }
+
   setCameraType(val: CameraType) {
     if (typeof val !== 'number') throw new TypeError();
     if (val > 6 || val < 0) throw new RangeError();
@@ -883,8 +906,9 @@ export class Camera {
    *
    * Splitting it into subfunctions would not be optimal
    */
-  snapToSat(sat: SatObject, simulationTime: Date) {
-    if (typeof sat === 'undefined' || sat === null || sat.static) return;
+  snapToSat(sat: DetailedSatellite | MissileObject, simulationTime: Date) {
+    if (typeof sat === 'undefined' || sat === null) return;
+    if (!sat.isMissile() && !sat.isSatellite()) return;
 
     if (!sat.position) throw new Error('Satellite position is undefined');
 
@@ -913,7 +937,7 @@ export class Camera {
     }
 
     if (this.camZoomSnappedOnSat && !this.settings_.isAutoZoomIn && !this.settings_.isAutoZoomOut) {
-      if (!sat.static && sat.active) {
+      if (sat.active) {
         // if this is a satellite not a missile
         const { gmst } = SatMath.calculateTimeVariables(simulationTime);
         this.camSnapToSat.altitude = SatMath.getAlt(sat.position, gmst);
@@ -1057,7 +1081,7 @@ export class Camera {
     mat4.translate(this.camMatrix, this.camMatrix, [this.fpsPos_[0], this.fpsPos_[1], -this.fpsPos_[2]]);
   }
 
-  private drawFixedToSatellite_(target: SatObject, targetPosition: vec3) {
+  private drawFixedToSatellite_(target: DetailedSatellite | MissileObject, targetPosition: vec3) {
     // mat4 commands are run in reverse order
     // 1. Move to the satellite position
     // 2. Twist the camera around Z-axis
@@ -1135,7 +1159,7 @@ export class Camera {
     }
   }
 
-  private drawSatellite_(target: SatObject) {
+  private drawSatellite_(target: DetailedSatellite | MissileObject) {
     const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
     mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
     vec3.normalize(this.normUp_, targetPositionTemp);

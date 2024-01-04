@@ -1,11 +1,11 @@
-import { GetSatType, KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import aboutPng from '@public/img/icons/about.png';
-import { EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
+import { BaseObject, DetailedSatellite, EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -25,7 +25,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     if (this.isMenuButtonActive) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-      const sat: SatObject = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
+      const sat = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
       (<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value = sat.sccNum;
     }
   };
@@ -82,9 +82,9 @@ export class DebrisScreening extends KeepTrackPlugin {
           </div>
           <div class="input-field col s12">
             <select id="${this.formPrefix_}-time">
-              <option value="1">1 Hour</option>
+              <option value="1" selected>1 Hour</option>
               <option value="4">4 Hours</option>
-              <option value="8" selected>8 Hours</option>
+              <option value="8">8 Hours</option>
               <option value="24">24 Hours</option>
               <option value="48">48 Hours</option>
               <option value="72">72 Hours</option>
@@ -145,7 +145,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject): void => {
+      cb: (sat: BaseObject): void => {
         if (sat) {
           this.setBottomIconToEnabled();
         } else {
@@ -168,17 +168,19 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   onFormSubmit(): void {
-    let satId = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
+    let satId = keepTrackApi.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
 
     const uVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-u`)).value);
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);
     const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value);
     const timeVal = <Hours>parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-time`)).value);
-    const sat = keepTrackApi.getCatalogManager().getSat(satId, GetSatType.SKIP_POS_VEL);
+    const sat = keepTrackApi.getCatalogManager().getObject(satId, GetSatType.SKIP_POS_VEL) as DetailedSatellite;
 
-    const possibleSats = (<SatObject[]>keepTrackApi.getCatalogManager().satData)
-      .filter((sat2) => {
-        if (!sat2.satrec) return false;
+    const possibleSats = keepTrackApi
+      .getCatalogManager()
+      .objectCache.filter((obj2) => {
+        if (!obj2.isSatellite()) return false;
+        const sat2 = obj2 as DetailedSatellite;
         if (sat2.perigee > sat.apogee) return false;
         if (sat.perigee > sat2.apogee) return false;
 
@@ -195,9 +197,10 @@ export class DebrisScreening extends KeepTrackPlugin {
       const satSv = Sgp4.propagate(sat.satrec, m) as { position: EciVec3; velocity: EciVec3 };
 
       for (let idx = 0; idx < possibleSats.length; idx++) {
-        const sat2 = keepTrackApi.getCatalogManager().getSat(possibleSats[idx], GetSatType.SKIP_POS_VEL);
-        if (!sat2?.satrec) continue;
+        const obj2 = keepTrackApi.getCatalogManager().getObject(possibleSats[idx], GetSatType.SKIP_POS_VEL);
+        if (!obj2?.isSatellite()) continue;
 
+        const sat2 = obj2 as DetailedSatellite;
         const { m } = SatMath.calculateTimeVariables(now, sat2.satrec);
         const sat2Sv = Sgp4.propagate(sat2.satrec, m) as { position: EciVec3; velocity: EciVec3 };
         if (!sat2Sv) {

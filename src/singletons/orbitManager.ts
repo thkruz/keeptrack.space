@@ -3,11 +3,14 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
-import { ColorSchemeManager, GetSatType, MissileParams, OrbitManager, SatObject, UiManager } from '../interfaces';
+import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
+import { GetSatType, OrbitManager, UiManager } from '../interfaces';
 import { setInnerHtml } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 import { Camera, CameraType } from './camera';
+import { ColorSchemeManager } from './color-scheme-manager';
 import { LineManager } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import { HoverManager } from './hover-manager';
@@ -17,6 +20,13 @@ export interface OrbitCruncherMessageMain {
     pointsOut: number[];
     satId: number;
   };
+}
+
+export interface ObjDataJson {
+  ignore?: boolean;
+  missile?: boolean;
+  tle1?: string;
+  tle2?: string;
 }
 
 export class StandardOrbitManager implements OrbitManager {
@@ -161,13 +171,13 @@ export class StandardOrbitManager implements OrbitManager {
       this.glBuffers_.push(this.allocateBuffer());
     }
 
-    const satDataString = StandardOrbitManager.getSatDataString(keepTrackApi.getCatalogManager().getSatsFromSatData());
+    const objDataString = StandardOrbitManager.getObjDataString(keepTrackApi.getCatalogManager().objectCache);
 
     if (!this.orbitWorker) return;
     this.orbitWorker.postMessage({
-      isInit: true,
+      typ: OrbitCruncherType.INIT,
       orbitFadeFactor: settingsManager.orbitFadeFactor,
-      satData: satDataString,
+      objData: objDataString,
       numSegs: settingsManager.orbitSegments,
     });
     this.isInitialized_ = true;
@@ -233,7 +243,7 @@ export class StandardOrbitManager implements OrbitManager {
 
   updateAllVisibleOrbits(uiManagerInstance: UiManager): void {
     if (uiManagerInstance.searchManager.isResultsOpen() && !settingsManager.disableUI && !settingsManager.lowPerf) {
-      const currentSearchSats = uiManagerInstance.searchManager.getLastResultGroup()?.objects;
+      const currentSearchSats = uiManagerInstance.searchManager.getLastResultGroup()?.ids;
       if (typeof currentSearchSats !== 'undefined') {
         if (this.updateAllThrottle_ >= currentSearchSats.length) this.updateAllThrottle_ = 0;
         for (let i = 0; this.updateAllThrottle_ < currentSearchSats.length && i < 5; this.updateAllThrottle_++, i++) {
@@ -243,76 +253,77 @@ export class StandardOrbitManager implements OrbitManager {
     }
   }
 
-  changeOrbitBufferData(satId: number, TLE1: string, TLE2: string): void {
+  changeOrbitBufferData(id: number, tle1: string, tle2: string): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     if (!this.orbitWorker) return;
     this.orbitWorker.postMessage({
-      isInit: false,
-      isUpdate: true,
-      satId: satId,
+      typ: OrbitCruncherType.SATELLITE_UPDATE,
+      id: id,
       dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
       staticOffset: timeManagerInstance.staticOffset,
       rate: timeManagerInstance.propRate,
-      TLE1: TLE1,
-      TLE2: TLE2,
+      tle1: tle1,
+      tle2: tle2,
       isEcfOutput: settingsManager.isOrbitCruncherInEcf,
     });
   }
 
   updateOrbitBuffer(
-    satId: number,
-    missileParams: MissileParams = {
-      missile: false,
-      latList: [],
-      lonList: [],
-      altList: [],
+    id: number,
+    missileParams?: {
+      latList: Degrees[];
+      lonList: Degrees[];
+      altList: Kilometers[];
     }
   ) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    const sat = catalogManagerInstance.getSat(satId);
-    if (!sat) return;
+    const obj = catalogManagerInstance.getObject(id);
+    if (!obj) return;
     if (!settingsManager.isDrawOrbits) return;
 
-    if (!this.inProgress_[satId] && !sat.static) {
-      const { missile, latList, lonList, altList } = missileParams;
-      if (missile) {
+    if (!this.inProgress_[id] && !obj.isStatic()) {
+      if (obj.isMissile()) {
         if (!this.orbitWorker) return;
         this.orbitWorker.postMessage({
-          isInit: false,
-          isUpdate: true,
-          missile: true,
-          satId: satId,
-          latList: latList,
-          lonList: lonList,
-          altList: altList,
-        });
-      } else {
-        if (!this.orbitWorker) return;
-        this.orbitWorker.postMessage({
-          isInit: false,
-          satId: satId,
+          typ: OrbitCruncherType.MISSILE_UPDATE,
+          id: id,
           dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
           staticOffset: timeManagerInstance.staticOffset,
-          rate: timeManagerInstance.propRate,
+          propRate: timeManagerInstance.propRate,
+          // If we are updating a missile trajectory, we need to pass in the missile params
+          latList: missileParams?.latList,
+          lonList: missileParams?.lonList,
+          altList: missileParams?.altList,
+        });
+      } else {
+        // Then it is a satellite
+        if (!this.orbitWorker) return;
+        this.orbitWorker.postMessage({
+          typ: OrbitCruncherType.SATELLITE_UPDATE,
+          id: id,
+          dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
+          staticOffset: timeManagerInstance.staticOffset,
+          propRate: timeManagerInstance.propRate,
           isEcfOutput: settingsManager.isOrbitCruncherInEcf,
         });
-        this.inProgress_[satId] = true;
+        this.inProgress_[id] = true;
       }
     }
   }
 
-  private static getSatDataString(satData: SatObject[]) {
+  private static getObjDataString(objData: BaseObject[]) {
     return JSON.stringify(
-      satData.map((sat) => ({
-        static: sat.static,
-        missile: sat.missile,
-        isRadarData: sat.isRadarData,
-        TLE1: sat.TLE1,
-        TLE2: sat.TLE2,
-      }))
+      objData.map((obj) => {
+        if (!obj.isSatellite() && !obj.isMissile()) return { ignore: true } as ObjDataJson;
+        if (obj.isMissile()) return { missile: true } as ObjDataJson;
+        return {
+          tle1: (obj as DetailedSatellite).tle1,
+          tle2: (obj as DetailedSatellite).tle2,
+        } as ObjDataJson;
+      })
     );
   }
 
@@ -331,9 +342,9 @@ export class StandardOrbitManager implements OrbitManager {
     const colorData = colorSchemeManagerInstance.colorData;
 
     if (groupManagerInstance.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
-      groupManagerInstance.selectedGroup.objects.forEach((id: number) => {
+      groupManagerInstance.selectedGroup.ids.forEach((id: number) => {
         if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) return; // Skip hover and select objects
-        if (!keepTrackApi.getCatalogManager().getSat(id)?.active) return; // Skip inactive objects
+        if (!keepTrackApi.getCatalogManager().getObject(id)?.active) return; // Skip inactive objects
 
         StandardOrbitManager.checColorBuffersValidity_(id, colorData);
 
@@ -380,7 +391,7 @@ export class StandardOrbitManager implements OrbitManager {
     if (settingsManager.isMobileModeEnabled) return; // No hover orbit on mobile
 
     const hoverId = hoverManagerInstance.getHoverId();
-    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !keepTrackApi.getCatalogManager().getSat(hoverId, GetSatType.EXTRA_ONLY)?.static) {
+    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !keepTrackApi.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY)?.isStatic()) {
       StandardOrbitManager.checColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
       this.writePathToGpu_(hoverId);
@@ -416,14 +427,14 @@ export class StandardOrbitManager implements OrbitManager {
   }
 
   private drawPrimaryObjectOrbit_() {
-    if (this.currentSelectId_ !== -1 && !keepTrackApi.getCatalogManager().getSat(this.currentSelectId_, GetSatType.EXTRA_ONLY)?.static) {
+    if (this.currentSelectId_ !== -1 && !keepTrackApi.getCatalogManager().getObject(this.currentSelectId_, GetSatType.EXTRA_ONLY)?.isStatic()) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor);
       this.writePathToGpu_(this.currentSelectId_);
     }
   }
 
   private drawSecondaryObjectOrbit_(): void {
-    if (this.secondarySelectId_ !== -1 && !keepTrackApi.getCatalogManager().getSat(this.secondarySelectId_, GetSatType.EXTRA_ONLY)?.static) {
+    if (this.secondarySelectId_ !== -1 && !keepTrackApi.getCatalogManager().getObject(this.secondarySelectId_, GetSatType.EXTRA_ONLY)?.isStatic()) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor2);
       this.writePathToGpu_(this.secondarySelectId_);
     }

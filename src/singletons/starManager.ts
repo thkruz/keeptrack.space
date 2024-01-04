@@ -50,8 +50,8 @@ export class StarManager {
           const dotsManagerInstance = keepTrackApi.getDotsManager();
           const starIdx1 = dotsManagerInstance.starIndex1;
           const starIdx2 = dotsManagerInstance.starIndex2;
-          star1 = catalogManagerInstance.getIdFromStarName(this.constellations[i].stars[s][0], starIdx1, starIdx2);
-          star2 = catalogManagerInstance.getIdFromStarName(this.constellations[i].stars[s][1], starIdx1, starIdx2);
+          star1 = catalogManagerInstance.starName2Id(this.constellations[i].stars[s][0], starIdx1, starIdx2);
+          star2 = catalogManagerInstance.starName2Id(this.constellations[i].stars[s][1], starIdx1, starIdx2);
           if (star1 == null || star2 == null) continue;
         } catch (e) {
           // IF this isn't Jest testing, then throw a warning
@@ -80,8 +80,8 @@ export class StarManager {
           const dotsManagerInstance = keepTrackApi.getDotsManager();
           const starIdx1 = dotsManagerInstance.starIndex1;
           const starIdx2 = dotsManagerInstance.starIndex2;
-          const star1 = catalogManagerInstance.getIdFromStarName(starPair[0], starIdx1, starIdx2);
-          const star2 = catalogManagerInstance.getIdFromStarName(starPair[1], starIdx1, starIdx2);
+          const star1 = catalogManagerInstance.starName2Id(starPair[0], starIdx1, starIdx2);
+          const star2 = catalogManagerInstance.starName2Id(starPair[1], starIdx1, starIdx2);
           if (star1 == null && star2 == null) return; // TODO: Not all constellations are ready yet
           /* istanbul ignore next */
           if (typeof star1 == 'undefined' || star1 == null || typeof star2 == 'undefined' || star2 == null) {

@@ -57,7 +57,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
       }
       // Simple Error Checking
     } else {
-      if (typeof sensor.obsminaz == 'undefined') {
+      if (typeof sensor.minAz == 'undefined') {
         console.debug('sensor format incorrect');
         return;
       }
@@ -130,22 +130,17 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
     elevation = lookAngles.el * RAD2DEG;
     range = lookAngles.rng;
 
-    if (sensor.obsminaz < sensor.obsmaxaz) {
+    if (sensor.minAz < sensor.maxAz) {
       if (
         !(
-          azimuth >= sensor.obsminaz &&
-          azimuth <= sensor.obsmaxaz &&
-          elevation >= sensor.obsminel &&
+          azimuth >= sensor.minAz &&
+          azimuth <= sensor.maxAz &&
+          elevation >= sensor.minEl &&
           elevation <= sensor.obsmaxel &&
-          range <= sensor.obsmaxrange &&
+          range <= sensor.maxRng &&
           range >= sensor.obsminrange
         ) ||
-        (azimuth >= sensor.obsminaz2 &&
-          azimuth <= sensor.obsmaxaz2 &&
-          elevation >= sensor.obsminel2 &&
-          elevation <= sensor.obsmaxel2 &&
-          range <= sensor.obsmaxrange2 &&
-          range >= sensor.obsminrange2)
+        (azimuth >= sensor.minAz2 && azimuth <= sensor.maxAz2 && elevation >= sensor.minEl2 && elevation <= sensor.maxEl2 && range <= sensor.maxRng2 && range >= sensor.minRng2)
       ) {
         if (tableType == 1) {
           return {
@@ -167,16 +162,12 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
       }
     }
     if (
-      ((azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
-        elevation >= sensor.obsminel &&
+      ((azimuth >= sensor.minAz || azimuth <= sensor.maxAz) &&
+        elevation >= sensor.minEl &&
         elevation <= sensor.obsmaxel &&
-        range <= sensor.obsmaxrange &&
+        range <= sensor.maxRng &&
         range >= sensor.obsminrange) ||
-      ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
-        elevation >= sensor.obsminel2 &&
-        elevation <= sensor.obsmaxel2 &&
-        range <= sensor.obsmaxrange2 &&
-        range >= sensor.obsminrange2)
+      ((azimuth >= sensor.minAz2 || azimuth <= sensor.maxAz2) && elevation >= sensor.minEl2 && elevation <= sensor.maxEl2 && range <= sensor.maxRng2 && range >= sensor.minRng2)
     ) {
       if (satellite.isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
@@ -209,17 +200,13 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
         range1 = lookAngles1.rng;
         if (
           !(
-            (azimuth >= sensor.obsminaz || azimuth <= sensor.obsmaxaz) &&
-            elevation >= sensor.obsminel &&
+            (azimuth >= sensor.minAz || azimuth <= sensor.maxAz) &&
+            elevation >= sensor.minEl &&
             elevation <= sensor.obsmaxel &&
-            range <= sensor.obsmaxrange &&
+            range <= sensor.maxRng &&
             range >= sensor.obsminrange
           ) ||
-          ((azimuth >= sensor.obsminaz2 || azimuth <= sensor.obsmaxaz2) &&
-            elevation >= sensor.obsminel2 &&
-            elevation <= sensor.obsmaxel2 &&
-            range <= sensor.obsmaxrange2 &&
-            range >= sensor.obsminrange2)
+          ((azimuth >= sensor.minAz2 || azimuth <= sensor.maxAz2) && elevation >= sensor.minEl2 && elevation <= sensor.maxEl2 && range <= sensor.maxRng2 && range >= sensor.minRng2)
         ) {
           return {
             time: dateFormat(now, 'isoDateTime', true),
@@ -256,17 +243,17 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
           range1 = lookAngles1.rng;
           if (
             !(
-              (azimuth1 >= sensor.obsminaz || azimuth1 <= sensor.obsmaxaz) &&
-              elevation1 >= sensor.obsminel &&
+              (azimuth1 >= sensor.minAz || azimuth1 <= sensor.maxAz) &&
+              elevation1 >= sensor.minEl &&
               elevation1 <= sensor.obsmaxel &&
-              range1 <= sensor.obsmaxrange &&
+              range1 <= sensor.maxRng &&
               range1 >= sensor.obsminrange
             ) ||
-            ((azimuth1 >= sensor.obsminaz2 || azimuth1 <= sensor.obsmaxaz2) &&
-              elevation1 >= sensor.obsminel2 &&
-              elevation1 <= sensor.obsmaxel2 &&
-              range1 <= sensor.obsmaxrange2 &&
-              range1 >= sensor.obsminrange2)
+            ((azimuth1 >= sensor.minAz2 || azimuth1 <= sensor.maxAz2) &&
+              elevation1 >= sensor.minEl2 &&
+              elevation1 <= sensor.maxEl2 &&
+              range1 <= sensor.maxRng2 &&
+              range1 >= sensor.minRng2)
           ) {
             return {
               time: dateFormat(now, 'isoDateTime', true),
@@ -378,7 +365,7 @@ var drawChart = (data) => {
       extra.inclination = satrec.inclo * RAD2DEG; // rads
       extra.eccentricity = satrec.ecco;
       extra.raan = satrec.nodeo * RAD2DEG; // rads
-      extra.argPe = satrec.argpo * RAD2DEG; // rads
+      extra.argOfPerigee = satrec.argpo * RAD2DEG; // rads
       extra.meanMotion = (satrec.no * 60 * 24) / (2 * Math.PI); // convert rads/minute to rev/day
 
       // fun other data
@@ -437,8 +424,8 @@ var drawChart = (data) => {
             labelInfo.push(`${lookAngles[i].time}`);
             if (lookAngles[i].rng > 0) lookAngles[i].rng = lookAngles[i].rng / 10;
             rngInfo.push({ x: i, y: lookAngles[i].rng });
-            if (sensor.obsminaz > sensor.obsmaxaz && lookAngles[i].az > sensor.obsmaxaz) {
-              if (sensor.obsminaz > 180) lookAngles[i].az = lookAngles[i].az - 360;
+            if (sensor.minAz > sensor.maxAz && lookAngles[i].az > sensor.maxAz) {
+              if (sensor.minAz > 180) lookAngles[i].az = lookAngles[i].az - 360;
             }
             azInfo.push({ x: i, y: lookAngles[i].az });
             elInfo.push({ x: i, y: lookAngles[i].el });
@@ -447,8 +434,8 @@ var drawChart = (data) => {
           labelInfo.push(`${lookAngles[i].time}`);
           if (lookAngles[i].rng > 0) lookAngles[i].rng = lookAngles[i].rng / 10;
           rngInfo.push({ x: i, y: lookAngles[i].rng });
-          if (sensor.obsminaz > sensor.obsmaxaz && lookAngles[i].az > sensor.obsmaxaz) {
-            if (sensor.obsminaz > 180) lookAngles[i].az = lookAngles[i].az - 360;
+          if (sensor.minAz > sensor.maxAz && lookAngles[i].az > sensor.maxAz) {
+            if (sensor.minAz > 180) lookAngles[i].az = lookAngles[i].az - 360;
           }
           azInfo.push({ x: i, y: lookAngles[i].az });
           elInfo.push({ x: i, y: lookAngles[i].el });

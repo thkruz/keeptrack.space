@@ -14,7 +14,7 @@ describe('SatInfoBoxCore_class', () => {
   standardPluginSuite(SelectSatManager, 'SelectSatManager');
 
   it('should be able to select a satellite', () => {
-    keepTrackApi.getCatalogManager().satData = [defaultSat];
+    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
@@ -31,7 +31,7 @@ describe('SatInfoBoxCore_class', () => {
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-    keepTrackApi.getCatalogManager().satData = [defaultSensor as any];
+    keepTrackApi.getCatalogManager().objectCache = [defaultSensor as any];
     selectSatManager.selectSat(0);
   });
 });

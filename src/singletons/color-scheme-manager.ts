@@ -20,21 +20,24 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
-import { ColorInformation, ColorRuleSet, Colors, ColorSchemeManager, Pickable, rgbaArray, SatObject } from '../interfaces';
+import { ColorRuleSet, KeepTrackApiEvents } from '@app/interfaces';
+import { ColorInformation, Colors, Pickable, rgbaArray } from '../interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
-import { SpaceObjectType } from '../lib/space-object-type';
 import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
+import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { BaseObject, Days, DetailedSatellite, Marker, SpaceObjectType, Star } from 'ootk';
 import { getDayOfYear } from '../lib/transforms';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
+import { MissileObject } from './catalog-manager/MissileObject';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
-export class StandardColorSchemeManager implements ColorSchemeManager {
+export class ColorSchemeManager {
   private readonly DOTS_PER_CALC = 450;
 
   private gl_: WebGL2RenderingContext;
@@ -51,7 +54,6 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   lastDotColored = 0;
   objectTypeFlags = {
     payload: true,
-    radarData: true,
     rocketBody: true,
     debris: true,
     facility: true,
@@ -100,7 +102,15 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   pickableData: Int8Array;
   lastSavedColorSchemeName_ = '';
 
-  static apogee(sat: SatObject): ColorInformation {
+  static apogee(obj: BaseObject): ColorInformation {
+    if (!obj.isSatellite()) {
+      return {
+        color: [0.0, 0.0, 0.0, 0.0],
+        pickable: Pickable.No,
+      };
+    }
+
+    const sat = obj as DetailedSatellite;
     return {
       color: [1.0 - Math.min(sat.apogee / 45000, 1.0), Math.min(sat.apogee / 45000, 1.0), 0.0, 1.0],
       pickable: Pickable.Yes,
@@ -108,7 +118,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   }
 
   ageOfElset(
-    sat: SatObject,
+    obj: BaseObject,
     params: {
       jday: number;
       year: string;
@@ -129,29 +139,30 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     const jday = params?.jday || 0;
     const year = params?.year || '';
 
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+    if (obj.isStar()) return this.starColor_(obj as Star);
 
-    const checkFacility = this.checkFacility_(sat);
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.static) {
+    if (obj.isSensor()) {
       return {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
     }
-    if (sat.missile) {
+    if (obj.isMissile()) {
       return {
         color: this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     }
 
-    let daysold;
-    if (sat.TLE1.substr(18, 2) === year) {
-      daysold = jday - parseInt(sat.TLE1.substr(20, 3));
+    let daysold: Days;
+    const sat = obj as DetailedSatellite;
+    if (sat.tle1.substr(18, 2) === year) {
+      daysold = (jday - parseInt(sat.tle1.substr(20, 3))) as Days;
     } else {
-      daysold = jday + parseInt(year) * 365 - (parseInt(sat.TLE1.substr(18, 2)) * 365 + parseInt(sat.TLE1.substr(20, 3)));
+      daysold = (jday + parseInt(year) * 365 - (parseInt(sat.tle1.substr(18, 2)) * 365 + parseInt(sat.tle1.substr(20, 3)))) as Days;
     }
 
     if (daysold < 3 && this.objectTypeFlags.ageNew) {
@@ -202,18 +213,15 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       // Note the colorscheme for next time
       this.lastColorScheme = this.currentColorScheme;
 
-      if (this.lastSavedColorSchemeName_ !== this.currentColorScheme.name) {
-        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.name);
-        this.lastSavedColorSchemeName_ = this.currentColorScheme.name;
+      if (this.lastSavedColorSchemeName_ !== this.currentColorScheme?.name) {
+        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme?.name);
+        this.lastSavedColorSchemeName_ = this.currentColorScheme?.name;
       }
 
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
       // We also need the velocity data if we are trying to colorizing that
-      let satVel: Float32Array | null = null;
-      if (this.currentColorScheme === this.velocity) {
-        satVel = this.currentColorScheme === this.velocity ? dotsManagerInstance.getSatVel() : null;
-      }
+      const satVel: Float32Array | null = this.currentColorScheme?.name === this.velocity.name ? dotsManagerInstance.getSatVel() : null;
 
       // Reset Which Sensor we are coloring before the loop begins
       if (firstDotToColor === 0) {
@@ -225,10 +233,10 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       // Velocity is a special case - we need to know the velocity of each satellite
-      if (this.currentColorScheme === this.velocity) {
-        this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.getSatsFromSatData(), satVel, params);
+      if (this.currentColorScheme?.name === this.velocity.name) {
+        this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, satVel, params);
       } else {
-        this.calculateBufferData_(firstDotToColor, lastDotToColor, catalogManagerInstance.getSatsFromSatData(), params);
+        this.calculateBufferData_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, params);
       }
 
       // If we don't do this then everytime the color refreshes it will undo any effect being applied outside of this loop
@@ -240,7 +248,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  countries(sat: SatObject): ColorInformation {
+  countries(obj: BaseObject): ColorInformation {
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
@@ -248,24 +256,24 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    const checkFacility = this.checkFacility_(sat);
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.type === SpaceObjectType.PAYLOAD) {
+    if (obj.type === SpaceObjectType.PAYLOAD) {
       if (!settingsManager.isShowPayloads) {
         return {
           color: this.colorTheme.deselected,
           pickable: Pickable.No,
         };
       }
-    } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
+    } else if (obj.type === SpaceObjectType.ROCKET_BODY) {
       if (!settingsManager.isShowRocketBodies) {
         return {
           color: this.colorTheme.deselected,
           pickable: Pickable.No,
         };
       }
-    } else if (sat.type === SpaceObjectType.DEBRIS) {
+    } else if (obj.type === SpaceObjectType.DEBRIS) {
       if (!settingsManager.isShowDebris) {
         return {
           color: this.colorTheme.deselected,
@@ -274,21 +282,21 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       }
     }
 
-    return this.checkCountry_(sat);
+    return this.checkCountry_(obj);
   }
 
-  default(sat: SatObject): ColorInformation {
+  default(obj: BaseObject): ColorInformation {
     // NOTE: The order of these checks is important
     // Grab reference to outside managers for their functions
     // @ts-expect-error
-    if (sat.type === SpaceObjectType.NOTIONAL && window.noNotional) {
+    if (obj.isNotional() && window.noNotional) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+    if (obj.isStar()) return this.starColor_(obj as Star);
 
     // If we are in astronomy mode, hide everything that isn't a star (above)
     if (keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY) {
@@ -298,67 +306,41 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    const checkFacility = this.checkFacility_(sat);
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.marker) return this.getMarkerColor_(sat);
+    if (obj.isMarker()) return this.getMarkerColor_(obj);
 
-    if (sat.isRadarData && !this.objectTypeFlags.radarData) {
+    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (sat.isRadarData) {
-      if (sat.missileComplex && sat.missileComplex >= 0) {
-        // || sat.missileObject >= 0
-        return {
-          color: this.colorTheme.radarDataMissile,
-          pickable: Pickable.Yes,
-        };
-      }
-      if (sat.sccNum && parseInt(sat.sccNum) >= 0) {
-        return {
-          color: this.colorTheme.radarDataSatellite,
-          pickable: Pickable.Yes,
-        };
-      }
-      return {
-        color: this.colorTheme.radarData,
-        pickable: Pickable.Yes,
-      };
-    }
-
-    if (sat.static && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
-      return {
-        color: this.colorTheme.deselected,
-        pickable: Pickable.No,
-      };
-    }
-    if (sat.static) {
+    if (obj.isSensor()) {
       return {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
     }
 
-    if (sat.missile) return this.missileColor_(sat);
+    if (obj.isMissile()) return this.missileColor_(obj as MissileObject);
 
-    if (sat.type === SpaceObjectType.PAYLOAD) {
+    if (obj.type === SpaceObjectType.PAYLOAD) {
       if (!settingsManager.isShowPayloads) {
         return {
           color: this.colorTheme.deselected,
           pickable: Pickable.No,
         };
       }
-    } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
+    } else if (obj.type === SpaceObjectType.ROCKET_BODY) {
       if (!settingsManager.isShowRocketBodies) {
         return {
           color: this.colorTheme.deselected,
           pickable: Pickable.No,
         };
       }
-    } else if (sat.type === SpaceObjectType.DEBRIS) {
+    } else if (obj.type === SpaceObjectType.DEBRIS) {
       if (!settingsManager.isShowDebris) {
         return {
           color: this.colorTheme.deselected,
@@ -370,6 +352,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const sat = obj as DetailedSatellite;
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.PAYLOAD &&
@@ -457,7 +440,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       }
     }
 
-    let color: [number, number, number, number] = [0, 0, 0, 0];
+    let color: [number, number, number, number];
     if (sat.country === 'ANALSAT') {
       color = this.colorTheme.analyst;
     } else if (sat.type === SpaceObjectType.PAYLOAD) {
@@ -491,19 +474,20 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
   }
 
-  geo(sat: SatObject): ColorInformation {
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+  geo(obj: BaseObject): ColorInformation {
+    if (obj.isStar()) return this.starColor_(obj as Star);
 
-    const checkFacility = this.checkFacility_(sat);
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.static) {
+    if (obj.isSensor()) {
       return {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
     }
 
+    const sat = obj as DetailedSatellite;
     if (sat.perigee < 35000) {
       return {
         color: this.colorTheme.transparent,
@@ -531,13 +515,13 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  group(sat: SatObject): ColorInformation {
+  group(obj: BaseObject): ColorInformation {
     // Show Things in the Group
-    if (sat.isInGroup) {
-      if (sat.missile) return this.missileColor_(sat);
+    if (keepTrackApi.getGroupsManager().selectedGroup.hasObject(obj.id)) {
+      if (obj.isMissile()) return this.missileColor_(obj as MissileObject);
 
-      let color: [number, number, number, number] = [0, 0, 0, 0];
-      switch (sat.type) {
+      let color: [number, number, number, number];
+      switch (obj.type) {
         case SpaceObjectType.PAYLOAD:
           color = this.colorTheme.payload;
           break;
@@ -563,9 +547,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    if (sat.marker) return this.getMarkerColor_(sat);
+    if (obj.isMarker()) return this.getMarkerColor_(obj);
 
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+    if (obj.isStar()) return this.starColor_(obj as Star);
 
     // Hide Everything Else
     return {
@@ -574,7 +558,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
   }
 
-  groupCountries(sat: SatObject): ColorInformation {
+  groupCountries(obj: BaseObject): ColorInformation {
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
@@ -582,11 +566,11 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    if (sat.isInGroup) {
-      return this.checkCountry_(sat);
+    if (keepTrackApi.getGroupsManager().selectedGroup.hasObject(obj.id)) {
+      return this.checkCountry_(obj);
     }
 
-    if (sat.marker) return this.getMarkerColor_(sat);
+    if (obj.isMarker()) return this.getMarkerColor_(obj);
 
     return {
       color: this.colorTheme.deselected,
@@ -637,9 +621,6 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       densityMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       densityLow: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       densityOther: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      radarData: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      radarDataSatellite: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      radarDataMissile: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       analyst: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       facility: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       missile: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
@@ -672,14 +653,20 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       event: KeepTrackApiEvents.onCruncherReady,
       cbName: 'colorSchemeManager',
       cb: (): void => {
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
         if (cachedColorScheme) {
           LegendManager.change(cachedColorScheme);
           const possibleColorScheme = this[cachedColorScheme];
           this.currentColorScheme = possibleColorScheme || this.default;
+          if (this.currentColorScheme?.name === this.sunlight.name) {
+            catalogManagerInstance.satCruncher.postMessage({
+              isSunlightView: true,
+              typ: CruncerMessageTypes.SUNLIGHT_VIEW,
+            });
+          }
         }
-
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         // Generate some buffers
         this.colorData = new Float32Array(catalogManagerInstance.numSats * 4);
@@ -691,36 +678,40 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     });
   }
 
-  isDebrisOff(sat: SatObject) {
-    return sat.type === 3 && this.objectTypeFlags.debris === false;
+  isDebrisOff(obj: BaseObject) {
+    return obj.type === 3 && this.objectTypeFlags.debris === false;
   }
 
-  isInViewOff(sat: SatObject) {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    return dotsManagerInstance.inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === false;
+  isInView(obj: BaseObject) {
+    return keepTrackApi.getDotsManager().inViewData[obj.id] === 1 && this.objectTypeFlags.inFOV === true;
   }
 
-  isPayloadOff(sat: SatObject) {
-    return sat.type === 1 && this.objectTypeFlags.payload === false;
+  isInViewOff(obj: BaseObject) {
+    return keepTrackApi.getDotsManager().inViewData[obj.id] === 1 && this.objectTypeFlags.inFOV === false;
   }
 
-  isRocketBodyOff(sat: SatObject) {
-    return sat.type === 2 && this.objectTypeFlags.rocketBody === false;
+  isPayloadOff(obj: BaseObject) {
+    return obj.type === 1 && this.objectTypeFlags.payload === false;
   }
 
-  leo(sat: SatObject): ColorInformation {
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+  isRocketBodyOff(obj: BaseObject) {
+    return obj.type === 2 && this.objectTypeFlags.rocketBody === false;
+  }
 
-    const checkFacility = this.checkFacility_(sat);
+  leo(obj: BaseObject): ColorInformation {
+    if (obj.isStar()) return this.starColor_(obj as Star);
+
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.static) {
+    if (obj.isSensor()) {
       return {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
     }
 
+    const sat = obj as DetailedSatellite;
     if (sat.apogee > 2000) {
       return {
         color: this.colorTheme.transparent,
@@ -728,7 +719,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    if (keepTrackApi.getDotsManager().inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
+    if (this.isInView(sat)) {
       return {
         color: this.colorTheme.inFOV,
         pickable: Pickable.Yes,
@@ -748,36 +739,37 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  lostobjects(sat: SatObject): ColorInformation {
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+  lostobjects(obj: BaseObject): ColorInformation {
+    if (obj.isStar()) return this.starColor_(obj as Star);
 
-    const checkFacility = this.checkFacility_(sat);
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.static) {
+    if (obj.isSensor()) {
       return {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
     }
-    if (sat.missile) {
+    if (obj.isMissile()) {
       return {
         color: this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     }
 
+    const sat = obj as DetailedSatellite;
     const now = new Date();
     const jday = getDayOfYear(now);
     const year = now.getUTCFullYear().toString().substr(2, 2);
-    let daysold;
-    if (sat.TLE1.substr(18, 2) === year) {
-      daysold = jday - parseInt(sat.TLE1.substr(20, 3));
+    let daysold: Days;
+    if (sat.tle1.substr(18, 2) === year) {
+      daysold = (jday - parseInt(sat.tle1.substr(20, 3))) as Days;
     } else {
-      daysold = jday - parseInt(sat.TLE1.substr(20, 3)) + parseInt(sat.TLE1.substr(17, 2)) * 365;
+      daysold = (jday - parseInt(sat.tle1.substr(20, 3)) + parseInt(sat.tle1.substr(17, 2)) * 365) as Days;
     }
     // NOTE: This will need to be adjusted if Alpha-5 satellites become numbers instead of alphanumeric
-    // TODO: Readd this idea - (satellite.obsmaxrange !== 0 && sat.perigee > satellite.obsmaxrange)
+    // TODO: Readd this idea - (satellite.maxRng !== 0 && sat.perigee > satellite.maxRng)
     if ((sat.sccNum && parseInt(sat.sccNum) >= 70000) || daysold < settingsManager.daysUntilObjectLost) {
       return {
         color: this.colorTheme.transparent,
@@ -792,7 +784,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  neighbors(sat: SatObject, params: any): ColorInformation {
+  neighbors(obj: BaseObject, params: any): ColorInformation {
     // NOSONAR
     // Hover and Select code might not pass params, so we will handle that here
     // TODO: Hover and select code should be refactored to pass params
@@ -805,24 +797,25 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+    if (obj.isStar()) return this.starColor_(obj as Star);
 
-    const checkFacility = this.checkFacility_(sat);
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.static) {
+    if (obj.isSensor()) {
       return {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
     }
-    if (sat.missile) {
+    if (obj.isMissile()) {
       return {
         color: this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     }
 
+    const sat = obj as DetailedSatellite;
     if (sat.type === SpaceObjectType.PAYLOAD) {
       if (this.objectTypeFlags.densityPayload) {
         return {
@@ -870,9 +863,9 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
   }
 
-  onlyFOV(sat: SatObject): ColorInformation {
+  onlyFOV(obj: BaseObject): ColorInformation {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    if (dotsManagerInstance.inViewData[sat.id] === 1) {
+    if (dotsManagerInstance.inViewData[obj.id] === 1) {
       return {
         color: this.colorTheme.inFOV,
         pickable: Pickable.Yes,
@@ -885,7 +878,10 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  rcs(sat: SatObject): ColorInformation {
+  rcs(obj: BaseObject): ColorInformation {
+    if (!obj.isSatellite) return { color: this.colorTheme.transparent, pickable: Pickable.No };
+
+    const sat = obj as DetailedSatellite;
     if (!sat.rcs) {
       return {
         color: this.colorTheme.rcsUnknown,
@@ -893,56 +889,55 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       };
     }
 
-    const rcs: number = parseFloat(sat.rcs);
-    if (rcs < 0.1 && this.objectTypeFlags.rcsSmall === false) {
+    if (sat.rcs < 0.1 && this.objectTypeFlags.rcsSmall === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (rcs >= 0.1 && rcs <= 1 && this.objectTypeFlags.rcsMed === false) {
+    if (sat.rcs >= 0.1 && sat.rcs <= 1 && this.objectTypeFlags.rcsMed === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (rcs > 1 && this.objectTypeFlags.rcsLarge === false) {
+    if (sat.rcs > 1 && this.objectTypeFlags.rcsLarge === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if ((typeof rcs === 'undefined' || isNaN(rcs) || rcs === null || typeof sat.rcs === 'undefined' || sat.rcs === 'N/A') && this.objectTypeFlags.rcsUnknown === false) {
+    if (sat.rcs === null && this.objectTypeFlags.rcsUnknown === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (rcs < 0.01) {
+    if (sat.rcs < 0.01) {
       return {
         color: this.colorTheme.rcsXXSmall,
         pickable: Pickable.Yes,
       };
     }
-    if (rcs >= 0.01 && rcs <= 0.05) {
+    if (sat.rcs >= 0.01 && sat.rcs <= 0.05) {
       return {
         color: this.colorTheme.rcsXSmall,
         pickable: Pickable.Yes,
       };
     }
-    if (rcs >= 0.05 && rcs <= 0.1) {
+    if (sat.rcs >= 0.05 && sat.rcs <= 0.1) {
       return {
         color: this.colorTheme.rcsSmall,
         pickable: Pickable.Yes,
       };
     }
-    if (rcs >= 0.1 && rcs <= 1) {
+    if (sat.rcs >= 0.1 && sat.rcs <= 1) {
       return {
         color: this.colorTheme.rcsMed,
         pickable: Pickable.Yes,
       };
     }
-    if (rcs > 1) {
+    if (sat.rcs > 1) {
       return {
         color: this.colorTheme.rcsLarge,
         pickable: Pickable.Yes,
@@ -955,16 +950,17 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     };
   }
 
-  confidence(sat: SatObject): ColorInformation {
-    if (!sat.TLE1) {
+  confidence(obj: BaseObject): ColorInformation {
+    if (!obj.isSatellite()) {
       return {
         color: this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     }
+    const sat = obj as DetailedSatellite;
 
-    let confidenceScore = parseInt(sat.TLE1.substring(64, 65)) || 0;
-    let pickable = Pickable.No;
+    let confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
+    let pickable: Pickable;
     let color: [number, number, number, number];
     if (confidenceScore >= 7 && this.objectTypeFlags.confidenceHi) {
       color = this.colorTheme.confidenceHi;
@@ -991,7 +987,6 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
   resetObjectTypeFlags() {
     this.objectTypeFlags.payload = true;
-    this.objectTypeFlags.radarData = true;
     this.objectTypeFlags.rocketBody = true;
     this.objectTypeFlags.debris = true;
     this.objectTypeFlags.facility = true;
@@ -1026,7 +1021,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     this.objectTypeFlags.ageLost = true;
   }
 
-  async setColorScheme(scheme: ((sat: SatObject, params?: any) => ColorInformation) | null, isForceRecolor?: boolean) {
+  async setColorScheme(scheme: ((obj: BaseObject, params?: any) => ColorInformation) | null, isForceRecolor?: boolean) {
     try {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
@@ -1047,21 +1042,24 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   }
 
   setToGroupColorScheme() {
-    if (this.currentColorScheme === this.countries || this.currentColorScheme === this.groupCountries) {
+    if (this.currentColorScheme?.name === this.countries.name || this.currentColorScheme?.name === this.groupCountries.name) {
       this.setColorScheme(this.groupCountries);
     } else {
       this.setColorScheme(this.group);
     }
   }
 
-  smallsats(sat: SatObject): ColorInformation {
-    if (sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.satSmall === false) {
+  smallsats(obj: BaseObject): ColorInformation {
+    if (!obj.isSatellite()) return { color: this.colorTheme.transparent, pickable: Pickable.No };
+
+    const sat = obj as DetailedSatellite;
+    if (sat.isPayload() && this.objectTypeFlags.satSmall === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (sat.rcs && parseFloat(sat.rcs) < 0.1 && sat.type === SpaceObjectType.PAYLOAD) {
+    if (sat.rcs && sat.rcs < 0.1 && sat.type === SpaceObjectType.PAYLOAD) {
       return {
         color: this.colorTheme.satSmall,
         pickable: Pickable.Yes,
@@ -1074,82 +1072,78 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  sunlight(sat: SatObject): ColorInformation {
-    if (sat.static && (sat.type === SpaceObjectType.LAUNCH_FACILITY || sat.type === SpaceObjectType.CONTROL_FACILITY) && this.objectTypeFlags.facility === false) {
-      return {
-        color: this.colorTheme.deselected,
-        pickable: Pickable.No,
-      };
-    }
-
-    const checkFacility = this.checkFacility_(sat);
+  sunlight(obj: BaseObject): ColorInformation {
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+    if (obj.isStar()) return this.starColor_(obj as Star);
+    if (obj.isMarker()) return this.getMarkerColor_(obj as Marker);
 
-    if (sat.marker) return this.getMarkerColor_(sat);
-
-    if (sat.static && this.objectTypeFlags.sensor === false) {
-      return {
-        color: this.colorTheme.deselected,
-        pickable: Pickable.No,
-      };
-    }
-    if (sat.static) {
-      return {
-        color: this.colorTheme.sensor,
-        pickable: Pickable.Yes,
-      };
-    }
-
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    if (sat.missile && dotsManagerInstance.inViewData[sat.id] === 0) {
-      return {
-        color: this.colorTheme.missile,
-        pickable: Pickable.Yes,
-      };
-    }
-    if (sat.missile && dotsManagerInstance.inViewData[sat.id] === 1) {
-      return {
-        color: this.colorTheme.missileInview,
-        pickable: Pickable.Yes,
-      };
-    }
-
-    if (dotsManagerInstance.inViewData[sat.id] === 1 && dotsManagerInstance.inSunData[sat.id] > 0 && this.objectTypeFlags.inFOV === true) {
-      if (typeof sat.vmag == 'undefined') {
+    if (obj.isSensor()) {
+      if (this.objectTypeFlags.sensor === false) {
         return {
           color: this.colorTheme.deselected,
           pickable: Pickable.No,
         };
+      } else {
+        return {
+          color: this.colorTheme.sensor,
+          pickable: Pickable.Yes,
+        };
       }
+    }
+
+    if (obj.isMissile()) return this.missileColor_(obj as MissileObject);
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+
+    // In FOV
+    if (dotsManagerInstance.inViewData?.[obj.id] === 1 && dotsManagerInstance.inSunData[obj.id] > 0 && this.objectTypeFlags.inFOV === true) {
+      if (dotsManagerInstance.inSunData[obj.id] == 0) {
+        if (this.objectTypeFlags.satLow === true) {
+          return {
+            color: this.colorTheme.umbral,
+            pickable: Pickable.No,
+          };
+        } else {
+          return {
+            color: this.colorTheme.deselected,
+            pickable: Pickable.No,
+          };
+        }
+      }
+      // TODO: Work out a system for vmag filtering
       return {
         color: this.colorTheme.sunlightInview,
         pickable: Pickable.Yes,
       };
     }
 
-    if (dotsManagerInstance.inViewData[sat.id] === 0 && typeof sat.vmag !== 'undefined') {
+    // Not in FOV
+    const sat = obj as DetailedSatellite;
+    if (dotsManagerInstance.inViewData[sat.id] === 0) {
       if (dotsManagerInstance.inSunData[sat.id] == 2 && this.objectTypeFlags.satHi === true) {
-        // If vmag is undefined color it like a star
         if (sat.vmag < 3) {
           return {
-            color: this.colorTheme.starHi,
+            color: this.colorTheme.sunlight100,
             pickable: Pickable.Yes,
           };
         }
         if (sat.vmag <= 4.5) {
           return {
-            color: this.colorTheme.starMed,
+            color: this.colorTheme.sunlight80,
             pickable: Pickable.Yes,
           };
         }
         if (sat.vmag > 4.5) {
           return {
-            color: this.colorTheme.starLow,
+            color: this.colorTheme.sunlight60,
             pickable: Pickable.Yes,
           };
         }
+        return {
+          color: this.colorTheme.sunlight60,
+          pickable: Pickable.Yes,
+        };
       }
 
       if (dotsManagerInstance.inSunData[sat.id] == 1 && this.objectTypeFlags.satMed === true) {
@@ -1162,34 +1156,35 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       if (dotsManagerInstance.inSunData[sat.id] == 0 && this.objectTypeFlags.satLow === true) {
         return {
           color: this.colorTheme.umbral,
-          pickable: Pickable.Yes,
+          pickable: Pickable.No,
         };
       }
-      // Not in the vmag database
+      // The color was deselected
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
+    // The color was deselected
     return {
       color: this.colorTheme.deselected,
       pickable: Pickable.No,
     };
   }
 
-  updateColorScheme(scheme: ColorRuleSet) {
+  updateColorScheme(scheme: (obj: BaseObject, params?: any) => ColorInformation) {
     this.currentColorScheme = scheme;
   }
 
-  velocity(sat: SatObject): ColorInformation {
-    if (sat.static && sat.type === SpaceObjectType.STAR) return this.starColor_(sat);
+  velocity(obj: BaseObject): ColorInformation {
+    if (obj.isStar()) return this.starColor_(obj as Star);
 
-    const checkFacility = this.checkFacility_(sat);
+    const checkFacility = this.checkFacility_(obj);
     if (checkFacility) return checkFacility;
 
     // Sensors
-    if (sat.static) {
+    if (obj.isSensor()) {
       return {
         color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
@@ -1197,7 +1192,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
 
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    if (dotsManagerInstance.inViewData[sat.id] === 1) {
+    if (dotsManagerInstance.inViewData[obj.id] === 1) {
       if (this.objectTypeFlags.inViewAlt === false) {
         return {
           color: this.colorTheme.deselected,
@@ -1210,36 +1205,27 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
         };
       }
     }
-    if (sat.velocity.total > 5.5 && this.objectTypeFlags.velocityFast === false) {
+    if (obj.totalVelocity > 5.5 && this.objectTypeFlags.velocityFast === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (sat.velocity.total >= 2.5 && sat.velocity.total <= 5.5 && this.objectTypeFlags.velocityMed === false) {
+    if (obj.totalVelocity >= 2.5 && obj.totalVelocity <= 5.5 && this.objectTypeFlags.velocityMed === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    if (sat.velocity.total < 2.5 && this.objectTypeFlags.velocitySlow === false) {
+    if (obj.totalVelocity < 2.5 && this.objectTypeFlags.velocitySlow === false) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
-    /*
-    NOTE: Removed variable declaration to reduce garbage collection
 
-    const gradientAmt = Math.min(sat.velocity.total / 15, 1.0);
-    const velGradient = [1.0 - gradientAmt, gradientAmt, 0.0, 1.0];
     return {
-      color: velGradient
-      pickable: Pickable.Yes,
-    };
-    */
-    return {
-      color: [1.0 - Math.min(sat.velocity.total / 15, 1.0), Math.min(sat.velocity.total / 15, 1.0), 0.0, 1.0],
+      color: [1.0 - Math.min(obj.totalVelocity / 15, 1.0), Math.min(obj.totalVelocity / 15, 1.0), 0.0, 1.0],
       pickable: Pickable.Yes,
     };
   }
@@ -1268,14 +1254,14 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   private calculateBufferDataVelocity_(
     firstDotToColor: number,
     lastDotToColor: number,
-    satData: SatObject[],
+    satData: BaseObject[],
     satVel: any,
     params: { year: string; jday: number; orbitDensity: any[]; orbitDensityMax: number }
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
-      satData[i].velocity.total = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
+      satData[i].totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
 
-      let colors = StandardColorSchemeManager.getColorIfDisabledSat_(satData, i);
+      let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
       colors ??= this.currentColorScheme(satData[i], params);
 
       this.colorData[i * 4] = colors.color[0]; // R
@@ -1289,11 +1275,11 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
   private calculateBufferData_(
     firstDotToColor: number,
     lastDotToColor: number,
-    satData: SatObject[],
+    satData: BaseObject[],
     params: { year: string; jday: number; orbitDensity: any[]; orbitDensityMax: number }
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
-      let colors = StandardColorSchemeManager.getColorIfDisabledSat_(satData, i);
+      let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
       colors ??= this.currentColorScheme(satData[i], params);
 
       this.colorData[i * 4] = colors.color[0]; // R
@@ -1304,40 +1290,42 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  private static getColorIfDisabledSat_(satData: SatObject[], i: number): ColorInformation | null {
+  private static getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
     let colors: ColorInformation | null = null;
 
-    if (!settingsManager.isShowNotionalSats && satData[i].type === SpaceObjectType.NOTIONAL) {
+    const sat = objectData[i] as DetailedSatellite;
+
+    if (!settingsManager.isShowNotionalSats && objectData[i].isNotional()) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowLeoSats && satData[i].apogee < 6000) {
+    if (!settingsManager.isShowLeoSats && sat.apogee < 6000) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowStarlinkSats && satData[i].name?.includes('STARLINK')) {
+    if (!settingsManager.isShowStarlinkSats && objectData[i].name?.includes('STARLINK')) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowHeoSats && (satData[i].eccentricity >= 0.1 || (satData[i].apogee >= 6000 && satData[i].perigee < 6000))) {
+    if (!settingsManager.isShowHeoSats && (sat.eccentricity >= 0.1 || (sat.apogee >= 6000 && sat.perigee < 6000))) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowMeoSats && satData[i].perigee <= 32000 && satData[i].perigee >= 6000) {
+    if (!settingsManager.isShowMeoSats && sat.perigee <= 32000 && sat.perigee >= 6000) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowGeoSats && satData[i].perigee > 32000) {
+    if (!settingsManager.isShowGeoSats && sat.perigee > 32000) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
@@ -1369,7 +1357,15 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     return params;
   }
 
-  private checkCountry_(sat: SatObject): ColorInformation {
+  private checkCountry_(obj: BaseObject): ColorInformation {
+    if (this.objectTypeFlags.countryOther === false || !obj.isSatellite()) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
+    const sat = obj as DetailedSatellite;
     switch (sat.country) {
       case 'United States of America':
       case 'United States':
@@ -1420,20 +1416,14 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
           };
         }
       default:
-        if (this.objectTypeFlags.countryOther === false || !sat.TLE1) {
-          return {
-            color: this.colorTheme.deselected,
-            pickable: Pickable.No,
-          };
-        }
+        return {
+          color: this.colorTheme.countryOther,
+          pickable: Pickable.Yes,
+        };
     }
-    return {
-      color: this.colorTheme.countryOther,
-      pickable: Pickable.Yes,
-    };
   }
 
-  private checkFacility_(sat: SatObject): ColorInformation | null {
+  private checkFacility_(sat: BaseObject): ColorInformation | null {
     // Let's see if we can determine color based on the object type
     switch (sat.type) {
       case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
@@ -1457,6 +1447,8 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
       case SpaceObjectType.LAUNCH_AGENCY:
       case SpaceObjectType.LAUNCH_SITE:
       case SpaceObjectType.LAUNCH_POSITION:
+      case SpaceObjectType.LAUNCH_FACILITY:
+      case SpaceObjectType.CONTROL_FACILITY:
         // If the facility flag is off then we don't want to show this
         if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
@@ -1475,15 +1467,15 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     return null;
   }
 
-  private getMarkerColor_(sat: SatObject): ColorInformation {
+  private getMarkerColor_(marker: Marker): ColorInformation {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     // This doesn't apply to sat overfly mode
-    if (!settingsManager.isSatOverflyModeOn) {
+    if (!keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn) {
       // But it doesn't work if we don't have marker info from the sensor
       if (typeof this.iSensor !== 'undefined' && typeof catalogManagerInstance.sensorMarkerArray !== 'undefined') {
         // if we have sensor markers enabled then we need to rotate colors as the marker numbers increase
-        if (sat.id === catalogManagerInstance.sensorMarkerArray[this.iSensor + 1]) {
+        if (marker.id >= catalogManagerInstance.sensorMarkerArray[this.iSensor + 1]) {
           this.iSensor++;
         }
       }
@@ -1504,10 +1496,10 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     }
   }
 
-  private missileColor_(sat: SatObject): ColorInformation {
+  private missileColor_(missile: MissileObject): ColorInformation {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 0) {
+    if (dotsManagerInstance.inViewData?.[missile.id] === 0) {
       if (this.objectTypeFlags.missile === false) {
         return {
           color: this.colorTheme.deselected,
@@ -1520,7 +1512,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
         };
       }
     } else {
-      if (this.objectTypeFlags.missileInview === false || !sat.active) {
+      if (this.objectTypeFlags.missileInview === false || !missile.active) {
         return {
           color: this.colorTheme.deselected,
           pickable: Pickable.No,
@@ -1555,7 +1547,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
 
     if (!isForceRecolor) {
       switch (this.currentColorScheme) {
-        case StandardColorSchemeManager.apogee:
+        case ColorSchemeManager.apogee:
         case this.smallsats:
         case this.confidence:
         case this.rcs:
@@ -1627,7 +1619,7 @@ export class StandardColorSchemeManager implements ColorSchemeManager {
     this.colorData[hovSat * 4 + 3] = settingsManager.hoverColor[3];
   }
 
-  private starColor_(sat: SatObject): ColorInformation {
+  private starColor_(sat: Star): ColorInformation {
     if (!sat.vmag) {
       return {
         color: this.colorTheme.deselected,
@@ -1704,9 +1696,6 @@ export interface ColorSchemeColorMap {
   marker: [number, number, number, number][];
   deselected: [number, number, number, number];
   inFOVAlt: [number, number, number, number];
-  radarData: [number, number, number, number];
-  radarDataMissile: [number, number, number, number];
-  radarDataSatellite: [number, number, number, number];
   payload: [number, number, number, number];
   rocketBody: [number, number, number, number];
   debris: [number, number, number, number];

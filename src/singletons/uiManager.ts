@@ -25,14 +25,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorInformation, ColorRuleSet, KeepTrackApiEvents, SatObject, ToastMsgType, UiManager } from '@app/interfaces';
+import { ColorRuleSet, KeepTrackApiEvents, ToastMsgType, UiManager } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
-import { Milliseconds } from 'ootk';
+import { BaseObject, DetailedSatellite, MILLISECONDS_PER_SECOND, Milliseconds } from 'ootk';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
 import { closeColorbox } from '../lib/colorbox';
-import { MILLISECONDS_PER_SECOND } from '../lib/constants';
 import { getClass } from '../lib/get-class';
 import { getEl, hideEl, setInnerHtml, showEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
@@ -56,7 +56,7 @@ export class StandardUiManager implements UiManager {
   isCurrentlyTyping = false;
   isUiVisible = false;
   lastBoxUpdateTime = 0;
-  lastColorScheme: { (sat: SatObject, params?: any): ColorInformation; (sat: SatObject, params?: any): ColorInformation; name?: any };
+  lastColorScheme: ColorRuleSet;
   lastNextPassCalcSatId = 0;
   lastNextPassCalcSensorShortName: string;
   lastToast: string;
@@ -137,27 +137,27 @@ export class StandardUiManager implements UiManager {
     switch (type) {
       case 'standby':
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
-        keepTrackApi.getSoundManager()?.play('standby');
+        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case 'normal':
         toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
-        keepTrackApi.getSoundManager()?.play('standby');
+        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case 'caution':
         toastMsg.$el[0].style.background = 'var(--statusDarkCaution)';
-        keepTrackApi.getSoundManager()?.play('standby');
+        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case 'serious':
         toastMsg.$el[0].style.background = 'var(--statusDarkSerious)';
-        keepTrackApi.getSoundManager()?.play('standby');
+        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case 'critical':
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
-        keepTrackApi.getSoundManager()?.play('standby');
+        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case 'error':
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
-        keepTrackApi.getSoundManager()?.play('error');
+        keepTrackApi.getSoundManager()?.play(SoundNames.ERROR);
         break;
     }
 
@@ -450,9 +450,10 @@ export class StandardUiManager implements UiManager {
   /**
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks
    */
-  updateSelectBox(realTime: Milliseconds, lastBoxUpdateTime: Milliseconds, sat: SatObject): void {
-    if (typeof sat === 'undefined' || sat.static) return;
+  updateSelectBox(realTime: Milliseconds, lastBoxUpdateTime: Milliseconds, obj: BaseObject): void {
+    if (!obj || obj.isStatic()) return;
 
+    const sat = obj as DetailedSatellite;
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
       keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, sat);
       keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;

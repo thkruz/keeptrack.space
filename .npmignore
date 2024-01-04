@@ -63,7 +63,6 @@ jspm_packages/
 src/social
 src/social/*
 src/textures-extra
-src/radarData/radar*
 src/admin
 src/tle/2006*
 src/tle/TLE.json.bak
@@ -87,7 +86,6 @@ embed
 
 # Work In Progress
 src/wip/
-src/satSet/radarDataManager.js
 
 # nyc Output
 .nyc_output

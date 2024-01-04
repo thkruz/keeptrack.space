@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -7,8 +7,10 @@ import { showLoading } from '@app/lib/showLoading';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import lookanglesPng from '@public/img/icons/lookangles.png';
+import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 export class LookAnglesPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Look Angles';
   dependencies = [SelectSatManager.PLUGIN_NAME];
@@ -117,6 +119,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         });
 
         getEl('export-look-angles')?.addEventListener('click', () => {
+          keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
           saveCsv(this.lastlooksArray_, 'Look-Angles');
         });
 
@@ -130,8 +133,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
-        this.checkIfCanBeEnabled_(sat);
+      cb: (obj: BaseObject) => {
+        this.checkIfCanBeEnabled_(obj);
       },
     });
 
@@ -155,11 +158,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     });
   }
 
-  private checkIfCanBeEnabled_(sat: SatObject) {
-    if (sat?.TLE1 && keepTrackApi.getSensorManager().isSensorSelected()) {
+  private checkIfCanBeEnabled_(obj: BaseObject) {
+    if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
       this.setBottomIconToEnabled();
-      if (this.isMenuButtonActive && sat) {
-        this.getlookangles_(sat);
+      if (this.isMenuButtonActive && obj) {
+        this.getlookangles_(obj as DetailedSatellite);
       }
     } else {
       if (this.isMenuButtonActive) {
@@ -172,13 +175,14 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   private refreshSideMenuData_ = (): void => {
     if (this.isMenuButtonActive) {
       showLoading(() => {
-        const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-        this.getlookangles_(sat);
+        const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+        if (!obj.isSatellite()) return;
+        this.getlookangles_(obj as DetailedSatellite);
       });
     }
   };
 
-  private getlookangles_(sat: SatObject, sensors?: SensorObject[]): TearrData[] {
+  private getlookangles_(sat: DetailedSatellite, sensors?: DetailedSensor[]): TearrData[] {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     if (!sensors) {

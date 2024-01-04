@@ -1,12 +1,12 @@
-import { KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { StringPad } from '@app/lib/stringPad';
 
+import { CatalogManager } from '@app/singletons/catalog-manager';
 import { FormatTle } from '@app/static/format-tle';
 import { StringifiedNumber } from '@app/static/sat-math';
-import { Sgp4 } from 'ootk';
+import { BaseObject, RAD2DEG, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -30,9 +30,9 @@ export class OrbitReferences extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat?: SatObject) => {
+      cb: (obj?: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (!sat) {
+        if (!obj) {
           return;
         }
 
@@ -56,28 +56,35 @@ export class OrbitReferences extends KeepTrackPlugin {
 
     // Determine which satellite is selected
     const sat = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
-    let satNum = catalogManagerInstance.analSatSet[0].id + 20000; // Find Analyst satellite 10,000
+    if (!sat) return;
+
     let searchStr = '';
 
     // Add the satellites
-    const satrec = Sgp4.createSatrec(sat.TLE1, sat.TLE2);
+    const satrec = Sgp4.createSatrec(sat.tle1, sat.tle2);
     const ecen = satrec.ecco.toFixed(7).substr(2, 7);
     const rasc = <StringifiedNumber>(satrec.nodeo * RAD2DEG).toString();
     const argPe = <StringifiedNumber>(satrec.argpo * RAD2DEG).toString();
-    const inc = <StringifiedNumber>sat.TLE2.substr(8, 8);
-    const meanmo = <StringifiedNumber>sat.TLE2.substr(52, 10);
-    const epochyr = sat.TLE1.substr(18, 2);
-    const epochday = sat.TLE1.substr(20, 12);
-    const intl = sat.TLE1.substr(9, 8);
-    const sccNum = StringPad.pad0(sat.TLE1.substr(2, 5).trim(), 5);
+    const inc = <StringifiedNumber>sat.tle2.substr(8, 8);
+    const meanmo = <StringifiedNumber>sat.tle2.substr(52, 10);
+    const epochyr = sat.tle1.substr(18, 2);
+    const epochday = sat.tle1.substr(20, 12);
+    const intl = sat.tle1.substr(9, 8);
+    const sccNum = StringPad.pad0(sat.tle1.substr(2, 5).trim(), 5);
 
     const period = 1440.0 / parseFloat(meanmo);
 
     let j = 0;
     for (let i = 0; i < 360; i++) {
       const meana = <StringifiedNumber>StringPad.pad0(j.toFixed(4), 8);
-      const { TLE1, TLE2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: sccNum });
-      searchStr += catalogManagerInstance.insertNewAnalystSatellite(TLE1, TLE2, satNum + i, (100000 + i).toString()).sccNum.toString() + ',';
+      const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: sccNum });
+      // Get the next available ID
+      const a5 = FormatTle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString().padStart(5, '0'));
+      const id = catalogManagerInstance.sccNum2Id(a5);
+      const analystSat = catalogManagerInstance.addAnalystSat(tle1, tle2, id, a5);
+      if (analystSat) {
+        searchStr += analystSat.sccNum.toString() + ',';
+      }
       j += (360 / period) * 4;
       if (j >= 360) break;
     }

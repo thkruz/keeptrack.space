@@ -1,34 +1,51 @@
-import * as Ootk from 'ootk';
-import { Degrees, Kilometers, Radians } from 'ootk';
+import { Degrees, Kilometers, Radians, SatelliteRecord } from 'ootk';
+import { ZoomValue } from 'ootk/lib/objects/DetailedSensor';
 import { SensorObjectCruncher } from '../interfaces';
+import { CruncerMessageTypes, MarkerMode } from './positionCruncher';
 
 // //////////////////////////////////////////////////////////////////////////////
 // Typing
 // //////////////////////////////////////////////////////////////////////////////
 
-export interface SatCacheObject extends Ootk.SatelliteRecord {
-  dec: Radians;
-  ra: Radians;
-  id?: number;
-  isimp: number;
-  apogee: Kilometers;
-  perigee: Kilometers;
-  isRadarData: any;
-  static: boolean;
-  marker: any;
-  isStar: boolean;
-  lat: Degrees;
-  lon: Degrees;
-  alt: Kilometers;
-  missile: any;
+// TODO: This should be multiple classes
+export interface PosCruncherCachedObject {
+  // All
   active: boolean;
-  altList: any;
-  startTime: number;
-  lastTime: any;
-  latList: any;
-  lonList: any;
-  skip?: boolean;
+  // Satellite
+  apogee?: Kilometers;
+  perigee?: Kilometers;
+  isimp?: boolean;
+  isUpdated?: boolean;
+  satrec?: SatelliteRecord;
+  // Sensor
+  lat?: Degrees;
+  lon?: Degrees;
+  alt?: Kilometers;
+  // Missiles
+  latList?: Degrees[];
+  lonList?: Degrees[];
+  altList?: Kilometers[];
+  startTime?: number;
+  lastTime?: number;
+  // Stars
+  ra?: Radians;
+  dec?: Radians;
+  // Markers
+  isMarker?: boolean;
 }
+
+export interface OrbitCruncherCachedObject {
+  // Other - We need placeholders to match the ids
+  ignore?: boolean;
+  // Satellite
+  satrec?: SatelliteRecord;
+  // Missiles
+  missile?: boolean;
+  latList?: Degrees[];
+  lonList?: Degrees[];
+  altList?: Kilometers[];
+}
+
 export type PositionCruncherOutgoingMsg = {
   satInView?: Int8Array;
   satInSun?: Int8Array;
@@ -58,47 +75,39 @@ export const emptySensor: SensorObjectCruncher = {
   lat: null,
   lon: null,
   name: '',
-  obsmaxaz: <Degrees>0,
-  obsmaxel: <Degrees>0,
-  obsmaxrange: <Kilometers>0,
-  obsminaz: <Degrees>0,
-  obsminel: <Degrees>0,
-  obsminrange: <Kilometers>0,
+  maxAz: <Degrees>0,
+  maxEl: <Degrees>0,
+  maxRng: <Kilometers>0,
+  minAz: <Degrees>0,
+  minEl: <Degrees>0,
+  minRng: <Kilometers>0,
   shortName: '',
-  staticNum: 0,
+  sensorId: 0,
   sun: '',
   volume: false,
-  zoom: '',
-};
-
-export type RangeAzEl = {
-  az: Radians;
-  el: Radians;
-  rng: number;
+  zoom: ZoomValue.MAX,
+  system: '',
+  operator: '',
+  uiName: '',
+  objName: '',
 };
 
 export interface PositionCruncherIncomingMsg {
   data: {
-    TLE2: string;
-    TLE1: string;
+    tle1: string;
+    tle2: string;
     dat: string; // JSON string
-    typ: any;
+    typ: CruncerMessageTypes;
     staticOffset?: number;
     dynamicOffsetEpoch?: number;
     propRate?: number;
     id?: number;
     satelliteSelected?: number[];
-    multiSensor?: boolean;
-    setlatlong?: any;
-    resetObserverGd?: any;
     selectedSatFOV?: any;
-    isShowSatOverfly?: string;
-    isSunlightView?: any;
-    isSlowCPUModeEnabled?: any;
-    isLowPerf?: any;
+    isSunlightView?: boolean;
+    isLowPerf?: boolean;
     fieldOfViewSetLength?: number;
-    isShowFOVBubble?: string;
-    isShowSurvFence?: string;
     sensor?: SensorObjectCruncher[];
+    markerMode?: MarkerMode;
   };
 }

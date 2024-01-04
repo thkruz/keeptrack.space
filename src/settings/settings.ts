@@ -110,18 +110,6 @@ export class SettingsManager {
    */
   lastMapUpdateTime = 0;
   /**
-   * Global flag for determining if 3D FOV markers are visible
-   */
-  isFOVBubbleModeOn = false;
-  /**
-   * Global flag for determining if Survelliance Fences are visible
-   */
-  isShowSurvFence = false;
-  /**
-   * Global flag for determining if Satellite Overfly Mode is on
-   */
-  isSatOverflyModeOn = false;
-  /**
    * @deprecated
    * Current color scheme for the application.
    */
@@ -355,12 +343,21 @@ export class SettingsManager {
   cameraDecayFactor = 5;
   /**
    * The speed at which the camera moves.
+   *
+   * TODO: This needs to be made read-only and a sepearate internal camera variable should be used to handle
+   * the logic when shift is pressed
    */
   cameraMovementSpeed = 0.003;
   /**
    * The minimum speed at which the camera moves.
+   *
+   * TODO: This needs to be made read-only and a sepearate internal camera variable should be used to handle
+   * the logic when shift is pressed
    */
   cameraMovementSpeedMin = 0.005;
+  /**
+   * Used for disabling the copyright text on screenshots and the map.
+   */
   copyrightOveride = false;
   /**
    * Global flag for determining if the cruncher's loading is complete
@@ -563,11 +560,6 @@ export class SettingsManager {
   isDrawLess = false;
   isEnableConsole = false;
   /**
-   * @deprecated
-   * WIP setting for loading radar data
-   */
-  isEnableRadarData = false;
-  /**
    * Determines whether the last map that was loaded should be loaded again on the next session.
    */
   isLoadLastMap = true;
@@ -642,7 +634,7 @@ export class SettingsManager {
    *
    * NOTE: This mainly applies to breakup scenarios
    */
-  maxAnalystSats = 30000;
+  maxAnalystSats = 10000;
   /**
    * Preallocate the maximum number of field of view marker dots that can be displayed
    *
@@ -671,13 +663,6 @@ export class SettingsManager {
    * The maximum number of orbits to be displayed on desktop.
    */
   maxOribtsDisplayedDesktop = 100000;
-  /**
-   * @deprecated
-   * Preallocate the maximum number of radar data points that can be displayed
-   *
-   * 70000 is the planned value
-   */
-  maxRadarData = 1;
   /**
    * The maximum zoom distance from the Earth's surface in kilometers.
    *
@@ -1188,14 +1173,14 @@ export class SettingsManager {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.0') {
+    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.1') {
       this.colors = {
-        version: '1.3.0',
+        version: '1.3.1',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
-        sunlight100: [1.0, 1.0, 1.0, 1.0],
-        sunlight80: [1.0, 1.0, 1.0, 0.85],
-        sunlight60: [1.0, 1.0, 1.0, 0.65],
+        sunlight100: [1.0, 1.0, 1.0, 0.8],
+        sunlight80: [1.0, 1.0, 1.0, 0.6],
+        sunlight60: [1.0, 1.0, 1.0, 0.3],
         starHi: [1.0, 1.0, 1.0, 1.0],
         starMed: [1.0, 1.0, 1.0, 0.85],
         starLow: [1.0, 1.0, 1.0, 0.65],
@@ -1223,9 +1208,6 @@ export class SettingsManager {
         deselected: [1.0, 1.0, 1.0, 0],
         inFOV: [0.85, 0.5, 0.0, 1.0],
         inFOVAlt: [0.2, 0.4, 1.0, 1],
-        radarData: [0.0, 1.0, 1.0, 1.0],
-        radarDataMissile: [1.0, 0.0, 0.0, 1.0],
-        radarDataSatellite: [0.0, 1.0, 0.0, 1.0],
         payload: [0.2, 1.0, 0.0, 0.5],
         rocketBody: [0.2, 0.4, 1.0, 1],
         debris: [0.5, 0.5, 0.5, 1],
@@ -1387,7 +1369,7 @@ export class SettingsManager {
                   if (typeof val === 'string') {
                     const sccNum = parseInt(val);
                     if (sccNum >= 0) {
-                      const id = keepTrackApi.getCatalogManager().getIdFromSccNum(sccNum);
+                      const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
                       if (id >= 0) {
                         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
                       } else {
@@ -1420,10 +1402,6 @@ export class SettingsManager {
           case 'console':
             this.isEnableConsole = true;
             break;
-          // case 'radarData':
-          //   this.isEnableRadarData = true;
-          //   this.maxRadarData = 150000;
-          //   break;
           case 'smallImages':
             this.smallImages = true;
             break;

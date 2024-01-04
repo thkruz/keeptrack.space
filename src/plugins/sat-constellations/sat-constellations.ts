@@ -146,15 +146,13 @@ export class SatConstellations extends KeepTrackPlugin {
     groupManagerInstance.selectGroup(groupManagerInstance.groupList[groupName]);
 
     // Populate searchDOM with a search string separated by commas - minus the last one
-    searchDOM.innerHTML = groupManagerInstance.groupList[groupName].objects
-      .reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id).sccNum},`, '')
-      .slice(0, -1);
+    searchDOM.innerHTML = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
 
     // If SelectSatManager is enabled, deselect the selected sat
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
-    uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].objects.map((id: number) => catalogManagerInstance.getSat(id).sccNum).join(','));
+    uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].ids.map((id: number) => catalogManagerInstance.getSat(id)?.sccNum).join(','));
 
     // Close Menus
     if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(true);

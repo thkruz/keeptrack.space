@@ -8,8 +8,9 @@ import { ZoomValue } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { LegendManager } from '@app/static/legend-manager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import customPng from '@public/img/icons/custom.png';
-import { Degrees, Kilometers, SpaceObjectType } from 'ootk';
+import { Degrees, DetailedSensor, Kilometers, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';
 
@@ -141,6 +142,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         triggerSubmit(<HTMLFormElement>getEl('customSensor'));
         catalogManagerInstance.satCruncher.postMessage({
           isSunlightView: true,
+          typ: CruncerMessageTypes.SUNLIGHT_VIEW,
         });
         LegendManager.change('sunlight');
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);
@@ -175,6 +177,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         uiManagerInstance.colorSchemeChangeAlert(settingsManager.currentColorScheme);
         catalogManagerInstance.satCruncher.postMessage({
           isSunlightView: false,
+          typ: CruncerMessageTypes.SUNLIGHT_VIEW,
         });
         break;
     }
@@ -288,27 +291,29 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         break;
     }
 
-    keepTrackApi.getSensorManager().addSecondarySensor({
-      id: null,
-      lat,
-      lon,
-      alt: CustomSensorPlugin.str2Km(alt),
-      obsminaz: CustomSensorPlugin.str2Deg(minaz),
-      obsmaxaz: CustomSensorPlugin.str2Deg(maxaz),
-      obsminel: CustomSensorPlugin.str2Deg(minel),
-      obsmaxel: CustomSensorPlugin.str2Deg(maxel),
-      obsminrange: CustomSensorPlugin.str2Km(minrange),
-      obsmaxrange: CustomSensorPlugin.str2Km(maxrange),
-      type,
-      name: 'Custom Sensor',
-      uiName: 'Custom Sensor',
-      system: 'Custom Sensor',
-      country: 'Custom Sensor',
-      objName: 'Custom Sensor',
-      operator: 'Custom Sensor',
-      zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
-      volume: false,
-    });
+    keepTrackApi.getSensorManager().addSecondarySensor(
+      new DetailedSensor({
+        id: null,
+        lat,
+        lon,
+        alt: CustomSensorPlugin.str2Km(alt),
+        minAz: CustomSensorPlugin.str2Deg(minaz),
+        maxAz: CustomSensorPlugin.str2Deg(maxaz),
+        minEl: CustomSensorPlugin.str2Deg(minel),
+        maxEl: CustomSensorPlugin.str2Deg(maxel),
+        minRng: CustomSensorPlugin.str2Km(minrange),
+        maxRng: CustomSensorPlugin.str2Km(maxrange),
+        type,
+        name: 'Custom Sensor',
+        uiName: 'Custom Sensor',
+        system: 'Custom Sensor',
+        country: 'Custom Sensor',
+        objName: 'Custom Sensor',
+        operator: 'Custom Sensor',
+        zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
+        volume: false,
+      })
+    );
   }
 
   private static addTelescopeClickListener_() {
@@ -337,12 +342,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
         const sensorManagerInstance = keepTrackApi.getSensorManager();
         if (sensorManagerInstance.isSensorSelected()) {
-          (<HTMLInputElement>getEl('cs-minaz')).value = sensorManagerInstance.currentSensors[0].obsminaz.toString();
-          (<HTMLInputElement>getEl('cs-maxaz')).value = sensorManagerInstance.currentSensors[0].obsmaxaz.toString();
-          (<HTMLInputElement>getEl('cs-minel')).value = sensorManagerInstance.currentSensors[0].obsminel.toString();
-          (<HTMLInputElement>getEl('cs-maxel')).value = sensorManagerInstance.currentSensors[0].obsmaxel.toString();
-          (<HTMLInputElement>getEl('cs-minrange')).value = sensorManagerInstance.currentSensors[0].obsminrange.toString();
-          (<HTMLInputElement>getEl('cs-maxrange')).value = sensorManagerInstance.currentSensors[0].obsmaxrange.toString();
+          (<HTMLInputElement>getEl('cs-minaz')).value = sensorManagerInstance.currentSensors[0].minAz.toString();
+          (<HTMLInputElement>getEl('cs-maxaz')).value = sensorManagerInstance.currentSensors[0].maxAz.toString();
+          (<HTMLInputElement>getEl('cs-minel')).value = sensorManagerInstance.currentSensors[0].minEl.toString();
+          (<HTMLInputElement>getEl('cs-maxel')).value = sensorManagerInstance.currentSensors[0].maxEl.toString();
+          (<HTMLInputElement>getEl('cs-minrange')).value = sensorManagerInstance.currentSensors[0].minRng.toString();
+          (<HTMLInputElement>getEl('cs-maxrange')).value = sensorManagerInstance.currentSensors[0].maxRng.toString();
         }
       }
     });

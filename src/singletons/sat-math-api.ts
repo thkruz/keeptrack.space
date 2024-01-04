@@ -23,8 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SatObject } from '@app/interfaces';
-import { Degrees } from 'ootk';
+import { Degrees, DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SatMath } from '../static/sat-math';
 
@@ -36,32 +35,32 @@ import { SatMath } from '../static/sat-math';
  * through this class.
  */
 export class SatMathApi {
-  static getEcfOfCurrentOrbit(sat: SatObject, points: number) {
+  static getEcfOfCurrentOrbit(sat: DetailedSatellite, points: number) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
     return SatMath.getEcfOfCurrentOrbit(sat, points, cb);
   }
 
-  static getEciOfCurrentOrbit(sat: SatObject, points: number) {
+  static getEciOfCurrentOrbit(sat: DetailedSatellite, points: number) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
     return SatMath.getEciOfCurrentOrbit(sat, points, cb);
   }
 
-  static getLlaOfCurrentOrbit(sat: SatObject, points: number) {
+  static getLlaOfCurrentOrbit(sat: DetailedSatellite, points: number) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
     return SatMath.getLlaOfCurrentOrbit(sat, points, cb);
   }
 
-  static getLlaTimeView(now: Date, sat: SatObject): { lat: Degrees; lon: Degrees; time: string; inView: boolean } {
+  static getLlaTimeView(now: Date, sat: DetailedSatellite): { lat: Degrees; lon: Degrees; time: string; inView: boolean } {
     const sensor = keepTrackApi.getSensorManager().currentSensors[0];
     return SatMath.getLlaTimeView(now, sat, sensor);
   }
 
-  static getRicOfCurrentOrbit(sat: SatObject, sat2: SatObject, points: number, orbits = 1) {
+  static getRicOfCurrentOrbit(sat: DetailedSatellite, sat2: DetailedSatellite, points: number, orbits = 1) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
     return SatMath.getRicOfCurrentOrbit(sat, sat2, points, cb, orbits);
   }
 
-  static map(sat: SatObject, i: number, pointPerOrbit = 256): { time: string; lat: Degrees; lon: Degrees; inView: boolean } {
+  static map(sat: DetailedSatellite, i: number, pointPerOrbit = 256): { time: string; lat: Degrees; lon: Degrees; inView: boolean } {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
     return SatMath.map(sat, i, cb, pointPerOrbit);
   }

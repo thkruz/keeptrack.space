@@ -25,8 +25,8 @@
 
 import { sensors } from '@app/catalogs/sensors';
 import { openColorbox } from '@app/lib/colorbox';
-import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
-import { getEl, hideEl, setInnerHtml, showEl } from '@app/lib/get-el';
+import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
+import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { spaceObjType2Str } from '@app/lib/spaceObjType2Str';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 
@@ -38,27 +38,22 @@ import { PersistenceManager, StorageKey } from '@app/singletons/persistence-mana
 import { LegendManager } from '@app/static/legend-manager';
 import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
-import { GreenwichMeanSiderealTime, Radians } from 'ootk';
-import { SensorManager, SensorObject } from '../../interfaces';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime } from 'ootk';
+import { SensorManager } from '../../interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
+import { SensorFov } from '../sensor-fov/sensor-fov';
+import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 
 export class StandardSensorManager implements SensorManager {
-  readonly defaultSensor = <SensorObject[]>[
-    {
-      observerGd: {
-        lat: null,
-        lon: 0,
-        alt: 0,
-      },
-    },
-  ];
+  readonly defaultSensor = <DetailedSensor[]>[];
 
   lastMultiSiteArray: TearrData[];
 
-  addSecondarySensor(sensor: SensorObject): void {
+  addSecondarySensor(sensor: DetailedSensor): void {
     // If there is no primary sensor, make this the primary sensor
     const primarySensor = this.currentSensors[0];
-    if (primarySensor && !primarySensor.lat) {
+    if (!primarySensor?.isSensor()) {
       this.currentSensors.push(sensor);
       this.setSensor(sensor);
     } else {
@@ -69,8 +64,8 @@ export class StandardSensorManager implements SensorManager {
   }
 
   /** Sensors that are currently selected/active */
-  currentSensors: SensorObject[] = [];
-  customSensors = <SensorObject[]>[];
+  currentSensors: DetailedSensor[] = [];
+  customSensors = <DetailedSensor[]>[];
   // UI Stuff
   isCustomSensorMenuOpen = false;
   isLookanglesMenuOpen = false;
@@ -78,7 +73,7 @@ export class StandardSensorManager implements SensorManager {
    * This is used for STFs and other "sensors" that are not actually sensors
    * and still require a primary sensor to be selected
    */
-  secondarySensors = <SensorObject[]>[];
+  secondarySensors = <DetailedSensor[]>[];
   sensorListUS = [
     sensors.CODSFS,
     sensors.BLEAFB,
@@ -98,14 +93,14 @@ export class StandardSensorManager implements SensorManager {
    * This is used for STFs and other "sensors" that are not actually sensors
    * and still require a primary sensor to be selected
    */
-  stfSensors = <SensorObject[]>[];
+  stfSensors = <DetailedSensor[]>[];
   whichRadar = '';
 
   constructor() {
     this.currentSensors = [...this.defaultSensor];
   }
 
-  static drawFov(sensor: SensorObject) {
+  static drawFov(sensor: DetailedSensor) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorId = catalogManagerInstance.getSensorFromSensorName(sensor.name);
     if (!sensorId) {
@@ -118,18 +113,18 @@ export class StandardSensorManager implements SensorManager {
       case 'BLE':
       case 'CLR':
       case 'THL':
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.obsminaz, sensor.obsminaz + 120, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.obsminaz + 120, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.minAz + 120, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz + 120, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
         break;
       case 'FYL':
         // TODO: Find actual face directions
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 300, 60, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 60, 180, sensor.obsminel, sensor.obsmaxrange], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 180, 300, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 300, 60, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 60, 180, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 180, 300, sensor.minEl, sensor.maxRng], 'c');
         break;
       case 'CDN':
         // NOTE: This will be a bit more complicated later
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.obsminaz, sensor.obsmaxaz, sensor.obsminel, sensor.obsmaxrange], 'c');
+        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
         break;
       default:
         errorManagerInstance.warn('Sensor not found');
@@ -137,7 +132,7 @@ export class StandardSensorManager implements SensorManager {
     }
   }
 
-  addStf(sensor: SensorObject) {
+  addStf(sensor: DetailedSensor) {
     this.stfSensors.push(sensor);
     this.updatePositionCruncher_();
   }
@@ -156,14 +151,10 @@ export class StandardSensorManager implements SensorManager {
   }
 
   isSensorSelected(): boolean {
-    if (this.currentSensors[0].name && this.currentSensors[0].name !== '' && this.currentSensors[0].lat !== null && this.currentSensors[0].observerGd?.lat !== null) {
-      return true;
-    }
-
-    return false;
+    return this.currentSensors[0]?.isSensor();
   }
 
-  removeSecondarySensor(sensor?: SensorObject) {
+  removeSecondarySensor(sensor?: DetailedSensor) {
     if (sensor) {
       this.secondarySensors = this.secondarySensors.filter((s) => s !== sensor);
     } else {
@@ -172,7 +163,7 @@ export class StandardSensorManager implements SensorManager {
     this.updatePositionCruncher_();
   }
 
-  removeStf(sensor?: SensorObject) {
+  removeStf(sensor?: DetailedSensor) {
     if (sensor) {
       this.stfSensors = this.stfSensors.filter((s) => s !== sensor);
     } else {
@@ -186,23 +177,19 @@ export class StandardSensorManager implements SensorManager {
 
     // Return to default settings with nothing 'inview'
     StandardSensorManager.updateSensorUiStyling(null);
-    this.setSensor(null); // Pass staticNum to identify which sensor the user clicked
+    this.setSensor(null); // Pass sensorId to identify which sensor the user clicked
     if (settingsManager.currentColorScheme == colorSchemeManagerInstance.default) {
       LegendManager.change('default');
     }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.satCruncher.postMessage({
-      typ: 'sensor',
-      setlatlong: true,
-      resetObserverGd: true,
-      sensor: [this.defaultSensor],
+      typ: CruncerMessageTypes.SENSOR,
+      sensor: [],
     });
-    catalogManagerInstance.satCruncher.postMessage({
-      isShowFOVBubble: 'reset',
-      isShowSurvFence: 'disable',
-    });
-    settingsManager.isFOVBubbleModeOn = false;
-    settingsManager.isShowSurvFence = false;
+
+    keepTrackApi.getPlugin(SensorFov)?.disableFovView();
+    keepTrackApi.getPlugin(SensorSurvFence)?.disableSurvView();
+
     getEl('menu-sensor-info')?.classList.remove('bmenu-item-selected');
     getEl('menu-fov-bubble')?.classList.remove('bmenu-item-selected');
     getEl('menu-surveillance')?.classList.remove('bmenu-item-selected');
@@ -225,7 +212,7 @@ export class StandardSensorManager implements SensorManager {
     keepTrackApi.runEvent(KeepTrackApiEvents.resetSensor);
   }
 
-  setCurrentSensor(sensor: SensorObject[] | null): void {
+  setCurrentSensor(sensor: DetailedSensor[] | null): void {
     // TODO: This function is totally redundant to setSensor. There should be
     // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
     if (sensor === null) {
@@ -237,25 +224,12 @@ export class StandardSensorManager implements SensorManager {
     } else if (sensor != null) {
       throw new Error('SensorManager.setCurrentSensor: sensor is not an array');
     }
-
-    this.currentSensors = sensor.map((s) => {
-      const lat = s.lat ? s.lat * DEG2RAD : null;
-      const lon = s.lon ? s.lon * DEG2RAD : null;
-
-      s.observerGd = {
-        // Array to calculate look angles in propagate()
-        lat: <Radians>lat,
-        lon: <Radians>lon,
-        alt: s.alt,
-      };
-      return s;
-    });
   }
 
-  static getSensorFromStaticNum(staticNum: number | null | undefined): SensorObject | null {
-    if (staticNum && staticNum >= 0) {
+  static getSensorFromsensorId(sensorId: number | null | undefined): DetailedSensor | null {
+    if (sensorId && sensorId >= 0) {
       for (const sensor in sensors) {
-        if (sensors[sensor].staticNum === staticNum) {
+        if (sensors[sensor].sensorId === sensorId) {
           return sensors[sensor];
         }
       }
@@ -264,16 +238,16 @@ export class StandardSensorManager implements SensorManager {
     return null;
   }
 
-  setSensor(selectedSensor: SensorObject | string | null, staticNum?: number): void {
+  setSensor(selectedSensor: DetailedSensor | string | null, sensorId?: number): void {
     if (!selectedSensor) {
-      selectedSensor = StandardSensorManager.getSensorFromStaticNum(staticNum);
+      selectedSensor = StandardSensorManager.getSensorFromsensorId(sensorId);
     }
 
-    PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, staticNum]));
+    PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    if (selectedSensor == null && staticNum == null) {
+    if (selectedSensor == null && sensorId == null) {
       // No sensor selected
       this.sensorTitle = '';
       this.currentSensors = [this.defaultSensor[0]];
@@ -282,13 +256,13 @@ export class StandardSensorManager implements SensorManager {
       const filteredSensors = Object.values(sensors).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
       StandardSensorManager.updateSensorUiStyling(filteredSensors);
     } else if (selectedSensor === 'NATO-MW') {
-      this.sensorTitle = 'All North American Aerospace Defense Command Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+      this.sensorTitle = 'All Missile Warning Sensors';
+      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
         [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB].includes(sensor)
       );
     } else if (selectedSensor === 'RUS-ALL') {
       this.sensorTitle = 'All Russian Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
         [
           sensors.OLED,
           sensors.OLEV,
@@ -307,15 +281,15 @@ export class StandardSensorManager implements SensorManager {
       );
     } else if (selectedSensor === 'PRC-ALL') {
       this.sensorTitle = 'All Chinese Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) => [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO].includes(sensor));
+      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) => [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO].includes(sensor));
     } else if (selectedSensor === 'LEO-LABS') {
       this.sensorTitle = 'All LEO Labs Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
         [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR].includes(sensor)
       );
     } else if (selectedSensor === 'ESOC-ALL') {
       this.sensorTitle = 'All Missile Defense Agency Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
         [
           sensors.GRV,
           sensors.TIR,
@@ -334,11 +308,11 @@ export class StandardSensorManager implements SensorManager {
       );
     } else if (selectedSensor === 'MD-ALL') {
       this.sensorTitle = 'All Missile Defense Agency Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: SensorObject) =>
+      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
         [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor)
       );
-    } else if ((<SensorObject>selectedSensor)?.name === 'Custom Sensor') {
-      this.currentSensors = [<SensorObject>selectedSensor];
+    } else if ((<DetailedSensor>selectedSensor)?.name === 'Custom Sensor') {
+      this.currentSensors = [<DetailedSensor>selectedSensor];
 
       // TODO: This should all be in the sensor plugin instead
       const sensorInfoTitleDom = getEl('sensor-info-title', true);
@@ -353,7 +327,7 @@ export class StandardSensorManager implements SensorManager {
         }
 
         if (this.currentSensors[0].type) {
-          setInnerHtml('sensor-type', spaceObjType2Str(this.currentSensors[0].type));
+          setInnerHtml('sensor-type', this.currentSensors[0].getTypeString());
         } else {
           setInnerHtml('sensor-type', 'Unknown Sensor');
         }
@@ -368,9 +342,9 @@ export class StandardSensorManager implements SensorManager {
         // If this is the sensor we selected
         const isMatchString = typeof selectedSensor === 'string' && sensors[sensor].objName === selectedSensor;
         const isMatchObj = typeof selectedSensor !== 'string' && sensors[sensor] === selectedSensor;
-        const isMatchStaticNum = typeof staticNum !== 'undefined' && sensors[sensor].staticNum === staticNum;
+        const isMatchsensorId = typeof sensorId !== 'undefined' && sensors[sensor].sensorId === sensorId;
 
-        if (isMatchString || isMatchObj || isMatchStaticNum) {
+        if (isMatchString || isMatchObj || isMatchsensorId) {
           this.currentSensors = [sensors[sensor]];
 
           // TODO: This should all be in the sensor plugin instead
@@ -399,7 +373,7 @@ export class StandardSensorManager implements SensorManager {
     }
 
     // Run any callbacks
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, staticNum);
+    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, sensorId);
 
     // TODO: Move this to top menu plugin
     // Update UI to reflect new sensor
@@ -419,8 +393,11 @@ export class StandardSensorManager implements SensorManager {
     StandardSensorManager.updateSensorUiStyling(this.currentSensors);
     // Update position cruncher with new sensor
     this.updatePositionCruncher_();
-    // Update the color scheme
-    colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+
+    // Update the color scheme in a frame or two
+    setTimeout(() => {
+      colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+    }, 40);
   }
 
   updateCruncherOnCustomSensors() {
@@ -428,31 +405,34 @@ export class StandardSensorManager implements SensorManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     catalogManagerInstance.satCruncher.postMessage({
-      typ: 'sensor',
-      setlatlong: true,
+      typ: CruncerMessageTypes.SENSOR,
       sensor: this.customSensors,
-      multiSensor: this.customSensors.length > 1,
     });
   }
 
-  static updateSensorUiStyling(sensors: SensorObject[] | null) {
+  static updateSensorUiStyling(sensors: DetailedSensor[] | null) {
     try {
-      if (sensors?.[0].objName) {
+      if (sensors?.[0]?.objName) {
         getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
         getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
-        showEl('reset-sensor-text');
+
+        if (getEl('reset-sensor-button')) {
+          (getEl('reset-sensor-button') as HTMLButtonElement).disabled = false;
+        }
       } else {
-        hideEl('reset-sensor-text');
+        if (getEl('reset-sensor-button')) {
+          (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
+        }
       }
     } catch (error) {
       errorManagerInstance.warn('Error updating sensor UI styling');
     }
   }
 
-  verifySensors(sensors: SensorObject[] | undefined): SensorObject[] {
+  verifySensors(sensors: DetailedSensor[] | undefined): DetailedSensor[] {
     // If no sensor passed to function then try to use the 'currentSensor'
     if (typeof sensors == 'undefined' || sensors == null) {
       if (typeof this.currentSensors == 'undefined') {
@@ -461,28 +441,10 @@ export class StandardSensorManager implements SensorManager {
         sensors = this.currentSensors;
       }
     }
-    // If sensor's observerGd is not set try to set it using it parameters
-    if (typeof sensors[0].observerGd == 'undefined') {
-      try {
-        const lat = sensors[0].lat;
-        const lon = sensors[0].lon;
-        if (lat && lon) {
-          sensors[0].observerGd = {
-            alt: sensors[0].alt,
-            lat: <Radians>(lat * DEG2RAD),
-            lon: <Radians>(lon * DEG2RAD),
-          };
-        } else {
-          throw new Error('observerGd is not set and could not be guessed.');
-        }
-      } catch (e) {
-        throw new Error('observerGd is not set and could not be guessed.');
-      }
-    }
     return sensors;
   }
 
-  public calculateSensorPos(now: Date, sensors?: SensorObject[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
+  public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
     sensors = this.verifySensors(sensors);
     const sensor = sensors[0];
     if (!sensor) {
@@ -510,7 +472,7 @@ export class StandardSensorManager implements SensorManager {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const primarySensor = this.currentSensors[0];
 
-    if (primarySensor.obsmaxrange > 6000) {
+    if (primarySensor.maxRng > 6000) {
       keepTrackApi.getMainCamera().changeZoom(ZoomValue.GEO);
     } else {
       keepTrackApi.getMainCamera().changeZoom(ZoomValue.LEO);
@@ -524,10 +486,8 @@ export class StandardSensorManager implements SensorManager {
     const combinedSensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
 
     catalogManagerInstance.satCruncher.postMessage({
-      typ: 'sensor',
-      setlatlong: true,
+      typ: CruncerMessageTypes.SENSOR,
       sensor: combinedSensors,
-      multiSensor: combinedSensors.length > 1,
     });
   }
 }

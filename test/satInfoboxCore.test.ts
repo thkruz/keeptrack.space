@@ -21,7 +21,7 @@ describe('SatInfoBoxCore_class', () => {
       keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
       keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
       keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-      keepTrackApi.getCatalogManager().satData = [defaultSat];
+      keepTrackApi.getCatalogManager().objectCache = [defaultSat];
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
       jest.advanceTimersByTime(1000);
     });
@@ -62,13 +62,13 @@ describe('SatInfoBoxCore_class', () => {
     });
 
     it('should work with no rcs', () => {
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, rcs: null }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, rcs: null }];
       expect(() => {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
         jest.advanceTimersByTime(1000);
       }).not.toThrow();
 
-      keepTrackApi.getCatalogManager().satData = [
+      keepTrackApi.getCatalogManager().objectCache = [
         { ...defaultSat, rcs: null },
         { ...defaultSat, rcs: '10' },
       ];
@@ -77,7 +77,7 @@ describe('SatInfoBoxCore_class', () => {
         jest.advanceTimersByTime(1000);
       }).not.toThrow();
 
-      keepTrackApi.getCatalogManager().satData = [
+      keepTrackApi.getCatalogManager().objectCache = [
         { ...defaultSat, rcs: null, diameter: '10', span: '10', length: '10', shape: 'sphere' },
         { ...defaultSat, rcs: null },
       ];
@@ -120,7 +120,7 @@ describe('SatInfoBoxCore_class', () => {
     it('should work with a missile', () => {
       keepTrackApi.getCatalogManager().isSensorManagerLoaded = true;
       keepTrackApi.getSensorManager().currentSensors = [defaultSensor];
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, missile: true, desc: 'Fake (F101)' }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, missile: true, desc: 'Fake (F101)' }];
 
       expect(() => {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
@@ -129,31 +129,31 @@ describe('SatInfoBoxCore_class', () => {
     });
 
     it('should work with all object typees', () => {
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.UNKNOWN }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.UNKNOWN }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.PAYLOAD }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.PAYLOAD }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.ROCKET_BODY }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.ROCKET_BODY }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.DEBRIS }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.DEBRIS }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.SPECIAL }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.SPECIAL }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.RADAR_MEASUREMENT }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.RADAR_MEASUREMENT }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.RADAR_TRACK }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.RADAR_TRACK }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.RADAR_OBJECT }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.RADAR_OBJECT }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, type: SpaceObjectType.STAR }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, type: SpaceObjectType.STAR }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
-      keepTrackApi.getCatalogManager().satData = [{ ...defaultSat, missile: true, desc: 'Fake (F101)', type: SpaceObjectType.BALLISTIC_MISSILE }];
+      keepTrackApi.getCatalogManager().objectCache = [{ ...defaultSat, missile: true, desc: 'Fake (F101)', type: SpaceObjectType.BALLISTIC_MISSILE }];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
     });
 
     it('should work with all intel data', () => {
       const newSat = { ...defaultSat, TTP: 'test', NOTES: 'test', FMISSED: 'test', ORPO: 'test', constellation: 'test', maneuver: 'test', associates: 'test' };
-      keepTrackApi.getCatalogManager().satData = [newSat];
+      keepTrackApi.getCatalogManager().objectCache = [newSat];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();
     });
   });

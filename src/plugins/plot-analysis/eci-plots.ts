@@ -1,10 +1,11 @@
-import { EChartsData, EciArr3, KeepTrackApiEvents, SatObject } from '@app/interfaces';
+import { EChartsData, EciArr3, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import scatterPlotPng2 from '@public/img/icons/scatter-plot2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -60,7 +61,7 @@ export class EciPlot extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
+      cb: (sat: BaseObject) => {
         // This runs no matter what
         if (sat) {
           this.setBottomIconToEnabled();
@@ -241,7 +242,7 @@ export class EciPlot extends KeepTrackPlugin {
     const data = [] as EChartsData;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    const curSatObj = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
+    const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
     data.push({ name: curSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
 
     const secSatObj = this.selectSatManager_.secondarySatObj;
@@ -251,7 +252,7 @@ export class EciPlot extends KeepTrackPlugin {
 
     const lastSatId = this.selectSatManager_.lastSelectedSat();
     if (lastSatId !== -1) {
-      const lastSatObj = catalogManagerInstance.getSat(lastSatId);
+      const lastSatObj = catalogManagerInstance.getObject(lastSatId) as DetailedSatellite;
       data.push({ name: lastSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
     }
 

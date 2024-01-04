@@ -1,5 +1,5 @@
 import { SatObject } from '@app/interfaces';
-import { Degrees, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2, Transforms } from 'ootk';
+import { Degrees, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { StringPad } from '../lib/stringPad';
 import { errorManagerInstance } from '../singletons/errorManager';
@@ -26,8 +26,8 @@ export abstract class ManueverMath {
     // Launch Points are the Satellites Current Location
     var TEARR = SensorMath.getTearr(mainsat, sensorManagerInstance.currentSensors, timeManagerInstance.simulationTimeObj);
     var launchLat: Degrees, launchLon: Degrees, alt: Kilometers;
-    launchLat = Transforms.getDegLat(TEARR.lat);
-    launchLon = Transforms.getDegLon(TEARR.lon);
+    launchLat = TEARR.lat;
+    launchLon = TEARR.lon;
     alt = TEARR.alt;
     const upOrDown = SatMath.getDirection(mainsat, timeManagerInstance.simulationTimeObj);
     if (upOrDown === 'Error') {
@@ -44,7 +44,7 @@ export abstract class ManueverMath {
     }
     var TLE1 = TLEs[0];
     var TLE2 = TLEs[1];
-    satId = catalogManagerInstance.getIdFromSccNum(80000);
+    satId = catalogManagerInstance.sccNum2Id(80000);
     var sat = catalogManagerInstance.getSat(satId);
     sat = origsat;
     let iTLE1 = '1 ' + 80000 + TLE1.substr(7);
@@ -123,15 +123,9 @@ export abstract class ManueverMath {
       for (let raanTemp = -1; raanTemp <= 1; raanTemp++) {
         for (let meanMoTemp = 0.95; meanMoTemp <= 1.05; meanMoTemp += 0.05) {
           if (ManueverMath.createManeuverAnalyst(sat.id, incTemp, meanMoTemp, raanTemp)) {
-            let minDistArrayTemp = SatMath.findClosestApproachTime(catalogManagerInstance.getSatFromSccNum(80000), sat2, propLength);
+            let minDistArrayTemp = SatMath.findClosestApproachTime(catalogManagerInstance.sccNum2Sat(80000), sat2, propLength);
             if (minDistArrayTemp.dist < minDistArray.dist) {
               minDistArray = minDistArrayTemp;
-              // let closestInc = incTemp;
-              // let closestRaan = raanTemp;
-              // let closestMeanMo = meanMoTemp;
-              // console.log(`Distance: ${minDistArray.dist}`);
-              // console.log(`Time: ${minDistArray.time}`);
-              // console.log(catalogManagerInstance.getSatFromObjNum(80000));
             }
           }
         }

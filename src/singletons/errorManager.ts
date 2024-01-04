@@ -51,7 +51,7 @@ export class ErrorManager {
     return this.newGithubIssueUrl_({
       user: 'thkruz',
       repo: 'keeptrack.space',
-      title: `${e.name} in ${funcName}`,
+      title: `${e?.name || 'Unknown'} in ${funcName}`,
       labels: ['Problems : Bug'],
       body: `#### User Description
 Type what you were trying to do here...\n\n\n

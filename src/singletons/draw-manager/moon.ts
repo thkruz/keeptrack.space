@@ -19,13 +19,13 @@
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
-import { RAD2DEG } from '@app/lib/constants';
+
 import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
 import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, Radians, Transforms, Utils } from 'ootk';
+import { Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, RAD2DEG, Radians, Utils, ecf2eci } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { GlUtils } from '../../static/gl-utils';
@@ -146,10 +146,7 @@ export class Moon {
    */
   private updateEciPosition_(simTime: Date, gmst: GreenwichMeanSiderealTime) {
     const rae = Utils.MoonMath.getMoonPosition(simTime, <Degrees>0, <Degrees>0);
-    this.eci = Transforms.ecf2eci(
-      CoordinateTransforms.rae2ecf(<Degrees>(rae.az * RAD2DEG), <Degrees>(rae.el * RAD2DEG), rae.rng as Kilometers, <Radians>0, <Radians>0, <Kilometers>0),
-      gmst
-    );
+    this.eci = ecf2eci(CoordinateTransforms.rae2ecf(<Degrees>(rae.az * RAD2DEG), <Degrees>(rae.el * RAD2DEG), rae.rng, <Radians>0, <Radians>0, <Kilometers>0), gmst);
 
     if (this.eci.x && this.eci.y && this.eci.z) {
       const scaleFactor = this.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));

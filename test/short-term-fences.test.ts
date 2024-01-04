@@ -44,7 +44,7 @@ describe('ShortTermFences_class', () => {
       keepTrackApi.getSensorManager().setCurrentSensor([defaultSensor]);
       expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
 
-      keepTrackApi.getCatalogManager().getSat = jest.fn().mockReturnValue(defaultSat);
+      keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
       keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
       expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
     });

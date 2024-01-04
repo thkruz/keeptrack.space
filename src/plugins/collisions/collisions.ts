@@ -132,7 +132,7 @@ export class Collissions extends KeepTrackPlugin {
 
     keepTrackApi.getUiManager().doSearch(`${sat1},${sat2}`);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    this.selectSatIdOnCruncher_ = catalogManagerInstance.getIdFromSccNum(parseInt(sat1));
+    this.selectSatIdOnCruncher_ = catalogManagerInstance.sccNum2Id(parseInt(sat1));
   }
 
   private createTable_(): void {

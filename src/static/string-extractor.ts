@@ -1,14 +1,13 @@
-import { ControlSiteObject } from '../catalogs/control-sites';
+import { BaseObject, SpaceObjectType } from 'ootk';
 import { countryCodeList, countryMapList, launchSiteMap } from '../catalogs/countries';
 import { rocketUrls } from '../catalogs/rocket-urls';
-import { SpaceObjectType } from '../lib/space-object-type';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export abstract class StringExtractor {
   /** Use this to adjust which type of objects are loaded
    * TODO: Move this somewhere else!
    */
-  public static controlSiteTypeFilter(controlSite: ControlSiteObject): boolean {
+  public static controlSiteTypeFilter(controlSite: BaseObject): boolean {
     switch (controlSite.type) {
       case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
       case SpaceObjectType.LAUNCH_AGENCY:

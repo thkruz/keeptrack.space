@@ -1,16 +1,17 @@
-import { KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import searchPng from '@public/img/icons/search.png';
 
+import { ZoomValue } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
-import { SensorMath } from '@app/static/sensor-math';
+import { BaseObject, Degrees, DetailedSensor, Kilometers, SpaceObjectType, eci2rae } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorFov } from '../sensor-fov/sensor-fov';
+import { SoundNames } from '../sounds/SoundNames';
 
 export class ShortTermFences extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Short Term Fences';
@@ -87,9 +88,9 @@ export class ShortTermFences extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
+      cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (sat === null || typeof sat === 'undefined') {
+        if (obj === null || typeof obj === 'undefined') {
           return;
         }
 
@@ -117,12 +118,15 @@ export class ShortTermFences extends KeepTrackPlugin {
       cb: () => {
         getEl('stfForm').addEventListener('submit', (e: Event) => {
           e.preventDefault();
+          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           this.onSubmit.bind(this)();
         });
         getEl('stf-remove-last').addEventListener('click', () => {
+          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           keepTrackApi.getSensorManager().removeStf();
         });
         getEl('stf-clear-all').addEventListener('click', () => {
+          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           keepTrackApi.getSensorManager().clearStf();
         });
       },
@@ -158,10 +162,6 @@ export class ShortTermFences extends KeepTrackPlugin {
   onSubmit() {
     if (!this.verifySensorSelected()) return;
 
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const { lat, lon, alt } = sensorManagerInstance.currentSensors[0];
-    const sensorType = 'Short Range Fence';
-
     // Multiply everything by 1 to convert string to number
     const az = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
     const azExt = parseFloat((<HTMLInputElement>getEl('stf-azExt')).value);
@@ -170,33 +170,42 @@ export class ShortTermFences extends KeepTrackPlugin {
     const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
     const rngExt = parseFloat((<HTMLInputElement>getEl('stf-rngExt')).value);
 
-    const minaz = az - azExt < 0 ? az - azExt + 360 : az - azExt / 2;
-    const maxaz = az + azExt > 360 ? az + azExt - 360 : az + azExt / 2;
-    const minel = el - elExt / 2;
-    const maxel = el + elExt / 2;
-    const minrange = rng - rngExt / 2;
-    const maxrange = rng + rngExt / 2;
+    const minaz = az - azExt < 0 ? ((az - azExt + 360) as Degrees) : ((az - azExt / 2) as Degrees);
+    const maxaz = az + azExt > 360 ? ((az + azExt - 360) as Degrees) : ((az + azExt / 2) as Degrees);
+    const minel = (el - elExt / 2) as Degrees;
+    const maxel = (el + elExt / 2) as Degrees;
+    const minrange = (rng - rngExt / 2) as Kilometers;
+    const maxrange = (rng + rngExt / 2) as Kilometers;
 
-    const stfSensor = <SensorObject>(<unknown>{
-      lat,
-      lon,
-      alt,
-      obsminaz: minaz,
-      obsmaxaz: maxaz,
-      obsminel: minel,
-      obsmaxel: maxel,
-      obsminrange: minrange,
-      obsmaxrange: maxrange,
-      type: sensorType,
+    const curSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const stfSensor = new DetailedSensor({
+      lat: curSensor.lat,
+      lon: curSensor.lon,
+      alt: curSensor.alt,
+      minAz: minaz,
+      maxAz: maxaz,
+      minEl: minel,
+      maxEl: maxel,
+      minRng: minrange,
+      maxRng: maxrange,
+      type: SpaceObjectType.SHORT_TERM_FENCE,
+      country: 'STF',
+      name: 'STF',
+      id: -2,
+      uiName: 'STF',
+      zoom: ZoomValue.GEO,
+      objName: 'STF',
+      system: 'STF',
+      operator: 'STF',
     });
 
     if (
-      !SatMath.checkIsInView(sensorManagerInstance.currentSensors[0], {
+      !curSensor.isRaeInFov({
         az: minaz,
         el: minel,
         rng: minrange,
       }) ||
-      !SatMath.checkIsInView(sensorManagerInstance.currentSensors[0], {
+      !curSensor.isRaeInFov({
         az: maxaz,
         el: maxel,
         rng: maxrange,
@@ -206,8 +215,7 @@ export class ShortTermFences extends KeepTrackPlugin {
       return;
     }
 
-    sensorManagerInstance.addStf(stfSensor);
-
+    keepTrackApi.getSensorManager().addStf(stfSensor);
     keepTrackApi.getPlugin(SensorFov)?.enableFovView();
   }
 
@@ -216,13 +224,12 @@ export class ShortTermFences extends KeepTrackPlugin {
     if (!this.verifySensorSelected()) return;
     if (!this.verifySatelliteSelected()) return;
 
-    // Update TEARR
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const tearr = SensorMath.getTearr(catalogManagerInstance.getSat(this.selectSatManager_.selectedSat), sensorManagerInstance.currentSensors);
+    const now = keepTrackApi.getTimeManager().simulationTimeObj;
+    const rae = eci2rae(now, this.selectSatManager_.primarySatObj.position, sensorManagerInstance.currentSensors[0]);
 
-    (<HTMLInputElement>getEl('stf-az')).value = tearr.az.toFixed(1);
-    (<HTMLInputElement>getEl('stf-el')).value = tearr.el.toFixed(1);
-    (<HTMLInputElement>getEl('stf-rng')).value = tearr.rng.toFixed(1);
+    (<HTMLInputElement>getEl('stf-az')).value = rae.az.toFixed(1);
+    (<HTMLInputElement>getEl('stf-el')).value = rae.el.toFixed(1);
+    (<HTMLInputElement>getEl('stf-rng')).value = rae.rng.toFixed(1);
 
     keepTrackApi.getUiManager().hideSideMenus();
     slideInRight(getEl('stf-menu'), 1000);

@@ -1,6 +1,5 @@
-import { KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { MINUTES_PER_DAY, TAU } from '@app/lib/constants';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
@@ -9,9 +8,10 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
-import { Degrees, Kilometers, SatelliteRecord, Seconds } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, MINUTES_PER_DAY, SatelliteRecord, Seconds, TAU } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 import { StandardSensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Multi Site Look Angles';
@@ -28,12 +28,13 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   bottomIconCallback: () => void = () => {
     const sat = this.selectSatManager_.getSelectedSat();
-    this.refreshSideMenuData(sat);
+    if (!sat?.isSatellite()) return;
+    this.refreshSideMenuData(sat as DetailedSatellite);
   };
 
   lookanglesLength = 1; // Days
   lookanglesInterval = <Seconds>30;
-  disabledSensors: SensorObject[] = [];
+  disabledSensors: DetailedSensor[] = [];
 
   bottomIconElementName = 'multi-site-look-angles-icon';
   bottomIconLabel = 'Multi-Site Looks';
@@ -83,6 +84,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('multi-site-look-angles-export')?.addEventListener('click', () => {
+          keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
           const exportData = keepTrackApi.getSensorManager().lastMultiSiteArray.map((look) => ({
             time: look.time,
             sensor: look.objName,
@@ -98,17 +100,17 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SatObject) => {
-        this.checkIfCanBeEnabled_(sat);
+      cb: (obj: BaseObject) => {
+        this.checkIfCanBeEnabled_(obj);
       },
     });
   }
 
-  private checkIfCanBeEnabled_(sat: SatObject) {
-    if (sat?.TLE1 && keepTrackApi.getSensorManager().isSensorSelected()) {
+  private checkIfCanBeEnabled_(obj: BaseObject) {
+    if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
       this.setBottomIconToEnabled();
-      if (this.isMenuButtonActive && sat) {
-        this.refreshSideMenuData(sat);
+      if (this.isMenuButtonActive && obj) {
+        this.refreshSideMenuData(obj as DetailedSatellite);
       }
     } else {
       if (this.isMenuButtonActive) {
@@ -125,12 +127,13 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const sat = this.selectSatManager_.getSelectedSat();
-        this.refreshSideMenuData(sat);
+        if (!sat?.isSatellite()) return;
+        this.refreshSideMenuData(sat as DetailedSatellite);
       },
     });
   }
 
-  private refreshSideMenuData(sat: SatObject) {
+  private refreshSideMenuData(sat: DetailedSatellite) {
     if (this.isMenuButtonActive) {
       if (sat) {
         showLoading(() => {
@@ -143,7 +146,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
           sensorListDom.innerHTML = '';
 
-          const allSensors: SensorObject[] = [];
+          const allSensors: DetailedSensor[] = [];
           for (const sensor of keepTrackApi.getSensorManager().sensorListUS) {
             if (!sensor.shortName) continue;
 
@@ -158,9 +161,11 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
               if (sensorButton.classList.contains('btn-red')) {
                 sensorButton.classList.remove('btn-red');
                 this.disabledSensors.splice(this.disabledSensors.indexOf(sensor), 1);
+                keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
               } else {
                 sensorButton.classList.add('btn-red');
                 this.disabledSensors.push(sensor);
+                keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
               }
 
               this.getlookanglesMultiSite_(
@@ -181,7 +186,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     }
   }
 
-  private getlookanglesMultiSite_(sat: SatObject, sensors?: SensorObject[]): void {
+  private getlookanglesMultiSite_(sat: DetailedSatellite, sensors?: DetailedSensor[]): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
@@ -204,7 +209,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     const multiSiteArray = <TearrData[]>[];
     for (const sensor of sensors) {
       // Skip if satellite is above the max range of the sensor
-      if (sensor.obsmaxrange < sat.perigee && (!sensor.obsmaxrange2 || sensor.obsmaxrange2 < sat.perigee)) continue;
+      if (sensor.maxRng < sat.perigee && (!sensor.maxRng2 || sensor.maxRng2 < sat.perigee)) continue;
 
       StandardSensorManager.updateSensorUiStyling([sensor]);
       let offset = 0;
@@ -230,7 +235,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     MultiSiteLookAnglesPlugin.populateMultiSiteTable_(multiSiteArray);
   }
 
-  private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: SensorObject): TearrData {
+  private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): TearrData {
     // Setup Realtime and Offset Time
     const aer = SatMath.getRae(now, satrec, sensor);
 
@@ -295,7 +300,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       // TODO: Future feature
       tr.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());
-        sensorManagerInstance.setSensor(sensor, sensor.staticNum);
+        sensorManagerInstance.setSensor(sensor, sensor.sensorId);
       });
     }
   }

@@ -1,6 +1,5 @@
 import { countriesMenuPlugin } from '@app/plugins/countries/countries';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
-import * as initialOrbit from '@app/plugins/initial-orbit/initial-orbit';
 import * as missile from '@app/plugins/missile/missilePlugin';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
@@ -24,7 +23,6 @@ import { DebugMenuPlugin } from './debug/debug';
 import { dopsPlugin } from './dops/dops';
 import { EditSat } from './edit-sat/edit-sat';
 import { gamepadPluginInstance } from './gamepad/gamepad';
-import { omManager } from './initial-orbit/om-manager';
 import { launchCalendarPlugin } from './launch-calendar/launch-calendar';
 import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
@@ -46,12 +44,12 @@ import { screenshotPlugin } from './screenshot/screenshot';
 import { SatInfoBox } from './select-sat-manager/sat-info-box';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { SensorFov } from './sensor-fov/sensor-fov';
+import { SensorListPlugin } from './sensor-list/sensor-list';
 import { SensorSurvFence } from './sensor-surv/sensor-surv-fence';
 import { CustomSensorPlugin } from './sensor/custom-sensor-plugin';
 import { LookAnglesPlugin } from './sensor/look-angles-plugin';
 import { MultiSiteLookAnglesPlugin } from './sensor/multi-site-look-angles-plugin';
 import { SensorInfoPlugin } from './sensor/sensor-info-plugin';
-import { SensorListPlugin } from './sensor/sensor-list-plugin';
 import { settingsMenuPlugin } from './settings-menu/settings-menu';
 import { ShortTermFences } from './short-term-fences/short-term-fences';
 import { SocialMedia } from './social/social';
@@ -141,7 +139,6 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
     if (plugins.debrisScreening) new DebrisScreening().init();
     if (plugins.editSat) new EditSat().init();
     if (plugins.newLaunch) new NewLaunch().init();
-    if (plugins.initialOrbit) initialOrbit.init();
     if (plugins.missile) missile.init();
     if (plugins.stereoMap) new StereoMap().init();
     if (plugins.sensorFov) new SensorFov().init();
@@ -271,4 +268,4 @@ export const startGoogleAnalytics = (): void => {
 };
 
 // Create common import for all plugins
-export { StreamManager as CanvasRecorder, catalogLoader, initialOrbit, missile, omManager };
+export { StreamManager as CanvasRecorder, catalogLoader, missile };

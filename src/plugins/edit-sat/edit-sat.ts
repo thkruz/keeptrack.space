@@ -1,6 +1,5 @@
 import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RAD2DEG } from '@app/lib/constants';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
@@ -13,9 +12,11 @@ import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { FormatTle } from '@app/static/format-tle';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
-import { SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { BaseObject, DetailedSatellite, RAD2DEG, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 
 export class EditSat extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Edit Sat';
@@ -175,6 +176,7 @@ export class EditSat extends KeepTrackPlugin {
         getEl(`editSat-save`).addEventListener('click', EditSat.editSatSaveClick);
 
         getEl(`editSat-open`).addEventListener('click', function () {
+          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           getEl(`editSat-file`).click();
         });
 
@@ -187,6 +189,23 @@ export class EditSat extends KeepTrackPlugin {
         getEl(`${EditSat.elementPrefix}-error`).addEventListener('click', function () {
           getEl(`${EditSat.elementPrefix}-error`).style.display = 'none';
         });
+      },
+    });
+  }
+
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.selectSatData,
+      cbName: this.PLUGIN_NAME,
+      cb: (obj: BaseObject) => {
+        if (!obj) {
+          if (this.isMenuButtonActive) {
+            this.closeSideMenu();
+          }
+          this.setBottomIconToDisabled();
+        }
       },
     });
   }
@@ -250,25 +269,25 @@ export class EditSat extends KeepTrackPlugin {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     const object = JSON.parse(<string>evt.target.result);
-    const sccNum = parseInt(StringPad.pad0(object.TLE1.substr(2, 5).trim(), 5));
-    const sat = keepTrackApi.getCatalogManager().getSatFromSccNum(sccNum);
+    const sccNum = parseInt(StringPad.pad0(object.tle1.substr(2, 5).trim(), 5));
+    const sat = keepTrackApi.getCatalogManager().sccNum2Sat(sccNum);
 
     let satrec: SatelliteRecord;
     try {
-      satrec = Sgp4.createSatrec(object.TLE1, object.TLE2);
+      satrec = Sgp4.createSatrec(object.tle1, object.tle2);
     } catch (e) {
       errorManagerInstance.error(e, 'edit-sat.ts', 'Error creating satellite record!');
       return;
     }
     if (SatMath.altitudeCheck(satrec, timeManagerInstance.simulationTimeObj) > 1) {
       keepTrackApi.getCatalogManager().satCruncher.postMessage({
-        typ: 'satEdit',
+        typ: CruncerMessageTypes.SAT_EDIT,
         id: sat.id,
         active: true,
-        TLE1: object.TLE1,
-        TLE2: object.TLE2,
+        tle1: object.tle1,
+        tle2: object.tle2,
       });
-      orbitManagerInstance.changeOrbitBufferData(sat.id, object.TLE1, object.TLE2);
+      orbitManagerInstance.changeOrbitBufferData(sat.id, object.tle1, object.tle2);
       sat.active = true;
     } else {
       uiManagerInstance.toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
@@ -276,23 +295,26 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   private populateSideMenu_() {
-    const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+    const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+    if (!obj?.isSatellite()) return;
+
+    const sat = obj as DetailedSatellite;
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
 
     const inc = (sat.inclination * RAD2DEG).toFixed(4).padStart(8, '0');
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = inc;
-    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.TLE1.substr(18, 2);
-    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = sat.TLE1.substr(20, 12);
-    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.TLE2.substr(52, 11);
-    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.tle1.substr(18, 2);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = sat.tle1.substr(20, 12);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.tle2.substr(52, 11);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.tle2.substr(52, 11))).toFixed(4);
 
     const rasc = (sat.raan * RAD2DEG).toFixed(4).padStart(8, '0');
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = rasc;
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-    const argPe = (sat.argPe * RAD2DEG).toFixed(4).padStart(8, '0');
+    const argPe = (sat.argOfPerigee * RAD2DEG).toFixed(4).padStart(8, '0');
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = StringPad.pad0(argPe, 8);
-    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.tle2.substr(44 - 1, 7 + 1);
   }
 
   private editSatNewTleClick_() {
@@ -305,9 +327,11 @@ export class EditSat extends KeepTrackPlugin {
 
     try {
       // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-      const satId = keepTrackApi.getCatalogManager().getIdFromSccNum(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
-      const mainsat = keepTrackApi.getCatalogManager().getSat(satId);
+      const satId = keepTrackApi.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
+      const obj = keepTrackApi.getCatalogManager().getObject(satId);
+      if (!obj.isSatellite()) return;
 
+      const mainsat = obj as DetailedSatellite;
       // Launch Points are the Satellites Current Location
       const lla = CoordinateTransforms.eci2lla(mainsat.position, timeManagerInstance.simulationTimeObj);
       let launchLon = lla.lon;
@@ -322,7 +346,7 @@ export class EditSat extends KeepTrackPlugin {
       const simulationTimeObj = timeManagerInstance.simulationTimeObj;
 
       const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
-      mainsat.TLE1 = (mainsat.TLE1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.TLE1.substr(32)) as TleLine1;
+      mainsat.tle1 = (mainsat.tle1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substr(32)) as TleLine1;
 
       keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
@@ -334,63 +358,71 @@ export class EditSat extends KeepTrackPlugin {
         TLEs = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt).rotateOrbitToLatLon();
       }
 
-      const TLE1 = TLEs[0];
-      const TLE2 = TLEs[1];
+      const tle1 = TLEs[0];
+      const tle2 = TLEs[1];
 
-      if (TLE1 === 'Error') {
-        uiManagerInstance.toast(`${TLE2}`, 'critical', true);
+      if (tle1 === 'Error') {
+        uiManagerInstance.toast(`${tle2}`, 'critical', true);
         return;
       }
 
       keepTrackApi.getCatalogManager().satCruncher.postMessage({
-        typ: 'satEdit',
+        typ: CruncerMessageTypes.SAT_EDIT,
         id: satId,
-        TLE1: TLE1,
-        TLE2: TLE2,
+        tle1: tle1,
+        tle2: tle2,
       });
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
+      orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
       //
       // Reload Menu with new TLE
       //
-      const sat = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+      const obj2 = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+      if (!obj2.isSatellite()) return;
+
+      const sat = obj2 as DetailedSatellite;
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
 
       const inc = (sat.inclination * RAD2DEG).toFixed(4).padStart(8, '0');
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = StringPad.pad0(inc, 8);
-      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.TLE1.substr(18, 2);
-      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = sat.TLE1.substr(20, 12);
-      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.TLE2.substr(52, 11);
-      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.TLE2.substr(52, 11))).toFixed(4);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.tle1.substr(18, 2);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = sat.tle1.substr(20, 12);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.tle2.substr(52, 11);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.tle2.substr(52, 11))).toFixed(4);
 
       const rasc = (sat.raan * RAD2DEG).toFixed(4).padStart(8, '0');
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = rasc;
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-      const argPe = (sat.argPe * RAD2DEG).toFixed(4).padStart(8, '0');
+      const argPe = (sat.argOfPerigee * RAD2DEG).toFixed(4).padStart(8, '0');
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = argPe;
-      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.TLE2.substr(44 - 1, 7 + 1);
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.tle2.substr(44 - 1, 7 + 1);
     } catch (error) {
       errorManagerInstance.warn(error);
     }
   }
 
   private static editSatSubmit() {
+    keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     getEl(`${EditSat.elementPrefix}-error`).style.display = 'none';
     const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
-    const satId = catalogManagerInstance.getIdFromSccNum(parseInt(scc));
+    const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
     if (satId === null) {
       errorManagerInstance.info('Not a Real Satellite');
     }
-    const sat = catalogManagerInstance.getSat(satId, GetSatType.EXTRA_ONLY);
-    const intl = sat.TLE1.substr(9, 8);
+    const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
+    if (!obj.isSatellite()) return;
+
+    const sat = obj as DetailedSatellite;
+    const intl = sat.tle1.substr(9, 8);
     let inc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value;
     let meanmo = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value;
     let rasc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value;
@@ -400,25 +432,25 @@ export class EditSat extends KeepTrackPlugin {
     const epochyr = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value;
     const epochday = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value;
 
-    const { TLE1, TLE2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
+    const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
 
     let satrec: SatelliteRecord;
     try {
-      satrec = Sgp4.createSatrec(TLE1, TLE2);
+      satrec = Sgp4.createSatrec(tle1, tle2);
     } catch (e) {
       errorManagerInstance.error(e, 'edit-sat.ts', 'Error creating satellite record!');
       return;
     }
     if (SatMath.altitudeCheck(satrec, timeManagerInstance.simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
-        typ: 'satEdit',
+        typ: CruncerMessageTypes.SAT_EDIT,
         id: satId,
         active: true,
-        TLE1: TLE1,
-        TLE2: TLE2,
+        tle1: tle1,
+        tle2: tle2,
       });
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      orbitManagerInstance.changeOrbitBufferData(satId, TLE1, TLE2);
+      orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
       sat.active = true;
 
       // Prevent caching of old TLEs
@@ -430,14 +462,15 @@ export class EditSat extends KeepTrackPlugin {
 
   private static editSatSaveClick(e: Event) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
 
     try {
       const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
-      const satId = catalogManagerInstance.getIdFromSccNum(parseInt(scc));
-      const sat = catalogManagerInstance.getSat(satId, GetSatType.EXTRA_ONLY);
+      const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
+      const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as DetailedSatellite;
       const sat2 = {
-        TLE1: sat.TLE1,
-        TLE2: sat.TLE2,
+        tle1: sat.tle1,
+        tle2: sat.tle2,
       };
       const variable = JSON.stringify(sat2);
       const blob = new Blob([variable], {

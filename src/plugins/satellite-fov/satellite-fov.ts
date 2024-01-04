@@ -24,6 +24,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import sat2Png from '@public/img/icons/sat2.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -36,13 +37,19 @@ declare module '@app/interfaces' {
 }
 
 export class SatelliteFov extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Satellite Field of View';
+
+  constructor() {
+    super(SatelliteFov.PLUGIN_NAME);
+  }
+
+  isSatOverflyModeOn = false;
+
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {
       this.enableFovView_();
-      settingsManager.isSatOverflyModeOn = true;
     } else {
-      this.disableFovView_();
-      settingsManager.isSatOverflyModeOn = false;
+      this.disableFovView();
     }
   };
 
@@ -54,11 +61,6 @@ export class SatelliteFov extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
-  constructor() {
-    const PLUGIN_NAME = 'Satellite Field of View';
-    super(PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
 
@@ -67,22 +69,25 @@ export class SatelliteFov extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+          this.isSatOverflyModeOn = false;
+          this.setBottomIconToUnselected(false);
         }
       },
     });
   }
 
-  private disableFovView_() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  disableFovView(isTellWorker = true) {
+    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
-    settingsManager.isSatOverflyModeOn = false;
-    this.setBottomIconToUnselected();
+    this.isSatOverflyModeOn = false;
+    this.setBottomIconToUnselected(false);
 
-    catalogManagerInstance.satCruncher.postMessage({
-      typ: 'isShowSatOverfly',
-      isShowSatOverfly: 'reset',
-    });
+    if (isTellWorker) {
+      keepTrackApi.getCatalogManager().satCruncher.postMessage({
+        typ: CruncerMessageTypes.UPDATE_MARKERS,
+        markerMode: MarkerMode.OFF,
+      });
+    }
   }
 
   static getSatFieldOfView_(): number {
@@ -108,33 +113,28 @@ export class SatelliteFov extends KeepTrackPlugin {
   }
 
   private enableFovView_() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
     keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
 
-    settingsManager.isShowSurvFence = false;
-    settingsManager.isFOVBubbleModeOn = false;
-    settingsManager.isSatOverflyModeOn = true;
-
+    this.isSatOverflyModeOn = true;
     this.setBottomIconToSelected();
 
     if ((<HTMLInputElement>getEl('search')).value !== '') {
       // If Group Selected
-      uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
+      keepTrackApi.getUiManager().doSearch((<HTMLInputElement>getEl('search')).value);
     }
 
     const satFieldOfView = SatelliteFov.getSatFieldOfView_();
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     catalogManagerInstance.satCruncher.postMessage({
-      isShowFOVBubble: 'reset',
-      isShowSurvFence: 'disable',
+      typ: CruncerMessageTypes.UPDATE_MARKERS,
+      markerMode: MarkerMode.OVERFLY,
     });
     catalogManagerInstance.satCruncher.postMessage({
-      typ: 'isShowSatOverfly',
-      isShowSatOverfly: 'enable',
+      typ: CruncerMessageTypes.IS_UPDATE_SATELLITE_OVERFLY,
       selectedSatFOV: satFieldOfView,
     });
-    colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
   }
 }

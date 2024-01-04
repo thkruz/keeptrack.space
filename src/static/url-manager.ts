@@ -1,6 +1,7 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { DetailedSatellite } from 'ootk';
 import { getEl } from '../lib/get-el';
 
 export abstract class UrlManager {
@@ -18,7 +19,6 @@ export abstract class UrlManager {
 
   static updateURL() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
@@ -31,9 +31,11 @@ export abstract class UrlManager {
     let url = arr[0];
     const paramSlices = [];
 
-    if (selectSatManagerInstance?.selectedSat !== -1 && typeof catalogManagerInstance.getSat(selectSatManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum != 'undefined') {
+    const selectedSat = selectSatManagerInstance?.getSelectedSat() as DetailedSatellite;
+
+    if (selectedSat?.isSatellite() && selectedSat.sccNum) {
       // TODO: This doesn't work for VIMPEL objects
-      const scc = catalogManagerInstance.getSat(selectSatManagerInstance.selectedSat, GetSatType.EXTRA_ONLY).sccNum;
+      const scc = selectedSat.sccNum;
       if (scc !== '') paramSlices.push('sat=' + scc);
     }
 
@@ -87,8 +89,8 @@ export abstract class UrlManager {
       cb: () => {
         const uiManagerInstance = keepTrackApi.getUiManager();
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const urlSatId = catalogManagerInstance.getIdFromIntlDes(val.toUpperCase());
-        if (urlSatId !== null && catalogManagerInstance.getSat(urlSatId).active) {
+        const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
+        if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId).active) {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {
           uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
@@ -104,7 +106,7 @@ export abstract class UrlManager {
       cb: () => {
         const uiManagerInstance = keepTrackApi.getUiManager();
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const urlSatId = catalogManagerInstance.getIdFromSccNum(parseInt(val));
+        const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
         if (urlSatId !== null) {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {

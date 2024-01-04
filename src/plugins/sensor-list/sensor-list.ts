@@ -1,20 +1,22 @@
 import { sensors } from '@app/catalogs/sensors';
-import { KeepTrackApiEvents, SatObject, SensorObject } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getClass } from '@app/lib/get-class';
 import { getEl } from '@app/lib/get-el';
-import { CameraType } from '@app/singletons/camera';
 import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { SensorMath } from '@app/static/sensor-math';
 import radarPng from '@public/img/icons/radar.png';
+import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { Planetarium } from '../planetarium/planetarium';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
+import './sensor-list.css';
 
 export class SensorListPlugin extends KeepTrackPlugin {
   dependencies: string[] = [DateTimeManager.PLUGIN_NAME];
@@ -50,11 +52,11 @@ export class SensorListPlugin extends KeepTrackPlugin {
     <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
         <div id="sensor-list-content" class="side-menu">
         <div class="row">
-            <ul id="reset-sensor-text" class="sensor-reset-menu">
-            <h5 id="reset-sensor-button" class="center-align menu-selectable">Reset Sensor</h5>
+          <ul id="reset-sensor-text" class="sensor-reset-menu">
+            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button">Reset Sensor &#9658;</button>
             <li class="divider"></li>
-            </ul>
-            <ul id="list-of-sensors">` +
+          </ul>
+          <ul id="list-of-sensors">` +
     SensorListPlugin.ssnSensors_() +
     SensorListPlugin.mwSensors_() +
     SensorListPlugin.mdaSensors_() +
@@ -64,9 +66,9 @@ export class SensorListPlugin extends KeepTrackPlugin {
     SensorListPlugin.chineseSensors_() +
     SensorListPlugin.otherSensors_() +
     keepTrackApi.html`
-            </ul>
+          </ul>
         </div>
-        </div>
+      </div>
     </div>`;
 
   static PLUGIN_NAME = 'Sensor List';
@@ -119,21 +121,25 @@ export class SensorListPlugin extends KeepTrackPlugin {
       cb: () => {
         getEl('sensor-selected').addEventListener('click', () => {
           keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
         });
 
-        getEl('sensor-list-content').addEventListener('click', (e: any) => {
-          let realTarget = e.target;
-          if (!e.target.classList.contains('menu-selectable')) {
-            realTarget = e.target.parentElement;
-            if (!realTarget.classList.contains('menu-selectable')) {
+        getEl('sensor-list-content').addEventListener('click', (e: Event) => {
+          let realTarget = e.target as HTMLElement | undefined;
+          if (!realTarget?.classList.contains('menu-selectable')) {
+            realTarget = realTarget?.closest('.menu-selectable');
+            if (!realTarget?.classList.contains('menu-selectable')) {
               return;
             }
           }
 
           if (realTarget.id === 'reset-sensor-button') {
             keepTrackApi.getSensorManager().resetSensorSelected();
+            keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
             return;
           }
+
+          keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
           const sensorClick = realTarget.dataset.sensor;
           this.sensorListContentClick(sensorClick);
         });
@@ -143,9 +149,9 @@ export class SensorListPlugin extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: 'sensor',
-      cb: (sat: SatObject) => {
+      cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (sat === null || typeof sat === 'undefined') {
+        if (obj === null || typeof obj === 'undefined') {
           return;
         }
 
@@ -164,7 +170,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
             Object.keys(sensors).forEach((key) => {
               const sensor = sensors[key];
               const sat = selectSatManagerInstance.getSelectedSat();
-              const tearr = SensorMath.getTearr(sat, [sensor]);
+              if (!sat.isMissile()) return;
+              const tearr = SensorMath.getTearr(sat as DetailedSatellite, [sensor]);
               if (tearr.inView) {
                 keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
               }
@@ -182,12 +189,14 @@ export class SensorListPlugin extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
       cbName: this.PLUGIN_NAME,
-      cb: (sat: SensorObject) => {
+      cb: (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) return;
+        if (!obj.isSensor()) return;
+        const sensor = obj as DetailedSensor;
 
         const sensorManagerInstance = keepTrackApi.getSensorManager();
         // No sensor manager on mobile
-        sensorManagerInstance.setSensor(null, sat.staticNum);
+        sensorManagerInstance.setSensor(null, sensor.sensorId);
 
         if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
         const timeManagerInstance = keepTrackApi.getTimeManager();
@@ -207,7 +216,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
-          SensorListPlugin.reloadLastSensor();
+          SensorListPlugin.reloadLastSensor_();
         }
       },
     });
@@ -271,7 +280,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
   }
 
-  static createLiForSensor(sensor: SensorObject) {
+  private static createLiForSensor_(sensor: DetailedSensor) {
     return keepTrackApi.html`
       <li class="menu-selectable" data-sensor="${sensor.objName}">
         <span>${sensor.uiName}</span>
@@ -281,8 +290,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
     `;
   }
 
-  static ssnSensors_() {
-    return this.createSection({
+  private static ssnSensors_() {
+    return this.createSection_({
       header: 'Space Surveillance Network Sensors',
       sensors: [
         sensors.EGLAFB,
@@ -310,8 +319,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
   }
 
-  static mwSensors_() {
-    return this.createSection({
+  private static mwSensors_() {
+    return this.createSection_({
       header: 'US Missile Warning Sensors',
       sensors: [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB],
       topLinks: [
@@ -324,8 +333,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
   }
 
-  static mdaSensors_() {
-    return this.createSection({
+  private static mdaSensors_() {
+    return this.createSection_({
       header: 'US Missile Defense Agency Sensors',
       sensors: [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR],
       topLinks: [
@@ -338,7 +347,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
   }
 
-  static createSection(params: { header: string; sensors: SensorObject[]; topLinks: { name: string; dataSensor: string; badge: string }[] }) {
+  private static createSection_(params: { header: string; sensors: DetailedSensor[]; topLinks: { name: string; dataSensor: string; badge: string }[] }) {
     return keepTrackApi.html`
               <li class="divider"></li>
               <h5 class="center-align">${params.header}</h5>
@@ -351,12 +360,12 @@ export class SensorListPlugin extends KeepTrackPlugin {
               </li>`
                 )
                 .join('')}
-              ${params.sensors.map((sensor) => SensorListPlugin.createLiForSensor(sensor)).join('')}
+              ${params.sensors.map((sensor) => SensorListPlugin.createLiForSensor_(sensor)).join('')}
               `;
   }
 
-  static esocSensors_() {
-    return this.createSection({
+  private static esocSensors_() {
+    return this.createSection_({
       header: 'ESA Space Operations Center Sensors',
       sensors: [
         sensors.GRV,
@@ -383,8 +392,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
   }
 
-  static leoLabsSensors_() {
-    return this.createSection({
+  private static leoLabsSensors_() {
+    return this.createSection_({
       header: 'Leo Labs Sensors',
       sensors: [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR],
       topLinks: [
@@ -397,16 +406,16 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
   }
 
-  static otherSensors_() {
-    return this.createSection({
+  private static otherSensors_() {
+    return this.createSection_({
       header: 'Other Sensors',
       sensors: [sensors.ROC, sensors.MLS, sensors.PO, sensors.LSO, sensors.MAY],
       topLinks: [],
     });
   }
 
-  static russianSensors_() {
-    return this.createSection({
+  private static russianSensors_() {
+    return this.createSection_({
       header: 'Russian Sensors',
       sensors: [
         sensors.OLED,
@@ -433,8 +442,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
   }
 
-  static chineseSensors_() {
-    return this.createSection({
+  private static chineseSensors_() {
+    return this.createSection_({
       header: 'Chinese Sensors',
       sensors: [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO],
       topLinks: [
@@ -447,7 +456,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
   }
 
-  static reloadLastSensor() {
+  private static reloadLastSensor_() {
     const json = PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
     if (!json) return;
     const currentSensor = JSON.parse(json);
@@ -456,7 +465,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       try {
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-        // If there is a staticnum set use that
+        // If there is a sensorId set use that
         if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
           sensorManagerInstance.setSensor(null, currentSensor[1]);
           LegendManager.change('default');
@@ -465,38 +474,13 @@ export class SensorListPlugin extends KeepTrackPlugin {
           sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
           LegendManager.change('default');
         } else {
-          // Seems to be a single sensor without a staticnum, load that
+          // Seems to be a single sensor without a sensorId, load that
           sensorManagerInstance.setSensor(sensors[currentSensor[0].objName], currentSensor[1]);
           LegendManager.change('default');
         }
       } catch {
         PersistenceManager.getInstance().removeItem(StorageKey.CURRENT_SENSOR);
       }
-    }
-  }
-
-  resetSensorButtonClick() {
-    if (!this.isMenuButtonActive) return;
-
-    getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
-    getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');
-    getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
-    getEl('menu-planetarium')?.classList.add('bmenu-item-disabled');
-    getEl('menu-astronomy')?.classList.add('bmenu-item-disabled');
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
-      keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-      keepTrackApi.getMainCamera().isPanReset = true;
-      keepTrackApi.getMainCamera().isLocalRotateReset = true;
-      settingsManager.fieldOfView = 0.6;
-      keepTrackApi.getRenderer().glInit();
-      const uiManagerInstance = keepTrackApi.getUiManager();
-      uiManagerInstance.hideSideMenus();
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
-      // TODO: implement fov information
-      // getEl('fov-text').innerHTML = ('');
-      getEl('menu-planetarium').classList.remove('bmenu-item-selected');
     }
   }
 }

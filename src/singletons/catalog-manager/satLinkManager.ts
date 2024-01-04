@@ -2,12 +2,11 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
 import numeric from 'numeric';
-import { ControlSiteObject } from '../../catalogs/control-sites';
-import { SatObject, SensorObject } from '../../interfaces';
-import { RAD2DEG } from '../../lib/constants';
+import { DetailedSatellite, DetailedSensor, RAD2DEG } from 'ootk';
 import { LineManager, LineTypes } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { TimeManager } from '../time-manager';
+import { ControlSite } from './ControlSite';
 
 export enum SatConstellationString {
   Aehf = 'aehf',
@@ -69,17 +68,17 @@ export class SatLinkManager {
 
   private idToSatnum_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    this.aehf = catalogManagerInstance.convertSatnumArrayToIdArray(this.aehf);
-    this.dscs = catalogManagerInstance.convertSatnumArrayToIdArray(this.dscs);
-    this.wgs = catalogManagerInstance.convertSatnumArrayToIdArray(this.wgs);
-    this.iridium = catalogManagerInstance.convertSatnumArrayToIdArray(this.iridium);
-    this.galileo = catalogManagerInstance.convertSatnumArrayToIdArray(this.galileo);
-    this.sbirs = catalogManagerInstance.convertSatnumArrayToIdArray(this.sbirs);
-    this.dsp = catalogManagerInstance.convertSatnumArrayToIdArray(this.dsp);
-    this.starlink = catalogManagerInstance.convertSatnumArrayToIdArray(this.starlink);
+    this.aehf = catalogManagerInstance.satnums2ids(this.aehf);
+    this.dscs = catalogManagerInstance.satnums2ids(this.dscs);
+    this.wgs = catalogManagerInstance.satnums2ids(this.wgs);
+    this.iridium = catalogManagerInstance.satnums2ids(this.iridium);
+    this.galileo = catalogManagerInstance.satnums2ids(this.galileo);
+    this.sbirs = catalogManagerInstance.satnums2ids(this.sbirs);
+    this.dsp = catalogManagerInstance.satnums2ids(this.dsp);
+    this.starlink = catalogManagerInstance.satnums2ids(this.starlink);
   }
 
-  init(controlSiteList: ControlSiteObject[]) {
+  init(controlSiteList: ControlSite[]) {
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherReady,
       cbName: 'satLinkManager',
@@ -87,7 +86,7 @@ export class SatLinkManager {
     });
   }
 
-  private onCruncher_(controlSiteList: ControlSiteObject[]) {
+  private onCruncher_(controlSiteList: ControlSite[]) {
     try {
       this.idToSatnum_();
 
@@ -198,8 +197,8 @@ export class SatLinkManager {
           for (let j = 0; j < satlist.length; j++) {
             if (i !== j) {
               const catalogManagerInstance = keepTrackApi.getCatalogManager();
-              const sat1 = catalogManagerInstance.getSat(satlist[i]);
-              const sat2 = catalogManagerInstance.getSat(satlist[j]);
+              const sat1 = catalogManagerInstance.getObject(satlist[i]);
+              const sat2 = catalogManagerInstance.getObject(satlist[j]);
               //
               // Debug for finding decayed satellites
               //
@@ -231,11 +230,11 @@ export class SatLinkManager {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         for (const sensorName of userlist) {
           let id = catalogManagerInstance.getSensorFromSensorName(sensorName.toString());
-          let user = <SensorObject>(<unknown>catalogManagerInstance.getSat(id));
-          let bestSat: SatObject = null;
+          let user = catalogManagerInstance.getObject(id) as DetailedSensor;
+          let bestSat: DetailedSatellite = null;
           let bestRange = 1000000;
           for (const satId of satlist) {
-            const sat = catalogManagerInstance.getSat(satId);
+            const sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
             const tearr = SensorMath.getTearr(sat, [user], timeManager.simulationTimeObj);
             if (tearr.el > elevationMask) {
               if (tearr.rng < bestRange) {
@@ -257,14 +256,14 @@ export class SatLinkManager {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         for (const sensorName of userlist) {
           // Select the current user
-          let user = <SensorObject>(<unknown>catalogManagerInstance.getSat(catalogManagerInstance.getSensorFromSensorName(sensorName.toString())));
+          let user = catalogManagerInstance.getObject(catalogManagerInstance.getSensorFromSensorName(sensorName.toString())) as DetailedSensor;
           if (!user) continue;
           // Loop through all of the satellites
-          let bestSat: SatObject = null;
+          let bestSat: DetailedSatellite = null;
           let bestRange = 1000000;
           for (const satId of satlist) {
             // Select the current satelltie
-            let sat = catalogManagerInstance.getSat(satId);
+            let sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
             // Calculate Time, Elevation, Azimuth, Range, and Range Rate data
             // of the current satellite relevant to the current user. This allows
             // us to figure out if the user can see the satellite

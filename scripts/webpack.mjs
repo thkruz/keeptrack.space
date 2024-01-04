@@ -128,7 +128,7 @@ const getBaseConfig = (dirName) => ({
         },
       },
       {
-        test: /\.(?:mp3)$/iu,
+        test: /\.(?:mp3|wav|flac)$/iu,
         include: [/src/u, /public/u],
         type: 'asset/resource',
         generator: {

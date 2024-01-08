@@ -138,8 +138,8 @@ export class SensorMath {
       tearr.lat = gpos.lat;
       let positionEcf = eci2ecf(positionEci, gmst);
       let lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
-      tearr.az = <Degrees>(lookAngles.az * RAD2DEG);
-      tearr.el = <Degrees>(lookAngles.el * RAD2DEG);
+      tearr.az = lookAngles.az;
+      tearr.el = lookAngles.el;
       tearr.rng = lookAngles.rng;
     } catch /* istanbul ignore next */ {
       tearr.alt = <Kilometers>0;

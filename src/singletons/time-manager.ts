@@ -100,6 +100,12 @@ export class TimeManager {
     UrlManager.updateURL();
   }
 
+  static isLeapYear(dateIn: Date) {
+    const year = dateIn.getUTCFullYear();
+    if ((year & 3) !== 0) return false;
+    return year % 100 !== 0 || year % 400 === 0;
+  }
+
   changeStaticOffset(staticOffset: number) {
     this.dynamicOffsetEpoch = Date.now();
     this.staticOffset = staticOffset;

@@ -840,7 +840,7 @@ export const updateMarkerSurvAndFov = (i: number, gmst: GreenwichMeanSiderealTim
 
     // Ignore Depe Sensors When showing Many - too many dots
     // TODO: We should use meshes for this instead of dots
-    if (sensor.isDeepSpace()) continue;
+    if (sensors.length > 1 && sensor.isDeepSpace()) continue;
 
     q = Math.abs(sensor.maxAz - sensor.minAz) < 30 ? 0.5 : 3;
     q2 = sensor.maxRng - sensor.minRng < 720 ? 125 : 30;

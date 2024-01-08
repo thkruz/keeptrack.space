@@ -28,9 +28,8 @@
 
 import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { FormatTle } from '@app/static/format-tle';
 import { CruncerMessageTypes, ExtraDataMessage } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, EciVec3, Kilometers, SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, EciVec3, FormatTle, Kilometers, SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';

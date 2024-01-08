@@ -7,7 +7,6 @@ import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
-import { SensorMath } from '@app/static/sensor-math';
 import radarPng from '@public/img/icons/radar.png';
 import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
@@ -164,15 +163,18 @@ export class SensorListPlugin extends KeepTrackPlugin {
                 `
           );
           getEl('sensors-in-fov-link').addEventListener('click', () => {
+            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+
             const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
             if (!selectSatManagerInstance) return;
 
+            const sat = selectSatManagerInstance.getSelectedSat();
+            if (sat.isMissile()) return;
+
             Object.keys(sensors).forEach((key) => {
               const sensor = sensors[key];
-              const sat = selectSatManagerInstance.getSelectedSat();
-              if (!sat.isMissile()) return;
-              const tearr = SensorMath.getTearr(sat as DetailedSatellite, [sensor]);
-              if (tearr.inView) {
+              const isInView = sensor.isSatInFov(sat as DetailedSatellite, keepTrackApi.getTimeManager().simulationTimeObj);
+              if (isInView) {
                 keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
               }
             });

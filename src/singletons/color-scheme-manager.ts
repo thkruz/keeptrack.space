@@ -36,6 +36,7 @@ import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { PersistenceManager, StorageKey } from './persistence-manager';
+import { TimeManager } from './time-manager';
 
 export class ColorSchemeManager {
   private readonly DOTS_PER_CALC = 450;
@@ -763,20 +764,26 @@ export class ColorSchemeManager {
     const jday = getDayOfYear(now);
     const year = now.getUTCFullYear().toString().substr(2, 2);
     let daysold: Days;
-    if (sat.tle1.substr(18, 2) === year) {
+    const yearForTle = sat.tle1.substr(18, 2);
+
+    if (yearForTle === year) {
       daysold = (jday - parseInt(sat.tle1.substr(20, 3))) as Days;
+    } else if (parseInt(yearForTle) - parseInt(year) > 1) {
+      // If the TLE year is more than 1 year behind the current year, then we assume it is lost
+      daysold = 99999 as Days;
     } else {
-      daysold = (jday - parseInt(sat.tle1.substr(20, 3)) + parseInt(sat.tle1.substr(17, 2)) * 365) as Days;
+      const isLeapYear = TimeManager.isLeapYear(keepTrackApi.getTimeManager().simulationTimeObj);
+      const daysInYear = isLeapYear ? 366 : 365;
+      daysold = (jday + daysInYear - parseInt(sat.tle1.substr(20, 3))) as Days;
     }
-    // NOTE: This will need to be adjusted if Alpha-5 satellites become numbers instead of alphanumeric
     // TODO: Readd this idea - (satellite.maxRng !== 0 && sat.perigee > satellite.maxRng)
-    if ((sat.sccNum && parseInt(sat.sccNum) >= 70000) || daysold < settingsManager.daysUntilObjectLost) {
+    if ((sat.sccNum6 && (parseInt(sat.sccNum6) >= 70000 || parseInt(sat.sccNum6) < 0)) || daysold < settingsManager.daysUntilObjectLost) {
       return {
         color: this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     } else {
-      settingsManager.lostSatStr += settingsManager.lostSatStr === '' ? sat.sccNum : `,${sat.sccNum}`;
+      settingsManager.lostSatStr += settingsManager.lostSatStr === '' ? sat.sccNum6 : `,${sat.sccNum6}`;
       return {
         color: this.colorTheme.lostobjects,
         pickable: Pickable.Yes,

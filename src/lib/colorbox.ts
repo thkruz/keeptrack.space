@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { getEl } from './get-el';
 import { showLoading } from './showLoading';
 import { slideInRight, slideOutLeft } from './slide';
@@ -84,6 +85,11 @@ const setupIframeColorbox_ = (url: string) => {
   }
   colorboxContainerDom.style.width = '100%';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'block';
+  // Catch failures to load
+  (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
+    errorManagerInstance.warn(`Failed to load: ${url}`);
+    closeColorbox();
+  };
   (<HTMLIFrameElement>getEl('colorbox-iframe')).src = url;
   (<HTMLImageElement>getEl('colorbox-img')).style.display = 'none';
 };
@@ -102,5 +108,10 @@ const setupImageColorbox_ = (url: string) => {
   colorboxContainerDom.style.transform = 'translateX(-200%)';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'none';
   (<HTMLImageElement>getEl('colorbox-img')).style.display = 'block';
+  // Catch failures to load images
+  (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
+    errorManagerInstance.warn(`Failed to load image: ${url}`);
+    closeColorbox();
+  };
   (<HTMLImageElement>getEl('colorbox-img')).src = url;
 };

@@ -34,9 +34,9 @@ import redSquare from '@public/img/red-square.png';
 import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
-import { SatMathApi } from '@app/singletons/sat-math-api';
+import { dateFormat } from '@app/lib/dateFormat';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { BaseObject } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -85,63 +85,24 @@ export class StereoMap extends KeepTrackPlugin {
   `;
 
   sideMenuElementName = 'map-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml =
+    keepTrackApi.html`
   <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
     <canvas id="map-2d"></canvas>
-    <img id="map-sat" class="map-item map-look" src=${satellite2} width="20px" height="20px">
-    <img id="map-sensor" class="map-item map-look start-hidden" src=${radar1} width="20px"
-      height="20px">
-    <img id="map-look1" class="map-item map-look">
-    <img id="map-look2" class="map-item map-look">
-    <img id="map-look3" class="map-item map-look">
-    <img id="map-look4" class="map-item map-look">
-    <img id="map-look5" class="map-item map-look">
-    <img id="map-look6" class="map-item map-look">
-    <img id="map-look7" class="map-item map-look">
-    <img id="map-look8" class="map-item map-look">
-    <img id="map-look9" class="map-item map-look">
-    <img id="map-look10" class="map-item map-look">
-    <img id="map-look11" class="map-item map-look">
-    <img id="map-look12" class="map-item map-look">
-    <img id="map-look13" class="map-item map-look">
-    <img id="map-look14" class="map-item map-look">
-    <img id="map-look15" class="map-item map-look">
-    <img id="map-look16" class="map-item map-look">
-    <img id="map-look17" class="map-item map-look">
-    <img id="map-look18" class="map-item map-look">
-    <img id="map-look19" class="map-item map-look">
-    <img id="map-look20" class="map-item map-look">
-    <img id="map-look21" class="map-item map-look">
-    <img id="map-look22" class="map-item map-look">
-    <img id="map-look23" class="map-item map-look">
-    <img id="map-look24" class="map-item map-look">
-    <img id="map-look25" class="map-item map-look">
-    <img id="map-look26" class="map-item map-look">
-    <img id="map-look27" class="map-item map-look">
-    <img id="map-look28" class="map-item map-look">
-    <img id="map-look29" class="map-item map-look">
-    <img id="map-look30" class="map-item map-look">
-    <img id="map-look31" class="map-item map-look">
-    <img id="map-look32" class="map-item map-look">
-    <img id="map-look33" class="map-item map-look">
-    <img id="map-look34" class="map-item map-look">
-    <img id="map-look35" class="map-item map-look">
-    <img id="map-look36" class="map-item map-look">
-    <img id="map-look37" class="map-item map-look">
-    <img id="map-look38" class="map-item map-look">
-    <img id="map-look39" class="map-item map-look">
-    <img id="map-look40" class="map-item map-look">
-    <img id="map-look41" class="map-item map-look">
-    <img id="map-look42" class="map-item map-look">
-    <img id="map-look43" class="map-item map-look">
-    <img id="map-look44" class="map-item map-look">
-    <img id="map-look45" class="map-item map-look">
-    <img id="map-look46" class="map-item map-look">
-    <img id="map-look47" class="map-item map-look">
-    <img id="map-look48" class="map-item map-look">
-    <img id="map-look49" class="map-item map-look">
-    <img id="map-look50" class="map-item map-look">
-  </div>`;
+    <img id="map-sat" class="map-item map-look" src=${satellite2} width="20px" height="20px"/>
+    <img id="map-sensor" class="map-item map-look start-hidden" src=${radar1} width="20px" height="20px"/>
+    ` +
+    StereoMap.generateMapLooks_(50) +
+    `</div>`;
+
+  static generateMapLooks_(count: number): string {
+    let html = '';
+    for (let i = 1; i <= count; i++) {
+      html += `<img id="map-look${i}" class="map-item map-look"/>`;
+    }
+
+    return html;
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -205,6 +166,16 @@ export class StereoMap extends KeepTrackPlugin {
     }
   }
 
+  static getMapPoints_(now: Date, sat: DetailedSatellite, sensor: DetailedSensor): { lla: LlaVec3<Degrees, Kilometers>; inView: boolean; time: string } {
+    const time = dateFormat(now, 'isoDateTime', true);
+
+    const { gmst } = calcGmst(now);
+    const lla = eci2lla(sat.getEci(now).position, gmst);
+    const inView = sensor.isSatInFov(sat, now);
+
+    return { lla, inView, time };
+  }
+
   private drawGroundTrace_() {
     const groundTracePoints: GroundTracePoint[] = [];
     const pointPerOrbit = 512;
@@ -213,22 +184,26 @@ export class StereoMap extends KeepTrackPlugin {
     let selectableIdx = 1;
 
     const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat);
+    const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+
     // Start at 1 so that the first point is NOT the satellite
     for (let i = 1; i < pointPerOrbit; i++) {
-      let map = SatMathApi.map(sat, i, pointPerOrbit);
+      const now = new Date(keepTrackApi.getTimeManager().simulationTimeObj.getTime() + ((i * sat.period * 1.15) / pointPerOrbit) * 60 * 1000);
+      const mapPoints = StereoMap.getMapPoints_(now, sat, sensor);
+
       groundTracePoints.push({
-        x: ((map.lon + 180) / 360) * settingsManager.mapWidth,
-        y: settingsManager.mapHeight - ((map.lat + 90) / 180) * settingsManager.mapHeight,
-        inView: map.inView,
+        x: ((mapPoints.lla.lon + 180) / 360) * settingsManager.mapWidth,
+        y: settingsManager.mapHeight - ((mapPoints.lla.lat + 90) / 180) * settingsManager.mapHeight,
+        inView: mapPoints.inView,
       });
 
       if (i % selectableInterval === 0) {
         const dotDom = <HTMLImageElement>getEl(`map-look${selectableIdx}`);
 
-        dotDom.src = map.inView ? yellowSquare : redSquare;
+        dotDom.src = mapPoints.inView ? yellowSquare : redSquare;
         dotDom.style.left = `${groundTracePoints[i - 1].x - this.halfDotSize_}px`;
         dotDom.style.top = `${groundTracePoints[i - 1].y - this.halfDotSize_}px`;
-        dotDom.dataset.time = map.time;
+        dotDom.dataset.time = mapPoints.time;
 
         selectableIdx++;
       }

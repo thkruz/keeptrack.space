@@ -22,7 +22,6 @@
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import fencePng from '@public/img/icons/fence.png';
 import { Sensor } from 'ootk';
@@ -67,6 +66,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     this.setBottomIconToUnselected(false);
 
     if (isTellWorker) {
+      this.isMenuButtonActive = false;
       keepTrackApi.getCatalogManager().satCruncher.postMessage({
         markerMode: MarkerMode.OFF,
         typ: CruncerMessageTypes.UPDATE_MARKERS,
@@ -85,6 +85,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
       satFovPlugin.isSatOverflyModeOn = false;
     }
 
+    this.isMenuButtonActive = true;
     keepTrackApi.getCatalogManager().satCruncher.postMessage({
       markerMode: MarkerMode.SURV,
       typ: CruncerMessageTypes.UPDATE_MARKERS,
@@ -102,13 +103,9 @@ export class SensorSurvFence extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (sensor: Sensor | string): void => {
         if (sensor) {
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = false;
+          this.setBottomIconToEnabled();
         } else {
-          getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = true;
-          this.isMenuButtonActive = false;
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
+          this.setBottomIconToDisabled();
         }
       },
     });
@@ -118,13 +115,9 @@ export class SensorSurvFence extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (sensor: Sensor): void => {
         if (sensor) {
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = false;
+          this.setBottomIconToEnabled();
         } else {
-          getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = true;
-          this.isMenuButtonActive = false;
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
+          this.setBottomIconToDisabled();
         }
       },
     });
@@ -134,8 +127,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (caller: string): void => {
         if (caller !== this.PLUGIN_NAME) {
-          this.isShowSurvFence = false;
-          this.setBottomIconToUnselected(false);
+          this.disableSurvView();
         }
       },
     });

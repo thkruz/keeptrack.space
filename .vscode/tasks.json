@@ -15,11 +15,9 @@
       "icon": {
         "id": "server-environment",
         "color": "terminal.ansiCyan"
-      }
+      },
+      "problemMatcher": []
     },
-    // ////////////////////////////////////////////////
-    // Build Tasks
-    // ////////////////////////////////////////////////
     {
       "label": "App: Build",
       "command": "npm run build:watch",
@@ -120,9 +118,6 @@
         "close": true
       }
     },
-    // ////////////////////////////////////////////////
-    // Test Tasks
-    // ////////////////////////////////////////////////
     {
       "label": "Test with Jest",
       "command": "npm test",

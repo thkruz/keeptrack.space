@@ -163,7 +163,7 @@ export const Missile = (
   NumberWarheads: number,
   MissileObjectNum: any,
   CurrentTime: any,
-  MissileDesc: any,
+  MissileDesc: string,
   Length: number,
   Diameter: number,
   NewBurnRate: number,
@@ -479,18 +479,18 @@ export const Missile = (
   }
 
   if (missileObj) {
-    missileObj.altList = AltitudeList;
-    missileObj.latList = LatList;
-    missileObj.lonList = LongList;
+    missileObj.altList = smoothList_(AltitudeList, 35);
+    missileObj.latList = smoothList_(LatList, 35);
+    missileObj.lonList = smoothList_(LongList, 35);
     missileObj.active = true;
-    missileObj.type = SpaceObjectType.UNKNOWN;
+    missileObj.type = SpaceObjectType.BALLISTIC_MISSILE;
     missileObj.id = MissileObjectNum;
     missileObj.name = 'RV_' + missileObj.id;
+    missileObj.desc = MissileDesc;
     // maxAlt is used for zoom controls
     missileObj.maxAlt = MaxAltitude;
     missileObj.startTime = CurrentTime;
     if (country) missileObj.country = country;
-    if (MissileDesc) missileObj.desc = MissileDesc;
 
     missileArray.push(missileObj);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -520,6 +520,27 @@ export const Missile = (
   missileManager.lastMissileErrorType = 'normal';
   missileManager.lastMissileError = 'Missile Named RV_' + missileObj.id + '<br>has been created.';
   return 1; // Successful Launch
+};
+
+/**
+ * Removes jagged edges to create a more perfect parabolic path.
+ * @param list A list of points along a rough parabolic path.
+ * @param smoothingFactor  A smoothed list of points along a parabolic path.
+ */
+export const smoothList_ = <T extends number>(list: T[], smoothingFactor: number): T[] => {
+  const newList: T[] = [];
+  for (let i = 0; i < list.length; i++) {
+    if (i < list.length / 3) {
+      let sum = 0;
+      for (let j = 0; j < smoothingFactor; j++) {
+        sum += list[i + j];
+      }
+      newList.push((sum / smoothingFactor) as T);
+    } else {
+      newList.push(list[i]);
+    }
+  }
+  return newList;
 };
 
 /**

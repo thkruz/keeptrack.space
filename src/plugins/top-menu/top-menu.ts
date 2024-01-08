@@ -32,8 +32,8 @@ export class TopMenu extends KeepTrackPlugin {
               <div id="nav-wrapper" class="nav-wrapper">
                 <ul id="nav-mobile2" class="right">
                   <li>
-                    <a id="sound-btn" class="top-menu-btns bmenu-item-selected">
-                      <div class="top-menu-icons">
+                    <a id="sound-btn" class="top-menu-btns">
+                      <div class="top-menu-icons bmenu-item-selected">
                         <img id="sound-icon"
                         width="25"
                         height="25"
@@ -127,10 +127,12 @@ export class TopMenu extends KeepTrackPlugin {
             soundManager.isMute = true;
             soundIcon.src = soundOffPng;
             soundIcon.parentElement.classList.remove('bmenu-item-selected');
+            soundIcon.parentElement.classList.add('bmenu-item-error');
           } else {
             soundManager.isMute = false;
             soundIcon.src = soundOnPng;
             soundIcon.parentElement.classList.add('bmenu-item-selected');
+            soundIcon.parentElement.classList.remove('bmenu-item-error');
           }
         };
       },

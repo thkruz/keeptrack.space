@@ -19,6 +19,7 @@ import Draggabilly from 'draggabilly';
 import { BaseObject, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, RAD2DEG, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missileManager';
+import { SoundNames } from '../sounds/SoundNames';
 import { StereoMap } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
 import './sat-info-box.css';
@@ -346,6 +347,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private nearObjectsLinkClick_(distance: number = 100): void {
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (this.selectSatManager_.selectedSat === -1) {
@@ -376,6 +378,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private nearOrbitsLink_() {
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.getSats(), catalogManagerInstance.getSat(this.selectSatManager_.selectedSat));
     const searchStr = SearchManager.doArraySearch(catalogManagerInstance, nearbyObjects);
@@ -383,6 +386,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private allObjectsLink_(): void {
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     if (this.selectSatManager_.selectedSat === -1) {
@@ -395,15 +399,18 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private drawLineToSun_() {
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const sun = keepTrackApi.getScene().sun;
     lineManagerInstance.create(LineTypes.REF_TO_SAT, [this.selectSatManager_.selectedSat, sun.position[0], sun.position[1], sun.position[2]], 'o');
   }
 
   private drawLineToEarth_() {
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_SAT, [this.selectSatManager_.selectedSat], 'p');
   }
 
   private drawLineToSat_() {
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     if (this.selectSatManager_.secondarySat == -1) keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', 'caution');
     lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.selectSatManager_.selectedSat, this.selectSatManager_.secondarySat], 'b');
   }

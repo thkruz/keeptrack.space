@@ -4,10 +4,9 @@ import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LandObject, Marker, Sensor, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, FormatTle, Kilometers, LandObject, Marker, Sensor, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
-import { FormatTle } from './format-tle';
 
 interface JsSat {
   TLE1: string;

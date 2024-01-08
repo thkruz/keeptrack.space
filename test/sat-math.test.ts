@@ -2,7 +2,6 @@
 
 import { SatObject, SensorObject } from '@app/interfaces';
 import { DEG2RAD, DISTANCE_TO_SUN, RADIUS_OF_EARTH } from '@app/lib/constants';
-import { dateFormat } from '@app/lib/dateFormat';
 import { Sun } from '@app/singletons/draw-manager/sun';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath, SunStatus } from '@app/static/sat-math';
@@ -454,59 +453,6 @@ describe('getRicOfCurrentOrbit_method', () => {
     const outPoints1 = SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1);
     const outPoints2 = SatMath.getRicOfCurrentOrbit(sat, sat2, points + 1, () => new Date(2023, 1, 1), 1);
     expect(outPoints1).not.toEqual(outPoints2);
-  });
-});
-
-describe('getLlaTimeView_method', () => {
-  // Tests that the method returns an object with lat, lon, time and inView properties when given valid inputs
-  it('test_happy_path_valid_inputs', () => {
-    const now = new Date();
-    const result = SatMath.getLlaTimeView(now, defaultSat, defaultSensor);
-    expect(result).toHaveProperty('lat');
-    expect(result).toHaveProperty('lon');
-    expect(result).toHaveProperty('time');
-    expect(result).toHaveProperty('inView');
-  });
-
-  // Tests that the method returns an object with lat and lon set to 0 and time set to 'Invalid' when positionEci is null
-  it('test_edge_case_null_position_eci', () => {
-    const now = new Date();
-    const sat = {
-      satrec: {
-        epochyr: 2021,
-        epochdays: 1,
-        ndot: 0,
-        nddot: 0,
-        bstar: 0,
-        inclo: 0,
-        nodeo: 0,
-        ecco: 0,
-        argpo: 0,
-        mo: 0,
-        no: 0,
-        a: 0,
-        alta: 0,
-        altp: 0,
-        jdsatepoch: 2459215.5,
-      },
-    } as SatObject;
-    const result = SatMath.getLlaTimeView(now, sat, defaultSensor);
-    expect(result.lat).toBe(0);
-    expect(result.lon).toBe(0);
-    expect(result.time).toBe('Invalid');
-  });
-
-  // Tests that the method throws an error when SensorManager.currentSensors is empty
-  it.skip('test_edge_case_empty_sensor_manager_current_sensors', () => {
-    const now = new Date();
-    expect(() => SatMath.getLlaTimeView(now, defaultSat, [] as any)).toThrow();
-  });
-
-  // Tests that the method uses dateFormat to format the time property
-  it('test_general_behaviour_uses_date_format', () => {
-    const now = new Date();
-    const result = SatMath.getLlaTimeView(now, defaultSat, defaultSensor);
-    expect(result.time).toBe(dateFormat(now, 'isoDateTime', true));
   });
 });
 

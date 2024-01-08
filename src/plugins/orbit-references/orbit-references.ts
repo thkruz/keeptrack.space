@@ -4,9 +4,8 @@ import { getEl } from '@app/lib/get-el';
 import { StringPad } from '@app/lib/stringPad';
 
 import { CatalogManager } from '@app/singletons/catalog-manager';
-import { FormatTle } from '@app/static/format-tle';
 import { StringifiedNumber } from '@app/static/sat-math';
-import { BaseObject, RAD2DEG, Sgp4 } from 'ootk';
+import { BaseObject, FormatTle, RAD2DEG, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

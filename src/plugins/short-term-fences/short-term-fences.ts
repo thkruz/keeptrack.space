@@ -189,14 +189,10 @@ export class ShortTermFences extends KeepTrackPlugin {
       minRng: minrange,
       maxRng: maxrange,
       type: SpaceObjectType.SHORT_TERM_FENCE,
-      country: 'STF',
       name: 'STF',
-      id: -2,
       uiName: 'STF',
-      zoom: ZoomValue.GEO,
-      objName: 'STF',
-      system: 'STF',
-      operator: 'STF',
+      zoom: maxrange > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
+      volume: true,
     });
 
     if (

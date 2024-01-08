@@ -27,12 +27,31 @@ export abstract class SplashScreen {
         <div id="logo-inner-container" class="valign">
           <div style="display: flex;">
             <span id="logo-text" class="logo-font">KEEP TRACK</span>
-            <span id="logo-text-version" class="logo-font">8</span>
+            <span id="logo-text-version" class="logo-font">9</span>
           </div>
           <span id="loader-text">Downloading Science...</span>
         </div>
+        <div id="loading-hint">Hint: ${this.showHint()}</div>
       </div>`;
   }
+
+  static showHint() {
+    return SplashScreen.randomHintText_[Math.floor(Math.random() * SplashScreen.randomHintText_.length)];
+  }
+
+  static randomHintText_ = [
+    'Press Shift+F1 to open the help menu at any time.',
+    'Press R to toggle on/off the auto rotation of the globe.',
+    'The settings menu located in the bottom toolbar contains many options to customize your experience.',
+    'Add satellites to the watchlist to get notifications when they are overhead.',
+    'Right click on the globe to open the context menu with more options.',
+    "Press '0' to pause the simulation and '1' to resume.",
+    "Press '+' or '-' to change the simulation speed.",
+    "Press 'C' to change the camera mode.",
+    "Press 'F11' to toggle on/off the fullscreen mode.",
+    'You can search for satellites by name or NORAD ID in the search bar at the top right.',
+    "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
+  ];
 
   static hideSplashScreen() {
     // Don't wait if we are running Jest

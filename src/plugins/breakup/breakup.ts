@@ -9,10 +9,9 @@ import breakupPng from '@public/img/icons/breakup.png';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { FormatTle } from '@app/static/format-tle';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, DetailedSatellite, FormatTle, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 

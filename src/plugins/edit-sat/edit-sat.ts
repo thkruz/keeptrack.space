@@ -10,10 +10,9 @@ import { saveAs } from 'file-saver';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { FormatTle } from '@app/static/format-tle';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, RAD2DEG, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
+import { BaseObject, DetailedSatellite, FormatTle, RAD2DEG, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -327,8 +326,8 @@ export class EditSat extends KeepTrackPlugin {
 
     try {
       // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-      const satId = keepTrackApi.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
-      const obj = keepTrackApi.getCatalogManager().getObject(satId);
+      const id = keepTrackApi.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
+      const obj = keepTrackApi.getCatalogManager().getObject(id);
       if (!obj.isSatellite()) return;
 
       const mainsat = obj as DetailedSatellite;
@@ -368,12 +367,12 @@ export class EditSat extends KeepTrackPlugin {
 
       keepTrackApi.getCatalogManager().satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
-        id: satId,
+        id: id,
         tle1: tle1,
         tle2: tle2,
       });
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
+      orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
       //
       // Reload Menu with new TLE
       //

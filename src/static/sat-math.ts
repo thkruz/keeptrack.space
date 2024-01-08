@@ -48,11 +48,9 @@ import {
 } from 'ootk';
 import { EciArr3 } from '../interfaces';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../lib/constants';
-import { dateFormat } from '../lib/dateFormat';
 import { jday, lon2yaw } from '../lib/transforms';
 import { Sun } from '../singletons/draw-manager/sun';
 import { errorManagerInstance } from '../singletons/errorManager';
-import { SatMathApi } from '../singletons/sat-math-api';
 import { CoordinateTransforms } from './coordinate-transforms';
 
 if (!global) {
@@ -585,34 +583,6 @@ export abstract class SatMath {
   }
 
   /**
-   * Calculates the latitude, longitude, time, and whether a satellite is in view for a given time and satellite object.
-   * @param now The current time.
-   * @param sat The satellite object.
-   * @param sensor The sensor object.
-   * @returns An object containing the latitude, longitude, time, and whether the satellite is in view.
-   */
-  static getLlaTimeView(now: Date, sat: DetailedSatellite, sensor: Sensor): { lat: Degrees; lon: Degrees; time: string; inView: boolean } {
-    const { m, gmst } = SatMath.calculateTimeVariables(now, sat.satrec);
-    const positionEci = <EciVec3>Sgp4.propagate(sat.satrec, m).position;
-
-    if (!positionEci) {
-      console.error('No ECI position for', sat.sccNum, 'at', now);
-      return { lat: 0 as Degrees, lon: 0 as Degrees, time: 'Invalid', inView: false };
-    }
-
-    const gpos = eci2lla(positionEci, gmst);
-    const lat = gpos.lat;
-    const lon = gpos.lon;
-    const time = dateFormat(now, 'isoDateTime', true);
-
-    const positionEcf = eci2ecf(positionEci, gmst);
-    const lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
-    const inView = SatMath.checkIsInView(sensor, lookAngles);
-
-    return { lat, lon, time, inView };
-  }
-
-  /**
    * Calculates the azimuth, elevation, and range of a satellite relative to a sensor at a given time.
    * @param now The current time.
    * @param satrec The satellite record.
@@ -719,18 +689,5 @@ export abstract class SatMath {
     const inc = Math.acos(Math.sin(beta) * Math.cos(phi));
 
     return <Degrees>(inc * RAD2DEG);
-  }
-
-  /**
-   * Returns an object containing the latitude, longitude, time, and whether the satellite is in view for a given satellite and index.
-   * @param sat The satellite object.
-   * @param i The index of the point to calculate.
-   * @param pointPerOrbit The number of points to calculate per orbit (optional, defaults to 256).
-   * @returns An object containing the latitude, longitude, time, and whether the satellite is in view.
-   */
-  static map(sat: DetailedSatellite, i: number, getOffsetTimeObj: (offset: number) => Date, pointPerOrbit: number): { time: string; lat: Degrees; lon: Degrees; inView: boolean } {
-    let offset = ((i * sat.period) / pointPerOrbit) * 60 * 1000; // Offset in seconds (msec * 1000)
-    const now = getOffsetTimeObj(offset);
-    return SatMathApi.getLlaTimeView(now, sat);
   }
 }

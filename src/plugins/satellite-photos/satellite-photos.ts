@@ -4,11 +4,30 @@ import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import photoManagerPng from '@public/img/icons/photoManager.png';
+import { Degrees } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
+interface DiscvrResponse {
+  centroid_coordinates: {
+    lat: Degrees;
+    lon: Degrees;
+  };
+  date: string;
+  identifier: string;
+  image: string;
+}
+
 export class SatellitePhotos extends KeepTrackPlugin {
+  static PLUGIN_NAME = 'Satellite Photos';
+  constructor() {
+    super(SatellitePhotos.PLUGIN_NAME);
+  }
+
+  discvrPhotos_: { imageUrl: string; lat: Degrees; lon: Degrees }[] = [];
+
   bottomIconElementName = 'menu-sat-photos';
   bottomIconLabel = 'SatellitePhotos';
   bottomIconImg = photoManagerPng;
@@ -16,13 +35,13 @@ export class SatellitePhotos extends KeepTrackPlugin {
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="sat-photo-menu" class="side-menu-parent start-hidden text-select">
     <div id="sat-photo-menu-content" class="side-menu">
-      <ul>
+      <ul id="sat-photo-menu-list">
         <h5 class="center-align">Satellites Imagery List</h5>
-        <li id="meteosat8-link" class="link satPhotoRow">MeteoSat 8</li>
+        <li id="meteosat9-link" class="link satPhotoRow">MeteoSat 9</li>
         <li id="meteosat11-link" class="link satPhotoRow">MeteoSat 11</li>
         <li id="himawari8-link" class="link satPhotoRow">Himawari 8</li>
-        <li id="discovr-link" class="link satPhotoRow">DSCOVR</li>
-        <li id="goes1-link" class="link satPhotoRow">GOES 1</li>
+        <li id="goes16-link" class="link satPhotoRow">GOES 16</li>
+        <li id="goes18-link" class="link satPhotoRow">GOES 18</li>
       </ul>
     </div>
   </div>`;
@@ -32,32 +51,37 @@ export class SatellitePhotos extends KeepTrackPlugin {
   <br><br>
   Note - changes in the image API may cause the wrong satellite to be selected in KeepTrack.`;
 
-  static PLUGIN_NAME = 'Satellite Photos';
-  constructor() {
-    super(SatellitePhotos.PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl('meteosat8-link').addEventListener('click', () => {
-          SatellitePhotos.loadPic(10489, `https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg`);
+        getEl('meteosat9-link').addEventListener('click', () => {
+          // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
+          SatellitePhotos.loadPic(28912, `https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg`);
         });
         getEl('meteosat11-link').addEventListener('click', () => {
+          // Meteosat 11 provides 0 deg full earth images every 15 minutes
           SatellitePhotos.loadPic(40732, `https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg`);
         });
         getEl('himawari8-link').addEventListener('click', () => {
           SatellitePhotos.himawari8();
         });
-        getEl('discovr-link').addEventListener('click', () => {
-          SatellitePhotos.discovr();
+        getEl('goes16-link').addEventListener('click', () => {
+          SatellitePhotos.loadPic(41866, `https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg`);
         });
-        getEl('goes1-link').addEventListener('click', () => {
-          SatellitePhotos.loadPic(8366, `https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg`);
+        getEl('goes18-link').addEventListener('click', () => {
+          SatellitePhotos.loadPic(51850, `https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg`);
         });
+      },
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onKeepTrackReady,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        this.initDISCOVR_();
       },
     });
   }
@@ -65,45 +89,55 @@ export class SatellitePhotos extends KeepTrackPlugin {
   /**
    * Retrieves natural color images of Earth captured by the DSCOVR satellite and displays them using the DrawManager instance.
    */
-  static discovr(): void {
-    const request = new XMLHttpRequest();
-    request.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);
+  initDISCOVR_(): void {
+    const req = new XMLHttpRequest();
+    req.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);
 
-    request.onload = () => {
-      SatellitePhotos.dscovrLoaded(request);
+    req.onload = () => {
+      if (req.status >= 200 && req.status < 400) {
+        const res = JSON.parse(req.response);
+        res.forEach((photo: DiscvrResponse) => {
+          const imageUrl = photo.image;
+          const dateStr = photo.identifier;
+          const year = dateStr.slice(0, 4);
+          const month = dateStr.slice(4, 6);
+          const day = dateStr.slice(6, 8);
+          const lat = photo.centroid_coordinates.lat;
+          const lon = photo.centroid_coordinates.lon;
+
+          this.discvrPhotos_.push({
+            imageUrl: `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageUrl}.png`,
+            lat: lat,
+            lon: lon,
+          });
+        });
+
+        for (let i = 1; i < this.discvrPhotos_.length + 1; i++) {
+          const html = `<li id="discovr-link${i}" class="link satPhotoRow">DSCOVR Image ${i}</li>`;
+
+          getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
+          getEl(`discovr-link${i}`).addEventListener('click', () => {
+            SatellitePhotos.loadPic(-1, this.discvrPhotos_[i - 1].imageUrl);
+            keepTrackApi.getMainCamera().camSnap(lat2pitch(this.discvrPhotos_[i - 1].lat), lon2yaw(this.discvrPhotos_[i - 1].lon, keepTrackApi.getTimeManager().simulationTimeObj));
+            keepTrackApi.getMainCamera().changeZoom(0.7);
+          });
+        }
+      } else {
+        errorManagerInstance.log(`https://epic.gsfc.nasa.gov/ request failed!`);
+        const html = `<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>`;
+
+        getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
+      }
     };
 
-    request.onerror = function () {
-      console.debug('https://epic.gsfc.nasa.gov/ request failed!');
+    req.onerror = function () {
+      errorManagerInstance.log(`https://epic.gsfc.nasa.gov/ request failed!`);
+      const html = `<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>`;
+
+      getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
     };
 
-    // DISCOVR is at the L1 Lagrange point, so we can't select it in KeepTrack
-    // Instead we will rotate the camera to look at the Earth using the coordinates of the DISCOVR satellite in dscovrLoaded
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
-    request.send();
-  }
-
-  static dscovrLoaded(req: any): void {
-    if (req.status >= 200 && req.status < 400) {
-      // Success!
-      const response = JSON.parse(req.response);
-      const imageUrl = response[0].image;
-      const dateStr = response[0].identifier;
-      const year = dateStr.slice(0, 4);
-      const month = dateStr.slice(4, 6);
-      const day = dateStr.slice(6, 8);
-      const hour = dateStr.slice(8, 10);
-      const min = dateStr.slice(10, 12);
-      const sec = dateStr.slice(12, 14);
-
-      // Hours are in EST? Daylight savings time might make this break
-      const dateObj = new Date(Date.UTC(year, month - 1, day, hour - 4, min, sec));
-
-      keepTrackApi.getMainCamera().camSnap(lat2pitch(response[0].centroid_coordinates.lat), lon2yaw(response[0].centroid_coordinates.lon, dateObj));
-      keepTrackApi.getMainCamera().changeZoom(0.7);
-
-      SatellitePhotos.colorbox(`https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageUrl}.png`);
-    }
+    req.send();
   }
 
   static colorbox = (url: string): void => {
@@ -116,6 +150,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
   };
 
   static loadPic(satId: number, url: string): void {
+    keepTrackApi.getUiManager().searchManager.hideResults();
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(satId));
     keepTrackApi.getMainCamera().changeZoom(0.7);
     SatellitePhotos.colorbox(url);

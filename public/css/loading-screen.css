@@ -160,6 +160,21 @@
     0px 0px 8px rgb(0 0 0);
 }
 
+#loading-hint {
+  text-align: left;
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-left: 5%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  bottom: 10%;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
 #mobile-start-button {
   display: none;
   margin-top: 10px;

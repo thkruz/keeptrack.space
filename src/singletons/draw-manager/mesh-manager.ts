@@ -1,9 +1,10 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { DEG2RAD, DetailedSatellite, EciVec3, Kilometers, Radians, SpaceObjectType } from 'ootk';
+import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, Kilometers, Radians, SpaceObjectType, Vec3 } from 'ootk';
 import { MeshMap, OBJ } from 'webgl-obj-loader';
 import { SatMath } from '../../static/sat-math';
 import { SplashScreen } from '../../static/splash-screen';
+import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
 
@@ -19,6 +20,7 @@ type MeshModel = {
 };
 
 export interface MeshObject {
+  rotation: Vec3<Degrees>;
   id: number;
   position: EciVec3<Kilometers>;
   sccNum: string;
@@ -92,6 +94,7 @@ export class MeshManager {
     inSun: 0,
     model: null,
     nadirYaw: null,
+    rotation: { x: 0, y: 0, z: 0 } as Vec3<Degrees>,
   };
 
   public models = {
@@ -123,6 +126,11 @@ export class MeshManager {
     debris0: null,
     debris1: null,
     debris2: null,
+    misl: null,
+    misl2: null,
+    misl3: null,
+    misl4: null,
+    rv: null,
   };
 
   mvMatrix_: mat4;
@@ -408,8 +416,8 @@ export class MeshManager {
     this.currentMeshObject.model = model;
   }
 
-  update(selectedDate: Date, sat: DetailedSatellite) {
-    if (!sat.isSatellite()) return;
+  update(selectedDate: Date, sat: DetailedSatellite | MissileObject) {
+    if (!sat.isSatellite() && !sat.isMissile()) return;
 
     this.updateModel_(selectedDate, sat);
 
@@ -443,6 +451,10 @@ export class MeshManager {
       mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.01, 0.01, 0.01));
     }
 
+    if (this.currentMeshObject.rotation?.x) mat4.rotateX(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.x * DEG2RAD);
+    if (this.currentMeshObject.rotation?.y) mat4.rotateY(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.y * DEG2RAD);
+    if (this.currentMeshObject.rotation?.z) mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.z * DEG2RAD);
+
     // Allow Manual Rotation of Meshes
     mat4.rotateX(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.x * DEG2RAD);
     mat4.rotateY(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.y * DEG2RAD);
@@ -453,16 +465,16 @@ export class MeshManager {
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
   }
 
-  private updateModel_(selectedDate: Date, sat: DetailedSatellite) {
+  private updateModel_(selectedDate: Date, obj: BaseObject) {
     try {
-      this.currentMeshObject.id = typeof sat?.id !== 'undefined' ? sat.id : -1;
+      this.currentMeshObject.id = typeof obj?.id !== 'undefined' ? obj.id : -1;
 
       if (typeof this.currentMeshObject.id == 'undefined' || this.currentMeshObject.id == -1) return;
       if (settingsManager.modelsOnSatelliteViewOverride) return;
 
-      this.updatePosition(sat.position);
+      this.updatePosition(obj.position);
 
-      this.currentMeshObject.inSun = SatMath.calculateIsInSun(sat, keepTrackApi.getScene().sun.eci);
+      this.currentMeshObject.inSun = SatMath.calculateIsInSun(obj, keepTrackApi.getScene().sun.eci);
       this.currentMeshObject.nadirYaw = null;
 
       if (settingsManager.meshOverride) {
@@ -475,32 +487,71 @@ export class MeshManager {
         }
       }
 
-      switch (sat.type) {
-        case SpaceObjectType.PAYLOAD:
-          this.getSatelliteModel(sat, selectedDate);
-          return;
-        case SpaceObjectType.ROCKET_BODY:
-          // TODO: Add more rocket body models
-          this.currentMeshObject.model = this.models.rocketbody;
-          return;
-        case SpaceObjectType.DEBRIS:
-          // TODO: Add more debris models
-          if (parseInt(sat.sccNum) <= 20000) {
-            this.currentMeshObject.model = this.models.debris0;
-          } else if (parseInt(sat.sccNum) <= 35000) {
-            this.currentMeshObject.model = this.models.debris1;
-          } else if (parseInt(sat.sccNum) > 35000) {
-            this.currentMeshObject.model = this.models.debris2;
-          } else {
-            this.currentMeshObject.model = this.models.debris0;
-          }
-          return;
-        default:
-          // Generic Model
-          this.currentMeshObject.model = this.models.sat2;
+      if (obj.isMissile()) {
+        this.getMislModel_(obj as MissileObject);
+      } else {
+        const sat = obj as DetailedSatellite;
+        switch (sat.type) {
+          case SpaceObjectType.PAYLOAD:
+            this.getSatelliteModel(sat, selectedDate);
+            return;
+          case SpaceObjectType.ROCKET_BODY:
+            // TODO: Add more rocket body models
+            this.currentMeshObject.model = this.models.rocketbody;
+            return;
+          case SpaceObjectType.DEBRIS:
+            // TODO: Add more debris models
+            if (parseInt(sat.sccNum) <= 20000) {
+              this.currentMeshObject.model = this.models.debris0;
+            } else if (parseInt(sat.sccNum) <= 35000) {
+              this.currentMeshObject.model = this.models.debris1;
+            } else if (parseInt(sat.sccNum) > 35000) {
+              this.currentMeshObject.model = this.models.debris2;
+            } else {
+              this.currentMeshObject.model = this.models.debris0;
+            }
+            return;
+          default:
+            // Generic Model
+            this.currentMeshObject.model = this.models.sat2;
+        }
       }
     } catch {
       // Don't Let meshManager break everything
+    }
+  }
+
+  private getMislModel_(misl: MissileObject) {
+    // TODO: This doesn't work!
+    const direction = misl.direction();
+    this.currentMeshObject.rotation.x = direction.x as Degrees;
+    this.currentMeshObject.rotation.y = direction.y as Degrees;
+    this.currentMeshObject.rotation.z = direction.z as Degrees;
+
+    // After max alt it looks like an RV
+    if (!misl.isGoingUp() && misl.lastTime > 20) {
+      this.currentMeshObject.model = this.models.rv;
+      return;
+    }
+
+    // Otherwise pick a random missile model, but use the
+    // name so that it stays consistent between draws
+    const lastNumberInName = RegExp(/\d+$/u, 'u').exec(misl.name);
+    if (lastNumberInName) {
+      const number = parseInt(lastNumberInName[0]);
+      if (number <= 2) {
+        this.currentMeshObject.model = this.models.misl;
+      } else if (number <= 4) {
+        this.currentMeshObject.model = this.models.misl2;
+      } else if (number <= 6) {
+        this.currentMeshObject.model = this.models.misl3;
+      } else if (number <= 8) {
+        this.currentMeshObject.model = this.models.misl4;
+      } else {
+        this.currentMeshObject.model = this.models.misl;
+      }
+    } else {
+      this.currentMeshObject.model = this.models.misl;
     }
   }
 

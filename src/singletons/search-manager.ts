@@ -257,7 +257,6 @@ export class SearchManager {
   }
 
   private static doRegularSearch_(searchString: string) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const results: SearchResult[] = [];
 
     // Split string into array using comma
@@ -267,7 +266,7 @@ export class SearchManager {
     settingsManager.lastSearch = searchList;
 
     // Initialize search results
-    const satData = SearchManager.getSearchableObjects_(catalogManagerInstance);
+    const satData = SearchManager.getSearchableObjects_(true) as (DetailedSatellite & MissileObject)[];
 
     searchList.forEach((searchStringIn) => {
       satData.every((sat) => {
@@ -353,7 +352,6 @@ export class SearchManager {
   }
 
   private static doNumOnlySearch_(searchString: string) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     let results: SearchResult[] = [];
 
     // Split string into array using comma
@@ -365,28 +363,34 @@ export class SearchManager {
     settingsManager.lastSearch = searchList;
 
     // Initialize search results
-    const satData = SearchManager.getSearchableObjects_(catalogManagerInstance);
+    const satData = (SearchManager.getSearchableObjects_(false) as DetailedSatellite[]).sort((a, b) => parseInt(a.sccNum6) - parseInt(b.sccNum6));
 
     let i = 0;
+    let lastFoundI = 0;
     searchList.forEach((searchStringIn) => {
+      // Don't search for things until at least the minimum characters
+      if (searchStringIn.length <= settingsManager.minimumSearchCharacters) return;
+      // Last one never got found
+      if (i >= satData.length) i = lastFoundI;
+
       for (; i < satData.length; i++) {
-        const sat = satData[i];
         if (results.length >= settingsManager.searchLimit) break;
-        // TODO: This wont work because of partial searches
-        // if (parseInt(sat.sccNum) > parseInt(searchStringIn)) break;
 
-        if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
-          // Ignore Notional Satellites unless all 6 characters are entered
-          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) continue;
+        const sat = satData[i];
+        // Ignore Notional Satellites unless all 6 characters are entered
+        if (sat.type === SpaceObjectType.NOTIONAL && searchStringIn.length < 6) continue;
 
+        // Check if matches 6Digit
+        if (sat.sccNum6?.indexOf(searchStringIn) !== -1) {
           results.push({
             strIndex: sat.sccNum.indexOf(searchStringIn),
             patlen: searchStringIn.length,
             id: sat.id,
             searchType: SearchResultType.SCC,
           });
+          lastFoundI = i;
 
-          if (searchStringIn.length === 5) {
+          if (searchStringIn.length === 6) {
             break;
           }
         }
@@ -399,10 +403,13 @@ export class SearchManager {
     return results;
   }
 
-  private static getSearchableObjects_(catalogManagerInstance: CatalogManager) {
-    return (
+  private static getSearchableObjects_(isIncludeMissiles = true): (DetailedSatellite | MissileObject)[] | DetailedSatellite[] {
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const searchableObjects = (
       catalogManagerInstance.objectCache.filter((obj) => {
         if (obj.isSensor() || obj.isMarker() || obj.isLandObject() || obj.isStar()) return false; // Skip static dots (Maybe these should be searchable?)
+        if (!isIncludeMissiles && obj.isMissile()) return false; // Skip missiles (if not searching for missiles
+
         if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn && obj.type !== SpaceObjectType.PAYLOAD) return false; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
         if (!(obj as MissileObject).active) return false; // Skip inactive missiles.
         if ((obj as DetailedSatellite).country == 'ANALSAT' && !obj.active) return false; // Skip Fake Analyst satellites
@@ -417,6 +424,8 @@ export class SearchManager {
         return 0;
       }
     });
+
+    return isIncludeMissiles ? (searchableObjects as (DetailedSatellite | MissileObject)[]) : (searchableObjects as DetailedSatellite[]);
   }
 
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
@@ -513,7 +522,12 @@ export class SearchManager {
           html += 'Star';
           break;
         default:
-          {
+          if (obj.isMissile()) {
+            const misl = obj as MissileObject;
+            html += misl.desc;
+          } else if (obj.isStar()) {
+            html += 'Star';
+          } else if (obj.isSatellite()) {
             const sat = obj as DetailedSatellite;
             html += sat.sccNum;
           }

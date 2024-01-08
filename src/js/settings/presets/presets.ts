@@ -24,6 +24,7 @@ export class SettingsPresets {
     settings.plugins.timeMachine = true;
     settings.loopTimeMachine = true;
     settings.timeMachineDelay = <Milliseconds>6000;
+    settings.timeMachineDelayAtPresentDay = <Milliseconds>(1000 * 60 * 4); // 4 Minutes
 
     settings.colors.transparent = [1, 1, 1, 0.4];
     settings.colors.rocketBody = [0.5, 0.5, 0.5, 1];

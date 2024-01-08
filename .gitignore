@@ -74,6 +74,7 @@ src/tle/TLEAltNemo*
 .notes.js
 classfd.tle
 src/audio/samples
+public/img/wallpaper/.archive
 
 # Jest Coverage
 coverage/

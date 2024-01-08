@@ -4,13 +4,12 @@ import { getEl, hideEl } from '@app/lib/get-el';
 import { slideInRight } from '@app/lib/slide';
 import { triggerSubmit } from '@app/lib/trigger-submit';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
-import { ZoomValue } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { LegendManager } from '@app/static/legend-manager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import customPng from '@public/img/icons/custom.png';
-import { Degrees, DetailedSensor, Kilometers, SpaceObjectType } from 'ootk';
+import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';
 

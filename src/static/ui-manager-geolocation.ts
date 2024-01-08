@@ -1,13 +1,12 @@
 import { GeolocationPosition, SensorGeolocation } from '@app/interfaces';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, DetailedSensor, Kilometers } from 'ootk';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { Degrees, DetailedSensor, Kilometers, ZoomValue } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { lat2pitch, lon2yaw } from '../lib/transforms';
 import { StandardSensorManager } from '../plugins/sensor/sensorManager';
-import { ZoomValue } from '../singletons/camera';
 import { errorManagerInstance } from '../singletons/errorManager';
-import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 
 export class UiGeolocation {
   static updateSensorPosition(position: GeolocationPosition): void {

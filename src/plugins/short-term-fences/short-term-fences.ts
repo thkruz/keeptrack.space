@@ -4,9 +4,8 @@ import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import searchPng from '@public/img/icons/search.png';
 
-import { ZoomValue } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { BaseObject, Degrees, DetailedSensor, Kilometers, SpaceObjectType, eci2rae } from 'ootk';
+import { BaseObject, Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

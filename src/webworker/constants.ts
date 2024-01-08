@@ -1,5 +1,4 @@
-import { Degrees, Kilometers, Radians, SatelliteRecord } from 'ootk';
-import { ZoomValue } from 'ootk/lib/objects/DetailedSensor';
+import { Degrees, Kilometers, Radians, SatelliteRecord, ZoomValue } from 'ootk';
 import { SensorObjectCruncher } from '../interfaces';
 import { CruncerMessageTypes, MarkerMode } from './positionCruncher';
 

@@ -1,10 +1,8 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
-import { DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType, Star } from 'ootk';
-import { RIC } from 'ootk/lib/coordinate/RIC';
+import { DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
-import { spaceObjType2Str } from '../lib/spaceObjType2Str';
 import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
 import { MissileObject } from './catalog-manager/MissileObject';

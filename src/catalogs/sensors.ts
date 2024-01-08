@@ -1,5 +1,4 @@
-import { Degrees, DetailedSensor, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
-import { ZoomValue } from '../singletons/camera';
+import { Degrees, DetailedSensor, Kilometers, Milliseconds, SpaceObjectType, ZoomValue } from 'ootk';
 
 export interface SensorList {
   [key: string]: DetailedSensor;

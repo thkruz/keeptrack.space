@@ -24,7 +24,7 @@ import { KeepTrackApiEvents, OrbitManager, SatShader } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU } from 'ootk';
+import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';
@@ -51,15 +51,6 @@ export enum CameraType {
   MAX_CAMERA_TYPES = 7,
   /** @deprecated */
   OFFSET = 8,
-}
-
-/**
- * Represents the possible preset zoom values for the camera.
- */
-export enum ZoomValue {
-  LEO = 0.45,
-  GEO = 0.82,
-  MAX = 1,
 }
 
 export class Camera {

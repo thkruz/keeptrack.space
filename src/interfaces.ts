@@ -1,9 +1,21 @@
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, Meters, Milliseconds, Radians, SpaceObjectType, Vec3Flat } from 'ootk';
+import {
+  BaseObject,
+  Degrees,
+  DetailedSatellite,
+  DetailedSensor,
+  GreenwichMeanSiderealTime,
+  Kilometers,
+  Meters,
+  Milliseconds,
+  Radians,
+  SpaceObjectType,
+  Vec3Flat,
+  ZoomValue,
+} from 'ootk';
 import { Camera } from './singletons/camera';
 import { GroupType, ObjectGroup } from './singletons/object-group';
 
 import { mat4 } from 'gl-matrix';
-import { ZoomValue } from 'ootk/lib/objects/DetailedSensor';
 import { MissileObject } from './singletons/catalog-manager/MissileObject';
 import { ColorSchemeManager } from './singletons/color-scheme-manager';
 import { LineManager } from './singletons/draw-manager/line-manager';

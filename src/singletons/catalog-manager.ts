@@ -29,7 +29,7 @@
 import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes, ExtraDataMessage } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, EciVec3, FormatTle, Kilometers, SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, EciVec3, Kilometers, SatelliteRecord, Sgp4, SpaceObjectType, Tle, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';
@@ -419,7 +419,7 @@ export class CatalogManager {
 
     // Create a buffer of analyst satellite objects
     for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
-      const sccNum = FormatTle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
+      const sccNum = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
       this.analSatSet.push(
         new DetailedSatellite({
           active: false,

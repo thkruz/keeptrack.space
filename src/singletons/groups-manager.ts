@@ -1,8 +1,6 @@
 import { keepTrackApi } from '../keepTrackApi';
 import { GroupType, ObjectGroup } from './object-group';
 
-import { GroupsManager } from '@app/interfaces';
-
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
@@ -25,7 +23,7 @@ import { GroupsManager } from '@app/interfaces';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-export class StandardGroupManager implements GroupsManager {
+export class GroupsManager {
   groupList: Record<string, ObjectGroup> = {};
   selectedGroup: ObjectGroup = null;
   stopUpdatingInViewSoon: boolean;

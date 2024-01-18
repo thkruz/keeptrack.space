@@ -10,12 +10,11 @@ import {
   EciVec3,
   Kilometers,
   MINUTES_PER_DAY,
-  RAD2DEG,
   SatelliteRecord,
   Sgp4,
   SpaceObjectType,
   TAU,
-  ecf2rae,
+  ecfRad2rae,
   eci2ecf,
   eci2lla,
 } from 'ootk';
@@ -36,6 +35,9 @@ export type TearrData = {
 };
 
 export class SensorMath {
+  /**
+   * @deprecated - Use ootk instead
+   */
   static getTearData(now: Date, satrec: SatelliteRecord, sensors: DetailedSensor[], isRiseSetLookangles = false): TearrData {
     // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
     const sensor = sensors[0];
@@ -107,6 +109,9 @@ export class SensorMath {
     };
   }
 
+  /**
+   * @deprecated - Use ootk instead
+   */
   static getTearr(sat: DetailedSatellite, sensors: DetailedSensor[], propTime?: Date): TearrData {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
@@ -137,7 +142,7 @@ export class SensorMath {
       tearr.lon = gpos.lon;
       tearr.lat = gpos.lat;
       let positionEcf = eci2ecf(positionEci, gmst);
-      let lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
+      let lookAngles = ecfRad2rae(sensor.llaRad(), positionEcf);
       tearr.az = lookAngles.az;
       tearr.el = lookAngles.el;
       tearr.rng = lookAngles.rng;
@@ -225,11 +230,8 @@ export class SensorMath {
       const dist = Math.sqrt(distX + distY + distZ);
 
       const positionEcf = eci2ecf(eci, gmst);
-      const lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
-
-      const az = lookAngles.az * RAD2DEG;
-      const el = lookAngles.el * RAD2DEG;
-      const rng = lookAngles.rng;
+      const lookAngles = ecfRad2rae(sensor.llaRad(), positionEcf);
+      const { az, el, rng } = lookAngles;
 
       if (sensor.minAz > sensor.maxAz) {
         if (

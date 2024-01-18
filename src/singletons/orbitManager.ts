@@ -6,7 +6,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
-import { GetSatType, OrbitManager, UiManager } from '../interfaces';
+import { GetSatType } from '../interfaces';
 import { setInnerHtml } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 import { Camera, CameraType } from './camera';
@@ -29,7 +29,7 @@ export interface ObjDataJson {
   tle2?: string;
 }
 
-export class StandardOrbitManager implements OrbitManager {
+export class OrbitManager {
   private currentInView_ = <number[]>[];
   private currentSelectId_ = -1;
   private glBuffers_ = <WebGLBuffer[]>[];
@@ -171,7 +171,7 @@ export class StandardOrbitManager implements OrbitManager {
       this.glBuffers_.push(this.allocateBuffer());
     }
 
-    const objDataString = StandardOrbitManager.getObjDataString(keepTrackApi.getCatalogManager().objectCache);
+    const objDataString = OrbitManager.getObjDataString(keepTrackApi.getCatalogManager().objectCache);
 
     if (!this.orbitWorker) return;
     this.orbitWorker.postMessage({
@@ -241,7 +241,9 @@ export class StandardOrbitManager implements OrbitManager {
     this.updateOrbitBuffer(satId);
   }
 
-  updateAllVisibleOrbits(uiManagerInstance: UiManager): void {
+  updateAllVisibleOrbits(): void {
+    const uiManagerInstance = keepTrackApi.getUiManager();
+
     if (uiManagerInstance.searchManager.isResultsOpen() && !settingsManager.disableUI && !settingsManager.lowPerf) {
       const currentSearchSats = uiManagerInstance.searchManager.getLastResultGroup()?.ids;
       if (typeof currentSearchSats !== 'undefined') {
@@ -346,7 +348,7 @@ export class StandardOrbitManager implements OrbitManager {
         if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) return; // Skip hover and select objects
         if (!keepTrackApi.getCatalogManager().getObject(id)?.active) return; // Skip inactive objects
 
-        StandardOrbitManager.checColorBuffersValidity_(id, colorData);
+        OrbitManager.checColorBuffersValidity_(id, colorData);
 
         if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== id) {
           // if color is black, we probably have old data, so recalculate color buffers
@@ -392,7 +394,7 @@ export class StandardOrbitManager implements OrbitManager {
 
     const hoverId = hoverManagerInstance.getHoverId();
     if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !keepTrackApi.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY)?.isStatic()) {
-      StandardOrbitManager.checColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
+      OrbitManager.checColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
       this.writePathToGpu_(hoverId);
     }
@@ -400,10 +402,10 @@ export class StandardOrbitManager implements OrbitManager {
 
   private static checColorBuffersValidity_(hoverId: number, colorData: Float32Array) {
     const hoverIdIndex = hoverId * 4;
-    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex, colorData);
-    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex + 1, colorData);
-    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex + 2, colorData);
-    StandardOrbitManager.checkColorBufferValidity_(hoverIdIndex + 3, colorData);
+    OrbitManager.checkColorBufferValidity_(hoverIdIndex, colorData);
+    OrbitManager.checkColorBufferValidity_(hoverIdIndex + 1, colorData);
+    OrbitManager.checkColorBufferValidity_(hoverIdIndex + 2, colorData);
+    OrbitManager.checkColorBufferValidity_(hoverIdIndex + 3, colorData);
   }
 
   private static checkColorBufferValidity_(index: number, colorData: Float32Array) {

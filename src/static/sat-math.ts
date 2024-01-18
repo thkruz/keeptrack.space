@@ -35,13 +35,14 @@ import {
   MILLISECONDS_TO_DAYS,
   MINUTES_PER_DAY,
   RAD2DEG,
+  RIC,
   Radians,
   SatelliteRecord,
   Sensor,
   Sgp4,
   TAU,
   ecf2eci,
-  ecf2rae,
+  ecfRad2rae,
   eci2ecf,
   eci2lla,
   eci2rae,
@@ -336,16 +337,14 @@ export abstract class SatMath {
     for (let t = 0; t < propLength; t++) {
       offset = t * 1000; // Offset in seconds (msec * 1000)
 
-      sat1.propagateTo(new Date(Date.now() + offset));
-      sat2.propagateTo(new Date(Date.now() + offset));
-      const pv = CoordinateTransforms.sat2ric(sat1, sat2);
-      const dist = Math.sqrt(pv.position[0] ** 2 + pv.position[1] ** 2 + pv.position[2] ** 2);
-      if (dist < minDist && !(pv.position[0] === 0 && pv.position[1] === 0 && pv.position[2] === 0)) {
-        minDist = dist;
+      const ric = RIC.fromJ2000(sat1.toJ2000(new Date(Date.now() + offset)), sat2.toJ2000(new Date(Date.now() + offset)));
+
+      if (ric.range < minDist && !(ric.position.x === 0 && ric.position.y === 0 && ric.position.z === 0)) {
+        minDist = ric.range;
         result = {
           offset,
-          dist: dist,
-          ric: pv,
+          dist: ric.range,
+          ric: { position: ric.position, velocity: ric.velocity },
         };
       }
     }
@@ -609,7 +608,7 @@ export abstract class SatMath {
     }
     const positionEcf = eci2ecf(positionEci, gmst);
 
-    return ecf2rae(sensor.getLlaRad(), positionEcf);
+    return ecfRad2rae(sensor.llaRad(), positionEcf);
   }
 
   /**

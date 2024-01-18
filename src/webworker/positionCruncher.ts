@@ -38,7 +38,6 @@ import {
   Milliseconds,
   Minutes,
   PI,
-  RAD2DEG,
   Radians,
   RaeVec3,
   Sgp4,
@@ -48,6 +47,7 @@ import {
   Vector3D,
   ecf2eci,
   ecf2rae,
+  ecfRad2rae,
   eci2ecf,
   eci2lla,
   lla2ecf,
@@ -246,7 +246,6 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
           extraRec.perigee = <Kilometers>(extraRec.semiMajorAxis * (1 - extraRec.eccentricity) - RADIUS_OF_EARTH);
           extraRec.period = <Minutes>(1440.0 / extraRec.meanMotion);
 
-          extraData.push(extraRec);
           delete satrec['id'];
           objCache.push({
             active: satData[i].active ?? true,
@@ -265,7 +264,6 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
             // Markers and Missiles Start Inactive
             obj.active = false;
           }
-          extraData.push(extraRec);
           objCache.push({ ...obj, ...{ active: obj.active } });
           i++;
         }
@@ -273,14 +271,6 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
 
       satPos = new Float32Array(len * 3);
       satVel = new Float32Array(len * 3);
-
-      try {
-        postMessage({
-          extraData: JSON.stringify(extraData),
-        });
-      } catch (e) {
-        if (!process) throw e;
-      }
 
       if (m.data.isLowPerf) {
         isLowPerf = true;
@@ -484,7 +474,7 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
   let satPosEcf: EcfVec3<Kilometers>;
   let satSelPos: EciVec3<Kilometers>;
   let satSelGeodetic: LlaVec3<Degrees, Kilometers>;
-  let groundPos: LlaVec3<Radians, Kilometers>;
+  let groundPos: LlaVec3<Degrees, Kilometers>;
 
   for (let snum = 0; snum < satelliteSelected.length + 1; snum++) {
     if (snum === satelliteSelected.length) {
@@ -505,8 +495,8 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
       satSelGeodetic = eci2lla(satSelPos, gmst); // pv.position is called positionEci originally
       satHeight = satSelGeodetic.alt;
       groundPos = {
-        lat: (satSelGeodetic.lat * DEG2RAD) as Radians,
-        lon: (satSelGeodetic.lon * DEG2RAD) as Radians,
+        lat: satSelGeodetic.lat,
+        lon: satSelGeodetic.lon,
         alt: <Kilometers>1,
       };
 
@@ -582,8 +572,8 @@ export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): nu
 export const updateStar = (i: number, now: Date, gmst: GreenwichMeanSiderealTime): void => {
   // INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.
   // WARNING: 180 and 0 really matter...unclear why
-  const starPosition = Celestial.getStarAzEl(now, STAR_LAT, STAR_LON, objCache[i].ra, objCache[i].dec);
-  const rae = { az: <Degrees>(starPosition.az * RAD2DEG), el: <Degrees>(starPosition.el * RAD2DEG), rng: STAR_DISTANCE };
+  const starPosition = Celestial.azEl(now, STAR_LAT, STAR_LON, objCache[i].ra, objCache[i].dec);
+  const rae = { az: starPosition.az, el: starPosition.el, rng: STAR_DISTANCE };
   const pos = rae2eci(rae, { lat: <Degrees>0, lon: <Degrees>0, alt: <Kilometers>0 }, gmst);
 
   // Reduce Random Jitter by Requiring New Positions to be Similar to Old
@@ -658,7 +648,7 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
     objCache[i].active = false;
   }
 
-  const rae = ecf2rae(sensors[0].getLlaRad(), positionEcf);
+  const rae = ecfRad2rae(sensors[0].llaRad(), positionEcf);
   satInView[i] = sensors[0].isRaeInFov(rae) ? 1 : 0;
   return true;
 };
@@ -746,7 +736,7 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
 
     // Skip Calculating Lookangles if No Sensor is Selected
     if (isSensor) {
-      rae = ecf2rae(sensors[0].getLlaRad(), eci2ecf(pv.position, gmst));
+      rae = ecfRad2rae(sensors[0].llaRad(), eci2ecf(pv.position, gmst));
     }
   } catch (e) {
     // This is probably a reentry and should be skipped from now on.
@@ -790,7 +780,7 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
           if (satInView[i]) break;
           try {
             positionEcf = eci2ecf(pv.position, gmst); // pv.position is called positionEci originally
-            rae = ecf2rae(sensors[0].getLlaRad(), positionEcf);
+            rae = ecfRad2rae(sensors[0].llaRad(), positionEcf);
           } catch (e) {
             continue;
           }

@@ -1,4 +1,4 @@
-import { Degrees, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, PI, RAD2DEG, Radians, RaeVec3, Sensor, Sgp4, SpaceObjectType, rae2eci } from 'ootk';
+import { Degrees, GreenwichMeanSiderealTime, Kilometers, LlaVec3, MILLISECONDS_TO_DAYS, PI, RAD2DEG, Radians, RaeVec3, Sensor, Sgp4, SpaceObjectType, rae2eci } from 'ootk';
 import { SensorObjectCruncher } from '../../interfaces';
 import { A } from '../../lib/external/meuusjs';
 import { jday } from '../../lib/transforms';
@@ -20,7 +20,7 @@ export const checkSunExclusion = (
 ): [isSunExclusion: boolean, sunECI: { x: number; y: number; z: number }] => {
   const jdo = new A.JulianDay(j); // now
   const coord = A.EclCoordfromWgs84(0, 0, 0);
-  const coord2 = A.EclCoordfromWgs84(sensor.lat * RAD2DEG, sensor.lon * RAD2DEG, sensor.alt);
+  const coord2 = A.EclCoordfromWgs84(sensor.lat, sensor.lon, sensor.alt);
 
   // AZ / EL Calculation
   const tp = <{ hz: { az: number; alt: number } }>(<unknown>A.Solar.topocentricPosition(jdo, coord, false));
@@ -109,10 +109,16 @@ export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: num
   };
 };
 
-export const createLatLonAlt = (lat: Radians, lon: Radians, alt: Kilometers) => ({
+export const createLatLonAltRad = (lat: Radians, lon: Radians, alt: Kilometers) => ({
   lon,
   lat,
   alt,
+});
+
+export const createLatLonAlt = (lat: Radians, lon: Radians, alt: Kilometers): LlaVec3<Degrees, Kilometers> => ({
+  lon: (lon * RAD2DEG) as Degrees,
+  lat: (lat * RAD2DEG) as Degrees,
+  alt: alt,
 });
 
 export const isInValidElevation = (rae: RaeVec3<Kilometers, Degrees>, selectedSatFOV: number) => rae.el > 90 - selectedSatFOV;

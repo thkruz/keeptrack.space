@@ -38,14 +38,11 @@ import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime, ZoomValue, spaceObjType2Str } from 'ootk';
-import { SensorManager } from '../../interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 
-export class StandardSensorManager implements SensorManager {
-  readonly defaultSensor = <DetailedSensor[]>[];
-
+export class SensorManager {
   lastMultiSiteArray: TearrData[];
 
   addSecondarySensor(sensor: DetailedSensor): void {
@@ -95,7 +92,7 @@ export class StandardSensorManager implements SensorManager {
   whichRadar = '';
 
   constructor() {
-    this.currentSensors = [...this.defaultSensor];
+    this.currentSensors = [];
   }
 
   static drawFov(sensor: DetailedSensor) {
@@ -174,7 +171,7 @@ export class StandardSensorManager implements SensorManager {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     // Return to default settings with nothing 'inview'
-    StandardSensorManager.updateSensorUiStyling(null);
+    SensorManager.updateSensorUiStyling(null);
     this.setSensor(null); // Pass sensorId to identify which sensor the user clicked
     if (settingsManager.currentColorScheme == colorSchemeManagerInstance.default) {
       LegendManager.change('default');
@@ -214,9 +211,7 @@ export class StandardSensorManager implements SensorManager {
     // TODO: This function is totally redundant to setSensor. There should be
     // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
     if (sensor === null) {
-      this.currentSensors = structuredClone(this.defaultSensor);
-      sensor = this.currentSensors;
-      console.warn(this.currentSensors[0]);
+      this.currentSensors = [];
     } else if (sensor[0] != null) {
       this.currentSensors = sensor;
     } else if (sensor != null) {
@@ -238,7 +233,7 @@ export class StandardSensorManager implements SensorManager {
 
   setSensor(selectedSensor: DetailedSensor | string | null, sensorId?: number): void {
     if (!selectedSensor) {
-      selectedSensor = StandardSensorManager.getSensorFromsensorId(sensorId);
+      selectedSensor = SensorManager.getSensorFromsensorId(sensorId);
     }
 
     PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
@@ -248,11 +243,11 @@ export class StandardSensorManager implements SensorManager {
     if (selectedSensor == null && sensorId == null) {
       // No sensor selected
       this.sensorTitle = '';
-      this.currentSensors = [this.defaultSensor[0]];
+      this.currentSensors = [];
     } else if (selectedSensor === 'SSN') {
       this.sensorTitle = 'All Space Surveillance Network Sensors';
       const filteredSensors = Object.values(sensors).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
-      StandardSensorManager.updateSensorUiStyling(filteredSensors);
+      SensorManager.updateSensorUiStyling(filteredSensors);
     } else if (selectedSensor === 'NATO-MW') {
       this.sensorTitle = 'All Missile Warning Sensors';
       this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
@@ -388,7 +383,7 @@ export class StandardSensorManager implements SensorManager {
     }
 
     // Update Satellite Math with new sensor - TODO: SatMath should reference the sensorManagerInstance
-    StandardSensorManager.updateSensorUiStyling(this.currentSensors);
+    SensorManager.updateSensorUiStyling(this.currentSensors);
     // Update position cruncher with new sensor
     this.updatePositionCruncher_();
 

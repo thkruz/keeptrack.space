@@ -271,7 +271,7 @@ export class HoverManager {
   private showRicOrEci_(sat: DetailedSatellite) {
     const sat2 = keepTrackApi.getPlugin(SelectSatManager)?.secondarySatObj;
     if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
-      const ric = sat2.getRIC(sat, keepTrackApi.getTimeManager().simulationTimeObj);
+      const ric = RIC.fromJ2000(sat2.toJ2000(keepTrackApi.getTimeManager().simulationTimeObj), sat.toJ2000(keepTrackApi.getTimeManager().simulationTimeObj));
       this.satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
       this.showRicDistAndVel_(ric);
     } else {

@@ -1,6 +1,6 @@
 import { EciArr3 } from '@app/interfaces';
 import { mat3, vec3 } from 'gl-matrix';
-import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, Kilometers, LlaVec3, RAD2DEG, Radians, RaeVec3, Sensor, ecf2rae, eci2ecf, eci2lla, lla2ecf } from 'ootk';
+import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, Kilometers, LlaVec3, Radians, RaeVec3, Sensor, ecfRad2rae, eci2ecf, eci2lla, lla2ecf } from 'ootk';
 import { SatMath } from './sat-math';
 
 /**
@@ -110,10 +110,6 @@ export abstract class CoordinateTransforms {
     const { gmst } = SatMath.calculateTimeVariables(now);
 
     let positionEcf = eci2ecf(<EciVec3>{ x: eci[0], y: eci[1], z: eci[2] }, gmst); // positionEci.position is called positionEci originally
-    let lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
-    let az = (lookAngles.az * RAD2DEG) as Degrees;
-    let el = (lookAngles.el * RAD2DEG) as Degrees;
-    let rng = lookAngles.rng;
-    return { az, el, rng };
+    return ecfRad2rae(sensor.llaRad(), positionEcf);
   }
 }

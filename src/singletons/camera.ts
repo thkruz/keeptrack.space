@@ -20,7 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, OrbitManager, SatShader } from '@app/interfaces';
+import { KeepTrackApiEvents, SatShader } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
@@ -34,6 +34,7 @@ import { SatMath } from '../static/sat-math';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { LineTypes } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
+import type { OrbitManager } from './orbitManager';
 
 /**
  * Represents the different types of cameras available.

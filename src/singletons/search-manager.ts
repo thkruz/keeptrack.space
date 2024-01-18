@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, UiManager } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -13,6 +13,7 @@ import { TopMenu } from '../plugins/top-menu/top-menu';
 import { LegendManager } from '../static/legend-manager';
 import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
+import type { UiManager } from './uiManager';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -407,7 +408,7 @@ export class SearchManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const searchableObjects = (
       catalogManagerInstance.objectCache.filter((obj) => {
-        if (obj.isSensor() || obj.isMarker() || obj.isLandObject() || obj.isStar()) return false; // Skip static dots (Maybe these should be searchable?)
+        if (obj.isSensor() || obj.isMarker() || obj.isGroundObject() || obj.isStar()) return false; // Skip static dots (Maybe these should be searchable?)
         if (!isIncludeMissiles && obj.isMissile()) return false; // Skip missiles (if not searching for missiles
 
         if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn && obj.type !== SpaceObjectType.PAYLOAD) return false; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode

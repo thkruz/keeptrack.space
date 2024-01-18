@@ -22,8 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, Minutes, SpaceObjectType } from 'ootk';
-import { CatalogSource } from './catalog-loader';
+import { BaseObject, CatalogSource, Degrees, DetailedSatellite, Minutes, SpaceObjectType } from 'ootk';
 
 /**
  * The CatalogSearch class provides static methods for filtering and searching through an array of satellite data.
@@ -95,32 +94,32 @@ export class CatalogSearch {
     raanMargin: Degrees = <Degrees>5,
     periodMargin: Minutes = <Minutes>0
   ): number[] {
-    const INC_MARGIN = incMargin * DEG2RAD;
-    const RAAN_MARGIN = raanMargin * DEG2RAD;
+    const INC_MARGIN = incMargin;
+    const RAAN_MARGIN = raanMargin;
 
     const maxPeriod = periodMargin === 0 ? sat.period * 1.1 : sat.period + periodMargin;
     const minPeriod = periodMargin === 0 ? sat.period * 0.9 : sat.period - periodMargin;
 
     const maxInclination = sat.inclination + INC_MARGIN;
     const minInclination = sat.inclination - INC_MARGIN;
-    let maxRaan = sat.raan + RAAN_MARGIN;
-    let minRaan = sat.raan - RAAN_MARGIN;
+    let maxRaan = sat.rightAscension + RAAN_MARGIN;
+    let minRaan = sat.rightAscension - RAAN_MARGIN;
 
-    if (sat.raan >= 360 - RAAN_MARGIN) {
-      maxRaan -= 360 * DEG2RAD;
+    if (sat.rightAscension >= 360 - RAAN_MARGIN) {
+      maxRaan -= 360;
     }
-    if (sat.raan <= RAAN_MARGIN) {
-      minRaan += 360 * DEG2RAD;
+    if (sat.rightAscension <= RAAN_MARGIN) {
+      minRaan += 360;
     }
 
     return satData
       .filter((s) => {
         if (s.isStatic()) return false;
         if (s.inclination < minInclination || s.inclination > maxInclination) return false;
-        if (sat.raan > 360 - RAAN_MARGIN || sat.raan < RAAN_MARGIN) {
-          if (s.raan > maxRaan && s.raan < minRaan) return false;
+        if (sat.rightAscension > 360 - RAAN_MARGIN || sat.rightAscension < RAAN_MARGIN) {
+          if (s.rightAscension > maxRaan && s.rightAscension < minRaan) return false;
         } else {
-          if (s.raan < minRaan || s.raan > maxRaan) return false;
+          if (s.rightAscension < minRaan || s.rightAscension > maxRaan) return false;
         }
         if (s.period < minPeriod || s.period > maxPeriod) return false;
         return true;

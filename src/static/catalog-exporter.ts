@@ -1,6 +1,6 @@
 import { saveCsv } from '@app/lib/saveVariable';
 import { saveAs } from 'file-saver';
-import { BaseObject, DetailedSatellite, RAD2DEG } from 'ootk';
+import { BaseObject, DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { errorManagerInstance } from '../singletons/errorManager';
 
@@ -26,10 +26,10 @@ export class CatalogExporter {
           name: sat.name,
           tle1: sat.tle1,
           tle2: sat.tle2,
-          inclination: sat.inclination * RAD2DEG,
+          inclination: sat.inclination,
           eccentricity: sat.eccentricity,
           period: sat.period,
-          raan: sat.raan * RAD2DEG,
+          raan: sat.rightAscension,
           apogee: sat.apogee,
           perigee: sat.perigee,
           country: sat.country,

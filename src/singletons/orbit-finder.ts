@@ -1,4 +1,4 @@
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, RAD2DEG, SatelliteRecord, Sgp4, TleLine1, TleLine2, eci2lla } from 'ootk';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { StringPad } from '../lib/stringPad';
 import { SatMath } from '../static/sat-math';
 
@@ -162,8 +162,8 @@ export class OrbitFinder {
     this.epochyr = this.sat.tle1.substring(18, 20);
     this.epochday = this.sat.tle1.substring(20, 32);
     this.meanmo = this.sat.tle2.substring(52, 63);
-    this.argPer = StringPad.pad0((this.sat.argOfPerigee * RAD2DEG).toFixed(4), 8);
-    this.inc = StringPad.pad0((this.sat.inclination * RAD2DEG).toFixed(4), 8);
+    this.argPer = StringPad.pad0(this.sat.argOfPerigee.toFixed(4), 8);
+    this.inc = StringPad.pad0(this.sat.inclination.toFixed(4), 8);
     this.ecen = this.sat.eccentricity.toFixed(7).substring(2, 9);
     // Disregarding the first and second derivatives of mean motion
     // Just keep whatever was in the original TLE
@@ -219,9 +219,9 @@ export class OrbitFinder {
     meana = meana / 10;
     const meanaStr = StringPad.pad0(meana.toFixed(4), 8);
 
-    const raan = StringPad.pad0((sat.raan * RAD2DEG).toFixed(4), 8);
+    const raan = StringPad.pad0(sat.rightAscension.toFixed(4), 8);
 
-    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0((sat.argOfPerigee * RAD2DEG).toFixed(4), 8);
+    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0(sat.argOfPerigee.toFixed(4), 8);
 
     const _TLE1Ending = sat.tle1.substring(32, 71);
     const tle1 = '1 ' + sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + _TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
@@ -323,7 +323,7 @@ export class OrbitFinder {
     const raanStr = StringPad.pad0(raan.toFixed(4), 8);
 
     // If we adjusted argPe use the new one - otherwise use the old one
-    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0((this.sat.argOfPerigee * RAD2DEG).toFixed(4), 8);
+    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0(this.sat.argOfPerigee.toFixed(4), 8);
 
     const tle1 = '1 ' + this.sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + this.TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
     const tle2 = '2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + raanStr + ' ' + this.ecen + ' ' + argPe + ' ' + this.newMeana + ' ' + this.meanmo + '    10';
@@ -354,7 +354,7 @@ export class OrbitFinder {
    */
   argPerCalc(argPe: string, now: Date): PropagationResults {
     const meana = this.newMeana;
-    const raan = StringPad.pad0((this.sat.raan * RAD2DEG).toFixed(4), 8);
+    const raan = StringPad.pad0(this.sat.rightAscension.toFixed(4), 8);
     argPe = StringPad.pad0((parseFloat(argPe) / 10).toFixed(4), 8);
 
     // Create the new TLEs

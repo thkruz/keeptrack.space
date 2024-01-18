@@ -6,7 +6,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import findSatPng from '@public/img/icons/find2.png';
 
 import { countryCodeList, countryMapList, countryNameList } from '@app/catalogs/countries';
-import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, RAD2DEG, eci2rae } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 
@@ -99,14 +99,35 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   public static searchSats(searchParams: SearchSatParams): DetailedSatellite[] {
-    let { az, el, rng, countryCode, inc, azMarg, elMarg, rngMarg, incMarg, period, periodMarg, rcs, rcsMarg, objType, raan, raanMarg, argPe, argPeMarg, bus, shape, payload } =
-      searchParams;
+    let {
+      az,
+      el,
+      rng,
+      countryCode,
+      inc,
+      azMarg,
+      elMarg,
+      rngMarg,
+      incMarg,
+      period,
+      periodMarg,
+      rcs,
+      rcsMarg,
+      objType,
+      raan: rightAscension,
+      raanMarg: rightAscensionMarg,
+      argPe,
+      argPeMarg,
+      bus,
+      shape,
+      payload,
+    } = searchParams;
 
     const isValidAz = !isNaN(az) && isFinite(az);
     const isValidEl = !isNaN(el) && isFinite(el);
     const isValidRange = !isNaN(rng) && isFinite(rng);
     const isValidInc = !isNaN(inc) && isFinite(inc);
-    const isValidRaan = !isNaN(raan) && isFinite(raan);
+    const isValidRaan = !isNaN(rightAscension) && isFinite(rightAscension);
     const isValidArgPe = !isNaN(argPe) && isFinite(argPe);
     const isValidPeriod = !isNaN(period) && isFinite(period);
     const isValidRcs = !isNaN(rcs) && isFinite(rcs);
@@ -120,7 +141,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : (1 as Degrees);
     periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : (0.5 as Minutes);
     rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
-    raanMarg = !isNaN(raanMarg) && isFinite(raanMarg) ? raanMarg : (1 as Degrees);
+    rightAscensionMarg = !isNaN(rightAscensionMarg) && isFinite(rightAscensionMarg) ? rightAscensionMarg : (1 as Degrees);
     argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : (1 as Degrees);
 
     if (
@@ -149,10 +170,10 @@ export class FindSatPlugin extends KeepTrackPlugin {
     if (isValidAz) res = FindSatPlugin.checkAz(res, az - azMarg, az + azMarg);
     if (isValidEl) res = FindSatPlugin.checkEl(res, el - elMarg, el + elMarg);
     if (isValidRange) res = FindSatPlugin.checkRange(res, rng - rngMarg, rng + rngMarg);
-    if (isValidInc) res = FindSatPlugin.checkInc(res, inc - incMarg, inc + incMarg);
-    if (isValidRaan) res = FindSatPlugin.checkRaan(res, raan - raanMarg, raan + raanMarg);
-    if (isValidArgPe) res = FindSatPlugin.checkArgPe(res, argPe - argPeMarg, argPe + argPeMarg);
-    if (isValidPeriod) res = FindSatPlugin.checkPeriod(res, period - periodMarg, period + periodMarg);
+    if (isValidInc) res = FindSatPlugin.checkInc(res, (inc - incMarg) as Degrees, (inc + incMarg) as Degrees);
+    if (isValidRaan) res = FindSatPlugin.checkRightAscension(res, (rightAscension - rightAscensionMarg) as Degrees, (rightAscension + rightAscensionMarg) as Degrees);
+    if (isValidArgPe) res = FindSatPlugin.checkArgPe(res, (argPe - argPeMarg) as Degrees, (argPe + argPeMarg) as Degrees);
+    if (isValidPeriod) res = FindSatPlugin.checkPeriod(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
     if (isValidRcs) res = FindSatPlugin.checkRcs(res, rcs - rcsMarg, rcs + rcsMarg);
     if (countryCode !== 'All') {
       let country = countryCode.split('|').map((code) => countryMapList[code]);
@@ -480,20 +501,20 @@ The search will then find all satellites within those inclinations and display t
       });
   }
 
-  private static checkArgPe(possibles: DetailedSatellite[], min: number, max: number) {
-    return possibles.filter((possible) => possible.argOfPerigee * RAD2DEG < max && possible.argOfPerigee * RAD2DEG > min);
+  private static checkArgPe(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+    return possibles.filter((possible) => possible.argOfPerigee < max && possible.argOfPerigee > min);
   }
 
-  private static checkInc(possibles: DetailedSatellite[], min: number, max: number) {
-    return possibles.filter((possible) => possible.inclination * RAD2DEG < max && possible.inclination * RAD2DEG > min);
+  private static checkInc(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+    return possibles.filter((possible) => possible.inclination < max && possible.inclination > min);
   }
 
-  private static checkPeriod(possibles: DetailedSatellite[], minPeriod: number, maxPeriod: number) {
+  private static checkPeriod(possibles: DetailedSatellite[], minPeriod: Minutes, maxPeriod: Minutes) {
     return possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
   }
 
-  private static checkRaan(possibles: DetailedSatellite[], min: number, max: number) {
-    return possibles.filter((possible) => possible.raan * RAD2DEG < max && possible.raan * RAD2DEG > min);
+  private static checkRightAscension(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+    return possibles.filter((possible) => possible.rightAscension < max && possible.rightAscension > min);
   }
 
   private static checkRcs(possibles: DetailedSatellite[], minRcs: number, maxRcs: number) {

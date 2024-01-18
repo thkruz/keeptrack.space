@@ -170,7 +170,7 @@ export class StereoMap extends KeepTrackPlugin {
     const time = dateFormat(now, 'isoDateTime', true);
 
     const { gmst } = calcGmst(now);
-    const lla = eci2lla(sat.getEci(now).position, gmst);
+    const lla = eci2lla(sat.eci(now).position, gmst);
     const inView = sensor.isSatInFov(sat, now);
 
     return { lla, inView, time };

@@ -1,12 +1,10 @@
 import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { jday } from '@app/lib/transforms';
-import { SatMath } from '@app/static/sat-math';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { DetailedSatellite, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, eci2lla } from 'ootk';
+import { DetailedSatellite, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -190,34 +188,23 @@ export class Inc2AltPlots extends KeepTrackPlugin {
 
       let sat = obj as DetailedSatellite;
       if (sat.period > 250) return;
-      sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
+      sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
       const now = keepTrackApi.getTimeManager().simulationTimeObj;
-      let j = jday(
-        now.getUTCFullYear(),
-        now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
-        now.getUTCDate(),
-        now.getUTCHours(),
-        now.getUTCMinutes(),
-        now.getUTCSeconds()
-      ); // Converts time to jday (TLEs use epoch year/day)
-      j += now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
-      const gmst = Sgp4.gstime(j);
-      sat = { ...sat, ...eci2lla(sat.position, gmst) } as unknown as DetailedSatellite;
 
-      if (SatMath.getAlt(sat.position, gmst) < 80) return; // TODO: USE THIS FOR FINDING DECAYS!
+      if (sat.lla(now).alt < 80) return; // TODO: USE THIS FOR FINDING DECAYS!
 
       switch (sat.country) {
         case 'United States of America':
         case 'United States':
         case 'US':
-          usa.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+          usa.push([sat.lla(now).alt, sat.inclination, sat.period, sat.name, sat.id]);
           return;
         case 'Russian Federation':
         case 'CIS':
         case 'RU':
         case 'SU':
         case 'Russia':
-          russia.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+          russia.push([sat.lla(now).alt, sat.inclination, sat.period, sat.name, sat.id]);
           return;
         case 'China':
         case `China, People's Republic of`:
@@ -225,10 +212,10 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         case 'China (Republic)':
         case 'PRC':
         case 'CN':
-          china.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+          china.push([sat.lla(now).alt, sat.inclination, sat.period, sat.name, sat.id]);
           return;
         default:
-          other.push([SatMath.getAlt(sat.position, gmst), sat.inclination * RAD2DEG, sat.period, sat.name, sat.id]);
+          other.push([sat.lla(now).alt, sat.inclination, sat.period, sat.name, sat.id]);
           return;
       }
     });

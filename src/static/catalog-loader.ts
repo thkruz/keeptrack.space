@@ -4,7 +4,22 @@ import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, FormatTle, Kilometers, LandObject, Marker, Sensor, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
+import {
+  BaseObject,
+  CatalogSource,
+  Degrees,
+  DetailedSatellite,
+  DetailedSensor,
+  Kilometers,
+  LandObject,
+  Marker,
+  Sensor,
+  SpaceObjectType,
+  Star,
+  Tle,
+  TleLine1,
+  TleLine2,
+} from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 
@@ -29,15 +44,6 @@ interface AsciiTleSat {
   SCC: string;
   TLE1: TleLine1;
   TLE2: TleLine2;
-}
-
-export enum CatalogSource {
-  USSF = 'USSF',
-  CELESTRAK = 'Celestrak',
-  UNIV_OF_MICH = 'University of Michigan',
-  VIMPEL = 'JSC Vimpel',
-  TLE_TXT = 'TLE.txt',
-  EXTRA_JSON = 'extra.json',
 }
 
 export interface KeepTrackTLEFile {
@@ -136,7 +142,7 @@ export class CatalogLoader {
       CatalogLoader.addSccNum_(resp, i);
 
       // Check if first digit is a letter
-      resp[i].sccNum = FormatTle.convertA5to6Digit(resp[i]?.sccNum);
+      resp[i].sccNum = Tle.convertA5to6Digit(resp[i]?.sccNum);
 
       if (settingsManager.limitSats === '') {
         CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
@@ -619,7 +625,7 @@ export class CatalogLoader {
     resp[i].active = true;
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
       resp[i].id = tempObjData.length;
-      const source = Tle.getClassification(resp[i].TLE1);
+      const source = Tle.classification(resp[i].TLE1);
       switch (source) {
         case 'U':
           resp[i].source = CatalogSource.USSF;
@@ -716,7 +722,7 @@ export class CatalogLoader {
       element.OT = SpaceObjectType.SPECIAL;
     }
     const intlDes = this.parseIntlDes_(element.TLE1);
-    const sccNum = FormatTle.convertA5to6Digit(element.SCC.toString());
+    const sccNum = Tle.convertA5to6Digit(element.SCC.toString());
     const asciiSatInfo = {
       static: false,
       missile: false,
@@ -833,7 +839,7 @@ export class CatalogLoader {
     // If jsCatalog catalogue
     for (const element of jsCatalog) {
       if (!element.TLE1 || !element.TLE2) continue; // Don't Process Bad Satellite Information
-      const scc = FormatTle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
+      const scc = Tle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
       if (typeof catalogManagerInstance.sccIndex[`${scc}`] !== 'undefined') {
         // console.warn('Duplicate Satellite Found in jsCatalog');
         // NOTE: We don't trust the jsCatalog, so we don't update the TLEs
@@ -890,7 +896,7 @@ export class CatalogLoader {
         catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
         resp[i].active = true;
-        const source = Tle.getClassification(resp[i].TLE1);
+        const source = Tle.classification(resp[i].TLE1);
         switch (source) {
           case 'U':
             resp[i].source = CatalogSource.USSF;

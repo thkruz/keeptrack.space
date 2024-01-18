@@ -1,11 +1,10 @@
-import { EChartsData, GetSatType } from '@app/interfaces';
+import { EChartsData } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { DetailedSatellite, RAD2DEG, SpaceObjectType } from 'ootk';
+import { DetailedSatellite, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -190,31 +189,31 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       if (sat.eccentricity > 0.1) return;
       if (sat.period < 1240) return;
       if (sat.period > 1640) return;
-      if (sat.inclination * RAD2DEG > 17) return;
+      if (sat.inclination > 17) return;
 
       // Update Position
-      sat.position = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY).position;
-      const lla = CoordinateTransforms.eci2lla(sat.position, keepTrackApi.getTimeManager().simulationTimeObj);
+      const now = keepTrackApi.getTimeManager().simulationTimeObj;
+      const lla = sat.lla(now);
 
       switch (sat.country) {
         case 'United States of America':
         case 'United States':
         case 'US':
-          usa.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
+          usa.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
           return;
         case 'Russian Federation':
         case 'CIS':
         case 'Russia':
-          russia.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
+          russia.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
           return;
         case 'China':
         case `China, People's Republic of`:
         case `Hong Kong Special Administrative Region, China`:
         case 'China (Republic)':
-          china.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
+          china.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
           return;
         default:
-          other.push([sat.inclination * RAD2DEG, lla.lon, sat.period, sat.name, sat.id]);
+          other.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
           return;
       }
     });

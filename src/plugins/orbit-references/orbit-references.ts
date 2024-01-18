@@ -1,11 +1,10 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { StringPad } from '@app/lib/stringPad';
 
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { StringifiedNumber } from '@app/static/sat-math';
-import { BaseObject, FormatTle, RAD2DEG, Sgp4 } from 'ootk';
+import { BaseObject, FormatTle, Tle } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -60,25 +59,24 @@ export class OrbitReferences extends KeepTrackPlugin {
     let searchStr = '';
 
     // Add the satellites
-    const satrec = Sgp4.createSatrec(sat.tle1, sat.tle2);
-    const ecen = satrec.ecco.toFixed(7).substr(2, 7);
-    const rasc = <StringifiedNumber>(satrec.nodeo * RAD2DEG).toString();
-    const argPe = <StringifiedNumber>(satrec.argpo * RAD2DEG).toString();
-    const inc = <StringifiedNumber>sat.tle2.substr(8, 8);
-    const meanmo = <StringifiedNumber>sat.tle2.substr(52, 10);
-    const epochyr = sat.tle1.substr(18, 2);
-    const epochday = sat.tle1.substr(20, 12);
-    const intl = sat.tle1.substr(9, 8);
-    const sccNum = StringPad.pad0(sat.tle1.substr(2, 5).trim(), 5);
+    const ecen = sat.eccentricity.toString();
+    const rasc = sat.rightAscension.toString();
+    const argPe = sat.argOfPerigee.toString();
+    const inc = sat.inclination.toString();
+    const meanmo = sat.meanMotion.toString();
+    const epochyr = sat.epochYear.toString();
+    const epochday = sat.epochDay.toString();
+    const intl = sat.intlDes;
+    const scc = sat.sccNum;
 
     const period = 1440.0 / parseFloat(meanmo);
 
     let j = 0;
     for (let i = 0; i < 360; i++) {
-      const meana = <StringifiedNumber>StringPad.pad0(j.toFixed(4), 8);
-      const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc: sccNum });
+      const meana = j.toFixed(4).padStart(8, '0') as StringifiedNumber;
+      const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
       // Get the next available ID
-      const a5 = FormatTle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString().padStart(5, '0'));
+      const a5 = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString().padStart(5, '0'));
       const id = catalogManagerInstance.sccNum2Id(a5);
       const analystSat = catalogManagerInstance.addAnalystSat(tle1, tle2, id, a5);
       if (analystSat) {
@@ -89,7 +87,7 @@ export class OrbitReferences extends KeepTrackPlugin {
     }
 
     // Remove the last comma
-    searchStr = searchStr.substr(0, searchStr.length - 1);
+    searchStr = searchStr.slice(0, -1);
     const uiManagerInstance = keepTrackApi.getUiManager();
     uiManagerInstance.doSearch(searchStr);
 

@@ -7,7 +7,6 @@ import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SearchManager } from '@app/singletons/search-manager';
-import { CatalogSource } from '@app/static/catalog-loader';
 import { CatalogSearch } from '@app/static/catalog-search';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
@@ -16,7 +15,7 @@ import { StringExtractor } from '@app/static/string-extractor';
 import addPng from '@public/img/add.png';
 import removePng from '@public/img/remove.png';
 import Draggabilly from 'draggabilly';
-import { BaseObject, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, RAD2DEG, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
+import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missileManager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -46,7 +45,6 @@ export class SatInfoBox extends KeepTrackPlugin {
   private issensorInfoLoaded_ = false;
   private islaunchDataLoaded_ = false;
   private issatMissionDataLoaded_ = false;
-  private isintelDataLoaded_ = false;
   private isTopLinkEventListenersAdded_ = false;
 
   currentTEARR = <TearrData>{
@@ -90,13 +88,6 @@ export class SatInfoBox extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_satMissionData`,
       cb: SatInfoBox.updateSatMissionData_.bind(this),
-    });
-
-    // Register intel data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.PLUGIN_NAME}_intelData`,
-      cb: SatInfoBox.updateIntelData_.bind(this),
     });
 
     // Register object data
@@ -144,8 +135,35 @@ export class SatInfoBox extends KeepTrackPlugin {
                 return;
               }
             }
-            SensorMath.getTearr(sat, sensorManagerInstance.currentSensors, timeManagerInstance.simulationTimeObj);
-            const currentTearr = SensorMath.getTearData(timeManagerInstance.simulationTimeObj, sat.satrec, sensorManagerInstance.currentSensors, false);
+
+            let currentTearr: TearrData;
+            let rae, isInView, lla;
+            if (keepTrackApi.getSensorManager().isSensorSelected()) {
+              const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+              rae = sensor.rae(sat, timeManagerInstance.simulationTimeObj);
+              isInView = sensor.isRaeInFov(rae);
+            } else {
+              rae = {
+                az: 0,
+                el: 0,
+                rng: 0,
+              };
+              isInView = false;
+            }
+
+            lla = eci2lla(sat.position, SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst);
+            currentTearr = {
+              time: timeManagerInstance.simulationTimeObj.toISOString(),
+              az: rae.az,
+              el: rae.el,
+              rng: rae.rng,
+              objName: sat.name,
+              lat: lla.lat,
+              lon: lla.lon,
+              alt: lla.alt,
+              inView: isInView,
+            };
+
             this.currentTEARR = currentTearr; // TODO: Make SatMath 100% static
           } else {
             // Is Missile
@@ -330,11 +348,6 @@ export class SatInfoBox extends KeepTrackPlugin {
       this.issatMissionDataLoaded_ = true;
     }
 
-    if (!this.isintelDataLoaded_) {
-      SatInfoBox.createIntelData();
-      this.isintelDataLoaded_ = true;
-    }
-
     // Now that is is loaded, reset the sizing and location
     SatInfoBox.resetMenuLocation(getEl(SatInfoBox.containerId_), false);
   }
@@ -419,10 +432,10 @@ export class SatInfoBox extends KeepTrackPlugin {
     if (sat.isSatellite()) {
       getEl('sat-apogee').innerHTML = sat.apogee.toFixed(0) + ' km';
       getEl('sat-perigee').innerHTML = sat.perigee.toFixed(0) + ' km';
-      getEl('sat-inclination').innerHTML = (sat.inclination * RAD2DEG).toFixed(2) + '°';
+      getEl('sat-inclination').innerHTML = sat.inclination.toFixed(2) + '°';
       getEl('sat-eccentricity').innerHTML = sat.eccentricity.toFixed(3);
-      getEl('sat-raan').innerHTML = (sat.raan * RAD2DEG).toFixed(2) + '°';
-      getEl('sat-argPe').innerHTML = (sat.argOfPerigee * RAD2DEG).toFixed(2) + '°';
+      getEl('sat-raan').innerHTML = sat.rightAscension.toFixed(2) + '°';
+      getEl('sat-argPe').innerHTML = sat.argOfPerigee.toFixed(2) + '°';
 
       const periodDom = getEl('sat-period');
       periodDom.innerHTML = sat.period.toFixed(2) + ' min';
@@ -994,7 +1007,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   private static updateSatMissionData_(obj?: BaseObject) {
     if (obj === null || typeof obj === 'undefined') return;
 
-    if (!obj.isSatellite()) {
+    if (obj.isSatellite()) {
       const sat = obj as DetailedSatellite;
       keepTrackApi.containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
         (<HTMLElement>el).style.display = 'flex';
@@ -1154,130 +1167,6 @@ export class SatInfoBox extends KeepTrackPlugin {
           </div>
         </div>
         `
-    );
-  }
-
-  private static updateIntelData_(sat: DetailedSatellite) {
-    if (!sat) return;
-
-    // if (typeof sat.TTP != 'undefined') {
-    //   getEl('sat-ttp-wrapper').style.display = 'block';
-    //   getEl('sat-ttp').innerHTML = sat.TTP;
-    // } else {
-    //   getEl('sat-ttp-wrapper').style.display = 'none';
-    // }
-    // if (typeof sat.NOTES != 'undefined') {
-    //   getEl('sat-notes-wrapper').style.display = 'block';
-    //   getEl('sat-notes').innerHTML = sat.NOTES;
-    // } else {
-    //   getEl('sat-notes-wrapper').style.display = 'none';
-    // }
-    // if (typeof sat.FMISSED != 'undefined') {
-    //   getEl('sat-fmissed-wrapper').style.display = 'block';
-    //   getEl('sat-fmissed').innerHTML = sat.FMISSED;
-    // } else {
-    //   getEl('sat-fmissed-wrapper').style.display = 'none';
-    // }
-    // if (typeof sat.ORPO != 'undefined') {
-    //   getEl('sat-oRPO-wrapper').style.display = 'block';
-    //   getEl('sat-oRPO').innerHTML = sat.ORPO;
-    // } else {
-    //   getEl('sat-oRPO-wrapper').style.display = 'none';
-    // }
-    // if (typeof sat.constellation != 'undefined') {
-    //   getEl('sat-constellation-wrapper').style.display = 'block';
-    //   getEl('sat-constellation').innerHTML = sat.constellation;
-    // } else {
-    //   getEl('sat-constellation-wrapper').style.display = 'none';
-    // }
-    // if (typeof sat.maneuver != 'undefined') {
-    //   getEl('sat-maneuver-wrapper').style.display = 'block';
-    //   getEl('sat-maneuver').innerHTML = sat.maneuver;
-    // } else {
-    //   getEl('sat-maneuver-wrapper').style.display = 'none';
-    // }
-    // if (typeof sat.associates != 'undefined') {
-    //   getEl('sat-associates-wrapper').style.display = 'block';
-    //   getEl('sat-associates').innerHTML = sat.associates;
-    // } else {
-    //   getEl('sat-associates-wrapper').style.display = 'none';
-    // }
-
-    // if (
-    //   typeof sat.TTP === 'undefined' &&
-    //   typeof sat.NOTES === 'undefined' &&
-    //   typeof sat.FMISSED === 'undefined' &&
-    //   typeof sat.ORPO === 'undefined' &&
-    //   typeof sat.constellation === 'undefined' &&
-    //   typeof sat.maneuver === 'undefined' &&
-    //   typeof sat.associates === 'undefined'
-    // ) {
-    //   getEl('intel-data-section').style.display = 'none';
-    // }
-  }
-
-  private static createIntelData() {
-    getEl(SatInfoBox.containerId_).insertAdjacentHTML(
-      'beforeend',
-      keepTrackApi.html`
-          <div id="intel-data-section" class="sat-info-section-header">Intel Data</div>
-            <div class="sat-info-row sat-only-info" id="sat-ttp-wrapper">
-              <div class="sat-info-key">
-                TTPs
-              </div>
-              <div class="sat-info-value" id="sat-ttp">
-                NO DATA
-              </div>
-            </div>
-            <div class="sat-info-row sat-only-info" id="sat-notes-wrapper">
-              <div class="sat-info-key">
-                Notes
-              </div>
-              <div class="sat-info-value" id="sat-notes">
-                NO DATA
-              </div>
-            </div>
-            <div class="sat-info-row sat-only-info" id="sat-fmissed-wrapper">
-              <div class="sat-info-key">
-                Freq. Missed
-              </div>
-              <div class="sat-info-value" id="sat-fmissed">
-                NO DATA
-              </div>
-            </div>
-            <div class="sat-info-row sat-only-info" id="sat-oRPO-wrapper">
-              <div class="sat-info-key">
-                Sec. Obj
-              </div>
-              <div class="sat-info-value" id="sat-oRPO">
-                NO DATA
-              </div>
-            </div>
-            <div class="sat-info-row sat-only-info" id="sat-constellation-wrapper">
-              <div class="sat-info-key">
-                Constellation
-              </div>
-              <div class="sat-info-value" id="sat-constellation">
-                NO DATA
-              </div>
-            </div>
-            <div class="sat-info-row sat-only-info" id="sat-maneuver-wrapper">
-              <div class="sat-info-key">
-                Maneuver
-              </div>
-              <div class="sat-info-value" id="sat-maneuver">
-                NO DATA
-              </div>
-            </div>
-            <div class="sat-info-row sat-only-info" id="sat-associates-wrapper">
-              <div class="sat-info-key">
-                Associates
-              </div>
-              <div class="sat-info-value" id="sat-associates">
-                NO DATA
-              </div>
-            </div>
-          </div>`
     );
   }
 

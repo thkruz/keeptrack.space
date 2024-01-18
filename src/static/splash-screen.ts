@@ -1,5 +1,5 @@
 import { keepTrackApi } from '../keepTrackApi';
-import { getEl, hideEl, setInnerHtml, showEl } from '../lib/get-el';
+import { getEl, hideEl, showEl } from '../lib/get-el';
 import { MobileManager } from '../singletons/mobileManager';
 
 export abstract class SplashScreen {
@@ -68,7 +68,7 @@ export abstract class SplashScreen {
     MobileManager.checkMobileMode();
 
     if (settingsManager.isMobileModeEnabled) {
-      SplashScreen.loadStr('Attempting to Math');
+      SplashScreen.loadStr(SplashScreen.msg.math);
       hideEl('loading-screen');
     } else {
       // Loading Screen Resized and Hidden
@@ -76,12 +76,15 @@ export abstract class SplashScreen {
         getEl('loading-screen')?.classList.remove('full-loader');
         getEl('loading-screen')?.classList.add('mini-loader-container');
         getEl('logo-inner-container')?.classList.add('mini-loader');
-        setInnerHtml('logo-text', '');
-        setInnerHtml('logo-text-version', '');
         hideEl('loading-screen');
         SplashScreen.loadStr(SplashScreen.msg.math);
       }, 100);
     }
+
+    // We no longer need these elements
+    hideEl('loading-hint');
+    hideEl('logo-text');
+    hideEl('logo-text-version');
   }
 
   static loadStr(str: string) {

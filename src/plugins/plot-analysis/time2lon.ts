@@ -5,7 +5,7 @@ import { SatMathApi } from '@app/singletons/sat-math-api';
 import linePlotPng from '@public/img/icons/line-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { DetailedSatellite, RAD2DEG, SpaceObjectType } from 'ootk';
+import { DetailedSatellite, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -208,7 +208,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
       plotPoints.forEach((point) => {
         const pointTime = (point.time - now) / 1000 / 60;
         if (pointTime > 1440 || pointTime < 0) return;
-        plotData.push([pointTime, point.lon * RAD2DEG]);
+        plotData.push([pointTime, point.lon]);
       });
       data.push({
         name: sat.name,

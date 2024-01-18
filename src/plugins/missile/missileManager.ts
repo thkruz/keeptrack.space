@@ -6,7 +6,7 @@ import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, gl
 import { jday } from '@app/lib/transforms';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { DEG2RAD, EciVec3, Kilometers, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecf2rae, eci2ecf, eci2lla } from 'ootk';
+import { DEG2RAD, EciVec3, Kilometers, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 
 let EarthRadius: number, EarthMass: number, FuelDensity: number, BurnRate: number, WarheadMass: number, R: number, G: number, h: number;
@@ -602,7 +602,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
     currentTEARR.lon = gpos.lon;
     currentTEARR.lat = gpos.lat;
     positionEcf = eci2ecf({ x, y, z }, gmst);
-    lookAngles = ecf2rae(sensor.getLlaRad(), positionEcf);
+    lookAngles = ecfRad2rae(sensor.llaRad(), positionEcf);
     currentTEARR.az = lookAngles.az * RAD2DEG;
     currentTEARR.el = lookAngles.el * RAD2DEG;
     currentTEARR.rng = lookAngles.rng;

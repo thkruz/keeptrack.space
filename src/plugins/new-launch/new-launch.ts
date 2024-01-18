@@ -12,7 +12,7 @@ import { launchSites } from '@app/catalogs/launch-sites';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, RAD2DEG, SatelliteRecord, Sgp4 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, SatelliteRecord, Sgp4 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -35,7 +35,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-    (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0((sat.inclination * RAD2DEG).toFixed(4), 8);
+    (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0(sat.inclination.toFixed(4), 8);
   };
 
   bottomIconElementName = 'menu-new-launch';
@@ -174,7 +174,7 @@ export class NewLaunch extends KeepTrackPlugin {
       launchLon = (launchLon - 360) as Degrees; // Convert from 0-360 to -180-180
     }
 
-    // if (sat.inclination * RAD2DEG < launchLat) {
+    // if (sat.inclination < launchLat) {
     //   uiManagerInstance.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
     //   return;
     // }
@@ -297,8 +297,8 @@ export class NewLaunch extends KeepTrackPlugin {
     // Get Current LaunchSiteOptionValue
     const launchSiteOptionValue = (<HTMLInputElement>getEl('nl-facility')).value;
     const lat = launchSites[launchSiteOptionValue].lat;
-    let inc = sat.inclination * RAD2DEG;
-    inc = inc > 90 ? 180 - inc : inc;
+    let inc = sat.inclination;
+    inc = inc > 90 ? ((180 - inc) as Degrees) : inc;
 
     const submitButtonDom = <HTMLButtonElement>getEl(this.sideMenuElementName + '-submit');
     if (inc < lat) {

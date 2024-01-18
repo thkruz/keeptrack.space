@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { EciArr3, GetSatType, KeepTrackApiEvents, Singletons } from '@app/interfaces';
-import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians, SpaceObjectType, Star, ecf2eci, ecf2rae, eci2ecf, lla2ecf } from 'ootk';
+import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, Kilometers, Radians, SpaceObjectType, Star, ecf2eci, ecf2rae, eci2ecf, lla2ecf } from 'ootk';
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
@@ -552,10 +552,10 @@ export class LineManager {
                   this.drawLineList[i].lat = <Degrees>-90;
                 }
 
-                const lla = { lat: <Radians>(this.drawLineList[i].lat * DEG2RAD), lon: <Radians>(this.drawLineList[i].lon * DEG2RAD), alt: <Kilometers>0.05 };
+                const lla = { lat: this.drawLineList[i].lat, lon: this.drawLineList[i].lon, alt: <Kilometers>0.05 };
                 const ecf = eci2ecf(this.drawLineList[i].sat.position, 0);
                 const rae = ecf2rae(lla, ecf);
-                const el = rae.el * RAD2DEG;
+                const el = rae.el;
                 if (el > settingsManager.lineScanMinEl) {
                   const pos = lla2ecf(lla);
                   this.drawLineList[i].line.update(

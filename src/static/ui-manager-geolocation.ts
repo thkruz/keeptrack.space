@@ -5,7 +5,7 @@ import { Degrees, DetailedSensor, Kilometers, ZoomValue } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { lat2pitch, lon2yaw } from '../lib/transforms';
-import { StandardSensorManager } from '../plugins/sensor/sensorManager';
+import { SensorManager } from '../plugins/sensor/sensorManager';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export class UiGeolocation {
@@ -35,7 +35,7 @@ export class UiGeolocation {
       sensor: sensorInfo,
     });
 
-    StandardSensorManager.updateSensorUiStyling([sensorInfo]);
+    SensorManager.updateSensorUiStyling([sensorInfo]);
 
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     const mainCameraInstance = keepTrackApi.getMainCamera();

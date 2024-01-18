@@ -12,7 +12,7 @@ import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, FormatTle, RAD2DEG, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
+import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -300,18 +300,18 @@ export class EditSat extends KeepTrackPlugin {
     const sat = obj as DetailedSatellite;
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
 
-    const inc = (sat.inclination * RAD2DEG).toFixed(4).padStart(8, '0');
+    const inc = sat.inclination.toFixed(4).padStart(8, '0');
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = inc;
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.tle1.substr(18, 2);
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = sat.tle1.substr(20, 12);
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.tle2.substr(52, 11);
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.tle2.substr(52, 11))).toFixed(4);
 
-    const rasc = (sat.raan * RAD2DEG).toFixed(4).padStart(8, '0');
+    const rasc = sat.rightAscension.toFixed(4).padStart(8, '0');
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = rasc;
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-    const argPe = (sat.argOfPerigee * RAD2DEG).toFixed(4).padStart(8, '0');
+    const argPe = sat.argOfPerigee.toFixed(4).padStart(8, '0');
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = StringPad.pad0(argPe, 8);
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.tle2.substr(44 - 1, 7 + 1);
   }
@@ -382,7 +382,7 @@ export class EditSat extends KeepTrackPlugin {
       const sat = obj2 as DetailedSatellite;
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
 
-      const inc = (sat.inclination * RAD2DEG).toFixed(4).padStart(8, '0');
+      const inc = sat.inclination.toFixed(4).padStart(8, '0');
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = StringPad.pad0(inc, 8);
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value = sat.tle1.substr(18, 2);
@@ -390,12 +390,12 @@ export class EditSat extends KeepTrackPlugin {
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = sat.tle2.substr(52, 11);
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = (1440 / parseFloat(sat.tle2.substr(52, 11))).toFixed(4);
 
-      const rasc = (sat.raan * RAD2DEG).toFixed(4).padStart(8, '0');
+      const rasc = sat.rightAscension.toFixed(4).padStart(8, '0');
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = rasc;
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-ecen`)).value = sat.eccentricity.toFixed(7).substr(2, 7);
 
-      const argPe = (sat.argOfPerigee * RAD2DEG).toFixed(4).padStart(8, '0');
+      const argPe = sat.argOfPerigee.toFixed(4).padStart(8, '0');
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = argPe;
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = sat.tle2.substr(44 - 1, 7 + 1);

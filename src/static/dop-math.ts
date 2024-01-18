@@ -1,5 +1,5 @@
 import numeric from 'numeric';
-import { AzEl, DEG2RAD, Degrees, DetailedSatellite, Kilometers, MILLISECONDS_PER_SECOND, RAD2DEG, Radians, ecf2rae, eci2ecf } from 'ootk';
+import { AzEl, DEG2RAD, Degrees, DetailedSatellite, Kilometers, MILLISECONDS_PER_SECOND, ecf2rae, eci2ecf } from 'ootk';
 import { dateFormat } from '../lib/dateFormat';
 import { getEl } from '../lib/get-el';
 import { SatMath } from './sat-math';
@@ -58,29 +58,27 @@ export abstract class DopMath {
    * Calculates the DOP values for a specific time and location.
    * @param propTime The time to use for the calculation.
    * @param gpsSats The GPS satellites to use for the calculation.
-   * @param latDeg The latitude of the observer.
-   * @param lonDeg The longitude of the observer.
+   * @param lat The latitude of the observer.
+   * @param lon The longitude of the observer.
    * @param alt The altitude of the observer.
    * @returns An object containing the calculated DOP values.
    * @throws An error if the latitude or longitude is undefined.
    */
-  public static getDops(propTime: Date, gpsSatObjects: DetailedSatellite[], latDeg: Degrees, lonDeg: Degrees, alt?: Kilometers, gpsElevationMask = <Degrees>10) {
-    if (typeof latDeg == 'undefined' || typeof lonDeg == 'undefined') {
+  public static getDops(propTime: Date, gpsSatObjects: DetailedSatellite[], lat: Degrees, lon: Degrees, alt?: Kilometers, gpsElevationMask = <Degrees>10) {
+    if (typeof lat == 'undefined' || typeof lon == 'undefined') {
       return { pdop: 'N/A', hdop: 'N/A', gdop: 'N/A', vdop: 'N/A', tdop: 'N/A' };
     }
 
-    let latRad = <Radians>(latDeg * DEG2RAD);
-    let lonRad = <Radians>(lonDeg * DEG2RAD);
     alt ??= <Kilometers>0;
 
     const { gmst } = SatMath.calculateTimeVariables(propTime);
 
     let inViewList = <AzEl<Degrees>[]>[];
     gpsSatObjects.forEach((sat: DetailedSatellite) => {
-      const lookAngles = ecf2rae({ lon: lonRad, lat: latRad, alt: alt }, eci2ecf(sat.position, gmst));
+      const lookAngles = ecf2rae({ lon, lat, alt }, eci2ecf(sat.position, gmst));
       const azel = {
-        az: (lookAngles.az * RAD2DEG) as Degrees,
-        el: (lookAngles.el * RAD2DEG) as Degrees,
+        az: lookAngles.az,
+        el: lookAngles.el,
       };
       if (azel.el > gpsElevationMask) {
         inViewList.push(azel);

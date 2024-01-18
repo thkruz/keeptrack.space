@@ -30,13 +30,12 @@ import { getEl } from '@app/lib/get-el';
 import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { CatalogSource } from '@app/static/catalog-loader';
 import { isThisNode } from '@app/static/isThisNode';
 import addPng from '@public/img/add.png';
 import watchlistPng from '@public/img/icons/watchlist.png';
 import removePng from '@public/img/remove.png';
 import saveAs from 'file-saver';
-import { DetailedSatellite } from 'ootk';
+import { CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 

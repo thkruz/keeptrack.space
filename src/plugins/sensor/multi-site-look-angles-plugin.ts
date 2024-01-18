@@ -12,7 +12,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, MIN
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { StandardSensorManager } from './sensorManager';
+import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   static PLUGIN_NAME = 'Multi Site Look Angles';
   dependencies = [SelectSatManager.PLUGIN_NAME];
@@ -211,7 +211,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       // Skip if satellite is above the max range of the sensor
       if (sensor.maxRng < sat.perigee && (!sensor.maxRng2 || sensor.maxRng2 < sat.perigee)) continue;
 
-      StandardSensorManager.updateSensorUiStyling([sensor]);
+      SensorManager.updateSensorUiStyling([sensor]);
       let offset = 0;
       for (let i = 0; i < this.lookanglesLength * 24 * 60 * 60; i += this.lookanglesInterval) {
         // 5second Looks
@@ -230,7 +230,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     multiSiteArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     sensorManagerInstance.lastMultiSiteArray = multiSiteArray;
 
-    isResetToDefault ? sensorManagerInstance.setCurrentSensor(sensorManagerInstance.defaultSensor) : sensorManagerInstance.setCurrentSensor(tempSensor);
+    isResetToDefault ? sensorManagerInstance.setCurrentSensor(null) : sensorManagerInstance.setCurrentSensor(tempSensor);
 
     MultiSiteLookAnglesPlugin.populateMultiSiteTable_(multiSiteArray);
   }

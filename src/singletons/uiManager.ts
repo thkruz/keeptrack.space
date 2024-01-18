@@ -25,7 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, KeepTrackApiEvents, ToastMsgType, UiManager } from '@app/interfaces';
+import { ColorRuleSet, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { loadJquery } from '@app/singletons/ui-manager/jquery';
@@ -42,7 +42,7 @@ import { errorManagerInstance } from './errorManager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 
-export class StandardUiManager implements UiManager {
+export class UiManager {
   private static LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
 
   private isFooterVisible_ = true;
@@ -133,7 +133,7 @@ export class StandardUiManager implements UiManager {
     });
 
     type = type || 'standby';
-    if (isLong) toastMsg.timeRemaining = StandardUiManager.LONG_TIMER_DELAY;
+    if (isLong) toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
     switch (type) {
       case 'standby':
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
@@ -274,7 +274,7 @@ export class StandardUiManager implements UiManager {
 
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
 
-    StandardUiManager.initBottomMenuResizing_();
+    UiManager.initBottomMenuResizing_();
 
     // Initialize Navigation and Select Menus
     let elems = document.querySelectorAll('.dropdown-button');
@@ -320,7 +320,7 @@ export class StandardUiManager implements UiManager {
     this.addSearchEventListeners_();
 
     getEl('fullscreen-icon')?.addEventListener('click', () => {
-      StandardUiManager.fullscreenToggle();
+      UiManager.fullscreenToggle();
     });
 
     getEl('nav-footer-toggle')?.addEventListener('click', () => {

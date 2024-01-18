@@ -2,7 +2,7 @@ import { GeolocationPosition } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
-import { StandardUiManager } from '@app/singletons/uiManager';
+import { UiManager } from '@app/singletons/uiManager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { defaultSensor } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
@@ -11,7 +11,7 @@ describe('uiManager', () => {
   // Should process fullscreenToggle
   it('process_fullscreen_toggle', () => {
     document.documentElement.requestFullscreen = jest.fn().mockImplementation(() => Promise.resolve());
-    expect(() => StandardUiManager.fullscreenToggle()).not.toThrow();
+    expect(() => UiManager.fullscreenToggle()).not.toThrow();
   });
 
   // Should process getsensorinfo
@@ -89,7 +89,7 @@ describe('uiManager', () => {
 
   // Should process colorSchemeChangeAlert
   it('process_colorSchemeChangeAlert', () => {
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     const colorSchemeManagerInstance = new StandardColorSchemeManager();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
@@ -117,7 +117,7 @@ describe('uiManager', () => {
     <div id="nav-footer-toggle"></div>
     <div id="ui-wrapper"></div>
     `;
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     expect(() => uiManagerInstance.footerToggle()).not.toThrow();
     expect(() => uiManagerInstance.footerToggle()).not.toThrow();
     expect(() => uiManagerInstance.hideUi()).not.toThrow();
@@ -134,14 +134,14 @@ describe('uiManager', () => {
     <div id="settings-menu"></div>
     <div id="about-menu"></div>
     `;
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     expect(() => uiManagerInstance.initMenuController()).not.toThrow();
   });
 
   // Should process onReady
   it('process_onReady', () => {
     setupStandardEnvironment();
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
 
     keepTrackApi.containerRoot.innerHTML += `
     <div id="save-rmb-menu"></div>
@@ -158,7 +158,7 @@ describe('uiManager', () => {
   // Should process init
   it('process_init', () => {
     setupStandardEnvironment();
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     expect(() => uiManagerInstance.init()).not.toThrow();
   });
 
@@ -178,6 +178,6 @@ describe('uiManager', () => {
     <div id="ms-lat"></div>
     <div id="ms-lon"></div>
     `;
-    expect(() => StandardUiManager.postStart()).not.toThrow();
+    expect(() => UiManager.postStart()).not.toThrow();
   });
 });

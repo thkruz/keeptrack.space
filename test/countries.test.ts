@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { StandardGroupManager } from '@app/singletons/groups-manager';
+import { GroupsManager } from '@app/singletons/groups-manager';
 import { ObjectGroup } from '@app/singletons/object-group';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
@@ -12,7 +12,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-te
 describe('CountriesMenu_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
-    const mockGroupsManager = new StandardGroupManager();
+    const mockGroupsManager = new GroupsManager();
     mockGroupsManager.groupList['Argentina'] = {
       groupName: 'Argentina',
       objects: [],

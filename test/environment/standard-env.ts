@@ -2,11 +2,11 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { StandardSensorManager } from '@app/plugins/sensor/sensorManager';
+import { SensorManager } from '@app/plugins/sensor/sensorManager';
 import { SettingsManager } from '@app/settings/settings';
 import { Camera } from '@app/singletons/camera';
 import { DotsManager } from '@app/singletons/dots-manager';
-import { StandardGroupManager } from '@app/singletons/groups-manager';
+import { GroupsManager } from '@app/singletons/groups-manager';
 import { InputManager } from '@app/singletons/input-manager';
 import { Scene } from '@app/singletons/scene';
 import { SearchManager } from '@app/singletons/search-manager';
@@ -16,9 +16,9 @@ import { SensorMath } from '@app/static/sensor-math';
 import { mat4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../src/container';
 import { Constructor, Singletons } from '../../src/interfaces';
-import { StandardCatalogManager } from '../../src/singletons/catalog-manager';
-import { StandardColorSchemeManager } from '../../src/singletons/color-scheme-manager';
-import { StandardOrbitManager } from '../../src/singletons/orbitManager';
+import { CatalogManager } from '../../src/singletons/catalog-manager';
+import { ColorSchemeManager } from '../../src/singletons/color-scheme-manager';
+import { OrbitManager } from '../../src/singletons/orbitManager';
 import { WebGLRenderer } from '../../src/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 
@@ -44,22 +44,22 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   const scene = new Scene({
     gl: global.mocks.glMock,
   });
-  const catalogManagerInstance = new StandardCatalogManager();
+  const catalogManagerInstance = new CatalogManager();
   catalogManagerInstance.satCruncher = {
     postMessage: jest.fn(),
     addEventListener: jest.fn(),
   } as unknown as Worker;
-  const orbitManagerInstance = new StandardOrbitManager();
+  const orbitManagerInstance = new OrbitManager();
   orbitManagerInstance.orbitWorker = {
     postMessage: jest.fn(),
     addEventListener: jest.fn(),
   } as unknown as Worker;
   orbitManagerInstance['gl_'] = global.mocks.glMock;
-  const colorSchemeManagerInstance = new StandardColorSchemeManager();
+  const colorSchemeManagerInstance = new ColorSchemeManager();
   const dotsManagerInstance = new DotsManager();
   const timeManagerInstance = new TimeManager();
   timeManagerInstance.simulationTimeObj = new Date(2023, 1, 1, 0, 0, 0, 0);
-  const sensorManagerInstance = new StandardSensorManager();
+  const sensorManagerInstance = new SensorManager();
   mockUiManager.searchManager = new SearchManager(mockUiManager);
 
   // Jest all Image class objects with a mock decode method.
@@ -76,7 +76,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   renderer['domElement'] = <any>{ style: { cursor: 'default' } };
 
   const inputManagerInstance = new InputManager();
-  const groupManagerInstance = new StandardGroupManager();
+  const groupManagerInstance = new GroupsManager();
 
   keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, renderer);
   keepTrackContainer.registerSingleton(Singletons.Scene, scene);

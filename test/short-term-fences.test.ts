@@ -29,7 +29,7 @@ describe('ShortTermFences_class', () => {
       websiteInit(stf);
       expect(() => stf.onSubmit()).not.toThrow();
 
-      keepTrackApi.getSensorManager().setCurrentSensor([defaultSensor]);
+      keepTrackApi.getSensorManager().setCurrentSensor(null);
       expect(() => stf.onSubmit()).not.toThrow();
     });
   });
@@ -41,7 +41,7 @@ describe('ShortTermFences_class', () => {
       websiteInit(stf);
       expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
 
-      keepTrackApi.getSensorManager().setCurrentSensor([defaultSensor]);
+      keepTrackApi.getSensorManager().setCurrentSensor(null);
       expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
 
       keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);

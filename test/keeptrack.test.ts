@@ -3,8 +3,8 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { keepTrackContainer } from '../src/container';
 import { SatObject, Singletons } from '../src/interfaces';
 import { StandardCatalogManager } from '../src/singletons/catalog-manager';
-import { StandardOrbitManager } from '../src/singletons/orbitManager';
-import { StandardUiManager } from '../src/singletons/uiManager';
+import { OrbitManager } from '../src/singletons/orbitManager';
+import { UiManager } from '../src/singletons/uiManager';
 import { WebGLRenderer } from '../src/singletons/webgl-renderer';
 import { CatalogLoader } from '../src/static/catalog-loader';
 import { KeepTrack } from './../src/keeptrack';
@@ -43,8 +43,8 @@ const setupStandardEnvironment = () => {
   setupDefaultHtml();
   const drawManagerInstance = new WebGLRenderer();
   const catalogManagerInstance = new StandardCatalogManager();
-  const orbitManagerInstance = new StandardOrbitManager();
-  const uiManagerInstance = new StandardUiManager();
+  const orbitManagerInstance = new OrbitManager();
+  const uiManagerInstance = new UiManager();
 
   // Jest all Image class objects with a mock decode method.
   Image.prototype.decode = jest.fn();

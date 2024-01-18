@@ -167,11 +167,19 @@ const getBaseConfig = (dirName) => ({
       },
       {
         test: /\.m?js$/u,
-        include: [/src/u],
-        exclude: [/(?:node_modules|bower_components)/u, /\dist/u, /\coverage/u, /\settings\.js/iu, /\.test\.jsx?$/u],
+        include: [/src/u, /node_modules/u],
+        resolve: {
+          fullySpecified: false,
+        },
+        // exclude: [/(?:node_modules|bower_components)/u, /\dist/u, /\coverage/u, /\settings\.js/iu, /\.test\.jsx?$/u],
         use: {
           loader: 'babel-loader',
         },
+      },
+      {
+        test: /\.m?js$/u,
+        enforce: 'pre',
+        use: ['source-map-loader'],
       },
     ],
   },

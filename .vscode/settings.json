@@ -65,5 +65,6 @@
     "connectionId": "thkruz",
     "projectKey": "thkruz_keeptrack.space"
   },
-  "task.autoDetect": "off"
+  "task.autoDetect": "off",
+  "editor.rulers": [180]
 }

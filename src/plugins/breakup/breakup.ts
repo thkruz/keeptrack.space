@@ -11,7 +11,7 @@ import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, FormatTle, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, DetailedSatellite, Kilometers, SatelliteRecord, Sgp4, Tle, TleLine1, TleLine2 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -241,7 +241,7 @@ export class Breakup extends KeepTrackPlugin {
     let i = 0;
     for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
       if (i >= breakupCount) break;
-      const a5Num = FormatTle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
+      const a5Num = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
       const id = catalogManagerInstance.sccNum2Id(a5Num);
       catalogManagerInstance.getObject(id); // TODO: This may be unnecessary needs tested
       let sat = origsat;
@@ -282,7 +282,7 @@ export class Breakup extends KeepTrackPlugin {
         const meanmoStr = meanmo.toFixed(8).padStart(11, '0');
         if (meanmoStr.length !== 11) throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTle2}`);
 
-        const a5Num = FormatTle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
+        const a5Num = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
         const satId = catalogManagerInstance.sccNum2Id(a5Num);
         iTle1 = `1 ${a5Num}` + iTle1.substring(7);
         iTle2 = `2 ${a5Num} ${incStr} ${iTle2.substring(17, 52)}${meanmoStr}${iTle2.substring(63)}`;

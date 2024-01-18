@@ -1,25 +1,29 @@
 /* eslint-disable class-methods-use-this */
 import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { Constructor, GroupsManager, KeepTrackApiEvents, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
+import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
+import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundNames } from './plugins/sounds/SoundNames';
 import { SoundManager } from './plugins/sounds/sound-manager';
 import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
-import { CatalogManager } from './singletons/catalog-manager';
+import type { CatalogManager } from './singletons/catalog-manager';
 import { MissileObject } from './singletons/catalog-manager/MissileObject';
-import { ColorSchemeManager } from './singletons/color-scheme-manager';
-import { DotsManager } from './singletons/dots-manager';
-import { LineManager } from './singletons/draw-manager/line-manager';
-import { MeshManager } from './singletons/draw-manager/mesh-manager';
+import type { ColorSchemeManager } from './singletons/color-scheme-manager';
+import type { DotsManager } from './singletons/dots-manager';
+import type { LineManager } from './singletons/draw-manager/line-manager';
+import type { MeshManager } from './singletons/draw-manager/mesh-manager';
 import { errorManagerInstance } from './singletons/errorManager';
-import { HoverManager } from './singletons/hover-manager';
-import { InputManager } from './singletons/input-manager';
+import type { GroupsManager } from './singletons/groups-manager';
+import type { HoverManager } from './singletons/hover-manager';
+import type { InputManager } from './singletons/input-manager';
 import { PanTouchEvent, TapTouchEvent } from './singletons/input-manager/touch-input';
+import type { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
 import { StarManager } from './singletons/starManager';
-import { TimeManager } from './singletons/time-manager';
+import type { TimeManager } from './singletons/time-manager';
+import type { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
@@ -152,6 +156,22 @@ export class KeepTrackApi {
   getPlugin<T extends KeepTrackPlugin>(pluginClass: Constructor<T>): T | null {
     if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass)) {
       return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin instanceof pluginClass) as T;
+    }
+    return null;
+  }
+
+  /**
+   * Retrieves a plugin by its name.
+   *
+   * This is for debugging and should not be used in production.
+   * @deprecated
+   *
+   * @param pluginName - The name of the plugin to retrieve.
+   * @returns The plugin with the specified name, or null if not found.
+   */
+  getPluginByName<T extends KeepTrackPlugin>(pluginName: string): T | null {
+    if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin.PLUGIN_NAME === pluginName)) {
+      return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin.PLUGIN_NAME === pluginName) as T;
     }
     return null;
   }

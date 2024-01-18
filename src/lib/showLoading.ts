@@ -8,7 +8,7 @@ import { getEl } from './get-el';
  */
 export const showLoading = (callback?: () => void, delay?: number): void => {
   const loading = getEl('loading-screen', true);
-  if (!loading) return; // TODO: This is a hack to get around the fact that the loading screen is not always present
+  if (!loading) return;
 
   keepTrackApi.getSoundManager().play(SoundNames.LOADING);
 

@@ -3,8 +3,9 @@ import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
-import { GroupsManager, KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
+import type { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { DopMath } from '@app/static/dop-math';

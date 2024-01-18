@@ -40,13 +40,13 @@ import eruda from 'eruda';
 import erudaFps from 'eruda-fps';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { KeepTrackApiEvents, OrbitManager, SensorManager, Singletons, UiManager } from './interfaces';
+import { KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl, hideEl } from './lib/get-el';
 import { getUnique } from './lib/get-unique';
 import { saveCsv, saveVariable } from './lib/saveVariable';
 import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
-import { StandardSensorManager } from './plugins/sensor/sensorManager';
+import { SensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager } from './settings/settings';
 import { VERSION } from './settings/version.js';
 import { VERSION_DATE } from './settings/versionDate.js';
@@ -57,14 +57,14 @@ import { DemoManager } from './singletons/demo-mode';
 import { DotsManager } from './singletons/dots-manager';
 import { LineManager, lineManagerInstance } from './singletons/draw-manager/line-manager';
 import { ErrorManager, errorManagerInstance } from './singletons/errorManager';
-import { StandardGroupManager } from './singletons/groups-manager';
+import { GroupsManager } from './singletons/groups-manager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
 import { mobileManager } from './singletons/mobileManager';
-import { StandardOrbitManager } from './singletons/orbitManager';
+import { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
 import { TimeManager } from './singletons/time-manager';
-import { StandardUiManager } from './singletons/uiManager';
+import { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
 import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
@@ -117,25 +117,26 @@ export class KeepTrack {
       if (!isThisNode() && settingsManager.isShowSplashScreen) KeepTrack.loadSplashScreen_();
     }
 
-    const orbitManagerInstance = new StandardOrbitManager();
+    const orbitManagerInstance = new OrbitManager();
     keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
     const catalogManagerInstance = new CatalogManager();
     keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
-    const groupManagerInstance = new StandardGroupManager();
+    const groupManagerInstance = new GroupsManager();
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
     const timeManagerInstance = new TimeManager();
     keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
     const rendererInstance = new WebGLRenderer();
     keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, rendererInstance);
+    keepTrackContainer.registerSingleton(Singletons.MeshManager, rendererInstance.meshManager);
     const sceneInstance = new Scene({
       gl: keepTrackApi.getRenderer().gl,
     });
     keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
-    const sensorManagerInstance = new StandardSensorManager();
+    const sensorManagerInstance = new SensorManager();
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
     const dotsManagerInstance = new DotsManager();
     keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
     const colorSchemeManagerInstance = new ColorSchemeManager();
     keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
@@ -361,7 +362,7 @@ theodore.kruczek at gmail dot com.
     renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
-      keepTrackApi.getOrbitManager().updateAllVisibleOrbits(keepTrackApi.getUiManager());
+      keepTrackApi.getOrbitManager().updateAllVisibleOrbits();
       this.inputManager.update(dt);
 
       // Only update hover if we are not on mobile
@@ -461,7 +462,7 @@ theodore.kruczek at gmail dot com.
 
   private postStart_() {
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
-    StandardUiManager.postStart();
+    UiManager.postStart();
 
     if (settingsManager.cruncherReady) {
       // Create Container Div

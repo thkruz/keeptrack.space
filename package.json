@@ -119,7 +119,7 @@
     "prettier": "^3.0.3",
     "prettier-plugin-organize-imports": "^3.2.3",
     "retire": "^4.3.1",
-    "serve": "^14.2.0",
+    "serve": "^14.2.1",
     "source-map-loader": "^4.0.2",
     "start-server-and-test": "^2.0.1",
     "style-loader": "^3.3.3",

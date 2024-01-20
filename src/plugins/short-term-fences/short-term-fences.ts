@@ -5,7 +5,7 @@ import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import searchPng from '@public/img/icons/search.png';
 
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { BaseObject, Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
+import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -47,7 +47,11 @@ export class ShortTermFences extends KeepTrackPlugin {
           </div>
           <div id="stf-azExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in degrees (ex: 4)">
             <input id="stf-azExt" type="text" value="4" />
-            <label for="stf-azExt" class="active">Azimuth Extent</label>
+            <label for="stf-azExt" class="active">Azimuth Extent (deg)</label>
+          </div>
+          <div id="stf-azExtKm-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in kilometers (ex: 120)">
+            <input id="stf-azExtKm" type="text" value="4" disabled/>
+            <label for="stf-azExtKm" class="active">Azimuth Extent (km)</label>
           </div>
           <div id="stf-el-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Elevation Point in degrees (ex: 20)">
             <input id="stf-el" type="text" value="20" />
@@ -55,7 +59,11 @@ export class ShortTermFences extends KeepTrackPlugin {
           </div>
           <div id="stf-elExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in degrees (ex: 4)">
             <input id="stf-elExt" type="text" value="4" />
-            <label for="stf-elExt" class="active">Elevation Extent</label>
+            <label for="stf-elExt" class="active">Elevation Extent (deg)</label>
+          </div>
+          <div id="stf-elExtKm-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in kilometers (ex: 120)">
+            <input id="stf-elExtKm" type="text" value="4" disabled/>
+            <label for="stf-elExtKm" class="active">Elevation Extent (km)</label>
           </div>
           <div id="stf-rng-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Range Point in kilometers (ex: 1000)">
             <input id="stf-rng" type="text" value="1000" />
@@ -128,6 +136,57 @@ export class ShortTermFences extends KeepTrackPlugin {
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           keepTrackApi.getSensorManager().clearStf();
         });
+
+        getEl('stf-azExt').addEventListener('blur', () => {
+          const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
+          const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
+          const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
+
+          let azExtDeg = parseFloat((<HTMLInputElement>getEl('stf-azExt')).value);
+          if (azExtDeg > 80) {
+            azExtDeg = 80;
+            (<HTMLInputElement>getEl('stf-azExt')).value = azExtDeg.toFixed(1);
+          }
+
+          const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
+          const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
+          const pt1 = new RAE(epoch, rng as Kilometers, ((centerAz - azExtDeg / 2) * DEG2RAD) as Radians, (centerEl * DEG2RAD) as Radians).position(siteJ2000);
+          const pt2 = new RAE(
+            EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
+            rng as Kilometers,
+            ((centerAz + azExtDeg / 2) * DEG2RAD) as Radians,
+            (centerEl * DEG2RAD) as Radians
+          ).position(siteJ2000);
+
+          // Calculate the distance between the two points
+          const azKm = Math.sqrt(Math.pow(pt1.x - pt2.x, 2) + Math.pow(pt1.y - pt2.y, 2) + Math.pow(pt1.z - pt2.z, 2));
+          (<HTMLInputElement>getEl('stf-azExtKm')).value = azKm.toFixed(1);
+        });
+        getEl('stf-elExt').addEventListener('blur', () => {
+          const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
+          const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
+          const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
+
+          let elExtDeg = parseFloat((<HTMLInputElement>getEl('stf-elExt')).value);
+          if (elExtDeg > 80) {
+            elExtDeg = 80;
+            (<HTMLInputElement>getEl('stf-elExt')).value = elExtDeg.toFixed(1);
+          }
+
+          const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
+          const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
+          const pt1 = new RAE(epoch, rng as Kilometers, (centerAz * DEG2RAD) as Radians, ((centerEl - elExtDeg / 2) * DEG2RAD) as Radians).position(siteJ2000);
+          const pt2 = new RAE(
+            EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
+            rng as Kilometers,
+            (centerAz * DEG2RAD) as Radians,
+            ((centerEl + elExtDeg / 2) * DEG2RAD) as Radians
+          ).position(siteJ2000);
+
+          // Calculate the distance between the two points
+          const elKm = Math.sqrt(Math.pow(pt1.x - pt2.x, 2) + Math.pow(pt1.y - pt2.y, 2) + Math.pow(pt1.z - pt2.z, 2));
+          (<HTMLInputElement>getEl('stf-elExtKm')).value = elKm.toFixed(1);
+        });
       },
     });
 
@@ -169,8 +228,8 @@ export class ShortTermFences extends KeepTrackPlugin {
     const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
     const rngExt = parseFloat((<HTMLInputElement>getEl('stf-rngExt')).value);
 
-    const minaz = az - azExt < 0 ? ((az - azExt + 360) as Degrees) : ((az - azExt / 2) as Degrees);
-    const maxaz = az + azExt > 360 ? ((az + azExt - 360) as Degrees) : ((az + azExt / 2) as Degrees);
+    const minaz = az - azExt / 2 < 0 ? ((az - azExt / 2 + 360) as Degrees) : ((az - azExt / 2) as Degrees);
+    const maxaz = az + azExt / 2 > 360 ? ((az + azExt / 2 - 360) as Degrees) : ((az + azExt / 2) as Degrees);
     const minel = (el - elExt / 2) as Degrees;
     const maxel = (el + elExt / 2) as Degrees;
     const minrange = (rng - rngExt / 2) as Kilometers;

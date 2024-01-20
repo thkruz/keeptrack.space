@@ -1,8 +1,9 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { LineManager, LineTypes } from '@app/singletons/draw-manager/line-manager';
 import radioTowerPng from '@public/img/icons/radio-tower.png';
+import { SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -65,6 +66,14 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         <div class="sensor-info-row">
             <div class="sensor-info-key">Max Range</div>
             <div class="sensor-info-value" id="sensor-maxrange">1000 km</div>
+        </div>
+        <div class="sensor-info-row">
+            <div class="sensor-info-key">Band</div>
+            <div class="sensor-info-value" id="sensor-band">UHF</div>
+        </div>
+        <div class="sensor-info-row">
+            <div class="sensor-info-key">Beam Width</div>
+            <div class="sensor-info-value" id="sensor-beamwidth">10 deg</div>
         </div>
         <div class="center-align row">
             <button id="sensor-sun-btn" class="btn btn-ui waves-effect waves-light" type="button">Draw Line to Sun &#9658;</button>
@@ -244,13 +253,23 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     if (!this.isHtmlAdded) return;
 
     const firstSensor = keepTrackApi.getSensorManager().currentSensors[0];
-    getEl('sensor-latitude').innerHTML = firstSensor.lat.toString();
-    getEl('sensor-longitude').innerHTML = firstSensor.lon.toString();
-    getEl('sensor-minazimuth').innerHTML = firstSensor.minAz.toString();
-    getEl('sensor-maxazimuth').innerHTML = firstSensor.maxAz.toString();
-    getEl('sensor-minelevation').innerHTML = firstSensor.minEl.toString();
-    getEl('sensor-maxelevation').innerHTML = firstSensor.maxEl.toString();
-    getEl('sensor-minrange').innerHTML = firstSensor.minRng.toString();
-    getEl('sensor-maxrange').innerHTML = firstSensor.maxRng.toString();
+
+    getEl('sensor-latitude').innerHTML = firstSensor.lat > 0 ? `${firstSensor.lat.toFixed(2)}° N` : `${Math.abs(firstSensor.lat).toFixed(2)}° S`;
+    getEl('sensor-longitude').innerHTML = firstSensor.lon > 0 ? `${firstSensor.lon.toFixed(2)}° E` : `${Math.abs(firstSensor.lon).toFixed(2)}° W`;
+    getEl('sensor-minazimuth').innerHTML = `${firstSensor.minAz.toFixed(1).toString()}°`;
+    getEl('sensor-maxazimuth').innerHTML = `${firstSensor.maxAz.toFixed(1).toString()}°`;
+    getEl('sensor-minelevation').innerHTML = `${firstSensor.minEl.toFixed(1).toString()}°`;
+    getEl('sensor-maxelevation').innerHTML = `${firstSensor.maxEl.toFixed(1).toString()}°`;
+    getEl('sensor-minrange').innerHTML = `${firstSensor.minRng.toFixed(1).toString()} km`;
+    getEl('sensor-maxrange').innerHTML = `${firstSensor.maxRng.toFixed(1).toString()} km`;
+    if (firstSensor.type === SpaceObjectType.OPTICAL || firstSensor.type === SpaceObjectType.OBSERVER) {
+      hideEl(getEl('sensor-band').parentElement);
+      hideEl(getEl('sensor-beamwidth').parentElement);
+    } else {
+      showEl(getEl('sensor-band').parentElement);
+      showEl(getEl('sensor-beamwidth').parentElement);
+      getEl('sensor-band').innerHTML = firstSensor.band ? firstSensor.band : 'Unknown';
+      getEl('sensor-beamwidth').innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : 'Unknown';
+    }
   }
 }

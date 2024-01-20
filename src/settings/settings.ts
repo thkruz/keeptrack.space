@@ -286,7 +286,7 @@ export class SettingsManager {
   /**
    * Distance from satellite when we switch to close camera mode
    */
-  nearZoomLevel = <Kilometers>300;
+  nearZoomLevel = <Kilometers>25;
   isPreventColorboxClose = false;
   isDayNightToggle = false;
   isUseHigherFOVonMobile = null;
@@ -953,7 +953,7 @@ export class SettingsManager {
   /**
    * Minimum distance from satellite when we switch to close camera mode
    */
-  minDistanceFromSatellite = <Kilometers>15;
+  minDistanceFromSatellite = <Kilometers>1.5;
 
   /**
    * Disable toast messages

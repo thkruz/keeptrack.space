@@ -451,6 +451,13 @@ export class OrbitManager {
     this.inProgress_[satId] = false;
   }
 
+  updateFirstPointOut(satId: number, firstPointOut: number[]): void {
+    // Update the first 3 pointsOut
+    const gl = this.gl_;
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(firstPointOut));
+  }
+
   private writePathToGpu_(id: number) {
     if (id === -1) return; // no hover object
     if (typeof this.glBuffers_[id] === 'undefined') throw new Error(`orbit buffer ${id} not allocated`);

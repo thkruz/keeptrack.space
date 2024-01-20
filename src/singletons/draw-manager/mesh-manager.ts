@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, Kilometers, Radians, SpaceObjectType, Vec3 } from 'ootk';
+import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
 import { MeshMap, OBJ } from 'webgl-obj-loader';
 import { SatMath } from '../../static/sat-math';
 import { SplashScreen } from '../../static/splash-screen';
@@ -41,7 +41,6 @@ export class MeshManager {
     aSpecularExponent: number;
   };
 
-  private earthLightDirection_: vec3;
   private fileList_: { obj: string; mtl: string }[] = [];
   private gl_: WebGL2RenderingContext;
   isReady = false;
@@ -98,39 +97,39 @@ export class MeshManager {
   };
 
   public models = {
-    starlink: null,
-    globalstar: null,
-    iridium: null,
-    orbcomm: null,
-    o3b: null,
-    gps: null,
-    galileo: null,
-    glonass: null,
-    beidou: null,
-    iss: null,
     aehf: null,
-    dsp: null,
-    other: null,
-    sbirs: null,
-    flock: null,
-    lemur: null,
-    spacebee1gen: null,
-    spacebee2gen: null,
-    spacebee3gen: null,
-    s1u: null,
-    s2u: null,
-    s3u: null,
-    oneweb: null,
-    sat2: null,
-    rocketbody: null,
+    beidou: null,
     debris0: null,
     debris1: null,
     debris2: null,
+    dsp: null,
+    flock: null,
+    galileo: null,
+    globalstar: null,
+    glonass: null,
+    gps: null,
+    iridium: null,
+    iss: null,
+    lemur: null,
     misl: null,
     misl2: null,
     misl3: null,
     misl4: null,
+    o3b: null,
+    oneweb: null,
+    orbcomm: null,
+    other: null,
+    rocketbody: null,
     rv: null,
+    s1u: null,
+    s2u: null,
+    s3u: null,
+    sat2: null,
+    sbirs: null,
+    spacebee1gen: null,
+    spacebee2gen: null,
+    spacebee3gen: null,
+    starlink: null,
   };
 
   mvMatrix_: mat4;
@@ -178,7 +177,7 @@ export class MeshManager {
     gl.useProgram(this.program_);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    gl.uniform3fv(this.uniforms_.uLightDirection, this.earthLightDirection_);
+    gl.uniform3fv(this.uniforms_.uLightDirection, keepTrackApi.getScene().earth.lightDirection);
     gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, pMatrix);
@@ -335,12 +334,10 @@ export class MeshManager {
     this.currentMeshObject.model = this.models.sat2;
   }
 
-  public async init(gl: WebGL2RenderingContext, earthLightDirection: vec3): Promise<void> {
+  public async init(gl: WebGL2RenderingContext): Promise<void> {
     try {
       if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
-
       this.gl_ = gl;
-      this.earthLightDirection_ = earthLightDirection;
 
       this.meshList_ =
         settingsManager.meshListOverride.length > 0
@@ -423,8 +420,7 @@ export class MeshManager {
 
     // Move the mesh to its location in world space
     this.mvMatrix_ = mat4.create();
-    mat4.identity(this.mvMatrix_);
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(this.currentMeshObject.position.x, this.currentMeshObject.position.y, this.currentMeshObject.position.z));
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(sat.position.x, sat.position.y, sat.position.z));
 
     // Rotate the Satellite to Face Nadir if needed
     if (this.currentMeshObject.nadirYaw !== null) {
@@ -438,17 +434,6 @@ export class MeshManager {
       const up = vec3.normalize(vec3.create(), drawPosition);
 
       mat4.targetTo(this.mvMatrix_, drawPosition, lookAtPos, up);
-
-      // TODO: Remove this code and the nadirYaw property from MeshObject
-      // Rotate the mesh to face nadir
-      // mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.nadirYaw);
-    }
-
-    // Scale the this.mvMatrix_ to 1/5 (models are too big)
-    if (this.currentMeshObject.sccNum !== '25544') {
-      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.1, 0.1, 0.1));
-    } else {
-      mat4.scale(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(0.01, 0.01, 0.01));
     }
 
     if (this.currentMeshObject.rotation?.x) mat4.rotateX(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.x * DEG2RAD);
@@ -474,7 +459,8 @@ export class MeshManager {
 
       this.updatePosition(obj.position);
 
-      this.currentMeshObject.inSun = SatMath.calculateIsInSun(obj, keepTrackApi.getScene().sun.eci);
+      const pos = new Vector3D(obj.position.x, obj.position.y, obj.position.z);
+      this.currentMeshObject.inSun = Sun.lightingRatio(pos, Sun.position(EpochUTC.fromDateTime(selectedDate)));
       this.currentMeshObject.nadirYaw = null;
 
       if (settingsManager.meshOverride) {
@@ -560,9 +546,15 @@ export class MeshManager {
   }
 
   public updatePosition(targetPosition: { x: Kilometers; y: Kilometers; z: Kilometers }) {
+    this.currentMeshObject.position.x = targetPosition.x;
+    this.currentMeshObject.position.y = targetPosition.y;
+    this.currentMeshObject.position.z = targetPosition.z;
+    return;
+
     // Move halfway between the satellite and the target position
     // This seems to cut down on the jitter. It might be caused by the scale of the meshes
     // TODO: Explore drawing the world at a much smaller scale vs using the kilometer scale
+    // eslint-disable-next-line no-unreachable
     const dx = targetPosition.x - this.currentMeshObject.position.x;
     const dy = targetPosition.y - this.currentMeshObject.position.y;
     const dz = targetPosition.z - this.currentMeshObject.position.z;
@@ -722,8 +714,8 @@ export class MeshManager {
       float lightAmt = max(dot(vTransformedNormal, vLightDirection), 0.0);
 
       vec3 ambientColor = vDiffuse * 0.1;
-      vec3 dirColor = vDiffuse * vAmbient * lightAmt * (min(vInSun,1.0) * 0.2);
-      vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.2);
+      vec3 dirColor = vDiffuse * vAmbient * lightAmt * (min(vInSun,1.0) * 0.65);
+      vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.65);
 
       vec3 color = ambientColor + dirColor + specColor;
 

@@ -28,7 +28,7 @@
 
 import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CruncerMessageTypes, ExtraDataMessage } from '@app/webworker/positionCruncher';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, EciVec3, Kilometers, SatelliteRecord, Sgp4, SpaceObjectType, Tle, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
@@ -74,7 +74,6 @@ export class CatalogManager {
   analSatSet = <DetailedSatellite[]>[];
   cosparIndex: { [key: string]: number } = {};
   fieldOfViewSet = [];
-  gotExtraData = false;
   hoveringSat = -1;
   isLaunchSiteManagerLoaded = false;
   isSensorManagerLoaded = false;
@@ -215,89 +214,6 @@ export class CatalogManager {
     return i === -1 ? null : i + starIndex1;
   }
 
-  cruncherExtraData(mData: SatCruncherMessageData) {
-    if (!mData?.extraData) throw new Error('extraData required!');
-
-    const satExtraData = JSON.parse(mData.extraData);
-
-    if (typeof this.objectCache === 'undefined') throw new Error('No sat data');
-    if (typeof satExtraData === 'undefined') throw new Error('No extra data');
-
-    for (let i = 0; i < 180; i++) {
-      this.orbitDensity[i] = [];
-      for (let p = 90; p < 1500; p++) {
-        this.orbitDensity[i][p] = 0;
-      }
-    }
-
-    for (let satCrunchIndex = 0; satCrunchIndex < this.numSats; satCrunchIndex++) {
-      try {
-        // Static objects lack these values and including them increase the JS heap a lot
-        if (!this.objectCache[satCrunchIndex].isSatellite()) continue;
-        const sat = this.objectCache[satCrunchIndex] as DetailedSatellite;
-        sat.inclination = satExtraData[satCrunchIndex].inclination;
-        sat.eccentricity = satExtraData[satCrunchIndex].eccentricity;
-        sat.raan = satExtraData[satCrunchIndex].raan;
-        sat.argOfPerigee = satExtraData[satCrunchIndex].argOfPerigee;
-        sat.meanMotion = satExtraData[satCrunchIndex].meanMotion;
-
-        sat.semiMajorAxis = satExtraData[satCrunchIndex].semiMajorAxis;
-        sat.semiMinorAxis = satExtraData[satCrunchIndex].semiMinorAxis;
-        sat.apogee = satExtraData[satCrunchIndex].apogee;
-        sat.perigee = satExtraData[satCrunchIndex].perigee;
-        sat.period = satExtraData[satCrunchIndex].period;
-        sat.satrec = this.calcSatrec(this.objectCache[satCrunchIndex] as DetailedSatellite);
-
-        if (this.objectCache[satCrunchIndex].type !== SpaceObjectType.PAYLOAD) {
-          const inc = Math.round(satExtraData[satCrunchIndex].inclination);
-          const per = Math.round(satExtraData[satCrunchIndex].period);
-          this.orbitDensity[inc][per] += 1;
-        }
-
-        this.objectCache[satCrunchIndex].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
-      } catch (error) {
-        if (typeof satExtraData[satCrunchIndex] === 'undefined') throw new Error('No extra data for sat ' + satCrunchIndex);
-        if (typeof this.objectCache[satCrunchIndex] === 'undefined') throw new Error('No data for sat ' + satCrunchIndex);
-        // Intentionally left blank
-      }
-    }
-
-    this.orbitDensityMax = 0;
-    for (let i = 0; i < 180; i++) {
-      for (let p = 90; p < 1500; p++) {
-        if (this.orbitDensity[i][p] > this.orbitDensityMax) this.orbitDensityMax = this.orbitDensity[i][p];
-      }
-    }
-
-    this.gotExtraData = true;
-  }
-
-  cruncherExtraUpdate(mData: SatCruncherMessageData) {
-    if (!mData?.extraUpdate) throw new Error('extraUpdate required!');
-
-    const satExtraData = JSON.parse(mData.extraData) as ExtraDataMessage[];
-    const satCrunchIndex = mData.satId;
-
-    const sat = this.objectCache[satCrunchIndex] as DetailedSatellite;
-
-    sat.inclination = satExtraData[0].inclination;
-    sat.eccentricity = satExtraData[0].eccentricity;
-    sat.raan = satExtraData[0].raan;
-    sat.argOfPerigee = satExtraData[0].argOfPerigee;
-    sat.meanMotion = satExtraData[0].meanMotion;
-
-    sat.semiMajorAxis = satExtraData[0].semiMajorAxis;
-    sat.semiMinorAxis = satExtraData[0].semiMinorAxis;
-    sat.apogee = satExtraData[0].apogee;
-    sat.perigee = satExtraData[0].perigee;
-    sat.period = satExtraData[0].period;
-
-    if (satExtraData[0].tle1) {
-      sat.tle1 = satExtraData[0].tle1 as TleLine1;
-      sat.tle2 = satExtraData[0].tle2 as TleLine2;
-    }
-  }
-
   /**
    * Retrieves a satellite object from the catalog.
    *
@@ -324,7 +240,7 @@ export class CatalogManager {
       return this.objectCache[i];
     }
 
-    if (this.gotExtraData && type !== GetSatType.SKIP_POS_VEL) {
+    if (type !== GetSatType.SKIP_POS_VEL) {
       keepTrackApi.getDotsManager().updatePosVel(this.objectCache[i], i);
     }
 
@@ -391,7 +307,6 @@ export class CatalogManager {
       }
 
       this.satCruncher.onmessage = this.satCruncherOnMessage.bind(this);
-      this.gotExtraData = false;
     } catch (error) {
       throw new Error(error);
     }
@@ -582,15 +497,7 @@ export class CatalogManager {
       }
     }
 
-    // store extra data that comes from crunching
-    // Only do this once
-    if (!this.gotExtraData && mData.extraData) {
-      this.cruncherExtraData(mData);
-      return;
-    }
-
     if (mData?.extraUpdate) {
-      this.cruncherExtraUpdate(mData);
       return;
     }
 
@@ -601,24 +508,61 @@ export class CatalogManager {
 
     // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
     if (!settingsManager.cruncherReady && this.objectCache && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
-      SplashScreen.hideSplashScreen();
+      this.onCruncherReady_();
+    }
+  }
 
-      const stars = this.objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);
-      if (stars.length > 0) {
-        stars.sort((a, b) => a.id - b.id);
-        // this is the smallest id
-        keepTrackApi.getDotsManager().starIndex1 = stars[0].id;
-        // this is the largest id
-        keepTrackApi.getDotsManager().starIndex2 = stars[stars.length - 1].id;
-        keepTrackApi.getDotsManager().updateSizeBuffer();
+  private onCruncherReady_() {
+    SplashScreen.hideSplashScreen();
+
+    const stars = this.objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);
+    if (stars.length > 0) {
+      stars.sort((a, b) => a.id - b.id);
+      // this is the smallest id
+      keepTrackApi.getDotsManager().starIndex1 = stars[0].id;
+      // this is the largest id
+      keepTrackApi.getDotsManager().starIndex2 = stars[stars.length - 1].id;
+      keepTrackApi.getDotsManager().updateSizeBuffer();
+    }
+
+    UrlManager.parseGetVariables();
+
+    this.buildOrbitDensityMatrix_();
+
+    // Run any functions registered with the API
+    keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherReady);
+
+    settingsManager.cruncherReady = true;
+  }
+
+  private buildOrbitDensityMatrix_() {
+    // Build the orbit density matrix
+    for (let i = 0; i < 180; i++) {
+      this.orbitDensity[i] = [];
+      for (let p = 90; p < 1500; p++) {
+        this.orbitDensity[i][p] = 0;
+      }
+    }
+
+    for (let i = 0; i < this.numSats; i++) {
+      // Static objects lack these values and including them increase the JS heap a lot
+      if (!this.objectCache[i].isSatellite()) continue;
+      const sat = this.objectCache[i] as DetailedSatellite;
+
+      if (this.objectCache[i].type !== SpaceObjectType.PAYLOAD) {
+        const inc = Math.round(sat.inclination);
+        const per = Math.round(sat.period);
+        this.orbitDensity[inc][per] += 1;
       }
 
-      UrlManager.parseGetVariables();
+      this.objectCache[i].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+    }
 
-      // Run any functions registered with the API
-      keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherReady);
-
-      settingsManager.cruncherReady = true;
+    this.orbitDensityMax = 0;
+    for (let i = 0; i < 180; i++) {
+      for (let p = 90; p < 1500; p++) {
+        if (this.orbitDensity[i][p] > this.orbitDensityMax) this.orbitDensityMax = this.orbitDensity[i][p];
+      }
     }
   }
 }

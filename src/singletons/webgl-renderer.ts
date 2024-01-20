@@ -3,14 +3,14 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { mat4, vec2, vec4 } from 'gl-matrix';
-import { BaseObject, DetailedSatellite, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GetSatType } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SettingsManager } from '../settings/settings';
-import { CatalogSource } from '../static/catalog-loader';
 import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
+import { MissileObject } from './catalog-manager/MissileObject';
 import { MeshManager } from './draw-manager/mesh-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
@@ -437,11 +437,24 @@ export class WebGLRenderer {
 
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
       const timeManagerInstance = keepTrackApi.getTimeManager();
+      const primarySat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
 
-      this.meshManager.update(timeManagerInstance.selectedDate, this.selectSatManager_.primarySatObj as DetailedSatellite);
-      keepTrackApi.getMainCamera().snapToSat(this.selectSatManager_.primarySatObj, timeManagerInstance.simulationTimeObj);
-      if (this.selectSatManager_.primarySatObj.isMissile()) keepTrackApi.getOrbitManager().setSelectOrbit(this.selectSatManager_.primarySatObj.id);
-      keepTrackApi.getScene().searchBox.update(this.selectSatManager_.primarySatObj, timeManagerInstance.selectedDate);
+      this.meshManager.update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
+      keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
+      if (primarySat.isMissile()) keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
+
+      // If in satellite view the orbit buffer needs to be updated every time
+      if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType == CameraType.FIXED_TO_SAT) {
+        keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
+        const firstPointOut = [
+          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3],
+          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 1],
+          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 2],
+        ]      
+        keepTrackApi.getOrbitManager().updateFirstPointOut(this.selectSatManager_.primarySatObj.id, firstPointOut);
+      }
+
+      keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
     } else {
       keepTrackApi.getScene().searchBox.update(null);
     }
@@ -476,13 +489,6 @@ export class WebGLRenderer {
 
     this.updatePrimarySatellite_();
     keepTrackApi.getMainCamera().update(this.dt);
-
-    // If in satellite view the orbit buffer needs to be updated every time
-    if (this.selectSatManager_) {
-      if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE && this.selectSatManager_.selectedSat !== -1) {
-        keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.lastSelectedSat());
-      }
-    }
 
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
     this.gmst = gmst;

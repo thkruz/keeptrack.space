@@ -3,9 +3,8 @@ import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SatMath } from '@app/static/sat-math';
 import { mat4 } from 'gl-matrix';
-import { BaseObject, DetailedSatellite, EciVec3, Kilometers, Sgp4, SpaceObjectType } from 'ootk';
+import { BaseObject, DetailedSatellite, EciVec3, Kilometers, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { BufferAttribute } from '../static/buffer-attribute';
@@ -542,19 +541,22 @@ export class DotsManager {
 
     const renderer = keepTrackApi.getRenderer();
     if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
-      this.interpolatePositions_(renderer);
       if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
         const obj = keepTrackApi.getCatalogManager().objectCache[keepTrackApi.getPlugin(SelectSatManager)?.selectedSat] as DetailedSatellite | MissileObject;
         if (obj.isSatellite()) {
           const sat = obj as DetailedSatellite;
           const now = keepTrackApi.getTimeManager().simulationTimeObj;
-          if (!sat.satrec) keepTrackApi.getCatalogManager().calcSatrec(sat);
-          const { m } = SatMath.calculateTimeVariables(now, sat.satrec);
-          const pv = Sgp4.propagate(sat.satrec, m);
+          const pv = sat.eci(now);
           if (!pv) return;
-          sat.position = pv.position as EciVec3<Kilometers>;
+          this.positionData[sat.id * 3] = pv.position.x;
+          this.positionData[sat.id * 3 + 1] = pv.position.y;
+          this.positionData[sat.id * 3 + 2] = pv.position.z;
+          this.velocityData[sat.id * 3] = pv.velocity.x;
+          this.velocityData[sat.id * 3 + 1] = pv.velocity.y;
+          this.velocityData[sat.id * 3 + 2] = pv.velocity.z;
         }
       }
+      this.interpolatePositions_(renderer);
     }
   }
 

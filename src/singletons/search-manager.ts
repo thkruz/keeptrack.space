@@ -382,7 +382,7 @@ export class SearchManager {
         if (sat.type === SpaceObjectType.NOTIONAL && searchStringIn.length < 6) continue;
 
         // Check if matches 6Digit
-        if (sat.sccNum6?.indexOf(searchStringIn) !== -1) {
+        if (sat.sccNum6 && sat.sccNum6.indexOf(searchStringIn) !== -1) {
           results.push({
             strIndex: sat.sccNum.indexOf(searchStringIn),
             patlen: searchStringIn.length,

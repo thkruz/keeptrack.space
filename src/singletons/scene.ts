@@ -54,7 +54,7 @@ export class Scene {
 
   update(simulationTime: Date, gmst: GreenwichMeanSiderealTime, j: number) {
     this.sun.update(j);
-    this.earth.update(gmst, j);
+    this.earth.update(gmst);
     this.moon.update(simulationTime);
     this.skybox.update();
   }

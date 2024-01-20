@@ -26,12 +26,11 @@ import { SettingsManager } from '@app/settings/settings';
 import { GlUtils } from '@app/static/gl-utils';
 import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
-import { SatMath } from '@app/static/sat-math';
 import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
 import { SplashScreen } from '@app/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { GreenwichMeanSiderealTime } from 'ootk';
+import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
 import { OcclusionProgram } from './post-processing';
 
 export class Earth {
@@ -170,8 +169,9 @@ export class Earth {
   /**
    * This is run once per frame to update the earth.
    */
-  update(gmst: GreenwichMeanSiderealTime, j: number): void {
-    this.lightDirection = SatMath.getSunDirection(j);
+  update(gmst: GreenwichMeanSiderealTime): void {
+    const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    this.lightDirection = [pos.x, pos.y, pos.z];
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);

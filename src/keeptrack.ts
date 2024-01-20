@@ -448,7 +448,7 @@ theodore.kruczek at gmail dot com.
       this.inputManager.init();
 
       await renderer.init(settingsManager);
-      renderer.meshManager.init(renderer.gl, sceneInstance.earth.lightDirection);
+      renderer.meshManager.init(renderer.gl);
 
       // Now that everything is loaded, start rendering to thg canvas
       this.gameLoop();
@@ -542,6 +542,9 @@ theodore.kruczek at gmail dot com.
       }, 500);
     }
 
+    // Update Draw Positions
+    keepTrackApi.getDotsManager().updatePositionBuffer();
+
     renderer.update();
 
     // Update Colors
@@ -549,9 +552,6 @@ theodore.kruczek at gmail dot com.
     if (!settingsManager.isMobileModeEnabled) {
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
     }
-
-    // Update Draw Positions
-    keepTrackApi.getDotsManager().updatePositionBuffer();
   }
 }
 

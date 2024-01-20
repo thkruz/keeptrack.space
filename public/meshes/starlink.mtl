@@ -1,8 +1,8 @@
-# Blender MTL File: 'starlink.blend'
-# Material Count: 4
+# Blender 3.6.4 MTL File: 'starlink.blend'
+# www.blender.org
 
 newmtl BrownMetal
-Ns 96.078443
+Ns 106.753822
 Ka 0.300000 0.300000 0.300000
 Kd 0.372549 0.294118 0.156863
 Ks 0.500000 0.500000 0.500000
@@ -12,7 +12,7 @@ d 1.000000
 illum 3
 
 newmtl DarkGrayMetal
-Ns 96.078443
+Ns 106.753822
 Ka 0.300000 0.300000 0.300000
 Kd 0.084000 0.084000 0.084000
 Ks 0.500000 0.500000 0.500000
@@ -22,7 +22,7 @@ d 1.000000
 illum 3
 
 newmtl LightGrayMetal
-Ns 900.000000
+Ns 1000.000000
 Ka 0.300000 0.300000 0.300000
 Kd 0.592000 0.592000 0.592000
 Ks 0.500000 0.500000 0.500000
@@ -32,7 +32,7 @@ d 1.000000
 illum 3
 
 newmtl SolarPanels
-Ns 96.078443
+Ns 106.753822
 Ka 1.000000 1.000000 1.000000
 Kd 0.019000 0.072000 0.656000
 Ks 0.500000 0.500000 0.500000

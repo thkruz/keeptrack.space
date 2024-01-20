@@ -287,7 +287,7 @@ export class SearchManager {
 
         if (typeof sat.bus !== 'undefined' && sat.bus.toUpperCase().indexOf(searchStringIn) !== -1) {
           results.push({
-            strIndex: sat.bus.indexOf(searchStringIn),
+            strIndex: sat.bus.toUpperCase().indexOf(searchStringIn),
             searchType: SearchResultType.BUS,
             patlen: len,
             id: sat.id,
@@ -299,7 +299,7 @@ export class SearchManager {
           // Do nothing there is no description property
         } else if (sat.desc.toUpperCase().indexOf(searchStringIn) !== -1) {
           results.push({
-            strIndex: sat.desc.indexOf(searchStringIn),
+            strIndex: sat.desc.toUpperCase().indexOf(searchStringIn),
             searchType: SearchResultType.MISSILE,
             patlen: len,
             id: sat.id,
@@ -337,7 +337,7 @@ export class SearchManager {
 
         if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
           results.push({
-            strIndex: sat.launchVehicle.indexOf(searchStringIn),
+            strIndex: sat.launchVehicle.toUpperCase().indexOf(searchStringIn),
             searchType: SearchResultType.LV,
             patlen: len,
             id: sat.id,

@@ -124,6 +124,8 @@ export class MeshManager {
     s1u: null,
     s2u: null,
     s3u: null,
+    s6u: null,
+    s12u: null,
     sat2: null,
     sbirs: null,
     spacebee1gen: null,
@@ -225,8 +227,8 @@ export class MeshManager {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  // prettier-ignore
-  public getSatelliteModel(sat: DetailedSatellite, selectedDate: Date) { // NOSONAR
+  public getSatelliteModel(sat: DetailedSatellite, selectedDate: Date) {
+    // NOSONAR
     if (this.checkIfNameKnown(sat.name)) {
       this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
       return;
@@ -285,6 +287,12 @@ export class MeshManager {
       case 'Cubesat 3U+':
         this.currentMeshObject.model = this.models.s3u;
         return;
+      case 'Cubesat 6U':
+        this.currentMeshObject.model = this.models.s6u;
+        return;
+      case 'Cubesat 12U':
+        this.currentMeshObject.model = this.models.s12u;
+        return;
       case 'DSP':
       case 'DSP B14':
       case 'DSP B18':
@@ -308,10 +316,8 @@ export class MeshManager {
         this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
         return;
       case 'Cubesat 1.5U':
-      case 'Cubesat 6U':
       case 'Cubesat 0.5U':
       case 'Cubesat 16U':
-      case 'Cubesat 12U':
       case 'Cubesat 0.3U':
       default:
       // Do Nothing
@@ -347,6 +353,8 @@ export class MeshManager {
               's1u',
               's2u',
               's3u',
+              's6u',
+              's12u',
               'starlink',
               'iss',
               'gps',
@@ -369,9 +377,6 @@ export class MeshManager {
               'rocketbody',
               'sbirs',
               'misl',
-              'misl2',
-              'misl3',
-              'misl4',
               'rv',
             ];
 

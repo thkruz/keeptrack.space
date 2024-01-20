@@ -1,10 +1,10 @@
-# Blender MTL File: 'None'
-# Material Count: 1
+# Blender 3.6.4 MTL File: 'rv.blend'
+# www.blender.org
 
-newmtl ICBM_Top_Material
-Ns 18.000005
+newmtl ICBM_Top_Material.001
+Ns 18.000004
 Ka 1.000000 1.000000 1.000000
-Kd 0.246202 0.246202 0.246202
+Kd 0.045081 0.045081 0.045081
 Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000

@@ -1,8 +1,8 @@
-# Blender MTL File: 'rocketBody.blend'
-# Material Count: 4
+# Blender 3.6.4 MTL File: 'rocketBody.blend'
+# www.blender.org
 
 newmtl BlueMetal
-Ns 96.236113
+Ns 106.929016
 Ka 1.000000 1.000000 1.000000
 Kd 0.005377 0.031048 0.800000
 Ks 0.500000 0.500000 0.500000
@@ -12,7 +12,7 @@ d 1.000000
 illum 2
 
 newmtl DarkGrayMetal
-Ns 96.236113
+Ns 106.929016
 Ka 1.000000 1.000000 1.000000
 Kd 0.128239 0.128239 0.128239
 Ks 0.500000 0.500000 0.500000
@@ -22,7 +22,7 @@ d 1.000000
 illum 2
 
 newmtl GrayMetal
-Ns 96.236113
+Ns 106.929016
 Ka 1.000000 1.000000 1.000000
 Kd 0.570471 0.570471 0.570471
 Ks 0.500000 0.500000 0.500000
@@ -32,7 +32,7 @@ d 1.000000
 illum 2
 
 newmtl WhiteMetal
-Ns 96.236113
+Ns 106.929016
 Ka 1.000000 1.000000 1.000000
 Kd 0.800000 0.800000 0.800000
 Ks 0.500000 0.500000 0.500000

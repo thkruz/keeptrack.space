@@ -40,6 +40,7 @@ export abstract class SplashScreen {
   }
 
   static randomHintText_ = [
+    'Objects on the screen may appear bigger than they are. Everything else is to scale.',
     'Press Shift+F1 to open the help menu at any time.',
     'Press R to toggle on/off the auto rotation of the globe.',
     'The settings menu located in the bottom toolbar contains many options to customize your experience.',

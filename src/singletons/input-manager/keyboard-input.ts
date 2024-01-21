@@ -114,12 +114,15 @@ export class KeyboardInput {
         break;
       case 'D':
         if (this.isShiftPressed && keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
-          if (keepTrackApi.getPlugin(DebugMenuPlugin).isErudaVisible) {
+          const debugPlugin = keepTrackApi.getPlugin(DebugMenuPlugin);
+          if (!debugPlugin) return;
+
+          if (debugPlugin.isErudaVisible) {
             eruda.hide();
-            keepTrackApi.getPlugin(DebugMenuPlugin).isErudaVisible = false;
+            debugPlugin.isErudaVisible = false;
           } else {
             eruda.show();
-            keepTrackApi.getPlugin(DebugMenuPlugin).isErudaVisible = true;
+            debugPlugin.isErudaVisible = true;
           }
         }
         break;

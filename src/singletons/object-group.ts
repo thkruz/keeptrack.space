@@ -16,6 +16,7 @@ export enum GroupType {
   BUS_REGEX = 8,
   SCC_NUM = 9,
   ID_LIST = 10,
+  PAYLOAD_NAME_REGEX = 11,
 }
 
 export class ObjectGroup {
@@ -55,6 +56,12 @@ export class ObjectGroup {
         this.ids = CatalogSearch.objectName(objData, data)
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((obj: BaseObject) => obj.id);
+        break;
+      case GroupType.PAYLOAD_NAME_REGEX:
+        this.ids = CatalogSearch.objectName(objData, data)
+          // .slice(0, settingsManager.maxOribtsDisplayed)
+          .map((obj: BaseObject) => obj.id)
+          .filter((id: number) => objData[id].isPayload());
         break;
       case GroupType.COUNTRY:
         this.createGroupByCountry_(data, keepTrackApi.getCatalogManager().getSats());

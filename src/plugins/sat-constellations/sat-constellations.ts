@@ -26,6 +26,10 @@ export class SatConstellations extends KeepTrackPlugin {
         <li class="menu-selectable" data-group="GPSGroup">GPS Satellites</li>
         <li class="menu-selectable" data-group="GalileoGroup">Galileo Satellites</li>
         <li class="menu-selectable" data-group="GlonassGroup">Glonass Satellites</li>
+        <li class="menu-selectable" data-group="iridium">Iridium</li>
+        <li class="menu-selectable" data-group="orbcomm">Orbcomm</li>
+        <li class="menu-selectable" data-group="globalstar">Globalstar</li>
+        <li class="menu-selectable" data-group="ses">SES</li>
         <li class="menu-selectable" data-group="aehf">Milstar and AEHF</li>
         <li class="menu-selectable" data-group="wgs">DSCS and WGS</li>
         <li class="menu-selectable" data-group="starlink">Starlink</li>
@@ -78,13 +82,25 @@ export class SatConstellations extends KeepTrackPlugin {
         if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.SCC_NUM, [25544, 48274], groupName);
         break;
       case 'GlonassGroup':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.NAME_REGEX, /GLONASS/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLONASS/u, groupName);
         break;
       case 'GalileoGroup':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.NAME_REGEX, /GALILEO/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GALILEO/u, groupName);
         break;
       case 'GPSGroup':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /NAVSTAR/u, groupName);
+        break;
+      case 'iridium':
+        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /IRIDIUM/u, groupName);
+        break;
+      case 'orbcomm':
+        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /ORBCOMM/u, groupName);
+        break;
+      case 'globalstar':
+        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLOBALSTAR/u, groupName);
+        break;
+      case 'ses':
+        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /SES \d+/u, groupName);
         break;
       case 'AmatuerRadio':
         if (!groupManagerInstance.groupList[groupName]) {

@@ -128,6 +128,7 @@ export class MeshManager {
     s12u: null,
     sat2: null,
     sbirs: null,
+    ses: null,
     spacebee1gen: null,
     spacebee2gen: null,
     spacebee3gen: null,
@@ -145,6 +146,7 @@ export class MeshManager {
     if (name.startsWith('GLOBALSTAR')) newModel = this.models.globalstar;
     if (name.startsWith('IRIDIUM')) newModel = this.models.iridium;
     if (name.startsWith('ORBCOMM')) newModel = this.models.orbcomm;
+    if (RegExp(/SES\s\d+/u, 'u').exec(name)) newModel = this.models.ses;
     if (name.startsWith('O3B')) newModel = this.models.o3b;
     if (name.startsWith('NAVSTAR')) newModel = this.models.gps;
     if (name.startsWith('GALILEO')) newModel = this.models.galileo;

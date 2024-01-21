@@ -1,12 +1,7 @@
 // @ts-nocheck
-
 import { Operators } from '@app/catalogs/sensors';
-import { DEG2RAD } from '@app/lib/constants';
-import { ZoomValue } from '@app/singletons/camera';
-import { CatalogSource } from '@app/static/catalog-loader';
-import { Degrees, Kilometers, Milliseconds, Sgp4 } from 'ootk';
+import { CatalogSource, DEG2RAD, Degrees, Kilometers, Milliseconds, Sgp4, SpaceObjectType, ZoomValue } from 'ootk';
 import { SatObject, SensorObject } from '../../src/interfaces';
-import { SpaceObjectType } from '../../src/lib/space-object-type';
 declare const jest: any;
 
 const fakeTimeObj = new Date(2022, 0, 1);

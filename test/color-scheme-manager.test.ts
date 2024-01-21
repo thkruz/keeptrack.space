@@ -1,6 +1,6 @@
 import { SatObject } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { SpaceObjectType, TleLine1 } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 
@@ -73,17 +73,17 @@ const listOfSatsToTest = [
   { ...defaultSat, ...{ TLE1: '1 25544U 58067A   23001.51736111  .00000000  00000-0  00000-0 0  9999' as TleLine1 } },
 ] as SatObject[];
 
-const disableAllColorThemes = (colorSchemeManager: StandardColorSchemeManager) => {
+const disableAllColorThemes = (colorSchemeManager: ColorSchemeManager) => {
   for (const flag in colorSchemeManager.objectTypeFlags) {
     colorSchemeManager.objectTypeFlags[flag] = false;
   }
 };
 
 // Test ColorSchemeManager class
-describe('StandardColorSchemeManager', () => {
-  let colorSchemeManager: StandardColorSchemeManager;
+describe('ColorSchemeManager', () => {
+  let colorSchemeManager: ColorSchemeManager;
   beforeEach(() => {
-    colorSchemeManager = new StandardColorSchemeManager();
+    colorSchemeManager = new ColorSchemeManager();
     colorSchemeManager.init();
 
     const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -100,7 +100,7 @@ describe('StandardColorSchemeManager', () => {
 
   // Test apogee color scheme
   it('should be able to get apogee color scheme', () => {
-    const test = (sat: SatObject) => StandardColorSchemeManager.apogee(sat);
+    const test = (sat: SatObject) => ColorSchemeManager.apogee(sat);
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
@@ -241,7 +241,7 @@ describe('StandardColorSchemeManager', () => {
   });
 });
 
-const testMultipleSats = (colorSchemeManager: StandardColorSchemeManager, listOfSatsToTest: SatObject[], test) => {
+const testMultipleSats = (colorSchemeManager: ColorSchemeManager, listOfSatsToTest: SatObject[], test) => {
   listOfSatsToTest.forEach((sat) => {
     expect(test(sat)).not.toThrow;
   });

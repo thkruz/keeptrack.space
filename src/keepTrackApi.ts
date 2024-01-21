@@ -140,7 +140,7 @@ export class KeepTrackApi {
     this.verifyEvent_(event);
 
     if (event === KeepTrackApiEvents.bottomMenuClick) {
-      keepTrackApi.getSoundManager().play(SoundNames.BEEP);
+      keepTrackApi.getSoundManager()?.play(SoundNames.BEEP);
     }
 
     (<KeepTrackApiRegisterParams<T>[]>this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));

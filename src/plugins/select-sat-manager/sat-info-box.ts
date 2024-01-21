@@ -236,13 +236,15 @@ export class SatInfoBox extends KeepTrackPlugin {
             const rangeDom = getEl('sat-range');
             if (rangeDom) rangeDom.innerHTML = 'Out of FOV';
             if (rangeDom) rangeDom.title = 'Range: ' + this.currentTEARR.rng.toFixed(2) + ' km';
-            const beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth ? sensorManagerInstance.currentSensors[0].beamwidth + '°' : 'Unknown';
+            const beamwidthString = sensorManagerInstance.currentSensors[0]?.beamwidth ? sensorManagerInstance.currentSensors[0].beamwidth + '°' : 'Unknown';
             if (getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = 'Out of FOV';
             if (getEl('sat-beamwidth')) getEl('sat-beamwidth').title = beamwidthString;
             if (getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = 'Out of FOV';
           }
 
           if (this.selectSatManager_.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
+            console.log('showing secondary sat info');
+            console.log(this.selectSatManager_.secondarySat);
             showEl('secondary-sat-info');
             showEl('sec-angle-link', 'flex');
           } else if (this.selectSatManager_.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
@@ -1020,7 +1022,10 @@ export class SatInfoBox extends KeepTrackPlugin {
       getEl('sat-dryMass').innerHTML = sat?.dryMass && sat?.dryMass !== '' ? sat?.dryMass + ' kg' : 'Unknown';
       getEl('sat-lifetime').innerHTML = sat?.lifetime && sat?.lifetime !== '' ? sat?.lifetime + ' yrs' : 'Unknown';
       getEl('sat-power').innerHTML = sat?.power && sat?.power !== '' ? sat?.power + ' w' : 'Unknown';
-      getEl('sat-stdmag').innerHTML = sat?.vmag && sat?.vmag?.toString() !== '' ? sat?.vmag?.toString() : 'Unknown';
+      if (!sat?.vmag && sat?.vmag !== 0) {
+        sat.vmag = SatInfoBox.calculateStdMag_(sat);
+      }
+      getEl('sat-stdmag').innerHTML = sat?.vmag && sat?.vmag?.toFixed(2) !== '' ? sat?.vmag?.toFixed(2) : 'Unknown';
       getEl('sat-bus').innerHTML = sat?.bus && sat?.bus !== '' ? sat?.bus : 'Unknown';
       getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
       getEl('sat-payload').innerHTML = sat?.payload && sat?.payload !== '' ? sat?.payload : 'Unknown';
@@ -1032,6 +1037,48 @@ export class SatInfoBox extends KeepTrackPlugin {
     } else {
       (<HTMLElement>keepTrackApi.containerRoot.querySelector('.sat-only-info')).style.display = 'none';
     }
+  }
+
+  private static calculateStdMag_(obj: DetailedSatellite): number {
+    if (obj.vmag) {
+      return obj.vmag;
+    }
+
+    let similarVmag = [];
+    keepTrackApi.getCatalogManager().objectCache.forEach((posObj) => {
+      if (!posObj.isSatellite()) return; // Only look at satellites
+      const posSat = posObj as DetailedSatellite;
+      if (obj.type !== posSat.type) return; // Only look at same type of curSat
+      if (obj.id === posSat.id) return; // Don't look at the same curSat
+      if (obj.country !== posSat.country) return; // Only look at same country
+
+      if (posSat.vmag) {
+        similarVmag.push(posSat.vmag);
+      } else {
+        return;
+      }
+
+      // Only use the first word of the name
+      const name = obj.name.toLowerCase();
+      const posName = posSat.name.toLowerCase();
+      if (name.length < 4 || posName.length < 4) return;
+
+      // Determine how many characters match
+      const matchingChars = name.split('').filter((char, index) => char === posName[index]);
+
+      if (matchingChars.length / name.length > 0.85) {
+        similarVmag.push(posSat.vmag);
+        similarVmag.push(posSat.vmag);
+        similarVmag.push(posSat.vmag);
+      }
+    });
+
+    if (similarVmag.length > 0) {
+      const avgVmag = similarVmag.reduce((a, b) => a + b, 0) / similarVmag.length;
+      return avgVmag;
+    }
+
+    return null;
   }
 
   private static createSatMissionData() {

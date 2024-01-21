@@ -1173,14 +1173,14 @@ export class SettingsManager {
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.1') {
+    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.2') {
       this.colors = {
-        version: '1.3.1',
+        version: '1.3.2',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
-        sunlight100: [1.0, 1.0, 1.0, 0.8],
-        sunlight80: [1.0, 1.0, 1.0, 0.6],
-        sunlight60: [1.0, 1.0, 1.0, 0.3],
+        sunlight100: [1.0, 1.0, 1.0, 0.7],
+        sunlight80: [1.0, 1.0, 1.0, 0.4],
+        sunlight60: [1.0, 1.0, 1.0, 0.1],
         starHi: [1.0, 1.0, 1.0, 1.0],
         starMed: [1.0, 1.0, 1.0, 0.85],
         starLow: [1.0, 1.0, 1.0, 0.65],

@@ -249,6 +249,7 @@ export class CatalogLoader {
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       catalogManagerInstance.numSats = catalogManagerInstance.objectCache.length;
+
       const satDataString = CatalogLoader.getSatDataString_(catalogManagerInstance.objectCache);
 
       /** Send satDataString to satCruncher to begin propagation loop */
@@ -648,7 +649,7 @@ export class CatalogLoader {
       rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
       rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
       rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
-      rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : null;
+      rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs ?? null;
 
       const satellite = new DetailedSatellite({
         id: tempObjData.length,
@@ -823,8 +824,8 @@ export class CatalogLoader {
         catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
         const satellite = new DetailedSatellite({
-          tle1: extrasSatInfo.tle1 as TleLine1,
-          tle2: extrasSatInfo.tle2 as TleLine2,
+          tle1: extrasSatInfo.tle1,
+          tle2: extrasSatInfo.tle2,
           ...extrasSatInfo,
         });
         satellite.id = tempSatData.length;

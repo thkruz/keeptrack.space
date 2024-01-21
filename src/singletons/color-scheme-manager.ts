@@ -496,7 +496,7 @@ export class ColorSchemeManager {
       };
     }
 
-    if (keepTrackApi.getDotsManager().inViewData[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
+    if (keepTrackApi.getDotsManager().inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === true) {
       return {
         color: this.colorTheme.inFOV,
         pickable: Pickable.Yes,
@@ -684,11 +684,11 @@ export class ColorSchemeManager {
   }
 
   isInView(obj: BaseObject) {
-    return keepTrackApi.getDotsManager().inViewData[obj.id] === 1 && this.objectTypeFlags.inFOV === true;
+    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && this.objectTypeFlags.inFOV === true;
   }
 
   isInViewOff(obj: BaseObject) {
-    return keepTrackApi.getDotsManager().inViewData[obj.id] === 1 && this.objectTypeFlags.inFOV === false;
+    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && this.objectTypeFlags.inFOV === false;
   }
 
   isPayloadOff(obj: BaseObject) {
@@ -872,7 +872,7 @@ export class ColorSchemeManager {
 
   onlyFOV(obj: BaseObject): ColorInformation {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    if (dotsManagerInstance.inViewData[obj.id] === 1) {
+    if (dotsManagerInstance.inViewData?.[obj.id] === 1) {
       return {
         color: this.colorTheme.inFOV,
         pickable: Pickable.Yes,
@@ -1127,21 +1127,41 @@ export class ColorSchemeManager {
 
     // Not in FOV
     const sat = obj as DetailedSatellite;
-    if (dotsManagerInstance.inViewData[sat.id] === 0) {
+    if (!dotsManagerInstance.inViewData?.[sat.id]) {
       if (dotsManagerInstance.inSunData[sat.id] == 2 && this.objectTypeFlags.satHi === true) {
-        if (sat.vmag < 3) {
-          return {
-            color: this.colorTheme.sunlight100,
-            pickable: Pickable.Yes,
-          };
+        if (sat.vmag !== null) {
+          if (sat.vmag < 3) {
+            return {
+              color: this.colorTheme.sunlight100,
+              pickable: Pickable.Yes,
+            };
+          }
+          if (sat.vmag <= 4.5) {
+            return {
+              color: this.colorTheme.sunlight80,
+              pickable: Pickable.Yes,
+            };
+          }
+          if (sat.vmag > 4.5) {
+            return {
+              color: this.colorTheme.sunlight60,
+              pickable: Pickable.Yes,
+            };
+          }
         }
-        if (sat.vmag <= 4.5) {
+        if (sat.isPayload()) {
           return {
             color: this.colorTheme.sunlight80,
             pickable: Pickable.Yes,
           };
         }
-        if (sat.vmag > 4.5) {
+        if (sat.isRocketBody()) {
+          return {
+            color: this.colorTheme.sunlight100,
+            pickable: Pickable.Yes,
+          };
+        }
+        if (sat.isDebris()) {
           return {
             color: this.colorTheme.sunlight60,
             pickable: Pickable.Yes,
@@ -1199,7 +1219,7 @@ export class ColorSchemeManager {
     }
 
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    if (dotsManagerInstance.inViewData[obj.id] === 1) {
+    if (dotsManagerInstance.inViewData?.[obj.id] === 1) {
       if (this.objectTypeFlags.inViewAlt === false) {
         return {
           color: this.colorTheme.deselected,

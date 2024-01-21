@@ -188,17 +188,19 @@ export class SoundManager extends KeepTrackPlugin {
     window.speechSynthesis.speak(msg);
   }
 
-  stop(soundName: SoundNames) {
+  stop(soundName: SoundNames, isFadeout = true) {
     if (soundName === SoundNames.CHATTER) {
       clearTimeout(this.nextChatter);
       for (let i = 1; i <= 8; i++) {
-        this.stop(`chatter${i}` as SoundNames);
+        this.stop(`chatter${i}` as SoundNames, isFadeout);
       }
       return;
     }
 
     const sound = this.sounds[soundName];
-    SoundManager.fadeOut_(sound);
+    if (isFadeout) {
+      SoundManager.fadeOut_(sound);
+    }
   }
 
   private static fadeOut_(sound: HTMLAudioElement, duration = 1000) {
@@ -265,7 +267,7 @@ export class SoundManager extends KeepTrackPlugin {
         }
         sound = this.sounds[`chatter${random}`];
         sound.volume = 0.15;
-        this.stop(SoundNames.CHATTER); // Stop all other chatter clips
+        this.stop(SoundNames.CHATTER, false); // Stop all other chatter clips
         sound.play();
 
         // Play another chatter clip after this one

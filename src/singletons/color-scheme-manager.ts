@@ -1385,7 +1385,7 @@ export class ColorSchemeManager {
   }
 
   private checkCountry_(obj: BaseObject): ColorInformation {
-    if (this.objectTypeFlags.countryOther === false || !obj.isSatellite()) {
+    if (!obj.isSatellite()) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -1443,10 +1443,17 @@ export class ColorSchemeManager {
           };
         }
       default:
+        if (this.objectTypeFlags.countryOther === false) {
+          return {
+            color: this.colorTheme.deselected,
+            pickable: Pickable.No,
+          };
+        } else {
         return {
           color: this.colorTheme.countryOther,
           pickable: Pickable.Yes,
         };
+      }
     }
   }
 

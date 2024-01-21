@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
-import { DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
+import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
@@ -162,9 +162,7 @@ export class HoverManager {
     // Use this as a default if no UI
     if (settingsManager.disableUI || settingsManager.isEPFL) {
       this.satHoverBoxNode1.textContent = sat.name;
-      let year = sat.intlDes.split('-')[0] === 'none' ? 'Unknown' : sat.intlDes.split('-')[0];
-      if (sat.type === SpaceObjectType.NOTIONAL) year = 'Planned';
-      this.satHoverBoxNode2.textContent = settingsManager.isEPFL ? `Launched: ${year}` : sat.sccNum;
+      this.satHoverBoxNode2.textContent = settingsManager.isEPFL ? HoverManager.getLaunchYear(sat) : sat.sccNum;
       let country = StringExtractor.extractCountry(sat.country);
       country = country.length > 0 ? country : 'Unknown';
       this.satHoverBoxNode3.textContent = country;
@@ -176,10 +174,7 @@ export class HoverManager {
       if (sat.sccNum) {
         this.satHoverBoxNode2.textContent = `NORAD: ${sat.sccNum}`;
       } else {
-        let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
-        year = year === '' ? 'Unknown' : year; // JSC VIMPEL objects have no launch year
-        if (sat.type === SpaceObjectType.NOTIONAL) year = 'Planned';
-        this.satHoverBoxNode2.textContent = `Launched: ${year}`;
+        this.satHoverBoxNode2.textContent = HoverManager.getLaunchYear(sat);
       }
 
       if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && renderer.isShowDistance) {
@@ -196,15 +191,24 @@ export class HoverManager {
       } else if (settingsManager.isEciOnHover) {
         this.showEciVel_(sat);
       } else {
-        let year = sat.intlDes.split('-')[0] === 'None' ? 'Unknown' : sat.intlDes.split('-')[0];
-        if (year) {
-          if (sat.type === SpaceObjectType.NOTIONAL) year = 'Planned';
-          this.satHoverBoxNode3.textContent = `Launched: ${year}`;
+        if (sat.source !== CatalogSource.VIMPEL) {
+          this.satHoverBoxNode3.textContent = HoverManager.getLaunchYear(sat);
         } else {
           this.satHoverBoxNode3.textContent = '';
         }
       }
     }
+  }
+
+  private static getLaunchYear(sat: DetailedSatellite) {
+    if (sat.type === SpaceObjectType.NOTIONAL) return 'Launched: Planned';
+    if (sat.source === CatalogSource.VIMPEL) return 'Launched: Unknown';
+
+    const launchYear = parseInt(sat.intlDes.slice(0, 2));
+    if (launchYear < 57) {
+      return `Launched: 20${launchYear}`;
+    }
+    return `Launched: 19${launchYear}`;
   }
 
   private showEciDistAndVel_(sat: DetailedSatellite) {

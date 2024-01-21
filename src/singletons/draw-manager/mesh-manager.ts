@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
-import { MeshMap, OBJ } from 'webgl-obj-loader';
+import { DownloadModelsOptions, MeshMap, OBJ } from 'webgl-obj-loader';
 import { SatMath } from '../../static/sat-math';
 import { SplashScreen } from '../../static/splash-screen';
 import { MissileObject } from '../catalog-manager/MissileObject';
@@ -32,16 +32,16 @@ export interface MeshObject {
 export class MeshManager {
   private attrIndices_ = {};
   private attribs_: {
-    aVertexPosition: number;
-    aVertexNormal: number;
-    aTextureCoord: number;
-    aAmbient: number;
-    aDiffuse: number;
-    aSpecular: number;
-    aSpecularExponent: number;
+    aVertexPosition: string;
+    aVertexNormal: string;
+    aTextureCoord: string;
+    aAmbient: string;
+    aDiffuse: string;
+    aSpecular: string;
+    aSpecularExponent: string;
   };
 
-  private fileList_: { obj: string; mtl: string }[] = [];
+  private fileList_: DownloadModelsOptions[] = [];
   private gl_: WebGL2RenderingContext;
   isReady = false;
   private meshList_: string[] = [];
@@ -85,8 +85,8 @@ export class MeshManager {
     uInSun: <WebGLUniformLocation>null,
   };
 
-  public calculateNadirYaw_: () => Radians;
-  public currentMeshObject: MeshObject = {
+  calculateNadirYaw_: () => Radians;
+  currentMeshObject: MeshObject = {
     id: -1,
     position: { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>,
     sccNum: '',
@@ -96,9 +96,9 @@ export class MeshManager {
     rotation: { x: 0, y: 0, z: 0 } as Vec3<Degrees>,
   };
 
-  public models = {
+  models = <Record<string, MeshModel>>{
     aehf: null,
-    beidou: null,
+    // beidou: null,
     debris0: null,
     debris1: null,
     debris2: null,
@@ -118,7 +118,7 @@ export class MeshManager {
     o3b: null,
     oneweb: null,
     orbcomm: null,
-    other: null,
+    // other: null,
     rocketbody: null,
     rv: null,
     s1u: null,
@@ -134,10 +134,10 @@ export class MeshManager {
     starlink: null,
   };
 
-  mvMatrix_: mat4;
-  nMatrix_: mat3;
+  private mvMatrix_: mat4;
+  private nMatrix_: mat3;
 
-  public checkIfNameKnown(name: string): boolean {
+  checkIfNameKnown(name: string): boolean {
     // TODO: Currently all named models aim at nadir - that isn't always true
 
     let newModel = null;
@@ -148,6 +148,7 @@ export class MeshManager {
     if (name.startsWith('O3B')) newModel = this.models.o3b;
     if (name.startsWith('NAVSTAR')) newModel = this.models.gps;
     if (name.startsWith('GALILEO')) newModel = this.models.galileo;
+    if (name.includes('GLONASS')) newModel = this.models.glonass;
     if (name.startsWith('SBIRS')) newModel = this.models.sbirs;
     if (name.startsWith('FLOCK')) newModel = this.models.flock;
     if (name.startsWith('LEMUR')) newModel = this.models.lemur;
@@ -160,7 +161,7 @@ export class MeshManager {
     return false;
   }
 
-  public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) {
+  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) {
     // Meshes aren't finished loading
     if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
     if (!this.isReady) return;
@@ -197,7 +198,7 @@ export class MeshManager {
     gl.disable(gl.BLEND);
   }
 
-  public drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
+  drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
     if (settingsManager.disableUI || settingsManager.isDrawLess) return;
 
     if (!this.currentMeshObject) return;
@@ -227,7 +228,7 @@ export class MeshManager {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  public getSatelliteModel(sat: DetailedSatellite, selectedDate: Date) {
+  getSatelliteModel(sat: DetailedSatellite, selectedDate: Date) {
     // NOSONAR
     if (this.checkIfNameKnown(sat.name)) {
       this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
@@ -340,45 +341,12 @@ export class MeshManager {
     this.currentMeshObject.model = this.models.sat2;
   }
 
-  public async init(gl: WebGL2RenderingContext): Promise<void> {
+  init(gl: WebGL2RenderingContext): void {
     try {
       if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
       this.gl_ = gl;
 
-      this.meshList_ =
-        settingsManager.meshListOverride.length > 0
-          ? settingsManager.meshListOverride
-          : [
-              'sat2',
-              's1u',
-              's2u',
-              's3u',
-              's6u',
-              's12u',
-              'starlink',
-              'iss',
-              'gps',
-              'aehf',
-              'dsp',
-              'flock',
-              'lemur',
-              'galileo',
-              'o3b',
-              'oneweb',
-              'orbcomm',
-              'spacebee1gen',
-              'spacebee2gen',
-              'spacebee3gen',
-              'iridium',
-              'globalstar',
-              'debris0',
-              'debris1',
-              'debris2',
-              'rocketbody',
-              'sbirs',
-              'misl',
-              'rv',
-            ];
+      this.meshList_ = settingsManager.meshListOverride.length > 0 ? settingsManager.meshListOverride : Object.keys(this.models).map((mesh) => mesh.toLowerCase());
 
       settingsManager.selectedColor = [0.0, 0.0, 0.0, 0.0];
 
@@ -390,9 +358,7 @@ export class MeshManager {
       // Changes Loading Screen Text
       SplashScreen.loadStr(SplashScreen.msg.models);
 
-      let p = OBJ.downloadModels(this.fileList_);
-
-      p.then((models: MeshMap) => {
+      OBJ.downloadModels(this.fileList_).then((models: MeshMap) => {
         // DEBUG:
         // for (var [name, mesh] of Object.entries(models)) {
         //   console.debug('Name:', name);
@@ -402,18 +368,13 @@ export class MeshManager {
         this.initShaders();
         this.initBuffers();
         this.isReady = true;
-        // eslint-disable-next-line no-unused-vars
-      }).catch(() => {
-        // DEBUG:
-        // console.warn(error);
       });
     } catch {
-      // DEBUG:
-      // console.debug(error);
+      errorManagerInstance.warn('Meshes failed to load!');
     }
   }
 
-  public setCurrentModel(model: MeshModel) {
+  setCurrentModel(model: MeshModel) {
     this.currentMeshObject.id = model.id;
     this.currentMeshObject.model = model;
   }
@@ -546,29 +507,15 @@ export class MeshManager {
     }
   }
 
-  public updateNadirYaw(yaw: Radians) {
+  updateNadirYaw(yaw: Radians) {
     this.currentMeshObject.nadirYaw = yaw;
   }
 
-  public updatePosition(targetPosition: { x: Kilometers; y: Kilometers; z: Kilometers }) {
+  updatePosition(targetPosition: { x: Kilometers; y: Kilometers; z: Kilometers }) {
     this.currentMeshObject.position.x = targetPosition.x;
     this.currentMeshObject.position.y = targetPosition.y;
     this.currentMeshObject.position.z = targetPosition.z;
     return;
-
-    // Move halfway between the satellite and the target position
-    // This seems to cut down on the jitter. It might be caused by the scale of the meshes
-    // TODO: Explore drawing the world at a much smaller scale vs using the kilometer scale
-    // eslint-disable-next-line no-unreachable
-    const dx = targetPosition.x - this.currentMeshObject.position.x;
-    const dy = targetPosition.y - this.currentMeshObject.position.y;
-    const dz = targetPosition.z - this.currentMeshObject.position.z;
-
-    this.currentMeshObject.position = {
-      x: this.currentMeshObject.position.x + dx / 2,
-      y: this.currentMeshObject.position.y + dy / 2,
-      z: this.currentMeshObject.position.z + dz / 2,
-    } as EciVec3<Kilometers>;
   }
 
   private applyAttributePointers_(model: any) {
@@ -616,6 +563,7 @@ export class MeshManager {
         // Create the vertex buffer for this mesh
         const vertexBuffer = <any>gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+
         const vertexData = this.meshes_[mesh].makeBufferData(layout);
         gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
         vertexBuffer.numItems = vertexData.numItems;
@@ -632,8 +580,10 @@ export class MeshManager {
 
         // this loops through the mesh names and creates new
         // model objects and setting their mesh to the current mesh
-        this.models[mesh] = {};
-        this.models[mesh].mesh = this.meshes_[mesh];
+        this.models[mesh] = {
+          id: -1,
+          mesh: this.meshes_[mesh],
+        };
         // DEBUG:
         // this.models[mesh].size = this.sizeInfo[mesh];
       } catch (error) {
@@ -667,13 +617,13 @@ export class MeshManager {
     gl.useProgram(this.program_);
 
     this.attribs_ = {
-      aVertexPosition: OBJ.Layout.POSITION.key as unknown as number,
-      aVertexNormal: OBJ.Layout.NORMAL.key as unknown as number,
-      aTextureCoord: OBJ.Layout.UV.key as unknown as number,
-      aAmbient: OBJ.Layout.AMBIENT.key as unknown as number,
-      aDiffuse: OBJ.Layout.DIFFUSE.key as unknown as number,
-      aSpecular: OBJ.Layout.SPECULAR.key as unknown as number,
-      aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key as unknown as number,
+      aVertexPosition: OBJ.Layout.POSITION.key,
+      aVertexNormal: OBJ.Layout.NORMAL.key,
+      aTextureCoord: OBJ.Layout.UV.key,
+      aAmbient: OBJ.Layout.AMBIENT.key,
+      aDiffuse: OBJ.Layout.DIFFUSE.key,
+      aSpecular: OBJ.Layout.SPECULAR.key,
+      aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key,
     };
 
     this.uniforms_.uPMatrix = gl.getUniformLocation(this.program_, 'uPMatrix');
@@ -685,18 +635,10 @@ export class MeshManager {
   }
 
   private populateFileList(): void {
-    try {
-      for (let i = 0; i < this.meshList_.length; i++) {
-        let meshFiles = {
-          obj: `${settingsManager.installDirectory}meshes/${this.meshList_[i]}.obj`,
-          mtl: `${settingsManager.installDirectory}meshes/${this.meshList_[i]}.mtl`,
-        };
-        this.fileList_.push(meshFiles);
-      }
-    } catch (error) {
-      // DEBUG:
-      // console.debug(error);
-    }
+    this.fileList_ = this.meshList_.map((mesh) => ({
+      obj: `${settingsManager.installDirectory}meshes/${mesh}.obj`,
+      mtl: `${settingsManager.installDirectory}meshes/${mesh}.mtl`,
+    }));
   }
 
   private shader_ = {

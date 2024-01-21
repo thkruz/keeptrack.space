@@ -38,12 +38,10 @@ export enum SearchResultType {
  * about the current search state.
  */
 export class SearchManager {
-  private resultsOpen_ = false;
+  isSearchOpen = false;
+  isResultsOpen = false;
   private lastResultGroup_ = <ObjectGroup>null;
   private uiManager_: UiManager;
-  private isSearchOpen = false;
-  private forceClose = false;
-  private forceOpen = false;
 
   constructor(uiManager: UiManager) {
     this.uiManager_ = uiManager;
@@ -73,7 +71,6 @@ export class SearchManager {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(satId);
       }
     });
-
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
       let satId = SearchManager.getSatIdFromSearchResults_(evt);
       if (isNaN(satId) || satId === -1) return;
@@ -85,14 +82,17 @@ export class SearchManager {
       keepTrackApi.getHoverManager().setHoverId(-1);
       this.uiManager_.searchHoverSatId = -1;
     });
-
     getEl('search')?.addEventListener('input', () => {
       const searchStr = (<HTMLInputElement>getEl('search')).value;
       this.doSearch(searchStr);
     });
-
+    getEl('search')?.addEventListener('blur', () => {
+      if (this.isSearchOpen && this.getCurrentSearch().length === 0) {
+        this.toggleSearch();
+      }
+    });
     getEl('search-icon')?.addEventListener('click', () => {
-      this.searchToggle();
+      this.toggleSearch();
     });
   }
 
@@ -122,7 +122,7 @@ export class SearchManager {
    * Returns the current search string entered by the user.
    */
   getCurrentSearch(): string {
-    if (this.resultsOpen_) {
+    if (this.isResultsOpen) {
       const searchDom = <HTMLInputElement>getEl('search', true);
       if (searchDom) {
         return searchDom.value;
@@ -130,10 +130,6 @@ export class SearchManager {
     }
 
     return '';
-  }
-
-  isResultsOpen(): boolean {
-    return this.resultsOpen_;
   }
 
   /**
@@ -149,7 +145,7 @@ export class SearchManager {
 
       slideOutUp(getEl('search-results'), 1000);
       groupManagerInstance.clearSelect();
-      this.resultsOpen_ = false;
+      this.isResultsOpen = false;
 
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];
@@ -543,7 +539,7 @@ export class SearchManager {
     if (satInfoboxDom) SatInfoBox.resetMenuLocation(satInfoboxDom, false);
 
     slideInDown(getEl('search-results'), 1000);
-    this.resultsOpen_ = true;
+    this.isResultsOpen = true;
 
     if (
       colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.groupCountries ||
@@ -555,51 +551,49 @@ export class SearchManager {
     }
   }
 
-  searchToggle(force?: boolean) {
-    // Reset Force Options
-    this.forceClose = false;
-    this.forceOpen = false;
-
-    // Pass false to force close and true to force open
-    if (typeof force != 'undefined') {
-      if (!force) this.forceClose = true;
-      if (force) this.forceOpen = true;
-    }
-
-    if ((!this.isSearchOpen && !this.forceClose) || this.forceOpen) {
-      this.isSearchOpen = true;
-      getEl('search-holder')?.classList.remove('search-slide-up');
-      getEl('search-holder')?.classList.add('search-slide-down');
-      getEl('search-icon')?.classList.add('search-icon-search-on');
-      getEl('fullscreen-icon')?.classList.add('top-menu-icons-search-on');
-      getEl('tutorial-icon')?.classList.add('top-menu-icons-search-on');
-      getEl('legend-icon')?.classList.add('top-menu-icons-search-on');
-      getEl('sound-icon')?.classList.add('top-menu-icons-search-on');
-
-      const searchDom = <HTMLInputElement>getEl('search');
-      if (searchDom) {
-        const curSearch = searchDom.value;
-        if (curSearch.length > settingsManager.minimumSearchCharacters) {
-          this.doSearch(curSearch);
-        }
-      }
+  toggleSearch() {
+    if (!this.isSearchOpen) {
+      this.openSearch();
     } else {
-      this.isSearchOpen = false;
-      getEl('search-holder')?.classList.remove('search-slide-down');
-      getEl('search-holder')?.classList.add('search-slide-up');
-      getEl('search-icon')?.classList.remove('search-icon-search-on');
-      setTimeout(function () {
-        getEl('fullscreen-icon')?.classList.remove('top-menu-icons-search-on');
-        getEl('tutorial-icon')?.classList.remove('top-menu-icons-search-on');
-        getEl('legend-icon')?.classList.remove('top-menu-icons-search-on');
-        getEl('sound-icon')?.classList.remove('top-menu-icons-search-on');
-      }, 500);
-      this.uiManager_.hideSideMenus();
-      this.hideResults();
-      // getEl('menu-space-stations').classList.remove('bmenu-item-selected');
-      // This is getting called too much. Not sure what it was meant to prevent?
-      // colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-      // this.uiManager_.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      this.closeSearch();
+    }
+  }
+
+  closeSearch(isForce = false) {
+    if (!this.isSearchOpen && !isForce) return;
+
+    this.isSearchOpen = false;
+    getEl('search-holder')?.classList.remove('search-slide-down');
+    getEl('search-holder')?.classList.add('search-slide-up');
+    getEl('search-icon')?.classList.remove('search-icon-search-on');
+    setTimeout(function () {
+      getEl('fullscreen-icon')?.classList.remove('top-menu-icons-search-on');
+      getEl('tutorial-icon')?.classList.remove('top-menu-icons-search-on');
+      getEl('legend-icon')?.classList.remove('top-menu-icons-search-on');
+      getEl('sound-icon')?.classList.remove('top-menu-icons-search-on');
+    }, 500);
+    this.uiManager_.hideSideMenus();
+    this.hideResults();
+  }
+
+  openSearch(isForce = false) {
+    if (this.isSearchOpen && !isForce) return;
+
+    this.isSearchOpen = true;
+    getEl('search-holder')?.classList.remove('search-slide-up');
+    getEl('search-holder')?.classList.add('search-slide-down');
+    getEl('search-icon')?.classList.add('search-icon-search-on');
+    getEl('fullscreen-icon')?.classList.add('top-menu-icons-search-on');
+    getEl('tutorial-icon')?.classList.add('top-menu-icons-search-on');
+    getEl('legend-icon')?.classList.add('top-menu-icons-search-on');
+    getEl('sound-icon')?.classList.add('top-menu-icons-search-on');
+
+    const searchDom = <HTMLInputElement>getEl('search');
+    if (searchDom) {
+      const curSearch = searchDom.value;
+      if (curSearch.length > settingsManager.minimumSearchCharacters) {
+        this.doSearch(curSearch);
+      }
     }
   }
 }

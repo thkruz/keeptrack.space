@@ -56,11 +56,7 @@ export class MobileManager {
             event: KeepTrackApiEvents.selectSatData,
             cbName: 'MobileManager.selectSatData',
             cb: () => {
-              const searchManager = keepTrackApi.getUiManager().searchManager;
-
-              if (searchManager.isResultsOpen) {
-                searchManager.searchToggle(false);
-              }
+              keepTrackApi.getUiManager().searchManager.closeSearch();
             },
           });
 

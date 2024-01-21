@@ -155,7 +155,7 @@ export class SatConstellations extends KeepTrackPlugin {
     uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].ids.map((id: number) => catalogManagerInstance.getSat(id)?.sccNum).join(','));
 
     // Close Menus
-    if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(true);
+    if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.closeSearch();
     uiManagerInstance.hideSideMenus();
   }
 }

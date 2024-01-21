@@ -138,7 +138,7 @@ export class CountriesMenu extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
 
     // Close Menus
-    if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(true);
+    if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.closeSearch();
     uiManagerInstance.hideSideMenus();
   }
 }

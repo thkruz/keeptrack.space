@@ -524,10 +524,10 @@ export class MouseInput {
         break;
       case 'clear-screen-rmb':
         if (keepTrackApi.getPlugin(TimeMachine)) {
-          (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false;
+          keepTrackApi.getPlugin(TimeMachine).isTimeMachineRunning = false;
         }
         uiManagerInstance.doSearch('');
-        uiManagerInstance.searchManager.searchToggle(false);
+        uiManagerInstance.searchManager.closeSearch();
         uiManagerInstance.hideSideMenus();
 
         // if (

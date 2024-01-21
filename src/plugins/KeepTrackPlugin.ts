@@ -523,7 +523,7 @@ export class KeepTrackPlugin {
 
   hideSideMenus(): void {
     if (settingsManager.isMobileModeEnabled) {
-      keepTrackApi.getUiManager().searchManager.searchToggle(false);
+      keepTrackApi.getUiManager().searchManager.closeSearch();
     }
     keepTrackApi.getUiManager().hideSideMenus();
     this.isMenuButtonActive = false;

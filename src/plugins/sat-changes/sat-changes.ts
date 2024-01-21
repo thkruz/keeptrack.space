@@ -140,7 +140,7 @@ export const bottomMenuClick = (iconName: string): void => {
       uiManagerInstance.hideSideMenus();
       return;
     } else {
-      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(false);
+      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.closeSearch();
       uiManagerInstance.hideSideMenus();
       slideInRight(getEl('satChng-menu'), 1000);
       issatChngMenuOpen = true;

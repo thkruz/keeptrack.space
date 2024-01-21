@@ -95,10 +95,13 @@ export class KeyboardInput {
       // Open the search bar for faster searching
       // TODO: What if it isn't available?
       case 'F':
-        if (this.isShiftPressed) {
-          evt.preventDefault();
-          uiManagerInstance.searchManager.searchToggle(true);
-          getEl('search').focus();
+        evt.preventDefault();
+
+        if (this.isShiftPressed && !uiManagerInstance.searchManager.isSearchOpen) {
+          uiManagerInstance.searchManager.toggleSearch();
+          setTimeout(() => {
+            getEl('search').focus();
+          }, 1000);
           this.releaseShiftKey(keepTrackApi.getMainCamera());
         }
         break;
@@ -111,12 +114,12 @@ export class KeyboardInput {
         break;
       case 'D':
         if (this.isShiftPressed && keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
-          if ((<DebugMenuPlugin>keepTrackApi.getPlugin(DebugMenuPlugin)).isErudaVisible) {
+          if (keepTrackApi.getPlugin(DebugMenuPlugin).isErudaVisible) {
             eruda.hide();
-            (<DebugMenuPlugin>keepTrackApi.getPlugin(DebugMenuPlugin)).isErudaVisible = false;
+            keepTrackApi.getPlugin(DebugMenuPlugin).isErudaVisible = false;
           } else {
             eruda.show();
-            (<DebugMenuPlugin>keepTrackApi.getPlugin(DebugMenuPlugin)).isErudaVisible = true;
+            keepTrackApi.getPlugin(DebugMenuPlugin).isErudaVisible = true;
           }
         }
         break;

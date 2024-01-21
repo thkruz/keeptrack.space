@@ -244,7 +244,7 @@ export class OrbitManager {
   updateAllVisibleOrbits(): void {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    if (uiManagerInstance.searchManager.isResultsOpen() && !settingsManager.disableUI && !settingsManager.lowPerf) {
+    if (uiManagerInstance.searchManager.isResultsOpen && !settingsManager.disableUI && !settingsManager.lowPerf) {
       const currentSearchSats = uiManagerInstance.searchManager.getLastResultGroup()?.ids;
       if (typeof currentSearchSats !== 'undefined') {
         if (this.updateAllThrottle_ >= currentSearchSats.length) this.updateAllThrottle_ = 0;

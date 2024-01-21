@@ -36,7 +36,7 @@ export const bottomMenuClick = (iconName: string): void => {
       uiManagerInstance.hideSideMenus();
       return;
     } else {
-      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.searchToggle(false);
+      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.closeSearch();
       uiManagerInstance.hideSideMenus();
       slideInRight(getEl('missile-menu'), 1000);
       getEl('menu-missile').classList.add('bmenu-item-selected');

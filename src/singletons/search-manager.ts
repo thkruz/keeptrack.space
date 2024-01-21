@@ -270,6 +270,8 @@ export class SearchManager {
         if (results.length >= settingsManager.searchLimit) return false;
         const len = searchStringIn.length;
         if (len === 0) return true; // Skip empty strings
+        // TODO: #855 Allow searching for other types of objects
+        if (!sat.isMissile() && !sat.isSatellite()) return true; // Skip non satellites and missiles
 
         if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
           results.push({

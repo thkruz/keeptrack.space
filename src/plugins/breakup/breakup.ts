@@ -11,7 +11,7 @@ import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, Kilometers, SatelliteRecord, Sgp4, Tle, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2 } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -223,6 +223,17 @@ export class Breakup extends KeepTrackPlugin {
     let tles = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt as Kilometers).rotateOrbitToLatLon();
     const tle1 = tles[0];
     const tle2 = tles[1];
+
+    const newSat = new DetailedSatellite({
+      ...mainsat,
+      ...{
+        id: satId,
+        tle1: tle1 as TleLine1,
+        tle2: tle2 as TleLine2,
+        active: true,
+      },
+    });
+    catalogManagerInstance.objectCache[satId] = newSat;
     catalogManagerInstance.satCruncher.postMessage({
       typ: CruncerMessageTypes.SAT_EDIT,
       id: satId,
@@ -290,23 +301,24 @@ export class Breakup extends KeepTrackPlugin {
         if (iTle1.length !== 69) throw new Error(`Invalid tle1: length is not 69 - ${iTle1}`);
         if (iTle2.length !== 69) throw new Error(`Invalid tle1: length is not 69 - ${iTle2}`);
 
-        sat = catalogManagerInstance.getSat(satId);
-        sat.tle1 = iTle1 as TleLine1;
-        sat.tle2 = iTle2 as TleLine2;
-        sat.active = true;
-
-        // Prevent caching of old TLEs
-        sat.satrec = null;
-
-        let satrec: SatelliteRecord;
+        let newSat: DetailedSatellite;
         try {
-          satrec = Sgp4.createSatrec(iTle1, iTle2);
+          newSat = new DetailedSatellite({
+            ...catalogManagerInstance.objectCache[satId],
+            ...{
+              id: satId,
+              tle1: iTle1 as TleLine1,
+              tle2: iTle2 as TleLine2,
+              active: true,
+            },
+          });
         } catch (e) {
           errorManagerInstance.error(e, 'breakup.ts', 'Error creating breakup!');
           return;
         }
 
-        if (SatMath.altitudeCheck(satrec, simulationTimeObj) > 1) {
+        if (SatMath.altitudeCheck(newSat.satrec, simulationTimeObj) > 1) {
+          catalogManagerInstance.objectCache[satId] = newSat;
           catalogManagerInstance.satCruncher.postMessage({
             typ: CruncerMessageTypes.SAT_EDIT,
             id: satId,

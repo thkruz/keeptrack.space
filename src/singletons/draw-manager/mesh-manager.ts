@@ -2,7 +2,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
 import { DownloadModelsOptions, MeshMap, OBJ } from 'webgl-obj-loader';
-import { SatMath } from '../../static/sat-math';
 import { SplashScreen } from '../../static/splash-screen';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
@@ -26,7 +25,7 @@ export interface MeshObject {
   sccNum: string;
   inSun: number;
   model: MeshModel;
-  nadirYaw: Radians;
+  isRotationStable: boolean;
 }
 
 export class MeshManager {
@@ -92,7 +91,7 @@ export class MeshManager {
     sccNum: '',
     inSun: 0,
     model: null,
-    nadirYaw: null,
+    isRotationStable: null,
     rotation: { x: 0, y: 0, z: 0 } as Vec3<Degrees>,
   };
 
@@ -230,15 +229,14 @@ export class MeshManager {
 
   // This is intentionally complex to reduce object creation and GC
   // Splitting it into subfunctions would not be optimal
-  getSatelliteModel(sat: DetailedSatellite, selectedDate: Date) {
-    // NOSONAR
+  getSatelliteModel(sat: DetailedSatellite) {
     if (this.checkIfNameKnown(sat.name)) {
-      this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
+      this.currentMeshObject.isRotationStable = true;
       return;
     }
 
     if (sat.sccNum === this.sccNumIss_) {
-      this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
+      this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.iss;
       return;
     }
@@ -248,19 +246,19 @@ export class MeshManager {
      * TODO: Create a real model for Tianhe-1
      */
     if (sat.sccNum === this.sccNumTianhe_) {
-      this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
+      this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.iss;
       return;
     }
 
     if (this.sccNumAehf_.findIndex((num) => sat.sccNum == num) !== -1) {
-      this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
+      this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.aehf;
       return;
     }
 
     if (this.sccNumDsp_.findIndex((num) => sat.sccNum == num) !== -1) {
-      this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
+      this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.dsp;
       return;
     }
@@ -316,7 +314,7 @@ export class MeshManager {
         return;
       case 'ARROW':
         this.currentMeshObject.model = this.models.oneweb;
-        this.updateNadirYaw(SatMath.calculateNadirYaw(sat.position, selectedDate));
+        this.currentMeshObject.isRotationStable = true;
         return;
       case 'Cubesat 1.5U':
       case 'Cubesat 0.5U':
@@ -391,7 +389,7 @@ export class MeshManager {
     mat4.translate(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(sat.position.x, sat.position.y, sat.position.z));
 
     // Rotate the Satellite to Face Nadir if needed
-    if (this.currentMeshObject.nadirYaw !== null) {
+    if (this.currentMeshObject.isRotationStable !== null) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const sat = catalogManagerInstance.getObject(this.currentMeshObject.id);
       const drawPosition = vec3.fromValues(sat.position.x, sat.position.y, sat.position.z);
@@ -399,7 +397,13 @@ export class MeshManager {
       // Calculate a position to look at along the satellite's velocity vector
       const lookAtPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
 
-      const up = vec3.normalize(vec3.create(), drawPosition);
+      let up: vec3;
+      if (sat.isSatellite()) {
+        up = vec3.normalize(vec3.create(), drawPosition);
+      } else {
+        // Up is perpendicular to the velocity vector
+        up = vec3.cross(vec3.create(), vec3.fromValues(0, 1, 0), vec3.fromValues(sat.velocity.x, sat.velocity.y, sat.velocity.z));
+      }
 
       mat4.targetTo(this.mvMatrix_, drawPosition, lookAtPos, up);
     }
@@ -429,7 +433,7 @@ export class MeshManager {
 
       const pos = new Vector3D(obj.position.x, obj.position.y, obj.position.z);
       this.currentMeshObject.inSun = Sun.lightingRatio(pos, Sun.position(EpochUTC.fromDateTime(selectedDate)));
-      this.currentMeshObject.nadirYaw = null;
+      this.currentMeshObject.isRotationStable = null;
 
       if (settingsManager.meshOverride) {
         if (typeof this.models[settingsManager.meshOverride] === 'undefined') {
@@ -447,7 +451,7 @@ export class MeshManager {
         const sat = obj as DetailedSatellite;
         switch (sat.type) {
           case SpaceObjectType.PAYLOAD:
-            this.getSatelliteModel(sat, selectedDate);
+            this.getSatelliteModel(sat);
             return;
           case SpaceObjectType.ROCKET_BODY:
             // TODO: Add more rocket body models
@@ -476,11 +480,7 @@ export class MeshManager {
   }
 
   private getMislModel_(misl: MissileObject) {
-    // TODO: This doesn't work!
-    const direction = misl.direction();
-    this.currentMeshObject.rotation.x = direction.x as Degrees;
-    this.currentMeshObject.rotation.y = direction.y as Degrees;
-    this.currentMeshObject.rotation.z = direction.z as Degrees;
+    this.currentMeshObject.isRotationStable = true;
 
     // After max alt it looks like an RV
     if (!misl.isGoingUp() && misl.lastTime > 20) {
@@ -507,10 +507,6 @@ export class MeshManager {
     } else {
       this.currentMeshObject.model = this.models.misl;
     }
-  }
-
-  updateNadirYaw(yaw: Radians) {
-    this.currentMeshObject.nadirYaw = yaw;
   }
 
   updatePosition(targetPosition: { x: Kilometers; y: Kilometers; z: Kilometers }) {

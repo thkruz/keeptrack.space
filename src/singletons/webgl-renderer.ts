@@ -444,13 +444,13 @@ export class WebGLRenderer {
       if (primarySat.isMissile()) keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
 
       // If in satellite view the orbit buffer needs to be updated every time
-      if (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType == CameraType.FIXED_TO_SAT) {
+      if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType == CameraType.FIXED_TO_SAT)) {
         keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
         const firstPointOut = [
           keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3],
           keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 1],
           keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 2],
-        ]      
+        ];
         keepTrackApi.getOrbitManager().updateFirstPointOut(this.selectSatManager_.primarySatObj.id, firstPointOut);
       }
 

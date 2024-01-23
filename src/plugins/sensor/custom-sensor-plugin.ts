@@ -57,12 +57,14 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
                 </select>
                 <label>Type of Sensor</label>
             </div>
-            <div class="switch row" data-position="top" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
-                <label>
-                <input id="cs-telescope" type="checkbox" checked="false" />
-                <span class="lever"></span>
-                Telescope
-                </label>
+            <div class="input-field col s12">
+              <div class="switch row" data-position="top" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
+                  <label>
+                  <input id="cs-telescope" type="checkbox" checked="false" />
+                  <span class="lever"></span>
+                  Telescope
+                  </label>
+              </div>
             </div>
             <div id="cs-minaz-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
                 <input id="cs-minaz" type="text" value="0" />

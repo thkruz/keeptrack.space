@@ -1,15 +1,15 @@
 ---
-name: Deploy Pipeline
+name: Develop Staging Pipeline
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   build:
-    name: Build for Deployment
+    name: Build for Staging
     runs-on: ubuntu-latest
     steps:
       # Checkout code
@@ -27,8 +27,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-            ${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}- ${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -46,10 +45,34 @@ jobs:
           name: build
           path: dist
 
-  production:
+  development:
+    name: Deploy to GitHub Pages
     needs: build
-    environment: Production
-    name: Deploy to keeptrack.space
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          npm run build
+
+      # Deploy to GitHub Pages
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        with:
+          # The branch the action should deploy to.
+          branch: gh-pages
+          # The folder the action should deploy.
+          folder: dist
+          # Automatically remove deleted files from the deploy branch
+          clean: true
+
+  staging:
+    needs: build
+    environment: Development
+    name: Deploy to dev.keeptrack.space
     runs-on: ubuntu-latest
 
     steps:
@@ -77,3 +100,4 @@ jobs:
           reverse: true
           ignoreFile: './dist/.lftp_ignore'
           options: '--verbose'
+

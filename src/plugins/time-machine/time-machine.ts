@@ -93,7 +93,7 @@ export class TimeMachine extends KeepTrackPlugin {
       if (settingsManager.loopTimeMachine) {
         setTimeout(() => {
           this.historyOfSatellitesPlay();
-        }, settingsManager.timeMachineDelay);
+        }, settingsManager.timeMachineDelayAtPresentDay);
       } else {
         setTimeout(() => {
           this.removeSatellite(runCount, colorSchemeManagerInstance);

@@ -87,6 +87,10 @@ export class SettingsManager {
    */
   timeMachineDelay = <Milliseconds>5000;
   /**
+   * Delay before advancing in Time Machine mode
+   */
+  timeMachineDelayAtPresentDay = <Milliseconds>20000;
+  /**
    * Initial resolution of the map width to increase performance
    */
   mapWidth = 800;
@@ -1339,6 +1343,12 @@ export class SettingsManager {
                 import('./presets/darkClouds').then((module) => {
                   module.darkClouds();
                 });
+                break;
+              case 'million-year':
+                SettingsPresets.loadPresetMillionYear(this);
+                break;
+              case 'million-year2':
+                SettingsPresets.loadPresetMillionYear2(this);
                 break;
               case 'facsat2':
                 SettingsPresets.loadPresetFacSat2(this);

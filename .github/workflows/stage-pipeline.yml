@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     name: Build for Staging
+    environment: Development
     runs-on: ubuntu-latest
     steps:
       # Checkout code
@@ -100,4 +101,3 @@ jobs:
           reverse: true
           ignoreFile: './dist/.lftp_ignore'
           options: '--verbose'
-

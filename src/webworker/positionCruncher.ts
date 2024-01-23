@@ -605,21 +605,26 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
 
   objCache[i].lastTime = objCache[i].lastTime >= 0 ? objCache[i].lastTime : 0;
 
-  cosLat = Math.cos(objCache[i].latList[objCache[i].lastTime + 1] * DEG2RAD);
-  sinLat = Math.sin(objCache[i].latList[objCache[i].lastTime + 1] * DEG2RAD);
-  cosLon = Math.cos(objCache[i].lonList[objCache[i].lastTime + 1] * DEG2RAD + gmstNext);
-  sinLon = Math.sin(objCache[i].lonList[objCache[i].lastTime + 1] * DEG2RAD + gmstNext);
+  const timeIndex = objCache[i].lastTime + 1;
+  const lat = objCache[i].latList[timeIndex];
+  const lon = objCache[i].lonList[timeIndex];
+  const alt = objCache[i].altList[timeIndex];
+
+  cosLat = Math.cos(lat * DEG2RAD);
+  sinLat = Math.sin(lat * DEG2RAD);
+  cosLon = Math.cos(lon * DEG2RAD + gmstNext);
+  sinLon = Math.sin(lon * DEG2RAD + gmstNext);
 
   if (objCache[i].lastTime === 0) {
     resetVelocity(satVel, i);
   } else if (satVel[i * 3] === 0 && satVel[i * 3 + 1] === 0 && satVel[i * 3 + 2] === 0) {
-    satVel[i * 3] = (6371 + objCache[i].altList[objCache[i].lastTime + 1]) * cosLat * cosLon - satPos[i * 3];
-    satVel[i * 3 + 1] = (6371 + objCache[i].altList[objCache[i].lastTime + 1]) * cosLat * sinLon - satPos[i * 3 + 1];
-    satVel[i * 3 + 2] = (6371 + objCache[i].altList[objCache[i].lastTime + 1]) * sinLat - satPos[i * 3 + 2];
+    satVel[i * 3] = (6371 + alt) * cosLat * cosLon - satPos[i * 3];
+    satVel[i * 3 + 1] = (6371 + alt) * cosLat * sinLon - satPos[i * 3 + 1];
+    satVel[i * 3 + 2] = (6371 + alt) * sinLat - satPos[i * 3 + 2];
   } else {
-    satVel[i * 3] += (6371 + objCache[i].altList[objCache[i].lastTime + 1]) * cosLat * cosLon - satPos[i * 3];
-    satVel[i * 3 + 1] += (6371 + objCache[i].altList[objCache[i].lastTime + 1]) * cosLat * sinLon - satPos[i * 3 + 1];
-    satVel[i * 3 + 2] += (6371 + objCache[i].altList[objCache[i].lastTime + 1]) * sinLat - satPos[i * 3 + 2];
+    satVel[i * 3] += (6371 + alt) * cosLat * cosLon - satPos[i * 3];
+    satVel[i * 3 + 1] += (6371 + alt) * cosLat * sinLon - satPos[i * 3 + 1];
+    satVel[i * 3 + 2] += (6371 + alt) * sinLat - satPos[i * 3 + 2];
     satVel[i * 3] *= 0.5;
     satVel[i * 3 + 1] *= 0.5;
     satVel[i * 3 + 2] *= 0.5;
@@ -641,15 +646,18 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
   const z = <Kilometers>satPos[i * 3 + 2];
 
   const positionEcf = eci2ecf({ x, y, z }, gmst);
-  // TODO: This looks useless
+
   if (eci2lla({ x, y, z }, gmst).alt <= 150 && !objCache[i].latList) {
-    // DEBUG:
-    // console.error(i);
     objCache[i].active = false;
   }
 
-  const rae = ecfRad2rae(sensors[0].llaRad(), positionEcf);
-  satInView[i] = sensors[0].isRaeInFov(rae) ? 1 : 0;
+  if (sensors[0]) {
+    const rae = ecfRad2rae(sensors[0].llaRad(), positionEcf);
+    satInView[i] = sensors[0].isRaeInFov(rae) ? 1 : 0;
+  } else {
+    satInView[i] = 0;
+  }
+
   return true;
 };
 export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): void => {

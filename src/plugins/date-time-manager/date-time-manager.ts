@@ -82,7 +82,7 @@ export class DateTimeManager extends KeepTrackPlugin {
       keepTrackApi.html`
           <div id="nav-mobile">
             <div id="jday"></div>
-            <div id="${this.divContainerId}" data-position="bottom" data-delay="50" data-tooltip="Time Menu">
+            <div id="${this.divContainerId}">
               <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
               <div id="datetime-input">
                 <form id="datetime-input-form">

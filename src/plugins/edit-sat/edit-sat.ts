@@ -12,7 +12,7 @@ import { TimeManager } from '@app/singletons/time-manager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
+import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, TleLine2, ZoomValue } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -408,8 +408,6 @@ export class EditSat extends KeepTrackPlugin {
     keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
 
     getEl(`${EditSat.elementPrefix}-error`).style.display = 'none';
     const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
@@ -431,7 +429,9 @@ export class EditSat extends KeepTrackPlugin {
     const epochyr = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-year`)).value;
     const epochday = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value;
 
-    const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
+    const { tle1: tle1_, tle2: tle2_ } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
+    const tle1 = tle1_ as TleLine1;
+    const tle2 = tle2_ as TleLine2;
 
     let satrec: SatelliteRecord;
     try {
@@ -440,7 +440,8 @@ export class EditSat extends KeepTrackPlugin {
       errorManagerInstance.error(e, 'edit-sat.ts', 'Error creating satellite record!');
       return;
     }
-    if (SatMath.altitudeCheck(satrec, timeManagerInstance.simulationTimeObj) > 1) {
+
+    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
         id: satId,
@@ -451,11 +452,10 @@ export class EditSat extends KeepTrackPlugin {
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
       orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
       sat.active = true;
-
-      // Prevent caching of old TLEs
-      sat.satrec = null;
+      sat.editTle(tle1, tle2);
+      keepTrackApi.getMainCamera().zoomTarget = ZoomValue.GEO;
     } else {
-      uiManagerInstance.toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
+      keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
     }
   }
 

@@ -7,6 +7,7 @@ export class ErrorManager {
   private readonly ALLOW_LOG = window.location.hostname === 'localhost';
   private readonly ALLOW_INFO = true;
   private readonly ALLOW_WARN = true;
+  private lastErrorTime = 0;
   isDebug = false;
 
   private newGithubIssueUrl_: (options: Options) => string;
@@ -35,8 +36,10 @@ export class ErrorManager {
     toastMsg ??= e.message || 'Unknown error';
     const url = this.getErrorUrl(e, funcName);
 
-    if (url !== '') {
+    // Max 1 error per 5 minutes
+    if (url !== '' && Date.now() - this.lastErrorTime > 1000 * 60 * 5) {
       window.open(url, '_blank');
+      this.lastErrorTime = Date.now();
     }
 
     const uiManagerInstance = keepTrackApi.getUiManager();

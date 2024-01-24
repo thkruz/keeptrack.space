@@ -108,7 +108,7 @@
     "http-server": "^14.1.1",
     "husky": "^8.0.1",
     "ignore-loader": "^0.1.2",
-    "imports-loader": "^4.0.1",
+    "imports-loader": "^5.0.0",
     "jest": "^29.7.0",
     "jest-canvas-mock": "^2.5.2",
     "jest-environment-jsdom": "^29.7.0",

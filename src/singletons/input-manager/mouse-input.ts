@@ -209,6 +209,7 @@ export class MouseInput {
     const resetCameraDOM = getEl('reset-camera-rmb');
     const clearScreenDOM = getEl('clear-screen-rmb');
     const clearLinesDOM = getEl('clear-lines-rmb');
+    const toggleTimeDOM = getEl('toggle-time-rmb');
     const rightBtnDrawDOM = getEl('draw-rmb');
     const rightBtnEarthDOM = getEl('earth-rmb');
 
@@ -278,7 +279,7 @@ export class MouseInput {
       // Create Event Listeners for Right Menu Buttons
       keepTrackApi.rmbMenuItems
         .map(({ elementIdL2 }) => getEl(elementIdL2))
-        .concat([rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
+        .concat([toggleTimeDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
             this.rmbMenuActions(e);
@@ -521,6 +522,9 @@ export class MouseInput {
         settingsManager.politicalImages = true;
         MouseInput.saveMapToLocalStorage('political'); // TODO: Verify this
         keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        break;
+      case 'toggle-time-rmb':
+        timeManagerInstance.toggleTime();
         break;
       case 'clear-screen-rmb':
         if (keepTrackApi.getPlugin(TimeMachine)) {

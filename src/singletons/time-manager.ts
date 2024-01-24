@@ -97,6 +97,13 @@ export class TimeManager {
 
     this.synchronize();
 
+    const toggleTimeDOM = getEl('toggle-time-rmb');
+    if (keepTrackApi.getTimeManager().propRate === 0) {
+      toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
+    } else {
+      toggleTimeDOM.childNodes[0].textContent = 'Pause Clock';
+    }
+
     UrlManager.updateURL();
   }
 
@@ -150,6 +157,24 @@ export class TimeManager {
 
     // NOTE: This should be the only regular call to calculateSimulationTime!!
     this.calculateSimulationTime();
+  }
+
+  toggleTime() {
+    if (this.propRate === 0) {
+      this.changePropRate(this.lastPropRate);
+    } else {
+      this.lastPropRate = this.propRate;
+      this.changePropRate(0);
+    }
+
+    const uiManagerInstance = keepTrackApi.getUiManager();
+    if (this.propRate > 1.01 || this.propRate < 0.99) {
+      if (this.propRate < 10) uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'standby');
+      if (this.propRate >= 10 && this.propRate < 60) uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'caution');
+      if (this.propRate >= 60) uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'serious');
+    } else {
+      uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'normal');
+    }
   }
 
   setSelectedDate(selectedDate: Date) {

@@ -233,6 +233,7 @@ export class InputManager {
       getEl('right-btn-menu-ul').insertAdjacentHTML(
         'beforeend',
         keepTrackApi.html`
+        <li id="toggle-time-rmb"><a href="#">Pause Clock</a></li>
         <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
         <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
         <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>

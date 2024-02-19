@@ -21,7 +21,7 @@ interface DiscvrResponse {
 }
 
 export class SatellitePhotos extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Satellite Photos';
+  static readonly PLUGIN_NAME = 'Satellite Photos';
   constructor() {
     super(SatellitePhotos.PLUGIN_NAME);
   }

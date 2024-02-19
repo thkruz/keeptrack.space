@@ -16,7 +16,7 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Breakup extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Breakup';
+  static readonly PLUGIN_NAME = 'Breakup';
   dependencies = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
 

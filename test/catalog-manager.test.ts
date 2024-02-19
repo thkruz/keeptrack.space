@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
-import { DEG2RAD, DetailedSatellite, SpaceObjectType } from 'ootk';
+import { Degrees, DetailedSatellite, Kilometers, Minutes, SpaceObjectType } from 'ootk';
 import { CatalogManager } from './../src/singletons/catalog-manager';
 import { defaultSat } from './environment/apiMocks';
 
@@ -16,15 +16,15 @@ describe('calcSatrec', () => {
 
   // should return a satrec object
   it('return_satrec_object', () => {
-    const newSat = { ...defaultSat, id: 0, satrec: null };
+    const newSat = defaultSat;
     catalogManagerInstance.objectCache = [newSat];
-    const satrec = catalogManagerInstance.calcSatrec(newSat);
+    const satrec = newSat.satrec;
     expect(satrec).toStrictEqual(defaultSat.satrec);
   });
 
   // should return a satrec object
   it('return_satrec_object2', () => {
-    const newSat = { ...defaultSat, id: 0, satrec: null };
+    const newSat = defaultSat;
     catalogManagerInstance.objectCache = [];
     const satrec = catalogManagerInstance.calcSatrec(newSat);
     expect(satrec).toStrictEqual(defaultSat.satrec);
@@ -33,7 +33,7 @@ describe('calcSatrec', () => {
   // should convert an id array into a satnum array
   it('convert_id_to_satnum', () => {
     const idList = [0];
-    const newSat = { ...defaultSat, id: 0, satrec: null };
+    const newSat = defaultSat;
     catalogManagerInstance.objectCache = [newSat];
     const satnumList = catalogManagerInstance.id2satnum(idList);
     expect(satnumList).toStrictEqual(['00005']);
@@ -44,12 +44,21 @@ describe('calcSatrec', () => {
     const selectSataManagerInstance = new SelectSatManager();
     selectSataManagerInstance.init();
 
-    defaultSat.period = 100;
-    const matchSat = { ...defaultSat, id: 1, period: 99 };
-    const nonmatchSat = { ...defaultSat, id: 2, period: 200 };
-    const nonmatchSat2 = { ...defaultSat, id: 3, inclination: 90 * DEG2RAD };
-    const nonmatchSat3 = { ...defaultSat, id: 4, raan: 200 * DEG2RAD };
-    const nonmatchSat4 = { ...defaultSat, id: 5, static: true };
+    const matchSat = defaultSat.clone();
+    matchSat.id = 1;
+    matchSat.period = 99 as Minutes;
+    const nonmatchSat = defaultSat.clone();
+    nonmatchSat.id = 2;
+    nonmatchSat.period = 200 as Minutes;
+    const nonmatchSat2 = defaultSat.clone();
+    nonmatchSat2.id = 3;
+    nonmatchSat2.inclination = 90 as Degrees;
+    const nonmatchSat3 = defaultSat.clone();
+    nonmatchSat3.id = 4;
+    nonmatchSat3.rightAscension = 200 as Degrees;
+    const nonmatchSat4 = defaultSat.clone();
+    nonmatchSat4.id = 5;
+    nonmatchSat4.isStatic = () => true;
 
     selectSataManagerInstance.selectedSat = defaultSat.id;
     catalogManagerInstance.objectCache = [defaultSat, matchSat, nonmatchSat, nonmatchSat2, nonmatchSat3, nonmatchSat4];
@@ -59,11 +68,19 @@ describe('calcSatrec', () => {
 
   // should find reentries
   it('find_reentries', () => {
-    defaultSat.period = 100;
-    const matchSat = { ...defaultSat, perigee: 200, sccNum: '00001' };
-    const nonmatchSat = { ...defaultSat, perigee: 0, sccNum: '00002' };
-    const nonmatchSat2 = { ...defaultSat, type: SpaceObjectType.LAUNCH_AGENCY, sccNum: '00002' };
-    const nonmatchSat3 = { ...defaultSat, perigee: 300, sccNum: '00002' };
+    defaultSat.period = 100 as Minutes;
+    const matchSat = defaultSat.clone();
+    matchSat.perigee = 200 as Kilometers;
+    matchSat.sccNum = '00001';
+    const nonmatchSat = defaultSat.clone();
+    nonmatchSat.perigee = 0 as Kilometers;
+    nonmatchSat.sccNum = '00002';
+    const nonmatchSat2 = defaultSat.clone();
+    nonmatchSat2.type = SpaceObjectType.LAUNCH_AGENCY;
+    nonmatchSat2.sccNum = '00002';
+    const nonmatchSat3 = defaultSat.clone();
+    nonmatchSat3.perigee = 300 as Kilometers;
+    nonmatchSat3.sccNum = '00002';
 
     catalogManagerInstance.objectCache = [];
     catalogManagerInstance.objectCache.push(nonmatchSat, nonmatchSat2, nonmatchSat3);
@@ -132,7 +149,7 @@ describe('calcSatrec', () => {
       postMessage: jest.fn(),
       terminate: jest.fn(),
     } as any;
-    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.TLE1, defaultSat.TLE2, 0)).not.toThrow();
+    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 0)).not.toThrow();
   });
 
   // Should error on bad addAnalystSat
@@ -142,8 +159,8 @@ describe('calcSatrec', () => {
       postMessage: jest.fn(),
       terminate: jest.fn(),
     } as any;
-    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.TLE1.slice(0, 68), defaultSat.TLE2, 0)).toThrow();
-    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.TLE1, `${defaultSat.TLE2}0`, 0)).toThrow();
-    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.TLE1, defaultSat.TLE2, 1)).toThrow();
+    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1.slice(0, 68), defaultSat.tle2, 0)).toThrow();
+    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, `${defaultSat.tle2}0`, 0)).toThrow();
+    expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1)).toThrow();
   });
 });

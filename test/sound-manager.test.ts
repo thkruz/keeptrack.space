@@ -1,5 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { standardPluginSuite } from './generic-tests';
 
@@ -27,12 +28,12 @@ describe('Sound Manager', () => {
         },
       } as Navigator);
 
-      expect(() => soundManagerPlugin2.play(sound)).not.toThrow();
+      expect(() => soundManagerPlugin2.play(sound as SoundNames)).not.toThrow();
     }
 
     for (let i = 0; i < 30; i++) {
       const soundManagerPlugin2 = soundManagerPlugin;
-      expect(() => soundManagerPlugin2.play('genericBeep')).not.toThrow();
+      expect(() => soundManagerPlugin2.play(SoundNames.BEEP)).not.toThrow();
     }
   });
 

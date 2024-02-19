@@ -1,4 +1,3 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Breakup } from '@app/plugins/breakup/breakup';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import * as OrbitFinderFile from '@app/singletons/orbit-finder';
@@ -20,19 +19,11 @@ describe('Breakup_class', () => {
       const breakupPlugin = new Breakup();
       websiteInit(breakupPlugin);
       standardSelectSat();
-      keepTrackApi.getCatalogManager = () =>
-        ({
-          getSat: () => defaultSat,
-          getIdFromSccNum: () => 0,
-          satCruncher: {
-            postMessage: jest.fn(),
-          },
-        }) as any;
       // Mock OrbitFinder class
       jest.spyOn(OrbitFinderFile, 'OrbitFinder').mockImplementation(
         () =>
           ({
-            rotateOrbitToLatLon: () => [defaultSat.TLE1, defaultSat.TLE2],
+            rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
           }) as any
       );
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();

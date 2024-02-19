@@ -1,7 +1,7 @@
 import { GeolocationPosition } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { UiManager } from '@app/singletons/uiManager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { defaultSensor } from './environment/apiMocks';
@@ -90,7 +90,7 @@ describe('uiManager', () => {
   // Should process colorSchemeChangeAlert
   it('process_colorSchemeChangeAlert', () => {
     const uiManagerInstance = new UiManager();
-    const colorSchemeManagerInstance = new StandardColorSchemeManager();
+    const colorSchemeManagerInstance = new ColorSchemeManager();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.group)).not.toThrow();

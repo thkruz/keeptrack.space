@@ -3,6 +3,7 @@ import { KeepTrack } from '@app/keeptrack';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from '@app/plugins/sensor/sensorManager';
+import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { Camera } from '@app/singletons/camera';
 import { DotsManager } from '@app/singletons/dots-manager';
@@ -12,6 +13,7 @@ import { Scene } from '@app/singletons/scene';
 import { SearchManager } from '@app/singletons/search-manager';
 import { starManager } from '@app/singletons/starManager';
 import { TimeManager } from '@app/singletons/time-manager';
+import { UiManager } from '@app/singletons/uiManager';
 import { SensorMath } from '@app/static/sensor-math';
 import { mat4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../src/container';
@@ -61,6 +63,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   timeManagerInstance.simulationTimeObj = new Date(2023, 1, 1, 0, 0, 0, 0);
   const sensorManagerInstance = new SensorManager();
   mockUiManager.searchManager = new SearchManager(mockUiManager);
+  const soundManagerInstance = new SoundManager();
 
   // Jest all Image class objects with a mock decode method.
   Image.prototype.decode = jest.fn();
@@ -92,12 +95,16 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackContainer.registerSingleton(Singletons.StarManager, starManager);
   const sensorMathInstance = new SensorMath();
   keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
+  keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerInstance);
 
   keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   // Setup a mock catalog
-  keepTrackApi.getCatalogManager().objectCache = [defaultSat, { ...defaultSat, ...{ id: 1, sccNum: '11' } }];
+  const sat2 = defaultSat.clone();
+  sat2.id = 1;
+  sat2.sccNum = '11';
+  keepTrackApi.getCatalogManager().objectCache = [defaultSat, sat2];
   const selectSatManager = new SelectSatManager();
   selectSatManager.init();
   catalogManagerInstance.staticSet = [defaultSensor];
@@ -167,13 +174,16 @@ export const setupMinimumHtml = () => {
   </div>`;
 };
 
-export const mockUiManager = {
+export const mockUiManager: UiManager = <UiManager>(<unknown>{
+  isFooterVisible_: false,
+  isInitialized_: true,
+  makeToast_: jest.fn(),
+  addSearchEventListeners_: jest.fn(),
+  activeToastList_: [],
   dismissAllToasts: jest.fn(),
   toast: jest.fn(),
   M: null,
   bottomIconPress: jest.fn(),
-  clearRMBSubMenu: jest.fn(),
-  earthClicked: jest.fn(),
   hideSideMenus: jest.fn(),
   isAnalysisMenuOpen: false,
   isCurrentlyTyping: false,
@@ -196,9 +206,8 @@ export const mockUiManager = {
   initMenuController: jest.fn(),
   legendHoverMenuClick: jest.fn(),
   onReady: jest.fn(),
-  searchToggle: jest.fn(),
   updateSelectBox: jest.fn(),
-};
+});
 
 export const mockCameraManager = <Camera>(<unknown>{
   camAngleSnappedOnSat: false,

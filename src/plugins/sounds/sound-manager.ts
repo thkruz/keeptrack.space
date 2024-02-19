@@ -227,7 +227,7 @@ export class SoundManager extends KeepTrackPlugin {
   }
 
   play(soundName: SoundNames) {
-    if (!navigator.userActivation.hasBeenActive) return; // Not active yet
+    if (!navigator.userActivation?.hasBeenActive) return; // Not active yet
 
     if (this.isMute) return; // Muted
     if (getEl('loading-screen').classList.contains('fullscreen')) return; // Not Ready Yet

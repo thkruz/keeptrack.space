@@ -1,13 +1,13 @@
 // @ts-nocheck
 import { Operators } from '@app/catalogs/sensors';
-import { CatalogSource, DEG2RAD, Degrees, Kilometers, Milliseconds, Sgp4, SpaceObjectType, ZoomValue } from 'ootk';
-import { SatObject, SensorObject } from '../../src/interfaces';
+import { CatalogSource, DEG2RAD, Degrees, DetailedSatellite, Kilometers, Milliseconds, Sensor, Sgp4, SpaceObjectType, ZoomValue } from 'ootk';
+import { SensorObject } from '../../src/interfaces';
 declare const jest: any;
 
 const fakeTimeObj = new Date(2022, 0, 1);
 fakeTimeObj.setUTCHours(0, 0, 0, 0);
 
-export const defaultSat: SatObject = {
+export const defaultSat: DetailedSatellite = new DetailedSatellite({
   id: 0,
   active: true,
   sccNum: '00005',
@@ -17,8 +17,8 @@ export const defaultSat: SatObject = {
   launchVehicle: 'Proton-K',
   name: 'ISS (ZARYA)',
   type: SpaceObjectType.PAYLOAD,
-  TLE1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
-  TLE2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
+  tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
+  tle2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
   rcs: '99.0524',
   owner: 'National Aeronautics and Space Administration (NASA)/Multinational',
   user: 'Government',
@@ -55,9 +55,9 @@ export const defaultSat: SatObject = {
   static: false,
   sensorId: null,
   source: CatalogSource.USSF,
-};
+});
 
-export const defaultSensor: SensorObject = {
+export const defaultSensor: SensorObject = new Sensor({
   observerGd: { lat: 0.7287584767123405, lon: -1.2311404365114507, alt: 0.060966 },
   objName: 'CODSFS',
   shortName: 'COD',
@@ -85,7 +85,7 @@ export const defaultSensor: SensorObject = {
   country: 'United States',
   operator: Operators.USSF,
   sensorId: 0, // For Testing Only
-};
+});
 
 export const useMockWorkers = (): void => {
   class Worker {

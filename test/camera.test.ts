@@ -1,7 +1,7 @@
-import { DEG2RAD, PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
+import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
-import { GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
+import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Camera) => {
@@ -244,12 +244,14 @@ describe('Camera snapToSat', () => {
 
   // test snapToSat with bad target data
   it('test_snap_to_sat_bad_target_data', () => {
-    const testFunc = () => cameraInstance.snapToSat({ ...defaultSat, ...{ position: null } }, new Date());
+    defaultSat.position = null;
+    const testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
     expect(() => testFunc()).toThrow();
   });
 
   // test snapToSat with normal data
   it('test_snap_to_sat_normal_data', () => {
+    defaultSat.position = { x: 0 as Kilometers, y: 0 as Kilometers, z: 6000 as Kilometers };
     let testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
     expect(testFunc).not.toThrow();
   });
@@ -258,6 +260,7 @@ describe('Camera snapToSat', () => {
   it('test_snap_to_sat_cam_angle_snapped_on_sat', () => {
     const testFunc = () => {
       cameraInstance.camAngleSnappedOnSat = true;
+      defaultSat.position = { x: 0 as Kilometers, y: 0 as Kilometers, z: 6000 as Kilometers };
       cameraInstance.snapToSat(defaultSat, new Date());
     };
     expect(testFunc).not.toThrow();
@@ -267,19 +270,12 @@ describe('Camera snapToSat', () => {
   it('test_snap_to_sat_cam_angle_snapped_on_sat_cam_snap_to_sat_yaw_bad', () => {
     const testFunc = () => {
       cameraInstance.camAngleSnappedOnSat = true;
-      cameraInstance.snapToSat(
-        {
-          ...defaultSat,
-          ...{
-            position: {
-              x: 'bad' as unknown as Kilometers,
-              y: 'bad' as unknown as Kilometers,
-              z: 6000 as Kilometers,
-            },
-          },
-        },
-        new Date()
-      );
+      defaultSat.position = {
+        x: 'bad' as unknown as Kilometers,
+        y: 'bad' as unknown as Kilometers,
+        z: 6000 as Kilometers,
+      };
+      cameraInstance.snapToSat(defaultSat, new Date());
     };
     expect(testFunc).not.toThrow();
   });
@@ -297,19 +293,12 @@ describe('Camera snapToSat', () => {
   it('test_snap_to_sat_cam_zoom_snapped_on_sat_bad_target_data', () => {
     const testFunc = () => {
       cameraInstance.camZoomSnappedOnSat = true;
-      cameraInstance.snapToSat(
-        {
-          ...defaultSat,
-          ...{
-            position: {
-              x: 'bad' as unknown as Kilometers,
-              y: 'bad' as unknown as Kilometers,
-              z: 6000 as Kilometers,
-            },
-          },
-        },
-        new Date()
-      );
+      defaultSat.position = {
+        x: 'bad' as unknown as Kilometers,
+        y: 'bad' as unknown as Kilometers,
+        z: 6000 as Kilometers,
+      };
+      cameraInstance.snapToSat(defaultSat, new Date());
     };
     expect(testFunc).not.toThrow();
   });

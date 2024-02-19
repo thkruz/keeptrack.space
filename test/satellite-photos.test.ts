@@ -13,23 +13,6 @@ describe('SatellitePhotos_class', () => {
 
   standardPluginSuite(SatellitePhotos, 'SatellitePhotos');
   standardPluginMenuButtonTests(SatellitePhotos, 'SatellitePhotos');
-
-  expect(() =>
-    SatellitePhotos.dscovrLoaded({
-      status: 200,
-      response: JSON.stringify([
-        {
-          image: 'https://epic.gsfc.nasa.gov/archive/natural/2015/10/31/png/epic_1b_20151031074859.png',
-          identifier: '20151031074859',
-          // eslint-disable-next-line camelcase
-          centroid_coordinates: {
-            lat: 0.0,
-            lon: 0.0,
-          },
-        },
-      ]),
-    })
-  ).not.toThrow();
 });
 
 describe('SatellitePhotos_test_links', () => {

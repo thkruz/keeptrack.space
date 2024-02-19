@@ -83,7 +83,7 @@ describe('CoordinateTransforms_class', () => {
   });
 
   it('test_valid_input_with_observerGd_and_positionEcf', () => {
-    const now = new Date();
+    const now = new Date(2024, 1, 1);
     const eci = [1000, 2000, 3000] as EciArr3;
     const sensor = defaultSensor;
     const result = CoordinateTransforms.eci2rae(now, eci, sensor);

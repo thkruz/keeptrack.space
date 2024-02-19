@@ -15,7 +15,7 @@ describe('CountriesMenu_class', () => {
     const mockGroupsManager = new GroupsManager();
     mockGroupsManager.groupList['Argentina'] = {
       groupName: 'Argentina',
-      objects: [],
+      ids: [],
       updateIsInGroup: jest.fn(),
     } as unknown as ObjectGroup;
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, mockGroupsManager);
@@ -51,7 +51,7 @@ describe('CountriesMenu_class', () => {
     // uiManagerInstance.searchManager.fillResultBox = jest.fn();
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     groupManagerInstance.groupList['Argentina'] = {
-      objects: [0, 1],
+      ids: [0, 1],
       updateIsInGroup: jest.fn(),
       updateOrbits: jest.fn(),
       clear: jest.fn(),

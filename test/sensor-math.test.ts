@@ -21,7 +21,7 @@ describe('sensor-math', () => {
   it('process_nextpassList', () => {
     const sensorMathInstance = new SensorMath();
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-    const test = () => SensorMath.nextpassList([defaultSat]);
+    const test = () => SensorMath.nextpassList([defaultSat], [defaultSensor]);
     expect(test).not.toThrow();
   });
 

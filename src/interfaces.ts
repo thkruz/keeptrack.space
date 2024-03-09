@@ -49,7 +49,7 @@ export type EChartsData = {
   satId?: number;
   country?: string;
   value?: [number, number, number][];
-  data?: [number, number, number][];
+  data?: [number, number, number?][];
 }[];
 
 export type rgbaArray = [number, number, number, number];

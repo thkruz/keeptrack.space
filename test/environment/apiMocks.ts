@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { Operators } from '@app/catalogs/sensors';
+import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CatalogSource, DEG2RAD, Degrees, DetailedSatellite, Kilometers, Milliseconds, Sensor, Sgp4, SpaceObjectType, ZoomValue } from 'ootk';
 import { SensorObject } from '../../src/interfaces';
 declare const jest: any;
@@ -55,6 +56,20 @@ export const defaultSat: DetailedSatellite = new DetailedSatellite({
   static: false,
   sensorId: null,
   source: CatalogSource.USSF,
+});
+
+export const defaultMisl = new MissileObject({
+  id: 1,
+  desc: 'Fake (F101)',
+  active: true,
+  latList: [0 as Degrees],
+  lonList: [0 as Degrees],
+  altList: [0 as Kilometers],
+  timeList: [0],
+  startTime: 0,
+  maxAlt: 0,
+  country: 'USA',
+  launchVehicle: 'Fake',
 });
 
 export const defaultSensor: SensorObject = new Sensor({

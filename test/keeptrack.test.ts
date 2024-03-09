@@ -2,7 +2,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { keepTrackContainer } from '../src/container';
 import { SatObject, Singletons } from '../src/interfaces';
-import { StandardCatalogManager } from '../src/singletons/catalog-manager';
+import { CatalogManager } from '../src/singletons/catalog-manager';
 import { OrbitManager } from '../src/singletons/orbitManager';
 import { UiManager } from '../src/singletons/uiManager';
 import { WebGLRenderer } from '../src/singletons/webgl-renderer';
@@ -42,7 +42,7 @@ Additional aspects:
 const setupStandardEnvironment = () => {
   setupDefaultHtml();
   const drawManagerInstance = new WebGLRenderer();
-  const catalogManagerInstance = new StandardCatalogManager();
+  const catalogManagerInstance = new CatalogManager();
   const orbitManagerInstance = new OrbitManager();
   const uiManagerInstance = new UiManager();
 

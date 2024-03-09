@@ -3,7 +3,7 @@ import { Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import { StandardColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
@@ -45,7 +45,7 @@ describe('SettingsMenuPlugin_class', () => {
     const settingsMenuPlugin = new SettingsMenuPlugin();
     websiteInit(settingsMenuPlugin);
     keepTrackApi.getGroupsManager().clearSelect = jest.fn();
-    const colorSchemeManagerInstance = new StandardColorSchemeManager();
+    const colorSchemeManagerInstance = new ColorSchemeManager();
     colorSchemeManagerInstance.setColorScheme = jest.fn();
     colorSchemeManagerInstance.reloadColors = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);

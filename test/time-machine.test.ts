@@ -19,8 +19,8 @@ describe('TimeMachine_class', () => {
   // test the full animation
   it('should animate the time machine', () => {
     websiteInit(timeMachinePlugin);
-    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
-    keepTrackApi.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true });
+    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
+    keepTrackApi.getCatalogManager().objectCache = Array(50).fill(defaultSat);
     keepTrackApi.containerRoot.innerHTML += '<div id="search-results"></div>';
 
     settingsManager.timeMachineDelay = <Milliseconds>0;

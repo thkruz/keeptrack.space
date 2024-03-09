@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DetailedSatellite } from 'ootk';
+import { Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SatMath } from '../static/sat-math';
 
@@ -45,9 +45,16 @@ export class SatMathApi {
     return SatMath.getEciOfCurrentOrbit(sat, points, cb);
   }
 
+  /**
+   * Retrieves the LLA (Latitude, Longitude, Altitude) coordinates of the current orbit for a given satellite.
+   *
+   * @param sat - The detailed satellite object.
+   * @param points - The number of points to calculate along the orbit.
+   * @returns An array of LLA coordinates representing the current orbit in latitude, longitude, altitude, and time.
+   */
   static getLlaOfCurrentOrbit(sat: DetailedSatellite, points: number) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
-    return SatMath.getLlaOfCurrentOrbit(sat, points, cb);
+    return SatMath.getLlaOfCurrentOrbit(sat, points, cb) as { lat: Degrees; lon: Degrees; alt: Kilometers; time: number }[];
   }
 
   static getRicOfCurrentOrbit(sat: DetailedSatellite, sat2: DetailedSatellite, points: number, orbits = 1) {

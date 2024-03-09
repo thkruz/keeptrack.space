@@ -201,7 +201,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
           satArray.push(catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY));
         }
 
-        this.nextPassArray = SensorMath.nextpassList(satArray, 1, this.OVERLAY_CALC_LENGTH_IN_DAYS);
+        this.nextPassArray = SensorMath.nextpassList(satArray, sensorManagerInstance.currentSensors, 1, this.OVERLAY_CALC_LENGTH_IN_DAYS);
         this.nextPassArray.sort(function (a: { time: string | number | Date }, b: { time: string | number | Date }) {
           return new Date(a.time).getTime() - new Date(b.time).getTime();
         });

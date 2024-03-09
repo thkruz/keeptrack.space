@@ -107,6 +107,27 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackApi.getCatalogManager().objectCache = [defaultSat, sat2];
   const selectSatManager = new SelectSatManager();
   selectSatManager.init();
+
+  keepTrackApi.containerRoot.innerHTML += `
+    <div id="save-rmb"></div>
+    <div id="save-rmb-menu"></div>
+    <div id="view-rmb"></div>
+    <div id="view-rmb-menu"></div>
+    <div id="create-rmb"></div>
+    <div id="create-rmb-menu"></div>
+    <div id="colors-rmb"></div>
+    <div id="colors-rmb-menu"></div>
+    <div id="draw-rmb"></div>
+    <div id="draw-rmb-menu"></div>
+    <div id="edit-rmb"></div>
+    <div id="edit-rmb-menu"></div>
+    <div id="earth-rmb"></div>
+    <div id="earth-rmb-menu"></div>
+    <div id="dops-rmb"></div>
+    <div id="dops-rmb-menu"></div>
+    `;
+
+  inputManagerInstance.init();
   catalogManagerInstance.staticSet = [defaultSensor];
 
   window.M = {

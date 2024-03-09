@@ -5,7 +5,7 @@ import { SatMathApi } from '@app/singletons/sat-math-api';
 import linePlotPng from '@public/img/icons/line-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { DetailedSatellite, SpaceObjectType } from 'ootk';
+import { Degrees, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -204,7 +204,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
       }
       sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
       const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
-      const plotData = [];
+      const plotData: [number, Degrees][] = [];
       plotPoints.forEach((point) => {
         const pointTime = (point.time - now) / 1000 / 60;
         if (pointTime > 1440 || pointTime < 0) return;

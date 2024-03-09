@@ -10,6 +10,7 @@ import {
   EciVec3,
   Kilometers,
   MINUTES_PER_DAY,
+  RfSensor,
   SatelliteRecord,
   Sgp4,
   SpaceObjectType,
@@ -182,11 +183,12 @@ export class SensorMath {
     // Calculate if same beam
     let sameBeamStr = '';
     try {
-      const satInfoBoxCorePlugin = <SatInfoBox>keepTrackApi.getPlugin(SatInfoBox);
+      const satInfoBoxCorePlugin = keepTrackApi.getPlugin(SatInfoBox);
       if (satInfoBoxCorePlugin.currentTEARR?.inView) {
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-        if (parseFloat(distanceApart) < satInfoBoxCorePlugin.currentTEARR?.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)) {
+        const firstSensor = sensorManagerInstance.currentSensors[0];
+        if (firstSensor instanceof RfSensor && parseFloat(distanceApart) < satInfoBoxCorePlugin.currentTEARR?.rng * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
           if (satInfoBoxCorePlugin.currentTEARR?.rng < sensorManagerInstance.currentSensors[0].maxRng && satInfoBoxCorePlugin.currentTEARR?.rng > 0) {
             sameBeamStr = ' (Within One Beam)';
           }
@@ -328,11 +330,11 @@ export class SensorMath {
     }
   }
 
-  static nextpassList(satArray: DetailedSatellite[], interval?: number, days = 7): SatPassTimes[] {
+  static nextpassList(satArray: DetailedSatellite[], sensorArray: DetailedSensor[], interval?: number, days = 7): SatPassTimes[] {
     let nextPassArray: SatPassTimes[] = [];
     const nextNPassesCount = settingsManager ? settingsManager.nextNPassesCount : 1;
     for (const sat of satArray) {
-      const passes = SensorMath.nextNpasses(sat, null, days, interval || 30, nextNPassesCount); // Only do 1 day looks
+      const passes = SensorMath.nextNpasses(sat, sensorArray, days, interval || 30, nextNPassesCount); // Only do 1 day looks
       for (const pass of passes) {
         nextPassArray.push({
           sat: sat,

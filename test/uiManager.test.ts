@@ -143,15 +143,6 @@ describe('uiManager', () => {
     setupStandardEnvironment();
     const uiManagerInstance = new UiManager();
 
-    keepTrackApi.containerRoot.innerHTML += `
-    <div id="save-rmb-menu"></div>
-    <div id="view-rmb-menu"></div>
-    <div id="create-rmb-menu"></div>
-    <div id="colors-rmb-menu"></div>
-    <div id="draw-rmb-menu"></div>
-    <div id="edit-rmb-menu"></div>
-    <div id="earth-rmb-menu"></div>`;
-
     expect(() => uiManagerInstance.onReady()).not.toThrow();
   });
 

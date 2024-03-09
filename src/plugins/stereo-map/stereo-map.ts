@@ -35,7 +35,7 @@ import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
 import { dateFormat } from '@app/lib/dateFormat';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -310,7 +310,8 @@ export class StereoMap extends KeepTrackPlugin {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const sat = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat);
-    const lla = CoordinateTransforms.eci2lla(sat.position, timeManagerInstance.simulationTimeObj);
+    const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+    const lla = eci2lla(sat.position, gmst);
     const map = {
       x: ((lla.lon + 180) / 360) * settingsManager.mapWidth,
       y: settingsManager.mapHeight - ((lla.lat + 90) / 180) * settingsManager.mapHeight,

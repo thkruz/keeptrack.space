@@ -1,13 +1,12 @@
 /* eslint-disable camelcase */
 import { EciArr3, GetSatType, KeepTrackApiEvents, Singletons } from '@app/interfaces';
-import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, Kilometers, Radians, SpaceObjectType, Star, ecf2eci, ecf2rae, eci2ecf, lla2ecf } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, Kilometers, SpaceObjectType, Star, ecf2eci, ecf2rae, eci2ecf, lla2ecf, rae2ecf } from 'ootk';
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../container';
-import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { SensorMath } from '../../static/sensor-math';
 import { WebGLRenderer } from '../webgl-renderer';
 import { Line } from './line-manager/line';
@@ -594,13 +593,17 @@ export class LineManager {
               // Adding 30km to altitude to avoid clipping the earth
               const lla = this.drawLineList[i].sat.lla(keepTrackApi.getTimeManager().simulationTimeObj);
               const pos = ecf2eci(
-                CoordinateTransforms.rae2ecf(
-                  this.drawLineList[i].az,
-                  this.drawLineList[i].minEl,
-                  this.drawLineList[i].maxRng,
-                  <Radians>(lla.lat * DEG2RAD),
-                  <Radians>(lla.lon * DEG2RAD),
-                  <Kilometers>(lla.alt + 30)
+                rae2ecf(
+                  {
+                    rng: this.drawLineList[i].maxRng,
+                    az: this.drawLineList[i].az,
+                    el: this.drawLineList[i].minEl,
+                  },
+                  {
+                    lat: lla.lat,
+                    lon: lla.lon,
+                    alt: lla.alt + 30,
+                  }
                 ),
                 gmst
               );

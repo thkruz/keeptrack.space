@@ -3,11 +3,11 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { lon2yaw } from '@app/lib/transforms';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { BaseObject, DEG2RAD, Kilometers } from 'ootk';
+import { BaseObject, DEG2RAD, Kilometers, eci2lla } from 'ootk';
 
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SatMath } from '@app/static/sat-math';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
-import { CoordinateTransforms } from '../../static/coordinate-transforms';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -139,7 +139,9 @@ export const update = (position: Kilometers[]) => {
   const h = vec3.distance([0, 0, 0], vec3.fromValues(cone.pos[0], cone.pos[1], cone.pos[2])) - offsetDistance;
   const halfwayPosition = vec3.scale(vec3.create(), vec3.fromValues(h + offsetDistance * 2, 0, 0), 0.5);
   // Rotate to face the center of the earth
-  const { lat, lon } = CoordinateTransforms.eci2lla({ x: position[0], y: position[1], z: position[2] }, timeManagerInstance.simulationTimeObj);
+
+  const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+  const { lat, lon } = eci2lla({ x: position[0], y: position[1], z: position[2] }, gmst);
 
   mat4.rotateZ(cone.mvMatrix, cone.mvMatrix, lon2yaw(lon, timeManagerInstance.selectedDate));
   mat4.rotateZ(cone.mvMatrix, cone.mvMatrix, -91.2 * DEG2RAD);

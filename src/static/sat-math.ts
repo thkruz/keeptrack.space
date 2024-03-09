@@ -155,7 +155,7 @@ export abstract class SatMath {
    * @returns A value indicating whether the satellite is in the sun's shadow (umbra), in the penumbra, or in sunlight.
    */
   static calculateIsInSun(obj: BaseObject, sunECI: EciVec3): SunStatus {
-    if (typeof obj.position == 'undefined') return SunStatus.UNKNOWN;
+    if (!obj || typeof obj.position == 'undefined') return SunStatus.UNKNOWN;
     if (!sunECI) return SunStatus.UNKNOWN;
 
     // NOTE: Code is mashed to save memory when used on the whole catalog
@@ -219,7 +219,8 @@ export abstract class SatMath {
    * @returns The nadir yaw angle in radians.
    */
   static calculateNadirYaw(position: EciVec3, selectedDate: Date): Radians {
-    return <Radians>(lon2yaw(CoordinateTransforms.eci2lla(position, selectedDate).lon, selectedDate) + 180 * DEG2RAD);
+    const gmst = SatMath.calculateTimeVariables(selectedDate).gmst;
+    return <Radians>(lon2yaw(eci2lla(position, gmst).lon, selectedDate) + 180 * DEG2RAD);
   }
 
   /**
@@ -414,13 +415,16 @@ export abstract class SatMath {
    * @returns A string indicating the direction of the satellite's movement ('N' for north, 'S' for south, or 'Error' if there was an error in the calculation).
    */
   static getDirection(sat: DetailedSatellite, simulationTime: Date) {
+    const gmst = SatMath.calculateTimeVariables(simulationTime).gmst;
+
     const FIVE_SECONDS = 5000;
     const fiveSecLaterTime = new Date(simulationTime.getTime() + FIVE_SECONDS);
     const fiveSecLaterPos = SatMath.getEci(sat, fiveSecLaterTime).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
+    const gmstFiveSecLater = SatMath.calculateTimeVariables(fiveSecLaterTime).gmst;
 
     if (fiveSecLaterPos) {
-      const nowLat = CoordinateTransforms.eci2lla(sat.position, simulationTime).lat;
-      const futLat = CoordinateTransforms.eci2lla(<EciVec3>fiveSecLaterPos, fiveSecLaterTime).lat;
+      const nowLat = eci2lla(sat.position, gmst).lat;
+      const futLat = eci2lla(<EciVec3>fiveSecLaterPos, gmstFiveSecLater).lat;
 
       if (nowLat < futLat) return 'N';
       if (nowLat > futLat) return 'S';
@@ -428,10 +432,11 @@ export abstract class SatMath {
 
     const tenSecLaterTime = new Date(simulationTime.getTime() + FIVE_SECONDS * 2);
     const tenSecLaterPos = SatMath.getEci(sat, tenSecLaterTime).position || { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
+    const gmstTenSecLater = SatMath.calculateTimeVariables(tenSecLaterTime).gmst;
 
     if (tenSecLaterPos) {
-      const nowLat = CoordinateTransforms.eci2lla(sat.position, simulationTime).lat;
-      const futLat = CoordinateTransforms.eci2lla(<EciVec3>tenSecLaterPos, tenSecLaterTime).lat;
+      const nowLat = eci2lla(sat.position, gmst).lat;
+      const futLat = eci2lla(<EciVec3>tenSecLaterPos, gmstTenSecLater).lat;
 
       if (nowLat < futLat) return 'N';
       if (nowLat > futLat) return 'S';

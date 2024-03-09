@@ -8,10 +8,9 @@ import breakupPng from '@public/img/icons/breakup.png';
 
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -200,7 +199,8 @@ export class Breakup extends KeepTrackPlugin {
     const origsat = mainsat;
 
     // Launch Points are the Satellites Current Location
-    const lla = CoordinateTransforms.eci2lla(mainsat.position, simulationTimeObj);
+    const gmst = SatMath.calculateTimeVariables(simulationTimeObj).gmst;
+    const lla = eci2lla(mainsat.position, gmst);
     const launchLat = lla.lat;
     const launchLon = lla.lon;
 

@@ -24,11 +24,10 @@ import { KeepTrackApiEvents, SatShader } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue } from 'ootk';
+import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';
-import { CoordinateTransforms } from '../static/coordinate-transforms';
 import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
 import { MissileObject } from './catalog-manager/MissileObject';
@@ -855,7 +854,8 @@ export class Camera {
   }
 
   lookAtPosition(pos: EciVec3, isFaceEarth: boolean, selectedDate: Date): void {
-    const lla = CoordinateTransforms.eci2lla(pos, selectedDate);
+    const gmst = SatMath.calculateTimeVariables(selectedDate).gmst;
+    const lla = eci2lla(pos, gmst);
     const latModifier = isFaceEarth ? 1 : -1;
     const lonModifier = isFaceEarth ? 0 : 180;
     this.camSnap(lat2pitch(<Degrees>(lla.lat * latModifier)), lon2yaw(<Degrees>(lla.lon + lonModifier), selectedDate));

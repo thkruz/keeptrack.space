@@ -6,12 +6,12 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
+import { SatMath } from '@app/static/sat-math';
 import { UrlManager } from '@app/static/url-manager';
-import { Kilometers } from 'ootk';
+import { Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
 import { showLoading } from '../../lib/showLoading';
-import { CoordinateTransforms } from '../../static/coordinate-transforms';
 import { LegendManager } from '../../static/legend-manager';
 import { LineTypes, lineManagerInstance } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
@@ -49,7 +49,9 @@ export class MouseInput {
 
     if (evt.button === 2) {
       this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-      this.latLon = CoordinateTransforms.eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, timeManagerInstance.simulationTimeObj);
+
+      const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+      this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
     }
 
     if (evt.button === 0) {
@@ -371,13 +373,13 @@ export class MouseInput {
       });
     }
 
-    getEl('nav-wrapper')?.addEventListener('click', () => {
+    getEl('nav-wrapper', true)?.addEventListener('click', () => {
       keepTrackApi.getInputManager().hidePopUps();
     });
-    getEl('nav-footer')?.addEventListener('click', () => {
+    getEl('nav-footer', true)?.addEventListener('click', () => {
       keepTrackApi.getInputManager().hidePopUps();
     });
-    getEl('ui-wrapper')?.addEventListener('click', () => {
+    getEl('ui-wrapper', true)?.addEventListener('click', () => {
       keepTrackApi.getInputManager().hidePopUps();
     });
   }
@@ -405,7 +407,8 @@ export class MouseInput {
       case 'view-info-rmb':
         if (typeof this.latLon == 'undefined' || isNaN(this.latLon.lat) || isNaN(this.latLon.lon)) {
           errorManagerInstance.debug('latLon undefined!');
-          this.latLon = CoordinateTransforms.eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, timeManagerInstance.simulationTimeObj);
+          const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+          this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
         }
         uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, 'normal', true);
         break;

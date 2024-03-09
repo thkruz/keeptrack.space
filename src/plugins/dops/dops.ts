@@ -7,9 +7,9 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import type { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { DopMath } from '@app/static/dop-math';
-import { Degrees, DetailedSatellite, Kilometers } from 'ootk';
+import { SatMath } from '@app/static/sat-math';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class DopsPlugin extends KeepTrackPlugin {
@@ -94,7 +94,15 @@ export class DopsPlugin extends KeepTrackPlugin {
 
           if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
             console.debug('latLon undefined!');
-            latLon = CoordinateTransforms.eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, keepTrackApi.getTimeManager().simulationTimeObj);
+            const gmst = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst;
+            latLon = eci2lla(
+              {
+                x: dragPosition[0],
+                y: dragPosition[1],
+                z: dragPosition[2],
+              } as EciVec3,
+              gmst
+            );
           }
           const gpsSatObjects = DopsPlugin.getGpsSats(keepTrackApi.getCatalogManager(), keepTrackApi.getGroupsManager());
           const gpsDOP = DopMath.getDops(keepTrackApi.getTimeManager().simulationTimeObj, gpsSatObjects, latLon.lat, latLon.lon, <Kilometers>0, settingsManager.gpsElevationMask);

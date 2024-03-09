@@ -9,10 +9,9 @@ import { saveAs } from 'file-saver';
 
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, TleLine2, ZoomValue } from 'ootk';
+import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, TleLine2, ZoomValue, eci2lla } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -332,7 +331,8 @@ export class EditSat extends KeepTrackPlugin {
 
       const mainsat = obj as DetailedSatellite;
       // Launch Points are the Satellites Current Location
-      const lla = CoordinateTransforms.eci2lla(mainsat.position, timeManagerInstance.simulationTimeObj);
+      const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+      const lla = eci2lla(mainsat.position, gmst);
       let launchLon = lla.lon;
       let launchLat = lla.lat;
       let alt = lla.alt;

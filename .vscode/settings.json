@@ -1,13 +1,11 @@
 {
   "jest.jestCommandLine": "",
   "conventionalCommits.promptScopes": false,
-  // "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "editor.formatOnSave": true,
   "typescript.validate.enable": true,
   "npm.exclude": ["**/dist/**", "**/src/admin", "**/src/admin/*"],
   "eslint.workingDirectories": ["./"],
   "typescript.tsdk": "./node_modules/typescript/lib",
-  // "workbench.editor.labelFormat": "short",
   "git.enableCommitSigning": true,
   "files.exclude": {
     "**/.git": true,
@@ -16,13 +14,6 @@
     "**/CVS": true,
     "**/.DS_Store": true,
     "**/Thumbs.db": true
-    // "dist/**": true,
-    // "embed/**": true,
-    // "src/tle/**": true,
-    // "src/offline/**": true,
-    // "src/admin/**": true,
-    // "src/lib/**": true,
-    // "tsconfig.json": true
   },
   "files.watcherExclude": {
     "**/.git/objects/**": true,
@@ -61,6 +52,7 @@
     }
   },
   "jestrunner.codeLens": ["run", "debug", "coverage"],
+  "jestrunner.runOptions": ["-o --coverage"],
   "sonarlint.connectedMode.project": {
     "connectionId": "thkruz",
     "projectKey": "thkruz_keeptrack.space"

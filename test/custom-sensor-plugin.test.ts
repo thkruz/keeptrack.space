@@ -1,4 +1,4 @@
-import { CustomSensorPlugin } from '@app/js/plugins/sensor/custom-sensor-plugin';
+import { CustomSensorPlugin } from '@app/plugins/sensor/custom-sensor-plugin';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 

@@ -2,15 +2,134 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Test with Jest",
-      "command": "npm test",
+      "label": "App: Start All",
+      "dependsOn": ["App: Build and Serve", "App: Open in Brave"],
+      "icon": {
+        "id": "server",
+        "color": "terminal.ansiCyan"
+      }
+    },
+    {
+      "label": "App: Build and Serve",
+      "dependsOn": ["App: Build", "App: Serve Server"],
+      "icon": {
+        "id": "server-environment",
+        "color": "terminal.ansiCyan"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "App: Build",
+      "command": "npm run build:watch",
       "type": "shell",
       "args": [],
       "isBackground": true,
       "problemMatcher": [],
       "icon": {
-        "id": "go-to-file",
+        "id": "package",
+        "color": "terminal.ansiCyan"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true,
+        "group": "dev"
+      }
+    },
+    {
+      "label": "App: Serve Server",
+      "command": "npm run start",
+      "type": "shell",
+      "args": [],
+      "isBackground": true,
+      "problemMatcher": [],
+      "icon": {
+        "id": "server-process",
+        "color": "terminal.ansiCyan"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true,
+        "group": "dev"
+      }
+    },
+    {
+      "label": "App: Open in Brave",
+      "type": "process",
+      "command": "",
+      "windows": {
+        "command": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
+        "args": ["http://localhost:8080"]
+      },
+      "icon": {
+        "id": "browser",
+        "color": "terminal.ansiCyan"
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": true
+      }
+    },
+    {
+      "label": "Github: KeepTrack.Space",
+      "type": "process",
+      "command": "",
+      "windows": {
+        "command": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
+        "args": ["https://github.com/thkruz/keeptrack.space"]
+      },
+      "icon": {
+        "id": "browser",
+        "color": "terminal.ansiRed"
+      },
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": true
+      }
+    },
+    {
+      "label": "Test with Jest",
+      "command": "npm test",
+      "type": "shell",
+      "args": [],
+      "icon": {
+        "id": "beaker",
         "color": "terminal.ansiGreen"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
       }
     },
     {
@@ -18,23 +137,13 @@
       "command": "npm run createtest",
       "type": "shell",
       "args": [],
-      "isBackground": true,
-      "problemMatcher": [],
       "icon": {
-        "id": "beaker",
+        "id": "repo-create",
         "color": "terminal.ansiGreen"
-      }
-    },
-    {
-      "label": "Build in Webpack",
-      "command": "npm run build:watch",
-      "type": "shell",
-      "args": [],
-      "isBackground": true,
-      "problemMatcher": [],
-      "icon": {
-        "id": "symbol-method",
-        "color": "terminal.ansiBlue"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
       }
     },
     {
@@ -42,23 +151,13 @@
       "command": "npm run lcov",
       "type": "shell",
       "args": [],
-      "isBackground": true,
-      "problemMatcher": [],
       "icon": {
         "id": "file-code",
-        "color": "terminal.ansiYellow"
-      }
-    },
-    {
-      "label": "Start KeepTrack",
-      "command": "npm run start",
-      "type": "shell",
-      "args": [],
-      "isBackground": true,
-      "problemMatcher": [],
-      "icon": {
-        "id": "play-circle",
         "color": "terminal.ansiGreen"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": false
       }
     }
   ],

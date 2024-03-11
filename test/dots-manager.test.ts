@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SettingsManager } from '@app/js/settings/settings';
-import { DotsManager } from '@app/js/singletons/dots-manager';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SettingsManager } from '@app/settings/settings';
+import { DotsManager } from '@app/singletons/dots-manager';
 import { mat4 } from 'gl-matrix';
 import { Milliseconds } from 'ootk';
 import { setupStandardEnvironment } from './environment/standard-env';

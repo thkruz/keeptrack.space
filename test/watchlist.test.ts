@@ -1,7 +1,9 @@
-import { WatchlistPlugin } from '@app/js/plugins/watchlist/watchlist';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml } from './environment/standard-env';
-import { standardPluginSuite, standardPluginMenuButtonTests, standardClickTests, websiteInit } from './generic-tests';
-import { keepTrackApi } from '@app/js/keepTrackApi';
+import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('WatchlistPlugin_class', () => {
   let watchlistPlugin: WatchlistPlugin;
@@ -20,8 +22,8 @@ describe('WatchlistPlugin_form', () => {
   let watchlistPlugin: WatchlistPlugin;
   beforeEach(() => {
     setupDefaultHtml();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     watchlistPlugin = new WatchlistPlugin();
     window.M = {
       keys: {
@@ -41,20 +43,20 @@ describe('WatchlistPlugin_form', () => {
   it('should add satellites to watchlist-new element', () => {
     // Step 1: Add satellites '1,5,25544' to watchlist-new element
     const satellites = '1,1,5,5,25544,25544';
-    const watchlistNewElement = <HTMLInputElement>document.getElementById('watchlist-new');
+    const watchlistNewElement = <HTMLInputElement>getEl('watchlist-new');
     if (watchlistNewElement) {
       watchlistNewElement.value = satellites;
     }
 
     // Step 2: Click add button
-    const addButton = document.getElementById('watchlist-add');
+    const addButton = getEl('watchlist-add');
     if (addButton) {
       addButton.click();
     }
 
     // Step 3: Click remove button
     // get first img by class "watchlist-remove"
-    const removeButton = <HTMLImageElement>document.querySelector('img.watchlist-remove');
+    const removeButton = <HTMLImageElement>keepTrackApi.containerRoot.querySelector('img.watchlist-remove');
     if (removeButton) {
       removeButton.click();
     }

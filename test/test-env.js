@@ -1,6 +1,6 @@
 import 'webgl-mock';
 
-import { settingsManager } from '@app/js/settings/settings';
+import { settingsManager } from '@app/settings/settings';
 import fs from 'fs';
 import $ from 'jquery';
 import { JSDOM } from 'jsdom';
@@ -14,7 +14,7 @@ fakeTime.setUTCHours(0, 0, 0, 0);
 jest.useFakeTimers().setSystemTime(fakeTime.getTime());
 
 // eslint-disable-next-line no-sync
-const documentHTML = fs.readFileSync(path.resolve(__dirname, '../src/index.html'), 'utf8').toString();
+const documentHTML = fs.readFileSync(path.resolve(__dirname, '../public/index.html'), 'utf8').toString();
 const body = '<body>';
 const bodyEnd = '</body>';
 const docBody = documentHTML.substring(documentHTML.indexOf(body) + body.length, documentHTML.indexOf(bodyEnd));
@@ -44,7 +44,7 @@ global.speechSynthesis = {
   paused: jest.fn(),
   resume: jest.fn(),
   getVoices: jest.fn(),
-}
+};
 
 global.document.canvas = new HTMLCanvasElement(1920, 1080);
 global.document.canvas.style = {};
@@ -73,7 +73,7 @@ window.matchMedia = jest.fn().mockImplementation((query) => ({
 
 window.M = {
   AutoInit: jest.fn(),
-}
+};
 
 global.requestAnimationFrame = function (cb) {
   return setTimeout(cb, 0);

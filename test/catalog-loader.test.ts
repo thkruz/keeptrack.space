@@ -1,4 +1,4 @@
-import { CatalogLoader } from '@app/js/static/catalog-loader';
+import { CatalogLoader } from '@app/static/catalog-loader';
 import { readFileSync } from 'fs';
 
 describe('Catalog Loader', () => {

@@ -1,4 +1,6 @@
-import { DopList, DopMath } from '@app/js/static/dop-math';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { DopList, DopMath } from '@app/static/dop-math';
 import { AzEl, Degrees, Kilometers } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';
@@ -68,9 +70,9 @@ describe('updateDopsTable_method', () => {
       { time: new Date(), dops: { pdop: '1', hdop: '2', gdop: '3' } },
       { time: new Date(), dops: { pdop: '4', hdop: '5', gdop: '6' } },
     ] as DopList;
-    document.body.innerHTML += '<table id="dops"></table>';
+    keepTrackApi.containerRoot.innerHTML += '<table id="dops"></table>';
     DopMath.updateDopsTable(dopsResults);
-    const table = document.getElementById('dops') as HTMLTableElement;
+    const table = getEl('dops') as HTMLTableElement;
     expect(table.rows.length).toBe(3);
     expect(table.rows[0].cells[0].innerHTML).toBe('Time');
     expect(table.rows[0].cells[1].innerHTML).toBe('HDOP');
@@ -88,12 +90,12 @@ describe('updateDopsTable_method', () => {
 
   // Tests that the method throws an error if the table element cannot be found
   it('test_missing_table', () => {
-    const temp = document.body.innerHTML;
-    document.body.innerHTML = '';
+    const temp = keepTrackApi.containerRoot.innerHTML;
+    keepTrackApi.containerRoot.innerHTML = '';
     disableConsoleErrors();
     expect(() => DopMath.updateDopsTable([defaultSat as any])).toThrow();
     enableConsoleErrors();
-    document.body.innerHTML = temp;
+    keepTrackApi.containerRoot.innerHTML = temp;
   });
 
   // Tests that the method throws an error if no DOPs results are found

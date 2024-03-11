@@ -1,5 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { ScreenRecorder } from '@app/js/plugins/screen-recorder/screen-recorder';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
 
@@ -26,7 +27,7 @@ describe('ScreenRecorder_class', () => {
     } as any;
     screenRecorderPlugin.streamManagerInstance.save = () => {};
 
-    expect(() => keepTrackApi.methods.bottomMenuClick(screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Tests error handling
@@ -37,6 +38,6 @@ describe('ScreenRecorder_class', () => {
       throw new Error('test');
     };
 
-    expect(() => keepTrackApi.methods.bottomMenuClick(screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 });

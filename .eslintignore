@@ -1,14 +1,14 @@
 package.json
 webpack.config.js
 README.md
-src/js/wip
-src/js/lib/external
+src/wip
+src/lib/external
 **/*.min.*
 **/*.css
 dist/**/*
 dist/*
 dist
-src/offline/tle.js
 src/tle
 **/**/tle.js
 embed
+public

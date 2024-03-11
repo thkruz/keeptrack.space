@@ -1,0 +1,186 @@
+:root {
+  --colorTertiary: rgb(40, 63, 88);
+  --colorTertiaryLighten1: rgb(82, 102, 122);
+  --colorTertiaryLighten2: rgb(126, 140, 155);
+  --colorTertiaryLighten3: rgb(169, 178, 188);
+  --colorTertiaryLighten4: rgb(212, 217, 222);
+  --colorTertiaryDarken1: rgb(31, 51, 71);
+  --colorTertiaryDarken2: rgb(24, 38, 53);
+  --colorTertiaryDarken3: rgb(16, 25, 35);
+  --colorTertiaryDarken4: rgb(8, 13, 18);
+}
+
+#keeptrack-root {
+  overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
+  color: white;
+  background: var(--colorTertiaryDarken2);
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
+  background: linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+}
+
+.ui-icon-minus {
+  margin: auto !important;
+}
+
+.ui-icon-plus {
+  margin: auto !important;
+}
+
+.ui-datepicker td a {
+  text-align: center !important;
+}
+
+#canvas-holder {
+  display: none; /* Display none till loading is complete main.js -227 */
+}
+
+#loading-screen {
+  display: flex;
+  padding: 0;
+  z-index: 101;
+  text-align: center;
+  background: #274059;
+  color: white;
+}
+
+.full-loader {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.mini-loader-container {
+  background: rgba(0, 0, 0, 0) !important;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.mini-loader {
+  border-radius: 35px;
+  z-index: 101;
+  border: 5px solid rgba(0, 0, 0, 0.3);
+  width: 300px;
+  padding-top: 25px;
+  padding-bottom: 5px;
+  overflow: hidden;
+  background: var(--colorTertiaryDarken2);
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+  -moz-background-clip: padding; /* Firefox 3.6 */
+  -webkit-background-clip: padding; /* Safari 4? Chrome 6? */
+  background-clip: padding-box; /* Firefox 4, Safari 5, Opera 10, IE 9 */
+}
+
+#logo-inner-container {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: 150px;
+  z-index: 1;
+}
+
+#logo-text {
+  display: block;
+  font-size: 9vh;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+#logo-text-version {
+  display: block;
+  font-size: 9vh;
+  padding-left: 50px;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+  color: var(--colorPrimaryLighten2) !important;
+}
+
+#sponsor-text {
+  display: block;
+  font-size: 2em;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+#sponsor-img {
+  background: white;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+@font-face {
+  font-family: 'nasalization';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    url('fonts/nasalization-rg.woff2') format('woff2'),
+    url('fonts/nasalization-rg.woff') format('woff'),
+    url('fonts/nasalization-rg.ttf') format('truetype');
+}
+
+.logo-font {
+  font-family: 'nasalization', sans-serif;
+  font-size: 8em;
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 800px) {
+  #logo-text {
+    font-size: 3em;
+  }
+  #logo-text-version {
+    font-size: 3em;
+  }
+}
+
+#loader-text {
+  display: block;
+  line-height: 50px;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+#loading-hint {
+  text-align: left;
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  font-size: 1.5em;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-left: 5%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  bottom: 10%;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+#mobile-start-button {
+  display: none;
+  margin-top: 10px;
+}
+
+.start-hidden {
+  display: none;
+}

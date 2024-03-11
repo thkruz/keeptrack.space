@@ -1,5 +1,9 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { NewLaunch } from '@app/js/plugins/new-launch/new-launch';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { NewLaunch } from '@app/plugins/new-launch/new-launch';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Degrees } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
@@ -29,27 +33,27 @@ describe('NewLaunch_form', () => {
   });
 
   it('should have a form and buttons', () => {
-    expect(document.getElementById(`${newLaunchPlugin.sideMenuElementName}-form`)).toBeDefined();
+    expect(getEl(`${newLaunchPlugin.sideMenuElementName}-form`)).toBeDefined();
   });
 
   it('should have working buttons', () => {
     websiteInit(newLaunchPlugin);
-    keepTrackApi.getCatalogManager().getSat = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
-    keepTrackApi.getCatalogManager().selectedSat = defaultSat.id;
-    keepTrackApi.getCatalogManager().satData = Array(50).fill({ ...defaultSat, isInGroup: true });
+    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
+    keepTrackApi.getPlugin(SelectSatManager).selectedSat = defaultSat.id;
+    keepTrackApi.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true });
     keepTrackApi.getCatalogManager().isLaunchSiteManagerLoaded = true;
-    keepTrackApi.getCatalogManager().launchSites = [
-      {
+    keepTrackApi.getCatalogManager().launchSites = {
+      CAS: {
         name: 'CAS',
-        lat: 0,
-        lon: 0,
-      } as any,
-    ];
+        lat: 0 as Degrees,
+        lon: 0 as Degrees,
+      },
+    };
 
-    keepTrackApi.methods.selectSatData(defaultSat, defaultSat.id);
-    keepTrackApi.methods.bottomMenuClick(newLaunchPlugin.bottomIconElementName);
+    keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, defaultSat.id);
+    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
 
-    expect(() => document.getElementById(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
+    expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
     jest.advanceTimersByTime(1000);
   });
 });

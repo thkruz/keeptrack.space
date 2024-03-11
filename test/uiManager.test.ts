@@ -1,8 +1,9 @@
-import { GeolocationPosition } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { StandardColorSchemeManager } from '@app/js/singletons/color-scheme-manager';
-import { StandardUiManager } from '@app/js/singletons/uiManager';
-import { UiGeolocation } from '@app/js/static/ui-manager-geolocation';
+import { GeolocationPosition } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import { UiManager } from '@app/singletons/uiManager';
+import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { defaultSensor } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
 
@@ -10,12 +11,12 @@ describe('uiManager', () => {
   // Should process fullscreenToggle
   it('process_fullscreen_toggle', () => {
     document.documentElement.requestFullscreen = jest.fn().mockImplementation(() => Promise.resolve());
-    expect(() => StandardUiManager.fullscreenToggle()).not.toThrow();
+    expect(() => UiManager.fullscreenToggle()).not.toThrow();
   });
 
   // Should process getsensorinfo
   it('process_getsensorinfo', () => {
-    document.body.innerHTML = `
+    keepTrackApi.containerRoot.innerHTML = `
     <div id="sensor-latitude"></div>
     <div id="sensor-longitude"></div>
     <div id="sensor-minazimuth"></div>
@@ -36,7 +37,7 @@ describe('uiManager', () => {
 
   // Should process updateSensorPosition
   it('process_updateSensorPosition', () => {
-    document.body.innerHTML = `
+    keepTrackApi.containerRoot.innerHTML = `
       <input id="cs-lat" />
       <input id="cs-lon" />
       <input id="cs-hei" />
@@ -56,6 +57,7 @@ describe('uiManager', () => {
       <div id="sensor-type">Telescope</div>
       <div id="sensor-info-title">Custom Sensor</div>
       <div id="sensor-country">Custom Sensor</div>
+      <div id="search"></div>
     `;
 
     expect(() =>
@@ -67,11 +69,11 @@ describe('uiManager', () => {
         },
       })
     ).not.toThrow();
-    expect((<HTMLInputElement>document.getElementById('cs-lat')).value).toBe('22');
-    expect((<HTMLInputElement>document.getElementById('cs-lon')).value).toBe('22');
-    expect((<HTMLInputElement>document.getElementById('cs-hei')).value).toBe('0.022');
+    expect((<HTMLInputElement>getEl('cs-lat')).value).toBe('22');
+    expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
+    expect((<HTMLInputElement>getEl('cs-hei')).value).toBe('0.022');
 
-    document.body.innerHTML = ``;
+    keepTrackApi.containerRoot.innerHTML = `<div id="search"></div>`;
     disableConsoleErrors();
     expect(() =>
       UiGeolocation.updateSensorPosition({
@@ -87,8 +89,8 @@ describe('uiManager', () => {
 
   // Should process colorSchemeChangeAlert
   it('process_colorSchemeChangeAlert', () => {
-    const uiManagerInstance = new StandardUiManager();
-    const colorSchemeManagerInstance = new StandardColorSchemeManager();
+    const uiManagerInstance = new UiManager();
+    const colorSchemeManagerInstance = new ColorSchemeManager();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.group)).not.toThrow();
@@ -109,13 +111,13 @@ describe('uiManager', () => {
   // Should process footerToggle and hideUi
   it('process_footerToggle_hideUi', () => {
     setupMinimumHtml();
-    document.body.innerHTML += `
+    keepTrackApi.containerRoot.innerHTML += `
     <div id="sat-infobox"></div>
     <div id="nav-footer"></div>
     <div id="nav-footer-toggle"></div>
     <div id="ui-wrapper"></div>
     `;
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     expect(() => uiManagerInstance.footerToggle()).not.toThrow();
     expect(() => uiManagerInstance.footerToggle()).not.toThrow();
     expect(() => uiManagerInstance.hideUi()).not.toThrow();
@@ -125,30 +127,21 @@ describe('uiManager', () => {
   // Should process initMenuController
   it('process_initMenuController', () => {
     setupStandardEnvironment();
-    document.body.innerHTML += `
+    keepTrackApi.containerRoot.innerHTML += `
     <div id="legend-menu"></div>
     <div id="legend-hover-menu"></div>
     <div id="legend-icon"></div>
     <div id="settings-menu"></div>
     <div id="about-menu"></div>
     `;
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     expect(() => uiManagerInstance.initMenuController()).not.toThrow();
   });
 
   // Should process onReady
   it('process_onReady', () => {
     setupStandardEnvironment();
-    const uiManagerInstance = new StandardUiManager();
-
-    document.body.innerHTML += `
-    <div id="save-rmb-menu"></div>
-    <div id="view-rmb-menu"></div>
-    <div id="create-rmb-menu"></div>
-    <div id="colors-rmb-menu"></div>
-    <div id="draw-rmb-menu"></div>
-    <div id="edit-rmb-menu"></div>
-    <div id="earth-rmb-menu"></div>`;
+    const uiManagerInstance = new UiManager();
 
     expect(() => uiManagerInstance.onReady()).not.toThrow();
   });
@@ -156,17 +149,16 @@ describe('uiManager', () => {
   // Should process init
   it('process_init', () => {
     setupStandardEnvironment();
-    const uiManagerInstance = new StandardUiManager();
+    const uiManagerInstance = new UiManager();
     expect(() => uiManagerInstance.init()).not.toThrow();
   });
 
   // Should process postStart
   it('process_postStart', () => {
     setupStandardEnvironment();
-    document.body.innerHTML += `
+    keepTrackApi.containerRoot.innerHTML += `
     <div id="editSat"></div>
     <div id="cs-geolocation"></div>
-    <div id="geolocation-btn"></div>
     <div id="es-ecen"></div>
     <div id="es-day"></div>
     <div id="es-inc"></div>
@@ -177,6 +169,6 @@ describe('uiManager', () => {
     <div id="ms-lat"></div>
     <div id="ms-lon"></div>
     `;
-    expect(() => StandardUiManager.postStart()).not.toThrow();
+    expect(() => UiManager.postStart()).not.toThrow();
   });
 });

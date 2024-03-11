@@ -9,7 +9,16 @@ const copySync = (src, dest) => {
   fs.writeFileSync(dest, data);
 };
 
-const files = ['tle/TLEdebris.json', 'textures/moon-1024.jpg', 'textures/earthmap512.jpg', 'textures/earthlights512.jpg', 'textures/earthbump8k.jpg', 'textures/earthspec8k.jpg', 'textures/earthmap4k.jpg', 'textures/earthlights4k.jpg'];
+const files = [
+  'tle/TLEdebris.json',
+  'textures/moon-1024.jpg',
+  'textures/earthmap512.jpg',
+  'textures/earthlights512.jpg',
+  'textures/earthbump8k.jpg',
+  'textures/earthspec8k.jpg',
+  'textures/earthmap4k.jpg',
+  'textures/earthlights4k.jpg',
+];
 
 console.log(`Removing ./embed...`);
 try {
@@ -43,4 +52,4 @@ files.forEach((file) => {
 });
 
 console.log(`Copying settingsOverride...`);
-copySync(`./src/js/settings/settingsOverrideEmbed.js`, `./embed/keepTrack/settingsOverride.js`);
+copySync(`./src/settings/settingsOverrideEmbed.js`, `./embed/keepTrack/settingsOverride.js`);

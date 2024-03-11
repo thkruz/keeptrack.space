@@ -1,3 +1,6 @@
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+
 const setup = {};
 
 setup.init = () => {
@@ -17,12 +20,12 @@ setup.init = () => {
     }
   );
 
-  document.body.innerHTML = global.docBody;
+  keepTrackApi.containerRoot.innerHTML = global.docBody;
 };
 
 const eventFire = (elObj, etype) => {
   try {
-    const el = typeof elObj == 'string' ? document.getElementById(elObj) : elObj;
+    const el = typeof elObj == 'string' ? getEl(elObj) : elObj;
     if (el.fireEvent) {
       el.fireEvent('on' + etype);
     } else {

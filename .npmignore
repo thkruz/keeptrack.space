@@ -63,7 +63,6 @@ jspm_packages/
 src/social
 src/social/*
 src/textures-extra
-src/radarData/radar*
 src/admin
 src/tle/2006*
 src/tle/TLE.json.bak
@@ -86,8 +85,7 @@ dist
 embed
 
 # Work In Progress
-src/js/wip/
-src/js/satSet/radarDataManager.js
+src/wip/
 
 # nyc Output
 .nyc_output
@@ -102,7 +100,7 @@ key.pem
 .cache/server.pem
 
 # TLE History
-src/analysis/sathist/*.json
+public/analysis/sathist/*.json
 
 # Custom Builds
 custom-builds

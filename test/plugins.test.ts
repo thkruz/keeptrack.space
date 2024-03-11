@@ -1,12 +1,11 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { loadCorePlugins } from '@app/js/plugins/plugins';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { loadPlugins } from '@app/plugins/plugins';
 
 describe('plugins', () => {
   it('should be able to initialize all plugins', () => {
-    loadCorePlugins(keepTrackApi, {
+    loadPlugins(keepTrackApi, {
       debug: false,
       satInfoboxCore: true,
-      updateSelectBoxCore: true,
       aboutManager: true,
       collisions: true,
       dops: true,
@@ -29,7 +28,6 @@ describe('plugins', () => {
       colorsMenu: true,
       shortTermFences: true,
       orbitReferences: true,
-      externalSources: true,
       analysis: true,
       plotAnalysis: true,
       sensorFov: true,

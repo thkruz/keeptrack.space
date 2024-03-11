@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`drawManager should calculate the moon's position 1`] = `
+[
+  31275.439059197695,
+  199999.99999999997,
+  101603.16033840728,
+]
+`;

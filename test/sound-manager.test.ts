@@ -1,5 +1,7 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { SoundManager } from '@app/js/plugins/sounds/sound-manager';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SoundNames } from '@app/plugins/sounds/SoundNames';
+import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { standardPluginSuite } from './generic-tests';
 
 describe('Sound Manager', () => {
@@ -18,17 +20,25 @@ describe('Sound Manager', () => {
 
     for (const sound in sounds) {
       const soundManagerPlugin2 = soundManagerPlugin;
-      expect(() => soundManagerPlugin2.play(sound)).not.toThrow();
+
+      jest.spyOn(global, 'navigator', 'get').mockReturnValue({
+        userActivation: {
+          isActive: true,
+          hasBeenActive: true,
+        },
+      } as Navigator);
+
+      expect(() => soundManagerPlugin2.play(sound as SoundNames)).not.toThrow();
     }
 
     for (let i = 0; i < 30; i++) {
       const soundManagerPlugin2 = soundManagerPlugin;
-      expect(() => soundManagerPlugin2.play('genericBeep')).not.toThrow();
+      expect(() => soundManagerPlugin2.play(SoundNames.BEEP)).not.toThrow();
     }
   });
 
   it('should_be_able_to_speak', () => {
-    keepTrackApi.methods.uiManagerInit();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     // Mock SpeechSynthesisUtterance
     global.SpeechSynthesisUtterance = jest.fn(() => ({
       lang: 'en-US',

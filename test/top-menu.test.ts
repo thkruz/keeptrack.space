@@ -1,16 +1,17 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { soundManagerPlugin } from '@app/js/plugins/sounds/sound-manager';
-import { TopMenu } from '@app/js/plugins/top-menu/top-menu';
-import { errorManagerInstance } from '@app/js/singletons/errorManager';
+import { keepTrackContainer } from '@app/container';
+import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 
 describe('TopMenu_class', () => {
   beforeEach(() => {
-    for (const callback in keepTrackApi.callbacks) {
-      keepTrackApi.callbacks[callback] = [];
+    for (const callback in keepTrackApi.events) {
+      keepTrackApi.events[callback] = [];
     }
     setupMinimumHtml();
   });
@@ -21,9 +22,9 @@ describe('TopMenu_class', () => {
   it('test_sound_button_toggle_without_sound_plugin', () => {
     const topMenu = new TopMenu();
     topMenu.init();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
-    const soundBtn = document.getElementById('sound-btn') as HTMLAnchorElement;
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     errorManagerInstance.warn = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.SoundManager, null);
     soundBtn.click();
@@ -34,11 +35,11 @@ describe('TopMenu_class', () => {
   it('test_sound_button_toggle', () => {
     const topMenu = new TopMenu();
     topMenu.init();
-    keepTrackApi.methods.uiManagerInit();
-    keepTrackApi.methods.uiManagerFinal();
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
 
-    const soundBtn = document.getElementById('sound-btn') as HTMLAnchorElement;
-    const soundIcon = document.getElementById('sound-icon') as HTMLImageElement;
+    const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
+    const soundIcon = getEl('sound-icon') as HTMLImageElement;
     keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerPlugin);
     const soundManager = keepTrackApi.getSoundManager();
     soundBtn.click();

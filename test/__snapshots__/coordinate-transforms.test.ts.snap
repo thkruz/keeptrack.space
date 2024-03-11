@@ -1,21 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CoordinateTransforms_class test_eci2lla_valid_input 1`] = `
-{
-  "alt": -5419.339931196243,
-  "lat": 49.606337502742264,
-  "lon": 124.13124141629075,
-}
-`;
-
-exports[`CoordinateTransforms_class test_rae2ecf_valid_input 1`] = `
-{
-  "x": 612.3724356957947,
-  "y": -4438.131567565985,
-  "z": 5273.9145013035195,
-}
-`;
-
 exports[`CoordinateTransforms_class test_sat2ric_valid_input 1`] = `
 {
   "position": Float32Array [
@@ -28,13 +12,5 @@ exports[`CoordinateTransforms_class test_sat2ric_valid_input 1`] = `
     0,
     0,
   ],
-}
-`;
-
-exports[`CoordinateTransforms_class test_valid_input_with_observerGd_and_positionEcf 1`] = `
-{
-  "az": 50.44182534718569,
-  "el": -61.833813183048285,
-  "rng": 3377.310320763129,
 }
 `;

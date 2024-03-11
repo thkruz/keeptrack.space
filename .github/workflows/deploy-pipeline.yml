@@ -46,65 +46,8 @@ jobs:
           name: build
           path: dist
 
-  development:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v4
-
-      - name: Install and Build 🔧
-        run: |
-          npm ci
-          npm run build
-
-      # Deploy to GitHub Pages
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
-        with:
-          # The branch the action should deploy to.
-          branch: gh-pages
-          # The folder the action should deploy.
-          folder: dist
-          # Automatically remove deleted files from the deploy branch
-          clean: true
-
-  staging:
-    needs: build
-    environment: Development
-    name: Deploy to dev.keeptrack.space
-    runs-on: ubuntu-latest
-
-    steps:
-      # Download Artifacts
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3.0.2
-        with:
-          name: build
-          path: dist
-      # Deploy
-      - name: Deploy files via SFTP
-        uses: pressidium/lftp-mirror-action@v1
-        with:
-          # SFTP credentials
-          host: ${{ secrets.FTP_HOST }}
-          port: 22
-          user: ${{ secrets.FTP_USERNAME }}
-          pass: ${{ secrets.FTP_PASSWORD }}
-          # lftp settings
-          onlyNewer: true
-          settings: 'sftp:auto-confirm=yes'
-          # Mirror command options
-          localDir: './dist/'
-          remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
-          reverse: true
-          ignoreFile: './dist/.lftp_ignore'
-          options: '--verbose'
-
-
   production:
-    needs: staging
+    needs: build
     environment: Production
     name: Deploy to keeptrack.space
     runs-on: ubuntu-latest

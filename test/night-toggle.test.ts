@@ -1,5 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { NightToggle } from '@app/js/plugins/night-toggle/night-toggle';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
@@ -18,7 +19,7 @@ describe('NightToggle_class', () => {
     const nightToggle = new NightToggle();
     nightToggle.init();
     expect(() => keepTrackApi.methods.nightToggle(global.mocks.glMock, null as unknown as WebGLTexture, null as unknown as WebGLTexture)).not.toThrow();
-    keepTrackApi.methods.bottomMenuClick('menu-day-night');
+    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-day-night');
     expect(() => keepTrackApi.methods.nightToggle(global.mocks.glMock, null as unknown as WebGLTexture, null as unknown as WebGLTexture)).not.toThrow();
   });
 });

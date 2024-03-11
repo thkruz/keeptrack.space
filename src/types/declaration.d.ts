@@ -1,4 +1,4 @@
-import { SettingsManager } from '@app/js/settings/settings';
+import { SettingsManager } from '@app/settings/settings';
 
 interface JQuery<HTMLElement> {
   effect: any;
@@ -24,6 +24,8 @@ declare global {
   module '*.jpg';
   module '*.png';
   declare module '*.mp3';
+  declare module '*.wav';
+  declare module '*.flac';
   interface Window {
     settingsManager: SettingsManager;
     settingsOverride: any;

@@ -1,5 +1,6 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { TimeMachine } from '@app/js/plugins/time-machine/time-machine';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Milliseconds } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
@@ -18,12 +19,12 @@ describe('TimeMachine_class', () => {
   // test the full animation
   it('should animate the time machine', () => {
     websiteInit(timeMachinePlugin);
-    keepTrackApi.getCatalogManager().getSat = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
-    keepTrackApi.getCatalogManager().satData = Array(50).fill({ ...defaultSat, isInGroup: true });
-    document.body.innerHTML += '<div id="search-results"></div>';
+    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
+    keepTrackApi.getCatalogManager().objectCache = Array(50).fill(defaultSat);
+    keepTrackApi.containerRoot.innerHTML += '<div id="search-results"></div>';
 
     settingsManager.timeMachineDelay = <Milliseconds>0;
-    keepTrackApi.methods.bottomMenuClick(timeMachinePlugin.bottomIconElementName);
+    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, timeMachinePlugin.bottomIconElementName);
     jest.advanceTimersByTime(1000);
     expect(timeMachinePlugin.isMenuButtonActive).toBe(true);
     jest.advanceTimersByTime(10000);

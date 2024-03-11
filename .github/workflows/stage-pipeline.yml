@@ -1,0 +1,104 @@
+---
+name: Develop Staging Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    name: Build for Staging
+    environment: Development
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      # Get Node Modules from Cache
+      - name: Cache node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
+            ${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      # Ensure Node Modules Setup
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+      # Build
+      - name: Build
+        run: npm run build
+      # Save Artifacts
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: build
+          path: dist
+
+  development:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          npm run build
+
+      # Deploy to GitHub Pages
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        with:
+          # The branch the action should deploy to.
+          branch: gh-pages
+          # The folder the action should deploy.
+          folder: dist
+          # Automatically remove deleted files from the deploy branch
+          clean: true
+
+  staging:
+    needs: build
+    environment: Development
+    name: Deploy to dev.keeptrack.space
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download Artifacts
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: build
+          path: dist
+      # Deploy
+      - name: Deploy files via SFTP
+        uses: pressidium/lftp-mirror-action@v1
+        with:
+          # SFTP credentials
+          host: ${{ secrets.FTP_HOST }}
+          port: 22
+          user: ${{ secrets.FTP_USERNAME }}
+          pass: ${{ secrets.FTP_PASSWORD }}
+          # lftp settings
+          onlyNewer: true
+          settings: 'sftp:auto-confirm=yes'
+          # Mirror command options
+          localDir: './dist/'
+          remoteDir: ${{ secrets.FTP_REMOTE_FOLDER }}
+          reverse: true
+          ignoreFile: './dist/.lftp_ignore'
+          options: '--verbose'

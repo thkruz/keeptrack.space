@@ -1,7 +1,7 @@
-import { keepTrackContainer } from '@app/js/container';
-import { Singletons } from '@app/js/interfaces';
-import { SatMath } from '@app/js/static/sat-math';
-import { SensorMath } from '@app/js/static/sensor-math';
+import { keepTrackContainer } from '@app/container';
+import { Singletons } from '@app/interfaces';
+import { SatMath } from '@app/static/sat-math';
+import { SensorMath } from '@app/static/sensor-math';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 describe('sensor-math', () => {
@@ -21,7 +21,7 @@ describe('sensor-math', () => {
   it('process_nextpassList', () => {
     const sensorMathInstance = new SensorMath();
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-    const test = () => SensorMath.nextpassList([defaultSat]);
+    const test = () => SensorMath.nextpassList([defaultSat], [defaultSensor]);
     expect(test).not.toThrow();
   });
 

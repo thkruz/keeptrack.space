@@ -1,5 +1,5 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { DopsPlugin } from '@app/js/plugins/dops/dops';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { DopsPlugin } from '@app/plugins/dops/dops';
 import { Degrees, Kilometers } from 'ootk';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite } from './generic-tests';

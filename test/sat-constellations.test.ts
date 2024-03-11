@@ -1,9 +1,9 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { getEl } from '@app/js/lib/get-el';
-import { SatConstellations } from '@app/js/plugins/sat-constellations/sat-constellations';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { SatConstellations } from '@app/plugins/sat-constellations/sat-constellations';
+import { GroupType } from '@app/singletons/object-group';
 import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
-import { GroupType } from '@app/js/singletons/object-group';
 
 describe('SatConstellations_class', () => {
   let satConstellationsPlugin: SatConstellations;
@@ -52,7 +52,7 @@ describe('SatConstellations_test_all_links', () => {
         },
         selectGroup: () => {},
         groupList: groupList,
-      } as any);
+      }) as any;
   });
 
   links.forEach((element) => {

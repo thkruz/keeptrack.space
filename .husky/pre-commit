@@ -1,4 +1,41 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#!/usr/bin/env sh
 
-npm run lint
+# Send all normal output to /dev/null
+exec 1>/dev/null
+
+HUSKY_OUTPUT_STRING=""
+HUSKY_OUTPUT_FOOTER="KeepTrack uses pre-commit hooks to run our linting and style checks. \
+We do this to avoid additional hassle during pull request reviews, \
+because all PRs must pass these checks. If you're doing something \
+temporary and want to skip these checks, you can disable this hook \
+with: git commit --no-verify For more details, see https://typicode.github.io/husky/guide.html#bypass-hooks"
+
+# This function is called when there is an error
+onError() {
+  echo "$1" >&2
+  echo "$HUSKY_OUTPUT_FOOTER" >&2
+  exit 1
+}
+
+# Function to check the number of staged files
+# and display an error message if there are too many files.
+check_staged_files() {
+  files=$(git status --porcelain | grep M | awk '{print $2}')
+
+  # Check if the number of staged files is greater than 1
+  if [ $(echo "$files" | wc -l) -gt 1 ]; then
+    onError "You have too many files staged. Please split your changes into multiple commits."
+  fi
+}
+
+# This function is the entry point for the pre-commit hook.
+main() {
+  . "$(dirname -- "$0")/_/husky.sh"
+
+  npm run lint || onError "Linting failed. Please fix the errors and try again."
+  #check_staged_files
+
+  exit 0
+}
+
+main

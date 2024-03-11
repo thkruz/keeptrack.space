@@ -1,28 +1,32 @@
-import { keepTrackApi } from '@app/js/keepTrackApi';
-import { KeepTrack } from '@app/js/keeptrack';
-import { KeepTrackPlugin } from '@app/js/plugins/KeepTrackPlugin';
-import { StandardSensorManager } from '@app/js/plugins/sensor/sensorManager';
-import { SettingsManager } from '@app/js/settings/settings';
-import { Camera } from '@app/js/singletons/camera';
-import { DotsManager } from '@app/js/singletons/dots-manager';
-import { StandardGroupManager } from '@app/js/singletons/groups-manager';
-import { InputManager } from '@app/js/singletons/input-manager';
-import { Scene } from '@app/js/singletons/scene';
-import { SearchManager } from '@app/js/singletons/search-manager';
-import { starManager } from '@app/js/singletons/starManager';
-import { TimeManager } from '@app/js/singletons/time-manager';
-import { SensorMath } from '@app/js/static/sensor-math';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
+import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SensorManager } from '@app/plugins/sensor/sensorManager';
+import { SoundManager } from '@app/plugins/sounds/sound-manager';
+import { SettingsManager } from '@app/settings/settings';
+import { Camera } from '@app/singletons/camera';
+import { DotsManager } from '@app/singletons/dots-manager';
+import { GroupsManager } from '@app/singletons/groups-manager';
+import { InputManager } from '@app/singletons/input-manager';
+import { Scene } from '@app/singletons/scene';
+import { SearchManager } from '@app/singletons/search-manager';
+import { starManager } from '@app/singletons/starManager';
+import { TimeManager } from '@app/singletons/time-manager';
+import { UiManager } from '@app/singletons/uiManager';
+import { SensorMath } from '@app/static/sensor-math';
 import { mat4 } from 'gl-matrix';
-import { keepTrackContainer } from '../../src/js/container';
-import { Constructor, Singletons } from '../../src/js/interfaces';
-import { StandardCatalogManager } from '../../src/js/singletons/catalog-manager';
-import { StandardColorSchemeManager } from '../../src/js/singletons/color-scheme-manager';
-import { StandardOrbitManager } from '../../src/js/singletons/orbitManager';
-import { WebGLRenderer } from '../../src/js/singletons/webgl-renderer';
+import { keepTrackContainer } from '../../src/container';
+import { Constructor, Singletons } from '../../src/interfaces';
+import { CatalogManager } from '../../src/singletons/catalog-manager';
+import { ColorSchemeManager } from '../../src/singletons/color-scheme-manager';
+import { OrbitManager } from '../../src/singletons/orbitManager';
+import { WebGLRenderer } from '../../src/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
   const settingsManager = new SettingsManager();
+  settingsManager.isShowSplashScreen = true;
   settingsManager.init();
   window.settingsManager = settingsManager;
   (global as any).settingsManager = settingsManager;
@@ -31,6 +35,9 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Image = jest.fn().mockImplementation(() => ({
     decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
   }));
+  keepTrackApi.containerRoot = null;
+  keepTrackApi.unregisterAllEvents();
+  document.body.innerHTML = `<div id="keeptrack-root"></div>`;
   setupDefaultHtml();
 
   clearAllCallbacks();
@@ -39,18 +46,24 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   const scene = new Scene({
     gl: global.mocks.glMock,
   });
-  const catalogManagerInstance = new StandardCatalogManager();
-  const orbitManagerInstance = new StandardOrbitManager();
+  const catalogManagerInstance = new CatalogManager();
+  catalogManagerInstance.satCruncher = {
+    postMessage: jest.fn(),
+    addEventListener: jest.fn(),
+  } as unknown as Worker;
+  const orbitManagerInstance = new OrbitManager();
   orbitManagerInstance.orbitWorker = {
-    postMessage: jest.fn() as any,
-  };
+    postMessage: jest.fn(),
+    addEventListener: jest.fn(),
+  } as unknown as Worker;
   orbitManagerInstance['gl_'] = global.mocks.glMock;
-  const colorSchemeManagerInstance = new StandardColorSchemeManager();
+  const colorSchemeManagerInstance = new ColorSchemeManager();
   const dotsManagerInstance = new DotsManager();
   const timeManagerInstance = new TimeManager();
   timeManagerInstance.simulationTimeObj = new Date(2023, 1, 1, 0, 0, 0, 0);
-  const sensorManagerInstance = new StandardSensorManager();
+  const sensorManagerInstance = new SensorManager();
   mockUiManager.searchManager = new SearchManager(mockUiManager);
+  const soundManagerInstance = new SoundManager();
 
   // Jest all Image class objects with a mock decode method.
   Image.prototype.decode = jest.fn();
@@ -66,7 +79,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   renderer['domElement'] = <any>{ style: { cursor: 'default' } };
 
   const inputManagerInstance = new InputManager();
-  const groupManagerInstance = new StandardGroupManager();
+  const groupManagerInstance = new GroupsManager();
 
   keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, renderer);
   keepTrackContainer.registerSingleton(Singletons.Scene, scene);
@@ -82,13 +95,39 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackContainer.registerSingleton(Singletons.StarManager, starManager);
   const sensorMathInstance = new SensorMath();
   keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
+  keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerInstance);
 
   keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   // Setup a mock catalog
-  keepTrackApi.getCatalogManager().satData = [defaultSat, { ...defaultSat, ...{ id: 1, sccNum: '11' } }];
-  catalogManagerInstance.selectedSat = -1;
+  const sat2 = defaultSat.clone();
+  sat2.id = 1;
+  sat2.sccNum = '11';
+  keepTrackApi.getCatalogManager().objectCache = [defaultSat, sat2];
+  const selectSatManager = new SelectSatManager();
+  selectSatManager.init();
+
+  keepTrackApi.containerRoot.innerHTML += `
+    <div id="save-rmb"></div>
+    <div id="save-rmb-menu"></div>
+    <div id="view-rmb"></div>
+    <div id="view-rmb-menu"></div>
+    <div id="create-rmb"></div>
+    <div id="create-rmb-menu"></div>
+    <div id="colors-rmb"></div>
+    <div id="colors-rmb-menu"></div>
+    <div id="draw-rmb"></div>
+    <div id="draw-rmb-menu"></div>
+    <div id="edit-rmb"></div>
+    <div id="edit-rmb-menu"></div>
+    <div id="earth-rmb"></div>
+    <div id="earth-rmb-menu"></div>
+    <div id="dops-rmb"></div>
+    <div id="dops-rmb-menu"></div>
+    `;
+
+  inputManagerInstance.init();
   catalogManagerInstance.staticSet = [defaultSensor];
 
   window.M = {
@@ -138,28 +177,34 @@ export const enableConsoleErrors = () => {
 };
 
 export const standardSelectSat = () => {
-  keepTrackApi.getCatalogManager().satData = [defaultSat];
+  keepTrackApi.getCatalogManager().objectCache = [defaultSat];
   keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-  keepTrackApi.getCatalogManager().getSat = () => defaultSat;
-  keepTrackApi.getCatalogManager().selectSat(0);
+  keepTrackApi.getCatalogManager().getObject = () => defaultSat;
+  keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 };
 export const setupMinimumHtml = () => {
-  document.body.innerHTML = `
+  keepTrackApi.containerRoot.innerHTML = `
+  <div id="keeptrack-root">
     <div id="keeptrack-header"></div>
-    <div id="keeptrack-main-container">
-      <div id="${KeepTrackPlugin.bottomIconsContainerId}"></div>
-    </div>`;
+    <div id="${KeepTrackPlugin.bottomIconsContainerId}"></div>
+    <div id="search"></div>
+    <div id="search-icon"></div>
+    <div id="search-results"></div>
+  </div>`;
 };
 
-export const mockUiManager = {
+export const mockUiManager: UiManager = <UiManager>(<unknown>{
+  isFooterVisible_: false,
+  isInitialized_: true,
+  makeToast_: jest.fn(),
+  addSearchEventListeners_: jest.fn(),
+  activeToastList_: [],
   dismissAllToasts: jest.fn(),
   toast: jest.fn(),
   M: null,
   bottomIconPress: jest.fn(),
-  clearRMBSubMenu: jest.fn(),
-  earthClicked: jest.fn(),
   hideSideMenus: jest.fn(),
   isAnalysisMenuOpen: false,
   isCurrentlyTyping: false,
@@ -169,7 +214,7 @@ export const mockUiManager = {
   lastNextPassCalcSatId: 0,
   lastNextPassCalcSensorShortName: '',
   lastToast: '',
-  hoverSatId: -1,
+  searchHoverSatId: -1,
   lookAtLatLon: null,
   searchManager: null,
   updateInterval: 0,
@@ -182,9 +227,8 @@ export const mockUiManager = {
   initMenuController: jest.fn(),
   legendHoverMenuClick: jest.fn(),
   onReady: jest.fn(),
-  searchToggle: jest.fn(),
   updateSelectBox: jest.fn(),
-};
+});
 
 export const mockCameraManager = <Camera>(<unknown>{
   camAngleSnappedOnSat: false,
@@ -266,7 +310,7 @@ export const mockCameraManager = <Camera>(<unknown>{
 export const setupDefaultHtml = () => {
   keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
   KeepTrack.getDefaultBodyHtml();
-  document.body.innerHTML += `
+  keepTrackApi.containerRoot.innerHTML += `
     <input id="search"></input>
     <div id="search-holder"></div>
     <div id="search-icon"></div>
@@ -281,7 +325,7 @@ export const setupDefaultHtml = () => {
 };
 
 export const clearAllCallbacks = () => {
-  for (const callback in keepTrackApi.callbacks) {
-    keepTrackApi.callbacks[callback] = [];
+  for (const callback in keepTrackApi.events) {
+    keepTrackApi.events[callback] = [];
   }
 };

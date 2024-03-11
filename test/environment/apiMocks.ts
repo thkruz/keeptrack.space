@@ -1,18 +1,14 @@
 // @ts-nocheck
-
-import { Operators } from '@app/js/catalogs/sensors';
-import { DEG2RAD } from '@app/js/lib/constants';
-import { ZoomValue } from '@app/js/singletons/camera';
-import { CatalogSource } from '@app/js/static/catalog-loader';
-import { Degrees, Kilometers, Milliseconds, Sgp4 } from 'ootk';
-import { SatObject, SensorObject } from '../../src/js/interfaces';
-import { SpaceObjectType } from '../../src/js/lib/space-object-type';
+import { Operators } from '@app/catalogs/sensors';
+import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
+import { CatalogSource, DEG2RAD, Degrees, DetailedSatellite, Kilometers, Milliseconds, Sensor, Sgp4, SpaceObjectType, ZoomValue } from 'ootk';
+import { SensorObject } from '../../src/interfaces';
 declare const jest: any;
 
 const fakeTimeObj = new Date(2022, 0, 1);
 fakeTimeObj.setUTCHours(0, 0, 0, 0);
 
-export const defaultSat: SatObject = {
+export const defaultSat: DetailedSatellite = new DetailedSatellite({
   id: 0,
   active: true,
   sccNum: '00005',
@@ -22,8 +18,8 @@ export const defaultSat: SatObject = {
   launchVehicle: 'Proton-K',
   name: 'ISS (ZARYA)',
   type: SpaceObjectType.PAYLOAD,
-  TLE1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
-  TLE2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
+  tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
+  tle2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
   rcs: '99.0524',
   owner: 'National Aeronautics and Space Administration (NASA)/Multinational',
   user: 'Government',
@@ -58,11 +54,25 @@ export const defaultSat: SatObject = {
     z: 0,
   },
   static: false,
-  staticNum: null,
+  sensorId: null,
   source: CatalogSource.USSF,
-};
+});
 
-export const defaultSensor: SensorObject = {
+export const defaultMisl = new MissileObject({
+  id: 1,
+  desc: 'Fake (F101)',
+  active: true,
+  latList: [0 as Degrees],
+  lonList: [0 as Degrees],
+  altList: [0 as Kilometers],
+  timeList: [0],
+  startTime: 0,
+  maxAlt: 0,
+  country: 'USA',
+  launchVehicle: 'Fake',
+});
+
+export const defaultSensor: SensorObject = new Sensor({
   observerGd: { lat: 0.7287584767123405, lon: -1.2311404365114507, alt: 0.060966 },
   objName: 'CODSFS',
   shortName: 'COD',
@@ -75,12 +85,12 @@ export const defaultSensor: SensorObject = {
   lat: <Degrees>41.754785,
   lon: <Degrees>-70.539151,
   alt: <Kilometers>0.060966,
-  obsminaz: <Degrees>347,
-  obsmaxaz: <Degrees>227,
-  obsminel: <Degrees>3,
-  obsmaxel: <Degrees>85,
-  obsminrange: <Kilometers>200,
-  obsmaxrange: <Kilometers>5556,
+  minAz: <Degrees>347,
+  maxAz: <Degrees>227,
+  minEl: <Degrees>3,
+  maxEl: <Degrees>85,
+  minRng: <Kilometers>200,
+  maxRng: <Kilometers>5556,
   changeObjectInterval: <Milliseconds>1000,
   beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
   linkAehf: true,
@@ -89,14 +99,13 @@ export const defaultSensor: SensorObject = {
   url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
   country: 'United States',
   operator: Operators.USSF,
-  staticNum: 0, // For Testing Only
-};
+  sensorId: 0, // For Testing Only
+});
 
 export const useMockWorkers = (): void => {
   class Worker {
     url: any;
-    // eslint-disable-next-line no-unused-vars
-    onmessage: (msg: any) => { data: {} };
+    onmessage: (msg: any) => { data: object };
     constructor(stringUrl: any) {
       this.url = stringUrl;
       this.onmessage = (msg: any) => {
@@ -463,9 +472,6 @@ export const keepTrackApiStubs = {
         id: 0,
       },
       analSatSet: [defaultSat],
-      radarDataSet: {
-        id: 0,
-      },
       missileSet: {
         id: 0,
       },

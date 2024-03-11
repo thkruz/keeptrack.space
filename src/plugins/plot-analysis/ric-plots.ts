@@ -12,7 +12,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 type EChartsOption = echarts.EChartsOption;
 
 export class RicPlot extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'RIC Plot';
+  static readonly PLUGIN_NAME = 'RIC Plot';
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
 

@@ -375,7 +375,6 @@ export class CatalogManager {
       let i = 0;
       for (const sensor in sensors) {
         sensors[sensor].sensorId = i;
-        sensors[sensor].static = true;
         this.staticSet.push(sensors[sensor]);
         i++;
       }

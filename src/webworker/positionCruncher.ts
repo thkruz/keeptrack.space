@@ -845,7 +845,7 @@ export const updateMarkerSurvAndFov = (i: number, gmst: GreenwichMeanSiderealTim
 
     // Don't show anything but the floor if in surveillance only mode
     // Unless it is a volume search radar
-    if (markerMode === MarkerMode.FOV || sensor.volume) {
+    if (markerMode === MarkerMode.FOV || sensor.isVolumetric) {
       // Only on non-360 FOV
       if (sensor.minAz !== 0 && sensor.maxAz !== 360) {
         // //////////////////////////////////
@@ -1006,7 +1006,7 @@ export const updateMarkerSurvAndFov = (i: number, gmst: GreenwichMeanSiderealTim
 
     // Don't show anything but the floor if in surveillance only mode
     // Unless it is a volume search radar
-    if (markerMode === MarkerMode.FOV || sensor.volume) {
+    if (markerMode === MarkerMode.FOV || sensor.isVolumetric) {
       // //////////////////////////////////
       // Outside Edge of FOV
       // //////////////////////////////////

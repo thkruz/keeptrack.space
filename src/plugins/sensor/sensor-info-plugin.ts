@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { LineManager, LineTypes } from '@app/singletons/draw-manager/line-manager';
 import radioTowerPng from '@public/img/icons/radio-tower.png';
-import { SpaceObjectType } from 'ootk';
+import { RfSensor, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -267,9 +267,14 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       hideEl(getEl('sensor-beamwidth').parentElement);
     } else {
       showEl(getEl('sensor-band').parentElement);
-      showEl(getEl('sensor-beamwidth').parentElement);
-      getEl('sensor-band').innerHTML = firstSensor.band ? firstSensor.band : 'Unknown';
-      getEl('sensor-beamwidth').innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : 'Unknown';
+      getEl('sensor-band').innerHTML = firstSensor.freqBand ? firstSensor.freqBand : 'Unknown';
+
+      if (firstSensor instanceof RfSensor) {
+        showEl(getEl('sensor-beamwidth').parentElement);
+        getEl('sensor-beamwidth').innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : 'Unknown';
+      } else {
+        hideEl(getEl('sensor-beamwidth').parentElement);
+      }
     }
   }
 }

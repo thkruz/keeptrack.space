@@ -312,7 +312,7 @@ export class HoverManager {
       this.satHoverBoxNode1.textContent = sensor.name;
       const isTelescope = sensor.type === SpaceObjectType.OPTICAL;
       this.satHoverBoxNode2.textContent = sensor.country;
-      this.satHoverBoxNode3.innerHTML = !isTelescope && sensor.band ? `${sensor.system} (${sensor.band})` : sensor.system;
+      this.satHoverBoxNode3.innerHTML = !isTelescope && sensor.freqBand ? `${sensor.system} (${sensor.freqBand})` : sensor.system;
     }
   }
 

@@ -15,7 +15,7 @@ import { StringExtractor } from '@app/static/string-extractor';
 import addPng from '@public/img/add.png';
 import removePng from '@public/img/remove.png';
 import Draggabilly from 'draggabilly';
-import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
+import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missileManager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -219,9 +219,12 @@ export class SatInfoBox extends KeepTrackPlugin {
                 const sat = obj as DetailedSatellite;
                 getEl('sat-vmag').innerHTML = SatMath.calculateVisMag(sat, sensorManagerInstance.currentSensors[0], timeManagerInstance.simulationTimeObj, sun).toFixed(2);
               }
-            const beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth
-              ? (this.currentTEARR.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2) + ' km'
-              : 'Unknown';
+            let beamwidthString = 'Unknown';
+            if (sensorManagerInstance.currentSensors[0] instanceof RfSensor) {
+              beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth
+                ? (this.currentTEARR.rng * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2) + ' km'
+                : 'Unknown';
+            }
             if (getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = beamwidthString;
             if (getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = ((this.currentTEARR.rng / cKmPerMs) * 2).toFixed(2) + ' ms'; // Time for RF to hit target and bounce back
           } else {
@@ -236,7 +239,11 @@ export class SatInfoBox extends KeepTrackPlugin {
             const rangeDom = getEl('sat-range');
             if (rangeDom) rangeDom.innerHTML = 'Out of FOV';
             if (rangeDom) rangeDom.title = 'Range: ' + this.currentTEARR.rng.toFixed(2) + ' km';
-            const beamwidthString = sensorManagerInstance.currentSensors[0]?.beamwidth ? sensorManagerInstance.currentSensors[0].beamwidth + '°' : 'Unknown';
+
+            let beamwidthString = 'Unknown';
+            if (sensorManagerInstance.currentSensors[0] instanceof RfSensor) {
+              beamwidthString = sensorManagerInstance.currentSensors[0]?.beamwidth ? sensorManagerInstance.currentSensors[0].beamwidth + '°' : 'Unknown';
+            }
             if (getEl('sat-beamwidth')) getEl('sat-beamwidth').innerHTML = 'Out of FOV';
             if (getEl('sat-beamwidth')) getEl('sat-beamwidth').title = beamwidthString;
             if (getEl('sat-maxTmx')) getEl('sat-maxTmx').innerHTML = 'Out of FOV';

@@ -13,8 +13,8 @@ import { errorManagerInstance } from '../../singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TopMenu extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Top Menu';
-  static SEARCH_RESULT_ID = 'search-results';
+  static readonly PLUGIN_NAME = 'Top Menu';
+  static readonly SEARCH_RESULT_ID = 'search-results';
   constructor() {
     super(TopMenu.PLUGIN_NAME);
   }

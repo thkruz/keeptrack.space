@@ -13,7 +13,7 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Debug Menu';
+  static readonly PLUGIN_NAME = 'Debug Menu';
   isErudaVisible = false;
   constructor() {
     super(DebugMenuPlugin.PLUGIN_NAME);

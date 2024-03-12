@@ -2,6 +2,212 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v9.0.2
+
+>  
+
+- fix: :ambulance: fix bug where lastPropRate not previously assigned
+
+#### v9.0.1
+
+>  
+
+- fix: :ambulance: deprecate plot code that is loading out of order
+
+#### v9.0.0
+
+>  
+
+- Develop
+- Develop
+- build(deps-dev): bump @types/webgl2 from 0.0.6 to 0.0.10
+- build(deps-dev): bump cypress from 12.17.4 to 13.6.1
+- build(deps-dev): bump @types/jquery from 3.5.14 to 3.5.29
+- Develop
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :bug: fix orbits broken when turned on after initialization
+- fix: :bug: fix moon position calculation
+- feat: :sparkles: improve scaling of mesh models
+- feat: :sparkles: add ses satellite mesh
+- chore: :fire: remove old tle files
+- chore: :fire: remove unused meshes
+- feat: :sparkles: ootk v4 integration
+- feat: :sparkles: add glonass meshes
+- chore: :card_file_box: update satellite databases
+- refactor: :heavy_minus_sign: reduce dependencies
+- chore: :card_file_box: update json databases
+- fix: :bug: streamline and fix mesh manager
+- refactor: :truck: reorganize source code
+- refactor: :recycle: refactor meshes
+- refactor: :truck: reorganize source code
+- refactor: :recycle: refactor drawing code
+- refactor: :poop: refactored to isolate plugins
+- refactor: :label: improve type support
+- build: :truck: update public folder
+- refactor: :label: improve type support for KeepTrackApi callbacks
+- refactor: :recycle: separate satellite selection from catalog management
+- refactor: :recycle: condense drawing code to align with three.js
+- feat: :sparkles: improved lineManager class
+- fix: :bug: fix countries plugin
+- feat: :sparkles: update loading screens
+- fix: :bug: fix and refactor meshes
+- chore: :card_file_box: update databases
+- test: :white_check_mark: fix all broken tests
+- test: :white_check_mark: update tests to work with ootk
+- fix: :bug: refactor and fix webgl issues
+- fix: :bug: fix stereo map
+- refactor: :beers: merge update-select-box with satinfoboxCore
+- refactor: :recycle: integrate with ootk v4
+- fix: :bug: fix satinfobox issues
+- refactor: :truck: refactor presets
+- feat: :sparkles: switch to css only tooltip for faster ui
+- refactor: :recycle: refactor sat-info-box
+- refactor: :wastebasket: deprecate socrates html file
+- chore: :card_file_box: update tle catalogs
+- fix: :bug: align mesh, orbits, and dots positions
+- refactor: :truck: reorganize source code
+- refactor: :recycle: refactor select sat manager functions out of webgl-renderer
+- refactor: :recycle: standardize plugins
+- fix: :bug: fix lookangles/multi-site lookangles not enabling/disabling correctly
+- build: :arrow_up: bump ootk
+- fix: :bug: fix edit satellite plugin
+- fix: :bug: fix css on mobile
+- refactor: :recycle: simplify zoomlevel functions
+- fix: :bug: update select sat manager
+- fix: :arrow_up: integrate latest ootk version
+- feat: :sparkles: add sun/moon toggle and export sats in fov
+- refactor: :recycle: refactor editsat
+- refactor: :recycle: remove unnecessary interfaces
+- fix: :bug: fix lookangles plugin
+- refactor: :recycle: remove code no handled in ootk
+- refactor: :fire: remove old interfaces
+- refactor: :recycle: refactor search manager functions out of ui manager
+- fix: :zap: add better number only searching
+- ci: :construction_worker: split cd pipeline into stage and deploy
+- chore: :coffin: remove old files
+- feat: :sparkles: add toggles for starlink and notional sats
+- fix: :bug: fix camera key not working
+- test: :bug: fix broken tests
+- fix: :bug: fix bugs caused by splitting velocity updates
+- fix: :bug: fix search bar toggle and slide in animations
+- feat: :sparkles: add starlink toggle
+- refactor: :boom: migrate to new selectsatmanager plugin
+- feat: :sparkles: update socrates to json input
+- refactor: :recycle: integrate with ootk v4
+- fix: :bug: fix touch controls
+- build: :technologist: update vscode tasks
+- feat: :zap: improve standard magnitude estimates
+- refactor: :truck: rename satInfoBoxCore to satInfoBox
+- refactor: :recycle: make sccNum vs Id more explicit
+- refactor: :recycle: cleanup collisions plugin
+- feat: :sparkles: million-year presets
+- refactor: :recycle: refactor enum to ootk
+- build: :wastebasket: deprecate build embed
+- build: :arrow_up: bump dependencies
+- fix: :bug: fix watchlist with vimpel objects
+- test: :white_check_mark: fix broken tests
+- fix: :children_crossing: improve missile mesh orientation
+- feat: :sparkles: add stf az el ext in kilometers
+- fix: :coffin: hide show agencies until it is fixed
+- fix: :bug: fix leo and geo color schemes
+- refactor: :recycle: refactor selectsat manager
+- docs: :page_facing_up: fix missing word public from license
+- docs: :memo: update changelog
+- fix: :bug: fix new launch plugin
+- fix: :bug: fix breakup icon color in bottom menu
+- fix: :bug: fix css issue on tablets
+- refactor: :recycle: organize breakup plugin
+- refactor: :recycle: add helpers for hide/show dom elements
+- fix: :bug: fix constellations
+- feat: :sparkles: add more sensor info
+- test: :white_check_mark: fix broken tests
+- build: :goal_net: update husky pre-commit to be more extensible
+- refactor: :rotating_light: Use // @ts-expect-error over // @ts-ignore
+- fix: :bug: fix missile crunching without sensor selected
+- fix: :bug: fix breakup not updating satellite
+- refactor: :wastebasket: deprecate stringPad class
+- refactor: :recycle: use KeepTrackApiEvents instead of strings
+- feat: :sparkles: add start-stop clock button to context menu
+- refactor: :recycle: refactor line manager code out of selectsat manager
+- fix: :bug: add callbacks for sensor dot selected
+- fix: :bug: fix search logic
+- feat: :sparkles: add more options to constellations plugin
+- fix: :bug: fix hover not showing launch year
+- fix: :bug: fix for #827
+- fix: :bug: fix select sat on plugins
+- test: :white_check_mark: fix broken tests
+- chore: :technologist: add task to open github page
+- fix: :bug: ensure consistency between constellations
+- chore: :label: add typing to crunchers
+- fix: :bug: fix issues with legend
+- test: :white_check_mark: add test to ensure moon is in right position
+- refactor: :bug: move conditional back to renderer
+- fix: :bug: fix sound playing before user interacts with page
+- fix: :bug: add fixes to presets
+- chore: :card_file_box: update sensor information
+- fix: :art: fix icon flickering when resizing bottom menu
+- fix: :bug: fix switch in custom sensor
+- chore: :technologist: minor tweaks to tasks.json
+- refactor: :recycle: move stereo map plugin code out of select sat manager
+- fix: :adhesive_bandage: add logic for when primary and secondary sat are the same
+- fix: :bug: fix hover color showing on selected sats
+- refactor: :rotating_light: remove use of banned type
+- fix: :bug: fix edit-sat
+- fix: :bug: fix short term fence and watchlist plugins
+- fix: :bug: better zoom out experience
+- chore: :wastebasket: cleanup vscode settings.json file
+- fix: :bug: fix ISS chatter not playing
+- feat: :sparkles: add setting for delay between time machine loops
+- refactor: :fire: remove duplicate code
+- fix: :bug: fix selected dot missing when zoomed out
+- fix: :bug: fix country color scheme
+- fix: :bug: fix debug menu throwing errors when disabled
+- fix: :bug: fix country color scheme and legend
+- fix: :bug: fix countries option in find sat plugin
+- fix: :adhesive_bandage: remove unnecessary console logging
+- refactor: :recycle: remove duplicate imports
+- fix: :bug: fix search dropdown css
+- fix: :adhesive_bandage: fix sec-angle-link showing when not usable
+- ci: :bug: fix build script
+- fix: :bug: fix selecting satellite dots
+- fix: :bug: fix collision plugin not searching for full satid
+- fix: :bug: reduce local storage saves
+- feat: :sparkles: expand showEl to allow passing a display value
+- build: :wastebasket: simplify build instructions
+- fix: :bug: fix for velocity being 0 instead of null or an object
+- fix: :bug: fix 16k skybox not loading
+- chore: :rotating_light: fix linter error in settings.json
+- fix: :bug: fix wrong decayed objects be deactivated
+- fix: :bug: fix excessive xmlserialize calls
+- fix: :bug: fix keyboard events not working
+- fix: :bug: better fix to resizeCanvas
+- fix: :bug: throttle multiple error requests to open github
+- fix: :bug: fix uv attribute bug in godrays
+- test: :white_check_mark: skip failing test for now
+- docs: :bookmark: update version to 9.0.0
+- refactor: :label: add readonly to plugin names
+- refactor: :children_crossing: slow auto zoom and chase speeds
+- perf: :zap: use RegExp#test for true/false tests
+- refactor: :recycle: create larger font for altitudes presentation
+- ci: :rotating_light: fix linter error
+- build: :label: add more type support
+- refactor: :heavy_plus_sign: add dependencies for refactored meshes
+- fix: :fire: remove tooltip that blocked clock
+- ci: :rotating_light: fix linter error
+- ci: :green_heart: add only build for staging after approval
+- fix: :bug: fix search finding land objects
+- build: :arrow_up: bump serve
+- fix: :bug: fix watchlist plugin
+- ci: :rotating_light: update sonar ignores
+- fix: :bug: fix resizeCanvas
+- fix: :bug: fix broken godrays
+- fix: :white_check_mark: fix broken test
+- docs: :memo: add description of searchBox scene object
+- build: :lock: fix security issue in dependencies
+
 #### v8.2.0
 
 >  

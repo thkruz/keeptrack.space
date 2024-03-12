@@ -16,7 +16,7 @@ export class TimeManager {
    */
   dynamicOffsetEpoch = <number>null;
   private iText = <number>null;
-  lastPropRate = <number>null;
+  lastPropRate = <number>1;
   /**
    * Time in Milliseconds the last time sim time was updated
    */

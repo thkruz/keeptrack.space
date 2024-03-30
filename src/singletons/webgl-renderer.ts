@@ -401,7 +401,7 @@ export class WebGLRenderer {
     const { vw, vh } = WebGLRenderer.getCanvasInfo();
 
     // If taking a screenshot then resize no matter what to get high resolution
-    if ((!isForcedResize && gl.canvas.width != vw) || gl.canvas.height != vh) {
+    if (!isForcedResize && (gl.canvas.width != vw || gl.canvas.height != vh)) {
       // If not autoresizing then don't do anything to the canvas
       if (settingsManager.isAutoResizeCanvas) {
         // If this is a cellphone avoid the keyboard forcing resizes but

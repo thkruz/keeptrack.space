@@ -58,6 +58,8 @@ export class ErrorManager {
       labels: ['Problems : Bug'],
       body: `#### User Description
 Type what you were trying to do here...\n\n\n
+#### Version
+${settingsManager.versionNumber} - ${settingsManager.versionDate}
 #### Error Title
 ${e.name}
 #### Error Message

@@ -58,7 +58,11 @@ export class SkyBoxSphere {
   public static getSrcMilkyWay(settings: SettingsManager): string {
     if (!settings.installDirectory) throw new Error('installDirectory is not defined');
 
-    let src = `${settings.installDirectory}textures/skybox8k.jpg`;
+    let src = `${settings.installDirectory}textures/skybox4k.jpg`;
+
+    if (!settings.isMobileModeEnabled) {
+      src = `${settings.installDirectory}textures/skybox8k.jpg`;
+    }
 
     if (settings.hiresMilkWay) {
       src = `${settings.installDirectory}textures/skybox16k.jpg`;

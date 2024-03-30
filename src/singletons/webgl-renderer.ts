@@ -189,6 +189,26 @@ export class WebGLRenderer {
     keepTrackApi.getScene().earth.reloadEarthHiResTextures();
   }
 
+  /**
+   * Calculates and displays the orbits and labels of satellites above the current camera view.
+   * This method is only called when camera type is astronomy or planetarium,
+   * or when watchlist satellites are in view.
+   *
+   * @remarks
+   * - If the scene is not yet redrawn with a new camera, the method sets a flag to draw the orbits above once the scene is redrawn.
+   * - If the satellite label mode is off or the camera type is not planetarium and there are no satellites in the watchlist in view,
+   *   the method clears the satellite mini boxes and returns.
+   * - If the current sensor's latitude is null, the method returns.
+   * - If the minimum time between satellite labels has not elapsed since the last label update, the method returns.
+   * - The method clears the in-view orbits and initializes a counter for the labels.
+   * - The method retrieves the DOM element for the satellite mini boxes.
+   * - If the camera type is planetarium, the method iterates over the orbital satellites in the catalog and adds their orbits and labels.
+   * - If the camera type is not planetarium, the method iterates over the satellites in the watchlist and adds their labels.
+   * - The method updates the flag indicating that the satellite mini boxes are in use and records the current time as the last label update time.
+   * - If the camera type is not astronomy, planetarium, or there are no satellites in the watchlist in view, the method resets the sensor position and the flag to draw orbits above.
+   * - If the satellite label mode is off or the camera type is not planetarium and there are no satellites in the watchlist in view,
+   *   the method clears the satellite mini boxes and returns.
+   */
   orbitsAbove() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -199,7 +219,15 @@ export class WebGLRenderer {
       keepTrackApi.getMainCamera().cameraType == CameraType.PLANETARIUM ||
       watchlistPluginInstance?.watchlistInViewList?.length > 0
     ) {
-      this.sensorPos = sensorManagerInstance.calculateSensorPos(timeManagerInstance.simulationTimeObj, sensorManagerInstance.currentSensors);
+      // Catch race condition where sensor has been reset but camera hasn't been updated
+      try {
+        this.sensorPos = sensorManagerInstance.calculateSensorPos(timeManagerInstance.simulationTimeObj, sensorManagerInstance.currentSensors);
+      } catch (e) {
+        errorManagerInstance.debug('Sensor not found, clearing orbits above!');
+        this.sensorPos = null;
+        keepTrackApi.getOrbitManager().clearInViewOrbit();
+        return;
+      }
       if (!this.isDrawOrbitsAbove) {
         // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
         // appear to be in the field of view

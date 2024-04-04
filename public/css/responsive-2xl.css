@@ -1,0 +1,5 @@
+@media (min-width: 1536px) {
+  :root {
+    --nav-bar-height: 25px !important;
+  }
+}

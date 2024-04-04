@@ -66,7 +66,9 @@ export class OrbitReferences extends KeepTrackPlugin {
     const meanmo = sat.meanMotion.toString();
     const epochyr = sat.epochYear.toString();
     const epochday = sat.epochDay.toString();
-    const intl = sat.intlDes;
+    // .intlDes is 2000-001A we need 00001A
+    const yy = sat.intlDes.split('-')[0].slice(2);
+    const intl = yy + sat.intlDes.split('-')[1];
     const scc = sat.sccNum;
 
     const period = 1440.0 / parseFloat(meanmo);

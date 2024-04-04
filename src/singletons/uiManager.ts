@@ -93,25 +93,23 @@ export class UiManager {
       });
     }, 0);
 
-    // Enable Satbox Overlay
-    if (settingsManager.enableHoverOverlay) {
-      try {
-        const hoverboxDOM = document.createElement('div');
-        hoverboxDOM.innerHTML = `
-        <div id="sat-hoverbox">
-          <span id="sat-hoverbox1"></span>
-          <br/>
-          <span id="sat-hoverbox2"></span>
-          <br/>
-          <span id="sat-hoverbox3"></span>
-        </div>`;
+    // // Enable Satbox Overlay
+    // if (settingsManager.enableHoverOverlay) {
+    //   try {
+    //     const hoverboxDOM = document.createElement('div');
+    //     hoverboxDOM.innerHTML = `
+    //     <div id="sat-hoverbox">
+    //       <span id="sat-hoverbox1"></span>
+    //       <span id="sat-hoverbox2"></span>
+    //       <span id="sat-hoverbox3"></span>
+    //     </div>`;
 
-        getEl('keeptrack-canvas')?.parentElement?.append(hoverboxDOM);
-      } catch {
-        /* istanbul ignore next */
-        console.debug('document.createElement() failed!');
-      }
-    }
+    //     getEl('keeptrack-canvas')?.parentElement?.append(hoverboxDOM);
+    //   } catch {
+    //     /* istanbul ignore next */
+    //     console.debug('document.createElement() failed!');
+    //   }
+    // }
   }
 
   dismissAllToasts() {

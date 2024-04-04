@@ -251,14 +251,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     // TODO: This should auto update the overlay when the time changes outside the original search window
     // Update once every 10 seconds
     const mainCameraInstance = keepTrackApi.getMainCamera();
-    if (
-      (Date.now() > this.lastOverlayUpdateTime * 1 + 10000 &&
-        (!keepTrackApi.getPlugin(SelectSatManager) || keepTrackApi.getPlugin(SelectSatManager)?.selectedSat === -1) &&
-        !mainCameraInstance.isDragging &&
-        mainCameraInstance.zoomLevel() < mainCameraInstance.zoomTarget + 0.01 &&
-        mainCameraInstance.zoomLevel() > mainCameraInstance.zoomTarget - 0.01) ||
-      isForceUpdate
-    ) {
+    if ((Date.now() > this.lastOverlayUpdateTime * 1 + 10000 && !mainCameraInstance.isDragging) || isForceUpdate) {
       this.infoOverlayDOMHtmlStrArr = [];
       this.infoOverlayDOMHtmlStrArr.push('<div>');
       for (let s = 0; s < this.nextPassArray.length; s++) {

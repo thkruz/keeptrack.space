@@ -208,9 +208,7 @@ export class KeepTrack {
           <div id="ui-wrapper">
             <div id="sat-hoverbox">
               <span id="sat-hoverbox1"></span>
-              <br />
               <span id="sat-hoverbox2"></span>
-              <br />
               <span id="sat-hoverbox3"></span>
             </div>
             <div id="sat-minibox"></div>
@@ -279,7 +277,39 @@ export class KeepTrack {
         });
         import(/* webpackMode: "eager" */ '@css/style.css')
           .then(
-            await import(/* webpackMode: "eager" */ '@css/responsive.css').catch(() => {
+            await import(/* webpackMode: "eager" */ '@css/responsive-sm.css').catch(() => {
+              // This is intentional
+            })
+          )
+          .catch(() => {
+            // This is intentional
+          })
+          .then(
+            await import(/* webpackMode: "eager" */ '@css/responsive-md.css').catch(() => {
+              // This is intentional
+            })
+          )
+          .catch(() => {
+            // This is intentional
+          })
+          .then(
+            await import(/* webpackMode: "eager" */ '@css/responsive-lg.css').catch(() => {
+              // This is intentional
+            })
+          )
+          .catch(() => {
+            // This is intentional
+          })
+          .then(
+            await import(/* webpackMode: "eager" */ '@css/responsive-xl.css').catch(() => {
+              // This is intentional
+            })
+          )
+          .catch(() => {
+            // This is intentional
+          })
+          .then(
+            await import(/* webpackMode: "eager" */ '@css/responsive-2xl.css').catch(() => {
               // This is intentional
             })
           )

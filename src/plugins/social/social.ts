@@ -24,11 +24,8 @@ export class SocialMedia extends KeepTrackPlugin {
     // Bottom Icon
     const githubShareElement = document.createElement('li');
     githubShareElement.innerHTML = keepTrackApi.html`
-          <a id="github-share1" class="top-menu-btns" rel="noreferrer" href="https://github.com/thkruz/keeptrack.space/" target="_blank">
+          <a id="github-share1" class="top-menu-icons" rel="noreferrer" href="https://github.com/thkruz/keeptrack.space/" target="_blank">
             <img
-            width="22"
-            height="22"
-            style="margin-top: 1px;"
             src="${githubPng}"
             />
           </a>

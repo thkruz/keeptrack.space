@@ -111,14 +111,23 @@ export class SensorListPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl('nav-mobile').insertAdjacentHTML('beforeend', keepTrackApi.html`<div id="sensor-selected" class="waves-effect waves-light"></div>`);
+        getEl('nav-mobile').insertAdjacentHTML(
+          'beforeend',
+          keepTrackApi.html`
+          <div id="sensor-selected-container">
+            <div id="sensor-selected" class="waves-effect waves-light">
+
+            </div>
+          </div>
+          `
+        );
       },
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl('sensor-selected').addEventListener('click', () => {
+        getEl('sensor-selected-container').addEventListener('click', () => {
           keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
           keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
         });

@@ -1,0 +1,30 @@
+@media (min-width: 768px) {
+  #sat-infobox {
+    width: 50%;
+    right: 0px;
+    border: 5px solid var(--colorTertiaryDarken3);
+  }
+
+  .search-slide-down {
+    width: 250px;
+  }
+
+  #ui-datepicker-div {
+    top: var(--top-menu-height) !important; /* Override jquery-ui */
+    left: 0px !important; /* Override jquery-ui */
+    border-radius: 0px;
+    bottom: unset;
+    width: fit-content;
+  }
+  .ui-timepicker-div dl {
+    text-align: center !important;
+  }
+
+  .ui-datepicker td a {
+    padding: 0.2em;
+  }
+
+  .ui-datepicker .ui-datepicker-buttonpane button {
+    padding: 0.2em 0.6em 0.3em 0.6em;
+  }
+}

@@ -29,7 +29,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
   discvrPhotos_: { imageUrl: string; lat: Degrees; lon: Degrees }[] = [];
 
   bottomIconElementName = 'menu-sat-photos';
-  bottomIconLabel = 'SatellitePhotos';
+  bottomIconLabel = 'Satellite Photos';
   bottomIconImg = photoManagerPng;
   sideMenuElementName: string = 'sat-photo-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

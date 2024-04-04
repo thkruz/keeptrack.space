@@ -4,9 +4,11 @@ import { WebGLRenderer } from '@app/singletons/webgl-renderer';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { keepTrackContainer } from '../src/container';
-import { CatalogManager, OrbitManager, Singletons } from '../src/interfaces';
+import { Singletons } from '../src/interfaces';
 import { HoverManager } from '../src/singletons/hover-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
+import { CatalogManager } from '@app/singletons/catalog-manager';
+import { OrbitManager } from '@app/singletons/orbitManager';
 
 /*
 Code Analysis
@@ -84,6 +86,6 @@ describe('code_snippet', () => {
     keepTrackContainer.registerSingleton<WebGLRenderer>(Singletons.WebGLRenderer, drawManagerInstance);
     hoverManager.setHoverId(1);
     expect(getEl('sat-hoverbox')).toBeDefined();
-    expect(getEl('sat-hoverbox')?.style.display).toBe('block');
+    expect(getEl('sat-hoverbox')?.style.display).toBe('flex');
   });
 });

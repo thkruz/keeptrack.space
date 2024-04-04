@@ -43,6 +43,8 @@ export class HoverManager {
       this.updateHover_(id);
     }
     if (settingsManager.enableHoverOverlay) {
+      if (this.satHoverBoxNode2) this.satHoverBoxNode2.style.display = 'block';
+      if (this.satHoverBoxNode3) this.satHoverBoxNode3.style.display = 'block';
       this.showHoverDetails_(id, mouseX, mouseY);
     }
   }
@@ -54,6 +56,7 @@ export class HoverManager {
     this.satHoverBoxNode2.innerHTML =
       obj.country + SensorMath.distanceString(obj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor) + '';
     this.satHoverBoxNode3.textContent = '';
+    this.satHoverBoxNode3.style.display = 'none';
   }
 
   private hoverOverNothing_() {
@@ -111,7 +114,7 @@ export class HoverManager {
       screenY ??= satScreenPositionArray.y;
 
       const style = {
-        display: 'block',
+        display: 'flex',
         left: `${screenX + 20}px`,
         top: `${screenY - 10}px`,
       };
@@ -131,12 +134,15 @@ export class HoverManager {
       SensorMath.distanceString(landObj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor) +
       '';
     this.satHoverBoxNode3.textContent = '';
+    this.satHoverBoxNode3.style.display = 'none';
   }
 
   private missile_(missile: MissileObject) {
-    this.satHoverBoxNode1.innerHTML = missile.name + '<br >' + missile.desc + '';
+    this.satHoverBoxNode1.innerHTML = `<span>${missile.name}</span><span>${missile.desc}</span>`;
     this.satHoverBoxNode2.textContent = '';
+    this.satHoverBoxNode2.style.display = 'none';
     this.satHoverBoxNode3.textContent = '';
+    this.satHoverBoxNode3.style.display = 'none';
   }
 
   private planetariumView_(satId: number) {
@@ -195,6 +201,7 @@ export class HoverManager {
           this.satHoverBoxNode3.textContent = HoverManager.getLaunchYear(sat);
         } else {
           this.satHoverBoxNode3.textContent = '';
+          this.satHoverBoxNode3.style.display = 'none';
         }
       }
     }
@@ -204,11 +211,14 @@ export class HoverManager {
     if (sat.type === SpaceObjectType.NOTIONAL) return 'Launched: Planned';
     if (sat.source === CatalogSource.VIMPEL) return 'Launched: Unknown';
 
-    const launchYear = parseInt(sat.intlDes.slice(0, 2));
+    const launchYear = parseInt(sat.intlDes.slice(2, 4));
     if (launchYear < 57) {
       return `Launched: 20${launchYear}`;
+    } else if (launchYear >= 57 && launchYear < 100) {
+      return `Launched: 19${launchYear}`;
+    } else {
+      return `Launched: Unknown`;
     }
-    return `Launched: 19${launchYear}`;
   }
 
   private showEciDistAndVel_(sat: DetailedSatellite) {
@@ -223,7 +233,6 @@ export class HoverManager {
         ' Z: ' +
         sat.position.z.toFixed(2) +
         ' km' +
-        '</br>' +
         'XDot: ' +
         sat.velocity.x.toFixed(2) +
         ' km/s' +
@@ -235,6 +244,7 @@ export class HoverManager {
         ' km/s';
     } else {
       this.satHoverBoxNode3.innerHTML = '';
+      this.satHoverBoxNode3.style.display = 'none';
     }
   }
 
@@ -246,7 +256,7 @@ export class HoverManager {
       sat.position.y.toFixed(2) +
       ' Z: ' +
       sat.position.z.toFixed(2) +
-      '</br>X: ' +
+      'X: ' +
       sat.velocity.x.toFixed(2) +
       ' Y: ' +
       sat.velocity.y.toFixed(2) +
@@ -268,8 +278,8 @@ export class HoverManager {
 
   private showRicDistAndVel_(ric: RIC) {
     this.satHoverBoxNode3.innerHTML =
-      `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km</br>` +
-      `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s</br>`;
+      `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km` +
+      `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s`;
   }
 
   private showRicOrEci_(sat: DetailedSatellite) {
@@ -287,12 +297,12 @@ export class HoverManager {
   private star_(sat: Star) {
     const constellationName = keepTrackApi.getStarManager().findStarsConstellation(sat.name);
     if (constellationName !== null) {
-      this.satHoverBoxNode1.innerHTML = sat.name + '</br>' + constellationName;
+      this.satHoverBoxNode1.innerHTML = sat.name + constellationName;
     } else {
       this.satHoverBoxNode1.textContent = sat.name;
     }
     this.satHoverBoxNode2.innerHTML = 'Star';
-    this.satHoverBoxNode3.innerHTML = 'RA: ' + sat.ra.toFixed(3) + ' deg </br> DEC: ' + sat.dec.toFixed(3) + ' deg';
+    this.satHoverBoxNode3.innerHTML = '<span>RA: ' + sat.ra.toFixed(3) + ' deg </span><span>DEC: ' + sat.dec.toFixed(3) + ' deg</span>';
 
     if (this.lasthoveringSat !== sat.id && typeof sat !== 'undefined' && constellationName !== null) {
       keepTrackApi.getStarManager().drawConstellations(constellationName);

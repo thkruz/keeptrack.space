@@ -30,7 +30,7 @@ describe('CollissionsPlugin_class', () => {
 
   it('should have clickable objects', () => {
     websiteInit(satConstellationsPlugin);
-    getEl('socrates-menu').click();
+    getEl('collisions-menu').click();
     satConstellationsPlugin['collisionList_'] = [
       {
         toca: '2021-01-01T00:00:00.000Z',

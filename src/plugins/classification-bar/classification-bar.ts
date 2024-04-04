@@ -96,9 +96,9 @@ export class ClassificationBar extends KeepTrackPlugin {
     if (!keepTrackApi.getPlugin(TopMenu)) return;
 
     // TODO: Top menu height should be a setting in the top menu plugin
-    let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--top-menu-height').replace('px', ''));
+    let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--classification-bar-height').replace('px', ''));
     if (isNaN(topMenuHeight)) topMenuHeight = 0;
-    document.documentElement.style.setProperty('--top-menu-height', topMenuHeight + (isExpanded ? this.containerHeight : -this.containerHeight) + 'px');
+    document.documentElement.style.setProperty('--classification-bar-height', (isExpanded ? this.containerHeight : -this.containerHeight) + 'px');
 
     this.isExpanded_ = isExpanded;
   }

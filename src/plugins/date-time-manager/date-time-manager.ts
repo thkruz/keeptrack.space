@@ -120,7 +120,9 @@ export class DateTimeManager extends KeepTrackPlugin {
         // This code gets called when the done button is pressed or the time sliders are closed
         if (that.isEditTimeOpen) {
           getEl('datetime-input').style.display = 'none';
-          that.isEditTimeOpen = false;
+          setTimeout(() => {
+            that.isEditTimeOpen = false;
+          }, 500);
 
           // TODO: Migrate to watchlist.ts
           try {

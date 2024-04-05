@@ -104,7 +104,6 @@ const setupImageColorbox_ = (url: string) => {
     return;
   }
 
-  colorboxContainerDom.style.width = '45%';
   colorboxContainerDom.style.transform = 'translateX(-200%)';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'none';
   (<HTMLImageElement>getEl('colorbox-img')).style.display = 'block';

@@ -908,6 +908,12 @@ export class CatalogLoader {
           case 'M':
             resp[i].source = CatalogSource.UNIV_OF_MICH;
             break;
+          case 'N':
+            resp[i].source = CatalogSource.NUSPACE;
+            break;
+          case 'P':
+            resp[i].source = CatalogSource.CALPOLY;
+            break;
           case 'V':
             resp[i].source = CatalogSource.VIMPEL;
             break;

@@ -1,0 +1,8 @@
+#collisions-table {
+  line-height: 0.05;
+  font-size: 13px;
+}
+
+#collisions-table td {
+  text-align: center;
+}

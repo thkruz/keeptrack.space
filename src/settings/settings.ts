@@ -860,7 +860,7 @@ export class SettingsManager {
   /**
    * The maximum number of satellites to display when searching.
    */
-  searchLimit = 150;
+  searchLimit = 350;
   /**
    * Color of the dot when selected.
    */

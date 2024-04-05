@@ -87,7 +87,6 @@ describe('openColorbox_function', () => {
     jest.advanceTimersByTime(2000);
 
     const colorboxContainer = <HTMLElement>getEl('colorbox-container');
-    expect(colorboxContainer.style.width).toBe('45%');
     expect(colorboxContainer.style.transform).toBe('translateX(-100%)');
     const colorboxIframe = <HTMLElement>getEl('colorbox-iframe');
     expect(colorboxIframe.style.display).toBe('none');

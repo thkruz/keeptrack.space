@@ -1,5 +1,6 @@
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import collissionsPng from '@public/img/icons/socrates.png';
+import collissionsPng from '@public/img/icons/collisions.png';
+import './collisions.css';
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
@@ -41,13 +42,13 @@ export class Collissions extends KeepTrackPlugin {
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = collissionsPng;
   bottomIconLabel: string = 'Collisions';
-  sideMenuElementName: string = 'socrates-menu';
+  sideMenuElementName: string = 'collisions-menu';
   sideMenuElementHtml = keepTrackApi.html`
-  <div id="socrates-menu" class="side-menu-parent start-hidden text-select">
-    <div id="socrates-content" class="side-menu">
+  <div id="collisions-menu" class="side-menu-parent start-hidden text-select">
+    <div id="collisions-content" class="side-menu">
       <div class="row">
         <h5 class="center-align">Possible Collisions</h5>
-        <table id="socrates-table" class="center-align"></table>
+        <table id="collisions-table" class="center-align"></table>
       </div>
     </div>
   </div>`;
@@ -59,7 +60,7 @@ export class Collissions extends KeepTrackPlugin {
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
-    minWidth: 500,
+    minWidth: 540,
     maxWidth: 650,
   };
 
@@ -96,7 +97,7 @@ export class Collissions extends KeepTrackPlugin {
     getEl(this.sideMenuElementName).addEventListener('click', (evt: any) => {
       showLoading(() => {
         const el = <HTMLElement>evt.target.parentElement;
-        if (!el.classList.contains('socrates-object')) return;
+        if (!el.classList.contains('collisions-object')) return;
         // Might be better code for this.
         const hiddenRow = el.dataset?.row;
         if (hiddenRow !== null) {
@@ -137,7 +138,7 @@ export class Collissions extends KeepTrackPlugin {
 
   private createTable_(): void {
     try {
-      const tbl = <HTMLTableElement>getEl('socrates-table'); // Identify the table to update
+      const tbl = <HTMLTableElement>getEl('collisions-table'); // Identify the table to update
       tbl.innerHTML = ''; // Clear the table from old object data
 
       Collissions.createHeaders_(tbl);
@@ -167,7 +168,7 @@ export class Collissions extends KeepTrackPlugin {
   private createRow_(tbl: HTMLTableElement, i: number): HTMLTableRowElement {
     // Create a new row
     const tr = tbl.insertRow();
-    tr.setAttribute('class', 'socrates-object link');
+    tr.setAttribute('class', 'collisions-object link');
     tr.setAttribute('data-row', i.toString());
 
     // Populate the table with the data

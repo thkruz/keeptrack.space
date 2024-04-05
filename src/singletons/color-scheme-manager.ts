@@ -657,6 +657,10 @@ export class ColorSchemeManager {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
+
+        // We don't want to reload a cached group color scheme because we might not have a search
+        // this can result in all dots turning black
+        // if (cachedColorScheme && !(cachedColorScheme === this.group.name || cachedColorScheme === this.groupCountries.name)) {
         if (cachedColorScheme) {
           LegendManager.change(cachedColorScheme);
           const possibleColorScheme = this[cachedColorScheme];
@@ -1449,11 +1453,11 @@ export class ColorSchemeManager {
             pickable: Pickable.No,
           };
         } else {
-        return {
-          color: this.colorTheme.countryOther,
-          pickable: Pickable.Yes,
-        };
-      }
+          return {
+            color: this.colorTheme.countryOther,
+            pickable: Pickable.Yes,
+          };
+        }
     }
   }
 
@@ -1569,7 +1573,7 @@ export class ColorSchemeManager {
         keepTrackApi.getUiManager().searchManager.getCurrentSearch() === '' &&
         watchlistTransform !== 'translateX(0px)' &&
         !keepTrackApi.getPlugin(TimeMachine)?.isMenuButtonActive &&
-        !(<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning
+        !(<TimeMachine>keepTrackApi.getPlugin(TimeMachine))?.isTimeMachineRunning
       ) {
         if (this.currentColorScheme === this.groupCountries) {
           this.updateColorScheme(this.countries);

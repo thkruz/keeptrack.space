@@ -15,10 +15,6 @@ export class AboutMenu extends KeepTrackPlugin {
   <div id="about-menu" class="side-menu-parent start-hidden text-select">
     <div id="about-content" class="side-menu">
       <div class="row">
-        <div id="mobile-warning" class="center-align">
-          You are using the mobile version. Please try the desktop version for full functionality.
-        </div>
-        <br>
         <div class="row">
           <h5 class="center-align">About</h5>
           <div class="col s12">

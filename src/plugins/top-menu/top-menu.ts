@@ -5,7 +5,6 @@ import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import fullscreenIconPng from '@public/img/fullscreen-icon.png';
 import helpPng from '@public/img/help.png';
 import findPng from '@public/img/icons/find.png';
-import githubPng from '@public/img/icons/github.png';
 import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
 import layersIconPng from '@public/img/layers-icon.png';
@@ -32,24 +31,22 @@ export class TopMenu extends KeepTrackPlugin {
               <div id="nav-wrapper" class="nav-wrapper">
                 <ul id="nav-mobile2" class="right">
                   <li>
-                    <a id="sound-btn" class="top-menu-btns">
+                    <a id="sound-btn" class="top-menu-icons">
                       <div class="top-menu-icons bmenu-item-selected">
                         <img id="sound-icon"
-                        width="25"
-                        height="25"
                         src="" delayedsrc="${soundOnPng}" alt="" />
                       </div>
                     </a>
                   </li>
                   <li>
-                    <a id="legend-menu" class="top-menu-btns">
+                    <a id="legend-menu" class="top-menu-icons">
                       <div id="legend-icon" class="top-menu-icons">
                         <img src=${layersIconPng} alt="" />
                       </div>
                     </a>
                   </li>
                   <li>
-                    <a id="tutorial-btn" class="top-menu-btns">
+                    <a id="tutorial-btn" class="top-menu-icons">
                       <div id="tutorial-icon" class="top-menu-icons">
                         <img src=${helpPng} alt="" />
                       </div>
@@ -70,18 +67,6 @@ export class TopMenu extends KeepTrackPlugin {
                     <input id="search" type="search" name="search" placeholder="Search.." required />
                   </div>
                 </ul>
-              </div>
-              <div id="social-alt" class="left">
-                <div id="share-icon-container">
-                  <a id="github-share" class="share-up share-icons" rel="noreferrer" href="https://github.com/thkruz/keeptrack.space/" target="_blank">
-                    <img
-                      alt="github"
-                      width="32"
-                      height="32"
-                      src="" delayedsrc="${githubPng}"
-                    />
-                  </a>
-                </div>
               </div>
             </nav>
           `

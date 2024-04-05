@@ -5096,11 +5096,11 @@ strong {
 }
 
 @media only screen and (min-width: 601px) and (max-width: 992px) {
-  #toast-container {
+  /* #toast-container {
     left: 5%;
     bottom: 7%;
     max-width: 90%;
-  }
+  } */
 }
 
 @media only screen and (min-width: 993px) {

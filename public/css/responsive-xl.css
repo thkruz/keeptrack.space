@@ -1,0 +1,175 @@
+@media (min-width: 1280px) {
+  :root {
+    --nav-bar-height: 30px !important;
+  }
+
+  #demo-logo {
+    font-size: 3vh;
+  }
+  #datetime-input {
+    position: absolute;
+    bottom: 10px;
+    display: none;
+  }
+  #datetime-input-tb {
+    color: white;
+    font-family: 'Open Sans', sans-serif;
+    padding: 10px 10px 11px 10px;
+    /* Moves it below screen */
+    height: 0px !important;
+    margin: 0 0 55px 0 !important;
+  }
+  #datetime-input-tb:focus,
+  input:focus {
+    outline: none;
+  }
+  #datetime-title {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    width: 220px;
+    height: 30px;
+    background: transparent;
+    overflow: hidden;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+  }
+  #sensor-selected-container {
+    padding: 0px 10px 0px 10px;
+    border-width: 0px 0px 0px 1px;
+    border-style: solid;
+    border-color: var(--colorSecondary);
+  }
+
+  #share-icon {
+    display: none;
+  }
+
+  #search-holder {
+    right: 0px;
+    top: 0px;
+    display: inline-flex;
+  }
+  #search {
+    height: 16px;
+    margin: 0;
+    padding-top: 5px;
+  }
+  #ui-datepicker-div {
+    position: relative !important;
+    border-radius: 0px;
+  }
+  #time-machine-menu {
+    padding-left: 35px;
+    color: white;
+    background: var(--colorTertiaryDarken2);
+    width: 300px;
+    top: 25px;
+    right: 0px;
+    z-index: 100;
+    position: absolute;
+    overflow: auto;
+    border-width: 0px 0px 5px 5px;
+    border-style: solid;
+    border-color: var(--colorTertiaryDarken3);
+  }
+  #obfit-menu {
+    width: 500px;
+  }
+  #legend-hover-menu {
+    padding-left: 35px;
+    color: white;
+    background: var(--colorTertiaryDarken2);
+    width: 300px;
+    top: var(--top-menu-height);
+    right: 0px;
+    z-index: 100;
+    position: absolute;
+    overflow: auto;
+    border-width: 0px 0px 5px 5px;
+    border-style: solid;
+    border-color: var(--colorTertiaryDarken3);
+  }
+  .side-menu {
+    position: absolute;
+    background: var(--colorTertiaryDarken2);
+    color: white;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 10;
+    /* border-width: 0px 5px 0px 0px; */
+    border-color: var(--colorTertiaryDarken3);
+    border-style: solid;
+  }
+
+  #about-menu {
+    width: 375px;
+  }
+  #multi-site-look-angles-menu {
+    width: 450px;
+  }
+  #multi-site-look-angles-sensor-list {
+    display: grid;
+    grid-template-columns: minmax(70px, max-content) repeat(auto-fill, 70px);
+    justify-content: space-evenly;
+    justify-items: stretch;
+    grid-row-gap: 5px;
+  }
+  #findByLooks .row {
+    margin: 0px;
+  }
+  #findByLooks .row div input {
+    height: 2.5rem;
+    margin: 0px;
+  }
+  #dops-menu {
+    width: 400px;
+  }
+  #menu-satellite-collision,
+  #menu-find-sat {
+    display: inline;
+  }
+  #footer-toggle-wrapper {
+    width: 50%;
+    left: 25%;
+    z-index: 1;
+    position: relative;
+  }
+  .footer-slide-down {
+    bottom: calc(-1 * var(--bottom-menu-height) + 5px) !important;
+    height: var(--bottom-menu-height) !important;
+    top: auto !important;
+  }
+  .footer-slide-trans {
+    transition: 1s;
+  }
+  .footer-slide-up {
+    bottom: 0px !important;
+    top: auto !important;
+  }
+  footer {
+    margin-top: -100px;
+    position: absolute;
+    bottom: 0px;
+    height: 120px;
+    width: 100%;
+  }
+  #social {
+    display: block;
+    margin-top: -75px;
+    margin-right: 90px;
+  }
+  #menu-space-stations,
+  #menu-launches {
+    display: inline;
+  }
+  #fastCompSettings {
+    display: block;
+  }
+  #mobile-warning {
+    display: none;
+  }
+}

@@ -1,11 +1,12 @@
 import { BufferGeometry } from './buffer-geometry';
+import { FlatGeometry } from './flat-geometry';
 import { GLSL1, GLSL3, Material } from './material';
 import { ProgramParams, WebGlProgramHelper } from './webgl-program';
 
 export class Mesh {
   name: string;
   gl: WebGL2RenderingContext;
-  geometry: BufferGeometry;
+  geometry: BufferGeometry | FlatGeometry;
   material: Material;
   program: WebGlProgramHelper;
   precision: 'highp' | 'mediump' | 'lowp';

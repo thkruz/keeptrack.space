@@ -12,13 +12,13 @@ export class FlatGeometry extends BufferGeometry {
     });
     this.gl = gl;
 
-    this.calculateBuffers();
+    this.calculateBuffers_();
   }
 
   /**
    * Generate a buffer for the geometry
    */
-  private calculateBuffers() {
+  private calculateBuffers_() {
     const gl = this.gl;
 
     const x1 = 0;

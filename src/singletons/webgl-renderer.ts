@@ -435,6 +435,9 @@ export class WebGLRenderer {
     // Fix the gpu picker texture size if it has already been created
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     if (dotsManagerInstance.isReady) dotsManagerInstance.initProgramPicking();
+
+    // Fix flat geometry if it has already been created
+    keepTrackApi.getScene().godrays?.init(gl, keepTrackApi.getScene().sun);
   }
 
   /**

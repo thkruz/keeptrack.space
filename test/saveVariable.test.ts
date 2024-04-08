@@ -6,39 +6,39 @@ import Papa from 'papaparse';
 import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';
 
 /**
-Objective:
-The objective of this code snippet is to provide functions for saving variables as text files and arrays of objects as CSV files. The code includes a function to handle circular references when saving variables as text files and uses the file-saver and papaparse libraries for saving files.
-
-Inputs:
-- variable: the variable to be saved as a text file
-- filename: the name of the text file to be saved
-- items: the array of objects to be saved as CSV
-- name: the name of the CSV file to be saved
-
-Flow:
-- saveVariable function:
-    1. Set filename to 'variable.txt' if not provided
-    2. Convert variable to a string with JSON.stringify and getCircularReplacer function
-    3. Create a Blob with the string and set the type to 'text/plain;charset=utf-8'
-    4. Use saveAs function from file-saver library to save the Blob as a file
-    5. Catch any errors and pass them to the errorManagerInstance
-- getCircularReplacer function:
-    1. Create a WeakSet to keep track of seen objects
-    2. Return a replacer function that replaces circular references with null
-- saveCsv function:
-    1. Use papaparse library to convert the array of objects to a CSV string
-    2. Create a Blob with the CSV string and set the type to 'text/plain;charset=utf-8'
-    3. Use saveAs function from file-saver library to save the Blob as a file
-    4. Catch any errors and pass them to the errorManagerInstance
-
-Outputs:
-- A text file containing the saved variable
-- A CSV file containing the saved array of objects
-
-Additional aspects:
-- The code uses the file-saver and papaparse libraries for saving files
-- The code includes a function to handle circular references when saving variables as text files
-- Any errors that occur during file saving are passed to the errorManagerInstance for handling
+ *Objective:
+ *The objective of this code snippet is to provide functions for saving variables as text files and arrays of objects as CSV files. The code includes a function to handle circular references when saving variables as text files and uses the file-saver and papaparse libraries for saving files.
+ *
+ *Inputs:
+ *- variable: the variable to be saved as a text file
+ *- filename: the name of the text file to be saved
+ *- items: the array of objects to be saved as CSV
+ *- name: the name of the CSV file to be saved
+ *
+ *Flow:
+ *- saveVariable function:
+ *  1. Set filename to 'variable.txt' if not provided
+ *  2. Convert variable to a string with JSON.stringify and getCircularReplacer function
+ *  3. Create a Blob with the string and set the type to 'text/plain;charset=utf-8'
+ *  4. Use saveAs function from file-saver library to save the Blob as a file
+ *  5. Catch any errors and pass them to the errorManagerInstance
+ *- getCircularReplacer function:
+ *  1. Create a WeakSet to keep track of seen objects
+ *  2. Return a replacer function that replaces circular references with null
+ *- saveCsv function:
+ *  1. Use papaparse library to convert the array of objects to a CSV string
+ *  2. Create a Blob with the CSV string and set the type to 'text/plain;charset=utf-8'
+ *  3. Use saveAs function from file-saver library to save the Blob as a file
+ *  4. Catch any errors and pass them to the errorManagerInstance
+ *
+ *Outputs:
+ *- A text file containing the saved variable
+ *- A CSV file containing the saved array of objects
+ *
+ *Additional aspects:
+ *- The code uses the file-saver and papaparse libraries for saving files
+ *- The code includes a function to handle circular references when saving variables as text files
+ *- Any errors that occur during file saving are passed to the errorManagerInstance for handling
  */
 
 describe('code_snippet', () => {
@@ -69,7 +69,8 @@ describe('code_snippet', () => {
   // Tests that getCircularReplacer returns a replacer function that replaces circular references with null
   it('test_get_circular_replacer', () => {
     const circularObj = { a: 1 };
-    // @ts-expect-error
+
+    // @ts-expect-error - Circular reference
     circularObj.b = circularObj;
     const expected = '{"a":1,"b":null}';
 
@@ -109,6 +110,7 @@ describe('code_snippet', () => {
   // Tests that saveVariable throws an error when saveAs is unavailable
   it('test_save_variable_saveAs_unavailable', () => {
     const variable = { a: 1, b: 2 };
+
     jest.spyOn(fileSaver, 'saveAs').mockImplementation(() => {
       throw new Error();
     });
@@ -121,10 +123,12 @@ describe('code_snippet', () => {
   // Tests that getCircularReplacer handles circular references in nested objects
   it('test_get_circular_replacer_handles_circular_references_in_nested_objects', () => {
     const obj = { a: 1 };
-    // @ts-expect-error
+
+    // @ts-expect-error - Circular reference
     obj.b = obj;
     const replacer = getCircularReplacer();
     const result = JSON.stringify(obj, replacer);
+
     expect(result).toBe('{"a":1,"b":null}');
   });
 });

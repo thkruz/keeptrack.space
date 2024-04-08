@@ -16,9 +16,11 @@ export class CustomMeshFactory {
     const customMesh = new CustomMesh();
 
     const renderer = keepTrackApi.getRenderer();
+
     customMesh.init(renderer.gl, vertexList);
     customMesh.id = this.customMeshes_.length;
     this.customMeshes_.push(customMesh);
+
     return customMesh;
   }
 
@@ -50,9 +52,11 @@ export class CustomMeshFactory {
     const radarDome = new RadarDome();
 
     const renderer = keepTrackApi.getRenderer();
+
     radarDome.init(renderer.gl);
     radarDome.id = this.customMeshes_.length;
     this.customMeshes_.push(radarDome);
+
     return radarDome;
   }
 
@@ -60,6 +64,7 @@ export class CustomMeshFactory {
     const centerPoint = [10000, 0, 0];
     const vertexList = new Float32Array(8 * 3);
     const halfExtent = 1000 / 2;
+
     vertexList[0] = centerPoint[0] - halfExtent;
     vertexList[1] = centerPoint[1] - halfExtent;
     vertexList[2] = centerPoint[2] - halfExtent;

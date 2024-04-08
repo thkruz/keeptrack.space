@@ -18,6 +18,7 @@ describe('OrbitReferences', () => {
 
   it('should_not_throw_error', () => {
     const orbitReferences = new OrbitReferences();
+
     expect(() => orbitReferences.init()).not.toThrow();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);

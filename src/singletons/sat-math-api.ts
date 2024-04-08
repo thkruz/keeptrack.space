@@ -37,11 +37,15 @@ import { SatMath } from '../static/sat-math';
 export class SatMathApi {
   static getEcfOfCurrentOrbit(sat: DetailedSatellite, points: number) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+
+
     return SatMath.getEcfOfCurrentOrbit(sat, points, cb);
   }
 
   static getEciOfCurrentOrbit(sat: DetailedSatellite, points: number) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+
+
     return SatMath.getEciOfCurrentOrbit(sat, points, cb);
   }
 
@@ -54,11 +58,15 @@ export class SatMathApi {
    */
   static getLlaOfCurrentOrbit(sat: DetailedSatellite, points: number) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+
+
     return SatMath.getLlaOfCurrentOrbit(sat, points, cb) as { lat: Degrees; lon: Degrees; alt: Kilometers; time: number }[];
   }
 
   static getRicOfCurrentOrbit(sat: DetailedSatellite, sat2: DetailedSatellite, points: number, orbits = 1) {
     const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+
+
     return SatMath.getRicOfCurrentOrbit(sat, sat2, points, cb, orbits);
   }
 }

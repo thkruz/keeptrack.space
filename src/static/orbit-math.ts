@@ -93,20 +93,34 @@ export abstract class OrbitMath {
     const ex = 1 - r / semiMajorAxis;
     const ey = q / Math.sqrt(semiMajorAxis * mu);
     const u = OrbitMath.arctan2(ey, ex);
+
+
     return ((u - eccentricity * Math.sin(u)) * RAD2DEG) % 360;
   }
 
   private static arctan2(y: number, x: number): number {
     let u: number;
-    if (x != 0) {
+
+    if (x !== 0) {
       u = Math.atan(y / x);
-      if (x < 0) u = u + Math.PI;
-      if (x > 0 && y < 0) u = u + TAU;
+      if (x < 0) {
+        u += Math.PI;
+      }
+      if (x > 0 && y < 0) {
+        u += TAU;
+      }
     } else {
-      if (y < 0) u = -Math.PI / 2;
-      if (y === 0) u = 0;
-      if (y > 0) u = Math.PI / 2;
+      if (y < 0) {
+        u = -Math.PI / 2;
+      }
+      if (y === 0) {
+        u = 0;
+      }
+      if (y > 0) {
+        u = Math.PI / 2;
+      }
     }
+
     return u;
   }
 
@@ -128,6 +142,8 @@ export abstract class OrbitMath {
 
     const period = TAU * Math.sqrt((semiMajorAxis * semiMajorAxis * semiMajorAxis) / (EARTHS_GRAV_CONST * (WeightOfSatellite + MASS_OF_EARTH)));
     const periodInMinutes = period / 60;
+
+
     return MINUTES_PER_DAY / periodInMinutes;
   }
 
@@ -140,6 +156,8 @@ export abstract class OrbitMath {
     const vz = <Meters>(velocity[2] * 1000);
 
     const angMomentum = OrbitMath.cross([rx, ry, rz], [vx, vy, vz]);
+
+
     return Math.atan2(angMomentum[0], -angMomentum[1]) * RAD2DEG;
   }
 
@@ -161,20 +179,22 @@ export abstract class OrbitMath {
     const mu = EARTHS_GRAV_CONST * (WeightOfSatellite + MASS_OF_EARTH);
     const r = OrbitMath.magnitude([rx, ry, rz]);
 
-    let q = rx * vx + ry * vy + rz * vz; // dot product of r*v
+    const q = rx * vx + ry * vy + rz * vz; // dot product of r*v
 
     const inclination = Math.acos(hz / h);
     let raan = 0;
-    if (inclination != 0) {
+
+    if (inclination !== 0) {
       raan = OrbitMath.arctan2(hx, -hy);
     }
 
-    let tax = (h * h) / (r * mu) - 1;
-    let tay = (h * q) / (r * mu);
-    let ta = OrbitMath.arctan2(tay, tax);
-    let cw = (rx * Math.cos(raan) + ry * Math.sin(raan)) / r;
+    const tax = (h * h) / (r * mu) - 1;
+    const tay = (h * q) / (r * mu);
+    const ta = OrbitMath.arctan2(tay, tax);
+    const cw = (rx * Math.cos(raan) + ry * Math.sin(raan)) / r;
 
     let sw = 0;
+
     if (inclination === 0 || inclination === Math.PI) {
       sw = (ry * Math.cos(raan) - rx * Math.sin(raan)) / r;
     } else {
@@ -182,9 +202,11 @@ export abstract class OrbitMath {
     }
 
     let argPe = OrbitMath.arctan2(sw, cw) - ta;
+
     if (argPe < 0) {
       argPe = TAU + argPe;
     }
+
     return (argPe * RAD2DEG) % 360;
   }
 
@@ -198,6 +220,8 @@ export abstract class OrbitMath {
 
   public static magnitude(vector: number[]): number {
     const squaredSum = vector.reduce((sum, component) => sum + component * component, 0);
+
+
     return Math.sqrt(squaredSum);
   }
 

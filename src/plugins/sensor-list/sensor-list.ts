@@ -76,7 +76,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     super(SensorListPlugin.PLUGIN_NAME);
   }
 
-  helpTitle = `Sensors Menu`;
+  helpTitle = 'Sensors Menu';
   helpBody = keepTrackApi.html`The Sensors menu allows you to select a sensor for use in calculations and other menu's functions.
   Sensors are in groups based on the networks they primarily support.
   On the left side of the menu is the name of the sensor and on the right side is the country/organization that owns it.
@@ -119,7 +119,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
             </div>
           </div>
-          `
+          `,
         );
       },
     });
@@ -134,6 +134,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
         getEl('sensor-list-content').addEventListener('click', (e: Event) => {
           let realTarget = e.target as HTMLElement | undefined;
+
           if (!realTarget?.classList.contains('menu-selectable')) {
             realTarget = realTarget?.closest('.menu-selectable');
             if (!realTarget?.classList.contains('menu-selectable')) {
@@ -144,11 +145,13 @@ export class SensorListPlugin extends KeepTrackPlugin {
           if (realTarget.id === 'reset-sensor-button') {
             keepTrackApi.getSensorManager().resetSensorSelected();
             keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+
             return;
           }
 
           keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
           const sensorClick = realTarget.dataset.sensor;
+
           this.sensorListContentClick(sensorClick);
         });
       },
@@ -169,20 +172,27 @@ export class SensorListPlugin extends KeepTrackPlugin {
             keepTrackApi.html`
                   <div id="sensors-in-fov-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                         data-tooltip="Visualize Sensor Coverage">Show All Sensors with FOV...</div>
-                `
+                `,
           );
           getEl('sensors-in-fov-link').addEventListener('click', () => {
             keepTrackApi.getSoundManager().play(SoundNames.CLICK);
 
             const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-            if (!selectSatManagerInstance) return;
+
+            if (!selectSatManagerInstance) {
+              return;
+            }
 
             const sat = selectSatManagerInstance.getSelectedSat();
-            if (sat.isMissile()) return;
+
+            if (sat.isMissile()) {
+              return;
+            }
 
             Object.keys(sensors).forEach((key) => {
               const sensor = sensors[key];
               const isInView = sensor.isSatInFov(sat as DetailedSatellite, keepTrackApi.getTimeManager().simulationTimeObj);
+
               if (isInView) {
                 keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
               }
@@ -201,23 +211,31 @@ export class SensorListPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.sensorDotSelected,
       cbName: this.PLUGIN_NAME,
       cb: (obj: BaseObject) => {
-        if (settingsManager.isMobileModeEnabled) return;
-        if (!obj.isSensor()) return;
+        if (settingsManager.isMobileModeEnabled) {
+          return;
+        }
+        if (!obj.isSensor()) {
+          return;
+        }
         const sensor = obj as DetailedSensor;
 
         const sensorManagerInstance = keepTrackApi.getSensorManager();
         // No sensor manager on mobile
+
         sensorManagerInstance.setSensor(null, sensor.sensorId);
 
-        if (sensorManagerInstance.currentSensors.length === 0) throw new Error('No sensors found');
+        if (sensorManagerInstance.currentSensors.length === 0) {
+          throw new Error('No sensors found');
+        }
         const timeManagerInstance = keepTrackApi.getTimeManager();
+
         keepTrackApi
           .getMainCamera()
           .lookAtLatLon(
             sensorManagerInstance.currentSensors[0].lat,
             sensorManagerInstance.currentSensors[0].lon,
             sensorManagerInstance.currentSensors[0].zoom,
-            timeManagerInstance.selectedDate
+            timeManagerInstance.selectedDate,
           );
       },
     });
@@ -234,11 +252,15 @@ export class SensorListPlugin extends KeepTrackPlugin {
   }
 
   sensorListContentClick(sensorClick: string) {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     const sensorManagerInstance = keepTrackApi.getSensorManager();
-    if (typeof sensorClick == 'undefined') {
+
+    if (typeof sensorClick === 'undefined') {
       errorManagerInstance.debug('The menu item was clicked but the menu was not defined.');
+
       return;
     }
 
@@ -279,11 +301,11 @@ export class SensorListPlugin extends KeepTrackPlugin {
           sensorManagerInstance.currentSensors[0].lat,
           sensorManagerInstance.currentSensors[0].lon,
           sensorManagerInstance.currentSensors[0].zoom,
-          keepTrackApi.getTimeManager().selectedDate
+          keepTrackApi.getTimeManager().selectedDate,
         );
     } catch (e) {
       // TODO: More intentional conditional statement
-      errorManagerInstance.warn('Error in sensorListContentClick: ' + e);
+      errorManagerInstance.warn(`Error in sensorListContentClick: ${e}`);
       // Multi-sensors break this
     }
     if (settingsManager.currentColorScheme == keepTrackApi.getColorSchemeManager().default) {
@@ -364,13 +386,13 @@ export class SensorListPlugin extends KeepTrackPlugin {
               <h5 class="center-align">${params.header}</h5>
               <li class="divider"></li>
               ${params.topLinks
-                .map(
-                  (link) => keepTrackApi.html`<li class="menu-selectable sensor-top-link" data-sensor="${link.dataSensor}">
+    .map(
+      (link) => keepTrackApi.html`<li class="menu-selectable sensor-top-link" data-sensor="${link.dataSensor}">
                 <span>${link.name}</span>
                 <span class="badge dark-blue-badge" data-badge-caption="${link.badge}"></span>
-              </li>`
-                )
-                .join('')}
+              </li>`,
+    )
+    .join('')}
               ${params.sensors.map((sensor) => SensorListPlugin.createLiForSensor_(sensor)).join('')}
               `;
   }
@@ -469,19 +491,23 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   private static reloadLastSensor_() {
     const json = PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
-    if (!json) return;
+
+    if (!json) {
+      return;
+    }
     const currentSensor = JSON.parse(json);
     // istanbul ignore next
+
     if (currentSensor !== null) {
       try {
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 
         // If there is a sensorId set use that
-        if (typeof currentSensor[0] == 'undefined' || currentSensor[0] == null) {
+        if (typeof currentSensor[0] === 'undefined' || currentSensor[0] == null) {
           sensorManagerInstance.setSensor(null, currentSensor[1]);
           LegendManager.change('default');
           // If the sensor is a string, load that collection of sensors
-        } else if (typeof currentSensor[0].objName == 'undefined') {
+        } else if (typeof currentSensor[0].objName === 'undefined') {
           sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
           LegendManager.change('default');
         } else {

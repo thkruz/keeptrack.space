@@ -5,7 +5,9 @@ import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
 describe('SatelliteFov_class', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let satelliteFovPlugin: SatelliteFov;
+
   beforeEach(() => {
     setupStandardEnvironment();
     satelliteFovPlugin = new SatelliteFov();

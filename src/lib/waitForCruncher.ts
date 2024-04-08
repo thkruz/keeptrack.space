@@ -17,15 +17,14 @@ export const waitForCruncher = (cruncher: Worker, cb: () => void, validationFunc
     'message',
     (m) => {
       if (validationFunc(m.data)) {
+        // eslint-disable-next-line callback-return
         cb();
+      } else if (retryCount < 5) {
+        waitForCruncher(cruncher, cb, validationFunc, error, retryCount++);
       } else {
-        if (retryCount < 5) {
-          waitForCruncher(cruncher, cb, validationFunc, error, retryCount++);
-        } else {
-          error();
-        }
+        error();
       }
     },
-    { once: true }
+    { once: true },
   );
 };

@@ -5,6 +5,7 @@ import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSu
 
 describe('Screenshot_class', () => {
   let screenshotPlugin: Screenshot;
+
   beforeEach(() => {
     setupDefaultHtml();
     screenshotPlugin = new Screenshot();

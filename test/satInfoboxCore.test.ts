@@ -17,6 +17,7 @@ describe('SatInfoBoxCore_class', () => {
   describe('Clicking Orbit Data Links', () => {
     beforeEach(() => {
       const satInfoBoxCorePlugin = new SatInfoBox();
+
       websiteInit(satInfoBoxCorePlugin);
       keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
       keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
@@ -55,6 +56,7 @@ describe('SatInfoBoxCore_class', () => {
   describe('Various Types of Objects', () => {
     beforeEach(() => {
       const satInfoBoxCorePlugin = new SatInfoBox();
+
       websiteInit(satInfoBoxCorePlugin);
       keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
       keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
@@ -63,6 +65,7 @@ describe('SatInfoBoxCore_class', () => {
 
     it('should work with no rcs', () => {
       let sat1 = defaultSat;
+
       sat1.rcs = null;
       let sat2 = defaultSat;
 
@@ -118,6 +121,7 @@ describe('SatInfoBoxCore_class', () => {
     it('should work with a telescope loaded', () => {
       keepTrackApi.getCatalogManager().isSensorManagerLoaded = true;
       const sensor = defaultSensor;
+
       sensor.type = SpaceObjectType.OPTICAL;
       keepTrackApi.getSensorManager().currentSensors = [sensor];
 
@@ -140,6 +144,7 @@ describe('SatInfoBoxCore_class', () => {
 
     it('should work with all object typees', () => {
       const sat = defaultSat;
+
       sat.type = SpaceObjectType.UNKNOWN;
       keepTrackApi.getCatalogManager().objectCache = [sat];
       expect(() => keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0)).not.toThrow();

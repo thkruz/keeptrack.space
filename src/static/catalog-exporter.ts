@@ -10,17 +10,20 @@ export class CatalogExporter {
       const catalogTLE2 = [];
       const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
 
-      if (satOnlyData.length == 0) {
+      if (satOnlyData.length === 0) {
         errorManagerInstance.info('No TLE data to export');
+
         return;
       }
 
       satOnlyData.sort((a, b) => parseInt(a.sccNum) - parseInt(b.sccNum));
       for (const sat of satOnlyData) {
-        if (typeof sat.tle1 == 'undefined' || typeof sat.tle2 == 'undefined') {
+        if (typeof sat.tle1 === 'undefined' || typeof sat.tle2 === 'undefined') {
           continue;
         }
-        if (isDeleteAnalysts && sat.country == 'ANALSAT') continue;
+        if (isDeleteAnalysts && sat.country === 'ANALSAT') {
+          continue;
+        }
         catalogTLE2.push({
           satId: sat.sccNum,
           name: sat.name,
@@ -49,8 +52,10 @@ export class CatalogExporter {
       }
       saveCsv(catalogTLE2, 'catalogInfo');
     } catch {
-      // DEBUG:
-      // console.warn('Failed to Export TLEs!');
+      /*
+       * DEBUG:
+       * console.warn('Failed to Export TLEs!');
+       */
     }
   }
 
@@ -59,6 +64,8 @@ export class CatalogExporter {
       .filter((obj) => obj.isSatellite() && (obj as DetailedSatellite).tle1 && keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1)
       .map((obj) => {
         const sat = obj as DetailedSatellite;
+
+
         return {
           satId: sat.sccNum,
           name: sat.name,
@@ -76,18 +83,21 @@ export class CatalogExporter {
       const catalogTLE2 = [];
       const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
 
-      if (satOnlyData.length == 0) {
+      if (satOnlyData.length === 0) {
         errorManagerInstance.info('No TLE data to export');
+
         return;
       }
 
       satOnlyData.sort((a, b) => parseInt(a.sccNum) - parseInt(b.sccNum));
       for (const sat of satOnlyData) {
-        if (typeof sat.tle1 == 'undefined' || typeof sat.tle2 == 'undefined') {
+        if (typeof sat.tle1 === 'undefined' || typeof sat.tle2 === 'undefined') {
           continue;
         }
-        if (isDeleteAnalysts && sat.country == 'ANALSAT') continue;
-        if (numberOfLines == 3) {
+        if (isDeleteAnalysts && sat.country === 'ANALSAT') {
+          continue;
+        }
+        if (numberOfLines === 3) {
           catalogTLE2.push(sat.name);
         }
 
@@ -105,10 +115,13 @@ export class CatalogExporter {
       const blob = new Blob([catalogTLE2Str], {
         type: 'text/plain;charset=utf-8',
       });
+
       saveAs(blob, 'TLE.txt');
     } catch {
-      // DEBUG:
-      // console.warn('Failed to Export TLEs!');
+      /*
+       * DEBUG:
+       * console.warn('Failed to Export TLEs!');
+       */
     }
   }
 }

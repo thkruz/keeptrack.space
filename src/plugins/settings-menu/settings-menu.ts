@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -336,7 +337,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = `Settings Menu`;
+  helpTitle = 'Settings Menu';
   helpBody = keepTrackApi.html`The Settings menu allows you to configure the application.`;
 
   isNotColorPickerInitialSetup = false;
@@ -367,54 +368,55 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           rgbCss([1, 1, 1, 1]), // White
         ];
 
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
 
         (<any>$('#settings-color-payload')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.payload || [0.2, 1.0, 0.0, 0.5]),
           palette: colorPalette,
-          onColorSelected: function () {
+          onColorSelected () {
             that.onColorSelected(this, 'payload');
           },
         });
         (<any>$('#settings-color-rocketBody')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
           palette: colorPalette,
-          onColorSelected: function () {
+          onColorSelected () {
             that.onColorSelected(this, 'rocketBody');
           },
         });
         (<any>$('#settings-color-debris')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.debris || [0.5, 0.5, 0.5, 1]),
           palette: colorPalette,
-          onColorSelected: function () {
+          onColorSelected () {
             that.onColorSelected(this, 'debris');
           },
         });
         (<any>$('#settings-color-inview')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.inFOV || [0.85, 0.5, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected: function () {
+          onColorSelected () {
             that.onColorSelected(this, 'inview');
           },
         });
         (<any>$('#settings-color-missile')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.missile || [1.0, 1.0, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected: function () {
+          onColorSelected () {
             that.onColorSelected(this, 'missile');
           },
         });
         (<any>$('#settings-color-missileInview')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected: function () {
+          onColorSelected () {
             that.onColorSelected(this, 'missileInview');
           },
         });
         (<any>$('#settings-color-special')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
           palette: colorPalette,
-          onColorSelected: function () {
+          onColorSelected () {
             that.onColorSelected(this, 'pink');
           },
         });
@@ -435,21 +437,28 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   onColorSelected(context: any, colorStr: string) {
-    if (typeof context === 'undefined' || context === null) throw new Error('context is undefined');
-    if (typeof colorStr === 'undefined' || colorStr === null) throw new Error('colorStr is undefined');
+    if (typeof context === 'undefined' || context === null) {
+      throw new Error('context is undefined');
+    }
+    if (typeof colorStr === 'undefined' || colorStr === null) {
+      throw new Error('colorStr is undefined');
+    }
 
     context.element.css('cssText', `background-color: ${context.color} !important; color: ${context.color};`);
     if (this.isNotColorPickerInitialSetup) {
       settingsManager.colors[colorStr] = parseRgba(context.color);
       LegendManager.legendColorsChange();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MANAGER_COLORS, JSON.stringify(settingsManager.colors));
     }
   }
 
   static onFormChange(e: any, isDMChecked?: boolean, isSLMChecked?: boolean) {
-    if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
+    if (typeof e === 'undefined' || e === null) {
+      throw new Error('e is undefined');
+    }
 
     switch (e.target?.id) {
       case 'settings-notionalSats':
@@ -598,7 +607,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   static onSubmit(e: any) {
-    if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
+    if (typeof e === 'undefined' || e === null) {
+      throw new Error('e is undefined');
+    }
     e.preventDefault();
 
     const uiManagerInstance = keepTrackApi.getUiManager();
@@ -619,9 +630,10 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
     settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
-    let isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
-    let isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
-    let isDrawAuroraChanged = settingsManager.isDrawAurora !== (<HTMLInputElement>getEl('settings-drawAurora')).checked;
+    const isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
+    const isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
+    const isDrawAuroraChanged = settingsManager.isDrawAurora !== (<HTMLInputElement>getEl('settings-drawAurora')).checked;
+
     settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
@@ -630,6 +642,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
 
     const isDrawOrbitsChanged = settingsManager.isDrawOrbits !== (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
+
     settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
     if (isDrawOrbitsChanged) {
       keepTrackApi.getOrbitManager().drawOrbitsSettingChanged();
@@ -651,8 +664,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     // Must come after the above checks
 
-    let isDrawMilkyWayChanged = settingsManager.isDrawMilkyWay !== (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
-    let isGraySkyboxChanged = settingsManager.isGraySkybox !== (<HTMLInputElement>getEl('settings-graySkybox')).checked;
+    const isDrawMilkyWayChanged = settingsManager.isDrawMilkyWay !== (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
+    const isGraySkyboxChanged = settingsManager.isGraySkybox !== (<HTMLInputElement>getEl('settings-graySkybox')).checked;
+
     settingsManager.isDrawMilkyWay = (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
     settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
 
@@ -662,6 +676,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
     const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;
+
     settingsManager.colors.transparent = isHOSChecked ? [1.0, 1.0, 1.0, 0] : [1.0, 1.0, 1.0, 0.1];
     settingsManager.isShowConfidenceLevels = (<HTMLInputElement>getEl('settings-confidence-levels')).checked;
     settingsManager.isDemoModeOn = (<HTMLInputElement>getEl('settings-demo-mode')).checked;
@@ -670,15 +685,19 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isFreezePropRateOnDrag = (<HTMLInputElement>getEl('settings-freeze-drag')).checked;
 
     settingsManager.isDisableTimeMachineToasts = (<HTMLInputElement>getEl('settings-time-machine-toasts')).checked;
-    // TODO: These settings buttons should be inside the plugins themselves
-    // Stop Time Machine
+    /*
+     * TODO: These settings buttons should be inside the plugins themselves
+     * Stop Time Machine
+     */
     if (keepTrackApi.getPlugin(TimeMachine)) {
       keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive = false;
     }
 
-    // if (orbitManagerInstance.isTimeMachineRunning) {
-    //   settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
-    // }
+    /*
+     * if (orbitManagerInstance.isTimeMachineRunning) {
+     *   settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
+     * }
+     */
     keepTrackApi.getGroupsManager().clearSelect();
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true); // force color recalc
 
@@ -687,6 +706,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     colorSchemeManagerInstance.reloadColors();
 
     const newFieldOfView = parseInt((<HTMLInputElement>getEl('satFieldOfView')).value);
+
     if (isNaN(newFieldOfView)) {
       (<HTMLInputElement>getEl('satFieldOfView')).value = '30';
       uiManagerInstance.toast('Invalid field of view value!', 'critical');
@@ -698,6 +718,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
 
     const maxSearchSats = parseInt((<HTMLInputElement>getEl('maxSearchSats')).value);
+
     if (isNaN(maxSearchSats)) {
       (<HTMLInputElement>getEl('maxSearchSats')).value = settingsManager.searchLimit.toString();
       uiManagerInstance.toast('Invalid max search sats value!', 'critical');

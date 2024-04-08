@@ -159,7 +159,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = `Settings Menu`;
+  helpTitle = 'Settings Menu';
   helpBody = keepTrackApi.html`The Settings menu allows you to configure the application.`;
 
   isNotColorPickerInitialSetup = false;
@@ -181,7 +181,9 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   }
 
   static onFormChange(e: any) {
-    if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
+    if (typeof e === 'undefined' || e === null) {
+      throw new Error('e is undefined');
+    }
 
     switch (e.target?.id) {
       case 'video-director-rotateL':
@@ -270,7 +272,9 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   }
 
   static onSubmit(e: any) {
-    if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
+    if (typeof e === 'undefined' || e === null) {
+      throw new Error('e is undefined');
+    }
     e.preventDefault();
 
     keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);

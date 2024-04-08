@@ -59,10 +59,12 @@ export class TimeManager {
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);
-    let epochYear = currentDateObj.getUTCFullYear().toString().substr(2, 2);
-    let epochDay = getDayOfYear(currentDateObj);
-    let timeOfDay = (currentDateObj.getUTCHours() * 60 + currentDateObj.getUTCMinutes()) / 1440;
+    const epochYear = currentDateObj.getUTCFullYear().toString().substr(2, 2);
+    const epochDay = getDayOfYear(currentDateObj);
+    const timeOfDay = (currentDateObj.getUTCHours() * 60 + currentDateObj.getUTCMinutes()) / 1440;
     const epochDayStr = StringPad.pad0((epochDay + timeOfDay).toFixed(8), 12);
+
+
     return [epochYear, epochDayStr];
   }
 
@@ -70,16 +72,19 @@ export class TimeManager {
   calculateSimulationTime(newSimulationTime?: Date): Date {
     if (typeof newSimulationTime !== 'undefined' && newSimulationTime !== null) {
       this.simulationTimeObj.setTime(newSimulationTime.getTime());
+
       return this.simulationTimeObj;
     }
 
     if (this.propRate === 0) {
       const simulationTime = this.dynamicOffsetEpoch + this.staticOffset;
+
       this.simulationTimeObj.setTime(simulationTime);
     } else {
       this.realTime = <Milliseconds>Date.now();
       this.dynamicOffset_ = this.realTime - this.dynamicOffsetEpoch;
       const simulationTime = this.dynamicOffsetEpoch + this.staticOffset + this.dynamicOffset_ * this.propRate;
+
       this.simulationTimeObj.setTime(simulationTime);
     }
 
@@ -87,7 +92,9 @@ export class TimeManager {
   }
 
   changePropRate(propRate: number) {
-    if (this.propRate === propRate) return; // no change
+    if (this.propRate === propRate) {
+      return;
+    } // no change
 
     this.staticOffset = this.simulationTimeObj.getTime() - Date.now();
     // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
@@ -98,6 +105,7 @@ export class TimeManager {
     this.synchronize();
 
     const toggleTimeDOM = getEl('toggle-time-rmb');
+
     if (keepTrackApi.getTimeManager().propRate === 0) {
       toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
     } else {
@@ -109,7 +117,11 @@ export class TimeManager {
 
   static isLeapYear(dateIn: Date) {
     const year = dateIn.getUTCFullYear();
-    if ((year & 3) !== 0) return false;
+
+    if ((year & 3) !== 0) {
+      return false;
+    }
+
     return year % 100 !== 0 || year % 400 === 0;
   }
 
@@ -125,13 +137,18 @@ export class TimeManager {
     // Make a time variable
     const now = new Date();
     // Set the time variable to the time in the future
+
     now.setTime(this.simulationTimeObj.getTime() + offset);
+
     return now;
   }
 
   getPropOffset(): number {
-    if (!this.selectedDate) return 0;
+    if (!this.selectedDate) {
+      return 0;
+    }
     // Not using local scope caused time to drift backwards!
+
     return this.selectedDate.getTime() - Date.now();
   }
 
@@ -143,7 +160,7 @@ export class TimeManager {
     this.timeTextStrEmpty_ = '';
 
     this.propFrozen = Date.now(); // for when propRate 0
-    this.realTime = <Milliseconds>this.propFrozen; // (initialized as Date.now)
+    this.realTime = <Milliseconds> this.propFrozen; // (initialized as Date.now)
     this.propRate = 1.0; // time rate multiplier for propagation
 
     // Initialize
@@ -153,7 +170,7 @@ export class TimeManager {
 
   setNow(realTime: Milliseconds) {
     this.realTime = realTime;
-    this.lastTime = <Milliseconds>this.simulationTimeObj.getTime();
+    this.lastTime = <Milliseconds> this.simulationTimeObj.getTime();
 
     // NOTE: This should be the only regular call to calculateSimulationTime!!
     this.calculateSimulationTime();
@@ -168,10 +185,17 @@ export class TimeManager {
     }
 
     const uiManagerInstance = keepTrackApi.getUiManager();
+
     if (this.propRate > 1.01 || this.propRate < 0.99) {
-      if (this.propRate < 10) uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'standby');
-      if (this.propRate >= 10 && this.propRate < 60) uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'caution');
-      if (this.propRate >= 60) uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'serious');
+      if (this.propRate < 10) {
+        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'standby');
+      }
+      if (this.propRate >= 10 && this.propRate < 60) {
+        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'caution');
+      }
+      if (this.propRate >= 60) {
+        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'serious');
+      }
     } else {
       uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'normal');
     }
@@ -186,7 +210,9 @@ export class TimeManager {
         this.simulationTimeSerialized_ = this.simulationTimeObj.toJSON();
         this.timeTextStr = this.timeTextStrEmpty_;
         for (this.iText = 11; this.iText < 20; this.iText++) {
-          if (this.iText > 11) this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
+          if (this.iText > 11) {
+            this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
+          }
         }
         this.propRate0 = this.propRate;
         settingsManager.isPropRateChange = false;
@@ -196,9 +222,12 @@ export class TimeManager {
       if (this.dateDOM == null) {
         try {
           this.dateDOM = getEl('datetime-text');
-          if (this.dateDOM == null) return;
+          if (this.dateDOM == null) {
+            return;
+          }
         } catch {
           console.log('errors...');
+
           return;
         }
       }
@@ -208,6 +237,7 @@ export class TimeManager {
 
       // Load the current JDAY
       const jday = getDayOfYear(this.simulationTimeObj);
+
       getEl('jday').innerHTML = jday.toString();
     }
 
@@ -221,7 +251,7 @@ export class TimeManager {
           this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
         }
         if (this.datetimeInputDOM !== null) {
-          this.datetimeInputDOM.value = this.selectedDate.toISOString().slice(0, 10) + ' ' + this.selectedDate.toISOString().slice(11, 19);
+          this.datetimeInputDOM.value = `${this.selectedDate.toISOString().slice(0, 10)} ${this.selectedDate.toISOString().slice(11, 19)}`;
         }
       }
     }
@@ -237,10 +267,13 @@ export class TimeManager {
       dynamicOffsetEpoch: this.dynamicOffsetEpoch,
       propRate: this.propRate,
     };
+
     catalogManagerInstance.satCruncher.postMessage(message);
 
-    // OrbitWorker starts later than the satCruncher so it might not be
-    // ready yet.
+    /*
+     * OrbitWorker starts later than the satCruncher so it might not be
+     * ready yet.
+     */
     if (orbitManagerInstance.orbitWorker) {
       orbitManagerInstance.orbitWorker.postMessage(message);
     }

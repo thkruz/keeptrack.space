@@ -56,7 +56,9 @@ export class SelectSatManager extends KeepTrackPlugin {
       let cssStyle = currentSearch.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
 
       // If a satellite is selected on a desktop computer then shrink the search box
-      if (window.innerWidth > 1000 && this.selectedSat !== -1) cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
+      if (window.innerWidth > 1000 && this.selectedSat !== -1) {
+        cssStyle = cssStyle.replace('max-height:auto', 'max-height:27%');
+      }
 
       // Avoid unnecessary dom updates
       if (cssStyle !== this.lastCssStyle && getEl(TopMenu.SEARCH_RESULT_ID)) {
@@ -66,7 +68,9 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   selectSat(satId: number) {
-    if (settingsManager.isDisableSelectSat) return;
+    if (settingsManager.isDisableSelectSat) {
+      return;
+    }
 
     const obj = keepTrackApi.getCatalogManager().getObject(satId);
 
@@ -83,6 +87,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.GROUND_SENSOR_STATION:
           this.selectSensorObject_(obj as DetailedSensor);
           keepTrackApi.getSoundManager()?.play(SoundNames.WHOOSH);
+
           return;
         case SpaceObjectType.PAYLOAD:
         case SpaceObjectType.ROCKET_BODY:
@@ -98,6 +103,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
         case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
           SelectSatManager.selectOwnerManufacturer_(obj as LandObject);
+
           return;
         case SpaceObjectType.STAR:
           return; // Do nothing
@@ -106,6 +112,7 @@ export class SelectSatManager extends KeepTrackPlugin {
           break;
         default:
           errorManagerInstance.log(`SelectSatManager.selectSat: Unknown SpaceObjectType: ${obj.type}`);
+
           return;
       }
     }
@@ -126,6 +133,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     // All sensors should have a sensorId
     if (!sensor.isSensor()) {
       errorManagerInstance.log(`SelectSatManager.selectSensorObject_: SensorObject does not have a sensorId: ${sensor}`);
+
       return;
     }
 
@@ -155,6 +163,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   private selectSatChange_(obj?: DetailedSatellite | MissileObject) {
     const id = obj?.id ?? -1;
+
     keepTrackApi.getSoundManager()?.play(SoundNames.WHOOSH);
 
     if ((obj as DetailedSatellite)?.sccNum === '25544') {
@@ -169,7 +178,9 @@ export class SelectSatManager extends KeepTrackPlugin {
     SelectSatManager.updateBottomMenu_();
 
     // If deselecting a satellite, clear the selected orbit
-    if (id === -1 && this.lastSelectedSat_ > -1) keepTrackApi.getOrbitManager().clearSelectOrbit();
+    if (id === -1 && this.lastSelectedSat_ > -1) {
+      keepTrackApi.getOrbitManager().clearSelectOrbit();
+    }
 
     UrlManager.updateURL();
   }
@@ -180,6 +191,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     if (
       colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group ||
       (typeof (<HTMLInputElement>getEl('search'))?.value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
@@ -197,8 +209,9 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (this.lastSelectedSat() !== -1) {
       keepTrackApi.getMainCamera().exitFixedToSat();
 
-      document.documentElement.style.setProperty('--search-box-bottom', `0px`);
+      document.documentElement.style.setProperty('--search-box-bottom', '0px');
       const satInfoBoxDom = getEl('sat-infobox', true);
+
       if (satInfoBoxDom) {
         satInfoBoxDom.style.display = 'none';
       }
@@ -246,6 +259,8 @@ export class SelectSatManager extends KeepTrackPlugin {
       .filter((_sat) => {
         const isOwner = (_sat as DetailedSatellite).owner === obj.Code;
         const isManufacturer = (_sat as DetailedSatellite).manufacturer === obj.Code; // TODO: This might not work anymroe without coutnry codes
+
+
         return isOwner || isManufacturer;
       })
       .map((_sat) => (_sat as DetailedSatellite).sccNum)
@@ -261,6 +276,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   lastSelectedSat(id?: number): number {
     this.lastSelectedSat_ = id >= -1 ? id : this.lastSelectedSat_;
+
     return this.lastSelectedSat_;
   }
 
@@ -279,11 +295,14 @@ export class SelectSatManager extends KeepTrackPlugin {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color
     const lastSelectedObject = this.lastSelectedSat();
+
     if (lastSelectedObject > -1) {
       colorSchemeManagerInstance.currentColorScheme ??= colorSchemeManagerInstance.default;
       const lastSat = keepTrackApi.getCatalogManager().getObject(lastSelectedObject);
+
       if (lastSat) {
         const newColor = colorSchemeManagerInstance.currentColorScheme(lastSat).color;
+
         colorSchemeManagerInstance.colorData[lastSelectedObject * 4] = newColor[0]; // R
         colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 1] = newColor[1]; // G
         colorSchemeManagerInstance.colorData[lastSelectedObject * 4 + 2] = newColor[2]; // B
@@ -332,7 +351,9 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   setSecondarySat(id: number): void {
-    if (settingsManager.isDisableSelectSat) return;
+    if (settingsManager.isDisableSelectSat) {
+      return;
+    }
     this.secondarySat = id;
     if (this.secondarySatObj?.id !== id) {
       this.secondarySatObj = keepTrackApi.getCatalogManager().getObject(id) as DetailedSatellite;
@@ -348,7 +369,9 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   setSelectedSat(id: number): void {
-    if (settingsManager.isDisableSelectSat || id === null) return;
+    if (settingsManager.isDisableSelectSat || id === null) {
+      return;
+    }
     this.selectedSat = id;
 
     if (this.selectedSat === this.secondarySat && this.selectedSat !== -1) {
@@ -360,8 +383,10 @@ export class SelectSatManager extends KeepTrackPlugin {
   switchPrimarySecondary(): void {
     const _primary = this.selectedSat;
     const _secondary = this.secondarySat;
+
     this.setSecondarySat(_primary);
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
     if (_primary !== -1) {
       orbitManagerInstance.setSelectOrbit(_primary, true);
     } else {
@@ -372,6 +397,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   private registerKeyboardEvents_() {
     const inputManagerInstance = keepTrackApi.getInputManager();
+
     inputManagerInstance.keyboard.registerKeyDownEvent({
       key: ']',
       callback: () => {

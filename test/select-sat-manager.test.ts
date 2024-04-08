@@ -19,6 +19,7 @@ describe('SatInfoBoxCore_class', () => {
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
     const selectSatManager = new SelectSatManager();
+
     selectSatManager.selectSat(0);
     expect(selectSatManager.selectedSat).toBe(0);
 
@@ -27,6 +28,7 @@ describe('SatInfoBoxCore_class', () => {
 
   it('should be able to select a sensor dot', () => {
     const selectSatManager = new SelectSatManager();
+
     websiteInit(new SatInfoBox());
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;

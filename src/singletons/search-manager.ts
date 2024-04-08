@@ -47,6 +47,7 @@ export class SearchManager {
     this.uiManager_ = uiManager;
     const uiWrapper = getEl('ui-wrapper');
     const searchResults = document.createElement('div');
+
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
     uiWrapper.prepend(searchResults);
 
@@ -60,11 +61,15 @@ export class SearchManager {
 
   private addListeners_() {
     getEl('search-results')?.addEventListener('click', (evt: Event) => {
-      let satId = SearchManager.getSatIdFromSearchResults_(evt);
-      if (isNaN(satId) || satId === -1) return;
+      const satId = SearchManager.getSatIdFromSearchResults_(evt);
+
+      if (isNaN(satId) || satId === -1) {
+        return;
+      }
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const obj = catalogManagerInstance.getObject(satId);
+
       if (obj?.type === SpaceObjectType.STAR) {
         keepTrackApi.getMainCamera().lookAtStar(obj as Star);
       } else {
@@ -72,8 +77,11 @@ export class SearchManager {
       }
     });
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
-      let satId = SearchManager.getSatIdFromSearchResults_(evt);
-      if (isNaN(satId) || satId === -1) return;
+      const satId = SearchManager.getSatIdFromSearchResults_(evt);
+
+      if (isNaN(satId) || satId === -1) {
+        return;
+      }
 
       keepTrackApi.getHoverManager().setHoverId(satId);
       this.uiManager_.searchHoverSatId = satId;
@@ -84,6 +92,7 @@ export class SearchManager {
     });
     getEl('search')?.addEventListener('input', () => {
       const searchStr = (<HTMLInputElement>getEl('search')).value;
+
       this.doSearch(searchStr);
     });
     getEl('search')?.addEventListener('blur', () => {
@@ -98,16 +107,21 @@ export class SearchManager {
 
   private static getSatIdFromSearchResults_(evt: Event) {
     let satId = -1;
+
     if ((<HTMLElement>evt.target).classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).dataset.objId;
+
       satId = satIdStr ? parseInt(satIdStr) : -1;
     } else if ((<HTMLElement>evt.target).parentElement?.classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).parentElement?.dataset.objId;
+
       satId = satIdStr ? parseInt(satIdStr) : -1;
     } else if ((<HTMLElement>evt.target).parentElement?.parentElement?.classList.contains('search-result')) {
       const satIdStr = (<HTMLElement>evt.target).parentElement?.parentElement?.dataset.objId;
+
       satId = satIdStr ? parseInt(satIdStr) : -1;
     }
+
     return satId;
   }
 
@@ -124,6 +138,7 @@ export class SearchManager {
   getCurrentSearch(): string {
     if (this.isResultsOpen) {
       const searchDom = <HTMLInputElement>getEl('search', true);
+
       if (searchDom) {
         return searchDom.value;
       }
@@ -170,13 +185,16 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     if (searchString == '') {
       this.hideResults();
+
       return;
     }
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const dotsManagerInstance = keepTrackApi.getDotsManager();
 
-    if (catalogManagerInstance.objectCache.length === 0) throw new Error('No sat data loaded! Check if TLEs are corrupted!');
+    if (catalogManagerInstance.objectCache.length === 0) {
+      throw new Error('No sat data loaded! Check if TLEs are corrupted!');
+    }
 
     if (searchString.length === 0) {
       settingsManager.lastSearch = '';
@@ -184,16 +202,20 @@ export class SearchManager {
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
+
       return;
     }
 
     const searchDom = <HTMLInputElement>getEl('search');
+
     if (searchDom) {
       searchDom.value = searchString;
     }
 
-    // Don't search for things until at least the minimum characters
-    // are typed otherwise there are just too many search results.
+    /*
+     * Don't search for things until at least the minimum characters
+     * are typed otherwise there are just too many search results.
+     */
     if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
       return;
     }
@@ -201,15 +223,20 @@ export class SearchManager {
     // Uppercase to make this search not case sensitive
     searchString = searchString.toUpperCase();
 
-    // NOTE: We are no longer using spaces because it is difficult
-    // to predict when a space is part of satellite name.
+    /*
+     * NOTE: We are no longer using spaces because it is difficult
+     * to predict when a space is part of satellite name.
+     */
 
-    // Split string into array using comma or space as delimiter
-    // let searchList = searchString.split(/(?![0-9]+)\s(?=[0-9]+)|,/u);
+    /*
+     * Split string into array using comma or space as delimiter
+     * let searchList = searchString.split(/(?![0-9]+)\s(?=[0-9]+)|,/u);
+     */
 
     let results = <SearchResult[]>[];
     // If so, then do a number only search
-    if (/^[0-9,]+$/u.test(searchString)) {
+
+    if ((/^[0-9,]+$/u).test(searchString)) {
       results = SearchManager.doNumOnlySearch_(searchString);
     } else {
       // If not, then do a regular search
@@ -221,6 +248,7 @@ export class SearchManager {
 
     // Make a group to hilight results
     const idList = results.map((sat) => sat.id);
+
     settingsManager.lastSearchResults = idList;
 
     dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
@@ -229,16 +257,20 @@ export class SearchManager {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     const dispGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, idList);
+
     this.lastResultGroup_ = dispGroup;
     groupManagerInstance.selectGroup(dispGroup);
 
-    if (!isPreventDropDown) this.fillResultBox(results, catalogManagerInstance);
+    if (!isPreventDropDown) {
+      this.fillResultBox(results, catalogManagerInstance);
+    }
 
     if (idList.length === 0) {
       if (settingsManager.lastSearch?.length > settingsManager.minimumSearchCharacters) {
         uiManagerInstance.toast('No Results Found', 'serious', false);
       }
       this.hideResults();
+
       return;
     }
 
@@ -257,7 +289,7 @@ export class SearchManager {
     const results: SearchResult[] = [];
 
     // Split string into array using comma
-    let searchList = searchString.split(/,/u);
+    const searchList = searchString.split(/,/u);
 
     // Update last search with the most recent search results
     settingsManager.lastSearch = searchList;
@@ -267,11 +299,18 @@ export class SearchManager {
 
     searchList.forEach((searchStringIn) => {
       satData.every((sat) => {
-        if (results.length >= settingsManager.searchLimit) return false;
+        if (results.length >= settingsManager.searchLimit) {
+          return false;
+        }
         const len = searchStringIn.length;
-        if (len === 0) return true; // Skip empty strings
+
+        if (len === 0) {
+          return true;
+        } // Skip empty strings
         // TODO: #855 Allow searching for other types of objects
-        if (!sat.isMissile() && !sat.isSatellite()) return true; // Skip non satellites and missiles
+        if (!sat.isMissile() && !sat.isSatellite()) {
+          return true;
+        } // Skip non satellites and missiles
 
         if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
           results.push({
@@ -280,6 +319,7 @@ export class SearchManager {
             patlen: len,
             id: sat.id,
           });
+
           return true; // Prevent's duplicate results
         }
 
@@ -290,6 +330,7 @@ export class SearchManager {
             patlen: len,
             id: sat.id,
           });
+
           return true; // Prevent's duplicate results
         }
 
@@ -302,6 +343,7 @@ export class SearchManager {
             patlen: len,
             id: sat.id,
           });
+
           return true; // Prevent's duplicate results
         } else {
           return true; // Last check for missiles
@@ -309,7 +351,9 @@ export class SearchManager {
 
         if (sat.sccNum && sat.sccNum.indexOf(searchStringIn) !== -1) {
           // Ignore Notional Satellites unless all 6 characters are entered
-          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) return true;
+          if (sat.name.includes(' Notional)') && searchStringIn.length < 6) {
+            return true;
+          }
 
           results.push({
             strIndex: sat.sccNum.indexOf(searchStringIn),
@@ -317,12 +361,15 @@ export class SearchManager {
             patlen: len,
             id: sat.id,
           });
+
           return true; // Prevent's duplicate results
         }
 
         if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
           // Ignore Notional Satellites
-          if (sat.name.includes(' Notional)')) return true;
+          if (sat.name.includes(' Notional)')) {
+            return true;
+          }
 
           results.push({
             strIndex: sat.intlDes.indexOf(searchStringIn),
@@ -330,6 +377,7 @@ export class SearchManager {
             patlen: len,
             id: sat.id,
           });
+
           return true; // Prevent's duplicate results
         }
 
@@ -340,6 +388,7 @@ export class SearchManager {
             patlen: len,
             id: sat.id,
           });
+
           return true; // Prevent's duplicate results
         }
 
@@ -356,6 +405,7 @@ export class SearchManager {
     // Split string into array using comma
     let searchList = searchString.split(/,/u).filter((str) => str.length > 0);
     // Sort the numbers so that the lowest numbers are searched first
+
     searchList = searchList.sort((a, b) => parseInt(a) - parseInt(b));
 
     // Update last search with the most recent search results
@@ -366,18 +416,28 @@ export class SearchManager {
 
     let i = 0;
     let lastFoundI = 0;
+
     searchList.forEach((searchStringIn) => {
       // Don't search for things until at least the minimum characters
-      if (searchStringIn.length <= settingsManager.minimumSearchCharacters) return;
+      if (searchStringIn.length <= settingsManager.minimumSearchCharacters) {
+        return;
+      }
       // Last one never got found
-      if (i >= satData.length) i = lastFoundI;
+      if (i >= satData.length) {
+        i = lastFoundI;
+      }
 
       for (; i < satData.length; i++) {
-        if (results.length >= settingsManager.searchLimit) break;
+        if (results.length >= settingsManager.searchLimit) {
+          break;
+        }
 
         const sat = satData[i];
         // Ignore Notional Satellites unless all 6 characters are entered
-        if (sat.type === SpaceObjectType.NOTIONAL && searchStringIn.length < 6) continue;
+
+        if (sat.type === SpaceObjectType.NOTIONAL && searchStringIn.length < 6) {
+          continue;
+        }
 
         // Check if matches 6Digit
         if (sat.sccNum6 && sat.sccNum6.indexOf(searchStringIn) !== -1) {
@@ -406,22 +466,36 @@ export class SearchManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const searchableObjects = (
       catalogManagerInstance.objectCache.filter((obj) => {
-        if (obj.isSensor() || obj.isMarker() || obj.isGroundObject() || obj.isStar()) return false; // Skip static dots (Maybe these should be searchable?)
-        if (!isIncludeMissiles && obj.isMissile()) return false; // Skip missiles (if not searching for missiles
+        if (obj.isSensor() || obj.isMarker() || obj.isGroundObject() || obj.isStar()) {
+          return false;
+        } // Skip static dots (Maybe these should be searchable?)
+        if (!isIncludeMissiles && obj.isMissile()) {
+          return false;
+        } // Skip missiles (if not searching for missiles
 
-        if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn && obj.type !== SpaceObjectType.PAYLOAD) return false; // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
-        if (!(obj as MissileObject).active) return false; // Skip inactive missiles.
-        if ((obj as DetailedSatellite).country == 'ANALSAT' && !obj.active) return false; // Skip Fake Analyst satellites
-        if (!obj.name) return false; // Everything has a name. If it doesn't then assume it isn't what we are searching for.
+        if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn && obj.type !== SpaceObjectType.PAYLOAD) {
+          return false;
+        } // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+        if (!(obj as MissileObject).active) {
+          return false;
+        } // Skip inactive missiles.
+        if ((obj as DetailedSatellite).country == 'ANALSAT' && !obj.active) {
+          return false;
+        } // Skip Fake Analyst satellites
+        if (!obj.name) {
+          return false;
+        } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
+
         return true;
       }) as (DetailedSatellite & MissileObject)[]
     ).sort((a, b) => {
       // Sort by sccNum
       if ((a as DetailedSatellite).sccNum && (b as DetailedSatellite).sccNum) {
         return parseInt((a as DetailedSatellite).sccNum) - parseInt((b as DetailedSatellite).sccNum);
-      } else {
-        return 0;
       }
+
+      return 0;
+
     });
 
     return isIncludeMissiles ? (searchableObjects as (DetailedSatellite | MissileObject)[]) : (searchableObjects as DetailedSatellite[]);
@@ -430,10 +504,12 @@ export class SearchManager {
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    let satData = catalogManagerInstance.objectCache;
+    const satData = catalogManagerInstance.objectCache;
+
     getEl('search-results').innerHTML = results.reduce((html, result) => {
       const obj = <DetailedSatellite | MissileObject>satData[result.id];
-      html += '<div class="search-result" data-obj-id="' + obj.id + '">';
+
+      html += `<div class="search-result" data-obj-id="${obj.id}">`;
       html += '<div class="truncate-search">';
 
       // Left half of search results
@@ -474,6 +550,7 @@ export class SearchManager {
           {
             const sat = obj as DetailedSatellite;
             // If the international designator matched
+
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
@@ -488,6 +565,7 @@ export class SearchManager {
           {
             const sat = obj as DetailedSatellite;
             // If the object number matched
+
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
@@ -501,6 +579,7 @@ export class SearchManager {
         case SearchResultType.LV:
           {
             const sat = obj as DetailedSatellite;
+
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
@@ -514,6 +593,7 @@ export class SearchManager {
         case SearchResultType.MISSILE:
           {
             const misl = obj as MissileObject;
+
             html += misl.desc;
           }
           break;
@@ -523,22 +603,28 @@ export class SearchManager {
         default:
           if (obj.isMissile()) {
             const misl = obj as MissileObject;
+
             html += misl.desc;
           } else if (obj.isStar()) {
             html += 'Star';
           } else if (obj.isSatellite()) {
             const sat = obj as DetailedSatellite;
+
             html += sat.sccNum;
           }
           break;
       }
 
       html += '</div></div>';
+
       return html;
     }, '');
 
     const satInfoboxDom = getEl('sat-infobox');
-    if (satInfoboxDom) SatInfoBox.resetMenuLocation(satInfoboxDom, false);
+
+    if (satInfoboxDom) {
+      SatInfoBox.resetMenuLocation(satInfoboxDom, false);
+    }
 
     slideInDown(getEl('search-results'), 1000);
     this.isResultsOpen = true;
@@ -562,7 +648,9 @@ export class SearchManager {
   }
 
   closeSearch(isForce = false) {
-    if (!this.isSearchOpen && !isForce) return;
+    if (!this.isSearchOpen && !isForce) {
+      return;
+    }
 
     this.isSearchOpen = false;
     getEl('search-holder')?.classList.remove('search-slide-down');
@@ -572,15 +660,19 @@ export class SearchManager {
   }
 
   openSearch(isForce = false) {
-    if (this.isSearchOpen && !isForce) return;
+    if (this.isSearchOpen && !isForce) {
+      return;
+    }
 
     this.isSearchOpen = true;
     getEl('search-holder')?.classList.remove('search-slide-up');
     getEl('search-holder')?.classList.add('search-slide-down');
 
     const searchDom = <HTMLInputElement>getEl('search');
+
     if (searchDom) {
       const curSearch = searchDom.value;
+
       if (curSearch.length > settingsManager.minimumSearchCharacters) {
         this.doSearch(curSearch);
       }

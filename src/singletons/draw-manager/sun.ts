@@ -59,7 +59,9 @@ export class Sun {
    * This is run once per frame to render the sun.
    */
   draw(earthLightDirection: vec3, tgtBuffer: WebGLFramebuffer = null) {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_) {
+      return;
+    }
     const gl = this.gl_;
 
     this.mesh.program.use();
@@ -107,6 +109,7 @@ export class Sun {
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
+
     this.mesh = new Mesh(this.gl_, geometry, material, {
       name: 'sun',
       precision: 'highp',
@@ -129,9 +132,11 @@ export class Sun {
    */
   update(j: number) {
     const eci = SatMath.getSunDirection(j);
+
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
+
     this.position[0] = (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE;
     this.position[1] = (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE;
     this.position[2] = (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE;
@@ -146,6 +151,7 @@ export class Sun {
    */
   private setUniforms_(earthLightDirection: vec3) {
     const gl = this.gl_;
+
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);

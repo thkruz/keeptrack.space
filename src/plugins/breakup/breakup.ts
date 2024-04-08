@@ -34,13 +34,18 @@ export class Breakup extends KeepTrackPlugin {
 
   bottomIconCallback = (): void => {
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-    if (!obj?.isSatellite()) return;
+
+    if (!obj?.isSatellite()) {
+      return;
+    }
 
     const sat = obj as DetailedSatellite;
+
     if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
       this.closeSideMenu();
       this.setBottomIconToDisabled();
+
       return;
     }
     this.updateSccNumInMenu_();
@@ -129,7 +134,7 @@ export class Breakup extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = `Breakup Menu`;
+  helpTitle = 'Breakup Menu';
   helpBody = keepTrackApi.html`The Breakup Menu is a tool for simulating the breakup of a satellite.
   <br><br>
   By modifying duplicating and modifying a satellite's orbit we can model the breakup of a satellite.
@@ -184,9 +189,14 @@ export class Breakup extends KeepTrackPlugin {
   }
 
   private updateSccNumInMenu_() {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-    if (!obj?.isSatellite()) return;
+
+    if (!obj?.isSatellite()) {
+      return;
+    }
     (<HTMLInputElement>getEl('hc-scc')).value = (obj as DetailedSatellite).sccNum;
   }
 
@@ -205,22 +215,25 @@ export class Breakup extends KeepTrackPlugin {
     const launchLon = lla.lon;
 
     const upOrDown = SatMath.getDirection(mainsat, simulationTimeObj);
+
     if (upOrDown === 'Error') {
       errorManagerInstance.warn('Cannot calculate direction of satellite. Try again later.');
     }
 
     const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
+
     mainsat.tle1 = (mainsat.tle1.substring(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substring(32)) as TleLine1;
 
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
+
       return;
     }
 
     const alt = mainsat.apogee - mainsat.perigee < 300 ? 0 : lla.alt; // Ignore argument of perigee for round orbits OPTIMIZE
-    let tles = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt as Kilometers).rotateOrbitToLatLon();
+    const tles = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt as Kilometers).rotateOrbitToLatLon();
     const tle1 = tles[0];
     const tle2 = tles[1];
 
@@ -233,14 +246,16 @@ export class Breakup extends KeepTrackPlugin {
         active: true,
       },
     });
+
     catalogManagerInstance.objectCache[satId] = newSat;
     catalogManagerInstance.satCruncher.postMessage({
       typ: CruncerMessageTypes.SAT_EDIT,
       id: satId,
-      tle1: tle1,
-      tle2: tle2,
+      tle1,
+      tle2,
     });
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
     orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
 
     const eVariation = 0.00015;
@@ -250,12 +265,16 @@ export class Breakup extends KeepTrackPlugin {
 
     // NOTE: Previously we used - settingsManager.maxAnalystSats;
     let i = 0;
+
     for (let rascIterat = 0; rascIterat <= 4; rascIterat++) {
-      if (i >= breakupCount) break;
+      if (i >= breakupCount) {
+        break;
+      }
       const a5Num = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
       const id = catalogManagerInstance.sccNum2Id(a5Num);
+
       catalogManagerInstance.getObject(id); // TODO: This may be unnecessary needs tested
-      let sat = origsat;
+      const sat = origsat;
       // Is this needed? -- let itle1 = '1 ' + (80000 + i) + tle1.substr(7) ??
 
       const rascOffset = -rascVariation / 2 + rascVariation * (rascIterat / 4);
@@ -263,25 +282,33 @@ export class Breakup extends KeepTrackPlugin {
       let iTLEs = new OrbitFinder(sat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, newAlt as Kilometers, rascOffset).rotateOrbitToLatLon();
 
       if (iTLEs[0] === 'Error') {
-        // Try a second time with a slightly different time
-        // TODO: There should be a more elegant way to do this
-        // I think a flag that has the orbit finder try to find a solution with more granularity would be better than
-        // just trying again with a different time.
+        /*
+         * Try a second time with a slightly different time
+         * TODO: There should be a more elegant way to do this
+         * I think a flag that has the orbit finder try to find a solution with more granularity would be better than
+         * just trying again with a different time.
+         */
         iTLEs = new OrbitFinder(sat, launchLat, launchLon, <'N' | 'S'>upOrDown, new Date(simulationTimeObj.getTime() + 1), newAlt as Kilometers, rascOffset).rotateOrbitToLatLon();
         if (iTLEs[0] === 'Error') {
           errorManagerInstance.error(new Error(iTLEs[1]), 'breakup.ts', 'Error creating breakup!');
+
           return;
         }
       }
 
       let iTle1 = iTLEs[0];
       let iTle2 = iTLEs[1];
+
       for (; i < ((rascIterat + 1) * breakupCount) / 4; i++) {
         // Inclination
         let inc = parseFloat(tle2.substring(8, 16));
+
         inc = inc + Math.random() * incVariation * 2 - incVariation;
         const incStr = inc.toFixed(4).padStart(8, '0');
-        if (incStr.length !== 8) throw new Error(`Inclination length is not 8 - ${incStr} - ${tle2}`);
+
+        if (incStr.length !== 8) {
+          throw new Error(`Inclination length is not 8 - ${incStr} - ${tle2}`);
+        }
 
         // Ecentricity
         sat.eccentricity = origEcc;
@@ -289,19 +316,29 @@ export class Breakup extends KeepTrackPlugin {
 
         // Mean Motion
         let meanmo = parseFloat(iTle2.substring(52, 62));
+
         meanmo = meanmo + Math.random() * meanmoVariation * 2 - meanmoVariation;
         const meanmoStr = meanmo.toFixed(8).padStart(11, '0');
-        if (meanmoStr.length !== 11) throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTle2}`);
+
+        if (meanmoStr.length !== 11) {
+          throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTle2}`);
+        }
 
         const a5Num = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
         const satId = catalogManagerInstance.sccNum2Id(a5Num);
-        iTle1 = `1 ${a5Num}` + iTle1.substring(7);
+
+        iTle1 = `1 ${a5Num}${iTle1.substring(7)}`;
         iTle2 = `2 ${a5Num} ${incStr} ${iTle2.substring(17, 52)}${meanmoStr}${iTle2.substring(63)}`;
 
-        if (iTle1.length !== 69) throw new Error(`Invalid tle1: length is not 69 - ${iTle1}`);
-        if (iTle2.length !== 69) throw new Error(`Invalid tle1: length is not 69 - ${iTle2}`);
+        if (iTle1.length !== 69) {
+          throw new Error(`Invalid tle1: length is not 69 - ${iTle1}`);
+        }
+        if (iTle2.length !== 69) {
+          throw new Error(`Invalid tle1: length is not 69 - ${iTle2}`);
+        }
 
         let newSat: DetailedSatellite;
+
         try {
           newSat = new DetailedSatellite({
             ...catalogManagerInstance.objectCache[satId],
@@ -314,6 +351,7 @@ export class Breakup extends KeepTrackPlugin {
           });
         } catch (e) {
           errorManagerInstance.error(e, 'breakup.ts', 'Error creating breakup!');
+
           return;
         }
 
@@ -345,6 +383,8 @@ export class Breakup extends KeepTrackPlugin {
     const incVariation = parseFloat((<HTMLInputElement>getEl('hc-inc')).value);
     const rascVariation = parseFloat((<HTMLInputElement>getEl('hc-raan')).value);
     const breakupCount = parseInt((<HTMLInputElement>getEl('hc-count')).value);
+
+
     return { satId, breakupCount, rascVariation, incVariation, meanmoVariation };
   }
 }

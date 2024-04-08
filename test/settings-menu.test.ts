@@ -19,6 +19,7 @@ describe('SettingsMenuPlugin_class', () => {
   // Test changing the form settings
   it('should change the form settings', () => {
     const settingsMenuPlugin = new SettingsMenuPlugin();
+
     websiteInit(settingsMenuPlugin);
     expect(() => getEl('settings-leoSats').click()).not.toThrow();
     expect(() => getEl('settings-heoSats').click()).not.toThrow();
@@ -43,9 +44,11 @@ describe('SettingsMenuPlugin_class', () => {
   // Test submitting changes
   it('should submit changes', () => {
     const settingsMenuPlugin = new SettingsMenuPlugin();
+
     websiteInit(settingsMenuPlugin);
     keepTrackApi.getGroupsManager().clearSelect = jest.fn();
     const colorSchemeManagerInstance = new ColorSchemeManager();
+
     colorSchemeManagerInstance.setColorScheme = jest.fn();
     colorSchemeManagerInstance.reloadColors = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);

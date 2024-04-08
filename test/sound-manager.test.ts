@@ -6,6 +6,7 @@ import { standardPluginSuite } from './generic-tests';
 
 describe('Sound Manager', () => {
   let soundManagerPlugin: SoundManager;
+
   beforeEach(() => {
     soundManagerPlugin = new SoundManager();
   });
@@ -18,6 +19,7 @@ describe('Sound Manager', () => {
     expect(sounds).toBeDefined();
     expect(sounds.click).toBeDefined();
 
+    // eslint-disable-next-line guard-for-in
     for (const sound in sounds) {
       const soundManagerPlugin2 = soundManagerPlugin;
 
@@ -33,6 +35,7 @@ describe('Sound Manager', () => {
 
     for (let i = 0; i < 30; i++) {
       const soundManagerPlugin2 = soundManagerPlugin;
+
       expect(() => soundManagerPlugin2.play(SoundNames.BEEP)).not.toThrow();
     }
   });

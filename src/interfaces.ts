@@ -273,7 +273,8 @@ export interface ColorRuleParams {
 
 export type ColorRuleSet = (obj: BaseObject, params?: any) => ColorInformation;
 
-/************************************************************
+/**
+ ***********************************************************
  * Singletons
  *
  * Using these interfaces will allow us to create replaceable
@@ -283,7 +284,8 @@ export type ColorRuleSet = (obj: BaseObject, params?: any) => ColorInformation;
  * CatalogManager interface but is more resource intensive
  * for better accuracy.
  *
- * **********************************************************/
+ * *********************************************************
+ */
 
 export enum Singletons {
   CatalogManager = 'CatalogManager',

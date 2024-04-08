@@ -6,12 +6,14 @@ import { setupDefaultHtml, setupStandardEnvironment } from './environment/standa
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('SatConstellations_class', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let satConstellationsPlugin: SatConstellations;
+
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
       AutoInit: () => {},
-    };
+    } as any;
     satConstellationsPlugin = new SatConstellations();
   });
 
@@ -19,11 +21,14 @@ describe('SatConstellations_class', () => {
   standardPluginMenuButtonTests(SatConstellations, 'SatConstellations');
 });
 
-// TODO: This test needs satLinkManager to be initialized in catalogManager to properly
-// test the menu items.
+/*
+ * TODO: This test needs satLinkManager to be initialized in catalogManager to properly
+ * test the menu items.
+ */
 describe('SatConstellations_test_all_links', () => {
-  let links = [];
+  const links = [];
   const tempSatConstellationsPlugin = new SatConstellations();
+
   websiteInit(tempSatConstellationsPlugin);
 
   getEl('constellation-menu')
@@ -42,7 +47,8 @@ describe('SatConstellations_test_all_links', () => {
     satConstellationsPlugin = new SatConstellations();
     websiteInit(satConstellationsPlugin);
 
-    let groupList = {};
+    const groupList = {};
+
     keepTrackApi.getGroupsManager = () =>
       ({
         createGroup: (_type: GroupType, _listOfSats: number[], name: string) => {
@@ -51,7 +57,7 @@ describe('SatConstellations_test_all_links', () => {
           };
         },
         selectGroup: () => {},
-        groupList: groupList,
+        groupList,
       }) as any;
   });
 

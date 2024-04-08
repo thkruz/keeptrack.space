@@ -12,17 +12,27 @@ export class KeyboardInput {
   isShiftPressed = false;
 
   init() {
-    if (settingsManager.isDisableKeyboard) return;
+    if (settingsManager.isDisableKeyboard) {
+      return;
+    }
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.ctrlKey === true || e.metaKey === true) this.isCtrlPressed = true;
-      if (e.shiftKey === true) this.isShiftPressed = true;
+      if (e.ctrlKey === true || e.metaKey === true) {
+        this.isCtrlPressed = true;
+      }
+      if (e.shiftKey === true) {
+        this.isShiftPressed = true;
+      }
     });
     window.addEventListener('keyup', (e: KeyboardEvent) => {
-      if (e.ctrlKey === false || e.metaKey === false) this.isCtrlPressed = false;
-      if (e.shiftKey === false) this.isShiftPressed = false;
+      if (e.ctrlKey === false || e.metaKey === false) {
+        this.isCtrlPressed = false;
+      }
+      if (e.shiftKey === false) {
+        this.isShiftPressed = false;
+      }
     });
 
     if (!settingsManager.disableUI) {
@@ -30,11 +40,15 @@ export class KeyboardInput {
         this.keyHandler(<KeyboardEvent>e);
       });
       window.addEventListener('keydown', (e: Event) => {
-        if (uiManagerInstance.isCurrentlyTyping) return;
+        if (uiManagerInstance.isCurrentlyTyping) {
+          return;
+        }
         this.keyDownHandler(<KeyboardEvent>e);
       });
       window.addEventListener('keyup', (e: Event) => {
-        if (uiManagerInstance.isCurrentlyTyping) return;
+        if (uiManagerInstance.isCurrentlyTyping) {
+          return;
+        }
         this.keyUpHandler(<KeyboardEvent>e);
       });
     }
@@ -82,18 +96,25 @@ export class KeyboardInput {
       });
   }
 
+  // eslint-disable-next-line complexity
   keyHandler(evt: KeyboardEvent) {
     // Error Handling
-    if (typeof evt.key == 'undefined') return;
+    if (typeof evt.key === 'undefined') {
+      return;
+    }
 
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    if (uiManagerInstance.isCurrentlyTyping) return;
+    if (uiManagerInstance.isCurrentlyTyping) {
+      return;
+    }
 
     switch (evt.key.toUpperCase()) {
-      // Open the search bar for faster searching
-      // TODO: What if it isn't available?
+      /*
+       * Open the search bar for faster searching
+       * TODO: What if it isn't available?
+       */
       case 'F':
         evt.preventDefault();
 
@@ -115,7 +136,10 @@ export class KeyboardInput {
       case 'D':
         if (this.isShiftPressed && keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
           const debugPlugin = keepTrackApi.getPlugin(DebugMenuPlugin);
-          if (!debugPlugin) return;
+
+          if (!debugPlugin) {
+            return;
+          }
 
           if (debugPlugin.isErudaVisible) {
             eruda.hide();
@@ -126,6 +150,9 @@ export class KeyboardInput {
           }
         }
         break;
+      default:
+        break;
+
     }
 
     switch (evt.key) {
@@ -203,6 +230,8 @@ export class KeyboardInput {
         timeManagerInstance.changePropRate(1);
         settingsManager.isPropRateChange = true;
         break;
+      default:
+        break;
     }
 
     if (settingsManager.isPropRateChange) {
@@ -210,10 +239,15 @@ export class KeyboardInput {
       timeManagerInstance.synchronize();
       if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate && timeManagerInstance.propRate0 !== timeManagerInstance.propRate) {
         if (timeManagerInstance.propRate > 1.01 || timeManagerInstance.propRate < 0.99) {
-          if (timeManagerInstance.propRate < 10) uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'standby');
-          if (timeManagerInstance.propRate >= 10 && timeManagerInstance.propRate < 60)
+          if (timeManagerInstance.propRate < 10) {
+            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'standby');
+          }
+          if (timeManagerInstance.propRate >= 10 && timeManagerInstance.propRate < 60) {
             uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'caution');
-          if (timeManagerInstance.propRate >= 60) uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'serious');
+          }
+          if (timeManagerInstance.propRate >= 60) {
+            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'serious');
+          }
         } else {
           uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'normal');
         }

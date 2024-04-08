@@ -8,6 +8,7 @@ export class SocialMedia extends KeepTrackPlugin {
   dependencies = ['Top Menu'];
   constructor() {
     const PLUGIN_NAME = 'Social Media';
+
     super(PLUGIN_NAME);
   }
 
@@ -23,6 +24,7 @@ export class SocialMedia extends KeepTrackPlugin {
   private static uiManagerFinal_(): void {
     // Bottom Icon
     const githubShareElement = document.createElement('li');
+
     githubShareElement.innerHTML = keepTrackApi.html`
           <a id="github-share1" class="top-menu-icons" rel="noreferrer" href="https://github.com/thkruz/keeptrack.space/" target="_blank">
             <img

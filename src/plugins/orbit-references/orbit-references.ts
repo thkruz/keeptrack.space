@@ -40,7 +40,7 @@ export class OrbitReferences extends KeepTrackPlugin {
             keepTrackApi.html`
                 <div id="orbit-references-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                       data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
-              `
+              `,
           );
           getEl('orbit-references-link').addEventListener('click', this.orbitReferencesLinkClick.bind(this));
           this.doOnce = true;
@@ -54,7 +54,10 @@ export class OrbitReferences extends KeepTrackPlugin {
 
     // Determine which satellite is selected
     const sat = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
-    if (!sat) return;
+
+    if (!sat) {
+      return;
+    }
 
     let searchStr = '';
 
@@ -74,6 +77,7 @@ export class OrbitReferences extends KeepTrackPlugin {
     const period = 1440.0 / parseFloat(meanmo);
 
     let j = 0;
+
     for (let i = 0; i < 360; i++) {
       const meana = j.toFixed(4).padStart(8, '0') as StringifiedNumber;
       const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
@@ -81,16 +85,20 @@ export class OrbitReferences extends KeepTrackPlugin {
       const a5 = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString().padStart(5, '0'));
       const id = catalogManagerInstance.sccNum2Id(a5);
       const analystSat = catalogManagerInstance.addAnalystSat(tle1, tle2, id, a5);
+
       if (analystSat) {
-        searchStr += analystSat.sccNum.toString() + ',';
+        searchStr += `${analystSat.sccNum.toString()},`;
       }
       j += (360 / period) * 4;
-      if (j >= 360) break;
+      if (j >= 360) {
+        break;
+      }
     }
 
     // Remove the last comma
     searchStr = searchStr.slice(0, -1);
     const uiManagerInstance = keepTrackApi.getUiManager();
+
     uiManagerInstance.doSearch(searchStr);
 
     this.isReferenceSatsActive = true;

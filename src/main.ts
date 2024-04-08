@@ -37,6 +37,7 @@ declare global {
 // Load the main website class
 const keepTrack = new KeepTrack(window.settingsOverride);
 // Expose to window for debugging
+
 window.keepTrack = keepTrack;
 // Initialize the website
 KeepTrack.initCss().then(() => {

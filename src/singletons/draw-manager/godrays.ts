@@ -42,12 +42,18 @@ export class Godrays {
   renderBuffer: WebGLRenderbuffer;
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer) {
-    if (!this.isLoaded_ || settingsManager.isDisableGodrays) return;
+    if (!this.isLoaded_ || settingsManager.isDisableGodrays) {
+      return;
+    }
     // Calculate sun position immediately before drawing godrays
     const screenPosition = this.getScreenCoords_(pMatrix, camMatrix);
-    if (isNaN(screenPosition[0]) || isNaN(screenPosition[1])) return;
+
+    if (isNaN(screenPosition[0]) || isNaN(screenPosition[1])) {
+      return;
+    }
 
     const gl = this.gl_;
+
     this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
@@ -100,6 +106,7 @@ export class Godrays {
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
+
     this.mesh = new Mesh(this.gl_, geometry, material, {
       name: 'godrays',
       precision: 'highp',
@@ -138,6 +145,7 @@ export class Godrays {
 
   private initFrameBuffer_(): void {
     const gl = this.gl_;
+
     keepTrackApi.getScene().frameBuffers.godrays = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.godrays);
 

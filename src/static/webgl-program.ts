@@ -43,20 +43,26 @@ export class WebGlProgramHelper {
    */
   createProgram(gl: WebGL2RenderingContext, vertShader: WebGLShader, fragShader: WebGLShader, attribs: any, uniforms: any): WebGLProgram {
     const program = gl.createProgram();
+
     gl.attachShader(program, vertShader);
     gl.attachShader(program, fragShader);
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       const info = gl.getProgramInfoLog(program);
-      throw new Error('Could not compile WebGL program. \n\n' + info);
+
+      throw new Error(`Could not compile WebGL program. \n\n${info}`);
     }
 
     GlUtils.tagObject(gl, program, this.name);
     gl.useProgram(program);
 
-    if (attribs) GlUtils.assignAttributes(attribs, gl, program, Object.keys(attribs));
-    if (uniforms) GlUtils.assignUniforms(uniforms, gl, program, Object.keys(uniforms));
+    if (attribs) {
+      GlUtils.assignAttributes(attribs, gl, program, Object.keys(attribs));
+    }
+    if (uniforms) {
+      GlUtils.assignUniforms(uniforms, gl, program, Object.keys(uniforms));
+    }
 
     return program;
   }
@@ -66,11 +72,13 @@ export class WebGlProgramHelper {
    */
   private static createVertexShader_(gl: WebGL2RenderingContext, source: string): WebGLShader {
     const vertShader = gl.createShader(gl.VERTEX_SHADER);
+
     gl.shaderSource(vertShader, source);
     gl.compileShader(vertShader);
     if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
-      throw new Error('Vertex shader compilation failed: ' + gl.getShaderInfoLog(vertShader));
+      throw new Error(`Vertex shader compilation failed: ${gl.getShaderInfoLog(vertShader)}`);
     }
+
     return vertShader;
   }
 
@@ -79,11 +87,13 @@ export class WebGlProgramHelper {
    */
   private static createFragmentShader_(gl: WebGL2RenderingContext, source: string): WebGLShader {
     const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+
     gl.shaderSource(fragShader, source);
     gl.compileShader(fragShader);
     if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
-      throw new Error('Fragment shader compilation failed: ' + gl.getShaderInfoLog(fragShader));
+      throw new Error(`Fragment shader compilation failed: ${gl.getShaderInfoLog(fragShader)}`);
     }
+
     return fragShader;
   }
 

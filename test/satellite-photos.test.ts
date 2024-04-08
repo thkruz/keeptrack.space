@@ -5,7 +5,9 @@ import { setupDefaultHtml, setupStandardEnvironment } from './environment/standa
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('SatellitePhotos_class', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let satellitePhotosPlugin: SatellitePhotos;
+
   beforeEach(() => {
     setupDefaultHtml();
     satellitePhotosPlugin = new SatellitePhotos();
@@ -17,10 +19,12 @@ describe('SatellitePhotos_class', () => {
 
 describe('SatellitePhotos_test_links', () => {
   const tempSatellitePhotosPlugin = new SatellitePhotos();
+
   websiteInit(tempSatellitePhotosPlugin);
   const links = Array.from(getEl('sat-photo-menu-content').getElementsByTagName('li')).map((li) => li.id);
 
   let satellitePhotosPlugin: SatellitePhotos;
+
   beforeEach(() => {
     setupStandardEnvironment();
     satellitePhotosPlugin = new SatellitePhotos();

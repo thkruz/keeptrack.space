@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { getEl } from '@app/lib/get-el';
 import { StringPad } from '@app/lib/stringPad';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
@@ -69,8 +70,10 @@ export interface KeepTrackTLEFile {
   equipment?: string;
   /** Date launched into space in YYYY-MM-DD */
   launchDate?: string;
-  /** Stable Date in YYYY-MM-DD.
-   * This is mainly for identifying fragment creation dates */
+  /**
+   * Stable Date in YYYY-MM-DD.
+   * This is mainly for identifying fragment creation dates
+   */
   stableDate?: string;
   /** Launch mass including fuel in kilograms */
   launchMass?: string;
@@ -110,7 +113,8 @@ export interface KeepTrackTLEFile {
   type?: SpaceObjectType;
   /** Visual magnitude of the object */
   vmag?: number;
-  /** Used internally only and deleted before saving
+  /**
+   * Used internally only and deleted before saving
    * @deprecated Not really, but it makes it clear that this is not saved to disk
    */
   JCAT?: string;
@@ -137,7 +141,8 @@ export class CatalogLoader {
 
     CatalogLoader.checkForLimitSats_(limitSatsArray);
 
-    let notionalSatNum = 400000; // Start at 400,000 to avoid conflicts with real satellites
+    const notionalSatNum = 400000; // Start at 400,000 to avoid conflicts with real satellites
+
     for (let i = 0; i < resp.length; i++) {
       CatalogLoader.addSccNum_(resp, i);
 
@@ -234,7 +239,7 @@ export class CatalogLoader {
       asciiCatalog: Promise<AsciiTleSat[] | void>;
       externalCatalog?: Promise<void> | Promise<AsciiTleSat[] | void>;
     },
-    jsCatalog: Promise<JsSat[]>
+    jsCatalog: Promise<JsSat[]>,
   ) {
     await Promise.all([extraSats, altCatalog.asciiCatalog, altCatalog.externalCatalog, jsCatalog]).then(([extraSats, asciiCatalog, externalCatalog, jsCatalog]) => {
       asciiCatalog = externalCatalog || asciiCatalog;
@@ -243,11 +248,14 @@ export class CatalogLoader {
       // Make sure everyone agrees on what time it is
       keepTrackApi.getTimeManager().synchronize();
 
-      // Filter TLEs
-      // Sets catalogManagerInstance.satData internally to reduce memory usage
+      /*
+       * Filter TLEs
+       * Sets catalogManagerInstance.satData internally to reduce memory usage
+       */
       CatalogLoader.filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog, jsCatalog);
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
       catalogManagerInstance.numSats = catalogManagerInstance.objectCache.length;
 
       const satDataString = CatalogLoader.getSatDataString_(catalogManagerInstance.objectCache);
@@ -272,9 +280,11 @@ export class CatalogLoader {
     // This should be somewhere else!!
     const queryStr = window.location.search.substring(1);
     const params = queryStr.split('&');
+
     for (const param of params) {
       const key = param.split('=')[0];
       const val = param.split('=')[1];
+
       switch (key) {
         case 'limitSats':
           settingsManager.limitSats = val;
@@ -299,10 +309,12 @@ export class CatalogLoader {
   private static addNonSatelliteObjects_(catalogManagerInstance: CatalogManager, tempObjData: BaseObject[]) {
     catalogManagerInstance.orbitalSats = tempObjData.length + settingsManager.maxAnalystSats;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
+
     dotsManagerInstance.starIndex1 = catalogManagerInstance.starIndex1 + catalogManagerInstance.orbitalSats;
     dotsManagerInstance.starIndex2 = catalogManagerInstance.starIndex2 + catalogManagerInstance.orbitalSats;
 
     let i = 0;
+
     for (const staticSat of catalogManagerInstance.staticSet) {
       staticSat.id = tempObjData.length;
       catalogManagerInstance.staticSet[i].id = tempObjData.length;
@@ -313,12 +325,14 @@ export class CatalogLoader {
           id: tempObjData.length,
           ...staticSat,
         });
+
         tempObjData.push(sensor);
       } else {
         const landObj = new LandObject({
           id: tempObjData.length,
           ...staticSat,
         });
+
         tempObjData.push(landObj);
       }
     }
@@ -336,6 +350,7 @@ export class CatalogLoader {
     for (const fieldOfViewMarker of catalogManagerInstance.fieldOfViewSet) {
       fieldOfViewMarker.id = tempObjData.length;
       const marker = new Marker(fieldOfViewMarker);
+
       tempObjData.push(marker);
     }
   }
@@ -345,7 +360,7 @@ export class CatalogLoader {
    * @param limitSatsArray - An array of limit sats.
    */
   private static checkForLimitSats_(limitSatsArray: string[]) {
-    if (typeof limitSatsArray === 'undefined' || limitSatsArray.length == 0 || limitSatsArray[0] == null) {
+    if (typeof limitSatsArray === 'undefined' || limitSatsArray.length === 0 || limitSatsArray[0] === null) {
       // If there are no limits then just process like normal
       settingsManager.limitSats = '';
     }
@@ -403,6 +418,7 @@ export class CatalogLoader {
     if (settingsManager.externalTLEs) {
       externalCatalog = CatalogLoader.getExternalCatalog_(settingsManager);
     }
+
     return { extraSats, asciiCatalog, jsCatalog, externalCatalog };
   }
 
@@ -412,13 +428,14 @@ export class CatalogLoader {
    * @returns An array of AsciiTleSat objects representing the catalog.
    */
   private static async getAsciiCatalog_(settingsManager: SettingsManager) {
-    let asciiCatalog: AsciiTleSat[] = [];
+    const asciiCatalog: AsciiTleSat[] = [];
     const resp = await fetch(`${settingsManager.installDirectory}tle/TLE.txt`);
 
     if (resp.ok) {
       const asciiCatalogFile = await resp.text();
       const content = asciiCatalogFile.split('\n');
-      for (let i = 0; i < content.length; i = i + 2) {
+
+      for (let i = 0; i < content.length; i += 2) {
         asciiCatalog.push({
           SCC: StringPad.pad0(content[i].substring(2, 7).trim(), 5),
           TLE1: <TleLine1>content[i],
@@ -438,14 +455,17 @@ export class CatalogLoader {
    * @param {SettingsManager} settingsManager - The settings manager containing the URL for the external TLEs.
    * @returns {Promise<AsciiTleSat[]>} - A promise that resolves to an array of AsciiTleSat objects representing the satellite TLEs.
    */
+  // eslint-disable-next-line require-await
   private static async getExternalCatalog_(settingsManager: SettingsManager): Promise<AsciiTleSat[] | void> {
     return fetch(settingsManager.externalTLEs)
       .then((resp) => {
         if (resp.ok) {
           const externalCatalog: AsciiTleSat[] = [];
+
           resp.text().then((data) => {
             const content = data.split('\n');
             // Check if last line is empty and remove it if so
+
             CatalogLoader.cleanAsciiCatalogFile_(content);
 
             if (content[0].startsWith('1 ')) {
@@ -461,13 +481,13 @@ export class CatalogLoader {
             return externalCatalog;
           });
         } else {
-          errorManagerInstance.warn('Error loading external TLEs from ' + settingsManager.externalTLEs);
+          errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.externalTLEs}`);
           errorManagerInstance.info('Reverting to internal TLEs');
           settingsManager.externalTLEs = '';
         }
       })
       .catch(() => {
-        errorManagerInstance.warn('Error loading external TLEs from ' + settingsManager.externalTLEs);
+        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.externalTLEs}`);
         errorManagerInstance.info('Reverting to internal TLEs');
         settingsManager.externalTLEs = '';
       });
@@ -489,15 +509,17 @@ export class CatalogLoader {
    * @param settingsManager - The settings manager to retrieve the catalog from.
    * @returns A promise that resolves to an array of JsSat objects.
    */
+  // eslint-disable-next-line require-await
   private static async getJscCatalog_(settingsManager: SettingsManager): Promise<JsSat[]> {
     return fetch(`${settingsManager.installDirectory}tle/jsc-orbits.json`)
       .then((response) => {
         if (response.ok) {
           return response.json();
-        } else {
-          errorManagerInstance.warn('Error loading jsc-orbits.json');
-          return [];
         }
+        errorManagerInstance.warn('Error loading jsc-orbits.json');
+
+        return [];
+
       })
       .catch(() => {
         errorManagerInstance.warn('Error loading jsc-orbits.json');
@@ -545,18 +567,21 @@ export class CatalogLoader {
         }
 
         return data;
-      })
+      }),
     );
   }
 
   private static makeDebris(notionalDebris: any, meanAnom: number, notionalSatNum: number, tempSatData: BaseObject[]) {
     const debris = { ...notionalDebris };
+
     debris.id = tempSatData.length;
     debris.sccNum = notionalSatNum.toString();
 
     if (notionalSatNum < 1300000) {
-      // ESA estimates 1300000 objects larger than 1cm
-      // Random number between 0.01 and 0.1
+      /*
+       * ESA estimates 1300000 objects larger than 1cm
+       * Random number between 0.01 and 0.1
+       */
       debris.rcs = 0.01 + Math.random() * 0.09;
     } else {
       // Random number between 0.001 and 0.01
@@ -567,8 +592,12 @@ export class CatalogLoader {
     notionalSatNum++;
 
     meanAnom = parseFloat(debris.TLE2.substr(43, 51)) + meanAnom;
-    if (meanAnom > 360) meanAnom -= 360;
-    if (meanAnom < 0) meanAnom += 360;
+    if (meanAnom > 360) {
+      meanAnom -= 360;
+    }
+    if (meanAnom < 0) {
+      meanAnom += 360;
+    }
 
     debris.TLE2 =
       debris.TLE2.substr(0, 17) + // Columns 1-18
@@ -580,7 +609,7 @@ export class CatalogLoader {
   }
 
   private static parseAscii3LE_(content: string[], externalCatalog: AsciiTleSat[]) {
-    for (let i = 0; i < content.length; i = i + 3) {
+    for (let i = 0; i < content.length; i += 3) {
       externalCatalog.push({
         SCC: StringPad.pad0(content[i + 1].substring(2, 7).trim(), 5),
         ON: content[i].trim(),
@@ -591,7 +620,7 @@ export class CatalogLoader {
   }
 
   private static parseAsciiTLE_(content: string[], externalCatalog: AsciiTleSat[]) {
-    for (let i = 0; i < content.length; i = i + 2) {
+    for (let i = 0; i < content.length; i += 2) {
       externalCatalog.push({
         SCC: StringPad.pad0(content[i].substring(2, 7).trim(), 5),
         TLE1: <TleLine1>content[i],
@@ -602,8 +631,10 @@ export class CatalogLoader {
 
   private static parseIntlDes_(TLE1: string) {
     let year = TLE1.substring(9, 17).trim().substring(0, 2); // clean up intl des for display
+
     if (year === '') {
-      errorManagerInstance.debug('intlDes is empty for ' + TLE1);
+      errorManagerInstance.debug(`intlDes is empty for ${TLE1}`);
+
       return 'None';
     }
     if (isNaN(parseInt(year))) {
@@ -611,15 +642,21 @@ export class CatalogLoader {
       debugger;
     }
     const prefix = parseInt(year) > 50 ? '19' : '20';
+
     year = prefix + year;
     const rest = TLE1.substring(9, 17).trim().substring(2);
-    return year + '-' + rest;
+
+
+    return `${year}-${rest}`;
   }
 
   private static processAllSats_(resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: BaseObject[], notionalSatNum: number): void {
-    if (settingsManager.isStarlinkOnly && resp[i].name.indexOf('STARLINK') === -1) return;
+    if (settingsManager.isStarlinkOnly && resp[i].name.indexOf('STARLINK') === -1) {
+      return;
+    }
 
     const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
+
     resp[i].intlDes = intlDes;
     catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = i;
     catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = i;
@@ -627,6 +664,7 @@ export class CatalogLoader {
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
       resp[i].id = tempObjData.length;
       const source = Tle.classification(resp[i].TLE1);
+
       switch (source) {
         case 'U':
           resp[i].source = CatalogSource.USSF;
@@ -646,6 +684,7 @@ export class CatalogLoader {
       }
 
       let rcs: number;
+
       rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
       rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
       rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
@@ -656,14 +695,14 @@ export class CatalogLoader {
         tle1: resp[i].TLE1,
         tle2: resp[i].TLE2,
         ...resp[i],
-        rcs: rcs,
+        rcs,
       });
 
       tempObjData.push(satellite);
     }
 
     if (settingsManager.isNotionalDebris && resp[i].type === 3) {
-      let notionalDebris = new DetailedSatellite({
+      const notionalDebris = new DetailedSatellite({
         id: 0,
         name: `${resp[i].name} (1cm Notional)`,
         tle1: resp[i].TLE1,
@@ -675,7 +714,9 @@ export class CatalogLoader {
       });
 
       for (let i = 0; i < 8; i++) {
-        if (tempObjData.length > settingsManager.maxNotionalDebris) break;
+        if (tempObjData.length > settingsManager.maxNotionalDebris) {
+          break;
+        }
         CatalogLoader.makeDebris(notionalDebris, 15 + Math.random() * 15, notionalSatNum, tempObjData);
         CatalogLoader.makeDebris(notionalDebris, -15 - Math.random() * 15, notionalSatNum, tempObjData);
         CatalogLoader.makeDebris(notionalDebris, 30 + Math.random() * 15, notionalSatNum, tempObjData);
@@ -706,6 +747,7 @@ export class CatalogLoader {
 
   private static processAsciiCatalogKnown_(catalogManagerInstance: CatalogManager, element: AsciiTleSat, tempSatData: any[]) {
     const i = catalogManagerInstance.sccIndex[`${element.SCC}`];
+
     tempSatData[i].tle1 = element.TLE1;
     tempSatData[i].tle2 = element.TLE2;
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
@@ -716,10 +758,10 @@ export class CatalogLoader {
   private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempObjData: BaseObject[], catalogManagerInstance: CatalogManager) {
     settingsManager.isExtraSatellitesAdded = true;
 
-    if (typeof element.ON == 'undefined') {
+    if (typeof element.ON === 'undefined') {
       element.ON = 'Unknown';
     }
-    if (typeof element.OT == 'undefined') {
+    if (typeof element.OT === 'undefined') {
       element.OT = SpaceObjectType.SPECIAL;
     }
     const intlDes = this.parseIntlDes_(element.TLE1);
@@ -733,15 +775,16 @@ export class CatalogLoader {
       country: 'Unknown',
       rocket: 'Unknown',
       site: 'Unknown',
-      sccNum: sccNum,
+      sccNum,
       tle1: element.TLE1,
       tle2: element.TLE2,
       source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT,
-      intlDes: intlDes,
+      intlDes,
       typ: 'sat', // TODO: What is this?
       id: tempObjData.length,
       isExternal: true,
     };
+
     catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempObjData.length;
     catalogManagerInstance.cosparIndex[`${intlDes}`] = tempObjData.length;
 
@@ -750,6 +793,7 @@ export class CatalogLoader {
       tle2: asciiSatInfo.tle2,
       ...asciiSatInfo,
     });
+
     satellite.id = tempObjData.length;
 
     tempObjData.push(satellite);
@@ -759,12 +803,14 @@ export class CatalogLoader {
     if (settingsManager.externalTLEs) {
       errorManagerInstance.info(`Processing ${settingsManager.externalTLEs}`);
     } else {
-      errorManagerInstance.log(`Processing ASCII Catalog`);
+      errorManagerInstance.log('Processing ASCII Catalog');
     }
 
     // If asciiCatalog catalogue
     for (const element of asciiCatalog) {
-      if (!element.TLE1 || !element.TLE2) continue; // Don't Process Bad Satellite Information
+      if (!element.TLE1 || !element.TLE2) {
+        continue;
+      } // Don't Process Bad Satellite Information
 
       // See if we know anything about it already
       if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
@@ -785,16 +831,22 @@ export class CatalogLoader {
         catalogManagerInstance.cosparIndex[`${tempSatData[idx].intlDes}`] = idx;
       }
     }
+
     return tempSatData;
   }
 
   private static processExtraSats_(extraSats: ExtraSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {
     // If extra catalogue
     for (const element of extraSats) {
-      if (!element.SCC || !element.TLE1 || !element.TLE2) continue; // Don't Process Bad Satellite Information
+      if (!element.SCC || !element.TLE1 || !element.TLE2) {
+        continue;
+      } // Don't Process Bad Satellite Information
       if (typeof catalogManagerInstance.sccIndex[`${element.SCC}`] !== 'undefined') {
         const i = catalogManagerInstance.sccIndex[`${element.SCC}`];
-        if (typeof tempSatData[i] === 'undefined') continue;
+
+        if (typeof tempSatData[i] === 'undefined') {
+          continue;
+        }
         tempSatData[i].TLE1 = element.TLE1;
         tempSatData[i].TLE2 = element.TLE2;
         tempSatData[i].source = CatalogSource.EXTRA_JSON;
@@ -815,11 +867,12 @@ export class CatalogLoader {
           tle1: element.TLE1 as TleLine1,
           tle2: element.TLE2 as TleLine2,
           source: 'extra.json',
-          intlDes: intlDes,
+          intlDes,
           typ: 'sat', // TODO: What is this?
           id: tempSatData.length,
           vmag: element.vmag,
         };
+
         catalogManagerInstance.sccIndex[`${element.SCC.toString()}`] = tempSatData.length;
         catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
@@ -828,6 +881,7 @@ export class CatalogLoader {
           tle2: extrasSatInfo.tle2,
           ...extrasSatInfo,
         });
+
         satellite.id = tempSatData.length;
 
         tempSatData.push(satellite);
@@ -839,19 +893,26 @@ export class CatalogLoader {
     errorManagerInstance.debug(`Processing ${settingsManager.isEnableJscCatalog ? 'JSC Vimpel' : 'Extended'} Catalog`);
     // If jsCatalog catalogue
     for (const element of jsCatalog) {
-      if (!element.TLE1 || !element.TLE2) continue; // Don't Process Bad Satellite Information
+      if (!element.TLE1 || !element.TLE2) {
+        continue;
+      } // Don't Process Bad Satellite Information
       const scc = Tle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
+
       if (typeof catalogManagerInstance.sccIndex[`${scc}`] !== 'undefined') {
-        // console.warn('Duplicate Satellite Found in jsCatalog');
-        // NOTE: We don't trust the jsCatalog, so we don't update the TLEs
-        // i = catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC}`];
-        // tempSatData[i].TLE1 = jsCatalog[s].TLE1;
-        // tempSatData[i].TLE2 = jsCatalog[s].TLE2;
+        /*
+         * console.warn('Duplicate Satellite Found in jsCatalog');
+         * NOTE: We don't trust the jsCatalog, so we don't update the TLEs
+         * i = catalogManagerInstance.sccIndex[`${jsCatalog[s].SCC}`];
+         * tempSatData[i].TLE1 = jsCatalog[s].TLE1;
+         * tempSatData[i].TLE2 = jsCatalog[s].TLE2;
+         */
       } else {
         // Check if the 8th character is 'V' for Vimpel
         const isVimpel = element.TLE1[7] === 'V';
+
         if (isVimpel) {
           const altId = element.TLE1.substring(9, 17).trim();
+
           settingsManager.isExtraSatellitesAdded = true;
           const jsSatInfo = {
             static: false,
@@ -866,7 +927,7 @@ export class CatalogLoader {
             TLE1: element.TLE1,
             TLE2: element.TLE2,
             source: 'JSC Vimpel',
-            altId: altId,
+            altId,
             intlDes: '',
             id: tempObjData.length,
           };
@@ -876,6 +937,7 @@ export class CatalogLoader {
             tle2: jsSatInfo.TLE2 as TleLine2,
             ...jsSatInfo,
           });
+
           satellite.id = tempObjData.length;
 
           tempObjData.push(satellite);
@@ -888,9 +950,11 @@ export class CatalogLoader {
 
   private static processLimitedSats_(limitSatsArray: string[], resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: any[]) {
     let newId = 0;
+
     for (const limitSat of limitSatsArray) {
       if (resp[i].sccNum === limitSat) {
         const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
+
         resp[i].intlDes = intlDes;
         resp[i].id = newId;
         newId++;
@@ -898,6 +962,7 @@ export class CatalogLoader {
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
         resp[i].active = true;
         const source = Tle.classification(resp[i].TLE1);
+
         switch (source) {
           case 'U':
             resp[i].source = CatalogSource.USSF;
@@ -943,6 +1008,7 @@ export class CatalogLoader {
       if (a.SCC > b.SCC) {
         return 1;
       }
+
       return 0;
     });
   }

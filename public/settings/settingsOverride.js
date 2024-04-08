@@ -1,6 +1,6 @@
 /**
-// /////////////////////////////////////////////////////////////////////////////
-
+ * // /////////////////////////////////////////////////////////////////////////////
+ *
  * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2023 Heather Kruczek
  *
@@ -70,9 +70,11 @@ const settingsOverride = {
     debrisScreening: true,
     videoDirector: false,
   },
-  // searchLimit: 150,
-  // isDisableCss: false,
-  // isShowSplashScreen: true,
+  /*
+   * searchLimit: 150,
+   * isDisableCss: false,
+   * isShowSplashScreen: true,
+   */
 };
 
 // Expose these to the console

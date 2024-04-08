@@ -9,6 +9,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 
 describe('SensorFov_class', () => {
   let SensorFovPlugin: SensorFov;
+
   beforeEach(() => {
     setupStandardEnvironment();
     SensorFovPlugin = new SensorFov();
@@ -24,6 +25,7 @@ describe('SensorFov_class', () => {
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
 
     const sensorManagerInstance = new SensorManager();
+
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();

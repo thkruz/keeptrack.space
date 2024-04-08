@@ -1,20 +1,22 @@
-/* /////////////////////////////////////////////////////////////////////////////
-
-(c) 2016-2023, Theodore Kruczek
-
-advice-module.js manages all recommended actions to the user in a semi-tutorial
-manner. It works closely with ui.js
-http://keeptrack.space
-
-All rights reserved. No part of this web site may be reproduced, published,
-distributed, displayed, performed, copied or stored for public or private
-use, without written permission of the author.
-
-No part of this code may be modified or changed or exploited in any way used
-for derivative works, or offered for sale, or used to construct any kind of database
-or mirrored at any other location without the express written permission of the author.
-
-///////////////////////////////////////////////////////////////////////////// */
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ * 
+ * (c) 2016-2023, Theodore Kruczek
+ * 
+ * advice-module.js manages all recommended actions to the user in a semi-tutorial
+ * manner. It works closely with ui.js
+ * http://keeptrack.space
+ * 
+ * All rights reserved. No part of this web site may be reproduced, published,
+ * distributed, displayed, performed, copied or stored for public or private
+ * use, without written permission of the author.
+ * 
+ * No part of this code may be modified or changed or exploited in any way used
+ * for derivative works, or offered for sale, or used to construct any kind of database
+ * or mirrored at any other location without the express written permission of the author.
+ * 
+ * ///////////////////////////////////////////////////////////////////////////// 
+ */
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '../keepTrackApi';
@@ -40,7 +42,7 @@ export class AdviceManager {
     this.helpTextDOM = getEl('help-text');
     this.tutIconDOM = getEl('tutorial-icon');
 
-    this.tutIconDOM.addEventListener('click', function () {
+    this.tutIconDOM.addEventListener('click', () => {
       keepTrackApi.runEvent(KeepTrackApiEvents.onHelpMenuClick);
     });
 
@@ -77,7 +79,9 @@ export class AdviceManager {
   }
 
   public showAdvice(header: string, text: string): void {
-    if (!this.isAdviceEnabled) return;
+    if (!this.isAdviceEnabled) {
+      return;
+    }
 
     this.isAdviceOpen = true;
 

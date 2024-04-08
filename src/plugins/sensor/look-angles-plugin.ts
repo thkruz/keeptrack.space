@@ -57,7 +57,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     maxWidth: 450,
   };
 
-  helpTitle = `Look Angles Menu`;
+  helpTitle = 'Look Angles Menu';
   helpBody = keepTrackApi.html`
     The Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a sensor and a satellite.
     A satellite and sensor must first be selected before the menu can be used.
@@ -126,6 +126,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         getEl('settings-riseset').addEventListener('change', this.settingsRisesetChange_.bind(this));
 
         const sat = this.selectSatManager_.getSelectedSat();
+
         this.checkIfCanBeEnabled_(sat);
       },
     });
@@ -176,7 +177,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     if (this.isMenuButtonActive) {
       showLoading(() => {
         const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
-        if (!obj.isSatellite()) return;
+
+        if (!obj.isSatellite()) {
+          return;
+        }
         this.getlookangles_(obj as DetailedSatellite);
       });
     }
@@ -191,6 +195,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       // Error Checking
       if (!sensorManagerInstance.isSensorSelected()) {
         console.debug('satellite.getlookangles requires a sensor to be set!');
+
         return [];
       }
       sensors = sensorManagerInstance.currentSensors;
@@ -198,16 +203,20 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     // Set default timing settings. These will be changed to find look angles at different times in future.
 
-    // const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
-    // Use custom interval unless doing rise/set lookangles - then use 1 second
-    let lookanglesInterval = this.isRiseSetLookangles_ ? 1 : this.lookanglesInterval_;
+    /*
+     * const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
+     * Use custom interval unless doing rise/set lookangles - then use 1 second
+     */
+    const lookanglesInterval = this.isRiseSetLookangles_ ? 1 : this.lookanglesInterval_;
 
-    let looksArray = <TearrData[]>[];
+    const looksArray = <TearrData[]>[];
     let offset = 0;
+
     for (let i = 0; i < this.lookanglesLength_ * 24 * 60 * 60; i += lookanglesInterval) {
       offset = i * 1000; // Offset in seconds (msec * 1000)
-      let now = timeManagerInstance.getOffsetTimeObj(offset);
-      let looksPass = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetLookangles_);
+      const now = timeManagerInstance.getOffsetTimeObj(offset);
+      const looksPass = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetLookangles_);
+
       if (looksPass.time !== '') {
         looksArray.push(looksPass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
       }
@@ -227,19 +236,24 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   }
 
   private static populateSideMenuTable_(lookAngleData: TearrData[], timeManagerInstance: TimeManager) {
-    let tbl = <HTMLTableElement>getEl('looks'); // Identify the table to update
+    const tbl = <HTMLTableElement>getEl('looks'); // Identify the table to update
+
     tbl.innerHTML = ''; // Clear the table from old object data
-    let tr = tbl.insertRow();
-    let tdT = tr.insertCell();
+    const tr = tbl.insertRow();
+    const tdT = tr.insertCell();
+
     tdT.appendChild(document.createTextNode('Time'));
     tdT.setAttribute('style', 'text-decoration: underline');
-    let tdE = tr.insertCell();
+    const tdE = tr.insertCell();
+
     tdE.appendChild(document.createTextNode('El'));
     tdE.setAttribute('style', 'text-decoration: underline');
-    let tdA = tr.insertCell();
+    const tdA = tr.insertCell();
+
     tdA.appendChild(document.createTextNode('Az'));
     tdA.setAttribute('style', 'text-decoration: underline');
-    let tdR = tr.insertCell();
+    const tdR = tr.insertCell();
+
     tdR.appendChild(document.createTextNode('Rng'));
     tdR.setAttribute('style', 'text-decoration: underline');
 
@@ -255,10 +269,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     timeManagerInstance: TimeManager,
     tdE: HTMLTableCellElement,
     tdA: HTMLTableCellElement,
-    tdR: HTMLTableCellElement
+    tdR: HTMLTableCellElement,
   ) {
     if (tbl.rows.length > 0) {
       const tr = tbl.insertRow();
+
       tr.setAttribute('class', 'link');
 
       tdT = tr.insertCell();
@@ -266,7 +281,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       // Create click listener
       tdT.addEventListener('click', () => {
-        timeManagerInstance.changeStaticOffset(new Date(dateFormat(lookAngleRow.time, 'isoDateTime', false) + 'z').getTime() - timeManagerInstance.realTime);
+        timeManagerInstance.changeStaticOffset(new Date(`${dateFormat(lookAngleRow.time, 'isoDateTime', false)}z`).getTime() - timeManagerInstance.realTime);
         timeManagerInstance.calculateSimulationTime();
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
       });
@@ -281,7 +296,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   }
 
   private settingsRisesetChange_(e: any, isRiseSetChecked?: boolean): void {
-    if (typeof e === 'undefined' || e === null) throw new Error('e is undefined');
+    if (typeof e === 'undefined' || e === null) {
+      throw new Error('e is undefined');
+    }
 
     isRiseSetChecked ??= (<HTMLInputElement>getEl('settings-riseset')).checked;
     if (isRiseSetChecked) {

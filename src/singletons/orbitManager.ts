@@ -49,34 +49,46 @@ export class OrbitManager {
 
   addInViewOrbit(satId: number): void {
     for (const inViewSatId of this.currentInView_) {
-      if (satId === inViewSatId) return;
+      if (satId === inViewSatId) {
+        return;
+      }
     }
     this.currentInView_.push(satId);
     this.updateOrbitBuffer(satId);
   }
 
   clearHoverOrbit(): void {
-    if (!settingsManager.isDrawOrbits) return;
+    if (!settingsManager.isDrawOrbits) {
+      return;
+    }
 
-    const gl = this.gl_;
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.hoverOrbitBuf_);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
   }
 
   clearInViewOrbit(): void {
-    if (this.currentInView_.length === 0) return;
+    if (this.currentInView_.length === 0) {
+      return;
+    }
     this.currentInView_ = [];
   }
 
   clearSelectOrbit(isSecondary: boolean = false): void {
-    const gl = this.gl_;
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+
     if (isSecondary) {
       this.secondarySelectId_ = -1;
-      if (!this.secondaryOrbitBuf_) return;
+      if (!this.secondaryOrbitBuf_) {
+        return;
+      }
       gl.bindBuffer(gl.ARRAY_BUFFER, this.secondaryOrbitBuf_);
     } else {
       this.currentSelectId_ = -1;
-      if (!this.selectOrbitBuf_) return;
+      if (!this.selectOrbitBuf_) {
+        return;
+      }
       gl.bindBuffer(gl.ARRAY_BUFFER, this.selectOrbitBuf_);
     }
 
@@ -89,10 +101,12 @@ export class OrbitManager {
     tgtBuffer: WebGLFramebuffer,
     hoverManagerInstance: HoverManager,
     colorSchemeManagerInstance: ColorSchemeManager,
-    mainCameraInstance: Camera
+    mainCameraInstance: Camera,
   ): void {
-    if (!this.isInitialized_) return;
-    const gl = this.gl_;
+    if (!this.isInitialized_) {
+      return;
+    }
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
@@ -139,9 +153,15 @@ export class OrbitManager {
   }
 
   init(lineManagerInstance: LineManager, gl: WebGL2RenderingContext, orbitWorker?: Worker): void {
-    if (this.isInitialized_) return; // Only initialize once
-    if (!settingsManager.isDrawOrbits) return;
-    if (!settingsManager.colors) return;
+    if (this.isInitialized_) {
+      return;
+    } // Only initialize once
+    if (!settingsManager.isDrawOrbits) {
+      return;
+    }
+    if (!settingsManager.colors) {
+      return;
+    }
 
     this.lineManagerInstance_ = lineManagerInstance;
     this.gl_ = gl;
@@ -173,7 +193,9 @@ export class OrbitManager {
 
     const objDataString = OrbitManager.getObjDataString(keepTrackApi.getCatalogManager().objectCache);
 
-    if (!this.orbitWorker) return;
+    if (!this.orbitWorker) {
+      return;
+    }
     this.orbitWorker.postMessage({
       typ: OrbitCruncherType.INIT,
       orbitFadeFactor: settingsManager.orbitFadeFactor,
@@ -201,13 +223,13 @@ export class OrbitManager {
         throw new Error('Your browser does not support web workers.');
       }
       try {
-        this.orbitWorker = new Worker(settingsManager.installDirectory + 'js/orbitCruncher.js');
+        this.orbitWorker = new Worker(`${settingsManager.installDirectory}js/orbitCruncher.js`);
       } catch (error) {
         // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
         if (window.location.href.startsWith('file://')) {
           setInnerHtml(
             'loader-text',
-            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
+            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.',
           );
         } else {
           errorManagerInstance.error(error, 'OrbitManager.init', 'Failed to create orbit web worker!');
@@ -218,12 +240,15 @@ export class OrbitManager {
 
   removeInViewOrbit(satId: number): void {
     let r: number | null = null;
+
     for (let i = 0; i < this.currentInView_.length; i++) {
       if (satId === this.currentInView_[i]) {
         r = i;
       }
     }
-    if (r === null) return;
+    if (r === null) {
+      return;
+    }
     this.currentInView_.splice(r, 1);
     this.updateOrbitBuffer(satId);
   }
@@ -246,8 +271,11 @@ export class OrbitManager {
 
     if (uiManagerInstance.searchManager?.isResultsOpen && !settingsManager.disableUI && !settingsManager.lowPerf) {
       const currentSearchSats = uiManagerInstance.searchManager.getLastResultGroup()?.ids;
+
       if (typeof currentSearchSats !== 'undefined') {
-        if (this.updateAllThrottle_ >= currentSearchSats.length) this.updateAllThrottle_ = 0;
+        if (this.updateAllThrottle_ >= currentSearchSats.length) {
+          this.updateAllThrottle_ = 0;
+        }
         for (let i = 0; this.updateAllThrottle_ < currentSearchSats.length && i < 5; this.updateAllThrottle_++, i++) {
           this.updateOrbitBuffer(currentSearchSats[this.updateAllThrottle_]);
         }
@@ -258,15 +286,17 @@ export class OrbitManager {
   changeOrbitBufferData(id: number, tle1: string, tle2: string): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    if (!this.orbitWorker) return;
+    if (!this.orbitWorker) {
+      return;
+    }
     this.orbitWorker.postMessage({
       typ: OrbitCruncherType.SATELLITE_UPDATE,
-      id: id,
+      id,
       dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
       staticOffset: timeManagerInstance.staticOffset,
       rate: timeManagerInstance.propRate,
-      tle1: tle1,
-      tle2: tle2,
+      tle1,
+      tle2,
       isEcfOutput: settingsManager.isOrbitCruncherInEcf,
     });
   }
@@ -277,21 +307,28 @@ export class OrbitManager {
       latList: Degrees[];
       lonList: Degrees[];
       altList: Kilometers[];
-    }
+    },
   ) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const obj = catalogManagerInstance.getObject(id);
-    if (!obj) return;
-    if (!settingsManager.isDrawOrbits) return;
+
+    if (!obj) {
+      return;
+    }
+    if (!settingsManager.isDrawOrbits) {
+      return;
+    }
 
     if (!this.inProgress_[id] && !obj.isStatic()) {
       if (obj.isMissile()) {
-        if (!this.orbitWorker) return;
+        if (!this.orbitWorker) {
+          return;
+        }
         this.orbitWorker.postMessage({
           typ: OrbitCruncherType.MISSILE_UPDATE,
-          id: id,
+          id,
           dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
           staticOffset: timeManagerInstance.staticOffset,
           propRate: timeManagerInstance.propRate,
@@ -302,10 +339,12 @@ export class OrbitManager {
         });
       } else {
         // Then it is a satellite
-        if (!this.orbitWorker) return;
+        if (!this.orbitWorker) {
+          return;
+        }
         this.orbitWorker.postMessage({
           typ: OrbitCruncherType.SATELLITE_UPDATE,
-          id: id,
+          id,
           dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
           staticOffset: timeManagerInstance.staticOffset,
           propRate: timeManagerInstance.propRate,
@@ -319,21 +358,28 @@ export class OrbitManager {
   private static getObjDataString(objData: BaseObject[]) {
     return JSON.stringify(
       objData.map((obj) => {
-        if (!obj.isSatellite() && !obj.isMissile()) return { ignore: true } as ObjDataJson;
-        if (obj.isMissile()) return { missile: true } as ObjDataJson;
+        if (!obj.isSatellite() && !obj.isMissile()) {
+          return { ignore: true } as ObjDataJson;
+        }
+        if (obj.isMissile()) {
+          return { missile: true } as ObjDataJson;
+        }
+
         return {
           tle1: (obj as DetailedSatellite).tle1,
           tle2: (obj as DetailedSatellite).tle2,
         } as ObjDataJson;
-      })
+      }),
     );
   }
 
   private allocateBuffer(): WebGLBuffer {
-    const gl = this.gl_;
-    let buf = gl.createBuffer();
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const buf = gl.createBuffer();
+
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
+
     return buf;
   }
 
@@ -345,8 +391,12 @@ export class OrbitManager {
 
     if (groupManagerInstance.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
       groupManagerInstance.selectedGroup.ids.forEach((id: number) => {
-        if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) return; // Skip hover and select objects
-        if (!keepTrackApi.getCatalogManager().getObject(id)?.active) return; // Skip inactive objects
+        if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) {
+          return;
+        } // Skip hover and select objects
+        if (!keepTrackApi.getCatalogManager().getObject(id)?.active) {
+          return;
+        } // Skip inactive objects
 
         OrbitManager.checColorBuffersValidity_(id, colorData);
 
@@ -362,8 +412,10 @@ export class OrbitManager {
             colorData[id * 4 + 2] <= 0
           ) {
             if (this.isCalculateColorLocked) {
-              // Prevent unexpected infinite coloring loop!
-              // TODO: This should be explored more to see if there is a better way to handle this
+              /*
+               * Prevent unexpected infinite coloring loop!
+               * TODO: This should be explored more to see if there is a better way to handle this
+               */
               return;
             }
             colorSchemeManagerInstance.calculateColorBuffers(true);
@@ -378,8 +430,10 @@ export class OrbitManager {
           }
           if (colorData[id * 4 + 3] <= 0) {
             return; // Skip transparent objects
-            // Debug: This is useful when all objects are supposed to be visible but groups can filter out objects
-            // throw new Error(`color buffer for ${id} isn't visible`);
+            /*
+             * Debug: This is useful when all objects are supposed to be visible but groups can filter out objects
+             * throw new Error(`color buffer for ${id} isn't visible`);
+             */
           }
         }
 
@@ -390,9 +444,12 @@ export class OrbitManager {
   }
 
   private drawHoverObjectOrbit_(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
-    if (settingsManager.isMobileModeEnabled) return; // No hover orbit on mobile
+    if (settingsManager.isMobileModeEnabled) {
+      return;
+    } // No hover orbit on mobile
 
     const hoverId = hoverManagerInstance.getHoverId();
+
     if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !keepTrackApi.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY)?.isStatic()) {
       OrbitManager.checColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
@@ -402,6 +459,7 @@ export class OrbitManager {
 
   private static checColorBuffersValidity_(hoverId: number, colorData: Float32Array) {
     const hoverIdIndex = hoverId * 4;
+
     OrbitManager.checkColorBufferValidity_(hoverIdIndex, colorData);
     OrbitManager.checkColorBufferValidity_(hoverIdIndex + 1, colorData);
     OrbitManager.checkColorBufferValidity_(hoverIdIndex + 2, colorData);
@@ -445,7 +503,8 @@ export class OrbitManager {
   private workerOnMessage_(m: OrbitCruncherMessageMain): void {
     const satId = m.data.satId;
     const pointsOut = new Float32Array(m.data.pointsOut);
-    const gl = this.gl_;
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
     gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
     this.inProgress_[satId] = false;
@@ -453,14 +512,19 @@ export class OrbitManager {
 
   updateFirstPointOut(satId: number, firstPointOut: number[]): void {
     // Update the first 3 pointsOut
-    const gl = this.gl_;
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(firstPointOut));
   }
 
   private writePathToGpu_(id: number) {
-    if (id === -1) return; // no hover object
-    if (typeof this.glBuffers_[id] === 'undefined') throw new Error(`orbit buffer ${id} not allocated`);
+    if (id === -1) {
+      return;
+    } // no hover object
+    if (typeof this.glBuffers_[id] === 'undefined') {
+      throw new Error(`orbit buffer ${id} not allocated`);
+    }
     this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], settingsManager.orbitSegments + 1);
   }
 }

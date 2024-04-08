@@ -25,7 +25,7 @@ export class Line {
       u_color: WebGLUniformLocation;
       u_camMatrix: WebGLUniformLocation;
       u_pMatrix: WebGLUniformLocation;
-    }
+    },
   ) {
     this.gl_ = gl;
     this.attribs_ = attribs;
@@ -44,6 +44,7 @@ export class Line {
     }
 
     const gl = this.gl_;
+
     gl.uniform4fv(this.uniforms_.u_color, color);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf_);

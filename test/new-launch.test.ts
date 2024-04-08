@@ -9,12 +9,14 @@ import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('NewLaunch_class', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let newLaunchPlugin: NewLaunch;
+
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
       AutoInit: () => {},
-    };
+    } as any;
     newLaunchPlugin = new NewLaunch();
   });
 
@@ -24,11 +26,12 @@ describe('NewLaunch_class', () => {
 
 describe('NewLaunch_form', () => {
   let newLaunchPlugin: NewLaunch;
+
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
       AutoInit: () => {},
-    };
+    } as any;
     newLaunchPlugin = new NewLaunch();
   });
 

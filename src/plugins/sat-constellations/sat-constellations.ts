@@ -38,7 +38,7 @@ export class SatConstellations extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = `Constellations Menu`;
+  helpTitle = 'Constellations Menu';
   helpBody = keepTrackApi.html`The Constellations menu allows you to view groups of satellites.
   <br><br>
   For some constellations, notional uplink/downlinks and/or crosslinks will be drawn between satellites in the constellation.`;
@@ -62,7 +62,7 @@ export class SatConstellations extends KeepTrackPlugin {
         getEl('constellation-menu')
           .querySelectorAll('li')
           .forEach((element) => {
-            element.addEventListener('click', function (evt: Event) {
+            element.addEventListener('click', (evt: Event) => {
               SatConstellations.constellationMenuClick((evt.target as HTMLElement).dataset.group);
             });
           });
@@ -75,32 +75,50 @@ export class SatConstellations extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
 
-    if (typeof groupManagerInstance == 'undefined') return;
+    if (typeof groupManagerInstance === 'undefined') {
+      return;
+    }
 
     switch (groupName) {
       case 'SpaceStations':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.SCC_NUM, [25544, 48274], groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.SCC_NUM, [25544, 48274], groupName);
+        }
         break;
       case 'GlonassGroup':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLONASS/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLONASS/u, groupName);
+        }
         break;
       case 'GalileoGroup':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GALILEO/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GALILEO/u, groupName);
+        }
         break;
       case 'GPSGroup':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /NAVSTAR/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /NAVSTAR/u, groupName);
+        }
         break;
       case 'iridium':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /IRIDIUM/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /IRIDIUM/u, groupName);
+        }
         break;
       case 'orbcomm':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /ORBCOMM/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /ORBCOMM/u, groupName);
+        }
         break;
       case 'globalstar':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLOBALSTAR/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /GLOBALSTAR/u, groupName);
+        }
         break;
       case 'ses':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /SES \d+/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.PAYLOAD_NAME_REGEX, /SES \d+/u, groupName);
+        }
         break;
       case 'AmatuerRadio':
         if (!groupManagerInstance.groupList[groupName]) {
@@ -112,7 +130,7 @@ export class SatConstellations extends KeepTrackPlugin {
               40043, 40057, 40071, 40074, 40377, 40378, 40379, 40380, 40654, 40719, 40900, 40903, 40906, 40907, 40908, 40910, 40911, 40912, 40926, 40927, 40928, 40931, 40967,
               40968, 41168, 41171, 41340, 41459, 41460, 41465, 41474, 41600, 41619, 41789, 41932, 41935, 42017,
             ],
-            groupName
+            groupName,
           );
         }
         break;
@@ -129,6 +147,7 @@ export class SatConstellations extends KeepTrackPlugin {
         if (!groupManagerInstance.groupList[groupName]) {
           // WGS also selects DSCS
           const wgs = catalogManagerInstance.satLinkManager.wgs.concat(catalogManagerInstance.satLinkManager.dscs);
+
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(wgs), groupName);
         }
         showLoading(() => {
@@ -137,28 +156,36 @@ export class SatConstellations extends KeepTrackPlugin {
         });
         break;
       case 'starlink':
-        if (!groupManagerInstance.groupList[groupName]) groupManagerInstance.createGroup(GroupType.NAME_REGEX, /STARLINK/u, groupName);
+        if (!groupManagerInstance.groupList[groupName]) {
+          groupManagerInstance.createGroup(GroupType.NAME_REGEX, /STARLINK/u, groupName);
+        }
         break;
       case 'sbirs': // SBIRS and DSP
         if (!groupManagerInstance.groupList[groupName]) {
           const sbirs = [...catalogManagerInstance.satLinkManager.sbirs, ...catalogManagerInstance.satLinkManager.dsp];
+
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(sbirs), groupName);
         }
         break;
       default:
-        throw new Error('Unknown group name: ' + groupName);
+        throw new Error(`Unknown group name: ${groupName}`);
     }
     SatConstellations.groupSelected(groupName);
   }
 
   static groupSelected(groupName: string) {
-    if (typeof groupName == 'undefined') return;
+    if (typeof groupName === 'undefined') {
+      return;
+    }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
 
-    if (typeof groupManagerInstance.groupList[groupName] == 'undefined') throw new Error('Unknown group name: ' + groupName);
+    if (typeof groupManagerInstance.groupList[groupName] === 'undefined') {
+      throw new Error(`Unknown group name: ${groupName}`);
+    }
 
     const searchDOM = getEl('search');
+
     groupManagerInstance.selectGroup(groupManagerInstance.groupList[groupName]);
 
     // Populate searchDOM with a search string separated by commas - minus the last one
@@ -168,10 +195,13 @@ export class SatConstellations extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
+
     uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].ids.map((id: number) => catalogManagerInstance.getSat(id)?.sccNum).join(','));
 
     // Close Menus
-    if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.closeSearch();
+    if (settingsManager.isMobileModeEnabled) {
+      uiManagerInstance.searchManager.closeSearch();
+    }
     uiManagerInstance.hideSideMenus();
   }
 }

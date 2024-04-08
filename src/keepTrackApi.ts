@@ -33,13 +33,34 @@ declare global {
     settingsManager: SettingsManager;
     jQuery: unknown;
     $: unknown;
-    gremlins: any;
-    randomizer: any;
+    gremlins: unknown;
+    randomizer: unknown;
+    // eslint-disable-next-line no-use-before-define
     keepTrackApi: KeepTrackApi;
-    dataLayer: any; // For Google Tag Manager
-    _numeric: any;
+    dataLayer: IArguments[]; // For Google Tag Manager
+    _numeric: unknown;
     satellite: SatMath;
-    M: any;
+    M: {
+      AutoInit: () => void;
+      Toast: {
+        dismissAll: () => void;
+      };
+      toast: (options: { unsafeHTML?: string, html?: string; displayLength?: number }) => {
+        $el: NodeListOf<HTMLElement>;
+        timeRemaining: number;
+        dismiss: () => void;
+      };
+      Dropdown: {
+        init: (el: NodeListOf<Element>) => void;
+      };
+      keys: {
+        TAB: number;
+        ENTER: number;
+        ESC: number;
+        ARROW_UP: number;
+        ARROW_DOWN: number;
+      };
+    }
   }
 }
 
@@ -124,26 +145,28 @@ export class KeepTrackApi {
   isInitialized = false;
   loadedPlugins = <KeepTrackPlugin[]>[];
   rmbMenuItems = <rmbMenuItem[]>[];
-  events = <any>{
-    altCanvasResize: [],
-    nightToggle: [],
+  events = {
+    altCanvasResize: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.altCanvasResize>[],
+    nightToggle: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.nightToggle>[],
+  } as {
+    [K in KeepTrackApiEvents]: KeepTrackApiRegisterParams<K>[];
   };
 
   methods = {
     nightToggle: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => {
-      this.events.nightToggle.forEach((cb: any) => cb.cb(gl, nightTexture, texture));
+      this.events.nightToggle.forEach((cb) => cb.cb(gl, nightTexture, texture));
     },
-    altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb: any) => cb.cb()),
+    altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb) => cb.cb()),
   };
 
   runEvent<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
     this.verifyEvent_(event);
 
     if (event === KeepTrackApiEvents.bottomMenuClick) {
-      keepTrackApi.getSoundManager()?.play(SoundNames.BEEP);
+      this.getSoundManager()?.play(SoundNames.BEEP);
     }
 
-    (<KeepTrackApiRegisterParams<T>[]>this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));
+    (<KeepTrackApiRegisterParams<T>[]> this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));
   }
 
   /** If the callback does not exist, create it */
@@ -157,6 +180,7 @@ export class KeepTrackApi {
     if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass)) {
       return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin instanceof pluginClass) as T;
     }
+
     return null;
   }
 
@@ -173,35 +197,40 @@ export class KeepTrackApi {
     if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin.PLUGIN_NAME === pluginName)) {
       return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin.PLUGIN_NAME === pluginName) as T;
     }
+
     return null;
   }
 
-  /** This is not a standard function. It is used in development for formatting template literals.
+  /**
+   * This is not a standard function. It is used in development for formatting template literals.
    * example: keepTrackApi.html\`\<div>example\</div>\`
    * TODO: This should be a static method
    */
-  // eslint-disable-next-line class-methods-use-this
-  html(strings: TemplateStringsArray, ...placeholders: any[]) {
+  html(strings: TemplateStringsArray, ...placeholders: string[]) {
     for (const placeholder of placeholders) {
       if (typeof placeholder !== 'string') {
         errorManagerInstance.error(new Error('Invalid input'), 'keepTrackApi.html');
       }
     }
+
     return String.raw(strings, ...placeholders);
   }
 
-  /** This is not a standard function. It is used in development for formatting template literals.
+  /**
+   * This is not a standard function. It is used in development for formatting template literals.
    * example: keepTrackApi.glsl\`uniform float example\`
    * TODO: This should be a static method
    */
   // eslint-disable-next-line class-methods-use-this
-  glsl(literals: TemplateStringsArray, ...placeholders: Array<any>): string {
+  glsl(literals: TemplateStringsArray, ...placeholders): string {
     let str = '';
+
     for (let i = 0; i < placeholders.length; i++) {
       str += literals[i];
       str += placeholders[i];
     }
     str += literals[literals.length - 1];
+
     return str;
   }
 
@@ -216,13 +245,17 @@ export class KeepTrackApi {
     this.verifyEvent_(params.event);
 
     // Add the callback
-    this.events[params.event].push({ name: params.cbName, cb: params.cb });
+    this.events[params.event].push({
+      cbName: params.cbName, cb: params.cb,
+      event: null,
+    });
   }
 
   unregister(params: { event: KeepTrackApiEvents; cbName: string }) {
     for (let i = 0; i < this.events[params.event].length; i++) {
-      if (this.events[params.event][i].name == params.cbName) {
+      if (this.events[params.event][i].cbName === params.cbName) {
         this.events[params.event].splice(i, 1);
+
         return;
       }
     }

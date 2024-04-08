@@ -81,7 +81,7 @@ export class KeepTrack {
   private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
   public api = {
-    SatMath: SatMath,
+    SatMath,
   };
 
   colorManager: ColorSchemeManager;
@@ -103,7 +103,7 @@ export class KeepTrack {
     settingsOverride = {
       isPreventDefaultHtml: false,
       isShowSplashScreen: true,
-    }
+    },
   ) {
     if (this.isReady) {
       throw new Error('KeepTrack is already started');
@@ -114,39 +114,55 @@ export class KeepTrack {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
 
-      if (!isThisNode() && settingsManager.isShowSplashScreen) KeepTrack.loadSplashScreen_();
+      if (!isThisNode() && settingsManager.isShowSplashScreen) {
+        KeepTrack.loadSplashScreen_();
+      }
     }
 
     const orbitManagerInstance = new OrbitManager();
+
     keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
     const catalogManagerInstance = new CatalogManager();
+
     keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
     const groupManagerInstance = new GroupsManager();
+
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
     const timeManagerInstance = new TimeManager();
+
     keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
     const rendererInstance = new WebGLRenderer();
+
     keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, rendererInstance);
     keepTrackContainer.registerSingleton(Singletons.MeshManager, rendererInstance.meshManager);
     const sceneInstance = new Scene({
       gl: keepTrackApi.getRenderer().gl,
     });
+
     keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
     const sensorManagerInstance = new SensorManager();
+
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
     const dotsManagerInstance = new DotsManager();
+
     keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
     const uiManagerInstance = new UiManager();
+
     keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
     const colorSchemeManagerInstance = new ColorSchemeManager();
+
     keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
     const inputManagerInstance = new InputManager();
+
     keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
     const sensorMathInstance = new SensorMath();
+
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
     const mainCameraInstance = new Camera();
+
     keepTrackContainer.registerSingleton(Singletons.MainCamera, mainCameraInstance);
     const hoverManagerInstance = new HoverManager();
+
     keepTrackContainer.registerSingleton(Singletons.HoverManager, hoverManagerInstance);
 
     this.mainCameraInstance = mainCameraInstance;
@@ -172,6 +188,7 @@ export class KeepTrack {
   gameLoop(timestamp = <Milliseconds>0): void {
     requestAnimationFrame(this.gameLoop.bind(this));
     const dt = <Milliseconds>(timestamp - this.lastGameLoopTimestamp_);
+
     this.lastGameLoopTimestamp_ = timestamp;
 
     if (settingsManager.cruncherReady) {
@@ -186,7 +203,10 @@ export class KeepTrack {
 
   static getDefaultBodyHtml(): void {
     const containerDom = settingsManager.divContainer ?? document.getElementById('keeptrack-root');
-    if (!containerDom) throw new Error('Failed to find container');
+
+    if (!containerDom) {
+      throw new Error('Failed to find container');
+    }
 
     // If no current shadow DOM, create one - this is mainly for testing
     if (!keepTrackApi.containerRoot) {
@@ -238,8 +258,10 @@ export class KeepTrack {
       </footer>`;
 
     if (!settingsManager.isShowSplashScreen) {
-      // hideEl('loading-screen');
-      // hideEl('nav-footer');
+      /*
+       * hideEl('loading-screen');
+       * hideEl('nav-footer');
+       */
     }
   }
 
@@ -279,7 +301,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-sm.css').catch(() => {
               // This is intentional
-            })
+            }),
           )
           .catch(() => {
             // This is intentional
@@ -287,7 +309,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-md.css').catch(() => {
               // This is intentional
-            })
+            }),
           )
           .catch(() => {
             // This is intentional
@@ -295,7 +317,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-lg.css').catch(() => {
               // This is intentional
-            })
+            }),
           )
           .catch(() => {
             // This is intentional
@@ -303,7 +325,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-xl.css').catch(() => {
               // This is intentional
-            })
+            }),
           )
           .catch(() => {
             // This is intentional
@@ -311,7 +333,7 @@ export class KeepTrack {
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-2xl.css').catch(() => {
               // This is intentional
-            })
+            }),
           )
           .catch(() => {
             // This is intentional
@@ -331,6 +353,7 @@ export class KeepTrack {
     // Randomly load a splash screen - not a vulnerability
     const image = KeepTrack.splashScreenImgList_[Math.floor(Math.random() * KeepTrack.splashScreenImgList_.length)];
     const loadingDom = getEl('loading-screen');
+
     if (loadingDom) {
       loadingDom.style.backgroundImage = `url(${image})`;
       loadingDom.style.backgroundSize = 'cover';
@@ -344,6 +367,7 @@ export class KeepTrack {
     setTimeout(() => {
       KeepTrack.splashScreenImgList_.forEach((img) => {
         const preloadImg = new Image();
+
         preloadImg.src = img;
       });
     }, 30000);
@@ -370,10 +394,12 @@ theodore.kruczek at gmail dot com.
     // TODO: Replace console calls with ErrorManagerInstance
 
     let errorHtml = '';
+
     errorHtml += error?.message ? `${error.message}<br>` : '';
     errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
     errorHtml += error?.stack ? `${error.stack}<br>` : '';
     const LoaderText = getEl('loader-text');
+
     if (LoaderText) {
       LoaderText.innerHTML = errorHtml;
       console.error(error);
@@ -381,7 +407,9 @@ theodore.kruczek at gmail dot com.
       console.error(error);
     }
     // istanbul ignore next
-    if (!isThisNode()) console.warn(error);
+    if (!isThisNode()) {
+      console.warn(error);
+    }
   }
 
   private draw_(dt = <Milliseconds>0) {
@@ -426,7 +454,9 @@ theodore.kruczek at gmail dot com.
 
       // Error Trapping
       window.addEventListener('error', (e: ErrorEvent) => {
-        if (!settingsManager.isGlobalErrorTrapOn) return;
+        if (!settingsManager.isGlobalErrorTrapOn) {
+          return;
+        }
         if (isThisNode()) {
           throw e.error;
         }
@@ -451,8 +481,10 @@ theodore.kruczek at gmail dot com.
       uiManagerInstance.onReady();
 
       SplashScreen.loadStr(SplashScreen.msg.dots);
-      // MobileManager.checkMobileMode();
-      // We need to know if we are on a small screen before starting webgl
+      /*
+       * MobileManager.checkMobileMode();
+       * We need to know if we are on a small screen before starting webgl
+       */
       await renderer.glInit();
 
       sceneInstance.init(renderer.gl);
@@ -495,10 +527,13 @@ theodore.kruczek at gmail dot com.
     UiManager.postStart();
 
     if (settingsManager.cruncherReady) {
-      // Create Container Div
-      // NOTE: This needs to be done before uiManagerFinal
+      /*
+       * Create Container Div
+       * NOTE: This needs to be done before uiManagerFinal
+       */
       if (settingsManager.plugins.debug) {
         const uiWrapperDom = getEl('ui-wrapper');
+
         if (uiWrapperDom) {
           uiWrapperDom.innerHTML += '<div id="eruda"></div>';
         }
@@ -509,6 +544,7 @@ theodore.kruczek at gmail dot com.
 
       if (settingsManager.plugins.debug) {
         const erudaDom = getEl('eruda');
+
         if (erudaDom) {
           eruda.init({
             autoScale: false,
@@ -518,6 +554,7 @@ theodore.kruczek at gmail dot com.
           });
           eruda.add(erudaFps);
           const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
+
           if (erudaEntryButtonDoms.length > 0) {
             hideEl(erudaEntryButtonDoms[0] as HTMLElement);
           }
@@ -537,6 +574,7 @@ theodore.kruczek at gmail dot com.
       // Update MaterialUI with new menu options
       try {
         // Jest workaround
+        // eslint-disable-next-line new-cap
         window.M.AutoInit();
       } catch {
         // intentionally left blank
@@ -560,7 +598,9 @@ theodore.kruczek at gmail dot com.
     renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
 
     // Display it if that settings is enabled
-    if (this.isShowFPS) console.log(KeepTrack.getFps_(renderer.dt));
+    if (this.isShowFPS) {
+      console.log(KeepTrack.getFps_(renderer.dt));
+    }
 
     // Update official time for everyone else
     timeManagerInstance.setNow(<Milliseconds>Date.now());
@@ -577,8 +617,10 @@ theodore.kruczek at gmail dot com.
 
     renderer.update();
 
-    // Update Colors
-    // NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
+    /*
+     * Update Colors
+     * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
+     */
     if (!settingsManager.isMobileModeEnabled) {
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
     }

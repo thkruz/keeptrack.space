@@ -17,7 +17,7 @@ setup.init = () => {
         search: '?sat=44444',
         value: jest.fn(),
       },
-    }
+    },
   );
 
   keepTrackApi.containerRoot.innerHTML = global.docBody;
@@ -25,11 +25,13 @@ setup.init = () => {
 
 const eventFire = (elObj, etype) => {
   try {
-    const el = typeof elObj == 'string' ? getEl(elObj) : elObj;
+    const el = typeof elObj === 'string' ? getEl(elObj) : elObj;
+
     if (el.fireEvent) {
-      el.fireEvent('on' + etype);
+      el.fireEvent(`on${etype}`);
     } else {
       const evObj = new Event(etype, { bubbles: true, cancelable: false });
+
       el.dispatchEvent(evObj);
     }
   } catch (error) {

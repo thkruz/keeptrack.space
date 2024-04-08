@@ -74,13 +74,17 @@ export class BufferGeometry {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.combinedBuffer);
 
+    // eslint-disable-next-line guard-for-in
     for (const key in this.attributes) {
       const attribute = this.attributes[key];
+
       gl.enableVertexAttribArray(attribute.location);
       gl.vertexAttribPointer(attribute.location, attribute.vertices, gl.FLOAT, false, attribute.stride, attribute.offset);
     }
 
-    if (this.index) gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index);
+    if (this.index) {
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index);
+    }
 
     gl.bindVertexArray(null);
   }
@@ -114,11 +118,13 @@ export class BufferGeometry {
 
   clone() {
     const clone = new BufferGeometry();
+
     clone.attributes = this.attributes;
     clone.index = this.index;
     clone.indexLength = this.indexLength;
     clone.combinedBuffer = this.combinedBuffer;
     clone.localMvMatrix = this.localMvMatrix;
+
     return clone;
   }
 

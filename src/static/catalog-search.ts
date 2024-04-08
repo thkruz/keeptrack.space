@@ -92,7 +92,7 @@ export class CatalogSearch {
     sat: DetailedSatellite,
     incMargin: Degrees = <Degrees>2,
     raanMargin: Degrees = <Degrees>5,
-    periodMargin: Minutes = <Minutes>0
+    periodMargin: Minutes = <Minutes>0,
   ): number[] {
     const INC_MARGIN = incMargin;
     const RAAN_MARGIN = raanMargin;
@@ -114,14 +114,23 @@ export class CatalogSearch {
 
     return satData
       .filter((s) => {
-        if (s.isStatic()) return false;
-        if (s.inclination < minInclination || s.inclination > maxInclination) return false;
-        if (sat.rightAscension > 360 - RAAN_MARGIN || sat.rightAscension < RAAN_MARGIN) {
-          if (s.rightAscension > maxRaan && s.rightAscension < minRaan) return false;
-        } else {
-          if (s.rightAscension < minRaan || s.rightAscension > maxRaan) return false;
+        if (s.isStatic()) {
+          return false;
         }
-        if (s.period < minPeriod || s.period > maxPeriod) return false;
+        if (s.inclination < minInclination || s.inclination > maxInclination) {
+          return false;
+        }
+        if (sat.rightAscension > 360 - RAAN_MARGIN || sat.rightAscension < RAAN_MARGIN) {
+          if (s.rightAscension > maxRaan && s.rightAscension < minRaan) {
+            return false;
+          }
+        } else if (s.rightAscension < minRaan || s.rightAscension > maxRaan) {
+          return false;
+        }
+        if (s.period < minPeriod || s.period > maxPeriod) {
+          return false;
+        }
+
         return true;
       })
       .map((s) => s.id);
@@ -193,7 +202,9 @@ export class CatalogSearch {
   static year(satData: DetailedSatellite[], yr: number): DetailedSatellite[] {
     return satData.filter((sat) => {
       const tleYear = sat?.tle1?.substring(9, 11) || '-1';
-      return parseInt(tleYear) == yr;
+
+
+      return parseInt(tleYear) === yr;
     });
   }
 
@@ -210,16 +221,19 @@ export class CatalogSearch {
    */
   static yearOrLess(satData: DetailedSatellite[], yr: number) {
     return satData.filter((sat) => {
-      if (sat.source === CatalogSource.VIMPEL) return false;
+      if (sat.source === CatalogSource.VIMPEL) {
+        return false;
+      }
 
       // 2007 Fengyun 1C ASAT Event
       if (sat.intlDes?.includes('1999-025')) {
         if (sat.intlDes !== '1999-025A') {
           if (yr >= 7 && yr < 57) {
             return true;
-          } else {
-            return false;
           }
+
+          return false;
+
         }
       }
 
@@ -228,9 +242,10 @@ export class CatalogSearch {
         if (sat.intlDes !== '1993-036A' && sat.intlDes !== '1997-051A') {
           if (yr >= 9 && yr < 57) {
             return true;
-          } else {
-            return false;
           }
+
+          return false;
+
         }
       }
 
@@ -239,18 +254,21 @@ export class CatalogSearch {
         if (sat.intlDes !== '1982-092A' && sat.intlDes !== '1982-092B') {
           if (yr >= 21 && yr < 57) {
             return true;
-          } else {
-            return false;
           }
+
+          return false;
+
         }
       }
 
       const tleYear = sat?.tle1?.substring(9, 11) || '-1';
+
       if (yr >= 57 && yr < 100) {
         return parseInt(tleYear) <= yr && parseInt(tleYear) >= 57;
-      } else {
-        return parseInt(tleYear) <= yr || parseInt(tleYear) >= 57;
       }
+
+      return parseInt(tleYear) <= yr || parseInt(tleYear) >= 57;
+
     });
   }
 

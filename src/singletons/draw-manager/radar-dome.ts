@@ -7,6 +7,7 @@ import { GlUtils } from '../../static/gl-utils';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
+// eslint-disable-next-line multiline-comment-style
 // ////////////////////////////////////////////////////////////////////////////
 // TODO: This is a WIP for a radar dome. It is not currently used.
 // ////////////////////////////////////////////////////////////////////////////
@@ -45,12 +46,16 @@ export class RadarDome {
   eci: Ootk.EciVec3;
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_) {
+      return;
+    }
 
     const gl = this.gl_;
 
     gl.useProgram(this.program_);
-    if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    if (tgtBuffer) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    }
 
     // Set the uniforms
     gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
@@ -91,7 +96,9 @@ export class RadarDome {
   }
 
   update() {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_) {
+      return;
+    }
 
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
@@ -102,13 +109,16 @@ export class RadarDome {
   vertexList: Float32Array = null;
 
   updateVertexList(vertexList: Float32Array) {
-    if (!this.isLoaded_) throw new Error('CustomMesh not loaded');
+    if (!this.isLoaded_) {
+      throw new Error('CustomMesh not loaded');
+    }
 
     if (this.vertexList.length !== vertexList.length) {
       this.vertexList = vertexList;
       this.initBuffers_();
     } else {
       const flatVerticies = vertexList;
+
       for (let i = 0; i < flatVerticies.length; i++) {
         this.vertexList[i] = flatVerticies[i];
       }
@@ -126,6 +136,7 @@ export class RadarDome {
   private initVao_() {
     const gl = this.gl_;
     // Make New Vertex Array Objects
+
     this.vao = gl.createVertexArray();
     gl.bindVertexArray(this.vao);
 

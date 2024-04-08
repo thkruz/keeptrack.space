@@ -3,7 +3,7 @@ import { getEl, hideEl, showEl } from '../lib/get-el';
 import { MobileManager } from '../singletons/mobileManager';
 
 export abstract class SplashScreen {
-  static msg = {
+  static readonly msg = {
     math: 'Attempting to Math...',
     science: 'Locating Science...',
     science2: 'Found Science...',
@@ -15,7 +15,7 @@ export abstract class SplashScreen {
     models: 'Building 3D Models...',
   };
 
-  static textElId = 'loader-text';
+  static readonly textElId = 'loader-text';
 
   /**
    * Initializes the loading screen and appends it to the specified root DOM element.
@@ -35,31 +35,32 @@ export abstract class SplashScreen {
       </div>`;
   }
 
-  static showHint() {
+  static showHint(): string {
     return SplashScreen.randomHintText_[Math.floor(Math.random() * SplashScreen.randomHintText_.length)];
   }
 
-  static randomHintText_ = [
+  static readonly randomHintText_ = [
     'Objects on the screen may appear bigger than they are. Everything else is to scale.',
     'Press Shift+F1 to open the help menu at any time.',
     'Press R to toggle on/off the auto rotation of the globe.',
     'The settings menu located in the bottom toolbar contains many options to customize your experience.',
     'Add satellites to the watchlist to get notifications when they are overhead.',
     'Right click on the globe to open the context menu with more options.',
-    "Press '0' to pause the simulation and '1' to resume.",
-    "Press '+' or '-' to change the simulation speed.",
-    "Press 'C' to change the camera mode.",
-    "Press 'F11' to toggle on/off the fullscreen mode.",
+    'Press \'0\' to pause the simulation and \'1\' to resume.',
+    'Press \'+\' or \'-\' to change the simulation speed.',
+    'Press \'C\' to change the camera mode.',
+    'Press \'F11\' to toggle on/off the fullscreen mode.',
     'You can search for satellites by name or NORAD ID in the search bar at the top right.',
-    "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
+    'A new launch nominal can be created by selecting a satellite and clicking the \'New Launch\' button in the bottom menu.',
   ];
 
   static hideSplashScreen() {
     // Don't wait if we are running Jest
     if (keepTrackApi.getScene().earth.isUseHiRes && keepTrackApi.getScene().earth.isHiResReady !== true) {
-      setTimeout(function () {
+      setTimeout(() => {
         SplashScreen.hideSplashScreen();
       }, 100);
+
       return;
     }
 
@@ -73,7 +74,7 @@ export abstract class SplashScreen {
       hideEl('loading-screen');
     } else {
       // Loading Screen Resized and Hidden
-      setTimeout(function () {
+      setTimeout(() => {
         getEl('loading-screen')?.classList.remove('full-loader');
         getEl('loading-screen')?.classList.add('mini-loader-container');
         getEl('logo-inner-container')?.classList.add('mini-loader');
@@ -90,7 +91,10 @@ export abstract class SplashScreen {
 
   static loadStr(str: string) {
     const LoaderText = getEl(SplashScreen.textElId);
-    if (!LoaderText) return; // If the element is not found, do nothing
+
+    if (!LoaderText) {
+      return;
+    } // If the element is not found, do nothing
     LoaderText.textContent = str;
   }
 }

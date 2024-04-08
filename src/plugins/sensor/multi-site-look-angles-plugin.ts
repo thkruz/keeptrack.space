@@ -28,7 +28,10 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   bottomIconCallback: () => void = () => {
     const sat = this.selectSatManager_.getSelectedSat();
-    if (!sat?.isSatellite()) return;
+
+    if (!sat?.isSatellite()) {
+      return;
+    }
     this.refreshSideMenuData(sat as DetailedSatellite);
   };
 
@@ -48,7 +51,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     maxWidth: 500,
   };
 
-  helpTitle = `Multi-Site Look Angles Menu`;
+  helpTitle = 'Multi-Site Look Angles Menu';
   helpBody = keepTrackApi.html`
     The Multi-Site Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a satellite and multiple sensors.
     A satellite must first be selected before the menu can be used.
@@ -92,6 +95,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
             el: look.el.toFixed(2),
             rng: look.rng.toFixed(2),
           }));
+
           saveCsv(exportData, 'multiSiteLooks');
         });
       },
@@ -127,7 +131,10 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const sat = this.selectSatManager_.getSelectedSat();
-        if (!sat?.isSatellite()) return;
+
+        if (!sat?.isSatellite()) {
+          return;
+        }
         this.refreshSideMenuData(sat as DetailedSatellite);
       },
     });
@@ -139,20 +146,28 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         showLoading(() => {
           // TODO: This should be a class property that persists between refreshes
           const sensorListDom = getEl('multi-site-look-angles-sensor-list');
+
           if (!sensorListDom) {
             errorManagerInstance.warn('Could not find sensor list dom');
+
             return;
           }
 
           sensorListDom.innerHTML = '';
 
           const allSensors: DetailedSensor[] = [];
+
           for (const sensor of keepTrackApi.getSensorManager().sensorListUS) {
-            if (!sensor.shortName) continue;
+            if (!sensor.shortName) {
+              continue;
+            }
 
             const sensorButton = document.createElement('button');
+
             sensorButton.classList.add('btn', 'btn-ui', 'waves-effect', 'waves-light');
-            if (this.disabledSensors.includes(sensor)) sensorButton.classList.add('btn-red');
+            if (this.disabledSensors.includes(sensor)) {
+              sensorButton.classList.add('btn-red');
+            }
 
             allSensors.push(sensor);
 
@@ -170,7 +185,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
               this.getlookanglesMultiSite_(
                 sat,
-                allSensors.filter((s) => !this.disabledSensors.includes(s))
+                allSensors.filter((s) => !this.disabledSensors.includes(s)),
               );
             });
             sensorListDom.appendChild(sensorButton);
@@ -179,7 +194,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
           this.getlookanglesMultiSite_(
             sat,
-            allSensors.filter((s) => !this.disabledSensors.includes(s))
+            allSensors.filter((s) => !this.disabledSensors.includes(s)),
           );
         });
       }
@@ -195,6 +210,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       sensors = [];
       for (const sensorName in staticSet) {
         const sensor = staticSet[sensorName];
+
         sensors.push(sensor);
       }
     }
@@ -207,22 +223,27 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     const orbitalPeriod = MINUTES_PER_DAY / ((sat.satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
     const multiSiteArray = <TearrData[]>[];
+
     for (const sensor of sensors) {
       // Skip if satellite is above the max range of the sensor
-      if (sensor.maxRng < sat.perigee && (!sensor.maxRng2 || sensor.maxRng2 < sat.perigee)) continue;
+      if (sensor.maxRng < sat.perigee && (!sensor.maxRng2 || sensor.maxRng2 < sat.perigee)) {
+        continue;
+      }
 
       SensorManager.updateSensorUiStyling([sensor]);
       let offset = 0;
+
       for (let i = 0; i < this.lookanglesLength * 24 * 60 * 60; i += this.lookanglesInterval) {
         // 5second Looks
         offset = i * 1000; // Offset in seconds (msec * 1000)
-        let now = timeManagerInstance.getOffsetTimeObj(offset);
-        let multiSitePass = MultiSiteLookAnglesPlugin.propagateMultiSite_(now, sat.satrec, sensor);
+        const now = timeManagerInstance.getOffsetTimeObj(offset);
+        const multiSitePass = MultiSiteLookAnglesPlugin.propagateMultiSite_(now, sat.satrec, sensor);
+
         if (multiSitePass.time !== '') {
           multiSiteArray.push(multiSitePass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
 
           // Jump 3/4th to the next orbit
-          i = i + orbitalPeriod * 60 * 0.75; // NOSONAR
+          i += orbitalPeriod * 60 * 0.75; // NOSONAR
         }
       }
     }
@@ -230,6 +251,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     multiSiteArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     sensorManagerInstance.lastMultiSiteArray = multiSiteArray;
 
+    // eslint-disable-next-line no-unused-expressions
     isResetToDefault ? sensorManagerInstance.setCurrentSensor(null) : sensorManagerInstance.setCurrentSensor(tempSensor);
 
     MultiSiteLookAnglesPlugin.populateMultiSiteTable_(multiSiteArray);
@@ -247,15 +269,16 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         rng: aer.rng,
         objName: sensor.objName,
       };
-    } else {
-      return {
-        time: '',
-        el: <Degrees>0,
-        az: <Degrees>0,
-        rng: <Kilometers>0,
-        objName: '',
-      };
     }
+
+    return {
+      time: '',
+      el: <Degrees>0,
+      az: <Degrees>0,
+      rng: <Kilometers>0,
+      objName: '',
+    };
+
   }
 
   private static populateMultiSiteTable_(multiSiteArray: TearrData[]) {
@@ -263,28 +286,38 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
 
     const tbl = <HTMLTableElement>getEl('multi-site-look-angles-table'); // Identify the table to update
+
     tbl.innerHTML = ''; // Clear the table from old object data
     let tr = tbl.insertRow();
     let tdT = tr.insertCell();
+
     tdT.appendChild(document.createTextNode('Time'));
     tdT.setAttribute('style', 'text-decoration: underline');
     let tdE = tr.insertCell();
+
     tdE.appendChild(document.createTextNode('El'));
     tdE.setAttribute('style', 'text-decoration: underline');
     let tdA = tr.insertCell();
+
     tdA.appendChild(document.createTextNode('Az'));
     tdA.setAttribute('style', 'text-decoration: underline');
     let tdR = tr.insertCell();
+
     tdR.appendChild(document.createTextNode('Rng'));
     tdR.setAttribute('style', 'text-decoration: underline');
     let tdS = tr.insertCell();
+
     tdS.appendChild(document.createTextNode('Sensor'));
     tdS.setAttribute('style', 'text-decoration: underline');
 
     const timeManagerInstance = keepTrackApi.getTimeManager();
+
     for (const entry of multiSiteArray) {
       const sensor = staticSet.find((s) => s.objName === entry.objName);
-      if (!sensor) continue;
+
+      if (!sensor) {
+        continue;
+      }
       tr = tbl.insertRow();
       tr.setAttribute('class', 'link');
       tdT = tr.insertCell();

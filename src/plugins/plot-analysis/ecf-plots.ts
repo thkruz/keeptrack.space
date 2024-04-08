@@ -25,7 +25,9 @@ export class EcfPlot extends KeepTrackPlugin {
   bottomIconLabel = 'ECF Plots';
   bottomIconImg = scatterPlotPng3;
   bottomIconCallback = () => {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
   };
@@ -35,7 +37,7 @@ export class EcfPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   chart: echarts.ECharts;
 
-  helpTitle = `ECF Plots Menu`;
+  helpTitle = 'ECF Plots Menu';
   helpBody = keepTrackApi.html`
   <p>
     The ECF Plots menu allows you to plot the position of a satellite in Earth Centered Fixed (ECF) coordinates.
@@ -68,7 +70,9 @@ export class EcfPlot extends KeepTrackPlugin {
         } else {
           this.setBottomIconToDisabled();
         }
-        if (!this.isMenuButtonActive) return;
+        if (!this.isMenuButtonActive) {
+          return;
+        }
 
         // This runs if the menu is open
         if (!sat) {
@@ -82,7 +86,9 @@ export class EcfPlot extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     // Delete any old charts and start fresh
     if (this.chart) {
@@ -109,6 +115,7 @@ export class EcfPlot extends KeepTrackPlugin {
           const data = params.value;
           const color = params.color;
           // Create a small circle to show the color of the satellite
+
           return `
             <div style="display: flex; flex-direction: column; align-items: flex-start;">
               <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-end;">
@@ -200,11 +207,13 @@ export class EcfPlot extends KeepTrackPlugin {
       { name: Z_AXIS, index: 2 },
     ];
 
-    const fieldIndices = schema.reduce(function (obj, item): object {
+    const fieldIndices = schema.reduce((obj, item): object => {
       obj[item.name] = item.index;
+
       return obj;
     }, {});
     let fieldNames = schema.map((item) => item.name);
+
     fieldNames = fieldNames.slice(2, fieldNames.length - 2);
     ['xAxis3D', 'yAxis3D', 'zAxis3D', 'color', 'symbolSize'].forEach((fieldName) => {
       app.configParameters[fieldName] = {
@@ -222,16 +231,20 @@ export class EcfPlot extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
+
     data.push({ name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
 
     const secSatObj = this.selectSatManager_.secondarySatObj;
+
     if (secSatObj) {
       data.push({ name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
     }
 
     const lastSatId = this.selectSatManager_.lastSelectedSat();
+
     if (lastSatId !== -1) {
       const lastSatObj = catalogManagerInstance.getObject(lastSatId) as DetailedSatellite;
+
       data.push({ name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
     }
 

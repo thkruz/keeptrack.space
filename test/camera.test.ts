@@ -23,11 +23,13 @@ const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Camera
 
 describe('Camera Key Input', () => {
   let cameraInstance: Camera;
+
   beforeEach(() => {
     cameraInstance = new Camera();
   });
   it('should handle C', () => {
     const testFunc = () => cameraInstance.keyDownC_();
+
     for (let i = 0; i < 25; i++) {
       expect(testFunc).not.toThrow();
     }
@@ -53,76 +55,89 @@ describe('Camera Key Input', () => {
   });
   it('should handle W', () => {
     let testFunc = () => cameraInstance.keyDownW_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpW_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle A', () => {
     let testFunc = () => cameraInstance.keyDownA_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpA_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle D', () => {
     let testFunc = () => cameraInstance.keyDownD_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpD_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle E', () => {
     let testFunc = () => cameraInstance.keyDownE_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpE_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle I', () => {
     let testFunc = () => cameraInstance.keyDownI_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpI_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle J', () => {
     let testFunc = () => cameraInstance.keyDownJ_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpJ_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle K', () => {
     let testFunc = () => cameraInstance.keyDownK_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpK_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle L', () => {
     let testFunc = () => cameraInstance.keyDownL_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpL_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Q', () => {
     let testFunc = () => cameraInstance.keyDownQ_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpQ_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle S', () => {
     let testFunc = () => cameraInstance.keyDownS_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpS_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle R', () => {
-    let testFunc = () => cameraInstance.keyDownR_();
+    const testFunc = () => cameraInstance.keyDownR_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle keyDownShift_', () => {
     let testFunc = () => cameraInstance.keyDownShift_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpShift_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle keyDownShiftRight_', () => {
     let testFunc = () => cameraInstance.keyDownShiftRight_();
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.keyUpShiftRight_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
@@ -139,8 +154,10 @@ describe('Camera Draw', () => {
     lat: 0,
     lon: 0,
   };
+
   beforeEach(() => {
     const now = new Date();
+
     cameraInstance = new Camera();
     const sensor = defaultSensor;
 
@@ -155,7 +172,7 @@ describe('Camera Draw', () => {
       x: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon,
       y: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * sinLon,
       z: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat,
-      gmst: gmst,
+      gmst,
       lat: sensor.lat,
       lon: sensor.lon,
     };
@@ -166,6 +183,7 @@ describe('Camera Draw', () => {
     const testResult = () => {
       cameraInstance.draw(defaultSat, sensorData);
     };
+
     expect(testResult).not.toThrow();
   });
 
@@ -174,6 +192,7 @@ describe('Camera Draw', () => {
     const testResult = () => {
       cameraInstance.draw(null, sensorData);
     };
+
     expect(testResult).not.toThrow();
   });
 
@@ -182,6 +201,7 @@ describe('Camera Draw', () => {
     const testResult = () => {
       cameraInstance.draw(defaultSat, null);
     };
+
     expect(testResult).not.toThrow();
   });
 
@@ -190,6 +210,7 @@ describe('Camera Draw', () => {
     const testResult = () => {
       cameraInstance.draw(null, null);
     };
+
     expect(testResult).not.toThrow();
   });
 
@@ -199,6 +220,7 @@ describe('Camera Draw', () => {
       cameraInstance.camPitch = NaN as unknown as Radians;
       cameraInstance.draw(defaultSat, sensorData);
     };
+
     expect(testResult).not.toThrow();
   });
 
@@ -208,6 +230,7 @@ describe('Camera Draw', () => {
       cameraInstance.camYaw = NaN as unknown as Radians;
       cameraInstance.draw(defaultSat, sensorData);
     };
+
     testFuncWithAllCameraTypes(testResult, cameraInstance);
 
     testResult = () => {
@@ -220,6 +243,7 @@ describe('Camera Draw', () => {
   // test draw with all camera types
   it('test_draw_all_camera_types', () => {
     let testFunc = () => cameraInstance.draw(defaultSat, sensorData);
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.draw(defaultSat, null);
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
@@ -232,6 +256,7 @@ describe('Camera Draw', () => {
 
 describe('Camera snapToSat', () => {
   let cameraInstance: Camera;
+
   beforeEach(() => {
     cameraInstance = new Camera();
   });
@@ -239,6 +264,7 @@ describe('Camera snapToSat', () => {
   // test snapToSat with no target
   it('test_snap_to_sat_no_target', () => {
     const testFunc = () => cameraInstance.snapToSat(null, new Date());
+
     expect(testFunc).not.toThrow();
   });
 
@@ -246,13 +272,15 @@ describe('Camera snapToSat', () => {
   it('test_snap_to_sat_bad_target_data', () => {
     defaultSat.position = null;
     const testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
+
     expect(() => testFunc()).toThrow();
   });
 
   // test snapToSat with normal data
   it('test_snap_to_sat_normal_data', () => {
     defaultSat.position = { x: 0 as Kilometers, y: 0 as Kilometers, z: 6000 as Kilometers };
-    let testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
+    const testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
+
     expect(testFunc).not.toThrow();
   });
 
@@ -263,6 +291,7 @@ describe('Camera snapToSat', () => {
       defaultSat.position = { x: 0 as Kilometers, y: 0 as Kilometers, z: 6000 as Kilometers };
       cameraInstance.snapToSat(defaultSat, new Date());
     };
+
     expect(testFunc).not.toThrow();
   });
 
@@ -277,6 +306,7 @@ describe('Camera snapToSat', () => {
       };
       cameraInstance.snapToSat(defaultSat, new Date());
     };
+
     expect(testFunc).not.toThrow();
   });
 
@@ -286,6 +316,7 @@ describe('Camera snapToSat', () => {
       cameraInstance.camZoomSnappedOnSat = true;
       cameraInstance.snapToSat(defaultSat, new Date());
     };
+
     expect(testFunc).not.toThrow();
   });
 
@@ -300,12 +331,14 @@ describe('Camera snapToSat', () => {
       };
       cameraInstance.snapToSat(defaultSat, new Date());
     };
+
     expect(testFunc).not.toThrow();
   });
 
   // Test snapToSat with all camera types
   it('test_snap_to_sat_all_camera_types', () => {
-    let testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
+    const testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
 });
@@ -313,12 +346,14 @@ describe('Camera snapToSat', () => {
 // test Camera update with all camera types
 describe('Camera update', () => {
   let cameraInstance: Camera;
+
   beforeEach(() => {
     cameraInstance = new Camera();
   });
 
   it('test_update_all_camera_types', () => {
-    let testFunc = () => cameraInstance.update(16 as Milliseconds);
+    const testFunc = () => cameraInstance.update(16 as Milliseconds);
+
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
 

@@ -4,5 +4,7 @@
  */
 export const isThisNode = () => {
   const nodeName = (typeof process !== 'undefined' && process?.release?.name) || false;
+
+
   return !!nodeName;
 };

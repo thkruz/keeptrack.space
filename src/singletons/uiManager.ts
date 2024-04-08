@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
-
+ *
  * http://keeptrack.space
  *
  * @Copyright (C) 2016-2023 Theodore Kruczek
@@ -93,6 +93,7 @@ export class UiManager {
       });
     }, 0);
 
+    // eslint-disable-next-line multiline-comment-style
     // // Enable Satbox Overlay
     // if (settingsManager.enableHoverOverlay) {
     //   try {
@@ -119,9 +120,11 @@ export class UiManager {
   }
 
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
-    if (settingsManager.isDisableToasts) return;
+    if (settingsManager.isDisableToasts) {
+      return null;
+    }
 
-    let toastMsg = window.M.toast({
+    const toastMsg = window.M.toast({
       unsafeHTML: toastText,
     });
 
@@ -135,7 +138,9 @@ export class UiManager {
     });
 
     type = type || 'standby';
-    if (isLong) toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
+    if (isLong) {
+      toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
+    }
     switch (type) {
       case 'standby':
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
@@ -161,6 +166,10 @@ export class UiManager {
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
         keepTrackApi.getSoundManager()?.play(SoundNames.ERROR);
         break;
+      default:
+        toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
+        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
+        break;
     }
 
     return toastMsg;
@@ -170,12 +179,17 @@ export class UiManager {
     // Don't Make an alert the first time!
     if (!this.lastColorScheme) {
       this.lastColorScheme = newScheme;
+
       return;
     }
 
-    // Don't make an alert unless something has really changed
-    // Check if the name of the lastColorScheme function is the same as the name of the new color scheme
-    if (this.lastColorScheme.name == newScheme.name) return;
+    /*
+     * Don't make an alert unless something has really changed
+     * Check if the name of the lastColorScheme function is the same as the name of the new color scheme
+     */
+    if (this.lastColorScheme.name === newScheme.name) {
+      return;
+    }
 
     // record the new color scheme
     this.lastColorScheme = newScheme;
@@ -183,41 +197,41 @@ export class UiManager {
     switch (newScheme.name) {
       case 'default':
       case 'group':
-        this.toast(`Color Scheme Changed to Object Types`, 'normal', false);
+        this.toast('Color Scheme Changed to Object Types', 'normal', false);
         break;
       case 'velocity':
-        this.toast(`Color Scheme Changed to Velocity`, 'normal', false);
+        this.toast('Color Scheme Changed to Velocity', 'normal', false);
         break;
       case 'sunlight':
-        this.toast(`Color Scheme Changed to Sunlight`, 'normal', false);
+        this.toast('Color Scheme Changed to Sunlight', 'normal', false);
         break;
       case 'countries':
       case 'groupCountries':
-        this.toast(`Color Scheme Changed to Countries`, 'normal', false);
+        this.toast('Color Scheme Changed to Countries', 'normal', false);
         break;
       case 'leo':
-        this.toast(`Color Scheme Changed to Near Earth`, 'normal', false);
+        this.toast('Color Scheme Changed to Near Earth', 'normal', false);
         break;
       case 'geo':
-        this.toast(`Color Scheme Changed to Deep Space`, 'normal', false);
+        this.toast('Color Scheme Changed to Deep Space', 'normal', false);
         break;
       case 'ageOfElset':
-        this.toast(`Color Scheme Changed to Elset Age`, 'normal', false);
+        this.toast('Color Scheme Changed to Elset Age', 'normal', false);
         break;
       case 'rcs':
-        this.toast(`Color Scheme Changed to Radar Cross Section`, 'normal', false);
+        this.toast('Color Scheme Changed to Radar Cross Section', 'normal', false);
         break;
       case 'smallsats':
-        this.toast(`Color Scheme Changed to Small Satellites`, 'normal', false);
+        this.toast('Color Scheme Changed to Small Satellites', 'normal', false);
         break;
       case 'lostobjects':
-        this.toast(`Color Scheme Changed to Lost Objects`, 'normal', false);
+        this.toast('Color Scheme Changed to Lost Objects', 'normal', false);
         break;
       case 'neighbors':
-        this.toast(`Color Scheme Changed to Orbit Density`, 'normal', false);
+        this.toast('Color Scheme Changed to Orbit Density', 'normal', false);
         break;
       case 'confidence':
-        this.toast(`Color Scheme Changed to Confidence`, 'normal', false);
+        this.toast('Color Scheme Changed to Confidence', 'normal', false);
         break;
       default:
         this.toast(`Color Scheme Changed to ${newScheme.name}`, 'normal', false);
@@ -267,19 +281,24 @@ export class UiManager {
   }
 
   init() {
-    if (this.isInitialized_) throw new Error('UiManager already initialized');
+    if (this.isInitialized_) {
+      throw new Error('UiManager already initialized');
+    }
     loadJquery();
 
     this.searchManager = new SearchManager(this);
 
-    if (settingsManager.isShowLogo) getEl('demo-logo')?.classList.remove('start-hidden');
+    if (settingsManager.isShowLogo) {
+      getEl('demo-logo')?.classList.remove('start-hidden');
+    }
 
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
 
     UiManager.initBottomMenuResizing_();
 
     // Initialize Navigation and Select Menus
-    let elems = document.querySelectorAll('.dropdown-button');
+    const elems = document.querySelectorAll('.dropdown-button');
+
     window.M.Dropdown.init(elems);
     this.isInitialized_ = true;
   }
@@ -328,10 +347,12 @@ export class UiManager {
     getEl('nav-footer-toggle')?.addEventListener('click', () => {
       this.footerToggle();
       const navFooterDom = getEl('nav-footer');
+
       if (navFooterDom && parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
         setTimeout(() => {
           const bottomHeight = getEl('bottom-icons-container')?.offsetHeight;
-          document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+
+          document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
         }, 1000); // Wait for the footer to be fully visible.
       } else {
         // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
@@ -367,6 +388,7 @@ export class UiManager {
 
     if (slug.startsWith('velocity')) {
       let colorString: [number, number, number, number];
+
       switch (slug) {
         case 'velocityFast':
           colorString = [0.75, 0.75, 0, 1];
@@ -375,6 +397,9 @@ export class UiManager {
           colorString = [0.75, 0.25, 0, 1];
           break;
         case 'velocitySlow':
+          colorString = [1.0, 0, 0.0, 1.0];
+          break;
+        default:
           colorString = [1.0, 0, 0.0, 1.0];
           break;
       }
@@ -389,23 +414,22 @@ export class UiManager {
           el.style.background = rgbCss(colorString).toString();
         });
       }
+    } else if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
+      colorSchemeManagerInstance.objectTypeFlags[slug] = false;
+      getClass(`legend-${slug}-box`).forEach((el) => {
+        el.style.background = 'black';
+      });
     } else {
-      if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
-        colorSchemeManagerInstance.objectTypeFlags[slug] = false;
-        getClass(`legend-${slug}-box`).forEach((el) => {
-          el.style.background = 'black';
-        });
-      } else {
-        colorSchemeManagerInstance.objectTypeFlags[slug] = true;
-        getClass(`legend-${slug}-box`).forEach((el) => {
-          const color = settingsManager.colors?.[slug];
-          if (!color) {
-            errorManagerInstance.debug(`Color not found for ${slug}`);
-          } else {
-            el.style.background = rgbCss(color);
-          }
-        });
-      }
+      colorSchemeManagerInstance.objectTypeFlags[slug] = true;
+      getClass(`legend-${slug}-box`).forEach((el) => {
+        const color = settingsManager.colors?.[slug];
+
+        if (!color) {
+          errorManagerInstance.debug(`Color not found for ${slug}`);
+        } else {
+          el.style.background = rgbCss(color);
+        }
+      });
     }
 
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
@@ -413,7 +437,9 @@ export class UiManager {
 
   onReady() {
     // Code Once index.htm is loaded
-    if (settingsManager.offline) this.updateInterval = 250;
+    if (settingsManager.offline) {
+      this.updateInterval = 250;
+    }
 
     // Setup Legend Colors
     LegendManager.legendColorsChange();
@@ -422,12 +448,16 @@ export class UiManager {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
     this.bottomIconPress = (el: HTMLElement) => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, el.id);
     const BottomIcons = getEl('bottom-icons');
+
     BottomIcons?.addEventListener('click', (evt: Event) => {
-      if ((<HTMLElement>evt.target).id === 'bottom-icons') return;
+      if ((<HTMLElement>evt.target).id === 'bottom-icons') {
+        return;
+      }
       if ((<HTMLElement>evt.target).parentElement?.id === 'bottom-icons') {
         this.bottomIconPress(<HTMLElement>evt.target);
       } else {
         const parentElement = (<HTMLElement>evt.target).parentElement;
+
         if (!parentElement) {
           errorManagerInstance.debug('parentElement is null');
         } else {
@@ -444,6 +474,7 @@ export class UiManager {
   toast(toastText: string, type: ToastMsgType, isLong = false) {
     this.lastToast = toastText;
     const toastMsg = this.makeToast_(toastText, type, isLong);
+
     this.activeToastList_.push(toastMsg);
   }
 
@@ -453,9 +484,12 @@ export class UiManager {
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks
    */
   updateSelectBox(realTime: Milliseconds, lastBoxUpdateTime: Milliseconds, obj: BaseObject): void {
-    if (!obj || obj.isStatic()) return;
+    if (!obj || obj.isStatic()) {
+      return;
+    }
 
     const sat = obj as DetailedSatellite;
+
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
       keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, sat);
       keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
@@ -472,13 +506,15 @@ export class UiManager {
     } else {
       clickAndDragHeight(bottomIconsContainerDom, maxHeight, () => {
         let bottomHeight = bottomIconsContainerDom.offsetHeight;
-        document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
+
+        document.documentElement.style.setProperty('--bottom-menu-height', `${bottomHeight}px`);
         const navFooterDom = getEl('nav-footer');
+
         if (navFooterDom && window.getComputedStyle(navFooterDom).bottom !== '0px') {
           document.documentElement.style.setProperty('--bottom-menu-top', '0px');
         } else {
           bottomHeight = bottomIconsContainerDom.offsetHeight;
-          document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+          document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
         }
       });
     }

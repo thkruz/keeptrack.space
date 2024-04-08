@@ -8,6 +8,7 @@ const socratesFileData = readFileSync('./public/tle/SOCRATES.json', 'utf8');
 
 describe('CollissionsPlugin_class', () => {
   let satConstellationsPlugin: Collissions;
+
   beforeEach(() => {
     setupDefaultHtml();
     satConstellationsPlugin = new Collissions();
@@ -21,7 +22,7 @@ describe('CollissionsPlugin_class', () => {
                 resolve(socratesFileData);
               }),
           } as Response);
-        })
+        }),
     );
   });
 
@@ -31,7 +32,7 @@ describe('CollissionsPlugin_class', () => {
   it('should have clickable objects', () => {
     websiteInit(satConstellationsPlugin);
     getEl('collisions-menu').click();
-    satConstellationsPlugin['collisionList_'] = [
+    satConstellationsPlugin.collisionList_ = [
       {
         toca: '2021-01-01T00:00:00.000Z',
         sat1: '25544',
@@ -48,6 +49,6 @@ describe('CollissionsPlugin_class', () => {
         maxProb: 6,
       } as CollisionEvent,
     ];
-    satConstellationsPlugin['eventClicked_'](0);
+    satConstellationsPlugin.eventClicked_(0);
   });
 });

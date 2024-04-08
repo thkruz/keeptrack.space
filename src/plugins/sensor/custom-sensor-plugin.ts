@@ -17,6 +17,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
       const sensorManagerInstance = keepTrackApi.getSensorManager();
+
       if (sensorManagerInstance.isSensorSelected()) {
         (<HTMLInputElement>getEl('cs-lat')).value = sensorManagerInstance.currentSensors[0].lat.toString();
         (<HTMLInputElement>getEl('cs-lon')).value = sensorManagerInstance.currentSensors[0].lon.toString();
@@ -152,7 +153,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           () => {
             colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
           },
-          (data: any) => data.satInSun
+          (data: any) => data.satInSun,
         );
         break;
       case 'create-sensor-rmb':
@@ -193,7 +194,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     super(MultiSiteLookAnglesPlugin.PLUGIN_NAME);
   }
 
-  helpTitle = `Custom Sensor Menu`;
+  helpTitle = 'Custom Sensor Menu';
   helpBody = keepTrackApi.html`
   This allows you to create a custom sensor for use in calculations and other menu's functions.
   This can be a completely original sensor or a modification of an existing sensor.
@@ -273,6 +274,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const maxrange = (<HTMLInputElement>getEl('cs-maxrange')).value;
 
     let type = SpaceObjectType.OBSERVER;
+
     switch (sensorType) {
       case 'Observer':
         type = SpaceObjectType.OBSERVER;
@@ -287,7 +289,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         type = SpaceObjectType.PHASED_ARRAY_RADAR;
         break;
       default:
-        errorManagerInstance.info('Unknown sensor type: ' + sensorType);
+        errorManagerInstance.info(`Unknown sensor type: ${sensorType}`);
         type = SpaceObjectType.OBSERVER;
         break;
     }
@@ -313,7 +315,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         operator: 'Custom Sensor',
         zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
         volume: false,
-      })
+      }),
     );
   }
 
@@ -342,6 +344,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         getEl('cs-maxrange-div').style.display = 'block';
 
         const sensorManagerInstance = keepTrackApi.getSensorManager();
+
         if (sensorManagerInstance.isSensorSelected()) {
           (<HTMLInputElement>getEl('cs-minaz')).value = sensorManagerInstance.currentSensors[0].minAz.toString();
           (<HTMLInputElement>getEl('cs-maxaz')).value = sensorManagerInstance.currentSensors[0].maxAz.toString();

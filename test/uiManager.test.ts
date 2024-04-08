@@ -27,6 +27,7 @@ describe('uiManager', () => {
     <div id="sensor-maxrange"></div>
     `;
     const sensorManagerInstance = keepTrackApi.getSensorManager();
+
     sensorManagerInstance.currentSensors = [defaultSensor];
   });
 
@@ -67,13 +68,13 @@ describe('uiManager', () => {
           longitude: 22,
           altitude: 22,
         },
-      })
+      }),
     ).not.toThrow();
     expect((<HTMLInputElement>getEl('cs-lat')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-hei')).value).toBe('0.022');
 
-    keepTrackApi.containerRoot.innerHTML = `<div id="search"></div>`;
+    keepTrackApi.containerRoot.innerHTML = '<div id="search"></div>';
     disableConsoleErrors();
     expect(() =>
       UiGeolocation.updateSensorPosition({
@@ -82,7 +83,7 @@ describe('uiManager', () => {
           longitude: 22,
           altitude: 22,
         },
-      })
+      }),
     ).not.toThrow();
     enableConsoleErrors();
   });
@@ -91,6 +92,7 @@ describe('uiManager', () => {
   it('process_colorSchemeChangeAlert', () => {
     const uiManagerInstance = new UiManager();
     const colorSchemeManagerInstance = new ColorSchemeManager();
+
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.group)).not.toThrow();
@@ -118,6 +120,7 @@ describe('uiManager', () => {
     <div id="ui-wrapper"></div>
     `;
     const uiManagerInstance = new UiManager();
+
     expect(() => uiManagerInstance.footerToggle()).not.toThrow();
     expect(() => uiManagerInstance.footerToggle()).not.toThrow();
     expect(() => uiManagerInstance.hideUi()).not.toThrow();
@@ -135,6 +138,7 @@ describe('uiManager', () => {
     <div id="about-menu"></div>
     `;
     const uiManagerInstance = new UiManager();
+
     expect(() => uiManagerInstance.initMenuController()).not.toThrow();
   });
 
@@ -150,6 +154,7 @@ describe('uiManager', () => {
   it('process_init', () => {
     setupStandardEnvironment();
     const uiManagerInstance = new UiManager();
+
     expect(() => uiManagerInstance.init()).not.toThrow();
   });
 

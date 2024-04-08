@@ -1,4 +1,6 @@
-// @ts-nocheck
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck - This file is a mock file and does not need to be type-checked
+
 import { Operators } from '@app/catalogs/sensors';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CatalogSource, DEG2RAD, Degrees, DetailedSatellite, Kilometers, Milliseconds, Sensor, Sgp4, SpaceObjectType, ZoomValue } from 'ootk';
@@ -6,6 +8,7 @@ import { SensorObject } from '../../src/interfaces';
 declare const jest: any;
 
 const fakeTimeObj = new Date(2022, 0, 1);
+
 fakeTimeObj.setUTCHours(0, 0, 0, 0);
 
 export const defaultSat: DetailedSatellite = new DetailedSatellite({
@@ -110,6 +113,7 @@ export const useMockWorkers = (): void => {
       this.url = stringUrl;
       this.onmessage = (msg: any) => {
         console.debug(msg);
+
         return {
           data: {},
         };

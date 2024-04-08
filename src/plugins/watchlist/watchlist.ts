@@ -69,7 +69,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   <br><br>
   The overlay feature relies on the watchlist being populated.`;
 
-  helpTitle = `Watchlist Menu`;
+  helpTitle = 'Watchlist Menu';
   isWatchlistChanged: boolean = null;
   sideMenuElementHtml = keepTrackApi.html`
     <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
@@ -150,13 +150,16 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       const newWatchlist = JSON.parse(watchlistString);
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const _watchlistInViewList = [];
+
       for (let i = 0; i < newWatchlist.length; i++) {
         const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(newWatchlist[i]), GetSatType.EXTRA_ONLY);
+
         if (sat !== null) {
           newWatchlist[i] = sat.id;
           _watchlistInViewList.push(false);
         } else {
           errorManagerInstance.warn('Watchlist File Format Incorret');
+
           return;
         }
       }
@@ -174,8 +177,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @throws {Error} If `evt` is null.
    */
   private onFileChanged_(evt: Event) {
-    if (evt === null) throw new Error('evt is null');
-    if (!window.FileReader) return; // Browser is not compatible
+    if (evt === null) {
+      throw new Error('evt is null');
+    }
+    if (!window.FileReader) {
+      return;
+    } // Browser is not compatible
 
     const reader = new FileReader();
 
@@ -238,6 +245,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    */
   updateWatchlist({ updateWatchlistList, updateWatchlistInViewList, isSkipSearch = false }: UpdateWatchlistParams = {}) {
     const settingsManager: any = window.settingsManager;
+
     if (typeof updateWatchlistList !== 'undefined') {
       this.watchlistList = updateWatchlistList;
     }
@@ -245,13 +253,16 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       this.watchlistInViewList = updateWatchlistInViewList;
     }
 
-    if (!this.watchlistList) return;
+    if (!this.watchlistList) {
+      return;
+    }
     settingsManager.isThemesNeeded = true;
     this.isWatchlistChanged = this.isWatchlistChanged != null;
     let watchlistString = '';
     let watchlistListHTML = '';
     let sat: DetailedSatellite;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
     for (let i = 0; i < this.watchlistList.length; i++) {
       sat = catalogManagerInstance.getSat(this.watchlistList[i], GetSatType.EXTRA_ONLY);
       if (sat == null) {
@@ -278,13 +289,18 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     for (let i = 0; i < this.watchlistList.length; i++) {
       // No duplicates
       watchlistString += catalogManagerInstance.getSat(this.watchlistList[i], GetSatType.EXTRA_ONLY).sccNum;
-      if (i !== this.watchlistList.length - 1) watchlistString += ',';
+      if (i !== this.watchlistList.length - 1) {
+        watchlistString += ',';
+      }
     }
 
-    if (!isSkipSearch) keepTrackApi.getUiManager().doSearch(watchlistString, true);
+    if (!isSkipSearch) {
+      keepTrackApi.getUiManager().doSearch(watchlistString, true);
+    }
     keepTrackApi.getColorSchemeManager().setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
 
     const saveWatchlist = [];
+
     for (let i = 0; i < this.watchlistList.length; i++) {
       sat = catalogManagerInstance.getSat(this.watchlistList[i], GetSatType.EXTRA_ONLY);
       saveWatchlist[i] = sat.sccNum;
@@ -315,6 +331,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     if (this.watchlistList.length <= 0) {
       uiManagerInstance.doSearch('');
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
@@ -330,10 +347,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       this.watchlistInViewList.push(false);
     } else {
       const sat = keepTrackApi.getCatalogManager().getSat(id);
+
       if (sat.sccNum) {
         errorManagerInstance.warn(`NORAD: ${sat.sccNum} already in watchlist!`);
       } else {
         const jscString = sat.source === CatalogSource.VIMPEL ? ` (JSC Vimpel ${sat.altId})` : '';
+
         errorManagerInstance.warn(`Object ${id}${jscString} already in watchlist!`);
       }
     }
@@ -342,7 +361,11 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       this.watchlistList.sort((a: number, b: number) => {
         const satA = keepTrackApi.getCatalogManager().getSat(a);
         const satB = keepTrackApi.getCatalogManager().getSat(b);
-        if (satA === null || satB === null) return 0;
+
+        if (satA === null || satB === null) {
+          return 0;
+        }
+
         return parseInt(satA.sccNum) - parseInt(satB.sccNum);
       });
       this.updateWatchlist();
@@ -350,7 +373,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   }
 
   isOnWatchlist(id: number) {
-    if (id === null) return false;
+    if (id === null) {
+      return false;
+    }
+
     return this.watchlistList.some((satId_: number) => satId_ === id);
   }
 
@@ -360,11 +386,13 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   private onAddEvent_() {
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
+
     sats.forEach((satNum: string) => {
       const id = keepTrackApi.getCatalogManager().sccNum2Id(parseInt(satNum));
 
       if (id === null) {
         errorManagerInstance.warn(`Sat ${id} not found!`);
+
         return;
       }
       this.addSat(id, true);
@@ -373,7 +401,11 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     this.watchlistList.sort((a: number, b: number) => {
       const satA = keepTrackApi.getCatalogManager().getSat(a);
       const satB = keepTrackApi.getCatalogManager().getSat(b);
-      if (satA === null || satB === null) return 0;
+
+      if (satA === null || satB === null) {
+        return 0;
+      }
+
       return parseInt(satA.sccNum) - parseInt(satB.sccNum);
     });
     this.updateWatchlist();
@@ -387,6 +419,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   private onClearClicked_() {
     keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
     for (const id of this.watchlistList) {
       orbitManagerInstance.removeInViewOrbit(id);
     }
@@ -399,30 +432,38 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @param evt - The ProgressEvent<FileReader> object.
    */
   private onReaderLoad_(evt: ProgressEvent<FileReader>) {
-    if (evt.target.readyState !== 2) return;
+    if (evt.target.readyState !== 2) {
+      return;
+    }
 
     if (evt.target.error) {
       errorManagerInstance.error(evt.target.error, 'watchlist.ts', 'Error reading watchlist!');
+
       return;
     }
 
     let newWatchlist: number[];
+
     try {
       newWatchlist = JSON.parse(<string>evt.target.result);
     } catch {
       errorManagerInstance.warn('Watchlist File Format Incorret');
+
       return;
     }
 
     if (newWatchlist.length === 0) {
       errorManagerInstance.warn('Watchlist File Format Incorret');
+
       return;
     }
 
     this.watchlistInViewList = [];
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
     for (let i = 0; i < newWatchlist.length; i++) {
       const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(newWatchlist[i]), GetSatType.EXTRA_ONLY);
+
       if (sat !== null && sat.id > 0) {
         newWatchlist[i] = sat.id;
         this.watchlistInViewList.push(false);
@@ -445,12 +486,14 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       const sat = keepTrackApi.getCatalogManager().getSat(this.watchlistList[i], GetSatType.EXTRA_ONLY);
+
       satIds[i] = sat.sccNum;
     }
     const watchlistString = JSON.stringify(satIds);
     const blob = new Blob([watchlistString], {
       type: 'text/plain;charset=utf-8',
     });
+
     try {
       saveAs(blob, 'watchlist.json');
     } catch (e) {

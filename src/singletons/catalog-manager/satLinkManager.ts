@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
@@ -68,6 +69,7 @@ export class SatLinkManager {
 
   private idToSatnum_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
     this.aehf = catalogManagerInstance.satnums2ids(this.aehf);
     this.dscs = catalogManagerInstance.satnums2ids(this.dscs);
     this.wgs = catalogManagerInstance.satnums2ids(this.wgs);
@@ -90,7 +92,8 @@ export class SatLinkManager {
     try {
       this.idToSatnum_();
 
-      for (let controlSite in controlSiteList) {
+      // eslint-disable-next-line guard-for-in
+      for (const controlSite in controlSiteList) {
         if (controlSiteList[controlSite].linkAehf) {
           this.aehfUsers.push(controlSiteList[controlSite].name);
         }
@@ -112,7 +115,9 @@ export class SatLinkManager {
     }
 
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
-    for (let sensor in staticSet) {
+
+    // eslint-disable-next-line guard-for-in
+    for (const sensor in staticSet) {
       if (staticSet[sensor].linkAehf) {
         this.aehfUsers.push(staticSet[sensor].name);
       }
@@ -137,6 +142,7 @@ export class SatLinkManager {
     let minTheta: number;
     let elevationMask: number;
     let linkType: LinkType;
+
     switch (group) {
       case SatConstellationString.Aehf:
         satlist = this.aehf;
@@ -189,6 +195,8 @@ export class SatLinkManager {
         linkType = LinkType.Both;
         elevationMask = 5;
         break;
+      default:
+        return;
     }
 
     if (linkType === LinkType.Both) {
@@ -199,9 +207,12 @@ export class SatLinkManager {
               const catalogManagerInstance = keepTrackApi.getCatalogManager();
               const sat1 = catalogManagerInstance.getObject(satlist[i]);
               const sat2 = catalogManagerInstance.getObject(satlist[j]);
-              //
-              // Debug for finding decayed satellites
-              //
+              /*
+               *
+               * Debug for finding decayed satellites
+               *
+               */
+
               if (sat1.position.x === 0 || sat1.position.y === 0 || sat1.position.z === 0 || sat2.position.x === 0 || sat2.position.y === 0 || sat2.position.z === 0) {
                 continue;
               }
@@ -211,14 +222,15 @@ export class SatLinkManager {
                   <number>(
                     numeric.dot(
                       [-sat1.position.x, -sat1.position.y, -sat1.position.z],
-                      [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z]
+                      [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z],
                     )
                   ) /
-                    (Math.sqrt(Math.pow(-sat1.position.x, 2) + Math.pow(-sat1.position.y, 2) + Math.pow(-sat1.position.z, 2)) *
+                    (Math.sqrt((-sat1.position.x) ** 2 + (-sat1.position.y) ** 2 + (-sat1.position.z) ** 2) *
                       Math.sqrt(
-                        Math.pow(-sat1.position.x + sat2.position.x, 2) + Math.pow(-sat1.position.y + sat2.position.y, 2) + Math.pow(-sat1.position.z + sat2.position.z, 2)
-                      ))
+                        (-sat1.position.x + sat2.position.x) ** 2 + (-sat1.position.y + sat2.position.y) ** 2 + (-sat1.position.z + sat2.position.z) ** 2,
+                      )),
                 ) * RAD2DEG;
+
               if (theta < minTheta) {
                 // Intentional
               } else {
@@ -228,14 +240,17 @@ export class SatLinkManager {
           }
         }
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
         for (const sensorName of userlist) {
-          let id = catalogManagerInstance.getSensorFromSensorName(sensorName.toString());
-          let user = catalogManagerInstance.getObject(id) as DetailedSensor;
+          const id = catalogManagerInstance.getSensorFromSensorName(sensorName.toString());
+          const user = catalogManagerInstance.getObject(id) as DetailedSensor;
           let bestSat: DetailedSatellite = null;
           let bestRange = 1000000;
+
           for (const satId of satlist) {
             const sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
             const tearr = SensorMath.getTearr(sat, [user], timeManager.simulationTimeObj);
+
             if (tearr.el > elevationMask) {
               if (tearr.rng < bestRange) {
                 bestSat = sat;
@@ -243,7 +258,9 @@ export class SatLinkManager {
               }
             }
           }
-          if (bestSat) lineManager.create(LineTypes.SENSOR_TO_SAT, [bestSat.id, id], [0, 1.0, 0.6, 1.0]);
+          if (bestSat) {
+            lineManager.create(LineTypes.SENSOR_TO_SAT, [bestSat.id, id], [0, 1.0, 0.6, 1.0]);
+          }
         }
       } catch (e) {
         // Intentionally empty
@@ -254,30 +271,41 @@ export class SatLinkManager {
       try {
         // Loop through all the users
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
         for (const sensorName of userlist) {
           // Select the current user
-          let user = catalogManagerInstance.getObject(catalogManagerInstance.getSensorFromSensorName(sensorName.toString())) as DetailedSensor;
-          if (!user) continue;
+          const user = catalogManagerInstance.getObject(catalogManagerInstance.getSensorFromSensorName(sensorName.toString())) as DetailedSensor;
+
+          if (!user) {
+            continue;
+          }
           // Loop through all of the satellites
           let bestSat: DetailedSatellite = null;
           let bestRange = 1000000;
+
           for (const satId of satlist) {
             // Select the current satelltie
-            let sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
-            // Calculate Time, Elevation, Azimuth, Range, and Range Rate data
-            // of the current satellite relevant to the current user. This allows
-            // us to figure out if the user can see the satellite
-            let tearr = SensorMath.getTearr(sat, [user], timeManager.simulationTimeObj);
+            const sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
+            /*
+             * Calculate Time, Elevation, Azimuth, Range, and Range Rate data
+             * of the current satellite relevant to the current user. This allows
+             * us to figure out if the user can see the satellite
+             */
+            const tearr = SensorMath.getTearr(sat, [user], timeManager.simulationTimeObj);
 
-            // Only draw the line between the user and the satellite if the
-            // elevation angle is greater than the elevation mask. This simulates
-            // the effects of hills, trees, and atmospheric ducting along the
-            // horizon.
-            //
+            /*
+             * Only draw the line between the user and the satellite if the
+             * elevation angle is greater than the elevation mask. This simulates
+             * the effects of hills, trees, and atmospheric ducting along the
+             * horizon.
+             *
+             */
             if (tearr.el > elevationMask) {
-              // If the satellite is visible, then check to see if it is the best
-              // satellite to draw a line to. The best satellite is the one that
-              // is closest to the user.
+              /*
+               * If the satellite is visible, then check to see if it is the best
+               * satellite to draw a line to. The best satellite is the one that
+               * is closest to the user.
+               */
               if (tearr.rng < bestRange) {
                 bestSat = sat;
                 bestRange = tearr.rng;

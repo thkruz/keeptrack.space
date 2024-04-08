@@ -27,12 +27,9 @@ export class Scene {
   godrays: Godrays;
   /** The pizza box shaped search around a satellite. */
   searchBox: Box;
-  frameBuffers: {
-    gpuPicking: WebGLFramebuffer;
-    godrays: WebGLFramebuffer;
-  } = {
-    gpuPicking: null,
-    godrays: null,
+  frameBuffers = {
+    gpuPicking: null as WebGLFramebuffer,
+    godrays: null as WebGLFramebuffer,
   };
 
   constructor(params: SceneParams) {
@@ -92,6 +89,7 @@ export class Scene {
 
       this.skybox.render(renderer.postProcessingManager.curBuffer);
 
+      // eslint-disable-next-line multiline-comment-style
       // Apply two pass gaussian blur to the godrays to smooth them out
       // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
       // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
@@ -127,8 +125,10 @@ export class Scene {
 
     orbitManagerInstance.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
 
-    // Draw a cone
-    // this.sceneManager.cone.draw(this.pMatrix, mainCamera.camMatrix);
+    /*
+     * Draw a cone
+     * this.sceneManager.cone.draw(this.pMatrix, mainCamera.camMatrix);
+     */
 
     keepTrackApi.getLineManager().draw(renderer, dotsManagerInstance.inViewData, camera.camMatrix, null);
 
@@ -149,8 +149,11 @@ export class Scene {
 
   clear(): void {
     const gl = this.gl_;
-    // NOTE: clearColor is set here because two different colors are used. If you set it during
-    // frameBuffer init then the wrong color will be applied (this can break gpuPicking)
+    /*
+     * NOTE: clearColor is set here because two different colors are used. If you set it during
+     * frameBuffer init then the wrong color will be applied (this can break gpuPicking)
+     */
+
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.gpuPicking);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -163,9 +166,11 @@ export class Scene {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Only needed when doing post processing - otherwise just stay where we are
-    // Setup Initial Frame Buffer for Offscreen Drawing
-    // gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
+    /*
+     * Only needed when doing post processing - otherwise just stay where we are
+     * Setup Initial Frame Buffer for Offscreen Drawing
+     * gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
+     */
   }
 
   async loadScene(): Promise<void> {

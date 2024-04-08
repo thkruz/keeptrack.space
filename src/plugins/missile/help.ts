@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
-export const helpTitleTextMissile = `Missile Menu`;
+export const helpTitleTextMissile = 'Missile Menu';
 
 export const helpBodyTextMissile = keepTrackApi.html`The Missile Menu is used for generating notional missile launches between countries.
 <br><br>

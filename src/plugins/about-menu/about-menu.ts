@@ -71,7 +71,7 @@ export class AboutMenu extends KeepTrackPlugin {
   </div>
 `;
 
-  helpTitle = `About Menu`;
+  helpTitle = 'About Menu';
   helpBody = keepTrackApi.html`The About Menu is a place to find information about KeepTrack.
   <br><br>
   Links to contributors and the source code are available here.
@@ -97,6 +97,7 @@ export class AboutMenu extends KeepTrackPlugin {
 
   constructor() {
     const PLUGIN_NAME = 'About Menu';
+
     super(PLUGIN_NAME);
   }
 }

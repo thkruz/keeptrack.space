@@ -34,8 +34,10 @@ export class DotsManager {
   readonly PICKING_READ_PIXEL_BUFFER_SIZE = 1;
 
   private pickingColorData: number[] = [];
-  // We draw the picking object bigger than the actual dot to make it easier to select objects
-  // glsl code - keep as a string
+  /*
+   * We draw the picking object bigger than the actual dot to make it easier to select objects
+   * glsl code - keep as a string
+   */
   private positionBufferOneTime_ = false;
   private settings_: SettingsManager;
   // Array for which colors go to which ids
@@ -144,10 +146,17 @@ export class DotsManager {
    * @param tgtBuffer - The WebGLFramebuffer to draw on.
    */
   draw(pMvCamMatrix: mat4, tgtBuffer: WebGLFramebuffer) {
-    if (!this.isReady || !settingsManager.cruncherReady) return;
+    if (!this.isReady || !settingsManager.cruncherReady) {
+      return;
+    }
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    if (!colorSchemeManagerInstance.colorBuffer) return;
-    if (!pMvCamMatrix) return;
+
+    if (!colorSchemeManagerInstance.colorBuffer) {
+      return;
+    }
+    if (!pMvCamMatrix) {
+      return;
+    }
 
     const gl = keepTrackApi.getRenderer().gl;
 
@@ -167,8 +176,10 @@ export class DotsManager {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.position);
     gl.enableVertexAttribArray(this.programs.dots.attribs.a_position.location);
-    // Buffering data here reduces the need to bind the buffer twice!
-    // Either allocate and assign the data to the buffer
+    /*
+     * Buffering data here reduces the need to bind the buffer twice!
+     * Either allocate and assign the data to the buffer
+     */
     if (!this.positionBufferOneTime_) {
       gl.bufferData(gl.ARRAY_BUFFER, this.positionData, gl.DYNAMIC_DRAW);
       this.positionBufferOneTime_ = true;
@@ -178,8 +189,10 @@ export class DotsManager {
     }
     gl.vertexAttribPointer(this.programs.dots.attribs.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
-    // DEBUG:
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    /*
+     * DEBUG:
+     * gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+     */
     gl.enable(gl.BLEND);
     gl.depthMask(false);
 
@@ -201,9 +214,14 @@ export class DotsManager {
    * @param mouseY - The y-coordinate of the mouse.
    */
   drawGpuPickingFrameBuffer(pMvCamMatrix: mat4, mouseX: number, mouseY: number) {
-    if (!this.isReady || !settingsManager.cruncherReady) return;
+    if (!this.isReady || !settingsManager.cruncherReady) {
+      return;
+    }
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    if (!colorSchemeManagerInstance.colorBuffer) return;
+
+    if (!colorSchemeManagerInstance.colorBuffer) {
+      return;
+    }
     const gl = keepTrackApi.getRenderer().gl;
 
     gl.useProgram(this.programs.picking.program);
@@ -234,9 +252,9 @@ export class DotsManager {
    */
   getCurrentPosition(i: number) {
     return {
-      x: <Kilometers>this.positionData[i * 3],
-      y: <Kilometers>this.positionData[i * 3 + 1],
-      z: <Kilometers>this.positionData[i * 3 + 2],
+      x: <Kilometers> this.positionData[i * 3],
+      y: <Kilometers> this.positionData[i * 3 + 1],
+      z: <Kilometers> this.positionData[i * 3 + 2],
     };
   }
 
@@ -247,16 +265,19 @@ export class DotsManager {
    * @returns The ID of the closest satellite, or null if no satellite is found within 100km.
    */
   getIdFromEci(eci: { x: number; y: number; z: number }, maxDots = this.positionData.length): number | null {
-    let possibleMatches: { id: number; distance: number }[] = [];
+    const possibleMatches: { id: number; distance: number }[] = [];
 
     // loop through all the satellites
     for (let id = 0; id < maxDots; id++) {
       const x = this.positionData[id * 3];
       const y = this.positionData[id * 3 + 1];
       const z = this.positionData[id * 3 + 2];
+
       if (x > eci.x - 100 && x < eci.x + 100 && y > eci.y - 100 && y < eci.y + 100 && z > eci.z - 100 && z < eci.z + 100) {
         // if within 1km of the satellite, return it
-        if (Math.sqrt((x - eci.x) ** 2 + (y - eci.y) ** 2 + (z - eci.z) ** 2) < 1) return id;
+        if (Math.sqrt((x - eci.x) ** 2 + (y - eci.y) ** 2 + (z - eci.z) ** 2) < 1) {
+          return id;
+        }
 
         // otherwise, add it to the list of possible matches
         possibleMatches.push({ id, distance: Math.sqrt((x - eci.x) ** 2 + (y - eci.y) ** 2 + (z - eci.z) ** 2) });
@@ -266,6 +287,7 @@ export class DotsManager {
     // if there are possible matches, return the closest one
     if (possibleMatches.length > 0) {
       possibleMatches.sort((a, b) => a.distance - b.distance);
+
       return possibleMatches[0].id;
     }
 
@@ -303,6 +325,7 @@ export class DotsManager {
    */
   init(settings: SettingsManager) {
     const renderer = keepTrackApi.getRenderer();
+
     this.settings_ = settings;
 
     this.initShaders_();
@@ -311,7 +334,7 @@ export class DotsManager {
       this.shaders_.dots.vert,
       this.shaders_.dots.frag,
       this.programs.dots.attribs,
-      this.programs.dots.uniforms
+      this.programs.dots.uniforms,
     ).program;
 
     // Make buffers for satellite positions and size -- color and pickability are created in ColorScheme class
@@ -327,6 +350,7 @@ export class DotsManager {
    */
   initBuffers(colorBuffer: WebGLBuffer) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
     this.setupPickingBuffer(catalogManagerInstance.objectCache.length);
     this.updateSizeBuffer(catalogManagerInstance.objectCache.length);
     this.initColorBuffer(colorBuffer);
@@ -349,6 +373,7 @@ export class DotsManager {
    */
   initProgramPicking() {
     const gl = keepTrackApi.getRenderer().gl;
+
     this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
@@ -386,6 +411,7 @@ export class DotsManager {
     gl.bindVertexArray(this.programs.dots.vao);
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     gl.enableVertexAttribArray(this.programs.dots.attribs.a_color.location);
     gl.vertexAttribPointer(this.programs.dots.attribs.a_color.location, 4, gl.FLOAT, false, 0, 0);
@@ -437,7 +463,8 @@ export class DotsManager {
    */
   setupPickingBuffer(satDataLen = 1): void {
     // assign colors to ids in hex order
-    let byteR: number, byteG: number, byteB: number; // reuse color variables
+    let byteB: number, byteG: number, byteR: number; // reuse color variables
+
     for (let i = 0; i < satDataLen; i++) {
       byteR = (i + 1) & 0xff;
       byteG = ((i + 1) & 0xff00) >> 8;
@@ -450,6 +477,7 @@ export class DotsManager {
     }
 
     const renderer = keepTrackApi.getRenderer();
+
     this.pickingBuffers.color = GlUtils.createArrayBuffer(renderer.gl, new Float32Array(this.pickingColorData));
   }
 
@@ -459,7 +487,7 @@ export class DotsManager {
    */
   updateCruncherBuffers(mData: SatCruncherMessageData) {
     if (mData.satPos) {
-      if (typeof this.positionData == 'undefined') {
+      if (typeof this.positionData === 'undefined') {
         this.positionData = new Float32Array(mData.satPos);
         this.isReady = true;
       } else {
@@ -468,7 +496,7 @@ export class DotsManager {
     }
 
     if (mData.satVel) {
-      if (typeof this.velocityData == 'undefined') {
+      if (typeof this.velocityData === 'undefined') {
         this.velocityData = new Float32Array(mData.satVel);
       } else {
         this.velocityData.set(mData.satVel, 0);
@@ -476,7 +504,7 @@ export class DotsManager {
     }
 
     if (mData.satInView?.length > 0) {
-      if (typeof this.inViewData == 'undefined' || this.inViewData.length !== mData.satInView.length) {
+      if (typeof this.inViewData === 'undefined' || this.inViewData.length !== mData.satInView.length) {
         this.inViewData = new Int8Array(mData.satInView);
       } else {
         this.inViewData.set(mData.satInView, 0);
@@ -484,7 +512,7 @@ export class DotsManager {
     }
 
     if (mData.satInSun?.length > 0) {
-      if (typeof this.inSunData == 'undefined' || this.inSunData.length !== mData.satInSun.length) {
+      if (typeof this.inSunData === 'undefined' || this.inSunData.length !== mData.satInSun.length) {
         this.inSunData = new Int8Array(mData.satInSun);
       } else {
         this.inSunData.set(mData.satInSun, 0);
@@ -498,21 +526,27 @@ export class DotsManager {
    * @param i The index of the satellite in the `positionData` and `velocityData` arrays.
    */
   updatePosVel(object: BaseObject, i: number): void {
-    if (!this.velocityData) return;
+    if (!this.velocityData) {
+      return;
+    }
 
-    // Fix for https://github.com/thkruz/keeptrack.space/issues/834
-    // TODO: Remove this once we figure out why this is happening
+    /*
+     * Fix for https://github.com/thkruz/keeptrack.space/issues/834
+     * TODO: Remove this once we figure out why this is happening
+     */
 
     object.velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
     object.totalVelocity = 0;
 
     const isChanged = object.velocity.x !== this.velocityData[i * 3] || object.velocity.y !== this.velocityData[i * 3 + 1] || object.velocity.z !== this.velocityData[i * 3 + 2];
+
     object.velocity.x = (this.velocityData[i * 3] as Kilometers) || (0 as Kilometers);
     object.velocity.y = (this.velocityData[i * 3 + 1] as Kilometers) || (0 as Kilometers);
     object.velocity.z = (this.velocityData[i * 3 + 2] as Kilometers) || (0 as Kilometers);
     if (object.type === SpaceObjectType.BALLISTIC_MISSILE) {
       const missile = object as MissileObject;
       const newVel = Math.sqrt(missile.velocity.x ** 2 + missile.velocity.y ** 2 + missile.velocity.z ** 2);
+
       if (missile.totalVelocity === 0) {
         missile.totalVelocity = newVel;
       } else if (isChanged) {
@@ -523,9 +557,9 @@ export class DotsManager {
     }
 
     object.position = {
-      x: <Kilometers>this.positionData[i * 3],
-      y: <Kilometers>this.positionData[i * 3 + 1],
-      z: <Kilometers>this.positionData[i * 3 + 2],
+      x: <Kilometers> this.positionData[i * 3],
+      y: <Kilometers> this.positionData[i * 3 + 1],
+      z: <Kilometers> this.positionData[i * 3 + 2],
     };
   }
 
@@ -540,14 +574,19 @@ export class DotsManager {
     }
 
     const renderer = keepTrackApi.getRenderer();
+
     if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
       if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
         const obj = keepTrackApi.getCatalogManager().objectCache[keepTrackApi.getPlugin(SelectSatManager)?.selectedSat] as DetailedSatellite | MissileObject;
+
         if (obj.isSatellite()) {
           const sat = obj as DetailedSatellite;
           const now = keepTrackApi.getTimeManager().simulationTimeObj;
           const pv = sat.eci(now);
-          if (!pv) return;
+
+          if (!pv) {
+            return;
+          }
           this.positionData[sat.id * 3] = pv.position.x;
           this.positionData[sat.id * 3 + 1] = pv.position.y;
           this.positionData[sat.id * 3 + 2] = pv.position.z;
@@ -582,15 +621,18 @@ export class DotsManager {
     }
 
     const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+
     if (selectedSat > -1) {
       this.sizeData[selectedSat] = 1.0;
     }
 
-    // Pretend Satellites that are currently being searched are stars
-    // The shaders will display these "stars" like close satellites
-    // because the distance from the center of the earth is too close to
-    // be a star. dotsManager method is so there are less buffers needed but as
-    // computers get faster it should be replaced
+    /*
+     * Pretend Satellites that are currently being searched are stars
+     * The shaders will display these "stars" like close satellites
+     * because the distance from the center of the earth is too close to
+     * be a star. dotsManager method is so there are less buffers needed but as
+     * computers get faster it should be replaced
+     */
     for (const lastSearchResult of settingsManager.lastSearchResults) {
       this.sizeData[lastSearchResult] = 1.0;
     }

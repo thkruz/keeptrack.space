@@ -1,6 +1,6 @@
 /**
-// /////////////////////////////////////////////////////////////////////////////
-
+ * // /////////////////////////////////////////////////////////////////////////////
+ *
  * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2023 Heather Kruczek
  *
@@ -27,9 +27,11 @@ const settingsOverride = {
 
   // installDirectory: '../',             // Directory where keepTrack is installed
 
-  // enableHoverOrbits: false,            // Show orbits when mouse hovers over
-  // startWithOrbitsDisplayed: true, // Start with orbits displayed
-  // maxOribtsDisplayedDesktopAll: 50000, // Maximum number of orbits to display
+  /*
+   * enableHoverOrbits: false,            // Show orbits when mouse hovers over
+   * startWithOrbitsDisplayed: true, // Start with orbits displayed
+   * maxOribtsDisplayedDesktopAll: 50000, // Maximum number of orbits to display
+   */
   isDisableSensors: true,
   isDisableLaunchSites: true,
   isDisableControlSites: true,
@@ -43,45 +45,47 @@ const settingsOverride = {
   orbitHoverColor: [1.0, 0.5, 0.5, 1.0], // Color of orbits when mouse hovers over
   colors: {
     debris: [1.0, 0.0, 0.0, 0.5], // Color of debris
-    // facility: [0.64, 0.0, 0.64, 1.0],
-    // sensor: [1.0, 0.0, 0.0, 1.0],
-    // deselected: [1.0, 1.0, 1.0, 0],
-    // inView: [0.85, 0.5, 0.0, 1.0],
-    // inviewAlt: [0.2, 0.4, 1.0, 1],
-    // payload: [0.2, 1.0, 0.0, 0.5],
-    // rocketBody: [0.2, 0.4, 1.0, 1],
-    // unknown: [0.5, 0.5, 0.5, 0.85],
-    // trusat: [1.0, 0.0, 0.6, 1.0],
-    // analyst: [1.0, 1.0, 1.0, 0.8],
-    // missile: [1.0, 1.0, 0.0, 1.0],
-    // missileInview: [1.0, 0.0, 0.0, 1.0],
-    // transparent: [1.0, 1.0, 1.0, 0.1],
-    // satHi: [1.0, 1.0, 1.0, 1.0],
-    // satMed: [1.0, 1.0, 1.0, 0.8],
-    // satLow: [1.0, 1.0, 1.0, 0.6],
-    // sunlightInview: [0.85, 0.5, 0.0, 1.0],
-    // penumbral: [1.0, 1.0, 1.0, 0.3],
-    // umbral: [1.0, 1.0, 1.0, 0.1],
-    // gradientAmt: 0,
-    // satSmall: [0.2, 1.0, 0.0, 0.65],
-    // rcsSmall: [1.0, 0, 0, 0.6],
-    // rcsMed: [0.2, 0.4, 1.0, 1],
-    // rcsLarge: [0, 1.0, 0, 0.6],
-    // rcsUnknown: [1.0, 1.0, 0, 0.6],
-    // ageNew: [0, 1.0, 0, 0.9],
-    // ageMed: [1.0, 1.0, 0.0, 0.9],
-    // ageOld: [1.0, 0.6, 0, 0.9],
-    // ageLost: [1.0, 0.0, 0, 0.9],
-    // lostobjects: [0.2, 1.0, 0.0, 0.65],
-    // satLEO: [0.2, 1.0, 0.0, 0.65],
-    // satGEO: [0.2, 1.0, 0.0, 0.65],
-    // inGroup: [1.0, 0.0, 0.0, 1.0],
-    // countryPRC: [1.0, 0, 0, 0.6],
-    // countryUS: [0.2, 0.4, 1.0, 1],
-    // countryCIS: [1.0, 1.0, 1.0, 1.0],
-    // countryOther: [0, 1.0, 0, 0.6],
-    // pink: [1.0, 0.0, 1.0, 1.0],
-    // notional: [1.0, 0.0, 0.0, 0.7],
+    /*
+     * facility: [0.64, 0.0, 0.64, 1.0],
+     * sensor: [1.0, 0.0, 0.0, 1.0],
+     * deselected: [1.0, 1.0, 1.0, 0],
+     * inView: [0.85, 0.5, 0.0, 1.0],
+     * inviewAlt: [0.2, 0.4, 1.0, 1],
+     * payload: [0.2, 1.0, 0.0, 0.5],
+     * rocketBody: [0.2, 0.4, 1.0, 1],
+     * unknown: [0.5, 0.5, 0.5, 0.85],
+     * trusat: [1.0, 0.0, 0.6, 1.0],
+     * analyst: [1.0, 1.0, 1.0, 0.8],
+     * missile: [1.0, 1.0, 0.0, 1.0],
+     * missileInview: [1.0, 0.0, 0.0, 1.0],
+     * transparent: [1.0, 1.0, 1.0, 0.1],
+     * satHi: [1.0, 1.0, 1.0, 1.0],
+     * satMed: [1.0, 1.0, 1.0, 0.8],
+     * satLow: [1.0, 1.0, 1.0, 0.6],
+     * sunlightInview: [0.85, 0.5, 0.0, 1.0],
+     * penumbral: [1.0, 1.0, 1.0, 0.3],
+     * umbral: [1.0, 1.0, 1.0, 0.1],
+     * gradientAmt: 0,
+     * satSmall: [0.2, 1.0, 0.0, 0.65],
+     * rcsSmall: [1.0, 0, 0, 0.6],
+     * rcsMed: [0.2, 0.4, 1.0, 1],
+     * rcsLarge: [0, 1.0, 0, 0.6],
+     * rcsUnknown: [1.0, 1.0, 0, 0.6],
+     * ageNew: [0, 1.0, 0, 0.9],
+     * ageMed: [1.0, 1.0, 0.0, 0.9],
+     * ageOld: [1.0, 0.6, 0, 0.9],
+     * ageLost: [1.0, 0.0, 0, 0.9],
+     * lostobjects: [0.2, 1.0, 0.0, 0.65],
+     * satLEO: [0.2, 1.0, 0.0, 0.65],
+     * satGEO: [0.2, 1.0, 0.0, 0.65],
+     * inGroup: [1.0, 0.0, 0.0, 1.0],
+     * countryPRC: [1.0, 0, 0, 0.6],
+     * countryUS: [0.2, 0.4, 1.0, 1],
+     * countryCIS: [1.0, 1.0, 1.0, 1.0],
+     * countryOther: [0, 1.0, 0, 0.6],
+     * pink: [1.0, 0.0, 1.0, 1.0],
+     * notional: [1.0, 0.0, 0.0, 0.7],
+     */
   },
   // noMeshManager: true,
 

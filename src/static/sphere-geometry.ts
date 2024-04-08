@@ -74,7 +74,7 @@ export class SphereGeometry extends BufferGeometry {
       phiLength = Math.PI * 2,
       thetaStart = 0,
       thetaLength = Math.PI,
-    }: SphereGeometryParams
+    }: SphereGeometryParams,
   ) {
     super({
       type: 'SphereGeometry',
@@ -121,30 +121,38 @@ export class SphereGeometry extends BufferGeometry {
    */
   private calculateCombinedArray(isSkipTexture: boolean) {
     const combinedArray = [];
+
     for (let heightSegment = 0; heightSegment <= this.heightSegments; heightSegment++) {
-      let theta = this.thetaStart + ((this.thetaStart + this.thetaLength) / this.heightSegments) * heightSegment - Math.PI / 2;
+      const theta = this.thetaStart + ((this.thetaStart + this.thetaLength) / this.heightSegments) * heightSegment - Math.PI / 2;
+
       if (theta > this.thetaStart + this.thetaLength) {
         continue;
       }
 
       const diskRadius = Math.cos(Math.abs(theta));
       const z = Math.sin(theta);
+
       for (let widthSegment = 0; widthSegment <= this.widthSegments; widthSegment++) {
         // add an extra vertex for texture funness
-        let phi = this.phiStart + ((this.phiStart + this.phiLength) / this.widthSegments) * widthSegment;
+        const phi = this.phiStart + ((this.phiStart + this.phiLength) / this.widthSegments) * widthSegment;
+
         if (phi > this.phiStart + this.phiLength) {
           continue;
         }
 
-        let x = Math.cos(phi) * diskRadius;
-        let y = Math.sin(phi) * diskRadius;
-        // console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
-        // mercator cylindrical projection (simple angle interpolation)
-        let v = 1 - heightSegment / this.heightSegments;
-        let u = 0.5 + widthSegment / this.widthSegments; // may need to change to move map
+        const x = Math.cos(phi) * diskRadius;
+        const y = Math.sin(phi) * diskRadius;
+        /*
+         * console.log('i: ' + i + '    LON: ' + lonAngle * RAD2DEG + ' X: ' + x + ' Y: ' + y)
+         * mercator cylindrical projection (simple angle interpolation)
+         */
+        const v = 1 - heightSegment / this.heightSegments;
+        const u = 0.5 + widthSegment / this.widthSegments; // may need to change to move map
 
-        // console.log('u: ' + u + ' v: ' + v);
-        // normals: should just be a vector from center to point (aka the point itself!
+        /*
+         * console.log('u: ' + u + ' v: ' + v);
+         * normals: should just be a vector from center to point (aka the point itself!
+         */
         combinedArray.push(x * this.radius);
         combinedArray.push(y * this.radius);
         combinedArray.push(z * this.radius);
@@ -168,16 +176,19 @@ export class SphereGeometry extends BufferGeometry {
    */
   private calculateVertIndicies_() {
     const index = [];
+
     for (let heightSegment = 0; heightSegment < this.heightSegments; heightSegment++) {
       // this is for each QUAD, not each vertex, so <
       for (let widthSegment = 0; widthSegment < this.widthSegments; widthSegment++) {
-        let blVert = heightSegment * (this.widthSegments + 1) + widthSegment; // there's this.widthSegments + 1 verts in each horizontal band
-        let brVert = blVert + 1;
-        let tlVert = (heightSegment + 1) * (this.widthSegments + 1) + widthSegment;
-        let trVert = tlVert + 1;
+        const blVert = heightSegment * (this.widthSegments + 1) + widthSegment; // there's this.widthSegments + 1 verts in each horizontal band
+        const brVert = blVert + 1;
+        const tlVert = (heightSegment + 1) * (this.widthSegments + 1) + widthSegment;
+        const trVert = tlVert + 1;
 
-        // DEBUG:
-        // console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
+        /*
+         * DEBUG:
+         * console.log('bl: ' + blVert + ' br: ' + brVert +  ' tl: ' + tlVert + ' tr: ' + trVert);
+         */
         index.push(blVert);
         index.push(brVert);
         index.push(tlVert);

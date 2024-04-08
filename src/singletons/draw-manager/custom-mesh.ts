@@ -85,12 +85,16 @@ export class CustomMesh {
   public eci: Ootk.EciVec3;
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_) {
+      return;
+    }
 
     const gl = this.gl_;
 
     gl.useProgram(this.program_);
-    if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    if (tgtBuffer) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    }
 
     // Set the uniforms
     gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
@@ -101,17 +105,21 @@ export class CustomMesh {
     gl.disable(gl.DEPTH_TEST); // Enable depth testing
     // gl.depthFunc(gl.LEQUAL); // Near things obscure far things
 
-    // Enable alpha blending
-    // gl.enable(gl.BLEND);
-    // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    /*
+     * Enable alpha blending
+     * gl.enable(gl.BLEND);
+     * gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+     */
 
     gl.bindVertexArray(this.vao);
     gl.drawArrays(gl.TRIANGLES, 0, this.buffers_.vertCount);
     gl.bindVertexArray(null);
 
-    // Disable alpha blending
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    // gl.disable(gl.BLEND);
+    /*
+     * Disable alpha blending
+     * gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+     * gl.disable(gl.BLEND);
+     */
 
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
   }
@@ -131,7 +139,9 @@ export class CustomMesh {
   }
 
   public update() {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_) {
+      return;
+    }
 
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
@@ -141,13 +151,16 @@ export class CustomMesh {
   vertexList: Float32Array = null;
 
   public updateVertexList(vertexList: Float32Array) {
-    if (!this.isLoaded_) throw new Error('CustomMesh not loaded');
+    if (!this.isLoaded_) {
+      throw new Error('CustomMesh not loaded');
+    }
 
     if (this.vertexList.length !== vertexList.length) {
       this.vertexList = vertexList;
       this.initBuffers_();
     } else {
       const flatVerticies = vertexList;
+
       for (let i = 0; i < flatVerticies.length; i++) {
         this.vertexList[i] = flatVerticies[i];
       }
@@ -164,6 +177,7 @@ export class CustomMesh {
 
   private initProgram_() {
     const gl = this.gl_;
+
     this.program_ = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
     this.gl_.useProgram(this.program_);
 
@@ -175,6 +189,7 @@ export class CustomMesh {
   private initVao_() {
     const gl = this.gl_;
     // Make New Vertex Array Objects
+
     this.vao = gl.createVertexArray();
     gl.bindVertexArray(this.vao);
 

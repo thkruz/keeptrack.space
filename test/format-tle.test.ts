@@ -22,6 +22,7 @@ describe('FormatTle_class', () => {
       scc: '25544',
     } as any;
     const { tle1, tle2 } = FormatTle.createTle(tleParams);
+
     expect(tle1).toBe('1 25544U 98067A   21275.13678787 +.00001908 +00000-0 +44309-4 0 09997');
     expect(tle2).toBe('2 25544 051.6443 082.9945 0002979 018.8536 341.2878 15.48970283 00010');
   });
@@ -65,6 +66,7 @@ describe('FormatTle_class', () => {
   it('test_TLE1_ending_invalid_input', () => {
     const TLE1Ending = ' +.00000000 +00000+0 +00000-0 0  9990';
     const expected = ' +.00000000 +00000+0 +00000-0 0  9990';
+
     expect(FormatTle.setCharAt(TLE1Ending, 1, '+')).toEqual(expected);
     expect(FormatTle.setCharAt(TLE1Ending, 12, '+')).toEqual(expected);
     expect(FormatTle.setCharAt(TLE1Ending, 21, '+')).toEqual(expected);

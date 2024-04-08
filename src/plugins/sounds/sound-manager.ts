@@ -72,13 +72,17 @@ export class SoundManager extends KeepTrackPlugin {
 
   constructor() {
     const PLUGIN_NAME = 'Sound Manager';
+
     super(PLUGIN_NAME);
 
     // Find the maxClickClip_
     Object.keys(this.sounds).forEach((key) => {
       if (key.startsWith('click')) {
         const clipNumber = parseInt(key.replace('click', ''));
-        if (clipNumber > this.maxClickClip_) this.maxClickClip_ = clipNumber;
+
+        if (clipNumber > this.maxClickClip_) {
+          this.maxClickClip_ = clipNumber;
+        }
       }
     });
   }
@@ -165,7 +169,9 @@ export class SoundManager extends KeepTrackPlugin {
    * Create a new utterance for the specified text and add it to the queue.
    */
   speak(text: string) {
-    if (this.isMute) return; // Muted
+    if (this.isMute) {
+      return;
+    } // Muted
 
     // Create a new instance of SpeechSynthesisUtterance.
     const msg = new SpeechSynthesisUtterance();
@@ -178,11 +184,11 @@ export class SoundManager extends KeepTrackPlugin {
     msg.rate = 1;
     msg.pitch = 1;
 
-    // If a voice has been selected, find the voice and set the
-    // utterance instance's voice attribute.
-    msg.voice = this.voices.filter(function (voice) {
-      return voice.name == 'Google UK English Female';
-    })[0];
+    /*
+     * If a voice has been selected, find the voice and set the
+     * utterance instance's voice attribute.
+     */
+    msg.voice = this.voices.filter((voice) => voice.name == 'Google UK English Female')[0];
 
     // Queue this utterance.
     window.speechSynthesis.speak(msg);
@@ -194,10 +200,12 @@ export class SoundManager extends KeepTrackPlugin {
       for (let i = 1; i <= 8; i++) {
         this.stop(`chatter${i}` as SoundNames, isFadeout);
       }
+
       return;
     }
 
     const sound = this.sounds[soundName];
+
     if (isFadeout) {
       SoundManager.fadeOut_(sound);
     }
@@ -227,43 +235,58 @@ export class SoundManager extends KeepTrackPlugin {
   }
 
   play(soundName: SoundNames) {
-    if (!navigator.userActivation?.hasBeenActive) return; // Not active yet
+    if (!navigator.userActivation?.hasBeenActive) {
+      return;
+    } // Not active yet
 
-    if (this.isMute) return; // Muted
-    if (getEl('loading-screen').classList.contains('fullscreen')) return; // Not Ready Yet
+    if (this.isMute) {
+      return;
+    } // Muted
+    if (getEl('loading-screen').classList.contains('fullscreen')) {
+      return;
+    } // Not Ready Yet
 
     let random = 1;
     let sound: HTMLAudioElement;
+
     switch (soundName) {
       case SoundNames.BEEP:
         random = Math.floor(Math.random() * 3) + 1;
         sound = this.sounds[`genericBeep${random}`];
         sound.play();
+
         return;
       case SoundNames.WHOOSH:
         random = Math.floor(Math.random() * 8) + 1;
         sound = this.sounds[`whoosh${random}`];
         sound.play();
+
         return;
       case SoundNames.ERROR:
-        if (this.lastLongAudioTime + 1200000 > Date.now()) return; // Don't play if played in last 30 second
+        if (this.lastLongAudioTime + 1200000 > Date.now()) {
+          return;
+        } // Don't play if played in last 30 second
         this.lastLongAudioTime = Date.now();
         // Random error or error2
         random = Math.floor(Math.random() * 2) + 1;
         sound = this.sounds[`error${random}`];
         sound.play();
+
         return;
       case SoundNames.CLICK:
         random = Math.floor(Math.random() * this.maxClickClip_) + 1;
         sound = this.sounds[`click${random}`];
         sound.volume = 0.25;
         sound.play();
+
         return;
       case SoundNames.CHATTER:
         random = Math.floor(Math.random() * 8) + 1;
         if (random === this.currentChatterClip_) {
           random++;
-          if (random > 8) random = 1;
+          if (random > 8) {
+            random = 1;
+          }
         }
         sound = this.sounds[`chatter${random}`];
         sound.volume = 0.15;
@@ -275,13 +298,14 @@ export class SoundManager extends KeepTrackPlugin {
           () => {
             this.play(SoundNames.CHATTER);
           },
-          sound.duration * 1000 + 10000
+          sound.duration * 1000 + 10000,
         );
+
         return;
       default:
         sound = this.sounds[soundName];
         sound.play();
-        return;
+
     }
   }
 }

@@ -81,6 +81,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
     this.isShowSurvFence = true;
 
     const satFovPlugin = keepTrackApi.getPlugin(SatelliteFov);
+
     if (satFovPlugin) {
       satFovPlugin.isSatOverflyModeOn = false;
     }
@@ -95,8 +96,10 @@ export class SensorSurvFence extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    // TODO: There are edge cases where the icon remains available when it should not be
-    // It does not break anything, but it is a bug
+    /*
+     * TODO: There are edge cases where the icon remains available when it should not be
+     * It does not break anything, but it is a bug
+     */
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,

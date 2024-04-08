@@ -17,6 +17,7 @@ export class ClassificationBar extends KeepTrackPlugin {
 
   constructor() {
     const PLUGIN_NAME = 'Classification';
+
     super(PLUGIN_NAME);
   }
 
@@ -41,10 +42,12 @@ export class ClassificationBar extends KeepTrackPlugin {
     getEl(this.textStringDomId).innerHTML = classificationString;
 
     const classificationContainerDom = getEl(this.containerDomId);
+
     classificationContainerDom.style.fontWeight = '500';
 
     if (Classification.isValidClassification(classificationString)) {
       const colors = Classification.getColors(classificationString);
+
       backgroundColor = colors.backgroundColor;
       color = colors.color;
     }
@@ -67,6 +70,7 @@ export class ClassificationBar extends KeepTrackPlugin {
 
   private createContainer_(): void {
     const node = document.createElement('div');
+
     node.innerHTML = keepTrackApi.html`<span id="${this.textStringDomId}"></span>`;
     node.id = this.containerDomId;
     node.style.cssText = `
@@ -91,14 +95,21 @@ export class ClassificationBar extends KeepTrackPlugin {
   }
 
   private updateTopMenuHeight_(isExpanded: boolean): void {
-    if (this.isExpanded_ === isExpanded) return;
+    if (this.isExpanded_ === isExpanded) {
+      return;
+    }
     // If top menu is not loaded, we are already at the correct height
-    if (!keepTrackApi.getPlugin(TopMenu)) return;
+    if (!keepTrackApi.getPlugin(TopMenu)) {
+      return;
+    }
 
     // TODO: Top menu height should be a setting in the top menu plugin
     let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--classification-bar-height').replace('px', ''));
-    if (isNaN(topMenuHeight)) topMenuHeight = 0;
-    document.documentElement.style.setProperty('--classification-bar-height', (isExpanded ? this.containerHeight : -this.containerHeight) + 'px');
+
+    if (isNaN(topMenuHeight)) {
+      topMenuHeight = 0;
+    }
+    document.documentElement.style.setProperty('--classification-bar-height', `${isExpanded ? this.containerHeight : -this.containerHeight}px`);
 
     this.isExpanded_ = isExpanded;
   }

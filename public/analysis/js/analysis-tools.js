@@ -1,19 +1,22 @@
-/* eslint-disable no-undef */
-/* /////////////////////////////////////////////////////////////////////////////
+/* eslint-disable */
 
-(c) 2016-2023, Theodore Kruczek
-http://keeptrack.space
-
-All code is Copyright © 2016-2023 by Theodore Kruczek. All rights reserved.
-No part of this web site may be reproduced, published, distributed, displayed,
-performed, copied or stored for public or private use, without written
-permission of the author.
-
-No part of this code may be modified or changed or exploited in any way used
-for derivative works, or offered for sale, or used to construct any kind of database
-or mirrored at any other location without the express written permission of the author.
-
-///////////////////////////////////////////////////////////////////////////// */
+/*
+ * /////////////////////////////////////////////////////////////////////////////
+ *
+ * (c) 2016-2023, Theodore Kruczek
+ * http://keeptrack.space
+ *
+ * All code is Copyright © 2016-2023 by Theodore Kruczek. All rights reserved.
+ * No part of this web site may be reproduced, published, distributed, displayed,
+ * performed, copied or stored for public or private use, without written
+ * permission of the author.
+ *
+ * No part of this code may be modified or changed or exploited in any way used
+ * for derivative works, or offered for sale, or used to construct any kind of database
+ * or mirrored at any other location without the express written permission of the author.
+ *
+ * /////////////////////////////////////////////////////////////////////////////
+ */
 
 import * as $ from 'jquery';
 
@@ -23,42 +26,45 @@ import { dateFormat } from '../../js/lib/dateFormat';
 import { jday } from '../../js/lib/transforms';
 import { satellite } from '../../js/static/sat-math';
 
-var requestInfo = {};
-var isDrawApogee = false;
-var isDrawPerigee = false;
-var isDrawInc = false;
-var isDrawEcc = false;
-var isDrawRAAN = false;
-var isDrawPeriod = false;
-var isDrawRng = false;
-var isDrawAz = false;
-var isDrawEl = false;
-var sensor;
-var TAU = 2 * Math.PI; // PI * 2 -- This makes understanding the formulas easier
-var DEG2RAD = TAU / 360; // Used to convert degrees to radians
-var RAD2DEG = 360 / TAU; // Used to convert radians to degrees
-var minutesPerDay = 1440;
-var millisecondsPerDay = 1.15741e-8;
-var raeType = 1;
+const requestInfo = {};
+let isDrawApogee = false;
+let isDrawPerigee = false;
+let isDrawInc = false;
+let isDrawEcc = false;
+let isDrawRAAN = false;
+let isDrawPeriod = false;
+let isDrawRng = false;
+let isDrawAz = false;
+let isDrawEl = false;
+let sensor;
+const TAU = 2 * Math.PI; // PI * 2 -- This makes understanding the formulas easier
+const DEG2RAD = TAU / 360; // Used to convert degrees to radians
+const RAD2DEG = 360 / TAU; // Used to convert radians to degrees
+const minutesPerDay = 1440;
+const millisecondsPerDay = 1.15741e-8;
+let raeType = 1;
 
 satellite.lookanglesInterval = 60;
 satellite.calculateLookAngles = (sat, sensor, tableType) => {
   // NOSONAR
-  var propOffset;
+  let propOffset;
+
   (function _inputValidation() {
     // Check if there is a sensor
-    if (typeof sensor == 'undefined') {
+    if (typeof sensor === 'undefined') {
       // Try using the current sensor if there is one
       if (satellite.sensorSelected()) {
         sensor = satellite.currentSensor;
       } else {
         console.debug('getlookangles2 requires a sensor!');
+
         return;
       }
       // Simple Error Checking
     } else {
-      if (typeof sensor.minAz == 'undefined') {
+      if (typeof sensor.minAz === 'undefined') {
         console.debug('sensor format incorrect');
+
         return;
       }
       sensor.observerGd = {
@@ -69,55 +75,55 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
       };
     }
 
-    if (typeof sat == 'undefined') {
+    if (typeof sat === 'undefined') {
       console.debug('sat parameter required!');
-    } else {
-      if (typeof sat.TLE1 == 'undefined' || typeof sat.TLE2 == 'undefined') {
-        console.debug('sat parameter invalid format!');
-      }
+    } else if (typeof sat.TLE1 === 'undefined' || typeof sat.TLE2 === 'undefined') {
+      console.debug('sat parameter invalid format!');
     }
 
-    if (typeof propOffset == 'undefined') {
+    if (typeof propOffset === 'undefined') {
       propOffset = 0;
     }
 
-    if (typeof tableType == 'undefined') {
+    if (typeof tableType === 'undefined') {
       tableType = 1;
     }
 
-    if (typeof satellite.isRiseSetLookangles == 'undefined') {
+    if (typeof satellite.isRiseSetLookangles === 'undefined') {
       satellite.isRiseSetLookangles = false;
     }
 
-    if (typeof satellite.lookanglesInterval == 'undefined') {
+    if (typeof satellite.lookanglesInterval === 'undefined') {
       satellite.lookanglesInterval = 1;
     }
-  })();
+  }());
 
   // Set default timing settings. These will be changed to find look angles at different times in future.
-  var propTempOffset = 0; // offset letting us propagate in the future (or past)
+  let propTempOffset = 0; // offset letting us propagate in the future (or past)
 
-  var satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
-  var lookanglesTable = []; // Iniially no rows to the table
+  const satrec = satellite.twoline2satrec(sat.TLE1, sat.TLE2); // perform and store sat init calcs
+  const lookanglesTable = []; // Iniially no rows to the table
 
   const propagate2 = (propTempOffset, satrec) => {
     // var lookAngleRecord = {};
-    var now = new Date(); // Make a time variable
+    const now = new Date(); // Make a time variable
+
     now.setTime(Number(Date.now()) + propTempOffset); // Set the time variable to the time in the future
-    var j = jday(
+    let j = jday(
       now.getUTCFullYear(),
       now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
-      now.getUTCSeconds()
+      now.getUTCSeconds(),
     ); // Converts time to jday (TLEs use epoch year/day)
-    j += now.getUTCMilliseconds() * millisecondsPerDay;
-    var gmst = Sgp4.gstime(j);
 
-    var m = (j - satrec.jdsatepoch) * minutesPerDay;
-    var positionEci = satellite.sgp4(satrec, m);
-    var positionEcf, lookAngles, azimuth, elevation, range;
+    j += now.getUTCMilliseconds() * millisecondsPerDay;
+    const gmst = Sgp4.gstime(j);
+
+    const m = (j - satrec.jdsatepoch) * minutesPerDay;
+    const positionEci = satellite.sgp4(satrec, m);
+    let azimuth, elevation, lookAngles, positionEcf, range;
 
     positionEcf = satellite.eci2ecf(positionEci.position, gmst); // positionEci.position is called positionEci originally
     const lla = {
@@ -125,6 +131,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
       lon: sensor.observerGd.lon,
       alt: sensor.observerGd.height,
     };
+
     lookAngles = satellite.ecfToLookAngles(lla, positionEcf);
     azimuth = lookAngles.az * RAD2DEG;
     elevation = lookAngles.el * RAD2DEG;
@@ -156,9 +163,10 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
             az: null,
             el: null,
           };
-        } else {
-          return;
         }
+
+        return;
+
       }
     }
     if (
@@ -171,28 +179,31 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
     ) {
       if (satellite.isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
-        var now1 = new Date();
+        const now1 = new Date();
+
         now1.setTime(Number(Date.now()) + propTempOffset - satellite.lookanglesInterval * 1000);
-        var j1 = jday(
+        let j1 = jday(
           now1.getUTCFullYear(),
           now1.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
           now1.getUTCDate(),
           now1.getUTCHours(),
           now1.getUTCMinutes(),
-          now1.getUTCSeconds()
+          now1.getUTCSeconds(),
         ); // Converts time to jday (TLEs use epoch year/day)
-        j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
-        var gmst1 = Sgp4.gstime(j1);
 
-        var m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
-        var positionEci1 = satellite.sgp4(satrec, m1);
-        var positionEcf1, lookAngles1, azimuth1, elevation1, range1;
+        j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
+        let gmst1 = Sgp4.gstime(j1);
+
+        let m1 = (j1 - satrec.jdsatepoch) * minutesPerDay;
+        let positionEci1 = satellite.sgp4(satrec, m1);
+        let azimuth1, elevation1, lookAngles1, positionEcf1, range1;
 
         const lla = {
           lat: sensor.observerGd.lat,
           lon: sensor.observerGd.lon,
           alt: sensor.observerGd.height,
         };
+
         positionEcf1 = satellite.eci2ecf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
         lookAngles1 = satellite.ecfToLookAngles(lla, positionEcf1);
         azimuth1 = lookAngles1.az * RAD2DEG;
@@ -223,7 +234,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
             now1.getUTCDate(),
             now1.getUTCHours(),
             now1.getUTCMinutes(),
-            now1.getUTCSeconds()
+            now1.getUTCSeconds(),
           ); // Converts time to jday (TLEs use epoch year/day)
           j1 += now1.getUTCMilliseconds() * millisecondsPerDay;
           gmst1 = Sgp4.gstime(j1);
@@ -236,6 +247,7 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
             lon: sensor.observerGd.lon,
             alt: sensor.observerGd.height,
           };
+
           positionEcf1 = satellite.eci2ecf(positionEci1.position, gmst1); // positionEci.position is called positionEci originally
           lookAngles1 = satellite.ecfToLookAngles(lla, positionEcf1);
           azimuth1 = lookAngles1.az * RAD2DEG;
@@ -277,10 +289,12 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
             az: null,
             el: null,
           };
-        } else {
-          return;
         }
+
+        return;
+
       }
+
       return {
         time: dateFormat(now, 'isoDateTime', true),
         rng: range,
@@ -302,28 +316,30 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
         az: null,
         el: null,
       };
-    } else {
-      return;
     }
+
+
   };
 
-  var tempLookanglesInterval;
+  let tempLookanglesInterval;
+
   if (satellite.isRiseSetLookangles) {
     tempLookanglesInterval = satellite.lookanglesInterval;
     satellite.lookanglesInterval = 1;
   }
 
-  if (typeof satellite.lookanglesLength == 'undefined') {
+  if (typeof satellite.lookanglesLength === 'undefined') {
     satellite.lookanglesLength = 1.0;
   }
 
-  for (var i = 0; i < satellite.lookanglesLength * 24 * 60 * 60; i += satellite.lookanglesInterval) {
+  for (let i = 0; i < satellite.lookanglesLength * 24 * 60 * 60; i += satellite.lookanglesInterval) {
     // satellite.lookanglesInterval in seconds
     propTempOffset = i * 1000 + propOffset; // Offset in seconds (msec * 1000)
     if (lookanglesTable.length <= 15000) {
       // Maximum of 1500 lines in the look angles table
-      let lookanglesRow = propagate2(propTempOffset, satrec);
-      if (typeof lookanglesRow != 'undefined') {
+      const lookanglesRow = propagate2(propTempOffset, satrec);
+
+      if (typeof lookanglesRow !== 'undefined') {
         lookanglesTable.push(lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
       }
     }
@@ -332,32 +348,36 @@ satellite.calculateLookAngles = (sat, sensor, tableType) => {
   if (satellite.isRiseSetLookangles) {
     satellite.lookanglesInterval = tempLookanglesInterval;
   }
+
   return lookanglesTable;
 };
 
-var drawChart = (data) => {
-  var labelInfo = [];
-  var inclinationInfo = [];
-  var periodInfo = [];
-  var apogeeInfo = [];
-  var perigeeInfo = [];
-  var raanInfo = [];
-  var eccInfo = [];
-  var rngInfo = [];
-  var azInfo = [];
-  var elInfo = [];
-  var dataInfo = [];
-  var satData = [];
+const drawChart = (data) => {
+  const labelInfo = [];
+  const inclinationInfo = [];
+  const periodInfo = [];
+  const apogeeInfo = [];
+  const perigeeInfo = [];
+  const raanInfo = [];
+  const eccInfo = [];
+  const rngInfo = [];
+  const azInfo = [];
+  const elInfo = [];
+  const dataInfo = [];
+  const satData = [];
+
   (function processTLEs() {
-    var RADIUS_OF_EARTH = 6371; // Radius of Earth in kilometers
-    var satrec;
-    for (var i = 0; i < data.length; i++) {
+    const RADIUS_OF_EARTH = 6371; // Radius of Earth in kilometers
+    let satrec;
+
+    for (let i = 0; i < data.length; i++) {
       satrec = satellite.twoline2satrec(
         // replace old TLEs
         data[i].TLE1,
-        data[i].TLE2
+        data[i].TLE2,
       );
-      let extra = {};
+      const extra = {};
+
       extra.year = data[i].TLE1.substr(18, 2);
       extra.jday = data[i].TLE1.substr(20, 12);
 
@@ -369,8 +389,8 @@ var drawChart = (data) => {
       extra.meanMotion = (satrec.no * 60 * 24) / (2 * Math.PI); // convert rads/minute to rev/day
 
       // fun other data
-      extra.semiMajorAxis = Math.pow(8681663.653 / extra.meanMotion, 2 / 3);
-      extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - Math.pow(extra.eccentricity, 2));
+      extra.semiMajorAxis = (8681663.653 / extra.meanMotion) ** (2 / 3);
+      extra.semiMinorAxis = extra.semiMajorAxis * Math.sqrt(1 - extra.eccentricity ** 2);
       extra.apogee = extra.semiMajorAxis * (1 + extra.eccentricity) - RADIUS_OF_EARTH;
       extra.perigee = extra.semiMajorAxis * (1 - extra.eccentricity) - RADIUS_OF_EARTH;
       extra.period = 1440.0 / extra.meanMotion;
@@ -378,10 +398,10 @@ var drawChart = (data) => {
       extra.TLE2 = data[i].TLE2;
       satData[i] = extra;
     }
-  })();
+  }());
   (function setupDataInfo() {
     // NOSONAR
-    if (typeof sensor == 'undefined' || isDrawInc || isDrawApogee || isDrawEcc || isDrawInc || isDrawPerigee || isDrawPeriod || isDrawRAAN) {
+    if (typeof sensor === 'undefined' || isDrawInc || isDrawApogee || isDrawEcc || isDrawInc || isDrawPerigee || isDrawPeriod || isDrawRAAN) {
       for (let i = 0; i < satData.length; i++) {
         labelInfo.push(`${satData[i].year} ${satData[i].jday}`);
       }
@@ -404,16 +424,17 @@ var drawChart = (data) => {
     for (let i = 0; i < satData.length; i++) {
       eccInfo.push({ x: i, y: satData[i].eccentricity });
     }
-    if (typeof sensor != 'undefined' && !isDrawInc && !isDrawApogee && !isDrawEcc && !isDrawInc && !isDrawPerigee && !isDrawPeriod && !isDrawRAAN) {
-      let lookAngles = satellite.calculateLookAngles(
+    if (typeof sensor !== 'undefined' && !isDrawInc && !isDrawApogee && !isDrawEcc && !isDrawInc && !isDrawPerigee && !isDrawPeriod && !isDrawRAAN) {
+      const lookAngles = satellite.calculateLookAngles(
         {
           TLE1: data[data.length - 1].TLE1,
           TLE2: data[data.length - 1].TLE2,
         },
         sensor,
-        raeType
+        raeType,
       );
-      for (var i = 0; i < lookAngles.length; i++) {
+
+      for (let i = 0; i < lookAngles.length; i++) {
         if (i > 0) {
           if ((Date.parse(lookAngles[i].time) - Date.parse(lookAngles[i - 1].time)) / 1000 > satellite.lookanglesInterval) {
             labelInfo.push('Gap');
@@ -422,20 +443,28 @@ var drawChart = (data) => {
             elInfo.push({ x: i, y: null });
           } else {
             labelInfo.push(`${lookAngles[i].time}`);
-            if (lookAngles[i].rng > 0) lookAngles[i].rng = lookAngles[i].rng / 10;
+            if (lookAngles[i].rng > 0) {
+              lookAngles[i].rng = lookAngles[i].rng / 10;
+            }
             rngInfo.push({ x: i, y: lookAngles[i].rng });
             if (sensor.minAz > sensor.maxAz && lookAngles[i].az > sensor.maxAz) {
-              if (sensor.minAz > 180) lookAngles[i].az = lookAngles[i].az - 360;
+              if (sensor.minAz > 180) {
+                lookAngles[i].az = lookAngles[i].az - 360;
+              }
             }
             azInfo.push({ x: i, y: lookAngles[i].az });
             elInfo.push({ x: i, y: lookAngles[i].el });
           }
         } else {
           labelInfo.push(`${lookAngles[i].time}`);
-          if (lookAngles[i].rng > 0) lookAngles[i].rng = lookAngles[i].rng / 10;
+          if (lookAngles[i].rng > 0) {
+            lookAngles[i].rng = lookAngles[i].rng / 10;
+          }
           rngInfo.push({ x: i, y: lookAngles[i].rng });
           if (sensor.minAz > sensor.maxAz && lookAngles[i].az > sensor.maxAz) {
-            if (sensor.minAz > 180) lookAngles[i].az = lookAngles[i].az - 360;
+            if (sensor.minAz > 180) {
+              lookAngles[i].az = lookAngles[i].az - 360;
+            }
           }
           azInfo.push({ x: i, y: lookAngles[i].az });
           elInfo.push({ x: i, y: lookAngles[i].el });
@@ -536,12 +565,12 @@ var drawChart = (data) => {
         fill: false,
       });
     }
-  })();
+  }());
 
   // Actually Draw the Charts
-  var context = document.getElementById('satChart').getContext('2d');
+  const context = document.getElementById('satChart').getContext('2d');
   // eslint-disable-next-line no-unused-vars
-  var myChart = new Chart(context, {
+  const myChart = new Chart(context, {
     type: 'line',
     data: {
       labels: labelInfo,
@@ -549,27 +578,31 @@ var drawChart = (data) => {
     },
     options: {
       scales: {
-        // yAxes: [
-        //   {
-        //     ticks: {
-        //       beginAtZero: true,
-        //     },
-        //   },
-        // ],
+        /*
+         * yAxes: [
+         *   {
+         *     ticks: {
+         *       beginAtZero: true,
+         *     },
+         *   },
+         * ],
+         */
       },
     },
   });
 
   (function resize() {
-    var isRedraw = false;
-    var canvas = document.getElementById('satChart');
+    let isRedraw = false;
+    const canvas = document.getElementById('satChart');
     // let context = canvas.getContext('2d');
 
     // resize the canvas to fill browser window dynamically
     window.addEventListener('resize', resizeCanvas, false);
 
     var resizeCanvas = () => {
-      if (isRedraw) return;
+      if (isRedraw) {
+        return;
+      }
       isRedraw = true;
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -580,42 +613,59 @@ var drawChart = (data) => {
        */
       isRedraw = false;
     };
+
     resizeCanvas();
-  })();
+  }());
 };
 
-var loadJSON = () => {
+const loadJSON = () => {
   $.get(`./js/analysis/sathist/${requestInfo.sat}.json`)
-    .done(function (resp) {
+    .done((resp) => {
       // if the .json loads then use it
       drawChart(resp);
     })
-    .fail(function () {
+    .fail(() => {
       console.debug('Could Not Load JSON File!');
     });
 };
 
 (function initParseFromGETVariables() {
-  // NOSONAR
-  // This is an initial parse of the GET variables
-  // A satSet focused one happens later.
+  /*
+   * NOSONAR
+   * This is an initial parse of the GET variables
+   * A satSet focused one happens later.
+   */
 
-  var queryStr = window.location.search.substring(1);
-  var params = queryStr.split('&');
-  for (var i = 0; i < params.length; i++) {
-    var key = params[i].split('=')[0];
-    var val = params[i].split('=')[1];
+  const queryStr = window.location.search.substring(1);
+  const params = queryStr.split('&');
+
+  for (let i = 0; i < params.length; i++) {
+    const key = params[i].split('=')[0];
+    const val = params[i].split('=')[1];
+
     switch (key) {
       case 'sat':
         requestInfo.sat = val;
         break;
       case 'type':
-        if (val == 'inc') isDrawInc = true;
-        if (val == 'ap') isDrawApogee = true;
-        if (val == 'pe') isDrawPerigee = true;
-        if (val == 'e') isDrawEcc = true;
-        if (val == 'per') isDrawPeriod = true;
-        if (val == 'ra') isDrawRAAN = true;
+        if (val == 'inc') {
+          isDrawInc = true;
+        }
+        if (val == 'ap') {
+          isDrawApogee = true;
+        }
+        if (val == 'pe') {
+          isDrawPerigee = true;
+        }
+        if (val == 'e') {
+          isDrawEcc = true;
+        }
+        if (val == 'per') {
+          isDrawPeriod = true;
+        }
+        if (val == 'ra') {
+          isDrawRAAN = true;
+        }
         if (val == 'all') {
           isDrawApogee = true;
           isDrawPerigee = true;
@@ -645,10 +695,18 @@ var loadJSON = () => {
         }
         break;
       case 'sensor':
-        if (val == 'BLE') sensor = sensorList.BLE;
-        if (val == 'CLR') sensor = sensorList.CLR;
-        if (val == 'COD') sensor = sensorList.COD;
-        if (val == 'FYL') sensor = sensorList.FYL;
+        if (val == 'BLE') {
+          sensor = sensorList.BLE;
+        }
+        if (val == 'CLR') {
+          sensor = sensorList.CLR;
+        }
+        if (val == 'COD') {
+          sensor = sensorList.COD;
+        }
+        if (val == 'FYL') {
+          sensor = sensorList.FYL;
+        }
         break;
       case 'lookanglesLength':
         satellite.lookanglesLength = parseFloat(val);
@@ -662,4 +720,4 @@ var loadJSON = () => {
     }
   }
   loadJSON();
-})();
+}());

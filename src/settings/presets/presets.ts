@@ -42,16 +42,21 @@ export class SettingsPresets {
       window.M.Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
       const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
       const english = `In ${yearPrefix}${yearStr}`;
-      // const french = `En ${yearPrefix}${yearStr}`;
-      // const german = `Im ${yearPrefix}${yearStr}`;
-      const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
-      const debrisSpan = `<span style="color: rgb(150, 150, 150);">Debris </span>`;
+      /*
+       * const french = `En ${yearPrefix}${yearStr}`;
+       * const german = `Im ${yearPrefix}${yearStr}`;
+       */
+      const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
+      const debrisSpan = '<span style="color: rgb(150, 150, 150);">Debris </span>';
+
       document.getElementById('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+
       return `${english}`;
     };
     settings.onLoadCb = () => {
       // Create div for textOverlay
       const textOverlay = document.createElement('div');
+
       textOverlay.id = 'textOverlay';
       document.body.appendChild(textOverlay);
 
@@ -63,6 +68,7 @@ export class SettingsPresets {
                     }
                   `;
       const style = document.createElement('style');
+
       style.type = 'text/css';
       style.appendChild(document.createTextNode(toastCss));
       document.head.appendChild(style);
@@ -167,16 +173,21 @@ export class SettingsPresets {
       window.M.Toast.dismissAll(); // Dismiss All Toast Messages (workaround to avoid animations)
       const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
       const english = `In ${yearPrefix}${yearStr}`;
-      // const french = `En ${yearPrefix}${yearStr}`;
-      // const german = `Im ${yearPrefix}${yearStr}`;
-      const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
-      const debrisSpan = `<span style="color: rgb(150, 150, 150);">Debris </span>`;
+      /*
+       * const french = `En ${yearPrefix}${yearStr}`;
+       * const german = `Im ${yearPrefix}${yearStr}`;
+       */
+      const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
+      const debrisSpan = '<span style="color: rgb(150, 150, 150);">Debris </span>';
+
       setInnerHtml('textOverlay', `${satellitesSpan} and ${debrisSpan} ${english}`);
+
       return `${english}`;
     };
     settings.onLoadCb = () => {
       // Create div for textOverlay
       const textOverlay = document.createElement('div');
+
       textOverlay.id = 'textOverlay';
       keepTrackApi.containerRoot.appendChild(textOverlay);
 
@@ -188,6 +199,7 @@ export class SettingsPresets {
                     }
                   `;
       const style = document.createElement('style');
+
       style.type = 'text/css';
       style.appendChild(document.createTextNode(toastCss));
       document.head.appendChild(style);
@@ -238,6 +250,7 @@ export class SettingsPresets {
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
       const allSats = groupManagerInstance.createGroup(0, null);
+
       groupManagerInstance.selectGroup(allSats);
       allSats.updateOrbits();
       keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
@@ -309,6 +322,7 @@ export class SettingsPresets {
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
       const sccNumGroup = groupManagerInstance.createGroup(9, [25544]);
+
       groupManagerInstance.selectGroup(sccNumGroup);
       sccNumGroup.updateOrbits();
       keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);

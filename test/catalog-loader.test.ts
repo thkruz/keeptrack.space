@@ -2,17 +2,21 @@ import { CatalogLoader } from '@app/static/catalog-loader';
 import { readFileSync } from 'fs';
 
 describe('Catalog Loader', () => {
-  let errorWatch = jest.fn();
+  const errorWatch = jest.fn();
+
   beforeAll(() => {
     // Watch for console.error
     global.console.error = (message: string) => {
       console.warn(message);
       errorWatch(message);
     };
+    // eslint-disable-next-line require-await
     global.fetch = jest.fn().mockImplementation(async () => ({
       json: () => {
         const tle = readFileSync('./test/environment/TLE2.json');
         const json = JSON.parse(tle.toString());
+
+
         return json;
       },
       catch: () => {

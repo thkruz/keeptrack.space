@@ -30,6 +30,7 @@ export class GroupsManager {
 
   private changeGroup_(group: ObjectGroup): ObjectGroup {
     this.selectedGroup = group;
+
     return this.selectedGroup;
   }
 
@@ -37,6 +38,7 @@ export class GroupsManager {
     this.changeGroup_(group);
     group.updateOrbits();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     colorSchemeManagerInstance.setToGroupColorScheme();
 
     this.stopUpdatingInViewSoon = false;
@@ -47,6 +49,7 @@ export class GroupsManager {
     settingsManager.isGroupOverlayDisabled = true;
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group);
   }
 
@@ -56,7 +59,8 @@ export class GroupsManager {
     this.stopUpdatingInViewSoon = true;
   }
 
-  /** Including the name parameter creates a cached version of the object
+  /**
+   * Including the name parameter creates a cached version of the object
    *
    * Do not include a name if the group is temporary or will change
    */

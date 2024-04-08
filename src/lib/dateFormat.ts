@@ -97,8 +97,8 @@ const formats = {
     longTime: 'h:MM:ss TT Z',
     isoDate: 'yyyy-mm-dd',
     isoTime: 'HH:MM:ss',
-    isoDateTime: "yyyy-mm-dd' 'HH:MM:ss",
-    isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'",
+    isoDateTime: 'yyyy-mm-dd\' \'HH:MM:ss',
+    isoUtcDateTime: 'UTC:yyyy-mm-dd\'T\'HH:MM:ss\'Z\'',
   },
   i18n: {
     // Internationalization strings
@@ -180,7 +180,8 @@ const token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/gu;
  */
 const timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/gu;
 
-/** A regular expression that matches any character that is not a digit, a plus sign, a minus sign, or an uppercase letter A to Z.
+/**
+ * A regular expression that matches any character that is not a digit, a plus sign, a minus sign, or an uppercase letter A to Z.
  *
  * This is used to remove any timezone information from a date string.
  */
@@ -205,16 +206,21 @@ const pad = function (num: number, length: number): string {
  * @throws SyntaxError if the provided date is invalid.
  */
 export const dateFormat = function (date: string | Date, mask: string, utc: boolean = false) {
-  if (typeof date === 'string' && !/\d/u.test(date)) {
+  if (typeof date === 'string' && !(/\d/u).test(date)) {
     mask = date;
     date = null;
   }
 
-  if (!date) throw SyntaxError('invalid date');
+  if (!date) {
+    throw new SyntaxError('invalid date');
+  }
   const dateObj = new Date(date as string);
-  if (Number.isNaN(dateObj.getTime())) throw SyntaxError(`invalid date - ${date}`);
 
-  mask = String(formats.masks[mask] || mask || formats.masks['default']);
+  if (Number.isNaN(dateObj.getTime())) {
+    throw new SyntaxError(`invalid date - ${date}`);
+  }
+
+  mask = String(formats.masks[mask] || mask || formats.masks.default);
 
   if (mask.slice(0, 4) === 'UTC:') {
     mask = mask.slice(4);
@@ -222,17 +228,17 @@ export const dateFormat = function (date: string | Date, mask: string, utc: bool
   }
 
   const getFunctionPrefix = utc ? 'getUTC' : 'get';
-  const d = dateObj[getFunctionPrefix + 'Date']();
-  const D = dateObj[getFunctionPrefix + 'Day']();
-  const m = dateObj[getFunctionPrefix + 'Month']();
-  const y = dateObj[getFunctionPrefix + 'FullYear']();
-  const H = dateObj[getFunctionPrefix + 'Hours']();
-  const M = dateObj[getFunctionPrefix + 'Minutes']();
-  const s = dateObj[getFunctionPrefix + 'Seconds']();
-  const L = dateObj[getFunctionPrefix + 'Milliseconds']();
+  const d = dateObj[`${getFunctionPrefix}Date`]();
+  const D = dateObj[`${getFunctionPrefix}Day`]();
+  const m = dateObj[`${getFunctionPrefix}Month`]();
+  const y = dateObj[`${getFunctionPrefix}FullYear`]();
+  const H = dateObj[`${getFunctionPrefix}Hours`]();
+  const M = dateObj[`${getFunctionPrefix}Minutes`]();
+  const s = dateObj[`${getFunctionPrefix}Seconds`]();
+  const L = dateObj[`${getFunctionPrefix}Milliseconds`]();
   const o = utc ? 0 : dateObj.getTimezoneOffset();
   const flags: DateFormatFlags = {
-    d: d,
+    d,
     dd: pad(d, 2),
     ddd: formats.i18n.dayNames[D],
     dddd: formats.i18n.dayNames[D + 7],
@@ -244,11 +250,11 @@ export const dateFormat = function (date: string | Date, mask: string, utc: bool
     yyyy: y,
     h: H % 12 || 12,
     hh: pad(H % 12 || 12, 2),
-    H: H,
+    H,
     HH: pad(H, 2),
-    M: M,
+    M,
     MM: pad(M, 2),
-    s: s,
+    s,
     ss: pad(s, 2),
     l: pad(L, 3),
     L: pad(L > 99 ? Math.round(L / 10) : L, 2),
@@ -261,7 +267,5 @@ export const dateFormat = function (date: string | Date, mask: string, utc: bool
     S: ['th', 'st', 'nd', 'rd'][d % 10 > 3 || (d % 100) - (d % 10) === 10 ? 0 : d % 10],
   };
 
-  return mask.replace(token, function ($0) {
-    return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
-  });
+  return mask.replace(token, ($0) => ($0 in flags ? flags[$0] : $0.slice(1, $0.length - 1)));
 };

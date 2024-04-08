@@ -498,7 +498,7 @@ export const launchSiteMap = {
     sitec: 'New Zealand',
   },
   AMH: {
-    site: "A' Mhòine",
+    site: 'A\' Mhòine',
     sitec: 'Scotland',
   },
   ALC: {

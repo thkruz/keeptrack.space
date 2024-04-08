@@ -34,7 +34,9 @@ try {
   onmessage = (m) => onmessageProcessing(m);
 } catch (e) {
   // If Jest isn't running then throw the error
-  if (!process) throw e;
+  if (!process) {
+    throw e;
+  }
 }
 
 export const onmessageProcessing = (m: {
@@ -83,6 +85,9 @@ export const onmessageProcessing = (m: {
       break;
     case OrbitCruncherType.CHANGE_ORBIT_TYPE:
       orbitType = m.data.orbitType;
+
+      return;
+    default:
       return;
   }
 
@@ -90,6 +95,7 @@ export const onmessageProcessing = (m: {
     const objData = JSON.parse(m.data.objData) as ObjDataJson[];
     const sLen = objData.length - 1;
     let i = -1;
+
     while (i < sLen) {
       i++;
       if (objData[i].missile) {
@@ -107,8 +113,10 @@ export const onmessageProcessing = (m: {
   }
 
   if (m.data.typ === OrbitCruncherType.SATELLITE_UPDATE || m.data.typ === OrbitCruncherType.MISSILE_UPDATE) {
-    // TODO: figure out how to calculate the orbit points on constant
-    // position slices, not timeslices (ugly perigees on HEOs)
+    /*
+     * TODO: figure out how to calculate the orbit points on constant
+     * position slices, not timeslices (ugly perigees on HEOs)
+     */
 
     dynamicOffsetEpoch = m.data.dynamicOffsetEpoch;
     staticOffset = m.data.staticOffset;
@@ -121,6 +129,7 @@ export const onmessageProcessing = (m: {
     const len = numberOfSegments + 1;
     let i = 0;
     // Calculate Missile Orbits
+
     if (objCache[id].missile) {
       while (i < len) {
         const missile = objCache[id];
@@ -172,12 +181,14 @@ export const postMessageProcessing = ({ pointsOut, satId }: OrbitCruncherMessage
   try {
     // TODO: Explore SharedArrayBuffer Options
     postMessage({
-      pointsOut: pointsOut,
+      pointsOut,
       satId,
     } as OrbitCruncherMessageWorker);
   } catch (e) {
     // If Jest isn't running then throw the error
-    if (!process) throw e;
+    if (!process) {
+      throw e;
+    }
   }
 };
 
@@ -192,7 +203,7 @@ const drawMissileSegment_ = (missile: OrbitCruncherCachedObject, i: number, poin
       missileTime.getUTCDate(),
       missileTime.getUTCHours(),
       missileTime.getUTCMinutes(),
-      missileTime.getUTCSeconds()
+      missileTime.getUTCSeconds(),
     ) +
     missileTime.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
   const gmst = Sgp4.gstime(j);
@@ -210,16 +221,19 @@ const drawMissileSegment_ = (missile: OrbitCruncherCachedObject, i: number, poin
 
 const drawOrbitSegmentTrail_ = (now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean, period: number, pointsOut: Float32Array, len: number) => {
   const t = now + i * timeslice;
-  let sv = Sgp4.propagate(objCache[id].satrec, t);
+  const sv = Sgp4.propagate(objCache[id].satrec, t);
+
   if (!sv) {
     pointsOut[i * 4] = 0;
     pointsOut[i * 4 + 1] = 0;
     pointsOut[i * 4 + 2] = 0;
     pointsOut[i * 4 + 3] = 0;
+
     return;
   }
 
   let pos = sv.position as EciVec3;
+
   if (isEcfOutput) {
     pos = ecf2eci(pos, (-i * timeslice * TAU) / period);
   }
@@ -231,16 +245,19 @@ const drawOrbitSegmentTrail_ = (now: number, i: number, timeslice: number, id: n
 
 const drawOrbitSegment_ = (now: number, i: number, timeslice: number, id: number, isEcfOutput: boolean, period: number, pointsOut: Float32Array, len: number) => {
   const t = now + i * timeslice;
-  let sv = Sgp4.propagate(objCache[id].satrec, t);
+  const sv = Sgp4.propagate(objCache[id].satrec, t);
+
   if (!sv) {
     pointsOut[i * 4] = 0;
     pointsOut[i * 4 + 1] = 0;
     pointsOut[i * 4 + 2] = 0;
     pointsOut[i * 4 + 3] = 0;
+
     return;
   }
 
   let pos = sv.position as EciVec3;
+
   if (isEcfOutput) {
     pos = ecf2eci(pos, (-i * timeslice * TAU) / period);
   }

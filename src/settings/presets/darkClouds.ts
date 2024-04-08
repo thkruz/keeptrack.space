@@ -43,8 +43,10 @@ export const darkClouds = () => {
   settingsManager.colors.unknown = [1, 0.8, 0.1, 0.85]; // Dark Yellow
   settingsManager.colors.rocketBody = [1, 0.8, 0.1, 0.85]; // Dark Yellow
   settingsManager.colors.debris = [0.8, 0.8, 0.1, 0.85]; // Yellow
-  // settingsManager.colors.rocketBody = [0.7, 0.7, 0.7, 0.85]; // Ted's recommendation - Dark Gray
-  // settingsManager.colors.debris = [0.8, 0.8, 0.8, 0.85]; // Ted's recommendation - Gray
+  /*
+   * settingsManager.colors.rocketBody = [0.7, 0.7, 0.7, 0.85]; // Ted's recommendation - Dark Gray
+   * settingsManager.colors.debris = [0.8, 0.8, 0.8, 0.85]; // Ted's recommendation - Gray
+   */
 
   settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.0]; // Transparent
 
@@ -54,8 +56,10 @@ export const darkClouds = () => {
 
   settingsManager.satShader.minSize = 12.0; // Change the size of the dots
 
-  // NOTE: Ideally you want each draw cycle to complete within 16ms. 10,000 creates enough lines to make it seem like "everything" to
-  // the average person while still keeping performance acceptable.
+  /*
+   * NOTE: Ideally you want each draw cycle to complete within 16ms. 10,000 creates enough lines to make it seem like "everything" to
+   * the average person while still keeping performance acceptable.
+   */
   settingsManager.maxOribtsDisplayedDesktopAll = 10000; // This applies when showing "all" orbits and improves performance substantially
   settingsManager.maxOribtsDisplayedDesktop = 200000; // settingsManager applies when searching (ie time machine)
   settingsManager.maxOribtsDisplayed = 100000;
@@ -63,17 +67,23 @@ export const darkClouds = () => {
   settingsManager.minZoomDistance = <Kilometers>10000;
   settingsManager.maxZoomDistance = <Kilometers>100000;
 
-  // Text Override for Time Machine Toast Messages
-  // yearStr is the last two digits of the year in string format
+  /*
+   * Text Override for Time Machine Toast Messages
+   * yearStr is the last two digits of the year in string format
+   */
   settingsManager.timeMachineString = (yearStr) => {
     keepTrackApi.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
     const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
     const english = `In ${yearPrefix}${yearStr}`;
-    // const french = `En ${yearPrefix}${yearStr}`;
-    // const german = `Im ${yearPrefix}${yearStr}`;
-    const satellitesSpan = `<span style="color: rgb(35, 255, 35);">Satellites </span>`;
-    const debrisSpan = `<span style="color: rgb(255, 255, 35);">Debris </span>`;
+    /*
+     * const french = `En ${yearPrefix}${yearStr}`;
+     * const german = `Im ${yearPrefix}${yearStr}`;
+     */
+    const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
+    const debrisSpan = '<span style="color: rgb(255, 255, 35);">Debris </span>';
+
     getEl('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+
     return `${english}`;
   };
 
@@ -82,6 +92,7 @@ export const darkClouds = () => {
 
     // Create div for textOverlay
     const textOverlay = document.createElement('div');
+
     textOverlay.id = 'textOverlay';
     keepTrackApi.containerRoot.appendChild(textOverlay);
 
@@ -93,6 +104,7 @@ export const darkClouds = () => {
                     }
                   `;
     const style = document.createElement('style');
+
     style.type = 'text/css';
     style.appendChild(document.createTextNode(toastCss));
     document.head.appendChild(style);
@@ -138,6 +150,7 @@ export const darkClouds = () => {
     // Initialize
     settingsManager.lastInteractionTime = Date.now() - RESTART_ROTATE_TIME * 1000 + 1000;
     const allSatsGroup = keepTrackApi.getGroupsManager().createGroup(0, null); // All Satellites
+
     setInnerHtml('textOverlay', 'Building Buffers');
 
     // Show All Orbits first to build buffers
@@ -151,35 +164,33 @@ export const darkClouds = () => {
           // If Time Machine is Off
           if (!(<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning) {
             startTimeMachine();
-          } else {
-            if ((<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesRunCount >= 67) {
-              setTimeout(() => {
-                startTimeMachine();
-              }, settingsManager.timeMachineDelay);
-            }
-          }
-        } else {
-          // If Time Machine is Running
-          if ((<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning) {
-            (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false; // Stop Time Machine
-
-            settingsManager.colors.transparent = keepTrackApi.getOrbitManager().tempTransColor;
-
-            keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
-
-            // groupsManager.selectGroup(null); // Deselect all orbits
-            keepTrackApi.getColorSchemeManager().setColorScheme(keepTrackApi.getColorSchemeManager().default, true); // Reset All Colors
-            keepTrackApi.getUiManager().dismissAllToasts();
-
-            // Add these four lines if you want to hide the orbits when interacting with the mouse
-            // const yearGroup = groupsManager.createGroup('yearOrLess', 2022); // Get All Satellites
-            // groupsManager.selectGroup(yearGroup);
-            // yearGroup.updateOrbits(orbitManager, orbitManager);
-            // satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
+          } else if ((<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesRunCount >= 67) {
             setTimeout(() => {
-              setInnerHtml('textOverlay', 'Present Day');
-            }, 0);
+              startTimeMachine();
+            }, settingsManager.timeMachineDelay);
           }
+          // If Time Machine is Running
+        } else if ((<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning) {
+          (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false; // Stop Time Machine
+
+          settingsManager.colors.transparent = keepTrackApi.getOrbitManager().tempTransColor;
+
+          keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
+
+          // groupsManager.selectGroup(null); // Deselect all orbits
+          keepTrackApi.getColorSchemeManager().setColorScheme(keepTrackApi.getColorSchemeManager().default, true); // Reset All Colors
+          keepTrackApi.getUiManager().dismissAllToasts();
+
+          /*
+           * Add these four lines if you want to hide the orbits when interacting with the mouse
+           * const yearGroup = groupsManager.createGroup('yearOrLess', 2022); // Get All Satellites
+           * groupsManager.selectGroup(yearGroup);
+           * yearGroup.updateOrbits(orbitManager, orbitManager);
+           * satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
+           */
+          setTimeout(() => {
+            setInnerHtml('textOverlay', 'Present Day');
+          }, 0);
         }
       }, 1000);
     }, 10000);

@@ -32,7 +32,9 @@ export interface LaunchInfoObject {
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
     this.showTable();
   };
 
@@ -51,7 +53,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     minWidth: 450,
   };
 
-  helpTitle = `Next Launches Menu`;
+  helpTitle = 'Next Launches Menu';
   helpBody = keepTrackApi.html`The Next Launches Menu pulls data from <a href="https://thespacedevs.com/" target="_blank">The Space Devs</a> to display upcoming launches.`;
 
   sideMenuElementName: string = 'nextLaunch-menu';
@@ -94,18 +96,23 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   showTable() {
     if (this.launchList.length === 0) {
       const apiUrl = window.location.hostname === 'localhost' ? 'lldev' : 'll';
+
       fetch(`https://${apiUrl}.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed`)
         .then((resp) => resp.json())
         .then((data) => this.processData(data))
         .catch(() => errorManagerInstance.warn(`https://${apiUrl}.thespacedevs.com/2.0.0/ is Unavailable!`))
         .finally(() => {
           const tbl: HTMLTableElement = <HTMLTableElement>getEl('nextLaunch-table'); // Identify the table to update
-          if (!tbl) return;
+
+          if (!tbl) {
+            return;
+          }
 
           // Only needs populated once
           if (tbl.innerHTML == '') {
             NextLaunchesPlugin.initTable(tbl, this.launchList);
             const aElements = getEl('nextLaunch-table').querySelectorAll('a');
+
             aElements.forEach((element) => {
               element.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -144,14 +151,16 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
         rocketURL: '',
       };
 
-      if (typeof launchLibResult.last_updated !== 'undefined') launchInfo.updated = new Date(launchLibResult.last_updated);
-      launchInfo.name = typeof launchLibResult.name != 'undefined' ? launchLibResult.name : 'Unknown';
+      if (typeof launchLibResult.last_updated !== 'undefined') {
+        launchInfo.updated = new Date(launchLibResult.last_updated);
+      }
+      launchInfo.name = typeof launchLibResult.name !== 'undefined' ? launchLibResult.name : 'Unknown';
       launchInfo.location = launchLibResult.pad?.location?.name.split(',', 1)[0];
       launchInfo.locationURL = launchLibResult.pad?.wiki_url;
-      if (typeof launchLibResult.launch_service_provider != 'undefined') {
-        launchInfo.agency = typeof launchLibResult.launch_service_provider.name != 'undefined' ? launchLibResult.launch_service_provider.name : 'Unknown';
-        launchInfo.country = typeof launchLibResult.launch_service_provider.country_code != 'undefined' ? launchLibResult.launch_service_provider.country_code : 'Unknown';
-        if (typeof launchLibResult.launch_service_provider.wiki_url != 'undefined') {
+      if (typeof launchLibResult.launch_service_provider !== 'undefined') {
+        launchInfo.agency = typeof launchLibResult.launch_service_provider.name !== 'undefined' ? launchLibResult.launch_service_provider.name : 'Unknown';
+        launchInfo.country = typeof launchLibResult.launch_service_provider.country_code !== 'undefined' ? launchLibResult.launch_service_provider.country_code : 'Unknown';
+        if (typeof launchLibResult.launch_service_provider.wiki_url !== 'undefined') {
           launchInfo.agencyURL = launchLibResult.launch_service_provider.wiki_url;
         }
       } else {
@@ -163,14 +172,14 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
         launchInfo.mission = launchLibResult.mission.description;
         launchInfo.missionName = launchLibResult.mission.name;
         launchInfo.missionType = launchLibResult.mission.type;
-        if (typeof launchLibResult.mission.wiki_url != 'undefined') {
+        if (typeof launchLibResult.mission.wiki_url !== 'undefined') {
           launchInfo.missionURL = launchLibResult.mission.wiki_url;
         }
       }
       launchInfo.rocket = launchLibResult.rocket?.configuration.full_name;
       launchInfo.rocketConfig = launchLibResult.rocket?.configuration.name;
       launchInfo.rocketFamily = launchLibResult.rocket?.configuration.family;
-      if (typeof launchLibResult.rocket.configuration.wiki_url != 'undefined') {
+      if (typeof launchLibResult.rocket.configuration.wiki_url !== 'undefined') {
         launchInfo.rocketURL = launchLibResult.rocket.configuration.wiki_url;
       }
       this.launchList[i] = launchInfo;
@@ -180,18 +189,23 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   static makeTableHeaders(tbl: HTMLTableElement): void {
     const tr = tbl.insertRow();
     const tdT = tr.insertCell();
+
     tdT.appendChild(document.createTextNode('Launch Window'));
     tdT.setAttribute('style', 'text-decoration: underline; width: 120px;');
     const tdN = tr.insertCell();
+
     tdN.appendChild(document.createTextNode('Mission'));
     tdN.setAttribute('style', 'text-decoration: underline; width: 140px;');
     const tdL = tr.insertCell();
+
     tdL.appendChild(document.createTextNode('Location'));
     tdL.setAttribute('style', 'text-decoration: underline');
     const tdA = tr.insertCell();
+
     tdA.appendChild(document.createTextNode('Agency'));
     tdA.setAttribute('style', 'text-decoration: underline');
     const tdC = tr.insertCell();
+
     tdC.appendChild(document.createTextNode('Country'));
     tdC.setAttribute('style', 'text-decoration: underline');
   }
@@ -204,7 +218,8 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
       // Time Cells
       const tdT = tr.insertCell();
-      const timeText = launchList[i].windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? 'TBD' : dateFormat(launchList[i].windowStart, 'isoDateTime', true) + ' UTC';
+      const timeText = launchList[i].windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? 'TBD' : `${dateFormat(launchList[i].windowStart, 'isoDateTime', true)} UTC`;
+
       tdT.appendChild(document.createTextNode(timeText));
 
       // Name Cells
@@ -231,6 +246,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
           : `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
 
       const tdL = tr.insertCell();
+
       tdL.innerHTML = locationHTML;
 
       // Agency Name HTML Setup
@@ -239,10 +255,12 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
         : `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
 
       const tdA = tr.insertCell();
+
       tdA.innerHTML = agencyHTML;
 
       // Country Cell
       const tdC = tr.insertCell();
+
       tdC.innerHTML = `<span class="badge dark-gray-badge" data-badge-caption="${launchList[i].country}"></span>`;
     }
   }

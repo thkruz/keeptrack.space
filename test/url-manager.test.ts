@@ -4,6 +4,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { UrlManager } from '@app/static/url-manager';
+import { BaseObject } from 'ootk';
 import { setupStandardEnvironment } from './environment/standard-env';
 
 describe('UrlManager_class', () => {
@@ -15,8 +16,9 @@ describe('UrlManager_class', () => {
   // Tests that URL parameters with valid values are parsed correctly
   it('test_parse_valid_params', () => {
     const url = 'http://localhost:8080/?sat=25544&search=ISS&rate=1.0&date=1630512000000';
+
     delete window.location;
-    // @ts-expect-error
+    // @ts-expect-error allow reassigning window.location
     window.location = new URL(url);
 
     const expectedSelectedSat = 25544;
@@ -26,6 +28,8 @@ describe('UrlManager_class', () => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
@@ -47,17 +51,20 @@ describe('UrlManager_class', () => {
   // Tests that intldes parameter with valid value is parsed correctly
   it('test_parse_valid_params', () => {
     const url = 'http://localhost:8080/?intldes=1988-064A';
+
     delete window.location;
-    // @ts-expect-error
+    // @ts-expect-error allow reassigning window.location
     window.location = new URL(url);
 
     const expectedSelectedSat = 10;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
+
+    // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.intlDes2id = () => 10;
-    catalogManagerInstance.getObject = () => ({ id: 10, sccNum: '25544', active: true }) as any;
+    catalogManagerInstance.getObject = () => ({ id: 10, sccNum: '25544', active: true }) as unknown as BaseObject;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
@@ -70,12 +77,15 @@ describe('UrlManager_class', () => {
   // Tests that URL parameters valid but satellite not found
   it('test_parse_valid_params_sat_not_found', () => {
     const url = 'http://localhost:8080/?intldes=1988-064A';
+
     delete window.location;
-    // @ts-expect-error
+    // @ts-expect-error allow reassigning window.location
     window.location = new URL(url);
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
+
+    // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     uiManagerInstance.toast = jest.fn();
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
@@ -92,12 +102,15 @@ describe('UrlManager_class', () => {
   // Tests that URL parameters valid but satellite not found2
   it('test_parse_valid_params_sat_not_found2', () => {
     const url = 'http://localhost:8080/?sat=99999';
+
     delete window.location;
-    // @ts-expect-error
+    // @ts-expect-error allow reassigning window.location
     window.location = new URL(url);
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
+
+    // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     uiManagerInstance.toast = jest.fn();
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
@@ -114,8 +127,9 @@ describe('UrlManager_class', () => {
   // Tests that URL parameters with empty parameters are parsed correctly
   it('test_parse_empty_params', () => {
     const url = 'http://localhost:8080/';
+
     delete window.location;
-    // @ts-expect-error
+    // @ts-expect-error allow reassigning window.location
     window.location = new URL(url);
 
     const expectedSelectedSat = 25544;
@@ -125,6 +139,8 @@ describe('UrlManager_class', () => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
@@ -143,8 +159,9 @@ describe('UrlManager_class', () => {
   // Tests that URL parameters with invalid parameters are not parsed
   it('test_parse_invalid_params', () => {
     const url = 'http://localhost:8080/?sat=invalid&search=ISS&rate=invalid&date=invalid';
+
     delete window.location;
-    // @ts-expect-error
+    // @ts-expect-error allow reassigning window.location
     window.location = new URL(url);
 
     const expectedSelectedSat = 25544;
@@ -154,6 +171,8 @@ describe('UrlManager_class', () => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;

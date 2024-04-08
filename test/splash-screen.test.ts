@@ -10,6 +10,7 @@ describe('SplashScreen_class', () => {
     const shadowDiv = document.createElement('div');
     const shadow = shadowDiv.attachShadow({ mode: 'open' });
     const shadowBody = document.createElement('body');
+
     shadow.appendChild(shadowBody);
     SplashScreen.initLoadingScreen(shadowBody);
   });

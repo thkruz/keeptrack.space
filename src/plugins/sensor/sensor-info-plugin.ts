@@ -97,7 +97,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     super(SensorInfoPlugin.PLUGIN_NAME);
   }
 
-  helpTitle = `Sensor Info`;
+  helpTitle = 'Sensor Info';
   helpBody = keepTrackApi.html`
     Sensor Info provides information about the currently selected sensor.
     The information is based on publicly available data and may not always be 100% accurate.
@@ -146,6 +146,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       if (line.type === LineTypes.SENSOR_TO_SUN) {
         return true;
       }
+
       return false;
     });
 
@@ -161,6 +162,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       if (line.type === LineTypes.SENSOR_TO_MOON) {
         return true;
       }
+
       return false;
     });
 
@@ -177,30 +179,34 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     getEl('sensor-moon-btn').addEventListener('click', () => {
       if (this.isMonnLineVisible_) {
         const lineManager = keepTrackApi.getLineManager();
+
         for (const line of lineManager.drawLineList) {
           if (line.type === LineTypes.SENSOR_TO_MOON) {
             lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
             getEl('sensor-moon-btn').textContent = 'Add Line to Moon  \u25B6';
             this.isMonnLineVisible_ = false;
             keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+
             return;
           }
         }
       } else {
         // Prevent Multiple Sensors
         const sensors = keepTrackApi.getSensorManager().currentSensors;
+
         if (sensors.length !== 1) {
           keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
         }
 
         // Draw Line to Sun from Sensor
         const scene = keepTrackApi.getScene();
+
         keepTrackApi
           .getLineManager()
           .create(
             LineTypes.SENSOR_TO_MOON,
             [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.moon.position[0], scene.moon.position[1], scene.moon.position[2]],
-            'w'
+            'w',
           );
 
         // Change Button Text
@@ -215,30 +221,34 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     getEl('sensor-sun-btn').addEventListener('click', () => {
       if (this.isSunLineVisible_) {
         const lineManager = keepTrackApi.getLineManager();
+
         for (const line of lineManager.drawLineList) {
           if (line.type === LineTypes.SENSOR_TO_SUN) {
             lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
             getEl('sensor-sun-btn').textContent = 'Add Line to Sun  \u25B6';
             this.isSunLineVisible_ = false;
             keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+
             return;
           }
         }
       } else {
         // Prevent Multiple Sensors
         const sensors = keepTrackApi.getSensorManager().currentSensors;
+
         if (sensors.length !== 1) {
           keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
         }
 
         // Draw Line to Sun from Sensor
         const scene = keepTrackApi.getScene();
+
         keepTrackApi
           .getLineManager()
           .create(
             LineTypes.SENSOR_TO_SUN,
             [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.sun.position[0], scene.sun.position[1], scene.sun.position[2]],
-            'o'
+            'o',
           );
 
         // Change Button Text
@@ -250,7 +260,9 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   }
 
   getSensorInfo() {
-    if (!this.isHtmlAdded) return;
+    if (!this.isHtmlAdded) {
+      return;
+    }
 
     const firstSensor = keepTrackApi.getSensorManager().currentSensors[0];
 

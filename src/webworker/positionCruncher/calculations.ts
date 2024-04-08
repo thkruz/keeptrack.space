@@ -8,7 +8,9 @@ import { oneOrZero } from '../constants';
 export const propTime = (dynamicOffsetEpoch: number, staticOffset: number, propRate: number) => {
   const now = new Date();
   const dynamicPropOffset = now.getTime() - dynamicOffsetEpoch;
+
   now.setTime(dynamicOffsetEpoch + staticOffset + dynamicPropOffset * propRate);
+
   return now;
 };
 
@@ -16,10 +18,12 @@ export const checkSunExclusion = (
   sensor: Sensor,
   j: number,
   gmst: GreenwichMeanSiderealTime,
-  now: Date
+  now: Date,
 ): [isSunExclusion: boolean, sunECI: { x: number; y: number; z: number }] => {
   const jdo = new A.JulianDay(j); // now
+  // eslint-disable-next-line new-cap
   const coord = A.EclCoordfromWgs84(0, 0, 0);
+  // eslint-disable-next-line new-cap
   const coord2 = A.EclCoordfromWgs84(sensor.lat, sensor.lon, sensor.alt);
 
   // AZ / EL Calculation
@@ -32,19 +36,25 @@ export const checkSunExclusion = (
   // Range Calculation
   const T = new A.JulianDay(A.JulianDay.dateToJD(now)).jdJ2000Century();
   let sunG = (A.Solar.meanAnomaly(T) * 180) / PI;
-  sunG = sunG % 360.0;
+
+  sunG %= 360.0;
   const sunR = 1.00014 - 0.01671 * Math.cos(sunG) - 0.00014 * Math.cos(2 * sunG);
   const sunRange = <Kilometers>((sunR * 149597870700) / 1000); // au to km conversion
 
   // RAE to ECI
   const sunECI = rae2eci({ az: sunAz, el: sunEl, rng: sunRange }, { lat: <Degrees>0, lon: <Degrees>0, alt: <Kilometers>0 }, gmst);
+
+
   return sensor && (sensor.type === SpaceObjectType.OPTICAL || sensor.type === SpaceObjectType.OBSERVER) && sunElRel > -6 ? [true, sunECI] : [false, sunECI];
 };
 
 export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RaeVec3): oneOrZero => {
-  if (!lookangles) return 0;
+  if (!lookangles) {
+    return 0;
+  }
 
   const { az, el, rng } = lookangles;
+
   if (sensor.minAz > sensor.maxAz) {
     if (
       ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
@@ -52,14 +62,13 @@ export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RaeVec3): one
     ) {
       return 1;
     }
-  } else {
-    if (
-      (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
+  } else if (
+    (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
       (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
-    ) {
-      return 1;
-    }
+  ) {
+    return 1;
   }
+
   return 0;
 };
 
@@ -73,7 +82,7 @@ export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: num
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
-      now.getUTCSeconds()
+      now.getUTCSeconds(),
     ) +
     now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 
@@ -81,6 +90,7 @@ export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: num
 
   let isSunExclusion = false;
   let sunEci = { x: 0, y: 0, z: 0 };
+
   if (isSunlightView && sensors.length === 1) {
     // TODO: Sun exclusion should be calculated for each sensor
     [isSunExclusion, sunEci] = checkSunExclusion(sensors[0], j, gmst, now);
@@ -93,7 +103,7 @@ export const setupTimeVariables = (dynamicOffsetEpoch: number, staticOffset: num
       now.getUTCDate(),
       now.getUTCHours(),
       now.getUTCMinutes(),
-      now.getUTCSeconds() + 1
+      now.getUTCSeconds() + 1,
     ) +
     now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
 
@@ -118,7 +128,7 @@ export const createLatLonAltRad = (lat: Radians, lon: Radians, alt: Kilometers) 
 export const createLatLonAlt = (lat: Radians, lon: Radians, alt: Kilometers): LlaVec3<Degrees, Kilometers> => ({
   lon: (lon * RAD2DEG) as Degrees,
   lat: (lat * RAD2DEG) as Degrees,
-  alt: alt,
+  alt,
 });
 
 export const isInValidElevation = (rae: RaeVec3<Kilometers, Degrees>, selectedSatFOV: number) => rae.el > 90 - selectedSatFOV;

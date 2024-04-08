@@ -5,6 +5,7 @@ import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 
 export class MobileManager {
+  // eslint-disable-next-line require-await
   public static async checkMobileMode() {
     try {
       // Don't become mobile after initialization
@@ -75,7 +76,7 @@ export class MobileManager {
           settingsManager.isLoadLastSensor = false;
         } else {
           settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;
-          if (typeof settingsManager.enableHoverOverlay == 'undefined') {
+          if (typeof settingsManager.enableHoverOverlay === 'undefined') {
             settingsManager.enableHoverOverlay = true;
           }
 
@@ -102,7 +103,7 @@ export class MobileManager {
   }
 
   public static checkIfMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu.test(navigator.userAgent);
+    return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu).test(navigator.userAgent);
   }
 
   // eslint-disable-next-line class-methods-use-this

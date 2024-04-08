@@ -24,13 +24,14 @@ export class Time2LonPlots extends KeepTrackPlugin {
   bottomIconImg = linePlotPng;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId);
+
     this.createPlot(Time2LonPlots.getPlotData(), chartDom);
   };
 
   plotCanvasId = 'plot-analysis-chart-time2lon';
   chart: echarts.ECharts;
 
-  helpTitle = `Time Vs Lon Plot Menu`;
+  helpTitle = 'Time Vs Lon Plot Menu';
   helpBody = keepTrackApi.html`
   <p>
     The Time vs Lon Plot Menu is used for plotting the time vs longitude in the GEO belt.
@@ -50,7 +51,9 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     // Delete any old charts and start fresh
     if (!this.chart) {
@@ -116,40 +119,42 @@ export class Time2LonPlots extends KeepTrackPlugin {
           end: 1440,
         },
       ],
-      // visualMap: [
-      //   {
-      //     left: 'left',
-      //     top: '10%',
-      //     dimension: 2,
-      //     min: 0,
-      //     max: 18,
-      //     itemWidth: 30,
-      //     itemHeight: 500,
-      //     calculable: true,
-      //     precision: 0.05,
-      //     text: ['Mean Motion'],
-      //     textGap: 30,
-      //     textStyle: {
-      //       color: '#fff',
-      //     },
-      //     inRange: {
-      //       // symbolSize: [10, 70],
-      //     },
-      //     outOfRange: {
-      //       // symbolSize: [10, 70],
-      //       opacity: 0,
-      //       symbol: 'none',
-      //     },
-      //     controller: {
-      //       inRange: {
-      //         color: ['#41577c'],
-      //       },
-      //       outOfRange: {
-      //         color: ['#999'],
-      //       },
-      //     },
-      //   },
-      // ],
+      /*
+       * visualMap: [
+       *   {
+       *     left: 'left',
+       *     top: '10%',
+       *     dimension: 2,
+       *     min: 0,
+       *     max: 18,
+       *     itemWidth: 30,
+       *     itemHeight: 500,
+       *     calculable: true,
+       *     precision: 0.05,
+       *     text: ['Mean Motion'],
+       *     textGap: 30,
+       *     textStyle: {
+       *       color: '#fff',
+       *     },
+       *     inRange: {
+       *       // symbolSize: [10, 70],
+       *     },
+       *     outOfRange: {
+       *       // symbolSize: [10, 70],
+       *       opacity: 0,
+       *       symbol: 'none',
+       *     },
+       *     controller: {
+       *       inRange: {
+       *         color: ['#41577c'],
+       *       },
+       *       outOfRange: {
+       *         color: ['#999'],
+       *       },
+       *     },
+       *   },
+       * ],
+       */
       series: data.map((item) => ({
         type: 'line',
         name: item.name,
@@ -158,11 +163,13 @@ export class Time2LonPlots extends KeepTrackPlugin {
           id: item.satId,
           value: [dataPoint[1], dataPoint[0]],
         })),
-        // symbolSize: 8,
-        // itemStyle: {
-        // borderWidth: 1,
-        // borderColor: 'rgba(255,255,255,0.8)',
-        // },
+        /*
+         * symbolSize: 8,
+         * itemStyle: {
+         * borderWidth: 1,
+         * borderColor: 'rgba(255,255,255,0.8)',
+         * },
+         */
         emphasis: {
           itemStyle: {
             color: '#fff',
@@ -179,14 +186,23 @@ export class Time2LonPlots extends KeepTrackPlugin {
     const now = timeManagerInstance.simulationTimeObj.getTime();
 
     const data = [] as EChartsData;
+
     objData.forEach((obj) => {
-      if (obj.type !== SpaceObjectType.PAYLOAD) return;
+      if (obj.type !== SpaceObjectType.PAYLOAD) {
+        return;
+      }
 
       let sat = obj as DetailedSatellite;
 
-      if (sat.eccentricity > 0.1) return;
-      if (sat.period < 1240) return;
-      if (sat.period > 1640) return;
+      if (sat.eccentricity > 0.1) {
+        return;
+      }
+      if (sat.period < 1240) {
+        return;
+      }
+      if (sat.period > 1640) {
+        return;
+      }
       switch (sat.country) {
         case 'United States of America':
         case 'United States':
@@ -195,8 +211,8 @@ export class Time2LonPlots extends KeepTrackPlugin {
         case 'CIS':
         case 'Russia':
         case 'China':
-        case `China, People's Republic of`:
-        case `Hong Kong Special Administrative Region, China`:
+        case 'China, People\'s Republic of':
+        case 'Hong Kong Special Administrative Region, China':
         case 'China (Republic)':
           break;
         default:
@@ -205,9 +221,13 @@ export class Time2LonPlots extends KeepTrackPlugin {
       sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
       const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
       const plotData: [number, Degrees][] = [];
+
       plotPoints.forEach((point) => {
         const pointTime = (point.time - now) / 1000 / 60;
-        if (pointTime > 1440 || pointTime < 0) return;
+
+        if (pointTime > 1440 || pointTime < 0) {
+          return;
+        }
         plotData.push([pointTime, point.lon]);
       });
       data.push({
@@ -217,6 +237,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
         data: plotData,
       });
     });
+
     return data;
   }
 }

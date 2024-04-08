@@ -51,6 +51,7 @@ export class MouseInput {
       this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
 
       const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+
       this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
     }
 
@@ -77,6 +78,7 @@ export class MouseInput {
       .sort((a, b) => a.order - b.order)
       .forEach((item) => {
         const dom = getEl(item.elementIdL1);
+
         if (dom) {
           dom.style.display = 'block';
           ++numMenuItems;
@@ -89,13 +91,27 @@ export class MouseInput {
     getEl('earth-high-no-clouds-rmb').style.display = 'block';
     getEl('earth-vec-rmb').style.display = 'block';
     getEl('earth-political-rmb').style.display = 'block';
-    if (settingsManager.nasaImages) getEl('earth-nasa-rmb').style.display = 'none';
-    if (settingsManager.trusatImages) getEl('earth-trusat-rmb').style.display = 'none';
-    if (settingsManager.blueImages) getEl('earth-blue-rmb').style.display = 'none';
-    if (settingsManager.lowresImages) getEl('earth-low-rmb').style.display = 'none';
-    if (settingsManager.hiresNoCloudsImages) getEl('earth-high-no-clouds-rmb').style.display = 'none';
-    if (settingsManager.vectorImages) getEl('earth-vec-rmb').style.display = 'none';
-    if (settingsManager.politicalImages) getEl('earth-political-rmb').style.display = 'none';
+    if (settingsManager.nasaImages) {
+      getEl('earth-nasa-rmb').style.display = 'none';
+    }
+    if (settingsManager.trusatImages) {
+      getEl('earth-trusat-rmb').style.display = 'none';
+    }
+    if (settingsManager.blueImages) {
+      getEl('earth-blue-rmb').style.display = 'none';
+    }
+    if (settingsManager.lowresImages) {
+      getEl('earth-low-rmb').style.display = 'none';
+    }
+    if (settingsManager.hiresNoCloudsImages) {
+      getEl('earth-high-no-clouds-rmb').style.display = 'none';
+    }
+    if (settingsManager.vectorImages) {
+      getEl('earth-vec-rmb').style.display = 'none';
+    }
+    if (settingsManager.politicalImages) {
+      getEl('earth-political-rmb').style.display = 'none';
+    }
 
     return numMenuItems;
   }
@@ -144,11 +160,13 @@ export class MouseInput {
     this.isStartedOnCanvas = false;
 
     if (!this.dragHasMoved) {
-      // if (settingsManager.isMobileModeEnabled) {
-      //   keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
-      //   keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
-      //   this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-      // }
+      /*
+       * if (settingsManager.isMobileModeEnabled) {
+       *   keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
+       *   keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
+       *   this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+       * }
+       */
       this.clickedSat = this.mouseSat;
       if (evt.button === 0) {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -191,11 +209,13 @@ export class MouseInput {
 
     const isFullScreen = keepTrackApi.containerRoot.clientWidth === window.innerWidth && keepTrackApi.containerRoot.clientHeight === window.innerHeight;
     const { isCtrlPressed, isShiftPressed } = keepTrackApi.getInputManager().keyboard;
+
     if (!isFullScreen && !isCtrlPressed && !isShiftPressed) {
       return;
     }
 
     let delta = evt.deltaY;
+
     if (evt.deltaMode === 1) {
       delta *= 33.3333333;
     }
@@ -227,14 +247,16 @@ export class MouseInput {
     }
 
     if (settingsManager.disableWindowScroll || settingsManager.disableNormalEvents) {
-      // window.addEventListener(
-      //   'scroll',
-      //   function () {
-      //     window.scrollTo(0, 0);
-      //     return false;
-      //   },
-      //   { passive: false }
-      // );
+      /*
+       * window.addEventListener(
+       *   'scroll',
+       *   function () {
+       *     window.scrollTo(0, 0);
+       *     return false;
+       *   },
+       *   { passive: false }
+       * );
+       */
     }
 
     this.mouseMoveTimeout = -1;
@@ -325,8 +347,10 @@ export class MouseInput {
     if (!settingsManager.disableCameraControls) {
       // prettier-ignore
       window.addEventListener('mousedown', (evt) => {
-        // Camera Manager Events
-        // Middle Mouse Button MMB
+        /*
+         * Camera Manager Events
+         * Middle Mouse Button MMB
+         */
         if (evt.button === 1) {
           keepTrackApi.getMainCamera().localRotateStartPosition = keepTrackApi.getMainCamera().localRotateCurrent;
           if (this.keyboard_.isShiftPressed) {
@@ -368,7 +392,7 @@ export class MouseInput {
     }
 
     if (settingsManager.disableUI) {
-      canvasDOM.addEventListener('wheel', function () {
+      canvasDOM.addEventListener('wheel', () => {
         satHoverBoxDOM.style.display = 'none';
       });
     }
@@ -386,7 +410,9 @@ export class MouseInput {
 
   public rmbMenuActions(e: MouseEvent) {
     // No Right Click Without UI
-    if (settingsManager.disableUI) return;
+    if (settingsManager.disableUI) {
+      return;
+    }
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
@@ -394,8 +420,9 @@ export class MouseInput {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    let target = <HTMLElement>e.target;
+    const target = <HTMLElement>e.target;
     let targetId = target.id;
+
     if (target.tagName == 'A') {
       targetId = (<HTMLElement>target.parentNode).id;
     }
@@ -405,9 +432,10 @@ export class MouseInput {
 
     switch (targetId) {
       case 'view-info-rmb':
-        if (typeof this.latLon == 'undefined' || isNaN(this.latLon.lat) || isNaN(this.latLon.lon)) {
+        if (typeof this.latLon === 'undefined' || isNaN(this.latLon.lat) || isNaN(this.latLon.lon)) {
           errorManagerInstance.debug('latLon undefined!');
           const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+
           this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
         }
         uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, 'normal', true);
@@ -422,8 +450,12 @@ export class MouseInput {
       case 'view-related-sats-rmb':
         {
           const intldes = catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY)?.intlDes;
-          if (!intldes) uiManagerInstance.toast(`Time 1 is Invalid!`, 'serious');
+
+          if (!intldes) {
+            uiManagerInstance.toast('Time 1 is Invalid!', 'serious');
+          }
           const searchStr = intldes.slice(0, 8);
+
           uiManagerInstance.doSearch(searchStr);
         }
         break;
@@ -471,7 +503,7 @@ export class MouseInput {
         lineManagerInstance.create(
           LineTypes.REF_TO_SAT,
           [this.clickedSat, keepTrackApi.getScene().sun.position[0], keepTrackApi.getScene().sun.position[1], keepTrackApi.getScene().sun.position[2]],
-          'o'
+          'o',
         );
         break;
       case 'earth-blue-rmb':
@@ -537,13 +569,15 @@ export class MouseInput {
         uiManagerInstance.searchManager.closeSearch();
         uiManagerInstance.hideSideMenus();
 
-        // if (
-        //   (!catalogManagerInstance.isSensorManagerLoaded || sensorManagerInstance.currentSensors[0].lat != null) &&
-        //   mainCameraInstance.cameraType !== CameraType.PLANETARIUM &&
-        //   mainCameraInstance.cameraType !== CameraType.ASTRONOMY
-        // ) {
-        //   LegendManager.change('default');
-        // }
+        /*
+         * if (
+         *   (!catalogManagerInstance.isSensorManagerLoaded || sensorManagerInstance.currentSensors[0].lat != null) &&
+         *   mainCameraInstance.cameraType !== CameraType.PLANETARIUM &&
+         *   mainCameraInstance.cameraType !== CameraType.ASTRONOMY
+         * ) {
+         *   LegendManager.change('default');
+         * }
+         */
 
         // Revert any group color scheme back to a non group scheme
         if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group) {

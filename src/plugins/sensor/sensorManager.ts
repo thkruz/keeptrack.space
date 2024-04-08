@@ -48,6 +48,7 @@ export class SensorManager {
   addSecondarySensor(sensor: DetailedSensor): void {
     // If there is no primary sensor, make this the primary sensor
     const primarySensor = this.currentSensors[0];
+
     if (!primarySensor?.isSensor()) {
       this.currentSensors.push(sensor);
       this.setSensor(sensor);
@@ -64,7 +65,8 @@ export class SensorManager {
   // UI Stuff
   isCustomSensorMenuOpen = false;
   isLookanglesMenuOpen = false;
-  /** List of secondary sensors
+  /**
+   * List of secondary sensors
    * This is used for STFs and other "sensors" that are not actually sensors
    * and still require a primary sensor to be selected
    */
@@ -84,7 +86,8 @@ export class SensorManager {
   ];
 
   sensorTitle = '';
-  /** List of STF sensors
+  /**
+   * List of STF sensors
    * This is used for STFs and other "sensors" that are not actually sensors
    * and still require a primary sensor to be selected
    */
@@ -98,8 +101,10 @@ export class SensorManager {
   static drawFov(sensor: DetailedSensor) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorId = catalogManagerInstance.getSensorFromSensorName(sensor.name);
+
     if (!sensorId) {
       errorManagerInstance.warn('Sensor not found');
+
       return;
     }
 
@@ -177,6 +182,7 @@ export class SensorManager {
       LegendManager.change('default');
     }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
     catalogManagerInstance.satCruncher.postMessage({
       typ: CruncerMessageTypes.SENSOR,
       sensor: [],
@@ -200,6 +206,7 @@ export class SensorManager {
 
     setTimeout(() => {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
+
       dotsManagerInstance.resetSatInView();
       colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
     }, 2000);
@@ -208,8 +215,10 @@ export class SensorManager {
   }
 
   setCurrentSensor(sensor: DetailedSensor[] | null): void {
-    // TODO: This function is totally redundant to setSensor. There should be
-    // ONE selectedSensor/currentSensor and it should be an array of selected sensors.
+    /*
+     * TODO: This function is totally redundant to setSensor. There should be
+     * ONE selectedSensor/currentSensor and it should be an array of selected sensors.
+     */
     if (sensor === null) {
       this.currentSensors = [];
     } else if (sensor[0] != null) {
@@ -247,11 +256,12 @@ export class SensorManager {
     } else if (selectedSensor === 'SSN') {
       this.sensorTitle = 'All Space Surveillance Network Sensors';
       const filteredSensors = Object.values(sensors).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
+
       SensorManager.updateSensorUiStyling(filteredSensors);
     } else if (selectedSensor === 'NATO-MW') {
       this.sensorTitle = 'All Missile Warning Sensors';
       this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB].includes(sensor)
+        [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB].includes(sensor),
       );
     } else if (selectedSensor === 'RUS-ALL') {
       this.sensorTitle = 'All Russian Sensors';
@@ -270,7 +280,7 @@ export class SensorManager {
           sensors.ORSV,
           sensors.STO,
           sensors.NAK,
-        ].includes(sensor)
+        ].includes(sensor),
       );
     } else if (selectedSensor === 'PRC-ALL') {
       this.sensorTitle = 'All Chinese Sensors';
@@ -278,7 +288,7 @@ export class SensorManager {
     } else if (selectedSensor === 'LEO-LABS') {
       this.sensorTitle = 'All LEO Labs Sensors';
       this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR].includes(sensor)
+        [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR].includes(sensor),
       );
     } else if (selectedSensor === 'ESOC-ALL') {
       this.sensorTitle = 'All Missile Defense Agency Sensors';
@@ -297,12 +307,12 @@ export class SensorManager {
           sensors.Kiruna,
           sensors.Sodankyla,
           sensors.Svalbard,
-        ].includes(sensor)
+        ].includes(sensor),
       );
     } else if (selectedSensor === 'MD-ALL') {
       this.sensorTitle = 'All Missile Defense Agency Sensors';
       this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor)
+        [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor),
       );
     } else if ((<DetailedSensor>selectedSensor)?.name === 'Custom Sensor') {
       this.currentSensors = [<DetailedSensor>selectedSensor];
@@ -311,8 +321,9 @@ export class SensorManager {
       const sensorInfoTitleDom = getEl('sensor-info-title', true);
 
       if (sensorInfoTitleDom) {
-        sensorInfoTitleDom.innerHTML = "<a href=''>" + this.currentSensors[0].name + '</a>';
+        sensorInfoTitleDom.innerHTML = `<a href=''>${this.currentSensors[0].name}</a>`;
         const url = this.currentSensors[0]?.url;
+
         if (url && url.length > 0) {
           sensorInfoTitleDom.addEventListener('click', () => {
             openColorbox(url);
@@ -331,8 +342,10 @@ export class SensorManager {
     } else {
       // Look through all known sensors
       for (const sensor in sensors) {
-        // TODO: Require explicit sensor selection!
-        // If this is the sensor we selected
+        /*
+         * TODO: Require explicit sensor selection!
+         * If this is the sensor we selected
+         */
         const isMatchString = typeof selectedSensor === 'string' && sensors[sensor].objName === selectedSensor;
         const isMatchObj = typeof selectedSensor !== 'string' && sensors[sensor] === selectedSensor;
         const isMatchsensorId = typeof sensorId !== 'undefined' && sensors[sensor].sensorId === sensorId;
@@ -344,8 +357,9 @@ export class SensorManager {
           const sensorInfoTitleDom = getEl('sensor-info-title', true);
 
           if (sensorInfoTitleDom) {
-            sensorInfoTitleDom.innerHTML = "<a href=''>" + this.currentSensors[0].name + '</a>';
+            sensorInfoTitleDom.innerHTML = `<a href=''>${this.currentSensors[0].name}</a>`;
             const url = this.currentSensors[0].url;
+
             if (url && url.length > 0) {
               sensorInfoTitleDom.addEventListener('click', () => {
                 openColorbox(url);
@@ -368,9 +382,12 @@ export class SensorManager {
     // Run any callbacks
     keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, sensorId);
 
-    // TODO: Move this to top menu plugin
-    // Update UI to reflect new sensor
+    /*
+     * TODO: Move this to top menu plugin
+     * Update UI to reflect new sensor
+     */
     const sensorSelectedDom = getEl('sensor-selected', true);
+
     if (sensorSelectedDom) {
       sensorSelectedDom.innerText = this.sensorTitle;
 
@@ -415,10 +432,8 @@ export class SensorManager {
         if (getEl('reset-sensor-button')) {
           (getEl('reset-sensor-button') as HTMLButtonElement).disabled = false;
         }
-      } else {
-        if (getEl('reset-sensor-button')) {
-          (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
-        }
+      } else if (getEl('reset-sensor-button')) {
+        (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
       }
     } catch (error) {
       errorManagerInstance.warn('Error updating sensor UI styling');
@@ -427,19 +442,21 @@ export class SensorManager {
 
   verifySensors(sensors: DetailedSensor[] | undefined): DetailedSensor[] {
     // If no sensor passed to function then try to use the 'currentSensor'
-    if (typeof sensors == 'undefined' || sensors == null) {
-      if (typeof this.currentSensors == 'undefined') {
+    if (typeof sensors === 'undefined' || sensors == null) {
+      if (typeof this.currentSensors === 'undefined') {
         throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
       } else {
         sensors = this.currentSensors;
       }
     }
+
     return sensors;
   }
 
   public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
     sensors = this.verifySensors(sensors);
     const sensor = sensors[0];
+
     if (!sensor) {
       throw new Error('Sensor not found');
     }
@@ -455,7 +472,7 @@ export class SensorManager {
       x: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon,
       y: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * sinLon,
       z: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat,
-      gmst: gmst,
+      gmst,
       lat: sensor.lat,
       lon: sensor.lon,
     };

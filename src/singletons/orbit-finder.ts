@@ -80,6 +80,7 @@ export class OrbitFinder {
 
     if (this.goalAlt > 0) {
       const argPerCalcResults = this.argPerCalcLoop();
+
       if (argPerCalcResults !== PropagationResults.Success) {
         return ['Error', 'Failed to find a solution for Argument of Perigee'];
       }
@@ -98,8 +99,9 @@ export class OrbitFinder {
     for (let offset = 0; offset < 360 * 10; offset += 1) {
       // Start with this.argPer - 10 degrees
       let posVal = parseFloat(this.argPer) * 10 - 100 + offset;
+
       if (posVal > 360 * 10) {
-        posVal = posVal - 360 * 10;
+        posVal -= 360 * 10;
       }
       this.argPerCalcResults = this.argPerCalc(posVal.toString(), this.now);
 
@@ -125,7 +127,7 @@ export class OrbitFinder {
       this.meanACalcResults = this.meanACalcLoop2();
       if (this.meanACalcResults === PropagationResults.Success) {
         if (this.currentDirection !== this.goalDirection) {
-          offset = offset + 20;
+          offset += 20;
         } else if (this.argPerCalcResults === PropagationResults.Success) {
           break;
         }
@@ -135,6 +137,7 @@ export class OrbitFinder {
         return PropagationResults.Error;
       }
     }
+
     return this.argPerCalcResults;
   }
 
@@ -143,7 +146,7 @@ export class OrbitFinder {
       this.meanACalcResults = this.meanACalc(posVal, this.now);
       if (this.meanACalcResults === PropagationResults.Success) {
         if (this.currentDirection !== this.goalDirection) {
-          posVal = posVal + 20;
+          posVal += 20;
         } else {
           break;
         }
@@ -153,6 +156,7 @@ export class OrbitFinder {
         return PropagationResults.Error;
       }
     }
+
     return this.meanACalcResults;
   }
 
@@ -165,20 +169,25 @@ export class OrbitFinder {
     this.argPer = StringPad.pad0(this.sat.argOfPerigee.toFixed(4), 8);
     this.inc = StringPad.pad0(this.sat.inclination.toFixed(4), 8);
     this.ecen = this.sat.eccentricity.toFixed(7).substring(2, 9);
-    // Disregarding the first and second derivatives of mean motion
-    // Just keep whatever was in the original TLE
+    /*
+     * Disregarding the first and second derivatives of mean motion
+     * Just keep whatever was in the original TLE
+     */
     this.TLE1Ending = this.sat.tle1.substring(32, 71);
   }
 
   /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 520 Degrees */
   private meanACalcLoop(now: Date, goalDirection: string) {
     let result = PropagationResults.Near;
+
     for (let posVal = 0; posVal < 520 * 10; posVal += 1) {
       result = this.meanACalc(posVal, now);
       if (result === PropagationResults.Success) {
         if (this.currentDirection !== goalDirection) {
-          // Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
-          // This happens when the goal latitude is near the poles
+          /*
+           * Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
+           * This happens when the goal latitude is near the poles
+           */
           posVal += 20;
         } else {
           break; // Stop changing the Mean Anomaly
@@ -188,11 +197,13 @@ export class OrbitFinder {
         posVal += 100;
       }
     }
+
     return result;
   }
 
   private raanCalcLoop(raanOffset: number, now: Date) {
     let raanCalcResults = PropagationResults.Near;
+
     for (let posVal = 0; posVal < 520 * 100; posVal += 1) {
       // 520 degress in 0.01 increments TODO More precise?
       raanCalcResults = this.raanCalc(posVal, raanOffset, now);
@@ -203,6 +214,7 @@ export class OrbitFinder {
         posVal += 10 * 100;
       }
     }
+
     return raanCalcResults;
   }
 
@@ -216,7 +228,7 @@ export class OrbitFinder {
 
     let satrec = sat.satrec || Sgp4.createSatrec(sat.tle1, sat.tle2); // perform and store sat init calcs
 
-    meana = meana / 10;
+    meana /= 10;
     const meanaStr = StringPad.pad0(meana.toFixed(4), 8);
 
     const raan = StringPad.pad0(sat.rightAscension.toFixed(4), 8);
@@ -224,29 +236,33 @@ export class OrbitFinder {
     const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0(sat.argOfPerigee.toFixed(4), 8);
 
     const _TLE1Ending = sat.tle1.substring(32, 71);
-    const tle1 = '1 ' + sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + _TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const tle2 = '2 ' + sat.sccNum + ' ' + this.inc + ' ' + raan + ' ' + this.ecen + ' ' + argPe + ' ' + meanaStr + ' ' + this.meanmo + '    10';
+    const tle1 = `1 ${sat.sccNum}U ${this.intl} ${this.epochyr}${this.epochday}${_TLE1Ending}`; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const tle2 = `2 ${sat.sccNum} ${this.inc} ${raan} ${this.ecen} ${argPe} ${meanaStr} ${this.meanmo}    10`;
 
     satrec = Sgp4.createSatrec(tle1, tle2);
     const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.MeanAnomaly);
+
     if (results === PropagationResults.Success) {
       sat.tle1 = tle1 as TleLine1;
       sat.tle2 = tle2 as TleLine2;
       this.newMeana = meanaStr;
     }
+
     return results;
   }
 
   private getOrbitByLatLonPropagate(nowIn: Date, satrec: SatelliteRecord, type: PropagationOptions): PropagationResults {
     const { m, gmst } = SatMath.calculateTimeVariables(nowIn, satrec);
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+
     if (isNaN(positionEci.x) || isNaN(positionEci.y) || isNaN(positionEci.z)) {
       return PropagationResults.Error;
     }
     const gpos = eci2lla(positionEci, gmst);
 
-    let { lat: latDeg, lon: lonDeg, alt } = gpos;
+    const { lat: latDeg, lon: lonDeg, alt } = gpos;
     // Set it the first time
+
     this.lastLat = this.lastLat ? this.lastLat : latDeg;
 
     if (type === PropagationOptions.MeanAnomaly) {
@@ -265,29 +281,35 @@ export class OrbitFinder {
     }
 
     if (type === PropagationOptions.MeanAnomaly && latDeg > this.goalLat - OrbitFinder.MAX_LAT_ERROR && latDeg < this.goalLat + OrbitFinder.MAX_LAT_ERROR) {
-      // Debugging Code:
-      // const distance = Math.sqrt(
-      //   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
-      // );
-      // console.log('Distance from Origin: ' + distance);
+      /*
+       * Debugging Code:
+       * const distance = Math.sqrt(
+       *   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
+       * );
+       * console.log('Distance from Origin: ' + distance);
+       */
       return PropagationResults.Success;
     }
 
     if (type === PropagationOptions.RightAscensionOfAscendingNode && lonDeg > this.goalLon - OrbitFinder.MAX_LON_ERROR && lonDeg < this.goalLon + OrbitFinder.MAX_LON_ERROR) {
-      // Debugging Code:
-      // const distance = Math.sqrt(
-      //   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
-      // );
-      // console.log('Distance from Origin: ' + distance);
+      /*
+       * Debugging Code:
+       * const distance = Math.sqrt(
+       *   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
+       * );
+       * console.log('Distance from Origin: ' + distance);
+       */
       return PropagationResults.Success;
     }
 
     if (type === PropagationOptions.ArgumentOfPerigee && alt > this.goalAlt - OrbitFinder.MAX_ALT_ERROR && alt < this.goalAlt + OrbitFinder.MAX_ALT_ERROR) {
-      // Debugging Code:
-      // const distance = Math.sqrt(
-      //   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
-      // );
-      // console.log('Distance from Origin: ' + distance);
+      /*
+       * Debugging Code:
+       * const distance = Math.sqrt(
+       *   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
+       * );
+       * console.log('Distance from Origin: ' + distance);
+       */
       return PropagationResults.Success;
     }
 
@@ -317,7 +339,8 @@ export class OrbitFinder {
    */
   private raanCalc(raan: number, raanOffsetIn: number, now: Date): PropagationResults {
     const origRaan = raan;
-    raan = raan / 100;
+
+    raan /= 100;
     raan = raan > 360 ? raan - 360 : raan;
 
     const raanStr = StringPad.pad0(raan.toFixed(4), 8);
@@ -325,8 +348,8 @@ export class OrbitFinder {
     // If we adjusted argPe use the new one - otherwise use the old one
     const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0(this.sat.argOfPerigee.toFixed(4), 8);
 
-    const tle1 = '1 ' + this.sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + this.TLE1Ending; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const tle2 = '2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + raanStr + ' ' + this.ecen + ' ' + argPe + ' ' + this.newMeana + ' ' + this.meanmo + '    10';
+    const tle1 = `1 ${this.sat.sccNum}U ${this.intl} ${this.epochyr}${this.epochday}${this.TLE1Ending}`; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
+    const tle2 = `2 ${this.sat.sccNum} ${this.inc} ${raanStr} ${this.ecen} ${argPe} ${this.newMeana} ${this.meanmo}    10`;
 
     const satrec = Sgp4.createSatrec(tle1, tle2);
     const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.RightAscensionOfAscendingNode);
@@ -339,11 +362,12 @@ export class OrbitFinder {
 
       const _raanStr = StringPad.pad0(raan.toFixed(4), 8);
 
-      const _TLE2 = '2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + _raanStr + ' ' + this.ecen + ' ' + argPe + ' ' + this.newMeana + ' ' + this.meanmo + '    10';
+      const _TLE2 = `2 ${this.sat.sccNum} ${this.inc} ${_raanStr} ${this.ecen} ${argPe} ${this.newMeana} ${this.meanmo}    10`;
 
       this.sat.tle1 = tle1 as TleLine1;
       this.sat.tle2 = _TLE2 as TleLine2;
     }
+
     return results;
   }
 
@@ -355,22 +379,25 @@ export class OrbitFinder {
   argPerCalc(argPe: string, now: Date): PropagationResults {
     const meana = this.newMeana;
     const raan = StringPad.pad0(this.sat.rightAscension.toFixed(4), 8);
+
     argPe = StringPad.pad0((parseFloat(argPe) / 10).toFixed(4), 8);
 
     // Create the new TLEs
-    const tle1 = ('1 ' + this.sat.sccNum + 'U ' + this.intl + ' ' + this.epochyr + this.epochday + this.TLE1Ending) as TleLine1;
-    const tle2 = ('2 ' + this.sat.sccNum + ' ' + this.inc + ' ' + raan + ' ' + this.ecen + ' ' + argPe + ' ' + meana + ' ' + this.meanmo + '    10') as TleLine2;
+    const tle1 = (`1 ${this.sat.sccNum}U ${this.intl} ${this.epochyr}${this.epochday}${this.TLE1Ending}`) as TleLine1;
+    const tle2 = (`2 ${this.sat.sccNum} ${this.inc} ${raan} ${this.ecen} ${argPe} ${meana} ${this.meanmo}    10`) as TleLine2;
 
     // Calculate the orbit
     const satrec = Sgp4.createSatrec(tle1, tle2);
 
     // Check the orbit
     const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.ArgumentOfPerigee);
+
     if (results === PropagationResults.Success) {
       this.sat.tle1 = tle1;
       this.sat.tle2 = tle2;
       this.newArgPer = argPe;
     }
+
     return results;
   }
 }

@@ -10,6 +10,7 @@ import { standardPluginSuite } from './generic-tests';
 
 describe('TopMenu_class', () => {
   beforeEach(() => {
+    // eslint-disable-next-line guard-for-in
     for (const callback in keepTrackApi.events) {
       keepTrackApi.events[callback] = [];
     }
@@ -21,10 +22,12 @@ describe('TopMenu_class', () => {
   // Tests that sound button throws warning if sound plugin is not loaded
   it('test_sound_button_toggle_without_sound_plugin', () => {
     const topMenu = new TopMenu();
+
     topMenu.init();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
+
     errorManagerInstance.warn = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.SoundManager, null);
     soundBtn.click();
@@ -34,14 +37,17 @@ describe('TopMenu_class', () => {
   // Tests that sound button toggles sound on/off
   it('test_sound_button_toggle', () => {
     const topMenu = new TopMenu();
+
     topMenu.init();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;
+
     keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerPlugin);
     const soundManager = keepTrackApi.getSoundManager();
+
     soundBtn.click();
     expect(soundManager.isMute).toBe(true);
     expect(soundIcon.parentElement.classList.contains('bmenu-item-selected')).toBe(false);

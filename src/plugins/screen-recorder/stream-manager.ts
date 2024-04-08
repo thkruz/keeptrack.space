@@ -38,7 +38,7 @@ export class StreamManager {
     if (error.message.includes('Permission denied')) {
       errorManagerInstance.warn('Permission denied! Did you click "Share"?');
     } else {
-      errorManagerInstance.warn('Error:' + error);
+      errorManagerInstance.warn(`Error:${error}`);
     }
   }
 
@@ -54,23 +54,27 @@ export class StreamManager {
       if ('getDisplayMedia' in navigator) {
         return (navigator as any).getDisplayMedia(displayMediaOptions).catch((err: Error) => {
           StreamManager.handleError(err);
+
           return null;
         });
       } else if ('getDisplayMedia' in navigator.mediaDevices) {
         return navigator.mediaDevices.getDisplayMedia(displayMediaOptions as any).catch((err) => {
           StreamManager.handleError(err);
+
           return null;
         });
-      } else {
-        errorManagerInstance.warn('Compatibility Error with Recording');
-        this.onError_();
-        return false;
       }
-    } else {
-      errorManagerInstance.warn('No Recording Support in Http! Try Https!');
+      errorManagerInstance.warn('Compatibility Error with Recording');
       this.onError_();
+
       return false;
+
     }
+    errorManagerInstance.warn('No Recording Support in Http! Try Https!');
+    this.onError_();
+
+    return false;
+
   }
 
   handleDataAvailable(event: BlobEvent): void {
@@ -80,8 +84,12 @@ export class StreamManager {
   }
 
   stop(): void {
-    if (!this.mediaRecorder_) throw new Error('MediaRecorder is not initialized');
-    if (this.isVideoRecording == false) return; // Already stopped
+    if (!this.mediaRecorder_) {
+      throw new Error('MediaRecorder is not initialized');
+    }
+    if (this.isVideoRecording == false) {
+      return;
+    } // Already stopped
 
     errorManagerInstance.debug('Recorder stopped.');
 
@@ -99,6 +107,7 @@ export class StreamManager {
     const blob = new Blob(this.recordedBlobs, { type: this.supportedType });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
+
     a.style.display = 'none';
     a.href = url;
     a.download = name;
@@ -113,12 +122,14 @@ export class StreamManager {
   start(): void {
     this.getStream()
       .then((steam) => {
-        if (steam == false) return;
+        if (steam == false) {
+          return;
+        }
         this.isVideoRecording = true;
         this.stream_ = steam;
-        let types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
+        const types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
 
-        for (let i in types) {
+        for (const i in types) {
           if (window.MediaRecorder.isTypeSupported(types[i])) {
             this.supportedType = types[i];
             break;
@@ -127,7 +138,7 @@ export class StreamManager {
         if (this.supportedType == null) {
           errorManagerInstance.debug('No supported type found for MediaRecorder');
         }
-        let options = {
+        const options = {
           mimeType: this.supportedType,
           videoBitsPerSecond: this.videoBitsPerSec_ || StreamManager.BIT_RATE_30_MBPS,
         };
@@ -138,6 +149,7 @@ export class StreamManager {
         } catch (e) {
           this.onMinorError_();
           this.isVideoRecording = false;
+
           return;
         }
 

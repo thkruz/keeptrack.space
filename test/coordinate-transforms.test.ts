@@ -4,17 +4,17 @@ import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { DetailedSatellite } from 'ootk';
 
 /**
-Main functionalities:
-The CoordinateTransforms class provides static methods for converting between different coordinate systems used in satellite tracking. It includes methods for converting satellite position and velocity vectors from ECI to RIC reference frame, converting RAE (Right Ascension, Azimuth, Elevation) coordinates to ECEF (Earth-Centered, Earth-Fixed) coordinates, converting ECI coordinates to latitude, longitude and altitude, and converting ECI coordinates to RAE coordinates.
-
-Methods:
-- sat2ric(sat: SatObject, reference: SatObject): Converts satellite position and velocity vectors from ECI to RIC reference frame.
-- rae2ecf(az: Degrees, el: Degrees, rng: Kilometers, lat: Radians, lon: Radians, alt: Kilometers): Converts RAE coordinates to ECEF coordinates.
-- eci2lla(position: EciVec3, simulationTime: Date): Converts ECI coordinates to latitude, longitude and altitude.
-- eci2rae(now: Date, eci: EciArr3, sensor: SensorObject): Converts ECI coordinates to RAE coordinates.
-
-Fields:
-- None.
+ *Main functionalities:
+ *The CoordinateTransforms class provides static methods for converting between different coordinate systems used in satellite tracking. It includes methods for converting satellite position and velocity vectors from ECI to RIC reference frame, converting RAE (Right Ascension, Azimuth, Elevation) coordinates to ECEF (Earth-Centered, Earth-Fixed) coordinates, converting ECI coordinates to latitude, longitude and altitude, and converting ECI coordinates to RAE coordinates.
+ *
+ *Methods:
+ *- sat2ric(sat: SatObject, reference: SatObject): Converts satellite position and velocity vectors from ECI to RIC reference frame.
+ *- rae2ecf(az: Degrees, el: Degrees, rng: Kilometers, lat: Radians, lon: Radians, alt: Kilometers): Converts RAE coordinates to ECEF coordinates.
+ *- eci2lla(position: EciVec3, simulationTime: Date): Converts ECI coordinates to latitude, longitude and altitude.
+ *- eci2rae(now: Date, eci: EciArr3, sensor: SensorObject): Converts ECI coordinates to RAE coordinates.
+ *
+ *Fields:
+ *- None.
  */
 
 describe('CoordinateTransforms_class', () => {
@@ -38,6 +38,7 @@ describe('CoordinateTransforms_class', () => {
   it('test_sat2ric_null_input', () => {
     const sat = null;
     const reference = null;
+
     expect(() => CoordinateTransforms.sat2ric(sat, reference)).toThrow();
   });
 });

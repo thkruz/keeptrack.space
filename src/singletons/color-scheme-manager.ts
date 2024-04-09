@@ -675,6 +675,10 @@ export class ColorSchemeManager {
           break;
       }
 
+      if (keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1) {
+        color = this.colorTheme.inFOV;
+      }
+
       return {
         color,
         pickable: Pickable.Yes,

@@ -492,6 +492,20 @@ export class CatalogManager {
     }
 
     if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
+      this.objectCache[id] = new DetailedSatellite({
+        active: true,
+        name: `Analyst Sat ${id}`,
+        country: 'ANALSAT',
+        launchVehicle: 'Analyst Satellite',
+        launchSite: 'ANALSAT',
+        sccNum: sccNum || TLE1.substring(2, 7).trim().padStart(5, '0'),
+        tle1: TLE1 as TleLine1,
+        tle2: TLE2 as TleLine2,
+        intlDes: TLE1.substring(9, 17),
+        type: SpaceObjectType.PAYLOAD,
+        id,
+      });
+
       const m = {
         typ: CruncerMessageTypes.SAT_EDIT,
         id,
@@ -502,15 +516,11 @@ export class CatalogManager {
 
       this.satCruncher.postMessage(m);
       keepTrackApi.getOrbitManager().changeOrbitBufferData(id, TLE1, TLE2);
-      const sat = this.getObject(id) as DetailedSatellite;
+      const sat = this.objectCache[id] as DetailedSatellite;
 
       if (!sat.isSatellite()) {
         throw new Error(`Object ${id} is not a satellite!`);
       }
-
-      sat.active = true;
-      sat.type = SpaceObjectType.PAYLOAD; // Default to Satellite
-      sat.sccNum = sccNum || TLE1.substring(2, 7).trim().padStart(5, '0');
 
       return sat;
     }

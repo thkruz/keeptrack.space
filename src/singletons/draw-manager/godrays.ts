@@ -168,16 +168,16 @@ export class Godrays {
       out vec4 fragColor;
 
       void main() {
-        float decay=1.0;
-        float exposure=0.95;
-        float density=0.99;
-        float weight=0.035;
+        float decay=0.99;
+        float exposure=1.25;
+        float density=1.05;
+        float weight=0.075;
         float illuminationDecay = 1.0;
         vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);
         vec2 texCoord = v_texCoord;
 
         /// samples will describe the rays quality, you can play with
-        const int samples = 75;
+        const int samples = 45;
 
         vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
         deltaTexCoord *= 1.0 / float(samples) * density;

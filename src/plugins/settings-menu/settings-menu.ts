@@ -630,6 +630,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
     settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
+    if (settingsManager.isDrawSun) {
+      keepTrackApi.getScene().drawTimeArray = Array(150).fill(16);
+    }
     const isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
     const isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     const isDrawAuroraChanged = settingsManager.isDrawAurora !== (<HTMLInputElement>getEl('settings-drawAurora')).checked;

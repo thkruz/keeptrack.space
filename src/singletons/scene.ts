@@ -1,6 +1,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { GreenwichMeanSiderealTime } from 'ootk';
+import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
 import { Box } from './draw-manager/cube';
@@ -9,6 +11,7 @@ import { Godrays } from './draw-manager/godrays';
 import { Moon } from './draw-manager/moon';
 import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
+import { errorManagerInstance } from './errorManager';
 import { WebGLRenderer } from './webgl-renderer';
 
 export interface SceneParams {
@@ -64,16 +67,45 @@ export class Scene {
     this.renderTransparent(renderer, camera);
   }
 
+  averageDrawTime = 0;
+  drawTimeArray: number[] = Array(150).fill(16);
+
   renderBackground(renderer: WebGLRenderer, camera: Camera): void {
+    this.drawTimeArray.push(Math.min(100, renderer.dt));
+    if (this.drawTimeArray.length > 150) {
+      this.drawTimeArray.shift();
+    }
+    this.averageDrawTime = this.drawTimeArray.reduce((a, b) => a + b) / this.drawTimeArray.length;
+
+    if (
+      (!settingsManager.isDisableMoon ||
+      settingsManager.isDrawSun ||
+      settingsManager.isDrawAurora ||
+      settingsManager.isDrawMilkyWay) &&
+      !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
+      keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling some visual effects in settings.', 'caution');
+      settingsManager.isDisableMoon = true;
+      settingsManager.isDrawSun = false;
+      settingsManager.isDrawAurora = false;
+      settingsManager.isDrawMilkyWay = false;
+      // console.error('FPS: ', 1000 / this.averageDrawTime);
+      try {
+        SettingsMenuPlugin?.syncOnLoad();
+      } catch (error) {
+        errorManagerInstance.log(error);
+      }
+    }
+
     if (!settingsManager.isDrawLess) {
       if (settingsManager.isDrawSun) {
+
         // Draw the Sun to the Godrays Frame Buffer
         this.sun.draw(this.earth.lightDirection, this.frameBuffers.godrays);
 
         // Draw a black earth mesh on top of the sun in the godrays frame buffer
         this.earth.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
 
-        // Draw a black mesh on top of the sun in the godrays frame buffer
+        // Draw a black object mesh on top of the sun in the godrays frame buffer
         if (
           !settingsManager.modelsOnSatelliteViewOverride &&
           keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1 &&

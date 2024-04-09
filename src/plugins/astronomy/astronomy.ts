@@ -45,12 +45,17 @@ export class Astronomy extends KeepTrackPlugin {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const drawManagerInstance = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
+
     if (this.isMenuButtonActive) {
-      if (!this.verifySensorSelected()) return;
+      if (!this.verifySensorSelected()) {
+        return;
+      }
 
       if (catalogManagerInstance.isStarManagerLoaded) {
-        // TODO: This takes way too long trying to find the star's
-        // satellite id from its name. The ids should be predetermined.
+        /*
+         * TODO: This takes way too long trying to find the star's
+         * satellite id from its name. The ids should be predetermined.
+         */
         keepTrackApi.getStarManager().drawAllConstellations();
       }
       orbitManagerInstance.clearInViewOrbit();

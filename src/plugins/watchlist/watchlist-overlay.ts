@@ -35,17 +35,21 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
 
     if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
-      keepTrackApi.getUiManager().toast(`Add Satellites to Watchlist!`, 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', 'caution');
       shake(getEl('menu-info-overlay'));
+
       return;
     }
 
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     if (this.watchlistPlugin_.watchlistList.length === 0 && !this.watchlistPlugin_.isWatchlistChanged) {
-      keepTrackApi.getUiManager().toast(`Add Satellites to Watchlist!`, 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', 'caution');
       shake(getEl('menu-info-overlay'));
       this.nextPassArray = [];
+
       return;
     }
 
@@ -86,6 +90,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
       const sccNum = parseInt((<HTMLElement>evt.target).textContent.split(':')[0]);
       const id = catalogManagerInstance.sccNum2Id(sccNum);
+
       if (id !== null) {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
       }
@@ -114,9 +119,13 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   updateLoop() {
     this.updateNextPassOverlay_();
 
-    if (!keepTrackApi.getDotsManager().inViewData) return;
+    if (!keepTrackApi.getDotsManager().inViewData) {
+      return;
+    }
 
-    if (this.watchlistPlugin_.watchlistList.length <= 0) return;
+    if (this.watchlistPlugin_.watchlistList.length <= 0) {
+      return;
+    }
     this.updateFovLines_();
 
     for (const element of this.watchlistPlugin_.watchlistInViewList) {
@@ -132,7 +141,10 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       const satrec = Sgp4.createSatrec(sat.tle1, sat.tle2); // perform and store sat init calcs
       const rae = SatMath.getRae(keepTrackApi.getTimeManager().simulationTimeObj, satrec, sensor);
       const isInFov = SatMath.checkIsInView(sensor, rae);
-      if (!isInFov) continue;
+
+      if (!isInFov) {
+        continue;
+      }
       lineManagerInstance.create(LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
     }
   }
@@ -148,7 +160,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       lineManagerInstance.create(
         LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV,
         [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(keepTrackApi.getSensorManager().currentSensors[0].name)],
-        'g'
+        'g',
       );
       keepTrackApi.getOrbitManager().addInViewOrbit(this.watchlistPlugin_.watchlistList[i]);
     }
@@ -166,6 +178,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
     for (let i = 0; i < this.watchlistPlugin_.watchlistList.length; i++) {
       const sat = catalogManagerInstance.getSat(this.watchlistPlugin_.watchlistList[i]);
+
       if (sensorManagerInstance.currentSensors.length > 1) {
         this.updateFovLinesMulti_(sat, i);
       } else {
@@ -197,14 +210,13 @@ export class WatchlistOverlay extends KeepTrackPlugin {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         const satArray: DetailedSatellite[] = [];
+
         for (const id of this.watchlistPlugin_.watchlistList) {
           satArray.push(catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY));
         }
 
         this.nextPassArray = SensorMath.nextpassList(satArray, sensorManagerInstance.currentSensors, 1, this.OVERLAY_CALC_LENGTH_IN_DAYS);
-        this.nextPassArray.sort(function (a: { time: string | number | Date }, b: { time: string | number | Date }) {
-          return new Date(a.time).getTime() - new Date(b.time).getTime();
-        });
+        this.nextPassArray.sort((a: { time: string | number | Date }, b: { time: string | number | Date }) => new Date(a.time).getTime() - new Date(b.time).getTime());
 
         this.lastSimTimeWhenCalc = timeManager.simulationTimeObj.getTime();
         this.lastSensorId = sensorManagerInstance.currentSensors[0].id;
@@ -221,7 +233,10 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   private pushOverlayElement_(s: number, propTime: any, infoOverlayDOMHtmlStrArr: string[]) {
     const isSatInView = keepTrackApi.getDotsManager().inViewData[this.nextPassArray[s].sat.id];
     // If old time and not in view, skip it
-    if (this.nextPassArray[s].time.getTime() - propTime < -1000 * 60 * 5 && !isSatInView) return;
+
+    if (this.nextPassArray[s].time.getTime() - propTime < -1000 * 60 * 5 && !isSatInView) {
+      return;
+    }
 
     // Get the pass Time
     const time = dateFormat(this.nextPassArray[s].time, 'isoTime', true);
@@ -229,28 +244,37 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
     // Yellow - In View (Only one pass can be in view at a time)
     if (isSatInView === 1 && this.nextPassArray[s].time.getTime() - propTime < 1000 * 60 * 5) {
-      infoOverlayDOMHtmlStrArr.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: yellow">' + name + ': ' + time + '</h5></div>');
+      infoOverlayDOMHtmlStrArr.push(`<div class="row"><h5 class="center-align watchlist-object link" style="color: yellow">${name}: ${time}</h5></div>`);
+
       return;
     }
-    // Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time
-    // This makes recent objects stay at the top of the list in blue
+    /*
+     * Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time
+     * This makes recent objects stay at the top of the list in blue
+     */
     if (this.nextPassArray[s].time.getTime() - propTime < 1000 * 60 * 30 && propTime - this.nextPassArray[s].time.getTime() < 1000 * 60 * 10) {
-      infoOverlayDOMHtmlStrArr.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: #0095ff">' + name + ': ' + time + '</h5></div>');
+      infoOverlayDOMHtmlStrArr.push(`<div class="row"><h5 class="center-align watchlist-object link" style="color: #0095ff">${name}: ${time}</h5></div>`);
+
       return;
     }
     // White - Any future pass not fitting the above requirements
     if (this.nextPassArray[s].time.getTime() - propTime > 0) {
-      infoOverlayDOMHtmlStrArr.push('<div class="row"><h5 class="center-align watchlist-object link" style="color: white">' + name + ': ' + time + '</h5></div>');
+      infoOverlayDOMHtmlStrArr.push(`<div class="row"><h5 class="center-align watchlist-object link" style="color: white">${name}: ${time}</h5></div>`);
     }
   }
 
   private updateNextPassOverlay_(isForceUpdate = false) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    if (this.nextPassArray.length <= 0 && !this.isMenuButtonActive) return;
-    // TODO: This should auto update the overlay when the time changes outside the original search window
-    // Update once every 10 seconds
+    if (this.nextPassArray.length <= 0 && !this.isMenuButtonActive) {
+      return;
+    }
+    /*
+     * TODO: This should auto update the overlay when the time changes outside the original search window
+     * Update once every 10 seconds
+     */
     const mainCameraInstance = keepTrackApi.getMainCamera();
+
     if ((Date.now() > this.lastOverlayUpdateTime * 1 + 10000 && !mainCameraInstance.isDragging) || isForceUpdate) {
       this.infoOverlayDOMHtmlStrArr = [];
       this.infoOverlayDOMHtmlStrArr.push('<div>');

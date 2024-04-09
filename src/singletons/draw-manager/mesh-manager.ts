@@ -141,21 +141,47 @@ export class MeshManager {
     // TODO: Currently all named models aim at nadir - that isn't always true
 
     let newModel = null;
-    if (name.startsWith('STARLINK')) newModel = this.models.starlink;
-    if (name.startsWith('GLOBALSTAR')) newModel = this.models.globalstar;
-    if (name.startsWith('IRIDIUM')) newModel = this.models.iridium;
-    if (name.startsWith('ORBCOMM')) newModel = this.models.orbcomm;
-    if (RegExp(/SES\s\d+/u, 'u').exec(name)) newModel = this.models.ses;
-    if (name.startsWith('O3B')) newModel = this.models.o3b;
-    if (name.startsWith('NAVSTAR')) newModel = this.models.gps;
-    if (name.startsWith('GALILEO')) newModel = this.models.galileo;
-    if (name.includes('GLONASS')) newModel = this.models.glonass;
-    if (name.startsWith('SBIRS')) newModel = this.models.sbirs;
-    if (name.startsWith('FLOCK')) newModel = this.models.flock;
-    if (name.startsWith('LEMUR')) newModel = this.models.lemur;
+
+    if (name.startsWith('STARLINK')) {
+      newModel = this.models.starlink;
+    }
+    if (name.startsWith('GLOBALSTAR')) {
+      newModel = this.models.globalstar;
+    }
+    if (name.startsWith('IRIDIUM')) {
+      newModel = this.models.iridium;
+    }
+    if (name.startsWith('ORBCOMM')) {
+      newModel = this.models.orbcomm;
+    }
+    if (RegExp(/SES\s\d+/u, 'u').exec(name)) {
+      newModel = this.models.ses;
+    }
+    if (name.startsWith('O3B')) {
+      newModel = this.models.o3b;
+    }
+    if (name.startsWith('NAVSTAR')) {
+      newModel = this.models.gps;
+    }
+    if (name.startsWith('GALILEO')) {
+      newModel = this.models.galileo;
+    }
+    if (name.includes('GLONASS')) {
+      newModel = this.models.glonass;
+    }
+    if (name.startsWith('SBIRS')) {
+      newModel = this.models.sbirs;
+    }
+    if (name.startsWith('FLOCK')) {
+      newModel = this.models.flock;
+    }
+    if (name.startsWith('LEMUR')) {
+      newModel = this.models.lemur;
+    }
 
     if (newModel !== null) {
       this.currentMeshObject.model = newModel;
+
       return true;
     }
 
@@ -164,14 +190,23 @@ export class MeshManager {
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) {
     // Meshes aren't finished loading
-    if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
-    if (!this.isReady) return;
+    if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) {
+      return;
+    }
+    if (!this.isReady) {
+      return;
+    }
     // Don't draw meshes if the camera is too far away
-    if (keepTrackApi.getMainCamera().camDistBuffer >= settingsManager.nearZoomLevel) return;
-    if (typeof this.currentMeshObject.id == 'undefined' || typeof this.currentMeshObject.model == 'undefined' || this.currentMeshObject.id == -1) return;
+    if (keepTrackApi.getMainCamera().camDistBuffer >= settingsManager.nearZoomLevel) {
+      return;
+    }
+    if (typeof this.currentMeshObject.id === 'undefined' || typeof this.currentMeshObject.model === 'undefined' || this.currentMeshObject.id == -1) {
+      return;
+    }
 
     if (this.currentMeshObject.model === null) {
       errorManagerInstance.debug('Race Condition: Mesh Object Model is null');
+
       return;
     }
 
@@ -200,10 +235,16 @@ export class MeshManager {
   }
 
   drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
-    if (settingsManager.disableUI || settingsManager.isDrawLess) return;
+    if (settingsManager.disableUI || settingsManager.isDrawLess) {
+      return;
+    }
 
-    if (!this.currentMeshObject) return;
-    if (typeof this.currentMeshObject?.id == 'undefined' || this.currentMeshObject?.id == -1) return;
+    if (!this.currentMeshObject) {
+      return;
+    }
+    if (typeof this.currentMeshObject?.id === 'undefined' || this.currentMeshObject?.id == -1) {
+      return;
+    }
 
     const gl = this.gl_;
 
@@ -223,21 +264,25 @@ export class MeshManager {
 
       occlusionPrgm.attrOff();
     } catch {
-      return;
+      // Don't let meshManager break everything
     }
   }
 
-  // This is intentionally complex to reduce object creation and GC
-  // Splitting it into subfunctions would not be optimal
+  /*
+   * This is intentionally complex to reduce object creation and GC
+   * Splitting it into subfunctions would not be optimal
+   */
   getSatelliteModel(sat: DetailedSatellite) {
     if (this.checkIfNameKnown(sat.name)) {
       this.currentMeshObject.isRotationStable = true;
+
       return;
     }
 
     if (sat.sccNum === this.sccNumIss_) {
       this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.iss;
+
       return;
     }
 
@@ -248,18 +293,21 @@ export class MeshManager {
     if (sat.sccNum === this.sccNumTianhe_) {
       this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.iss;
+
       return;
     }
 
     if (this.sccNumAehf_.findIndex((num) => sat.sccNum == num) !== -1) {
       this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.aehf;
+
       return;
     }
 
     if (this.sccNumDsp_.findIndex((num) => sat.sccNum == num) !== -1) {
       this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.dsp;
+
       return;
     }
 
@@ -272,6 +320,7 @@ export class MeshManager {
         } else {
           this.currentMeshObject.model = this.models.spacebee1gen;
         }
+
         return;
       case 'Cubesat':
       case 'Cubesat 1U':
@@ -280,19 +329,24 @@ export class MeshManager {
         } else {
           this.currentMeshObject.model = this.models.s1u;
         }
+
         return;
       case 'Cubesat 2U':
         this.currentMeshObject.model = this.models.s2u;
+
         return;
       case 'Cubesat 3U':
       case 'Cubesat 3U+':
         this.currentMeshObject.model = this.models.s3u;
+
         return;
       case 'Cubesat 6U':
         this.currentMeshObject.model = this.models.s6u;
+
         return;
       case 'Cubesat 12U':
         this.currentMeshObject.model = this.models.s12u;
+
         return;
       case 'DSP':
       case 'DSP B14':
@@ -301,6 +355,7 @@ export class MeshManager {
       case 'DSP P2U':
       case 'DSP P2':
         this.currentMeshObject.model = this.models.dsp;
+
         return;
       case 'GPS':
       case 'GPS II':
@@ -308,13 +363,16 @@ export class MeshManager {
       case 'GPS IIF':
       case 'GPS IIR':
         this.currentMeshObject.model = this.models.gps;
+
         return;
       case 'Iridium':
         this.currentMeshObject.model = this.models.iridium;
+
         return;
       case 'ARROW':
         this.currentMeshObject.model = this.models.oneweb;
         this.currentMeshObject.isRotationStable = true;
+
         return;
       case 'Cubesat 1.5U':
       case 'Cubesat 0.5U':
@@ -327,12 +385,15 @@ export class MeshManager {
     switch (true) {
       case sat.rcs < 0.1 && sat.rcs > 0.04:
         this.currentMeshObject.model = this.models.s1u;
+
         return;
       case sat.rcs < 0.22 && sat.rcs >= 0.1:
         this.currentMeshObject.model = this.models.s2u;
+
         return;
       case sat.rcs < 0.33 && sat.rcs >= 0.22:
         this.currentMeshObject.model = this.models.s3u;
+
         return;
       default:
       // Generic Model
@@ -343,7 +404,9 @@ export class MeshManager {
 
   init(gl: WebGL2RenderingContext): void {
     try {
-      if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) return;
+      if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) {
+        return;
+      }
       this.gl_ = gl;
 
       this.meshList_ = settingsManager.meshListOverride.length > 0 ? settingsManager.meshListOverride : Object.keys(this.models).map((mesh) => mesh.toLowerCase());
@@ -359,11 +422,13 @@ export class MeshManager {
       SplashScreen.loadStr(SplashScreen.msg.models);
 
       OBJ.downloadModels(this.fileList_).then((models: MeshMap) => {
-        // DEBUG:
-        // for (var [name, mesh] of Object.entries(models)) {
-        //   console.debug('Name:', name);
-        //   console.debug('Mesh:', mesh);
-        // }
+        /*
+         * DEBUG:
+         * for (var [name, mesh] of Object.entries(models)) {
+         *   console.debug('Name:', name);
+         *   console.debug('Mesh:', mesh);
+         * }
+         */
         this.meshes_ = models;
         this.initShaders();
         this.initBuffers();
@@ -380,7 +445,9 @@ export class MeshManager {
   }
 
   update(selectedDate: Date, sat: DetailedSatellite | MissileObject) {
-    if (!sat.isSatellite() && !sat.isMissile()) return;
+    if (!sat.isSatellite() && !sat.isMissile()) {
+      return;
+    }
 
     this.updateModel_(selectedDate, sat);
 
@@ -398,6 +465,7 @@ export class MeshManager {
       const lookAtPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
 
       let up: vec3;
+
       if (sat.isSatellite()) {
         up = vec3.normalize(vec3.create(), drawPosition);
       } else {
@@ -408,9 +476,15 @@ export class MeshManager {
       mat4.targetTo(this.mvMatrix_, drawPosition, lookAtPos, up);
     }
 
-    if (this.currentMeshObject.rotation?.x) mat4.rotateX(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.x * DEG2RAD);
-    if (this.currentMeshObject.rotation?.y) mat4.rotateY(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.y * DEG2RAD);
-    if (this.currentMeshObject.rotation?.z) mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.z * DEG2RAD);
+    if (this.currentMeshObject.rotation?.x) {
+      mat4.rotateX(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.x * DEG2RAD);
+    }
+    if (this.currentMeshObject.rotation?.y) {
+      mat4.rotateY(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.y * DEG2RAD);
+    }
+    if (this.currentMeshObject.rotation?.z) {
+      mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.z * DEG2RAD);
+    }
 
     // Allow Manual Rotation of Meshes
     mat4.rotateX(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.x * DEG2RAD);
@@ -426,12 +500,17 @@ export class MeshManager {
     try {
       this.currentMeshObject.id = typeof obj?.id !== 'undefined' ? obj.id : -1;
 
-      if (typeof this.currentMeshObject.id == 'undefined' || this.currentMeshObject.id == -1) return;
-      if (settingsManager.modelsOnSatelliteViewOverride) return;
+      if (typeof this.currentMeshObject.id === 'undefined' || this.currentMeshObject.id == -1) {
+        return;
+      }
+      if (settingsManager.modelsOnSatelliteViewOverride) {
+        return;
+      }
 
       this.updatePosition(obj.position);
 
       const pos = new Vector3D(obj.position.x, obj.position.y, obj.position.z);
+
       this.currentMeshObject.inSun = Sun.lightingRatio(pos, Sun.position(EpochUTC.fromDateTime(selectedDate)));
       this.currentMeshObject.isRotationStable = null;
 
@@ -441,6 +520,7 @@ export class MeshManager {
           settingsManager.meshOverride = null;
         } else {
           this.currentMeshObject.model = this.models[settingsManager.meshOverride];
+
           return;
         }
       }
@@ -449,13 +529,16 @@ export class MeshManager {
         this.getMislModel_(obj as MissileObject);
       } else {
         const sat = obj as DetailedSatellite;
+
         switch (sat.type) {
           case SpaceObjectType.PAYLOAD:
             this.getSatelliteModel(sat);
+
             return;
           case SpaceObjectType.ROCKET_BODY:
             // TODO: Add more rocket body models
             this.currentMeshObject.model = this.models.rocketbody;
+
             return;
           case SpaceObjectType.DEBRIS:
             // TODO: Add more debris models
@@ -468,6 +551,7 @@ export class MeshManager {
             } else {
               this.currentMeshObject.model = this.models.debris0;
             }
+
             return;
           default:
             // Generic Model
@@ -485,14 +569,19 @@ export class MeshManager {
     // After max alt it looks like an RV
     if (!misl.isGoingUp() && misl.lastTime > 20) {
       this.currentMeshObject.model = this.models.rv;
+
       return;
     }
 
-    // Otherwise pick a random missile model, but use the
-    // name so that it stays consistent between draws
+    /*
+     * Otherwise pick a random missile model, but use the
+     * name so that it stays consistent between draws
+     */
     const lastNumberInName = RegExp(/\d+$/u, 'u').exec(misl.name);
+
     if (lastNumberInName) {
       const number = parseInt(lastNumberInName[0]);
+
       if (number <= 2) {
         this.currentMeshObject.model = this.models.misl;
       } else if (number <= 4) {
@@ -513,19 +602,22 @@ export class MeshManager {
     this.currentMeshObject.position.x = targetPosition.x;
     this.currentMeshObject.position.y = targetPosition.y;
     this.currentMeshObject.position.z = targetPosition.z;
-    return;
+
   }
 
   private applyAttributePointers_(model: any) {
     const gl = this.gl_;
     const layout = model.mesh.vertexBuffer.layout;
+
     for (const attrName in this.attribs_) {
       if (!Object.prototype.hasOwnProperty.call(this.attribs_, attrName) || this.attrIndices_[attrName] == -1) {
         continue;
       }
       const layoutKey = this.attribs_[attrName];
+
       if (typeof this.attrIndices_[attrName] !== 'undefined' && this.attrIndices_[attrName] != -1) {
         const attr = layout.attributeMap[layoutKey];
+
         gl.vertexAttribPointer(this.attrIndices_[attrName], attr.size, gl[attr.type], attr.normalized, attr.stride, attr.offset);
       }
     }
@@ -533,6 +625,7 @@ export class MeshManager {
 
   private changeVertexAttribArrays(enable: boolean) {
     const gl = this.gl_;
+
     for (const attrName in this.attribs_) {
       if (!Object.prototype.hasOwnProperty.call(this.attribs_, attrName)) {
         continue;
@@ -545,7 +638,7 @@ export class MeshManager {
           gl.disableVertexAttribArray(this.attrIndices_[attrName]);
         }
       } else if (this.numOfWarnings_ < 10) {
-        console.warn('Shader attribute "' + attrName + '" not found in shader. Is it undeclared or unused in the shader code?');
+        console.warn(`Shader attribute "${attrName}" not found in shader. Is it undeclared or unused in the shader code?`);
         this.numOfWarnings_++;
       }
     }
@@ -556,13 +649,16 @@ export class MeshManager {
     const layout = new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
 
     // initialize the mesh's buffers
+    // eslint-disable-next-line guard-for-in
     for (const mesh in this.meshes_) {
       try {
         // Create the vertex buffer for this mesh
         const vertexBuffer = <any>gl.createBuffer();
+
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
         const vertexData = this.meshes_[mesh].makeBufferData(layout);
+
         gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
         vertexBuffer.numItems = vertexData.numItems;
         vertexBuffer.layout = layout;
@@ -570,23 +666,31 @@ export class MeshManager {
 
         // Create the index buffer for this mesh
         const indexBuffer = <any>gl.createBuffer();
+
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         const indexData = this.meshes_[mesh].makeIndexBufferDataForMaterials(...Object.values(this.meshes_[mesh].materialIndices));
+
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
         indexBuffer.numItems = indexData.numItems;
         this.meshes_[mesh].indexBuffer = indexBuffer;
 
-        // this loops through the mesh names and creates new
-        // model objects and setting their mesh to the current mesh
+        /*
+         * this loops through the mesh names and creates new
+         * model objects and setting their mesh to the current mesh
+         */
         this.models[mesh] = {
           id: -1,
           mesh: this.meshes_[mesh],
         };
-        // DEBUG:
-        // this.models[mesh].size = this.sizeInfo[mesh];
+        /*
+         * DEBUG:
+         * this.models[mesh].size = this.sizeInfo[mesh];
+         */
       } catch (error) {
-        // DEBUG:
-        // console.warn(error);
+        /*
+         * DEBUG:
+         * console.warn(error);
+         */
       }
     }
   }
@@ -594,13 +698,15 @@ export class MeshManager {
   private initShaders() {
     const gl = this.gl_;
 
-    let fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    let fragCode = this.shader_.frag;
+    const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+    const fragCode = this.shader_.frag;
+
     gl.shaderSource(fragShader, fragCode);
     gl.compileShader(fragShader);
 
-    let vertShader = gl.createShader(gl.VERTEX_SHADER);
-    let vertCode = this.shader_.vert;
+    const vertShader = gl.createShader(gl.VERTEX_SHADER);
+    const vertCode = this.shader_.vert;
+
     gl.shaderSource(vertShader, vertCode);
     gl.compileShader(vertShader);
 

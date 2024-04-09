@@ -56,6 +56,7 @@ export class PersistenceManager {
     if (!PersistenceManager.instance_) {
       PersistenceManager.instance_ = new PersistenceManager();
     }
+
     return PersistenceManager.instance_;
   }
 
@@ -74,9 +75,11 @@ export class PersistenceManager {
     PersistenceManager.verifyKey_(key);
 
     const value = this.storage_.getItem(key);
+
     if (value === null) {
       return null;
     }
+
     return value;
   }
 

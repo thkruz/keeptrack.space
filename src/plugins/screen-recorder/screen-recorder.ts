@@ -12,6 +12,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
     if (this.isCompatibilityIssue) {
       errorManagerInstance.warn('Recording unavailable due to compatibility issues!');
       this.shakeBottomIcon();
+
       return;
     }
 
@@ -40,6 +41,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
 
   constructor() {
     const PLUGIN_NAME = 'Screen Recorder';
+
     super(PLUGIN_NAME);
   }
 

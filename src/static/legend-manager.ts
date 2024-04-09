@@ -86,7 +86,10 @@ export abstract class LegendManager {
 
   static change(menu: string) {
     const legendHoverDom = getEl('legend-hover-menu');
-    if (!legendHoverDom) return;
+
+    if (!legendHoverDom) {
+      return;
+    }
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -106,6 +109,7 @@ export abstract class LegendManager {
 
   static legendColorsChange(): void {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     colorSchemeManagerInstance.resetObjectTypeFlags();
 
     try {
@@ -119,9 +123,13 @@ export abstract class LegendManager {
   private static setColors_(colorSchemeManagerInstance: ColorSchemeManager) {
     LegendManager.legendClassList.forEach((selector) => {
       const elementFromClass = document.querySelector(selector);
+
       if (elementFromClass && settingsManager.colors) {
         const rgba = settingsManager.colors[selector.split('-')[1]];
-        if (!rgba) return;
+
+        if (!rgba) {
+          return;
+        }
         (<HTMLElement>elementFromClass).style.background = rgbCss(rgba);
       }
       colorSchemeManagerInstance.objectTypeFlags[selector.split('-')[1]] = true;
@@ -132,6 +140,7 @@ export abstract class LegendManager {
     const velocitySlowClass = <HTMLElement>document.querySelector('.legend-velocitySlow-box');
     const velocityMedClass = <HTMLElement>document.querySelector('.legend-velocityMed-box');
     const velocityFastClass = <HTMLElement>document.querySelector('.legend-velocityFast-box');
+
     if (velocitySlowClass) {
       velocitySlowClass.style.background = rgbCss([1, 0, 0, 1]);
     }

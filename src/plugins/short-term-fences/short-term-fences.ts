@@ -29,7 +29,7 @@ export class ShortTermFences extends KeepTrackPlugin {
   // isIconDisabledOnLoad = true;
   isAddStfLinksOnce = false;
 
-  helpTitle = `Short Term Fences (STF) Menu`;
+  helpTitle = 'Short Term Fences (STF) Menu';
   helpBody = keepTrackApi.html`The Short Term Fences (STF) Menu is used for visualizing sensor search boxes.
   <br><br>
   This is unlikely to be very helpful unless you own/operate a sensor with a search box functionality.`;
@@ -107,7 +107,7 @@ export class ShortTermFences extends KeepTrackPlugin {
             keepTrackApi.html`
             <div id="stf-on-object-link" class="link sat-infobox-links" data-position="top" data-delay="50"
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
-            `
+            `,
           );
           getEl('stf-on-object-link').addEventListener('click', this.stfOnObjectLinkClick.bind(this));
           this.isAddStfLinksOnce = true;
@@ -143,6 +143,7 @@ export class ShortTermFences extends KeepTrackPlugin {
           const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
 
           let azExtDeg = parseFloat((<HTMLInputElement>getEl('stf-azExt')).value);
+
           if (azExtDeg > 80) {
             azExtDeg = 80;
             (<HTMLInputElement>getEl('stf-azExt')).value = azExtDeg.toFixed(1);
@@ -155,11 +156,12 @@ export class ShortTermFences extends KeepTrackPlugin {
             EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
             rng as Kilometers,
             ((centerAz + azExtDeg / 2) * DEG2RAD) as Radians,
-            (centerEl * DEG2RAD) as Radians
+            (centerEl * DEG2RAD) as Radians,
           ).position(siteJ2000);
 
           // Calculate the distance between the two points
-          const azKm = Math.sqrt(Math.pow(pt1.x - pt2.x, 2) + Math.pow(pt1.y - pt2.y, 2) + Math.pow(pt1.z - pt2.z, 2));
+          const azKm = Math.sqrt((pt1.x - pt2.x) ** 2 + (pt1.y - pt2.y) ** 2 + (pt1.z - pt2.z) ** 2);
+
           (<HTMLInputElement>getEl('stf-azExtKm')).value = azKm.toFixed(1);
         });
         getEl('stf-elExt').addEventListener('blur', () => {
@@ -168,6 +170,7 @@ export class ShortTermFences extends KeepTrackPlugin {
           const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
 
           let elExtDeg = parseFloat((<HTMLInputElement>getEl('stf-elExt')).value);
+
           if (elExtDeg > 80) {
             elExtDeg = 80;
             (<HTMLInputElement>getEl('stf-elExt')).value = elExtDeg.toFixed(1);
@@ -180,11 +183,12 @@ export class ShortTermFences extends KeepTrackPlugin {
             EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
             rng as Kilometers,
             (centerAz * DEG2RAD) as Radians,
-            ((centerEl + elExtDeg / 2) * DEG2RAD) as Radians
+            ((centerEl + elExtDeg / 2) * DEG2RAD) as Radians,
           ).position(siteJ2000);
 
           // Calculate the distance between the two points
-          const elKm = Math.sqrt(Math.pow(pt1.x - pt2.x, 2) + Math.pow(pt1.y - pt2.y, 2) + Math.pow(pt1.z - pt2.z, 2));
+          const elKm = Math.sqrt((pt1.x - pt2.x) ** 2 + (pt1.y - pt2.y) ** 2 + (pt1.z - pt2.z) ** 2);
+
           (<HTMLInputElement>getEl('stf-elExtKm')).value = elKm.toFixed(1);
         });
       },
@@ -218,7 +222,9 @@ export class ShortTermFences extends KeepTrackPlugin {
   }
 
   onSubmit() {
-    if (!this.verifySensorSelected()) return;
+    if (!this.verifySensorSelected()) {
+      return;
+    }
 
     // Multiply everything by 1 to convert string to number
     const az = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
@@ -266,6 +272,7 @@ export class ShortTermFences extends KeepTrackPlugin {
       })
     ) {
       errorManagerInstance.warn('STF is not in view of the sensor!');
+
       return;
     }
 
@@ -275,8 +282,13 @@ export class ShortTermFences extends KeepTrackPlugin {
 
   stfOnObjectLinkClick() {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
-    if (!this.verifySensorSelected()) return;
-    if (!this.verifySatelliteSelected()) return;
+
+    if (!this.verifySensorSelected()) {
+      return;
+    }
+    if (!this.verifySatelliteSelected()) {
+      return;
+    }
 
     const now = keepTrackApi.getTimeManager().simulationTimeObj;
     const rae = eci2rae(now, this.selectSatManager_.primarySatObj.position, sensorManagerInstance.currentSensors[0]);

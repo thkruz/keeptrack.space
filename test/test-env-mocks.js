@@ -67,7 +67,9 @@ class RequestAnimationFrameMockSession {
 
   requestAnimationFrame(callback) {
     const handle = this.handleCounter++;
+
     this.queue.set(handle, callback);
+
     return handle;
   }
 
@@ -77,7 +79,10 @@ class RequestAnimationFrameMockSession {
 
   triggerNextAnimationFrame(time = performance.now()) {
     const nextEntry = this.queue.entries().next().value;
-    if (typeof nextEntry === 'undefined') return;
+
+    if (typeof nextEntry === 'undefined') {
+      return;
+    }
 
     const [nextHandle, nextCallback] = nextEntry;
 
@@ -86,7 +91,9 @@ class RequestAnimationFrameMockSession {
   }
 
   triggerAllAnimationFrames(time = performance.now()) {
-    while (this.queue.size > 0) this.triggerNextAnimationFrame(time);
+    while (this.queue.size > 0) {
+      this.triggerNextAnimationFrame(time);
+    }
   }
 
   reset() {

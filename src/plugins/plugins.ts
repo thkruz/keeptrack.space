@@ -29,12 +29,14 @@ import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitReferences } from './orbit-references/orbit-references';
 import { Planetarium } from './planetarium/planetarium';
-// import { ecfPlotsPlugin } from './plot-analysis/ecf-plots';
-// import { eciPlotsPlugin } from './plot-analysis/eci-plots';
-// import { inc2AltPlotPlugin } from './plot-analysis/inc2alt';
-// import { inc2LonPlotPlugin } from './plot-analysis/inc2lon';
-// import { ricPlotPlugin } from './plot-analysis/ric-plots';
-// import { time2LonPlotsPlugin } from './plot-analysis/time2lon';
+/*
+ * import { ecfPlotsPlugin } from './plot-analysis/ecf-plots';
+ * import { eciPlotsPlugin } from './plot-analysis/eci-plots';
+ * import { inc2AltPlotPlugin } from './plot-analysis/inc2alt';
+ * import { inc2LonPlotPlugin } from './plot-analysis/inc2lon';
+ * import { ricPlotPlugin } from './plot-analysis/ric-plots';
+ * import { time2LonPlotsPlugin } from './plot-analysis/time2lon';
+ */
 import { satConstellationsPlugin } from './sat-constellations/sat-constellations';
 import { SatelliteFov } from './satellite-fov/satellite-fov';
 import { satellitePhotosPlugin } from './satellite-photos/satellite-photos';
@@ -118,7 +120,9 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
   try {
     loadCorePlugins_(plugins);
 
-    if (plugins.classificationBar) new ClassificationBar().init();
+    if (plugins.classificationBar) {
+      new ClassificationBar().init();
+    }
     if (plugins.sensor) {
       new SensorListPlugin().init();
       new SensorInfoPlugin().init();
@@ -130,46 +134,112 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
       new WatchlistPlugin().init();
       new WatchlistOverlay().init();
     }
-    if (plugins.nextLaunch) new NextLaunchesPlugin().init();
-    if (plugins.findSat) new FindSatPlugin().init();
-    if (plugins.shortTermFences) new ShortTermFences().init();
-    if (plugins.orbitReferences) new OrbitReferences().init();
-    if (plugins.collisions) new Collissions().init();
-    if (plugins.breakup) new Breakup().init();
-    if (plugins.debrisScreening) new DebrisScreening().init();
-    if (plugins.editSat) new EditSat().init();
-    if (plugins.newLaunch) new NewLaunch().init();
-    if (plugins.missile) missile.init();
-    if (plugins.stereoMap) new StereoMap().init();
-    if (plugins.sensorFov) new SensorFov().init();
-    if (plugins.sensorSurv) new SensorSurvFence().init();
-    if (plugins.satelliteView) new SatelliteViewPlugin().init();
-    if (plugins.satelliteFov) new SatelliteFov().init();
-    if (plugins.planetarium) new Planetarium().init();
+    if (plugins.nextLaunch) {
+      new NextLaunchesPlugin().init();
+    }
+    if (plugins.findSat) {
+      new FindSatPlugin().init();
+    }
+    if (plugins.shortTermFences) {
+      new ShortTermFences().init();
+    }
+    if (plugins.orbitReferences) {
+      new OrbitReferences().init();
+    }
+    if (plugins.collisions) {
+      new Collissions().init();
+    }
+    if (plugins.breakup) {
+      new Breakup().init();
+    }
+    if (plugins.debrisScreening) {
+      new DebrisScreening().init();
+    }
+    if (plugins.editSat) {
+      new EditSat().init();
+    }
+    if (plugins.newLaunch) {
+      new NewLaunch().init();
+    }
+    if (plugins.missile) {
+      missile.init();
+    }
+    if (plugins.stereoMap) {
+      new StereoMap().init();
+    }
+    if (plugins.sensorFov) {
+      new SensorFov().init();
+    }
+    if (plugins.sensorSurv) {
+      new SensorSurvFence().init();
+    }
+    if (plugins.satelliteView) {
+      new SatelliteViewPlugin().init();
+    }
+    if (plugins.satelliteFov) {
+      new SatelliteFov().init();
+    }
+    if (plugins.planetarium) {
+      new Planetarium().init();
+    }
     // TODO: Fix astronomy plugin
-    if (plugins.astronomy) new Astronomy().init();
-    if (plugins.nightToggle) new NightToggle().init();
-    if (plugins.dops) dopsPlugin.init();
-    if (plugins.constellations) satConstellationsPlugin.init();
-    if (plugins.countries) countriesMenuPlugin.init();
-    if (plugins.colorsMenu) colorMenuPlugin.init();
-    if (plugins.screenshot) screenshotPlugin.init();
-    if (plugins.launchCalendar) launchCalendarPlugin.init();
-    if (plugins.timeMachine) timeMachinePlugin.init();
-    if (plugins.photoManager) satellitePhotosPlugin.init();
-    if (plugins.screenRecorder) screenRecorderPlugin.init();
-    if (plugins.analysis) analysisMenuPlugin.init();
-    // if (plugins.plotAnalysis) eciPlotsPlugin.init();
-    // if (plugins.plotAnalysis) ecfPlotsPlugin.init();
-    // if (plugins.plotAnalysis) ricPlotPlugin.init();
-    // if (plugins.plotAnalysis) time2LonPlotsPlugin.init();
-    // if (plugins.plotAnalysis) inc2AltPlotPlugin.init();
-    // if (plugins.plotAnalysis) inc2LonPlotPlugin.init();
-    // if (plugins.aboutManager) aboutMenuPlugin.init();
-    if (plugins.settingsMenu) settingsMenuPlugin.init();
-    if (plugins.soundManager) soundManagerPlugin.init();
-    if (plugins.gamepad) gamepadPluginInstance.init();
-    if (plugins.videoDirector) videoDirectorPlugin.init();
+    if (plugins.astronomy) {
+      new Astronomy().init();
+    }
+    if (plugins.nightToggle) {
+      new NightToggle().init();
+    }
+    if (plugins.dops) {
+      dopsPlugin.init();
+    }
+    if (plugins.constellations) {
+      satConstellationsPlugin.init();
+    }
+    if (plugins.countries) {
+      countriesMenuPlugin.init();
+    }
+    if (plugins.colorsMenu) {
+      colorMenuPlugin.init();
+    }
+    if (plugins.screenshot) {
+      screenshotPlugin.init();
+    }
+    if (plugins.launchCalendar) {
+      launchCalendarPlugin.init();
+    }
+    if (plugins.timeMachine) {
+      timeMachinePlugin.init();
+    }
+    if (plugins.photoManager) {
+      satellitePhotosPlugin.init();
+    }
+    if (plugins.screenRecorder) {
+      screenRecorderPlugin.init();
+    }
+    if (plugins.analysis) {
+      analysisMenuPlugin.init();
+    }
+    /*
+     * if (plugins.plotAnalysis) eciPlotsPlugin.init();
+     * if (plugins.plotAnalysis) ecfPlotsPlugin.init();
+     * if (plugins.plotAnalysis) ricPlotPlugin.init();
+     * if (plugins.plotAnalysis) time2LonPlotsPlugin.init();
+     * if (plugins.plotAnalysis) inc2AltPlotPlugin.init();
+     * if (plugins.plotAnalysis) inc2LonPlotPlugin.init();
+     * if (plugins.aboutManager) aboutMenuPlugin.init();
+     */
+    if (plugins.settingsMenu) {
+      settingsMenuPlugin.init();
+    }
+    if (plugins.soundManager) {
+      soundManagerPlugin.init();
+    }
+    if (plugins.gamepad) {
+      gamepadPluginInstance.init();
+    }
+    if (plugins.videoDirector) {
+      videoDirectorPlugin.init();
+    }
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
@@ -179,32 +249,48 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
       },
     });
   } catch (e) {
-    errorManagerInstance.info('Error loading core plugins:' + e.message);
+    errorManagerInstance.info(`Error loading core plugins:${e.message}`);
   }
 };
 
 const loadCorePlugins_ = (plugins: KeepTrackPlugins) => {
-  if (plugins.debug) new DebugMenuPlugin().init();
+  if (plugins.debug) {
+    new DebugMenuPlugin().init();
+  }
   new SelectSatManager().init();
 
-  if (plugins.topMenu) new TopMenu().init();
-  if (plugins.satInfoboxCore) new SatInfoBox().init();
-  if (plugins.datetime) new DateTimeManager().init();
-  if (plugins.social) new SocialMedia().init();
+  if (plugins.topMenu) {
+    new TopMenu().init();
+  }
+  if (plugins.satInfoboxCore) {
+    new SatInfoBox().init();
+  }
+  if (plugins.datetime) {
+    new DateTimeManager().init();
+  }
+  if (plugins.social) {
+    new SocialMedia().init();
+  }
 };
+
 export const uiManagerFinal = (plugins: any): void => {
   const bicDom = getEl('bottom-icons-container');
+
   if (bicDom) {
     const bottomHeight = bicDom.offsetHeight;
-    document.documentElement.style.setProperty('--bottom-menu-height', bottomHeight + 'px');
+
+    document.documentElement.style.setProperty('--bottom-menu-height', `${bottomHeight}px`);
   } else {
     document.documentElement.style.setProperty('--bottom-menu-height', '0px');
   }
 
   if (plugins.topMenu) {
     let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--nav-bar-height').replace('px', ''));
-    if (isNaN(topMenuHeight)) topMenuHeight = 0;
-    document.documentElement.style.setProperty('--nav-bar-height', topMenuHeight + 50 + 'px');
+
+    if (isNaN(topMenuHeight)) {
+      topMenuHeight = 0;
+    }
+    document.documentElement.style.setProperty('--nav-bar-height', `${topMenuHeight + 50}px`);
   }
 
   if (getEl('bottom-icons') && getEl('bottom-icons').innerText == '') {
@@ -215,9 +301,11 @@ export const uiManagerFinal = (plugins: any): void => {
   }
 
   const bottomContainer = getEl('bottom-icons-container');
+
   if (bottomContainer) {
     const bottomHeight = bottomContainer.offsetHeight;
-    document.documentElement.style.setProperty('--bottom-menu-top', bottomHeight + 'px');
+
+    document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
   }
 
   if (plugins.aboutManager) {
@@ -233,6 +321,7 @@ export const uiManagerFinal = (plugins: any): void => {
     const step = 0.15;
     const pos = dom.scrollTop;
     const nextPos = pos + step * deltaY;
+
     dom.scrollTop = nextPos;
   };
 
@@ -242,23 +331,25 @@ export const uiManagerFinal = (plugins: any): void => {
       event.preventDefault();
       wheel(event.currentTarget, event.deltaY);
     },
-    { passive: false }
+    { passive: false },
   );
 };
 
 /* istanbul ignore next */
 export const startGoogleAnalytics = (): void => {
   const newScript = document.createElement('script');
+
   newScript.type = 'text/javascript';
   newScript.setAttribute('async', 'true');
   newScript.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7');
   document.documentElement.firstChild.appendChild(newScript);
   window.dataLayer = window.dataLayer || [];
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   const gtag = function (_a?: string, _b?: any): void {
     // eslint-disable-next-line prefer-rest-params
     window.dataLayer.push(arguments);
   };
+
   gtag('js', new Date());
   gtag('config', 'G-ENHWK6L0X7');
 };

@@ -39,6 +39,8 @@ export class UiGeolocation {
 
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     const mainCameraInstance = keepTrackApi.getMainCamera();
+
+    // eslint-disable-next-line no-unused-expressions
     maxrange > 6000 ? mainCameraInstance.changeZoom(ZoomValue.GEO) : mainCameraInstance.changeZoom(ZoomValue.LEO);
     mainCameraInstance.camSnap(lat2pitch(lat), lon2yaw(lon, timeManagerInstance.simulationTimeObj));
   }
@@ -53,27 +55,39 @@ export class UiGeolocation {
     settingsManager.geolocation.maxel = <Degrees>90;
     settingsManager.geolocation.minrange = <Kilometers>0;
     settingsManager.geolocation.maxrange = <Kilometers>100000;
+
     return settingsManager.geolocation;
   }
 
   static useCurrentGeolocationAsSensor() {
     if (location.protocol === 'https:' && !settingsManager.geolocationUsed && settingsManager.isMobileModeEnabled) {
-      // Access to the users geolocation is explicitly for allowing them to use the
-      // lat lon information when creating a custom sensor.
+      /*
+       * Access to the users geolocation is explicitly for allowing them to use the
+       * lat lon information when creating a custom sensor.
+       */
       navigator.geolocation.getCurrentPosition(UiGeolocation.updateSensorPosition);
     }
   }
 
   private static updateCustomSensorUi_(): void {
-    if (!settingsManager.geolocation) throw new Error('geolocation is not defined');
-    if (typeof settingsManager.geolocation.lat !== 'number') throw new Error('geolocation.lat is not valid');
-    if (typeof settingsManager.geolocation.lon !== 'number') throw new Error('geolocation.lon is not valid');
-    if (typeof settingsManager.geolocation.alt !== 'number') throw new Error('geolocation.alt is not valid');
+    if (!settingsManager.geolocation) {
+      throw new Error('geolocation is not defined');
+    }
+    if (typeof settingsManager.geolocation.lat !== 'number') {
+      throw new Error('geolocation.lat is not valid');
+    }
+    if (typeof settingsManager.geolocation.lon !== 'number') {
+      throw new Error('geolocation.lon is not valid');
+    }
+    if (typeof settingsManager.geolocation.alt !== 'number') {
+      throw new Error('geolocation.alt is not valid');
+    }
 
     try {
       const csLat = <HTMLInputElement>getEl('cs-lat');
       const csLon = <HTMLInputElement>getEl('cs-lon');
       const csHei = <HTMLInputElement>getEl('cs-hei');
+
       csLat.value = settingsManager.geolocation.lat.toString();
       csLat.dispatchEvent(new Event('change'));
       csLon.value = settingsManager.geolocation.lon.toString();

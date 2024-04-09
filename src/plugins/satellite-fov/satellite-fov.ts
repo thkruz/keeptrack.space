@@ -100,12 +100,15 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     if (fovStr.value === '') {
       errorManagerInstance.warn('No Satellite FOV value entered. Using default value of 30 degrees.');
+
       return 30;
     }
 
     const fov = parseFloat(fovStr.value);
+
     if (isNaN(fov) || fov < 0 || fov > 180) {
       errorManagerInstance.warn('Invalid Satellite FOV value. Using default value of 30 degrees.');
+
       return 30;
     }
 
@@ -125,6 +128,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     const satFieldOfView = SatelliteFov.getSatFieldOfView_();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
     catalogManagerInstance.satCruncher.postMessage({
       typ: CruncerMessageTypes.UPDATE_MARKERS,
       markerMode: MarkerMode.OVERFLY,
@@ -135,6 +139,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     });
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
   }
 }

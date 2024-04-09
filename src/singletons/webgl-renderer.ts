@@ -32,12 +32,14 @@ export class WebGLRenderer {
   /** A canvas where the renderer draws its output. */
   domElement: HTMLCanvasElement;
   demoModeSatellite: any;
-  /** The number of milliseconds since the last draw event
+  /**
+   * The number of milliseconds since the last draw event
    *
    *  Use this for all ui interactions that are agnostic to propagation rate
    */
   dt: Milliseconds;
-  /** The number of milliseconds since the last draw event multiplied by propagation rate
+  /**
+   * The number of milliseconds since the last draw event multiplied by propagation rate
    *
    *  Use this for all time calculations involving position and velocity
    */
@@ -64,11 +66,14 @@ export class WebGLRenderer {
 
   static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
     const pMatrix = mat4.create();
+
     mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
 
     // This converts everything from 3D space to ECI (z and y planes are swapped)
     const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+
     mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
+
     return pMatrix;
   }
 
@@ -85,7 +90,9 @@ export class WebGLRenderer {
   private isAltCanvasSize_: boolean = false;
 
   render(scene: Scene, camera: Camera): void {
-    if (this.isContextLost_) return;
+    if (this.isContextLost_) {
+      return;
+    }
 
     if (keepTrackApi.methods.altCanvasResize()) {
       this.resizeCanvas(true);
@@ -123,12 +130,13 @@ export class WebGLRenderer {
     this.isContextLost_ = false;
   }
 
+  // eslint-disable-next-line require-await
   async glInit(): Promise<WebGL2RenderingContext> {
     // Ensure the canvas is available
     this.domElement ??= isThisNode() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas');
 
     if (!this.domElement) {
-      throw new Error(`The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.`);
+      throw new Error('The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.');
     }
 
     window.addEventListener('resize', () => {
@@ -141,18 +149,17 @@ export class WebGLRenderer {
       this.domElement.addEventListener('webglcontextrestored', this.onContextRestore_.bind(this));
     }
 
-    let gl: WebGL2RenderingContext;
-    gl = isThisNode()
+    const gl: WebGL2RenderingContext = isThisNode()
       ? global.mocks.glMock
       : this.domElement.getContext('webgl2', {
-          alpha: false,
-          premultipliedAlpha: false,
-          desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
-          antialias: true,
-          powerPreference: 'high-performance',
-          preserveDrawingBuffer: true,
-          stencil: false,
-        });
+        alpha: false,
+        premultipliedAlpha: false,
+        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+        antialias: true,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: true,
+        stencil: false,
+      });
 
     // Check for WebGL Issues
     if (gl === null) {
@@ -173,6 +180,7 @@ export class WebGLRenderer {
     return gl;
   }
 
+  // eslint-disable-next-line require-await
   async init(settings: SettingsManager): Promise<void> {
     this.settings_ = settings;
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
@@ -215,8 +223,8 @@ export class WebGLRenderer {
     const watchlistPluginInstance = keepTrackApi.getPlugin(WatchlistPlugin);
 
     if (
-      keepTrackApi.getMainCamera().cameraType == CameraType.ASTRONOMY ||
-      keepTrackApi.getMainCamera().cameraType == CameraType.PLANETARIUM ||
+      keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY ||
+      keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM ||
       watchlistPluginInstance?.watchlistInViewList?.length > 0
     ) {
       // Catch race condition where sensor has been reset but camera hasn't been updated
@@ -226,12 +234,16 @@ export class WebGLRenderer {
         errorManagerInstance.debug('Sensor not found, clearing orbits above!');
         this.sensorPos = null;
         keepTrackApi.getOrbitManager().clearInViewOrbit();
+
         return;
       }
       if (!this.isDrawOrbitsAbove) {
-        // Don't do this until the scene is redrawn with a new camera or thousands of satellites will
-        // appear to be in the field of view
+        /*
+         * Don't do this until the scene is redrawn with a new camera or thousands of satellites will
+         * appear to be in the field of view
+         */
         this.isDrawOrbitsAbove = true;
+
         return;
       }
       // Previously called showOrbitsAbove();
@@ -241,16 +253,23 @@ export class WebGLRenderer {
           this.hoverBoxOnSatMiniElements_.innerHTML = '';
         }
         this.isSatMiniBoxInUse_ = false;
+
         return;
       }
 
-      if (sensorManagerInstance?.currentSensors[0]?.lat === null) return;
-      if (timeManagerInstance.realTime - this.satLabelModeLastTime_ < settingsManager.minTimeBetweenSatLabels) return;
+      if (sensorManagerInstance?.currentSensors[0]?.lat === null) {
+        return;
+      }
+      if (timeManagerInstance.realTime - this.satLabelModeLastTime_ < settingsManager.minTimeBetweenSatLabels) {
+        return;
+      }
 
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
       orbitManagerInstance.clearInViewOrbit();
 
       let obj: BaseObject;
+
       this.labelCount_ = 0;
 
       this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
@@ -266,27 +285,47 @@ export class WebGLRenderer {
         for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
           obj = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY);
 
-          if (!obj.isSatellite()) continue;
+          if (!obj.isSatellite()) {
+            continue;
+          }
           const sat = <DetailedSatellite>obj;
-          if (keepTrackApi.getColorSchemeManager().isPayloadOff(sat)) continue;
-          if (keepTrackApi.getColorSchemeManager().isRocketBodyOff(sat)) continue;
-          if (keepTrackApi.getColorSchemeManager().isDebrisOff(sat)) continue;
-          if (keepTrackApi.getColorSchemeManager().isInViewOff(sat)) continue;
+
+          if (keepTrackApi.getColorSchemeManager().isPayloadOff(sat)) {
+            continue;
+          }
+          if (keepTrackApi.getColorSchemeManager().isRocketBodyOff(sat)) {
+            continue;
+          }
+          if (keepTrackApi.getColorSchemeManager().isDebrisOff(sat)) {
+            continue;
+          }
+          if (keepTrackApi.getColorSchemeManager().isInViewOff(sat)) {
+            continue;
+          }
 
           const satScreenPositionArray = this.getScreenCoords(sat);
-          if (satScreenPositionArray.error) continue;
-          if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') continue;
-          if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) continue;
+
+          if (satScreenPositionArray.error) {
+            continue;
+          }
+          if (typeof satScreenPositionArray.x === 'undefined' || typeof satScreenPositionArray.y === 'undefined') {
+            continue;
+          }
+          if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) {
+            continue;
+          }
 
           // Draw Orbits
           if (!settingsManager.isShowSatNameNotOrbit) {
             orbitManagerInstance.addInViewOrbit(i);
           }
 
-          // Draw Sat Labels
-          // if (!settingsManager.enableHoverOverlay) continue
+          /*
+           * Draw Sat Labels
+           * if (!settingsManager.enableHoverOverlay) continue
+           */
           this.satHoverMiniDOM_ = document.createElement('div');
-          this.satHoverMiniDOM_.id = 'sat-minibox-' + i;
+          this.satHoverMiniDOM_.id = `sat-minibox-${i}`;
           if (sat.source === CatalogSource.VIMPEL) {
             this.satHoverMiniDOM_.textContent = `JSC${sat.altId}`;
           } else {
@@ -306,20 +345,34 @@ export class WebGLRenderer {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const dotsManagerInstance = keepTrackApi.getDotsManager();
 
-        if (!dotsManagerInstance.inViewData) return;
+        if (!dotsManagerInstance.inViewData) {
+          return;
+        }
 
         watchlistPluginInstance?.watchlistList.forEach((id: number) => {
           const obj = catalogManagerInstance.getObject(id, GetSatType.POSITION_ONLY) as DetailedSatellite;
-          if (dotsManagerInstance.inViewData[id] === 0) return;
-          const satScreenPositionArray = this.getScreenCoords(obj);
-          if (satScreenPositionArray.error) return;
-          if (typeof satScreenPositionArray.x == 'undefined' || typeof satScreenPositionArray.y == 'undefined') return;
-          if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) return;
 
-          // Draw Sat Labels
-          // if (!settingsManager.enableHoverOverlay) continue
+          if (dotsManagerInstance.inViewData[id] === 0) {
+            return;
+          }
+          const satScreenPositionArray = this.getScreenCoords(obj);
+
+          if (satScreenPositionArray.error) {
+            return;
+          }
+          if (typeof satScreenPositionArray.x === 'undefined' || typeof satScreenPositionArray.y === 'undefined') {
+            return;
+          }
+          if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) {
+            return;
+          }
+
+          /*
+           * Draw Sat Labels
+           * if (!settingsManager.enableHoverOverlay) continue
+           */
           this.satHoverMiniDOM_ = document.createElement('div');
-          this.satHoverMiniDOM_.id = 'sat-minibox-' + id;
+          this.satHoverMiniDOM_.id = `sat-minibox-${id}`;
           if (obj.source === CatalogSource.VIMPEL) {
             this.satHoverMiniDOM_.textContent = `JSC${obj.altId}`;
           } else {
@@ -367,9 +420,13 @@ export class WebGLRenderer {
     const pMatrix = this.projectionMatrix;
     const camMatrix = keepTrackApi.getMainCamera().camMatrix;
     const screenPos = { x: 0, y: 0, z: 0, error: false };
+
     try {
-      let pos = obj.position;
-      if (!pos) throw new Error(`No Position for Sat ${obj.id}`);
+      const pos = obj.position;
+
+      if (!pos) {
+        throw new Error(`No Position for Sat ${obj.id}`);
+      }
 
       const posVec4 = <[number, number, number, number]>vec4.fromValues(pos.x, pos.y, pos.z, 1);
 
@@ -387,29 +444,36 @@ export class WebGLRenderer {
     } catch {
       screenPos.error = true;
     }
+
     return screenPos;
   }
 
   resizeCanvas(isForcedResize: boolean = false) {
     const gl = this.gl;
+
     if (!gl.canvas) {
       // We lost the canvas - try to get it again
       this.glInit();
+
       return;
     }
 
     const { vw, vh } = WebGLRenderer.getCanvasInfo();
 
     // If taking a screenshot then resize no matter what to get high resolution
-    if (!isForcedResize && (gl.canvas.width != vw || gl.canvas.height != vh)) {
+    if (!isForcedResize && (gl.canvas.width !== vw || gl.canvas.height !== vh)) {
       // If not autoresizing then don't do anything to the canvas
       if (settingsManager.isAutoResizeCanvas) {
-        // If this is a cellphone avoid the keyboard forcing resizes but
-        // always resize on rotation
+        /*
+         * If this is a cellphone avoid the keyboard forcing resizes but
+         * always resize on rotation
+         */
         const oldWidth = this.domElement.width;
         const oldHeight = this.domElement.height;
-        // Changes more than 35% of height but not due to rotation are likely the keyboard! Ignore them
-        // but make sure we have set this at least once to trigger
+        /*
+         * Changes more than 35% of height but not due to rotation are likely the keyboard! Ignore them
+         * but make sure we have set this at least once to trigger
+         */
         const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
 
         if (!settingsManager.isMobileModeEnabled || isKeyboardOut || this.isRotationEvent_ || !this.projectionMatrix) {
@@ -434,16 +498,28 @@ export class WebGLRenderer {
 
     // Fix the gpu picker texture size if it has already been created
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    if (dotsManagerInstance.isReady) dotsManagerInstance.initProgramPicking();
+
+    if (dotsManagerInstance.isReady) {
+      dotsManagerInstance.initProgramPicking();
+    }
+
+    // Fix flat geometry if it has already been created
+    keepTrackApi.getScene().godrays?.init(gl, keepTrackApi.getScene().sun);
   }
 
   /**
    * @deprecated
    */
   resizePostProcessingTexture(gl: WebGL2RenderingContext, sun: Sun, postProcessingManagerRef: PostProcessingManager): void {
-    if (typeof gl === 'undefined' || gl === null) throw new Error('gl is undefined or null');
-    if (typeof sun === 'undefined' || sun === null) throw new Error('sun is undefined or null');
-    if (typeof postProcessingManagerRef === 'undefined' || postProcessingManagerRef === null) throw new Error('postProcessingManager is undefined or null');
+    if (typeof gl === 'undefined' || gl === null) {
+      throw new Error('gl is undefined or null');
+    }
+    if (typeof sun === 'undefined' || sun === null) {
+      throw new Error('sun is undefined or null');
+    }
+    if (typeof postProcessingManagerRef === 'undefined' || postProcessingManagerRef === null) {
+      throw new Error('postProcessingManager is undefined or null');
+    }
 
     // Post Processing Texture Needs Scaled
     keepTrackApi.getScene().godrays?.init(gl, sun);
@@ -469,16 +545,19 @@ export class WebGLRenderer {
 
       this.meshManager.update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
       keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
-      if (primarySat.isMissile()) keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
+      if (primarySat.isMissile()) {
+        keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
+      }
 
       // If in satellite view the orbit buffer needs to be updated every time
-      if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType == CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType == CameraType.FIXED_TO_SAT)) {
+      if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)) {
         keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
         const firstPointOut = [
           keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3],
           keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 1],
           keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 2],
         ];
+
         keepTrackApi.getOrbitManager().updateFirstPointOut(this.selectSatManager_.primarySatObj.id, firstPointOut);
       }
 
@@ -497,6 +576,7 @@ export class WebGLRenderer {
     this.domElement.style.cursor = cursor;
   }
 
+  // eslint-disable-next-line require-await
   async startWithOrbits(): Promise<void> {
     if (this.settings_.startWithOrbitsDisplayed) {
       const groupsManagerInstance = keepTrackApi.getGroupsManager();
@@ -504,7 +584,7 @@ export class WebGLRenderer {
 
       // All Orbits
       groupsManagerInstance.groupList.debris = groupsManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');
-      groupsManagerInstance.selectGroup(groupsManagerInstance.groupList['debris']);
+      groupsManagerInstance.selectGroup(groupsManagerInstance.groupList.debris);
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true); // force color recalc
       groupsManagerInstance.groupList.debris.updateOrbits();
       this.settings_.isOrbitOverlayVisible = true;
@@ -519,30 +599,37 @@ export class WebGLRenderer {
     keepTrackApi.getMainCamera().update(this.dt);
 
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
+
     this.gmst = gmst;
 
     keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj, gmst, j);
 
-    this.orbitsAbove(); //this.sensorPos is set here for the Camera Manager
+    this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
 
-    // cone.update([
-    //   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3],
-    //   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 1],
-    //   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 2],
-    // ]);
+    /*
+     * cone.update([
+     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3],
+     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 1],
+     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 2],
+     * ]);
+     */
 
     keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
   }
 
   getCurrentViewport(target?: vec4): vec4 {
     const gl = this.gl;
+
     vec4.set(target ?? vec4.create(), 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
     return target;
   }
 
   getDrawingBufferSize(target?: vec2): vec2 {
     const gl = this.gl;
+
     vec2.set(target ?? vec2.create(), gl.drawingBufferWidth, gl.drawingBufferHeight);
+
     return target;
   }
 
@@ -555,6 +642,8 @@ export class WebGLRenderer {
     const gl = this.gl;
     const activeTexture = gl.getParameter(gl.TEXTURE_BINDING_2D);
     const activeTextureLevel = gl.getTexParameter(activeTexture, gl.TEXTURE_MAX_LEVEL);
+
+
     return activeTextureLevel;
   }
 
@@ -587,53 +676,69 @@ export class WebGLRenderer {
   }
 }
 
-// DEBUG: Kept for future use
-// export const checkIfPostProcessingRequired = (postProcessingManagerOverride?) => {
-//   if (postProcessingManagerOverride) drawManager.postProcessingManager = postProcessingManagerOverride;
+/*
+ * DEBUG: Kept for future use
+ * export const checkIfPostProcessingRequired = (postProcessingManagerOverride?) => {
+ *   if (postProcessingManagerOverride) drawManager.postProcessingManager = postProcessingManagerOverride;
+ */
 
-//   // if (keepTrackApi.getMainCamera().camPitchAccel > 0.0002 || keepTrackApi.getMainCamera().camPitchAccel < -0.0002 || keepTrackApi.getMainCamera().camYawAccel > 0.0002 || keepTrackApi.getMainCamera().camYawAccel < -0.0002) {
-//   //   // drawManager.gaussianAmt += this.dt * 2;
-//   //   // drawManager.gaussianAmt = Math.min(500, Math.max(drawManager.gaussianAmt, 0));
-//   //   drawManager.gaussianAmt = 500;
-//   // }
+/*
+ *   // if (keepTrackApi.getMainCamera().camPitchAccel > 0.0002 || keepTrackApi.getMainCamera().camPitchAccel < -0.0002 || keepTrackApi.getMainCamera().camYawAccel > 0.0002 || keepTrackApi.getMainCamera().camYawAccel < -0.0002) {
+ *   //   // drawManager.gaussianAmt += this.dt * 2;
+ *   //   // drawManager.gaussianAmt = Math.min(500, Math.max(drawManager.gaussianAmt, 0));
+ *   //   drawManager.gaussianAmt = 500;
+ *   // }
+ */
 
-// DEBUG: Kept for future use
-//   // if (drawManager.gaussianAmt > 0) {
-//   //   drawManager.gaussianAmt -= this.dt * 2;
-//   //   drawManager.isNeedPostProcessing = true;
-//   drawManager.postProcessingManager.isGaussianNeeded = false;
-//   // } else {
-//   //   drawManager.postProcessingManager.isGaussianNeeded = false;
-//   // }
+/*
+ * DEBUG: Kept for future use
+ *   // if (drawManager.gaussianAmt > 0) {
+ *   //   drawManager.gaussianAmt -= this.dt * 2;
+ *   //   drawManager.isNeedPostProcessing = true;
+ *   drawManager.postProcessingManager.isGaussianNeeded = false;
+ *   // } else {
+ *   //   drawManager.postProcessingManager.isGaussianNeeded = false;
+ *   // }
+ */
 
-// DEBUG: Kept for future use
-//   // Slight Blur
-//   drawManager.postProcessingManager.isFxaaNeeded = false;
-//   // Horrible Results
-//   drawManager.postProcessingManager.isSmaaNeeded = false;
+/*
+ * DEBUG: Kept for future use
+ *   // Slight Blur
+ *   drawManager.postProcessingManager.isFxaaNeeded = false;
+ *   // Horrible Results
+ *   drawManager.postProcessingManager.isSmaaNeeded = false;
+ */
 
-// DEBUG: Kept for future use
-//   if (drawManager.postProcessingManager.isGaussianNeeded) {
-//     drawManager.isNeedPostProcessing = true;
-//     drawManager.postProcessingManager.switchFrameBuffer();
-//     return;
-//   }
+/*
+ * DEBUG: Kept for future use
+ *   if (drawManager.postProcessingManager.isGaussianNeeded) {
+ *     drawManager.isNeedPostProcessing = true;
+ *     drawManager.postProcessingManager.switchFrameBuffer();
+ *     return;
+ *   }
+ */
 
-// DEBUG: Kept for future use
-//   if (drawManager.postProcessingManager.isFxaaNeeded) {
-//     drawManager.isNeedPostProcessing = true;
-//     drawManager.postProcessingManager.switchFrameBuffer();
-//     return;
-//   }
+/*
+ * DEBUG: Kept for future use
+ *   if (drawManager.postProcessingManager.isFxaaNeeded) {
+ *     drawManager.isNeedPostProcessing = true;
+ *     drawManager.postProcessingManager.switchFrameBuffer();
+ *     return;
+ *   }
+ */
 
-// DEBUG: Kept for future use
-//   if (drawManager.postProcessingManager.isSmaaNeeded) {
-//     drawManager.isNeedPostProcessing = true;
-//     drawManager.postProcessingManager.switchFrameBuffer();
-//     return;
-//   }
+/*
+ * DEBUG: Kept for future use
+ *   if (drawManager.postProcessingManager.isSmaaNeeded) {
+ *     drawManager.isNeedPostProcessing = true;
+ *     drawManager.postProcessingManager.switchFrameBuffer();
+ *     return;
+ *   }
+ */
 
-// DEBUG: Kept for future use
-//   // drawManager.postProcessingManager.switchFrameBuffer();
-//   drawManager.isNeedPostProcessing = false;
-// };
+/*
+ * DEBUG: Kept for future use
+ *   // drawManager.postProcessingManager.switchFrameBuffer();
+ *   drawManager.isNeedPostProcessing = false;
+ * };
+ */

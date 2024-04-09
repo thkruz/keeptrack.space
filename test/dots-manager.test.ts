@@ -7,6 +7,7 @@ import { setupStandardEnvironment } from './environment/standard-env';
 
 describe('drawManager', () => {
   let dotsManagerInstance: DotsManager;
+
   beforeEach(() => {
     dotsManagerInstance = new DotsManager();
   });
@@ -18,9 +19,10 @@ describe('drawManager', () => {
     expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>null)).not.toThrow();
     settingsManager.cruncherReady = true;
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
     colorSchemeManagerInstance.colorBuffer = new Uint8Array(4);
-    dotsManagerInstance['settings_'] = <SettingsManager>{
-      ...dotsManagerInstance['settings_'],
+    dotsManagerInstance.settings_ = <SettingsManager>{
+      ...dotsManagerInstance.settings_,
       satShader: {
         minSize: 1,
         maxSize: 1,
@@ -34,6 +36,7 @@ describe('drawManager', () => {
     dotsManagerInstance.positionData = new Float32Array(1);
     dotsManagerInstance.velocityData = new Float32Array(1);
     const drawManagerInstance = keepTrackApi.getRenderer();
+
     drawManagerInstance.dtAdjusted = <Milliseconds>1000000000;
     expect(() => dotsManagerInstance.updatePositionBuffer()).not.toThrow();
     drawManagerInstance.dtAdjusted = <Milliseconds>1000000000;

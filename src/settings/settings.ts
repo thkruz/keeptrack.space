@@ -1,6 +1,7 @@
+/* eslint-disable max-lines */
 /**
-// /////////////////////////////////////////////////////////////////////////////
-
+ * // /////////////////////////////////////////////////////////////////////////////
+ *
  * @Copyright (C) 2016-2023 Theodore Kruczek
  * @Copyright (C) 2020-2023 Heather Kruczek
  *
@@ -652,7 +653,7 @@ export class SettingsManager {
    *
    * Set mobileMaxLabels and desktopMaxLabels instead of this directly
    */
-  maxLabels = 0; //20000;
+  maxLabels = 0; // 20000;
   /**
    * Preallocate the maximum number of missiles that can be displayed
    *
@@ -1000,110 +1001,137 @@ export class SettingsManager {
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
+
     if (isShowNotionalSatsString !== null) {
       this.isShowNotionalSats = isShowNotionalSatsString === 'true';
     }
     const leoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_LEO_SATS);
+
     if (leoSatsString !== null) {
       this.isShowLeoSats = leoSatsString === 'true';
     }
     const starlinkSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_STARLINK_SATS);
+
     if (starlinkSatsString !== null) {
       this.isShowStarlinkSats = starlinkSatsString === 'true';
     }
     const heoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_HEO_SATS);
+
     if (heoSatsString !== null) {
       this.isShowHeoSats = heoSatsString === 'true';
     }
     const meoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_MEO_SATS);
+
     if (meoSatsString !== null) {
       this.isShowMeoSats = meoSatsString === 'true';
     }
     const geoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GEO_SATS);
+
     if (geoSatsString !== null) {
       this.isShowGeoSats = geoSatsString === 'true';
     }
     const payloadsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_PAYLOADS);
+
     if (payloadsString !== null) {
       this.isShowPayloads = payloadsString === 'true';
     }
     const rocketBodiesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ROCKET_BODIES);
+
     if (rocketBodiesString !== null) {
       this.isShowRocketBodies = rocketBodiesString === 'true';
     }
     const debrisString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEBRIS);
+
     if (debrisString !== null) {
       this.isShowDebris = debrisString === 'true';
     }
     const agenciesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_AGENCIES);
+
     if (agenciesString !== null) {
       this.isShowAgencies = agenciesString === 'true';
     }
     const drawOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ORBITS);
+
     if (drawOrbitsString !== null) {
       this.isDrawOrbits = drawOrbitsString === 'true';
     }
     const drawTrailingOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS);
+
     if (drawTrailingOrbitsString !== null) {
       this.isDrawTrailingOrbits = drawTrailingOrbitsString === 'true';
     }
     const isOrbitCruncherInEcfString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ECF);
+
     if (isOrbitCruncherInEcfString !== null) {
       this.isOrbitCruncherInEcf = isOrbitCruncherInEcfString === 'true';
     }
     const drawInCoverageLinesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES);
+
     if (drawInCoverageLinesString !== null) {
       this.isDrawInCoverageLines = drawInCoverageLinesString === 'true';
     }
     const drawSunString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_SUN);
+
     if (drawSunString !== null) {
       this.isDrawSun = drawSunString === 'true';
     }
     const blackEarthString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH);
+
     if (blackEarthString !== null) {
       this.isBlackEarth = blackEarthString === 'true';
     }
     const drawAtmosphereString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE);
+
     if (drawAtmosphereString !== null) {
       this.isDrawAtmosphere = drawAtmosphereString === 'true';
     }
     const drawAuroraString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_AURORA);
+
     if (drawAuroraString !== null) {
       this.isDrawAurora = drawAuroraString === 'true';
     }
     const drawMilkyWayString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_MILKY_WAY);
+
     if (drawMilkyWayString !== null) {
       this.isDrawMilkyWay = drawMilkyWayString === 'true';
     }
     const graySkyboxString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GRAY_SKYBOX);
+
     if (graySkyboxString !== null) {
       this.isGraySkybox = graySkyboxString === 'true';
     }
     const eciOnHoverString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ECI_ON_HOVER);
+
     if (eciOnHoverString !== null) {
       this.isEciOnHover = eciOnHoverString === 'true';
     }
     const isShowConfidenceLevelsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
+
     if (isShowConfidenceLevelsString !== null) {
       this.isShowConfidenceLevels = isShowConfidenceLevelsString === 'true';
     }
     const demoModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEMO_MODE);
+
     if (demoModeOnString !== null) {
       this.isDemoModeOn = demoModeOnString === 'true';
     }
     const satLabelModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SAT_LABEL_MODE);
+
     if (satLabelModeOnString !== null) {
       this.isSatLabelModeOn = satLabelModeOnString === 'true';
     }
     const freezePropRateOnDragString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG);
+
     if (freezePropRateOnDragString !== null) {
       this.isFreezePropRateOnDrag = freezePropRateOnDragString === 'true';
     }
     const disableTimeMachineToastsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS);
+
     if (disableTimeMachineToastsString !== null) {
       this.isDisableTimeMachineToasts = disableTimeMachineToastsString === 'true';
     }
     const searchLimitString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SEARCH_LIMIT);
+
     if (searchLimitString !== null) {
       this.searchLimit = parseInt(searchLimitString);
     }
@@ -1146,10 +1174,14 @@ export class SettingsManager {
 
     this.loadLastMapTexture();
 
-    // Export settingsManager to everyone else
-    // window.settingsManager = this;
-    // Expose these to node if running in node
-    if (global) (<any>global).settingsManager = this;
+    /*
+     * Export settingsManager to everyone else
+     * window.settingsManager = this;
+     * Expose these to node if running in node
+     */
+    if (global) {
+      (<any>global).settingsManager = this;
+    }
   }
 
   private checkIfIframe() {
@@ -1171,15 +1203,16 @@ export class SettingsManager {
     this.colors = {} as ColorSchemeColorMap;
     try {
       const jsonString = PersistenceManager.getInstance().getItem(StorageKey.THIS_COLORS);
+
       if (jsonString) {
         this.colors = JSON.parse(jsonString);
       }
     } catch {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.2') {
+    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.3') {
       this.colors = {
-        version: '1.3.2',
+        version: '1.3.3',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 0.7],
@@ -1228,14 +1261,18 @@ export class SettingsManager {
         sunlightInview: [0.85, 0.5, 0.0, 1.0],
         penumbral: [1.0, 1.0, 1.0, 0.3],
         umbral: [1.0, 1.0, 1.0, 0.1],
-        // DEBUG Colors
-        // sunlight = [0.2, 0.4, 1.0, 1]
-        // penumbral = [0.5, 0.5, 0.5, 0.85]
-        // umbral = [0.2, 1.0, 0.0, 0.5]
+        /*
+         * DEBUG Colors
+         * sunlight = [0.2, 0.4, 1.0, 1]
+         * penumbral = [0.5, 0.5, 0.5, 0.85]
+         * umbral = [0.2, 1.0, 0.0, 0.5]
+         */
         gradientAmt: 0,
-        // Gradients Must be Edited in color-scheme.js
-        // apogeeGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
-        // velGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
+        /*
+         * Gradients Must be Edited in color-scheme.js
+         * apogeeGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
+         * velGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
+         */
         satSmall: [0.2, 1.0, 0.0, 0.65],
         confidenceHi: [0.0, 1.0, 0.0, 0.65],
         confidenceMed: [1.0, 0.4, 0.0, 0.65],
@@ -1264,6 +1301,8 @@ export class SettingsManager {
         densityLow: [1, 1, 0, 0.9],
         densityOther: [0.8, 0.8, 0.8, 0.3],
         notional: [1, 0, 0, 0.8],
+        starlink: [0.0, 0.8, 0.0, 0.8],
+        starlinkNot: [0.8, 0.0, 0.0, 0.8],
       };
 
       PersistenceManager.getInstance().saveItem(StorageKey.THIS_COLORS, JSON.stringify(this.colors));
@@ -1275,7 +1314,7 @@ export class SettingsManager {
    * @returns An array of query string parameters.
    */
   private loadOverridesFromUrl() {
-    let queryStr = window.location.search.substring(1);
+    const queryStr = window.location.search.substring(1);
 
     // URI Encode all %22 to ensure url is not broken
     const params = queryStr
@@ -1283,23 +1322,29 @@ export class SettingsManager {
       .map((item, index) => {
         if (index % 2 === 0) {
           return item;
-        } else {
-          return encodeURIComponent(item);
         }
+
+        return encodeURIComponent(item);
+
       })
       .join('')
       .split('&');
 
     const plugins = this.plugins;
+
     for (const param of params) {
       const key = param.split('=')[0];
       const val = param.split('=')[1];
+
       if (key === 'settingsManagerOverride') {
         const overrides = JSON.parse(decodeURIComponent(val));
+
         Object.keys(overrides.plugins)
           .filter((_key) => _key in plugins)
           .forEach((_key) => {
-            if (typeof overrides.plugins[_key] == 'undefined') return;
+            if (typeof overrides.plugins[_key] === 'undefined') {
+              return;
+            }
             this.plugins[_key] = overrides.plugins[_key];
           });
       }
@@ -1323,6 +1368,7 @@ export class SettingsManager {
       for (const param of params) {
         const key = param.split('=')[0];
         const val = param.split('=')[1];
+
         switch (key) {
           case 'preset':
             switch (val) {
@@ -1378,8 +1424,10 @@ export class SettingsManager {
                 setTimeout(() => {
                   if (typeof val === 'string') {
                     const sccNum = parseInt(val);
+
                     if (sccNum >= 0) {
                       const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
+
                       if (id >= 0) {
                         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
                       } else {
@@ -1486,6 +1534,7 @@ export class SettingsManager {
 
     if (this.isLoadLastMap && !this.isDrawLess) {
       const lastMap = PersistenceManager.getInstance().getItem(StorageKey.LAST_MAP);
+
       switch (lastMap) {
         case 'blue':
           this.blueImages = true;
@@ -1542,6 +1591,7 @@ export class SettingsManager {
    */
   private setEmbedOverrides() {
     let pageName = location.href.split('/').slice(-1);
+
     pageName = pageName[0].split('?').slice(0);
 
     if (pageName[0] == 'embed.html') {
@@ -1566,9 +1616,11 @@ export class SettingsManager {
   private setMobileSettings() {
     if (window.innerWidth <= this.desktopMinimumWidth) {
       this.disableWindowTouchMove = false;
-      // this.maxFieldOfViewMarkers = 20000;
-      // this.isDrawLess = true;
-      // this.noMeshManager = true;
+      /*
+       * this.maxFieldOfViewMarkers = 20000;
+       * this.isDrawLess = true;
+       * this.noMeshManager = true;
+       */
     }
   }
 
@@ -1576,6 +1628,7 @@ export class SettingsManager {
     // combine settingsOverride with window.settingsOverride
     const overrides = { ...settingsOverride, ...window.settingsOverride };
     // override values in this with overrides
+
     for (const key of Object.keys(overrides)) {
       if (key in this) {
         if (key === 'colors' || key === 'plugins') {
@@ -1602,8 +1655,10 @@ export class SettingsManager {
         if (isThisNode()) {
           this.installDirectory = 'http://127.0.0.1:8080/';
         } else {
-          // Comment Out the Next Two Lines if you are testing on a local server
-          // and have the keeptrack files installed in a subdirectory
+          /*
+           * Comment Out the Next Two Lines if you are testing on a local server
+           * and have the keeptrack files installed in a subdirectory
+           */
           this.installDirectory = '/';
           // this.offline = true;
         }
@@ -1627,7 +1682,7 @@ export class SettingsManager {
         this.installDirectory = '/';
         break;
     }
-    if (typeof this.installDirectory == 'undefined') {
+    if (typeof this.installDirectory === 'undefined') {
       // Put Your Custom Install Directory Here
       this.installDirectory = '/';
     }
@@ -1636,7 +1691,7 @@ export class SettingsManager {
   /**
    * Placeholder for overrides
    */
-  // eslint-disable-next-line class-methods-use-this
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   timeMachineString(_yearStr: string): string | boolean {
     return false;
   }
@@ -1648,10 +1703,11 @@ export class SettingsManager {
   setCurrentColorScheme(val: any): void {
     if (!val) {
       console.warn('Settings Manager: Invalid color scheme');
+
       return;
     }
     this.currentColorScheme = val;
   }
 }
 
-export let settingsManager = new SettingsManager();
+export const settingsManager = new SettingsManager();

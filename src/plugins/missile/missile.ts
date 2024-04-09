@@ -1,3 +1,6 @@
+/* eslint-disable complexity */
+/* eslint-disable max-statements */
+/* eslint-disable max-lines-per-function */
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -5,9 +8,9 @@ import { Kilometers, Meters, SpaceObjectType } from 'ootk';
 import { missileManager } from './missileManager';
 
 export class Missile {
-  static EarthMass = 5.9726 * Math.pow(10, 24); // (kg)
+  static EarthMass = 5.9726 * 10 ** 24; // (kg)
   static R = 287; // (J * K^-1 * kg^-1)
-  static G = 6.67384 * Math.pow(10, -11); // (m^3 * kg^-1 * s^-2)
+  static G = 6.67384 * 10 ** -11; // (m^3 * kg^-1 * s^-2)
 
   /**
    * This function calculates the path of the rocket across the earth in terms of coordinates by using
@@ -55,7 +58,7 @@ export class Missile {
     CurrentLatitude: number,
     CurrentLongitude: number,
     TargetLatitude: number,
-    TargetLongitude: number
+    TargetLongitude: number,
   ): [number[], number[], number, number, number[], number] {
     const r = RADIUS_OF_EARTH * 1000; // (m)
     const Phi1 = (CurrentLatitude * Math.PI) / 180; // (Rad)
@@ -64,9 +67,15 @@ export class Missile {
     const Lambda2 = (TargetLongitude * Math.PI) / 180; // (Rad)
     let Lambda12;
 
-    if (Lambda2 - Lambda1 >= -180 && Lambda2 - Lambda1 <= 180) Lambda12 = Lambda2 - Lambda1; // (Rad)
-    if (Lambda2 - Lambda1 > 180) Lambda12 = Lambda2 - Lambda1 - 2 * Math.PI; // (Rad)
-    if (Lambda2 - Lambda1 < -180) Lambda12 = Lambda2 - Lambda1 + 2 * Math.PI; // (Rad)
+    if (Lambda2 - Lambda1 >= -180 && Lambda2 - Lambda1 <= 180) {
+      Lambda12 = Lambda2 - Lambda1;
+    } // (Rad)
+    if (Lambda2 - Lambda1 > 180) {
+      Lambda12 = Lambda2 - Lambda1 - 2 * Math.PI;
+    } // (Rad)
+    if (Lambda2 - Lambda1 < -180) {
+      Lambda12 = Lambda2 - Lambda1 + 2 * Math.PI;
+    } // (Rad)
 
     const Alpha1 = Math.atan2(Math.sin(Lambda12), Math.cos(Phi1) * Math.tan(Phi2) - Math.sin(Phi1) * Math.cos(Lambda12)); // (Rad)
     const DeltaTheta12 = Math.acos(Math.sin(Phi1) * Math.sin(Phi2) + Math.cos(Phi1) * Math.cos(Phi2) * Math.cos(Lambda12)); // (Rad)
@@ -86,11 +95,15 @@ export class Missile {
     const LongList3 = [];
     const EstDistanceList: number[] = [];
     let GoalDistance;
+
     for (let i = 0; i <= 2400; i++) {
       const Sigma = DeltaSigma01 + (i * (DeltaSigma02 - DeltaSigma01)) / 2000; // (Rad)
       const Phi = (Math.asin(Math.cos(Alphao) * Math.sin(Sigma)) * 180) / Math.PI; // (Degrees)
       const Lambda = ((Lambdao + Math.atan2(Math.sin(Alphao) * Math.sin(Sigma), Math.cos(Sigma))) * 180) / Math.PI; // (Degrees)
-      if (i === 2000) GoalDistance = (Sigma - DeltaSigma01) * r;
+
+      if (i === 2000) {
+        GoalDistance = (Sigma - DeltaSigma01) * r;
+      }
       EstDistanceList.push(((Sigma - DeltaSigma01) * r) / 1000);
       if (Lambda >= -180 && Lambda <= 180) {
         LongList1.push(Lambda); // (Degrees)
@@ -106,12 +119,24 @@ export class Missile {
       }
     }
 
-    for (const lat of LatList1) EstLatList.push(lat);
-    for (const lat of LatList2) EstLatList.push(lat);
-    for (const lat of LatList3) EstLatList.push(lat);
-    for (const lon of LongList1) EstLongList.push(lon);
-    for (const lon of LongList2) EstLongList.push(lon);
-    for (const lon of LongList3) EstLongList.push(lon);
+    for (const lat of LatList1) {
+      EstLatList.push(lat);
+    }
+    for (const lat of LatList2) {
+      EstLatList.push(lat);
+    }
+    for (const lat of LatList3) {
+      EstLatList.push(lat);
+    }
+    for (const lon of LongList1) {
+      EstLongList.push(lon);
+    }
+    for (const lon of LongList2) {
+      EstLongList.push(lon);
+    }
+    for (const lon of LongList3) {
+      EstLongList.push(lon);
+    }
 
     return [EstLatList, EstLongList, (Alpha1 * 180) / Math.PI, ArcLength, EstDistanceList, GoalDistance];
   }
@@ -177,7 +202,7 @@ export class Missile {
     AngleCoefficient: number,
     FuelDensity,
     BurnRate,
-    WarheadMass
+    WarheadMass,
   ) {
     let NozzleAltitude2, NozzleAltitude3;
     let iterationFunOutput = [];
@@ -199,7 +224,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -226,7 +251,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -253,7 +278,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -280,7 +305,7 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
@@ -292,8 +317,11 @@ export class Missile {
     }
 
     let MaxAltitudeMax = 0;
+
     for (let i = 0; i < MaxAltitude.length; i++) {
-      if (MaxAltitude[i] > MaxAltitudeMax) MaxAltitudeMax = MaxAltitude[i];
+      if (MaxAltitude[i] > MaxAltitudeMax) {
+        MaxAltitudeMax = MaxAltitude[i];
+      }
     }
 
     return Distance;
@@ -366,7 +394,7 @@ export class Missile {
     GoalDistance: number,
     FuelDensity,
     BurnRate,
-    WarheadMass
+    WarheadMass,
   ) {
     const DistanceSteps = [];
     let AngleCoefficient = 0;
@@ -374,6 +402,7 @@ export class Missile {
     let AC1 = 0;
     let AC2 = 0;
     const Steps = 500;
+
     for (let i = 0; i < Steps; i++) {
       AngleCoefficient = (i * 1) / Steps / 2 + 0.5;
       DistanceSteps.push(
@@ -396,14 +425,16 @@ export class Missile {
           AngleCoefficient,
           FuelDensity,
           BurnRate,
-          WarheadMass
-        )
+          WarheadMass,
+        ),
       );
     }
     let DistanceClosest = DistanceSteps[0];
     let oldDistanceClosest = Math.abs(DistanceSteps[0] - GoalDistance);
+
     for (let i = 0; i < DistanceSteps.length; i++) {
       const newDistanceClosest = Math.abs(DistanceSteps[i] - GoalDistance);
+
       if (newDistanceClosest < oldDistanceClosest) {
         oldDistanceClosest = newDistanceClosest;
         DistanceClosest = DistanceSteps[i];
@@ -440,9 +471,10 @@ export class Missile {
       ACNew,
       FuelDensity,
       BurnRate,
-      WarheadMass
+      WarheadMass,
     );
     let error = Math.abs((GoalDistance - qRunACNew) / GoalDistance) * 100;
+
     while (error > 0.01 && Math.abs(AC2 - AC1) >= 0.0001) {
       ACNew = (AC1 + AC2) / 2;
       error =
@@ -467,9 +499,9 @@ export class Missile {
               ACNew,
               FuelDensity,
               BurnRate,
-              WarheadMass
+              WarheadMass,
             )) /
-            GoalDistance
+            GoalDistance,
         ) * 100;
       if (
         Missile.testTrajectory_(
@@ -491,7 +523,7 @@ export class Missile {
           ACNew,
           FuelDensity,
           BurnRate,
-          WarheadMass
+          WarheadMass,
         ) > GoalDistance
       ) {
         AC2 = ACNew;
@@ -500,6 +532,7 @@ export class Missile {
       }
     }
     AngleCoefficient = ACNew;
+
     return AngleCoefficient;
   }
 
@@ -521,6 +554,8 @@ export class Missile {
     const Tsea = 288; // (K)
     const _R = 8.31451; // (J / K mol)
     const g = 9.81; // (m/s^2)
+
+
     return Po * Math.exp((-mol * g * Altitude) / (_R * Tsea)); // (Pa)
   }
 
@@ -536,15 +571,34 @@ export class Missile {
    */
   private static calcTemperature_(inAlt: Meters): Kilometers {
     const alt = <Kilometers>(inAlt / 1000);
-    if (alt < 12.5) return <Kilometers>(276.642857143 - 5.02285714286 * alt);
-    if (alt < 20) return <Kilometers>213.0;
-    if (alt < 47.5) return <Kilometers>(171.224358974 + 2.05384615385 * alt);
-    if (alt < 52.5) return <Kilometers>270.0;
-    if (alt < 80) return <Kilometers>(435.344405594 - 3.13916083916 * alt);
-    if (alt < 90) return <Kilometers>183.0;
-    if (alt < 110) return <Kilometers>(-221.111111111 + 4.47 * alt);
-    if (alt < 120) return <Kilometers>(-894.0 + 10.6 * alt);
-    if (alt >= 120) return <Kilometers>(-894.0 + 10.6 * 120);
+
+    if (alt < 12.5) {
+      return <Kilometers>(276.642857143 - 5.02285714286 * alt);
+    }
+    if (alt < 20) {
+      return <Kilometers>213.0;
+    }
+    if (alt < 47.5) {
+      return <Kilometers>(171.224358974 + 2.05384615385 * alt);
+    }
+    if (alt < 52.5) {
+      return <Kilometers>270.0;
+    }
+    if (alt < 80) {
+      return <Kilometers>(435.344405594 - 3.13916083916 * alt);
+    }
+    if (alt < 90) {
+      return <Kilometers>183.0;
+    }
+    if (alt < 110) {
+      return <Kilometers>(-221.111111111 + 4.47 * alt);
+    }
+    if (alt < 120) {
+      return <Kilometers>(-894.0 + 10.6 * alt);
+    }
+    if (alt >= 120) {
+      return <Kilometers>(-894.0 + 10.6 * 120);
+    }
 
     // Catch All
     return <Kilometers>(-894.0 + 10.6 * 120);
@@ -559,71 +613,86 @@ export class Missile {
    * @returns The drag coefficient of the rocket
    */
   private static calcDragCoefficient_(M: number) {
-    if (M < 0.5) return 0.125;
-    if (M < 1.1875) return -0.329086061307 + 2.30117394072 * M + -4.06597222013 * Math.pow(M, 2) + 3.01851851676 * Math.pow(M, 3) + -0.666666666129 * Math.pow(M, 4);
-    if (M < 1.625) return 0.10937644721 + -4.61979595244 * M + 9.72917139612 * Math.pow(M, 2) + -6.33333563852 * Math.pow(M, 3) + 1.33333375211 * Math.pow(M, 4);
-    if (M < 3.625) return 0.97916002909 + -0.540978181863 * M + 0.125235817144 * Math.pow(M, 2) + -0.00666103733277 * Math.pow(M, 3) + -0.000558009790208 * Math.pow(M, 4);
-    if (M > 3.625) return 0.25;
+    if (M < 0.5) {
+      return 0.125;
+    }
+    if (M < 1.1875) {
+      return -0.329086061307 + 2.30117394072 * M + -4.06597222013 * M ** 2 + 3.01851851676 * M ** 3 + -0.666666666129 * M ** 4;
+    }
+    if (M < 1.625) {
+      return 0.10937644721 + -4.61979595244 * M + 9.72917139612 * M ** 2 + -6.33333563852 * M ** 3 + 1.33333375211 * M ** 4;
+    }
+    if (M < 3.625) {
+      return 0.97916002909 + -0.540978181863 * M + 0.125235817144 * M ** 2 + -0.00666103733277 * M ** 3 + -0.000558009790208 * M ** 4;
+    }
+    if (M > 3.625) {
+      return 0.25;
+    }
 
     // Catch All
     return 0.25;
   }
 
   /**
-     * This function calculates the thrust force of the rocket by maximizing the efficiency
-     * through designing the correct shaped nozzle for the given rocket scenario. For this
-     * function is gives the option for stages of the rocket to be introduced. Theoretically
-     * this function can have an unlimited amount of stages but for this particular use there
-     * will only be 3 stages. The iMathuts for the function are:
-
-     * MassOut:            Mass leaving the nozzle
-     * Altitude:           Rockets current elevation
-     * FuelArea:           Burn area in the combustion chamber
-     * NozzleAltitude:     Altitude immediately after a rocket stage detaches
-
-     * The constants for the function were based off of data found for the Trident II Intercontinental
-     * ballistic missile. These constants are:
-     * k:  Specific heat ratio for the fuel
-     * Ru:  Universal gas constant
-     * Tc: Chamber temperature
-     * Pc: Chamber pressure
-     * Mw: Molecular weight of the fuel
-     * q:  Mass flow out through the nozzle
-     * Pa: Atmospheric pressure used for optimizing nozzle diameters
-     * The iteratively calculated variables for this function are:
-     * Pe: Current atmospheric pressure
-     * Pt: Throat pressure
-     * Tt: Throat temperature
-     * At: Throat area
-     * Nm: Mach number of the exiting gas
-     * Ae: Exit area of the nozzle
-     * Ve: Velocity of the fuel exiting the nozzle
-     * After making all of these calculations the function will return the force generated by the trust
-     * of the fuel in units of Newtons. This function will also make sure that the exit nozzle area will
-     * not exceed that of the cross sectional area for the inside of rocket casing.
-     * @param MassOut
-     * @param Altitude
-     * @param FuelArea
-     * @param NozzleAltitude
-     * @returns
-     */
+   * This function calculates the thrust force of the rocket by maximizing the efficiency
+   * through designing the correct shaped nozzle for the given rocket scenario. For this
+   * function is gives the option for stages of the rocket to be introduced. Theoretically
+   * this function can have an unlimited amount of stages but for this particular use there
+   * will only be 3 stages. The iMathuts for the function are:
+   *
+   * MassOut:            Mass leaving the nozzle
+   * Altitude:           Rockets current elevation
+   * FuelArea:           Burn area in the combustion chamber
+   * NozzleAltitude:     Altitude immediately after a rocket stage detaches
+   *
+   * The constants for the function were based off of data found for the Trident II Intercontinental
+   * ballistic missile. These constants are:
+   * k:  Specific heat ratio for the fuel
+   * Ru:  Universal gas constant
+   * Tc: Chamber temperature
+   * Pc: Chamber pressure
+   * Mw: Molecular weight of the fuel
+   * q:  Mass flow out through the nozzle
+   * Pa: Atmospheric pressure used for optimizing nozzle diameters
+   * The iteratively calculated variables for this function are:
+   * Pe: Current atmospheric pressure
+   * Pt: Throat pressure
+   * Tt: Throat temperature
+   * At: Throat area
+   * Nm: Mach number of the exiting gas
+   * Ae: Exit area of the nozzle
+   * Ve: Velocity of the fuel exiting the nozzle
+   * After making all of these calculations the function will return the force generated by the trust
+   * of the fuel in units of Newtons. This function will also make sure that the exit nozzle area will
+   * not exceed that of the cross sectional area for the inside of rocket casing.
+   * @param MassOut
+   * @param Altitude
+   * @param FuelArea
+   * @param NozzleAltitude
+   * @returns
+   */
   private static calcThrustForce_(MassOut: number, Altitude: any, FuelArea: number, NozzleAltitude: any) {
     const k = 1.2; // Heat Ratio
     const Ru = 8314.4621; // Universal Gas Constant (m^3 Pa / K mol)
     const Tc = 3700; // (K)
-    const Pc = 25 * Math.pow(10, 6); // Chamber Pressure (Pa)
+    const Pc = 25 * 10 ** 6; // Chamber Pressure (Pa)
     const Mw = 22; // Molecular Weight
     const q = MassOut; // Mass Flow Rate (kg/s)
     const Pa = this.calcPressure_(NozzleAltitude); // Ambient pressure used to calculate nozzle (Pa)
     const Pe = this.calcPressure_(Altitude); // Actual Atmospheric Pressure (Pa)
-    const Pt = Math.pow(Pc * (1 + (k - 1) / 2), -k / (k - 1)); // Throat Pressure (Pa)
+    const Pt = (Pc * (1 + (k - 1) / 2)) ** (-k / (k - 1)); // Throat Pressure (Pa)
     const Tt = Tc / (1 + (k - 1) / 2); // Throat Temperature (k)
     const At = (q / Pt) * Math.sqrt((Ru * Tt) / (Mw * k)); // Throat Area (m^2)
-    const Nm = Math.sqrt((2 / (k - 1)) * Math.pow(Pc / Pa, (k - 1) / k - 1)); // Mach Number
-    let Ae = (At / Nm) * Math.pow(1 + (((k - 1) / 2) * Math.pow(Nm, 2)) / ((k + 1) / 2), (k + 1) / (2 * (k - 1))); // Exit Nozzle Area (m^2)
-    if (Ae > FuelArea) Ae = FuelArea;
-    const VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * Math.pow(1 - Pe / Pc, (k - 1) / k);
+    const Nm = Math.sqrt((2 / (k - 1)) * (Pc / Pa) ** ((k - 1) / k - 1)); // Mach Number
+    let Ae = (At / Nm) * (1 + (((k - 1) / 2) * Nm ** 2) / ((k + 1) / 2)) ** ((k + 1) / (2 * (k - 1))); // Exit Nozzle Area (m^2)
+
+    if (Ae > FuelArea) {
+      Ae = FuelArea;
+    }
+    const VeSub = ((2 * k) / (k - 1)) * ((Ru * Tc) / Mw) * (1 - Pe / Pc) ** ((k - 1) / k);
     const Ve = Math.sqrt(VeSub); // Partical Exit Velocity (m/s)
+
+
     return q * Ve + (Pe - Pa) * Ae; // Thrust (N)
   }
 
@@ -666,7 +735,7 @@ export class Missile {
    * Some of these values do not need to be returned for calculations in later
    * iterations but are returned anyways to present the data later on in plots
    * in order to understand the flight of the missile and its governing principles
-
+   *
    * This governs the thrust angle as a function of altitude
    */
   private static iterationFun_(
@@ -684,21 +753,24 @@ export class Missile {
     AngleCoefficient: number,
     FuelDensity: number,
     BurnRate: number,
-    WarheadMass: number
+    WarheadMass: number,
   ) {
     let ThrustAngle;
-    if (Altitude < 1200000)
+
+    if (Altitude < 1200000) {
       ThrustAngle =
         (90 -
           AngleCoefficient *
             (1.5336118956 +
               0.00443173537387 * Altitude -
-              9.30373890848 * Math.pow(10, -8) * Math.pow(Altitude, 2) +
-              8.37838197732 * Math.pow(10, -13) * Math.pow(Altitude, 3) -
-              2.71228576626 * Math.pow(10, -18) * Math.pow(Altitude, 4))) *
+              9.30373890848 * 10 ** -8 * Altitude ** 2 +
+              8.37838197732 * 10 ** -13 * Altitude ** 3 -
+              2.71228576626 * 10 ** -18 * Altitude ** 4)) *
         0.0174533;
-    // (Degrees)
-    else ThrustAngle = 30;
+      // (Degrees)
+    } else {
+      ThrustAngle = 30;
+    }
 
     // This calculates the angle the drag force acts upon the missile
     const Radius = RADIUS_OF_EARTH + Altitude; // (m)
@@ -710,7 +782,8 @@ export class Missile {
     if (FuelMass > 0) {
       MassOut = FuelDensity * FuelArea * BurnRate; // (kg)
       const dmdt = MassIn - MassOut; // (kg/s)
-      FuelMass = FuelMass + dmdt * Missile.h; // (kg)
+
+      FuelMass += dmdt * Missile.h; // (kg)
     } else {
       FuelMass = 0;
     }
@@ -721,32 +794,38 @@ export class Missile {
     const AirDensity = Patm / (Missile.R * Tatm); // (kg/m^3)
 
     // This calculates the drag coeficiant
-    const c = Math.pow(1.4 * Missile.R * Tatm, 1 / 2); // (m/s)
-    const M = Math.sqrt(Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) / c; // (Unitless)
+    const c = (1.4 * Missile.R * Tatm) ** (1 / 2); // (m/s)
+    const M = Math.sqrt(drdt ** 2 + dthetadt ** 2) / c; // (Unitless)
     const cD = Missile.calcDragCoefficient_(Math.abs(M)); // (Unitless)
 
     // This calculates all the forces acting upon the missile
     let Thrust = 0;
-    if (FuelMass > 0) Thrust = Missile.calcThrustForce_(MassOut, Altitude, FuelArea, NozzleAltitude); // (N)
 
-    const DragForce = (1 / 2) * AirDensity * (Math.pow(drdt, 2) + Math.pow(dthetadt, 2)) * RocketArea * cD; // (N)
-    const WeightForce = (Missile.G * Missile.EarthMass * RocketMass) / Math.pow(Radius, 2); // (N)
+    if (FuelMass > 0) {
+      Thrust = Missile.calcThrustForce_(MassOut, Altitude, FuelArea, NozzleAltitude);
+    } // (N)
+
+    const DragForce = (1 / 2) * AirDensity * (drdt ** 2 + dthetadt ** 2) * RocketArea * cD; // (N)
+    const WeightForce = (Missile.G * Missile.EarthMass * RocketMass) / Radius ** 2; // (N)
 
     // Vertical Acceleration and velocity
-    const dr2dt = (Thrust * Math.sin(ThrustAngle) - DragForce * Math.sin(DragAngle) - WeightForce) / RocketMass + Radius * Math.pow(dthetadt / Radius, 2); // (m/s^2)
-    drdt = drdt + dr2dt * Missile.h; // (m/s)
+    const dr2dt = (Thrust * Math.sin(ThrustAngle) - DragForce * Math.sin(DragAngle) - WeightForce) / RocketMass + Radius * (dthetadt / Radius) ** 2; // (m/s^2)
 
-    Altitude = Altitude + drdt * Missile.h; // (m)
+    drdt += dr2dt * Missile.h; // (m/s)
 
-    Distance = Distance + dthetadt * Missile.h; // (m)
+    Altitude += drdt * Missile.h; // (m)
+
+    Distance += dthetadt * Missile.h; // (m)
 
     // Angular distance the missile traveled vs time
     const ArcVelocity = (dthetadt * RADIUS_OF_EARTH) / Radius; // (m/s)
-    ArcDistance = ArcDistance + ArcVelocity * Missile.h; // (m)
+
+    ArcDistance += ArcVelocity * Missile.h; // (m)
 
     // Angular acceleration and velocity
     const dtheta2dt = (Thrust * Math.cos(ThrustAngle) - DragForce * Math.cos(DragAngle)) / RocketMass - 2 * drdt * (dthetadt / Radius); // (m/s^2)
-    dthetadt = dthetadt + dtheta2dt * Missile.h; // (m/s)
+
+    dthetadt += dtheta2dt * Missile.h; // (m/s)
 
     return [FuelMass, RocketMass, Tatm, Patm, AirDensity, c, M, cD, Thrust, DragForce, WeightForce, dr2dt, drdt, Altitude, Distance, ArcVelocity, ArcDistance, dtheta2dt, dthetadt];
   }
@@ -854,11 +933,13 @@ export class Missile {
     if (TargetLatitude > 90 || TargetLatitude < -90) {
       missileManager.lastMissileErrorType = 'critical';
       missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
+
       return null;
     }
     if (TargetLongitude > 180 || TargetLongitude < -180) {
       missileManager.lastMissileErrorType = 'critical';
       missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 90 and -90 degrees';
+
       return null;
     }
     if (NumberWarheads > 12) {
@@ -868,7 +949,9 @@ export class Missile {
       return null;
     }
 
-    if (typeof minAltitude == 'undefined') minAltitude = 0;
+    if (typeof minAltitude === 'undefined') {
+      minAltitude = 0;
+    }
 
     // This function will calculate the path the rocket will take in terms of coordinates
     const LatList = [];
@@ -879,12 +962,14 @@ export class Missile {
     if (ArcLength < 320000) {
       missileManager.lastMissileErrorType = 'critical';
       missileManager.lastMissileError = 'Error: This missile has a minimum distance of 320 km.';
+
       return null;
     }
 
     if (ArcLength > MaxMissileRange * 1000) {
       missileManager.lastMissileErrorType = 'critical';
       missileManager.lastMissileError = `Error: This missile has a maximum distance of ${MaxMissileRange} km.`;
+
       return null;
     }
 
@@ -896,19 +981,19 @@ export class Missile {
 
     // Calculations for the casing
     const Thickness = 0.050389573 * Diameter; // (m)
-    const RocketArea = 0.25 * Math.PI * Math.pow(Diameter, 2); // (m^2)
+    const RocketArea = 0.25 * Math.PI * Diameter ** 2; // (m^2)
 
     const RocketCasingDensity = 1628.75; // (kg/m^3)http://scholar.lib.vt.edu/theses/available/etd-101198-161441/unrestricted/appendix.pdf
-    const RocketCasingVolume = 0.25 * Math.PI * Length * (Math.pow(Diameter, 2) - Math.pow(Diameter - Thickness, 2)); // (m^3)
+    const RocketCasingVolume = 0.25 * Math.PI * Length * (Diameter ** 2 - (Diameter - Thickness) ** 2); // (m^3)
     const RocketCasingMass1 = RocketCasingDensity * RocketCasingVolume; // (kg)
-    const RocketCasingMass2 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.4937) * (Math.pow(Diameter, 2) - Math.pow(Diameter - Thickness, 2)); // (kg)
-    const RocketCasingMass3 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.157) * (Math.pow(Diameter * 0.75, 2) - (Diameter * 0.75 - Math.pow(Thickness / 2, 2), 2)); // (kg)
+    const RocketCasingMass2 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.4937) * (Diameter ** 2 - (Diameter - Thickness) ** 2); // (kg)
+    const RocketCasingMass3 = RocketCasingDensity * 0.25 * Math.PI * (Length * 0.157) * ((Diameter * 0.75) ** 2 - (Diameter * 0.75 - (Thickness / 2) ** 2)); // (kg)
 
     // Calculations for the fuel
     const BurnRate = NewBurnRate || 0.042; // (m/s)
     const FuelDensity = 1750; // (kg/m^2)
-    const FuelArea1 = 0.25 * Math.PI * Math.pow(Diameter - Thickness, 2); // (m^2)
-    const FuelArea2 = 0.25 * Math.PI * Math.pow(Diameter * 0.75 - Thickness, 2); // (m^2)
+    const FuelArea1 = 0.25 * Math.PI * (Diameter - Thickness) ** 2; // (m^2)
+    const FuelArea2 = 0.25 * Math.PI * (Diameter * 0.75 - Thickness) ** 2; // (m^2)
     const FuelVolume = FuelArea1 * (Length * 0.651) + FuelArea2 * (Length * 0.178); // (m^3)
     let FuelMass = FuelDensity * FuelVolume; // http://www.lr.tudelft.nl/en/organisation/departments/space-engineering/space-systems-engineering/expertise-areas/space-propulsion/design-of-elements/rocket-propellants/solids/
 
@@ -951,7 +1036,7 @@ export class Missile {
       GoalDistance,
       FuelDensity,
       BurnRate,
-      WarheadMass
+      WarheadMass,
     );
 
     while (FuelMass / FuelDensity / FuelVolume > 0.4 && Altitude >= 0) {
@@ -970,8 +1055,9 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
+
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
       Altitude = iterationFunOutput[13];
@@ -992,6 +1078,7 @@ export class Missile {
       }
 
       let hListSum = 0;
+
       for (let i = 0; i < hList.length; i++) {
         hListSum += hList[i];
       }
@@ -1014,8 +1101,9 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
+
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
       Altitude = iterationFunOutput[13];
@@ -1036,6 +1124,7 @@ export class Missile {
       }
 
       let hListSum = 0;
+
       for (const h of hList) {
         hListSum += h;
       }
@@ -1058,8 +1147,9 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
+
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
       Altitude = iterationFunOutput[13];
@@ -1078,6 +1168,7 @@ export class Missile {
       }
 
       let hListSum = 0;
+
       for (const h of hList) {
         hListSum += h;
       }
@@ -1101,8 +1192,9 @@ export class Missile {
         AngleCoefficient,
         FuelDensity,
         BurnRate,
-        WarheadMass
+        WarheadMass,
       );
+
       FuelMass = iterationFunOutput[0];
       drdt = iterationFunOutput[12];
       Altitude = iterationFunOutput[13];
@@ -1121,14 +1213,13 @@ export class Missile {
       }
     }
 
-    const MaxAltitude = AltitudeList.reduce(function (a, b) {
-      return Math.max(a, b);
-    });
+    const MaxAltitude = AltitudeList.reduce((a, b) => Math.max(a, b));
 
     if (MaxAltitude < minAltitudeTrue) {
       // Try again with 25% increase to burn rate
       const burnMultiplier = Math.max(Math.min(3, minAltitudeTrue / MaxAltitude), 1.25);
       // setTimeout(function () {
+
       return {
         isRetry: true,
         CurrentLatitude,
@@ -1152,6 +1243,7 @@ export class Missile {
     if (minAltitudeTrue === (minAltitude * 3) / 2) {
       missileManager.lastMissileErrorType = 'critical';
       missileManager.lastMissileError = 'Error: This distance is too close for the selected missile.';
+
       return null;
     }
 
@@ -1161,13 +1253,17 @@ export class Missile {
     missileObj.active = true;
     missileObj.type = SpaceObjectType.UNKNOWN;
     missileObj.id = MissileObjectNum;
-    missileObj.name = 'RV_' + missileObj.id;
+    missileObj.name = `RV_${missileObj.id}`;
     // maxAlt is used for zoom controls
     missileObj.maxAlt = MaxAltitude;
     missileObj.startTime = CurrentTime;
-    if (country) missileObj.country = country;
+    if (country) {
+      missileObj.country = country;
+    }
 
-    if (MissileDesc) missileObj.desc = MissileDesc;
+    if (MissileDesc) {
+      missileObj.desc = MissileDesc;
+    }
 
     return missileObj; // Successful Launch
   }

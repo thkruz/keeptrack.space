@@ -5,7 +5,7 @@ import { SatObject } from '../src/interfaces';
 import { keepTrackApi } from '../src/keepTrackApi';
 import { defaultSat } from './environment/apiMocks';
 
-test(`keepTrackApi Unit Testing`, () => {
+test('keepTrackApi Unit Testing', () => {
   expect(() => {
     keepTrackApi.unregister({ event: KeepTrackApiEvents.touchStart, cbName: 'test' });
   }).toThrow(Error);
@@ -120,8 +120,10 @@ test(`keepTrackApi Unit Testing`, () => {
   keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'test');
   keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
 
-  // let emptyTexture: WebGLTexture;
-  // keepTrackApi.runEvent(KeepTrackApiEvents.nightToggle(keepTrackApi.programs.drawManager.gl, emptyTexture, emptyTexture));
+  /*
+   * let emptyTexture: WebGLTexture;
+   * keepTrackApi.runEvent(KeepTrackApiEvents.nightToggle(keepTrackApi.programs.drawManager.gl, emptyTexture, emptyTexture));
+   */
   keepTrackApi.runEvent(KeepTrackApiEvents.orbitManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
   keepTrackApi.runEvent(KeepTrackApiEvents.drawOptionalScenery);
@@ -133,14 +135,15 @@ test(`keepTrackApi Unit Testing`, () => {
   keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, 0);
 });
 
-describe(`keepTrackApi.html`, () => {
-  test(`keepTrackApi.html Good HTML`, () => {
+describe('keepTrackApi.html', () => {
+  test('keepTrackApi.html Good HTML', () => {
     expect(() => {
+      // eslint-disable-next-line no-unused-expressions
       keepTrackApi.html`<div id="about-menu" class="side-menu-parent start-hidden text-select">`;
     }).not.toThrow(Error);
   });
 
-  test(`keepTrackApi.html Bad HTML`, () => {
+  test('keepTrackApi.html Bad HTML', () => {
     expect(() => keepTrackApi.html(<TemplateStringsArray>(<unknown>'A'))).toThrow(Error);
   });
 });

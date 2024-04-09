@@ -9,6 +9,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 
 describe('SensorSurvFence_class', () => {
   let sensorSurvFencePlugin: SensorSurvFence;
+
   beforeEach(() => {
     setupStandardEnvironment();
     sensorSurvFencePlugin = new SensorSurvFence();
@@ -24,6 +25,7 @@ describe('SensorSurvFence_class', () => {
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
 
     const sensorManagerInstance = new SensorManager();
+
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();

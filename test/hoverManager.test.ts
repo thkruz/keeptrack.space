@@ -3,43 +3,45 @@ import { WebGLRenderer } from '@app/singletons/webgl-renderer';
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { CatalogManager } from '@app/singletons/catalog-manager';
+import { OrbitManager } from '@app/singletons/orbitManager';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
 import { HoverManager } from '../src/singletons/hover-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
-import { CatalogManager } from '@app/singletons/catalog-manager';
-import { OrbitManager } from '@app/singletons/orbitManager';
 
 /*
-Code Analysis
-
-Objective:
-The HoverManager class is responsible for managing the hover functionality in the KeepTrack application. It handles the display of information about a satellite or other space object when the user hovers over it with their mouse.
-
-Inputs:
-- Various imported modules and classes from the KeepTrack application
-- HTML eleimport { catalogManagerInstance } from '@app/singletons/catalog-manager';
-ments for the hover box
-
-Flow:
-- The class has methods for initializing the hover box, setting the current hover ID, and updating the hover box with information about the currently hovered object.
-- The updateHover method is called periodically to update the hover box based on the user's mouse position and other settings.
-- The class also has several private methods for displaying different types of information in the hover box, depending on the type of object being hovered over.
-
-Outputs:
-- The current hover ID
-- Display of information about the currently hovered object in the hover box
-
-Additional aspects:
-- The class handles different types of space objects, including satellites, launch facilities, and radar data.
-- It also takes into account various settings and user preferences, such as whether to display ECI coordinates or next pass information.
-- The class is part of a larger application and relies on other modules and classes to function properly.
-*/
+ *Code Analysis
+ *
+ *Objective:
+ *The HoverManager class is responsible for managing the hover functionality in the KeepTrack application. It handles the display of information about a satellite or other space object when the user hovers over it with their mouse.
+ *
+ *Inputs:
+ *- Various imported modules and classes from the KeepTrack application
+ *- HTML eleimport { catalogManagerInstance } from '@app/singletons/catalog-manager';
+ *ments for the hover box
+ *
+ *Flow:
+ *- The class has methods for initializing the hover box, setting the current hover ID, and updating the hover box with information about the currently hovered object.
+ *- The updateHover method is called periodically to update the hover box based on the user's mouse position and other settings.
+ *- The class also has several private methods for displaying different types of information in the hover box, depending on the type of object being hovered over.
+ *
+ *Outputs:
+ *- The current hover ID
+ *- Display of information about the currently hovered object in the hover box
+ *
+ *Additional aspects:
+ *- The class handles different types of space objects, including satellites, launch facilities, and radar data.
+ *- It also takes into account various settings and user preferences, such as whether to display ECI coordinates or next pass information.
+ *- The class is part of a larger application and relies on other modules and classes to function properly.
+ */
 
 describe('code_snippet', () => {
   let hoverManager: HoverManager;
   let orbitManagerInstance: OrbitManager;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let catalogManagerInstance: CatalogManager;
+
   beforeAll(() => {
     orbitManagerInstance = keepTrackApi.getOrbitManager();
     catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -71,6 +73,7 @@ describe('code_snippet', () => {
   it('test_sat_screen_position_error', () => {
     hoverManager.init();
     const drawManagerInstance = keepTrackApi.getRenderer();
+
     drawManagerInstance.getScreenCoords = jest.fn().mockReturnValue({ error: true, x: 0, y: 0 });
     keepTrackContainer.registerSingleton<WebGLRenderer>(Singletons.WebGLRenderer, drawManagerInstance);
     hoverManager.setHoverId(1);
@@ -82,6 +85,7 @@ describe('code_snippet', () => {
   it('test_sat_screen_position_no_error', () => {
     hoverManager.init();
     const drawManagerInstance = keepTrackApi.getRenderer();
+
     drawManagerInstance.getScreenCoords = jest.fn().mockReturnValue({ error: false, x: 0, y: 0 });
     keepTrackContainer.registerSingleton<WebGLRenderer>(Singletons.WebGLRenderer, drawManagerInstance);
     hoverManager.setHoverId(1);

@@ -4,12 +4,15 @@ interface ClickDragOptions {
 }
 
 export const clickAndDragWidth = (el: HTMLElement | null, options: ClickDragOptions = {}): void => {
-  if (!el) return;
+  if (!el) {
+    return;
+  }
 
   const minWidth = options.minWidth ?? 280;
   const maxWidth = options.maxWidth ?? 450;
 
   let width = el.style.width ? parseInt(el.style.width) : el.clientWidth;
+
   width = width < minWidth ? minWidth : width;
   width = width > maxWidth ? maxWidth : width;
   el.style.width = `${width}px`;
@@ -23,7 +26,9 @@ export const clickAndDragWidth = (el: HTMLElement | null, options: ClickDragOpti
 };
 
 export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback?: () => void): void => {
-  if (!el) return;
+  if (!el) {
+    return;
+  }
   settingsManager.isDragging = false;
 
   // create new element on right edge
@@ -35,6 +40,7 @@ export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback
 const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number) => {
   let startX: number;
   let startWidth: number;
+
   edgeEl.addEventListener('mousedown', (e: MouseEvent) => {
     Object.assign(edgeEl.style, {
       width: '100vw',
@@ -70,6 +76,7 @@ const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number,
 
 const createElWidth_ = (el: HTMLElement) => {
   const edgeEl = document.createElement('div');
+
   edgeEl.style.position = 'relative';
   edgeEl.style.height = '100%';
   edgeEl.style.width = '8px';
@@ -78,6 +85,7 @@ const createElWidth_ = (el: HTMLElement) => {
   edgeEl.style.zIndex = '9999';
   edgeEl.style.marginLeft = 'auto';
   el.appendChild(edgeEl);
+
   return edgeEl;
 };
 
@@ -105,7 +113,10 @@ const addEventsHeight_ = (edgeEl: HTMLDivElement, el: HTMLElement, callback?: ()
       position: 'absolute',
     } as CSSStyleDeclaration);
 
-    if (callback) callback();
+    if (callback) {
+      // eslint-disable-next-line callback-return
+      callback();
+    }
   });
   edgeEl.addEventListener('mousemove', (e: MouseEvent) => {
     if (settingsManager.isDragging) {
@@ -121,6 +132,7 @@ const addEventsHeight_ = (edgeEl: HTMLDivElement, el: HTMLElement, callback?: ()
 
 const createElHeight_ = (el: HTMLElement) => {
   const edgeEl = document.createElement('div');
+
   edgeEl.style.position = 'absolute';
   edgeEl.style.width = '100%';
   edgeEl.style.height = '8px';
@@ -131,5 +143,6 @@ const createElHeight_ = (el: HTMLElement) => {
   edgeEl.style.marginLeft = 'auto';
   edgeEl.style.marginRight = 'auto';
   el.appendChild(edgeEl);
+
   return edgeEl;
 };

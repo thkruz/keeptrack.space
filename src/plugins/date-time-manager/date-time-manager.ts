@@ -45,6 +45,7 @@ export class DateTimeManager extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
+
         getEl('jday').innerHTML = jday.toString();
       },
     });
@@ -54,6 +55,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const dateTimeInputTbDOM = $(`#${this.dateTimeInputTbId}`);
     // TODO: remove this check when jest is fixed
+
     if (dateTimeInputTbDOM && !isThisNode()) {
       dateTimeInputTbDOM.datepicker('setDate', date);
     }
@@ -67,6 +69,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     if (!this.isEditTimeOpen) {
       const datetimeInput = getEl('datetime-input');
       const datetimeInputTb = getEl(this.dateTimeInputTbId);
+
       if (datetimeInput && datetimeInputTb) {
         datetimeInput.style.display = 'block';
         datetimeInputTb.focus();
@@ -77,6 +80,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
   uiManagerInit() {
     const NavWrapper = getEl('nav-wrapper');
+
     NavWrapper?.insertAdjacentHTML(
       'afterbegin',
       keepTrackApi.html`
@@ -91,7 +95,7 @@ export class DateTimeManager extends KeepTrackPlugin {
               </div>
             </div>
         </div>
-          `
+          `,
     );
   }
 
@@ -103,8 +107,10 @@ export class DateTimeManager extends KeepTrackPlugin {
       e.preventDefault();
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     // Initialize the date/time picker
+
     (<any>$('#datetime-input-tb'))
       .datetimepicker({
         dateFormat: 'yy-mm-dd',
@@ -112,11 +118,13 @@ export class DateTimeManager extends KeepTrackPlugin {
         timezone: '+0000',
         gotoCurrent: true,
         addSliderAccess: true,
-        // minDate: -14, // No more than 7 days in the past
-        // maxDate: 14, // or 7 days in the future to make sure ELSETs are valid
+        /*
+         * minDate: -14, // No more than 7 days in the past
+         * maxDate: 14, // or 7 days in the future to make sure ELSETs are valid
+         */
         sliderAccessArgs: { touchonly: false },
       })
-      .on('change.dp', function () {
+      .on('change.dp', () => {
         // This code gets called when the done button is pressed or the time sliders are closed
         if (that.isEditTimeOpen) {
           getEl('datetime-input').style.display = 'none';
@@ -127,6 +135,7 @@ export class DateTimeManager extends KeepTrackPlugin {
           // TODO: Migrate to watchlist.ts
           try {
             const uiManagerInstance = keepTrackApi.getUiManager();
+
             uiManagerInstance.updateNextPassOverlay(true);
           } catch {
             // Intentionally ignored
@@ -148,6 +157,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
     const today = new Date();
     const jday = getDayOfYear(timeManagerInstance.simulationTimeObj);
+
     getEl('jday').innerHTML = jday.toString();
     timeManagerInstance.changeStaticOffset(selectedDate.getTime() - today.getTime());
     colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
@@ -159,6 +169,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     try {
       (<WatchlistOverlay>keepTrackApi.getPlugin(WatchlistOverlay)).lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
       const uiManagerInstance = keepTrackApi.getUiManager();
+
       uiManagerInstance.updateNextPassOverlay(true);
     } catch {
       // Ignore

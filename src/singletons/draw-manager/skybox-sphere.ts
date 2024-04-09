@@ -32,31 +32,39 @@ export class SkyBoxSphere {
   private isLoaded_ = false;
 
   public static getSrcBoundaries(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('installDirectory is not defined');
+    if (!settings.installDirectory) {
+      throw new Error('installDirectory is not defined');
+    }
 
-    let src = `${settings.installDirectory}textures/skyboxBoundaries8k.jpg`;
+    const src = `${settings.installDirectory}textures/skyboxBoundaries8k.jpg`;
 
     return src;
   }
 
   public static getSrcConstellations(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('installDirectory is not defined');
+    if (!settings.installDirectory) {
+      throw new Error('installDirectory is not defined');
+    }
 
-    let src = `${settings.installDirectory}textures/skyboxConstellations8k.jpg`;
+    const src = `${settings.installDirectory}textures/skyboxConstellations8k.jpg`;
 
     return src;
   }
 
   public static getSrcGraySkybox(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('installDirectory is not defined');
+    if (!settings.installDirectory) {
+      throw new Error('installDirectory is not defined');
+    }
 
-    let src = `${settings.installDirectory}textures/skybox1k-gray.jpg`;
+    const src = `${settings.installDirectory}textures/skybox1k-gray.jpg`;
 
     return src;
   }
 
   public static getSrcMilkyWay(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('installDirectory is not defined');
+    if (!settings.installDirectory) {
+      throw new Error('installDirectory is not defined');
+    }
 
     let src = `${settings.installDirectory}textures/skybox4k.jpg`;
 
@@ -72,16 +80,24 @@ export class SkyBoxSphere {
   }
 
   public render(tgtBuffer?: WebGLFramebuffer): void {
-    if (!this.isLoaded_) return;
-    if (!this.isTexturesReady_ || settingsManager.isDisableSkybox) return;
+    if (!this.isLoaded_) {
+      return;
+    }
+    if (!this.isTexturesReady_ || settingsManager.isDisableSkybox) {
+      return;
+    }
 
     // Make sure there is something to draw
-    if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations && !this.settings_.isGraySkybox) return;
+    if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations && !this.settings_.isGraySkybox) {
+      return;
+    }
 
     const gl = this.gl_;
 
     this.mesh.program.use();
-    if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    if (tgtBuffer) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    }
 
     this.setUniforms_(gl);
 
@@ -135,17 +151,25 @@ export class SkyBoxSphere {
         gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay_);
       }
 
-      // Figure out how bright the milky way should be to make the blending consistent
-      // The more textures that are on the brighter the milky way needs to be
+      /*
+       * Figure out how bright the milky way should be to make the blending consistent
+       * The more textures that are on the brighter the milky way needs to be
+       */
       let milkyWayMul: 6 | 4 | 2 | 0;
       const factor1 = this.settings_.isDrawMilkyWay ? 1 : 0;
       const factor2 = this.settings_.isDrawConstellationBoundaries ? 1 : 0;
       const factor3 = this.settings_.isDrawNasaConstellations ? 1 : 0;
       const sum = factor1 + factor2 + factor3;
-      if (sum === 3) milkyWayMul = 6;
-      else if (sum === 2) milkyWayMul = 4;
-      else if (sum === 1) milkyWayMul = 2;
-      else milkyWayMul = 0;
+
+      if (sum === 3) {
+        milkyWayMul = 6;
+      } else if (sum === 2) {
+        milkyWayMul = 4;
+      } else if (sum === 1) {
+        milkyWayMul = 2;
+      } else {
+        milkyWayMul = 0;
+      }
 
       gl.uniform1f(this.mesh.material.uniforms.u_fMilkyWay, milkyWayMul);
     }
@@ -160,6 +184,7 @@ export class SkyBoxSphere {
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
+
     this.initTextures_();
     const material = new ShaderMaterial(gl, {
       uniforms: {
@@ -172,6 +197,7 @@ export class SkyBoxSphere {
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
+
     this.mesh = new Mesh(gl, geometry, material, {
       name: 'skybox',
       precision: 'highp',
@@ -190,6 +216,7 @@ export class SkyBoxSphere {
     mat4.identity(this.mvMatrix_);
 
     const cameraPos = keepTrackApi.getMainCamera().getCameraPosition();
+
     mat4.translate(this.mvMatrix_, this.mvMatrix_, cameraPos);
 
     mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, -90 * DEG2RAD);

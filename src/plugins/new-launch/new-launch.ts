@@ -28,12 +28,15 @@ export class NewLaunch extends KeepTrackPlugin {
   }
 
   bottomIconCallback = () => {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
     if (!this.verifySatelliteSelected()) {
       return;
     }
 
     const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
     (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0(sat.inclination.toFixed(4), 8);
   };
@@ -126,7 +129,7 @@ export class NewLaunch extends KeepTrackPlugin {
   </div>
   `;
 
-  helpTitle = `New Launch Menu`;
+  helpTitle = 'New Launch Menu';
   helpBody = keepTrackApi.html`The New Launch Menu is used for generating notional orbital launches by modifying existing satellites with similar parameters.
     <br><br>
     After selecting a satellite, you can select a launch location and a north/south azimuth.
@@ -141,7 +144,9 @@ export class NewLaunch extends KeepTrackPlugin {
 
   isDoingCalculations: boolean = false;
   submitCallback: () => void = () => {
-    if (this.isDoingCalculations) return;
+    if (this.isDoingCalculations) {
+      return;
+    }
     this.isDoingCalculations = true;
 
     const timeManagerInstance = keepTrackApi.getTimeManager();
@@ -153,7 +158,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const sccNum = (<HTMLInputElement>getEl('nl-scc')).value;
     const id = catalogManagerInstance.sccNum2Id(parseInt(sccNum));
-    let sat = catalogManagerInstance.getObject(id) as DetailedSatellite;
+    const sat = catalogManagerInstance.getObject(id) as DetailedSatellite;
 
     const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
     const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
@@ -174,11 +179,13 @@ export class NewLaunch extends KeepTrackPlugin {
       launchLon = (launchLon - 360) as Degrees; // Convert from 0-360 to -180-180
     }
 
-    // if (sat.inclination < launchLat) {
-    //   uiManagerInstance.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
-    //   return;
-    // }
-    // Set time to 0000z for relative time.
+    /*
+     * if (sat.inclination < launchLat) {
+     *   uiManagerInstance.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
+     *   return;
+     * }
+     * Set time to 0000z for relative time.
+     */
     const today = new Date(); // Need to know today for offset calculation
     const quadZTime = new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
 
@@ -213,35 +220,39 @@ export class NewLaunch extends KeepTrackPlugin {
       timeManagerInstance.changeStaticOffset(cacheStaticOffset);
       this.isDoingCalculations = false;
       hideLoading();
+
       return;
     }
 
-    uiManagerInstance.toast(`Time is now relative to launch time.`, 'standby');
+    uiManagerInstance.toast('Time is now relative to launch time.', 'standby');
     keepTrackApi.getSoundManager()?.play(SoundNames.LIFT_OFF);
 
     // Prevent caching of old TLEs
     sat.satrec = null;
 
     let satrec: SatelliteRecord;
+
     try {
       satrec = Sgp4.createSatrec(TLE1, TLE2);
     } catch (e) {
       errorManagerInstance.error(e, 'new-launch.ts', 'Error creating satellite record!');
+
       return;
     }
     if (SatMath.altitudeCheck(satrec, simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
-        id: id,
+        id,
         active: true,
-        TLE1: TLE1,
-        TLE2: TLE2,
+        TLE1,
+        TLE2,
       });
 
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
       orbitManagerInstance.changeOrbitBufferData(id, TLE1, TLE2);
     } else {
-      uiManagerInstance.toast(`Failed Altitude Test - Try a Different Satellite!`, 'critical');
+      uiManagerInstance.toast('Failed Altitude Test - Try a Different Satellite!', 'critical');
     }
 
     waitForCruncher(
@@ -256,8 +267,8 @@ export class NewLaunch extends KeepTrackPlugin {
       () => {
         this.isDoingCalculations = false;
         hideLoading();
-        uiManagerInstance.toast(`Cruncher failed to meet requirement after multiple tries! Is this launch even possible?`, 'critical');
-      }
+        uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', 'critical');
+      },
     );
   };
 
@@ -267,9 +278,12 @@ export class NewLaunch extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl(this.sideMenuElementName + '-form').addEventListener('change', () => {
+        getEl(`${this.sideMenuElementName}-form`).addEventListener('change', () => {
           const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
-          if (!sat.isSatellite()) return;
+
+          if (!sat.isSatellite()) {
+            return;
+          }
           this.preValidate_(sat);
         });
       },
@@ -281,6 +295,7 @@ export class NewLaunch extends KeepTrackPlugin {
       cb: (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           const sat = obj as DetailedSatellite;
+
           (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
@@ -298,9 +313,11 @@ export class NewLaunch extends KeepTrackPlugin {
     const launchSiteOptionValue = (<HTMLInputElement>getEl('nl-facility')).value;
     const lat = launchSites[launchSiteOptionValue].lat;
     let inc = sat.inclination;
+
     inc = inc > 90 ? ((180 - inc) as Degrees) : inc;
 
-    const submitButtonDom = <HTMLButtonElement>getEl(this.sideMenuElementName + '-submit');
+    const submitButtonDom = <HTMLButtonElement>getEl(`${this.sideMenuElementName}-submit`);
+
     if (inc < lat) {
       submitButtonDom.disabled = true;
       submitButtonDom.textContent = 'Inclination Too Low!';

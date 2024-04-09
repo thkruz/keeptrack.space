@@ -1,3 +1,5 @@
+/* eslint-disable new-cap */
+/* eslint-disable max-statements */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
@@ -16,8 +18,9 @@ let isSub = false;
 let i = 0;
 
 export const updateLoop = (): void => {
-  if (typeof missileManagerInstance != 'undefined' && missileManagerInstance.missileArray.length > 0) {
+  if (typeof missileManagerInstance !== 'undefined' && missileManagerInstance.missileArray.length > 0) {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
     for (i = 0; i < missileManagerInstance.missileArray.length; i++) {
       orbitManagerInstance.updateOrbitBuffer(missileManagerInstance.missileArray[i].id);
     }
@@ -31,17 +34,20 @@ export const hideSideMenus = (): void => {
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-missile') {
     const uiManagerInstance = keepTrackApi.getUiManager();
+
     if (isMissileMenuOpen) {
       isMissileMenuOpen = false;
       uiManagerInstance.hideSideMenus();
-      return;
+
     } else {
-      if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.closeSearch();
+      if (settingsManager.isMobileModeEnabled) {
+        uiManagerInstance.searchManager.closeSearch();
+      }
       uiManagerInstance.hideSideMenus();
       slideInRight(getEl('missile-menu'), 1000);
       getEl('menu-missile').classList.add('bmenu-item-selected');
       isMissileMenuOpen = true;
-      return;
+
     }
   }
 };
@@ -80,6 +86,7 @@ export const missileSubmit = (): void => {
     const launchTime = timeManagerInstance.selectedDate.getTime();
 
     let sim = '';
+
     if (type === 1) {
       sim = 'simulation/Russia2USA.json';
       missileManager.MassRaidPre(launchTime, sim);
@@ -115,13 +122,15 @@ export const missileSubmit = (): void => {
       if (target === -1) {
         // Custom Target
         if (isNaN(tgtLat)) {
-          uiManagerInstance.toast(`Invalid Target Latitude!`, 'critical');
+          uiManagerInstance.toast('Invalid Target Latitude!', 'critical');
           getEl('loading-screen').style.display = 'none';
+
           return;
         }
         if (isNaN(tgtLon)) {
-          uiManagerInstance.toast(`Invalid Target Longitude!`, 'critical');
+          uiManagerInstance.toast('Invalid Target Longitude!', 'critical');
           getEl('loading-screen').style.display = 'none';
+
           return;
         }
       } else {
@@ -132,13 +141,15 @@ export const missileSubmit = (): void => {
 
       if (isSub) {
         if (isNaN(lauLat)) {
-          uiManagerInstance.toast(`Invalid Launch Latitude!`, 'critical');
+          uiManagerInstance.toast('Invalid Launch Latitude!', 'critical');
           getEl('loading-screen').style.display = 'none';
+
           return;
         }
         if (isNaN(lauLon)) {
-          uiManagerInstance.toast(`Invalid Launch Longitude!`, 'critical');
+          uiManagerInstance.toast('Invalid Launch Longitude!', 'critical');
           getEl('loading-screen').style.display = 'none';
+
           return;
         }
       }
@@ -152,13 +163,14 @@ export const missileSubmit = (): void => {
         a = attacker - 100;
         b = 500 - missileManagerInstance.missilesInUse;
         let missileMinAlt = 1200;
+
         if (attacker != 100) {
           // Use Custom Launch Site
           lauLat = <number>missileManager.UsaICBM[a * 4];
           lauLon = <number>missileManager.UsaICBM[a * 4 + 1];
-          missileMinAlt = 1100; //https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
+          missileMinAlt = 1100; // https://www.space.com/8689-air-force-launches-ballistic-missile-suborbital-test.html
         }
-        missileManagerInstance.Missile(
+        missileManagerInstance.createMissile(
           lauLat,
           lauLon,
           tgtLat,
@@ -172,19 +184,20 @@ export const missileSubmit = (): void => {
           0.07,
           <number>missileManager.UsaICBM[a * 4 + 3],
           'United States',
-          missileMinAlt
+          missileMinAlt,
         );
       } else if (attacker < 300) {
         // Russian
         a = attacker - 200;
         b = 500 - missileManagerInstance.missilesInUse;
         const missileMinAlt = 1120;
+
         if (attacker != 213 && attacker != 214 && attacker != 215) {
           // Use Custom Launch Site
           lauLat = <number>missileManager.RussianICBM[a * 4];
           lauLon = <number>missileManager.RussianICBM[a * 4 + 1];
         }
-        missileManagerInstance.Missile(
+        missileManagerInstance.createMissile(
           lauLat,
           lauLon,
           tgtLat,
@@ -198,19 +211,20 @@ export const missileSubmit = (): void => {
           0.07,
           <number>missileManager.RussianICBM[a * 4 + 3],
           'Russia',
-          missileMinAlt
+          missileMinAlt,
         );
       } else if (attacker < 400) {
         // Chinese
         a = attacker - 300;
         b = 500 - missileManagerInstance.missilesInUse;
         const missileMinAlt = 1120;
+
         if (attacker != 321) {
           // Use Custom Launch Site
           lauLat = <number>missileManager.ChinaICBM[a * 4];
           lauLon = <number>missileManager.ChinaICBM[a * 4 + 1];
         }
-        missileManagerInstance.Missile(
+        missileManagerInstance.createMissile(
           lauLat,
           lauLon,
           tgtLat,
@@ -224,19 +238,20 @@ export const missileSubmit = (): void => {
           0.07,
           <number>missileManager.ChinaICBM[a * 4 + 3],
           'China',
-          missileMinAlt
+          missileMinAlt,
         );
       } else if (attacker < 500) {
         // North Korean
         a = attacker - 400;
         b = 500 - missileManagerInstance.missilesInUse;
         const missileMinAlt = 1120;
+
         if (attacker != 400) {
           // Use Custom Launch Site
           lauLat = <number>missileManager.NorthKoreanBM[a * 4];
           lauLon = <number>missileManager.NorthKoreanBM[a * 4 + 1];
         }
-        missileManagerInstance.Missile(
+        missileManagerInstance.createMissile(
           lauLat,
           lauLon,
           tgtLat,
@@ -250,20 +265,21 @@ export const missileSubmit = (): void => {
           0.07,
           <number>missileManager.NorthKoreanBM[a * 4 + 3],
           'North Korea',
-          missileMinAlt
+          missileMinAlt,
         );
       } else if (attacker < 600) {
         // French SLBM
         a = attacker - 500;
         b = 500 - missileManagerInstance.missilesInUse;
         const missileMinAlt = 1000;
+
         if (attacker != 500) {
           // Use Custom Launch Site
           lauLat = <number>missileManager.FraSLBM[a * 4];
           lauLon = <number>missileManager.FraSLBM[a * 4 + 1];
         }
         // https://etikkradet.no/files/2017/02/EADS-Engelsk.pdf
-        missileManagerInstance.Missile(
+        missileManagerInstance.createMissile(
           lauLat,
           lauLon,
           tgtLat,
@@ -277,19 +293,20 @@ export const missileSubmit = (): void => {
           0.07,
           <number>missileManager.FraSLBM[a * 4 + 3],
           'France',
-          missileMinAlt
+          missileMinAlt,
         );
       } else if (attacker < 700) {
         // United Kingdom SLBM
         a = attacker - 600;
         b = 500 - missileManagerInstance.missilesInUse;
         const missileMinAlt = 1200;
+
         if (attacker != 600) {
           // Use Custom Launch Site
           lauLat = <number>missileManager.ukSLBM[a * 4];
           lauLon = <number>missileManager.ukSLBM[a * 4 + 1];
         }
-        missileManagerInstance.Missile(
+        missileManagerInstance.createMissile(
           lauLat,
           lauLon,
           tgtLat,
@@ -303,7 +320,7 @@ export const missileSubmit = (): void => {
           0.07,
           <number>missileManager.ukSLBM[a * 4 + 3],
           'United Kigndom',
-          missileMinAlt
+          missileMinAlt,
         );
       }
       uiManagerInstance.toast(missileManagerInstance.lastMissileError, missileManagerInstance.lastMissileErrorType);
@@ -470,7 +487,7 @@ export const uiManagerInit = (): void => {
             </div>
           </div>
         </div>
-      `
+      `,
   );
 
   // Bottom Icon
@@ -485,12 +502,13 @@ export const uiManagerInit = (): void => {
           <span class="bmenu-title">Missile</span>
           <div class="status-icon"></div>
         </div>
-        `
+        `,
   );
 };
 
 export const searchForRvs = () => {
   const uiManagerInstance = keepTrackApi.getUiManager();
+
   uiManagerInstance.doSearch('RV_');
 };
 
@@ -554,14 +572,17 @@ export const init = (): void => {
 export const onHelpMenuClick = (): boolean => {
   if (isMissileMenuOpen) {
     adviceManagerInstance.showAdvice(helpTitleTextMissile, helpBodyTextMissile);
+
     return true;
   }
+
   return false;
 };
 
 export const msAttackerChange = () => {
   isSub = false;
   const subList = [100, 600, 213, 214, 215, 321, 500, 400];
+
   for (let i = 0; i < subList.length; i++) {
     if (subList[i] == parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
       isSub = true;

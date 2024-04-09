@@ -20,8 +20,10 @@ export class Box {
    * @param {Kilometers} w - The distance from the center of the object to the outside of the box along the cross-track axis.
    */
   public setCubeSize(u: Kilometers, v: Kilometers, w: Kilometers) {
-    // When scaling the cube our axis aren't correct. They are labeled as u, v, w but they are actually v, w, u.
-    // So we need to swap them around.
+    /*
+     * When scaling the cube our axis aren't correct. They are labeled as u, v, w but they are actually v, w, u.
+     * So we need to swap them around.
+     */
 
     // intrack, crosstrack, radial
 
@@ -111,13 +113,19 @@ export class Box {
   public eci: EciVec3;
 
   public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-    if (!this.isLoaded_) return;
-    if (this.drawPosition[0] === 0 && this.drawPosition[1] === 0 && this.drawPosition[2] === 0) return;
+    if (!this.isLoaded_) {
+      return;
+    }
+    if (this.drawPosition[0] === 0 && this.drawPosition[1] === 0 && this.drawPosition[2] === 0) {
+      return;
+    }
 
     const gl = this.gl_;
 
     gl.useProgram(this.program_);
-    if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    if (tgtBuffer) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+    }
 
     // Set the uniforms
     gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
@@ -152,12 +160,16 @@ export class Box {
     this.isLoaded_ = true;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public update(obj: BaseObject, _selectedDate?: Date) {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_) {
+      return;
+    }
     if (!obj?.position) {
       this.drawPosition[0] = 0;
       this.drawPosition[1] = 0;
       this.drawPosition[2] = 0;
+
       return;
     }
 
@@ -194,6 +206,7 @@ export class Box {
 
   private initProgram_() {
     const gl = this.gl_;
+
     this.program_ = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag).program;
     this.gl_.useProgram(this.program_);
 
@@ -205,6 +218,7 @@ export class Box {
   private initVao_() {
     const gl = this.gl_;
     // Make New Vertex Array Objects
+
     this.vao = gl.createVertexArray();
     gl.bindVertexArray(this.vao);
 

@@ -24,6 +24,7 @@ export class ObjectGroup {
 
   constructor(type: GroupType, data: any) {
     const objData = keepTrackApi.getCatalogManager().objectCache;
+
     switch (type) {
       case GroupType.ALL:
         objData.every((sat) => {
@@ -31,6 +32,7 @@ export class ObjectGroup {
             this.ids.push(sat.id);
           }
           // Stop when we hit the max number of orbits to display
+
           return this.ids.length <= Math.min(settingsManager.maxOribtsDisplayed, settingsManager.maxOribtsDisplayedDesktopAll);
         });
         break;
@@ -100,8 +102,10 @@ export class ObjectGroup {
   // What calls the orbit buffer when selected a group from the menu.
   updateOrbits = (): this => {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
     this.ids.forEach((id) => {
       const obj = keepTrackApi.getCatalogManager().objectCache[id];
+
       if (obj.isMissile()) {
         orbitManagerInstance.updateOrbitBuffer(obj.id, obj as MissileObject);
       } else {
@@ -116,6 +120,7 @@ export class ObjectGroup {
     // Map country name to country code
     const expandedData = data.split('|').map((countryName: string) => countryMapList[countryName]);
     // Concat data with expandedData using | as a delimiter
+
     data = `${data}|${expandedData.join('|')}`;
     this.ids = satData
       .filter((sat: DetailedSatellite) => data.split('|').includes(sat.country))

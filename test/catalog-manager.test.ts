@@ -10,6 +10,7 @@ import { defaultSat } from './environment/apiMocks';
 // Test calcSatrec function
 describe('calcSatrec', () => {
   let catalogManagerInstance: CatalogManager;
+
   beforeEach(() => {
     catalogManagerInstance = new CatalogManager();
   });
@@ -17,16 +18,20 @@ describe('calcSatrec', () => {
   // should return a satrec object
   it('return_satrec_object', () => {
     const newSat = defaultSat;
+
     catalogManagerInstance.objectCache = [newSat];
     const satrec = newSat.satrec;
+
     expect(satrec).toStrictEqual(defaultSat.satrec);
   });
 
   // should return a satrec object
   it('return_satrec_object2', () => {
     const newSat = defaultSat;
+
     catalogManagerInstance.objectCache = [];
     const satrec = catalogManagerInstance.calcSatrec(newSat);
+
     expect(satrec).toStrictEqual(defaultSat.satrec);
   });
 
@@ -34,35 +39,44 @@ describe('calcSatrec', () => {
   it('convert_id_to_satnum', () => {
     const idList = [0];
     const newSat = defaultSat;
+
     catalogManagerInstance.objectCache = [newSat];
     const satnumList = catalogManagerInstance.id2satnum(idList);
+
     expect(satnumList).toStrictEqual(['00005']);
   });
 
   // should search for objects in similar orbits
   it('search_for_similar_orbits', () => {
     const selectSataManagerInstance = new SelectSatManager();
+
     selectSataManagerInstance.init();
 
     const matchSat = defaultSat.clone();
+
     matchSat.id = 1;
     matchSat.period = 99 as Minutes;
     const nonmatchSat = defaultSat.clone();
+
     nonmatchSat.id = 2;
     nonmatchSat.period = 200 as Minutes;
     const nonmatchSat2 = defaultSat.clone();
+
     nonmatchSat2.id = 3;
     nonmatchSat2.inclination = 90 as Degrees;
     const nonmatchSat3 = defaultSat.clone();
+
     nonmatchSat3.id = 4;
     nonmatchSat3.rightAscension = 200 as Degrees;
     const nonmatchSat4 = defaultSat.clone();
+
     nonmatchSat4.id = 5;
     nonmatchSat4.isStatic = () => true;
 
     selectSataManagerInstance.selectedSat = defaultSat.id;
     catalogManagerInstance.objectCache = [defaultSat, matchSat, nonmatchSat, nonmatchSat2, nonmatchSat3, nonmatchSat4];
     const satData = CatalogSearch.findObjsByOrbit(catalogManagerInstance.objectCache as DetailedSatellite[], defaultSat);
+
     expect(satData).toStrictEqual([0, 1]);
   });
 
@@ -70,27 +84,33 @@ describe('calcSatrec', () => {
   it('find_reentries', () => {
     defaultSat.period = 100 as Minutes;
     const matchSat = defaultSat.clone();
+
     matchSat.perigee = 200 as Kilometers;
     matchSat.sccNum = '00001';
     const nonmatchSat = defaultSat.clone();
+
     nonmatchSat.perigee = 0 as Kilometers;
     nonmatchSat.sccNum = '00002';
     const nonmatchSat2 = defaultSat.clone();
+
     nonmatchSat2.type = SpaceObjectType.LAUNCH_AGENCY;
     nonmatchSat2.sccNum = '00002';
     const nonmatchSat3 = defaultSat.clone();
+
     nonmatchSat3.perigee = 300 as Kilometers;
     nonmatchSat3.sccNum = '00002';
 
     catalogManagerInstance.objectCache = [];
     catalogManagerInstance.objectCache.push(nonmatchSat, nonmatchSat2, nonmatchSat3);
     const correctResult = [];
+
     for (let i = 0; i < 100; i++) {
       catalogManagerInstance.objectCache.push(matchSat);
       correctResult.push(matchSat.sccNum);
     }
 
     const satData = CatalogSearch.findReentry(catalogManagerInstance.objectCache as DetailedSatellite[]);
+
     expect(satData).toStrictEqual(correctResult);
   });
 
@@ -117,6 +137,7 @@ describe('calcSatrec', () => {
     catalogManagerInstance.cosparIndex = [] as any;
     catalogManagerInstance.cosparIndex[defaultSat.intlDes] = 0;
     const result = catalogManagerInstance.intlDes2id(defaultSat.intlDes);
+
     expect(result).toStrictEqual(0);
   });
 
@@ -124,8 +145,10 @@ describe('calcSatrec', () => {
   it('process_get_sat_pos_only', () => {
     catalogManagerInstance.objectCache = [defaultSat];
     const dotsManagerInstance = keepTrackApi.getDotsManager();
+
     dotsManagerInstance.positionData = new Float32Array(3);
     const result = catalogManagerInstance.getSat(0, GetSatType.POSITION_ONLY);
+
     expect(result).toStrictEqual(defaultSat);
   });
 

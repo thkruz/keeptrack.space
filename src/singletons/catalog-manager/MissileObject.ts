@@ -44,6 +44,8 @@ export class MissileObject extends BaseObject {
   getAltitude(): Kilometers {
     const { gmst } = calcGmst(keepTrackApi.getTimeManager().simulationTimeObj);
     const lla = eci2lla(this.position, gmst);
+
+
     return lla.alt;
   }
 
@@ -72,15 +74,19 @@ export class MissileObject extends BaseObject {
     };
 
     const eci = lla2eci(lla, gmst);
+
+
     return new Vector3D(eci.x, eci.y, eci.z);
   }
 
   isGoingUp(): boolean {
     const t = this.getTimeInTrajectory();
+
     if (this.altList[t] > this.altList[t - 1]) {
       return true;
-    } else {
-      return false;
     }
+
+    return false;
+
   }
 }

@@ -49,13 +49,18 @@ export class Planetarium extends KeepTrackPlugin {
   bottomIconCallback = (): void => {
     const renderer = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
+
     if (this.isMenuButtonActive) {
-      if (!this.verifySensorSelected()) return;
+      if (!this.verifySensorSelected()) {
+        return;
+      }
 
       keepTrackApi.getMainCamera().cameraType = CameraType.PLANETARIUM; // Activate Planetarium Camera Mode
 
-      // Assume Sensor plugin is on because we are in planetarium view
-      // TODO: This should explicitly check for the sensor plugin
+      /*
+       * Assume Sensor plugin is on because we are in planetarium view
+       * TODO: This should explicitly check for the sensor plugin
+       */
       try {
         getEl('cspocAllSensor').style.display = 'none';
         getEl('mwAllSensor').style.display = 'none';
@@ -68,10 +73,13 @@ export class Planetarium extends KeepTrackPlugin {
         // Do nothing
       }
 
-      // TODO: implement fov information
-      // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+      /*
+       * TODO: implement fov information
+       * getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
+       */
       LegendManager.change('planetarium');
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
       if (catalogManagerInstance.isStarManagerLoaded) {
         keepTrackApi.getStarManager().clearConstellations();
       }
@@ -84,10 +92,13 @@ export class Planetarium extends KeepTrackPlugin {
       renderer.glInit();
       uiManagerInstance.hideSideMenus();
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
       orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
       keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
-      // TODO: implement fov information
-      // getEl('fov-text').innerHTML = ('');
+      /*
+       * TODO: implement fov information
+       * getEl('fov-text').innerHTML = ('');
+       */
     }
   };
 

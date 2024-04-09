@@ -26,6 +26,7 @@ describe('SatInfoBoxCore_class2', () => {
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.isInitialized = true;
     const selectSatManager = new SelectSatManager();
+
     selectSatManager.init();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);

@@ -2,9 +2,7 @@ import { Degrees, Kilometers, Radians, SatelliteRecord, ZoomValue } from 'ootk';
 import { SensorObjectCruncher } from '../interfaces';
 import { CruncerMessageTypes, MarkerMode } from './positionCruncher';
 
-// //////////////////////////////////////////////////////////////////////////////
 // Typing
-// //////////////////////////////////////////////////////////////////////////////
 
 // TODO: This should be multiple classes
 export interface PosCruncherCachedObject {
@@ -54,9 +52,7 @@ export type PositionCruncherOutgoingMsg = {
 };
 export type oneOrZero = 0 | 1;
 
-// //////////////////////////////////////////////////////////////////////////////
 // Code
-// //////////////////////////////////////////////////////////////////////////////
 export const defaultGd = {
   lat: <Radians>null,
   lon: <Radians>0,
@@ -102,7 +98,7 @@ export interface PositionCruncherIncomingMsg {
     propRate?: number;
     id?: number;
     satelliteSelected?: number[];
-    selectedSatFOV?: any;
+    selectedSatFOV?: number;
     isSunlightView?: boolean;
     isLowPerf?: boolean;
     fieldOfViewSetLength?: number;

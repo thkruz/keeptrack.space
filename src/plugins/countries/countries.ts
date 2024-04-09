@@ -75,7 +75,7 @@ export class CountriesMenu extends KeepTrackPlugin {
     `;
 
   sideMenuElementName = 'countries-menu';
-  helpTitle = `Countries Menu`;
+  helpTitle = 'Countries Menu';
   helpBody = keepTrackApi.html`The Countries Menu allows you to filter the satellites by country of origin.`;
 
   addJs() {
@@ -88,9 +88,9 @@ export class CountriesMenu extends KeepTrackPlugin {
         getEl('country-menu')
           .querySelectorAll('li')
           .forEach((element) => {
-            element.addEventListener('click', function () {
+            element.addEventListener('click', () => {
               keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
-              CountriesMenu.countryMenuClick_(this.getAttribute('data-group'));
+              CountriesMenu.countryMenuClick_(element.getAttribute('data-group'));
             });
           });
 
@@ -102,7 +102,10 @@ export class CountriesMenu extends KeepTrackPlugin {
   private static countryMenuClick_(groupName: string): void {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     const countryCode = StringExtractor.getCountryCode(groupName);
-    if (countryCode === '') throw new Error('Unknown country group');
+
+    if (countryCode === '') {
+      throw new Error('Unknown country group');
+    }
 
     if (!groupManagerInstance.groupList[groupName]) {
       groupManagerInstance.createGroup(GroupType.COUNTRY, countryCode, groupName);
@@ -117,20 +120,25 @@ export class CountriesMenu extends KeepTrackPlugin {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     const searchDOM = <HTMLInputElement>getEl('search');
-    if (typeof groupName == 'undefined') return;
-    if (typeof groupManagerInstance.groupList[groupName] == 'undefined') return;
+
+    if (typeof groupName === 'undefined') {
+      return;
+    }
+    if (typeof groupManagerInstance.groupList[groupName] === 'undefined') {
+      return;
+    }
     groupManagerInstance.selectGroup(groupManagerInstance.groupList[groupName]);
 
     // Populate searchDOM with a search string separated by commas - minus the last one
     if (groupManagerInstance.groupList[groupName].ids.length < settingsManager.searchLimit) {
       uiManagerInstance.searchManager.doSearch(
-        groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1)
+        groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1),
       );
     } else {
       searchDOM.value = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
       uiManagerInstance.searchManager.fillResultBox(
-        groupManagerInstance.groupList[groupName].ids.map((id: number) => <SearchResult>{ id: id }),
-        catalogManagerInstance
+        groupManagerInstance.groupList[groupName].ids.map((id: number) => <SearchResult>{ id }),
+        catalogManagerInstance,
       );
     }
 
@@ -138,7 +146,9 @@ export class CountriesMenu extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
 
     // Close Menus
-    if (settingsManager.isMobileModeEnabled) uiManagerInstance.searchManager.closeSearch();
+    if (settingsManager.isMobileModeEnabled) {
+      uiManagerInstance.searchManager.closeSearch();
+    }
     uiManagerInstance.hideSideMenus();
   }
 }

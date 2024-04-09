@@ -16,6 +16,7 @@ describe('altitudeCheck_method', () => {
     const now = new Date();
     const satrec = Sgp4.createSatrec(tle1, tle2);
     const altitude = SatMath.altitudeCheck(satrec, now);
+
     expect(altitude).toBeGreaterThan(0);
   });
 
@@ -24,6 +25,7 @@ describe('altitudeCheck_method', () => {
     const satrec = 'invalid_satrec';
     const now = new Date();
     const altitude = SatMath.altitudeCheck(satrec as unknown as SatelliteRecord, now);
+
     expect(altitude).toEqual(0);
   });
 
@@ -32,6 +34,7 @@ describe('altitudeCheck_method', () => {
     const tle1 = '1 25544U 98067A   21275.61828767  .00000808  00000-0  26368-4 0  9993';
     const tle2 = '2 25544  51.6443  82.0195 0002976  83.8537 276.3289 15.48978703297422';
     const satrec = Sgp4.createSatrec(tle1, tle2);
+
     expect(satrec).toBeDefined();
   });
 
@@ -43,6 +46,7 @@ describe('altitudeCheck_method', () => {
     const satrec = Sgp4.createSatrec(tle1, tle2);
     const { m } = SatMath.calculateTimeVariables(now, satrec);
     const positionEci = Sgp4.propagate(satrec, m).position;
+
     expect(positionEci).toBeDefined();
   });
 });
@@ -59,6 +63,7 @@ describe('getAngleBetweenTwoSatellites_method', () => {
       velocity: { x: 7, y: 0, z: 0 },
     } as Ootk.DetailedSatellite;
     const result = SatMath.getAngleBetweenTwoSatellites(sat1, sat2);
+
     expect(result.az).toBeCloseTo(90.0);
     expect(result.el).toBeCloseTo(-45);
   });
@@ -74,6 +79,7 @@ describe('getAngleBetweenTwoSatellites_method', () => {
       velocity: { x: 0, y: 0, z: 0 },
     } as Ootk.DetailedSatellite;
     const result = SatMath.getAngleBetweenTwoSatellites(sat1, sat2);
+
     expect(result.az).toBeCloseTo(0.0);
     expect(result.el).toBeCloseTo(0.0);
   });
@@ -89,6 +95,7 @@ describe('getAngleBetweenTwoSatellites_method', () => {
       velocity: { x: 1000, y: 1000, z: 1000 },
     } as Ootk.DetailedSatellite;
     const result = SatMath.getAngleBetweenTwoSatellites(sat1, sat2);
+
     expect(result.az).toBeCloseTo(0);
     expect(result.el).toBeCloseTo(0);
   });
@@ -104,6 +111,7 @@ describe('getAngleBetweenTwoSatellites_method', () => {
       velocity: { x: 10, y: 10, z: 10 },
     } as Ootk.DetailedSatellite;
     const result = SatMath.getAngleBetweenTwoSatellites(sat1, sat2);
+
     expect(result.az).toBeCloseTo(120.465, 2);
     expect(result.el).toBeCloseTo(-19.54049, 2);
   });
@@ -117,6 +125,7 @@ describe('getAngleBetweenTwoSatellites_method', () => {
     const sat2 = {
       position: { x: 1000, y: 1000, z: 1000 },
     } as Ootk.DetailedSatellite;
+
     expect(() => {
       SatMath.getAngleBetweenTwoSatellites(sat1, sat2);
     }).toThrow('Sat2 velocity is undefined');
@@ -130,6 +139,7 @@ describe('getDirection_method', () => {
     const sat = null;
     const simulationTime = new Date();
     const direction = SatMath.getDirection(sat, simulationTime);
+
     expect(direction).toBe('N');
   });
 
@@ -139,6 +149,7 @@ describe('getDirection_method', () => {
     const sat = null;
     const simulationTime = new Date();
     const direction = SatMath.getDirection(sat, simulationTime);
+
     expect(direction).toBe('S');
   });
 
@@ -147,8 +158,10 @@ describe('getDirection_method', () => {
     // TODO: Generate a satellite/time pair that isn't moving
     const sat = null;
     const simulationTime = new Date();
+
     disableConsoleErrors();
     const direction = SatMath.getDirection(sat, simulationTime);
+
     enableConsoleErrors();
     expect(direction).toBe('Error');
   });
@@ -158,8 +171,10 @@ describe('getDirection_method', () => {
     // TODO: Generate a satellite/time pair that causes an error
     const sat = null;
     const simulationTime = new Date();
+
     disableConsoleErrors();
     const direction = SatMath.getDirection(sat, simulationTime);
+
     enableConsoleErrors();
     expect(direction).toBe('Error');
   });
@@ -170,6 +185,7 @@ describe('getDirection_method', () => {
     const sat = null;
     const simulationTime = new Date();
     const direction = SatMath.getDirection(sat, simulationTime);
+
     expect(direction).toBe('N');
   });
 
@@ -179,6 +195,7 @@ describe('getDirection_method', () => {
     const sat = null;
     const simulationTime = new Date();
     const direction = SatMath.getDirection(sat, simulationTime);
+
     expect(direction).toBe('S');
   });
 });
@@ -189,6 +206,7 @@ describe('getEcfOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 10;
     const outPoints = SatMath.getEcfOfCurrentOrbit(sat, points, () => new Date(2023, 1, 1));
+
     expect(outPoints).toMatchSnapshot();
   });
 
@@ -197,6 +215,7 @@ describe('getEcfOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 10;
     const ecfPoints = SatMath.getEcfOfCurrentOrbit(sat, points, () => new Date());
+
     expect(ecfPoints.length).toBe(points);
     expect(ecfPoints[0]).toHaveProperty('x');
     expect(ecfPoints[0]).toHaveProperty('y');
@@ -208,6 +227,7 @@ describe('getEcfOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 0;
     const ecfPoints = SatMath.getEcfOfCurrentOrbit(sat, points, () => new Date());
+
     expect(ecfPoints.length).toBe(0);
   });
 
@@ -217,6 +237,7 @@ describe('getEcfOfCurrentOrbit_method', () => {
     const points = 10;
     const ecfPoints1 = SatMath.getEcfOfCurrentOrbit(sat, points, () => new Date());
     const ecfPoints2 = SatMath.getEcfOfCurrentOrbit(sat, points + 1, () => new Date());
+
     expect(ecfPoints1).not.toEqual(ecfPoints2);
   });
 });
@@ -227,6 +248,7 @@ describe('getEciOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 10;
     const outPoints = SatMath.getEciOfCurrentOrbit(sat, points, () => new Date(2023, 1, 1));
+
     expect(outPoints).toMatchSnapshot();
   });
 
@@ -235,6 +257,7 @@ describe('getEciOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 10;
     const eciPoints = SatMath.getEciOfCurrentOrbit(sat, points, () => new Date());
+
     expect(eciPoints.length).toBe(points);
     expect(eciPoints[0]).toHaveProperty('x');
     expect(eciPoints[0]).toHaveProperty('y');
@@ -246,6 +269,7 @@ describe('getEciOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 0;
     const eciPoints = SatMath.getEciOfCurrentOrbit(sat, points, () => new Date());
+
     expect(eciPoints.length).toBe(0);
   });
 
@@ -255,6 +279,7 @@ describe('getEciOfCurrentOrbit_method', () => {
     const points = 10;
     const eciPoints1 = SatMath.getEciOfCurrentOrbit(sat, points, () => new Date());
     const eciPoints2 = SatMath.getEciOfCurrentOrbit(sat, points + 1, () => new Date());
+
     expect(eciPoints1).not.toEqual(eciPoints2);
   });
 });
@@ -265,6 +290,7 @@ describe('getLlaOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 10;
     const outPoints = SatMath.getLlaOfCurrentOrbit(sat, points, () => new Date(2023, 1, 1));
+
     expect(outPoints).toMatchSnapshot();
   });
 
@@ -273,6 +299,7 @@ describe('getLlaOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 10;
     const llaPoints = SatMath.getLlaOfCurrentOrbit(sat, points, () => new Date());
+
     expect(llaPoints.length).toBe(points);
     expect(llaPoints[0]).toHaveProperty('lat');
     expect(llaPoints[0]).toHaveProperty('lon');
@@ -284,6 +311,7 @@ describe('getLlaOfCurrentOrbit_method', () => {
     const sat = defaultSat.clone();
     const points = 0;
     const llaPoints = SatMath.getLlaOfCurrentOrbit(sat, points, () => new Date());
+
     expect(llaPoints.length).toBe(0);
   });
 
@@ -293,6 +321,7 @@ describe('getLlaOfCurrentOrbit_method', () => {
     const points = 10;
     const llaPoints1 = SatMath.getLlaOfCurrentOrbit(sat, points, () => new Date());
     const llaPoints2 = SatMath.getLlaOfCurrentOrbit(sat, points + 1, () => new Date());
+
     expect(llaPoints1).not.toEqual(llaPoints2);
   });
 });
@@ -306,12 +335,14 @@ describe('getRicOfCurrentOrbit_method', () => {
       tle2: '2 25544  51.6423 168.5744 0001475 184.3976 304.3642 15.48839820294053' as Ootk.TleLine2,
     },
   });
+
   sat2.satrec = Sgp4.createSatrec(sat2.tle1, sat2.tle2);
 
   // Tests that answers remain the same
   it('test_answers_remain_the_same', () => {
     const points = 10;
     const outPoints = SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1);
+
     expect(outPoints).toMatchSnapshot();
   });
 
@@ -319,6 +350,7 @@ describe('getRicOfCurrentOrbit_method', () => {
   it('test_happy_path_returns_ric_points', () => {
     const points = 10;
     const outPoints = SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1);
+
     expect(outPoints.length).toBe(points);
     expect(outPoints[0]).toHaveProperty('x');
     expect(outPoints[0]).toHaveProperty('y');
@@ -329,6 +361,7 @@ describe('getRicOfCurrentOrbit_method', () => {
   it('test_edge_case_returns_empty_array_when_points_is_zero', () => {
     const points = 0;
     const outPoints = SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1);
+
     expect(outPoints.length).toBe(0);
   });
 
@@ -342,6 +375,7 @@ describe('getRicOfCurrentOrbit_method', () => {
         tle2: '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 14.48978703297420' as Ootk.TleLine2,
       },
     });
+
     expect(() => SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1)).not.toThrow();
     expect(() => SatMath.getRicOfCurrentOrbit(sat2, sat, points, () => new Date(2023, 1, 1), 1)).not.toThrow();
   });
@@ -351,6 +385,7 @@ describe('getRicOfCurrentOrbit_method', () => {
     const points = 10;
     const outPoints1 = SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1);
     const outPoints2 = SatMath.getRicOfCurrentOrbit(sat, sat2, points + 1, () => new Date(2023, 1, 1), 1);
+
     expect(outPoints1).not.toEqual(outPoints2);
   });
 });
@@ -363,10 +398,11 @@ describe('getRae_method', () => {
     const now = new Date();
     const satrec = Sgp4.createSatrec(
       '1 25544U 98067A   21268.51782528  .00002182  00000-0  50870-4 0  9993',
-      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 15.48978703297420'
+      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 15.48978703297420',
     );
     const sensor = defaultSensor;
     const result = SatMath.getRae(now, satrec, sensor);
+
     expect(result).toHaveProperty('az');
     expect(result).toHaveProperty('el');
     expect(result).toHaveProperty('rng');
@@ -377,12 +413,15 @@ describe('getRae_method', () => {
     const now = new Date();
     const satrec = Sgp4.createSatrec(
       '1 25544U 98067A   21268.51782528  .00002182  00000-0  50870-4 0  9993',
-      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 15.48978703297420'
+      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 15.48978703297420',
     );
     const sensor = defaultSensor;
     // eslint-disable-next-line
+
+    // eslint-disable-next-line no-undefined
     sensor.observerGd = undefined;
     const result = SatMath.getRae(now, satrec, sensor);
+
     expect(result).toHaveProperty('az');
     expect(result).toHaveProperty('el');
     expect(result).toHaveProperty('rng');
@@ -393,10 +432,11 @@ describe('getRae_method', () => {
     const now = new Date();
     const satrec = Sgp4.createSatrec(
       '1 25544U 98067A   21268.51782528  .00002182  00000-0  50870-4 0  9993',
-      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 15.48978703297420'
+      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 15.48978703297420',
     );
     const sensor = defaultSensor;
     const result = SatMath.getRae(now, satrec, sensor);
+
     expect(result).toHaveProperty('az');
     expect(result).toHaveProperty('el');
     expect(result).toHaveProperty('rng');
@@ -407,9 +447,10 @@ describe('getRae_method', () => {
     const now = new Date();
     const satrec = Sgp4.createSatrec(
       '1 25544U 98067A   21268.51782528  .00002182  00000-0  50870-4 0  9993',
-      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 28.48978703297420'
+      '2 25544  51.6443  98.5701 0001669  95.6847 264.4655 28.48978703297420',
     );
     const sensor = defaultSensor;
+
     expect(() => SatMath.getRae(now, satrec, sensor)).not.toThrow();
   });
 
@@ -418,6 +459,7 @@ describe('getRae_method', () => {
     const now = null;
     const satrec = null;
     const sensor = null;
+
     expect(() => SatMath.getRae(now, satrec, sensor)).toThrow();
   });
 
@@ -429,6 +471,7 @@ describe('getRae_method', () => {
     const satrec = undefined;
     // eslint-disable-next-line no-undefined
     const sensor = undefined;
+
     expect(() => SatMath.getRae(now, satrec, sensor)).toThrow();
   });
 });
@@ -440,6 +483,7 @@ describe('getSunDirection_method', () => {
   it('test_valid_jd', () => {
     const jd = 2451545.0;
     const sunDirection = SatMath.getSunDirection(jd);
+
     expect(sunDirection).toMatchSnapshot();
   });
 
@@ -447,6 +491,7 @@ describe('getSunDirection_method', () => {
   it('test_jd_start_of_year', () => {
     const jd = 2458850.5;
     const sunDirection = SatMath.getSunDirection(jd);
+
     expect(sunDirection).toMatchSnapshot();
   });
 
@@ -454,12 +499,14 @@ describe('getSunDirection_method', () => {
   it('test_jd_end_of_year', () => {
     const jd = 2459203.5;
     const sunDirection = SatMath.getSunDirection(jd);
+
     expect(sunDirection).toMatchSnapshot();
   });
 
   // Tests that the method returns null for a null Julian date
   it('test_jd_null', () => {
     const jd = null;
+
     expect(() => SatMath.getSunDirection(jd)).toThrow();
   });
 });
@@ -468,6 +515,7 @@ describe('calculateIsInSun_method', () => {
   // Tests that SunStatus.SUN is returned when semiDiamEarth is less than semiDiamSun and theta is greater than semiDiamEarth - semiDiamSun
   it('test_happy_path_1', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: 10000 as Ootk.Kilometers,
       y: 10000 as Ootk.Kilometers,
@@ -478,12 +526,14 @@ describe('calculateIsInSun_method', () => {
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
+
     expect(SatMath.calculateIsInSun(sat, sunECI)).toBe(SunStatus.SUN);
   });
 
   // Tests that SunStatus.UMBRAL is returned when semiDiamEarth is greater than semiDiamSun
   it('test_happy_path_2', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: -10000 as Ootk.Kilometers,
       y: -10000 as Ootk.Kilometers,
@@ -494,12 +544,14 @@ describe('calculateIsInSun_method', () => {
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
+
     expect(SatMath.calculateIsInSun(sat, sunECI)).toBe(SunStatus.UMBRAL);
   });
 
   // Tests that SunStatus.PENUMBRAL is returned when theta is less than semiDiamSun - semiDiamEarth
   it('test_happy_path_3', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: (-RADIUS_OF_EARTH - 7800) as Ootk.Kilometers,
       y: -RADIUS_OF_EARTH as Ootk.Kilometers,
@@ -510,6 +562,7 @@ describe('calculateIsInSun_method', () => {
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
+
     expect(SatMath.calculateIsInSun(sat, sunECI)).toBe(SunStatus.PENUMBRAL);
   });
 
@@ -521,12 +574,14 @@ describe('calculateIsInSun_method', () => {
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
+
     expect(SatMath.calculateIsInSun(sat, sunECI)).toBe(SunStatus.UNKNOWN);
   });
 
   // Tests that SunStatus.UNKNOWN is returned when sunECI is null
   it('test_edge_case_2', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: -1000 as Ootk.Kilometers,
       y: -1000 as Ootk.Kilometers,
@@ -543,6 +598,7 @@ describe('distance_method', () => {
   it('test_distance_different_values', () => {
     const obj1 = { x: 1, y: 2, z: 3 } as EciVec3;
     const obj2 = { x: 4, y: 5, z: 6 } as EciVec3;
+
     expect(SatMath.distance(obj1, obj2)).toBeCloseTo(5.196152, 6);
   });
 });
@@ -553,6 +609,7 @@ describe('calculateVisMag_method', () => {
   // Tests that the method returns a valid visual magnitude when given a valid satellite object, sensor object, propTime, and sun object
   it('test_valid_satellite_and_sensor', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: 15000 as Ootk.Kilometers,
       y: 10000 as Ootk.Kilometers,
@@ -562,18 +619,21 @@ describe('calculateVisMag_method', () => {
     const sensor = defaultSensor;
     const propTime = new Date();
     const sun = new Sun();
+
     sun.eci = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
     const visMag = SatMath.calculateVisMag(sat, sensor, propTime, sun);
+
     expect(visMag).toBeGreaterThan(0);
   });
 
   // Test if the method returns a huge number when the satellite is eclipsing the sun
   it('test_satellite_eclipsing_sun', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: 15000 as Ootk.Kilometers,
       y: 15000 as Ootk.Kilometers,
@@ -583,18 +643,21 @@ describe('calculateVisMag_method', () => {
     const sensor = defaultSensor;
     const propTime = new Date();
     const sun = new Sun();
+
     sun.eci = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
     const visMag = SatMath.calculateVisMag(sat, sensor, propTime, sun);
+
     expect(visMag).toBe(30);
   });
 
   // Tests that the method returns a valid visual magnitude when given a satellite object that has a vmag property
   it('test_satellite_with_vmag_property', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: 7000 as Ootk.Kilometers,
       y: 10000 as Ootk.Kilometers,
@@ -604,18 +667,21 @@ describe('calculateVisMag_method', () => {
     const sensor = defaultSensor;
     const propTime = new Date();
     const sun = new Sun();
+
     sun.eci = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
     const visMag = SatMath.calculateVisMag(sat, sensor, propTime, sun);
+
     expect(visMag).toBeLessThan(0);
   });
 
   // Tests that the method returns a valid visual magnitude when given a satellite object that does not have a vmag property
   it('test_satellite_without_vmag_property', () => {
     const sat = defaultSat.clone();
+
     sat.position = {
       x: 7000 as Ootk.Kilometers,
       y: 10000 as Ootk.Kilometers,
@@ -624,12 +690,14 @@ describe('calculateVisMag_method', () => {
     const sensor = defaultSensor;
     const propTime = new Date();
     const sun = new Sun();
+
     sun.eci = {
       x: DISTANCE_TO_SUN,
       y: DISTANCE_TO_SUN,
       z: DISTANCE_TO_SUN,
     } as EciVec3;
     const visMag = SatMath.calculateVisMag(sat, sensor, propTime, sun);
+
     expect(visMag).toBeGreaterThan(0);
     expect(visMag).toBeLessThan(25);
   });

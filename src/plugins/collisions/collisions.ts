@@ -53,7 +53,7 @@ export class Collissions extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = `Collisions Menu`;
+  helpTitle = 'Collisions Menu';
   helpBody = keepTrackApi.html`The Collisions Menu shows satellites with a high probability of collision.
   <br><br>
   Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision.`;
@@ -97,9 +97,13 @@ export class Collissions extends KeepTrackPlugin {
     getEl(this.sideMenuElementName).addEventListener('click', (evt: any) => {
       showLoading(() => {
         const el = <HTMLElement>evt.target.parentElement;
-        if (!el.classList.contains('collisions-object')) return;
+
+        if (!el.classList.contains('collisions-object')) {
+          return;
+        }
         // Might be better code for this.
         const hiddenRow = el.dataset?.row;
+
         if (hiddenRow !== null) {
           this.eventClicked_(parseInt(hiddenRow));
         }
@@ -125,6 +129,7 @@ export class Collissions extends KeepTrackPlugin {
 
   private eventClicked_(row: number) {
     const now = new Date();
+
     keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].toca).getTime() - now.getTime() - 1000 * 30);
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
@@ -133,12 +138,14 @@ export class Collissions extends KeepTrackPlugin {
 
     keepTrackApi.getUiManager().doSearch(`${sat1},${sat2}`);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
     this.selectSatIdOnCruncher_ = catalogManagerInstance.sccNum2Id(parseInt(sat1));
   }
 
   private createTable_(): void {
     try {
       const tbl = <HTMLTableElement>getEl('collisions-table'); // Identify the table to update
+
       tbl.innerHTML = ''; // Clear the table from old object data
 
       Collissions.createHeaders_(tbl);
@@ -156,10 +163,12 @@ export class Collissions extends KeepTrackPlugin {
   }
 
   private static createHeaders_(tbl: HTMLTableElement) {
-    let tr = tbl.insertRow();
+    const tr = tbl.insertRow();
     const names = ['TOCA', '#1', '#2', 'Max Prob', 'Min Range (km)', 'Rel Speed (km/s)'];
+
     for (const name of names) {
       const column = tr.insertCell();
+
       column.appendChild(document.createTextNode(name));
       column.setAttribute('style', 'text-decoration: underline');
     }
@@ -168,6 +177,7 @@ export class Collissions extends KeepTrackPlugin {
   private createRow_(tbl: HTMLTableElement, i: number): HTMLTableRowElement {
     // Create a new row
     const tr = tbl.insertRow();
+
     tr.setAttribute('class', 'collisions-object link');
     tr.setAttribute('data-row', i.toString());
 
@@ -178,11 +188,13 @@ export class Collissions extends KeepTrackPlugin {
     Collissions.createCell_(tr, this.collisionList_[i].maxProb.toFixed(3));
     Collissions.createCell_(tr, this.collisionList_[i].minRng.toString());
     Collissions.createCell_(tr, this.collisionList_[i].relSpeed.toFixed(2));
+
     return tr;
   }
 
   private static createCell_(tr: HTMLTableRowElement, text: string): void {
     const cell = tr.insertCell();
+
     cell.appendChild(document.createTextNode(text));
   }
 }

@@ -7,6 +7,7 @@ import { standardPluginInit, standardPluginSuite } from './generic-tests';
 
 describe('classification_bar_plugin', () => {
   let classificationPlugin: ClassificationBar;
+
   beforeEach(() => {
     classificationPlugin = new ClassificationBar();
     setupMinimumHtml();

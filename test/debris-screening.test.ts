@@ -19,6 +19,7 @@ describe('DebrisScreening_class', () => {
 
 describe('DebrisScreening_form', () => {
   let debrisScreeningPlugin: DebrisScreening;
+
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {

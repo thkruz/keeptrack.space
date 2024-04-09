@@ -1,28 +1,29 @@
-/*!
-  stereo-map.ts was created by Theodore Kruczek using the work of
-  Julius Tens' "projections" library (https://github.com/juliuste/projections).
-  This file is exclusively released under the same license as the original author.
-  The license only applies to stereo-map.ts
-
-  The MIT License
-  Copyright (c) 2017, Julius Tens
-
-  Permission is hereby granted, free of charge, to any person obtaining a
-  copy of this software and associated documentation files (the "Software"),
-  to deal in the Software without restriction, including without limitation
-  the rights to use, copy, modify, merge, publish, distribute, sublicense,
-  and/or sell copies of the Software, and to permit persons to whom the
-  Software is furnished to do so, subject to the following conditions:
-  The above copyright notice and this permission notice shall be included
-  in all copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+/*
+ *!
+ *stereo-map.ts was created by Theodore Kruczek using the work of
+ *Julius Tens' "projections" library (https://github.com/juliuste/projections).
+ *This file is exclusively released under the same license as the original author.
+ *The license only applies to stereo-map.ts
+ *
+ *The MIT License
+ *Copyright (c) 2017, Julius Tens
+ *
+ *Permission is hereby granted, free of charge, to any person obtaining a
+ *copy of this software and associated documentation files (the "Software"),
+ *to deal in the Software without restriction, including without limitation
+ *the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *and/or sell copies of the Software, and to permit persons to whom the
+ *Software is furnished to do so, subject to the following conditions:
+ *The above copyright notice and this permission notice shall be included
+ *in all copies or substantial portions of the Software.
+ *
+ *THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ *FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ *COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ *IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ *CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -72,11 +73,13 @@ export class StereoMap extends KeepTrackPlugin {
   bottomIconImg = mapPng;
   bottomIconLabel = 'Stereo Map';
   bottomIconCallback: () => void = () => {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
     this.updateMap();
   };
 
-  helpTitle = `Stereographic Map Menu`;
+  helpTitle = 'Stereographic Map Menu';
   helpBody = keepTrackApi.html`The Stereographic Map Menu is used for visualizing satellite ground traces in a stereographic projection.
     <br/><br/>
     You can click on a spot along the ground trace to change the time of the simulation to when the satellite reaches that spot.
@@ -86,17 +89,18 @@ export class StereoMap extends KeepTrackPlugin {
 
   sideMenuElementName = 'map-menu';
   sideMenuElementHtml =
-    keepTrackApi.html`
+    `${keepTrackApi.html`
   <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
     <canvas id="map-2d"></canvas>
     <img id="map-sat" class="map-item map-look" src=${satellite2} width="20px" height="20px"/>
     <img id="map-sensor" class="map-item map-look start-hidden" src=${radar1} width="20px" height="20px"/>
     ` +
-    StereoMap.generateMapLooks_(50) +
-    `</div>`;
+    StereoMap.generateMapLooks_(50)
+    }</div>`;
 
   static generateMapLooks_(count: number): string {
     let html = '';
+
     for (let i = 1; i <= count; i++) {
       html += `<img id="map-look${i}" class="map-item map-look"/>`;
     }
@@ -117,7 +121,9 @@ export class StereoMap extends KeepTrackPlugin {
         this.resize2DMap_();
 
         window.addEventListener('resize', () => {
-          if (!settingsManager.disableUI) this.resize2DMap_();
+          if (!settingsManager.disableUI) {
+            this.resize2DMap_();
+          }
         });
 
         getEl('fullscreen-icon').addEventListener('click', () => {
@@ -125,7 +131,9 @@ export class StereoMap extends KeepTrackPlugin {
         });
 
         getEl('map-menu').addEventListener('click', (evt: Event) => {
-          if (!(<HTMLElement>evt.target).classList.contains('map-look')) return;
+          if (!(<HTMLElement>evt.target).classList.contains('map-look')) {
+            return;
+          }
           this.mapMenuClick(evt);
         });
       },
@@ -153,8 +161,12 @@ export class StereoMap extends KeepTrackPlugin {
 
   async updateMap(): Promise<void> {
     try {
-      if (this.selectSatManager_.selectedSat === -1) return;
-      if (!this.isMenuButtonActive) return;
+      if (this.selectSatManager_.selectedSat === -1) {
+        return;
+      }
+      if (!this.isMenuButtonActive) {
+        return;
+      }
 
       this.updateSatPosition_();
       StereoMap.updateSensorPosition_();
@@ -212,6 +224,7 @@ export class StereoMap extends KeepTrackPlugin {
     // Draw ground trace
     const ctx = this.canvas_.getContext('2d');
     const bigJumpSize = 0.2 * settingsManager.mapWidth;
+
     ctx.strokeStyle = groundTracePoints[0].inView ? '#ffff00' : '#ff0000';
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -232,8 +245,10 @@ export class StereoMap extends KeepTrackPlugin {
         ctx.moveTo(groundTracePoints[i - 1].x, groundTracePoints[i - 1].y);
         ctx.lineTo(groundTracePoints[i].x, groundTracePoints[i].y);
       } else if (groundTracePoints[i].x - groundTracePoints[i - 1].x > bigJumpSize || groundTracePoints[i - 1].x - groundTracePoints[i].x > bigJumpSize) {
-        // If there is a big jump assume we crossed a pole and should
-        // jump to the next point to continue drawing the line
+        /*
+         * If there is a big jump assume we crossed a pole and should
+         * jump to the next point to continue drawing the line
+         */
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(groundTracePoints[i].x, groundTracePoints[i].y);
@@ -246,13 +261,15 @@ export class StereoMap extends KeepTrackPlugin {
 
   private addTextToMap_() {
     const ctx = this.canvas_.getContext('2d');
-    let d = new Date();
-    let n = d.getUTCFullYear();
+    const d = new Date();
+    const n = d.getUTCFullYear();
     const copyrightStr = !settingsManager.copyrightOveride ? `©${n} KEEPTRACK.SPACE` : '';
-    let cw = this.canvas_.width;
-    let ch = this.canvas_.height;
+    const cw = this.canvas_.width;
+    const ch = this.canvas_.height;
+
     ctx.font = '24px nasalization';
     let textWidth = ctx.measureText(copyrightStr).width;
+
     ctx.globalAlpha = 1.0;
     ctx.fillStyle = 'black';
     ctx.fillText(copyrightStr, cw - textWidth - 30, ch - 30);
@@ -297,6 +314,7 @@ export class StereoMap extends KeepTrackPlugin {
         y: settingsManager.mapHeight - ((sensorManagerInstance.currentSensors[0].lat + 90) / 180) * settingsManager.mapHeight,
       };
       const sensorDom = <HTMLImageElement>getEl('map-sensor');
+
       showEl('map-sensor');
       getEl('map-sensor').style.left = `${map.x - sensorDom.width / 2}px`;
       getEl('map-sensor').style.top = `${map.y - sensorDom.height / 2}px`;
@@ -317,6 +335,7 @@ export class StereoMap extends KeepTrackPlugin {
       y: settingsManager.mapHeight - ((lla.lat + 90) / 180) * settingsManager.mapHeight,
     };
     const satDom = <HTMLImageElement>getEl('map-sat');
+
     getEl('map-sat').style.left = `${map.x - satDom.width / 2}px`;
     getEl('map-sat').style.top = `${map.y - satDom.height / 2}px`;
   }
@@ -329,19 +348,19 @@ export class StereoMap extends KeepTrackPlugin {
       // If widescreen
       settingsManager.mapWidth = window.innerWidth;
       settingsManager.mapHeight = settingsManager.mapWidth / 2;
-      mapMenuDOM.style.width = window.innerWidth + 'px';
+      mapMenuDOM.style.width = `${window.innerWidth}px`;
 
       this.canvas_.width = settingsManager.mapWidth;
       this.canvas_.height = settingsManager.mapHeight;
     } else {
       settingsManager.mapHeight = window.innerHeight - 100; // Subtract 100 portrait (mobile)
       settingsManager.mapWidth = settingsManager.mapHeight * 2;
-      mapMenuDOM.style.width = settingsManager.mapWidth + 'px';
+      mapMenuDOM.style.width = `${settingsManager.mapWidth}px`;
 
       this.canvas_.width = settingsManager.mapWidth;
-      this.canvas_.style.width = settingsManager.mapWidth + 'px';
+      this.canvas_.style.width = `${settingsManager.mapWidth}px`;
       this.canvas_.height = settingsManager.mapHeight;
-      this.canvas_.style.height = settingsManager.mapHeight + 'px';
+      this.canvas_.style.height = `${settingsManager.mapHeight}px`;
     }
 
     this.drawEarthLayer();
@@ -349,6 +368,7 @@ export class StereoMap extends KeepTrackPlugin {
 
   drawEarthLayer(): void {
     const ctx = this.canvas_.getContext('2d');
+
     if (this.earthImg.src) {
       ctx.drawImage(this.earthImg, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
     } else {
@@ -378,12 +398,16 @@ export class StereoMap extends KeepTrackPlugin {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     this.isMapUpdateOverride_ = true;
-    if (!evt.target?.dataset.time) return;
+    if (!evt.target?.dataset.time) {
+      return;
+    }
     let time = evt.target.dataset.time;
+
     if (time !== null) {
       time = time.split(' ');
-      time = new Date(time[0] + 'T' + time[1] + 'Z');
+      time = new Date(`${time[0]}T${time[1]}Z`);
       const today = new Date(); // Need to know today for offset calculation
+
       timeManagerInstance.changeStaticOffset(time.getTime() - today.getTime()); // Find the offset from today
     }
   }

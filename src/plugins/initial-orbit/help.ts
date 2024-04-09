@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
-export const helpTitleTextInitOrbit = `Initial Orbit Menu`;
+export const helpTitleTextInitOrbit = 'Initial Orbit Menu';
 
 export const helpBodyTextInitOrbit = keepTrackApi.html`The Initial Orbit Menu is used for generating TLEs using 1-3 state vectors.
 <br><br>

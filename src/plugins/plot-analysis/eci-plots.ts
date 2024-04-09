@@ -25,7 +25,9 @@ export class EciPlot extends KeepTrackPlugin {
   bottomIconLabel = 'ECI Plots';
   bottomIconImg = scatterPlotPng2;
   bottomIconCallback = () => {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
   };
@@ -35,7 +37,7 @@ export class EciPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   chart: echarts.ECharts;
 
-  helpTitle = `ECI Plots Menu`;
+  helpTitle = 'ECI Plots Menu';
   helpBody = keepTrackApi.html`
   <p>
     The ECI Plots menu allows you to plot the position of a satellite in Earth Centered Inertial (ECI) coordinates.
@@ -68,13 +70,16 @@ export class EciPlot extends KeepTrackPlugin {
         } else {
           this.setBottomIconToDisabled();
         }
-        if (!this.isMenuButtonActive) return;
+        if (!this.isMenuButtonActive) {
+          return;
+        }
 
         // This runs if the menu is open
         if (!sat) {
           this.hideSideMenus();
         } else {
           const chartDom = getEl(this.plotCanvasId);
+
           this.createPlot(this.getPlotData(), chartDom);
         }
       },
@@ -83,7 +88,9 @@ export class EciPlot extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     // Delete any old charts and start fresh
     if (this.chart) {
@@ -107,6 +114,8 @@ export class EciPlot extends KeepTrackPlugin {
       const minData = Math.round(Math.min(minDataX, minDataY, minDataZ) / 1000) * 1000;
       const maxData = Math.round(Math.max(maxDataX, maxDataY, maxDataZ) / 1000) * 1000;
       const _dataRange = Math.max(maxData, Math.abs(minData));
+
+
       return Math.max(range, _dataRange);
     }, 0);
 
@@ -124,6 +133,7 @@ export class EciPlot extends KeepTrackPlugin {
           const data = params.value;
           const color = params.color;
           // Create a small circle to show the color of the satellite
+
           return `
             <div style="display: flex; flex-direction: column; align-items: flex-start;">
               <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-end;">
@@ -221,11 +231,13 @@ export class EciPlot extends KeepTrackPlugin {
       { name: Z_AXIS, index: 2 },
     ];
 
-    const fieldIndices = schema.reduce(function (obj, item): object {
+    const fieldIndices = schema.reduce((obj, item): object => {
       obj[item.name] = item.index;
+
       return obj;
     }, {});
     let fieldNames = schema.map((item) => item.name);
+
     fieldNames = fieldNames.slice(2, fieldNames.length - 2);
     ['xAxis3D', 'yAxis3D', 'zAxis3D', 'color', 'symbolSize'].forEach((fieldName) => {
       app.configParameters[fieldName] = {
@@ -243,16 +255,20 @@ export class EciPlot extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
+
     data.push({ name: curSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
 
     const secSatObj = this.selectSatManager_.secondarySatObj;
+
     if (secSatObj) {
       data.push({ name: secSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
     }
 
     const lastSatId = this.selectSatManager_.lastSelectedSat();
+
     if (lastSatId !== -1) {
       const lastSatObj = catalogManagerInstance.getObject(lastSatId) as DetailedSatellite;
+
       data.push({ name: lastSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
     }
 

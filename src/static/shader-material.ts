@@ -56,6 +56,7 @@ export class ShaderMaterial extends Material {
 
   initFlatTexture() {
     const gl = this.gl;
+
     gl.bindTexture(gl.TEXTURE_2D, this.map);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);

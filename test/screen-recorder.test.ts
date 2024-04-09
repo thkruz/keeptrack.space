@@ -6,6 +6,7 @@ import { standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('ScreenRecorder_class', () => {
   let screenRecorderPlugin: ScreenRecorder;
+
   beforeEach(() => {
     setupDefaultHtml();
     screenRecorderPlugin = new ScreenRecorder();
@@ -15,14 +16,14 @@ describe('ScreenRecorder_class', () => {
   // standardPluginMenuButtonTests(ScreenRecorder, 'ScreenRecorder');
 
   // Tests stopping a video
-  test(`ScreenRecorder_stop_video`, () => {
+  test('ScreenRecorder_stop_video', () => {
     websiteInit(screenRecorderPlugin);
 
     screenRecorderPlugin.streamManagerInstance.isVideoRecording = true;
-    screenRecorderPlugin.streamManagerInstance['mediaRecorder_'] = {
+    screenRecorderPlugin.streamManagerInstance.mediaRecorder_ = {
       stop: () => {},
     } as any;
-    screenRecorderPlugin.streamManagerInstance['stream_'] = {
+    screenRecorderPlugin.streamManagerInstance.stream_ = {
       getTracks: () => [],
     } as any;
     screenRecorderPlugin.streamManagerInstance.save = () => {};
@@ -31,7 +32,7 @@ describe('ScreenRecorder_class', () => {
   });
 
   // Tests error handling
-  test(`ScreenRecorder_error_checking`, () => {
+  test('ScreenRecorder_error_checking', () => {
     websiteInit(screenRecorderPlugin);
 
     screenRecorderPlugin.streamManagerInstance.start = () => {

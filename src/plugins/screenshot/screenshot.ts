@@ -93,6 +93,7 @@ export class Screenshot extends KeepTrackPlugin {
 
   constructor() {
     const PLUGIN_NAME = 'Screenshot';
+
     super(PLUGIN_NAME);
   }
 
@@ -108,7 +109,9 @@ export class Screenshot extends KeepTrackPlugin {
       event: KeepTrackApiEvents.endOfDraw,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        if (this.queuedScreenshot_) this.takeScreenShot();
+        if (this.queuedScreenshot_) {
+          this.takeScreenShot();
+        }
       },
     });
   }
@@ -122,12 +125,13 @@ export class Screenshot extends KeepTrackPlugin {
    * Screenshot is then taken at the end of the draw loop
    */
   public takeScreenShot() {
-    let link = document.createElement('a');
+    const link = document.createElement('a');
+
     link.download = 'keeptrack.png';
 
-    let d = new Date();
-    let n = d.getUTCFullYear();
-    let copyrightStr = !settingsManager.copyrightOveride ? `©${n} KEEPTRACK.SPACE` : '';
+    const d = new Date();
+    const n = d.getUTCFullYear();
+    const copyrightStr = !settingsManager.copyrightOveride ? `©${n} KEEPTRACK.SPACE` : '';
 
     link.href = Screenshot.watermarkedDataUrl(copyrightStr);
     link.click();
@@ -139,16 +143,19 @@ export class Screenshot extends KeepTrackPlugin {
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
-    let cw = (tempCanvas.width = canvas.width);
-    let ch = (tempCanvas.height = canvas.height);
+    const cw = (tempCanvas.width = canvas.width);
+    const ch = (tempCanvas.height = canvas.height);
+
     tempCtx.drawImage(canvas, 0, 0);
     tempCtx.font = '24px nasalization';
     let textWidth = tempCtx.measureText(text).width;
+
     tempCtx.globalAlpha = 1.0;
     tempCtx.fillStyle = 'white';
     tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
 
     const { classificationstr, classificationColor } = Screenshot.calculateClassificationText();
+
     if (classificationstr !== '') {
       tempCtx.font = '24px nasalization';
       tempCtx.globalAlpha = 1.0;
@@ -161,20 +168,23 @@ export class Screenshot extends KeepTrackPlugin {
     }
 
     keepTrackApi.containerRoot.appendChild(tempCanvas);
-    let image = tempCanvas.toDataURL();
+    const image = tempCanvas.toDataURL();
+
     tempCanvas.parentNode.removeChild(tempCanvas);
+
     return image;
   }
 
   private static calculateClassificationText(): { classificationstr: string; classificationColor: string } {
     if (settingsManager.classificationStr === '') {
       return { classificationstr: '', classificationColor: '' };
-    } else {
-      return {
-        classificationstr: settingsManager.classificationStr,
-        classificationColor: Classification.getColors(settingsManager.classificationStr).backgroundColor,
-      };
     }
+
+    return {
+      classificationstr: settingsManager.classificationStr,
+      classificationColor: Classification.getColors(settingsManager.classificationStr).backgroundColor,
+    };
+
   }
 }
 

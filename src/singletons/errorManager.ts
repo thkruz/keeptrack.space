@@ -43,6 +43,7 @@ export class ErrorManager {
     }
 
     const uiManagerInstance = keepTrackApi.getUiManager();
+
     uiManagerInstance.toast(toastMsg, 'error', true);
 
     if (isThisNode()) {
@@ -72,6 +73,7 @@ ${e.stack}`,
   public warn(msg: string) {
     if (this.ALLOW_WARN) {
       const uiManagerInstance = keepTrackApi.getUiManager();
+
       uiManagerInstance.toast(msg, 'serious', true);
     }
     if (this.isDebug) {
@@ -82,6 +84,7 @@ ${e.stack}`,
   public info(msg: string) {
     if (this.ALLOW_INFO) {
       const uiManagerInstance = keepTrackApi.getUiManager();
+
       uiManagerInstance.toast(msg, 'normal', true);
     }
     if (this.isDebug) {
@@ -92,6 +95,7 @@ ${e.stack}`,
   public log(msg: string) {
     if (this.ALLOW_LOG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
+
       uiManagerInstance.toast(msg, 'normal', true);
     }
     if (this.isDebug) {
@@ -102,6 +106,7 @@ ${e.stack}`,
   public debug(msg: string) {
     if (this.ALLOW_DEBUG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
+
       uiManagerInstance.toast(msg, 'standby', true);
       // eslint-disable-next-line no-debugger
       debugger;

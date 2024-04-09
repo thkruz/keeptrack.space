@@ -11,9 +11,11 @@ import { WebGlProgramHelper } from '@app/static/webgl-program';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
-/* ***************************************************************************
+/*
+ * ***************************************************************************
  * Initialization Code
- * ***************************************************************************/
+ * **************************************************************************
+ */
 const offsetDistance = RADIUS_OF_EARTH + 80 + 1;
 
 export const init = async () => {
@@ -27,8 +29,11 @@ export const init = async () => {
     event: KeepTrackApiEvents.selectSatData,
     cbName: 'coneInit',
     cb: (obj: BaseObject | null, satId: number) => {
-      if (!obj) return;
+      if (!obj) {
+        return;
+      }
       const dotsManagerInstance = keepTrackApi.getDotsManager();
+
       cone.pos = [dotsManagerInstance.positionData[satId * 3], dotsManagerInstance.positionData[satId * 3 + 1], dotsManagerInstance.positionData[satId * 3 + 2]];
       init();
     },
@@ -65,6 +70,7 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
 
   let Phi = 0;
   const dPhi = (2 * Math.PI) / (nPhi - 1);
+
   Phi += dPhi;
   let Nx = r1 - r2;
   let Ny = h;
@@ -78,6 +84,7 @@ export const initBuffers = (gl: WebGL2RenderingContext) => {
     const sinPhi = Math.sin(Phi);
     const cosPhi2 = Math.cos(Phi + dPhi / 2);
     const sinPhi2 = Math.sin(Phi + dPhi / 2);
+
     if (i !== nPhi) {
       vertPos.push(-h / 2, cosPhi * r1, sinPhi * r1); // points
       vertNorm.push(Nx, Ny * cosPhi, Ny * sinPhi); // normals
@@ -122,12 +129,17 @@ export const initVao = (gl: WebGL2RenderingContext) => {
   gl.bindVertexArray(null);
 };
 
-/* ***************************************************************************
+/*
+ * ***************************************************************************
  * Render Loop Code
- * ***************************************************************************/
+ * **************************************************************************
+ */
 export const update = (position: Kilometers[]) => {
   const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
-  if (!selectSatManagerInstance || selectSatManagerInstance.selectedSat === -1) return;
+
+  if (!selectSatManagerInstance || selectSatManagerInstance.selectedSat === -1) {
+    return;
+  }
 
   const timeManagerInstance = keepTrackApi.getTimeManager();
 
@@ -153,16 +165,23 @@ export const update = (position: Kilometers[]) => {
 
 export const draw = function (pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
   const selectSatManagerInstance = <SelectSatManager>keepTrackApi.getPlugin(SelectSatManager);
-  if (!selectSatManagerInstance || selectSatManagerInstance.selectedSat === -1) return;
+
+  if (!selectSatManagerInstance || selectSatManagerInstance.selectedSat === -1) {
+    return;
+  }
 
   const { gl } = keepTrackApi.getRenderer();
 
   cone.pMatrix = pMatrix;
   cone.camMatrix = camMatrix;
-  if (!cone.isLoaded) return;
+  if (!cone.isLoaded) {
+    return;
+  }
 
   gl.useProgram(cone.program.program);
-  if (tgtBuffer) gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+  if (tgtBuffer) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+  }
 
   // Set the uniforms
   gl.uniformMatrix3fv(cone.material.uniforms.u_nMatrix, false, cone.nMatrix);
@@ -181,9 +200,11 @@ export const draw = function (pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLF
   gl.bindVertexArray(null);
 };
 
-/* ***************************************************************************
+/*
+ * ***************************************************************************
  * Export Code
- * ***************************************************************************/
+ * **************************************************************************
+ */
 const shaders = {
   cone: {
     frag: `#version 300 es
@@ -221,6 +242,7 @@ const shaders = {
       `,
   },
 };
+
 export type ConeObject = typeof cone;
 export const cone = {
   program: <WebGlProgramHelper>null,
@@ -250,9 +272,9 @@ export const cone = {
   mvMatrix: mat4.create(),
   pMatrix: mat4.create(),
   nMatrix: mat3.create(),
-  init: init,
-  update: update,
-  draw: draw,
+  init,
+  update,
+  draw,
   pos: [40000, 0, 0],
   angle: 3,
   isLoaded: false,

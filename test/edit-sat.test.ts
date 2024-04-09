@@ -16,34 +16,42 @@ describe('EditSatPlugin_class', () => {
 
   it('should submit the form', () => {
     const editSatPlugin = new EditSat();
+
     websiteInit(editSatPlugin);
     standardSelectSat();
     const button = <HTMLButtonElement>keepTrackApi.containerRoot.querySelector('button[type="submit"]');
+
     button.click();
   });
 
   it('should create new TLE at Epoch', () => {
     const editSatPlugin = new EditSat();
+
     websiteInit(editSatPlugin);
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
+
     toggleButton.click();
     keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
     keepTrackApi.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-newTLE');
+
     button.click();
     jest.advanceTimersByTime(1000);
   });
 
   it('should save TLE', () => {
     const editSatPlugin = new EditSat();
+
     websiteInit(editSatPlugin);
     standardSelectSat();
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
+
     toggleButton.click();
     keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
     keepTrackApi.getCatalogManager().getObject = () => defaultSat;
-    const button = getEl(`editSat-save`);
+    const button = getEl('editSat-save');
+
     button.click();
     jest.advanceTimersByTime(1000);
   });

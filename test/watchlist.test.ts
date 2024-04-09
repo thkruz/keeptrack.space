@@ -7,6 +7,7 @@ import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite,
 
 describe('WatchlistPlugin_class', () => {
   let watchlistPlugin: WatchlistPlugin;
+
   beforeEach(() => {
     setupDefaultHtml();
     watchlistPlugin = new WatchlistPlugin();
@@ -20,6 +21,7 @@ describe('WatchlistPlugin_class', () => {
 
 describe('WatchlistPlugin_form', () => {
   let watchlistPlugin: WatchlistPlugin;
+
   beforeEach(() => {
     setupDefaultHtml();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
@@ -33,7 +35,8 @@ describe('WatchlistPlugin_form', () => {
         ARROW_UP: 38,
         ARROW_DOWN: 40,
       },
-    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
   });
 
   it('should be initialized', () => {
@@ -44,19 +47,24 @@ describe('WatchlistPlugin_form', () => {
     // Step 1: Add satellites '1,5,25544' to watchlist-new element
     const satellites = '1,1,5,5,25544,25544';
     const watchlistNewElement = <HTMLInputElement>getEl('watchlist-new');
+
     if (watchlistNewElement) {
       watchlistNewElement.value = satellites;
     }
 
     // Step 2: Click add button
     const addButton = getEl('watchlist-add');
+
     if (addButton) {
       addButton.click();
     }
 
-    // Step 3: Click remove button
-    // get first img by class "watchlist-remove"
+    /*
+     * Step 3: Click remove button
+     * get first img by class "watchlist-remove"
+     */
     const removeButton = <HTMLImageElement>keepTrackApi.containerRoot.querySelector('img.watchlist-remove');
+
     if (removeButton) {
       removeButton.click();
     }

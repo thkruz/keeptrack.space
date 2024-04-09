@@ -4,6 +4,7 @@ import { TimeManager } from '@app/singletons/time-manager';
 
 describe('SatLinkManager', () => {
   let satLinkManager: SatLinkManager;
+
   beforeEach(() => {
     satLinkManager = new SatLinkManager();
   });

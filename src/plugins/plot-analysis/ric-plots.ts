@@ -28,13 +28,17 @@ export class RicPlot extends KeepTrackPlugin {
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
       keepTrackApi.getUiManager().toast('Select a Satellite First!', 'critical');
+
       return;
     }
     if (!this.selectSatManager_.secondarySatObj) {
       keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', 'critical');
+
       return;
     }
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
   };
@@ -42,7 +46,7 @@ export class RicPlot extends KeepTrackPlugin {
   plotCanvasId = 'plot-analysis-chart-ric';
   chart: echarts.ECharts;
 
-  helpTitle = `RIC Plot Menu`;
+  helpTitle = 'RIC Plot Menu';
   helpBody = keepTrackApi.html`
   <p>
   The RIC Plot Menu is used for plotting the RIC position of a satellite over time.
@@ -64,7 +68,9 @@ export class RicPlot extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.selectedSat === -1) {
-          if (this.isMenuButtonActive) this.hideSideMenus();
+          if (this.isMenuButtonActive) {
+            this.hideSideMenus();
+          }
           this.setBottomIconToDisabled();
         } else {
           this.setBottomIconToEnabled();
@@ -77,7 +83,9 @@ export class RicPlot extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.secondarySat === -1) {
-          if (this.isMenuButtonActive) this.hideSideMenus();
+          if (this.isMenuButtonActive) {
+            this.hideSideMenus();
+          }
           this.setBottomIconToDisabled();
         } else {
           this.setBottomIconToEnabled();
@@ -88,7 +96,9 @@ export class RicPlot extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     // Delete any old charts and start fresh
     if (this.chart) {
@@ -115,6 +125,7 @@ export class RicPlot extends KeepTrackPlugin {
           const data = params.value;
           const color = params.color;
           // Create a small circle to show the color of the satellite
+
           return `
             <div style="display: flex; flex-direction: column; align-items: flex-start;">
               <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-end;">
@@ -205,11 +216,13 @@ export class RicPlot extends KeepTrackPlugin {
       { name: Z_AXIS, index: 2 },
     ];
 
-    const fieldIndices = schema.reduce(function (obj, item): object {
+    const fieldIndices = schema.reduce((obj, item): object => {
       obj[item.name] = item.index;
+
       return obj;
     }, {});
     let fieldNames = schema.map((item) => item.name);
+
     fieldNames = fieldNames.slice(2, fieldNames.length - 2);
     ['xAxis3D', 'yAxis3D', 'zAxis3D', 'color', 'symbolSize'].forEach((fieldName) => {
       app.configParameters[fieldName] = {
@@ -227,10 +240,13 @@ export class RicPlot extends KeepTrackPlugin {
 
     const data = [] as EChartsData;
 
-    if (this.selectSatManager_.selectedSat === -1 || this.selectSatManager_.secondarySat === -1) return [];
+    if (this.selectSatManager_.selectedSat === -1 || this.selectSatManager_.secondarySat === -1) {
+      return [];
+    }
 
     const satP = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
     const satS = this.selectSatManager_.secondarySatObj;
+
     data.push({ name: satP.name, value: [[0, 0, 0]] });
     data.push({ name: satS.name, value: SatMathApi.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, NUMBER_OF_ORBITS).map((point) => [point.x, point.y, point.z]) });
 

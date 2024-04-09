@@ -104,11 +104,12 @@ export class CatalogManager {
   updateCruncherBuffers = (mData: SatCruncherMessageData): void => {
     keepTrackApi.getDotsManager().updateCruncherBuffers(mData);
 
-    if (typeof mData?.sensorMarkerArray != 'undefined' && mData?.sensorMarkerArray?.length !== 0) {
+    if (typeof mData?.sensorMarkerArray !== 'undefined' && mData?.sensorMarkerArray?.length !== 0) {
       this.sensorMarkerArray = mData.sensorMarkerArray;
     }
 
     const highestMarkerNumber = this.sensorMarkerArray?.[this.sensorMarkerArray?.length - 1] || 0;
+
     settingsManager.dotsOnScreen = Math.max(this.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
   };
 
@@ -174,17 +175,24 @@ export class CatalogManager {
    */
   sccNum2Id(a5Num: string | number, isExtensiveSearch: boolean = true): number | null {
     // For backwards compatibility, this method accepts a number or string as the a5Num parameter.
-    if (typeof a5Num === 'number') a5Num = a5Num.toString().padStart(5, '0');
+    if (typeof a5Num === 'number') {
+      a5Num = a5Num.toString().padStart(5, '0');
+    }
 
     const satBySccIndex = this.sccIndex[`${a5Num}`];
+
     if (typeof satBySccIndex !== 'undefined') {
       return this.sccIndex[`${a5Num}`];
     } else if (isExtensiveSearch) {
       for (let i = 0; i < this.objectCache.length; i++) {
         const obj = this.objectCache[i];
-        if (obj?.isSatellite() && (obj as DetailedSatellite)?.sccNum === a5Num.toString()) return i;
+
+        if (obj?.isSatellite() && (obj as DetailedSatellite)?.sccNum === a5Num.toString()) {
+          return i;
+        }
       }
     }
+
     return null;
   }
 
@@ -196,7 +204,11 @@ export class CatalogManager {
    */
   sccNum2Sat(sccNum: number): DetailedSatellite | null {
     const sat = this.getObject(this.sccNum2Id(sccNum.toString().padStart(5, '0')));
-    if (!sat.isSatellite()) throw new Error(`Object ${sccNum} is not a satellite!`);
+
+    if (!sat.isSatellite()) {
+      throw new Error(`Object ${sccNum} is not a satellite!`);
+    }
+
     return sat as DetailedSatellite;
   }
 
@@ -211,6 +223,8 @@ export class CatalogManager {
    */
   starName2Id(starName: string, starIndex1: number, starIndex2: number): number | null {
     const i = this.objectCache.slice(starIndex1, starIndex2).findIndex((object) => object?.type === SpaceObjectType.STAR && object?.name === starName);
+
+
     return i === -1 ? null : i + starIndex1;
   }
 
@@ -223,11 +237,15 @@ export class CatalogManager {
   getObject(i: number | null | undefined, type: GetSatType = GetSatType.DEFAULT): BaseObject | null {
     if (!(i > -1)) {
       errorManagerInstance.debug('getSat: i is null');
+
       return null;
     }
 
     if (i == -1 || !this.objectCache || !this.objectCache[i]) {
-      if (!isThisNode() && i >= 0 && !this.objectCache[i]) console.warn(`Satellite ${i} not found`);
+      if (!isThisNode() && i >= 0 && !this.objectCache[i]) {
+        console.warn(`Satellite ${i} not found`);
+      }
+
       return null;
     }
 
@@ -237,6 +255,7 @@ export class CatalogManager {
 
     if (type === GetSatType.POSITION_ONLY) {
       this.objectCache[i].position = keepTrackApi.getDotsManager().getCurrentPosition(i);
+
       return this.objectCache[i];
     }
 
@@ -249,7 +268,11 @@ export class CatalogManager {
 
   getSat(satId: number, type: GetSatType = GetSatType.DEFAULT): DetailedSatellite | null {
     const sat = this.getObject(satId, type);
-    if (!sat.isSatellite()) return null;
+
+    if (!sat.isSatellite()) {
+      return null;
+    }
+
     return sat as DetailedSatellite;
   }
 
@@ -259,7 +282,11 @@ export class CatalogManager {
 
   getMissile(missileId: number): MissileObject | null {
     const missile = this.getObject(missileId);
-    if (!missile.isMissile()) return null;
+
+    if (!missile.isMissile()) {
+      return null;
+    }
+
     return missile as MissileObject;
   }
 
@@ -268,7 +295,7 @@ export class CatalogManager {
   }
 
   id2satnum(satIdArray: number[]) {
-    return satIdArray.map((id) => ((<DetailedSatellite>this.getObject(id))?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
+    return satIdArray.map((id) => ((<DetailedSatellite> this.getObject(id))?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
   }
 
   async init(satCruncherOveride?: any): Promise<void> {
@@ -281,6 +308,7 @@ export class CatalogManager {
         } else {
           try {
             const url = 'http://localhost:8080/js/positionCruncher.js';
+
             this.satCruncher = new Worker(url);
           } catch (error) {
             this.satCruncher = {} as any;
@@ -293,12 +321,12 @@ export class CatalogManager {
         }
         /* istanbul ignore next */
         try {
-          this.satCruncher = new Worker(settingsManager.installDirectory + 'js/positionCruncher.js');
+          this.satCruncher = new Worker(`${settingsManager.installDirectory}js/positionCruncher.js`);
         } catch (error) {
           // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
           if (window.location.href.startsWith('file://')) {
             throw new Error(
-              'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.'
+              'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.',
             );
           } else {
             throw new Error(error);
@@ -323,32 +351,33 @@ export class CatalogManager {
         new MissileObject({
           active: false,
           type: SpaceObjectType.BALLISTIC_MISSILE,
-          name: 'Missile ' + i,
+          name: `Missile ${i}`,
           latList: [],
           lonList: [],
           altList: [],
           timeList: [],
-        } as unknown as MissileParams)
+        } as unknown as MissileParams),
       );
     }
 
     // Create a buffer of analyst satellite objects
     for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
       const sccNum = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
+
       this.analSatSet.push(
         new DetailedSatellite({
           active: false,
-          name: 'Analyst Sat ' + i,
+          name: `Analyst Sat ${i}`,
           country: 'ANALSAT',
           launchVehicle: 'Analyst Satellite',
           launchSite: 'ANALSAT',
-          sccNum: sccNum,
+          sccNum,
           tle1: `${CatalogManager.TEMPLATE_TLE1_BEGINNING}${sccNum}${CatalogManager.TEMPLATE_TLE1_ENDING}` as TleLine1,
           tle2: `${CatalogManager.TEMPLATE_TLE2_BEGINNING}${sccNum}${CatalogManager.TEMPLATE_TLE2_ENDING}` as TleLine2,
           intlDes: CatalogManager.TEMPLATE_INTLDES,
           type: SpaceObjectType.PAYLOAD,
           id: i,
-        })
+        }),
       );
     }
 
@@ -373,6 +402,8 @@ export class CatalogManager {
     // Create Sensors
     if (!settingsManager.isDisableSensors) {
       let i = 0;
+
+      // eslint-disable-next-line guard-for-in
       for (const sensor in sensors) {
         sensors[sensor].sensorId = i;
         this.staticSet.push(sensors[sensor]);
@@ -382,8 +413,10 @@ export class CatalogManager {
 
     // Create Launch Sites
     if (!settingsManager.isDisableLaunchSites) {
+      // eslint-disable-next-line guard-for-in
       for (const launchSiteName in launchSites) {
         const launchSite = launchSites[launchSiteName];
+
         this.staticSet.push({
           static: true,
           type: SpaceObjectType.LAUNCH_FACILITY,
@@ -422,15 +455,17 @@ export class CatalogManager {
           marker: true,
           id: i,
         };
+
         this.fieldOfViewSet.push(fieldOfViewMarker);
       }
     } else {
-      console.debug(`settingsManager.maxFieldOfViewMarkers missing or broken!`);
+      console.debug('settingsManager.maxFieldOfViewMarkers missing or broken!');
     }
 
     // Initialize the satLinkMananger and then attach it to the object manager
     try {
       const satLinkManager = new SatLinkManager();
+
       satLinkManager.init(controlSites);
       this.satLinkManager = satLinkManager;
     } catch (e) {
@@ -439,60 +474,89 @@ export class CatalogManager {
   }
 
   addAnalystSat(TLE1: string, TLE2: string, id: number, sccNum?: string): DetailedSatellite | null {
-    if (TLE1.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
-    if (TLE2.length !== 69) throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
+    if (TLE1.length !== 69) {
+      throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
+    }
+    if (TLE2.length !== 69) {
+      throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
+    }
 
     let satrec: SatelliteRecord;
+
     try {
       satrec = Sgp4.createSatrec(TLE1, TLE2);
     } catch (e) {
       errorManagerInstance.error(e, 'catalog-manager.ts', 'Error creating satellite record!');
+
       return null;
     }
 
     if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
+      this.objectCache[id] = new DetailedSatellite({
+        active: true,
+        name: `Analyst Sat ${id}`,
+        country: 'ANALSAT',
+        launchVehicle: 'Analyst Satellite',
+        launchSite: 'ANALSAT',
+        sccNum: sccNum || TLE1.substring(2, 7).trim().padStart(5, '0'),
+        tle1: TLE1 as TleLine1,
+        tle2: TLE2 as TleLine2,
+        intlDes: TLE1.substring(9, 17),
+        type: SpaceObjectType.PAYLOAD,
+        id,
+      });
+
       const m = {
         typ: CruncerMessageTypes.SAT_EDIT,
-        id: id,
+        id,
         active: true,
         tle1: TLE1,
         tle2: TLE2,
       };
+
       this.satCruncher.postMessage(m);
       keepTrackApi.getOrbitManager().changeOrbitBufferData(id, TLE1, TLE2);
-      const sat = this.getObject(id) as DetailedSatellite;
-      if (!sat.isSatellite()) throw new Error(`Object ${id} is not a satellite!`);
+      const sat = this.objectCache[id] as DetailedSatellite;
 
-      sat.active = true;
-      sat.type = SpaceObjectType.PAYLOAD; // Default to Satellite
-      sat.sccNum = sccNum || TLE1.substring(2, 7).trim().padStart(5, '0');
+      if (!sat.isSatellite()) {
+        throw new Error(`Object ${id} is not a satellite!`);
+      }
+
       return sat;
-    } else {
-      errorManagerInstance.debug(TLE1);
-      errorManagerInstance.debug(TLE2);
-      errorManagerInstance.warn(`New Analyst Satellite is Invalid!`);
     }
+    errorManagerInstance.debug(TLE1);
+    errorManagerInstance.debug(TLE2);
+    errorManagerInstance.warn('New Analyst Satellite is Invalid!');
+
 
     return null;
   }
 
   satCruncherOnMessage({ data: mData }: { data: SatCruncherMessageData }) {
-    if (!mData) return;
+    if (!mData) {
+      return;
+    }
 
     if (mData.badObjectId) {
       if (mData.badObjectId >= 0) {
         // Mark the satellite as inactive
         const id = mData.badObjectId;
+
         if (id !== null) {
           const sat = this.objectCache[id] as DetailedSatellite;
+
           sat.active = false;
-          // (<any>window).decayedSats = (<any>window).decayedSats || [];
-          // (<any>window).decayedSats.push(this.satData[id].sccNum);
+          /*
+           * (<any>window).decayedSats = (<any>window).decayedSats || [];
+           * (<any>window).decayedSats.push(this.satData[id].sccNum);
+           */
           errorManagerInstance.debug(`Object ${mData.badObjectId} is inactive due to bad TLE\nSatellite ${sat.sccNum}\n${sat.tle1}\n${sat.tle2}`);
         }
       } else {
-        // console.debug(`Bad sat number: ${mData.badObjectId}`);
-        // How are we getting a negative number? There is a bug somewhere...
+        /*
+         * console.debug(`Bad sat number: ${mData.badObjectId}`);
+         * How are we getting a negative number? There is a bug somewhere...
+         */
       }
     }
 
@@ -515,6 +579,7 @@ export class CatalogManager {
     SplashScreen.hideSplashScreen();
 
     const stars = this.objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);
+
     if (stars.length > 0) {
       stars.sort((a, b) => a.id - b.id);
       // this is the smallest id
@@ -545,12 +610,15 @@ export class CatalogManager {
 
     for (let i = 0; i < this.numSats; i++) {
       // Static objects lack these values and including them increase the JS heap a lot
-      if (!this.objectCache[i].isSatellite()) continue;
+      if (!this.objectCache[i].isSatellite()) {
+        continue;
+      }
       const sat = this.objectCache[i] as DetailedSatellite;
 
       if (this.objectCache[i].type !== SpaceObjectType.PAYLOAD) {
         const inc = Math.round(sat.inclination);
         const per = Math.round(sat.period);
+
         this.orbitDensity[inc][per] += 1;
       }
 
@@ -560,7 +628,9 @@ export class CatalogManager {
     this.orbitDensityMax = 0;
     for (let i = 0; i < 180; i++) {
       for (let p = 90; p < 1500; p++) {
-        if (this.orbitDensity[i][p] > this.orbitDensityMax) this.orbitDensityMax = this.orbitDensity[i][p];
+        if (this.orbitDensity[i][p] > this.orbitDensityMax) {
+          this.orbitDensityMax = this.orbitDensity[i][p];
+        }
       }
     }
   }

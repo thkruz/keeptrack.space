@@ -5,7 +5,9 @@ import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
 describe('NightToggle_class', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let nightToggle: NightToggle;
+
   beforeAll(() => {
     setupDefaultHtml();
     nightToggle = new NightToggle();
@@ -17,6 +19,7 @@ describe('NightToggle_class', () => {
   // Tests that night toggle callback works
   it('test_night_toggle_callback', () => {
     const nightToggle = new NightToggle();
+
     nightToggle.init();
     expect(() => keepTrackApi.methods.nightToggle(global.mocks.glMock, null as unknown as WebGLTexture, null as unknown as WebGLTexture)).not.toThrow();
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-day-night');

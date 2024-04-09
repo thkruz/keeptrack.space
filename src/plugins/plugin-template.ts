@@ -30,7 +30,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     super(SensorInfoPlugin.PLUGIN_NAME);
   }
 
-  helpTitle = `Sensor Info`;
+  helpTitle = 'Sensor Info';
   helpBody = keepTrackApi.html`
     Sensor Info provides information about the currently selected sensor.`;
 

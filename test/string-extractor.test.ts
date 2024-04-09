@@ -12,7 +12,9 @@ describe('StringExtractor_class', () => {
   // Test all known country codes
   it('test_extract_country_all_known_codes', () => {
     for (const code in countryMapList) {
-      if (code === 'TBD') continue;
+      if (code === 'TBD') {
+        continue;
+      }
       expect(StringExtractor.extractCountry(code)).not.toBe('Unknown');
     }
   });
@@ -34,7 +36,7 @@ describe('StringExtractor_class', () => {
 
   // Tests that extractLiftVehicle returns link for known lift vehicle
   it('test_extract_lift_vehicle_known_vehicle', () => {
-    StringExtractor['rocketUrls'] = [{ rocket: 'Falcon 9', url: 'https://www.spacex.com/vehicles/falcon-9/' }];
+    StringExtractor.rocketUrls = [{ rocket: 'Falcon 9', url: 'https://www.spacex.com/vehicles/falcon-9/' }];
     expect(StringExtractor.extractLiftVehicle('Falcon 9')).toBe('<a class="iframe" href="https://en.wikipedia.org/wiki/Falcon_9">Falcon 9</a>');
   });
 
@@ -56,7 +58,7 @@ describe('StringExtractor_class', () => {
 
   // Tests that 'unknownRocket' is returned when input is 'unknownRocket' rocket
   it('test_unknown_rocket', () => {
-    StringExtractor['rocketUrls'] = [];
+    StringExtractor.rocketUrls = [];
     expect(StringExtractor.extractLiftVehicle('unknownRocket')).toBe('unknownRocket');
   });
 

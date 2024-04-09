@@ -26,6 +26,7 @@ import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
   const settingsManager = new SettingsManager();
+
   settingsManager.isShowSplashScreen = true;
   settingsManager.init();
   window.settingsManager = settingsManager;
@@ -37,7 +38,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   }));
   keepTrackApi.containerRoot = null;
   keepTrackApi.unregisterAllEvents();
-  document.body.innerHTML = `<div id="keeptrack-root"></div>`;
+  document.body.innerHTML = '<div id="keeptrack-root"></div>';
   setupDefaultHtml();
 
   clearAllCallbacks();
@@ -47,21 +48,26 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     gl: global.mocks.glMock,
   });
   const catalogManagerInstance = new CatalogManager();
+
   catalogManagerInstance.satCruncher = {
     postMessage: jest.fn(),
     addEventListener: jest.fn(),
   } as unknown as Worker;
   const orbitManagerInstance = new OrbitManager();
+
   orbitManagerInstance.orbitWorker = {
     postMessage: jest.fn(),
     addEventListener: jest.fn(),
   } as unknown as Worker;
-  orbitManagerInstance['gl_'] = global.mocks.glMock;
+
+  orbitManagerInstance.init(null as any, global.mocks.glMock);
   const colorSchemeManagerInstance = new ColorSchemeManager();
   const dotsManagerInstance = new DotsManager();
   const timeManagerInstance = new TimeManager();
+
   timeManagerInstance.simulationTimeObj = new Date(2023, 1, 1, 0, 0, 0, 0);
   const sensorManagerInstance = new SensorManager();
+
   mockUiManager.searchManager = new SearchManager(mockUiManager);
   const soundManagerInstance = new SoundManager();
 
@@ -76,7 +82,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   // Pretend webGl works
   renderer.gl = global.mocks.glMock;
   // Pretend we have a working canvas
-  renderer['domElement'] = <any>{ style: { cursor: 'default' } };
+  renderer.domElement = <any>{ style: { cursor: 'default' } };
 
   const inputManagerInstance = new InputManager();
   const groupManagerInstance = new GroupsManager();
@@ -94,6 +100,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.StarManager, starManager);
   const sensorMathInstance = new SensorMath();
+
   keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
   keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerInstance);
 
@@ -102,10 +109,12 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   // Setup a mock catalog
   const sat2 = defaultSat.clone();
+
   sat2.id = 1;
   sat2.sccNum = '11';
   keepTrackApi.getCatalogManager().objectCache = [defaultSat, sat2];
   const selectSatManager = new SelectSatManager();
+
   selectSatManager.init();
 
   keepTrackApi.containerRoot.innerHTML += `
@@ -145,10 +154,11 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     Dropdown: {
       init: jest.fn(),
     },
-  };
+  } as any;
 
-  dependencies?.forEach((dependency) => {
-    const instance = new dependency();
+  dependencies?.forEach((Dependency) => {
+    const instance = new Dependency();
+
     instance.init();
     if (instance.singletonValue) {
       keepTrackContainer.registerSingleton(instance.singletonValue, instance);
@@ -156,12 +166,13 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   });
 };
 
-let backupConsoleError = {
+const backupConsoleError = {
   error: console.error,
   warn: console.warn,
   info: console.info,
   log: console.log,
 };
+
 export const disableConsoleErrors = () => {
   console.error = jest.fn();
   console.warn = jest.fn();
@@ -325,6 +336,7 @@ export const setupDefaultHtml = () => {
 };
 
 export const clearAllCallbacks = () => {
+  // eslint-disable-next-line guard-for-in
   for (const callback in keepTrackApi.events) {
     keepTrackApi.events[callback] = [];
   }

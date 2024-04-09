@@ -46,7 +46,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = `Satellite Photos Menu`;
+  helpTitle = 'Satellite Photos Menu';
   helpBody = keepTrackApi.html`The Satellite Photos Menu is used for displaying live photos from select satellites.
   <br><br>
   Note - changes in the image API may cause the wrong satellite to be selected in KeepTrack.`;
@@ -59,20 +59,20 @@ export class SatellitePhotos extends KeepTrackPlugin {
       cb: () => {
         getEl('meteosat9-link').addEventListener('click', () => {
           // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
-          SatellitePhotos.loadPic(28912, `https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg`);
+          SatellitePhotos.loadPic(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
         });
         getEl('meteosat11-link').addEventListener('click', () => {
           // Meteosat 11 provides 0 deg full earth images every 15 minutes
-          SatellitePhotos.loadPic(40732, `https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg`);
+          SatellitePhotos.loadPic(40732, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg');
         });
         getEl('himawari8-link').addEventListener('click', () => {
           SatellitePhotos.himawari8();
         });
         getEl('goes16-link').addEventListener('click', () => {
-          SatellitePhotos.loadPic(41866, `https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg`);
+          SatellitePhotos.loadPic(41866, 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg');
         });
         getEl('goes18-link').addEventListener('click', () => {
-          SatellitePhotos.loadPic(51850, `https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg`);
+          SatellitePhotos.loadPic(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
         });
       },
     });
@@ -91,11 +91,13 @@ export class SatellitePhotos extends KeepTrackPlugin {
    */
   initDISCOVR_(): void {
     const req = new XMLHttpRequest();
-    req.open('GET', `https://epic.gsfc.nasa.gov/api/natural`, true);
+
+    req.open('GET', 'https://epic.gsfc.nasa.gov/api/natural', true);
 
     req.onload = () => {
       if (req.status >= 200 && req.status < 400) {
         const res = JSON.parse(req.response);
+
         res.forEach((photo: DiscvrResponse) => {
           const imageUrl = photo.image;
           const dateStr = photo.identifier;
@@ -107,8 +109,8 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
           this.discvrPhotos_.push({
             imageUrl: `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${imageUrl}.png`,
-            lat: lat,
-            lon: lon,
+            lat,
+            lon,
           });
         });
 
@@ -123,16 +125,16 @@ export class SatellitePhotos extends KeepTrackPlugin {
           });
         }
       } else {
-        errorManagerInstance.log(`https://epic.gsfc.nasa.gov/ request failed!`);
-        const html = `<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>`;
+        errorManagerInstance.log('https://epic.gsfc.nasa.gov/ request failed!');
+        const html = '<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>';
 
         getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
       }
     };
 
     req.onerror = function () {
-      errorManagerInstance.log(`https://epic.gsfc.nasa.gov/ request failed!`);
-      const html = `<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>`;
+      errorManagerInstance.log('https://epic.gsfc.nasa.gov/ request failed!');
+      const html = '<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>';
 
       getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
     };
@@ -142,7 +144,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   static colorbox = (url: string): void => {
     settingsManager.isPreventColorboxClose = true;
-    setTimeout(function () {
+    setTimeout(() => {
       settingsManager.isPreventColorboxClose = false;
     }, 2000);
 
@@ -162,11 +164,13 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
     // Propagation time minus 30 minutes so that the pictures have time to become available
     let propTime = keepTrackApi.getTimeManager().simulationTimeObj;
+
     if (propTime.getTime() < Date.now()) {
       propTime = new Date(propTime.getTime() - 1000 * 60 * 30);
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
-      uiManagerInstance.toast(`Can't load pictures from the future. Loading most recent photos.`, 'caution');
+
+      uiManagerInstance.toast('Can\'t load pictures from the future. Loading most recent photos.', 'caution');
       propTime = new Date(Date.now() - 1000 * 60 * 30);
     }
     const year = propTime.getUTCFullYear();
@@ -176,7 +180,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     const min = (Math.floor(propTime.getUTCMinutes() / 10) * 10).toString().padStart(2, '0');
 
     settingsManager.isPreventColorboxClose = true;
-    setTimeout(function () {
+    setTimeout(() => {
       settingsManager.isPreventColorboxClose = false;
     }, 2000);
 

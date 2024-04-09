@@ -18,6 +18,7 @@ describe('ShortTermFences_class', () => {
 
   it('should be able to closeAndDisable', () => {
     const stf = new ShortTermFences();
+
     websiteInit(stf);
     expect(() => stf.closeAndDisable()).not.toThrow();
   });
@@ -26,6 +27,7 @@ describe('ShortTermFences_class', () => {
   describe('stfFormOnSubmit', () => {
     it('should call the stfFormOnSubmit method on the ShortTermFences instance', () => {
       const stf = new ShortTermFences();
+
       websiteInit(stf);
       expect(() => stf.onSubmit()).not.toThrow();
 
@@ -38,6 +40,7 @@ describe('ShortTermFences_class', () => {
   describe('stfOnObjectLinkClick', () => {
     it('should call the stfOnObjectLinkClick method on the ShortTermFences instance', () => {
       const stf = new ShortTermFences();
+
       websiteInit(stf);
       expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
 
@@ -52,6 +55,7 @@ describe('ShortTermFences_class', () => {
 
   it('should be able to handle setSensor', () => {
     const stf = new ShortTermFences();
+
     websiteInit(stf);
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();

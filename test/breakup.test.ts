@@ -17,6 +17,7 @@ describe('Breakup_class', () => {
   describe('onSubmit', () => {
     it('should call the onSubmit method on the Breakup instance', () => {
       const breakupPlugin = new Breakup();
+
       websiteInit(breakupPlugin);
       standardSelectSat();
       // Mock OrbitFinder class
@@ -24,9 +25,9 @@ describe('Breakup_class', () => {
         () =>
           ({
             rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          }) as any
+          }) as any,
       );
-      expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
+      expect(() => breakupPlugin.onSubmit_()).not.toThrow();
     });
   });
 });

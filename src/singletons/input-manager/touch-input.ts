@@ -105,14 +105,19 @@ export class TouchInput {
     }
 
     // Can't move if there is no touch
-    if (!evt.touches || evt.touches.length < 1) return;
+    if (!evt.touches || evt.touches.length < 1) {
+      return;
+    }
 
     this.touchX = evt.touches[0].clientX;
     this.touchY = evt.touches[0].clientY;
 
     if (this.isPinching && evt.touches?.[0] && evt.touches?.[1]) {
       const currentPinchDistance = Math.hypot(evt.touches[0].pageX - evt.touches[1].pageX, evt.touches[0].pageY - evt.touches[1].pageY);
-      if (isNaN(currentPinchDistance)) return;
+
+      if (isNaN(currentPinchDistance)) {
+        return;
+      }
 
       if (currentPinchDistance > this.tapMovementThreshold) {
         this.pinchMove({
@@ -175,6 +180,7 @@ export class TouchInput {
 
     // Try to select satellite
     const satId = keepTrackApi.getInputManager().getSatIdFromCoord(evt.x, evt.y);
+
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(satId);
   }
 
@@ -214,6 +220,7 @@ export class TouchInput {
 
     this.deltaPinchDistance = (this.startPinchDistance - evt.pinchDistance) / this.maxPinchSize;
     let zoomTarget = mainCameraInstance.zoomTarget;
+
     zoomTarget += this.deltaPinchDistance * settingsManager.zoomSpeed;
     zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
     mainCameraInstance.zoomTarget = zoomTarget;

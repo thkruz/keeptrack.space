@@ -70,9 +70,11 @@ describe('updateDopsTable_method', () => {
       { time: new Date(), dops: { pdop: '1', hdop: '2', gdop: '3' } },
       { time: new Date(), dops: { pdop: '4', hdop: '5', gdop: '6' } },
     ] as DopList;
+
     keepTrackApi.containerRoot.innerHTML += '<table id="dops"></table>';
     DopMath.updateDopsTable(dopsResults);
     const table = getEl('dops') as HTMLTableElement;
+
     expect(table.rows.length).toBe(3);
     expect(table.rows[0].cells[0].innerHTML).toBe('Time');
     expect(table.rows[0].cells[1].innerHTML).toBe('HDOP');
@@ -91,6 +93,7 @@ describe('updateDopsTable_method', () => {
   // Tests that the method throws an error if the table element cannot be found
   it('test_missing_table', () => {
     const temp = keepTrackApi.containerRoot.innerHTML;
+
     keepTrackApi.containerRoot.innerHTML = '';
     disableConsoleErrors();
     expect(() => DopMath.updateDopsTable([defaultSat as any])).toThrow();
@@ -109,6 +112,7 @@ describe('calculateDops_method', () => {
   it('test_four_gps_satellites', () => {
     const azElList = goodAzElList.slice(0, 4);
     const dops = DopMath.calculateDops(azElList);
+
     expect(dops.pdop).toMatchSnapshot();
     expect(dops.hdop).toMatchSnapshot();
     expect(dops.gdop).toMatchSnapshot();
@@ -120,6 +124,7 @@ describe('calculateDops_method', () => {
   it('test_more_than_four_gps_satellites', () => {
     const azElList = goodAzElList;
     const dops = DopMath.calculateDops(azElList);
+
     expect(dops.pdop).toMatchSnapshot();
     expect(dops.hdop).toMatchSnapshot();
     expect(dops.gdop).toMatchSnapshot();
@@ -131,6 +136,7 @@ describe('calculateDops_method', () => {
   it('test_less_than_four_gps_satellites', () => {
     const azElList = goodAzElList.slice(0, 3);
     const dops = DopMath.calculateDops(azElList);
+
     expect(dops.pdop).toMatchSnapshot();
     expect(dops.hdop).toMatchSnapshot();
     expect(dops.gdop).toMatchSnapshot();

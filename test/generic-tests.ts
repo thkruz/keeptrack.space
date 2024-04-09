@@ -16,13 +16,15 @@ export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, plugin
 
   test(`${pluginName}_no_private_init`, () => {
     const plugin = new Plugin();
-    expect(plugin['addHtml_']).toBeUndefined();
-    expect(plugin['addJs_']).toBeUndefined();
-    expect(plugin['init_']).toBeUndefined();
+
+    expect(plugin.addHtml_).toBeUndefined();
+    expect(plugin.addJs_).toBeUndefined();
+    expect(plugin.init_).toBeUndefined();
   });
 
   test(`${pluginName}_process_init_twice`, () => {
     const plugin = new Plugin();
+
     expect(plugin.init).toBeDefined();
     expect(() => plugin.init()).not.toThrow();
     expect(() => plugin.init()).toThrow();
@@ -31,12 +33,14 @@ export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, plugin
   // Tests that html can be added to the DOM
   test(`${pluginName}_add_html`, () => {
     const plugin = new Plugin();
+
     expect(() => plugin.addHtml()).not.toThrow();
   });
 
   // Tests that addHtml throws an error if html is already added
   test(`${pluginName}_add_html_twice`, () => {
     const plugin = new Plugin();
+
     plugin.addHtml();
     expect(() => plugin.addHtml()).toThrow();
   });
@@ -44,12 +48,14 @@ export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, plugin
   // Tests that js can be added to the DOM
   test(`${pluginName}_add_js`, () => {
     const plugin = new Plugin();
+
     expect(() => plugin.addJs()).not.toThrow();
   });
 
   // Tests that addJs throws an error if js is already added
   test(`${pluginName}_add_js_twice`, () => {
     const plugin = new Plugin();
+
     plugin.addJs();
     expect(() => plugin.addJs()).toThrow();
   });
@@ -62,6 +68,7 @@ export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, plugin
  */
 export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
   const plugin = new Plugin();
+
   expect(plugin.init).toBeDefined();
   expect(() => plugin.init()).not.toThrow();
   expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit)).not.toThrow();
@@ -74,6 +81,7 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 
 export const websiteInit = (plugin: KeepTrackPlugin) => {
   const settingsManager = new SettingsManager();
+
   settingsManager.init();
   keepTrackApi.getColorSchemeManager().init();
   window.settingsManager = settingsManager;
@@ -90,6 +98,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
   test(`${pluginName}_turned_off_by_default`, () => {
     const plugin = new Plugin();
+
     plugin.init();
     expect(plugin.isMenuButtonActive).toBe(false);
   });
@@ -97,9 +106,11 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   // Tests that other bottom icons being clicked are ignored
   test(`${pluginName}_other_bottom_icon_clicked`, () => {
     const plugin = new Plugin();
+
     websiteInit(plugin);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
+
     expect(toggleButton).toBeDefined();
     expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'random-icon');
@@ -108,9 +119,11 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   // Tests that clicking on the bottom icon toggles
   test(`${pluginName}_toggle`, () => {
     const plugin = new Plugin();
+
     websiteInit(plugin);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
+
     expect(toggleButton).toBeDefined();
     expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
@@ -127,10 +140,12 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   // Tests that clicking on the bottom icon toggles with sensor
   test(`${pluginName}_toggle_w_sensor`, () => {
     const plugin = new Plugin();
+
     websiteInit(plugin);
     keepTrackApi.getSensorManager().setSensor(defaultSensor, 0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
+
     expect(toggleButton).toBeDefined();
 
     if (plugin.isIconDisabled || plugin.isRequireSatelliteSelected) {
@@ -155,11 +170,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   // Tests that clicking on the bottom icon toggles with satellite
   test(`${pluginName}_toggle_w_satellite`, () => {
     const plugin = new Plugin();
+
     websiteInit(plugin);
     keepTrackApi.getCatalogManager().objectCache = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
+
     expect(toggleButton).toBeDefined();
     expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
@@ -180,12 +197,14 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   // Tests that clicking on the bottom icon toggles with satellite and sensor
   test(`${pluginName}_toggle_w_sat_and_sensor`, () => {
     const plugin = new Plugin();
+
     websiteInit(plugin);
     keepTrackApi.getSensorManager().setSensor(defaultSensor, 0);
     keepTrackApi.getCatalogManager().objectCache = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
+
     expect(toggleButton).toBeDefined();
     expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
@@ -202,10 +221,12 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
   // Tests that bottom icon is added to the UI on initialization
   test(`${pluginName}_bottom_icon_added`, () => {
     const plugin = new Plugin();
+
     websiteInit(plugin);
 
     if (plugin.bottomIconElementName !== null) {
       const bottomIcons = getEl(KeepTrackPlugin.bottomIconsContainerId);
+
       expect(bottomIcons).toBeDefined();
       expect(bottomIcons.innerHTML).toContain(plugin.bottomIconElementName);
     } else {
@@ -220,6 +241,7 @@ export const standardPluginRmbTests = (Plugin: Constructor<KeepTrackPlugin>, plu
   // Tests that other bottom icons being clicked are ignored
   describe(`${pluginName}_rmb_clicked`, () => {
     const plugin = new Plugin();
+
     websiteInit(plugin);
 
     // Create a list from li ids in rmbL2Html
@@ -231,6 +253,7 @@ export const standardPluginRmbTests = (Plugin: Constructor<KeepTrackPlugin>, plu
     rmbOptions.forEach((rmbOption) => {
       test(`${pluginName}_rmb_clicked_${rmbOption}`, () => {
         const plugin = new Plugin();
+
         websiteInit(plugin);
         expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
         jest.advanceTimersByTime(1000);
@@ -248,9 +271,11 @@ export const standardClickTests = (Plugin: Constructor<KeepTrackPlugin>) => {
     .split('<button id="')
     .slice(1)
     .map((s) => s.split('"')[0]);
+
   buttonElements.forEach((buttonElement) => {
     test(`${Plugin.name}_button_${buttonElement}`, () => {
       const plugin = new Plugin();
+
       websiteInit(plugin);
       expect(() => getEl(buttonElement).click()).not.toThrow();
       jest.advanceTimersByTime(1000);
@@ -269,8 +294,10 @@ export const standardChangeTests = (Plugin: Constructor<KeepTrackPlugin>) => {
   inputElements.forEach((inputElement) => {
     test(`${Plugin.name}_input_${inputElement}`, () => {
       const plugin = new Plugin();
+
       websiteInit(plugin);
       const elementDom = getEl(inputElement);
+
       (<HTMLInputElement>elementDom).value = '1';
       // Fire a change event
       expect(() => elementDom.dispatchEvent(new Event('change'))).not.toThrow();

@@ -37,10 +37,11 @@ export class LaunchCalendar extends KeepTrackPlugin {
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {
       settingsManager.isPreventColorboxClose = true;
-      setTimeout(function () {
+      setTimeout(() => {
         settingsManager.isPreventColorboxClose = false;
       }, 2000);
       const year = new Date().getFullYear();
+
       openColorbox(`https://space.skyrocket.de/doc_chr/lau${year}.htm`, {
         callback: this.closeColorbox_.bind(this),
       });
@@ -51,6 +52,7 @@ export class LaunchCalendar extends KeepTrackPlugin {
 
   constructor() {
     const PLUGIN_NAME = 'Launch Menu';
+
     super(PLUGIN_NAME);
   }
 

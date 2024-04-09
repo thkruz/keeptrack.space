@@ -113,14 +113,20 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
         getEl('debug-cam-to-sat')?.addEventListener('click', () => {
           const camera = keepTrackApi.getMainCamera();
+
           if (camera) {
             const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
-            if (!selectedSat || selectedSat === -1) return;
+
+            if (!selectedSat || selectedSat === -1) {
+              return;
+            }
 
             const sat = keepTrackApi.getCatalogManager().getObject(selectedSat);
+
             if (sat) {
               const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
               const position = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
+
               lineManagerInstance.create(LineTypes.REF_TO_SAT, [selectedSat, position[0], position[1], position[2]], 'o');
             }
           }
@@ -128,8 +134,10 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
         getEl('debug-cam-to-center')?.addEventListener('click', () => {
           const camera = keepTrackApi.getMainCamera();
+
           if (camera) {
             const position = camera.getCameraPosition();
+
             lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [position[0], position[1], position[2]], 'r');
           }
         });
@@ -147,7 +155,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.updateLoop,
       cbName: this.PLUGIN_NAME,
       cb: (): void => {
-        if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) return;
+        if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) {
+          return;
+        }
         const camera = keepTrackApi.getMainCamera();
         const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
@@ -156,19 +166,23 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getObject(selectedSat) : null;
 
           const position = camera.getCameraPosition(sat?.position);
+
           setInnerHtml('debug-camera-position-x', `X: ${position[0].toFixed(2)}`);
           setInnerHtml('debug-camera-position-y', `Y: ${position[1].toFixed(2)}`);
           setInnerHtml('debug-camera-position-z', `Z: ${position[2].toFixed(2)}`);
           setInnerHtml('debug-camera-distance-from-earth', `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`);
-          this.lastCameraUpdate = <Milliseconds>new Date().getTime();
+          this.lastCameraUpdate = <Milliseconds> new Date().getTime();
         }
         if (selectSatManagerInstance.selectedSat >= 0) {
           const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat);
+
           if (!sat) {
             console.warn('Satellite not found');
+
             return;
           }
           const position = sat.position;
+
           setInnerHtml('debug-sat-position-x', `X: ${position.x.toFixed(2)}`);
           setInnerHtml('debug-sat-position-y', `Y: ${position.y.toFixed(2)}`);
           setInnerHtml('debug-sat-position-z', `Z: ${position.z.toFixed(2)}`);
@@ -187,19 +201,27 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   private static getRandomInt_(min: number, max: number): number {
     min = Number.isNaN(min) ? 0 : Math.ceil(min);
     max = Number.isNaN(max) ? 100 : Math.floor(max);
-    // The use of Math.random here is for debugging purposes only.
-    // It is not used in any cryptographic way.
+    /*
+     * The use of Math.random here is for debugging purposes only.
+     * It is not used in any cryptographic way.
+     */
+
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   private static defaultPositionSelector_() {
     const x = DebugMenuPlugin.getRandomInt_(0, Math.max(0, document.documentElement.clientWidth - 1));
     const y = DebugMenuPlugin.getRandomInt_(Math.max(0, document.documentElement.clientHeight - 100), Math.max(0, document.documentElement.clientHeight - 1));
+
+
     return [x, y];
   }
 
   private static canClick_(element: { parentElement: { className: string } }) {
-    if (typeof element.parentElement == 'undefined' || element.parentElement == null) return null;
+    if (typeof element.parentElement === 'undefined' || element.parentElement == null) {
+      return null;
+    }
+
     return element.parentElement.className === 'bmenu-item';
   }
 
@@ -239,10 +261,18 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
   runGremlins() {
     // If any of the required elements are missing then throw an error
-    if (!getEl('nav-footer')) throw new Error('nav-footer is missing');
-    if (!getEl('nav-footer-toggle')) throw new Error('nav-footer-toggle is missing');
-    if (!getEl('bottom-icons-container')) throw new Error('bottom-icons-container is missing');
-    if (!getEl('bottom-icons')) throw new Error('bottom-icons is missing');
+    if (!getEl('nav-footer')) {
+      throw new Error('nav-footer is missing');
+    }
+    if (!getEl('nav-footer-toggle')) {
+      throw new Error('nav-footer-toggle is missing');
+    }
+    if (!getEl('bottom-icons-container')) {
+      throw new Error('bottom-icons-container is missing');
+    }
+    if (!getEl('bottom-icons')) {
+      throw new Error('bottom-icons is missing');
+    }
 
     (<HTMLElement>getEl('nav-footer')).style.height = '200px';
     (<HTMLElement>getEl('nav-footer-toggle')).style.display = 'none';

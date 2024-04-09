@@ -11,6 +11,6 @@ export enum SoundNames {
   BUTTON_CLICK = 'button',
   WARNING = 'standby',
   MENU_BUTTON = 'menuButton',
-  LOADING = "loading",
-  EXPORT = "export"
+  LOADING = 'loading',
+  EXPORT = 'export'
 }

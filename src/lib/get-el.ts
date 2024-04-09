@@ -11,31 +11,40 @@ import { isThisNode } from '../static/isThisNode';
  */
 export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null => {
   const el = document.getElementById(id);
-  if (el) return el;
-  // if (isThisNode()) {
-  //     // Create an empty DIV and send that back
-  //     // TODO - This is a hack. Tests should provide the right environment.
-  //     const _el = document.createElement('div');
-  //     _el.id = id;
-  //     document.body.appendChild(_el);
-  //     return <HTMLElement>(<unknown>_el);
-  // }
+
+  if (el) {
+    return el;
+  }
+  /*
+   * if (isThisNode()) {
+   *     // Create an empty DIV and send that back
+   *     // TODO - This is a hack. Tests should provide the right environment.
+   *     const _el = document.createElement('div');
+   *     _el.id = id;
+   *     document.body.appendChild(_el);
+   *     return <HTMLElement>(<unknown>_el);
+   * }
+   */
 
   // Return an empty div to avoid errors
   if (isThisNode() && !isExpectedMissing) {
     // console.warn(document.body.innerHTML);
     throw new Error(`Element with id '${id}' not found!`);
   }
+
   return null;
   // DEBUG: Use this code for finding bad requests
 };
 
 export const setInnerHtml = (id: string, html: string) => {
   const el = getEl(id);
+
   if (!el && settingsManager.plugins.debug) {
     console.error(`Element with id ${id} not found!`);
   }
-  if (el) el.innerHTML = html;
+  if (el) {
+    el.innerHTML = html;
+  }
 };
 
 /**
@@ -46,11 +55,15 @@ export const setInnerHtml = (id: string, html: string) => {
 export const showEl = (id: string | HTMLElement, value = 'block') => {
   if (typeof id === 'object') {
     id.style.display = value;
+
     return;
   }
 
   const el = getEl(id, true);
-  if (el) el.style.display = value;
+
+  if (el) {
+    el.style.display = value;
+  }
 };
 
 /**
@@ -60,12 +73,17 @@ export const showEl = (id: string | HTMLElement, value = 'block') => {
 export const hideEl = (id: string | HTMLElement) => {
   if (typeof id === 'object') {
     id.style.display = 'none';
+
     return;
   }
 
   if (typeof id === 'string') {
     const el = getEl(id, true);
-    if (el) el.style.display = 'none';
+
+    if (el) {
+      el.style.display = 'none';
+    }
+
     return;
   }
 

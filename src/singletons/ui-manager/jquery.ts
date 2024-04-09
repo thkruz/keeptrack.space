@@ -11,6 +11,8 @@ import '@app/lib/external/jquery-ui-timepicker.js';
  */
 
 export const loadJquery = () => {
-  // This is just to make sure that the jquery is loaded
-  // in the correct order
+  /*
+   * This is just to make sure that the jquery is loaded
+   * in the correct order
+   */
 };

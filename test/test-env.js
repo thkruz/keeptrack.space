@@ -10,6 +10,7 @@ import path from 'path';
 // eslint-disable-next-line no-process-env
 process.env.TZ = 'GMT';
 const fakeTime = new Date('2022-01-01');
+
 fakeTime.setUTCHours(0, 0, 0, 0);
 jest.useFakeTimers().setSystemTime(fakeTime.getTime());
 
@@ -34,7 +35,7 @@ global.settingsManager = settingsManager;
 
 global.document.url = 'https://keeptrack.space';
 global.document.includeNodeLocations = true;
-if (typeof global.window == 'undefined') {
+if (typeof global.window === 'undefined') {
   global.window = global.document.parentWindow;
 }
 
@@ -55,6 +56,7 @@ global.window.resizeTo = (width, height) => {
 
   // Simulate window resize event
   const resizeEvent = global.document.createEvent('Event');
+
   resizeEvent.initEvent('resize', true, true);
 };
 
@@ -87,8 +89,10 @@ global.console = {
   error: console.debug, // NOSONAR
   // error: jest.fn(),
   warn: console.warn, // NOSONAR
-  // warn: jest.fn(),
-  // info: console.info,
+  /*
+   * warn: jest.fn(),
+   * info: console.info,
+   */
   info: jest.fn(),
   // debug: console.debug,
   debug: jest.fn(),
@@ -107,7 +111,8 @@ window.HTMLMediaElement.prototype.addTextTrack = () => {
   /* do nothing */
 };
 
-global.$ = global.jQuery = $;
+global.jQuery = $;
+global.$ = $;
 window.jQuery = $;
 
 $.fn.replace = (input, output) => $.fn.toString().replace(input, output);
@@ -120,8 +125,10 @@ $.fn.resizable = jest.fn();
 // $.fn.tooltip = jest.fn();
 $.fn.fadeIn = jest.fn((time, cb) => {
   if (typeof cb !== 'undefined') {
-    cb();
+    return cb();
   }
+
+  return true;
 });
 
 global.document.canvas.addEventListener = () => true;

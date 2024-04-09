@@ -8,6 +8,7 @@ describe('NextLaunches_class', () => {
   beforeAll(() => {
     global.window = Object.create(window);
     const url = 'https://Keeptrack.space';
+
     Object.defineProperty(window, 'location', {
       value: {
         href: url,
@@ -22,6 +23,7 @@ describe('NextLaunches_class', () => {
     keepTrackApi.containerRoot.innerHTML = '';
     setupStandardEnvironment();
 
+    // eslint-disable-next-line require-await
     global.fetch = jest.fn().mockImplementation(async () => ({
       json: () => ({
         results: readFileSync('./test/environment/lldev.json', 'utf8'),

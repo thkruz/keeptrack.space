@@ -8,6 +8,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 
 describe('TimeMachine_class', () => {
   let timeMachinePlugin: TimeMachine;
+
   beforeEach(() => {
     setupDefaultHtml();
     timeMachinePlugin = new TimeMachine();

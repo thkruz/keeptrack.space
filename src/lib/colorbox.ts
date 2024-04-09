@@ -10,19 +10,26 @@ interface ColorboxOptions {
 }
 
 let isColorBoxReady = false;
+
 export const openColorbox = (url: string, options: ColorboxOptions = {}): void => {
   if (!isColorBoxReady) {
     createColorbox();
   }
 
   const colorboxDom = getEl('colorbox-div');
-  if (!colorboxDom) return;
+
+  if (!colorboxDom) {
+    return;
+  }
 
   const handleClick = () => {
     closeColorbox();
-    if (options.callback) options.callback();
+    if (options.callback) {
+      options.callback();
+    }
     colorboxDom.removeEventListener('click', handleClick);
   };
+
   colorboxDom.addEventListener('click', handleClick);
 
   showLoading(() => {
@@ -39,8 +46,12 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
 export const closeColorbox = (): void => {
   const colorboxDom = getEl('colorbox-div');
 
-  if (!colorboxDom) return;
-  if (colorboxDom.style.display !== 'block') return;
+  if (!colorboxDom) {
+    return;
+  }
+  if (colorboxDom.style.display !== 'block') {
+    return;
+  }
 
   slideOutLeft(
     getEl('colorbox-container'),
@@ -48,7 +59,7 @@ export const closeColorbox = (): void => {
     () => {
       colorboxDom.style.display = 'none';
     },
-    -200
+    -200,
   );
 };
 
@@ -57,15 +68,19 @@ export const closeColorbox = (): void => {
  */
 export const createColorbox = () => {
   const colorboxDiv = document.createElement('div');
+
   colorboxDiv.id = 'colorbox-div';
   keepTrackApi.containerRoot.appendChild(colorboxDiv);
   const colorboxContainer = document.createElement('div');
+
   colorboxContainer.id = 'colorbox-container';
   colorboxDiv.appendChild(colorboxContainer);
   const colorboxIframe = document.createElement('iframe');
+
   colorboxIframe.id = 'colorbox-iframe';
   colorboxContainer.appendChild(colorboxIframe);
   const img = document.createElement('img');
+
   img.id = 'colorbox-img';
   img.style.width = '100%';
   img.style.height = '100%';
@@ -79,8 +94,10 @@ export const createColorbox = () => {
  */
 const setupIframeColorbox_ = (url: string) => {
   const colorboxContainerDom = getEl('colorbox-container');
+
   if (!colorboxContainerDom) {
     console.warn('Colorbox container not found!');
+
     return;
   }
   colorboxContainerDom.style.width = '100%';
@@ -99,8 +116,10 @@ const setupIframeColorbox_ = (url: string) => {
  */
 const setupImageColorbox_ = (url: string) => {
   const colorboxContainerDom = getEl('colorbox-container');
+
   if (!colorboxContainerDom) {
     console.warn('Colorbox container not found!');
+
     return;
   }
 

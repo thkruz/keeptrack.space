@@ -59,7 +59,9 @@ export class Moon {
    * This is run once per frame to render the moon.
    */
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer = null) {
-    if (!this.isLoaded_ || settingsManager.isDisableMoon) return;
+    if (!this.isLoaded_ || settingsManager.isDisableMoon) {
+      return;
+    }
     const gl = this.gl_;
 
     this.mesh.program.use();
@@ -110,6 +112,7 @@ export class Moon {
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
     });
+
     this.mesh = new Mesh(gl, geometry, material, {
       name: 'moon',
       precision: 'highp',
@@ -127,7 +130,9 @@ export class Moon {
    * This is run once per frame to update the moon.
    */
   update(simTime: Date) {
-    if (!this.isLoaded_) return;
+    if (!this.isLoaded_) {
+      return;
+    }
 
     this.updateEciPosition_(simTime);
 
@@ -148,6 +153,7 @@ export class Moon {
 
     if (this.eci.x && this.eci.y && this.eci.z) {
       const scaleFactor = this.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));
+
       this.position[0] = this.eci.x * scaleFactor;
       this.position[1] = this.eci.y * scaleFactor;
       this.position[2] = this.eci.z * scaleFactor;

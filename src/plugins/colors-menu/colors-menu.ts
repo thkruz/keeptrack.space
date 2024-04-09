@@ -10,7 +10,7 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Color Menu';
+  static readonly PLUGIN_NAME = 'Color Menu';
   bottomIconImg = colorsPng;
   bottomIconElementName: string = 'menu-color-scheme';
   bottomIconLabel: string = 'Color Schemes';
@@ -27,6 +27,7 @@ export class ColorMenu extends KeepTrackPlugin {
         <li class="menu-selectable" data-color="neighbors">Orbit Density</li>
         <li class="menu-selectable" data-color="confidence">Confidence Level</li>
         <li class="menu-selectable" data-color="rcs">Radar Cross Section</li>
+        <li class="menu-selectable" data-color="starlink">Starlink</li>
         <li class="menu-selectable" data-color="smallsats">Small Satellites</li>
         <li class="menu-selectable" data-color="countries">Countries</li>
         <li class="menu-selectable" data-color="near-earth">Near Earth</li>
@@ -37,7 +38,7 @@ export class ColorMenu extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = `Colors Menu`;
+  helpTitle = 'Colors Menu';
 
   helpBody = keepTrackApi.html`The Colors Menu is a place to change the color theme used to render the objects.
 <br><br>
@@ -58,6 +59,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
     <li id="colors-default-rmb"><a href="#">Object Types</a></li>
     <li id="colors-rcs-rmb"><a href="#">Radar Cross Section</a></li>
     <li id="colors-density-rmb"><a href="#">Orbit Density</a></li>
+    <li id="colors-starlink-rmb"><a href="#">Starlink</a></li>
     <li id="colors-sunlight-rmb"><a href="#">Sunlight Status</a></li>
     <li id="colors-country-rmb"><a href="#">Country</a></li>
     <li id="colors-confidence-rmb"><a href="#">Confidence Level</a></li>
@@ -68,9 +70,6 @@ The various themes can change the colors based on the objects' orbits, objects' 
   // eslint-disable-next-line class-methods-use-this
   rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
     switch (targetId) {
-      case 'colors-default-rmb':
-        ColorMenu.colorsMenuClick('default');
-        break;
       case 'colors-confidence-rmb':
         ColorMenu.colorsMenuClick('confidence');
         break;
@@ -79,6 +78,9 @@ The various themes can change the colors based on the objects' orbits, objects' 
         break;
       case 'colors-density-rmb':
         ColorMenu.colorsMenuClick('neighbors');
+        break;
+      case 'colors-starlink-rmb':
+        ColorMenu.colorsMenuClick('starlink');
         break;
       case 'colors-sunlight-rmb':
         ColorMenu.colorsMenuClick('sunlight');
@@ -91,6 +93,10 @@ The various themes can change the colors based on the objects' orbits, objects' 
         break;
       case 'colors-ageOfElset-rmb':
         ColorMenu.colorsMenuClick('elset-age');
+        break;
+      case 'colors-default-rmb':
+      default:
+        ColorMenu.colorsMenuClick('default');
         break;
     }
   };
@@ -112,8 +118,9 @@ The various themes can change the colors based on the objects' orbits, objects' 
         getEl('colors-menu')
           .querySelectorAll('li')
           .forEach((element) => {
-            element.addEventListener('click', function () {
-              const colorName = this.dataset.color;
+            element.addEventListener('click', () => {
+              const colorName = element.dataset.color;
+
               ColorMenu.colorsMenuClick(colorName);
             });
           });
@@ -121,9 +128,8 @@ The various themes can change the colors based on the objects' orbits, objects' 
     });
   }
 
-  static colorsMenuClick = (colorName: string) => {
+  static readonly colorsMenuClick = (colorName: string) => {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    // TODO: Update ColorScheme interface
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -137,11 +143,6 @@ The various themes can change the colors based on the objects' orbits, objects' 
       });
     }
     switch (colorName) {
-      case 'default':
-        LegendManager.change('default');
-        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
-        break;
       case 'confidence':
         LegendManager.change('confidence');
         colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.confidence, true);
@@ -164,7 +165,7 @@ The various themes can change the colors based on the objects' orbits, objects' 
           () => {
             colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
           },
-          (data: any) => data.satInSun
+          (data) => data.satInSun,
         );
         break;
       case 'near-earth':
@@ -199,6 +200,11 @@ The various themes can change the colors based on the objects' orbits, objects' 
         colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.rcs, true);
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         break;
+      case 'starlink':
+        LegendManager.change('starlink');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.starlink, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
       case 'smallsats':
         LegendManager.change('small');
         colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.smallsats, true);
@@ -216,6 +222,12 @@ The various themes can change the colors based on the objects' orbits, objects' 
         } else {
           colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.countries, true);
         }
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'default':
+      default:
+        LegendManager.change('default');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         break;
     }

@@ -23,13 +23,14 @@ export class Inc2LonPlots extends KeepTrackPlugin {
   bottomIconImg = scatterPlotPng;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId);
+
     this.createPlot(Inc2LonPlots.getPlotData(), chartDom);
   };
 
   plotCanvasId = 'plot-analysis-chart-inc2lon';
   chart: echarts.ECharts;
 
-  helpTitle = `Inc Vs Lon Plot Menu`;
+  helpTitle = 'Inc Vs Lon Plot Menu';
   helpBody = keepTrackApi.html`
   <p>
     The Inc Vs Lon Plot Menu is used for plotting the inclination vs longitude in the GEO belt.
@@ -49,7 +50,9 @@ export class Inc2LonPlots extends KeepTrackPlugin {
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     // Delete any old charts and start fresh
     if (!this.chart) {
@@ -184,12 +187,23 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     const other = [];
 
     keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
-      if (obj.type !== SpaceObjectType.PAYLOAD) return;
+      if (obj.type !== SpaceObjectType.PAYLOAD) {
+        return;
+      }
       const sat = obj as DetailedSatellite;
-      if (sat.eccentricity > 0.1) return;
-      if (sat.period < 1240) return;
-      if (sat.period > 1640) return;
-      if (sat.inclination > 17) return;
+
+      if (sat.eccentricity > 0.1) {
+        return;
+      }
+      if (sat.period < 1240) {
+        return;
+      }
+      if (sat.period > 1640) {
+        return;
+      }
+      if (sat.inclination > 17) {
+        return;
+      }
 
       // Update Position
       const now = keepTrackApi.getTimeManager().simulationTimeObj;
@@ -200,21 +214,24 @@ export class Inc2LonPlots extends KeepTrackPlugin {
         case 'United States':
         case 'US':
           usa.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
+
           return;
         case 'Russian Federation':
         case 'CIS':
         case 'Russia':
           russia.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
+
           return;
         case 'China':
-        case `China, People's Republic of`:
-        case `Hong Kong Special Administrative Region, China`:
+        case 'China, People\'s Republic of':
+        case 'Hong Kong Special Administrative Region, China':
         case 'China (Republic)':
           china.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
+
           return;
         default:
           other.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
-          return;
+
       }
     });
 

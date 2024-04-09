@@ -48,7 +48,10 @@ export class GamepadPlugin {
   updateGamepad(index?: number): void {
     index ??= 0; // Assume first gamepad if not specified
     const controller = GamepadPlugin.getController(index);
-    if (controller === null) return; // No controller anymore - give up
+
+    if (controller === null) {
+      return;
+    } // No controller anymore - give up
 
     this.currentController = controller;
     this.updateZoom_();
@@ -119,8 +122,10 @@ export class GamepadPlugin {
             this.btnXbox();
             break;
           default:
-            // DEBUG:
-            // console.debug(`Button ${index}`);
+            /*
+             * DEBUG:
+             * console.debug(`Button ${index}`);
+             */
             break;
         }
         // if the button is not pressed and was pressed before
@@ -132,63 +137,84 @@ export class GamepadPlugin {
   }
 
   private btnA_() {
-    if (settingsManager.isLimitedGamepadControls) return;
+    if (settingsManager.isLimitedGamepadControls) {
+      return;
+    }
     console.log('A');
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getHoverManager().hoveringSat);
   }
 
   private btnB_() {
-    if (settingsManager.isLimitedGamepadControls) return;
+    if (settingsManager.isLimitedGamepadControls) {
+      return;
+    }
     console.log('B');
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     keepTrackApi.getMainCamera().zoomTarget = 0.8;
   }
 
   private btnX_() {
-    if (settingsManager.isLimitedGamepadControls) return;
+    if (settingsManager.isLimitedGamepadControls) {
+      return;
+    }
     console.log('X');
     keepTrackApi.getMainCamera().autoRotate();
   }
 
   private btnY_() {
     console.log('Y');
-    // if (settingsManager.colors.transparent[3] === 0.2) {
-    //   settingsManager.colors.transparent = [1, 1, 1, 0];
-    //   settingsManager.dotsPerColor = null;
-    // } else {
-    //   settingsManager.colors.transparent = [1, 1, 1, 0.2];
-    //   settingsManager.dotsPerColor = 100;
-    // }
-    // uiManager?.keyHandler({ key: 'C' });
+    /*
+     * if (settingsManager.colors.transparent[3] === 0.2) {
+     *   settingsManager.colors.transparent = [1, 1, 1, 0];
+     *   settingsManager.dotsPerColor = null;
+     * } else {
+     *   settingsManager.colors.transparent = [1, 1, 1, 0.2];
+     *   settingsManager.dotsPerColor = 100;
+     * }
+     * uiManager?.keyHandler({ key: 'C' });
+     */
   }
 
   private btnLeftBumper() {
-    if (settingsManager.isLimitedGamepadControls) return;
+    if (settingsManager.isLimitedGamepadControls) {
+      return;
+    }
     console.log('Left Bumper');
 
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-    if (!selectSatManagerInstance) return;
+
+    if (!selectSatManagerInstance) {
+      return;
+    }
 
     const satId = selectSatManagerInstance.selectedSat - 1;
+
     if (satId >= 0) {
       selectSatManagerInstance.selectSat(satId);
     } else {
       const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
       const lastSatId = activeSats[activeSats.length - 1].id;
+
       selectSatManagerInstance.selectSat(lastSatId);
     }
   }
 
   private btnRightBumper_() {
-    if (settingsManager.isLimitedGamepadControls) return;
+    if (settingsManager.isLimitedGamepadControls) {
+      return;
+    }
     console.log('Right Bumper');
 
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-    if (!selectSatManagerInstance) return;
+
+    if (!selectSatManagerInstance) {
+      return;
+    }
 
     const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
     const lastSatId = activeSats[activeSats.length - 1].id;
     const satId = selectSatManagerInstance.selectedSat + 1;
+
     if (satId <= lastSatId) {
       selectSatManagerInstance.selectSat(satId);
     } else {
@@ -197,7 +223,9 @@ export class GamepadPlugin {
   }
 
   private btnHome_() {
-    if (settingsManager.isLimitedGamepadControls) return;
+    if (settingsManager.isLimitedGamepadControls) {
+      return;
+    }
     console.log('Home');
     keepTrackApi.getMainCamera().isPanReset = true;
     keepTrackApi.getMainCamera().isLocalRotateReset = true;
@@ -252,10 +280,13 @@ export class GamepadPlugin {
     const zoomOut = this.currentController.buttons[6].value;
     const zoomIn = this.currentController.buttons[7].value;
 
-    if (zoomOut === 0 && zoomIn === 0) return; // Not Zooming
+    if (zoomOut === 0 && zoomIn === 0) {
+      return;
+    } // Not Zooming
     const renderer = keepTrackApi.getRenderer();
 
     let zoomTarget = keepTrackApi.getMainCamera().zoomLevel();
+
     switch (keepTrackApi.getMainCamera().cameraType) {
       case CameraType.DEFAULT:
       case CameraType.OFFSET:
@@ -293,6 +324,7 @@ export class GamepadPlugin {
     if (x > this.deadzone || x < -this.deadzone || y > this.deadzone || y < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
       const drawManagerInstance = keepTrackApi.getRenderer();
+
       settingsManager.lastGamepadMovement = Date.now();
 
       switch (keepTrackApi.getMainCamera().cameraType) {
@@ -320,7 +352,9 @@ export class GamepadPlugin {
   }
 
   private updateRightStick_(): void {
-    if (settingsManager.isLimitedGamepadControls) return;
+    if (settingsManager.isLimitedGamepadControls) {
+      return;
+    }
 
     const x = this.currentController.axes[2];
     const y = this.currentController.axes[3];
@@ -349,7 +383,9 @@ export class GamepadPlugin {
   }
 
   vibrate(vibrateTime?: number): void {
-    if (!this.currentController) return;
+    if (!this.currentController) {
+      return;
+    }
 
     this.currentController.vibrationActuator.playEffect('dual-rumble', {
       duration: vibrateTime || 300,
@@ -362,10 +398,12 @@ export class GamepadPlugin {
   static getController(index = 0): Gamepad | null {
     // If gamepad not specified then try the first one
     const gamepads = navigator.getGamepads().filter((gamepad) => gamepad !== null);
+
     if (gamepads.length > index && gamepads[index] !== null) {
       return gamepads[index];
     }
     // Get the gamepad or return null if not connected
+
     return null;
   }
 }

@@ -45,6 +45,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   bottomIconCallback = () => {
     if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
       const uiManagerInstance = keepTrackApi.getUiManager();
+
       uiManagerInstance.hideSideMenus();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT; // Back to normal Camera Mode
       getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
@@ -53,7 +54,8 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
       getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
-      uiManagerInstance.toast(`Select a Satellite First!`, 'caution');
+
+      uiManagerInstance.toast('Select a Satellite First!', 'caution');
       shake(getEl(this.bottomIconElementName));
     }
   };

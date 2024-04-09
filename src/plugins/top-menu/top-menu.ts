@@ -69,7 +69,7 @@ export class TopMenu extends KeepTrackPlugin {
                 </ul>
               </div>
             </nav>
-          `
+          `,
         );
 
         keepTrackApi.containerRoot.insertAdjacentHTML(
@@ -85,7 +85,7 @@ export class TopMenu extends KeepTrackPlugin {
                 </div>
               </div>
             </div>
-          `
+          `,
         );
 
         adviceManagerInstance.init();
@@ -105,6 +105,7 @@ export class TopMenu extends KeepTrackPlugin {
 
           if (!soundManager) {
             errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
+
             return;
           }
 

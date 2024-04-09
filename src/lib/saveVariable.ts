@@ -43,7 +43,10 @@ export const saveVariable = <T>(variable: T, filename?: string): void => {
     filename = filename || 'variable.txt';
     const variableStr = JSON.stringify(variable, getCircularReplacer());
     const blob = new Blob([variableStr], { type: 'text/plain;charset=utf-8' });
-    if (!saveAs) throw new Error('saveAs is unavailable!');
+
+    if (!saveAs) {
+      throw new Error('saveAs is unavailable!');
+    }
     saveAs(blob, filename);
   } catch (e) {
     errorManagerInstance.error(e, 'saveVariable', 'Error in saving variable!');
@@ -56,12 +59,16 @@ export const saveVariable = <T>(variable: T, filename?: string): void => {
  */
 export const getCircularReplacer = () => {
   const seen = new WeakSet();
+
+
   return (_key: string, value: object) => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) {
         return null;
-      } else seen.add(value);
+      }
+      seen.add(value);
     }
+
     return value;
   };
 };
@@ -75,7 +82,10 @@ export const saveCsv = <T extends Record<string, unknown>>(items: Array<T>, name
   try {
     const csv = Papa.unparse(items);
     const blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
-    if (!saveAs) throw new Error('saveAs is unavailable!');
+
+    if (!saveAs) {
+      throw new Error('saveAs is unavailable!');
+    }
     name ??= 'data';
     saveAs(blob, `${name}.csv`);
   } catch (e) {

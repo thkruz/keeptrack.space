@@ -15,7 +15,7 @@ export enum Operators {
   ESA = 'ESA',
   ROC = 'ROC',
   EISCAT = 'EISCAT',
-  RUSSF = 'RUS SF', //Russian Space Forces
+  RUSSF = 'RUS SF', // Russian Space Forces
   MIT = 'MIT',
   NOR = 'NOR',
   PLA = 'PLA',
@@ -776,15 +776,19 @@ export const sensors = <SensorList>{
     changeObjectInterval: <Milliseconds>1000,
     url: 'https://platform.leolabs.space/sites/pfisr',
     country: 'United States',
-    // "boresight": new DetailedSensor({ "azimuth": 15.0, "elevation": 74.0 }),
-    // "transmitFrequency": 450000000.0,
-    // "transmitPower": 2000000.0,
+    /*
+     * "boresight": new DetailedSensor({ "azimuth": 15.0, "elevation": 74.0 }),
+     * "transmitFrequency": 450000000.0,
+     * "transmitPower": 2000000.0,
+     */
     volume: true,
     operator: Operators.LEOLABS,
   }),
 
-  // TODO: There needs to be a new method for doing FOV when
-  // the radar is a fence but not aiming at 90 elevation
+  /*
+   * TODO: There needs to be a new method for doing FOV when
+   * the radar is a fence but not aiming at 90 elevation
+   */
   LEOKSR: new DetailedSensor({
     objName: 'LEOKSR',
     id: 0,
@@ -796,18 +800,20 @@ export const sensors = <SensorList>{
     lat: <Degrees>-45.03854,
     lon: <Degrees>170.09556,
     alt: <Kilometers>0.6,
-    // minAz:<Degrees>(-13 - 45),
-    // maxAz: <Degrees>(-13 + 45),
-    // minEl: <Degrees>69,
-    // maxEl: <Degrees>71,
-    // minRng: <Kilometers>100,
-    // maxRng: <Kilometers>1800,
-    // minAz2: <Degrees>(167 - 45),
-    // maxAz2: <Degrees>(167 + 45),
-    // minEl2: <Degrees>69,
-    // maxEl2: <Degrees>71,
-    // minRng2: <Kilometers>100,
-    // maxRng2: <Kilometers>1800,
+    /*
+     * minAz:<Degrees>(-13 - 45),
+     * maxAz: <Degrees>(-13 + 45),
+     * minEl: <Degrees>69,
+     * maxEl: <Degrees>71,
+     * minRng: <Kilometers>100,
+     * maxRng: <Kilometers>1800,
+     * minAz2: <Degrees>(167 - 45),
+     * maxAz2: <Degrees>(167 + 45),
+     * minEl2: <Degrees>69,
+     * maxEl2: <Degrees>71,
+     * minRng2: <Kilometers>100,
+     * maxRng2: <Kilometers>1800,
+     */
     minAz: <Degrees>269,
     maxAz: <Degrees>271,
     minEl: <Degrees>10,
@@ -1264,7 +1270,7 @@ export const sensors = <SensorList>{
     id: 0,
     name: 'Pechora, Russia',
     uiName: 'Pechora',
-    system: `Dar'yal`,
+    system: 'Dar\'yal',
     freqBand: 'UHF',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
     lat: <Degrees>65.21,
@@ -1374,28 +1380,30 @@ export const sensors = <SensorList>{
     zoom: ZoomValue.LEO,
     operator: Operators.RUSSF,
   }),
-  // Decommissioned???
-  // GAN: new DetailedSensor({
-  //   objName: 'GAN',
-  //   id: 0,
-  //   name: 'Gantsevichi, Russia',
-  //   uiName: 'GAN',
-  //   system: 'GAN',
-  //   type: SpaceObjectType.PHASED_ARRAY_RADAR,
-  //   lat: <Degrees>52.85,
-  //   lon: <Degrees>26.48,
-  //   alt: <Kilometers>0.0,
-  //   minAz:<Degrees>190, // All Information via russianforces.org
-  //   maxAz: <Degrees>310,
-  //   minEl: <Degrees>3,
-  //   maxEl: <Degrees>80,
-  //   minRng: <Kilometers>300,
-  //   maxRng: <Kilometers>6500,
-  //   zoom: ZoomValue.LEO,
-  //   changeObjectInterval: <Milliseconds>1000,
-  //   country: 'Russia',
-  //   operator: Operators.RUSSF,
-  // }),
+  /*
+   * Decommissioned???
+   * GAN: new DetailedSensor({
+   *   objName: 'GAN',
+   *   id: 0,
+   *   name: 'Gantsevichi, Russia',
+   *   uiName: 'GAN',
+   *   system: 'GAN',
+   *   type: SpaceObjectType.PHASED_ARRAY_RADAR,
+   *   lat: <Degrees>52.85,
+   *   lon: <Degrees>26.48,
+   *   alt: <Kilometers>0.0,
+   *   minAz:<Degrees>190, // All Information via russianforces.org
+   *   maxAz: <Degrees>310,
+   *   minEl: <Degrees>3,
+   *   maxEl: <Degrees>80,
+   *   minRng: <Kilometers>300,
+   *   maxRng: <Kilometers>6500,
+   *   zoom: ZoomValue.LEO,
+   *   changeObjectInterval: <Milliseconds>1000,
+   *   country: 'Russia',
+   *   operator: Operators.RUSSF,
+   * }),
+   */
   KALV: new DetailedSensor({
     objName: 'KALV',
     id: 0,
@@ -1487,29 +1495,31 @@ export const sensors = <SensorList>{
     country: 'Russia',
     operator: Operators.RUSSF,
   }),
-  // Removed from combat alert in 2020
-  // BAL: new DetailedSensor({
-  //   objName: 'BAL',
-  //   id: 0,
-  //   name: 'Balkhash, Russia',
-  //   uiName: 'BAL',
-  //   system: 'Dnepr',
-  //   freqBand: 'UHF',
-  //   type: SpaceObjectType.PHASED_ARRAY_RADAR,
-  //   lat: <Degrees>46.603076,
-  //   lon: <Degrees>74.530985,
-  //   alt: <Kilometers>0.0,
-  //   minAz:<Degrees>91, // All Information via russianforces.org
-  //   maxAz: <Degrees>151,
-  //   minEl: <Degrees>5.5,
-  //   maxEl: <Degrees>34.5,
-  //   minRng: <Kilometers>385,
-  //   maxRng: <Kilometers>4600,
-  //   zoom: ZoomValue.LEO,
-  //   changeObjectInterval: <Milliseconds>1000,
-  //   country: 'Russia',
-  //   operator: Operators.RUSSF,
-  // }),
+  /*
+   * Removed from combat alert in 2020
+   * BAL: new DetailedSensor({
+   *   objName: 'BAL',
+   *   id: 0,
+   *   name: 'Balkhash, Russia',
+   *   uiName: 'BAL',
+   *   system: 'Dnepr',
+   *   freqBand: 'UHF',
+   *   type: SpaceObjectType.PHASED_ARRAY_RADAR,
+   *   lat: <Degrees>46.603076,
+   *   lon: <Degrees>74.530985,
+   *   alt: <Kilometers>0.0,
+   *   minAz:<Degrees>91, // All Information via russianforces.org
+   *   maxAz: <Degrees>151,
+   *   minEl: <Degrees>5.5,
+   *   maxEl: <Degrees>34.5,
+   *   minRng: <Kilometers>385,
+   *   maxRng: <Kilometers>4600,
+   *   zoom: ZoomValue.LEO,
+   *   changeObjectInterval: <Milliseconds>1000,
+   *   country: 'Russia',
+   *   operator: Operators.RUSSF,
+   * }),
+   */
   STO: new DetailedSensor({
     objName: 'STO',
     id: 0,
@@ -1623,8 +1633,8 @@ export const sensors = <SensorList>{
   ZHE: new DetailedSensor({
     objName: 'ZHE',
     id: 0,
-    name: `Lin'an Zhejiang, China`,
-    uiName: `Lin'an`,
+    name: 'Lin\'an Zhejiang, China',
+    uiName: 'Lin\'an',
     system: 'LPAR',
     freqBand: 'X-Band',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,

@@ -12,3 +12,4 @@ src/tle
 **/**/tle.js
 embed
 public
+public/analysis/js/analysis-tools.js

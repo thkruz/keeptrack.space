@@ -310,6 +310,7 @@ export class KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const item = document.createElement('div');
+
         item.innerHTML = html;
         // Replace outer element with first child
         getEl(KeepTrackPlugin.rmbMenuL1ContainerId).appendChild(item.lastChild);
@@ -323,6 +324,7 @@ export class KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const item = document.createElement('div');
+
         item.id = elementId;
         item.className = 'right-btn-menu';
         item.innerHTML = html;
@@ -341,9 +343,12 @@ export class KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const button = document.createElement('div');
+
         button.id = this.bottomIconElementName;
         button.classList.add('bmenu-item');
-        if (isDisabled) button.classList.add('bmenu-item-disabled');
+        if (isDisabled) {
+          button.classList.add('bmenu-item-disabled');
+        }
         button.innerHTML = `
             <img
               alt="${this.PLUGIN_NAME}"
@@ -363,27 +368,37 @@ export class KeepTrackPlugin {
   }
 
   setBottomIconToSelected(): void {
-    if (this.isMenuButtonActive) return;
+    if (this.isMenuButtonActive) {
+      return;
+    }
     this.isMenuButtonActive = true;
     getEl(this.bottomIconElementName).classList.add('bmenu-item-selected');
   }
 
   setBottomIconToUnselected(isHideSideMenus = true): void {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
     this.isMenuButtonActive = false;
-    if (isHideSideMenus) keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+    if (isHideSideMenus) {
+      keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+    }
     getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
   }
 
   setBottomIconToDisabled(isHideSideMenus = true): void {
-    if (this.isIconDisabled) return;
+    if (this.isIconDisabled) {
+      return;
+    }
     this.setBottomIconToUnselected(isHideSideMenus);
     this.isIconDisabled = true;
     getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
   }
 
   setBottomIconToEnabled(): void {
-    if (!this.isIconDisabled) return;
+    if (!this.isIconDisabled) {
+      return;
+    }
     this.isIconDisabled = false;
     getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
   }
@@ -396,11 +411,13 @@ export class KeepTrackPlugin {
   verifySensorSelected(isMakeToast = true): boolean {
     if (!keepTrackApi.getSensorManager().isSensorSelected()) {
       if (isMakeToast) {
-        errorManagerInstance.warn(`Select a Sensor First!`);
+        errorManagerInstance.warn('Select a Sensor First!');
         shake(getEl(this.bottomIconElementName));
       }
+
       return false;
     }
+
     return true;
   }
 
@@ -410,13 +427,17 @@ export class KeepTrackPlugin {
   isRequireSatelliteSelected: boolean = false;
 
   verifySatelliteSelected(): boolean {
-    // const searchDom = getEl('search', true);
-    // if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
+    /*
+     * const searchDom = getEl('search', true);
+     * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
+     */
     if (!(keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1)) {
-      errorManagerInstance.warn(`Select a Satellite First!`);
+      errorManagerInstance.warn('Select a Satellite First!');
       shake(getEl(this.bottomIconElementName));
+
       return false;
     }
+
     return true;
   }
 
@@ -494,11 +515,15 @@ export class KeepTrackPlugin {
           } else {
             // Verifiy that the user has selected a sensor and/or satellite if required
             if (this.isRequireSensorSelected) {
-              if (!this.verifySensorSelected()) return;
+              if (!this.verifySensorSelected()) {
+                return;
+              }
             }
 
             if (this.isRequireSatelliteSelected) {
-              if (!this.verifySatelliteSelected()) return;
+              if (!this.verifySatelliteSelected()) {
+                return;
+              }
             }
 
             // If the icon is disabled, skip automatically selecting it
@@ -515,7 +540,10 @@ export class KeepTrackPlugin {
           }
 
           // If a callback is defined, call it even if the icon is disabled
-          if (callback) callback();
+          if (callback) {
+            // eslint-disable-next-line callback-return
+            callback();
+          }
         }
       },
     });
@@ -544,10 +572,14 @@ export class KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         const form = getEl(`${this.sideMenuElementName}-form`);
+
         if (form) {
           form.addEventListener('submit', (e) => {
             e.preventDefault();
-            if (callback) callback();
+            if (callback) {
+              // eslint-disable-next-line callback-return
+              callback();
+            }
           });
         } else {
           throw new Error(`Form not found for ${this.sideMenuElementName}`);
@@ -578,8 +610,10 @@ export class KeepTrackPlugin {
       cb: (): boolean => {
         if (this.isMenuButtonActive) {
           adviceManagerInstance.showAdvice(helpTitle, helpText);
+
           return true;
         }
+
         return false;
       },
     });

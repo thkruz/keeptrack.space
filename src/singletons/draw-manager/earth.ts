@@ -60,7 +60,9 @@ export class Earth {
    * This is run once per frame to render the earth.
    */
   draw(tgtBuffer: WebGLFramebuffer) {
-    if (!this.isTexturesReady_) return;
+    if (!this.isTexturesReady_) {
+      return;
+    }
     this.drawColoredEarth_(tgtBuffer);
     this.drawBlackGpuPickingEarth_();
   }
@@ -71,6 +73,7 @@ export class Earth {
   drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
     const gl = this.gl_;
     // Change to the earth shader
+
     gl.useProgram(occlusionPrgm.program);
     // Change to the main drawing buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
@@ -83,8 +86,10 @@ export class Earth {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
 
-    // DEBUG:
-    // occlusionPrgm.attrOff(occlusionPrgm);
+    /*
+     * DEBUG:
+     * occlusionPrgm.attrOff(occlusionPrgm);
+     */
   }
 
   /**
@@ -92,7 +97,9 @@ export class Earth {
    */
   async init(settings: SettingsManager, gl?: WebGL2RenderingContext): Promise<void> {
     try {
-      if (!gl && !this.gl_) throw new Error('No WebGL context found');
+      if (!gl && !this.gl_) {
+        throw new Error('No WebGL context found');
+      }
       this.gl_ ??= gl;
       this.settings_ = settings;
 
@@ -117,6 +124,7 @@ export class Earth {
         fragmentShader: this.shaders_.frag,
         glslVersion: GLSL3,
       });
+
       this.mesh = new Mesh(this.gl_, geometry, material, {
         name: 'earth',
         precision: 'highp',
@@ -139,6 +147,7 @@ export class Earth {
   async loadHiRes(texture: WebGLTexture, src: string): Promise<void> {
     try {
       const img = new Image();
+
       img.onload = () => {
         if (!this.settings_.isBlackEarth) {
           GlUtils.bindImageToTexture(this.gl_, texture, img);
@@ -171,8 +180,9 @@ export class Earth {
    */
   update(gmst: GreenwichMeanSiderealTime): void {
     const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+
     this.lightDirection = [pos.x, pos.y, pos.z];
-    vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
+    vec3.normalize(<vec3>(<unknown> this.lightDirection), <vec3>(<unknown> this.lightDirection));
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
     // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
@@ -189,10 +199,15 @@ export class Earth {
    * Determines the url to the bump map based on the settings.
    */
   private static getSrcBump_(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
+    if (!settings.installDirectory) {
+      throw new Error('settings.installDirectory is undefined');
+    }
 
     let src = `${settings.installDirectory}textures/earthbump8k.jpg`;
-    if (settings.smallImages || settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthbump256.jpg`;
+
+    if (settings.smallImages || settings.isMobileModeEnabled) {
+      src = `${settings.installDirectory}textures/earthbump256.jpg`;
+    }
     // if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthbump4k.jpg`;
 
     return src;
@@ -202,9 +217,11 @@ export class Earth {
    * Determines the url to the day texture based on the settings.
    */
   private static getSrcDay_(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
+    if (!settings.installDirectory) {
+      throw new Error('settings.installDirectory is undefined');
+    }
 
-    let src = `${settings.installDirectory}textures/earthmap512.jpg`;
+    const src = `${settings.installDirectory}textures/earthmap512.jpg`;
 
     return src;
   }
@@ -213,16 +230,36 @@ export class Earth {
    * Determines the url to the high resolution day texture based on the settings.
    */
   private static getSrcHiResDay_(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
+    if (!settings.installDirectory) {
+      throw new Error('settings.installDirectory is undefined');
+    }
     let src = `${settings.installDirectory}textures/earthmap4k.jpg`;
-    if (settings.smallImages) src = `${settings.installDirectory}textures/earthmap512.jpg`;
-    if (settings.nasaImages) src = `${settings.installDirectory}textures/mercator-tex.jpg`;
-    if (settings.trusatImages) src = `${settings.installDirectory}textures/trusatvector-4096.jpg`;
-    if (settings.blueImages) src = `${settings.installDirectory}textures/world_blue-2048.png`;
-    if (settings.vectorImages) src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
-    if (settings.politicalImages) src = `${settings.installDirectory}textures/political8k-gray.jpg`;
-    if (settings.hiresImages) src = `${settings.installDirectory}textures/earthmap16k.jpg`;
-    if (settings.hiresNoCloudsImages) src = `${settings.installDirectory}textures/earthmap16k.jpg`;
+
+    if (settings.smallImages) {
+      src = `${settings.installDirectory}textures/earthmap512.jpg`;
+    }
+    if (settings.nasaImages) {
+      src = `${settings.installDirectory}textures/mercator-tex.jpg`;
+    }
+    if (settings.trusatImages) {
+      src = `${settings.installDirectory}textures/trusatvector-4096.jpg`;
+    }
+    if (settings.blueImages) {
+      src = `${settings.installDirectory}textures/world_blue-2048.png`;
+    }
+    if (settings.vectorImages) {
+      src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
+    }
+    if (settings.politicalImages) {
+      src = `${settings.installDirectory}textures/political8k-gray.jpg`;
+    }
+    if (settings.hiresImages) {
+      src = `${settings.installDirectory}textures/earthmap16k.jpg`;
+    }
+    if (settings.hiresNoCloudsImages) {
+      src = `${settings.installDirectory}textures/earthmap16k.jpg`;
+    }
+
     return src;
   }
 
@@ -230,12 +267,21 @@ export class Earth {
    * Determines the url to the high resolution night texture based on the settings.
    */
   private static getSrcHiResNight_(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
+    if (!settings.installDirectory) {
+      throw new Error('settings.installDirectory is undefined');
+    }
 
     let src = `${settings.installDirectory}textures/earthlights4k.jpg`;
-    if (settings.vectorImages) src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
-    if (settings.politicalImages) src = `${settings.installDirectory}textures/political8k-gray-night.jpg`;
-    if (settings.hiresImages || settings.hiresNoCloudsImages) src = `${settings.installDirectory}textures/earthlights16k.jpg`;
+
+    if (settings.vectorImages) {
+      src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
+    }
+    if (settings.politicalImages) {
+      src = `${settings.installDirectory}textures/political8k-gray-night.jpg`;
+    }
+    if (settings.hiresImages || settings.hiresNoCloudsImages) {
+      src = `${settings.installDirectory}textures/earthlights16k.jpg`;
+    }
 
     return src;
   }
@@ -244,9 +290,11 @@ export class Earth {
    * Determines the url to the night texture based on the settings.
    */
   private static getSrcNight_(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
+    if (!settings.installDirectory) {
+      throw new Error('settings.installDirectory is undefined');
+    }
 
-    let src = `${settings.installDirectory}textures/earthlights512.jpg`;
+    const src = `${settings.installDirectory}textures/earthlights512.jpg`;
 
     return src;
   }
@@ -255,10 +303,15 @@ export class Earth {
    * Determines the url to the specular map based on the settings.
    */
   private static getSrcSpec_(settings: SettingsManager): string {
-    if (!settings.installDirectory) throw new Error('settings.installDirectory is undefined');
+    if (!settings.installDirectory) {
+      throw new Error('settings.installDirectory is undefined');
+    }
 
     let src = `${settings.installDirectory}textures/earthspec8k.jpg`;
-    if (settings.smallImages || settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthspec256.jpg`;
+
+    if (settings.smallImages || settings.isMobileModeEnabled) {
+      src = `${settings.installDirectory}textures/earthspec256.jpg`;
+    }
     // if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthspec4k.jpg`;
 
     return src;
@@ -280,15 +333,17 @@ export class Earth {
 
     gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
 
-    // no reason to render 100000s of pixels when
-    // we're only going to read one
+    /*
+     * no reason to render 100000s of pixels when
+     * we're only going to read one
+     */
     if (!this.settings_.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
       gl.scissor(
         keepTrackApi.getMainCamera().mouseX,
         gl.drawingBufferHeight - keepTrackApi.getMainCamera().mouseY,
         keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
-        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE
+        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
       );
     }
 
@@ -299,9 +354,11 @@ export class Earth {
     }
 
     gl.bindVertexArray(null);
-    // Disable attributes to avoid conflict with other shaders
-    // NOTE: This breaks satellite gpu picking.
-    // gl.disableVertexAttribArray(dotsManagerInstance.pickingProgram.aPos);
+    /*
+     * Disable attributes to avoid conflict with other shaders
+     * NOTE: This breaks satellite gpu picking.
+     * gl.disableVertexAttribArray(dotsManagerInstance.pickingProgram.aPos);
+     */
   }
 
   /**
@@ -309,6 +366,7 @@ export class Earth {
    */
   private drawColoredEarth_(tgtBuffer: WebGLFramebuffer) {
     const gl = this.gl_;
+
     this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
@@ -339,6 +397,7 @@ export class Earth {
     this.isBumpTextureReady_ = false;
     this.textureBump_ = this.gl_.createTexture();
     const img = new Image();
+
     img.onload = () => {
       if (this.settings_.isDrawBumpMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
         GlUtils.bindImageToTexture(this.gl_, this.textureBump_, img);
@@ -357,6 +416,7 @@ export class Earth {
     SplashScreen.loadStr(SplashScreen.msg.painting);
     this.textureDay_ = this.gl_.createTexture();
     const img = new Image();
+
     img.onload = () => {
       if (!this.settings_.isBlackEarth) {
         GlUtils.bindImageToTexture(this.gl_, this.textureDay_, img);
@@ -371,6 +431,7 @@ export class Earth {
   private initTextureNight_(): void {
     this.textureNight_ = this.gl_.createTexture();
     const img = new Image();
+
     img.onload = () => {
       if (!this.settings_.isBlackEarth) {
         GlUtils.bindImageToTexture(this.gl_, this.textureNight_, img);
@@ -386,6 +447,7 @@ export class Earth {
     this.isSpecularTextureReady_ = false;
     this.textureSpec_ = this.gl_.createTexture();
     const img = new Image();
+
     img.onload = () => {
       if (this.settings_.isDrawSpecMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
         GlUtils.bindImageToTexture(this.gl_, this.textureSpec_, img);
@@ -399,15 +461,25 @@ export class Earth {
     };
     img.src = Earth.getSrcSpec_(this.settings_);
 
-    // DEBUG:
-    // `${this.settings_.installDirectory}textures/earthspec1k.jpg`;
+    /*
+     * DEBUG:
+     * `${this.settings_.installDirectory}textures/earthspec1k.jpg`;
+     */
   }
 
   private initTextures_(): void {
-    if (!this.textureDay_) this.initTextureDay_();
-    if (!this.textureNight_) this.initTextureNight_();
-    if (!this.textureBump_) this.initTextureBump_();
-    if (!this.textureSpec_) this.initTextureSpec_();
+    if (!this.textureDay_) {
+      this.initTextureDay_();
+    }
+    if (!this.textureNight_) {
+      this.initTextureNight_();
+    }
+    if (!this.textureBump_) {
+      this.initTextureBump_();
+    }
+    if (!this.textureSpec_) {
+      this.initTextureSpec_();
+    }
   }
 
   /**
@@ -422,9 +494,11 @@ export class Earth {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
 
-    // gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
-    // Disable color vertex so that the earth is drawn black
-    // TODO: Figure out why this is in the earth class
+    /*
+     * gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
+     * Disable color vertex so that the earth is drawn black
+     * TODO: Figure out why this is in the earth class
+     */
     gl.disableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_color.location); // IMPORTANT!
 
     // Only Enable Position Attribute
@@ -487,11 +561,14 @@ export class Earth {
 
     // If there are no callbacks, just use the night texture
     const altNightTexBind = keepTrackApi.events.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null;
+
     if (!altNightTexBind) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureNight_);
     } else {
-      // If there are callbacks use those to determine which texture to use
-      // This is primarily used for the night mode toggle
+      /*
+       * If there are callbacks use those to determine which texture to use
+       * This is primarily used for the night mode toggle
+       */
       altNightTexBind(gl, this.textureNight_, this.textureDay_);
     }
 

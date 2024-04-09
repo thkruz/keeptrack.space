@@ -3,17 +3,17 @@
 import { StringPad } from '@app/lib/stringPad';
 
 /**
-Main functionalities:
-The StringPad class provides static methods for padding strings with zeros or spaces. It can pad a string to a specified length, pad a string with spaces to a specified size, pad a string with zeros to a maximum length, and add trailing zeros to a string up to a maximum length.
-
-Methods:
-- pad(val: string, len = 2): pads the input string with zeros to a specified length (default is 2)
-- padEmpty(num: string, size: number): pads the input string with spaces to a specified size plus the length of the input string
-- pad0(str: string, max: number): pads the input string with zeros to a maximum length
-- trail0(str: string, max: number): adds trailing zeros to the input string up to a maximum length
-
-Fields:
-The StringPad class does not have any fields.
+ *Main functionalities:
+ *The StringPad class provides static methods for padding strings with zeros or spaces. It can pad a string to a specified length, pad a string with spaces to a specified size, pad a string with zeros to a maximum length, and add trailing zeros to a string up to a maximum length.
+ *
+ *Methods:
+ *- pad(val: string, len = 2): pads the input string with zeros to a specified length (default is 2)
+ *- padEmpty(num: string, size: number): pads the input string with spaces to a specified size plus the length of the input string
+ *- pad0(str: string, max: number): pads the input string with zeros to a maximum length
+ *- trail0(str: string, max: number): adds trailing zeros to the input string up to a maximum length
+ *
+ *Fields:
+ *The StringPad class does not have any fields.
  */
 
 describe('StringPad_class', () => {

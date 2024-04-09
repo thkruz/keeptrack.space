@@ -39,21 +39,26 @@ export class InputManager {
     this.touch = new TouchInput();
   }
 
-  // *********************************************************************************************************************
-  // WebGL Functions that we can't unit test for yet
-  // *********************************************************************************************************************
+  /*
+   * *********************************************************************************************************************
+   * WebGL Functions that we can't unit test for yet
+   * *********************************************************************************************************************
+   */
   /* istanbul ignore next */
   public static clientWaitAsync(gl: WebGL2RenderingContext, sync: WebGLSync, flags: number, intervalMs: Milliseconds): Promise<string> {
     return new Promise((resolve, reject) => {
       const test = () => {
         // eslint-disable-next-line no-sync
         const res = gl.clientWaitSync(sync, flags, 0);
+
         if (res == gl.WAIT_FAILED) {
           reject(new Error('Async Rejected!'));
+
           return;
         }
         if (res == gl.TIMEOUT_EXPIRED) {
           setTimeout(test, intervalMs);
+
           return;
         }
         resolve('Async Resolved!');
@@ -71,10 +76,11 @@ export class InputManager {
     srcByteOffset: number,
     dstBuffer: Uint8Array,
     dstOffset?: number,
-    length?: number
+    length?: number,
   ) {
     // eslint-disable-next-line no-sync
     const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+
     gl.flush();
 
     await InputManager.clientWaitAsync(gl, sync, 0, <Milliseconds>10);
@@ -97,8 +103,12 @@ export class InputManager {
   }
 
   public static getEarthScreenPoint(x: number, y: number): Kilometers[] {
-    if (typeof x === 'undefined' || typeof y === 'undefined') throw new Error('x and y must be defined');
-    if (isNaN(x) || isNaN(y)) throw new Error('x and y must be numbers');
+    if (typeof x === 'undefined' || typeof y === 'undefined') {
+      throw new Error('x and y must be defined');
+    }
+    if (isNaN(x) || isNaN(y)) {
+      throw new Error('x and y must be numbers');
+    }
 
     // Where is the camera
     const rayOrigin = keepTrackApi.getMainCamera().getForwardVector();
@@ -107,14 +117,17 @@ export class InputManager {
 
     // Clicked on minus starting point is our direction vector
     const rayDir = vec3.create();
+
     vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
     vec3.normalize(rayDir, rayDir);
 
     const toCenterVec = vec3.create();
+
     vec3.scale(toCenterVec, rayOrigin, -1); // toCenter is just -camera pos because center is at [0,0,0]
     const dParallel = vec3.dot(rayDir, toCenterVec);
 
     const longDir = vec3.create();
+
     vec3.scale(longDir, rayDir, dParallel); // longDir = rayDir * distParallel
     vec3.add(ptThru, rayOrigin, longDir); // ptThru is now on the plane going through the center of sphere
     const dPerp = vec3.len(ptThru);
@@ -123,6 +136,7 @@ export class InputManager {
     const dSurf = dParallel - dSubSurf;
 
     const ptSurf = vec3.create();
+
     vec3.scale(ptSurf, rayDir, dSurf);
     vec3.add(ptSurf, ptSurf, rayOrigin);
 
@@ -139,11 +153,15 @@ export class InputManager {
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const dotsManagerInstance = keepTrackApi.getDotsManager();
+
+
     return dotsManagerInstance.getIdFromEci(eciArray, catalogManagerInstance.orbitalSats);
   }
 
   hidePopUps() {
-    if (settingsManager.isPreventColorboxClose) return;
+    if (settingsManager.isPreventColorboxClose) {
+      return;
+    }
     hideEl('right-btn-menu');
     InputManager.clearRMBSubMenu();
     this.isRmbMenuOpen = false;
@@ -158,11 +176,12 @@ export class InputManager {
 
   static showDropdownSubMenu(rightBtnMenuDOM: HTMLElement, rightBtnDOM: HTMLElement, canvasDOM: HTMLCanvasElement, element1?: HTMLElement) {
     const offsetX = rightBtnMenuDOM.offsetLeft < canvasDOM.clientWidth / 2 ? 160 : -160;
+
     rightBtnDOM.style.display = 'block';
     rightBtnDOM.style.textAlign = 'center';
     rightBtnDOM.style.position = 'absolute';
-    rightBtnDOM.style.left = rightBtnMenuDOM.offsetLeft + offsetX + 'px';
-    rightBtnDOM.style.top = element1 ? rightBtnMenuDOM.offsetTop + element1.offsetTop + 'px' : rightBtnMenuDOM.offsetTop + 'px';
+    rightBtnDOM.style.left = `${rightBtnMenuDOM.offsetLeft + offsetX}px`;
+    rightBtnDOM.style.top = element1 ? `${rightBtnMenuDOM.offsetTop + element1.offsetTop}px` : `${rightBtnMenuDOM.offsetTop}px`;
     if (rightBtnDOM.offsetTop !== 0) {
       rightBtnDOM.style.display = 'block';
     } else {
@@ -179,10 +198,13 @@ export class InputManager {
     const screenVec = <vec4>[glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
 
     const comboPMat = mat4.create();
+
     mat4.mul(comboPMat, renderer.projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
     const invMat = mat4.create();
+
     mat4.invert(invMat, comboPMat);
     const worldVec = <[number, number, number, number]>(<unknown>vec4.create());
+
     vec4.transformMat4(worldVec, screenVec, invMat);
 
     return [worldVec[0] / worldVec[3], worldVec[1] / worldVec[3], worldVec[2] / worldVec[3]];
@@ -208,11 +230,13 @@ export class InputManager {
       gl.readPixels(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
     }
     // NOTE: const id = ((dotsManagerInstance.pickReadPixelBuffer[2] << 16) | (dotsManagerInstance.pickReadPixelBuffer[1] << 8) | dotsManagerInstance.pickReadPixelBuffer[0]) - 1;
+
     return ((dotsManagerInstance.pickReadPixelBuffer[2] << 16) | (dotsManagerInstance.pickReadPixelBuffer[1] << 8) | dotsManagerInstance.pickReadPixelBuffer[0]) - 1;
   }
 
   public init(): void {
     const rmbWrapperDom = getEl('rmb-wrapper');
+
     if (rmbWrapperDom) {
       rmbWrapperDom.insertAdjacentHTML(
         'beforeend',
@@ -224,7 +248,7 @@ export class InputManager {
           <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>
         </ul>
       </div>
-      `
+      `,
       );
       // Append any other menus before putting the reset/clear options
       keepTrackApi.runEvent(KeepTrackApiEvents.rightBtnMenuAdd);
@@ -237,7 +261,7 @@ export class InputManager {
         <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
         <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
         <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
-        `
+        `,
       );
 
       getEl('rmb-wrapper').insertAdjacentHTML(
@@ -274,7 +298,7 @@ export class InputManager {
             <li id="earth-political-rmb"><a href="#">Political Map</a></li>
           </ul>
         </div>
-      `
+      `,
       );
 
       keepTrackApi.rmbMenuItems.push({
@@ -308,9 +332,12 @@ export class InputManager {
       const rmbWrapper = getEl('right-btn-menu-ul');
       const rmbWrapperChildren = rmbWrapper.children;
       const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
+
       rmbWrapperChildrenArray.sort((a, b) => {
         const aOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
         const bOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
+
+
         return aOrder - bOrder;
       });
       rmbWrapper.innerHTML = '';
@@ -323,10 +350,10 @@ export class InputManager {
     if (settingsManager.disableWindowTouchMove) {
       window.addEventListener(
         'touchmove',
-        function (event) {
+        (event) => {
           event.preventDefault();
         },
-        { passive: false }
+        { passive: false },
       );
     }
 
@@ -334,6 +361,7 @@ export class InputManager {
       window.oncontextmenu = function (event) {
         event.preventDefault();
         event.stopPropagation();
+
         return false;
       };
     }
@@ -353,7 +381,9 @@ export class InputManager {
   }
 
   public openRmbMenu(clickedSatId: number = -1) {
-    if (!settingsManager.isAllowRightClick) return;
+    if (!settingsManager.isAllowRightClick) {
+      return;
+    }
 
     this.isRmbMenuOpen = true;
 
@@ -398,9 +428,14 @@ export class InputManager {
     }
 
     if (this.mouse.mouseSat !== -1 || clickedSatId !== -1) {
-      if (typeof this.mouse.clickedSat == 'undefined') return;
+      if (typeof this.mouse.clickedSat === 'undefined') {
+        return;
+      }
       const sat = catalogManagerInstance.getObject(this.mouse.clickedSat);
-      if (typeof sat == 'undefined' || sat == null) return;
+
+      if (typeof sat === 'undefined' || sat == null) {
+        return;
+      }
 
       if (!sat.isStatic()) {
         showEl('view-sat-info-rmb');
@@ -410,9 +445,15 @@ export class InputManager {
           getEl('line-sensor-sat-rmb').style.display = 'block';
         }
 
-        if (!settingsManager.isMobileModeEnabled) getEl('line-earth-sat-rmb').style.display = 'block';
-        if (!settingsManager.isMobileModeEnabled) getEl('line-sat-sat-rmb').style.display = 'block';
-        if (!settingsManager.isMobileModeEnabled) getEl('line-sat-sun-rmb').style.display = 'block';
+        if (!settingsManager.isMobileModeEnabled) {
+          getEl('line-earth-sat-rmb').style.display = 'block';
+        }
+        if (!settingsManager.isMobileModeEnabled) {
+          getEl('line-sat-sat-rmb').style.display = 'block';
+        }
+        if (!settingsManager.isMobileModeEnabled) {
+          getEl('line-sat-sun-rmb').style.display = 'block';
+        }
       } else {
         switch (sat.type) {
           case SpaceObjectType.PHASED_ARRAY_RADAR:
@@ -428,12 +469,13 @@ export class InputManager {
       // Intentional
     }
 
-    if (typeof this.mouse.latLon == 'undefined' || isNaN(this.mouse.latLon.lat) || isNaN(this.mouse.latLon.lon)) {
+    if (typeof this.mouse.latLon === 'undefined' || isNaN(this.mouse.latLon.lat) || isNaN(this.mouse.latLon.lon)) {
       // Not Earth
       keepTrackApi.rmbMenuItems
         .filter((item) => item.isRmbOffEarth || (item.isRmbOnSat && clickedSatId !== -1))
         .forEach((item) => {
           const dom = getEl(item.elementIdL1);
+
           if (dom) {
             dom.style.display = 'block';
             numMenuItems++;
@@ -450,11 +492,14 @@ export class InputManager {
     rightBtnMenuDOM.style.display = 'block';
     satHoverBoxDOM.style.display = 'none';
 
-    // Offset size is based on size in style.css
-    // TODO: Make this dynamic
+    /*
+     * Offset size is based on size in style.css
+     * TODO: Make this dynamic
+     */
     const mainCameraInstance = keepTrackApi.getMainCamera();
     const offsetX = mainCameraInstance.mouseX < canvasDOM.clientWidth / 2 ? 0 : -1 * 165;
     const offsetY = mainCameraInstance.mouseY < canvasDOM.clientHeight / 2 ? 0 : numMenuItems * -25;
+
     rightBtnMenuDOM.style.display = 'block';
     rightBtnMenuDOM.style.textAlign = 'center';
     rightBtnMenuDOM.style.position = 'absolute';
@@ -465,8 +510,10 @@ export class InputManager {
   /* istanbul ignore next */
   public async readPixelsAsync(x: number, y: number, w: number, h: number, format: number, type: number, dstBuffer: Uint8Array) {
     const gl = keepTrackApi.getRenderer().gl;
+
     try {
       const buf = gl.createBuffer();
+
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buf);
       gl.bufferData(gl.PIXEL_PACK_BUFFER, dstBuffer.byteLength, gl.STREAM_READ);
       gl.readPixels(x, y, w, h, format, type, 0);
@@ -484,22 +531,29 @@ export class InputManager {
 
   /** readpixels used to determine which satellite is hovered is the biggest performance hit and we should throttle that */
   public update(dt?: Milliseconds) {
-    // gl.readPixels in uiInput.getSatIdFromCoord creates a lot of jank
-    // Earlier in the loop we decided how much to throttle updateHover
-    // if we skip it this loop, we want to still draw the last thing
-    // it was looking at
+    /*
+     * gl.readPixels in uiInput.getSatIdFromCoord creates a lot of jank
+     * Earlier in the loop we decided how much to throttle updateHover
+     * if we skip it this loop, we want to still draw the last thing
+     * it was looking at
+     */
 
     if (KeepTrack.isFpsAboveLimit(dt, 30)) {
-      if (this.updateHoverDelayLimit > 0) --this.updateHoverDelayLimit;
+      if (this.updateHoverDelayLimit > 0) {
+        --this.updateHoverDelayLimit;
+      }
     } else if (KeepTrack.isFpsAboveLimit(dt, 15)) {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     }
 
-    if (keepTrackApi.getMainCamera().isDragging) return;
+    if (keepTrackApi.getMainCamera().isDragging) {
+      return;
+    }
 
     const mainCameraInstance = keepTrackApi.getMainCamera();
+
     if (settingsManager.isMobileModeEnabled) {
       // this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
       return;

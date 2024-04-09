@@ -17,12 +17,14 @@ export class DopsPlugin extends KeepTrackPlugin {
   bottomIconLabel = 'View DOPs';
   bottomIconImg = gpsPng;
   bottomIconCallback = (): void => {
-    if (!this.isMenuButtonActive) return;
+    if (!this.isMenuButtonActive) {
+      return;
+    }
 
     showLoading(DopsPlugin.updateSideMenu);
   };
 
-  helpTitle = `Dilution of Precision (DOP) Menu`;
+  helpTitle = 'Dilution of Precision (DOP) Menu';
 
   helpBody = keepTrackApi.html`The Dilution of Precision (DOP) Menu is used to calculate the Dilution of Precision (DOP) for a given location and elevation mask.
     <br><br>
@@ -92,20 +94,22 @@ export class DopsPlugin extends KeepTrackPlugin {
           let latLon = keepTrackApi.getInputManager().mouse.latLon;
           const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
 
-          if (typeof latLon == 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
+          if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
             console.debug('latLon undefined!');
             const gmst = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst;
+
             latLon = eci2lla(
               {
                 x: dragPosition[0],
                 y: dragPosition[1],
                 z: dragPosition[2],
               } as EciVec3,
-              gmst
+              gmst,
             );
           }
           const gpsSatObjects = DopsPlugin.getGpsSats(keepTrackApi.getCatalogManager(), keepTrackApi.getGroupsManager());
           const gpsDOP = DopMath.getDops(keepTrackApi.getTimeManager().simulationTimeObj, gpsSatObjects, latLon.lat, latLon.lon, <Kilometers>0, settingsManager.gpsElevationMask);
+
           keepTrackApi
             .getUiManager()
             .toast(`HDOP: ${gpsDOP.hdop}<br/>VDOP: ${gpsDOP.vdop}<br/>PDOP: ${gpsDOP.pdop}<br/>GDOP: ${gpsDOP.gdop}<br/>TDOP: ${gpsDOP.tdop}`, 'normal', true);
@@ -114,6 +118,7 @@ export class DopsPlugin extends KeepTrackPlugin {
       }
       case 'dops-24dops-rmb': {
         const latLon = keepTrackApi.getInputManager().mouse.latLon;
+
         if (!this.isMenuButtonActive) {
           (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
@@ -160,22 +165,27 @@ export class DopsPlugin extends KeepTrackPlugin {
     const lon = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-lon')).value);
     const alt = <Kilometers>parseFloat((<HTMLInputElement>getEl('dops-alt')).value);
     const el = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-el')).value);
+
     settingsManager.gpsElevationMask = el;
     const gpsSats = DopsPlugin.getGpsSats(catalogManagerInstance, groupManagerInstance);
     const getOffsetTimeObj = (now: number) => timeManagerInstance.getOffsetTimeObj(now);
     const dopsList = DopMath.getDopsList(getOffsetTimeObj, gpsSats, lat, lon, alt, el);
+
     DopMath.updateDopsTable(dopsList);
   }
 
   static getGpsSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager): DetailedSatellite[] {
-    const gpsSats = (groupManagerInstance.groupList['GPSGroup'] ??= groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/iu, 'GPSGroup'));
+    const gpsSats = (groupManagerInstance.groupList.GPSGroup ??= groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/iu, 'GPSGroup'));
     const gpsSatObjects = [];
+
     gpsSats.ids.forEach((id: number) => {
       const sat = catalogManagerInstance.getSat(id);
+
       if (sat) {
         gpsSatObjects.push(sat);
       }
     });
+
     return gpsSatObjects;
   }
 }

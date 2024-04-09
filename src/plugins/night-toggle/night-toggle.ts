@@ -10,6 +10,7 @@ export class NightToggle extends KeepTrackPlugin {
   bottomIconImg = dayNightPng;
   constructor() {
     const PLUGIN_NAME = 'Night Toggle';
+
     super(PLUGIN_NAME);
   }
 

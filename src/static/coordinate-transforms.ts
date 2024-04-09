@@ -13,7 +13,7 @@ export abstract class CoordinateTransforms {
    */
   public static sat2ric(
     sat: DetailedSatellite | { position: EciVec3; velocity: EciVec3 },
-    reference: DetailedSatellite | { position: EciVec3; velocity: EciVec3 }
+    reference: DetailedSatellite | { position: EciVec3; velocity: EciVec3 },
   ): { position: vec3; velocity: vec3 } {
     const { position, velocity } = sat;
     const r = vec3.fromValues(position.x, position.y, position.z);

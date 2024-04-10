@@ -357,7 +357,8 @@ export class OrbitManager {
 
   private static getObjDataString(objData: BaseObject[]) {
     return JSON.stringify(
-      objData.map((obj) => {
+      // TODO: objData should always be guaranteed
+      objData?.map((obj) => {
         if (!obj.isSatellite() && !obj.isMissile()) {
           return { ignore: true } as ObjDataJson;
         }

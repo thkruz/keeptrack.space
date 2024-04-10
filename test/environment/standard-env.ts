@@ -53,6 +53,9 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     postMessage: jest.fn(),
     addEventListener: jest.fn(),
   } as unknown as Worker;
+  catalogManagerInstance.objectCache = [defaultSat];
+  keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
+
   const orbitManagerInstance = new OrbitManager();
 
   orbitManagerInstance.orbitWorker = {
@@ -61,12 +64,24 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   } as unknown as Worker;
 
   orbitManagerInstance.init(null as any, global.mocks.glMock);
+  keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
+
   const colorSchemeManagerInstance = new ColorSchemeManager();
+
+  keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
+
   const dotsManagerInstance = new DotsManager();
+
+  keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
+
   const timeManagerInstance = new TimeManager();
 
   timeManagerInstance.simulationTimeObj = new Date(2023, 1, 1, 0, 0, 0, 0);
+  keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
+
   const sensorManagerInstance = new SensorManager();
+
+  keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
 
   mockUiManager.searchManager = new SearchManager(mockUiManager);
   const soundManagerInstance = new SoundManager();
@@ -89,13 +104,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
   keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, renderer);
   keepTrackContainer.registerSingleton(Singletons.Scene, scene);
-  keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.UiManager, mockUiManager);
-  keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.StarManager, starManager);

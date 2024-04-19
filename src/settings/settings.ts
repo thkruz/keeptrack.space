@@ -2,8 +2,8 @@
 /**
  * // /////////////////////////////////////////////////////////////////////////////
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -245,7 +245,7 @@ export class SettingsManager {
    * Callback function that is called when the settings are loaded.
    */
   // eslint-disable-next-line class-methods-use-this
-  onLoadCb = () => {};
+  onLoadCb = () => { };
   /**
    * Disables Toasts During Time Machine
    */

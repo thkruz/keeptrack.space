@@ -4,7 +4,6 @@ import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Classification, ClassificationString } from '@app/static/classification';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { TopMenu } from '../top-menu/top-menu';
 
 export class ClassificationBar extends KeepTrackPlugin {
   private classificationString_: ClassificationString;
@@ -98,17 +97,7 @@ export class ClassificationBar extends KeepTrackPlugin {
     if (this.isExpanded_ === isExpanded) {
       return;
     }
-    // If top menu is not loaded, we are already at the correct height
-    if (!keepTrackApi.getPlugin(TopMenu)) {
-      return;
-    }
 
-    // TODO: Top menu height should be a setting in the top menu plugin
-    let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--classification-bar-height').replace('px', ''));
-
-    if (isNaN(topMenuHeight)) {
-      topMenuHeight = 0;
-    }
     document.documentElement.style.setProperty('--classification-bar-height', `${isExpanded ? this.containerHeight : -this.containerHeight}px`);
 
     this.isExpanded_ = isExpanded;

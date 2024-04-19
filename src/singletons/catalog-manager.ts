@@ -5,8 +5,8 @@
  * It manages all interaction with the satellite catalogue.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/

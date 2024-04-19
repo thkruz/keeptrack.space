@@ -100,6 +100,10 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   uiManagerFinal() {
+    if (!settingsManager.plugins.topMenu) {
+      return;
+    }
+
     getEl('datetime-text').addEventListener('click', this.datetimeTextClick.bind(this));
 
     $('#datetime-input-form').on('change', (e: Event) => {

@@ -261,6 +261,9 @@ const loadCorePlugins_ = (plugins: KeepTrackPlugins) => {
 
   if (plugins.topMenu) {
     new TopMenu().init();
+  } else {
+    // Set --nav-bar-height of :root to 0px if topMenu is not enabled and ensure it overrides any other value
+    document.documentElement.style.setProperty('--nav-bar-height', '0px');
   }
   if (plugins.satInfoboxCore) {
     new SatInfoBox().init();
@@ -284,14 +287,14 @@ export const uiManagerFinal = (plugins: any): void => {
     document.documentElement.style.setProperty('--bottom-menu-height', '0px');
   }
 
-  if (plugins.topMenu) {
-    let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--nav-bar-height').replace('px', ''));
+  // if (plugins.topMenu) {
+  //   let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--nav-bar-height').replace('px', ''));
 
-    if (isNaN(topMenuHeight)) {
-      topMenuHeight = 0;
-    }
-    document.documentElement.style.setProperty('--nav-bar-height', `${topMenuHeight + 50}px`);
-  }
+  //   if (isNaN(topMenuHeight)) {
+  //     topMenuHeight = 0;
+  //   }
+  //   document.documentElement.style.setProperty('--nav-bar-height', `${topMenuHeight + 50}px`);
+  // }
 
   if (getEl('bottom-icons') && getEl('bottom-icons').innerText == '') {
     getEl('nav-footer').style.visibility = 'hidden';

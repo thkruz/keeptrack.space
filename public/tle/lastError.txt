@@ -1,0 +1,1 @@
+{"errno":-4058,"code":"ENOENT","syscall":"copyfile","path":"F:\\keeptrack\\keeptrack-catalog\\planet4589\\db\\satcat-extended.json","dest":"F:\\keeptrack\\keeptrack-api\\data\\satcat-extended.json"}

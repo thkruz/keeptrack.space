@@ -4,8 +4,8 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -473,9 +473,14 @@ export class UiManager {
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {
     this.lastToast = toastText;
-    const toastMsg = this.makeToast_(toastText, type, isLong);
 
-    this.activeToastList_.push(toastMsg);
+    try {
+      const toastMsg = this.makeToast_(toastText, type, isLong);
+
+      this.activeToastList_.push(toastMsg);
+    } catch (e) {
+      errorManagerInstance.debug('toast failed');
+    }
   }
 
   private activeToastList_: any[] = [];

@@ -5,8 +5,8 @@
  * providing tailored functions for calculating orbital data.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -204,8 +204,8 @@ export abstract class SatMath {
     const theta =
       Math.acos(
         <number>numeric.dot([-obj.position.x, -obj.position.y, -obj.position.z], [-obj.position.x + sunECI.x, -obj.position.y + sunECI.y, -obj.position.z + sunECI.z]) /
-          (Math.sqrt((-obj.position.x) ** 2 + (-obj.position.y) ** 2 + (-obj.position.z) ** 2) *
-            Math.sqrt((-obj.position.x + sunECI.x) ** 2 + (-obj.position.y + sunECI.y) ** 2 + (-obj.position.z + sunECI.z) ** 2)),
+        (Math.sqrt((-obj.position.x) ** 2 + (-obj.position.y) ** 2 + (-obj.position.z) ** 2) *
+          Math.sqrt((-obj.position.x + sunECI.x) ** 2 + (-obj.position.y + sunECI.y) ** 2 + (-obj.position.z + sunECI.z) ** 2)),
       ) * RAD2DEG;
 
     if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
@@ -274,8 +274,8 @@ export abstract class SatMath {
 
     const phaseAngle = Math.acos(
       <number>numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.eci.x, -sat.position.y + sun.eci.y, -sat.position.z + sun.eci.z]) /
-        (Math.sqrt((-sat.position.x) ** 2 + (-sat.position.y) ** 2 + (-sat.position.z) ** 2) *
-          Math.sqrt((-sat.position.x + sun.eci.x) ** 2 + (-sat.position.y + sun.eci.y) ** 2 + (-sat.position.z + sun.eci.z) ** 2)),
+      (Math.sqrt((-sat.position.x) ** 2 + (-sat.position.y) ** 2 + (-sat.position.z) ** 2) *
+        Math.sqrt((-sat.position.x + sun.eci.x) ** 2 + (-sat.position.y + sun.eci.y) ** 2 + (-sat.position.z + sun.eci.z) ** 2)),
     );
 
     // The object is likely eclipsing the sun
@@ -320,7 +320,7 @@ export abstract class SatMath {
     }
     if (
       (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-        (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
+      (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
     ) {
       return true;
     }

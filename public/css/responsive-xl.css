@@ -1,8 +1,10 @@
-@media (min-width: 1280px) {
+@media (min-width: 1280px) and (max-width: 1535px) {
   :root {
-    --nav-bar-height: 30px !important;
+    --nav-bar-height: 30px;
   }
+}
 
+@media (min-width: 1280px) {
   #demo-logo {
     font-size: 3vh;
   }

@@ -20,8 +20,8 @@ import { TimeMachine } from '../time-machine/time-machine';
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -374,49 +374,49 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         (<any>$('#settings-color-payload')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.payload || [0.2, 1.0, 0.0, 0.5]),
           palette: colorPalette,
-          onColorSelected () {
+          onColorSelected() {
             that.onColorSelected(this, 'payload');
           },
         });
         (<any>$('#settings-color-rocketBody')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
           palette: colorPalette,
-          onColorSelected () {
+          onColorSelected() {
             that.onColorSelected(this, 'rocketBody');
           },
         });
         (<any>$('#settings-color-debris')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.debris || [0.5, 0.5, 0.5, 1]),
           palette: colorPalette,
-          onColorSelected () {
+          onColorSelected() {
             that.onColorSelected(this, 'debris');
           },
         });
         (<any>$('#settings-color-inview')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.inFOV || [0.85, 0.5, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected () {
+          onColorSelected() {
             that.onColorSelected(this, 'inview');
           },
         });
         (<any>$('#settings-color-missile')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.missile || [1.0, 1.0, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected () {
+          onColorSelected() {
             that.onColorSelected(this, 'missile');
           },
         });
         (<any>$('#settings-color-missileInview')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected () {
+          onColorSelected() {
             that.onColorSelected(this, 'missileInview');
           },
         });
         (<any>$('#settings-color-special')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
           palette: colorPalette,
-          onColorSelected () {
+          onColorSelected() {
             that.onColorSelected(this, 'pink');
           },
         });

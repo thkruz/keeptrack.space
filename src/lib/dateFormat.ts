@@ -5,9 +5,9 @@
  * and a mask, and returns a formatted version of the given date.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2007-2009 Steven Levithan <stevenlevithan.com>
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  *
  * This file includes enhancements by:
  * Scott Trenda <scott.trenda.net>

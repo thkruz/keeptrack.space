@@ -1,8 +1,10 @@
-@media (min-width: 1024px) {
+@media (min-width: 1024px) and (max-width: 1279px) {
   :root {
-    --nav-bar-height: 35px !important;
+    --nav-bar-height: 35px;
   }
+}
 
+@media (min-width: 1024px) {
   #sensor-selected-container {
     width: 100%;
     padding: 0px 10px;

@@ -116,6 +116,6 @@ There are Typescript files for generating TLE.json that are not included, but ht
 
 # License
 
-Copyright (C) 2016-2023 Theodore Kruczek<br> Copyright (C) 2020-2023 Heather Kruczek
+Copyright (C) 2016-2024 Theodore Kruczek<br> Copyright (C) 2020-2024 Heather Kruczek
 
 KeepTrack.Space is licensed under the GNU Affero General Public License. This means you can freely use, modify, and distribute it, provided you adhere to the terms of the license. For more details, see the [Full License](https://github.com/thkruz/keeptrack.space/blob/master/LICENSE).

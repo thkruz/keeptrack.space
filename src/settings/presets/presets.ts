@@ -110,6 +110,7 @@ export class SettingsPresets {
     settings.isDisableExtraCatalog = true;
     settings.isDisableAsciiCatalog = true;
     settings.isStarlinkOnly = true;
+    settings.isShowStarlinkSats = true;
     settings.isEnableJscCatalog = false;
 
     settings.isShowAgencies = false;

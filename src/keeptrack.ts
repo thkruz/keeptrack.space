@@ -5,8 +5,8 @@
  * interaction with the application.
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -565,10 +565,6 @@ theodore.kruczek at gmail dot com.
         }
       }
 
-      if (settingsManager.onLoadCb) {
-        settingsManager.onLoadCb();
-      }
-
       keepTrackApi.getUiManager().initMenuController();
 
       // Update MaterialUI with new menu options
@@ -582,6 +578,9 @@ theodore.kruczek at gmail dot com.
 
       keepTrackApi.isInitialized = true;
       keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+      if (settingsManager.onLoadCb) {
+        settingsManager.onLoadCb();
+      }
     } else {
       setTimeout(() => {
         this.postStart_();

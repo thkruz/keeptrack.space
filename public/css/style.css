@@ -1,3 +1,10 @@
+@media (max-width: 1023px) {
+  :root {
+    /** The height of the navigation bar */
+    --nav-bar-height: 50px;
+  }
+}
+
 :root {
   /* --colorPrimary: rgb(163, 30, 20);
   --colorSecondary: rgb(255, 72, 77);
@@ -17,8 +24,6 @@
   --search-box-bottom: 0px;
   /** The combination of title bar and classification bar */
   --top-menu-height: calc(var(--nav-bar-height) + var(--classification-bar-height));
-  /** The height of the navigation bar */
-  --nav-bar-height: 50px;
   /** The height of the classification bar */
   --classification-bar-height: 0px;
 }

@@ -47,24 +47,20 @@ export class InputManager {
   /* istanbul ignore next */
   public static clientWaitAsync(gl: WebGL2RenderingContext, sync: WebGLSync, flags: number, intervalMs: Milliseconds): Promise<string> {
     return new Promise((resolve, reject) => {
-      const test = () => {
-        // eslint-disable-next-line no-sync
-        const res = gl.clientWaitSync(sync, flags, 0);
+      // eslint-disable-next-line no-sync
+      const res = gl.clientWaitSync(sync, flags, 0);
 
-        if (res == gl.WAIT_FAILED) {
-          reject(new Error('Async Rejected!'));
+      if (res === gl.WAIT_FAILED) {
+        reject(new Error('Async Rejected!'));
 
-          return;
-        }
-        if (res == gl.TIMEOUT_EXPIRED) {
-          setTimeout(test, intervalMs);
+        return;
+      }
+      if (res === gl.TIMEOUT_EXPIRED) {
+        setTimeout(test, intervalMs);
 
-          return;
-        }
-        resolve('Async Resolved!');
-      };
-
-      test();
+        return;
+      }
+      resolve('Async Resolved!');
     });
   }
 

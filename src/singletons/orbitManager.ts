@@ -216,7 +216,7 @@ export class OrbitManager {
           postMessage: () => {
             // This is intentional
           },
-        } as any;
+        } as unknown as Worker;
       }
     } else {
       if (typeof Worker === 'undefined') {
@@ -384,7 +384,7 @@ export class OrbitManager {
     return buf;
   }
 
-  private isCalculateColorLocked = false;
+  // private isCalculateColorLocked = false;
 
   private drawGroupObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
@@ -401,41 +401,42 @@ export class OrbitManager {
 
         OrbitManager.checColorBuffersValidity_(id, colorData);
 
-        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== id) {
-          // if color is black, we probably have old data, so recalculate color buffers
-          if (
-            settingsManager.isShowLeoSats &&
-            settingsManager.isShowMeoSats &&
-            settingsManager.isShowGeoSats &&
-            settingsManager.isShowHeoSats &&
-            colorData[id * 4] <= 0 &&
-            colorData[id * 4 + 1] <= 0 &&
-            colorData[id * 4 + 2] <= 0
-          ) {
-            if (this.isCalculateColorLocked) {
-              /*
-               * Prevent unexpected infinite coloring loop!
-               * TODO: This should be explored more to see if there is a better way to handle this
-               */
-              return;
-            }
-            colorSchemeManagerInstance.calculateColorBuffers(true);
-            // Fix: Crued workaround to getting dots to show up when loading with search parameter
-            setTimeout(() => {
-              colorSchemeManagerInstance.calculateColorBuffers(true);
-              this.isCalculateColorLocked = true;
-            }, 500);
-            setTimeout(() => {
-              this.isCalculateColorLocked = false;
-            }, 2000);
-          }
-          if (colorData[id * 4 + 3] <= 0) {
-            return; // Skip transparent objects
-            /*
-             * Debug: This is useful when all objects are supposed to be visible but groups can filter out objects
-             * throw new Error(`color buffer for ${id} isn't visible`);
-             */
-          }
+        // if color is black, we probably have old data, so recalculate color buffers
+        if (
+          settingsManager.isShowLeoSats &&
+          settingsManager.isShowMeoSats &&
+          settingsManager.isShowGeoSats &&
+          settingsManager.isShowHeoSats &&
+          colorData[id * 4] <= 0 &&
+          colorData[id * 4 + 1] <= 0 &&
+          colorData[id * 4 + 2] <= 0
+        ) {
+          // eslint-disable-next-line no-debugger
+          // debugger;
+          // if (this.isCalculateColorLocked) {
+          //   /*
+          //    * Prevent unexpected infinite coloring loop!
+          //    * TODO: This should be explored more to see if there is a better way to handle this
+          //    */
+          //   return;
+          // }
+          // colorSchemeManagerInstance.calculateColorBuffers(true);
+          // // Fix: Crued workaround to getting dots to show up when loading with search parameter
+          // setTimeout(() => {
+          //   colorSchemeManagerInstance.calculateColorBuffers(true);
+          //   this.isCalculateColorLocked = true;
+          // }, 500);
+          // setTimeout(() => {
+          //   this.isCalculateColorLocked = false;
+          // }, 2000);
+        }
+
+        if (colorData[id * 4 + 3] <= 0) {
+          return; // Skip transparent objects
+          /*
+           * Debug: This is useful when all objects are supposed to be visible but groups can filter out objects
+           * throw new Error(`color buffer for ${id} isn't visible`);
+           */
         }
 
         this.lineManagerInstance_.setColorUniforms([colorData[id * 4], colorData[id * 4 + 1], colorData[id * 4 + 2], colorData[id * 4 + 3] * settingsManager.orbitGroupAlpha]);

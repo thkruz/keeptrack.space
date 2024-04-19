@@ -6,8 +6,8 @@
  *
  * http://keeptrack.space
  *
- * @Copyright (C) 2016-2023 Theodore Kruczek
- * @Copyright (C) 2020-2023 Heather Kruczek
+ * @Copyright (C) 2016-2024 Theodore Kruczek
+ * @Copyright (C) 2020-2024 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -822,7 +822,7 @@ export class ColorSchemeManager {
         // Generate some buffers
         this.colorData = new Float32Array(catalogManagerInstance.numSats * 4);
         this.pickableData = new Int8Array(catalogManagerInstance.numSats);
-        this.calculateColorBuffers().then(() => {
+        this.calculateColorBuffers(true).then(() => {
           this.isReady = true;
         });
       },

@@ -126,7 +126,7 @@ export class StereoMap extends KeepTrackPlugin {
           }
         });
 
-        getEl('fullscreen-icon').addEventListener('click', () => {
+        getEl('fullscreen-icon')?.addEventListener('click', () => {
           this.resize2DMap_();
         });
 

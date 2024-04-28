@@ -90,6 +90,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Image.prototype.decode = jest.fn();
 
   catalogManagerInstance.satCruncher = {
+    addEventListener: jest.fn(),
     postMessage: jest.fn(),
     terminate: jest.fn(),
   } as any;

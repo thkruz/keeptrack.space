@@ -76,9 +76,9 @@ ${e.stack}`,
 
       uiManagerInstance.toast(msg, 'serious', true);
     }
-    if (this.isDebug) {
-      console.warn(msg);
-    }
+
+    // eslint-disable-next-line no-console
+    console.warn(msg);
   }
 
   public info(msg: string) {

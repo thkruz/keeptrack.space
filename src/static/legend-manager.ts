@@ -91,11 +91,8 @@ export abstract class LegendManager {
       return;
     }
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-
     const selectedOption =
-      LegendManager.menuOptions[menu] || (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.isSensorSelected() ? defaultSensorDiv : defaultDiv);
+      LegendManager.menuOptions[menu] || (keepTrackApi.getSensorManager().currentSensors.length > 0 ? defaultSensorDiv : defaultDiv);
 
     legendHoverDom.innerHTML = selectedOption;
     if (menu === 'clear') {

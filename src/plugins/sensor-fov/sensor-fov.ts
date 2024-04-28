@@ -23,6 +23,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { waitForCruncher } from '@app/lib/waitForCruncher';
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import fovPng from '@public/img/icons/fov.png';
 import { Sensor } from 'ootk';
@@ -109,6 +111,17 @@ export class SensorFov extends KeepTrackPlugin {
         typ: CruncerMessageTypes.UPDATE_MARKERS,
         markerMode: MarkerMode.OFF,
       });
+
+      waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
+        () => {
+          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+        },
+        (m: PositionCruncherOutgoingMsg) => m.satPos?.length > 0,
+        () => {
+          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+        },
+        5,
+      );
     }
   }
 
@@ -122,5 +135,16 @@ export class SensorFov extends KeepTrackPlugin {
       typ: CruncerMessageTypes.UPDATE_MARKERS,
       markerMode: MarkerMode.FOV,
     });
+
+    waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
+      () => {
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+      },
+      (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
+      () => {
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+      },
+      5,
+    );
   }
 }

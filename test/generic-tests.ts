@@ -91,6 +91,10 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+  keepTrackApi.getCatalogManager().satCruncher = {
+    addEventListener: jest.fn(),
+    postMessage: jest.fn(),
+  } as any;
 };
 
 export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {

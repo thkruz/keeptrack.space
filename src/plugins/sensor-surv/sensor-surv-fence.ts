@@ -22,6 +22,8 @@
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { waitForCruncher } from '@app/lib/waitForCruncher';
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import fencePng from '@public/img/icons/fence.png';
 import { Sensor } from 'ootk';
@@ -71,6 +73,17 @@ export class SensorSurvFence extends KeepTrackPlugin {
         markerMode: MarkerMode.OFF,
         typ: CruncerMessageTypes.UPDATE_MARKERS,
       });
+
+      waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
+        () => {
+          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+        },
+        (m: PositionCruncherOutgoingMsg) => m.satPos?.length > 0,
+        () => {
+          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+        },
+        5,
+      );
     }
   }
 
@@ -91,6 +104,17 @@ export class SensorSurvFence extends KeepTrackPlugin {
       markerMode: MarkerMode.SURV,
       typ: CruncerMessageTypes.UPDATE_MARKERS,
     });
+
+    waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
+      () => {
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+      },
+      (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
+      () => {
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+      },
+      5,
+    );
   }
 
   addJs(): void {

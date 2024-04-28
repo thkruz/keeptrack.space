@@ -265,7 +265,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
 
     switch (sensorClick) {
-      case 'cspocAll':
+      case 'ssnAll':
         sensorManagerInstance.setSensor('SSN');
         break;
       case 'mwAll':

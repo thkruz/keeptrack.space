@@ -31,11 +31,13 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime, ZoomValue, spaceObjType2Str } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -247,17 +249,14 @@ export class SensorManager {
 
     PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
 
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
     if (selectedSensor == null && sensorId == null) {
       // No sensor selected
       this.sensorTitle = '';
       this.currentSensors = [];
     } else if (selectedSensor === 'SSN') {
       this.sensorTitle = 'All Space Surveillance Network Sensors';
-      const filteredSensors = Object.values(sensors).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
-
-      SensorManager.updateSensorUiStyling(filteredSensors);
+      this.currentSensors = Object.values(sensors).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
+      SensorManager.updateSensorUiStyling(this.currentSensors);
     } else if (selectedSensor === 'NATO-MW') {
       this.sensorTitle = 'All Missile Warning Sensors';
       this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
@@ -404,10 +403,16 @@ export class SensorManager {
     // Update position cruncher with new sensor
     this.updatePositionCruncher_();
 
-    // Update the color scheme in a frame or two
-    setTimeout(() => {
-      colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
-    }, 40);
+    waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
+      () => {
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+      },
+      (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
+      () => {
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+      },
+      5,
+    );
   }
 
   updateCruncherOnCustomSensors() {

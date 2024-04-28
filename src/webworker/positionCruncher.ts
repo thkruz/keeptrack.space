@@ -139,6 +139,7 @@ let propRate = 1; // vars us run time faster (or slower) than normal
 /** Settings */
 let selectedSatFOV = 90; // FOV in Degrees
 let isSensor = false;
+/** Do we have more than one sensor? */
 let isSensors = false;
 let isSunlightView = false;
 let isLowPerf = false;
@@ -396,8 +397,13 @@ export const propagationLoop = (mockSatCache?: PosCruncherCachedObject[]) => {
   len = isCanSkipMarkers() ? objCache.length - 1 - fieldOfViewSetLength : objCache.length - 1;
 
   // Setup optional arrays
-  satInView = isSensor && (!satInView || satInView === EMPTY_INT8_ARRAY) ? new Int8Array(objCache.length) : EMPTY_INT8_ARRAY;
-  satInSun = isSunlightView && (!satInSun || satInSun === EMPTY_INT8_ARRAY) ? new Int8Array(objCache.length) : EMPTY_INT8_ARRAY;
+  if (satInView.length !== objCache.length) {
+    satInView = isSensor && (!satInView || satInView === EMPTY_INT8_ARRAY) ? new Int8Array(objCache.length) : EMPTY_INT8_ARRAY;
+  }
+
+  if (satInSun.length !== objCache.length) {
+    satInSun = isSunlightView && (!satInSun || satInSun === EMPTY_INT8_ARRAY) ? new Int8Array(objCache.length) : EMPTY_INT8_ARRAY;
+  }
 
   updateSatCache(now, j, gmst, gmstNext, isSunExclusion);
   if (isResetFOVBubble) {
@@ -694,10 +700,15 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
     objCache[i].active = false;
   }
 
-  if (sensors[0]) {
-    const rae = ecfRad2rae(sensors[0].llaRad(), positionEcf);
+  if (sensors.length > 0) {
+    for (const sensor of sensors) {
+      if (satInView[i] === 1) {
+        break;
+      }
+      const rae = ecfRad2rae(sensor.llaRad(), positionEcf);
 
-    satInView[i] = sensors[0].isRaeInFov(rae) ? 1 : 0;
+      satInView[i] = sensor.isRaeInFov(rae) ? 1 : 0;
+    }
   } else {
     satInView[i] = 0;
   }
@@ -792,11 +803,6 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
         throw new Error('Impossible orbit');
       }
     }
-
-    // Skip Calculating Lookangles if No Sensor is Selected
-    if (isSensor) {
-      rae = ecfRad2rae(sensors[0].llaRad(), eci2ecf(pv.position, gmst));
-    }
   } catch (e) {
     // This is probably a reentry and should be skipped from now on.
     objCache[i].active = false;
@@ -836,19 +842,22 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
       for (const sensor of sensors) {
         // Skip satellites in the dark if you are an optical sensor
         if (!(sensor.type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
-          if (satInView[i]) {
+          if (satInView[i] === 1) {
+            // If the satellite is already in view, skip the rest of the sensors
             break;
           }
           try {
             positionEcf = eci2ecf(pv.position, gmst); // pv.position is called positionEci originally
-            rae = ecfRad2rae(sensors[0].llaRad(), positionEcf);
+            rae = ecfRad2rae(sensor.llaRad(), positionEcf);
           } catch (e) {
             continue;
           }
           satInView[i] = sensor.isRaeInFov(rae) ? 1 : 0;
         }
       }
-    } else if (rae) {
+      // Skip Calculating Lookangles if No Sensor is Selected
+    } else if (isSensor) {
+      rae = ecfRad2rae(sensors[0].llaRad(), eci2ecf(pv.position, gmst));
       // If it is an optical sensor and the satellite is in the dark, skip it
       if (!(sensors[0].type === SpaceObjectType.OPTICAL && satInSun[i] === SunStatus.UMBRAL)) {
         satInView[i] = sensors[0].isRaeInFov(rae) ? 1 : 0;

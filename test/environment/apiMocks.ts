@@ -277,7 +277,7 @@ export const keepTrackApiStubs = {
           loadHiResNight: jest.fn(),
           lightDirection: [0, 0, 0],
           draw: jest.fn(),
-          drawOcclusion: () => {}, // NOSONAR
+          drawOcclusion: () => { }, // NOSONAR
         },
         moon: {
           draw: jest.fn(),
@@ -492,6 +492,7 @@ export const keepTrackApiStubs = {
         sbirs: [25544],
       },
       satCruncher: {
+        addEventListener: jest.fn(),
         postMessage: jest.fn(),
         onmessage: jest.fn(),
         addEventListener: jest.fn(),

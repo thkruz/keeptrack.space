@@ -473,18 +473,18 @@ export class CatalogManager {
     }
   }
 
-  addAnalystSat(TLE1: string, TLE2: string, id: number, sccNum?: string): DetailedSatellite | null {
-    if (TLE1.length !== 69) {
-      throw new Error(`Invalid TLE1: length is not 69 - ${TLE1}`);
+  addAnalystSat(tle1: string, tle2: string, id: number, sccNum?: string): DetailedSatellite | null {
+    if (tle1.length !== 69) {
+      throw new Error(`Invalid TLE1: length is not 69 - ${tle1}`);
     }
-    if (TLE2.length !== 69) {
-      throw new Error(`Invalid TLE1: length is not 69 - ${TLE2}`);
+    if (tle2.length !== 69) {
+      throw new Error(`Invalid TLE1: length is not 69 - ${tle2}`);
     }
 
     let satrec: SatelliteRecord;
 
     try {
-      satrec = Sgp4.createSatrec(TLE1, TLE2);
+      satrec = Sgp4.createSatrec(tle1, tle2);
     } catch (e) {
       errorManagerInstance.error(e, 'catalog-manager.ts', 'Error creating satellite record!');
 
@@ -498,10 +498,10 @@ export class CatalogManager {
         country: 'ANALSAT',
         launchVehicle: 'Analyst Satellite',
         launchSite: 'ANALSAT',
-        sccNum: sccNum || TLE1.substring(2, 7).trim().padStart(5, '0'),
-        tle1: TLE1 as TleLine1,
-        tle2: TLE2 as TleLine2,
-        intlDes: TLE1.substring(9, 17),
+        sccNum: sccNum || tle1.substring(2, 7).trim().padStart(5, '0'),
+        tle1: tle1 as TleLine1,
+        tle2: tle2 as TleLine2,
+        intlDes: tle1.substring(9, 17),
         type: SpaceObjectType.PAYLOAD,
         id,
       });
@@ -510,12 +510,12 @@ export class CatalogManager {
         typ: CruncerMessageTypes.SAT_EDIT,
         id,
         active: true,
-        tle1: TLE1,
-        tle2: TLE2,
+        tle1,
+        tle2,
       };
 
       this.satCruncher.postMessage(m);
-      keepTrackApi.getOrbitManager().changeOrbitBufferData(id, TLE1, TLE2);
+      keepTrackApi.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
       const sat = this.objectCache[id] as DetailedSatellite;
 
       if (!sat.isSatellite()) {
@@ -524,8 +524,8 @@ export class CatalogManager {
 
       return sat;
     }
-    errorManagerInstance.debug(TLE1);
-    errorManagerInstance.debug(TLE2);
+    errorManagerInstance.debug(tle1);
+    errorManagerInstance.debug(tle2);
     errorManagerInstance.warn('New Analyst Satellite is Invalid!');
 
 

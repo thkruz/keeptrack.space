@@ -56,7 +56,9 @@ export class InputManager {
         return;
       }
       if (res === gl.TIMEOUT_EXPIRED) {
-        setTimeout(test, intervalMs);
+        setTimeout(() => {
+          InputManager.clientWaitAsync(gl, sync, flags, intervalMs).then(resolve).catch(reject);
+        }, intervalMs);
 
         return;
       }

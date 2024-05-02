@@ -204,16 +204,16 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const TLEs = new OrbitFinder(sat, launchLat, launchLon, upOrDown, simulationTimeObj).rotateOrbitToLatLon();
 
-    const TLE1 = TLEs[0];
-    const TLE2 = TLEs[1];
+    const tle1 = TLEs[0];
+    const tle2 = TLEs[1];
 
-    if (TLE1 === 'Error' || TLE1.length !== 69 || TLE2.length !== 69) {
-      if (TLE1 === 'Error') {
-        uiManagerInstance.toast(`Failed to Create TLE: ${TLE2}`, 'critical');
-      } else if (TLE1.length !== 69) {
-        uiManagerInstance.toast(`Invalid TLE1 Created: length is not 69 - ${TLE1}`, 'critical');
-      } else if (TLE2.length !== 69) {
-        uiManagerInstance.toast(`Invalid TLE2 Created: length is not 69 - ${TLE2}`, 'critical');
+    if (tle1 === 'Error' || tle1.length !== 69 || tle2.length !== 69) {
+      if (tle1 === 'Error') {
+        uiManagerInstance.toast(`Failed to Create TLE: ${tle2}`, 'critical');
+      } else if (tle1.length !== 69) {
+        uiManagerInstance.toast(`Invalid TLE1 Created: length is not 69 - ${tle1}`, 'critical');
+      } else if (tle2.length !== 69) {
+        uiManagerInstance.toast(`Invalid TLE2 Created: length is not 69 - ${tle2}`, 'critical');
       }
 
       // We have to change the time for the TLE creation, but it failed, so revert it.
@@ -233,7 +233,8 @@ export class NewLaunch extends KeepTrackPlugin {
     let satrec: SatelliteRecord;
 
     try {
-      satrec = Sgp4.createSatrec(TLE1, TLE2);
+      satrec = Sgp4.createSatrec(tle1, tle2);
+      sat.satrec = satrec;
     } catch (e) {
       errorManagerInstance.error(e, 'new-launch.ts', 'Error creating satellite record!');
 
@@ -244,13 +245,13 @@ export class NewLaunch extends KeepTrackPlugin {
         typ: CruncerMessageTypes.SAT_EDIT,
         id,
         active: true,
-        TLE1,
-        TLE2,
+        tle1,
+        tle2,
       });
 
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
-      orbitManagerInstance.changeOrbitBufferData(id, TLE1, TLE2);
+      orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
     } else {
       uiManagerInstance.toast('Failed Altitude Test - Try a Different Satellite!', 'critical');
     }

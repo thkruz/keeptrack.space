@@ -148,13 +148,13 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         });
         LegendManager.change('sunlight');
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);
-        waitForCruncher(
-          catalogManagerInstance.satCruncher,
-          () => {
+        waitForCruncher({
+          cruncher: catalogManagerInstance.satCruncher,
+          cb: () => {
             colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
           },
-          (data: any) => data.satInSun,
-        );
+          validationFunc: (data: any) => data.satInSun,
+        });
         break;
       case 'create-sensor-rmb':
         slideInRight(getEl('custom-sensor-menu'), 1000);
@@ -176,11 +176,14 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         triggerSubmit(<HTMLFormElement>getEl('customSensor'));
         LegendManager.change('default');
         colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-        uiManagerInstance.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         catalogManagerInstance.satCruncher.postMessage({
           isSunlightView: false,
           typ: CruncerMessageTypes.SUNLIGHT_VIEW,
         });
+        break;
+      default:
+        errorManagerInstance.info(`Unknown RMB target: ${targetId}`);
         break;
     }
   };

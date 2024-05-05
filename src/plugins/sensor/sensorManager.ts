@@ -403,16 +403,26 @@ export class SensorManager {
     // Update position cruncher with new sensor
     this.updatePositionCruncher_();
 
-    waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
-      () => {
+    waitForCruncher({
+      cruncher: keepTrackApi.getCatalogManager().satCruncher,
+      cb: () => {
         keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
       },
-      (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
-      () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+      validationFunc: (m: PositionCruncherOutgoingMsg) => {
+        if (selectedSensor && m.sensorMarkerArray?.length > 0) {
+          return true;
+        }
+
+        if (!selectedSensor && m.satInView?.length > 0) {
+          return true;
+        }
+
+        return false;
       },
-      5,
-    );
+      isSkipFirst: true,
+      isRunCbOnFailure: true,
+      maxRetries: 5,
+    });
   }
 
   updateCruncherOnCustomSensors() {

@@ -256,21 +256,22 @@ export class NewLaunch extends KeepTrackPlugin {
       uiManagerInstance.toast('Failed Altitude Test - Try a Different Satellite!', 'critical');
     }
 
-    waitForCruncher(
-      catalogManagerInstance.satCruncher,
-      () => {
+    waitForCruncher({
+      cruncher: catalogManagerInstance.satCruncher,
+      cb: () => {
         this.isDoingCalculations = false;
         hideLoading();
 
-        keepTrackApi.getUiManager().searchManager.doSearch(sat.sccNum);
+        uiManagerInstance.toast('Launch Nominal Created!', 'standby');
+        uiManagerInstance.searchManager.doSearch(sat.sccNum);
       },
-      (data) => typeof data.satPos !== 'undefined',
-      () => {
+      validationFunc: (data: any) => typeof data.satPos !== 'undefined',
+      error: () => {
         this.isDoingCalculations = false;
         hideLoading();
         uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', 'critical');
       },
-    );
+    });
   };
 
   addJs(): void {

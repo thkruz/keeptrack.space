@@ -31,7 +31,7 @@ import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class SensorFov extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Sensor Field of View';
+  static readonly PLUGIN_NAME = 'Sensor Field of View';
   constructor() {
     super(SensorFov.PLUGIN_NAME);
   }
@@ -112,16 +112,16 @@ export class SensorFov extends KeepTrackPlugin {
         markerMode: MarkerMode.OFF,
       });
 
-      waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
-        () => {
+      waitForCruncher({
+        cruncher: keepTrackApi.getCatalogManager().satCruncher,
+        cb: () => {
           keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
         },
-        (m: PositionCruncherOutgoingMsg) => m.satPos?.length > 0,
-        () => {
-          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-        },
-        5,
-      );
+        validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length === 0,
+        isSkipFirst: true,
+        isRunCbOnFailure: true,
+        maxRetries: 5,
+      });
     }
   }
 
@@ -136,15 +136,15 @@ export class SensorFov extends KeepTrackPlugin {
       markerMode: MarkerMode.FOV,
     });
 
-    waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
-      () => {
+    waitForCruncher({
+      cruncher: keepTrackApi.getCatalogManager().satCruncher,
+      cb: () => {
         keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
       },
-      (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
-      () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-      },
-      5,
-    );
+      validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
+      isSkipFirst: true,
+      isRunCbOnFailure: true,
+      maxRetries: 5,
+    });
   }
 }

@@ -38,7 +38,7 @@ declare module '@app/interfaces' {
 }
 
 export class SensorSurvFence extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Sensor Surveillance Fence';
+  static readonly PLUGIN_NAME = 'Sensor Surveillance Fence';
   constructor() {
     super(SensorSurvFence.PLUGIN_NAME);
   }
@@ -74,16 +74,16 @@ export class SensorSurvFence extends KeepTrackPlugin {
         typ: CruncerMessageTypes.UPDATE_MARKERS,
       });
 
-      waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
-        () => {
+      waitForCruncher({
+        cruncher: keepTrackApi.getCatalogManager().satCruncher,
+        cb: () => {
           keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
         },
-        (m: PositionCruncherOutgoingMsg) => m.satPos?.length > 0,
-        () => {
-          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-        },
-        5,
-      );
+        validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length === 0,
+        isSkipFirst: true,
+        isRunCbOnFailure: true,
+        maxRetries: 5,
+      });
     }
   }
 
@@ -105,16 +105,16 @@ export class SensorSurvFence extends KeepTrackPlugin {
       typ: CruncerMessageTypes.UPDATE_MARKERS,
     });
 
-    waitForCruncher(keepTrackApi.getCatalogManager().satCruncher,
-      () => {
+    waitForCruncher({
+      cruncher: keepTrackApi.getCatalogManager().satCruncher,
+      cb: () => {
         keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
       },
-      (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
-      () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-      },
-      5,
-    );
+      validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
+      isSkipFirst: true,
+      isRunCbOnFailure: true,
+      maxRetries: 5,
+    });
   }
 
   addJs(): void {

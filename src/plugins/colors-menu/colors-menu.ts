@@ -160,13 +160,13 @@ The various themes can change the colors based on the objects' orbits, objects' 
         });
         LegendManager.change('sunlight');
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);
-        waitForCruncher(
-          catalogManagerInstance.satCruncher,
-          () => {
+        waitForCruncher({
+          cruncher: catalogManagerInstance.satCruncher,
+          cb: () => {
             colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
           },
-          (data) => data.satInSun,
-        );
+          validationFunc: (data) => data.satInSun,
+        });
         break;
       case 'near-earth':
         LegendManager.change('near');

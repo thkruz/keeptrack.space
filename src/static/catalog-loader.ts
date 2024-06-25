@@ -690,15 +690,20 @@ export class CatalogLoader {
       rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
       rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs ?? null;
 
-      const satellite = new DetailedSatellite({
-        id: tempObjData.length,
-        tle1: resp[i].TLE1,
-        tle2: resp[i].TLE2,
-        ...resp[i],
-        rcs,
-      });
+      // Never fail just because of one bad satellite
+      try {
+        const satellite = new DetailedSatellite({
+          id: tempObjData.length,
+          tle1: resp[i].TLE1,
+          tle2: resp[i].TLE2,
+          ...resp[i],
+          rcs,
+        });
 
-      tempObjData.push(satellite);
+        tempObjData.push(satellite);
+      } catch (e) {
+        errorManagerInstance.log(e);
+      }
     }
 
     if (settingsManager.isNotionalDebris && resp[i].type === 3) {

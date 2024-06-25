@@ -151,7 +151,7 @@
     "new-github-issue-url": "^1.0.0",
     "node-fetch": "^3.3.2",
     "numeric": "^1.2.6",
-    "ootk": "^4.0.0",
+    "ootk": "^4.0.1",
     "papaparse": "^5.4.1",
     "resizable": "^1.2.1",
     "ts-node": "^10.9.1",

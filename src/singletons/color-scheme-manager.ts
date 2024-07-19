@@ -303,9 +303,9 @@ export class ColorSchemeManager {
     waitForCruncher({
       cruncher: keepTrackApi.getCatalogManager().satCruncher,
       cb: () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers();
       },
-      validationFunc: (m: PositionCruncherOutgoingMsg) => m.satPos?.length > 0,
+      validationFunc: (m: PositionCruncherOutgoingMsg) => m.satInView?.length > 0,
       isSkipFirst: true,
       isRunCbOnFailure: true,
       maxRetries: 5,
@@ -840,6 +840,18 @@ export class ColorSchemeManager {
         this.calculateColorBuffers(true).then(() => {
           this.isReady = true;
         });
+
+        // This helps keep the inview colors up to date
+        keepTrackApi.register({
+          event: KeepTrackApiEvents.staticOffsetChange,
+          cbName: 'colorSchemeManager',
+          cb: () => {
+            setTimeout(() => {
+              this.calcColorBufsNextCruncher();
+            }, 1000);
+          },
+        });
+
       },
     });
   }

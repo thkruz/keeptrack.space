@@ -189,6 +189,16 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           typ: CruncerMessageTypes.SUNLIGHT_VIEW,
         });
         break;
+      case 'colors-confidence-rmb':
+      case 'colors-rcs-rmb':
+      case 'colors-density-rmb':
+      case 'colors-starlink-rmb':
+      case 'colors-sunlight-rmb':
+      case 'colors-country-rmb':
+      case 'colors-velocity-rmb':
+      case 'colors-ageOfElset-rmb':
+      case 'colors-default-rmb':
+        break;
       default:
         errorManagerInstance.info(`Unknown RMB target: ${targetId}`);
         break;

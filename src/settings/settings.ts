@@ -79,6 +79,8 @@ export class SettingsManager {
     scenarioCreator: false,
     debrisScreening: true,
     videoDirector: true,
+    reports: true,
+    polarPlot: true,
   };
 
   colors: ColorSchemeColorMap;

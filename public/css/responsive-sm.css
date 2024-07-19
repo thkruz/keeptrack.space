@@ -83,4 +83,8 @@
     max-width: 380px;
     right: 0px;
   }
+
+  #polar-plot {
+    width: 100%;
+  }
 }

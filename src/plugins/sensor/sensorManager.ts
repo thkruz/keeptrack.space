@@ -47,6 +47,10 @@ import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 export class SensorManager {
   lastMultiSiteArray: TearrData[];
 
+  getSensor(): DetailedSensor | null {
+    return this.currentSensors[0] ?? null;
+  }
+
   addSecondarySensor(sensor: DetailedSensor, isReplaceSensor = false): void {
     // If there is no primary sensor, make this the primary sensor
     const primarySensor = this.currentSensors[0];

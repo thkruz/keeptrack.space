@@ -37,6 +37,8 @@ import { Planetarium } from './planetarium/planetarium';
  * import { ricPlotPlugin } from './plot-analysis/ric-plots';
  * import { time2LonPlotsPlugin } from './plot-analysis/time2lon';
  */
+import { PolarPlotPlugin } from './polar-plot/polar-plot';
+import { ReportsPlugin } from './reports/reports';
 import { satConstellationsPlugin } from './sat-constellations/sat-constellations';
 import { SatelliteFov } from './satellite-fov/satellite-fov';
 import { satellitePhotosPlugin } from './satellite-photos/satellite-photos';
@@ -112,6 +114,8 @@ export type KeepTrackPlugins = {
   topMenu?: boolean;
   updateSelectBox?: boolean;
   watchlist?: boolean;
+  reports?: boolean;
+  polarPlot?: boolean;
 };
 
 // Register all core modules
@@ -133,6 +137,12 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
     if (plugins.watchlist) {
       new WatchlistPlugin().init();
       new WatchlistOverlay().init();
+    }
+    if (plugins.reports) {
+      new ReportsPlugin().init();
+    }
+    if (plugins.polarPlot) {
+      new PolarPlotPlugin().init();
     }
     if (plugins.nextLaunch) {
       new NextLaunchesPlugin().init();
@@ -287,14 +297,18 @@ export const uiManagerFinal = (plugins: any): void => {
     document.documentElement.style.setProperty('--bottom-menu-height', '0px');
   }
 
-  // if (plugins.topMenu) {
-  //   let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--nav-bar-height').replace('px', ''));
+  /*
+   * if (plugins.topMenu) {
+   *   let topMenuHeight = parseInt(document.documentElement.style.getPropertyValue('--nav-bar-height').replace('px', ''));
+   */
 
-  //   if (isNaN(topMenuHeight)) {
-  //     topMenuHeight = 0;
-  //   }
-  //   document.documentElement.style.setProperty('--nav-bar-height', `${topMenuHeight + 50}px`);
-  // }
+  /*
+   *   if (isNaN(topMenuHeight)) {
+   *     topMenuHeight = 0;
+   *   }
+   *   document.documentElement.style.setProperty('--nav-bar-height', `${topMenuHeight + 50}px`);
+   * }
+   */
 
   if (getEl('bottom-icons') && getEl('bottom-icons').innerText == '') {
     getEl('nav-footer').style.visibility = 'hidden';

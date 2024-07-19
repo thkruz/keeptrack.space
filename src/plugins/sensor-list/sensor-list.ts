@@ -264,6 +264,9 @@ export class SensorListPlugin extends KeepTrackPlugin {
       return;
     }
 
+    // Remove any secondary sensors
+    sensorManagerInstance.clearSecondarySensors();
+
     switch (sensorClick) {
       case 'ssnAll':
         sensorManagerInstance.setSensor('SSN');

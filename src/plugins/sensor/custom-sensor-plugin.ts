@@ -11,6 +11,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import customPng from '@public/img/icons/custom.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { SoundNames } from '../sounds/SoundNames';
 import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
@@ -19,9 +20,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       const sensorManagerInstance = keepTrackApi.getSensorManager();
 
       if (sensorManagerInstance.isSensorSelected()) {
+        (<HTMLInputElement>getEl('cs-replace')).style.display = '';
         (<HTMLInputElement>getEl('cs-lat')).value = sensorManagerInstance.currentSensors[0].lat.toString();
         (<HTMLInputElement>getEl('cs-lon')).value = sensorManagerInstance.currentSensors[0].lon.toString();
         (<HTMLInputElement>getEl('cs-hei')).value = sensorManagerInstance.currentSensors[0].alt.toString();
+      } else {
+        (<HTMLInputElement>getEl('cs-replace')).style.display = 'none';
       }
     }
   };
@@ -92,6 +96,9 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
                 <label for="cs-maxrange" class="active">Maximum Range</label>
             </div>
             <div class="center-align">
+                <button id="cs-replace" class="btn btn-ui waves-effect waves-light" name="action">Replace Sensor &#9658;</button>
+                <br />
+                <br />
                 <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Add Custom Sensor &#9658;</button>
                 <br />
                 <br />
@@ -234,28 +241,35 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   private static addCustomSensorFormSubmitListener() {
     getEl('customSensor').addEventListener('submit', (e: Event) => {
+      // Prevent the form from submitting
       e.preventDefault();
-      // CustomSensorPlugin.processCustomSensorSubmit_();
     });
   }
 
   private static addUseGeolocationListener_() {
     getEl('cs-geolocation').addEventListener('click', UiGeolocation.useCurrentGeolocationAsSensor);
+    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
   }
 
   private static addClearCustomSensorListener_() {
     getEl('cs-clear').addEventListener('click', () => {
       keepTrackApi.getSensorManager().clearSecondarySensors();
+      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
     });
   }
 
   private static addCustomSensorBtnCLickListener_() {
     getEl('cs-submit').addEventListener('click', () => {
       CustomSensorPlugin.processCustomSensorSubmit_();
+      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+    });
+    getEl('cs-replace').addEventListener('click', () => {
+      CustomSensorPlugin.processCustomSensorSubmit_(true);
+      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
     });
   }
 
-  private static processCustomSensorSubmit_() {
+  private static processCustomSensorSubmit_(isReplaceSensor = false) {
     getEl('menu-sensor-info')?.classList.remove('bmenu-item-disabled');
     getEl('menu-fov-bubble')?.classList.remove('bmenu-item-disabled');
     getEl('menu-surveillance')?.classList.remove('bmenu-item-disabled');
@@ -319,6 +333,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
         volume: false,
       }),
+      isReplaceSensor,
     );
   }
 

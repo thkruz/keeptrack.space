@@ -2,7 +2,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import analysisPng from '@public/img/icons/analysis.png';
+import analysisPng from '@public/img/icons/reports.png';
 
 
 import { BaseObject, DetailedSatellite, MILLISECONDS_PER_SECOND } from 'ootk';

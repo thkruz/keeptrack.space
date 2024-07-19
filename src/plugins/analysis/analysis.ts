@@ -11,7 +11,7 @@ import { saveCsv } from '@app/lib/saveVariable';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
 import analysisPng from '@public/img/icons/analysis.png';
-import { DetailedSatellite, DetailedSensor, EciVec3, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
+import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 /**
@@ -485,21 +485,23 @@ export class AnalysisMenu extends KeepTrackPlugin {
             if (sTime == null) {
               return {
                 sortTime: null,
-                scc: null,
-                score: null,
-                startDate: null,
-                startTime: null,
-                startAz: null,
-                startEl: null,
-                startrng: null,
-                stopDate: null,
-                stopTime: null,
-                stopAz: null,
-                stopEl: null,
-                stoprng: null,
-                tic: null,
-                minrng: null,
-                passMaxEl: null,
+                SATELLITE_ID: null,
+                PASS_SCORE: null,
+                START_DATE: null,
+                START_TIME: null,
+                START_AZIMUTH: null,
+                START_ELEVATION: null,
+                START_RANGE: null,
+                STOP_DATE: null,
+                STOP_TIME: null,
+                STOP_AZIMTUH: null,
+                STOP_ELEVATION: null,
+                STOP_RANGE: null,
+                TIME_IN_COVERAGE_SECONDS: null,
+                MINIMUM_RANGE: null,
+                MAXIMUM_ELEVATION: null,
+                SENSOR_TO_SUN_AZIMUTH: null,
+                SENSOR_TO_SUN_ELEVATION: null,
               };
             }
 
@@ -516,24 +518,33 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
             tic = (now.getTime() - sTime.getTime()) / 1000 || 0;
 
+            const scene = keepTrackApi.getScene();
+            const sunRae = eci2rae(now, {
+              x: scene.sun.position[0] as Kilometers,
+              y: scene.sun.position[1] as Kilometers,
+              z: scene.sun.position[2] as Kilometers,
+            }, sensor);
+
             // Last Line of Coverage
             return {
               sortTime: sTime.getTime(),
-              scc: satrecIn.satnum,
-              score,
-              startDate: sTime,
-              startTime: sTime,
-              startAz: sAz,
-              startEl: sEl,
-              startrng: srng,
-              stopDate: now,
-              stopTime: now,
-              stopAz: aer.az.toFixed(0),
-              stopEl: aer.el.toFixed(1),
-              stoprng: aer.rng.toFixed(0),
-              tic,
-              minrng: passMinrng.toFixed(0),
-              passMaxEl: passMaxEl.toFixed(1),
+              SATELLITE_ID: parseInt(satrecIn.satnum).toString(),
+              PASS_SCORE: score.toFixed(1),
+              START_DATE: sTime,
+              START_TIME: sTime,
+              START_AZIMUTH: sAz,
+              START_ELEVATION: sEl,
+              START_RANGE: srng,
+              STOP_DATE: now,
+              STOP_TIME: now,
+              STOP_AZIMTUH: aer.az.toFixed(0),
+              STOP_ELEVATION: aer.el.toFixed(1),
+              STOP_RANGE: aer.rng.toFixed(0),
+              TIME_IN_COVERAGE_SECONDS: tic,
+              MINIMUM_RANGE: passMinrng.toFixed(0),
+              MAXIMUM_ELEVATION: passMaxEl.toFixed(1),
+              SENSOR_TO_SUN_AZIMUTH: sunRae.az.toFixed(1),
+              SENSOR_TO_SUN_ELEVATION: sunRae.el.toFixed(1),
             };
           }
         }
@@ -548,21 +559,23 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
       return {
         sortTime: null,
-        scc: null,
-        score: null,
-        startDate: null,
-        startTime: null,
-        startAz: null,
-        startEl: null,
-        startrng: null,
-        stopDate: null,
-        stopTime: null,
-        stopAz: null,
-        stopEl: null,
-        stoprng: null,
-        tic: null,
-        minrng: null,
-        passMaxEl: null,
+        SATELLITE_ID: null,
+        PASS_SCORE: null,
+        START_DATE: null,
+        START_TIME: null,
+        START_AZIMUTH: null,
+        START_ELEVATION: null,
+        START_RANGE: null,
+        STOP_DATE: null,
+        STOP_TIME: null,
+        STOP_AZIMTUH: null,
+        STOP_ELEVATION: null,
+        STOP_RANGE: null,
+        TIME_IN_COVERAGE_SECONDS: null,
+        MINIMUM_RANGE: null,
+        MAXIMUM_ELEVATION: null,
+        SENSOR_TO_SUN_AZIMUTH: null,
+        SENSOR_TO_SUN_ELEVATION: null,
       };
     };
 
@@ -576,7 +589,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
         const _lookanglesRow = propagateBestPass_(now, satrec);
         // If data came back...
 
-        if (_lookanglesRow.score !== null) {
+        if (_lookanglesRow.PASS_SCORE !== null) {
           lookanglesTable.push(_lookanglesRow); // Update the table with looks for this 5 second chunk and then increase table counter by 1
 
           // Reset flags for next pass
@@ -601,7 +614,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   static findBestPasses(sats: string, sensor: DetailedSensor) {
     sats = sats.replace(/ /gu, ',');
     const satArray = sats.split(',');
-    const passes = [];
+    const passes: lookanglesRow[] = [];
 
     for (const satId of satArray) {
       try {
@@ -625,10 +638,10 @@ export class AnalysisMenu extends KeepTrackPlugin {
     });
 
     for (const pass of passes) {
-      pass.startDate = pass.startDate.toISOString().split('T')[0];
-      pass.startTime = pass.startTime.toISOString().split('T')[1].split('.')[0];
-      pass.stopDate = pass.stopDate.toISOString().split('T')[0];
-      pass.stopTime = pass.stopTime.toISOString().split('T')[1].split('.')[0];
+      pass.START_DATE = (<Date>pass.START_DATE).toISOString().split('T')[0];
+      pass.START_TIME = (<Date>pass.START_TIME).toISOString().split('T')[1].split('.')[0];
+      pass.STOP_DATE = (<Date>pass.STOP_DATE).toISOString().split('T')[0];
+      pass.STOP_TIME = (<Date>pass.STOP_TIME).toISOString().split('T')[1].split('.')[0];
     }
 
     saveCsv(passes, 'bestSatTimes');
@@ -653,7 +666,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     if (!sensorManagerInstance.isSensorSelected()) {
       keepTrackApi.getUiManager().toast('You must select a sensor first!', 'critical');
     } else {
-      AnalysisMenu.findBestPasses(sats, sensorManagerInstance.currentSensors[0]);
+      AnalysisMenu.findBestPasses(sats, sensorManagerInstance.getSensor());
     }
   }
 

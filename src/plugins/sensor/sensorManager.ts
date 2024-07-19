@@ -47,18 +47,24 @@ import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 export class SensorManager {
   lastMultiSiteArray: TearrData[];
 
-  addSecondarySensor(sensor: DetailedSensor): void {
+  getSensor(): DetailedSensor | null {
+    return this.currentSensors[0] ?? null;
+  }
+
+  addSecondarySensor(sensor: DetailedSensor, isReplaceSensor = false): void {
     // If there is no primary sensor, make this the primary sensor
     const primarySensor = this.currentSensors[0];
 
-    if (!primarySensor?.isSensor()) {
-      this.currentSensors.push(sensor);
+    if (!primarySensor?.isSensor() || isReplaceSensor) {
+      this.currentSensors = [sensor];
       this.setSensor(sensor);
     } else {
       this.secondarySensors.push(sensor);
     }
     this.updatePositionCruncher_();
     this.cameraToCurrentSensor_();
+    // Force a recalculation of the color buffers on next cruncher
+    keepTrackApi.getColorSchemeManager().calcColorBufsNextCruncher();
   }
 
   /** Sensors that are currently selected/active */
@@ -153,7 +159,7 @@ export class SensorManager {
   }
 
   isSensorSelected(): boolean {
-    return this.currentSensors[0]?.isSensor();
+    return this.currentSensors?.length > 0 && this.currentSensors[0]?.isSensor();
   }
 
   removeSecondarySensor(sensor?: DetailedSensor) {

@@ -84,6 +84,8 @@ const createElWidth_ = (el: HTMLElement) => {
   edgeEl.style.cursor = 'w-resize';
   edgeEl.style.zIndex = '9999';
   edgeEl.style.marginLeft = 'auto';
+  edgeEl.style.cursor = 'w-resize';
+
   el.appendChild(edgeEl);
 
   return edgeEl;

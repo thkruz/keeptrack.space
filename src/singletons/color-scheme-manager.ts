@@ -30,8 +30,10 @@ import { getEl } from '../lib/get-el';
 import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
+import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Days, DetailedSatellite, Marker, SpaceObjectType, Star } from 'ootk';
 import { getDayOfYear } from '../lib/transforms';
@@ -295,6 +297,19 @@ export class ColorSchemeManager {
       color: this.colorTheme.deselected,
       pickable: Pickable.No,
     };
+  }
+
+  calcColorBufsNextCruncher(): void {
+    waitForCruncher({
+      cruncher: keepTrackApi.getCatalogManager().satCruncher,
+      cb: () => {
+        keepTrackApi.getColorSchemeManager().calculateColorBuffers();
+      },
+      validationFunc: (m: PositionCruncherOutgoingMsg) => m.satInView?.length > 0,
+      isSkipFirst: true,
+      isRunCbOnFailure: true,
+      maxRetries: 5,
+    });
   }
 
   async calculateColorBuffers(isForceRecolor = false): Promise<void> {
@@ -825,6 +840,18 @@ export class ColorSchemeManager {
         this.calculateColorBuffers(true).then(() => {
           this.isReady = true;
         });
+
+        // This helps keep the inview colors up to date
+        keepTrackApi.register({
+          event: KeepTrackApiEvents.staticOffsetChange,
+          cbName: 'colorSchemeManager',
+          cb: () => {
+            setTimeout(() => {
+              this.calcColorBufsNextCruncher();
+            }, 1000);
+          },
+        });
+
       },
     });
   }

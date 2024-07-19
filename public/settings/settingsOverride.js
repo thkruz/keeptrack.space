@@ -69,6 +69,8 @@ const settingsOverride = {
     scenarioCreator: false,
     debrisScreening: true,
     videoDirector: false,
+    reports: true,
+    polarPlot: true,
   },
   /*
    * searchLimit: 150,

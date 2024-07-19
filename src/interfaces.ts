@@ -169,21 +169,23 @@ export interface SensorObjectCruncher {
 
 export type lookanglesRow = {
   sortTime: number;
-  scc: string;
-  score: number;
-  startDate: Date;
-  startTime: Date;
-  startAz: string;
-  startEl: string;
-  startrng: string;
-  stopDate: Date;
-  stopTime: Date;
-  stopAz: string;
-  stopEl: string;
-  stoprng: string;
-  tic: number;
-  minrng: string;
-  passMaxEl: string;
+  SATELLITE_ID: string;
+  PASS_SCORE: string;
+  START_DATE: Date | string
+  START_TIME: Date | string;
+  START_AZIMUTH: string;
+  START_ELEVATION: string;
+  START_RANGE: string;
+  STOP_DATE: Date | string;
+  STOP_TIME: Date | string;
+  STOP_AZIMTUH: string;
+  STOP_ELEVATION: string;
+  STOP_RANGE: string;
+  TIME_IN_COVERAGE_SECONDS: number;
+  MINIMUM_RANGE: string;
+  MAXIMUM_ELEVATION: string;
+  SENSOR_TO_SUN_AZIMUTH: string;
+  SENSOR_TO_SUN_ELEVATION: string;
 };
 
 export type SatPassTimes = {

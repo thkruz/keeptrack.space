@@ -205,7 +205,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .getLineManager()
           .create(
             LineTypes.SENSOR_TO_MOON,
-            [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.moon.position[0], scene.moon.position[1], scene.moon.position[2]],
+            [sensors[0].eci().x, sensors[0].eci().y, sensors[0].eci().z, scene.moon.position[0], scene.moon.position[1], scene.moon.position[2]],
             'w',
           );
 
@@ -247,7 +247,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .getLineManager()
           .create(
             LineTypes.SENSOR_TO_SUN,
-            [keepTrackApi.getCatalogManager().getSensorFromSensorName(sensors[0].name), scene.sun.position[0], scene.sun.position[1], scene.sun.position[2]],
+            [sensors[0].eci().x, sensors[0].eci().y, sensors[0].eci().z, scene.sun.position[0], scene.sun.position[1], scene.sun.position[2]],
             'o',
           );
 

@@ -127,10 +127,6 @@ export class LineManager {
       case LineTypes.CENTER_OF_EARTH_TO_SAT:
         this.createSat_(value as [number], color);
         break;
-      case LineTypes.SENSOR_TO_SUN:
-      case LineTypes.SENSOR_TO_MOON:
-        this.createSat2_(value as [number, number, number, number], color, type);
-        break;
       case LineTypes.REF_TO_SAT:
         this.createSat2_(value as [number, number, number, number], color);
         break;
@@ -158,6 +154,8 @@ export class LineManager {
       case LineTypes.CENTER_OF_EARTH_TO_REF:
         this.createRef_(value as [number, number, number], color);
         break;
+      case LineTypes.SENSOR_TO_SUN:
+      case LineTypes.SENSOR_TO_MOON:
       case LineTypes.REF_TO_REF:
         this.createRef2_(value as [number, number, number, number, number, number], color);
         break;
@@ -612,9 +610,9 @@ export class LineManager {
             // Is azimuth outside of FOV?
             if (
               (this.drawLineList[i].maxAz > this.drawLineList[i].minAz && this.drawLineList[i].az > this.drawLineList[i].maxAz) ||
-                (this.drawLineList[i].maxAz < this.drawLineList[i].minAz &&
-                  this.drawLineList[i].az > this.drawLineList[i].maxAz &&
-                  this.drawLineList[i].az < this.drawLineList[i].minAz)
+              (this.drawLineList[i].maxAz < this.drawLineList[i].minAz &&
+                this.drawLineList[i].az > this.drawLineList[i].maxAz &&
+                this.drawLineList[i].az < this.drawLineList[i].minAz)
             ) {
               // Reset it
               this.drawLineList[i].az = this.drawLineList[i].minAz;
@@ -639,7 +637,7 @@ export class LineManager {
               ),
               gmst,
             );
-              // Update the line
+            // Update the line
 
             this.drawLineList[i].line.update(
               [pos.x, pos.y, pos.z],

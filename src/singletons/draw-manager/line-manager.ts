@@ -157,7 +157,7 @@ export class LineManager {
       case LineTypes.SENSOR_TO_SUN:
       case LineTypes.SENSOR_TO_MOON:
       case LineTypes.REF_TO_REF:
-        this.createRef2_(value as [number, number, number, number, number, number], color);
+        this.createRef2_(value as [number, number, number, number, number, number], color, type);
         break;
       default:
         break;
@@ -169,13 +169,13 @@ export class LineManager {
   /**
    * Reference Point to Reference Point
    */
-  private createRef2_(value: [number, number, number, number, number, number], color: [number, number, number, number]) {
+  private createRef2_(value: [number, number, number, number, number, number], color: [number, number, number, number], type = LineTypes.REF_TO_REF) {
     this.drawLineList.push({
       line: new Line(this.gl_, this.attribs_, this.uniforms_),
       ref: [value[0], value[1], value[2]],
       ref2: [value[3], value[4], value[5]],
       color,
-      type: LineTypes.REF_TO_REF,
+      type,
     });
   }
 

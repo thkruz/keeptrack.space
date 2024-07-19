@@ -155,7 +155,7 @@ export class SensorManager {
   }
 
   isSensorSelected(): boolean {
-    return this.currentSensors[0]?.isSensor();
+    return this.currentSensors?.length > 0 && this.currentSensors[0]?.isSensor();
   }
 
   removeSecondarySensor(sensor?: DetailedSensor) {

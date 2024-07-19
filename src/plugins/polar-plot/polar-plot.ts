@@ -42,8 +42,9 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   sideMenuElementName: string = 'polar-plot-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="polar-plot-menu" class="side-menu-parent start-hidden text-select">
-    <div id="polar-plot-content" class="side-menu" style="display: flex; justify-content: center; align-items: center;">
+    <div id="polar-plot-content" class="side-menu" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
       <canvas id="polar-plot" class="w-96" width="1000" height="1000"></canvas>
+      <button id="polar-plot-save" class="btn btn-primary">Save Image</button>
     </div>
   </div>
   `;
@@ -56,6 +57,26 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     minWidth: 450,
     maxWidth: 1000,
   };
+
+  addHtml(): void {
+    super.addHtml();
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.PLUGIN_NAME,
+      cb: () => {
+        getEl('polar-plot-save').addEventListener('click', () => {
+          const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
+          const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+          const link = document.createElement('a');
+
+          link.href = image;
+          link.download = `sat-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-polar-plot.png`;
+          link.click();
+        });
+      },
+    });
+  }
 
   addJs(): void {
     super.addJs();

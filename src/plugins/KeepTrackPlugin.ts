@@ -225,7 +225,7 @@ export class KeepTrackPlugin {
       this.registerSubmitButtonClicked(this.submitCallback);
     }
 
-    if (this.dragOptions?.isDraggable) {
+    if (this.dragOptions) {
       this.registerClickAndDragOptions(this.dragOptions);
     }
 
@@ -456,7 +456,7 @@ export class KeepTrackPlugin {
    * @param callback The callback function to run when the bottom icon is clicked. This is run
    * even if the bottom icon is disabled.
    */
-  registerBottomMenuClicked(callback: () => void = () => {}) {
+  registerBottomMenuClicked(callback: () => void = () => { }) {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
       keepTrackApi.register({
         event: KeepTrackApiEvents.selectSatData,

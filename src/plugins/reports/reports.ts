@@ -5,9 +5,17 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import analysisPng from '@public/img/icons/reports.png';
 
 
-import { BaseObject, DetailedSatellite, MILLISECONDS_PER_SECOND } from 'ootk';
+import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+
+interface ReportData {
+  filename: string;
+  header: string;
+  body: string;
+  columns?: number;
+  isHeaders?: boolean;
+}
 
 export class ReportsPlugin extends KeepTrackPlugin {
   static readonly PLUGIN_NAME = 'Reports';
@@ -33,10 +41,17 @@ export class ReportsPlugin extends KeepTrackPlugin {
       <div class="row">
         <h5 class="center-align">Reports</h5>
         <div class="divider"></div>
-        <div class="center-align">
-          <br>
+        <div class="center-align" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; margin-left: 10px; margin-right: 10px;">
           <button
-              id="aer-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Generate AER Report &#9658;
+              id="aer-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Azimuth Elevation Range &#9658;
+          </button>
+          <button
+              id="lla-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Lattitude Longitude Altitude &#9658;
+          </button>
+          <button
+              id="eci-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Earth Centered Intertial &#9658;
+          <button
+              id="coes-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Classical Orbital Elements &#9658;
           </button>
         </div>
       </div>
@@ -48,7 +63,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
   helpBody = keepTrackApi.html`The Reports Menu is a collection of tools to help you analyze and understand the data you are viewing.`;
 
   dragOptions: clickDragOptions = {
-    isDraggable: true,
+    isDraggable: false,
+    minWidth: 320,
   };
 
   addJs(): void {
@@ -57,7 +73,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        getEl('aer-report-btn').addEventListener('click', () => this.generateAerReport());
+        getEl('aer-report-btn').addEventListener('click', () => this.generateAzElRng_());
+        getEl('coes-report-btn').addEventListener('click', () => this.generateClasicalOrbElJ2000_());
+        getEl('eci-report-btn').addEventListener('click', () => this.generateEci_());
+        getEl('lla-report-btn').addEventListener('click', () => this.generateLla_());
       },
     });
 
@@ -76,73 +95,175 @@ export class ReportsPlugin extends KeepTrackPlugin {
     });
   }
 
-  generateAerReport() {
-    const sensorManager = keepTrackApi.getSensorManager();
-    const sat = this.selectSatManager_.primarySatObj as DetailedSatellite;
+  private generateAzElRng_() {
+    const sat = this.getSat_();
+    const sensor = this.getSensor_();
 
-
-    if (!sensorManager.isSensorSelected()) {
-      errorManagerInstance.warn('Select a sensor first!');
-
-      return;
-    }
-    if (!sat) {
-      errorManagerInstance.warn('Select a satellite first!');
-
+    if (!sat || !sensor) {
       return;
     }
 
-    if (!(sat instanceof DetailedSatellite)) {
-      errorManagerInstance.warn('Satellite is not DetailedSatellite!');
-
-      return;
-    }
-
-    const sensor = sensorManager.currentSensors[0];
-
-
-    /*
-     * Azimuth Elevation Range Report
-     * ------------------------------
-     * Satellite: [Satellite Name]
-     * NORAD ID: [NORAD ID]
-     * Date: [Date]
-     */
-
-    const reportHeader = `Azimuth Elevation Range Report\n-------------------------------\nSatellite: ${sat.name}\nNORAD ID: ${sat.sccNum}\nDate: ${new Date().toISOString()}\n\n`;
-    let report = 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n';
-    const durationInMinutes = 72 * 60;
+    const header = `Azimuth Elevation Range Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
+    let body = 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n';
+    const durationInSeconds = 72 * 60 * 60;
     let isInCoverage = false;
+    let time = this.getStartTime_();
 
-    for (let t = 0; t < durationInMinutes; t++) {
-      const time = keepTrackApi.getTimeManager().getOffsetTimeObj(t * MILLISECONDS_PER_SECOND * 60);
+    for (let t = 0; t < durationInSeconds; t += 30) {
+      time = new Date(time.getTime() + MILLISECONDS_PER_SECOND * 30);
       const rae = sensor.rae(sat, time);
 
       if (rae.el > 0) {
         isInCoverage = true;
-        report += `${time.toISOString()},${rae.az.toFixed(3)},${rae.el.toFixed(3)},${rae.rng.toFixed(3)}\n`;
+        body += `${this.formatTime_(time)},${rae.az.toFixed(3)},${rae.el.toFixed(3)},${rae.rng.toFixed(3)}\n`;
       } else if (isInCoverage) {
         // If we were in coverage but now we are not, add a blank line to separate the passes
-        report += '\n\n';
+        body += '\n\n';
         isInCoverage = false;
       }
     }
 
-    if (report === 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n') {
-      report += 'No passes found!';
+    if (body === 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n') {
+      body += 'No passes found!';
     }
 
-    this.writeReport(sat, reportHeader, report);
+    this.writeReport_({
+      filename: `aer-${sat.sccNum}`,
+      header,
+      body,
+    });
   }
 
-  writeReport(sat: DetailedSatellite, reportHeader: string, report: string) {
-    // Open a new window and write the report to it - the title of the window should be the satellite name
-    const win = window.open('text/plain', sat.name);
+  private formatTime_(time: Date) {
+    const timeStr = time.toISOString();
+    const timeStrSplit = timeStr.split('T');
+    const date = timeStrSplit[0];
+    const timeSplit = timeStrSplit[1].split('.');
+    const timeOut = timeSplit[0];
 
-    const colWidths = [0, 0, 0, 0];
+    return `${date} ${timeOut}`;
+  }
+
+  private generateLla_() {
+    const sat = this.getSat_();
+
+    if (!sat) {
+      return;
+    }
+
+    const header = `Latitude Longitude Altitude Report\n-------------------------------\n${this.createHeader_(sat)}`;
+    let body = 'Time (UTC),Latitude(°),Longitude(°),Altitude(km)\n';
+    const durationInSeconds = 72 * 60 * 60;
+    let time = this.getStartTime_();
+
+    for (let t = 0; t < durationInSeconds; t += 30) {
+      time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
+      const lla = sat.lla(time);
+
+      body += `${this.formatTime_(time)},${lla.lat.toFixed(3)},${lla.lon.toFixed(3)},${lla.alt.toFixed(3)}\n`;
+    }
+
+    this.writeReport_({
+      filename: `lla-${sat.sccNum}`,
+      header,
+      body,
+    });
+  }
+
+  private generateEci_() {
+    const sat = this.getSat_();
+
+    if (!sat) {
+      return;
+    }
+
+    const header = `Earth Centered Intertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
+    let body = 'Time (UTC),Position X(km),Position Y(km),Position Z(km),Velocity X(km/s),Velocity Y(km/s),Velocity Z(km/s)\n';
+    const durationInSeconds = 72 * 60 * 60;
+    let time = this.getStartTime_();
+
+    for (let t = 0; t < durationInSeconds; t += 30) {
+      time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
+      const eci = sat.eci(time);
+
+      body += `${this.formatTime_(time)},${eci.position.x.toFixed(3)},${eci.position.y.toFixed(3)},${eci.position.z.toFixed(3)},` +
+        `${eci.velocity.x.toFixed(3)},${eci.velocity.y.toFixed(3)},${eci.velocity.z.toFixed(3)}\n`;
+    }
+
+    this.writeReport_({
+      filename: `eci-${sat.sccNum}`,
+      header,
+      body,
+      columns: 7,
+      isHeaders: true,
+    });
+  }
+
+  private createHeader_(sat: DetailedSatellite, sensor?: DetailedSensor) {
+    const satData = '' +
+      `Date: ${new Date().toISOString()}\n` +
+      `Satellite: ${sat.name}\n` +
+      `NORAD ID: ${sat.sccNum}\n` +
+      `Alternate ID: ${sat.altId || 'None'}\n` +
+      `International Designator: ${sat.intlDes}\n\n`;
+    const sensorData = '' +
+      `Sensor: ${sensor ? sensor.name : 'None'}\n` +
+      `Type: ${sensor ? sensor.getTypeString() : 'None'}\n` +
+      `Latitude: ${sensor ? sensor.lat : 'None'}\n` +
+      `Longitude: ${sensor ? sensor.lon : 'None'}\n` +
+      `Altitude: ${sensor ? sensor.alt : 'None'}\n` +
+      `Min Azimuth: ${sensor ? sensor.minAz : 'None'}\n` +
+      `Max Azimuth: ${sensor ? sensor.maxAz : 'None'}\n` +
+      `Min Elevation: ${sensor ? sensor.minEl : 'None'}\n` +
+      `Max Elevation: ${sensor ? sensor.maxEl : 'None'}\n` +
+      `Min Range: ${sensor ? sensor.minRng : 'None'}\n` +
+      `Max Range: ${sensor ? sensor.maxRng : 'None'}\n\n`;
+
+
+    return sensor ? `${satData}${sensorData}` : `${satData}`;
+  }
+
+  private generateClasicalOrbElJ2000_() {
+    const sat = this.getSat_();
+
+    if (!sat) {
+      return;
+    }
+
+    const header = `Classic Orbit Elements Report\n-------------------------------\n${this.createHeader_(sat)}`;
+    const classicalEls = sat.toJ2000().toClassicalElements();
+    const body = '' +
+      `Epoch, ${classicalEls.epoch}\n` +
+      `Apogee, ${classicalEls.apogee.toFixed(3)} km\n` +
+      `Perigee, ${classicalEls.perigee.toFixed(3)} km\n` +
+      `Inclination, ${classicalEls.inclination.toFixed(3)}°\n` +
+      `Right Ascension, ${classicalEls.rightAscensionDegrees.toFixed(3)}°\n` +
+      `Argument of Perigee, ${classicalEls.argPerigeeDegrees.toFixed(3)}°\n` +
+      `True Anomaly, ${classicalEls.trueAnomalyDegrees.toFixed(3)}°\n` +
+      `Eccentricity, ${classicalEls.eccentricity.toFixed(3)}\n` +
+      `Period, ${classicalEls.period.toFixed(3)} min\n` +
+      `Semi-Major Axis, ${classicalEls.semimajorAxis.toFixed(3)} km\n` +
+      `Mean Motion, ${classicalEls.meanMotion.toFixed(3)} rev/day`;
+
+
+    this.writeReport_({
+      filename: `coes-${sat.sccNum}`,
+      header,
+      body,
+      columns: 2,
+      isHeaders: false,
+    });
+  }
+
+  private writeReport_({ filename, header, body, columns = 4, isHeaders = true }: ReportData) {
+    // Open a new window and write the report to it - the title of the window should be the satellite name
+    const win = window.open('text/plain', filename);
+
+    // Create an array that is columns long and fill it with 0s
+    const colWidths = new Array(columns).fill(0);
 
     if (win) {
-      const formattedReport = report
+      const formattedReport = body
         .split('\n')
         .map((line) => line.split(','))
         .map((values, idx) => values.map((value, idx2) => {
@@ -160,7 +281,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
         .map((values, idx) => {
           const row = values.join('   ');
 
-          if (idx === 0) {
+          if (idx === 0 && isHeaders) {
             // Add ---- under the entire header
             const header = values.join('   ');
             const headerUnderline = header.replace(/./gu, '-');
@@ -174,12 +295,56 @@ export class ReportsPlugin extends KeepTrackPlugin {
         })
         .join('\n');
 
-      win.document.write(`<plaintext>${reportHeader}${formattedReport}</plaintext>`);
-      win.document.title = sat.name;
-      win.history.replaceState(null, sat.name, `/${sat.name}.txt`);
+      // Create a download button at the top so you can download the report as a .txt file
+      win.document.write(`<a href="data:text/plain;charset=utf-8,${encodeURIComponent(header + formattedReport)}" download="${filename}.txt">Download Report</a><br>`);
+
+      win.document.write(`<plaintext>${header}${formattedReport}`);
+      win.document.title = filename;
+      win.history.replaceState(null, filename, `/${filename}.txt`);
     } else {
       // eslint-disable-next-line no-alert
       alert('Please allow popups for this site');
     }
+  }
+
+  private getStartTime_() {
+    const time = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+
+    time.setMilliseconds(0);
+    time.setSeconds(0);
+
+    return time;
+  }
+
+  private getSat_(): DetailedSatellite {
+    const sat = this.selectSatManager_.primarySatObj as DetailedSatellite;
+
+    if (!sat) {
+      errorManagerInstance.warn('Select a satellite first!');
+
+      return null;
+    }
+
+    if (!(sat instanceof DetailedSatellite)) {
+      errorManagerInstance.warn('Satellite is not DetailedSatellite!');
+
+      return null;
+    }
+
+    return sat;
+  }
+
+  private getSensor_(): DetailedSensor {
+    const sensorManager = keepTrackApi.getSensorManager();
+
+    if (!sensorManager.isSensorSelected()) {
+      errorManagerInstance.warn('Select a sensor first!');
+
+      return null;
+    }
+
+    const sensor = sensorManager.currentSensors[0];
+
+    return sensor;
   }
 }

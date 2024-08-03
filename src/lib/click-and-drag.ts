@@ -1,6 +1,8 @@
 import { clickDragOptions } from '@app/plugins/KeepTrackPlugin';
 
-export const clickAndDragWidth = (el: HTMLElement | null, options: clickDragOptions = {}): void => {
+export const clickAndDragWidth = (el: HTMLElement | null, options: clickDragOptions = {
+  isDraggable: true,
+}): void => {
   if (!el) {
     return;
   }

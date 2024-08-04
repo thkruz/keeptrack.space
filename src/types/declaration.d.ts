@@ -25,6 +25,7 @@ declare global {
   module '*.css';
   module '*.jpg';
   module '*.png';
+  module '*.svg';
   declare module '*.mp3';
   declare module '*.wav';
   declare module '*.flac';

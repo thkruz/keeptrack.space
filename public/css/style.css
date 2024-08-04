@@ -755,6 +755,7 @@ ul {
   left: 0px;
   transition: all 1s ease-in-out;
   transform: translateX(-100%);
+  background: var(--colorTertiaryDarken2);
 }
 
 input[type='checkbox'].css-checkbox {
@@ -1550,6 +1551,26 @@ footer {
   overflow: auto;
   z-index: 10;
   padding: 0px 5px;
+}
+
+.side-menu-settings {
+  position: relative;
+  height: 100%;
+  border-width: 0px 5px 0px 0px;
+  border-color: var(--colorTertiaryDarken3);
+  border-style: solid;
+  background: var(--colorTertiaryDarken2);
+  color: white;
+  width: 100%;
+  top: 0px;
+  bottom: 0px;
+  overflow: auto;
+  z-index: 10;
+  padding: 0px 10px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 10px;
 }
 
 .ui-slider {

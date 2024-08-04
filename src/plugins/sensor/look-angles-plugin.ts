@@ -12,27 +12,26 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 export class LookAnglesPlugin extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Look Angles';
   dependencies = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(LookAnglesPlugin.PLUGIN_NAME);
+    super(LookAnglesPlugin.name);
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
   /**
    * Flag to determine if the look angles should only show rise and set times
    */
-  private isRiseSetLookangles_ = true;
+  private isRiseSetOnly_ = true;
   /**
    * The interval between each line of look angles
    */
-  private lookanglesInterval_ = 30;
+  private angleCalculationInterval_ = 30;
   /**
-   * The length of the look angles
+   * The length of time to calculate look angles for
    */
-  private lookanglesLength_ = 2;
+  private lengthOfLookAngles_ = 2;
   /**
    * The last look angles array
    */
@@ -68,38 +67,40 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     The search range can be modified by changing the length and interval options.`;
 
   sideMenuElementName: string = 'look-angles-menu';
+  sideMenuTitle: string = 'Sensor Look Angles';
   sideMenuElementHtml: string = keepTrackApi.html`
-    <div id="look-angles-menu" class="side-menu-parent start-hidden text-select">
-        <div id="look-angles-content" class="side-menu">
-            <div class="row">
-            <h5 class="center-align">Sensor Look Angles</h5>
-            <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-            <div id="settings-look-angles">
-                <h5 class="center-align">Look Angles Settings</h5>
-                <div class="switch row">
-                <label>
-                    <input id="settings-riseset" type="checkbox" checked="true" />
-                    <span class="lever"></span>
-                    Show Only Rise and Set Times
-                </label>
-                </div>
-                <div class="input-field col s6">
-                <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated" />
-                <label for="look-anglesLength" class="active">Length (Days)</label>
-                </div>
-                <div class="input-field col s6">
-                <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles" />
-                <label for="look-anglesInterval" class="active">Interval</label>
-                </div>
-                <div class="row"></div>
-            </div>
-            <table id="looks" class="center-align striped-light centered"></table>
-            <br />
-            <center>
-                <button id="export-look-angles" class="btn btn-ui waves-effect waves-light">Export &#9658;</button>
-            </center>
-            </div>
-        </div>
+    <div class="row"></div>
+    <div class="row">
+      <div class="center-align">
+        <button id="export-look-angles" class="btn btn-ui waves-effect waves-light">Download &#9658;</button>
+      </div>
+    </div>
+    <div class="row">
+      <table id="looks" class="center-align striped-light centered"></table>
+    </div>`;
+  sideMenuSettingsHtml = keepTrackApi.html`
+    <div class="switch row">
+        <label>
+            <input id="settings-riseset" type="checkbox" checked="true" />
+            <span class="lever"></span>
+            Show Only Rise and Set Times
+        </label>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+          <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated"
+            style="text-align: center;"
+          />
+          <label for="look-anglesLength" class="active">Calculation Length (Days)</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+          <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles"
+            style="text-align: center;"
+          />
+          <label for="look-anglesInterval" class="active">Interval (Seconds)</label>
+      </div>
     </div>`;
 
   addHtml(): void {
@@ -109,12 +110,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: () => {
         getEl('look-angles-length').addEventListener('change', () => {
-          this.lookanglesLength_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
+          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
           this.refreshSideMenuData_();
         });
 
         getEl('look-angles-interval').addEventListener('change', () => {
-          this.lookanglesInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
+          this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
           this.refreshSideMenuData_();
         });
 
@@ -207,15 +208,15 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
      * const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
      * Use custom interval unless doing rise/set lookangles - then use 1 second
      */
-    const lookanglesInterval = this.isRiseSetLookangles_ ? 1 : this.lookanglesInterval_;
+    const lookanglesInterval = this.isRiseSetOnly_ ? 1 : this.angleCalculationInterval_;
 
     const looksArray = <TearrData[]>[];
     let offset = 0;
 
-    for (let i = 0; i < this.lookanglesLength_ * 24 * 60 * 60; i += lookanglesInterval) {
+    for (let i = 0; i < this.lengthOfLookAngles_ * 24 * 60 * 60; i += lookanglesInterval) {
       offset = i * 1000; // Offset in seconds (msec * 1000)
       const now = timeManagerInstance.getOffsetTimeObj(offset);
-      const looksPass = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetLookangles_);
+      const looksPass = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetOnly_);
 
       if (looksPass.time !== '') {
         looksArray.push(looksPass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
@@ -302,9 +303,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     isRiseSetChecked ??= (<HTMLInputElement>getEl('settings-riseset')).checked;
     if (isRiseSetChecked) {
-      this.isRiseSetLookangles_ = true;
+      this.isRiseSetOnly_ = true;
     } else {
-      this.isRiseSetLookangles_ = false;
+      this.isRiseSetOnly_ = false;
     }
     this.refreshSideMenuData_();
   }

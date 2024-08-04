@@ -9,11 +9,13 @@ import { shake } from '../lib/shake';
 import { slideInRight, slideOutLeft } from '../lib/slide';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
+import { SoundNames } from './sounds/SoundNames';
 
 export interface clickDragOptions {
   isDraggable?: boolean;
   minWidth?: number;
   maxWidth?: number;
+  attachedElement?: HTMLElement;
 }
 
 /**
@@ -67,10 +69,25 @@ export class KeepTrackPlugin {
   sideMenuElementName: string;
 
   /**
+   * The title of the side menu.
+   * @example 'Countries Menu'
+   */
+  sideMenuTitle: string;
+
+  /**
    * The html to use for the side menu.
    */
   sideMenuElementHtml: string;
 
+  /**
+   * The html to use for the side menu's attached settings menu.
+   */
+  sideMenuSettingsHtml: string;
+
+  /**
+   * Whether the side menu settings are open.
+   */
+  isSideMenuSettingsOpen: boolean = false;
   /**
    * The title of the help dialog.
    * @example 'Countries Menu'
@@ -216,9 +233,63 @@ export class KeepTrackPlugin {
     }
 
     if (this.sideMenuElementName && this.sideMenuElementHtml) {
-      this.addSideMenu(this.sideMenuElementHtml);
+      if (this.sideMenuSettingsHtml) {
+        const settingsBtn = `${this.sideMenuElementName}-settings-btn`;
+        const sideMenuHtmlWrapped = keepTrackApi.html`
+          <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select" style="z-index: 5;">
+            <div id="${this.sideMenuElementName}-content" class="side-menu">
+              <div class="row" style="margin-top: 5px;margin-bottom: 0px;display: flex;justify-content: space-evenly;align-items: center;flex-direction: row;flex-wrap: nowrap;">
+                <h5 class="center-align" style="margin-left: auto">${this.sideMenuTitle}</h5>
+                <button id="${settingsBtn}"
+                  class="center-align btn btn-ui waves-effect waves-light"
+                  style="padding: 2px; margin: 0px;margin-left: auto; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
+                  type="button">
+                  <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
+                    settings
+                  </i>
+                </button>
+              </div>
+              <li class="divider" style="padding: 2px !important;"></li>
+              ${this.sideMenuElementHtml}
+            </div>
+          </div>`;
+
+        this.addSideMenu(sideMenuHtmlWrapped);
+      } else {
+        this.addSideMenu(this.sideMenuElementHtml);
+      }
     } else if (this.sideMenuElementName || this.sideMenuElementHtml) {
       throw new Error(`${this.PLUGIN_NAME} side menu element name and html must both be defined.`);
+    }
+
+    if (this.sideMenuSettingsHtml) {
+      const sideMenuHtmlWrapped = keepTrackApi.html`
+        <div id="${this.sideMenuElementName}-settings" class="side-menu-parent start-hidden text-select" style="z-index: 3;">
+          <div id="${this.sideMenuElementName}-content" class="side-menu-settings" style="padding: 0px 10px;">
+            <div class="row"></div>
+            ${this.sideMenuSettingsHtml}
+          </div>
+        </div>
+      `;
+
+      this.addSideMenu(sideMenuHtmlWrapped);
+
+      keepTrackApi.register({
+        event: KeepTrackApiEvents.uiManagerInit,
+        cbName: this.PLUGIN_NAME,
+        cb: () => {
+          getEl(`${this.sideMenuElementName}-settings-btn`).addEventListener('click', () => {
+            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+            if (this.isSideMenuSettingsOpen) {
+              this.closeSettingsMenu();
+              getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkStandby)';
+            } else {
+              this.openSettingsMenu();
+              getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkNormal)';
+            }
+          });
+        },
+      });
     }
 
     if (this.submitCallback) {
@@ -286,7 +357,11 @@ export class KeepTrackPlugin {
     }
 
     if (this.sideMenuElementName) {
-      this.registerHideSideMenu(this.bottomIconElementName, this.sideMenuElementName);
+      this.registerHideSideMenu(this.bottomIconElementName, this.closeSideMenu.bind(this));
+    }
+
+    if (this.sideMenuSettingsHtml) {
+      this.registerHideSideMenu(this.bottomIconElementName, this.closeSettingsMenu.bind(this));
     }
 
     if (this.rmbCallback) {
@@ -562,8 +637,27 @@ export class KeepTrackPlugin {
     slideInRight(getEl(this.sideMenuElementName), 1000);
   }
 
+  openSettingsMenu() {
+    const settingsMenuElement = getEl(`${this.sideMenuElementName}-settings`);
+    const sideMenuElement = getEl(this.sideMenuElementName);
+
+    if (settingsMenuElement) {
+      this.isSideMenuSettingsOpen = true;
+      settingsMenuElement.style.left = `${sideMenuElement.getBoundingClientRect().right}px`;
+      slideInRight(settingsMenuElement, 1000);
+    }
+  }
+
   closeSideMenu() {
-    slideOutLeft(getEl(this.sideMenuElementName), 1000);
+    const settingsMenuElement = getEl(`${this.sideMenuElementName}`);
+
+    slideOutLeft(settingsMenuElement, 1000);
+  }
+
+  closeSettingsMenu() {
+    this.isSideMenuSettingsOpen = false;
+    getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkStandby)';
+    slideOutLeft(getEl(`${this.sideMenuElementName}-settings`), 1500, null, -300);
   }
 
   registerSubmitButtonClicked(callback: () => void = null) {
@@ -593,6 +687,9 @@ export class KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
+        if (this.sideMenuSettingsHtml) {
+          opts.attachedElement = getEl(`${this.sideMenuElementName}-settings`);
+        }
         clickAndDragWidth(getEl(this.sideMenuElementName), opts);
       },
     });
@@ -622,14 +719,14 @@ export class KeepTrackPlugin {
   /**
    * Registers a callback function to hide the side menu and deselect the bottom icon element.
    * @param bottomIconElementName The name of the bottom icon element to deselect.
-   * @param sideMenuElementName The name of the side menu element to hide.
+   * @param slideCb The callback function to run when the side menu is hidden.
    */
-  registerHideSideMenu(bottomIconElementName: string, sideMenuElementName: string): void {
+  registerHideSideMenu(bottomIconElementName: string, slideCb: () => void): void {
     keepTrackApi.register({
       event: KeepTrackApiEvents.hideSideMenus,
       cbName: this.PLUGIN_NAME,
       cb: (): void => {
-        slideOutLeft(getEl(sideMenuElementName), 1000);
+        slideCb();
         getEl(bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
         this.isMenuButtonActive = false;
       },

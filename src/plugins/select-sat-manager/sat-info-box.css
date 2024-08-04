@@ -19,9 +19,17 @@
 
 #sat-add-watchlist,
 #sat-remove-watchlist {
-  width: 15px;
-  height: 15px;
+  width: 25px;
+  height: 25px;
   cursor: pointer;
+}
+
+#sat-add-watchlist {
+  filter: hue-rotate(275deg) brightness(1.2);
+}
+
+#sat-remove-watchlist {
+  filter: invert(52%) sepia(130%) saturate(7323%) hue-rotate(353deg) brightness(100%) contrast(86%);
 }
 
 .sat-info-section-header {

@@ -15,8 +15,8 @@ import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { StringExtractor } from '@app/static/string-extractor';
-import addPng from '@public/img/add.png';
-import removePng from '@public/img/remove.png';
+import addPng from '@public/img/icons/add.png';
+import removePng from '@public/img/icons/remove.png';
 import Draggabilly from 'draggabilly';
 import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -566,11 +566,12 @@ export class SatInfoBox extends KeepTrackPlugin {
   };
 
   private addRemoveWatchlist_() {
-    const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
+    const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
 
     if (watchlistPlugin) {
       const id = this.selectSatManager_.selectedSat;
 
+      keepTrackApi.getSoundManager().play(SoundNames.CLICK);
       if (watchlistPlugin.isOnWatchlist(id)) {
         watchlistPlugin.removeSat(id);
       } else {
@@ -857,17 +858,16 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl('ui-wrapper').insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-            <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
-              <div id="sat-info-top-links">
-                <div id="sat-info-title" class="center-text sat-info-section-header">
-                  <img id="sat-add-watchlist" src="${addPng}"/>
-                  <img id="sat-remove-watchlist" src="${removePng}"/>
-                  <span id="sat-info-title-name">
-                    This is a title
-                  </span>
-                </div>
-                ${
-  getEl('search')
+      <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
+        <div id="sat-info-top-links">
+          <div id="sat-info-title" class="center-text sat-info-section-header">
+            <img id="sat-add-watchlist" src="${addPng}"/>
+            <img id="sat-remove-watchlist" src="${removePng}"/>
+            <span id="sat-info-title-name">
+              This is a title
+            </span>
+          </div>
+          ${getEl('search')
     ? keepTrackApi.html`
                   <div id="all-objects-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
                   data-tooltip="Find Related Objects">Find all objects from this launch...</div>

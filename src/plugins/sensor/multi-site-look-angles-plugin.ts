@@ -14,13 +14,28 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Multi Site Look Angles';
+  static readonly PLUGIN_NAME = 'Multi Site Look Angles';
   dependencies = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
+
+  // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
+  private sensorList = keepTrackApi.getSensorManager().sensorListSsn.concat(
+    keepTrackApi.getSensorManager().sensorListMw,
+    keepTrackApi.getSensorManager().sensorListMda,
+    keepTrackApi.getSensorManager().sensorListLeoLabs,
+    keepTrackApi.getSensorManager().sensorListEsoc,
+    keepTrackApi.getSensorManager().sensorListRus,
+    keepTrackApi.getSensorManager().sensorListPrc,
+    keepTrackApi.getSensorManager().sensorListOther,
+  );
 
   constructor() {
     super(MultiSiteLookAnglesPlugin.PLUGIN_NAME);
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    // remove duplicates in sensorList
+    this.sensorList = this.sensorList.filter(
+      (sensor, index, self) => index === self.findIndex((t) => t.uiName === sensor.uiName),
+    );
   }
 
   isRequireSatelliteSelected: boolean = true;
@@ -37,7 +52,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   lookanglesLength = 1; // Days
   lookanglesInterval = <Seconds>30;
-  disabledSensors: DetailedSensor[] = [];
+  disabledSensors: DetailedSensor[] = this.sensorList.filter((s) =>
+    !keepTrackApi.getSensorManager().sensorListMw.includes(s),
+  );
 
   bottomIconElementName = 'multi-site-look-angles-icon';
   bottomIconLabel = 'Multi-Site Looks';
@@ -63,21 +80,23 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     Clicking on a row in the table will select the sensor and change the simulation time to the time of the look angle.`;
 
   sideMenuElementName: string = 'multi-site-look-angles-menu';
+  sideMenuTitle: string = 'Multi-Sensor Look Angles';
   sideMenuElementHtml: string = keepTrackApi.html`
-    <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select">
-        <div id="multi-site-look-angles-content" class="side-menu">
-        <div class="row">
-            <h5 class="center-align">Multi-Sensor Look Angles</h5>
-            <div id="multi-site-look-angles-sensor-list">
-            </div>
-            <table id="multi-site-look-angles-table" class="center-align striped-light centered"></table>
-            <br />
-            <center>
-            <button id="multi-site-look-angles-export" class="btn btn-ui waves-effect waves-light">Export &#9658;</button>
-            </center>
-        </div>
-        </div>
+    <div class="row"></div>
+    <div class="row">
+      <div class="center-align">
+        <button id="multi-site-look-angles-export" class="btn btn-ui waves-effect waves-light">Download &#9658;</button>
+      </div>
+    </div>
+    <div class="row">
+      <table id="multi-site-look-angles-table" class="center-align striped-light centered"></table>
     </div>`;
+  sideMenuSettingsHtml: string = keepTrackApi.html`
+    <div class="row" style="margin: 0 10px;">
+      <div id="multi-site-look-angles-sensor-list">
+      </div>
+    </div>`;
+  sideMenuSettingsWidth: number = 350;
 
   addHtml(): void {
     super.addHtml();
@@ -157,8 +176,8 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
           const allSensors: DetailedSensor[] = [];
 
-          for (const sensor of keepTrackApi.getSensorManager().sensorListUS) {
-            if (!sensor.shortName) {
+          for (const sensor of this.sensorList) {
+            if (!sensor.objName) {
               continue;
             }
 
@@ -171,7 +190,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
             allSensors.push(sensor);
 
-            sensorButton.innerText = sensor.shortName;
+            sensorButton.innerText = sensor.uiName ?? sensor.shortName ?? sensor.objName;
             sensorButton.addEventListener('click', () => {
               if (sensorButton.classList.contains('btn-red')) {
                 sensorButton.classList.remove('btn-red');
@@ -329,7 +348,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       tdR = tr.insertCell();
       tdR.appendChild(document.createTextNode(entry.rng.toFixed(0)));
       tdS = tr.insertCell();
-      tdS.appendChild(document.createTextNode(sensor.shortName ?? ''));
+      tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
       // TODO: Future feature
       tr.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());

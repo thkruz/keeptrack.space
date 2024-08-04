@@ -113,13 +113,6 @@
   #multi-site-look-angles-menu {
     width: 450px;
   }
-  #multi-site-look-angles-sensor-list {
-    display: grid;
-    grid-template-columns: minmax(70px, max-content) repeat(auto-fill, 70px);
-    justify-content: space-evenly;
-    justify-items: stretch;
-    grid-row-gap: 5px;
-  }
   #findByLooks .row {
     margin: 0px;
   }

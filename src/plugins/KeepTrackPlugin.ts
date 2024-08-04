@@ -85,6 +85,11 @@ export class KeepTrackPlugin {
   sideMenuSettingsHtml: string;
 
   /**
+   * The width of the side menu's settings sub-menu.
+   */
+  sideMenuSettingsWidth: number = 300;
+
+  /**
    * Whether the side menu settings are open.
    */
   isSideMenuSettingsOpen: boolean = false;
@@ -235,8 +240,9 @@ export class KeepTrackPlugin {
     if (this.sideMenuElementName && this.sideMenuElementHtml) {
       if (this.sideMenuSettingsHtml) {
         const settingsBtn = `${this.sideMenuElementName}-settings-btn`;
+        const menuWidthStr = `${this.sideMenuSettingsWidth.toString()} px !important`;
         const sideMenuHtmlWrapped = keepTrackApi.html`
-          <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select" style="z-index: 5;">
+          <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select" style="z-index: 5; width: ${menuWidthStr};">
             <div id="${this.sideMenuElementName}-content" class="side-menu">
               <div class="row" style="margin-top: 5px;margin-bottom: 0px;display: flex;justify-content: space-evenly;align-items: center;flex-direction: row;flex-wrap: nowrap;">
                 <h5 class="center-align" style="margin-left: auto">${this.sideMenuTitle}</h5>

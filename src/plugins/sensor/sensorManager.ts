@@ -248,6 +248,68 @@ export class SensorManager {
     return null;
   }
 
+  sensorListMw = Object.values(sensors).filter((sensor: DetailedSensor) =>
+    [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB].includes(sensor),
+  );
+  sensorListRus = Object.values(sensors).filter((sensor: DetailedSensor) =>
+    [
+      sensors.OLED,
+      sensors.OLEV,
+      sensors.PEC,
+      sensors.MISD,
+      sensors.MISV,
+      sensors.LEKV,
+      sensors.ARMV,
+      sensors.KALV,
+      sensors.BARV,
+      sensors.YENV,
+      sensors.ORSV,
+      sensors.STO,
+      sensors.NAK,
+    ].includes(sensor),
+  );
+  sensorListPrc = Object.values(sensors).filter((sensor: DetailedSensor) => [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO].includes(sensor));
+  sensorListLeoLabs = Object.values(sensors).filter((sensor: DetailedSensor) =>
+    [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR].includes(sensor),
+  );
+  sensorListEsoc = Object.values(sensors).filter((sensor: DetailedSensor) =>
+    [
+      sensors.GRV,
+      sensors.TIR,
+      sensors.GES,
+      sensors.NRC,
+      sensors.PDM,
+      sensors.TRO,
+      sensors.Tenerife,
+      sensors.ZimLAT,
+      sensors.ZimSMART,
+      sensors.Tromso,
+      sensors.Kiruna,
+      sensors.Sodankyla,
+      sensors.Svalbard,
+    ].includes(sensor),
+  );
+  sensorListOther = Object.values(sensors).filter((sensor: DetailedSensor) => [sensors.ROC, sensors.MLS, sensors.PO, sensors.LSO, sensors.MAY].includes(sensor));
+  sensorListMda = Object.values(sensors).filter((sensor: DetailedSensor) =>
+    [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor),
+  );
+  sensorListSsn = Object.values(sensors).filter((sensor) => [
+    sensors.EGLAFB,
+    sensors.KWAJSPF,
+    sensors.GEODDSDGC,
+    sensors.GEODDSMAU,
+    sensors.GEODDSSOC,
+    sensors.KWAJALT,
+    sensors.KWAJMMW,
+    sensors.KWAJALC,
+    sensors.KWAJTDX,
+    sensors.MITMIL,
+    sensors.RAFASC,
+    sensors.GLBII,
+    sensors.HOLCBAND,
+    sensors.HOLSST,
+  ].includes(sensor));
+
   setSensor(selectedSensor: DetailedSensor | string | null, sensorId?: number): void {
     if (!selectedSensor) {
       selectedSensor = SensorManager.getSensorFromsensorId(sensorId);
@@ -261,64 +323,26 @@ export class SensorManager {
       this.currentSensors = [];
     } else if (selectedSensor === 'SSN') {
       this.sensorTitle = 'All Space Surveillance Network Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor) => sensor.country === 'United States' || sensor.country === 'United Kingdom' || sensor.country === 'Norway');
+      this.currentSensors = this.sensorListSsn;
       SensorManager.updateSensorUiStyling(this.currentSensors);
     } else if (selectedSensor === 'NATO-MW') {
       this.sensorTitle = 'All Missile Warning Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB].includes(sensor),
-      );
+      this.currentSensors = this.sensorListMw;
     } else if (selectedSensor === 'RUS-ALL') {
       this.sensorTitle = 'All Russian Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [
-          sensors.OLED,
-          sensors.OLEV,
-          sensors.PEC,
-          sensors.MISD,
-          sensors.MISV,
-          sensors.LEKV,
-          sensors.ARMV,
-          sensors.KALV,
-          sensors.BARV,
-          sensors.YENV,
-          sensors.ORSV,
-          sensors.STO,
-          sensors.NAK,
-        ].includes(sensor),
-      );
+      this.currentSensors = this.sensorListRus;
     } else if (selectedSensor === 'PRC-ALL') {
       this.sensorTitle = 'All Chinese Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) => [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO].includes(sensor));
+      this.currentSensors = this.sensorListPrc;
     } else if (selectedSensor === 'LEO-LABS') {
       this.sensorTitle = 'All LEO Labs Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR].includes(sensor),
-      );
+      this.currentSensors = this.sensorListLeoLabs;
     } else if (selectedSensor === 'ESOC-ALL') {
-      this.sensorTitle = 'All Missile Defense Agency Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [
-          sensors.GRV,
-          sensors.TIR,
-          sensors.GES,
-          sensors.NRC,
-          sensors.PDM,
-          sensors.TRO,
-          sensors.Tenerife,
-          sensors.ZimLAT,
-          sensors.ZimSMART,
-          sensors.Tromso,
-          sensors.Kiruna,
-          sensors.Sodankyla,
-          sensors.Svalbard,
-        ].includes(sensor),
-      );
+      this.sensorTitle = 'All ESOC Sensors';
+      this.currentSensors = this.sensorListEsoc;
     } else if (selectedSensor === 'MD-ALL') {
       this.sensorTitle = 'All Missile Defense Agency Sensors';
-      this.currentSensors = Object.values(sensors).filter((sensor: DetailedSensor) =>
-        [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor),
-      );
+      this.currentSensors = this.sensorListMda;
     } else if ((<DetailedSensor>selectedSensor)?.name === 'Custom Sensor') {
       this.currentSensors = [<DetailedSensor>selectedSensor];
 

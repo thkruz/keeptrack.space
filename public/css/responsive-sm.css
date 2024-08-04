@@ -87,4 +87,12 @@
   #polar-plot {
     width: 100%;
   }
+
+  #multi-site-look-angles-sensor-list {
+    display: grid;
+    justify-content: space-evenly;
+    justify-items: stretch;
+    grid-row-gap: 10px;
+    grid-column-gap: 10px;
+  }
 }

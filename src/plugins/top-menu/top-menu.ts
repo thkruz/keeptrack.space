@@ -5,9 +5,9 @@ import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import fullscreenIconPng from '@public/img/fullscreen-icon.png';
 import helpPng from '@public/img/help.png';
 import findPng from '@public/img/icons/find.png';
+import layersIconPng from '@public/img/icons/layers-icon.png';
 import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
-import layersIconPng from '@public/img/layers-icon.png';
 import { errorManagerInstance } from '../../singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

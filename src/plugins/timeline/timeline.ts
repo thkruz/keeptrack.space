@@ -2,14 +2,13 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import mapPng from '@public/img/icons/map.png';
+import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
 import { sensors } from '@app/catalogs/sensors';
 import { SatMath } from '@app/static/sat-math';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { MultiSiteLookAnglesPlugin } from '../sensor/multi-site-look-angles-plugin';
 import { SensorManager } from '../sensor/sensorManager';
 
 interface Pass {
@@ -23,20 +22,38 @@ interface SensorPasses {
 }
 
 export class Timeline extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Timeline';
   dependencies = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
   private canvas_: HTMLCanvasElement;
   private ctx_: CanvasRenderingContext2D;
   private canvasStatic_: HTMLCanvasElement;
   private ctxStatic_: CanvasRenderingContext2D;
-  multiSitePlugin_: MultiSiteLookAnglesPlugin;
-  drawEvents_: { [key: string]: (mouseX: number, mouseY: number) => boolean } = {};
+  private drawEvents_: { [key: string]: (mouseX: number, mouseY: number) => boolean } = {};
+  private allSensorLists_ = keepTrackApi.getSensorManager().sensorListSsn.concat(
+    keepTrackApi.getSensorManager().sensorListMw,
+    keepTrackApi.getSensorManager().sensorListMda,
+    keepTrackApi.getSensorManager().sensorListLeoLabs,
+    keepTrackApi.getSensorManager().sensorListEsoc,
+    keepTrackApi.getSensorManager().sensorListRus,
+    keepTrackApi.getSensorManager().sensorListPrc,
+    keepTrackApi.getSensorManager().sensorListOther,
+  );
+  disabledSensors_: DetailedSensor[] = this.allSensorLists_.filter((s) =>
+    !keepTrackApi.getSensorManager().sensorListMw.includes(s),
+  );
+  private lengthOfLookAngles_ = 6 as Hours;
+  private lengthOfBadPass_ = 120 as Seconds;
+  private lengthOfAvgPass_ = 240 as Seconds;
+  private angleCalculationInterval_ = <Seconds>30;
 
   constructor() {
-    super(Timeline.PLUGIN_NAME);
+    super(Timeline.name);
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
-    this.multiSitePlugin_ = keepTrackApi.getPlugin(MultiSiteLookAnglesPlugin);
+
+    // remove duplicates in sensorList
+    this.allSensorLists_ = this.allSensorLists_.filter(
+      (sensor, index, self) => index === self.findIndex((t) => t.uiName === sensor.uiName),
+    );
   }
 
   isRequireSatelliteSelected = true;
@@ -44,7 +61,7 @@ export class Timeline extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
 
   bottomIconElementName = 'menu-timeline';
-  bottomIconImg = mapPng;
+  bottomIconImg = viewTimelinePng;
   bottomIconLabel = 'Timeline';
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) {
@@ -58,11 +75,63 @@ export class Timeline extends KeepTrackPlugin {
   helpBody = keepTrackApi.html`The timeline menu displays a chart of satellite passes across multiple sensors.`;
 
   sideMenuElementName = 'timeline-menu';
+  sideMenuTitle: string = 'Timeline';
   sideMenuElementHtml = keepTrackApi.html`
-    <div id="timeline-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
+    <div class="row"></div>
+    <div class="row" style="margin: 0;">
       <canvas id="timeline-canvas"></canvas>
       <canvas id="timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
+  sideMenuSettingsHtml: string = keepTrackApi.html`
+    <div class="switch row">
+      <label>
+        <input id="settings-riseset" type="checkbox" checked="true" />
+        <span class="lever"></span>
+        Show Only Rise and Set Times
+      </label>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
+          style="text-align: center;"
+        />
+        <label for="timeline-setting-total-length" class="active">Calculation Length (Hours)</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
+          style="text-align: center;"
+        />
+        <label for="timeline-setting-bad-length" class="active">Bad Pass Length (Seconds)</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+        <input id="timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
+          style="text-align: center;"
+        />
+        <label for="timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
+      </div>
+    </div>
+    <div class="row" style="margin: 0 10px;">
+      <div id="multi-site-look-angles-sensor-list">
+      </div>
+    </div>`;
+  sideMenuSettingsOptions = {
+    width: 350,
+    leftOffset: 0,
+    zIndex: 10,
+  };
+  downloadIconCb = () => {
+    const canvas = document.getElementById('timeline-canvas') as HTMLCanvasElement;
+    const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+    const link = document.createElement('a');
+
+    link.href = image;
+    link.download = `sat-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-timeline.png`;
+    link.click();
+  };
 
   addHtml(): void {
     super.addHtml();
@@ -76,8 +145,27 @@ export class Timeline extends KeepTrackPlugin {
         this.canvasStatic_ = <HTMLCanvasElement>getEl('timeline-canvas-static');
         this.ctx_ = this.canvas_.getContext('2d');
         this.ctxStatic_ = this.canvasStatic_.getContext('2d');
+
+        getEl('timeline-setting-total-length').addEventListener('change', () => {
+          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('timeline-setting-total-length')).value) as Hours;
+          this.ctxStatic_.reset();
+          this.updateTimeline();
+        });
+
+        getEl('timeline-setting-bad-length').addEventListener('change', () => {
+          this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('timeline-setting-bad-length')).value) as Seconds;
+          this.ctxStatic_.reset();
+          this.updateTimeline();
+        });
+
+        getEl('timeline-setting-avg-length').addEventListener('change', () => {
+          this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('timeline-setting-avg-length')).value) as Seconds;
+          this.ctxStatic_.reset();
+          this.updateTimeline();
+        });
       },
     });
+
   }
 
   addJs(): void {
@@ -106,7 +194,7 @@ export class Timeline extends KeepTrackPlugin {
 
       const satellite = this.selectSatManager_.getSelectedSat() as DetailedSatellite;
       const sensors_ = [sensors.BLEAFB, sensors.CODSFS, sensors.MITMIL, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB];
-      const sensorPasses = this.calculatePasses(satellite, sensors_);
+      const sensorPasses = this.calculatePasses_(satellite, sensors_);
 
       this.drawTimeline(sensorPasses);
     } catch (e) {
@@ -114,7 +202,7 @@ export class Timeline extends KeepTrackPlugin {
     }
   }
 
-  private calculatePasses(satellite: DetailedSatellite, sensors: DetailedSensor[]): SensorPasses[] {
+  private calculatePasses_(satellite: DetailedSatellite, sensors: DetailedSensor[]): SensorPasses[] {
     const sensorPasses: SensorPasses[] = [];
 
     for (const sensor of sensors) {
@@ -131,14 +219,14 @@ export class Timeline extends KeepTrackPlugin {
       SensorManager.updateSensorUiStyling([sensor]);
       let offset = 0;
 
-      const secondsIn24Hours = 24 * 60 * 60;
+      const durationInSeconds = this.lengthOfLookAngles_ * 60 * 60;
       let isInView = false;
       let isEnterView = false;
       let isExitView = false;
       let startTime = null;
 
 
-      for (let i = 0; i < secondsIn24Hours; i += 30) {
+      for (let i = 0; i < durationInSeconds; i += this.angleCalculationInterval_) {
         // 5second Looks
         offset = i * 1000; // Offset in seconds (msec * 1000)
         const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
@@ -158,7 +246,7 @@ export class Timeline extends KeepTrackPlugin {
           i += satellite.period * 60 * 0.75;
         }
 
-        if ((isEnterView && isExitView) || (isEnterView && i === secondsIn24Hours - 30)) {
+        if ((isEnterView && isExitView) || (isEnterView && i === durationInSeconds - this.angleCalculationInterval_)) {
           sensorPass.passes.push({
             start: startTime,
             end: now,
@@ -211,12 +299,12 @@ export class Timeline extends KeepTrackPlugin {
     this.drawEvents_ = {};
 
     const leftOffset = this.canvas_.width * 0.1;
-    const topOffset = this.canvas_.height * 0.05;
+    const topOffset = 0;
     const width = this.canvas_.width * 0.8;
-    const height = this.canvas_.height * 0.8;
+    const height = this.canvas_.height * 0.75;
     const timeManager = keepTrackApi.getTimeManager();
     const startTime = timeManager.simulationTimeObj.getTime();
-    const endTime = startTime + 24 * 60 * 60 * 1000; // 24 hours from now
+    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000; // 24 hours from now
 
     // clear canvas
     this.ctx_.reset();
@@ -236,7 +324,7 @@ export class Timeline extends KeepTrackPlugin {
     this.ctx_.stroke();
 
     // Draw hour markers
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i <= this.lengthOfLookAngles_; i++) {
       const x = leftOffset + ((i * 60 * 60 * 1000) * xScale);
 
       this.ctx_.lineWidth = 5; // Increase line width to make it thicker
@@ -255,15 +343,11 @@ export class Timeline extends KeepTrackPlugin {
 
       let hour = timeManager.simulationTimeObj.getUTCHours();
 
-      if (hour + i > 23) {
-        hour = hour + i - 24;
-      } else {
-        hour += i;
-      }
+      hour = (hour + i) % 24;
 
-      this.ctx_.font = '12px Consolas';
+      this.ctx_.font = '14px Consolas';
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-      this.ctx_.fillText(`${hour}h`, x - 10, topOffset + height - 5);
+      this.ctx_.fillText(`${hour}h`, x - 10, topOffset + height);
     }
 
     // Draw passes for each sensor
@@ -272,7 +356,7 @@ export class Timeline extends KeepTrackPlugin {
 
       // Draw sensor name
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-      this.ctx_.font = '12px Consolas';
+      this.ctx_.font = '14px Consolas';
       this.ctx_.fillText(sensorPass.sensor.shortName, leftOffset - 30, y + 5);
 
       // Draw passes
@@ -284,9 +368,9 @@ export class Timeline extends KeepTrackPlugin {
 
         const passLength = (passEnd - passStart) / MILLISECONDS_PER_SECOND;
 
-        if (passLength < 120) {
+        if (passLength < this.lengthOfBadPass_) {
           this.ctx_.fillStyle = 'rgb(255, 42, 4)';
-        } else if (passLength < 240) {
+        } else if (passLength < this.lengthOfAvgPass_) {
           this.ctx_.fillStyle = 'rgb(252, 232, 58)';
         } else {
           this.ctx_.fillStyle = 'rgb(86, 240, 0)';
@@ -303,7 +387,7 @@ export class Timeline extends KeepTrackPlugin {
             // Calculate width of box based on text
             const text = `${sensorPass.sensor.shortName}: ${startTime} - ${endTime}`;
 
-            this.ctx_.font = '12px Consolas';
+            this.ctx_.font = '14px Consolas';
 
             const boxWidth = this.ctx_.measureText(text).width;
 

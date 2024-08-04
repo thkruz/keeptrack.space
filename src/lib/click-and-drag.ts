@@ -23,7 +23,7 @@ export const clickAndDragWidth = (el: HTMLElement | null, options: clickDragOpti
     // create new element on right edge
     const edgeEl = createElWidth_(el);
 
-    addEventsWidth_(edgeEl, el, width, minWidth, maxWidth, options.attachedElement);
+    addEventsWidth_(edgeEl, el, width, minWidth, maxWidth, options.attachedElement, options.leftOffset);
   }
 };
 
@@ -39,7 +39,7 @@ export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback
   addEventsHeight_(edgeEl, el, callback, maxHeight);
 };
 
-const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number, attachedElement?: HTMLElement) => {
+const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number, attachedElement?: HTMLElement, leftOffset?: number) => {
   let startX: number;
   let startWidth: number;
 
@@ -72,7 +72,7 @@ const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number,
         width = width > maxWidth ? maxWidth : width;
         el.style.width = `${width}px`;
 
-        if (attachedElement) {
+        if (attachedElement && !leftOffset) {
           attachedElement.style.left = `${el.getBoundingClientRect().right}px`;
         }
       });

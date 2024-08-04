@@ -22,6 +22,7 @@ export const generateConfig = (env, isWatch) => {
    * @type {webpack.Configuration[]}
    */
   const webpackConfig = [];
+
   env ??= 'production';
 
   let baseConfig = getBaseConfig(dirName);
@@ -71,9 +72,11 @@ export const generateConfig = (env, isWatch) => {
 
   // split entry points main, webworkers, and possibly analysis tools
   const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
+
   webpackConfig.push(mainConfig);
 
   const exampleConfig = getMainConfig(baseConfig, dirName, 'dist', '../../');
+
   exampleConfig.plugins = [
     new webpack.ProvidePlugin({
       '$': 'jquery',
@@ -84,20 +87,22 @@ export const generateConfig = (env, isWatch) => {
       beforeCompile: true,
     }),
   ];
-  const examples = readdirSync(`./public/examples`, { withFileTypes: true });
+  const examples = readdirSync('./public/examples', { withFileTypes: true });
+
   examples.forEach((example) => {
     if (!example.isDirectory()) {
       exampleConfig.plugins.push(
         new HtmlWebpackPlugin({
           filename: `../examples/${example.name}`,
           template: `./public/examples/${example.name}`,
-        })
+        }),
       );
     }
   });
   webpackConfig.push(exampleConfig);
 
   const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
+
   webpackConfig.push(webWorkerConfig);
 
   return webpackConfig;
@@ -145,7 +150,7 @@ const getBaseConfig = (dirName) => ({
       },
       {
         test: /\.css$/iu,
-        include: [/src/u, /public/u],
+        include: [/node_modules/u, /src/u, /public/u],
         use: ['style-loader', 'css-loader'],
         generator: {
           filename: './css/[name][ext]',
@@ -216,13 +221,14 @@ const getNonEmbedConfig = (baseConfig, env) => {
     new HtmlWebpackPlugin({
       filename: '../index.html',
       template: './public/index.html',
-    })
+    }),
   );
   baseConfig.module.rules.push({
     test: /\.(?:woff|woff2|eot|ttf|otf)$/iu,
     include: [/src/u],
     type: 'asset/resource',
   });
+
   return baseConfig;
 };
 

@@ -12,10 +12,27 @@ import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { SoundNames } from './sounds/SoundNames';
 
 export interface clickDragOptions {
+  leftOffset?: number;
   isDraggable?: boolean;
   minWidth?: number;
   maxWidth?: number;
   attachedElement?: HTMLElement;
+}
+
+interface SideMenuSettingsOptions {
+  /**
+   * The width of the side menu's settings sub-menu.
+   */
+  width: number;
+  /**
+   * Override for the left offset of the side menu's settings sub-menu.
+   * If this is not set then it will default to the right edge of the side menu.
+   */
+  leftOffset?: number;
+  /**
+   * The z-index of the side menu's settings sub-menu.
+   */
+  zIndex: number;
 }
 
 /**
@@ -84,10 +101,17 @@ export class KeepTrackPlugin {
    */
   sideMenuSettingsHtml: string;
 
+  sideMenuSettingsOptions: SideMenuSettingsOptions = {
+    width: 300,
+    leftOffset: null,
+    zIndex: 5,
+  };
+
   /**
-   * The width of the side menu's settings sub-menu.
+   * The callback to run when the download icon is clicked.
+   * Download icon is automatically added if this is defined.
    */
-  sideMenuSettingsWidth: number = 300;
+  downloadIconCb: () => void = null;
 
   /**
    * Whether the side menu settings are open.
@@ -227,6 +251,8 @@ export class KeepTrackPlugin {
       throw new Error(`${this.PLUGIN_NAME} HTML already added.`);
     }
 
+    this.sideMenuSettingsOptions.leftOffset = typeof this.sideMenuSettingsOptions.leftOffset === 'number' ? this.sideMenuSettingsOptions.leftOffset : null;
+
     if (this.bottomIconElementName || this.bottomIconLabel) {
       if (!this.bottomIconElementName || !this.bottomIconLabel) {
         throw new Error(`${this.PLUGIN_NAME} bottom icon element name, image, and label must all be defined.`);
@@ -239,26 +265,7 @@ export class KeepTrackPlugin {
 
     if (this.sideMenuElementName && this.sideMenuElementHtml) {
       if (this.sideMenuSettingsHtml) {
-        const settingsBtn = `${this.sideMenuElementName}-settings-btn`;
-        const menuWidthStr = `${this.sideMenuSettingsWidth.toString()} px !important`;
-        const sideMenuHtmlWrapped = keepTrackApi.html`
-          <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select" style="z-index: 5; width: ${menuWidthStr};">
-            <div id="${this.sideMenuElementName}-content" class="side-menu">
-              <div class="row" style="margin-top: 5px;margin-bottom: 0px;display: flex;justify-content: space-evenly;align-items: center;flex-direction: row;flex-wrap: nowrap;">
-                <h5 class="center-align" style="margin-left: auto">${this.sideMenuTitle}</h5>
-                <button id="${settingsBtn}"
-                  class="center-align btn btn-ui waves-effect waves-light"
-                  style="padding: 2px; margin: 0px;margin-left: auto; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
-                  type="button">
-                  <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
-                    settings
-                  </i>
-                </button>
-              </div>
-              <li class="divider" style="padding: 2px !important;"></li>
-              ${this.sideMenuElementHtml}
-            </div>
-          </div>`;
+        const sideMenuHtmlWrapped = this.generateSideMenuHtml_();
 
         this.addSideMenu(sideMenuHtmlWrapped);
       } else {
@@ -270,7 +277,7 @@ export class KeepTrackPlugin {
 
     if (this.sideMenuSettingsHtml) {
       const sideMenuHtmlWrapped = keepTrackApi.html`
-        <div id="${this.sideMenuElementName}-settings" class="side-menu-parent start-hidden text-select" style="z-index: 3;">
+        <div id="${this.sideMenuElementName}-settings" class="side-menu-parent start-hidden text-select" style="z-index: ${this.sideMenuSettingsOptions.zIndex.toString()};">
           <div id="${this.sideMenuElementName}-content" class="side-menu-settings" style="padding: 0px 10px;">
             <div class="row"></div>
             ${this.sideMenuSettingsHtml}
@@ -294,6 +301,13 @@ export class KeepTrackPlugin {
               getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkNormal)';
             }
           });
+
+          if (this.downloadIconCb) {
+            getEl(`${this.sideMenuElementName}-download-btn`).addEventListener('click', () => {
+              keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
+              this.downloadIconCb();
+            });
+          }
         },
       });
     }
@@ -344,6 +358,49 @@ export class KeepTrackPlugin {
    * Whether the context menu opens when a satellite is clicked
    */
   isRmbOnSat: boolean = false;
+
+  private generateSideMenuHtml_() {
+    const menuWidthStr = `${this.sideMenuSettingsOptions.width.toString()} px !important`;
+    const downloadIconHtml = this.downloadIconCb ? keepTrackApi.html`
+      <button id="${this.sideMenuElementName}-download-btn";
+        class="center-align btn btn-ui waves-effect waves-light"
+        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
+        type="button">
+        <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
+          file_download
+        </i>
+      </button>
+    ` : '';
+    const settingsIconHtml = keepTrackApi.html`
+      <button id="${this.sideMenuElementName}-settings-btn"
+        class="center-align btn btn-ui waves-effect waves-light"
+        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
+        type="button">
+        <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
+          settings
+        </i>
+      </button>`;
+    const spacerDiv = keepTrackApi.html`<div style="width: 30px; height: 30px; display: block; margin: 0px 5px 0px 0px;"></div>`;
+
+    const sideMenuHtmlWrapped = keepTrackApi.html`
+          <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select"
+            style="z-index: 5; width: ${menuWidthStr};">
+            <div id="${this.sideMenuElementName}-content" class="side-menu">
+              <div class="row" style="margin-top: 5px;margin-bottom: 0px;display: flex;justify-content: space-evenly;align-items: center;flex-direction: row;flex-wrap: nowrap;">
+                ${spacerDiv}
+                ${this.downloadIconCb ? spacerDiv : ''}
+                <h5 class="center-align" style="margin: 0px auto">${this.sideMenuTitle}</h5>
+                ${downloadIconHtml}
+                ${settingsIconHtml}
+              </div>
+              <li class="divider" style="padding: 2px !important;"></li>
+              ${this.sideMenuElementHtml}
+            </div>
+          </div>`;
+
+
+    return sideMenuHtmlWrapped;
+  }
 
   /**
    * Adds the JS for the KeepTrackPlugin.
@@ -649,7 +706,11 @@ export class KeepTrackPlugin {
 
     if (settingsMenuElement) {
       this.isSideMenuSettingsOpen = true;
-      settingsMenuElement.style.left = `${sideMenuElement.getBoundingClientRect().right}px`;
+      if (this.sideMenuSettingsOptions.leftOffset !== null) {
+        settingsMenuElement.style.left = `${this.sideMenuSettingsOptions.leftOffset}px`;
+      } else {
+        settingsMenuElement.style.left = `${sideMenuElement.getBoundingClientRect().right}px`;
+      }
       slideInRight(settingsMenuElement, 1000);
     }
   }
@@ -695,6 +756,9 @@ export class KeepTrackPlugin {
       cb: () => {
         if (this.sideMenuSettingsHtml) {
           opts.attachedElement = getEl(`${this.sideMenuElementName}-settings`);
+        }
+        if (this.sideMenuSettingsOptions.leftOffset) {
+          opts.leftOffset = this.sideMenuSettingsOptions.leftOffset;
         }
         clickAndDragWidth(getEl(this.sideMenuElementName), opts);
       },

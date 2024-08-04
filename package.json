@@ -147,6 +147,7 @@
     "gremlins.js": "^2.2.0",
     "jquery": "^3.7.1",
     "jquery-ui-bundle": "^1.12.1-migrate",
+    "material-icons": "^1.13.12",
     "meeusjs": "^1.0.4",
     "new-github-issue-url": "^1.0.0",
     "node-fetch": "^3.3.2",

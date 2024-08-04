@@ -35,6 +35,7 @@ import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
 import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
 import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
+import 'material-icons/iconfont/material-icons.css';
 
 import eruda from 'eruda';
 import erudaFps from 'eruda-fps';

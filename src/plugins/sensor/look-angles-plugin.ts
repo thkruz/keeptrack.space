@@ -10,7 +10,6 @@ import lookanglesPng from '@public/img/icons/lookangles.png';
 import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
 export class LookAnglesPlugin extends KeepTrackPlugin {
   dependencies = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
@@ -32,6 +31,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
    * The length of time to calculate look angles for
    */
   private lengthOfLookAngles_ = 2;
+
   /**
    * The last look angles array
    */
@@ -52,8 +52,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
-    minWidth: 300,
-    maxWidth: 450,
+    minWidth: 400,
+    maxWidth: 600,
   };
 
   helpTitle = 'Look Angles Menu';
@@ -70,11 +70,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   sideMenuTitle: string = 'Sensor Look Angles';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div class="row"></div>
-    <div class="row">
-      <div class="center-align">
-        <button id="export-look-angles" class="btn btn-ui waves-effect waves-light">Download &#9658;</button>
-      </div>
-    </div>
     <div class="row">
       <table id="looks" class="center-align striped-light centered"></table>
     </div>`;
@@ -102,6 +97,15 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
           <label for="look-anglesInterval" class="active">Interval (Seconds)</label>
       </div>
     </div>`;
+  downloadIconCb = () => {
+    const sensor = keepTrackApi.getSensorManager().getSensor();
+
+    saveCsv(this.lastlooksArray_, `${sensor.shortName ?? sensor.objName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
+  };
+  sideMenuSettingsOptions = {
+    width: 300,
+    zIndex: 3,
+  };
 
   addHtml(): void {
     super.addHtml();
@@ -117,11 +121,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         getEl('look-angles-interval').addEventListener('change', () => {
           this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
           this.refreshSideMenuData_();
-        });
-
-        getEl('export-look-angles')?.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
-          saveCsv(this.lastlooksArray_, 'Look-Angles');
         });
 
         getEl('settings-riseset').addEventListener('change', this.settingsRisesetChange_.bind(this));

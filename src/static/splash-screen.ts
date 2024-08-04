@@ -27,7 +27,7 @@ export abstract class SplashScreen {
         <div id="logo-inner-container" class="valign">
           <div style="display: flex;">
             <span id="logo-text" class="logo-font">KEEP TRACK</span>
-            <span id="logo-text-version" class="logo-font">9</span>
+            <span id="logo-text-version" class="logo-font">10</span>
           </div>
           <span id="loader-text">Downloading Science...</span>
         </div>

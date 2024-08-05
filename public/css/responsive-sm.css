@@ -88,6 +88,7 @@
     width: 100%;
   }
 
+  #timeline-sensor-list,
   #multi-site-look-angles-sensor-list {
     display: grid;
     justify-content: space-evenly;

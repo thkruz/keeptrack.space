@@ -256,7 +256,7 @@ export class CatalogLoader {
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-      catalogManagerInstance.numSats = catalogManagerInstance.objectCache.length;
+      catalogManagerInstance.numObjects = catalogManagerInstance.objectCache.length;
 
       const satDataString = CatalogLoader.getSatDataString_(catalogManagerInstance.objectCache);
 
@@ -340,6 +340,8 @@ export class CatalogLoader {
       analSat.id = tempObjData.length;
       tempObjData.push(analSat);
     }
+
+    catalogManagerInstance.numSatellites = tempObjData.length;
 
     for (const missileObj of catalogManagerInstance.missileSet) {
       tempObjData.push(missileObj);

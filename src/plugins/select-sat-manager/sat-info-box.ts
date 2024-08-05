@@ -450,7 +450,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     const posZmax = pos.z + distance;
 
     (<HTMLInputElement>getEl('search')).value = '';
-    for (let i = 0; i < catalogManagerInstance.numSats; i++) {
+    for (let i = 0; i < catalogManagerInstance.numSatellites; i++) {
       pos = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY).position;
       if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
         SCCs.push(catalogManagerInstance.getSat(i, GetSatType.EXTRA_ONLY).sccNum);
@@ -1173,41 +1173,42 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
 
     const similarVmag = [];
+    const catalogManager = keepTrackApi.getCatalogManager();
+    const curSatType = obj.type;
+    const curSatId = obj.id;
+    const curSatCountry = obj.country;
+    const curSatName = obj.name.toLowerCase();
 
-    keepTrackApi.getCatalogManager().objectCache.forEach((posObj) => {
-      if (!posObj.isSatellite()) {
+    catalogManager.getSats().forEach((posSat) => {
+      if (!posSat.vmag) {
         return;
-      } // Only look at satellites
-      const posSat = posObj as DetailedSatellite;
-
-      if (obj.type !== posSat.type) {
+      }
+      if (curSatCountry !== posSat.country) {
+        // Only look at same country
         return;
-      } // Only look at same type of curSat
-      if (obj.id === posSat.id) {
+      }
+      if (curSatType !== posSat.type) {
+        // Only look at same type of curSat
         return;
-      } // Don't look at the same curSat
-      if (obj.country !== posSat.country) {
-        return;
-      } // Only look at same country
-
-      if (posSat.vmag) {
-        similarVmag.push(posSat.vmag);
-      } else {
+      }
+      if (curSatId === posSat.id) {
+        // Don't look at the same curSat
         return;
       }
 
+      similarVmag.push(posSat.vmag);
+
       // Only use the first word of the name
-      const name = obj.name.toLowerCase();
       const posName = posSat.name.toLowerCase();
 
-      if (name.length < 4 || posName.length < 4) {
+      if (curSatName.length < 4 || posName.length < 4) {
         return;
       }
 
       // Determine how many characters match
-      const matchingChars = name.split('').filter((char, index) => char === posName[index]);
+      const matchingChars = curSatName.split('').filter((char, index) => char === posName[index]);
 
-      if (matchingChars.length / name.length > 0.85) {
+      if (matchingChars.length / curSatName.length > 0.85) {
         similarVmag.push(posSat.vmag);
         similarVmag.push(posSat.vmag);
         similarVmag.push(posSat.vmag);

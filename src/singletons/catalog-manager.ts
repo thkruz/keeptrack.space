@@ -88,7 +88,8 @@ export class CatalogManager {
 
   missileSats: number = 0;
   missileSet = [];
-  numSats: number = 0;
+  numSatellites: number = 0;
+  numObjects: number = 0;
   orbitDensity: number[][] = [];
   orbitDensityMax = 0;
   orbitalSats: number;
@@ -110,7 +111,7 @@ export class CatalogManager {
 
     const highestMarkerNumber = this.sensorMarkerArray?.[this.sensorMarkerArray?.length - 1] || 0;
 
-    settingsManager.dotsOnScreen = Math.max(this.numSats - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
+    settingsManager.dotsOnScreen = Math.max(this.numObjects - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
   };
 
   /**
@@ -277,7 +278,8 @@ export class CatalogManager {
   }
 
   getSats(): DetailedSatellite[] {
-    return this.objectCache.filter((obj) => obj?.isSatellite()) as DetailedSatellite[];
+    // sats are the first numSats objects in the objectCache
+    return this.objectCache.slice(0, this.numSatellites).filter((sat) => sat.isSatellite()) as DetailedSatellite[];
   }
 
   getMissile(missileId: number): MissileObject | null {
@@ -295,7 +297,7 @@ export class CatalogManager {
   }
 
   id2satnum(satIdArray: number[]) {
-    return satIdArray.map((id) => ((<DetailedSatellite> this.getObject(id))?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
+    return satIdArray.map((id) => ((<DetailedSatellite>this.getObject(id))?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
   }
 
   async init(satCruncherOveride?: any): Promise<void> {
@@ -608,7 +610,7 @@ export class CatalogManager {
       }
     }
 
-    for (let i = 0; i < this.numSats; i++) {
+    for (let i = 0; i < this.numObjects; i++) {
       // Static objects lack these values and including them increase the JS heap a lot
       if (!this.objectCache[i].isSatellite()) {
         continue;

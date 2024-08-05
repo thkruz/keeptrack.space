@@ -835,8 +835,8 @@ export class ColorSchemeManager {
         }
 
         // Generate some buffers
-        this.colorData = new Float32Array(catalogManagerInstance.numSats * 4);
-        this.pickableData = new Int8Array(catalogManagerInstance.numSats);
+        this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
+        this.pickableData = new Int8Array(catalogManagerInstance.numObjects);
         this.calculateColorBuffers(true).then(() => {
           this.isReady = true;
         });

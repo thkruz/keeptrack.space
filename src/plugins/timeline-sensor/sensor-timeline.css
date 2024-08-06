@@ -1,0 +1,12 @@
+#sensor-timeline-menu {
+  display: none;
+  position: absolute;
+  width: 800px;
+  left: 0;
+  margin: 0;
+  border-top: 3px solid var(--color-primary);
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  z-index: 10;
+}

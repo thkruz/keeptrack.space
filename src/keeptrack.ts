@@ -30,11 +30,13 @@
 
 import issJpg from '@public/img/wallpaper/iss.jpg';
 import missionControlJpg from '@public/img/wallpaper/mission-control.jpg';
+import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import rocketJpg from '@public/img/wallpaper/rocket.jpg';
 import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
 import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
 import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
+import 'material-icons/iconfont/material-icons.css';
 
 import eruda from 'eruda';
 import erudaFps from 'eruda-fps';
@@ -74,7 +76,7 @@ import { SplashScreen } from './static/splash-screen';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
-  private static splashScreenImgList_ = [thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, missionControlJpg, issJpg, rocket3Jpg];
+  private static splashScreenImgList_ = [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, missionControlJpg, issJpg, rocket3Jpg];
 
   private isShowFPS = false;
   public isReady = false;

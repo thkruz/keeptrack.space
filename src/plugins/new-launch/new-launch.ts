@@ -44,6 +44,7 @@ export class NewLaunch extends KeepTrackPlugin {
   bottomIconElementName = 'menu-new-launch';
   bottomIconLabel = 'New Launch';
   bottomIconImg = rocketPng;
+  isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   sideMenuElementName: string = 'newLaunch-menu';

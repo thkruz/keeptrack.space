@@ -28,49 +28,6 @@
     /* Safari, Android, iOS */ url('fonts/droid/droid-sans-v6-latin-regular.svg#DroidSans') format('svg'); /* Legacy iOS */
 }
 
-/*Material Icons*/
-
-/* fallback */
-@font-face {
-  font-family: 'Material Icons';
-  font-style: normal;
-  font-weight: 400;
-  src: url('fonts/material-icons/material-icons.eot'); /* For IE6-8 */
-  src:
-    local('Material Icons'),
-    local('MaterialIcons-Regular'),
-    url('fonts/material-icons/material-icons.woff2') format('woff2'),
-    url('fonts/material-icons/material-icons.woff') format('woff'),
-    url('fonts/material-icons/material-icons.ttf') format('truetype');
-}
-
-.material-icons {
-  font-family: 'Material Icons', sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px; /* Preferred icon size */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-
-  /* Support for all WebKit browsers. */
-  -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
-  font-feature-settings: 'liga';
-}
-
-/*Material Icons*/
-
 /*Icomoon Font*/
 
 @font-face {

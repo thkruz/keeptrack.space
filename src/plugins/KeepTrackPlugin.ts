@@ -9,11 +9,30 @@ import { shake } from '../lib/shake';
 import { slideInRight, slideOutLeft } from '../lib/slide';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
+import { SoundNames } from './sounds/SoundNames';
 
 export interface clickDragOptions {
+  leftOffset?: number;
   isDraggable?: boolean;
   minWidth?: number;
   maxWidth?: number;
+  attachedElement?: HTMLElement;
+}
+
+interface SideMenuSettingsOptions {
+  /**
+   * The width of the side menu's settings sub-menu.
+   */
+  width: number;
+  /**
+   * Override for the left offset of the side menu's settings sub-menu.
+   * If this is not set then it will default to the right edge of the side menu.
+   */
+  leftOffset?: number;
+  /**
+   * The z-index of the side menu's settings sub-menu.
+   */
+  zIndex: number;
 }
 
 /**
@@ -67,10 +86,37 @@ export class KeepTrackPlugin {
   sideMenuElementName: string;
 
   /**
+   * The title of the side menu.
+   * @example 'Countries Menu'
+   */
+  sideMenuTitle: string;
+
+  /**
    * The html to use for the side menu.
    */
   sideMenuElementHtml: string;
 
+  /**
+   * The html to use for the side menu's attached settings menu.
+   */
+  sideMenuSettingsHtml: string;
+
+  sideMenuSettingsOptions: SideMenuSettingsOptions = {
+    width: 300,
+    leftOffset: null,
+    zIndex: 5,
+  };
+
+  /**
+   * The callback to run when the download icon is clicked.
+   * Download icon is automatically added if this is defined.
+   */
+  downloadIconCb: () => void = null;
+
+  /**
+   * Whether the side menu settings are open.
+   */
+  isSideMenuSettingsOpen: boolean = false;
   /**
    * The title of the help dialog.
    * @example 'Countries Menu'
@@ -205,6 +251,8 @@ export class KeepTrackPlugin {
       throw new Error(`${this.PLUGIN_NAME} HTML already added.`);
     }
 
+    this.sideMenuSettingsOptions.leftOffset = typeof this.sideMenuSettingsOptions.leftOffset === 'number' ? this.sideMenuSettingsOptions.leftOffset : null;
+
     if (this.bottomIconElementName || this.bottomIconLabel) {
       if (!this.bottomIconElementName || !this.bottomIconLabel) {
         throw new Error(`${this.PLUGIN_NAME} bottom icon element name, image, and label must all be defined.`);
@@ -216,16 +264,59 @@ export class KeepTrackPlugin {
     }
 
     if (this.sideMenuElementName && this.sideMenuElementHtml) {
-      this.addSideMenu(this.sideMenuElementHtml);
+      if (this.sideMenuSettingsHtml) {
+        const sideMenuHtmlWrapped = this.generateSideMenuHtml_();
+
+        this.addSideMenu(sideMenuHtmlWrapped);
+      } else {
+        this.addSideMenu(this.sideMenuElementHtml);
+      }
     } else if (this.sideMenuElementName || this.sideMenuElementHtml) {
       throw new Error(`${this.PLUGIN_NAME} side menu element name and html must both be defined.`);
+    }
+
+    if (this.sideMenuSettingsHtml) {
+      const sideMenuHtmlWrapped = keepTrackApi.html`
+        <div id="${this.sideMenuElementName}-settings" class="side-menu-parent start-hidden text-select" style="z-index: ${this.sideMenuSettingsOptions.zIndex.toString()};">
+          <div id="${this.sideMenuElementName}-content" class="side-menu-settings" style="padding: 0px 10px;">
+            <div class="row"></div>
+            ${this.sideMenuSettingsHtml}
+          </div>
+        </div>
+      `;
+
+      this.addSideMenu(sideMenuHtmlWrapped);
+
+      keepTrackApi.register({
+        event: KeepTrackApiEvents.uiManagerInit,
+        cbName: this.PLUGIN_NAME,
+        cb: () => {
+          getEl(`${this.sideMenuElementName}-settings-btn`).addEventListener('click', () => {
+            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+            if (this.isSideMenuSettingsOpen) {
+              this.closeSettingsMenu();
+              getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkStandby)';
+            } else {
+              this.openSettingsMenu();
+              getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkNormal)';
+            }
+          });
+
+          if (this.downloadIconCb) {
+            getEl(`${this.sideMenuElementName}-download-btn`).addEventListener('click', () => {
+              keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
+              this.downloadIconCb();
+            });
+          }
+        },
+      });
     }
 
     if (this.submitCallback) {
       this.registerSubmitButtonClicked(this.submitCallback);
     }
 
-    if (this.dragOptions?.isDraggable) {
+    if (this.dragOptions) {
       this.registerClickAndDragOptions(this.dragOptions);
     }
 
@@ -268,6 +359,49 @@ export class KeepTrackPlugin {
    */
   isRmbOnSat: boolean = false;
 
+  private generateSideMenuHtml_() {
+    const menuWidthStr = `${this.sideMenuSettingsOptions.width.toString()} px !important`;
+    const downloadIconHtml = this.downloadIconCb ? keepTrackApi.html`
+      <button id="${this.sideMenuElementName}-download-btn";
+        class="center-align btn btn-ui waves-effect waves-light"
+        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
+        type="button">
+        <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
+          file_download
+        </i>
+      </button>
+    ` : '';
+    const settingsIconHtml = keepTrackApi.html`
+      <button id="${this.sideMenuElementName}-settings-btn"
+        class="center-align btn btn-ui waves-effect waves-light"
+        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
+        type="button">
+        <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
+          settings
+        </i>
+      </button>`;
+    const spacerDiv = keepTrackApi.html`<div style="width: 30px; height: 30px; display: block; margin: 0px 5px 0px 0px;"></div>`;
+
+    const sideMenuHtmlWrapped = keepTrackApi.html`
+          <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select"
+            style="z-index: 5; width: ${menuWidthStr};">
+            <div id="${this.sideMenuElementName}-content" class="side-menu">
+              <div class="row" style="margin-top: 5px;margin-bottom: 0px;display: flex;justify-content: space-evenly;align-items: center;flex-direction: row;flex-wrap: nowrap;">
+                ${spacerDiv}
+                ${this.downloadIconCb ? spacerDiv : ''}
+                <h5 class="center-align" style="margin: 0px auto">${this.sideMenuTitle}</h5>
+                ${downloadIconHtml}
+                ${settingsIconHtml}
+              </div>
+              <li class="divider" style="padding: 2px !important;"></li>
+              ${this.sideMenuElementHtml}
+            </div>
+          </div>`;
+
+
+    return sideMenuHtmlWrapped;
+  }
+
   /**
    * Adds the JS for the KeepTrackPlugin.
    * @throws {Error} If the JS has already been added.
@@ -286,7 +420,11 @@ export class KeepTrackPlugin {
     }
 
     if (this.sideMenuElementName) {
-      this.registerHideSideMenu(this.bottomIconElementName, this.sideMenuElementName);
+      this.registerHideSideMenu(this.bottomIconElementName, this.closeSideMenu.bind(this));
+    }
+
+    if (this.sideMenuSettingsHtml) {
+      this.registerHideSideMenu(this.bottomIconElementName, this.closeSettingsMenu.bind(this));
     }
 
     if (this.rmbCallback) {
@@ -456,7 +594,7 @@ export class KeepTrackPlugin {
    * @param callback The callback function to run when the bottom icon is clicked. This is run
    * even if the bottom icon is disabled.
    */
-  registerBottomMenuClicked(callback: () => void = () => {}) {
+  registerBottomMenuClicked(callback: () => void = () => { }) {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
       keepTrackApi.register({
         event: KeepTrackApiEvents.selectSatData,
@@ -562,8 +700,31 @@ export class KeepTrackPlugin {
     slideInRight(getEl(this.sideMenuElementName), 1000);
   }
 
+  openSettingsMenu() {
+    const settingsMenuElement = getEl(`${this.sideMenuElementName}-settings`);
+    const sideMenuElement = getEl(this.sideMenuElementName);
+
+    if (settingsMenuElement) {
+      this.isSideMenuSettingsOpen = true;
+      if (this.sideMenuSettingsOptions.leftOffset !== null) {
+        settingsMenuElement.style.left = `${this.sideMenuSettingsOptions.leftOffset}px`;
+      } else {
+        settingsMenuElement.style.left = `${sideMenuElement.getBoundingClientRect().right}px`;
+      }
+      slideInRight(settingsMenuElement, 1000);
+    }
+  }
+
   closeSideMenu() {
-    slideOutLeft(getEl(this.sideMenuElementName), 1000);
+    const settingsMenuElement = getEl(`${this.sideMenuElementName}`);
+
+    slideOutLeft(settingsMenuElement, 1000);
+  }
+
+  closeSettingsMenu() {
+    this.isSideMenuSettingsOpen = false;
+    getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkStandby)';
+    slideOutLeft(getEl(`${this.sideMenuElementName}-settings`), 1500, null, -300);
   }
 
   registerSubmitButtonClicked(callback: () => void = null) {
@@ -593,6 +754,12 @@ export class KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
+        if (this.sideMenuSettingsHtml) {
+          opts.attachedElement = getEl(`${this.sideMenuElementName}-settings`);
+        }
+        if (this.sideMenuSettingsOptions.leftOffset) {
+          opts.leftOffset = this.sideMenuSettingsOptions.leftOffset;
+        }
         clickAndDragWidth(getEl(this.sideMenuElementName), opts);
       },
     });
@@ -622,14 +789,14 @@ export class KeepTrackPlugin {
   /**
    * Registers a callback function to hide the side menu and deselect the bottom icon element.
    * @param bottomIconElementName The name of the bottom icon element to deselect.
-   * @param sideMenuElementName The name of the side menu element to hide.
+   * @param slideCb The callback function to run when the side menu is hidden.
    */
-  registerHideSideMenu(bottomIconElementName: string, sideMenuElementName: string): void {
+  registerHideSideMenu(bottomIconElementName: string, slideCb: () => void): void {
     keepTrackApi.register({
       event: KeepTrackApiEvents.hideSideMenus,
       cbName: this.PLUGIN_NAME,
       cb: (): void => {
-        slideOutLeft(getEl(sideMenuElementName), 1000);
+        slideCb();
         getEl(bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
         this.isMenuButtonActive = false;
       },

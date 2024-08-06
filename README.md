@@ -1,14 +1,13 @@
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=flat-square) ![Sonar Coverage](https://img.shields.io/sonar/coverage/thkruz_keeptrack.space?server=https%3A%2F%2Fsonarcloud.io&style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square) <img src="./docs/keeptrack8-cover.png" width='100%' alt="KeepTrack.Space" align="center">
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=flat-square) ![Sonar Coverage](https://img.shields.io/sonar/coverage/thkruz_keeptrack.space?server=https%3A%2F%2Fsonarcloud.io&style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square) <img src="./public/img/textLogoLg.png" width='100%' alt="KeepTrack.Space" align="center">
 
 # Table of Contents
 
 - [Project Overview](#project-overview)
-- [Who Should Use KeepTrack?](#who-should-use-keeptrack)
+- [Who Is KeepTrack For?](#who-is-keeptrack-for)
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Code Structure](#code-structure)
 - [Previous Versions](#previous-versions)
 - [Contributors](#contributors)
 - [License](#license)
@@ -17,7 +16,7 @@
 
 Welcome to KeepTrack, an ambitious project aiming to make orbital analysis tools accessible to all. Keep Track is the only astrodynamics tool designed for non-engineers. It provides a simplified and streamlined experience for learning and interacting with satellites and space debris. Keep Track is built from the ground up with custom WebGL shaders and a high-performance render loop. It can simulate 2.5 million pieces of debris at 60fps. The core app is only 7 Mb and loads in 2 seconds. It's free, open source, and works on any modern browser.
 
-## Who is KeepTrack for?
+## Who is KeepTrack For?
 
 Keep Track is used in operations centers, classrooms, and outreach programs. Here are some examples of how different groups use Keep Track:
 

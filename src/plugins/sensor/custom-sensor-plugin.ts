@@ -12,7 +12,6 @@ import customPng from '@public/img/icons/custom.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
-import { MultiSiteLookAnglesPlugin } from './multi-site-look-angles-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   bottomIconCallback: () => void = () => {
@@ -209,9 +208,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     isDraggable: true,
   };
 
-  static PLUGIN_NAME = 'Custom Sensor';
   constructor() {
-    super(MultiSiteLookAnglesPlugin.PLUGIN_NAME);
+    super(CustomSensorPlugin.name);
   }
 
   helpTitle = 'Custom Sensor Menu';

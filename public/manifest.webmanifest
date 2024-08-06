@@ -18,14 +18,14 @@
   "screenshots": [
     {
       "src": "img/pwa/wide.png",
-      "sizes": "3366x1456",
+      "sizes": "1920x1080",
       "type": "image/png",
       "form_factor": "wide",
       "label": "KeepTrack"
     },
     {
       "src": "img/pwa/square.png",
-      "sizes": "2038x1456",
+      "sizes": "1024x1024",
       "type": "image/png",
       "label": "KeepTrack"
     }

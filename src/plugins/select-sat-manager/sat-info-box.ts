@@ -15,8 +15,8 @@ import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { StringExtractor } from '@app/static/string-extractor';
-import addPng from '@public/img/add.png';
-import removePng from '@public/img/remove.png';
+import addPng from '@public/img/icons/add.png';
+import removePng from '@public/img/icons/remove.png';
 import Draggabilly from 'draggabilly';
 import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -450,7 +450,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     const posZmax = pos.z + distance;
 
     (<HTMLInputElement>getEl('search')).value = '';
-    for (let i = 0; i < catalogManagerInstance.numSats; i++) {
+    for (let i = 0; i < catalogManagerInstance.numSatellites; i++) {
       pos = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY).position;
       if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
         SCCs.push(catalogManagerInstance.getSat(i, GetSatType.EXTRA_ONLY).sccNum);
@@ -566,11 +566,12 @@ export class SatInfoBox extends KeepTrackPlugin {
   };
 
   private addRemoveWatchlist_() {
-    const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
+    const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
 
     if (watchlistPlugin) {
       const id = this.selectSatManager_.selectedSat;
 
+      keepTrackApi.getSoundManager().play(SoundNames.CLICK);
       if (watchlistPlugin.isOnWatchlist(id)) {
         watchlistPlugin.removeSat(id);
       } else {
@@ -857,17 +858,16 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl('ui-wrapper').insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-            <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
-              <div id="sat-info-top-links">
-                <div id="sat-info-title" class="center-text sat-info-section-header">
-                  <img id="sat-add-watchlist" src="${addPng}"/>
-                  <img id="sat-remove-watchlist" src="${removePng}"/>
-                  <span id="sat-info-title-name">
-                    This is a title
-                  </span>
-                </div>
-                ${
-  getEl('search')
+      <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
+        <div id="sat-info-top-links">
+          <div id="sat-info-title" class="center-text sat-info-section-header">
+            <img id="sat-add-watchlist" src="${addPng}"/>
+            <img id="sat-remove-watchlist" src="${removePng}"/>
+            <span id="sat-info-title-name">
+              This is a title
+            </span>
+          </div>
+          ${getEl('search')
     ? keepTrackApi.html`
                   <div id="all-objects-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
                   data-tooltip="Find Related Objects">Find all objects from this launch...</div>
@@ -1173,41 +1173,42 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
 
     const similarVmag = [];
+    const catalogManager = keepTrackApi.getCatalogManager();
+    const curSatType = obj.type;
+    const curSatId = obj.id;
+    const curSatCountry = obj.country;
+    const curSatName = obj.name.toLowerCase();
 
-    keepTrackApi.getCatalogManager().objectCache.forEach((posObj) => {
-      if (!posObj.isSatellite()) {
+    catalogManager.getSats().forEach((posSat) => {
+      if (!posSat.vmag) {
         return;
-      } // Only look at satellites
-      const posSat = posObj as DetailedSatellite;
-
-      if (obj.type !== posSat.type) {
+      }
+      if (curSatCountry !== posSat.country) {
+        // Only look at same country
         return;
-      } // Only look at same type of curSat
-      if (obj.id === posSat.id) {
+      }
+      if (curSatType !== posSat.type) {
+        // Only look at same type of curSat
         return;
-      } // Don't look at the same curSat
-      if (obj.country !== posSat.country) {
-        return;
-      } // Only look at same country
-
-      if (posSat.vmag) {
-        similarVmag.push(posSat.vmag);
-      } else {
+      }
+      if (curSatId === posSat.id) {
+        // Don't look at the same curSat
         return;
       }
 
+      similarVmag.push(posSat.vmag);
+
       // Only use the first word of the name
-      const name = obj.name.toLowerCase();
       const posName = posSat.name.toLowerCase();
 
-      if (name.length < 4 || posName.length < 4) {
+      if (curSatName.length < 4 || posName.length < 4) {
         return;
       }
 
       // Determine how many characters match
-      const matchingChars = name.split('').filter((char, index) => char === posName[index]);
+      const matchingChars = curSatName.split('').filter((char, index) => char === posName[index]);
 
-      if (matchingChars.length / name.length > 0.85) {
+      if (matchingChars.length / curSatName.length > 0.85) {
         similarVmag.push(posSat.vmag);
         similarVmag.push(posSat.vmag);
         similarVmag.push(posSat.vmag);

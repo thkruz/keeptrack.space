@@ -14,13 +14,19 @@
     "__dirname": "readonly",
     "settingsManager": "writable"
   },
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
     "ecmaVersion": 2021
   },
-  "plugins": ["@typescript-eslint", "jest"],
+  "plugins": [
+    "@typescript-eslint",
+    "jest"
+  ],
   "rules": {
     "accessor-pairs": "error",
     "array-bracket-newline": "error",
@@ -37,10 +43,18 @@
     "camelcase": "error",
     "capitalized-comments": "off",
     "class-methods-use-this": "off",
-    "comma-dangle": ["error", "always-multiline"],
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
     "comma-spacing": "error",
     "comma-style": "error",
-    "complexity": ["error", { "max": 40 }], // TODO: change to error
+    "complexity": [
+      "error",
+      {
+        "max": 40
+      }
+    ], // TODO: change to error
     "computed-property-spacing": "error",
     "consistent-return": "error",
     "consistent-this": "error",
@@ -68,25 +82,65 @@
     "id-length": "off",
     "id-match": "error",
     "implicit-arrow-linebreak": "off",
-    "indent": ["error", 2, { "SwitchCase": 1 }],
-    "indent-legacy": ["error", 2, { "SwitchCase": 1 }],
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "indent-legacy": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
     "init-declarations": "off",
     "jsx-quotes": "error",
     "key-spacing": "error",
-    "keyword-spacing": "error",
+    "keyword-spacing": "off",
     "line-comment-position": "off",
-    "linebreak-style": ["error", "unix"],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
     "lines-around-comment": "off",
     "lines-around-directive": "error",
     "lines-between-class-members": "off",
     "max-classes-per-file": "error",
     "max-depth": "warn", // TODO: change to error
-    "max-len": ["warn", { "code": 180 }], // TODO: change to error
-    "max-lines": ["warn", { "max": 1000 }], // TODO: change to error
-    "max-lines-per-function": ["error", { "max": 300 }],
+    "max-len": [
+      "warn",
+      {
+        "code": 180
+      }
+    ], // TODO: change to error
+    "max-lines": [
+      "warn",
+      {
+        "max": 1000
+      }
+    ], // TODO: change to error
+    "max-lines-per-function": [
+      "error",
+      {
+        "max": 300
+      }
+    ],
     "max-nested-callbacks": "error",
-    "max-params": ["warn", { "max": 8 }], // TODO: change to error
-    "max-statements": ["warn", { "max": 85 }], // TODO: change to error
+    "max-params": [
+      "warn",
+      {
+        "max": 8
+      }
+    ], // TODO: change to error
+    "max-statements": [
+      "warn",
+      {
+        "max": 85
+      }
+    ], // TODO: change to error
     "max-statements-per-line": "error",
     "multiline-comment-style": "warn", // TODO: change to error
     "multiline-ternary": "off",
@@ -172,7 +226,12 @@
     "no-template-curly-in-string": "error",
     "no-ternary": "off",
     "no-throw-literal": "error",
-    "no-trailing-spaces": ["error", { "ignoreComments": true }],
+    "no-trailing-spaces": [
+      "error",
+      {
+        "ignoreComments": true
+      }
+    ],
     "no-undef-init": "error",
     "no-undefined": "error",
     "no-underscore-dangle": "off",
@@ -218,7 +277,10 @@
     "prefer-spread": "error",
     "prefer-template": "error",
     "quote-props": "off",
-    "quotes": ["error", "single"],
+    "quotes": [
+      "error",
+      "single"
+    ],
     "radix": "off",
     "require-atomic-updates": "error",
     "require-await": "warn", // TODO: change to errors

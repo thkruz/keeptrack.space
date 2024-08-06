@@ -71,6 +71,8 @@ const settingsOverride = {
     videoDirector: false,
     reports: true,
     polarPlot: true,
+    timeline: true,
+    timelineAlt: true,
   },
   /*
    * searchLimit: 150,

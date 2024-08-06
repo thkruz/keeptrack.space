@@ -14,6 +14,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   static readonly PLUGIN_NAME = 'Polar Plot';
   dependencies = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
+  passStartTime_: Date;
+  passStopTime_: Date;
 
   constructor() {
     super(PolarPlotPlugin.PLUGIN_NAME);
@@ -120,16 +122,24 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   }
 
   private generatePlotData_(): boolean {
+    this.passStartTime_ = null;
+    this.passStopTime_ = null;
+
     const sensor = keepTrackApi.getSensorManager().getSensor();
     const sat = this.selectSatManager_.getSelectedSat() as DetailedSatellite;
     let isSomethingInView = false;
 
     this.plotData_ = [];
+    let now: Date = null;
+
     for (let i = 0; i < secondsPerDay * 3; i++) {
-      const now = keepTrackApi.getTimeManager().getOffsetTimeObj(i * MILLISECONDS_PER_SECOND);
+      now = keepTrackApi.getTimeManager().getOffsetTimeObj(i * MILLISECONDS_PER_SECOND);
       const inView = sensor.isSatInFov(sat, now);
 
       if (inView) {
+        if (!this.passStartTime_) {
+          this.passStartTime_ = now;
+        }
         const rae = sensor.rae(sat, now);
 
         this.plotData_.push([rae.az, rae.el]);
@@ -139,6 +149,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       }
     }
 
+    this.passStopTime_ = now;
+
     return isSomethingInView;
   }
 
@@ -147,6 +159,16 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.drawPlotBackground_();
     this.drawOrbitLine_();
     this.drawStartAndEnd_();
+    this.drawTitle_();
+  }
+
+  private drawTitle_(): void {
+    this.ctx_.font = `${this.canvasSize_ * 0.035}px consolas`;
+    this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+    this.ctx_.textAlign = 'center';
+    this.ctx_.textBaseline = 'top';
+    this.ctx_.fillText(`Satellite ${(<DetailedSatellite>this.selectSatManager_.getSelectedSat()).sccNum}: ` +
+      `${this.passStartTime_.toISOString().slice(11, 19)} - ${this.passStopTime_.toISOString().slice(11, 19)}`, this.centerX_, 0);
   }
 
   private setupCanvas_() {

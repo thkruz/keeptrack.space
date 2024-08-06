@@ -329,22 +329,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static ssnSensors_() {
     return this.createSection_({
       header: 'Space Surveillance Network Sensors',
-      sensors: [
-        sensors.EGLAFB,
-        sensors.KWAJSPF,
-        sensors.GEODDSDGC,
-        sensors.GEODDSMAU,
-        sensors.GEODDSSOC,
-        sensors.KWAJALT,
-        sensors.KWAJMMW,
-        sensors.KWAJALC,
-        sensors.KWAJTDX,
-        sensors.MITMIL,
-        sensors.RAFASC,
-        sensors.GLBII,
-        sensors.HOLCBAND,
-        sensors.HOLSST,
-      ],
+      sensors: keepTrackApi.getSensorManager().sensorListSsn,
       topLinks: [
         {
           name: 'All SSN Sensors',
@@ -358,7 +343,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static mwSensors_() {
     return this.createSection_({
       header: 'US Missile Warning Sensors',
-      sensors: [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB],
+      sensors: keepTrackApi.getSensorManager().sensorListMw,
       topLinks: [
         {
           name: 'All MW Sensors',
@@ -372,7 +357,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static mdaSensors_() {
     return this.createSection_({
       header: 'US Missile Defense Agency Sensors',
-      sensors: [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR],
+      sensors: keepTrackApi.getSensorManager().sensorListMda,
       topLinks: [
         {
           name: 'All MDA Sensors',
@@ -403,21 +388,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static esocSensors_() {
     return this.createSection_({
       header: 'ESA Space Operations Center Sensors',
-      sensors: [
-        sensors.GRV,
-        sensors.TIR,
-        sensors.GES,
-        sensors.NRC,
-        sensors.PDM,
-        sensors.TRO,
-        sensors.Tenerife,
-        sensors.ZimLAT,
-        sensors.ZimSMART,
-        sensors.Tromso,
-        sensors.Kiruna,
-        sensors.Sodankyla,
-        sensors.Svalbard,
-      ],
+      sensors: keepTrackApi.getSensorManager().sensorListEsoc,
       topLinks: [
         {
           name: 'All ESOC Sensors',
@@ -431,7 +402,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static leoLabsSensors_() {
     return this.createSection_({
       header: 'Leo Labs Sensors',
-      sensors: [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR],
+      sensors: keepTrackApi.getSensorManager().sensorListLeoLabs,
       topLinks: [
         {
           name: 'All Leo Labs Sensors',
@@ -445,7 +416,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static otherSensors_() {
     return this.createSection_({
       header: 'Other Sensors',
-      sensors: [sensors.ROC, sensors.MLS, sensors.PO, sensors.LSO, sensors.MAY],
+      sensors: keepTrackApi.getSensorManager().sensorListOther,
       topLinks: [],
     });
   }
@@ -453,21 +424,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static russianSensors_() {
     return this.createSection_({
       header: 'Russian Sensors',
-      sensors: [
-        sensors.OLED,
-        sensors.OLEV,
-        sensors.PEC,
-        sensors.MISD,
-        sensors.MISV,
-        sensors.LEKV,
-        sensors.ARMV,
-        sensors.KALV,
-        sensors.BARV,
-        sensors.YENV,
-        sensors.ORSV,
-        sensors.STO,
-        sensors.NAK,
-      ],
+      sensors: keepTrackApi.getSensorManager().sensorListRus,
       topLinks: [
         {
           name: 'All Russian Sensors',
@@ -481,7 +438,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   private static chineseSensors_() {
     return this.createSection_({
       header: 'Chinese Sensors',
-      sensors: [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO],
+      sensors: keepTrackApi.getSensorManager().sensorListPrc,
       topLinks: [
         {
           name: 'All Chinese Sensors',

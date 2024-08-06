@@ -31,9 +31,9 @@ import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { isThisNode } from '@app/static/isThisNode';
-import addPng from '@public/img/add.png';
+import addPng from '@public/img/icons/add.png';
+import removePng from '@public/img/icons/remove.png';
 import watchlistPng from '@public/img/icons/watchlist.png';
-import removePng from '@public/img/remove.png';
 import saveAs from 'file-saver';
 import { CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -378,6 +378,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     }
 
     return this.watchlistList.some((satId_: number) => satId_ === id);
+  }
+
+  getSatellites() {
+    return this.watchlistList;
   }
 
   /**

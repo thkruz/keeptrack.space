@@ -87,7 +87,7 @@ export class UiManager {
 
     setTimeout(() => {
       document.querySelectorAll('img').forEach((img: any) => {
-        if (img.src && !img.src.includes('.png') && !img.src.includes('.jpg')) {
+        if (img.src && !img.src.includes('.svg') && !img.src.includes('.png') && !img.src.includes('.jpg')) {
           img.src = img.attributes.delayedsrc?.value;
         }
       });

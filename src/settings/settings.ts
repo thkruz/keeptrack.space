@@ -81,6 +81,8 @@ export class SettingsManager {
     videoDirector: true,
     reports: true,
     polarPlot: true,
+    timeline: true,
+    timelineAlt: true,
   };
 
   colors: ColorSchemeColorMap;
@@ -1142,21 +1144,21 @@ export class SettingsManager {
   init(settingsOverride?: any) {
     this.pTime = [];
 
-    this.checkIfIframe();
+    this.checkIfIframe_();
     this.setInstallDirectory_();
-    this.setMobileSettings();
-    this.setEmbedOverrides();
-    this.setColorSettings();
+    this.setMobileSettings_();
+    this.setEmbedOverrides_();
+    this.setColorSettings_();
     /**
      * Load Order:
      * URL Params > Local Storage > Default
      */
-    this.loadOverrides(settingsOverride);
+    this.loadOverrides_(settingsOverride);
     this.loadPersistedSettings();
 
-    const params = this.loadOverridesFromUrl();
+    const params = this.loadOverridesFromUrl_();
 
-    this.initParseFromGETVariables(params);
+    this.initParseFromGETVariables_(params);
 
     // If No UI Reduce Overhead
     if (this.disableUI) {
@@ -1174,7 +1176,7 @@ export class SettingsManager {
       this.maxFieldOfViewMarkers = 1;
     }
 
-    this.loadLastMapTexture();
+    this.loadLastMapTexture_();
 
     /*
      * Export settingsManager to everyone else
@@ -1186,7 +1188,7 @@ export class SettingsManager {
     }
   }
 
-  private checkIfIframe() {
+  private checkIfIframe_() {
     if (window.self !== window.top) {
       this.isInIframe = true;
       this.isShowLogo = true;
@@ -1199,7 +1201,7 @@ export class SettingsManager {
    *
    * @private
    */
-  private setColorSettings() {
+  private setColorSettings_() {
     this.selectedColorFallback = this.selectedColor;
 
     this.colors = {} as ColorSchemeColorMap;
@@ -1315,7 +1317,7 @@ export class SettingsManager {
    * Loads overrides from the URL query string and applies them to the plugin settings.
    * @returns An array of query string parameters.
    */
-  private loadOverridesFromUrl() {
+  private loadOverridesFromUrl_() {
     const queryStr = window.location.search.substring(1);
 
     // URI Encode all %22 to ensure url is not broken
@@ -1365,7 +1367,7 @@ export class SettingsManager {
    * This is an initial parse of the GET variables to determine
    * critical settings. Other variables are checked later during catalogManagerInstance.init
    */
-  private initParseFromGETVariables(params: string[]) {
+  private initParseFromGETVariables_(params: string[]) {
     if (!this.disableUI) {
       for (const param of params) {
         const key = param.split('=')[0];
@@ -1529,7 +1531,7 @@ export class SettingsManager {
   /**
    * Load the previously saved map texture.
    */
-  private loadLastMapTexture() {
+  private loadLastMapTexture_() {
     if (this.disableUI) {
       this.isLoadLastMap = false;
     }
@@ -1591,7 +1593,7 @@ export class SettingsManager {
    *
    * FOR TESTING ONLY
    */
-  private setEmbedOverrides() {
+  private setEmbedOverrides_() {
     let pageName = location.href.split('/').slice(-1);
 
     pageName = pageName[0].split('?').slice(0);
@@ -1615,7 +1617,7 @@ export class SettingsManager {
    * If the window width is less than or equal to the desktop minimum width,
    * mobile mode is enabled and certain settings are adjusted accordingly.
    */
-  private setMobileSettings() {
+  private setMobileSettings_() {
     if (window.innerWidth <= this.desktopMinimumWidth) {
       this.disableWindowTouchMove = false;
       /*
@@ -1626,7 +1628,25 @@ export class SettingsManager {
     }
   }
 
-  private loadOverrides(settingsOverride: any) {
+  exportSettingsToJSON() {
+    const settings = {};
+
+    for (const key of Object.keys(this)) {
+      settings[key] = this[key];
+    }
+
+    // Save the settings to a file
+    const settingsBlob = new Blob([JSON.stringify(settings)], { type: 'application/json' });
+    const url = URL.createObjectURL(settingsBlob);
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = 'settings.json';
+
+    a.click();
+  }
+
+  private loadOverrides_(settingsOverride: any) {
     // combine settingsOverride with window.settingsOverride
     const overrides = { ...settingsOverride, ...window.settingsOverride };
     // override values in this with overrides

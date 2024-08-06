@@ -3,11 +3,11 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import fullscreenIconPng from '@public/img/fullscreen-icon.png';
-import helpPng from '@public/img/help.png';
 import findPng from '@public/img/icons/find.png';
+import helpPng from '@public/img/icons/help.png';
+import layersIconPng from '@public/img/icons/layers-icon.png';
 import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
-import layersIconPng from '@public/img/layers-icon.png';
 import { errorManagerInstance } from '../../singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 

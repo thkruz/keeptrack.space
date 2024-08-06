@@ -81,6 +81,8 @@ export class SettingsManager {
     videoDirector: true,
     reports: true,
     polarPlot: true,
+    timeline: true,
+    timelineAlt: true,
   };
 
   colors: ColorSchemeColorMap;

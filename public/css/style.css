@@ -706,6 +706,13 @@ ul {
   cursor: 'pointer';
 }
 
+#info-overlay-menu {
+  background: rgba(0, 0, 0, 0);
+  width: 0px;
+  height: auto;
+  bottom: auto;
+}
+
 #info-overlay-content {
   position: absolute;
   background: rgba(0, 0, 0, 0);
@@ -713,7 +720,7 @@ ul {
   max-width: 550px;
   padding-left: 20px;
   top: 25px;
-  bottom: 50px;
+  height: auto;
   overflow: auto;
   z-index: 10;
 }

@@ -380,6 +380,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     return this.watchlistList.some((satId_: number) => satId_ === id);
   }
 
+  getSatellites() {
+    return this.watchlistList;
+  }
+
   /**
    * Handles the event when a new satellite is added to the watchlist.
    */

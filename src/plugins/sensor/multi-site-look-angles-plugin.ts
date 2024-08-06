@@ -65,8 +65,8 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
-    minWidth: 350,
-    maxWidth: 500,
+    minWidth: 500,
+    maxWidth: 750,
   };
 
   helpTitle = 'Multi-Site Look Angles Menu';

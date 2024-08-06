@@ -59,7 +59,8 @@ import { ShortTermFences } from './short-term-fences/short-term-fences';
 import { SocialMedia } from './social/social';
 import { StereoMap } from './stereo-map/stereo-map';
 import { timeMachinePlugin } from './time-machine/time-machine';
-import { Timeline } from './timeline/timeline';
+import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
+import { SensorTimeline } from './timeline-sensor/sensor-timeline';
 import { videoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
@@ -118,6 +119,7 @@ export type KeepTrackPlugins = {
   reports?: boolean;
   polarPlot?: boolean;
   timeline?: boolean;
+  timelineAlt?: boolean;
 };
 
 // Register all core modules
@@ -137,7 +139,8 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new CustomSensorPlugin().init(), enabled: plugins.sensor },
       { init: () => new LookAnglesPlugin().init(), enabled: plugins.sensor },
       { init: () => new MultiSiteLookAnglesPlugin().init(), enabled: plugins.sensor },
-      { init: () => new Timeline().init(), enabled: plugins.timeline },
+      { init: () => new SensorTimeline().init(), enabled: plugins.timeline },
+      { init: () => new SatelliteTimeline().init(), enabled: plugins.timelineAlt },
       { init: () => new WatchlistPlugin().init(), enabled: plugins.watchlist },
       { init: () => new WatchlistOverlay().init(), enabled: plugins.watchlist },
       { init: () => new ReportsPlugin().init(), enabled: plugins.reports },

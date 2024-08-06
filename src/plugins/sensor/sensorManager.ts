@@ -183,6 +183,13 @@ export class SensorManager {
   resetSensorSelected() {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
+    // Remove satellite minibox hover
+    const satMinibox = getEl('sat-minibox');
+
+    if (satMinibox) {
+      satMinibox.innerHTML = '';
+    }
+
     // Return to default settings with nothing 'inview'
     SensorManager.updateSensorUiStyling(null);
     this.setSensor(null); // Pass sensorId to identify which sensor the user clicked

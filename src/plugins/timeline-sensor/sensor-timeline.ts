@@ -21,9 +21,8 @@ interface SensorPasses {
   passes: Pass[];
 }
 
-export class Timeline extends KeepTrackPlugin {
+export class SensorTimeline extends KeepTrackPlugin {
   dependencies = [SelectSatManager.PLUGIN_NAME];
-  private selectSatManager_: SelectSatManager;
   private canvas_: HTMLCanvasElement;
   private ctx_: CanvasRenderingContext2D;
   private canvasStatic_: HTMLCanvasElement;
@@ -47,8 +46,7 @@ export class Timeline extends KeepTrackPlugin {
   private angleCalculationInterval_ = <Seconds>30;
 
   constructor() {
-    super(Timeline.name);
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    super(SensorTimeline.name);
 
     // remove duplicates in sensorList
     this.allSensorLists_ = this.allSensorLists_.filter(
@@ -60,9 +58,9 @@ export class Timeline extends KeepTrackPlugin {
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
 
-  bottomIconElementName = 'menu-timeline';
+  bottomIconElementName = 'menu-sensor-timeline';
   bottomIconImg = viewTimelinePng;
-  bottomIconLabel = 'Timeline';
+  bottomIconLabel = 'Sensor Timeline';
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) {
       return;
@@ -71,16 +69,17 @@ export class Timeline extends KeepTrackPlugin {
     this.updateTimeline();
   };
 
-  helpTitle = 'Timeline Menu';
-  helpBody = keepTrackApi.html`The timeline menu displays a chart of satellite passes across multiple sensors.`;
+  helpTitle = 'Sensor Timeline';
+  helpBody = `The Sensor Timeline plugin shows the times when a satellite is in view of various sensors. The timeline is color-coded to show the quality of the
+    pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the sensor and time to that pass.`;
 
-  sideMenuElementName = 'timeline-menu';
-  sideMenuTitle: string = 'Timeline';
+  sideMenuElementName = 'sensor-timeline-menu';
+  sideMenuTitle: string = 'Sensor Timeline';
   sideMenuElementHtml = keepTrackApi.html`
     <div class="row"></div>
     <div class="row" style="margin: 0;">
-      <canvas id="timeline-canvas"></canvas>
-      <canvas id="timeline-canvas-static" style="display: none;"></canvas>
+      <canvas id="sensor-timeline-canvas"></canvas>
+      <canvas id="sensor-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
   sideMenuSettingsHtml: string = keepTrackApi.html`
     <!-- <div class="switch row">
@@ -92,38 +91,38 @@ export class Timeline extends KeepTrackPlugin {
     </div> -->
     <div class="row">
       <div class="input-field col s12">
-        <input id="timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
+        <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="timeline-setting-total-length" class="active">Calculation Length (Hours)</label>
+        <label for="sensor-timeline-setting-total-length" class="active">Calculation Length (Hours)</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s12">
-        <input id="timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
+        <input id="sensor-timeline-setting-interval" value="${this.angleCalculationInterval_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="timeline-setting-interval" class="active">Calculation Interval (Seconds)</label>
+        <label for="sensor-timeline-setting-interval" class="active">Calculation Interval (Seconds)</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s12">
-        <input id="timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
+        <input id="sensor-timeline-setting-bad-length" value="${this.lengthOfBadPass_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="timeline-setting-bad-length" class="active">Bad Pass Length (Seconds)</label>
+        <label for="sensor-timeline-setting-bad-length" class="active">Bad Pass Length (Seconds)</label>
       </div>
     </div>
     <div class="row">
       <div class="input-field col s12">
-        <input id="timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
+        <input id="sensor-timeline-setting-avg-length" value="${this.lengthOfAvgPass_.toString()}" type="text"
           style="text-align: center;"
         />
-        <label for="timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
+        <label for="sensor-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
       </div>
     </div>
     <div class="row" style="margin: 0 10px;">
-      <div id="timeline-sensor-list">
+      <div id="sensor-timeline-sensor-list">
       </div>
     </div>`;
   sideMenuSettingsOptions = {
@@ -132,48 +131,48 @@ export class Timeline extends KeepTrackPlugin {
     zIndex: 10,
   };
   downloadIconCb = () => {
-    const canvas = document.getElementById('timeline-canvas') as HTMLCanvasElement;
+    const canvas = document.getElementById('sensor-timeline-canvas') as HTMLCanvasElement;
     const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
     const link = document.createElement('a');
 
     link.href = image;
-    link.download = `sat-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-timeline.png`;
+    link.download = `sat-${(keepTrackApi.getPlugin(SelectSatManager).getSelectedSat() as DetailedSatellite).sccNum6}-timeline.png`;
     link.click();
   };
 
   addHtml(): void {
     super.addHtml();
-    import('./timeline.css');
+    import('./sensor-timeline.css');
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.PLUGIN_NAME,
       cb: () => {
-        this.canvas_ = <HTMLCanvasElement>getEl('timeline-canvas');
-        this.canvasStatic_ = <HTMLCanvasElement>getEl('timeline-canvas-static');
+        this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
+        this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
         this.ctx_ = this.canvas_.getContext('2d');
         this.ctxStatic_ = this.canvasStatic_.getContext('2d');
 
-        getEl('timeline-setting-total-length').addEventListener('change', () => {
-          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('timeline-setting-total-length')).value) as Hours;
+        getEl('sensor-timeline-setting-total-length').addEventListener('change', () => {
+          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
 
-        getEl('timeline-setting-interval').addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('timeline-setting-interval')).value) as Seconds;
+        getEl('sensor-timeline-setting-interval').addEventListener('change', () => {
+          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-interval')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
 
-        getEl('timeline-setting-bad-length').addEventListener('change', () => {
-          this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('timeline-setting-bad-length')).value) as Seconds;
+        getEl('sensor-timeline-setting-bad-length').addEventListener('change', () => {
+          this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
 
-        getEl('timeline-setting-avg-length').addEventListener('change', () => {
-          this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('timeline-setting-avg-length')).value) as Seconds;
+        getEl('sensor-timeline-setting-avg-length').addEventListener('change', () => {
+          this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-avg-length')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
@@ -200,7 +199,7 @@ export class Timeline extends KeepTrackPlugin {
 
   updateTimeline(): void {
     try {
-      if (this.selectSatManager_.selectedSat === -1) {
+      if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
         return;
       }
       if (!this.isMenuButtonActive) {
@@ -217,7 +216,7 @@ export class Timeline extends KeepTrackPlugin {
   }
 
   private calculateSensors_() {
-    const sensorListDom = getEl('timeline-sensor-list');
+    const sensorListDom = getEl('sensor-timeline-sensor-list');
 
     if (!sensorListDom) {
       errorManagerInstance.warn('Could not find sensor list dom');
@@ -261,7 +260,7 @@ export class Timeline extends KeepTrackPlugin {
 
   private calculatePasses_(): SensorPasses[] {
     const sensorPasses: SensorPasses[] = [];
-    const satellite = this.selectSatManager_.getSelectedSat() as DetailedSatellite;
+    const satellite = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat() as DetailedSatellite;
 
     for (const sensor of this.enabledSensors_) {
       const sensorPass: SensorPasses = {
@@ -271,6 +270,7 @@ export class Timeline extends KeepTrackPlugin {
 
       // Skip if satellite is above the max range of the sensor
       if (sensor.maxRng < satellite.perigee && (!sensor.maxRng2 || sensor.maxRng2 < satellite.perigee)) {
+        sensorPasses.push(sensorPass); // Add empty pass to keep the order of the sensors
         continue;
       }
 
@@ -288,7 +288,7 @@ export class Timeline extends KeepTrackPlugin {
         // 5second Looks
         offset = i * 1000; // Offset in seconds (msec * 1000)
         const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
-        const multiSitePass = Timeline.propagateMultiSite(now, satellite.satrec, sensor);
+        const multiSitePass = SensorTimeline.propagateMultiSite(now, satellite.satrec, sensor);
 
         // Check if in FOV
         if (multiSitePass.time && !isInView) {
@@ -487,13 +487,51 @@ export class Timeline extends KeepTrackPlugin {
             timeManagerInstance.calculateSimulationTime();
             keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
 
-            const currentSatId = this.selectSatManager_.selectedSat;
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const currentSatId = selectSatManagerInstance.selectedSat;
 
-            this.selectSatManager_.selectSat(null);
-            this.selectSatManager_.selectSat(currentSatId);
+            selectSatManagerInstance.selectSat(null);
+            selectSatManagerInstance.selectSat(currentSatId);
           }
         });
+
       });
+
+      // If no passes draw a light gray bar to indicate no passes
+      if (sensorPass.passes.length === 0) {
+        this.ctx_.fillStyle = 'rgba(200, 200, 200, 0.2)';
+        this.ctx_.fillRect(leftOffset, y - 10, width, 20);
+
+        const drawEvent = (mouseX: number, mouseY: number): boolean => {
+          if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
+            const text = `${sensorPass.sensor.uiName}: No Passes`;
+
+            this.ctx_.font = '14px Consolas';
+
+            const boxWidth = this.ctx_.measureText(text).width;
+
+            // Draw tooltip box (first box is bigger to make a white border)
+            this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+            this.ctx_.fillRect(mouseX - boxWidth / 2 - 6, mouseY - 30, boxWidth + 12, 24);
+            // Draw tooltip box (second box is smaller to create a border effect)
+            this.ctx_.fillStyle = 'rgb(31, 51, 71)';
+            this.ctx_.fillRect(mouseX - boxWidth / 2 - 3, mouseY - 27, boxWidth + 6, 18);
+
+            // Draw tooltip text
+            this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+            this.ctx_.fillText(text, mouseX - boxWidth / 2, mouseY - 15);
+
+            // Make mouse cursor a pointer
+            this.canvas_.style.cursor = 'pointer';
+
+            return true;
+          }
+
+          return false;
+        };
+
+        this.drawEvents_[`${index}-${sensorPass.sensor.id}-no-passes`] = drawEvent;
+      }
     });
 
     // Add one mousemove event
@@ -533,7 +571,7 @@ export class Timeline extends KeepTrackPlugin {
 
   private resizeCanvas_(isForceWidescreen?: boolean): void {
     isForceWidescreen ??= false;
-    const timelineMenuDOM = getEl('timeline-menu');
+    const timelineMenuDOM = getEl('sensor-timeline-menu');
 
     if (isForceWidescreen || window.innerWidth > window.innerHeight) {
       timelineMenuDOM.style.width = `${window.innerWidth}px`;

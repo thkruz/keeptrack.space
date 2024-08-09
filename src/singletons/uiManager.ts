@@ -345,23 +345,27 @@ export class UiManager {
     });
 
     getEl('nav-footer-toggle')?.addEventListener('click', () => {
-      this.footerToggle();
-      const navFooterDom = getEl('nav-footer');
-
-      if (navFooterDom && parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
-        setTimeout(() => {
-          const bottomHeight = getEl('bottom-icons-container')?.offsetHeight;
-
-          document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
-        }, 1000); // Wait for the footer to be fully visible.
-      } else {
-        // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
-        document.documentElement.style.setProperty('--bottom-menu-top', '0px');
-      }
+      this.toggleBottomMenu();
     });
 
     clickAndDragWidth(getEl('settings-menu'));
     clickAndDragWidth(getEl('about-menu'));
+  }
+
+  toggleBottomMenu() {
+    this.footerToggle();
+    const navFooterDom = getEl('nav-footer');
+
+    if (navFooterDom && parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
+      setTimeout(() => {
+        const bottomHeight = getEl('bottom-icons-container')?.offsetHeight;
+
+        document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
+      }, 1000); // Wait for the footer to be fully visible.
+    } else {
+      // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
+      document.documentElement.style.setProperty('--bottom-menu-top', '0px');
+    }
   }
 
   private addSearchEventListeners_() {

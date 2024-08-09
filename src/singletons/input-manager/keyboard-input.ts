@@ -133,6 +133,13 @@ export class KeyboardInput {
           this.releaseShiftKey(keepTrackApi.getMainCamera());
         }
         break;
+      // Close the bottom menu
+      case 'B':
+        if (this.isShiftPressed) {
+          uiManagerInstance.toggleBottomMenu();
+          this.releaseShiftKey(keepTrackApi.getMainCamera());
+        }
+        break;
       case 'D':
         if (this.isShiftPressed && keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
           const debugPlugin = keepTrackApi.getPlugin(DebugMenuPlugin);

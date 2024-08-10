@@ -242,6 +242,22 @@ export class Camera {
     this.zoomTarget_ = val;
   }
 
+  zoomIn(): void {
+    this.zoomWheel(-100);
+  }
+
+  zoomOut(): void {
+    this.zoomWheel(100);
+  }
+
+  resetCamera() {
+    if (this.cameraType !== CameraType.FPS) {
+      this.isPanReset = true;
+    }
+    this.isLocalRotateReset = true;
+    this.ftsRotateReset = true;
+  }
+
   /**
    * TODO: This should be moved to another class
    */
@@ -283,12 +299,28 @@ export class Camera {
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
     }
 
-    this.cameraType++;
+    switch (this.cameraType) {
+      case CameraType.DEFAULT:
+        this.cameraType = CameraType.FIXED_TO_SAT;
+        break;
+      case CameraType.FIXED_TO_SAT:
+        this.cameraType = CameraType.FPS;
+        break;
+      case CameraType.FPS:
+        this.cameraType = CameraType.SATELLITE;
+        break;
+      case CameraType.SATELLITE:
+        this.cameraType = CameraType.DEFAULT;
+        break;
+      default:
+        this.cameraType = CameraType.MAX_CAMERA_TYPES;
+        break;
+    }
 
-    if ((this.cameraType == CameraType.FIXED_TO_SAT && !selectSatManagerInstance) || selectSatManagerInstance?.selectedSat === -1) {
+    if ((this.cameraType === CameraType.FIXED_TO_SAT && !selectSatManagerInstance) || selectSatManagerInstance?.selectedSat === -1) {
       this.cameraType++;
     }
-    if (this.cameraType == CameraType.FPS) {
+    if (this.cameraType === CameraType.FPS) {
       this.resetFpsPos_();
     }
     if (this.cameraType === CameraType.PLANETARIUM && !sensorManagerInstance.isSensorSelected()) {
@@ -610,7 +642,7 @@ export class Camera {
     this.settings_ = settings;
 
     const inputManager = keepTrackApi.getInputManager();
-    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'I', 'J', 'K', 'L', 'Q', 'E', 'R', 'C'];
+    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
     keysDown.forEach((key) => {
       inputManager.keyboard.registerKeyDownEvent({
@@ -618,12 +650,27 @@ export class Camera {
         callback: this[`keyDown${key}_`].bind(this),
       });
     });
-    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'I', 'J', 'K', 'L', 'Q', 'E'];
+    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
+      inputManager.keyboard.registerKeyDownEvent({
+        key: code.replace('Numpad', ''),
+        code,
+        callback: this[`keyDown${code}_`].bind(this),
+      });
+    });
+
+    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
     keysUp.forEach((key) => {
       inputManager.keyboard.registerKeyUpEvent({
         key,
         callback: this[`keyUp${key}_`].bind(this),
+      });
+    });
+    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
+      inputManager.keyboard.registerKeyUpEvent({
+        key: code.replace('Numpad', ''),
+        code,
+        callback: this[`keyUp${code}_`].bind(this),
       });
     });
 
@@ -681,7 +728,55 @@ export class Camera {
     }
   }
 
-  keyDownC_() {
+  keyDownArrowDown_() {
+    if (!this.settings_.isAutoPanD) {
+      this.panDown();
+    }
+  }
+
+  keyDownArrowLeft_() {
+    if (!this.settings_.isAutoPanL) {
+      this.panLeft();
+    }
+  }
+
+  keyDownArrowRight_() {
+    if (!this.settings_.isAutoPanR) {
+      this.panRight();
+    }
+  }
+
+  keyDownArrowUp_() {
+    if (!this.settings_.isAutoPanU) {
+      this.panUp();
+    }
+  }
+
+  keyUpArrowDown_() {
+    if (this.settings_.isAutoPanD) {
+      this.panDown();
+    }
+  }
+
+  keyUpArrowLeft_() {
+    if (this.settings_.isAutoPanL) {
+      this.panLeft();
+    }
+  }
+
+  keyUpArrowRight_() {
+    if (this.settings_.isAutoPanR) {
+      this.panRight();
+    }
+  }
+
+  keyUpArrowUp_() {
+    if (this.settings_.isAutoPanU) {
+      this.panUp();
+    }
+  }
+
+  keyDownV_() {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
@@ -742,13 +837,13 @@ export class Camera {
     }
   }
 
-  keyDownI_() {
+  keyDownNumpad8_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
       this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
     }
   }
 
-  keyDownJ_() {
+  keyDownNumpad4_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
       this.fpsYawRate = -settingsManager.fpsYawRate / this.speedModifier;
     }
@@ -757,13 +852,13 @@ export class Camera {
     }
   }
 
-  keyDownK_() {
+  keyDownNumpad2_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
       this.fpsPitchRate = -settingsManager.fpsPitchRate / this.speedModifier;
     }
   }
 
-  keyDownL_() {
+  keyDownNumpad6_() {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
       this.fpsYawRate = settingsManager.fpsYawRate / this.speedModifier;
     }
@@ -834,16 +929,16 @@ export class Camera {
     this.fpsRotateRate = 0;
   }
 
-  keyUpI_() {
+  keyUpNumpad8_() {
     this.fpsPitchRate = 0;
   }
 
   // Intentionally the same as keyUpI_
-  keyUpK_() {
+  keyUpNumpad2_() {
     this.fpsPitchRate = 0;
   }
 
-  keyUpJ_() {
+  keyUpNumpad4_() {
     if (this.cameraType === CameraType.ASTRONOMY) {
       this.fpsRotateRate = 0;
     } else {
@@ -852,7 +947,7 @@ export class Camera {
   }
 
   // Intentionally the same as keyUpJ_
-  keyUpL_() {
+  keyUpNumpad6_() {
     if (this.cameraType === CameraType.ASTRONOMY) {
       this.fpsRotateRate = 0;
     } else {
@@ -1032,6 +1127,22 @@ export class Camera {
     if (this.cameraType === CameraType.PLANETARIUM) {
       this.zoomTarget = 0.01;
     }
+  }
+
+  panUp() {
+    this.settings_.isAutoPanU = !this.settings_.isAutoPanU;
+  }
+
+  panDown() {
+    this.settings_.isAutoPanD = !this.settings_.isAutoPanD;
+  }
+
+  panLeft() {
+    this.settings_.isAutoPanL = !this.settings_.isAutoPanL;
+  }
+
+  panRight() {
+    this.settings_.isAutoPanR = !this.settings_.isAutoPanR;
   }
 
   /**

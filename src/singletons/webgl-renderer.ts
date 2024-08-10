@@ -139,8 +139,12 @@ export class WebGLRenderer {
       throw new Error('The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.');
     }
 
-    window.addEventListener('resize', () => {
-      this.resizeCanvas();
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.resize,
+      cbName: 'webgl-Renderer',
+      cb: () => {
+        this.resizeCanvas();
+      },
     });
 
     // Try to prevent crashes

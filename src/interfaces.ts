@@ -354,6 +354,7 @@ export enum KeepTrackApiEvents {
    */
   setSensor = 'setSensor',
   changeSensorMarkers = 'changeSensorMarkers',
+  resize = 'resize',
   altCanvasResize = 'altCanvasResize',
   endOfDraw = 'endOfDraw',
   /**

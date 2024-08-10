@@ -1,12 +1,13 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import analysisPng from '@public/img/icons/polar.png';
 
 
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
@@ -16,6 +17,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private selectSatManager_: SelectSatManager;
   passStartTime_: Date;
   passStopTime_: Date;
+
+  private plotDuration_ = 3;
 
   constructor() {
     super(PolarPlotPlugin.PLUGIN_NAME);
@@ -45,6 +48,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="polar-plot-menu" class="side-menu-parent start-hidden text-select">
     <div id="polar-plot-content" class="side-menu" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+      <span id="polar-plot-warning" class="text-center">Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours</span>
       <canvas id="polar-plot" class="w-96" width="1000" height="1000"></canvas>
       <button id="polar-plot-save" class="btn btn-primary">Save Image</button>
     </div>
@@ -138,8 +142,14 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     if (this.generatePlotData_()) {
       // If there is data draw it
       this.drawPlot_();
+      hideEl('polar-plot-warning');
+      showEl('polar-plot');
+      showEl('polar-plot-save');
     } else {
-      getEl('polar-plot-content').innerHTML = 'Satellite is not in view for the next 48 hours';
+      showEl('polar-plot-warning');
+      hideEl('polar-plot');
+      hideEl('polar-plot-save');
+      getEl('polar-plot-warning').innerHTML = `Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours`;
     }
   }
 
@@ -151,10 +161,14 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     const sat = this.selectSatManager_.getSelectedSat() as DetailedSatellite;
     let isSomethingInView = false;
 
+    if (sat.perigee > sensor.maxRng || sat.apogee < sensor.minRng) {
+      return false;
+    }
+
     this.plotData_ = [];
     let now: Date = null;
 
-    for (let i = 0; i < secondsPerDay * 3; i++) {
+    for (let i = 0; i < this.plotDuration_ * secondsPerDay; i++) {
       now = keepTrackApi.getTimeManager().getOffsetTimeObj(i * MILLISECONDS_PER_SECOND);
       const inView = sensor.isSatInFov(sat, now);
 
@@ -195,6 +209,10 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
   private setupCanvas_() {
     const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
+
+    if (!canvas) {
+      return;
+    }
 
     this.ctx_ = canvas.getContext('2d');
     this.canvasSize_ = Math.min(this.ctx_.canvas.width, this.ctx_.canvas.height);

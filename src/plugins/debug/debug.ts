@@ -11,6 +11,7 @@ import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
   static readonly PLUGIN_NAME = 'Debug Menu';
@@ -171,7 +172,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           setInnerHtml('debug-camera-position-y', `Y: ${position[1].toFixed(2)}`);
           setInnerHtml('debug-camera-position-z', `Z: ${position[2].toFixed(2)}`);
           setInnerHtml('debug-camera-distance-from-earth', `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`);
-          this.lastCameraUpdate = <Milliseconds> new Date().getTime();
+          this.lastCameraUpdate = <Milliseconds>new Date().getTime();
         }
         if (selectSatManagerInstance.selectedSat >= 0) {
           const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat);
@@ -186,6 +187,25 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           setInnerHtml('debug-sat-position-x', `X: ${position.x.toFixed(2)}`);
           setInnerHtml('debug-sat-position-y', `Y: ${position.y.toFixed(2)}`);
           setInnerHtml('debug-sat-position-z', `Z: ${position.z.toFixed(2)}`);
+        }
+      },
+    });
+
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyDownEvent({
+      key: 'F12',
+      callback: () => {
+        if (keyboardManager.isShiftPressed) {
+          if (this.isErudaVisible) {
+            eruda.hide();
+            this.isErudaVisible = false;
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+          } else {
+            eruda.show();
+            this.isErudaVisible = true;
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+          }
         }
       },
     });

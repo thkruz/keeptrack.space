@@ -1,16 +1,13 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
+import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { mat4 } from 'gl-matrix';
+import { DetailedSensor, GreenwichMeanSiderealTime } from 'ootk';
 import { CustomMesh } from './custom-mesh';
 import { RadarDome } from './radar-dome';
 
-// ////////////////////////////////////////////////////////////////////////////
-// TODO: This is a WIP for a custom mesh factory. It's not used yet.
-// ////////////////////////////////////////////////////////////////////////////
-
-/* istanbul ignore file */
-
 export class CustomMeshFactory {
-  private customMeshes_: any[] = [];
+  private customMeshes_: (CustomMesh | RadarDome)[] = [];
 
   createCustomMesh(vertexList: Float32Array) {
     const customMesh = new CustomMesh();
@@ -29,7 +26,11 @@ export class CustomMeshFactory {
   }
 
   updateVertexList(id: number, vertexList: Float32Array) {
-    this.customMeshes_[id].updateVertexList(vertexList);
+    const mesh = this.customMeshes_[id];
+
+    if (mesh instanceof CustomMesh) {
+      mesh.updateVertexList(vertexList);
+    }
   }
 
   clear() {
@@ -37,25 +38,111 @@ export class CustomMeshFactory {
   }
 
   drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-    this.customMeshes_.forEach((customMesh) => {
-      customMesh.draw(pMatrix, camMatrix, tgtBuffer);
+    let i = 0;
+    let lastSensorObjName = '';
+
+    /*
+     * Only draw the radar dome if the sensor is active. Check current sensors for
+     * sensor with the same objName since those are unique (this is for sensors with
+     * two parameters like LEOCRSR)
+     */
+    const activeSensors = keepTrackApi.getSensorManager().currentSensors.concat(keepTrackApi.getSensorManager().secondarySensors.concat(keepTrackApi.getSensorManager().stfSensors));
+
+    this.customMeshes_.forEach((mesh) => {
+      if (mesh instanceof RadarDome) {
+        // There needs to be a reason to draw the radar dome.
+        if ((keepTrackApi.getPlugin(SensorFov).isMenuButtonActive ||
+          keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive)) {
+
+
+          // Ignore deep space when there are multiple sensors active
+          if (activeSensors.length > 1 && mesh.sensor.maxRng > 40000) {
+            return;
+          }
+
+          const sensors = activeSensors.filter((s) => s.objName === mesh.sensor.objName);
+
+          if (sensors.length > 0) {
+            mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
+            if (mesh.sensor.objName !== lastSensorObjName) {
+              i++;
+              lastSensorObjName = mesh.sensor.objName;
+            }
+          }
+        }
+      } else {
+        mesh.draw(pMatrix, camMatrix, tgtBuffer);
+      }
     });
   }
 
-  updateAll() {
-    this.customMeshes_.forEach((customMesh) => {
-      customMesh.update();
+  updateAll(gmst: GreenwichMeanSiderealTime) {
+    /*
+     * Only draw the radar dome if the sensor is active. Check current sensors for
+     * sensor with the same objName since those are unique (this is for sensors with
+     * two parameters like LEOCRSR)
+     */
+    const activeSensors = keepTrackApi.getSensorManager().currentSensors.concat(keepTrackApi.getSensorManager().secondarySensors.concat(keepTrackApi.getSensorManager().stfSensors));
+
+    this.customMeshes_.forEach((mesh) => {
+      if (mesh instanceof RadarDome) {
+        // There needs to be a reason to draw the radar dome.
+        if ((keepTrackApi.getPlugin(SensorFov).isMenuButtonActive ||
+          keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive)) {
+
+          const sensor = activeSensors.find((s) => s.objName === mesh.sensor.objName);
+
+          if (sensor) {
+            mesh.update(gmst);
+          }
+        }
+      } else {
+        mesh.update();
+      }
     });
   }
 
-  createRadarDome() {
-    const radarDome = new RadarDome();
+  createRadarDome(sensor: DetailedSensor): RadarDome {
+    const found = this.customMeshes_.find((mesh) => {
+      if (mesh instanceof RadarDome) {
+        return mesh.sensor === sensor;
+      }
+
+      return false;
+    }) as RadarDome;
+
+    if (found) {
+      return found;
+    }
+
+    const radarDome = new RadarDome(sensor);
 
     const renderer = keepTrackApi.getRenderer();
 
     radarDome.init(renderer.gl);
     radarDome.id = this.customMeshes_.length;
     this.customMeshes_.push(radarDome);
+
+    if (sensor.minAz2) {
+      const sensor2 = new DetailedSensor({
+        ...sensor,
+        minAz: sensor.minAz2,
+        maxAz: sensor.maxAz2,
+        minEl: sensor.minEl2,
+        maxEl: sensor.maxEl2,
+        minRng: sensor.minRng2,
+        maxRng: sensor.maxRng2,
+        volume: sensor.isVolumetric,
+      });
+
+      const radarDome = new RadarDome(sensor2);
+
+      const renderer = keepTrackApi.getRenderer();
+
+      radarDome.init(renderer.gl);
+      radarDome.id = this.customMeshes_.length;
+      this.customMeshes_.push(radarDome);
+    }
 
     return radarDome;
   }

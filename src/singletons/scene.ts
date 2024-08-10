@@ -6,6 +6,7 @@ import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
 import { Box } from './draw-manager/cube';
+import { CustomMeshFactory } from './draw-manager/custom-mesh-factory';
 import { Earth } from './draw-manager/earth';
 import { Godrays } from './draw-manager/godrays';
 import { Moon } from './draw-manager/moon';
@@ -34,6 +35,7 @@ export class Scene {
     gpuPicking: null as WebGLFramebuffer,
     godrays: null as WebGLFramebuffer,
   };
+  customMeshFactory: CustomMeshFactory;
 
   constructor(params: SceneParams) {
     this.gl_ = params.gl;
@@ -45,6 +47,7 @@ export class Scene {
     this.sun = new Sun();
     this.godrays = new Godrays();
     this.searchBox = new Box();
+    this.customMeshFactory = new CustomMeshFactory();
   }
 
   init(gl: WebGL2RenderingContext): void {
@@ -57,6 +60,8 @@ export class Scene {
     this.earth.update(gmst);
     this.moon.update(simulationTime);
     this.skybox.update();
+
+    this.customMeshFactory.updateAll(gmst);
   }
 
   render(renderer: WebGLRenderer, camera: Camera): void {
@@ -65,6 +70,8 @@ export class Scene {
     this.renderBackground(renderer, camera);
     this.renderOpaque(renderer, camera);
     this.renderTransparent(renderer, camera);
+
+    this.customMeshFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
   }
 
   averageDrawTime = 0;
@@ -79,9 +86,9 @@ export class Scene {
 
     if (
       (!settingsManager.isDisableMoon ||
-      settingsManager.isDrawSun ||
-      settingsManager.isDrawAurora ||
-      settingsManager.isDrawMilkyWay) &&
+        settingsManager.isDrawSun ||
+        settingsManager.isDrawAurora ||
+        settingsManager.isDrawMilkyWay) &&
       !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
       keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling some visual effects in settings.', 'caution');
       settingsManager.isDisableMoon = true;

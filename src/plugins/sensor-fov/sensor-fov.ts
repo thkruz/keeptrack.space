@@ -87,17 +87,6 @@ export class SensorFov extends KeepTrackPlugin {
         }
       },
     });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.changeSensorMarkers,
-      cbName: this.PLUGIN_NAME,
-      cb: (caller: string): void => {
-        if (caller !== this.PLUGIN_NAME) {
-          this.isFovBubbleModeOn = false;
-          this.setBottomIconToUnselected(false);
-        }
-      },
-    });
   }
 
   disableFovView(isTellWorker = true) {

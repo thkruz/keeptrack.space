@@ -463,11 +463,7 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
         break;
       case 'reset-camera-rmb':
-        if (keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
-          keepTrackApi.getMainCamera().isPanReset = true;
-        }
-        keepTrackApi.getMainCamera().isLocalRotateReset = true;
-        keepTrackApi.getMainCamera().ftsRotateReset = true;
+        keepTrackApi.getMainCamera().resetCamera();
         break;
       case 'clear-lines-rmb':
         lineManagerInstance.clear();

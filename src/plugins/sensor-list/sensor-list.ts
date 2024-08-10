@@ -1,8 +1,8 @@
 import { sensors } from '@app/catalogs/sensors';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { getClass } from '@app/lib/get-class';
 import { getEl } from '@app/lib/get-el';
+import { CameraType } from '@app/singletons/camera';
 import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -15,7 +15,10 @@ import { Planetarium } from '../planetarium/planetarium';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+
+// TODO: Add a search bar and filter for sensors
 
 export class SensorListPlugin extends KeepTrackPlugin {
   dependencies: string[] = [DateTimeManager.PLUGIN_NAME];
@@ -249,6 +252,22 @@ export class SensorListPlugin extends KeepTrackPlugin {
         }
       },
     });
+
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyUpEvent({
+      key: 'Home',
+      callback: () => {
+        // If a sensor is selected rotate the camera to it
+        if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
+          (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT)) {
+          const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+
+          keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom, keepTrackApi.getTimeManager().selectedDate);
+          keepTrackApi.getSoundManager().play(SoundNames.WHOOSH);
+        }
+      },
+    });
   }
 
   sensorListContentClick(sensorClick: string) {
@@ -295,21 +314,21 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
 
     // Deselect any satellites
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
-
-    try {
-      keepTrackApi
-        .getMainCamera()
-        .lookAtLatLon(
-          sensorManagerInstance.currentSensors[0].lat,
-          sensorManagerInstance.currentSensors[0].lon,
-          sensorManagerInstance.currentSensors[0].zoom,
-          keepTrackApi.getTimeManager().selectedDate,
-        );
-    } catch (e) {
-      // TODO: More intentional conditional statement
-      errorManagerInstance.warn(`Error in sensorListContentClick: ${e}`);
-      // Multi-sensors break this
+    if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+      try {
+        keepTrackApi
+          .getMainCamera()
+          .lookAtLatLon(
+            sensorManagerInstance.currentSensors[0].lat,
+            sensorManagerInstance.currentSensors[0].lon,
+            sensorManagerInstance.currentSensors[0].zoom,
+            keepTrackApi.getTimeManager().selectedDate,
+          );
+      } catch (e) {
+        // TODO: More intentional conditional statement
+        errorManagerInstance.warn(`Error in sensorListContentClick: ${e}`);
+        // Multi-sensors break this
+      }
     }
     if (settingsManager.currentColorScheme == keepTrackApi.getColorSchemeManager().default) {
       LegendManager.change('default');

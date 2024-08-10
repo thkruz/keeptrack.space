@@ -181,22 +181,7 @@ export class GamepadPlugin {
     }
     console.log('Left Bumper');
 
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-
-    if (!selectSatManagerInstance) {
-      return;
-    }
-
-    const satId = selectSatManagerInstance.selectedSat - 1;
-
-    if (satId >= 0) {
-      selectSatManagerInstance.selectSat(satId);
-    } else {
-      const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
-      const lastSatId = activeSats[activeSats.length - 1].id;
-
-      selectSatManagerInstance.selectSat(lastSatId);
-    }
+    keepTrackApi.getPlugin(SelectSatManager)?.selectPrevSat();
   }
 
   private btnRightBumper_() {
@@ -205,21 +190,7 @@ export class GamepadPlugin {
     }
     console.log('Right Bumper');
 
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-
-    if (!selectSatManagerInstance) {
-      return;
-    }
-
-    const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
-    const lastSatId = activeSats[activeSats.length - 1].id;
-    const satId = selectSatManagerInstance.selectedSat + 1;
-
-    if (satId <= lastSatId) {
-      selectSatManagerInstance.selectSat(satId);
-    } else {
-      selectSatManagerInstance.selectSat(0);
-    }
+    keepTrackApi.getPlugin(SelectSatManager)?.selectNextSat();
   }
 
   private btnHome_() {

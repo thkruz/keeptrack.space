@@ -12,6 +12,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatelliteFov } from '../satellite-fov/satellite-fov';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
+import { SatInfoBox } from './sat-info-box';
 
 /**
  * This is the class that manages the selection of objects.
@@ -64,6 +65,31 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (cssStyle !== this.lastCssStyle && getEl(TopMenu.SEARCH_RESULT_ID)) {
         this.lastCssStyle = cssStyle;
       }
+    }
+  }
+
+  selectPrevSat() {
+    const satId = this.selectedSat - 1;
+
+    if (satId >= 0) {
+      this.selectSat(satId);
+    } else {
+      const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
+      const lastSatId = activeSats[activeSats.length - 1].id;
+
+      this.selectSat(lastSatId);
+    }
+  }
+
+  selectNextSat() {
+    const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
+    const lastSatId = activeSats[activeSats.length - 1].id;
+    const satId = this.selectedSat + 1;
+
+    if (satId <= lastSatId) {
+      this.selectSat(satId);
+    } else {
+      this.selectSat(0);
     }
   }
 
@@ -210,11 +236,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getMainCamera().exitFixedToSat();
 
       document.documentElement.style.setProperty('--search-box-bottom', '0px');
-      const satInfoBoxDom = getEl('sat-infobox', true);
-
-      if (satInfoBoxDom) {
-        satInfoBoxDom.style.display = 'none';
-      }
+      keepTrackApi.getPlugin(SatInfoBox)?.hide();
 
       // Add Grey Out
       getEl('menu-satview', true)?.classList.add('bmenu-item-disabled');
@@ -405,7 +427,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       },
     });
     inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: '{',
+      key: '[',
       callback: () => {
         this.switchPrimarySecondary();
       },

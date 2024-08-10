@@ -242,7 +242,9 @@ export class ShortTermFences extends KeepTrackPlugin {
     const maxrange = (rng + rngExt / 2) as Kilometers;
 
     const curSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const randomUUID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const stfSensor = new DetailedSensor({
+      objName: `STF-${randomUUID}`,
       lat: curSensor.lat,
       lon: curSensor.lon,
       alt: curSensor.alt,

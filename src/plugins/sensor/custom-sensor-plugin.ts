@@ -319,6 +319,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         break;
     }
 
+    const randomUUID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
     keepTrackApi.getSensorManager().addSecondarySensor(
       new DetailedSensor({
         id: null,
@@ -336,7 +338,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         uiName: 'Custom Sensor',
         system: 'Custom Sensor',
         country: 'Custom Sensor',
-        objName: 'Custom Sensor',
+        objName: `Custom Sensor-${randomUUID}`,
         operator: 'Custom Sensor',
         zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
         volume: false,

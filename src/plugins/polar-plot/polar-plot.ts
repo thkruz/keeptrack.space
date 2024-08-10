@@ -110,6 +110,28 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
         }
       },
     });
+
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyUpEvent({
+      key: 'P',
+      callback: () => {
+        if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+          return;
+        }
+
+        if (!this.isMenuButtonActive) {
+          this.openSideMenu();
+          this.setBottomIconToSelected();
+          this.updatePlot_();
+          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+        } else {
+          this.closeSideMenu();
+          this.setBottomIconToUnselected();
+          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+        }
+      },
+    });
   }
 
   private updatePlot_(): void {

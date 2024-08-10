@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { CommLink, Degrees, DetailedSensor, Kilometers, Milliseconds, RfSensor, SpaceObjectType, ZoomValue } from 'ootk';
 
 export interface SensorList {
@@ -126,10 +127,12 @@ export const sensors = <SensorList>{
     maxAz: <Degrees>240,
     boresightAz: [180 as Degrees],
     minEl: <Degrees>3, // Should this be 0 for "horizon"?
-    maxEl: <Degrees>105, // https://en.wikipedia.org/wiki/Eglin_AFB_Site_C-6 (an elevation range from the horizon to 15° past the zenith)
+    // TODO: Incorporate boresight into rae2ecf calculations for inclined sensors
+    maxEl: <Degrees>90, // https://en.wikipedia.org/wiki/Eglin_AFB_Site_C-6 (an elevation range from the horizon to 15° past the zenith)
+    // maxEl: <Degrees>105, // https://en.wikipedia.org/wiki/Eglin_AFB_Site_C-6 (an elevation range from the horizon to 15° past the zenith)
     boresightEl: [45 as Degrees],
     minRng: <Kilometers>200,
-    maxRng: <Kilometers>200000,
+    maxRng: <Kilometers>50000,
     changeObjectInterval: <Milliseconds>1000,
     zoom: ZoomValue.GEO,
     beamwidth: <Degrees>1.1, // Tmx 1.4 and Rcv 0.8 for Avg of 1.1
@@ -179,7 +182,11 @@ export const sensors = <SensorList>{
     maxAz: <Degrees>78,
     boresightAz: [8 as Degrees],
     minEl: <Degrees>1.9,
-    maxEl: <Degrees>95,
+    maxEl: <Degrees>90,
+    /*
+     * TODO: incorporate boresight into rae2ecf calculations for inclined sensors
+     * maxEl: <Degrees>95,
+     */
     boresightEl: [25 as Degrees], // https://satelliteobservation.files.wordpress.com/2018/11/missile-warning-systems.pdf
     minRng: <Kilometers>200,
     maxRng: <Kilometers>3300, // 1,780 Nm http://www.fortwiki.com/Cavalier_Air_Force_Station
@@ -320,10 +327,9 @@ export const sensors = <SensorList>{
     minEl: <Degrees>1,
     maxEl: <Degrees>90,
     minRng: <Kilometers>0,
-    maxRng: <Kilometers>2500,
+    maxRng: <Kilometers>200000,
+    zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
-
-    zoom: ZoomValue.LEO,
     url: '',
     country: 'United States',
     operator: Operators.USA,
@@ -344,8 +350,8 @@ export const sensors = <SensorList>{
     minEl: <Degrees>1,
     maxEl: <Degrees>90,
     minRng: <Kilometers>0,
-    maxRng: <Kilometers>2300,
-    zoom: ZoomValue.LEO,
+    maxRng: <Kilometers>200000,
+    zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
 
     url: '',
@@ -394,8 +400,8 @@ export const sensors = <SensorList>{
     minRng: <Kilometers>50,
     maxRng: <Kilometers>3057.754, // https://www.spaceforce.mil/News/Article/2142648/swinging-for-the-space-fence/
     zoom: ZoomValue.LEO,
+    volume: true,
     changeObjectInterval: <Milliseconds>2000,
-
     url: '',
     country: 'United States',
     operator: Operators.USSF,
@@ -437,7 +443,7 @@ export const sensors = <SensorList>{
     maxAz: <Degrees>360,
     minEl: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
     maxEl: <Degrees>90,
-    minRng: <Kilometers>15000,
+    minRng: <Kilometers>0,
     maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
@@ -481,7 +487,7 @@ export const sensors = <SensorList>{
     maxAz: <Degrees>360,
     minEl: <Degrees>20, // https://www.osti.gov/servlets/purl/1253293
     maxEl: <Degrees>90,
-    minRng: <Kilometers>15000,
+    minRng: <Kilometers>0,
     maxRng: <Kilometers>200000,
     zoom: ZoomValue.GEO,
     changeObjectInterval: <Milliseconds>20000,
@@ -597,7 +603,11 @@ export const sensors = <SensorList>{
     minAz: <Degrees>5,
     maxAz: <Degrees>125,
     minEl: <Degrees>5,
-    maxEl: <Degrees>95,
+    maxEl: <Degrees>90,
+    /*
+     * TODO: incorporate boresight into rae2ecf calculations for inclined sensors
+     * maxEl: <Degrees>95,
+     */
     minRng: <Kilometers>0,
     maxRng: <Kilometers>3000, // https://missilethreat.csis.org/defsys/tpy-2/
     zoom: ZoomValue.LEO,
@@ -1059,7 +1069,7 @@ export const sensors = <SensorList>{
     country: 'United Kingdom',
     operator: Operators.UKSA,
   }),
-  Tenerife: new DetailedSensor({
+  SDT: new DetailedSensor({
     objName: 'SDT',
     id: 0,
     name: 'ESA Space Debris Telescope, Spain',

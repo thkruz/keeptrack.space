@@ -6,37 +6,41 @@ import { Degrees, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, rae2eci
 import { keepTrackApi } from '../../keepTrackApi';
 import { CustomMesh } from './custom-mesh';
 
+interface SurfaceMeshParams {
+  azStart: Degrees;
+  azEnd: Degrees;
+  elStart: Degrees;
+  elEnd: Degrees;
+  rngStart: Kilometers;
+  rngEnd: Kilometers;
+  azSegments: number;
+  elSegments: number;
+  reverse?: boolean;
+}
+
 export class SensorFovMesh extends CustomMesh {
+  private readonly azimuthSegments = 32;
+  private readonly elevationSegments = 16;
+  private readonly rangeSegments = 16;
+  sensor: DetailedSensor;
+
   uniforms_ = {
     u_pMatrix: <WebGLUniformLocation>null,
     u_camMatrix: <WebGLUniformLocation>null,
     u_mvMatrix: <WebGLUniformLocation>null,
     u_color: <WebGLUniformLocation>null,
   };
-
-  sensor: DetailedSensor;
+  /**
+   * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
+   * This is used when wanting to display on the bottom of the sensor.
+   */
   private indiciesBottom_: Uint16Array;
-  private minRange_: Kilometers;
-  private maxRange_: Kilometers;
-  private minEl_: Degrees;
-  private maxEl_: Degrees;
-  private minAz_: Degrees;
-  private maxAz_: Degrees;
+
 
   constructor(sensor: DetailedSensor) {
     super();
 
     this.sensor = sensor;
-    this.minRange_ = sensor.minRng;
-    this.maxRange_ = sensor.maxRng;
-    this.minEl_ = sensor.minEl;
-    this.maxEl_ = sensor.maxEl;
-    if (sensor.minAz > sensor.maxAz) {
-      this.minAz_ = sensor.minAz - 360 as Degrees;
-    } else {
-      this.minAz_ = sensor.minAz;
-    }
-    this.maxAz_ = sensor.maxAz;
   }
 
   update(gmst: GreenwichMeanSiderealTime) {
@@ -101,201 +105,243 @@ export class SensorFovMesh extends CustomMesh {
     gl.disable(gl.POLYGON_OFFSET_FILL);
   }
 
-  createMesh_() {
-    const azimuthSegments = 32;
-    const elevationSegments = 16;
-    const rangeSegments = 16;
+  private verticesTmp_: number[] = [];
+  private indicesTmp_: number[] = [];
+  private vertexCount_ = 0;
 
-    const vertices = [];
-    const indices = [];
-    let vertexCount = 0;
+  private createHorzGeometry(
+    { azStart, azEnd, elStart, elEnd, rngStart, rngEnd, azSegments, elSegments, reverse = false }: SurfaceMeshParams,
+  ) {
+    const startIndex = this.vertexCount_;
 
-    const createSurface = (
-      azStart, azEnd, elStart, elEnd, rngStart, rngEnd,
-      azSegments, elSegments,
-      reverse = false,
-    ) => {
-      const startIndex = vertexCount;
+    this.createHorzVertices_({ azSegments, azStart, azEnd, elSegments, elStart, elEnd, rngStart, rngEnd, startIndex });
+    this.createHorzIndices_(azSegments, elSegments, startIndex, reverse);
+  }
 
-      for (let i = 0; i <= azSegments; i++) {
-        let az = azStart + (i / azSegments) * (azEnd - azStart);
+  private createHorzIndices_(azSegments: number, elSegments: number, startIndex: number, reverse: boolean) {
+    for (let i = 0; i < azSegments; i++) {
+      for (let j = 0; j < elSegments; j++) {
+        const a = startIndex + i * (elSegments + 1) + j;
+        const b = a + elSegments + 1;
+        const c = a + 1;
+        const d = b + 1;
 
-        for (let j = 0; j <= elSegments; j++) {
-          let el = elStart + (j / elSegments) * (elEnd - elStart);
-          const rng = rngStart + (j / elSegments) * (rngEnd - rngStart);
-
-          // Handle elevations above 90 degrees
-          if (el > 90) {
-            el = 180 - el;
-            az += 180;
-            if (az > 360) {
-              az -= 360;
-            }
-          }
-
-          const eci = rae2eci({ az, el, rng }, this.sensor, 0);
-
-          vertices.push(eci.x, eci.y, eci.z);
-          vertexCount++;
-
-          if (i < azSegments && j < elSegments) {
-            const a = startIndex + i * (elSegments + 1) + j;
-            const b = a + elSegments + 1;
-
-            indices.push(a, b, a + 1);
-            indices.push(b, b + 1, a + 1);
-          }
+        if (reverse) {
+          this.indicesTmp_.push(a, c, b);
+          this.indicesTmp_.push(b, c, d);
+        } else {
+          this.indicesTmp_.push(a, b, c);
+          this.indicesTmp_.push(b, d, c);
         }
       }
+    }
+  }
 
-      for (let i = 0; i < azSegments; i++) {
-        for (let j = 0; j < elSegments; j++) {
-          const a = startIndex + i * (elSegments + 1) + j;
-          const b = a + elSegments + 1;
-          const c = a + 1;
-          const d = b + 1;
+  private createHorzVertices_({ azSegments, azStart, azEnd, elSegments, elStart, elEnd, rngStart, rngEnd, startIndex }) {
+    for (let i = 0; i <= azSegments; i++) {
+      let az = azStart + (i / azSegments) * (azEnd - azStart) as Degrees;
 
-          if (reverse) {
-            indices.push(a, c, b);
-            indices.push(b, c, d);
-          } else {
-            indices.push(a, b, c);
-            indices.push(b, d, c);
-          }
-        }
-      }
-    };
-
-    /**
-     * This creates the left and right walls of the radar dome.
-     * The first vertex is at minimum range, elevation, and a fixed azimuth
-     * The second is at maximum range, minimum elevation, and a fixed azimuth
-     * It then continues climbing in elevation until it reaches the maximum elevation
-     * The last vertex is at maximum range, maximum elevation, and a fixed azimuth
-     */
-    const createWallSurface_ = (
-      az: Degrees,
-      elStart: Degrees,
-      elEnd: Degrees,
-      rngStart: Kilometers,
-      rngEnd: Kilometers,
-      elSegments: number,
-      reverse = false,
-    ) => {
-      const startIndex = vertexCount;
-
-      for (let i = 0; i <= elSegments; i++) {
-        let el = elStart + (i / elSegments) * (elEnd - elStart) as Degrees;
-        let localAz = az;
+      for (let j = 0; j <= elSegments; j++) {
+        let el = elStart + (j / elSegments) * (elEnd - elStart) as Degrees;
+        const rng = rngStart + (j / elSegments) * (rngEnd - rngStart);
 
         // Handle elevations above 90 degrees
         if (el > 90) {
           el = 180 - el as Degrees;
-          localAz = localAz + 180 as Degrees;
-          if (localAz > 360) {
-            localAz = localAz - 360 as Degrees;
+          az = az + 180 as Degrees;
+          if (az > 360) {
+            az = az - 360 as Degrees;
           }
         }
 
-        for (let j = 0; j <= 1; j++) {
-          const rng = j ? rngEnd : rngStart;
+        const eci = rae2eci({ az, el, rng }, this.sensor, 0);
 
-          const eci = rae2eci({ az: localAz, el, rng }, this.sensor, 0);
+        this.verticesTmp_.push(eci.x, eci.y, eci.z);
+        this.vertexCount_++;
 
-          vertices.push(eci.x, eci.y, eci.z);
-          vertexCount++;
+        if (i < azSegments && j < elSegments) {
+          const a = startIndex + i * (elSegments + 1) + j;
+          const b = a + elSegments + 1;
 
-          if (i < 1 && j < 1) {
-            const a = startIndex + i * (1 + 1) + j;
-            const b = a + 1 + 1;
+          this.indicesTmp_.push(a, b, a + 1);
+          this.indicesTmp_.push(b, b + 1, a + 1);
+        }
+      }
+    }
+  }
 
-            indices.push(a, b, a + 1);
-            indices.push(b, b + 1, a + 1);
-          }
+  /**
+   * This creates the left and right walls of the radar dome.
+   * The first vertex is at minimum range, elevation, and a fixed azimuth
+   * The second is at maximum range, minimum elevation, and a fixed azimuth
+   * It then continues climbing in elevation until it reaches the maximum elevation
+   * The last vertex is at maximum range, maximum elevation, and a fixed azimuth
+   */
+  private createVertGeometry_(
+    az: Degrees,
+    elStart: Degrees,
+    elEnd: Degrees,
+    rngStart: Kilometers,
+    rngEnd: Kilometers,
+    elSegments: number,
+    reverse = false,
+  ) {
+    const startIndex = this.vertexCount_;
+
+    this.createVertVertices_(elSegments, elStart, elEnd, az, rngEnd, rngStart, startIndex);
+    this.createVertIndices_(elSegments, startIndex, reverse);
+  }
+
+  private createVertIndices_(elSegments: number, startIndex: number, reverse: boolean) {
+    for (let i = 0; i < elSegments; i++) {
+      for (let j = 0; j < 1; j++) {
+        const a = startIndex + i * (1 + 1) + j;
+        const b = a + 1 + 1;
+        const c = a + 1;
+        const d = b + 1;
+
+        if (reverse) {
+          this.indicesTmp_.push(a, c, b);
+          this.indicesTmp_.push(b, c, d);
+        } else {
+          this.indicesTmp_.push(a, b, c);
+          this.indicesTmp_.push(b, d, c);
+        }
+      }
+    }
+  }
+
+  private createVertVertices_(elSegments: number, elStart: Degrees, elEnd: Degrees, az: Degrees, rngEnd: Kilometers, rngStart: Kilometers, startIndex: number) {
+    for (let i = 0; i <= elSegments; i++) {
+      let el = elStart + (i / elSegments) * (elEnd - elStart) as Degrees;
+      let localAz = az;
+
+      // Handle elevations above 90 degrees
+      if (el > 90) {
+        el = 180 - el as Degrees;
+        localAz = localAz + 180 as Degrees;
+        if (localAz > 360) {
+          localAz = localAz - 360 as Degrees;
         }
       }
 
-      for (let i = 0; i < elSegments; i++) {
-        for (let j = 0; j < 1; j++) {
+      for (let j = 0; j <= 1; j++) {
+        const rng = j ? rngEnd : rngStart;
+
+        const eci = rae2eci({ az: localAz, el, rng }, this.sensor, 0);
+
+        this.verticesTmp_.push(eci.x, eci.y, eci.z);
+        this.vertexCount_++;
+
+        if (i < 1 && j < 1) {
           const a = startIndex + i * (1 + 1) + j;
           const b = a + 1 + 1;
-          const c = a + 1;
-          const d = b + 1;
 
-          if (reverse) {
-            indices.push(a, c, b);
-            indices.push(b, c, d);
-          } else {
-            indices.push(a, b, c);
-            indices.push(b, d, c);
-          }
+          this.indicesTmp_.push(a, b, a + 1);
+          this.indicesTmp_.push(b, b + 1, a + 1);
         }
       }
+    }
+  }
 
-      return { vertices, indices };
-    };
+  initGeometry_() {
+    const { maxEl, minAz, maxAz, azRange, minEl, minRange, maxRange } = this.getSensorFovParams_();
 
-    if (this.sensor.maxEl <= 90) {
+
+    if (maxEl <= 90) {
       // 1. Bottom surface
-      createSurface(
-        this.minAz_, this.maxAz_, this.minEl_, this.minEl_,
-        this.minRange_, this.maxRange_,
-        azimuthSegments, rangeSegments,
+      this.createHorzGeometry(
+        { azStart: minAz, azEnd: maxAz, elStart: minEl, elEnd: minEl, rngStart: minRange, rngEnd: maxRange, azSegments: this.azimuthSegments, elSegments: this.rangeSegments },
       );
 
-      this.indiciesBottom_ = new Uint16Array(indices);
+      this.indiciesBottom_ = new Uint16Array(this.indicesTmp_);
     }
 
     // 2. Left side (if not 360 degrees)
-    let azRange = this.maxAz_ - this.minAz_;
-
-    if (azRange < 0) {
-      azRange += 360;
-    }
-
     if (azRange < 360) {
-      createWallSurface_(
-        this.minAz_, this.minEl_, this.maxEl_, this.minRange_, this.maxRange_,
-        elevationSegments,
+      this.createVertGeometry_(
+        minAz, minEl, maxEl, minRange, maxRange,
+        this.elevationSegments,
         true,
       );
     }
 
     // 3. Right side (if not 360 degrees)
     if (azRange < 360) {
-      createWallSurface_(
-        this.maxAz_, this.minEl_, this.maxEl_, this.minRange_, this.maxRange_,
-        elevationSegments,
+      this.createVertGeometry_(
+        maxAz, minEl, maxEl, minRange, maxRange,
+        this.elevationSegments,
       );
     }
 
-    if (this.sensor.maxEl <= 90) {
+    /*
+     * Beyond 90 degrees elevation the mesh criss-crosses itself, this will
+     * be fixed with an update to ootk where the elevation is ajusted to
+     * a reference boresight elevation
+     */
+    if (maxEl <= 90) {
       // 4. Back side
-      createSurface(
-        this.minAz_, this.maxAz_, this.minEl_, this.maxEl_,
-        this.minRange_, this.minRange_,
-        azimuthSegments, elevationSegments,
-        true,
-      );
+      this.createHorzGeometry({
+        azStart: minAz,
+        azEnd: maxAz,
+        elStart: minEl,
+        elEnd: maxEl,
+        rngStart: minRange,
+        rngEnd: minRange,
+        azSegments: this.azimuthSegments,
+        elSegments: this.elevationSegments,
+        reverse: true,
+      });
 
       // 5. Front side
-      createSurface(
-        this.minAz_, this.maxAz_, this.minEl_, this.maxEl_,
-        this.maxRange_, this.maxRange_,
-        azimuthSegments, elevationSegments,
-      );
+      this.createHorzGeometry({
+        azStart: minAz,
+        azEnd: maxAz,
+        elStart: minEl,
+        elEnd: maxEl,
+        rngStart: maxRange,
+        rngEnd: maxRange,
+        azSegments: this.azimuthSegments,
+        elSegments: this.elevationSegments,
+      });
 
       // 6. Top surface
-      createSurface(
-        this.minAz_, this.maxAz_, this.maxEl_, this.maxEl_,
-        this.minRange_, this.maxRange_,
-        azimuthSegments, rangeSegments,
-      );
+      this.createHorzGeometry({
+        azStart: minAz,
+        azEnd: maxAz,
+        elStart: maxEl,
+        elEnd: maxEl,
+        rngStart: minRange,
+        rngEnd: maxRange,
+        azSegments: this.azimuthSegments,
+        elSegments: this.rangeSegments,
+      });
     }
 
 
-    this.vertices_ = new Float32Array(vertices);
-    this.indices_ = new Uint16Array(indices);
+    this.vertices_ = new Float32Array(this.verticesTmp_);
+    this.indices_ = new Uint16Array(this.indicesTmp_);
+  }
+
+  private getSensorFovParams_() {
+    const minRange = this.sensor.minRng;
+    const maxRange = this.sensor.maxRng;
+    const minEl = this.sensor.minEl;
+    const maxEl = this.sensor.maxEl;
+    let minAz = this.sensor.minAz;
+
+    if (this.sensor.minAz > this.sensor.maxAz) {
+      minAz = this.sensor.minAz - 360 as Degrees;
+    }
+    const maxAz = this.sensor.maxAz;
+
+    let azRange = maxAz - minAz;
+
+    if (azRange < 0) {
+      azRange += 360;
+    }
+
+    return { maxEl, minAz, maxAz, azRange, minEl, minRange, maxRange };
   }
 
   shaders_ = {

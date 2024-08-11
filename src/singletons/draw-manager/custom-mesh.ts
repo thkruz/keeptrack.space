@@ -46,7 +46,7 @@ export abstract class CustomMesh {
     this.gl_ = gl;
 
     this.program_ = new WebGlProgramHelper(this.gl_, this.shaders_.vert, this.shaders_.frag, this.attribs_, this.uniforms_).program;
-    this.createMesh_();
+    this.initGeometry_();
     this.initBuffers_();
     this.initVao_();
 
@@ -106,7 +106,7 @@ export abstract class CustomMesh {
     this.sortedIndices = buckets.reduceRight((acc, bucket) => acc.concat(bucket), []);
   }
 
-  abstract createMesh_(): void;
+  abstract initGeometry_(): void;
 
   protected initVao_() {
     const gl = this.gl_;

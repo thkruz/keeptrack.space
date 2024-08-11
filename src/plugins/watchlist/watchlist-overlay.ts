@@ -84,6 +84,8 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   sideMenuElementName = 'info-overlay-menu';
 
+  isRequireSensorSelected: boolean = true;
+
   static uiManagerFinal() {
     getEl('info-overlay-content').addEventListener('click', (evt: Event) => {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();

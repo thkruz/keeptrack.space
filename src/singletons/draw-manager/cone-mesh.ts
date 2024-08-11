@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
-import { SatMath } from '@app/static/sat-math';
-import { mat4, vec3 } from 'gl-matrix';
-import { BaseObject, DEG2RAD, eci2lla, Kilometers, RADIUS_OF_EARTH } from 'ootk';
+import { mat4, quat, vec3 } from 'gl-matrix';
+import { BaseObject, RADIUS_OF_EARTH } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { CustomMesh } from './custom-mesh';
 
@@ -37,27 +36,30 @@ export class ConeMesh extends CustomMesh {
   }
 
   update() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-
     this.updatePosition_();
 
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
 
-    // Translate to halfway between this.pos and the center of the earth
-    const h = vec3.distance([0, 0, 0], vec3.fromValues(this.pos[0], this.pos[1], this.pos[2])) - this.offsetDistance;
-    const halfwayPosition = vec3.scale(vec3.create(), vec3.fromValues(h + this.offsetDistance * 2, 0, 0), 0.5);
-    // Rotate to face the center of the earth
+    // Calculate the height of the cone
+    const satDistance = vec3.length(this.pos);
+    const coneHeight = satDistance - this.offsetDistance;
 
-    const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
-    const { lat, lon } = eci2lla({ x: this.pos[0] as Kilometers, y: this.pos[1] as Kilometers, z: this.pos[2] as Kilometers }, gmst);
+    // Translate RADIUS_OF_EARTH units along the satellite's position vector
+    const normalizedPositionScaled = vec3.scale(vec3.create(), vec3.normalize(vec3.create(), this.pos), this.offsetDistance);
 
-    mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, lon * DEG2RAD);
-    mat4.rotateY(this.mvMatrix_, this.mvMatrix_, lat * DEG2RAD);
-    mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, gmst);
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, normalizedPositionScaled);
 
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, halfwayPosition);
+    // Create a rotation matrix to align the cone with the satellite's position
+    const rotationMatrix = mat4.create();
 
+    mat4.fromQuat(rotationMatrix, quat.rotationTo(quat.create(), [0, 0, 1], vec3.normalize(vec3.create(), this.pos)));
+
+    // Apply the rotation
+    mat4.multiply(this.mvMatrix_, this.mvMatrix_, rotationMatrix);
+
+    // Scale the cone to the correct height
+    mat4.scale(this.mvMatrix_, this.mvMatrix_, [coneHeight, coneHeight, coneHeight]);
   }
 
   draw(pMatrix: mat4, camMatrix: mat4, color: [number, number, number, number], tgtBuffer?: WebGLFramebuffer) {
@@ -100,46 +102,29 @@ export class ConeMesh extends CustomMesh {
   }
 
   initGeometry_() {
-    // height is the distance from the center of the earth ([0,0,0]) to the cone.pos
-    const h = vec3.distance([0, 0, 0], vec3.fromValues(this.pos[0], this.pos[1], this.pos[2])) - this.offsetDistance;
-
-    // Calculate the width of the cone based on the angle given and the height of the cone
-    const r1 = h * Math.tan((this.angle * Math.PI) / 180);
-    const r2 = 0.05;
+    const height = 1; // Use a unit height, scale in update method
+    const radius = Math.tan((this.angle * Math.PI) / 180);
     const nPhi = 100;
 
-    let Phi = 0;
-    const dPhi = (2 * Math.PI) / (nPhi - 1);
+    const dPhi = (2 * Math.PI) / nPhi;
 
-    Phi += dPhi;
-    /*
-     * let Nx = r1 - r2;
-     * let Ny = h;
-     * const N = Math.sqrt(Nx * Nx + Ny * Ny);
-     */
+    // Apex of the cone
+    this.verticesTmp_.push(0, 0, height);
 
-    /*
-     * Nx /= N;
-     * Ny /= N;
-     */
+    // Base vertices
+    for (let i = 0; i <= nPhi; i++) {
+      const phi = i * dPhi;
+      const x = radius * Math.cos(phi);
+      const y = radius * Math.sin(phi);
 
-    for (let i = 0; i < nPhi + 1; i++) {
-      const cosPhi = Math.cos(Phi);
-      const sinPhi = Math.sin(Phi);
-      const cosPhi2 = Math.cos(Phi + dPhi / 2);
-      const sinPhi2 = Math.sin(Phi + dPhi / 2);
-
-      if (i !== nPhi) {
-        this.verticesTmp_.push(-h / 2, cosPhi * r1, sinPhi * r1);
-        // vertNorm.push(Nx, Ny * cosPhi, Ny * sinPhi); // normals
-        this.indicesTmp_.push(2 * i, 2 * i + 1, 2 * i + 2);
-      }
-      this.verticesTmp_.push(h / 2, cosPhi2 * r2, sinPhi2 * r2);
-      // vertNorm.push(Nx, Ny * cosPhi2, Ny * sinPhi2); // normals
-      this.indicesTmp_.push(2 * i + 1, 2 * i + 3, 2 * i + 2);
-      Phi += dPhi;
+      this.verticesTmp_.push(x, y, 0);
     }
 
+    // Triangles
+    for (let i = 0; i < nPhi; i++) {
+      // Triangle from apex to base
+      this.indicesTmp_.push(0, i + 1, i + 2);
+    }
 
     this.vertices_ = new Float32Array(this.verticesTmp_);
     this.indices_ = new Uint16Array(this.indicesTmp_);

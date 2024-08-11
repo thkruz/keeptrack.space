@@ -47,6 +47,16 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   const scene = new Scene({
     gl: global.mocks.glMock,
   });
+
+  scene.customMeshFactory = {
+    createCustomMesh: jest.fn(),
+    createRadarDome: jest.fn(),
+    remove: jest.fn(),
+    updateVertexList: jest.fn(),
+    clear: jest.fn(),
+    drawAll: jest.fn(),
+  } as any;
+
   const catalogManagerInstance = new CatalogManager();
 
   catalogManagerInstance.satCruncher = {

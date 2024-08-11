@@ -285,6 +285,9 @@ export const keepTrackApiStubs = {
         skybox: {
           draw: jest.fn(),
         },
+        customMeshFactory: {
+          creatRadarDome: jest.fn(),
+        },
       },
       startWithOrbits: jest.fn(),
     },

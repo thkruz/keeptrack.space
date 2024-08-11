@@ -89,13 +89,7 @@
         "SwitchCase": 1
       }
     ],
-    "indent-legacy": [
-      "error",
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
+    "indent-legacy": "off",
     "init-declarations": "off",
     "jsx-quotes": "error",
     "key-spacing": "error",

@@ -3,28 +3,19 @@ import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { mat4 } from 'gl-matrix';
 import { DetailedSensor, GreenwichMeanSiderealTime, SpaceObjectType } from 'ootk';
+import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
 
 // TODO: Sensors should be indpeneent of the object they are attached to. This will remove minAz2 and maxAz2 type of properties
 
-export class SensorFovMeshFactory {
-  private fovMeshes_: (SensorFovMesh)[] = [];
-
-  remove(id: number) {
-    this.fovMeshes_.splice(id, 1);
-  }
-
-  clear() {
-    this.fovMeshes_ = [];
-  }
-
+export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     let i = 0;
     let lastSensorObjName = '';
 
     const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
 
-    this.fovMeshes_.forEach((mesh) => {
+    this.meshes_.forEach((mesh) => {
       const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
 
       if (!isNeeded) {
@@ -84,7 +75,7 @@ export class SensorFovMeshFactory {
   updateAll(gmst: GreenwichMeanSiderealTime) {
     const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
 
-    this.fovMeshes_.forEach((mesh) => {
+    this.meshes_.forEach((mesh) => {
       const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
 
       if (!isNeeded) {
@@ -99,14 +90,14 @@ export class SensorFovMeshFactory {
     });
   }
 
-  generateSensorFovMesh(sensor: DetailedSensor): SensorFovMesh {
+  generateSensorFovMesh(sensor: DetailedSensor) {
     const foundSensorFovMesh = this.checkCacheForMesh_(sensor);
 
     if (foundSensorFovMesh) {
-      return foundSensorFovMesh;
+      return;
     }
 
-    const radarDome = this.createSensorFovMesh_(sensor);
+    this.create(sensor);
 
     // Create a second sensor if it exists
     if (sensor.minAz2) {
@@ -121,14 +112,12 @@ export class SensorFovMeshFactory {
         volume: sensor.isVolumetric,
       });
 
-      this.createSensorFovMesh_(sensor2);
+      this.create(sensor2);
     }
-
-    return radarDome;
   }
 
   private checkCacheForMesh_(sensor: DetailedSensor) {
-    return this.fovMeshes_.find((mesh) => {
+    return this.meshes_.find((mesh) => {
       if (mesh instanceof SensorFovMesh) {
         return mesh.sensor === sensor;
       }
@@ -137,15 +126,9 @@ export class SensorFovMeshFactory {
     });
   }
 
-  private createSensorFovMesh_(sensor: DetailedSensor) {
-    const radarDome = new SensorFovMesh(sensor);
+  create(sensor: DetailedSensor) {
+    const sensorFovMesh = new SensorFovMesh(sensor);
 
-    const renderer = keepTrackApi.getRenderer();
-
-    radarDome.init(renderer.gl);
-    radarDome.id = this.fovMeshes_.length;
-    this.fovMeshes_.push(radarDome);
-
-    return radarDome;
+    this.add(sensorFovMesh);
   }
 }

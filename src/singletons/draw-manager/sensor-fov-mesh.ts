@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 import { Degrees, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, rae2eci } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { CustomMesh } from './custom-mesh';
@@ -86,7 +86,7 @@ export class SensorFovMesh extends CustomMesh {
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);
-    gl.polygonOffset(-2.0, -2.0);
+    gl.polygonOffset(-5.0, -5.0);
 
     gl.bindVertexArray(this.vao_);
 
@@ -321,6 +321,44 @@ export class SensorFovMesh extends CustomMesh {
 
     this.vertices_ = new Float32Array(this.verticesTmp_);
     this.indices_ = new Uint16Array(this.indicesTmp_);
+  }
+
+  sortFacesByDistance(camPos: vec3): void {
+    const buckets: number[][] = Array(this.NUM_BUCKETS).fill(null).map(() => []);
+    const faceCenters: vec3[] = [];
+
+    // Pre-compute face centers
+    for (let i = 0; i < this.indices_.length; i += 3) {
+      const centerX = (this.vertices_[this.indices_[i] * 3] + this.vertices_[this.indices_[i + 1] * 3] + this.vertices_[this.indices_[i + 2] * 3]) / 3;
+      const centerY = (this.vertices_[this.indices_[i] * 3 + 1] + this.vertices_[this.indices_[i + 1] * 3 + 1] + this.vertices_[this.indices_[i + 2] * 3 + 1]) / 3;
+      const centerZ = (this.vertices_[this.indices_[i] * 3 + 2] + this.vertices_[this.indices_[i + 1] * 3 + 2] + this.vertices_[this.indices_[i + 2] * 3 + 2]) / 3;
+
+      faceCenters.push(vec3.fromValues(centerX, centerY, centerZ));
+    }
+
+    // Find min and max distances
+    let minDist = Infinity;
+    let maxDist = -Infinity;
+
+    faceCenters.forEach((center) => {
+      const dist = vec3.squaredDistance(center, camPos);
+
+      minDist = Math.min(minDist, dist);
+      maxDist = Math.max(maxDist, dist);
+    });
+
+    // Distribute faces into buckets
+    const bucketSize = (maxDist - minDist) / this.NUM_BUCKETS;
+
+    for (let i = 0; i < this.indices_.length; i += 3) {
+      const dist = vec3.squaredDistance(faceCenters[i / 3], camPos);
+      const bucketIndex = Math.min(Math.floor((dist - minDist) / bucketSize), this.NUM_BUCKETS - 1);
+
+      buckets[bucketIndex].push(this.indices_[i], this.indices_[i + 1], this.indices_[i + 2]);
+    }
+
+    // Concatenate buckets from far to near
+    this.sortedIndices = buckets.reduceRight((acc, bucket) => acc.concat(bucket), []);
   }
 
   private getSensorFovParams_() {

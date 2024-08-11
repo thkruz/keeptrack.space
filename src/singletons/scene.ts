@@ -5,6 +5,7 @@ import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
+import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
 import { Box } from './draw-manager/cube';
 import { Earth } from './draw-manager/earth';
 import { Godrays } from './draw-manager/godrays';
@@ -30,6 +31,7 @@ export class Scene {
   sun: Sun;
   godrays: Godrays;
   sensorFovFactory: SensorFovMeshFactory;
+  coneFactory: ConeMeshFactory;
   /** The pizza box shaped search around a satellite. */
   searchBox: Box;
   frameBuffers = {
@@ -48,6 +50,7 @@ export class Scene {
     this.godrays = new Godrays();
     this.searchBox = new Box();
     this.sensorFovFactory = new SensorFovMeshFactory();
+    this.coneFactory = new ConeMeshFactory();
   }
 
   init(gl: WebGL2RenderingContext): void {
@@ -62,6 +65,7 @@ export class Scene {
     this.skybox.update();
 
     this.sensorFovFactory.updateAll(gmst);
+    this.coneFactory.updateAll();
   }
 
   render(renderer: WebGLRenderer, camera: Camera): void {
@@ -72,6 +76,7 @@ export class Scene {
     this.renderTransparent(renderer, camera);
 
     this.sensorFovFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+    this.coneFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
   }
 
   averageDrawTime = 0;
@@ -163,11 +168,6 @@ export class Scene {
     dotsManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
 
     orbitManagerInstance.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
-
-    /*
-     * Draw a cone
-     * this.sceneManager.cone.draw(this.pMatrix, mainCamera.camMatrix);
-     */
 
     keepTrackApi.getLineManager().draw(renderer, dotsManagerInstance.inViewData, camera.camMatrix, null);
 

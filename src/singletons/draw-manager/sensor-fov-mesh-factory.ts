@@ -97,7 +97,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       return;
     }
 
-    this.create(sensor);
+    this.create_(sensor);
 
     // Create a second sensor if it exists
     if (sensor.minAz2) {
@@ -112,11 +112,11 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
         volume: sensor.isVolumetric,
       });
 
-      this.create(sensor2);
+      this.create_(sensor2);
     }
   }
 
-  private checkCacheForMesh_(sensor: DetailedSensor) {
+  checkCacheForMesh_(sensor: DetailedSensor) {
     return this.meshes_.find((mesh) => {
       if (mesh instanceof SensorFovMesh) {
         return mesh.sensor === sensor;
@@ -126,9 +126,11 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     });
   }
 
-  create(sensor: DetailedSensor) {
+  create_(sensor: DetailedSensor) {
     const sensorFovMesh = new SensorFovMesh(sensor);
 
     this.add(sensorFovMesh);
+
+    sensorFovMesh.sortFacesByDistance(keepTrackApi.getMainCamera().getCamPos());
   }
 }

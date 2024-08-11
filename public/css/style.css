@@ -767,6 +767,10 @@ ul {
   background: var(--colorTertiaryDarken2);
 }
 
+.divider {
+  padding: 2px !important;
+}
+
 input[type='checkbox'].css-checkbox {
   position: absolute;
   z-index: -1000;

@@ -101,8 +101,9 @@ export class RadarDome {
 
     const isFovDrawn = keepTrackApi.getPlugin(SensorFov).isMenuButtonActive;
     const isSurvFenceDrawn = keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive;
+    const isStfCreated = keepTrackApi.getSensorManager().stfSensors.length > 0;
 
-    if (!isFovDrawn && !isSurvFenceDrawn) {
+    if (!isFovDrawn && !isSurvFenceDrawn && !isStfCreated) {
       return;
     }
 

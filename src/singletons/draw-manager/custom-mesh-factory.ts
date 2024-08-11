@@ -2,7 +2,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { mat4 } from 'gl-matrix';
-import { DetailedSensor, GreenwichMeanSiderealTime } from 'ootk';
+import { DetailedSensor, GreenwichMeanSiderealTime, SpaceObjectType } from 'ootk';
 import { CustomMesh } from './custom-mesh';
 import { RadarDome } from './radar-dome';
 
@@ -51,23 +51,30 @@ export class CustomMeshFactory {
     this.customMeshes_.forEach((mesh) => {
       if (mesh instanceof RadarDome) {
         // There needs to be a reason to draw the radar dome.
-        if ((keepTrackApi.getPlugin(SensorFov).isMenuButtonActive ||
-          keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive)) {
+        if (mesh.sensor.type === SpaceObjectType.SHORT_TERM_FENCE &&
+          keepTrackApi.getSensorManager().stfSensors.length === 0
+        ) {
+          return;
+        }
+
+        if (mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE && (!keepTrackApi.getPlugin(SensorFov).isMenuButtonActive &&
+          !keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive)) {
+          return;
+        }
 
 
-          // Ignore deep space when there are multiple sensors active
-          if (activeSensors.length > 1 && mesh.sensor.maxRng > 40000) {
-            return;
-          }
+        // Ignore deep space when there are multiple sensors active
+        if (activeSensors.length > 1 && mesh.sensor.maxRng > 40000) {
+          return;
+        }
 
-          const sensors = activeSensors.filter((s) => s.objName === mesh.sensor.objName);
+        const sensors = activeSensors.filter((s) => s.objName === mesh.sensor.objName);
 
-          if (sensors.length > 0) {
-            mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
-            if (mesh.sensor.objName !== lastSensorObjName) {
-              i++;
-              lastSensorObjName = mesh.sensor.objName;
-            }
+        if (sensors.length > 0) {
+          mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
+          if (mesh.sensor.objName !== lastSensorObjName) {
+            i++;
+            lastSensorObjName = mesh.sensor.objName;
           }
         }
       } else {
@@ -82,19 +89,28 @@ export class CustomMeshFactory {
      * sensor with the same objName since those are unique (this is for sensors with
      * two parameters like LEOCRSR)
      */
-    const activeSensors = keepTrackApi.getSensorManager().currentSensors.concat(keepTrackApi.getSensorManager().secondarySensors.concat(keepTrackApi.getSensorManager().stfSensors));
+    const activeSensors = keepTrackApi.getSensorManager()
+      .currentSensors.concat(keepTrackApi.getSensorManager()
+        .secondarySensors.concat(keepTrackApi.getSensorManager().stfSensors));
 
     this.customMeshes_.forEach((mesh) => {
       if (mesh instanceof RadarDome) {
         // There needs to be a reason to draw the radar dome.
-        if ((keepTrackApi.getPlugin(SensorFov).isMenuButtonActive ||
-          keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive)) {
+        if (mesh.sensor.type === SpaceObjectType.SHORT_TERM_FENCE &&
+          keepTrackApi.getSensorManager().stfSensors.length === 0
+        ) {
+          return;
+        }
 
-          const sensor = activeSensors.find((s) => s.objName === mesh.sensor.objName);
+        if (mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE && (!keepTrackApi.getPlugin(SensorFov).isMenuButtonActive &&
+          !keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive)) {
+          return;
+        }
 
-          if (sensor) {
-            mesh.update(gmst);
-          }
+        const sensor = activeSensors.find((s) => s.objName === mesh.sensor.objName);
+
+        if (sensor) {
+          mesh.update(gmst);
         }
       } else {
         mesh.update();

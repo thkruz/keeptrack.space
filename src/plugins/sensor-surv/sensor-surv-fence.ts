@@ -61,7 +61,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
   }
 
   private enableSurvView_() {
-    keepTrackApi.getPlugin(SensorFov).setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
     this.setBottomIconToSelected();
   }
 

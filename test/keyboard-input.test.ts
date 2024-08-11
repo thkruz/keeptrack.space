@@ -92,7 +92,10 @@ describe('KeyboardInput_class', () => {
     const keyboardInput = new KeyboardInput();
 
     keyboardInput.init();
-    keyboardInput.registerKeyEvent('R', () => console.log('R pressed'));
+    keyboardInput.registerKeyEvent({
+      key: 'R',
+      callback: () => console.log('R pressed'),
+    });
     expect(keyboardInput.keyEvents.length).toBe(1);
   });
 });

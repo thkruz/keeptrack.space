@@ -495,7 +495,7 @@ export class SensorManager {
     }
 
     for (const sensor of this.currentSensors) {
-      keepTrackApi.getScene().customMeshFactory.createRadarDome(sensor);
+      keepTrackApi.getScene().sensorFovFactory.createRadarDome(sensor);
     }
 
     // Update Satellite Math with new sensor - TODO: SatMath should reference the sensorManagerInstance
@@ -601,7 +601,7 @@ export class SensorManager {
     const combinedSensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
 
     for (const sensor of combinedSensors) {
-      keepTrackApi.getScene().customMeshFactory.createRadarDome(sensor);
+      keepTrackApi.getScene().sensorFovFactory.createRadarDome(sensor);
     }
 
     catalogManagerInstance.satCruncher.postMessage({

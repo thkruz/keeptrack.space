@@ -6,7 +6,7 @@ import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
 import { Box } from './draw-manager/cube';
-import { CustomMeshFactory } from './draw-manager/custom-mesh-factory';
+import { SensorFovMeshFactory } from './draw-manager/custom-mesh-factory';
 import { Earth } from './draw-manager/earth';
 import { Godrays } from './draw-manager/godrays';
 import { Moon } from './draw-manager/moon';
@@ -29,13 +29,13 @@ export class Scene {
   moon: Moon;
   sun: Sun;
   godrays: Godrays;
+  sensorFovFactory: SensorFovMeshFactory;
   /** The pizza box shaped search around a satellite. */
   searchBox: Box;
   frameBuffers = {
     gpuPicking: null as WebGLFramebuffer,
     godrays: null as WebGLFramebuffer,
   };
-  customMeshFactory: CustomMeshFactory;
 
   constructor(params: SceneParams) {
     this.gl_ = params.gl;
@@ -47,7 +47,7 @@ export class Scene {
     this.sun = new Sun();
     this.godrays = new Godrays();
     this.searchBox = new Box();
-    this.customMeshFactory = new CustomMeshFactory();
+    this.sensorFovFactory = new SensorFovMeshFactory();
   }
 
   init(gl: WebGL2RenderingContext): void {
@@ -61,7 +61,7 @@ export class Scene {
     this.moon.update(simulationTime);
     this.skybox.update();
 
-    this.customMeshFactory.updateAll(gmst);
+    this.sensorFovFactory.updateAll(gmst);
   }
 
   render(renderer: WebGLRenderer, camera: Camera): void {
@@ -71,7 +71,7 @@ export class Scene {
     this.renderOpaque(renderer, camera);
     this.renderTransparent(renderer, camera);
 
-    this.customMeshFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+    this.sensorFovFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
   }
 
   averageDrawTime = 0;

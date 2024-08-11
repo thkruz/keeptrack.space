@@ -7,7 +7,7 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Degrees, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, rae2eci } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 
-export class RadarDome {
+export class SensorFovMesh {
   id = 0;
   sortedIndices: number[] = [];
   private readonly NUM_BUCKETS = 100; // Adjust based on your needs

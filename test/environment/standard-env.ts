@@ -48,7 +48,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     gl: global.mocks.glMock,
   });
 
-  scene.customMeshFactory = {
+  scene.sensorFovFactory = {
     createCustomMesh: jest.fn(),
     createRadarDome: jest.fn(),
     remove: jest.fn(),

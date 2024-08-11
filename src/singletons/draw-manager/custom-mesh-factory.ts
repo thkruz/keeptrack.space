@@ -4,10 +4,10 @@ import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { mat4 } from 'gl-matrix';
 import { DetailedSensor, GreenwichMeanSiderealTime, SpaceObjectType } from 'ootk';
 import { CustomMesh } from './custom-mesh';
-import { RadarDome } from './radar-dome';
+import { SensorFovMesh } from './sensor-fov-mesh';
 
-export class CustomMeshFactory {
-  private customMeshes_: (CustomMesh | RadarDome)[] = [];
+export class SensorFovMeshFactory {
+  private customMeshes_: (CustomMesh | SensorFovMesh)[] = [];
 
   createCustomMesh(vertexList: Float32Array) {
     const customMesh = new CustomMesh();
@@ -49,7 +49,7 @@ export class CustomMeshFactory {
     const activeSensors = keepTrackApi.getSensorManager().currentSensors.concat(keepTrackApi.getSensorManager().secondarySensors.concat(keepTrackApi.getSensorManager().stfSensors));
 
     this.customMeshes_.forEach((mesh) => {
-      if (mesh instanceof RadarDome) {
+      if (mesh instanceof SensorFovMesh) {
         // There needs to be a reason to draw the radar dome.
         if (mesh.sensor.type === SpaceObjectType.SHORT_TERM_FENCE &&
           keepTrackApi.getSensorManager().stfSensors.length === 0
@@ -94,7 +94,7 @@ export class CustomMeshFactory {
         .secondarySensors.concat(keepTrackApi.getSensorManager().stfSensors));
 
     this.customMeshes_.forEach((mesh) => {
-      if (mesh instanceof RadarDome) {
+      if (mesh instanceof SensorFovMesh) {
         // There needs to be a reason to draw the radar dome.
         if (mesh.sensor.type === SpaceObjectType.SHORT_TERM_FENCE &&
           keepTrackApi.getSensorManager().stfSensors.length === 0
@@ -118,20 +118,20 @@ export class CustomMeshFactory {
     });
   }
 
-  createRadarDome(sensor: DetailedSensor): RadarDome {
+  createRadarDome(sensor: DetailedSensor): SensorFovMesh {
     const found = this.customMeshes_.find((mesh) => {
-      if (mesh instanceof RadarDome) {
+      if (mesh instanceof SensorFovMesh) {
         return mesh.sensor === sensor;
       }
 
       return false;
-    }) as RadarDome;
+    }) as SensorFovMesh;
 
     if (found) {
       return found;
     }
 
-    const radarDome = new RadarDome(sensor);
+    const radarDome = new SensorFovMesh(sensor);
 
     const renderer = keepTrackApi.getRenderer();
 
@@ -151,7 +151,7 @@ export class CustomMeshFactory {
         volume: sensor.isVolumetric,
       });
 
-      const radarDome = new RadarDome(sensor2);
+      const radarDome = new SensorFovMesh(sensor2);
 
       const renderer = keepTrackApi.getRenderer();
 
@@ -161,38 +161,5 @@ export class CustomMeshFactory {
     }
 
     return radarDome;
-  }
-
-  createMarkerMesh() {
-    const centerPoint = [10000, 0, 0];
-    const vertexList = new Float32Array(8 * 3);
-    const halfExtent = 1000 / 2;
-
-    vertexList[0] = centerPoint[0] - halfExtent;
-    vertexList[1] = centerPoint[1] - halfExtent;
-    vertexList[2] = centerPoint[2] - halfExtent;
-    vertexList[3] = centerPoint[0] + halfExtent;
-    vertexList[4] = centerPoint[1] - halfExtent;
-    vertexList[5] = centerPoint[2] - halfExtent;
-    vertexList[6] = centerPoint[0] - halfExtent;
-    vertexList[7] = centerPoint[1] + halfExtent;
-    vertexList[8] = centerPoint[2] - halfExtent;
-    vertexList[9] = centerPoint[0] + halfExtent;
-    vertexList[10] = centerPoint[1] + halfExtent;
-    vertexList[11] = centerPoint[2] - halfExtent;
-    vertexList[12] = centerPoint[0] - halfExtent;
-    vertexList[13] = centerPoint[1] - halfExtent;
-    vertexList[14] = centerPoint[2] + halfExtent;
-    vertexList[15] = centerPoint[0] + halfExtent;
-    vertexList[16] = centerPoint[1] - halfExtent;
-    vertexList[17] = centerPoint[2] + halfExtent;
-    vertexList[18] = centerPoint[0] - halfExtent;
-    vertexList[19] = centerPoint[1] + halfExtent;
-    vertexList[20] = centerPoint[2] + halfExtent;
-    vertexList[21] = centerPoint[0] + halfExtent;
-    vertexList[22] = centerPoint[1] + halfExtent;
-    vertexList[23] = centerPoint[2] + halfExtent;
-
-    return this.createCustomMesh(vertexList);
   }
 }

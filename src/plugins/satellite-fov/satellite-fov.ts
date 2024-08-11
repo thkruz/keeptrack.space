@@ -64,13 +64,28 @@ export class SatelliteFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.changeSensorMarkers,
-      cbName: this.PLUGIN_NAME,
-      cb: (caller: string): void => {
-        if (caller !== this.PLUGIN_NAME) {
-          this.isSatOverflyModeOn = false;
-          this.setBottomIconToUnselected(false);
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyEvent({
+      key: 'C',
+      callback: () => {
+        if (keyboardManager.isShiftPressed) {
+          const currentSat = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat();
+
+          if (currentSat) {
+            const coneFactory = keepTrackApi.getScene().coneFactory;
+
+            // See if it is already in the scene
+            const cone = coneFactory.checkCacheForMesh_(currentSat);
+
+            if (cone) {
+              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+              coneFactory.remove(cone.id);
+            } else {
+              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+              coneFactory.generateMesh(currentSat);
+            }
+          }
         }
       },
     });

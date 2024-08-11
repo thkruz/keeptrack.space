@@ -27,8 +27,8 @@ describe('Camera Key Input', () => {
   beforeEach(() => {
     cameraInstance = new Camera();
   });
-  it('should handle C', () => {
-    const testFunc = () => cameraInstance.keyDownC_();
+  it('should handle V', () => {
+    const testFunc = () => cameraInstance.keyDownV_();
 
     for (let i = 0; i < 25; i++) {
       expect(testFunc).not.toThrow();
@@ -81,32 +81,32 @@ describe('Camera Key Input', () => {
     testFunc = () => cameraInstance.keyUpE_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle I', () => {
-    let testFunc = () => cameraInstance.keyDownI_();
+  it('should handle Numpad8', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad8_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpI_();
+    testFunc = () => cameraInstance.keyUpNumpad8_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle J', () => {
-    let testFunc = () => cameraInstance.keyDownJ_();
+  it('should handle Numpad4', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad4_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpJ_();
+    testFunc = () => cameraInstance.keyUpNumpad4_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle K', () => {
-    let testFunc = () => cameraInstance.keyDownK_();
+  it('should handle Numpad6', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad6_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpK_();
+    testFunc = () => cameraInstance.keyUpNumpad6_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle L', () => {
-    let testFunc = () => cameraInstance.keyDownL_();
+  it('should handle Numpad2', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad2_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpL_();
+    testFunc = () => cameraInstance.keyUpNumpad2_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Q', () => {

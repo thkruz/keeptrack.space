@@ -375,4 +375,5 @@ export enum KeepTrackApiEvents {
   sensorDotSelected = 'sensorDotSelected',
   canvasMouseDown = 'canvasMouseDown',
   touchStart = 'touchStart',
+  ConeMeshUpdate = 'ConeMeshUpdate',
 }

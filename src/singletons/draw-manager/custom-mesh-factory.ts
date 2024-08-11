@@ -3,22 +3,22 @@ import { mat4 } from 'gl-matrix';
 import { CustomMesh } from './custom-mesh';
 
 export abstract class CustomMeshFactory<T extends CustomMesh> {
-  protected meshes_: T[] = [];
+  meshes: T[] = [];
 
   remove(id: number) {
-    this.meshes_.splice(id, 1);
+    this.meshes.splice(id, 1);
   }
 
   clear() {
-    this.meshes_ = [];
+    this.meshes = [];
   }
 
   add(mesh: T) {
     const renderer = keepTrackApi.getRenderer();
 
     mesh.init(renderer.gl);
-    mesh.id = this.meshes_.length;
-    this.meshes_.push(mesh);
+    mesh.id = this.meshes.length;
+    this.meshes.push(mesh);
   }
 
   protected abstract create_(...args: unknown[]): void;

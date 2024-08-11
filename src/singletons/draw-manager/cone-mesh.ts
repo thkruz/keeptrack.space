@@ -1,8 +1,21 @@
 /* eslint-disable camelcase */
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { BaseObject } from 'ootk';
+import { BaseObject, Degrees, Kilometers, RADIUS_OF_EARTH } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { CustomMesh } from './custom-mesh';
+
+export interface ConeSettings {
+  /** The field of view of the cone in degrees, default is 3 */
+  fieldOfView: Degrees;
+  /** The color of the cone, default is [0.2, 1.0, 1.0, 1.0] */
+  color?: [number, number, number, number];
+  /**
+   * @deprecated
+   * The range of the cone in kilometers, default is the distance to Earth from the attachmentPoint
+   * This is not implemented yet
+   */
+  range?: Kilometers;
+}
 
 export class ConeMesh extends CustomMesh {
   uniforms_ = {
@@ -14,18 +27,32 @@ export class ConeMesh extends CustomMesh {
   private verticesTmp_: number[] = [];
   private indicesTmp_: number[] = [];
   /** The angle of the cone mesh. Tied to the object's FOV */
-  angle: number;
+  fieldOfView: number;
+  color: [number, number, number, number] = [0.2, 1.0, 1.0, 1.0];
+  range: Kilometers = 0 as Kilometers;
   pos: vec3 = vec3.create();
-  offsetDistance: number = 0;
+  offsetDistance: number = (RADIUS_OF_EARTH + 80) as Kilometers;
   obj: BaseObject;
 
 
-  constructor(obj: BaseObject, angle: number = 15) {
+  constructor(obj: BaseObject, settings: ConeSettings) {
     super();
     this.obj = obj;
-    this.angle = angle;
+    this.fieldOfView = settings.fieldOfView;
+    this.color = settings.color || this.color;
+    this.range = settings.range || this.range;
 
     this.updatePosition_();
+  }
+
+  editSettings(settings: ConeSettings) {
+    if (this.fieldOfView !== settings.fieldOfView) {
+      this.fieldOfView = settings.fieldOfView;
+      this.init(this.gl_);
+    }
+
+    this.color = settings.color || this.color;
+    this.range = settings.range || this.range;
   }
 
   private updatePosition_() {
@@ -62,7 +89,7 @@ export class ConeMesh extends CustomMesh {
     mat4.scale(this.mvMatrix_, this.mvMatrix_, [coneHeight, coneHeight, coneHeight]);
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, color: [number, number, number, number], tgtBuffer?: WebGLFramebuffer) {
+  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     if (!this.isLoaded_) {
       return;
     }
@@ -78,7 +105,7 @@ export class ConeMesh extends CustomMesh {
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
-    gl.uniform4fv(this.uniforms_.u_color, color);
+    gl.uniform4fv(this.uniforms_.u_color, this.color);
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -87,7 +114,7 @@ export class ConeMesh extends CustomMesh {
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);
-    gl.polygonOffset(-2.0, -2.0);
+    gl.polygonOffset(-1.0, -1.0);
 
     gl.bindVertexArray(this.vao_);
 
@@ -102,11 +129,16 @@ export class ConeMesh extends CustomMesh {
   }
 
   initGeometry_() {
+    // Clear the arrays
+    this.verticesTmp_ = [];
+    this.indicesTmp_ = [];
+
     const height = 1; // Use a unit height, scale in update method
-    const radius = Math.tan((this.angle * Math.PI) / 180);
+    const radius = Math.tan((this.fieldOfView * Math.PI) / 180);
     const nPhi = 100;
 
     const dPhi = (2 * Math.PI) / nPhi;
+
 
     // Apex of the cone
     this.verticesTmp_.push(0, 0, height);
@@ -139,7 +171,7 @@ export class ConeMesh extends CustomMesh {
       out vec4 fragColor;
 
       void main(void) {
-        fragColor = vec4(u_color.rgb, 0.15);
+        fragColor = vec4(u_color.rgba);
       }
     `,
     vert: keepTrackApi.glsl`#version 300 es

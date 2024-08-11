@@ -29,14 +29,15 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Satellite View';
-  dependencies = [SelectSatManager.PLUGIN_NAME];
+  dependencies = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(SatelliteViewPlugin.PLUGIN_NAME);
+    super(SatelliteViewPlugin.name);
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  isRequireSatelliteSelected: boolean = true;
 
   bottomIconElementName = 'menu-satview';
   bottomIconLabel = 'Satellite View';

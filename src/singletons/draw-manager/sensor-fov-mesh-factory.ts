@@ -15,7 +15,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
 
     const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
 
-    this.meshes_.forEach((mesh) => {
+    this.meshes.forEach((mesh) => {
       const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
 
       if (!isNeeded) {
@@ -75,7 +75,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   updateAll(gmst: GreenwichMeanSiderealTime) {
     const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
 
-    this.meshes_.forEach((mesh) => {
+    this.meshes.forEach((mesh) => {
       const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
 
       if (!isNeeded) {
@@ -117,7 +117,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   }
 
   checkCacheForMesh_(sensor: DetailedSensor) {
-    return this.meshes_.find((mesh) => {
+    return this.meshes.find((mesh) => {
       if (mesh instanceof SensorFovMesh) {
         return mesh.sensor === sensor;
       }

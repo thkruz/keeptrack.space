@@ -97,6 +97,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.uiManagerInit]: [];
   [KeepTrackApiEvents.uiManagerOnReady]: [];
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
+  [KeepTrackApiEvents.ConeMeshUpdate]: [];
 };
 
 interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {

@@ -49,12 +49,11 @@ interface GroundTracePoint {
 }
 
 export class StereoMap extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Stereo Map';
-  dependencies = [SelectSatManager.PLUGIN_NAME];
+  dependencies = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(StereoMap.PLUGIN_NAME);
+    super(StereoMap.name);
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 

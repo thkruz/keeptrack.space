@@ -1,42 +1,65 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4 } from 'gl-matrix';
-import { BaseObject } from 'ootk';
-import { ConeMesh } from './cone-mesh';
+import { BaseObject, Degrees } from 'ootk';
+import { ConeMesh, ConeSettings } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
 
 export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
-  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
-    let i = 0;
+  private defaultConeSettings_: ConeSettings = {
+    fieldOfView: 3 as Degrees,
+    color: [0.2, 1.0, 1.0, 0.15],
+  };
 
-    this.meshes_.forEach((mesh) => {
-      mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
-      i++;
+  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+    this.meshes.forEach((mesh) => {
+      mesh.draw(pMatrix, camMatrix, tgtBuffer);
     });
   }
 
   updateAll() {
-    this.meshes_.forEach((mesh) => {
+    this.meshes.forEach((mesh) => {
       mesh.update();
     });
   }
 
-  generateMesh(cone: BaseObject) {
+  generateMesh(cone: BaseObject, settings: ConeSettings = this.defaultConeSettings_) {
     const foundSensorFovMesh = this.checkCacheForMesh_(cone);
 
     if (foundSensorFovMesh) {
       return;
     }
 
-    this.create_(cone);
+    this.create_(cone, settings);
   }
 
   checkCacheForMesh_(coneAttachPoint: BaseObject) {
-    return this.meshes_.find((mesh) => mesh.obj.id === coneAttachPoint.id);
+    return this.meshes.find((mesh) => mesh.obj.id === coneAttachPoint.id);
   }
 
-  create_(coneAttachPoint: BaseObject) {
-    const sensorFovMesh = new ConeMesh(coneAttachPoint);
+  editSettings(settings: ConeSettings) {
+    this.defaultConeSettings_ = settings;
+  }
+
+  create_(coneAttachPoint: BaseObject, settings: ConeSettings) {
+    const sensorFovMesh = new ConeMesh(coneAttachPoint, settings);
 
     this.add(sensorFovMesh);
+    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+  }
+
+  remove(id: number) {
+    this.meshes.splice(id, 1);
+    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+  }
+
+  removeByObjectId(id: number) {
+    const index = this.meshes.findIndex((mesh) => mesh.obj.id === id);
+
+    if (index !== -1) {
+      this.remove(index);
+    }
+
+    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
   }
 }

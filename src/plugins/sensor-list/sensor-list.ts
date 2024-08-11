@@ -56,7 +56,6 @@ export class SensorListPlugin extends KeepTrackPlugin {
         <div class="row">
           <ul id="reset-sensor-text" class="sensor-reset-menu">
             <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button">Reset Sensor &#9658;</button>
-            <li class="divider"></li>
           </ul>
           <ul id="list-of-sensors">` +
     SensorListPlugin.ssnSensors_() +
@@ -389,9 +388,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   private static createSection_(params: { header: string; sensors: DetailedSensor[]; topLinks: { name: string; dataSensor: string; badge: string }[] }) {
     return keepTrackApi.html`
-              <li class="divider"></li>
-              <h5 class="center-align">${params.header}</h5>
-              <li class="divider"></li>
+              ${this.genH5Title_(params.header)}
               ${params.topLinks
     .map(
       (link) => keepTrackApi.html`<li class="menu-selectable sensor-top-link" data-sensor="${link.dataSensor}">

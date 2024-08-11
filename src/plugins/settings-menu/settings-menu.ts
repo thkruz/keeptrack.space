@@ -9,7 +9,6 @@ import { parseRgba } from '@app/lib/rgba';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
-import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import $ from 'jquery'; // TODO: Remove Color Picker
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
@@ -713,11 +712,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (isNaN(newFieldOfView)) {
       (<HTMLInputElement>getEl('satFieldOfView')).value = '30';
       uiManagerInstance.toast('Invalid field of view value!', 'critical');
-    } else {
-      keepTrackApi.getCatalogManager().satCruncher.postMessage({
-        typ: CruncerMessageTypes.IS_UPDATE_SATELLITE_OVERFLY,
-        selectedSatFOV: newFieldOfView,
-      });
     }
 
     const maxSearchSats = parseInt((<HTMLInputElement>getEl('maxSearchSats')).value);

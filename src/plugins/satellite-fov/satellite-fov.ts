@@ -20,11 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import sat2Png from '@public/img/icons/sat2.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -44,18 +40,6 @@ export class SatelliteFov extends KeepTrackPlugin {
   constructor() {
     super(SatelliteFov.PLUGIN_NAME);
   }
-
-  isSatOverflyModeOn = false;
-
-  bottomIconCallback = () => {
-    if (this.isMenuButtonActive) {
-      this.enableFovView_();
-    } else {
-      this.disableFovView();
-    }
-  };
-
-  isRequireSatelliteSelected: boolean = true;
 
   bottomIconElementName = 'menu-sat-fov';
   bottomIconLabel = 'Satellite FOV';
@@ -91,72 +75,5 @@ export class SatelliteFov extends KeepTrackPlugin {
         }
       },
     });
-  }
-
-  disableFovView(isTellWorker = true) {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
-
-    this.isSatOverflyModeOn = false;
-    this.setBottomIconToUnselected(false);
-
-    if (isTellWorker) {
-      keepTrackApi.getCatalogManager().satCruncher.postMessage({
-        typ: CruncerMessageTypes.UPDATE_MARKERS,
-        markerMode: MarkerMode.OFF,
-      });
-    }
-  }
-
-  static getSatFieldOfView_(): number {
-    const fovStr = <HTMLInputElement>getEl('satFieldOfView', true);
-
-    if (!fovStr) {
-      // There is no settings menu, but this is optional.
-      return 30;
-    }
-
-    if (fovStr.value === '') {
-      errorManagerInstance.warn('No Satellite FOV value entered. Using default value of 30 degrees.');
-
-      return 30;
-    }
-
-    const fov = parseFloat(fovStr.value);
-
-    if (isNaN(fov) || fov < 0 || fov > 180) {
-      errorManagerInstance.warn('Invalid Satellite FOV value. Using default value of 30 degrees.');
-
-      return 30;
-    }
-
-    return fov;
-  }
-
-  private enableFovView_() {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
-
-    this.isSatOverflyModeOn = true;
-    this.setBottomIconToSelected();
-
-    if ((<HTMLInputElement>getEl('search')).value !== '') {
-      // If Group Selected
-      keepTrackApi.getUiManager().doSearch((<HTMLInputElement>getEl('search')).value);
-    }
-
-    const satFieldOfView = SatelliteFov.getSatFieldOfView_();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    catalogManagerInstance.satCruncher.postMessage({
-      typ: CruncerMessageTypes.UPDATE_MARKERS,
-      markerMode: MarkerMode.OVERFLY,
-    });
-    catalogManagerInstance.satCruncher.postMessage({
-      typ: CruncerMessageTypes.IS_UPDATE_SATELLITE_OVERFLY,
-      selectedSatFOV: satFieldOfView,
-    });
-
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
   }
 }

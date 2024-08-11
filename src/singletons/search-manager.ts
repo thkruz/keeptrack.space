@@ -1,10 +1,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
-import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -275,12 +273,6 @@ export class SearchManager {
       return;
     }
 
-    if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn) {
-      catalogManagerInstance.satCruncher.postMessage({
-        typ: CruncerMessageTypes.SATELLITE_SELECTED,
-        satelliteSelected: idList,
-      });
-    }
     // Don't let the search overlap with the legend
     LegendManager.change('clear');
     UrlManager.updateURL();
@@ -485,9 +477,7 @@ export class SearchManager {
           return false;
         } // Skip missiles (if not searching for missiles
 
-        if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn && obj.type !== SpaceObjectType.PAYLOAD) {
-          return false;
-        } // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+        // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
         if (!(obj as MissileObject).active) {
           return false;
         } // Skip inactive missiles.

@@ -9,7 +9,6 @@ import { UrlManager } from '@app/static/url-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SatelliteFov } from '../satellite-fov/satellite-fov';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
 import { SatInfoBox } from './sat-info-box';
@@ -227,8 +226,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     } else {
       getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-selected');
       getEl('menu-sat-fov', true)?.classList.add('bmenu-item-disabled');
-
-      keepTrackApi.getPlugin(SatelliteFov)?.disableFovView();
     }
 
     // Run this ONCE when clicking empty space

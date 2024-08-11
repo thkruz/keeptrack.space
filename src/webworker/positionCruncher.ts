@@ -34,7 +34,6 @@ import {
   EpochUTC,
   GreenwichMeanSiderealTime,
   Kilometers,
-  LlaVec3,
   Milliseconds,
   Minutes,
   PI,
@@ -45,19 +44,16 @@ import {
   Sun,
   TAU,
   Vector3D,
-  ecf2eci,
-  ecf2rae,
   ecfRad2rae,
   eci2ecf,
   eci2lla,
-  lla2ecf,
   lla2eci,
   rae2eci,
 } from 'ootk';
 import { GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH, STAR_DISTANCE } from '../lib/constants';
 import { PosCruncherCachedObject, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from './constants';
-import { createLatLonAlt, isInValidElevation, setupTimeVariables } from './positionCruncher/calculations';
-import { resetPosition, resetVelocity, setPosition } from './positionCruncher/satCache';
+import { setupTimeVariables } from './positionCruncher/calculations';
+import { resetPosition, resetVelocity } from './positionCruncher/satCache';
 
 export interface CruncherSat {
   // Satellites
@@ -94,16 +90,12 @@ export enum CruncerMessageTypes {
   NEW_MISSILE = 'NEW_MISSILE',
   SATELLITE_SELECTED = 'SATELLITE_SELECTED',
   SENSOR = 'SENSOR',
-  IS_UPDATE_SATELLITE_OVERFLY = 'IS_SHOW_SATELLITE_OVERFLY',
   UPDATE_MARKERS = 'UPDATE_MARKERS',
   SUNLIGHT_VIEW = 'SUNLIGHT_VIEW',
 }
 
 export enum MarkerMode {
   OFF,
-  SURV,
-  FOV,
-  OVERFLY,
 }
 
 const EMPTY_FLOAT32_ARRAY = new Float32Array(0);
@@ -137,7 +129,6 @@ let propRate = 1; // vars us run time faster (or slower) than normal
 // let propChangeTime = Date.now(); // vars us run time faster (or slower) than normal
 
 /** Settings */
-let selectedSatFOV = 90; // FOV in Degrees
 let isSensor = false;
 /** Do we have more than one sensor? */
 let isSensors = false;
@@ -345,9 +336,6 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
         isResetInView = true;
       }
       break;
-    case CruncerMessageTypes.IS_UPDATE_SATELLITE_OVERFLY:
-      selectedSatFOV = m.data.selectedSatFOV ? m.data.selectedSatFOV : selectedSatFOV;
-      break;
     case CruncerMessageTypes.UPDATE_MARKERS:
       if (m.data.fieldOfViewSetLength) {
         fieldOfViewSetLength = m.data.fieldOfViewSetLength;
@@ -355,15 +343,6 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
 
       if (typeof m.data.markerMode !== 'undefined') {
         markerMode = m.data.markerMode;
-
-        if (markerMode === MarkerMode.SURV || markerMode === MarkerMode.OFF) {
-          isResetMarker = true;
-        }
-
-        if (markerMode !== MarkerMode.OVERFLY) {
-          isResetSatOverfly = true;
-          isResetMarker = true;
-        }
       }
 
       break;
@@ -461,8 +440,6 @@ export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSidereal
       resetVelocity(satVel, i);
     } else if (objCache[i].latList) {
       isContinue = !updateMissile(i, now, gmstNext, gmst);
-    } else if (objCache[i].isMarker && (markerMode === MarkerMode.OVERFLY || isResetSatOverfly)) {
-      i = updateSatOverfly(i, gmst);
     }
 
     if (!isContinue) {
@@ -481,133 +458,6 @@ export const updateSatCache = (now: Date, j: number, gmst: GreenwichMeanSidereal
   }
 };
 
-export const updateSatOverfly = (i: number, gmst: GreenwichMeanSiderealTime): number => {
-  if (isResetSatOverfly && objCache[i].active === true) {
-    // Let the main loop know what i we ended on
-    return i;
-  }
-
-  let rae: RaeVec3<Kilometers, Degrees>;
-  let lat: Radians;
-  let lon: Radians;
-  let satHeight: Kilometers;
-  let pos: EcfVec3<Kilometers>;
-  let deltaLonInt: Degrees;
-  let deltaLat: Degrees;
-  let deltaLatInt: Degrees;
-  let deltaLon: Degrees;
-  let satPosEcf: EcfVec3<Kilometers>;
-  let satSelPos: EciVec3<Kilometers>;
-  let satSelGeodetic: LlaVec3<Degrees, Kilometers>;
-  let groundPos: LlaVec3<Degrees, Kilometers>;
-
-  for (let snum = 0; snum < satelliteSelected.length + 1; snum++) {
-    if (snum === satelliteSelected.length) {
-      sensorMarkerArray.push(i);
-      break;
-    }
-    if (satelliteSelected[snum] !== -1) {
-      if (markerMode !== MarkerMode.OVERFLY) {
-        continue;
-      }
-      // Find the ECI position of the Selected Satellite
-      satPosEcf = {
-        x: satPos[satelliteSelected[snum] * 3] as Kilometers,
-        y: satPos[satelliteSelected[snum] * 3 + 1] as Kilometers,
-        z: satPos[satelliteSelected[snum] * 3 + 2] as Kilometers,
-      };
-      satSelPos = ecf2eci(satPosEcf, gmst);
-
-      // Find the Lat/Long of the Selected Satellite
-      satSelGeodetic = eci2lla(satSelPos, gmst); // pv.position is called positionEci originally
-      satHeight = satSelGeodetic.alt;
-      groundPos = {
-        lat: satSelGeodetic.lat,
-        lon: satSelGeodetic.lon,
-        alt: <Kilometers>1,
-      };
-
-      deltaLatInt = 1 as Degrees;
-      if (satHeight < 2500 && selectedSatFOV <= 60) {
-        deltaLatInt = 0.5 as Degrees;
-      }
-      if (satHeight > 7000 || selectedSatFOV >= 90) {
-        deltaLatInt = 2 as Degrees;
-      }
-      if (satelliteSelected.length > 1) {
-        deltaLatInt = 2 as Degrees;
-      }
-      for (deltaLat = -60 as Degrees; deltaLat < 60; deltaLat = (deltaLat + deltaLatInt) as Degrees) {
-        lat = (Math.max(Math.min(Math.round(satSelGeodetic.lat) + deltaLat, 90), -90) * DEG2RAD) as Radians;
-        if (lat > 90) {
-          continue;
-        }
-
-        if (satHeight < 2500 && selectedSatFOV <= 60) {
-          deltaLonInt = 0.5 as Degrees;
-        } else if (satHeight > 7000 || selectedSatFOV >= 90) {
-          deltaLonInt = 2 as Degrees;
-        } else {
-          deltaLonInt = 1 as Degrees;
-        }
-
-        if (satelliteSelected.length > 1) {
-          deltaLonInt = 2 as Degrees;
-        }
-        for (deltaLon = 0 as Degrees; deltaLon < 181; deltaLon = (deltaLon + deltaLonInt) as Degrees) {
-          // Add Long
-          lon = ((satSelGeodetic.lon + deltaLon) * DEG2RAD) as Radians;
-          groundPos = createLatLonAlt(lat, lon, <Kilometers>15);
-          // Find the rae from ground to satellite
-          rae = ecf2rae(groundPos, satPosEcf);
-
-          if (isInValidElevation(rae, selectedSatFOV)) {
-            pos = lla2ecf(groundPos);
-
-            // eslint-disable-next-line max-depth
-            if (i === len) {
-              continue; // Only get so many markers.
-            }
-            objCache[i].active = true;
-
-            satPos = setPosition(satPos, i, pos);
-            resetVelocity(satVel, i);
-            i++;
-          }
-          // Minus Long
-          if (deltaLon === 0 || deltaLon === 180) {
-            continue;
-          } // Don't Draw Two Dots On the Center Line
-          lon = ((satSelGeodetic.lon - deltaLon) * DEG2RAD) as Radians;
-          groundPos = createLatLonAlt(lat, lon, <Kilometers>15);
-          // Find the Az/El of the position on the earth
-          rae = ecf2rae(groundPos, satPosEcf);
-
-          if (isInValidElevation(rae, selectedSatFOV)) {
-            pos = lla2ecf(groundPos);
-
-            // eslint-disable-next-line max-depth
-            if (i === len) {
-              continue; // Only get so many markers.
-            }
-            objCache[i].active = true;
-
-            satPos = setPosition(satPos, i, pos);
-            resetVelocity(satVel, i);
-            i++;
-          }
-
-          if (lat === 90 || lat === -90) {
-            break;
-          } // One Dot for the Poles
-        }
-      }
-    }
-  }
-
-  // Let the main loop know what i we ended on
-  return i;
-};
 export const updateStar = (i: number, now: Date, gmst: GreenwichMeanSiderealTime): void => {
   /*
    * INFO: 0 Latitude returns upside down results. Using 180 looks right, but more verification needed.

@@ -9,7 +9,7 @@ import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, MINUTES_PER_DAY, SatelliteRecord, Seconds, TAU } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, SideMenuSettingsOptions, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { SensorManager } from './sensorManager';
@@ -105,8 +105,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
     saveCsv(exportData, `multisite-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
   };
-  sideMenuSettingsOptions = {
+  sideMenuSettingsOptions: SideMenuSettingsOptions = {
     width: 300,
+    leftOffset: null,
     zIndex: 3,
   };
 

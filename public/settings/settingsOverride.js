@@ -52,7 +52,7 @@ const settingsOverride = {
     plotAnalysis: false,
     sensorFov: true,
     sensorSurv: true,
-    satelliteFov: false,
+    satelliteFov: true,
     satelliteView: true,
     planetarium: true,
     astronomy: false,

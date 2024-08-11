@@ -27,6 +27,8 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import sat2Png from '@public/img/icons/sat2.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 
 declare module '@app/interfaces' {
   interface UserSettings {

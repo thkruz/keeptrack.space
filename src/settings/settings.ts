@@ -62,7 +62,7 @@ export class SettingsManager {
     plotAnalysis: true,
     sensorFov: true,
     sensorSurv: true,
-    satelliteFov: false,
+    satelliteFov: true,
     satelliteView: true,
     planetarium: true,
     astronomy: true,

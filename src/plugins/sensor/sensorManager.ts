@@ -495,7 +495,7 @@ export class SensorManager {
     }
 
     for (const sensor of this.currentSensors) {
-      keepTrackApi.getScene().sensorFovFactory.createRadarDome(sensor);
+      keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
     }
 
     // Update Satellite Math with new sensor - TODO: SatMath should reference the sensorManagerInstance
@@ -558,6 +558,10 @@ export class SensorManager {
     return sensors;
   }
 
+  getAllActiveSensors(): DetailedSensor[] {
+    return this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+  }
+
   public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
     sensors = this.verifySensors(sensors);
     const sensor = sensors[0];
@@ -601,7 +605,7 @@ export class SensorManager {
     const combinedSensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
 
     for (const sensor of combinedSensors) {
-      keepTrackApi.getScene().sensorFovFactory.createRadarDome(sensor);
+      keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
     }
 
     catalogManagerInstance.satCruncher.postMessage({

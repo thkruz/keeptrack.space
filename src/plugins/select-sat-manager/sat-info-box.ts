@@ -35,6 +35,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   static PLUGIN_NAME = 'SatInfoBox';
   dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
   private selectSatManager_: SelectSatManager;
+  private isVisible_ = false;
 
   constructor() {
     super(SatInfoBox.PLUGIN_NAME);
@@ -86,6 +87,19 @@ export class SatInfoBox extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: `${this.PLUGIN_NAME}_launchData`,
       cb: SatInfoBox.updateLaunchData_.bind(this),
+    });
+
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyDownEvent({
+      key: 'i',
+      callback: () => {
+        if (this.isVisible_) {
+          this.hide();
+        } else {
+          this.show();
+        }
+      },
     });
 
     // Register mission data
@@ -390,7 +404,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
-      cb: SatInfoBox.selectSat_.bind(this),
+      cb: this.selectSat_.bind(this),
     });
   }
 
@@ -421,6 +435,19 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     // Now that is is loaded, reset the sizing and location
     SatInfoBox.resetMenuLocation(getEl(SatInfoBox.containerId_), false);
+  }
+
+  hide(): void {
+    hideEl(SatInfoBox.containerId_);
+    this.isVisible_ = false;
+  }
+
+  show(): void {
+    if (this.selectSatManager_.primarySatObj.id === -1) {
+      return;
+    }
+    showEl(SatInfoBox.containerId_);
+    this.isVisible_ = true;
   }
 
   orbitalData(sat: DetailedSatellite): void {
@@ -1070,7 +1097,9 @@ export class SatInfoBox extends KeepTrackPlugin {
   private static updateRcsData_(sat: DetailedSatellite) {
     const satRcsEl = getEl('sat-rcs');
 
-    if (sat.rcs === null || typeof sat.rcs === 'undefined') {
+    // TODO: Fix performance of historical RCS
+    // eslint-disable-next-line no-constant-condition
+    if (false && (sat.rcs === null || typeof sat.rcs === 'undefined')) {
       const historicRcs = keepTrackApi
         .getCatalogManager()
         .objectCache.filter((obj) => {
@@ -1127,7 +1156,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       }
     } else {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
-      satRcsEl.setAttribute('data-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
+      // satRcsEl.setAttribute('data-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
     }
   }
 
@@ -1525,13 +1554,13 @@ export class SatInfoBox extends KeepTrackPlugin {
    *
    * @param obj - The satellite, missile, or sensor object to be selected.
    */
-  private static selectSat_(obj?: BaseObject): void {
+  private selectSat_(obj?: BaseObject): void {
     if (obj) {
       if (obj.isSensor()) {
         return;
       }
 
-      showEl(SatInfoBox.containerId_);
+      this.show();
 
       const satInfoBoxDom = getEl(SatInfoBox.containerId_);
       // Get the height of the DOM

@@ -19,7 +19,7 @@ export interface clickDragOptions {
   attachedElement?: HTMLElement;
 }
 
-interface SideMenuSettingsOptions {
+export interface SideMenuSettingsOptions {
   /**
    * The width of the side menu's settings sub-menu.
    */
@@ -277,8 +277,12 @@ export class KeepTrackPlugin {
 
     if (this.sideMenuSettingsHtml) {
       const sideMenuHtmlWrapped = keepTrackApi.html`
-        <div id="${this.sideMenuElementName}-settings" class="side-menu-parent start-hidden text-select" style="z-index: ${this.sideMenuSettingsOptions.zIndex.toString()};">
-          <div id="${this.sideMenuElementName}-content" class="side-menu-settings" style="padding: 0px 10px;">
+        <div id="${this.sideMenuElementName}-settings"
+          class="side-menu-parent start-hidden text-select"
+          style="z-index: ${this.sideMenuSettingsOptions.zIndex.toString()};
+          width: ${this.sideMenuSettingsOptions.width.toString()}px;"
+        >
+          <div id="${this.sideMenuElementName}-settings-content" class="side-menu-settings" style="padding: 0px 10px;">
             <div class="row"></div>
             ${this.sideMenuSettingsHtml}
           </div>
@@ -394,6 +398,7 @@ export class KeepTrackPlugin {
                 ${settingsIconHtml}
               </div>
               <li class="divider" style="padding: 2px !important;"></li>
+              <div class="row"></div>
               ${this.sideMenuElementHtml}
             </div>
           </div>`;

@@ -51,6 +51,32 @@ export class SensorManager {
     return this.currentSensors[0] ?? null;
   }
 
+  getSensorById(sensorId: number): DetailedSensor | null {
+    // Look through all current, secondary, and stf sensors
+    const sensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+
+    for (const sensor of sensors) {
+      if (sensor.sensorId === sensorId) {
+        return sensor;
+      }
+    }
+
+    return null;
+  }
+
+  getSensorByObjName(objName: string): DetailedSensor | null {
+    // Look through all current, secondary, and stf sensors
+    const sensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+
+    for (const sensor of sensors) {
+      if (sensor.objName === objName) {
+        return sensor;
+      }
+    }
+
+    return null;
+  }
+
   addSecondarySensor(sensor: DetailedSensor, isReplaceSensor = false): void {
     // If there is no primary sensor, make this the primary sensor
     const primarySensor = this.currentSensors[0];
@@ -159,6 +185,40 @@ export class SensorManager {
 
   isSensorSelected(): boolean {
     return this.currentSensors?.length > 0 && this.currentSensors[0]?.isSensor();
+  }
+
+  removeSensor(sensor: DetailedSensor) {
+    this.currentSensors = this.currentSensors.filter((s) => s !== sensor);
+
+    if (this.currentSensors.length === 0) {
+      if (this.secondarySensors.length > 0) {
+        this.currentSensors = [this.secondarySensors.pop()];
+      } else {
+        this.resetSensorSelected();
+      }
+    }
+
+    this.secondarySensors = this.secondarySensors.filter((s) => s !== sensor);
+    this.stfSensors = this.stfSensors.filter((s) => s !== sensor);
+    this.updatePositionCruncher_();
+  }
+
+  removePrimarySensor(sensor?: DetailedSensor) {
+    if (sensor) {
+      this.currentSensors = this.currentSensors.filter((s) => s !== sensor);
+    } else {
+      this.currentSensors.pop();
+    }
+
+    if (this.currentSensors.length === 0) {
+      if (this.secondarySensors.length > 0) {
+        this.currentSensors = [this.secondarySensors.pop()];
+      } else {
+        this.resetSensorSelected();
+      }
+    }
+
+    this.updatePositionCruncher_();
   }
 
   removeSecondarySensor(sensor?: DetailedSensor) {

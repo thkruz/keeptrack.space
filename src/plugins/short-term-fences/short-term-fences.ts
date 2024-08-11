@@ -9,7 +9,6 @@ import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class ShortTermFences extends KeepTrackPlugin {
@@ -279,7 +278,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     }
 
     keepTrackApi.getSensorManager().addStf(stfSensor);
-    keepTrackApi.getPlugin(SensorFov)?.enableFovView();
+    // keepTrackApi.getPlugin(SensorFov)?.enableFovView();
   }
 
   stfOnObjectLinkClick() {

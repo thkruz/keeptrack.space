@@ -23,12 +23,10 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { waitForCruncher } from '@app/lib/waitForCruncher';
-import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import fovPng from '@public/img/icons/fov.png';
 import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 
 export class SensorFov extends KeepTrackPlugin {
   static readonly PLUGIN_NAME = 'Sensor Field of View';
@@ -36,10 +34,8 @@ export class SensorFov extends KeepTrackPlugin {
     super(SensorFov.PLUGIN_NAME);
   }
 
-  isFovBubbleModeOn = false;
-
   bottomIconCallback = () => {
-    if (this.isFovBubbleModeOn) {
+    if (!this.isMenuButtonActive) {
       this.disableFovView();
     } else {
       this.enableFovView();
@@ -89,51 +85,14 @@ export class SensorFov extends KeepTrackPlugin {
     });
   }
 
-  disableFovView(isTellWorker = true) {
+  disableFovView() {
     keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
-
-    this.isFovBubbleModeOn = false;
     this.setBottomIconToUnselected(false);
-
-    if (isTellWorker) {
-      keepTrackApi.getCatalogManager().satCruncher.postMessage({
-        typ: CruncerMessageTypes.UPDATE_MARKERS,
-        markerMode: MarkerMode.OFF,
-      });
-
-      waitForCruncher({
-        cruncher: keepTrackApi.getCatalogManager().satCruncher,
-        cb: () => {
-          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-        },
-        validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length === 0,
-        isSkipFirst: true,
-        isRunCbOnFailure: true,
-        maxRetries: 5,
-      });
-    }
   }
 
   public enableFovView() {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
+    keepTrackApi.getPlugin(SensorSurvFence).setBottomIconToUnselected();
 
-    this.isFovBubbleModeOn = true;
     this.setBottomIconToSelected();
-
-    keepTrackApi.getCatalogManager().satCruncher.postMessage({
-      typ: CruncerMessageTypes.UPDATE_MARKERS,
-      markerMode: MarkerMode.FOV,
-    });
-
-    waitForCruncher({
-      cruncher: keepTrackApi.getCatalogManager().satCruncher,
-      cb: () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-      },
-      validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
-      isSkipFirst: true,
-      isRunCbOnFailure: true,
-      maxRetries: 5,
-    });
   }
 }

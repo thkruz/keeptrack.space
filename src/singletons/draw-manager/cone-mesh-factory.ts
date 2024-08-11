@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4 } from 'gl-matrix';
-import { BaseObject, DetailedSensor } from 'ootk';
+import { BaseObject } from 'ootk';
 import { ConeMesh } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
 
@@ -20,7 +20,7 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
     });
   }
 
-  generateMesh(cone: DetailedSensor) {
+  generateMesh(cone: BaseObject) {
     const foundSensorFovMesh = this.checkCacheForMesh_(cone);
 
     if (foundSensorFovMesh) {

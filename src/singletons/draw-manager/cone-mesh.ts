@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { BaseObject, RADIUS_OF_EARTH } from 'ootk';
+import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { CustomMesh } from './custom-mesh';
 
@@ -16,7 +16,7 @@ export class ConeMesh extends CustomMesh {
   /** The angle of the cone mesh. Tied to the object's FOV */
   angle: number;
   pos: vec3 = vec3.create();
-  offsetDistance: number = RADIUS_OF_EARTH + 80 + 1;
+  offsetDistance: number = 0;
   obj: BaseObject;
 
 

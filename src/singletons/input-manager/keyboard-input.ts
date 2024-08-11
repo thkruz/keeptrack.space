@@ -78,6 +78,8 @@ export class KeyboardInput {
   keyUpEvents = <KeyEvent[]>[];
   keyDownEvents = <KeyEvent[]>[];
 
+  // TODO: shfit and ctrl should be added to the keyEvents parameters
+
   registerKeyEvent({ key, code, callback }: { key: string; code?: string; callback: () => void }) {
     if (this.keyEvents.find((event) => event.key === key.toUpperCase() || (code && event.code === code))) {
       errorManagerInstance.debug(`Key '${key}' or Code '${code}' is already registered in keyEvents!`);
@@ -267,6 +269,11 @@ export class KeyboardInput {
         settingsManager.isPropRateChange = true;
         break;
       default:
+        this.keyEvents
+          .filter((event) => event.key === evt.key?.toUpperCase() && (!event.code || event.code === evt.code))
+          .forEach((event) => {
+            event.callback();
+          });
         break;
     }
 

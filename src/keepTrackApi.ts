@@ -79,6 +79,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.resetSensor]: [];
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string, number];
   [KeepTrackApiEvents.changeSensorMarkers]: [string];
+  [KeepTrackApiEvents.resize]: [];
   [KeepTrackApiEvents.altCanvasResize]: [];
   [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
   [KeepTrackApiEvents.onWatchlistUpdated]: [number[]];
@@ -96,6 +97,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.uiManagerInit]: [];
   [KeepTrackApiEvents.uiManagerOnReady]: [];
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
+  [KeepTrackApiEvents.ConeMeshUpdate]: [];
 };
 
 interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
@@ -149,8 +151,8 @@ export class KeepTrackApi {
     altCanvasResize: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.altCanvasResize>[],
     nightToggle: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.nightToggle>[],
   } as {
-    [K in KeepTrackApiEvents]: KeepTrackApiRegisterParams<K>[];
-  };
+      [K in KeepTrackApiEvents]: KeepTrackApiRegisterParams<K>[];
+    };
 
   methods = {
     nightToggle: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => {
@@ -166,7 +168,7 @@ export class KeepTrackApi {
       this.getSoundManager()?.play(SoundNames.BEEP);
     }
 
-    (<KeepTrackApiRegisterParams<T>[]> this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));
+    (<KeepTrackApiRegisterParams<T>[]>this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));
   }
 
   /** If the callback does not exist, create it */

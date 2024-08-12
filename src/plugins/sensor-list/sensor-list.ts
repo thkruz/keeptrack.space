@@ -1,8 +1,8 @@
 import { sensors } from '@app/catalogs/sensors';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { getClass } from '@app/lib/get-class';
 import { getEl } from '@app/lib/get-el';
+import { CameraType } from '@app/singletons/camera';
 import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -15,7 +15,10 @@ import { Planetarium } from '../planetarium/planetarium';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+
+// TODO: Add a search bar and filter for sensors
 
 export class SensorListPlugin extends KeepTrackPlugin {
   dependencies: string[] = [DateTimeManager.PLUGIN_NAME];
@@ -53,7 +56,6 @@ export class SensorListPlugin extends KeepTrackPlugin {
         <div class="row">
           <ul id="reset-sensor-text" class="sensor-reset-menu">
             <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button">Reset Sensor &#9658;</button>
-            <li class="divider"></li>
           </ul>
           <ul id="list-of-sensors">` +
     SensorListPlugin.ssnSensors_() +
@@ -249,6 +251,22 @@ export class SensorListPlugin extends KeepTrackPlugin {
         }
       },
     });
+
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyUpEvent({
+      key: 'Home',
+      callback: () => {
+        // If a sensor is selected rotate the camera to it
+        if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
+          (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT)) {
+          const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+
+          keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom, keepTrackApi.getTimeManager().selectedDate);
+          keepTrackApi.getSoundManager().play(SoundNames.WHOOSH);
+        }
+      },
+    });
   }
 
   sensorListContentClick(sensorClick: string) {
@@ -295,21 +313,21 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
 
     // Deselect any satellites
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
-
-    try {
-      keepTrackApi
-        .getMainCamera()
-        .lookAtLatLon(
-          sensorManagerInstance.currentSensors[0].lat,
-          sensorManagerInstance.currentSensors[0].lon,
-          sensorManagerInstance.currentSensors[0].zoom,
-          keepTrackApi.getTimeManager().selectedDate,
-        );
-    } catch (e) {
-      // TODO: More intentional conditional statement
-      errorManagerInstance.warn(`Error in sensorListContentClick: ${e}`);
-      // Multi-sensors break this
+    if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+      try {
+        keepTrackApi
+          .getMainCamera()
+          .lookAtLatLon(
+            sensorManagerInstance.currentSensors[0].lat,
+            sensorManagerInstance.currentSensors[0].lon,
+            sensorManagerInstance.currentSensors[0].zoom,
+            keepTrackApi.getTimeManager().selectedDate,
+          );
+      } catch (e) {
+        // TODO: More intentional conditional statement
+        errorManagerInstance.warn(`Error in sensorListContentClick: ${e}`);
+        // Multi-sensors break this
+      }
     }
     if (settingsManager.currentColorScheme == keepTrackApi.getColorSchemeManager().default) {
       LegendManager.change('default');
@@ -370,9 +388,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   private static createSection_(params: { header: string; sensors: DetailedSensor[]; topLinks: { name: string; dataSensor: string; badge: string }[] }) {
     return keepTrackApi.html`
-              <li class="divider"></li>
-              <h5 class="center-align">${params.header}</h5>
-              <li class="divider"></li>
+              ${this.genH5Title_(params.header)}
               ${params.topLinks
     .map(
       (link) => keepTrackApi.html`<li class="menu-selectable sensor-top-link" data-sensor="${link.dataSensor}">

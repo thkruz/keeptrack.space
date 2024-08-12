@@ -9,7 +9,6 @@ import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class ShortTermFences extends KeepTrackPlugin {
@@ -242,7 +241,9 @@ export class ShortTermFences extends KeepTrackPlugin {
     const maxrange = (rng + rngExt / 2) as Kilometers;
 
     const curSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const randomUUID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const stfSensor = new DetailedSensor({
+      objName: `STF-${randomUUID}`,
       lat: curSensor.lat,
       lon: curSensor.lon,
       alt: curSensor.alt,
@@ -277,7 +278,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     }
 
     keepTrackApi.getSensorManager().addStf(stfSensor);
-    keepTrackApi.getPlugin(SensorFov)?.enableFovView();
+    // keepTrackApi.getPlugin(SensorFov)?.enableFovView();
   }
 
   stfOnObjectLinkClick() {

@@ -20,6 +20,7 @@ export type LatLon = {
 
 export type KeyEvent = {
   key: string;
+  code?: string;
   callback: () => void;
 };
 

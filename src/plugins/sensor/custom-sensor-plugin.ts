@@ -9,8 +9,9 @@ import { LegendManager } from '@app/static/legend-manager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import customPng from '@public/img/icons/custom.png';
+import removePng from '@public/img/icons/remove.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { KeepTrackPlugin, SideMenuSettingsOptions, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
@@ -34,82 +35,92 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   bottomIconImg = customPng;
 
   sideMenuElementName: string = 'custom-sensor-menu';
+  sideMenuTitle: string = 'Custom Sensor';
   sideMenuElementHtml: string = keepTrackApi.html`
-    <div id="custom-sensor-menu" class="side-menu-parent start-hidden text-select">
-        <div id="customSensor-content" class="side-menu">
-        <div class="row">
-            <h5 class="center-align">Custom Sensor</h5>
-            <form id="customSensor">
-            <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
-                <input id="cs-lat" type="text" value="0" />
-                <label for="cs-lat" class="active">Latitude</label>
-            </div>
-            <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
-                <input id="cs-lon" type="text" value="0" />
-                <label for="cs-lon" class="active">Longitude</label>
-            </div>
-            <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
-                <input id="cs-hei" type="text" value="0" />
-                <label for="cs-hei" class="active">Elevation Above Sea Level (Km)</label>
-            </div>
-            <div class="input-field col s12">
-                <select id="cs-type">
-                <option value="Observer">Observer</option>
-                <option value="Optical">Optical</option>
-                <option value="Phased Array Radar">Phased Array Radar</option>
-                <option value="Mechanical">Mechanical</option>
-                </select>
-                <label>Type of Sensor</label>
-            </div>
-            <div class="input-field col s12">
-              <div class="switch row" data-position="top" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
-                  <label>
-                  <input id="cs-telescope" type="checkbox" checked="false" />
-                  <span class="lever"></span>
-                  Telescope
-                  </label>
-              </div>
-            </div>
-            <div id="cs-minaz-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
-                <input id="cs-minaz" type="text" value="0" />
-                <label for="cs-minaz" class="active">Minimum Azimuth</label>
-            </div>
-            <div id="cs-maxaz-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
-                <input id="cs-maxaz" type="text" value="360" />
-                <label for="cs-maxaz" class="active">Maximum Azimuth</label>
-            </div>
-            <div id="cs-minel-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
-                <input id="cs-minel" type="text" value="10" />
-                <label for="cs-minel" class="active">Minimum Elevation</label>
-            </div>
-            <div id="cs-maxel-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
-                <input id="cs-maxel" type="text" value="90" />
-                <label for="cs-maxel" class="active">Maximum Elevation</label>
-            </div>
-            <div id="cs-minrange-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
-                <input id="cs-minrange" type="text" value="100" />
-                <label for="cs-minrange" class="active">Minimum Range</label>
-            </div>
-            <div id="cs-maxrange-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
-                <input id="cs-maxrange" type="text" value="50000" />
-                <label for="cs-maxrange" class="active">Maximum Range</label>
-            </div>
-            <div class="center-align">
-                <button id="cs-replace" class="btn btn-ui waves-effect waves-light" name="action">Replace Sensor &#9658;</button>
-                <br />
-                <br />
-                <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Add Custom Sensor &#9658;</button>
-                <br />
-                <br />
-                <button id="cs-clear" class="btn btn-ui waves-effect waves-light" name="action">Clear Custom Sensors &#9658;</button>
-                <br />
-                <br />
-                <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" name="search">Use Geolocation &#9658;</button>
-            </div>
-            </form>
+    <div class="row">
+        <form id="customSensor">
+        <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Name of the Sensor">
+            <input id="cs-uiName" type="text" value="Custom Sensor" />
+            <label for="cs-uiName" class="active">Sensor Name</label>
         </div>
+        <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Latitude in Decimal Form (ex: 43.283)">
+            <input id="cs-lat" type="text" value="0" />
+            <label for="cs-lat" class="active">Latitude</label>
         </div>
+        <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Longitude in Decimal Form (ex: -73.283)">
+            <input id="cs-lon" type="text" value="0" />
+            <label for="cs-lon" class="active">Longitude</label>
+        </div>
+        <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in kilometers (ex: 0.645)">
+            <input id="cs-hei" type="text" value="0" />
+            <label for="cs-hei" class="active">Elevation Above Sea Level (Km)</label>
+        </div>
+        <div class="input-field col s12">
+            <select id="cs-type">
+            <option value="Observer">Observer</option>
+            <option value="Optical">Optical</option>
+            <option value="Phased Array Radar">Phased Array Radar</option>
+            <option value="Mechanical">Mechanical</option>
+            </select>
+            <label>Type of Sensor</label>
+        </div>
+        <div class="input-field col s12">
+          <div class="switch row" data-position="top" data-delay="50" data-tooltip="Is this Sensor a Telescope?">
+              <label>
+              <input id="cs-telescope" type="checkbox" checked="false" />
+              <span class="lever"></span>
+              Telescope
+              </label>
+          </div>
+        </div>
+        <div id="cs-minaz-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Azimuth in degrees (ex: 50)">
+            <input id="cs-minaz" type="text" value="0" />
+            <label for="cs-minaz" class="active">Minimum Azimuth</label>
+        </div>
+        <div id="cs-maxaz-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Azimuth in degrees (ex: 120)">
+            <input id="cs-maxaz" type="text" value="360" />
+            <label for="cs-maxaz" class="active">Maximum Azimuth</label>
+        </div>
+        <div id="cs-minel-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in degrees (ex: 10)">
+            <input id="cs-minel" type="text" value="10" />
+            <label for="cs-minel" class="active">Minimum Elevation</label>
+        </div>
+        <div id="cs-maxel-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Elevation in degrees (ex: 90)">
+            <input id="cs-maxel" type="text" value="90" />
+            <label for="cs-maxel" class="active">Maximum Elevation</label>
+        </div>
+        <div id="cs-minrange-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Range in kilometers (ex: 500)">
+            <input id="cs-minrange" type="text" value="100" />
+            <label for="cs-minrange" class="active">Minimum Range</label>
+        </div>
+        <div id="cs-maxrange-div" class="start-hidden input-field col s12" data-position="top" data-delay="50" data-tooltip="Range in kilometers (ex: 20000)">
+            <input id="cs-maxrange" type="text" value="50000" />
+            <label for="cs-maxrange" class="active">Maximum Range</label>
+        </div>
+        <div class="center-align">
+            <button id="cs-replace" class="btn btn-ui waves-effect waves-light" name="action">Replace Sensor &#9658;</button>
+            <br />
+            <br />
+            <button id="cs-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Add Custom Sensor &#9658;</button>
+            <br />
+            <br />
+            <button id="cs-clear" class="btn btn-ui waves-effect waves-light" name="action">Clear Custom Sensors &#9658;</button>
+            <br />
+            <br />
+            <button id="cs-geolocation" class="btn btn-ui waves-effect waves-light" name="search">Use Geolocation &#9658;</button>
+        </div>
+        </form>
     </div>`;
+  sideMenuSettingsHtml: string = keepTrackApi.html`
+    <div class="row" style="margin: 0 10px;">
+      <div id="custom-sensors-sensor-list">
+      </div>
+    </div>`;
+  sideMenuSettingsOptions: SideMenuSettingsOptions = {
+    width: 450,
+    leftOffset: null,
+    zIndex: 3,
+  };
 
   rmbL1ElementName = 'create-rmb';
   rmbL1Html = keepTrackApi.html`
@@ -143,6 +154,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         if (!(<HTMLInputElement>getEl('cs-telescope')).checked) {
           getEl('cs-telescope').click();
         }
+        (<HTMLInputElement>getEl('cs-uiName')).value = 'Observer';
         (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
         (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
         (<HTMLInputElement>getEl('cs-hei')).value = '0';
@@ -169,6 +181,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
           getEl('cs-telescope').click();
         }
+        (<HTMLInputElement>getEl('cs-uiName')).value = 'Custom Sensor';
         (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
         (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
         (<HTMLInputElement>getEl('cs-hei')).value = '0';
@@ -263,6 +276,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     getEl('cs-clear').addEventListener('click', () => {
       keepTrackApi.getSensorManager().clearSecondarySensors();
       keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+      CustomSensorPlugin.updateCustomSensorListDom();
     });
   }
 
@@ -287,6 +301,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     getEl('sensor-info-title').innerHTML = 'Custom Sensor';
     getEl('sensor-country').innerHTML = 'Custom Sensor';
 
+    const uiName = (<HTMLInputElement>getEl('cs-uiName')).value;
     const lon = CustomSensorPlugin.str2Deg((<HTMLInputElement>getEl('cs-lon')).value);
     const lat = CustomSensorPlugin.str2Deg((<HTMLInputElement>getEl('cs-lat')).value);
     const alt = (<HTMLInputElement>getEl('cs-hei')).value;
@@ -319,6 +334,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         break;
     }
 
+    const randomUUID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
     keepTrackApi.getSensorManager().addSecondarySensor(
       new DetailedSensor({
         id: null,
@@ -333,16 +350,55 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         maxRng: CustomSensorPlugin.str2Km(maxrange),
         type,
         name: 'Custom Sensor',
-        uiName: 'Custom Sensor',
+        uiName,
         system: 'Custom Sensor',
         country: 'Custom Sensor',
-        objName: 'Custom Sensor',
+        objName: `Custom Sensor-${randomUUID}`,
         operator: 'Custom Sensor',
         zoom: CustomSensorPlugin.str2Km(maxrange) > 6000 ? ZoomValue.GEO : ZoomValue.LEO,
         volume: false,
       }),
       isReplaceSensor,
     );
+
+    CustomSensorPlugin.updateCustomSensorListDom();
+  }
+
+  private static updateCustomSensorListDom() {
+    const primarySensor = keepTrackApi.getSensorManager().currentSensors[0]?.objName.startsWith('Custom Sensor')
+      ? [keepTrackApi.getSensorManager().currentSensors[0]]
+      : [] as DetailedSensor[];
+    const sensors = primarySensor.concat(keepTrackApi.getSensorManager().secondarySensors);
+
+    getEl('custom-sensors-sensor-list').innerHTML = sensors.map((sensor) => `
+      <div class="row" style="height: 100%; display: flex; align-items: center; margin: 20px 0px;">
+        <div class="col s10 m10 l10">
+          <div><strong>Sensor Name:</strong> ${sensor.uiName}</div>
+          <div><strong>Latitude:</strong> ${sensor.lat.toFixed(0)}°</div>
+          <div><strong>Longitude:</strong> ${sensor.lon.toFixed(0)}°</div>
+          <div><strong>Elevation:</strong> ${sensor.alt.toFixed(0)} km</div>
+          <div><strong>Azimuth:</strong> ${sensor.minAz.toFixed(0)}° - ${sensor.maxAz.toFixed(0)}°</div>
+          <div><strong>Elevation:</strong> ${sensor.minEl.toFixed(0)}° - ${sensor.maxEl.toFixed(0)}°</div>
+          <div><strong>Range:</strong> ${sensor.minRng.toFixed(0)} km - ${sensor.maxRng.toFixed(0)} km</div>
+        </div>
+        <div class="col s2 m2 l2 center-align remove-icon" style="display: flex; align-items: center; height: 100%;">
+          <img class="remove-sensor" data-id="${sensor.objName}" src="${removePng}" style="cursor: pointer;"></img>
+        </div>
+      </div>
+      <div class="divider"></div>
+      `).join('');
+
+    document.querySelectorAll('.remove-sensor').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+        const objName = (<HTMLElement>e.target).dataset.id;
+        const sensor = keepTrackApi.getSensorManager().getSensorByObjName(objName);
+
+        keepTrackApi.getSensorManager().removeSensor(sensor);
+        CustomSensorPlugin.updateCustomSensorListDom();
+      });
+    });
   }
 
   private static addTelescopeClickListener_() {

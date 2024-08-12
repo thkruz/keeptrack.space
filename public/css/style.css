@@ -755,6 +755,16 @@ ul {
   margin: 0;
 }
 
+.side-menu-row-header {
+  background: var(--colorTertiaryDarken3);
+  margin: 0px -5px;
+  padding: 5px;
+}
+
+.flow5out {
+  margin: 0px -5px;
+}
+
 .side-menu-parent {
   display: none;
   position: absolute;
@@ -765,6 +775,10 @@ ul {
   transition: all 1s ease-in-out;
   transform: translateX(-100%);
   background: var(--colorTertiaryDarken2);
+}
+
+.divider {
+  padding: 2px !important;
 }
 
 input[type='checkbox'].css-checkbox {
@@ -1574,7 +1588,7 @@ footer {
   top: 0px;
   bottom: 0px;
   overflow: auto;
-  z-index: 10;
+  z-index: 3;
   padding: 0px 10px;
   display: flex;
   flex-direction: column;

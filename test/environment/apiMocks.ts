@@ -285,6 +285,9 @@ export const keepTrackApiStubs = {
         skybox: {
           draw: jest.fn(),
         },
+        customMeshFactory: {
+          creatRadarDome: jest.fn(),
+        },
       },
       startWithOrbits: jest.fn(),
     },
@@ -471,7 +474,7 @@ export const keepTrackApiStubs = {
       selectedSat: -1,
       secondarySat: -1,
       setSecondarySat: jest.fn(),
-      setSelectedSat: jest.fn(),
+      setSelectedSat_: jest.fn(),
       staticSet: {
         id: 0,
       },

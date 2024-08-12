@@ -51,6 +51,32 @@ export class SensorManager {
     return this.currentSensors[0] ?? null;
   }
 
+  getSensorById(sensorId: number): DetailedSensor | null {
+    // Look through all current, secondary, and stf sensors
+    const sensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+
+    for (const sensor of sensors) {
+      if (sensor.sensorId === sensorId) {
+        return sensor;
+      }
+    }
+
+    return null;
+  }
+
+  getSensorByObjName(objName: string): DetailedSensor | null {
+    // Look through all current, secondary, and stf sensors
+    const sensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+
+    for (const sensor of sensors) {
+      if (sensor.objName === objName) {
+        return sensor;
+      }
+    }
+
+    return null;
+  }
+
   addSecondarySensor(sensor: DetailedSensor, isReplaceSensor = false): void {
     // If there is no primary sensor, make this the primary sensor
     const primarySensor = this.currentSensors[0];
@@ -69,7 +95,6 @@ export class SensorManager {
 
   /** Sensors that are currently selected/active */
   currentSensors: DetailedSensor[] = [];
-  customSensors = <DetailedSensor[]>[];
   // UI Stuff
   isCustomSensorMenuOpen = false;
   isLookanglesMenuOpen = false;
@@ -117,20 +142,20 @@ export class SensorManager {
     }
 
     switch (sensor.objName) {
-      case 'COD':
-      case 'BLE':
-      case 'CLR':
-      case 'THL':
+      case 'CODSFS':
+      case 'BLEAFB':
+      case 'CLRSFS':
+      case 'THLSFB':
         lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.minAz + 120, sensor.minEl, sensor.maxRng], 'c');
         lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz + 120, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
         break;
-      case 'FYL':
+      case 'RAFFYL':
         // TODO: Find actual face directions
         lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 300, 60, sensor.minEl, sensor.maxRng], 'c');
         lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 60, 180, sensor.minEl, sensor.maxRng], 'c');
         lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 180, 300, sensor.minEl, sensor.maxRng], 'c');
         break;
-      case 'CDN':
+      case 'COBRADANE':
         // NOTE: This will be a bit more complicated later
         lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
         break;
@@ -160,6 +185,40 @@ export class SensorManager {
 
   isSensorSelected(): boolean {
     return this.currentSensors?.length > 0 && this.currentSensors[0]?.isSensor();
+  }
+
+  removeSensor(sensor: DetailedSensor) {
+    this.currentSensors = this.currentSensors.filter((s) => s !== sensor);
+
+    if (this.currentSensors.length === 0) {
+      if (this.secondarySensors.length > 0) {
+        this.currentSensors = [this.secondarySensors.pop()];
+      } else {
+        this.resetSensorSelected();
+      }
+    }
+
+    this.secondarySensors = this.secondarySensors.filter((s) => s !== sensor);
+    this.stfSensors = this.stfSensors.filter((s) => s !== sensor);
+    this.updatePositionCruncher_();
+  }
+
+  removePrimarySensor(sensor?: DetailedSensor) {
+    if (sensor) {
+      this.currentSensors = this.currentSensors.filter((s) => s !== sensor);
+    } else {
+      this.currentSensors.pop();
+    }
+
+    if (this.currentSensors.length === 0) {
+      if (this.secondarySensors.length > 0) {
+        this.currentSensors = [this.secondarySensors.pop()];
+      } else {
+        this.resetSensorSelected();
+      }
+    }
+
+    this.updatePositionCruncher_();
   }
 
   removeSecondarySensor(sensor?: DetailedSensor) {
@@ -256,7 +315,7 @@ export class SensorManager {
   }
 
   sensorListMw = Object.values(sensors).filter((sensor: DetailedSensor) =>
-    [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.COBRADANE, sensors.RAFFYL, sensors.PITSB].includes(sensor),
+    [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.RAFFYL, sensors.PITSB].includes(sensor),
   );
   sensorListRus = Object.values(sensors).filter((sensor: DetailedSensor) =>
     [
@@ -287,7 +346,7 @@ export class SensorManager {
       sensors.NRC,
       sensors.PDM,
       sensors.TRO,
-      sensors.Tenerife,
+      sensors.SDT,
       sensors.ZimLAT,
       sensors.ZimSMART,
       sensors.Tromso,
@@ -298,7 +357,7 @@ export class SensorManager {
   );
   sensorListOther = Object.values(sensors).filter((sensor: DetailedSensor) => [sensors.ROC, sensors.MLS, sensors.PO, sensors.LSO, sensors.MAY].includes(sensor));
   sensorListMda = Object.values(sensors).filter((sensor: DetailedSensor) =>
-    [sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor),
+    [sensors.COBRADANE, sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor),
   );
   sensorListSsn = Object.values(sensors).filter((sensor) => [
     sensors.EGLAFB,
@@ -435,6 +494,10 @@ export class SensorManager {
       }
     }
 
+    for (const sensor of this.currentSensors) {
+      keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
+    }
+
     // Update Satellite Math with new sensor - TODO: SatMath should reference the sensorManagerInstance
     SensorManager.updateSensorUiStyling(this.currentSensors);
     // Update position cruncher with new sensor
@@ -459,16 +522,6 @@ export class SensorManager {
       isSkipFirst: true,
       isRunCbOnFailure: true,
       maxRetries: 5,
-    });
-  }
-
-  updateCruncherOnCustomSensors() {
-    this.whichRadar = this.customSensors.length > 1 ? 'MULTI CUSTOM' : 'CUSTOM';
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    catalogManagerInstance.satCruncher.postMessage({
-      typ: CruncerMessageTypes.SENSOR,
-      sensor: this.customSensors,
     });
   }
 
@@ -503,6 +556,10 @@ export class SensorManager {
     }
 
     return sensors;
+  }
+
+  getAllActiveSensors(): DetailedSensor[] {
+    return this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
   }
 
   public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
@@ -546,6 +603,10 @@ export class SensorManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const combinedSensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+
+    for (const sensor of combinedSensors) {
+      keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
+    }
 
     catalogManagerInstance.satCruncher.postMessage({
       typ: CruncerMessageTypes.SENSOR,

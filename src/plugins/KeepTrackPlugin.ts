@@ -19,7 +19,7 @@ export interface clickDragOptions {
   attachedElement?: HTMLElement;
 }
 
-interface SideMenuSettingsOptions {
+export interface SideMenuSettingsOptions {
   /**
    * The width of the side menu's settings sub-menu.
    */
@@ -104,7 +104,7 @@ export class KeepTrackPlugin {
   sideMenuSettingsOptions: SideMenuSettingsOptions = {
     width: 300,
     leftOffset: null,
-    zIndex: 5,
+    zIndex: 3,
   };
 
   /**
@@ -231,6 +231,8 @@ export class KeepTrackPlugin {
     this.addHtml();
     this.addJs();
 
+    this.helpTitle = this.helpTitle || this.sideMenuTitle;
+
     if (this.helpTitle && this.helpBody) {
       this.registerHelp(this.helpTitle, this.helpBody);
     } else if (this.helpTitle || this.helpBody) {
@@ -241,6 +243,9 @@ export class KeepTrackPlugin {
 
     keepTrackApi.loadedPlugins.push(this);
   }
+
+  protected isSettingsMenuEnabled_ = true;
+
 
   /**
    * Adds HTML for the KeepTrackPlugin.
@@ -277,8 +282,12 @@ export class KeepTrackPlugin {
 
     if (this.sideMenuSettingsHtml) {
       const sideMenuHtmlWrapped = keepTrackApi.html`
-        <div id="${this.sideMenuElementName}-settings" class="side-menu-parent start-hidden text-select" style="z-index: ${this.sideMenuSettingsOptions.zIndex.toString()};">
-          <div id="${this.sideMenuElementName}-content" class="side-menu-settings" style="padding: 0px 10px;">
+        <div id="${this.sideMenuElementName}-settings"
+          class="side-menu-parent start-hidden text-select"
+          style="z-index: ${this.sideMenuSettingsOptions.zIndex.toString()};
+          width: ${this.sideMenuSettingsOptions.width.toString()}px;"
+        >
+          <div id="${this.sideMenuElementName}-settings-content" class="side-menu-settings" style="padding: 0px 10px;">
             <div class="row"></div>
             ${this.sideMenuSettingsHtml}
           </div>
@@ -292,6 +301,10 @@ export class KeepTrackPlugin {
         cbName: this.PLUGIN_NAME,
         cb: () => {
           getEl(`${this.sideMenuElementName}-settings-btn`).addEventListener('click', () => {
+            if (!this.isSettingsMenuEnabled_) {
+              return;
+            }
+
             keepTrackApi.getSoundManager().play(SoundNames.CLICK);
             if (this.isSideMenuSettingsOpen) {
               this.closeSettingsMenu();
@@ -394,6 +407,7 @@ export class KeepTrackPlugin {
                 ${settingsIconHtml}
               </div>
               <li class="divider" style="padding: 2px !important;"></li>
+              <div class="row"></div>
               ${this.sideMenuElementHtml}
             </div>
           </div>`;
@@ -685,6 +699,14 @@ export class KeepTrackPlugin {
         }
       },
     });
+  }
+
+  protected static genH5Title_(title: string): string {
+    return keepTrackApi.html`
+      <div class="divider flow5out"></div>
+        <h5 class="center-align side-menu-row-header">${title}</h5>
+      <div class="divider flow5out"></div>
+    `;
   }
 
   hideSideMenus(): void {

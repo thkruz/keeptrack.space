@@ -578,6 +578,10 @@ theodore.kruczek at gmail dot com.
         // intentionally left blank
       }
 
+      window.addEventListener('resize', () => {
+        keepTrackApi.runEvent(KeepTrackApiEvents.resize);
+      });
+
       keepTrackApi.isInitialized = true;
       keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
       if (settingsManager.onLoadCb) {

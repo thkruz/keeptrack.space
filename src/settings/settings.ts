@@ -646,12 +646,8 @@ export class SettingsManager {
   maxAnalystSats = 10000;
   /**
    * Preallocate the maximum number of field of view marker dots that can be displayed
-   *
-   * This needs to be large to accomodate a large number of simultaneous sensor FOVs
-   *
-   * TODO: Implementing 3D meshes would reduce the number of dots needed
    */
-  maxFieldOfViewMarkers = 500000;
+  maxFieldOfViewMarkers = 1;
   /**
    * Preallocate the maximum number of labels that can be displayed
    *

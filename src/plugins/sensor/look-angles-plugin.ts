@@ -5,7 +5,7 @@ import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
 import { TimeManager } from '@app/singletons/time-manager';
-import { SensorMath, TearrData } from '@app/static/sensor-math';
+import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
 import lookanglesPng from '@public/img/icons/lookangles.png';
 import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
@@ -100,7 +100,17 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   downloadIconCb = () => {
     const sensor = keepTrackApi.getSensorManager().getSensor();
 
-    saveCsv(this.lastlooksArray_, `${sensor.shortName ?? sensor.objName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
+    // Prepare lastlooksArray_ for CSV
+    const csvData = this.lastlooksArray_.map((look) => ({
+      Time: dateFormat(look.time, 'isoDateTime', false),
+      Type: LookAnglesPlugin.tearrTypeToString_(look.type),
+      Azimuth: look.az.toFixed(1),
+      Elevation: look.el.toFixed(1),
+      Range: look.rng.toFixed(0),
+      Sensor: sensor.system ? `${sensor.system} (${sensor.name})` : sensor.name,
+    }));
+
+    saveCsv(csvData, `${sensor.shortName ?? sensor.objName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
   };
   sideMenuSettingsOptions = {
     width: 300,
@@ -211,14 +221,39 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     const looksArray = <TearrData[]>[];
     let offset = 0;
+    let isMaxElFound = false;
 
     for (let i = 0; i < this.lengthOfLookAngles_ * 24 * 60 * 60; i += lookanglesInterval) {
       offset = i * 1000; // Offset in seconds (msec * 1000)
       const now = timeManagerInstance.getOffsetTimeObj(offset);
-      const looksPass = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetOnly_);
+      const looksPass = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetOnly_, isMaxElFound);
 
       if (looksPass.time !== '') {
-        looksArray.push(looksPass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
+        // Update the table with looks for this 5 second chunk and then increase table counter by 1
+        switch (looksPass.type) {
+          case TearrType.RISE:
+          case TearrType.SET:
+            isMaxElFound = false;
+            looksArray.push(looksPass);
+            break;
+          case TearrType.MAX_EL:
+            isMaxElFound = true;
+            looksArray.push(looksPass);
+            break;
+          case TearrType.RISE_AND_MAX_EL:
+            isMaxElFound = true;
+            looksArray.push({ ...looksPass, type: TearrType.RISE });
+            looksArray.push({ ...looksPass, type: TearrType.MAX_EL });
+            break;
+          case TearrType.MAX_EL_AND_SET:
+            isMaxElFound = false;
+            looksArray.push({ ...looksPass, type: TearrType.MAX_EL });
+            looksArray.push({ ...looksPass, type: TearrType.SET });
+            break;
+          default:
+            looksArray.push(looksPass);
+            break;
+        }
       }
       if (looksArray.length >= 1500) {
         // Maximum of 1500 lines in the look angles table
@@ -244,6 +279,17 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     tdT.appendChild(document.createTextNode('Time'));
     tdT.setAttribute('style', 'text-decoration: underline');
+
+    // If isRiseSetOnly is true, add a column for type
+    let tdType = null;
+
+    if (lookAngleData.length > 0 && typeof lookAngleData[0].type !== 'undefined') {
+      tdType = tr.insertCell();
+
+      tdType.appendChild(document.createTextNode('Type'));
+      tdType.setAttribute('style', 'text-decoration: underline');
+    }
+
     const tdE = tr.insertCell();
 
     tdE.appendChild(document.createTextNode('El'));
@@ -258,7 +304,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdR.setAttribute('style', 'text-decoration: underline');
 
     for (const lookAngleRow of lookAngleData) {
-      LookAnglesPlugin.populateSideMenuRow_(tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR);
+      LookAnglesPlugin.populateSideMenuRow_(tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR, tdType);
     }
   }
 
@@ -270,6 +316,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdE: HTMLTableCellElement,
     tdA: HTMLTableCellElement,
     tdR: HTMLTableCellElement,
+    tdType: HTMLTableCellElement,
   ) {
     if (tbl.rows.length > 0) {
       const tr = tbl.insertRow();
@@ -286,6 +333,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
       });
 
+      if (tdType) {
+        tdType = tr.insertCell();
+        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(lookAngleRow.type)));
+      }
+
       tdE = tr.insertCell();
       tdE.appendChild(document.createTextNode(lookAngleRow.el.toFixed(1)));
       tdA = tr.insertCell();
@@ -294,6 +346,20 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tdR.appendChild(document.createTextNode(lookAngleRow.rng.toFixed(0)));
     }
   }
+
+  private static tearrTypeToString_(type: TearrType): string {
+    switch (type) {
+      case TearrType.RISE:
+        return 'Rise';
+      case TearrType.SET:
+        return 'Set';
+      case TearrType.MAX_EL:
+        return 'Max El';
+      default:
+        return 'Unknown';
+    }
+  }
+
 
   private settingsRisesetChange_(e: any, isRiseSetChecked?: boolean): void {
     if (typeof e === 'undefined' || e === null) {

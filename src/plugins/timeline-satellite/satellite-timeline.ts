@@ -49,8 +49,8 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       return;
     }
 
-    if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', 'caution');
+    if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', 'caution');
       shake(getEl(this.bottomIconElementName));
 
       return;
@@ -60,7 +60,6 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       return;
     }
     this.resizeCanvas_();
-    this.updateTimeline();
   };
 
   helpTitle = 'Satellite Timeline';
@@ -176,6 +175,12 @@ export class SatelliteTimeline extends KeepTrackPlugin {
           this.updateTimeline();
           this.canvas_.style.display = 'block';
         }
+
+        if (!sat && keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
+          this.setBottomIconToDisabled();
+        } else if (this.verifySensorSelected(false)) {
+          this.setBottomIconToEnabled();
+        }
       },
     });
     keepTrackApi.register({
@@ -183,10 +188,16 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: this.onWatchlistUpdated_.bind(this),
     });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.resize,
+      cbName: this.PLUGIN_NAME,
+      cb: this.resizeCanvas_.bind(this),
+    });
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {
-    if (watchlistList.length === 0) {
+    if (watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
       this.setBottomIconToDisabled();
     } else if (this.verifySensorSelected(false)) {
       this.setBottomIconToEnabled();
@@ -213,8 +224,9 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   private calculatePasses_(): SatellitePasses[] {
     const satellitePasses: SatellitePasses[] = [];
     const sensor = keepTrackApi.getSensorManager().getSensor();
+    const satellites = keepTrackApi.getPlugin(WatchlistPlugin).getSatellites().concat(keepTrackApi.getPlugin(SelectSatManager).selectedSat).filter((sat) => sat !== -1);
 
-    for (const sat of keepTrackApi.getPlugin(WatchlistPlugin).getSatellites()) {
+    for (const sat of satellites) {
       const satellite = keepTrackApi.getCatalogManager().getSat(sat);
       const sensorPass: SatellitePasses = {
         satellite,
@@ -517,6 +529,11 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     isForceWidescreen ??= false;
     const timelineMenuDOM = getEl('satellite-timeline-menu');
 
+    // if the canvas is not visible, don't resize it
+    if (timelineMenuDOM.style.display === 'none') {
+      return;
+    }
+
     if (isForceWidescreen || window.innerWidth > window.innerHeight) {
       timelineMenuDOM.style.width = `${window.innerWidth}px`;
 
@@ -534,5 +551,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
     this.canvasStatic_.width = this.canvas_.width;
     this.canvasStatic_.height = this.canvas_.height;
+
+    this.updateTimeline();
   }
 }

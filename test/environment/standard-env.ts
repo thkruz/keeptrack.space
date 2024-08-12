@@ -7,6 +7,8 @@ import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { Camera } from '@app/singletons/camera';
 import { DotsManager } from '@app/singletons/dots-manager';
+import { ConeMeshFactory } from '@app/singletons/draw-manager/cone-mesh-factory';
+import { SensorFovMeshFactory } from '@app/singletons/draw-manager/sensor-fov-mesh-factory';
 import { GroupsManager } from '@app/singletons/groups-manager';
 import { InputManager } from '@app/singletons/input-manager';
 import { Scene } from '@app/singletons/scene';
@@ -47,6 +49,24 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   const scene = new Scene({
     gl: global.mocks.glMock,
   });
+
+  scene.sensorFovFactory = {
+    drawAll: jest.fn(),
+    updateAll: jest.fn(),
+    generateSensorFovMesh: jest.fn(),
+    meshes: [],
+  } as unknown as SensorFovMeshFactory;
+
+  scene.coneFactory = {
+    drawAll: jest.fn(),
+    updateAll: jest.fn(),
+    generateMesh: jest.fn(),
+    editSettings: jest.fn(),
+    remove: jest.fn(),
+    removeByObjectId: jest.fn(),
+    meshes: [],
+  } as unknown as ConeMeshFactory;
+
   const catalogManagerInstance = new CatalogManager();
 
   catalogManagerInstance.satCruncher = {

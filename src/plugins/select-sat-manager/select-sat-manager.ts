@@ -9,9 +9,9 @@ import { UrlManager } from '@app/static/url-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SatelliteFov } from '../satellite-fov/satellite-fov';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
+import { SatInfoBox } from './sat-info-box';
 
 /**
  * This is the class that manages the selection of objects.
@@ -64,6 +64,31 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (cssStyle !== this.lastCssStyle && getEl(TopMenu.SEARCH_RESULT_ID)) {
         this.lastCssStyle = cssStyle;
       }
+    }
+  }
+
+  selectPrevSat() {
+    const satId = this.selectedSat - 1;
+
+    if (satId >= 0) {
+      this.selectSat(satId);
+    } else {
+      const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
+      const lastSatId = activeSats[activeSats.length - 1].id;
+
+      this.selectSat(lastSatId);
+    }
+  }
+
+  selectNextSat() {
+    const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
+    const lastSatId = activeSats[activeSats.length - 1].id;
+    const satId = this.selectedSat + 1;
+
+    if (satId <= lastSatId) {
+      this.selectSat(satId);
+    } else {
+      this.selectSat(0);
     }
   }
 
@@ -150,15 +175,12 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.runEvent(KeepTrackApiEvents.sensorDotSelected, sensor);
     }
 
-    this.setSelectedSat(-1);
+    this.setSelectedSat_(-1);
     getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
-    if (this.selectedSat !== -1) {
-      getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
-    }
   }
 
   private selectSatChange_(obj?: DetailedSatellite | MissileObject) {
@@ -174,8 +196,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     SelectSatManager.updateCruncher_(id);
     this.updateDotSizeAndColor_(id);
-    this.setSelectedSat(id);
-    SelectSatManager.updateBottomMenu_();
+    this.setSelectedSat_(id);
 
     // If deselecting a satellite, clear the selected orbit
     if (id === -1 && this.lastSelectedSat_ > -1) {
@@ -190,41 +211,15 @@ export class SelectSatManager extends KeepTrackPlugin {
       this.selectSatChange_(null);
     }
 
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-    if (
-      colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group ||
-      (typeof (<HTMLInputElement>getEl('search'))?.value !== 'undefined' && (<HTMLInputElement>getEl('search')).value.length >= 3)
-    ) {
-      // If group selected
-      getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
-    } else {
-      getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-selected');
-      getEl('menu-sat-fov', true)?.classList.add('bmenu-item-disabled');
-
-      keepTrackApi.getPlugin(SatelliteFov)?.disableFovView();
-    }
-
     // Run this ONCE when clicking empty space
     if (this.lastSelectedSat() !== -1) {
       keepTrackApi.getMainCamera().exitFixedToSat();
 
       document.documentElement.style.setProperty('--search-box-bottom', '0px');
-      const satInfoBoxDom = getEl('sat-infobox', true);
-
-      if (satInfoBoxDom) {
-        satInfoBoxDom.style.display = 'none';
-      }
-
-      // Add Grey Out
-      getEl('menu-satview', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-editSat', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-map', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-newLaunch', true)?.classList.add('bmenu-item-disabled');
-      getEl('menu-breakup', true)?.classList.add('bmenu-item-disabled');
+      keepTrackApi.getPlugin(SatInfoBox)?.hide();
     }
 
-    this.setSelectedSat(-1);
+    this.setSelectedSat_(-1);
   }
 
   private selectSatObject_(sat: DetailedSatellite | MissileObject) {
@@ -250,7 +245,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
     keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
 
-    this.setSelectedSat(sat.id);
+    this.setSelectedSat_(sat.id);
   }
 
   private static selectOwnerManufacturer_(obj: LandObject) {
@@ -331,21 +326,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
   }
 
-  private static updateBottomMenu_() {
-    if (keepTrackApi.getSensorManager().isSensorSelected()) {
-      getEl('menu-lookangles', true)?.classList.remove('bmenu-item-disabled');
-    }
-    getEl('menu-lookanglesmultisite', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-satview', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-map', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-editSat', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-sat-fov', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-newLaunch', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-breakup', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-plot-analysis', true)?.classList.remove('bmenu-item-disabled');
-    getEl('menu-plot-analysis2', true)?.classList.remove('bmenu-item-disabled');
-  }
-
   getSelectedSat(type = GetSatType.DEFAULT): DetailedSatellite | MissileObject {
     return keepTrackApi.getCatalogManager().getObject(this.selectedSat, type) as DetailedSatellite | MissileObject;
   }
@@ -361,14 +341,14 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (this.secondarySat === this.selectedSat) {
       this.selectedSat = -1;
-      this.setSelectedSat(-1);
+      this.setSelectedSat_(-1);
       keepTrackApi.getOrbitManager().clearSelectOrbit(false);
     }
 
     keepTrackApi.runEvent(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
   }
 
-  setSelectedSat(id: number): void {
+  private setSelectedSat_(id: number): void {
     if (settingsManager.isDisableSelectSat || id === null) {
       return;
     }
@@ -392,7 +372,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     } else {
       orbitManagerInstance.clearSelectOrbit(true);
     }
-    this.setSelectedSat(_secondary);
+    this.setSelectedSat_(_secondary);
   }
 
   private registerKeyboardEvents_() {
@@ -405,7 +385,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       },
     });
     inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: '{',
+      key: '[',
       callback: () => {
         this.switchPrimarySecondary();
       },

@@ -27,8 +27,8 @@ describe('Camera Key Input', () => {
   beforeEach(() => {
     cameraInstance = new Camera();
   });
-  it('should handle C', () => {
-    const testFunc = () => cameraInstance.keyDownC_();
+  it('should handle V', () => {
+    const testFunc = () => cameraInstance.keyDownV_();
 
     for (let i = 0; i < 25; i++) {
       expect(testFunc).not.toThrow();
@@ -81,32 +81,32 @@ describe('Camera Key Input', () => {
     testFunc = () => cameraInstance.keyUpE_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle I', () => {
-    let testFunc = () => cameraInstance.keyDownI_();
+  it('should handle Numpad8', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad8_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpI_();
+    testFunc = () => cameraInstance.keyUpNumpad8_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle J', () => {
-    let testFunc = () => cameraInstance.keyDownJ_();
+  it('should handle Numpad4', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad4_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpJ_();
+    testFunc = () => cameraInstance.keyUpNumpad4_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle K', () => {
-    let testFunc = () => cameraInstance.keyDownK_();
+  it('should handle Numpad6', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad6_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpK_();
+    testFunc = () => cameraInstance.keyUpNumpad6_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
-  it('should handle L', () => {
-    let testFunc = () => cameraInstance.keyDownL_();
+  it('should handle Numpad2', () => {
+    let testFunc = () => cameraInstance.keyDownNumpad2_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpL_();
+    testFunc = () => cameraInstance.keyUpNumpad2_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Q', () => {
@@ -386,16 +386,16 @@ const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: Camera) 
   cameraInstance.keyDownE_();
   testFunc();
 
-  cameraInstance.keyDownI_();
+  cameraInstance.keyDownArrowDown_();
   testFunc();
 
-  cameraInstance.keyDownJ_();
+  cameraInstance.keyDownArrowLeft_();
   testFunc();
 
-  cameraInstance.keyDownK_();
+  cameraInstance.keyDownArrowRight_();
   testFunc();
 
-  cameraInstance.keyDownL_();
+  cameraInstance.keyDownArrowUp_();
   testFunc();
 
   cameraInstance.keyDownQ_();
@@ -426,12 +426,12 @@ const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: Camera) 
   cameraInstance.keyDownE_();
   testFunc();
 
-  cameraInstance.keyDownI_();
-  cameraInstance.keyDownJ_();
+  cameraInstance.keyDownArrowUp_();
+  cameraInstance.keyDownArrowDown_();
   testFunc();
 
-  cameraInstance.keyDownK_();
-  cameraInstance.keyDownL_();
+  cameraInstance.keyDownArrowLeft_();
+  cameraInstance.keyDownArrowRight_();
   testFunc();
 
   cameraInstance.keyDownShift_();
@@ -452,16 +452,16 @@ const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: Camera) =>
   cameraInstance.keyUpE_();
   testFunc();
 
-  cameraInstance.keyUpI_();
+  cameraInstance.keyUpArrowUp_();
   testFunc();
 
-  cameraInstance.keyUpJ_();
+  cameraInstance.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyUpK_();
+  cameraInstance.keyUpArrowLeft_();
   testFunc();
 
-  cameraInstance.keyUpL_();
+  cameraInstance.keyUpArrowRight_();
   testFunc();
 
   cameraInstance.keyUpQ_();
@@ -489,12 +489,12 @@ const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: Camera) =>
   cameraInstance.keyUpE_();
   testFunc();
 
-  cameraInstance.keyUpI_();
-  cameraInstance.keyUpJ_();
+  cameraInstance.keyUpArrowUp_();
+  cameraInstance.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyUpK_();
-  cameraInstance.keyUpL_();
+  cameraInstance.keyUpArrowLeft_();
+  cameraInstance.keyUpArrowRight_();
   testFunc();
 
   cameraInstance.keyUpShift_();
@@ -516,12 +516,12 @@ const testVariousKeyCombinationInputs = (testFunc: () => void, cameraInstance: C
   cameraInstance.keyUpE_();
   testFunc();
 
-  cameraInstance.keyDownI_();
-  cameraInstance.keyUpJ_();
+  cameraInstance.keyDownArrowUp_();
+  cameraInstance.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyDownK_();
-  cameraInstance.keyUpL_();
+  cameraInstance.keyDownArrowLeft_();
+  cameraInstance.keyUpArrowRight_();
   testFunc();
 
   cameraInstance.keyDownShift_();
@@ -541,12 +541,12 @@ const testVariousKeyCombinationInputs = (testFunc: () => void, cameraInstance: C
   cameraInstance.keyDownE_();
   testFunc();
 
-  cameraInstance.keyUpI_();
-  cameraInstance.keyDownJ_();
+  cameraInstance.keyUpArrowUp_();
+  cameraInstance.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyUpK_();
-  cameraInstance.keyDownL_();
+  cameraInstance.keyUpArrowLeft_();
+  cameraInstance.keyUpArrowRight_();
   testFunc();
 
   cameraInstance.keyUpShift_();

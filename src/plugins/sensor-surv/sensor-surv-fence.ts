@@ -22,13 +22,10 @@
 
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { waitForCruncher } from '@app/lib/waitForCruncher';
-import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { CruncerMessageTypes, MarkerMode } from '@app/webworker/positionCruncher';
 import fencePng from '@public/img/icons/fence.png';
 import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SatelliteFov } from '../satellite-fov/satellite-fov';
+import { SensorFov } from '../sensor-fov/sensor-fov';
 
 declare module '@app/interfaces' {
   interface UserSettings {
@@ -43,10 +40,8 @@ export class SensorSurvFence extends KeepTrackPlugin {
     super(SensorSurvFence.PLUGIN_NAME);
   }
 
-  isShowSurvFence = false;
-
   bottomIconCallback = () => {
-    if (this.isShowSurvFence) {
+    if (!this.isMenuButtonActive) {
       this.disableSurvView();
     } else {
       this.enableSurvView_();
@@ -61,60 +56,13 @@ export class SensorSurvFence extends KeepTrackPlugin {
 
   isRequireSensorSelected = true;
 
-  disableSurvView(isTellWorker = true) {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
-
-    this.isShowSurvFence = false;
+  disableSurvView() {
     this.setBottomIconToUnselected(false);
-
-    if (isTellWorker) {
-      this.isMenuButtonActive = false;
-      keepTrackApi.getCatalogManager().satCruncher.postMessage({
-        markerMode: MarkerMode.OFF,
-        typ: CruncerMessageTypes.UPDATE_MARKERS,
-      });
-
-      waitForCruncher({
-        cruncher: keepTrackApi.getCatalogManager().satCruncher,
-        cb: () => {
-          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-        },
-        validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length === 0,
-        isSkipFirst: true,
-        isRunCbOnFailure: true,
-        maxRetries: 5,
-      });
-    }
   }
 
   private enableSurvView_() {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.PLUGIN_NAME);
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
     this.setBottomIconToSelected();
-
-    this.isShowSurvFence = true;
-
-    const satFovPlugin = keepTrackApi.getPlugin(SatelliteFov);
-
-    if (satFovPlugin) {
-      satFovPlugin.isSatOverflyModeOn = false;
-    }
-
-    this.isMenuButtonActive = true;
-    keepTrackApi.getCatalogManager().satCruncher.postMessage({
-      markerMode: MarkerMode.SURV,
-      typ: CruncerMessageTypes.UPDATE_MARKERS,
-    });
-
-    waitForCruncher({
-      cruncher: keepTrackApi.getCatalogManager().satCruncher,
-      cb: () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
-      },
-      validationFunc: (m: PositionCruncherOutgoingMsg) => m.sensorMarkerArray?.length > 0,
-      isSkipFirst: true,
-      isRunCbOnFailure: true,
-      maxRetries: 5,
-    });
   }
 
   addJs(): void {
@@ -145,16 +93,6 @@ export class SensorSurvFence extends KeepTrackPlugin {
           this.setBottomIconToEnabled();
         } else {
           this.setBottomIconToDisabled();
-        }
-      },
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.changeSensorMarkers,
-      cbName: this.PLUGIN_NAME,
-      cb: (caller: string): void => {
-        if (caller !== this.PLUGIN_NAME) {
-          this.disableSurvView();
         }
       },
     });

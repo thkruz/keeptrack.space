@@ -1,10 +1,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
-import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -24,10 +22,11 @@ export interface SearchResult {
 
 export enum SearchResultType {
   BUS,
-  ON,
-  SCC,
+  OBJECT_NAME,
+  ALT_NAME,
+  NORAD_ID,
   INTLDES,
-  LV,
+  LAUNCH_VEHICLE,
   MISSILE,
   STAR,
 }
@@ -274,12 +273,6 @@ export class SearchManager {
       return;
     }
 
-    if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn) {
-      catalogManagerInstance.satCruncher.postMessage({
-        typ: CruncerMessageTypes.SATELLITE_SELECTED,
-        satelliteSelected: idList,
-      });
-    }
     // Don't let the search overlap with the legend
     LegendManager.change('clear');
     UrlManager.updateURL();
@@ -315,7 +308,18 @@ export class SearchManager {
         if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
           results.push({
             strIndex: sat.name.indexOf(searchStringIn),
-            searchType: SearchResultType.ON,
+            searchType: SearchResultType.OBJECT_NAME,
+            patlen: len,
+            id: sat.id,
+          });
+
+          return true; // Prevent's duplicate results
+        }
+
+        if (sat.altName && sat.altName.toUpperCase().indexOf(searchStringIn) !== -1) {
+          results.push({
+            strIndex: sat.altName.toUpperCase().indexOf(searchStringIn),
+            searchType: SearchResultType.ALT_NAME,
             patlen: len,
             id: sat.id,
           });
@@ -357,7 +361,7 @@ export class SearchManager {
 
           results.push({
             strIndex: sat.sccNum.indexOf(searchStringIn),
-            searchType: SearchResultType.SCC,
+            searchType: SearchResultType.NORAD_ID,
             patlen: len,
             id: sat.id,
           });
@@ -365,7 +369,7 @@ export class SearchManager {
           return true; // Prevent's duplicate results
         }
 
-        if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1) {
+        if (sat.intlDes && sat.intlDes.indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
           // Ignore Notional Satellites
           if (sat.name.includes(' Notional)')) {
             return true;
@@ -384,7 +388,7 @@ export class SearchManager {
         if (sat.launchVehicle && sat.launchVehicle.toUpperCase().indexOf(searchStringIn) !== -1) {
           results.push({
             strIndex: sat.launchVehicle.toUpperCase().indexOf(searchStringIn),
-            searchType: SearchResultType.LV,
+            searchType: SearchResultType.LAUNCH_VEHICLE,
             patlen: len,
             id: sat.id,
           });
@@ -445,7 +449,7 @@ export class SearchManager {
             strIndex: sat.sccNum.indexOf(searchStringIn),
             patlen: searchStringIn.length,
             id: sat.id,
-            searchType: SearchResultType.SCC,
+            searchType: SearchResultType.NORAD_ID,
           });
           lastFoundI = i;
 
@@ -473,9 +477,7 @@ export class SearchManager {
           return false;
         } // Skip missiles (if not searching for missiles
 
-        if (keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn && obj.type !== SpaceObjectType.PAYLOAD) {
-          return false;
-        } // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
+        // Skip Debris and Rocket Bodies if In Satelltie FOV Mode
         if (!(obj as MissileObject).active) {
           return false;
         } // Skip inactive missiles.
@@ -515,13 +517,22 @@ export class SearchManager {
       // Left half of search results
       if (obj.isMissile()) {
         html += obj.name;
-      } else if (result.searchType === SearchResultType.ON) {
+      } else if (result.searchType === SearchResultType.OBJECT_NAME) {
         // If the name matched - highlight it
         html += obj.name.substring(0, result.strIndex);
         html += '<span class="search-hilight">';
         html += obj.name.substring(result.strIndex, result.strIndex + result.patlen);
         html += '</span>';
         html += obj.name.substring(result.strIndex + result.patlen);
+      } else if (obj.isSatellite() && result.searchType === SearchResultType.ALT_NAME) {
+        const sat = obj as DetailedSatellite;
+
+        // If the alternate name matched - highlight it
+        html += sat.altName.substring(0, result.strIndex);
+        html += '<span class="search-hilight">';
+        html += sat.altName.substring(result.strIndex, result.strIndex + result.patlen);
+        html += '</span>';
+        html += sat.altName.substring(result.strIndex + result.patlen);
       } else {
         // If not, just write the name
         html += obj.name;
@@ -531,7 +542,7 @@ export class SearchManager {
 
       // Right half of search results
       switch (result.searchType) {
-        case SearchResultType.SCC:
+        case SearchResultType.NORAD_ID:
           {
             const sat = obj as DetailedSatellite;
 
@@ -576,7 +587,7 @@ export class SearchManager {
             html += sat.bus.substring(result.strIndex + result.patlen);
           }
           break;
-        case SearchResultType.LV:
+        case SearchResultType.LAUNCH_VEHICLE:
           {
             const sat = obj as DetailedSatellite;
 

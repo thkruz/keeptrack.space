@@ -1,9 +1,9 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { DebugMenuPlugin } from '@app/plugins/debug/debug';
-import { Camera, CameraType } from '@app/singletons/camera';
-import eruda from 'eruda';
+import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { Camera } from '@app/singletons/camera';
+import { errorManagerInstance } from '../errorManager';
 import { KeyEvent } from '../input-manager';
 
 export class KeyboardInput {
@@ -33,6 +33,16 @@ export class KeyboardInput {
       if (e.shiftKey === false) {
         this.isShiftPressed = false;
       }
+    });
+
+    this.registerKeyDownEvent({
+      key: 'F2',
+      callback: () => {
+        if (this.isShiftPressed) {
+          uiManagerInstance.hideUi();
+          this.releaseShiftKey(keepTrackApi.getMainCamera());
+        }
+      },
     });
 
     if (!settingsManager.disableUI) {
@@ -68,21 +78,35 @@ export class KeyboardInput {
   keyUpEvents = <KeyEvent[]>[];
   keyDownEvents = <KeyEvent[]>[];
 
-  registerKeyEvent(key: string, callback: () => void) {
-    this.keyEvents.push({ key: key.toUpperCase(), callback });
+  // TODO: shfit and ctrl should be added to the keyEvents parameters
+
+  registerKeyEvent({ key, code, callback }: { key: string; code?: string; callback: () => void }) {
+    if (this.keyEvents.find((event) => event.key === key.toUpperCase() || (code && event.code === code))) {
+      errorManagerInstance.debug(`Key '${key}' or Code '${code}' is already registered in keyEvents!`);
+    }
+
+    this.keyEvents.push({ key: key.toUpperCase(), code, callback });
   }
 
-  registerKeyUpEvent({ key, callback }: { key: string; callback: () => void }) {
-    this.keyUpEvents.push({ key: key.toUpperCase(), callback });
+  registerKeyUpEvent({ key, code, callback }: { key: string; code?: string; callback: () => void }) {
+    if (this.keyUpEvents.find((event) => event.key === key.toUpperCase() || (code && (code && event.code === code)))) {
+      errorManagerInstance.debug(`Key '${key}' or Code '${code}' is already registered (KeyUp)`);
+    }
+
+    this.keyUpEvents.push({ key: key.toUpperCase(), code, callback });
   }
 
-  registerKeyDownEvent({ key, callback }: { key: string; callback: () => void }) {
-    this.keyDownEvents.push({ key: key.toUpperCase(), callback });
+  registerKeyDownEvent({ key, code, callback }: { key: string; code?: string; callback: () => void }) {
+    if (this.keyDownEvents.find((event) => event.key === key.toUpperCase() || (code && event.code === code))) {
+      errorManagerInstance.debug(`Key '${key}' or Code '${code}' is already registered (KeyDown)`);
+    }
+
+    this.keyDownEvents.push({ key: key.toUpperCase(), code, callback });
   }
 
   keyUpHandler(evt: KeyboardEvent) {
     this.keyUpEvents
-      .filter((event) => event.key == evt.key?.toUpperCase())
+      .filter((event) => event.key === evt.key?.toUpperCase() && (!event.code || event.code === evt.code))
       .forEach((event) => {
         event.callback();
       });
@@ -90,7 +114,7 @@ export class KeyboardInput {
 
   keyDownHandler(evt: KeyboardEvent) {
     this.keyDownEvents
-      .filter((event) => event.key == evt.key?.toUpperCase())
+      .filter((event) => event.key === evt.key?.toUpperCase() && (!event.code || event.code === evt.code))
       .forEach((event) => {
         event.callback();
       });
@@ -126,89 +150,70 @@ export class KeyboardInput {
           this.releaseShiftKey(keepTrackApi.getMainCamera());
         }
         break;
-      // Hide the UI
-      case 'H':
-        if (this.isShiftPressed) {
-          uiManagerInstance.hideUi();
-          this.releaseShiftKey(keepTrackApi.getMainCamera());
-        }
+      // Close the bottom menu
+      case 'B':
+        uiManagerInstance.toggleBottomMenu();
+        this.releaseShiftKey(keepTrackApi.getMainCamera());
         break;
-      case 'D':
-        if (this.isShiftPressed && keepTrackApi.getMainCamera().cameraType !== CameraType.FPS) {
-          const debugPlugin = keepTrackApi.getPlugin(DebugMenuPlugin);
-
-          if (!debugPlugin) {
-            return;
-          }
-
-          if (debugPlugin.isErudaVisible) {
-            eruda.hide();
-            debugPlugin.isErudaVisible = false;
-          } else {
-            eruda.show();
-            debugPlugin.isErudaVisible = true;
-          }
+      case 'L':
+        settingsManager.isDrawOrbits = !settingsManager.isDrawOrbits;
+        if (settingsManager.isDrawOrbits) {
+          uiManagerInstance.toast('Orbits On', 'normal');
+        } else {
+          uiManagerInstance.toast('Orbits Off', 'standby');
         }
+        SettingsMenuPlugin.syncOnLoad();
         break;
       default:
         break;
 
     }
 
-    switch (evt.key) {
-      case '!':
-        timeManagerInstance.changeStaticOffset(0); // Reset to Current Time
-        settingsManager.isPropRateChange = true;
+    switch (evt.code) {
+      case 'NumpadAdd':
+        keepTrackApi.getMainCamera().zoomIn();
         break;
-      case ',':
-        timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 1000 * 60); // Move back a Minute
-        settingsManager.isPropRateChange = true;
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+      case 'NumpadSubtract':
+        keepTrackApi.getMainCamera().zoomOut();
         break;
-      case '.':
+      case 'Equal':
         timeManagerInstance.calculateSimulationTime();
         timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 1000 * 60); // Move forward a Minute
         settingsManager.isPropRateChange = true;
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;
-      case '<':
+      case 'Minus':
         timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 4000 * 60); // Move back 4 Minutes
+        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 1000 * 60); // Move back a Minute
         settingsManager.isPropRateChange = true;
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;
-      case '>':
-        timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 4000 * 60); // Move forward 4 Minutes
-        settingsManager.isPropRateChange = true;
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+      default:
         break;
-      case '0':
-        timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changePropRate(0);
-        settingsManager.isPropRateChange = true;
-        break;
-      case '+':
-      case '=':
-        timeManagerInstance.calculateSimulationTime();
-        if (timeManagerInstance.propRate < 0.001 && timeManagerInstance.propRate > -0.001) {
-          timeManagerInstance.changePropRate(0.001);
-        }
+    }
 
-        if (timeManagerInstance.propRate > 1000) {
-          timeManagerInstance.changePropRate(1000);
-        }
-
-        if (timeManagerInstance.propRate < 0) {
-          timeManagerInstance.changePropRate((timeManagerInstance.propRate * 2) / 3);
-        } else {
-          timeManagerInstance.changePropRate(timeManagerInstance.propRate * 1.5);
-        }
+    switch (evt.key) {
+      case '}':
+        /*
+         * TODO: Implement
+         * keepTrackApi.getPlugin(SelectSatManager).selectNextSat();
+         */
+        break;
+      case '{':
+        /*
+         * TODO: Implement
+         * keepTrackApi.getPlugin(SelectSatManager).selectPrevSat();
+         */
+        break;
+      case '`':
+        keepTrackApi.getMainCamera().resetCamera();
+        break;
+      case 't':
+        uiManagerInstance.toast('Time Set to Real Time', 'normal');
+        timeManagerInstance.changeStaticOffset(0); // Reset to Current Time
         settingsManager.isPropRateChange = true;
         break;
-      case '-':
-      case '_':
+      case ',':
         timeManagerInstance.calculateSimulationTime();
         if (timeManagerInstance.propRate < 0.001 && timeManagerInstance.propRate > -0.001) {
           timeManagerInstance.changePropRate(-0.001);
@@ -225,12 +230,50 @@ export class KeyboardInput {
         }
         settingsManager.isPropRateChange = true;
         break;
-      case '1':
+      case '.':
         timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changePropRate(1);
+        if (timeManagerInstance.propRate < 0.001 && timeManagerInstance.propRate > -0.001) {
+          timeManagerInstance.changePropRate(0.001);
+        }
+
+        if (timeManagerInstance.propRate > 1000) {
+          timeManagerInstance.changePropRate(1000);
+        }
+
+        if (timeManagerInstance.propRate < 0) {
+          timeManagerInstance.changePropRate((timeManagerInstance.propRate * 2) / 3);
+        } else {
+          timeManagerInstance.changePropRate(timeManagerInstance.propRate * 1.5);
+        }
+        settingsManager.isPropRateChange = true;
+        break;
+      case '<':
+        timeManagerInstance.calculateSimulationTime();
+        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 4000 * 60); // Move back 4 Minutes
+        settingsManager.isPropRateChange = true;
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+        break;
+      case '>':
+        timeManagerInstance.calculateSimulationTime();
+        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 4000 * 60); // Move forward 4 Minutes
+        settingsManager.isPropRateChange = true;
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+        break;
+      case '/':
+        if (timeManagerInstance.propRate === 1) {
+          timeManagerInstance.changePropRate(0);
+        } else {
+          timeManagerInstance.changePropRate(1);
+        }
+        timeManagerInstance.calculateSimulationTime();
         settingsManager.isPropRateChange = true;
         break;
       default:
+        this.keyEvents
+          .filter((event) => event.key === evt.key?.toUpperCase() && (!event.code || event.code === evt.code))
+          .forEach((event) => {
+            event.callback();
+          });
         break;
     }
 

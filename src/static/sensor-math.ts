@@ -23,12 +23,21 @@ import { keepTrackApi } from '../keepTrackApi';
 import { dateFormat } from '../lib/dateFormat';
 import { SatMath } from './sat-math';
 
+export enum TearrType {
+  RISE,
+  SET,
+  MAX_EL,
+  RISE_AND_MAX_EL,
+  MAX_EL_AND_SET,
+}
+
 export type TearrData = {
   objName: string;
   rng: Kilometers;
   az: Degrees;
   el: Degrees;
   time: string;
+  type?: TearrType;
   inView?: boolean;
   alt?: Kilometers;
   lat?: Degrees;
@@ -39,7 +48,7 @@ export class SensorMath {
   /**
    * @deprecated - Use ootk instead
    */
-  static getTearData(now: Date, satrec: SatelliteRecord, sensors: DetailedSensor[], isRiseSetLookangles = false): TearrData {
+  static getTearData(now: Date, satrec: SatelliteRecord, sensors: DetailedSensor[], isRiseSetLookangles = false, isMaxElFound = false): TearrData {
     // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
     const sensor = sensors[0];
 
@@ -52,36 +61,55 @@ export class SensorMath {
         const now1 = new Date();
 
         now1.setTime(Number(now) - 1000);
-        let aer1 = SatMath.getRae(now1, satrec, sensor);
-        let isInFOV1 = SatMath.checkIsInView(sensor, aer1);
+        const aerPrevious = SatMath.getRae(now1, satrec, sensor);
+        const isInFOVPrevious = SatMath.checkIsInView(sensor, aerPrevious);
+        let isRise = false;
 
         // Is in FOV and Wasn't Last Time so First Line of Coverage
-        if (!isInFOV1) {
-          return {
-            time: dateFormat(now, 'isoDateTime', true),
-            rng: aer.rng,
-            az: aer.az,
-            el: aer.el,
-            inView: isInFOV,
-            objName: sensor.objName,
-          };
+        if (!isInFOVPrevious) {
+          isRise = true;
         }
         // Next Pass to Calculate Last line of coverage
         now1.setTime(Number(now) + 1000);
-        aer1 = SatMath.getRae(now1, satrec, sensor);
-        isInFOV1 = SatMath.checkIsInView(sensor, aer1);
+        const aerNext = SatMath.getRae(now1, satrec, sensor);
+        const isInFOVNext = SatMath.checkIsInView(sensor, aerNext);
 
-        // Is in FOV and Wont Be Next Time so Last Line of Coverage
-        if (!isInFOV1) {
+        // if elevation is going down then it is a peak
+        if (!isMaxElFound && aerNext.el < aer.el) {
           return {
             time: dateFormat(now, 'isoDateTime', true),
             rng: aer.rng,
             az: aer.az,
             el: aer.el,
+            type: isRise ? TearrType.RISE_AND_MAX_EL : TearrType.MAX_EL,
+            inView: isInFOV,
+            objName: sensor.objName,
+          };
+        } else if (isRise) {
+          return {
+            time: dateFormat(now, 'isoDateTime', true),
+            rng: aer.rng,
+            az: aer.az,
+            el: aer.el,
+            type: TearrType.RISE,
             inView: isInFOV,
             objName: sensor.objName,
           };
         }
+
+        // Is in FOV and Wont Be Next Time so Last Line of Coverage
+        if (!isInFOVNext) {
+          return {
+            time: dateFormat(now, 'isoDateTime', true),
+            rng: aer.rng,
+            az: aer.az,
+            el: aer.el,
+            type: !isMaxElFound ? TearrType.MAX_EL_AND_SET : TearrType.SET,
+            inView: isInFOV,
+            objName: sensor.objName,
+          };
+        }
+
 
         return {
           time: '',
@@ -93,6 +121,7 @@ export class SensorMath {
         };
       }
 
+      // If not rise set look angles just return all the data
       return {
         time: dateFormat(now, 'isoDateTime', true),
         rng: aer.rng,
@@ -103,6 +132,7 @@ export class SensorMath {
       };
     }
 
+    // If not in FOV return no time to filter out
     return {
       time: '',
       rng: aer.rng,
@@ -267,7 +297,7 @@ export class SensorMath {
         }
       } else if (
         (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-          (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
+        (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
       ) {
         if (dist < minDistanceApart) {
           minDistanceApart = dist;

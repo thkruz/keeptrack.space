@@ -31,11 +31,10 @@ import { CameraType } from './camera';
 import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
-import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Days, DetailedSatellite, Marker, SpaceObjectType, Star } from 'ootk';
+import { BaseObject, Days, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { getDayOfYear } from '../lib/transforms';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
@@ -137,7 +136,7 @@ export class ColorSchemeManager {
     }
 
     if (obj.isMarker()) {
-      return this.getMarkerColor_(obj);
+      return this.getMarkerColor_();
     }
 
     if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
@@ -440,7 +439,7 @@ export class ColorSchemeManager {
     }
 
     if (obj.isMarker()) {
-      return this.getMarkerColor_(obj);
+      return this.getMarkerColor_();
     }
 
     if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
@@ -701,7 +700,7 @@ export class ColorSchemeManager {
     }
 
     if (obj.isMarker()) {
-      return this.getMarkerColor_(obj);
+      return this.getMarkerColor_();
     }
 
     if (obj.isStar()) {
@@ -728,7 +727,7 @@ export class ColorSchemeManager {
     }
 
     if (obj.isMarker()) {
-      return this.getMarkerColor_(obj);
+      return this.getMarkerColor_();
     }
 
     return {
@@ -1303,7 +1302,7 @@ export class ColorSchemeManager {
       return this.starColor_(obj as Star);
     }
     if (obj.isMarker()) {
-      return this.getMarkerColor_(obj as Marker);
+      return this.getMarkerColor_();
     }
 
     if (obj.isSensor()) {
@@ -1751,30 +1750,10 @@ export class ColorSchemeManager {
     return null;
   }
 
-  private getMarkerColor_(marker: Marker): ColorInformation {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    // This doesn't apply to sat overfly mode
-    if (!keepTrackApi.getPlugin(SatelliteFov)?.isSatOverflyModeOn) {
-      // But it doesn't work if we don't have marker info from the sensor
-      if (typeof this.iSensor !== 'undefined' && typeof catalogManagerInstance.sensorMarkerArray !== 'undefined') {
-        // if we have sensor markers enabled then we need to rotate colors as the marker numbers increase
-        if (marker.id >= catalogManagerInstance.sensorMarkerArray[this.iSensor + 1]) {
-          this.iSensor++;
-        }
-      }
-    }
-    if (this.iSensor >= 0) {
-      return {
-        color: this.colorTheme.marker[this.iSensor],
-        marker: true,
-        pickable: Pickable.No,
-      };
-    }
-
+  private getMarkerColor_(): ColorInformation {
     return {
-      // Failsafe
-      color: this.colorTheme.marker[0],
+      // TODO: Use this for Santa Tracker
+      color: [1, 0, 0, 1],
       marker: true,
       pickable: Pickable.No,
     };

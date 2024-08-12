@@ -40,6 +40,7 @@ import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SoundNames } from '../sounds/SoundNames';
 
 interface GroundTracePoint {
   x: number;
@@ -48,12 +49,11 @@ interface GroundTracePoint {
 }
 
 export class StereoMap extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Stereo Map';
-  dependencies = [SelectSatManager.PLUGIN_NAME];
+  dependencies = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(StereoMap.PLUGIN_NAME);
+    super(StereoMap.name);
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -154,6 +154,28 @@ export class StereoMap extends KeepTrackPlugin {
       cb: (sat: BaseObject) => {
         if (sat) {
           this.updateMap();
+        }
+      },
+    });
+
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyUpEvent({
+      key: 'M',
+      callback: () => {
+        if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+          return;
+        }
+
+        if (!this.isMenuButtonActive) {
+          this.openSideMenu();
+          this.setBottomIconToSelected();
+          this.updateMap();
+          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+        } else {
+          this.closeSideMenu();
+          this.setBottomIconToUnselected();
+          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
         }
       },
     });

@@ -110,12 +110,12 @@ There are Typescript files for generating TLE.json that are not included, but ht
 
 # Release Notes
 
-- Version 10.0 - [Euclid](./docs/v10.0.md)
+- Version 10.0 - [Euclid](./docs/v10.md)
 - Version 9.1 - [Kepler](./docs/v9.1.md)
-- Version 9.0 - [Kepler](./docs/v9.0.md)
+- Version 9.0 - [Kepler](./docs/v9.md)
 - Version 8.2 - [Phoenix](./docs/v8.2.md)
 - Version 8.1 - [Phoenix](./docs/v8.1.md)
-- Version 8.0 - [Phoenix](./docs/v8.0.md)
+- Version 8.0 - [Phoenix](./docs/v8.md)
 - Version 7.2 - [Nebula Navigator](./docs/v7.2.md)
 - Version 7.0 - [Vega Viewpoint](./docs/v7.md)
 - Version 6.0 - [Celestial Symphony](./docs/v6.md)

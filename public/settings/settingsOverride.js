@@ -28,6 +28,7 @@ const settingsOverride = {
     satInfoboxCore: true,
     aboutManager: false,
     collisions: true,
+    trackingImpactPredict: true,
     dops: false,
     findSat: true,
     launchCalendar: true,

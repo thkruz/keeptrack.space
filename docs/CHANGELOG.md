@@ -2,6 +2,118 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.0.0
+
+>  
+
+- feat: :sparkles: add satellite-timeline plugin
+- feat: :sparkles: add timeline feature
+- refactor: :recycle: abstract away common elements of sesnor-fov-mesh/factory
+- feat: :sparkles: update satellite fov menu
+- feat: :sparkles: add radar domes
+- feat: :sparkles: add settings and download buttons to look-angles and multi-site-looks
+- refactor: :fire: remove markers for sensor fov and surv
+- refactor: :recycle: split methods in SensorFovMesh class
+- feat: :sparkles: improve sensor management and menus to incorporate radarDomes
+- feat: :construction: add cone mesh and coneFactory
+- feat: :wastebasket: deprecate marker logic
+- fix: :bug: fix cone mesh only hitting surface of earth
+- chore: :art: update logos
+- feat: :sparkles: add settings menu to multi-site looks
+- chore: :card_file_box: update databases
+- feat: :sparkles: add settings sub-menu to plugins
+- refactor: :recycle: refactor sensor-fov-mesh-factory to remove duplication and deprecated methods
+- feat: :sparkles: update keyboard shortcuts to align with kerbal
+- fix: :zap: fix long loop through markers looking for satellites
+- feat: :sparkles: update camera keyboard controls to match kerbal
+- feat: :art: update icons and logos
+- feat: :sparkles: add scc num and time to polar plots
+- fix: :bug: fix cone's not lining up prefectly with a satellite
+- feat: :sparkles: update look angles logic and add type column
+- refactor: :truck: rename customMeshFactory to sensorFovMeshFactory
+- refactor: :recycle: consolidate selectsat manager logic
+- feat: :sparkles: improve radarDomes
+- fix: :bug: catch edge case where some plugins not loaded
+- feat: :art: replace all icons
+- feat: :sparkles: update keyboard shortcuts for sensor-list
+- feat: :sparkles: add math for new look angles logic
+- fix: :bug: fix resizing of timeline window
+- feat: :sparkles: add searching by alt name
+- refactor: :coffin: disable satelliteFov until I have a working mesh solution instead of markers
+- feat: :sparkles: update keyboard shortcuts for sat-info-box
+- feat: :sparkles: add createRadarDome calls
+- feat: :sparkles: add ctrl+b to toggle bottom menu open/close
+- chore: :card_file_box: update sensors paramaters
+- feat: :sparkles: add keyboard shortcut for satelltie FOV cones
+- feat: :sparkles: update keyboard shortcuts for stereo map
+- fix: :bug: fix polar plot overwriting canvas
+- feat: :sparkles: update keyboard shortcuts for polar plot
+- feat: :sparkles: update keyboard shortcuts for debug menu
+- feat: :sparkles: remove markers changed cb from sensor fov and surv
+- feat: :sparkles: update keyboard shortcuts for night toggle
+- test: :white_check_mark: fix testing environment
+- fix: :bug: fix side menu sub menu width override not working
+- fix: :bug: fix keyEvents not firing
+- fix: :bug: reenable satelliteFOV plugin
+- refactor: :recycle: refactor camera logic out of mouse input
+- feat: :sparkles: add uuid to custom and stf sensor objNames to differentiate them
+- refactor: :recycle: type settingsSideMenu in multi-site-look-angles
+- feat: :sparkles: update splash screens
+- refactor: :art: update css to make dividers thicker
+- fix: :bug: fix hide UI shortcut not working initially
+- feat: :sparkles: add resize event
+- fix: :bug: fix default isDraggable settings
+- refactor: :truck: rename SensorFovMeshFactory filename
+- fix: :bug: fix wathlist overlay being enabled incorrectly
+- fix: :art: fix logo being oversized
+
+#### v9.1.0
+
+>  
+
+- fix: :bug: fix issue with godrays breaking after screen resize
+- fix: :bug: fix issue with godrays breaking after screen resize
+- refactor: :rotating_light: migrate to eslint for formatting
+- chore: :card_file_box: update database files
+- fix: :zap: fix performance bug and css issues
+- chore: :card_file_box: update data
+- feat: :sparkles: add polar plots
+- feat: :sparkles: add new quick reports
+- fix: :ambulance: fix one bad satellite breaking website
+- chore: :card_file_box: update databases
+- chore: :card_file_box: update database
+- fix: :bug: fix logic on waitForCruncher
+- feat: :sparkles: add aer report
+- feat: :sparkles: add sun angle to bestpass report
+- fix: :bug: multiple bug fixes related to color buffer updates
+- fix: :ambulance: fix new launch plugin
+- refactor: :recycle: update settings methods to identify private funcs
+- fix: :zap: reduce impact of godrays on performance
+- fix: :bug: fix conflict between custom sensors and normal sensors
+- test: :white_check_mark: fix broken tests
+- feat: :sparkles: add save button to polar plots
+- fix: :bug: fix reference orbits not updating correctly
+- fix: :bug: fix line to sun/moon in sensor info for custom sensors
+- fix: :bug: fix sun/moon line
+- build: :arrow_up: bump ootk
+- feat: :sparkles: add inFOV color to group color scheme
+- fix: :zap: remove unnecessary color buffer update
+- fix: :bug: fix how isSensorSelected works
+- fix: :lipstick: fix resize cursor icon on draggable menus
+
+#### v9.0.3
+
+>  
+
+- fix: :bug: fix error when sensor reset and planetarium is open
+- feat: :sparkles: add responsive design
+- refactor: :technologist: add version number to error handler for easier debugging
+- docs: :memo: update changelog
+- fix: :bug: fix canvas resizing issue on mobile
+- fix: :bug: fix webgl issue with large images on small devices
+- refactor: :recycle: add additional catalog sources
+- build: :arrow_up: bump ootk
+
 #### v9.0.2
 
 >  

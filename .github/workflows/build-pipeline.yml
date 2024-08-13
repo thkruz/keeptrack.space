@@ -34,7 +34,11 @@ jobs:
       - name: NPM Audit Action
         uses: oke-py/npm-audit-action@main
         with:
+          issue_assignees: thkruz
+          issue_labels: Security
+          dedupe_issues: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
   eslint:
     needs: compliance
     name: Lint

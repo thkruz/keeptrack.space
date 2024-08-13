@@ -8,7 +8,7 @@
 - [Screenshots](#screenshots)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Previous Versions](#previous-versions)
+- [Release Notes](#release-notes)
 - [Contributors](#contributors)
 - [License](#license)
 
@@ -53,16 +53,25 @@ The feature set rivals those of expensive toolkits, such as AGI's STK, and inclu
 
 <!-- white border -->
 <div style="border: 1px solid white;">
+    <img src="./docs/5.jpg" align="center" style="width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
     <img src="./docs/1.jpg" align="center" style="width: 100%; height: 400px;">
 </div>
 <div style="border: 1px solid white;">
     <img src="./docs/2.jpg" align="center" style="width: 100%; height: 400px;">
 </div>
 <div style="border: 1px solid white;">
+    <img src="./docs/6.jpg" align="center" style="width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
     <img src="./docs/3.jpg" align="center" style="width: 100%; height: 400px;">
 </div>
 <div style="border: 1px solid white;">
     <img src="./docs/4.jpg" align="center" style="width: 100%; height: 400px;">
+</div>
+<div style="border: 1px solid white;">
+    <img src="./docs/7.jpg" align="center" style="width: 100%; height: 400px;">
 </div>
 
 # Installation
@@ -99,8 +108,14 @@ Any modifications to a satellite require that information to be passed to the po
 
 There are Typescript files for generating TLE.json that are not included, but http://keeptrack.space/tle/TLE2.json can be referenced for an up-to-date catalog.
 
-# Previous Versions
+# Release Notes
 
+- Version 10.0 - [Euclid](./docs/v10.0.md)
+- Version 9.1 - [Kepler](./docs/v9.1.md)
+- Version 9.0 - [Kepler](./docs/v9.0.md)
+- Version 8.2 - [Phoenix](./docs/v8.2.md)
+- Version 8.1 - [Phoenix](./docs/v8.1.md)
+- Version 8.0 - [Phoenix](./docs/v8.0.md)
 - Version 7.2 - [Nebula Navigator](./docs/v7.2.md)
 - Version 7.0 - [Vega Viewpoint](./docs/v7.md)
 - Version 6.0 - [Celestial Symphony](./docs/v6.md)

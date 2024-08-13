@@ -10,7 +10,7 @@ const env = myArgs[0];
 const isWatch = !!(typeof myArgs[1] !== 'undefined' && myArgs[1] === '--watch');
 
 // Print current working directory
-console.log('Current working directory: ' + process.cwd()); // NOSONAR
+console.log(`Current working directory: ${process.cwd()}`); // NOSONAR
 
 console.log('Removing old files...'); // NOSONAR
 // Remove all files in dist
@@ -24,6 +24,7 @@ try {
 console.log('Copy static files...'); // NOSONAR
 // Get a list of all files (not folders) in the public folder
 let files = readdirSync('./public', { withFileTypes: true });
+
 files.forEach((file) => {
   if (!file.isDirectory()) {
     cpSync(`./public/${file.name}`, `./dist/${file.name}`);
@@ -38,7 +39,7 @@ files.forEach((file) => {
   }
 });
 
-['audio', 'css', 'img', 'meshes', 'res', 'settings', 'simulation', 'textures', 'tle'].forEach((dir) => {
+['audio', 'css', 'data', 'img', 'meshes', 'res', 'settings', 'simulation', 'textures', 'tle'].forEach((dir) => {
   cpSync(`public/${dir}`, `dist/${dir}`, { recursive: true, preserveTimestamps: true });
 });
 
@@ -52,6 +53,7 @@ const webpackConfig = generateConfig(env, isWatch);
 
 const compiler = webpack(webpackConfig, (watchErrors, watchStats) => {
   const hasErrors = watchErrors || watchStats.hasErrors();
+
   if (hasErrors) {
     console.log(
       watchStats.toString({
@@ -71,7 +73,7 @@ const compiler = webpack(webpackConfig, (watchErrors, watchStats) => {
         children: false,
         reasons: false,
         source: false,
-      })
+      }),
     );
   }
 });
@@ -79,6 +81,7 @@ const compiler = webpack(webpackConfig, (watchErrors, watchStats) => {
 if (isWatch) {
   compiler.watch({}, (watchErrors, watchStats) => {
     const hasErrors = watchErrors || watchStats.hasErrors();
+
     if (hasErrors && watchStats) {
       console.log(
         watchStats.toString({
@@ -98,7 +101,7 @@ if (isWatch) {
           children: false,
           reasons: false,
           source: false,
-        })
+        }),
       );
     }
   });
@@ -117,22 +120,24 @@ if (isWatch) {
   });
 } else {
   compiler.run((runErrors, runStats) => {
-    // console.log(
-    //   runStats.toString({
-    //     cached: false,
-    //     colors: true,
-    //     assets: true,
-    //     chunks: false,
-    //     chunkModules: false,
-    //     chunkOrigins: false,
-    //     errors: true,
-    //     errorDetails: true,
-    //     hash: false,
-    //     modules: false,
-    //     timings: false,
-    //     warnings: false,
-    //     version: false,
-    //   })
-    // );
+    /*
+     * console.log(
+     *   runStats.toString({
+     *     cached: false,
+     *     colors: true,
+     *     assets: true,
+     *     chunks: false,
+     *     chunkModules: false,
+     *     chunkOrigins: false,
+     *     errors: true,
+     *     errorDetails: true,
+     *     hash: false,
+     *     modules: false,
+     *     timings: false,
+     *     warnings: false,
+     *     version: false,
+     *   })
+     * );
+     */
   });
 }

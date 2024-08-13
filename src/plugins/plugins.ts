@@ -29,6 +29,7 @@ import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitReferences } from './orbit-references/orbit-references';
 import { Planetarium } from './planetarium/planetarium';
+import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
 /*
  * import { ecfPlotsPlugin } from './plot-analysis/ecf-plots';
  * import { eciPlotsPlugin } from './plot-analysis/eci-plots';
@@ -84,6 +85,7 @@ export type KeepTrackPlugins = {
   catalogLoader?: boolean;
   classificationBar?: boolean;
   collissions?: boolean;
+  trackingImpactPredict?: boolean;
   colorsMenu?: boolean;
   constellations?: boolean;
   countriesMenu?: boolean;
@@ -150,6 +152,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new ShortTermFences().init(), enabled: plugins.shortTermFences },
       { init: () => new OrbitReferences().init(), enabled: plugins.orbitReferences },
       { init: () => new Collissions().init(), enabled: plugins.collisions },
+      { init: () => new TrackingImpactPredict().init(), enabled: plugins.trackingImpactPredict },
       { init: () => new Breakup().init(), enabled: plugins.breakup },
       { init: () => new DebrisScreening().init(), enabled: plugins.debrisScreening },
       { init: () => new EditSat().init(), enabled: plugins.editSat },

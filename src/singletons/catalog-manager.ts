@@ -206,8 +206,9 @@ export class CatalogManager {
   sccNum2Sat(sccNum: number): DetailedSatellite | null {
     const sat = this.getObject(this.sccNum2Id(sccNum.toString().padStart(5, '0')));
 
-    if (!sat.isSatellite()) {
-      throw new Error(`Object ${sccNum} is not a satellite!`);
+    if (!sat?.isSatellite()) {
+      // throw new Error(`Object ${sccNum} is not a satellite!`);
+      return null;
     }
 
     return sat as DetailedSatellite;

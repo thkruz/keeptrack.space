@@ -38,6 +38,7 @@ export class SettingsManager {
     satInfoboxCore: true,
     aboutManager: false,
     collisions: true,
+    trackingImpactPredict: true,
     dops: false,
     findSat: true,
     launchCalendar: true,

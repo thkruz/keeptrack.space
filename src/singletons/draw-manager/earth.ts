@@ -182,7 +182,7 @@ export class Earth {
     const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
 
     this.lightDirection = [pos.x, pos.y, pos.z];
-    vec3.normalize(<vec3>(<unknown> this.lightDirection), <vec3>(<unknown> this.lightDirection));
+    vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
     // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
@@ -372,6 +372,10 @@ export class Earth {
 
     this.setUniforms_(gl);
     this.setTextures_(gl);
+
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);

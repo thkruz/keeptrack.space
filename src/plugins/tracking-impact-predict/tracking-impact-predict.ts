@@ -139,6 +139,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     this.tipList_ = tipList;
     this.tipList_.sort((a, b) => new Date(b.MSG_EPOCH).getTime() - new Date(a.MSG_EPOCH).getTime());
     this.tipList_ = this.tipList_.filter((v, i, a) => a.findIndex((t) => t.NORAD_CAT_ID === v.NORAD_CAT_ID) === i);
+    this.tipList_.sort((a, b) => new Date(b.DECAY_EPOCH).getTime() - new Date(a.DECAY_EPOCH).getTime());
   }
 
   private eventClicked_(row: number) {

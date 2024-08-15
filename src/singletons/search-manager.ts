@@ -260,7 +260,7 @@ export class SearchManager {
     this.lastResultGroup_ = dispGroup;
     groupManagerInstance.selectGroup(dispGroup);
 
-    if (!isPreventDropDown) {
+    if (!isPreventDropDown && idList.length > 0) {
       this.fillResultBox(results, catalogManagerInstance);
     }
 

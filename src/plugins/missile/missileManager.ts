@@ -40,10 +40,20 @@ export const MassRaidPre = async (time: number, simFile: string) => {
 
         // Add the missile to the catalog
         catalogManagerInstance.objectCache[x] = newMissileArray[i];
-        catalogManagerInstance.objectCache[x].velocity ??= { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>; // Set the velocity to 0 if it doesn't exist
+        if (!catalogManagerInstance.objectCache[x].velocity?.x) {
+          catalogManagerInstance.objectCache[x].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+        }
         catalogManagerInstance.objectCache[x].totalVelocity ??= 0;
 
         const missileObj = catalogManagerInstance.getObject(x) as MissileObject;
+
+        missileObj.isMissile = () => true;
+        missileObj.isMarker = () => false;
+        missileObj.isStatic = () => false;
+        missileObj.isSensor = () => false;
+        missileObj.isSatellite = () => false;
+        missileObj.isStar = () => false;
+        missileObj.isGroundObject = () => false;
 
         if (missileObj) {
           missileObj.id = satSetLen - 500 + i;
@@ -69,9 +79,11 @@ export const MassRaidPre = async (time: number, simFile: string) => {
       missileManager.missileArray = newMissileArray;
     });
 
-  const uiManagerInstance = keepTrackApi.getUiManager();
+  keepTrackApi.getUiManager().toast('Missile Mass Raid Loaded Successfully', ToastMsgType.normal);
+  settingsManager.searchLimit = settingsManager.searchLimit > 500 ? settingsManager.searchLimit : 500;
+  SettingsMenuPlugin.syncOnLoad();
 
-  uiManagerInstance.doSearch('RV_');
+  keepTrackApi.getUiManager().doSearch('RV_');
 };
 export const clearMissiles = () => {
   const uiManagerInstance = keepTrackApi.getUiManager();

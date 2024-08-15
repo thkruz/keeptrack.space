@@ -252,9 +252,9 @@ export class DotsManager {
    */
   getCurrentPosition(i: number) {
     return {
-      x: <Kilometers> this.positionData[i * 3],
-      y: <Kilometers> this.positionData[i * 3 + 1],
-      z: <Kilometers> this.positionData[i * 3 + 2],
+      x: <Kilometers>this.positionData[i * 3],
+      y: <Kilometers>this.positionData[i * 3 + 1],
+      z: <Kilometers>this.positionData[i * 3 + 2],
     };
   }
 
@@ -535,6 +535,33 @@ export class DotsManager {
      * TODO: Remove this once we figure out why this is happening
      */
 
+    if (typeof object.velocity === 'undefined') {
+      console.error('Object velocity is undefined', object);
+      console.trace();
+
+      return;
+    }
+    if (typeof object.velocity?.x === 'undefined') {
+      console.error('Object velocity.x is undefined', object);
+      console.trace();
+
+      return;
+    }
+
+    if (typeof object.velocity?.y === 'undefined') {
+      console.error('Object position is undefined', object);
+      console.trace();
+
+      return;
+    }
+
+    if (typeof object.position?.z === 'undefined') {
+      console.error('Object position.x is undefined', object);
+      console.trace();
+
+      return;
+    }
+
     object.velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
     object.totalVelocity = 0;
 
@@ -557,9 +584,9 @@ export class DotsManager {
     }
 
     object.position = {
-      x: <Kilometers> this.positionData[i * 3],
-      y: <Kilometers> this.positionData[i * 3 + 1],
-      z: <Kilometers> this.positionData[i * 3 + 2],
+      x: <Kilometers>this.positionData[i * 3],
+      y: <Kilometers>this.positionData[i * 3 + 1],
+      z: <Kilometers>this.positionData[i * 3 + 2],
     };
   }
 

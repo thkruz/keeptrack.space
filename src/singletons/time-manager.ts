@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -160,7 +160,7 @@ export class TimeManager {
     this.timeTextStrEmpty_ = '';
 
     this.propFrozen = Date.now(); // for when propRate 0
-    this.realTime = <Milliseconds> this.propFrozen; // (initialized as Date.now)
+    this.realTime = <Milliseconds>this.propFrozen; // (initialized as Date.now)
     this.propRate = 1.0; // time rate multiplier for propagation
 
     // Initialize
@@ -170,7 +170,7 @@ export class TimeManager {
 
   setNow(realTime: Milliseconds) {
     this.realTime = realTime;
-    this.lastTime = <Milliseconds> this.simulationTimeObj.getTime();
+    this.lastTime = <Milliseconds>this.simulationTimeObj.getTime();
 
     // NOTE: This should be the only regular call to calculateSimulationTime!!
     this.calculateSimulationTime();
@@ -188,16 +188,16 @@ export class TimeManager {
 
     if (this.propRate > 1.01 || this.propRate < 0.99) {
       if (this.propRate < 10) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'standby');
+        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
       }
       if (this.propRate >= 10 && this.propRate < 60) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'caution');
+        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.caution);
       }
       if (this.propRate >= 60) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'serious');
+        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.serious);
       }
     } else {
-      uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, 'normal');
+      uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.normal);
     }
   }
 

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { rgbCss } from '@app/lib/rgbCss';
@@ -711,14 +711,14 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     if (isNaN(newFieldOfView)) {
       (<HTMLInputElement>getEl('satFieldOfView')).value = '30';
-      uiManagerInstance.toast('Invalid field of view value!', 'critical');
+      uiManagerInstance.toast('Invalid field of view value!', ToastMsgType.critical);
     }
 
     const maxSearchSats = parseInt((<HTMLInputElement>getEl('maxSearchSats')).value);
 
     if (isNaN(maxSearchSats)) {
       (<HTMLInputElement>getEl('maxSearchSats')).value = settingsManager.searchLimit.toString();
-      uiManagerInstance.toast('Invalid max search sats value!', 'critical');
+      uiManagerInstance.toast('Invalid max search sats value!', ToastMsgType.critical);
     } else {
       settingsManager.searchLimit = maxSearchSats;
       uiManagerInstance.searchManager.doSearch(keepTrackApi.getUiManager().searchManager.getCurrentSearch());

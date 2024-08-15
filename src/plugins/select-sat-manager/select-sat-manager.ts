@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
@@ -262,7 +262,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       .join(',');
 
     if (searchStr.length === 0) {
-      keepTrackApi.getUiManager().toast('No satellites found for this owner/manufacturer', 'caution', false);
+      keepTrackApi.getUiManager().toast('No satellites found for this owner/manufacturer', ToastMsgType.caution, false);
     } else {
       keepTrackApi.getUiManager().searchManager.doSearch(searchStr);
       keepTrackApi.getMainCamera().changeZoom(0.9);

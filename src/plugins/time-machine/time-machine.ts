@@ -1,3 +1,4 @@
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import type { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
@@ -94,12 +95,12 @@ export class TimeMachine extends KeepTrackPlugin {
       if (year >= 57 && year < 100) {
         const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`);
 
-        keepTrackApi.getUiManager().toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
+        keepTrackApi.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       } else {
         const yearStr = year < 10 ? `0${year}` : `${year}`;
         const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`);
 
-        keepTrackApi.getUiManager().toast(timeMachineString, 'normal', settingsManager.timeMachineLongToast);
+        keepTrackApi.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       }
     }
 

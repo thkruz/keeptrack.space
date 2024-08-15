@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { LineManager, LineTypes } from '@app/singletons/draw-manager/line-manager';
@@ -195,7 +195,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         const sensors = keepTrackApi.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
+          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
         }
 
         // Draw Line to Sun from Sensor
@@ -238,7 +238,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         const sensors = keepTrackApi.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
+          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
         }
 
         // Draw Line to Sun from Sensor

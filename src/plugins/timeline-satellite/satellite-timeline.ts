@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -50,7 +50,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     }
 
     if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
 
       return;

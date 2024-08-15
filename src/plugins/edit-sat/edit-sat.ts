@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -308,7 +308,7 @@ export class EditSat extends KeepTrackPlugin {
       orbitManagerInstance.changeOrbitBufferData(sat.id, object.tle1, object.tle2);
       sat.active = true;
     } else {
-      uiManagerInstance.toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
+      uiManagerInstance.toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', ToastMsgType.caution, true);
     }
   }
 
@@ -370,7 +370,7 @@ export class EditSat extends KeepTrackPlugin {
       const upOrDown = SatMath.getDirection(mainsat, timeManagerInstance.simulationTimeObj);
 
       if (upOrDown === 'Error') {
-        uiManagerInstance.toast('Cannot calculate direction of satellite. Try again later.', 'caution');
+        uiManagerInstance.toast('Cannot calculate direction of satellite. Try again later.', ToastMsgType.caution);
       }
 
       const simulationTimeObj = timeManagerInstance.simulationTimeObj;
@@ -394,7 +394,7 @@ export class EditSat extends KeepTrackPlugin {
       const tle2 = TLEs[1];
 
       if (tle1 === 'Error') {
-        uiManagerInstance.toast(`${tle2}`, 'critical', true);
+        uiManagerInstance.toast(`${tle2}`, ToastMsgType.critical, true);
 
         return;
       }
@@ -409,9 +409,9 @@ export class EditSat extends KeepTrackPlugin {
 
       orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
       /*
-       * 
+       *
        * Reload Menu with new TLE
-       * 
+       *
        */
       const obj2 = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
 
@@ -503,7 +503,7 @@ export class EditSat extends KeepTrackPlugin {
       sat.editTle(tle1, tle2);
       keepTrackApi.getMainCamera().zoomTarget = ZoomValue.GEO;
     } else {
-      keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', 'caution', true);
+      keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', ToastMsgType.caution, true);
     }
   }
 

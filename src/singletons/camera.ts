@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, SatShader } from '@app/interfaces';
+import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
@@ -784,27 +784,27 @@ export class Camera {
 
     switch (this.cameraType) {
       case CameraType.DEFAULT:
-        uiManagerInstance.toast('Earth Centered Camera Mode', 'standby');
+        uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
         this.zoomTarget = 0.5;
         break;
       case CameraType.OFFSET:
-        uiManagerInstance.toast('Offset Camera Mode', 'standby');
+        uiManagerInstance.toast('Offset Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.FIXED_TO_SAT:
-        uiManagerInstance.toast('Fixed to Satellite Camera Mode', 'standby');
+        uiManagerInstance.toast('Fixed to Satellite Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.FPS:
-        uiManagerInstance.toast('Free Camera Mode', 'standby');
+        uiManagerInstance.toast('Free Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.PLANETARIUM:
-        uiManagerInstance.toast('Planetarium Camera Mode', 'standby');
+        uiManagerInstance.toast('Planetarium Camera Mode', ToastMsgType.standby);
         LegendManager.change('planetarium');
         break;
       case CameraType.SATELLITE:
-        uiManagerInstance.toast('Satellite Camera Mode', 'standby');
+        uiManagerInstance.toast('Satellite Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.ASTRONOMY:
-        uiManagerInstance.toast('Astronomy Camera Mode', 'standby');
+        uiManagerInstance.toast('Astronomy Camera Mode', ToastMsgType.standby);
         LegendManager.change('astronomy');
         break;
       default:

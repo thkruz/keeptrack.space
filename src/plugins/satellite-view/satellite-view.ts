@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
@@ -56,7 +57,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast('Select a Satellite First!', 'caution');
+      uiManagerInstance.toast('Select a Satellite First!', ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
     }
   };

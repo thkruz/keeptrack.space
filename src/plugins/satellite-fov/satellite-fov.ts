@@ -20,7 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import removePng from '@public/img/icons/remove.png';
@@ -274,35 +274,35 @@ export class SatelliteFov extends KeepTrackPlugin {
     const toast = keepTrackApi.getUiManager().toast.bind(keepTrackApi.getUiManager());
 
     if (isNaN(fovAngle) || fovAngle <= 0 || fovAngle > 180) {
-      toast('Field of View must be a number between 0 and 180 degrees.', 'critical');
+      toast('Field of View must be a number between 0 and 180 degrees.', ToastMsgType.critical);
       (getEl('sat-fov-default-fov-angle') as HTMLInputElement).value = '3';
 
       return;
     }
 
     if (isNaN(red) || red < 0 || red > 1) {
-      toast('Red color value must be a number between 0 and 1.', 'critical');
+      toast('Red color value must be a number between 0 and 1.', ToastMsgType.critical);
       (getEl('sat-fov-default-red') as HTMLInputElement).value = '0.5';
 
       return;
     }
 
     if (isNaN(green) || green < 0 || green > 1) {
-      toast('Green color value must be a number between 0 and 1.', 'critical');
+      toast('Green color value must be a number between 0 and 1.', ToastMsgType.critical);
       (getEl('sat-fov-default-green') as HTMLInputElement).value = '0.5';
 
       return;
     }
 
     if (isNaN(blue) || blue < 0 || blue > 1) {
-      toast('Blue color value must be a number between 0 and 1.', 'critical');
+      toast('Blue color value must be a number between 0 and 1.', ToastMsgType.critical);
       (getEl('sat-fov-default-blue') as HTMLInputElement).value = '0.5';
 
       return;
     }
 
     if (isNaN(opacity) || opacity < 0 || opacity > 1) {
-      toast('Opacity value must be a number between 0 and 1.', 'critical');
+      toast('Opacity value must be a number between 0 and 1.', ToastMsgType.critical);
       (getEl('sat-fov-default-opacity') as HTMLInputElement).value = '0.15';
 
       return;

@@ -1,6 +1,6 @@
 /* eslint-disable new-cap */
 /* eslint-disable max-statements */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -116,19 +116,19 @@ export const missileSubmit = (): void => {
       missileManager.MassRaidPre(launchTime, sim);
     }
     if (type !== 0) {
-      uiManagerInstance.toast(`${sim} Loaded`, 'standby', true);
+      uiManagerInstance.toast(`${sim} Loaded`, ToastMsgType.standby, true);
     }
     if (type === 0) {
       if (target === -1) {
         // Custom Target
         if (isNaN(tgtLat)) {
-          uiManagerInstance.toast('Invalid Target Latitude!', 'critical');
+          uiManagerInstance.toast('Invalid Target Latitude!', ToastMsgType.critical);
           getEl('loading-screen').style.display = 'none';
 
           return;
         }
         if (isNaN(tgtLon)) {
-          uiManagerInstance.toast('Invalid Target Longitude!', 'critical');
+          uiManagerInstance.toast('Invalid Target Longitude!', ToastMsgType.critical);
           getEl('loading-screen').style.display = 'none';
 
           return;
@@ -141,13 +141,13 @@ export const missileSubmit = (): void => {
 
       if (isSub) {
         if (isNaN(lauLat)) {
-          uiManagerInstance.toast('Invalid Launch Latitude!', 'critical');
+          uiManagerInstance.toast('Invalid Launch Latitude!', ToastMsgType.critical);
           getEl('loading-screen').style.display = 'none';
 
           return;
         }
         if (isNaN(lauLon)) {
-          uiManagerInstance.toast('Invalid Launch Longitude!', 'critical');
+          uiManagerInstance.toast('Invalid Launch Longitude!', ToastMsgType.critical);
           getEl('loading-screen').style.display = 'none';
 
           return;

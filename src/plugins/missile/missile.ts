@@ -1,6 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -501,7 +502,7 @@ export class Missile {
               BurnRate,
               WarheadMass,
             )) /
-            GoalDistance,
+          GoalDistance,
         ) * 100;
       if (
         Missile.testTrajectory_(
@@ -761,11 +762,11 @@ export class Missile {
       ThrustAngle =
         (90 -
           AngleCoefficient *
-            (1.5336118956 +
-              0.00443173537387 * Altitude -
-              9.30373890848 * 10 ** -8 * Altitude ** 2 +
-              8.37838197732 * 10 ** -13 * Altitude ** 3 -
-              2.71228576626 * 10 ** -18 * Altitude ** 4)) *
+          (1.5336118956 +
+            0.00443173537387 * Altitude -
+            9.30373890848 * 10 ** -8 * Altitude ** 2 +
+            8.37838197732 * 10 ** -13 * Altitude ** 3 -
+            2.71228576626 * 10 ** -18 * Altitude ** 4)) *
         0.0174533;
       // (Degrees)
     } else {
@@ -931,13 +932,13 @@ export class Missile {
       return null;
     }
     if (TargetLatitude > 90 || TargetLatitude < -90) {
-      missileManager.lastMissileErrorType = 'critical';
+      missileManager.lastMissileErrorType = ToastMsgType.critical;
       missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
 
       return null;
     }
     if (TargetLongitude > 180 || TargetLongitude < -180) {
-      missileManager.lastMissileErrorType = 'critical';
+      missileManager.lastMissileErrorType = ToastMsgType.critical;
       missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 90 and -90 degrees';
 
       return null;
@@ -960,14 +961,14 @@ export class Missile {
     const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = Missile.calcCoordinates_(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
     if (ArcLength < 320000) {
-      missileManager.lastMissileErrorType = 'critical';
+      missileManager.lastMissileErrorType = ToastMsgType.critical;
       missileManager.lastMissileError = 'Error: This missile has a minimum distance of 320 km.';
 
       return null;
     }
 
     if (ArcLength > MaxMissileRange * 1000) {
-      missileManager.lastMissileErrorType = 'critical';
+      missileManager.lastMissileErrorType = ToastMsgType.critical;
       missileManager.lastMissileError = `Error: This missile has a maximum distance of ${MaxMissileRange} km.`;
 
       return null;
@@ -1241,7 +1242,7 @@ export class Missile {
     }
 
     if (minAltitudeTrue === (minAltitude * 3) / 2) {
-      missileManager.lastMissileErrorType = 'critical';
+      missileManager.lastMissileErrorType = ToastMsgType.critical;
       missileManager.lastMissileError = 'Error: This distance is too close for the selected missile.';
 
       return null;

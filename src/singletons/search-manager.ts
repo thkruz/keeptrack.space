@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
@@ -266,7 +266,7 @@ export class SearchManager {
 
     if (idList.length === 0) {
       if (settingsManager.lastSearch?.length > settingsManager.minimumSearchCharacters) {
-        uiManagerInstance.toast('No Results Found', 'serious', false);
+        uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
       }
       this.hideResults();
 

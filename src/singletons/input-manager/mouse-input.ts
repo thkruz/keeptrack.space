@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
@@ -438,7 +438,7 @@ export class MouseInput {
 
           this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
         }
-        uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, 'normal', true);
+        uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
         break;
       case 'view-sat-info-rmb':
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
@@ -452,7 +452,7 @@ export class MouseInput {
           const intldes = catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY)?.intlDes;
 
           if (!intldes) {
-            uiManagerInstance.toast('Time 1 is Invalid!', 'serious');
+            uiManagerInstance.toast('Time 1 is Invalid!', ToastMsgType.serious);
           }
           const searchStr = intldes.slice(0, 8);
 

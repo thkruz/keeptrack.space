@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, SatPassTimes } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, SatPassTimes, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -35,7 +35,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
 
     if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
       shake(getEl('menu-info-overlay'));
 
       return;
@@ -46,7 +46,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
 
     if (this.watchlistPlugin_.watchlistList.length === 0 && !this.watchlistPlugin_.isWatchlistChanged) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
       shake(getEl('menu-info-overlay'));
       this.nextPassArray = [];
 
@@ -158,7 +158,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     if (inView === 1 && this.watchlistPlugin_.watchlistInViewList[i] === false) {
       // Is inview and wasn't previously
       this.watchlistPlugin_.watchlistInViewList[i] = true;
-      uiManagerInstance.toast(`Satellite ${sat.sccNum} is In Field of View!`, 'normal');
+      uiManagerInstance.toast(`Satellite ${sat.sccNum} is In Field of View!`, ToastMsgType.normal);
       lineManagerInstance.create(
         LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV,
         [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(keepTrackApi.getSensorManager().currentSensors[0].name)],
@@ -169,7 +169,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     if (inView === 0 && this.watchlistPlugin_.watchlistInViewList[i] === true) {
       // Isn't inview and was previously
       this.watchlistPlugin_.watchlistInViewList[i] = false;
-      uiManagerInstance.toast(`Satellite ${sat.sccNum} left Field of View!`, 'standby');
+      uiManagerInstance.toast(`Satellite ${sat.sccNum} left Field of View!`, ToastMsgType.standby);
       keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[i]);
     }
   }

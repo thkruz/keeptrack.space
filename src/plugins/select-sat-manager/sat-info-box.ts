@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -152,7 +152,7 @@ export class SatInfoBox extends KeepTrackPlugin {
                   .getUiManager()
                   .toast(
                     `Satellite ${sat.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
-                    'error',
+                    ToastMsgType.error,
                     true,
                   );
                 this.selectSatManager_.selectSat(-1);
@@ -529,7 +529,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   private drawLineToSat_() {
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     if (this.selectSatManager_.secondarySat == -1) {
-      keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', 'caution');
+      keepTrackApi.getUiManager().toast('No Secondary Satellite Selected', ToastMsgType.caution);
     }
     lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.selectSatManager_.selectedSat, this.selectSatManager_.secondarySat], 'b');
   }

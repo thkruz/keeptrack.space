@@ -1,3 +1,4 @@
+import { ToastMsgType } from '@app/interfaces';
 import { Options } from 'new-github-issue-url';
 import { keepTrackApi } from '../keepTrackApi';
 import { isThisNode } from '../static/isThisNode';
@@ -44,7 +45,7 @@ export class ErrorManager {
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    uiManagerInstance.toast(toastMsg, 'error', true);
+    uiManagerInstance.toast(toastMsg, ToastMsgType.error, true);
 
     if (isThisNode()) {
       throw e;
@@ -74,7 +75,7 @@ ${e.stack}`,
     if (this.ALLOW_WARN) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, 'serious', true);
+      uiManagerInstance.toast(msg, ToastMsgType.serious, true);
     }
 
     // eslint-disable-next-line no-console
@@ -85,7 +86,7 @@ ${e.stack}`,
     if (this.ALLOW_INFO) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, 'normal', true);
+      uiManagerInstance.toast(msg, ToastMsgType.normal, true);
     }
     if (this.isDebug) {
       console.info(msg);
@@ -96,7 +97,7 @@ ${e.stack}`,
     if (this.ALLOW_LOG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, 'normal', true);
+      uiManagerInstance.toast(msg, ToastMsgType.normal, true);
     }
     if (this.isDebug) {
       console.log(msg);
@@ -107,7 +108,7 @@ ${e.stack}`,
     if (this.ALLOW_DEBUG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, 'standby', true);
+      uiManagerInstance.toast(msg, ToastMsgType.standby, true);
       // eslint-disable-next-line no-debugger
       debugger;
     }

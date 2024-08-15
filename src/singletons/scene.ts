@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
@@ -95,7 +95,7 @@ export class Scene {
         settingsManager.isDrawAurora ||
         settingsManager.isDrawMilkyWay) &&
       !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
-      keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling some visual effects in settings.', 'caution');
+      keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling some visual effects in settings.', ToastMsgType.caution);
       settingsManager.isDisableMoon = true;
       settingsManager.isDrawSun = false;
       settingsManager.isDrawAurora = false;

@@ -1,4 +1,4 @@
-import { EChartsData, KeepTrackApiEvents } from '@app/interfaces';
+import { EChartsData, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
@@ -27,12 +27,12 @@ export class RicPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
-      keepTrackApi.getUiManager().toast('Select a Satellite First!', 'critical');
+      keepTrackApi.getUiManager().toast('Select a Satellite First!', ToastMsgType.critical);
 
       return;
     }
     if (!this.selectSatManager_.secondarySatObj) {
-      keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', 'critical');
+      keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', ToastMsgType.critical);
 
       return;
     }

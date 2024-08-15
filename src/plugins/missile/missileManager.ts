@@ -13,6 +13,7 @@ import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, EciVec3, Kilometers, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
+import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 
 let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
 const missileArray: any[] = [];
@@ -197,13 +198,13 @@ export const Missile = (
     return 0;
   }
   if (TargetLatitude > 90 || TargetLatitude < -90) {
-    missileManager.lastMissileErrorType = 'critical';
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
     missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
 
     return 0;
   }
   if (TargetLongitude > 180 || TargetLongitude < -180) {
-    missileManager.lastMissileErrorType = 'critical';
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
     missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 90 and -90 degrees';
 
     return 0;
@@ -231,14 +232,14 @@ export const Missile = (
   const [EstLatList, EstLongList, , ArcLength, EstDistanceList, GoalDistance] = calculateCoordinates_(CurrentLatitude, CurrentLongitude, TargetLatitude, TargetLongitude);
 
   if (ArcLength < 320000) {
-    missileManager.lastMissileErrorType = 'critical';
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
     missileManager.lastMissileError = 'Error: This missile has a minimum distance of 320 km.';
 
     return 0;
   }
 
   if (ArcLength > MaxMissileRange * 1000) {
-    missileManager.lastMissileErrorType = 'critical';
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
     missileManager.lastMissileError = `Error: This missile has a maximum distance of ${MaxMissileRange} km.`;
 
     return 0;
@@ -499,7 +500,7 @@ export const Missile = (
   }
 
   if (minAltitudeTrue === (minAltitude * 3) / 2) {
-    missileManager.lastMissileErrorType = 'critical';
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
     missileManager.lastMissileError = 'Error: This distance is too close for the selected missile.';
 
     return 0;
@@ -548,7 +549,7 @@ export const Missile = (
     missileManager.missileArray = missileArray;
   }
   missileManager.missilesInUse++;
-  missileManager.lastMissileErrorType = 'normal';
+  missileManager.lastMissileErrorType = ToastMsgType.normal;
   missileManager.lastMissileError = `Missile Named RV_${missileObj.id}<br>has been created.`;
 
   return 1; // Successful Launch
@@ -674,17 +675,17 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
     }
   } else if (
     (currentTEARR.az >= sensor.minAz &&
-        currentTEARR.az <= sensor.maxAz &&
-        currentTEARR.el >= sensor.minEl &&
-        currentTEARR.el <= sensor.maxEl &&
-        currentTEARR.rng <= sensor.maxRng &&
-        currentTEARR.rng >= sensor.minRng) ||
-      (currentTEARR.az >= sensor.minAz2 &&
-        currentTEARR.az <= sensor.maxAz2 &&
-        currentTEARR.el >= sensor.minEl2 &&
-        currentTEARR.el <= sensor.maxEl2 &&
-        currentTEARR.rng <= sensor.maxRng2 &&
-        currentTEARR.rng >= sensor.minRng2)
+      currentTEARR.az <= sensor.maxAz &&
+      currentTEARR.el >= sensor.minEl &&
+      currentTEARR.el <= sensor.maxEl &&
+      currentTEARR.rng <= sensor.maxRng &&
+      currentTEARR.rng >= sensor.minRng) ||
+    (currentTEARR.az >= sensor.minAz2 &&
+      currentTEARR.az <= sensor.maxAz2 &&
+      currentTEARR.el >= sensor.minEl2 &&
+      currentTEARR.el <= sensor.maxEl2 &&
+      currentTEARR.rng <= sensor.maxRng2 &&
+      currentTEARR.rng >= sensor.minRng2)
   ) {
     currentTEARR.inView = true;
   } else {
@@ -1158,7 +1159,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
  *  if (ArcLength > MaxMissileRange * 1000) {
  *    // console.debug('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
  *    // console.debug('Please choose different target coordinates.');
- *    missileManager.lastMissileErrorType = 'critical';
+ *    missileManager.lastMissileErrorType = ToastMsgType.critical;
  *    missileManager.lastMissileError = 'Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.';
  *    return 0;
  *  }
@@ -1498,7 +1499,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
  *  console.log(AltitudeList);
  *  console.log(`Required Altitude ${minAltitude}`);
  *  if (MaxAltitude < minAltitude) {
- *    missileManager.lastMissileErrorType = 'critical';
+ *    missileManager.lastMissileErrorType = ToastMsgType.critical;
  *    missileManager.lastMissileError = `Failed Min Altitude Check! Max Altitude ${MaxAltitude} km.`;
  *    return -1;
  *  }
@@ -1656,14 +1657,14 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
  *  }
  *  if (TargetLatitude > 90 || TargetLatitude < -90) {
  *    // console.debug('Error: Target Latitude must be between 90 and -90 degrees');
- *    missileManager.lastMissileErrorType = 'critical';
+ *    missileManager.lastMissileErrorType = ToastMsgType.critical;
  *    missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
  *    return 0;
  *  }
  *  if (TargetLongitude > 180 || TargetLongitude < -180) {
  *    // console.debug('Error: Target Longitude must be between 180 and -180 degrees');
  *    console.log(TargetLongitude);
- *    missileManager.lastMissileErrorType = 'critical';
+ *    missileManager.lastMissileErrorType = ToastMsgType.critical;
  *    missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 180 and -180 degrees';
  *    return 0;
  *  }
@@ -1712,7 +1713,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
  *  if (ArcLength > MaxMissileRange * 1000) {
  *    // console.debug('Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.');
  *    // console.debug('Please choose different target coordinates.');
- *    missileManager.lastMissileErrorType = 'critical';
+ *    missileManager.lastMissileErrorType = ToastMsgType.critical;
  *    missileManager.lastMissileError = 'Error: This missile has a maximum distance of ' + MaxMissileRange + ' km.';
  *    return 0;
  *  }

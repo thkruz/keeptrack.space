@@ -2,7 +2,7 @@ import { openColorbox } from '@app/lib/colorbox';
 import { getEl } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import photoManagerPng from '@public/img/icons/photoManager.png';
@@ -170,7 +170,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast('Can\'t load pictures from the future. Loading most recent photos.', 'caution');
+      uiManagerInstance.toast('Can\'t load pictures from the future. Loading most recent photos.', ToastMsgType.caution);
       propTime = new Date(Date.now() - 1000 * 60 * 30);
     }
     const year = propTime.getUTCFullYear();

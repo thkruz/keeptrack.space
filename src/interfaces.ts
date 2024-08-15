@@ -193,7 +193,14 @@ export type SatPassTimes = {
   time: Date;
 };
 
-export type ToastMsgType = 'standby' | 'normal' | 'caution' | 'serious' | 'critical' | 'error';
+export enum ToastMsgType {
+  standby = 'standby',
+  normal = 'normal',
+  caution = 'caution',
+  serious = 'serious',
+  critical = 'critical',
+  error = 'error',
+}
 
 export type GeolocationPosition = {
   coords: {

@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -164,7 +164,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         }
       }
       if (newWatchlist.length > 0) {
-        keepTrackApi.getUiManager().toast(`Watchlist Loaded with ${newWatchlist.length} Satellites`, 'normal');
+        keepTrackApi.getUiManager().toast(`Watchlist Loaded with ${newWatchlist.length} Satellites`, ToastMsgType.normal);
       }
 
       this.updateWatchlist({ updateWatchlistList: newWatchlist, updateWatchlistInViewList: _watchlistInViewList, isSkipSearch: true });

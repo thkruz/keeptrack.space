@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import searchPng from '@public/img/icons/search.png';
 
@@ -96,9 +96,12 @@ export class ShortTermFences extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (obj === null || typeof obj === 'undefined') {
+        if (!obj?.isSatellite()) {
+          hideEl('stf-on-object-link');
+
           return;
         }
+        showEl('stf-on-object-link');
 
         if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
           getEl('sat-info-top-links').insertAdjacentHTML(

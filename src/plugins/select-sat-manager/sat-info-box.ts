@@ -903,14 +903,16 @@ export class SatInfoBox extends KeepTrackPlugin {
             </span>
           </div>
           ${getEl('search') ? SatInfoBox.createSearchLinks_() : ''}
-          <div id="sun-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
-          data-tooltip="Visualize Angle to Sun">Draw sat to sun line...</div>
-          <div id="ric-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
-          data-tooltip="Visualize RIC Vector">Draw sat to RIC line...</div>
-          <div id="nadir-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
-          data-tooltip="Visualize Angle to Earth">Draw sat to nadir line...</div>
-          <div id="sec-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
-          data-tooltip="Visualize Angle to Secondary Satellite">Draw sat to second sat line...</div>
+          <div id="draw-line-links">
+            <div id="sun-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
+            data-tooltip="Visualize Angle to Sun">Draw sat to sun line...</div>
+            <div id="ric-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
+            data-tooltip="Visualize RIC Vector">Draw sat to RIC line...</div>
+            <div id="nadir-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
+            data-tooltip="Visualize Angle to Earth">Draw sat to nadir line...</div>
+            <div id="sec-angle-link" class="link sat-infobox-links" data-position="top" data-delay="50"
+            data-tooltip="Visualize Angle to Secondary Satellite">Draw sat to second sat line...</div>
+          </div>
         </div>
         <div id="sat-identifier-data">
           <div class="sat-info-section-header">Identifiers</div>
@@ -1055,6 +1057,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   private static createSearchLinks_(): string {
     return keepTrackApi.html`
+    <div id="search-links">
       <div id="all-objects-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
       data-tooltip="Find Related Objects">Find all objects from this launch...</div>
       <div id="near-orbits-link" class="link sat-infobox-links sat-only-info" data-position="top" data-delay="50"
@@ -1064,7 +1067,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       <div id="near-objects-link2" class="link sat-infobox-links" data-position="top" data-delay="50"
       data-tooltip="Find Nearby Objects">Find all objects within 200km...</div>
       <div id="near-objects-link4" class="link sat-infobox-links" data-position="top" data-delay="50"
-      data-tooltip="Find Nearby Objects">Find all objects within 400km...</div>`;
+      data-tooltip="Find Nearby Objects">Find all objects within 400km...</div>
+    </div>`;
   }
 
   static resetMenuLocation(satInfoboxDom: HTMLElement, isShow = true) {
@@ -1600,7 +1604,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         if (!el) {
           return;
         }
-        hideEl(el.parentElement.id);
+        hideEl(el.parentElement);
       },
     );
 

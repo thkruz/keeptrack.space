@@ -1,7 +1,7 @@
 import { sensors } from '@app/catalogs/sensors';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { getClass } from '@app/lib/get-class';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -163,9 +163,13 @@ export class SensorListPlugin extends KeepTrackPlugin {
       cbName: 'sensor',
       cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (obj === null || typeof obj === 'undefined') {
+        if (!obj?.isSatellite()) {
+          hideEl('sensors-in-fov-link');
+
           return;
         }
+
+        showEl('sensors-in-fov-link');
 
         if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
           getEl('sat-info-top-links').insertAdjacentHTML(

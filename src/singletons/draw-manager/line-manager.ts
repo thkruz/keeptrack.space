@@ -51,7 +51,7 @@ export class LineManager {
   }
 
   createSatRicFrame(sat: DetailedSatellite | MissileObject | null): void {
-    if (!sat || sat instanceof MissileObject) {
+    if (!sat || !(sat instanceof DetailedSatellite)) {
       return;
     }
 
@@ -61,7 +61,7 @@ export class LineManager {
   }
 
   createSatToRef(sat: DetailedSatellite | MissileObject | null, ref: vec3, color?: vec4): void {
-    if (!sat || sat instanceof MissileObject) {
+    if (!sat || !(sat instanceof DetailedSatellite)) {
       return;
     }
 
@@ -69,7 +69,7 @@ export class LineManager {
   }
 
   createSat2Sun(sat: DetailedSatellite | MissileObject | null): void {
-    if (!sat || sat instanceof MissileObject) {
+    if (!sat || !(sat instanceof DetailedSatellite)) {
       return;
     }
 
@@ -110,7 +110,7 @@ export class LineManager {
   }
 
   createSensorToSat(sensor: DetailedSensor | null, sat: DetailedSatellite | MissileObject | null, color?: vec4): void {
-    if (!sensor || !sat || sat instanceof MissileObject) {
+    if (!sensor || !sat || !(sat instanceof DetailedSatellite)) {
       return;
     }
 
@@ -136,7 +136,7 @@ export class LineManager {
   }
 
   createSensorToSatFovAndSelectedOnly(sensor: DetailedSensor | null, sat: DetailedSatellite | null, color?: vec4): void {
-    if (!sensor || !sat || sat instanceof MissileObject) {
+    if (!sensor || !sat || !(sat instanceof DetailedSatellite)) {
       return;
     }
 

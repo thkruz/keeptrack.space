@@ -1,6 +1,6 @@
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -120,6 +120,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.SPECIAL:
         case SpaceObjectType.NOTIONAL:
         case SpaceObjectType.UNKNOWN:
+          showEl('search-links');
+          showEl('draw-line-links');
           this.selectSatObject_(obj as DetailedSatellite);
           break;
         case SpaceObjectType.PAYLOAD_OWNER:
@@ -133,6 +135,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.STAR:
           return; // Do nothing
         case SpaceObjectType.BALLISTIC_MISSILE:
+          hideEl('search-links');
+          hideEl('draw-line-links');
           this.selectSatObject_(obj as MissileObject);
           break;
         default:

@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { StringifiedNumber } from '@app/static/sat-math';
@@ -30,9 +30,12 @@ export class OrbitReferences extends KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (obj?: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (!obj) {
+        if (!obj?.isSatellite()) {
+          hideEl('orbit-references-link');
+
           return;
         }
+        showEl('orbit-references-link');
 
         if (!this.doOnce) {
           getEl('sat-info-top-links').insertAdjacentHTML(

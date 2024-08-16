@@ -136,7 +136,7 @@ export class LineManager {
   }
 
   createSensorToSatFovAndSelectedOnly(sensor: DetailedSensor | null, sat: DetailedSatellite | null, color?: vec4): void {
-    if (!sensor || !sat) {
+    if (!sensor || !sat || sat instanceof MissileObject) {
       return;
     }
 

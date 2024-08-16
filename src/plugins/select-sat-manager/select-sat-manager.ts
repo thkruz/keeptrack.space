@@ -102,6 +102,13 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (!obj) {
       this.selectSatReset_();
     } else {
+
+      if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0) {
+        keepTrackApi.getUiManager().toast('Object is inside the Earth, cannot select it', ToastMsgType.caution);
+
+        return;
+      }
+
       // First thing we need to do is determine what type of SpaceObjectType we have
       switch (obj.type) {
         case SpaceObjectType.MECHANICAL:

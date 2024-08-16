@@ -1060,7 +1060,15 @@ export class Camera {
     }
 
     if (!sat.position) {
-      throw new Error('Satellite position is undefined');
+      throw new Error(`Object ${sat.id} has no position!`);
+    }
+
+    if (sat.position.x === 0 && sat.position.y === 0 && sat.position.z === 0) {
+      keepTrackApi.getUiManager().toast('Object is inside the earth!', ToastMsgType.critical);
+      this.camZoomSnappedOnSat = false;
+      this.camAngleSnappedOnSat = false;
+
+      return;
     }
 
     if (this.camAngleSnappedOnSat) {

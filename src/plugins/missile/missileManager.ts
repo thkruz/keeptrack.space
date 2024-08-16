@@ -3,7 +3,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-params */
 /* eslint-disable max-lines */
-import { ToastMsgType } from '@app/interfaces';
+import { MissileParams, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missileData';
@@ -45,15 +45,22 @@ export const MassRaidPre = async (time: number, simFile: string) => {
         }
         catalogManagerInstance.objectCache[x].totalVelocity ??= 0;
 
-        const missileObj = catalogManagerInstance.getObject(x) as MissileObject;
+        // Convert legacy format to new MissileObject class
+        const missileObjData = catalogManagerInstance.getObject(x) as MissileObject;
+        const missileObj = new MissileObject({
+          id: x,
+          name: missileObjData.name,
+          country: missileObjData.country,
+          desc: missileObjData.desc,
+          active: missileObjData.active,
+          type: missileObjData.type,
+          latList: missileObjData.latList,
+          lonList: missileObjData.lonList,
+          altList: missileObjData.altList,
+          startTime: missileObjData.startTime,
+        } as unknown as MissileParams);
 
-        missileObj.isMissile = () => true;
-        missileObj.isMarker = () => false;
-        missileObj.isStatic = () => false;
-        missileObj.isSensor = () => false;
-        missileObj.isSatellite = () => false;
-        missileObj.isStar = () => false;
-        missileObj.isGroundObject = () => false;
+        catalogManagerInstance.objectCache[x] = missileObj;
 
         if (missileObj) {
           missileObj.id = satSetLen - 500 + i;

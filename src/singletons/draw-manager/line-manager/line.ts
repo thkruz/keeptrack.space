@@ -1,35 +1,36 @@
 /* eslint-disable camelcase */
 import { EciArr3 } from '@app/interfaces';
-import { BufferAttribute } from '@app/static/buffer-attribute';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { vec4 } from 'gl-matrix';
 import { GlUtils } from '../../../static/gl-utils';
+import { LineManager } from '../line-manager';
+
+export type LineColor = typeof LineColors[keyof typeof LineColors] | vec4;
+
+export const LineColors = {
+  RED: [1.0, 0.0, 0.0, 1.0] as vec4,
+  ORANGE: [1.0, 0.5, 0.0, 1.0] as vec4,
+  YELLOW: [1.0, 1.0, 0.0, 1.0] as vec4,
+  GREEN: [0.0, 1.0, 0.0, 1.0] as vec4,
+  BLUE: [0.0, 0.0, 1.0, 1.0] as vec4,
+  CYAN: [0.0, 1.0, 1.0, 1.0] as vec4,
+  PURPLE: [1.0, 0.0, 1.0, 1.0] as vec4,
+  WHITE: [1.0, 1.0, 1.0, 1.0] as vec4,
+};
 
 /**
  * A line with a start and end point.
  *
  * It requires a precompiled shader program and its attributes to work.
  */
-export class Line {
-  private attribs_: { a_position: BufferAttribute };
-
-  private gl_: WebGL2RenderingContext;
-  private uniforms_: { u_color: WebGLUniformLocation; u_camMatrix: WebGLUniformLocation; u_pMatrix: WebGLUniformLocation };
+export abstract class Line {
   private vertBuf_: WebGLBuffer;
+  protected color_: vec4;
+  protected isDraw_: boolean = true;
+  isGarbage: boolean = false;
 
-  constructor(
-    gl: WebGL2RenderingContext,
-    attribs: {
-      a_position: BufferAttribute;
-    },
-    uniforms: {
-      u_color: WebGLUniformLocation;
-      u_camMatrix: WebGLUniformLocation;
-      u_pMatrix: WebGLUniformLocation;
-    },
-  ) {
-    this.gl_ = gl;
-    this.attribs_ = attribs;
-    this.uniforms_ = uniforms;
+  constructor() {
+    const gl = keepTrackApi.getRenderer().gl;
 
     this.vertBuf_ = gl.createBuffer();
     GlUtils.bindBufferStreamDraw(gl, this.vertBuf_, new Float32Array(6));
@@ -38,22 +39,32 @@ export class Line {
   /**
    * This assumes that LineManager.drawFirst has already run and LineManager.drawLast will run after all lines are drawn.
    */
-  draw(color = <vec4>[1.0, 1.0, 1.0, 1.0]) {
-    if (color[0] < 0 || color[0] > 1 || color[1] < 0 || color[1] > 1 || color[2] < 0 || color[2] > 1 || color[3] < 0 || color[3] > 1) {
-      throw new Error('Invalid color');
+  draw(lineManager: LineManager): void {
+    if (!this.isDraw_) {
+      return;
     }
 
-    const gl = this.gl_;
+    const gl = keepTrackApi.getRenderer().gl;
 
-    gl.uniform4fv(this.uniforms_.u_color, color);
+    gl.uniform4fv(lineManager.uniforms_.u_color, this.color_);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf_);
-    gl.vertexAttribPointer(this.attribs_.a_position.location, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(lineManager.attribs.a_position.location, 3, gl.FLOAT, false, 0, 0);
 
     gl.drawArrays(gl.LINES, 0, 2);
   }
 
-  update(pt1: EciArr3, pt2: EciArr3) {
-    GlUtils.bindBufferStreamDraw(this.gl_, this.vertBuf_, new Float32Array([pt1[0], pt1[1], pt1[2], pt2[0], pt2[1], pt2[2]]));
+  abstract update(): void;
+
+  updateVertBuf(pt1: EciArr3, pt2: EciArr3) {
+    const gl = keepTrackApi.getRenderer().gl;
+
+    GlUtils.bindBufferStreamDraw(gl, this.vertBuf_, new Float32Array([pt1[0], pt1[1], pt1[2], pt2[0], pt2[1], pt2[2]]));
+  }
+
+  protected validateColor(color: vec4): void {
+    if (color[0] < 0 || color[0] > 1 || color[1] < 0 || color[1] > 1 || color[2] < 0 || color[2] > 1 || color[3] < 0 || color[3] > 1) {
+      throw new Error('Invalid color');
+    }
   }
 }

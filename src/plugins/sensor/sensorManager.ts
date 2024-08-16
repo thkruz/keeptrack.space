@@ -32,7 +32,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
-import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
+import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { SatMath } from '@app/static/sat-math';
@@ -146,18 +146,16 @@ export class SensorManager {
       case 'BLEAFB':
       case 'CLRSFS':
       case 'THLSFB':
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.minAz + 120, sensor.minEl, sensor.maxRng], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz + 120, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 2);
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 2, 2);
         break;
       case 'RAFFYL':
-        // TODO: Find actual face directions
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 300, 60, sensor.minEl, sensor.maxRng], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 60, 180, sensor.minEl, sensor.maxRng], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 180, 300, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 3);
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 2, 3);
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 3, 3);
         break;
       case 'COBRADANE':
-        // NOTE: This will be a bit more complicated later
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 1);
         break;
       default:
         errorManagerInstance.warn('Sensor not found');
@@ -560,6 +558,10 @@ export class SensorManager {
 
   getAllActiveSensors(): DetailedSensor[] {
     return this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+  }
+
+  getAllSensors(): DetailedSensor[] {
+    return Object.values(sensors);
   }
 
   public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {

@@ -72,16 +72,7 @@ export class HoverManager {
     if (this.satHoverBoxDOM.style.display === 'none' || !settingsManager.enableHoverOverlay) {
       return false;
     }
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const renderer = keepTrackApi.getRenderer();
-
-    if (catalogManagerInstance.isStarManagerLoaded) {
-      const starManager = keepTrackApi.getStarManager();
-
-      if (starManager.isConstellationVisible === true && !starManager.isAllConstellationVisible) {
-        starManager.clearConstellations();
-      }
-    }
 
     this.satHoverBoxDOM.style.display = 'none';
     renderer.setCursor('default');
@@ -329,29 +320,13 @@ export class HoverManager {
     }
   }
 
-  private star_(sat: Star) {
-    const constellationName = keepTrackApi.getStarManager().findStarsConstellation(sat.name);
-
-    if (constellationName !== null) {
-      this.satHoverBoxNode1.innerHTML = sat.name + constellationName;
-    } else {
-      this.satHoverBoxNode1.textContent = sat.name;
-    }
-    this.satHoverBoxNode2.innerHTML = 'Star';
-    this.satHoverBoxNode3.innerHTML = `<span>RA: ${sat.ra.toFixed(3)} deg </span><span>DEC: ${sat.dec.toFixed(3)} deg</span>`;
-
-    if (this.lasthoveringSat !== sat.id && typeof sat !== 'undefined' && constellationName !== null) {
-      keepTrackApi.getStarManager().drawConstellations(constellationName);
-    }
-  }
-
   private staticObj_(obj: DetailedSensor | LandObject | Star) {
     if (obj.type === SpaceObjectType.LAUNCH_FACILITY) {
       this.launchFacility_(obj as LandObject);
     } else if (obj.type === SpaceObjectType.CONTROL_FACILITY) {
       this.controlFacility_(obj as LandObject);
     } else if (obj.type === SpaceObjectType.STAR) {
-      this.star_(obj as Star);
+      // Do nothing
     } else {
       // It is a Sensor at this point
       const sensor = obj as DetailedSensor;

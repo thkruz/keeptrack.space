@@ -78,11 +78,6 @@ export class Planetarium extends KeepTrackPlugin {
        * getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
        */
       LegendManager.change('planetarium');
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-      if (catalogManagerInstance.isStarManagerLoaded) {
-        keepTrackApi.getStarManager().clearConstellations();
-      }
 
       keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
     } else {

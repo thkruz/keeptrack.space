@@ -33,7 +33,6 @@ import { SettingsManager } from '../settings/settings';
 import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
 import { MissileObject } from './catalog-manager/MissileObject';
-import { LineTypes } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import type { OrbitManager } from './orbitManager';
 
@@ -1029,11 +1028,6 @@ export class Camera {
     }
 
     lineManagerInstance.clear();
-    if (catalogManagerInstance.isStarManagerLoaded) {
-      keepTrackApi.getStarManager().isAllConstellationVisible = false;
-    }
-
-    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
     this.cameraType = CameraType.DEFAULT; // Earth will block the view of the star
     this.lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
   }

@@ -8,16 +8,17 @@ import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
 import { UrlManager } from '@app/static/url-manager';
-import { Kilometers, eci2lla } from 'ootk';
+import { DetailedSatellite, Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
 import { showLoading } from '../../lib/showLoading';
 import { LegendManager } from '../../static/legend-manager';
-import { LineTypes, lineManagerInstance } from '../draw-manager/line-manager';
+import { MissileObject } from '../catalog-manager/MissileObject';
+import { lineManagerInstance } from '../draw-manager/line-manager';
+import { LineColors } from '../draw-manager/line-manager/line';
 import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { PersistenceManager, StorageKey } from '../persistence-manager';
-import { starManager } from '../starManager';
 import { KeyboardInput } from './keyboard-input';
 
 export class MouseInput {
@@ -416,7 +417,6 @@ export class MouseInput {
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
@@ -428,6 +428,16 @@ export class MouseInput {
     }
     if (target.tagName == 'UL') {
       targetId = (<HTMLElement>target.firstChild).id;
+    }
+
+    let clickSatObj: DetailedSatellite | MissileObject | null = null;
+
+    if (this.clickedSat === -1) {
+      const obj = catalogManagerInstance.getObject(this.mouseSat);
+
+      if ((obj instanceof DetailedSatellite) || (obj instanceof MissileObject)) {
+        clickSatObj = obj;
+      }
     }
 
     switch (targetId) {
@@ -467,14 +477,11 @@ export class MouseInput {
         break;
       case 'clear-lines-rmb':
         lineManagerInstance.clear();
-        if (catalogManagerInstance.isStarManagerLoaded) {
-          starManager.isAllConstellationVisible = false;
-        }
         break;
       case 'line-eci-axis-rmb':
-        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [25000, 0, 0], 'r');
-        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [0, 25000, 0], 'g');
-        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [0, 0, 25000], 'b');
+        lineManagerInstance.createRef2Ref([0, 0, 0], [25000, 0, 0], LineColors.RED);
+        lineManagerInstance.createRef2Ref([0, 0, 0], [0, 25000, 0], LineColors.GREEN);
+        lineManagerInstance.createRef2Ref([0, 0, 0], [0, 0, 25000], LineColors.BLUE);
         break;
       case 'line-eci-xgrid-rmb':
         lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 1], 1);
@@ -486,21 +493,16 @@ export class MouseInput {
         lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 1], 1);
         break;
       case 'line-earth-sat-rmb':
-        lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_SAT, [this.clickedSat], 'p');
+        lineManagerInstance.createSatToRef(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, [0, 0, 0], LineColors.PURPLE);
         break;
       case 'line-sensor-sat-rmb':
-        // Sensor always has to be #2
-        lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.clickedSat, catalogManagerInstance.getSensorFromSensorName(sensorManagerInstance.currentSensors[0].name)], 'p');
+        lineManagerInstance.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), clickSatObj, LineColors.GREEN);
         break;
       case 'line-sat-sat-rmb':
-        lineManagerInstance.create(LineTypes.SENSOR_TO_SAT, [this.clickedSat, keepTrackApi.getPlugin(SelectSatManager)?.selectedSat], 'b');
+        lineManagerInstance.createObjToObj(clickSatObj, keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, LineColors.BLUE);
         break;
       case 'line-sat-sun-rmb':
-        lineManagerInstance.create(
-          LineTypes.REF_TO_SAT,
-          [this.clickedSat, keepTrackApi.getScene().sun.position[0], keepTrackApi.getScene().sun.position[1], keepTrackApi.getScene().sun.position[2]],
-          'o',
-        );
+        lineManagerInstance.createSat2Sun(clickSatObj);
         break;
       case 'earth-blue-rmb':
         MouseInput.resetCurrentEarthTexture();

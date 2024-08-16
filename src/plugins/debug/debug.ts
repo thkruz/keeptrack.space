@@ -6,7 +6,8 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
-import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
+import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
+import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
@@ -126,9 +127,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
             if (sat) {
               const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
-              const position = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
+              const camPos = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
 
-              lineManagerInstance.create(LineTypes.REF_TO_SAT, [selectedSat, position[0], position[1], position[2]], 'o');
+              lineManagerInstance.createRef2Ref([camPos[0], camPos[1], camPos[2]], [sat.position.x, sat.position.y, sat.position.z], LineColors.PURPLE);
             }
           }
         });
@@ -139,7 +140,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           if (camera) {
             const position = camera.getCameraPosition();
 
-            lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [position[0], position[1], position[2]], 'r');
+            lineManagerInstance.createRef2Ref(position, [0, 0, 0], LineColors.PURPLE);
           }
         });
       },

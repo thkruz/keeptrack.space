@@ -21,7 +21,6 @@ import type { InputManager } from './singletons/input-manager';
 import { PanTouchEvent, TapTouchEvent } from './singletons/input-manager/touch-input';
 import type { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
-import { StarManager } from './singletons/starManager';
 import type { TimeManager } from './singletons/time-manager';
 import type { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
@@ -82,7 +81,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.resize]: [];
   [KeepTrackApiEvents.altCanvasResize]: [];
   [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
-  [KeepTrackApiEvents.onWatchlistUpdated]: [number[]];
+  [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
   [KeepTrackApiEvents.staticOffsetChange]: [number];
   [KeepTrackApiEvents.onLineAdded]: [LineManager];
   [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
@@ -266,7 +265,6 @@ export class KeepTrackApi {
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
-  getStarManager = () => keepTrackContainer.get<StarManager>(Singletons.StarManager);
   getRenderer = () => keepTrackContainer.get<WebGLRenderer>(Singletons.WebGLRenderer);
   getScene = () => keepTrackContainer.get<Scene>(Singletons.Scene);
   getCatalogManager = () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);

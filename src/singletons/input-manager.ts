@@ -421,7 +421,7 @@ export class InputManager {
     hideEl('earth-vec-rmb');
     hideEl('earth-political-rmb');
 
-    if (lineManagerInstance.drawLineList.length > 0) {
+    if (lineManagerInstance.lines.length > 0) {
       getEl('clear-lines-rmb').style.display = 'block';
       numMenuItems++;
     }

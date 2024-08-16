@@ -65,7 +65,7 @@ describe('Line_class', () => {
     };
     const line = new Line(gl, attribs, uniforms);
 
-    line.update([0, 0, 0], [1, 1, 1]);
+    line.updateVertBuf([0, 0, 0], [1, 1, 1]);
     expect(line).toBeInstanceOf(Line);
   });
 

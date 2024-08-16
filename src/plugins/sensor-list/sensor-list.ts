@@ -3,7 +3,6 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { getClass } from '@app/lib/get-class';
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
-import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
@@ -187,18 +186,11 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
             const sat = selectSatManagerInstance.getSelectedSat();
 
-            if (sat.isMissile()) {
+            if (!sat.isSatellite()) {
               return;
             }
 
-            Object.keys(sensors).forEach((key) => {
-              const sensor = sensors[key];
-              const isInView = sensor.isSatInFov(sat as DetailedSatellite, keepTrackApi.getTimeManager().simulationTimeObj);
-
-              if (isInView) {
-                keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
-              }
-            });
+            keepTrackApi.getLineManager().createSensorsToSatFovOnly(sat as DetailedSatellite);
           });
           this.isSensorLinksAdded = true;
         }

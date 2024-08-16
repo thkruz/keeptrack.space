@@ -4,7 +4,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
 import numeric from 'numeric';
 import { DetailedSatellite, DetailedSensor, RAD2DEG } from 'ootk';
-import { LineManager, LineTypes } from '../draw-manager/line-manager';
+import { LineManager } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { TimeManager } from '../time-manager';
 import { ControlSite } from './ControlSite';
@@ -205,8 +205,8 @@ export class SatLinkManager {
           for (let j = 0; j < satlist.length; j++) {
             if (i !== j) {
               const catalogManagerInstance = keepTrackApi.getCatalogManager();
-              const sat1 = catalogManagerInstance.getObject(satlist[i]);
-              const sat2 = catalogManagerInstance.getObject(satlist[j]);
+              const sat1 = catalogManagerInstance.getSat(satlist[i]);
+              const sat2 = catalogManagerInstance.getSat(satlist[j]);
               /*
                *
                * Debug for finding decayed satellites
@@ -225,16 +225,16 @@ export class SatLinkManager {
                       [-sat1.position.x + sat2.position.x, -sat1.position.y + sat2.position.y, -sat1.position.z + sat2.position.z],
                     )
                   ) /
-                    (Math.sqrt((-sat1.position.x) ** 2 + (-sat1.position.y) ** 2 + (-sat1.position.z) ** 2) *
-                      Math.sqrt(
-                        (-sat1.position.x + sat2.position.x) ** 2 + (-sat1.position.y + sat2.position.y) ** 2 + (-sat1.position.z + sat2.position.z) ** 2,
-                      )),
+                  (Math.sqrt((-sat1.position.x) ** 2 + (-sat1.position.y) ** 2 + (-sat1.position.z) ** 2) *
+                    Math.sqrt(
+                      (-sat1.position.x + sat2.position.x) ** 2 + (-sat1.position.y + sat2.position.y) ** 2 + (-sat1.position.z + sat2.position.z) ** 2,
+                    )),
                 ) * RAD2DEG;
 
               if (theta < minTheta) {
                 // Intentional
               } else {
-                lineManager.create(LineTypes.SENSOR_TO_SAT, [sat1.id, sat2.id], [0, 0.6, 1, 1]);
+                lineManager.createObjToObj(sat1, sat2, [0, 0.6, 1, 1]);
               }
             }
           }
@@ -259,7 +259,7 @@ export class SatLinkManager {
             }
           }
           if (bestSat) {
-            lineManager.create(LineTypes.SENSOR_TO_SAT, [bestSat.id, id], [0, 1.0, 0.6, 1.0]);
+            lineManager.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), bestSat, [0, 1.0, 0.6, 1.0]);
           }
         }
       } catch (e) {
@@ -313,7 +313,7 @@ export class SatLinkManager {
             }
           }
           // Draw a line from the user to the satellite
-          lineManager.create(LineTypes.SENSOR_TO_SAT, [bestSat.id, catalogManagerInstance.getSensorFromSensorName(user.name)], [0, 1.0, 0.6, 1.0]);
+          lineManager.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), bestSat, [0, 1.0, 0.6, 1.0]);
         }
       } catch (e) {
         errorManagerInstance.info(e);

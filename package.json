@@ -133,7 +133,9 @@
     "worker-loader": "^3.0.8"
   },
   "dependencies": {
+    "@analytics/google-analytics": "^1.0.7",
     "@materializecss/materialize": "^1.2.2",
+    "analytics": "^0.8.14",
     "axios": "^1.7.3",
     "draggabilly": "^3.0.0",
     "draggy": "^1.6.6",

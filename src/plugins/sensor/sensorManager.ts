@@ -379,6 +379,13 @@ export class SensorManager {
       selectedSensor = SensorManager.getSensorFromsensorId(sensorId);
     }
 
+    if (selectedSensor instanceof DetailedSensor) {
+      keepTrackApi.analytics.track('select_sensor', {
+        sensor: selectedSensor.uiName,
+        objName: selectedSensor.objName,
+      });
+    }
+
     PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
 
     if (selectedSensor == null && sensorId == null) {

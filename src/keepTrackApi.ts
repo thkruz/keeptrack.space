@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { AnalyticsInstance } from 'analytics';
 import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
@@ -133,6 +134,7 @@ type rmbMenuItem = {
 };
 
 export class KeepTrackApi {
+  analytics: AnalyticsInstance;
   /**
    * Unregisters all events in the KeepTrackApi. Used for testing.
    */

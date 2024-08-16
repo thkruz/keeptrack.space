@@ -658,6 +658,11 @@ export class KeepTrackPlugin {
       cbName: this.PLUGIN_NAME,
       cb: (iconName: string): void => {
         if (iconName === this.bottomIconElementName) {
+          keepTrackApi.analytics.track('bottom_menu_click', {
+            plugin: this.PLUGIN_NAME,
+            iconName,
+          });
+
           if (this.isMenuButtonActive) {
             if (this.sideMenuElementName || this.isForceHideSideMenus) {
               this.hideSideMenus();

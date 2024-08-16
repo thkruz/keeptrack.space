@@ -290,6 +290,10 @@ export class SearchManager {
     const satData = SearchManager.getSearchableObjects_(true) as (DetailedSatellite & MissileObject)[];
 
     searchList.forEach((searchStringIn) => {
+      keepTrackApi.analytics.track('search', {
+        search: searchStringIn,
+      });
+
       satData.every((sat) => {
         if (results.length >= settingsManager.searchLimit) {
           return false;
@@ -429,6 +433,10 @@ export class SearchManager {
       if (i >= satData.length) {
         i = lastFoundI;
       }
+
+      keepTrackApi.analytics.track('search', {
+        search: searchStringIn,
+      });
 
       for (; i < satData.length; i++) {
         if (results.length >= settingsManager.searchLimit) {

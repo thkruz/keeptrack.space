@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { countriesMenuPlugin } from '@app/plugins/countries/countries';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
 import * as missile from '@app/plugins/missile/missilePlugin';
@@ -38,6 +39,8 @@ import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact
  * import { ricPlotPlugin } from './plot-analysis/ric-plots';
  * import { time2LonPlotsPlugin } from './plot-analysis/time2lon';
  */
+import googleAnalytics from '@analytics/google-analytics';
+import createAnalytics from 'analytics';
 import { PolarPlotPlugin } from './polar-plot/polar-plot';
 import { ReportsPlugin } from './reports/reports';
 import { satConstellationsPlugin } from './sat-constellations/sat-constellations';
@@ -258,8 +261,18 @@ export const uiManagerFinal = (plugins: any): void => {
   }
 
   // Only turn on analytics if on keeptrack.space ()
-  if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
-    startGoogleAnalytics();
+  if (window.location.hostname === 'localhost' || window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
+    keepTrackApi.analytics = createAnalytics({
+      app: 'KeepTrack',
+      version: 100,
+      plugins: [
+        googleAnalytics({
+          measurementIds: 'G-ENHWK6L0X7',
+        }),
+      ],
+    });
+
+    keepTrackApi.analytics.page();
   }
 
   const wheel = (dom: any, deltaY: number) => {
@@ -278,25 +291,6 @@ export const uiManagerFinal = (plugins: any): void => {
     },
     { passive: false },
   );
-};
-
-/* istanbul ignore next */
-export const startGoogleAnalytics = (): void => {
-  const newScript = document.createElement('script');
-
-  newScript.type = 'text/javascript';
-  newScript.setAttribute('async', 'true');
-  newScript.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=G-ENHWK6L0X7');
-  document.documentElement.firstChild.appendChild(newScript);
-  window.dataLayer = window.dataLayer || [];
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const gtag = function (_a?: string, _b?: any): void {
-    // eslint-disable-next-line prefer-rest-params
-    window.dataLayer.push(arguments);
-  };
-
-  gtag('js', new Date());
-  gtag('config', 'G-ENHWK6L0X7');
 };
 
 // Create common import for all plugins

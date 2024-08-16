@@ -256,6 +256,14 @@ export class SelectSatManager extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
     keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
 
+    if (sat instanceof DetailedSatellite) {
+      keepTrackApi.analytics.track('select_satellite', {
+        id: sat.id,
+        name: sat.name,
+        sccNum: sat.sccNum,
+      });
+    }
+
     this.setSelectedSat_(sat.id);
   }
 

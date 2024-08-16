@@ -30,6 +30,7 @@ import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class Screenshot extends KeepTrackPlugin {
+  protected dependencies_: string[];
   bottomIconCallback = () => {
     this.saveHiResPhoto('4k');
   };
@@ -91,23 +92,17 @@ export class Screenshot extends KeepTrackPlugin {
     this.queuedScreenshot_ = true;
   };
 
-  constructor() {
-    const PLUGIN_NAME = 'Screenshot';
-
-    super(PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.altCanvasResize,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => this.queuedScreenshot_,
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.endOfDraw,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         if (this.queuedScreenshot_) {
           this.takeScreenShot();

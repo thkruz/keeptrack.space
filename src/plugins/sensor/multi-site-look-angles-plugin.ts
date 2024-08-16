@@ -14,7 +14,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
-  dependencies = [SelectSatManager.name];
+  dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
   private sensorList_ = keepTrackApi.getSensorManager().sensorListSsn.concat(
@@ -116,7 +116,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         this.checkIfCanBeEnabled_(obj);
       },
@@ -141,7 +141,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         const sat = this.selectSatManager_.getSelectedSat();
 

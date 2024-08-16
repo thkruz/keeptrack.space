@@ -10,12 +10,11 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class DebrisScreening extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Debris Screening';
-  dependencies = [SelectSatManager.PLUGIN_NAME];
+  dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(DebrisScreening.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -128,7 +127,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl(`${this.sideMenuElementName}-form`).addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -147,7 +146,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sat: BaseObject): void => {
         if (sat) {
           this.setBottomIconToEnabled();

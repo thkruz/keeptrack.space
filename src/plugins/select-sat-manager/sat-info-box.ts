@@ -33,13 +33,12 @@ import { SelectSatManager } from './select-sat-manager';
  * There are select events and update events that are registered to the keepTrackApi.
  */
 export class SatInfoBox extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'SatInfoBox';
-  dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
+  dependencies_: string[] = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
   private isVisible_ = false;
 
   constructor() {
-    super(SatInfoBox.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -72,21 +71,21 @@ export class SatInfoBox extends KeepTrackPlugin {
      */
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.PLUGIN_NAME}_orbitalData`,
+      cbName: `${this.constructor.name}_orbitalData`,
       cb: this.orbitalData.bind(this),
     });
 
     // Register sensor data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.PLUGIN_NAME}_sensorInfo`,
+      cbName: `${this.constructor.name}_sensorInfo`,
       cb: SatInfoBox.updateSensorInfo_.bind(this),
     });
 
     // Register launch data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.PLUGIN_NAME}_launchData`,
+      cbName: `${this.constructor.name}_launchData`,
       cb: SatInfoBox.updateLaunchData_.bind(this),
     });
 
@@ -106,20 +105,20 @@ export class SatInfoBox extends KeepTrackPlugin {
     // Register mission data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.PLUGIN_NAME}_satMissionData`,
+      cbName: `${this.constructor.name}_satMissionData`,
       cb: SatInfoBox.updateSatMissionData_.bind(this),
     });
 
     // Register object data
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.PLUGIN_NAME}_objectData`,
+      cbName: `${this.constructor.name}_objectData`,
       cb: SatInfoBox.updateObjectData_,
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.uiManagerFinal_.bind(this),
     });
   }
@@ -128,7 +127,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         if (!keepTrackApi.isInitialized) {
           return;
@@ -378,7 +377,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (watchlistList: { id: number, inView: boolean }[]) => {
         let isOnList = false;
 
@@ -404,7 +403,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.selectSat_.bind(this),
     });
   }

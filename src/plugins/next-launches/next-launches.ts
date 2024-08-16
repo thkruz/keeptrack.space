@@ -31,17 +31,13 @@ export interface LaunchInfoObject {
 }
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {
+  protected dependencies_: string[];
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) {
       return;
     }
     this.showTable();
   };
-
-  static PLUGIN_NAME = 'Next Launches';
-  constructor() {
-    super(NextLaunchesPlugin.PLUGIN_NAME);
-  }
 
   bottomIconElementName: string = 'menu-nextLaunch';
   bottomIconImg = calendar2Png;
@@ -83,7 +79,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('export-launch-info').addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.EXPORT);

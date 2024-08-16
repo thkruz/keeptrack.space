@@ -45,8 +45,7 @@ interface UpdateWatchlistParams {
 }
 
 export class WatchlistPlugin extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'watchlist';
-
+  protected dependencies_: string[];
   bottomIconCallback = () => {
     // The accounts for clicking the button again before the animation is done
     if (!this.isMenuButtonActive) {
@@ -109,22 +108,18 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   sideMenuElementName: string = 'watchlist-menu';
   watchlistList: { id: number, inView: boolean }[] = [];
 
-  constructor() {
-    super(WatchlistPlugin.PLUGIN_NAME);
-  }
-
   addHtml(): void {
     super.addHtml();
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.uiManagerFinal_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.onCruncherReady_.bind(this),
     });
   }
@@ -352,11 +347,11 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       const sat = keepTrackApi.getCatalogManager().getSat(id);
 
       if (sat.sccNum) {
-        errorManagerInstance.warn(`NORAD: ${sat.sccNum} already in watchlist!`);
+        errorManagerInstance.warn(`NORAD: ${sat.sccNum} already in watchlist!`, true);
       } else {
         const jscString = sat.source === CatalogSource.VIMPEL ? ` (JSC Vimpel ${sat.altId})` : '';
 
-        errorManagerInstance.warn(`Object ${id}${jscString} already in watchlist!`);
+        errorManagerInstance.warn(`Object ${id}${jscString} already in watchlist!`, true);
       }
     }
 
@@ -404,7 +399,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       const id = keepTrackApi.getCatalogManager().sccNum2Id(parseInt(satNum));
 
       if (id === null) {
-        errorManagerInstance.warn(`Sat ${id} not found!`);
+        errorManagerInstance.warn(`Sat ${id} not found!`, true);
 
         return;
       }
@@ -488,7 +483,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       if (sat !== null && sat.id > 0) {
         this.watchlistList.push({ id: sat.id, inView: false });
       } else {
-        errorManagerInstance.warn(`Sat ${obj} not found!`);
+        errorManagerInstance.warn(`Sat ${obj} not found!`, true);
       }
     }
     this.updateWatchlist();

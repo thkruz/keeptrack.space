@@ -71,15 +71,17 @@ ${e.stack}`,
     });
   }
 
-  public warn(msg: string) {
+  public warn(msg: string, isHideFromConsole = false) {
     if (this.ALLOW_WARN) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
       uiManagerInstance.toast(msg, ToastMsgType.serious, true);
     }
 
-    // eslint-disable-next-line no-console
-    console.warn(msg);
+    if (!isHideFromConsole) {
+      // eslint-disable-next-line no-console
+      console.warn(msg);
+    }
   }
 
   public info(msg: string) {
@@ -88,7 +90,8 @@ ${e.stack}`,
 
       uiManagerInstance.toast(msg, ToastMsgType.normal, true);
     }
-    if (this.isDebug) {
+    if (this.isDebug && !isThisNode()) {
+      // eslint-disable-next-line no-console
       console.info(msg);
     }
   }
@@ -99,7 +102,8 @@ ${e.stack}`,
 
       uiManagerInstance.toast(msg, ToastMsgType.normal, true);
     }
-    if (this.isDebug) {
+    if (this.isDebug && !isThisNode()) {
+      // eslint-disable-next-line no-console
       console.log(msg);
     }
   }
@@ -112,7 +116,8 @@ ${e.stack}`,
       // eslint-disable-next-line no-debugger
       debugger;
     }
-    if (this.isDebug) {
+    if (this.isDebug && !isThisNode()) {
+      // eslint-disable-next-line no-console
       console.debug(msg);
     }
   }

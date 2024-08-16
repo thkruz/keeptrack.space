@@ -29,12 +29,7 @@ export interface CollisionEvent {
 }
 
 export class Collissions extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'collisions';
-
-  constructor() {
-    super(Collissions.PLUGIN_NAME);
-  }
-
+  protected dependencies_: string[];
   private readonly collisionDataSrc = './tle/SOCRATES.json';
   private selectSatIdOnCruncher_: number | null = null;
   private collisionList_ = <CollisionEvent[]>[];
@@ -75,13 +70,13 @@ export class Collissions extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.uiManagerFinal_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added

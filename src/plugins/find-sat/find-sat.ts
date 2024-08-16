@@ -37,6 +37,7 @@ export interface SearchSatParams {
 }
 
 export class FindSatPlugin extends KeepTrackPlugin {
+  protected dependencies_: string[];
   private lastResults = <DetailedSatellite[]>[];
 
   dragOptions: clickDragOptions = {
@@ -488,11 +489,6 @@ The search will then find all satellites within those inclinations and display t
       cbName: 'findSat',
       cb: this.uiManagerFinal.bind(this),
     });
-  }
-
-  static PLUGIN_NAME: string = 'findSat';
-  constructor() {
-    super(FindSatPlugin.PLUGIN_NAME);
   }
 
   public printLastResults() {

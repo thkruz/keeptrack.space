@@ -144,6 +144,10 @@ export class KeepTrackApi {
     }
   }
 
+  unregisterAllPlugins() {
+    this.loadedPlugins = [];
+  }
+
   containerRoot = <HTMLDivElement>null;
   isInitialized = false;
   loadedPlugins = <KeepTrackPlugin[]>[];
@@ -197,8 +201,8 @@ export class KeepTrackApi {
    * @returns The plugin with the specified name, or null if not found.
    */
   getPluginByName<T extends KeepTrackPlugin>(pluginName: string): T | null {
-    if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin.PLUGIN_NAME === pluginName)) {
-      return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin.PLUGIN_NAME === pluginName) as T;
+    if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin.constructor.name === pluginName)) {
+      return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin.constructor.name === pluginName) as T;
     }
 
     return null;

@@ -44,11 +44,7 @@ declare module '@app/interfaces' {
 }
 
 export class SettingsMenuPlugin extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Settings Menu';
-  constructor() {
-    super(SettingsMenuPlugin.PLUGIN_NAME);
-  }
-
+  protected dependencies_: string[];
   bottomIconElementName: string = 'settings-menu-icon';
   bottomIconImg = settingsPng;
   bottomIconLabel: string = 'Settings Menu';
@@ -345,7 +341,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('settings-form').addEventListener('change', SettingsMenuPlugin.onFormChange);
         getEl('settings-form').addEventListener('submit', SettingsMenuPlugin.onSubmit);
@@ -428,7 +424,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         SettingsMenuPlugin.syncOnLoad();
       },
@@ -703,7 +699,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     keepTrackApi.getGroupsManager().clearSelect();
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true); // force color recalc
 
-    getEl('menu-time-machine')?.classList.remove('bmenu-item-selected');
+    keepTrackApi.getPlugin(TimeMachine)?.setBottomIconToUnselected();
 
     colorSchemeManagerInstance.reloadColors();
 

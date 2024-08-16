@@ -6,6 +6,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { StreamManager } from './stream-manager';
 
 export class ScreenRecorder extends KeepTrackPlugin {
+  protected dependencies_: string[];
   static readonly FILE_NAME = 'keeptrack.webm';
 
   bottomIconCallback = () => {
@@ -39,18 +40,12 @@ export class ScreenRecorder extends KeepTrackPlugin {
   isCompatibilityIssue = false;
   streamManagerInstance: StreamManager;
 
-  constructor() {
-    const PLUGIN_NAME = 'Screen Recorder';
-
-    super(PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerOnReady,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         try {
           this.streamManagerInstance = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop.bind(this), this.onMinorError.bind(this), this.onError.bind(this));

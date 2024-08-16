@@ -32,7 +32,7 @@ export class TimeManager {
    * The time in the real world
    */
   realTime = <Milliseconds>0;
-  selectedDate = <Date>null;
+  selectedDate = new Date();
   /**
    * The time in the simulation
    *

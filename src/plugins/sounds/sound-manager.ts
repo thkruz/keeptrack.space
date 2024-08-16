@@ -63,6 +63,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from './SoundNames';
 
 export class SoundManager extends KeepTrackPlugin {
+  protected dependencies_: string[];
   lastLongAudioTime = 0;
   isMute = false;
   private currentChatterClip_ = 0;
@@ -71,9 +72,7 @@ export class SoundManager extends KeepTrackPlugin {
   private maxClickClip_ = 0;
 
   constructor() {
-    const PLUGIN_NAME = 'Sound Manager';
-
-    super(PLUGIN_NAME);
+    super();
 
     // Find the maxClickClip_
     Object.keys(this.sounds).forEach((key) => {
@@ -154,7 +153,7 @@ export class SoundManager extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         this.voices = speechSynthesis.getVoices();
       },

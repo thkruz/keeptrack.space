@@ -20,7 +20,7 @@ import './sensor-list.css';
 // TODO: Add a search bar and filter for sensors
 
 export class SensorListPlugin extends KeepTrackPlugin {
-  dependencies: string[] = [DateTimeManager.PLUGIN_NAME];
+  dependencies_: string[] = [DateTimeManager.name];
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
@@ -71,11 +71,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       </div>
     </div>`;
 
-  static PLUGIN_NAME = 'Sensor List';
   isSensorLinksAdded = false;
-  constructor() {
-    super(SensorListPlugin.PLUGIN_NAME);
-  }
 
   helpTitle = 'Sensors Menu';
   helpBody = keepTrackApi.html`The Sensors menu allows you to select a sensor for use in calculations and other menu's functions.
@@ -110,7 +106,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
@@ -126,7 +122,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
           keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
@@ -207,7 +203,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) {
           return;
@@ -240,7 +236,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
           SensorListPlugin.reloadLastSensor_();

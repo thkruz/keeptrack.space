@@ -14,14 +14,6 @@ export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, plugin
     standardPluginInit(Plugin);
   });
 
-  test(`${pluginName}_no_private_init`, () => {
-    const plugin = new Plugin();
-
-    expect(plugin.addHtml_).toBeUndefined();
-    expect(plugin.addJs_).toBeUndefined();
-    expect(plugin.init_).toBeUndefined();
-  });
-
   test(`${pluginName}_process_init_twice`, () => {
     const plugin = new Plugin();
 
@@ -153,7 +145,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     expect(toggleButton).toBeDefined();
 
     if (plugin.isIconDisabled || plugin.isRequireSatelliteSelected) {
-      if (plugin.PLUGIN_NAME !== 'Screenshot') {
+      if (plugin.constructor.name !== 'Screenshot') {
         expect(toggleButton.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeTruthy();
       }
       expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();

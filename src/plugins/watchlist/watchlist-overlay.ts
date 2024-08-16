@@ -14,12 +14,11 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Watchlist Overlay';
-  dependencies = [WatchlistPlugin.PLUGIN_NAME];
+  dependencies_ = [WatchlistPlugin.name];
   private watchlistPlugin_: WatchlistPlugin;
 
   constructor() {
-    super(WatchlistOverlay.PLUGIN_NAME);
+    super();
     this.watchlistPlugin_ = keepTrackApi.getPlugin(WatchlistPlugin);
   }
 
@@ -108,12 +107,12 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.onWatchlistUpdated_.bind(this),
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: WatchlistOverlay.uiManagerFinal.bind(this),
     });
   }

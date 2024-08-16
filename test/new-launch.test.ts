@@ -15,7 +15,7 @@ describe('NewLaunch_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => {},
+      AutoInit: () => { },
     } as any;
     newLaunchPlugin = new NewLaunch();
   });
@@ -30,7 +30,7 @@ describe('NewLaunch_form', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => {},
+      AutoInit: () => { },
     } as any;
     newLaunchPlugin = new NewLaunch();
   });
@@ -41,9 +41,9 @@ describe('NewLaunch_form', () => {
 
   it('should have working buttons', () => {
     websiteInit(newLaunchPlugin);
-    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true });
+    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true, isSatellite: () => true });
     keepTrackApi.getPlugin(SelectSatManager).selectedSat = defaultSat.id;
-    keepTrackApi.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true });
+    keepTrackApi.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true, isSatellite: () => true });
     keepTrackApi.getCatalogManager().isLaunchSiteManagerLoaded = true;
     keepTrackApi.getCatalogManager().launchSites = {
       CAS: {

@@ -40,6 +40,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  */
 
 export class AnalysisMenu extends KeepTrackPlugin {
+  protected dependencies_: [];
   bottomIconElementName = 'analysis-bottom-icon';
   bottomIconImg = analysisPng;
   bottomIconLabel = 'Analysis Menu';
@@ -233,7 +234,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sensor: DetailedSensor | string) => {
         AnalysisMenu.setSensor_(sensor);
       },
@@ -680,12 +681,6 @@ export class AnalysisMenu extends KeepTrackPlugin {
       submitButtonDom.disabled = false;
       submitButtonDom.textContent = 'Generate Best Pass Times \u25B6';
     }
-  }
-
-  constructor() {
-    const PLUGIN_NAME = 'Analysis Menu';
-
-    super(PLUGIN_NAME);
   }
 }
 

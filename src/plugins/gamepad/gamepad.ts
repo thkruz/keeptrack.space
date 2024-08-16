@@ -6,7 +6,7 @@ import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class GamepadPlugin {
-  PLUGIN_NAME = 'Gamepad';
+  dependencies_: string[] = [];
   currentController: Gamepad;
   deadzone = 0.55;
   buttonsPressedHistory: number[] = [];
@@ -19,7 +19,7 @@ export class GamepadPlugin {
       } else {
         keepTrackApi.register({
           event: KeepTrackApiEvents.uiManagerInit,
-          cbName: this.PLUGIN_NAME,
+          cbName: this.constructor.name,
           cb: () => this.initializeGamepad(e.gamepad),
         });
       }
@@ -37,7 +37,7 @@ export class GamepadPlugin {
     if (!this.currentController) {
       keepTrackApi.register({
         event: KeepTrackApiEvents.updateLoop,
-        cbName: this.PLUGIN_NAME,
+        cbName: this.constructor.name,
         cb: this.updateGamepad.bind(this),
       });
     }

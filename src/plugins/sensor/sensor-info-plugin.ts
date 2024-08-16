@@ -10,6 +10,7 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
+  protected dependencies_: string[];
   isRequireSensorSelected: boolean = true;
 
   bottomIconCallback: () => void = () => {
@@ -91,13 +92,8 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     isDraggable: true,
   };
 
-  static PLUGIN_NAME = 'Sensor Info';
   private isSunLineVisible_ = false;
   private isMonnLineVisible_ = false;
-
-  constructor() {
-    super(SensorInfoPlugin.PLUGIN_NAME);
-  }
 
   helpTitle = 'Sensor Info';
   helpBody = keepTrackApi.html`
@@ -127,7 +123,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         this.addSensorToSunBtnListener_();
         this.addSensorToMoonBtnListener();
@@ -136,7 +132,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onLineAdded,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (lineManager: LineManager) => {
         this.checkIfLinesVisible_(lineManager);
       },

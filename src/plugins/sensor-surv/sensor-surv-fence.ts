@@ -26,6 +26,7 @@ import fencePng from '@public/img/icons/fence.png';
 import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
+import { SensorListPlugin } from '../sensor-list/sensor-list';
 
 declare module '@app/interfaces' {
   interface UserSettings {
@@ -35,11 +36,7 @@ declare module '@app/interfaces' {
 }
 
 export class SensorSurvFence extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Sensor Surveillance Fence';
-  constructor() {
-    super(SensorSurvFence.PLUGIN_NAME);
-  }
-
+  protected dependencies_: string[] = [SensorListPlugin.name];
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
       this.disableSurvView();
@@ -75,7 +72,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sensor: Sensor | string): void => {
         if (sensor) {
           this.setBottomIconToEnabled();
@@ -87,7 +84,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sensor: Sensor): void => {
         if (sensor) {
           this.setBottomIconToEnabled();

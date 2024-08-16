@@ -41,8 +41,12 @@ import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime, ZoomValue, spaceObjType2Str } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
+import { Astronomy } from '../astronomy/astronomy';
+import { Planetarium } from '../planetarium/planetarium';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
+import { LookAnglesPlugin } from './look-angles-plugin';
+import { SensorInfoPlugin } from './sensor-info-plugin';
 
 export class SensorManager {
   lastMultiSiteArray: TearrData[];
@@ -263,18 +267,24 @@ export class SensorManager {
     keepTrackApi.getPlugin(SensorFov)?.disableFovView();
     keepTrackApi.getPlugin(SensorSurvFence)?.disableSurvView();
 
-    getEl('menu-sensor-info')?.classList.remove('bmenu-item-selected');
-    getEl('menu-fov-bubble')?.classList.remove('bmenu-item-selected');
-    getEl('menu-surveillance')?.classList.remove('bmenu-item-selected');
-    getEl('menu-lookangles')?.classList.remove('bmenu-item-selected');
-    getEl('menu-planetarium')?.classList.remove('bmenu-item-selected');
-    getEl('menu-astronomy')?.classList.remove('bmenu-item-selected');
-    getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
-    getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');
-    getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
-    getEl('menu-lookangles')?.classList.add('bmenu-item-disabled');
-    getEl('menu-planetarium')?.classList.add('bmenu-item-disabled');
-    getEl('menu-astronomy')?.classList.add('bmenu-item-disabled');
+    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToDisabled();
 
     setTimeout(() => {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -533,16 +543,16 @@ export class SensorManager {
   static updateSensorUiStyling(sensors: DetailedSensor[] | null) {
     try {
       if (sensors?.[0]?.objName) {
-        getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
+        keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
 
-        if (getEl('reset-sensor-button')) {
+        if (getEl('reset-sensor-button', true)) {
           (getEl('reset-sensor-button') as HTMLButtonElement).disabled = false;
         }
-      } else if (getEl('reset-sensor-button')) {
+      } else if (getEl('reset-sensor-button', true)) {
         (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
       }
     } catch (error) {

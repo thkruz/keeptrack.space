@@ -167,7 +167,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange.bind(this));
         getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange.bind(this));
@@ -179,7 +179,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('reset-sat-fov-cones-button').addEventListener('click', () => {
           keepTrackApi.getScene().coneFactory.clear();

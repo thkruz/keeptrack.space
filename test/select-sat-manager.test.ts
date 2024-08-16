@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
+import { DetailedSatellite, DetailedSensor } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
@@ -14,7 +15,15 @@ describe('SatInfoBoxCore_class', () => {
   standardPluginSuite(SelectSatManager, 'SelectSatManager');
 
   it('should be able to select a satellite', () => {
-    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
+    keepTrackApi.getCatalogManager().objectCache = [
+      {
+        ...defaultSat, position: {
+          x: 10000,
+          y: 10000,
+          z: 10000,
+        },
+      } as DetailedSatellite,
+    ];
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
@@ -33,7 +42,7 @@ describe('SatInfoBoxCore_class', () => {
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-    keepTrackApi.getCatalogManager().objectCache = [defaultSensor as any];
+    keepTrackApi.getCatalogManager().objectCache = [defaultSensor as DetailedSensor];
     selectSatManager.selectSat(0);
   });
 });

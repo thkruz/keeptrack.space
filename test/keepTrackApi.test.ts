@@ -1,7 +1,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { isThisNode } from '@app/static/isThisNode';
 import { expect } from '@jest/globals';
-import { SatObject } from '../src/interfaces';
+import { DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../src/keepTrackApi';
 import { defaultSat } from './environment/apiMocks';
 
@@ -13,7 +14,7 @@ test('keepTrackApi Unit Testing', () => {
   keepTrackApi.register({
     event: KeepTrackApiEvents.updateSelectBox,
     cbName: 'test',
-    cb: (sat: SatObject) => console.log(sat),
+    cb: (sat: DetailedSatellite | MissileObject) => console.log(sat),
   });
 
   keepTrackApi.register({
@@ -112,7 +113,7 @@ test('keepTrackApi Unit Testing', () => {
     cb: (sat, satId) => console.log(`${sat} - ${satId}`),
   });
 
-  keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, 'test');
+  keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, 'test' as unknown as DetailedSatellite);
   keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherReady);
   keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);

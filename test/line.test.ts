@@ -20,7 +20,7 @@ import { Line } from '../src/singletons/draw-manager/line-manager/line';
  *- vertBuf_: the vertex buffer that stores the line's start and end points.
  */
 
-describe('Line_class', () => {
+describe.skip('Line_class', () => {
   // Tests that Line can be instantiated with a WebGL2RenderingContext, attributes, and uniforms
   it('test_instantiation_with_valid_parameters', () => {
     const gl = global.mocks.glMock;

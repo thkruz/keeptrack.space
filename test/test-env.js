@@ -133,6 +133,15 @@ $.fn.fadeIn = jest.fn((time, cb) => {
 
 global.document.canvas.addEventListener = () => true;
 
+/*
+ * Eruda is a console for mobile web browsers
+ * It is not needed for testing and causes issues with the test environment
+ */
+jest.mock('eruda', () => ({
+  init: jest.fn(),
+  add: jest.fn(),
+}));
+
 /** Setup catalog, webgl, and other standard environment */
 import('./environment/standard-env').then((module) => {
   module.setupStandardEnvironment();

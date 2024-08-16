@@ -9,8 +9,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TimeMachine extends KeepTrackPlugin {
   static readonly TIME_BETWEEN_SATELLITES = 10000;
-
-  static PLUGIN_NAME = 'Time Machine';
+  protected dependencies_: string[];
 
   bottomIconCallback = () => {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
@@ -38,10 +37,6 @@ export class TimeMachine extends KeepTrackPlugin {
   bottomIconLabel = 'Time Machine';
   historyOfSatellitesRunCount = 0;
   isTimeMachineRunning = false;
-
-  constructor() {
-    super(TimeMachine.PLUGIN_NAME);
-  }
 
   historyOfSatellitesPlay() {
     this.isTimeMachineRunning = true;

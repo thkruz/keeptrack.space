@@ -3,20 +3,19 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import githubPng from '@public/img/icons/github.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { TopMenu } from '../top-menu/top-menu';
 
 export class SocialMedia extends KeepTrackPlugin {
-  dependencies = ['Top Menu'];
+  dependencies_ = [TopMenu.name];
   constructor() {
-    const PLUGIN_NAME = 'Social Media';
-
-    super(PLUGIN_NAME);
+    super(SocialMedia.name);
   }
 
   addHtml() {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: SocialMedia.uiManagerFinal_,
     });
   }

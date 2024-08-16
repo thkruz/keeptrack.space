@@ -27,10 +27,7 @@ export interface TipMsg {
 }
 
 export class TrackingImpactPredict extends KeepTrackPlugin {
-  constructor() {
-    super(TrackingImpactPredict.name);
-  }
-
+  protected dependencies_: string[];
   private readonly tipDataSrc = './data/tip.json';
   private selectSatIdOnCruncher_: number | null = null;
   private tipList_ = <TipMsg[]>[];

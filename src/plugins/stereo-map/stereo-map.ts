@@ -53,7 +53,7 @@ export class StereoMap extends KeepTrackPlugin {
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(StereoMap.name);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 

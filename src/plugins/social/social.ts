@@ -7,10 +7,6 @@ import { TopMenu } from '../top-menu/top-menu';
 
 export class SocialMedia extends KeepTrackPlugin {
   dependencies_ = [TopMenu.name];
-  constructor() {
-    super(SocialMedia.name);
-  }
-
   addHtml() {
     super.addHtml();
     keepTrackApi.register({

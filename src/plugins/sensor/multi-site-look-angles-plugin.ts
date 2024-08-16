@@ -37,7 +37,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   );
 
   constructor() {
-    super(MultiSiteLookAnglesPlugin.name);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
 
     // remove duplicates in sensorList

@@ -18,6 +18,8 @@ import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
 const missileArray: any[] = [];
 
+let isMassRaidLoaded = false;
+
 // External Functions
 
 // This function stalls Jest for multiple minutes.
@@ -30,7 +32,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const satSetLen = catalogManagerInstance.missileSats;
 
-      missileManager.missilesInUse = satSetLen;
+      missileManager.missilesInUse = newMissileArray.length;
       for (let i = 0; i < newMissileArray.length; i++) {
         const x = satSetLen - 500 + i;
 
@@ -90,6 +92,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
   settingsManager.searchLimit = settingsManager.searchLimit > 500 ? settingsManager.searchLimit : 500;
   SettingsMenuPlugin.syncOnLoad();
 
+  isMassRaidLoaded = true;
   keepTrackApi.getUiManager().doSearch('RV_');
 };
 export const clearMissiles = () => {
@@ -205,6 +208,20 @@ export const Missile = (
   minAltitude: number,
 ) => {
   const missileObj: MissileObject = <MissileObject>keepTrackApi.getCatalogManager().getObject(MissileObjectNum);
+
+  if (isMassRaidLoaded) {
+    clearMissiles();
+    const satSetLen = keepTrackApi.getCatalogManager().missileSats;
+
+    MissileObjectNum = satSetLen - 500;
+  }
+
+  if (missileManager.missilesInUse >= 500) {
+    missileManager.lastMissileErrorType = ToastMsgType.critical;
+    missileManager.lastMissileError = 'Error: Maximum number of missiles<br>have been reached.';
+
+    return 0;
+  }
 
   // Dimensions of the rocket
   Length = Length || 17; // (m)

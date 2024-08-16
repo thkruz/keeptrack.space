@@ -1,4 +1,4 @@
-import { EChartsData, KeepTrackApiEvents } from '@app/interfaces';
+import { EChartsData, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
@@ -12,12 +12,11 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 type EChartsOption = echarts.EChartsOption;
 
 export class RicPlot extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'RIC Plot';
-  dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
+  dependencies_: string[] = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(RicPlot.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -27,12 +26,12 @@ export class RicPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
-      keepTrackApi.getUiManager().toast('Select a Satellite First!', 'critical');
+      keepTrackApi.getUiManager().toast('Select a Satellite First!', ToastMsgType.critical);
 
       return;
     }
     if (!this.selectSatManager_.secondarySatObj) {
-      keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', 'critical');
+      keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', ToastMsgType.critical);
 
       return;
     }
@@ -65,7 +64,7 @@ export class RicPlot extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSecondarySat,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.selectedSat === -1) {
           if (this.isMenuButtonActive) {
@@ -80,7 +79,7 @@ export class RicPlot extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.secondarySat === -1) {
           if (this.isMenuButtonActive) {

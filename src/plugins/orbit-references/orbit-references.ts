@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { StringifiedNumber } from '@app/static/sat-math';
@@ -10,12 +10,11 @@ import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class OrbitReferences extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Orbit References';
-  dependencies: string[] = [SatInfoBox.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
+  dependencies_: string[] = [SatInfoBox.name, SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(OrbitReferences.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -27,12 +26,15 @@ export class OrbitReferences extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj?: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (!obj) {
+        if (!obj?.isSatellite()) {
+          hideEl('orbit-references-link');
+
           return;
         }
+        showEl('orbit-references-link');
 
         if (!this.doOnce) {
           getEl('sat-info-top-links').insertAdjacentHTML(

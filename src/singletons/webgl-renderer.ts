@@ -229,7 +229,7 @@ export class WebGLRenderer {
     if (
       keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY ||
       keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM ||
-      watchlistPluginInstance?.watchlistInViewList?.length > 0
+      watchlistPluginInstance?.hasAnyInView()
     ) {
       // Catch race condition where sensor has been reset but camera hasn't been updated
       try {
@@ -251,7 +251,7 @@ export class WebGLRenderer {
         return;
       }
       // Previously called showOrbitsAbove();
-      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPluginInstance?.watchlistInViewList?.length === 0)) {
+      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
         if (this.isSatMiniBoxInUse_) {
           this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
           this.hoverBoxOnSatMiniElements_.innerHTML = '';
@@ -353,7 +353,7 @@ export class WebGLRenderer {
           return;
         }
 
-        watchlistPluginInstance?.watchlistList.forEach((id: number) => {
+        watchlistPluginInstance?.watchlistList.forEach(({ id }) => {
           const obj = catalogManagerInstance.getObject(id, GetSatType.POSITION_ONLY) as DetailedSatellite;
 
           if (dotsManagerInstance.inViewData[id] === 0) {
@@ -406,7 +406,7 @@ export class WebGLRenderer {
     }
 
     // Hide satMiniBoxes When Not in Use
-    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && watchlistPluginInstance?.watchlistInViewList?.length === 0)) {
+    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
       if (this.isSatMiniBoxInUse_) {
         this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
         this.satMiniBox_.innerHTML = '';

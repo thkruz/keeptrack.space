@@ -12,7 +12,7 @@ describe('SatConstellations_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => {},
+      AutoInit: () => { },
     } as any;
     satConstellationsPlugin = new SatConstellations();
   });
@@ -42,8 +42,8 @@ describe('SatConstellations_test_all_links', () => {
   beforeEach(() => {
     setupStandardEnvironment();
     window.M = {
-      AutoInit: () => {},
-    };
+      AutoInit: () => { },
+    } as any;
     satConstellationsPlugin = new SatConstellations();
     websiteInit(satConstellationsPlugin);
 
@@ -56,13 +56,14 @@ describe('SatConstellations_test_all_links', () => {
             objects: [0],
           };
         },
-        selectGroup: () => {},
+        selectGroup: () => { },
         groupList,
       }) as any;
   });
 
   links.forEach((element) => {
     test(`SatConstellations_test_${element.dataset.group}`, () => {
+      SatConstellations.groupSelected = jest.fn();
       element.click();
     });
   });

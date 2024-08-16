@@ -12,17 +12,17 @@ import { errorManagerInstance } from '../../singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TopMenu extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Top Menu';
+  protected dependencies_: string[];
   static readonly SEARCH_RESULT_ID = 'search-results';
   constructor() {
-    super(TopMenu.PLUGIN_NAME);
+    super(TopMenu.name);
   }
 
   addHtml = (): void => {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('keeptrack-header').insertAdjacentHTML(
           'beforeend',
@@ -97,7 +97,7 @@ export class TopMenu extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('sound-btn').onclick = () => {
           const soundIcon = <HTMLImageElement>getEl('sound-icon');

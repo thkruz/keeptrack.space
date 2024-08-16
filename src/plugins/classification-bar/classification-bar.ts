@@ -6,6 +6,7 @@ import { Classification, ClassificationString } from '@app/static/classification
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class ClassificationBar extends KeepTrackPlugin {
+  protected dependencies_: string[];
   private classificationString_: ClassificationString;
   private isClassificationContainerLoaded_: boolean = false;
   private isExpanded_: boolean = false;
@@ -13,12 +14,6 @@ export class ClassificationBar extends KeepTrackPlugin {
   private readonly containerDomId = 'classification-container';
   private readonly textStringDomId = 'classification-string';
   private readonly containerHeight = 20;
-
-  constructor() {
-    const PLUGIN_NAME = 'Classification';
-
-    super(PLUGIN_NAME);
-  }
 
   init(): void {
     super.init();
@@ -62,7 +57,7 @@ export class ClassificationBar extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.uiManagerInit_.bind(this),
     });
   }

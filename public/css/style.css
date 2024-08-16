@@ -998,6 +998,10 @@ input:focus {
   margin-right: 10px;
 }
 
+#nav-mobile2 a:hover {
+  filter: brightness(3);
+}
+
 #sensor-selected-container:hover,
 #datetime-text:hover {
   background: rgba(255, 255, 255, 0.1);

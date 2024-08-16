@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, SatShader } from '@app/interfaces';
+import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
@@ -33,7 +33,6 @@ import { SettingsManager } from '../settings/settings';
 import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
 import { MissileObject } from './catalog-manager/MissileObject';
-import { LineTypes } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import type { OrbitManager } from './orbitManager';
 
@@ -784,27 +783,27 @@ export class Camera {
 
     switch (this.cameraType) {
       case CameraType.DEFAULT:
-        uiManagerInstance.toast('Earth Centered Camera Mode', 'standby');
+        uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
         this.zoomTarget = 0.5;
         break;
       case CameraType.OFFSET:
-        uiManagerInstance.toast('Offset Camera Mode', 'standby');
+        uiManagerInstance.toast('Offset Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.FIXED_TO_SAT:
-        uiManagerInstance.toast('Fixed to Satellite Camera Mode', 'standby');
+        uiManagerInstance.toast('Fixed to Satellite Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.FPS:
-        uiManagerInstance.toast('Free Camera Mode', 'standby');
+        uiManagerInstance.toast('Free Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.PLANETARIUM:
-        uiManagerInstance.toast('Planetarium Camera Mode', 'standby');
+        uiManagerInstance.toast('Planetarium Camera Mode', ToastMsgType.standby);
         LegendManager.change('planetarium');
         break;
       case CameraType.SATELLITE:
-        uiManagerInstance.toast('Satellite Camera Mode', 'standby');
+        uiManagerInstance.toast('Satellite Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.ASTRONOMY:
-        uiManagerInstance.toast('Astronomy Camera Mode', 'standby');
+        uiManagerInstance.toast('Astronomy Camera Mode', ToastMsgType.standby);
         LegendManager.change('astronomy');
         break;
       default:
@@ -1029,11 +1028,6 @@ export class Camera {
     }
 
     lineManagerInstance.clear();
-    if (catalogManagerInstance.isStarManagerLoaded) {
-      keepTrackApi.getStarManager().isAllConstellationVisible = false;
-    }
-
-    lineManagerInstance.create(LineTypes.CENTER_OF_EARTH_TO_REF, [sat.position.x, sat.position.y, sat.position.z], [1, 0.4, 0, 1]);
     this.cameraType = CameraType.DEFAULT; // Earth will block the view of the star
     this.lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
   }
@@ -1066,7 +1060,15 @@ export class Camera {
     }
 
     if (!sat.position) {
-      throw new Error('Satellite position is undefined');
+      throw new Error(`Object ${sat.id} has no position!`);
+    }
+
+    if (sat.position.x === 0 && sat.position.y === 0 && sat.position.z === 0) {
+      keepTrackApi.getUiManager().toast('Object is inside the earth!', ToastMsgType.critical);
+      this.camZoomSnappedOnSat = false;
+      this.camAngleSnappedOnSat = false;
+
+      return;
     }
 
     if (this.camAngleSnappedOnSat) {

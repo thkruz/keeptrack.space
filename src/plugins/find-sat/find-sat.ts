@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
@@ -37,6 +37,7 @@ export interface SearchSatParams {
 }
 
 export class FindSatPlugin extends KeepTrackPlugin {
+  protected dependencies_: string[];
   private lastResults = <DetailedSatellite[]>[];
 
   dragOptions: clickDragOptions = {
@@ -111,7 +112,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (possibles.length >= limit) {
-      uiManagerInstance.toast(`Too many results, limited to ${limit}`, 'serious');
+      uiManagerInstance.toast(`Too many results, limited to ${limit}`, ToastMsgType.serious);
     }
     possibles = possibles.slice(0, limit);
 
@@ -462,11 +463,11 @@ The search will then find all satellites within those inclinations and display t
 
       this.lastResults = FindSatPlugin.searchSats(searchParams as SearchSatParams);
       if (this.lastResults.length === 0) {
-        uiManagerInstance.toast('No Satellites Found', 'critical');
+        uiManagerInstance.toast('No Satellites Found', ToastMsgType.critical);
       }
     } catch (e) {
       if (e.message === 'No Search Criteria Entered') {
-        uiManagerInstance.toast('No Search Criteria Entered', 'critical');
+        uiManagerInstance.toast('No Search Criteria Entered', ToastMsgType.critical);
       }
     }
   }
@@ -488,11 +489,6 @@ The search will then find all satellites within those inclinations and display t
       cbName: 'findSat',
       cb: this.uiManagerFinal.bind(this),
     });
-  }
-
-  static PLUGIN_NAME: string = 'findSat';
-  constructor() {
-    super(FindSatPlugin.PLUGIN_NAME);
   }
 
   public printLastResults() {

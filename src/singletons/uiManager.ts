@@ -137,35 +137,32 @@ export class UiManager {
       this.dismissAllToasts();
     });
 
-    type = type || 'standby';
+    type = type || ToastMsgType.standby;
     if (isLong) {
       toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
     }
     switch (type) {
-      case 'standby':
+      case ToastMsgType.standby:
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
         keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
-      case 'normal':
-        toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
-        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
-        break;
-      case 'caution':
+      case ToastMsgType.caution:
         toastMsg.$el[0].style.background = 'var(--statusDarkCaution)';
         keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
-      case 'serious':
+      case ToastMsgType.serious:
         toastMsg.$el[0].style.background = 'var(--statusDarkSerious)';
         keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
-      case 'critical':
+      case ToastMsgType.critical:
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
         keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
         break;
-      case 'error':
+      case ToastMsgType.error:
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
         keepTrackApi.getSoundManager()?.play(SoundNames.ERROR);
         break;
+      case ToastMsgType.normal:
       default:
         toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
         keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
@@ -197,44 +194,44 @@ export class UiManager {
     switch (newScheme.name) {
       case 'default':
       case 'group':
-        this.toast('Color Scheme Changed to Object Types', 'normal', false);
+        this.toast('Color Scheme Changed to Object Types', ToastMsgType.normal, false);
         break;
       case 'velocity':
-        this.toast('Color Scheme Changed to Velocity', 'normal', false);
+        this.toast('Color Scheme Changed to Velocity', ToastMsgType.normal, false);
         break;
       case 'sunlight':
-        this.toast('Color Scheme Changed to Sunlight', 'normal', false);
+        this.toast('Color Scheme Changed to Sunlight', ToastMsgType.normal, false);
         break;
       case 'countries':
       case 'groupCountries':
-        this.toast('Color Scheme Changed to Countries', 'normal', false);
+        this.toast('Color Scheme Changed to Countries', ToastMsgType.normal, false);
         break;
       case 'leo':
-        this.toast('Color Scheme Changed to Near Earth', 'normal', false);
+        this.toast('Color Scheme Changed to Near Earth', ToastMsgType.normal, false);
         break;
       case 'geo':
-        this.toast('Color Scheme Changed to Deep Space', 'normal', false);
+        this.toast('Color Scheme Changed to Deep Space', ToastMsgType.normal, false);
         break;
       case 'ageOfElset':
-        this.toast('Color Scheme Changed to Elset Age', 'normal', false);
+        this.toast('Color Scheme Changed to Elset Age', ToastMsgType.normal, false);
         break;
       case 'rcs':
-        this.toast('Color Scheme Changed to Radar Cross Section', 'normal', false);
+        this.toast('Color Scheme Changed to Radar Cross Section', ToastMsgType.normal, false);
         break;
       case 'smallsats':
-        this.toast('Color Scheme Changed to Small Satellites', 'normal', false);
+        this.toast('Color Scheme Changed to Small Satellites', ToastMsgType.normal, false);
         break;
       case 'lostobjects':
-        this.toast('Color Scheme Changed to Lost Objects', 'normal', false);
+        this.toast('Color Scheme Changed to Lost Objects', ToastMsgType.normal, false);
         break;
       case 'neighbors':
-        this.toast('Color Scheme Changed to Orbit Density', 'normal', false);
+        this.toast('Color Scheme Changed to Orbit Density', ToastMsgType.normal, false);
         break;
       case 'confidence':
-        this.toast('Color Scheme Changed to Confidence', 'normal', false);
+        this.toast('Color Scheme Changed to Confidence', ToastMsgType.normal, false);
         break;
       default:
-        this.toast(`Color Scheme Changed to ${newScheme.name}`, 'normal', false);
+        this.toast(`Color Scheme Changed to ${newScheme.name}`, ToastMsgType.normal, false);
         console.debug(`${newScheme.name} missing from alert list!`);
         break;
     }

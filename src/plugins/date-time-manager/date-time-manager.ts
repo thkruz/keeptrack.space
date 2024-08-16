@@ -10,39 +10,35 @@ import { TopMenu } from '../top-menu/top-menu';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 
 export class DateTimeManager extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Date Time Manager';
-  dependencies = [TopMenu.PLUGIN_NAME];
+  dependencies_ = [TopMenu.name];
   isEditTimeOpen = false;
   divContainerId = 'datetime';
   dateTimeInputTbId = 'datetime-input-tb';
-  constructor() {
-    super(DateTimeManager.PLUGIN_NAME);
-  }
 
   init(): void {
     super.init();
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.uiManagerInit.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.uiManagerFinal.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateDateTime,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.updateDateTime.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
 
@@ -114,6 +110,11 @@ export class DateTimeManager extends KeepTrackPlugin {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     // Initialize the date/time picker
+
+    // TODO: remove this check when jest is fixed
+    if (isThisNode()) {
+      return;
+    }
 
     (<any>$('#datetime-input-tb'))
       .datetimepicker({

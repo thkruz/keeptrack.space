@@ -30,6 +30,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import calendarPng from '@public/img/icons/calendar.png';
 
 export class LaunchCalendar extends KeepTrackPlugin {
+  protected dependencies_: string[];
   bottomIconElementName = 'menu-launches';
   bottomIconImg = calendarPng;
   bottomIconLabel = 'Launch Calendar';
@@ -49,12 +50,6 @@ export class LaunchCalendar extends KeepTrackPlugin {
   };
 
   isForceHideSideMenus = true;
-
-  constructor() {
-    const PLUGIN_NAME = 'Launch Menu';
-
-    super(PLUGIN_NAME);
-  }
 
   private closeColorbox_() {
     if (this.isMenuButtonActive) {

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
@@ -158,9 +158,9 @@ export class KeyboardInput {
       case 'L':
         settingsManager.isDrawOrbits = !settingsManager.isDrawOrbits;
         if (settingsManager.isDrawOrbits) {
-          uiManagerInstance.toast('Orbits On', 'normal');
+          uiManagerInstance.toast('Orbits On', ToastMsgType.normal);
         } else {
-          uiManagerInstance.toast('Orbits Off', 'standby');
+          uiManagerInstance.toast('Orbits Off', ToastMsgType.standby);
         }
         SettingsMenuPlugin.syncOnLoad();
         break;
@@ -209,7 +209,7 @@ export class KeyboardInput {
         keepTrackApi.getMainCamera().resetCamera();
         break;
       case 't':
-        uiManagerInstance.toast('Time Set to Real Time', 'normal');
+        uiManagerInstance.toast('Time Set to Real Time', ToastMsgType.normal);
         timeManagerInstance.changeStaticOffset(0); // Reset to Current Time
         settingsManager.isPropRateChange = true;
         break;
@@ -283,16 +283,16 @@ export class KeyboardInput {
       if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate && timeManagerInstance.propRate0 !== timeManagerInstance.propRate) {
         if (timeManagerInstance.propRate > 1.01 || timeManagerInstance.propRate < 0.99) {
           if (timeManagerInstance.propRate < 10) {
-            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'standby');
+            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.standby);
           }
           if (timeManagerInstance.propRate >= 10 && timeManagerInstance.propRate < 60) {
-            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'caution');
+            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.caution);
           }
           if (timeManagerInstance.propRate >= 60) {
-            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'serious');
+            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.serious);
           }
         } else {
-          uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, 'normal');
+          uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.normal);
         }
       }
 

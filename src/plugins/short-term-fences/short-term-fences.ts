@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import searchPng from '@public/img/icons/search.png';
 
@@ -12,12 +12,11 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class ShortTermFences extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Short Term Fences';
-  dependencies: string[] = [SatInfoBox.PLUGIN_NAME, SelectSatManager.PLUGIN_NAME];
+  dependencies_: string[] = [SatInfoBox.name, SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(ShortTermFences.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -93,12 +92,15 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (obj === null || typeof obj === 'undefined') {
+        if (!obj?.isSatellite()) {
+          hideEl('stf-on-object-link');
+
           return;
         }
+        showEl('stf-on-object-link');
 
         if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
           getEl('sat-info-top-links').insertAdjacentHTML(
@@ -120,7 +122,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('stfForm').addEventListener('submit', (e: Event) => {
           e.preventDefault();

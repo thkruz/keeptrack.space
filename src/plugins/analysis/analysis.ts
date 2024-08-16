@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, lookanglesRow } from '@app/interfaces';
+import { KeepTrackApiEvents, lookanglesRow, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -40,6 +40,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  */
 
 export class AnalysisMenu extends KeepTrackPlugin {
+  protected dependencies_: [];
   bottomIconElementName = 'analysis-bottom-icon';
   bottomIconImg = analysisPng;
   bottomIconLabel = 'Analysis Menu';
@@ -233,7 +234,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sensor: DetailedSensor | string) => {
         AnalysisMenu.setSensor_(sensor);
       },
@@ -419,7 +420,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
     // Check if there is a sensor
     if (sensors.length <= 0 || !sensors[0] || typeof sensors[0].minAz === 'undefined') {
-      keepTrackApi.getUiManager().toast('Sensor\'s format incorrect. Did you select a sensor first?', 'critical');
+      keepTrackApi.getUiManager().toast('Sensor\'s format incorrect. Did you select a sensor first?', ToastMsgType.critical);
 
       return [];
     }
@@ -664,7 +665,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     if (!sensorManagerInstance.isSensorSelected()) {
-      keepTrackApi.getUiManager().toast('You must select a sensor first!', 'critical');
+      keepTrackApi.getUiManager().toast('You must select a sensor first!', ToastMsgType.critical);
     } else {
       AnalysisMenu.findBestPasses(sats, sensorManagerInstance.getSensor());
     }
@@ -680,12 +681,6 @@ export class AnalysisMenu extends KeepTrackPlugin {
       submitButtonDom.disabled = false;
       submitButtonDom.textContent = 'Generate Best Pass Times \u25B6';
     }
-  }
-
-  constructor() {
-    const PLUGIN_NAME = 'Analysis Menu';
-
-    super(PLUGIN_NAME);
   }
 }
 

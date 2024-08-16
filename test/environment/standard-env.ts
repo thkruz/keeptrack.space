@@ -6,6 +6,7 @@ import { SensorManager } from '@app/plugins/sensor/sensorManager';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { Camera } from '@app/singletons/camera';
+import { SatLinkManager } from '@app/singletons/catalog-manager/satLinkManager';
 import { DotsManager } from '@app/singletons/dots-manager';
 import { ConeMeshFactory } from '@app/singletons/draw-manager/cone-mesh-factory';
 import { SensorFovMeshFactory } from '@app/singletons/draw-manager/sensor-fov-mesh-factory';
@@ -13,7 +14,6 @@ import { GroupsManager } from '@app/singletons/groups-manager';
 import { InputManager } from '@app/singletons/input-manager';
 import { Scene } from '@app/singletons/scene';
 import { SearchManager } from '@app/singletons/search-manager';
-import { starManager } from '@app/singletons/starManager';
 import { TimeManager } from '@app/singletons/time-manager';
 import { UiManager } from '@app/singletons/uiManager';
 import { SensorMath } from '@app/static/sensor-math';
@@ -39,7 +39,28 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
   }));
   keepTrackApi.containerRoot = null;
+  keepTrackApi.analytics = {
+    track: jest.fn(),
+    identify: jest.fn(),
+    page: jest.fn(),
+    user: jest.fn(),
+    reset: jest.fn(),
+    ready: jest.fn(),
+    on: jest.fn(),
+    once: jest.fn(),
+    getState: jest.fn(),
+    storage: {
+      getItem: jest.fn(),
+      setItem: jest.fn(),
+      removeItem: jest.fn(),
+    },
+    plugins: {
+      enable: jest.fn(),
+      disable: jest.fn(),
+    },
+  };
   keepTrackApi.unregisterAllEvents();
+  keepTrackApi.unregisterAllPlugins();
   document.body.innerHTML = '<div id="keeptrack-root"></div>';
   setupDefaultHtml();
 
@@ -74,6 +95,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     addEventListener: jest.fn(),
   } as unknown as Worker;
   catalogManagerInstance.objectCache = [defaultSat];
+  catalogManagerInstance.satLinkManager = new SatLinkManager();
   keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
 
   const orbitManagerInstance = new OrbitManager();
@@ -91,6 +113,8 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
 
   const dotsManagerInstance = new DotsManager();
+
+  dotsManagerInstance.inViewData = Array(100).fill(0) as unknown as Int8Array;
 
   keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
 
@@ -128,7 +152,6 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackContainer.registerSingleton(Singletons.UiManager, mockUiManager);
   keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.StarManager, starManager);
   const sensorMathInstance = new SensorMath();
 
   keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);

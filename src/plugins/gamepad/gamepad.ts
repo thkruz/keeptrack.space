@@ -1,12 +1,12 @@
 /* eslint-disable class-methods-use-this */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class GamepadPlugin {
-  PLUGIN_NAME = 'Gamepad';
+  dependencies_: string[] = [];
   currentController: Gamepad;
   deadzone = 0.55;
   buttonsPressedHistory: number[] = [];
@@ -19,25 +19,25 @@ export class GamepadPlugin {
       } else {
         keepTrackApi.register({
           event: KeepTrackApiEvents.uiManagerInit,
-          cbName: this.PLUGIN_NAME,
+          cbName: this.constructor.name,
           cb: () => this.initializeGamepad(e.gamepad),
         });
       }
     });
     window.addEventListener('gamepaddisconnected', () => {
-      keepTrackApi.getUiManager().toast('Gamepad disconnected', 'critical');
+      keepTrackApi.getUiManager().toast('Gamepad disconnected', ToastMsgType.critical);
       this.currentController = null;
     });
   }
 
   initializeGamepad(gamepad: Gamepad): void {
-    keepTrackApi.getUiManager().toast('Gamepad connected', 'normal');
+    keepTrackApi.getUiManager().toast('Gamepad connected', ToastMsgType.normal);
 
     // Only initialize once
     if (!this.currentController) {
       keepTrackApi.register({
         event: KeepTrackApiEvents.updateLoop,
-        cbName: this.PLUGIN_NAME,
+        cbName: this.constructor.name,
         cb: this.updateGamepad.bind(this),
       });
     }

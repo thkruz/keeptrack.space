@@ -2,7 +2,7 @@ import { openColorbox } from '@app/lib/colorbox';
 import { getEl } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import photoManagerPng from '@public/img/icons/photoManager.png';
@@ -21,11 +21,7 @@ interface DiscvrResponse {
 }
 
 export class SatellitePhotos extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Satellite Photos';
-  constructor() {
-    super(SatellitePhotos.PLUGIN_NAME);
-  }
-
+  protected dependencies_: string[] = [SelectSatManager.name];
   discvrPhotos_: { imageUrl: string; lat: Degrees; lon: Degrees }[] = [];
 
   bottomIconElementName = 'menu-sat-photos';
@@ -55,7 +51,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('meteosat9-link').addEventListener('click', () => {
           // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
@@ -79,7 +75,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         this.initDISCOVR_();
       },
@@ -170,7 +166,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast('Can\'t load pictures from the future. Loading most recent photos.', 'caution');
+      uiManagerInstance.toast('Can\'t load pictures from the future. Loading most recent photos.', ToastMsgType.caution);
       propTime = new Date(Date.now() - 1000 * 60 * 30);
     }
     const year = propTime.getUTCFullYear();

@@ -1,6 +1,6 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -17,7 +17,7 @@ import { SatInfoBox } from './sat-info-box';
  * This is the class that manages the selection of objects.
  */
 export class SelectSatManager extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Select Sat Manager';
+  protected dependencies_: string[];
   lastCssStyle = '';
   selectedSat = -1;
   private readonly noSatObj_ = <DetailedSatellite>(<unknown>{
@@ -32,10 +32,6 @@ export class SelectSatManager extends KeepTrackPlugin {
   secondarySatObj: DetailedSatellite;
   private lastSelectedSat_ = -1;
 
-  constructor() {
-    super(SelectSatManager.PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
 
@@ -43,7 +39,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateLoop,
-      cbName: SelectSatManager.PLUGIN_NAME,
+      cbName: SelectSatManager.constructor.name,
       cb: this.checkIfSelectSatVisible.bind(this),
     });
   }
@@ -102,6 +98,13 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (!obj) {
       this.selectSatReset_();
     } else {
+
+      if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0) {
+        keepTrackApi.getUiManager().toast('Object is inside the Earth, cannot select it', ToastMsgType.caution);
+
+        return;
+      }
+
       // First thing we need to do is determine what type of SpaceObjectType we have
       switch (obj.type) {
         case SpaceObjectType.MECHANICAL:
@@ -120,6 +123,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.SPECIAL:
         case SpaceObjectType.NOTIONAL:
         case SpaceObjectType.UNKNOWN:
+          showEl('search-links');
+          showEl('draw-line-links');
           this.selectSatObject_(obj as DetailedSatellite);
           break;
         case SpaceObjectType.PAYLOAD_OWNER:
@@ -133,6 +138,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.STAR:
           return; // Do nothing
         case SpaceObjectType.BALLISTIC_MISSILE:
+          hideEl('search-links');
+          hideEl('draw-line-links');
           this.selectSatObject_(obj as MissileObject);
           break;
         default:
@@ -245,6 +252,14 @@ export class SelectSatManager extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
     keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
 
+    if (sat instanceof DetailedSatellite) {
+      keepTrackApi.analytics.track('select_satellite', {
+        id: sat.id,
+        name: sat.name,
+        sccNum: sat.sccNum,
+      });
+    }
+
     this.setSelectedSat_(sat.id);
   }
 
@@ -262,7 +277,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       .join(',');
 
     if (searchStr.length === 0) {
-      keepTrackApi.getUiManager().toast('No satellites found for this owner/manufacturer', 'caution', false);
+      keepTrackApi.getUiManager().toast('No satellites found for this owner/manufacturer', ToastMsgType.caution, false);
     } else {
       keepTrackApi.getUiManager().searchManager.doSearch(searchStr);
       keepTrackApi.getMainCamera().changeZoom(0.9);

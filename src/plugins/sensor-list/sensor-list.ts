@@ -1,9 +1,8 @@
 import { sensors } from '@app/catalogs/sensors';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { getClass } from '@app/lib/get-class';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
-import { LineTypes } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
@@ -21,7 +20,7 @@ import './sensor-list.css';
 // TODO: Add a search bar and filter for sensors
 
 export class SensorListPlugin extends KeepTrackPlugin {
-  dependencies: string[] = [DateTimeManager.PLUGIN_NAME];
+  dependencies_: string[] = [DateTimeManager.name];
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
@@ -72,11 +71,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       </div>
     </div>`;
 
-  static PLUGIN_NAME = 'Sensor List';
   isSensorLinksAdded = false;
-  constructor() {
-    super(SensorListPlugin.PLUGIN_NAME);
-  }
 
   helpTitle = 'Sensors Menu';
   helpBody = keepTrackApi.html`The Sensors menu allows you to select a sensor for use in calculations and other menu's functions.
@@ -111,7 +106,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
@@ -127,7 +122,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
           keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
@@ -164,9 +159,13 @@ export class SensorListPlugin extends KeepTrackPlugin {
       cbName: 'sensor',
       cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
-        if (obj === null || typeof obj === 'undefined') {
+        if (!obj?.isSatellite()) {
+          hideEl('sensors-in-fov-link');
+
           return;
         }
+
+        showEl('sensors-in-fov-link');
 
         if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
           getEl('sat-info-top-links').insertAdjacentHTML(
@@ -187,18 +186,11 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
             const sat = selectSatManagerInstance.getSelectedSat();
 
-            if (sat.isMissile()) {
+            if (!sat.isSatellite()) {
               return;
             }
 
-            Object.keys(sensors).forEach((key) => {
-              const sensor = sensors[key];
-              const isInView = sensor.isSatInFov(sat as DetailedSatellite, keepTrackApi.getTimeManager().simulationTimeObj);
-
-              if (isInView) {
-                keepTrackApi.getLineManager().create(LineTypes.MULTI_SENSORS_TO_SAT, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
-              }
-            });
+            keepTrackApi.getLineManager().createSensorsToSatFovOnly(sat as DetailedSatellite);
           });
           this.isSensorLinksAdded = true;
         }
@@ -211,7 +203,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) {
           return;
@@ -244,7 +236,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
           SensorListPlugin.reloadLastSensor_();

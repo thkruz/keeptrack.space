@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
@@ -55,7 +55,6 @@ export class SearchManager {
       cbName: 'Search Manager',
       cb: this.addListeners_.bind(this),
     });
-    this.addListeners_();
   }
 
   private addListeners_() {
@@ -260,13 +259,13 @@ export class SearchManager {
     this.lastResultGroup_ = dispGroup;
     groupManagerInstance.selectGroup(dispGroup);
 
-    if (!isPreventDropDown) {
+    if (!isPreventDropDown && idList.length > 0) {
       this.fillResultBox(results, catalogManagerInstance);
     }
 
     if (idList.length === 0) {
       if (settingsManager.lastSearch?.length > settingsManager.minimumSearchCharacters) {
-        uiManagerInstance.toast('No Results Found', 'serious', false);
+        uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
       }
       this.hideResults();
 
@@ -291,6 +290,10 @@ export class SearchManager {
     const satData = SearchManager.getSearchableObjects_(true) as (DetailedSatellite & MissileObject)[];
 
     searchList.forEach((searchStringIn) => {
+      keepTrackApi.analytics.track('search', {
+        search: searchStringIn,
+      });
+
       satData.every((sat) => {
         if (results.length >= settingsManager.searchLimit) {
           return false;
@@ -430,6 +433,10 @@ export class SearchManager {
       if (i >= satData.length) {
         i = lastFoundI;
       }
+
+      keepTrackApi.analytics.track('search', {
+        search: searchStringIn,
+      });
 
       for (; i < satData.length; i++) {
         if (results.length >= settingsManager.searchLimit) {

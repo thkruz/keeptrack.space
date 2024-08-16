@@ -32,7 +32,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
-import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
+import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { SatMath } from '@app/static/sat-math';
@@ -41,8 +41,12 @@ import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime, ZoomValue, spaceObjType2Str } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
+import { Astronomy } from '../astronomy/astronomy';
+import { Planetarium } from '../planetarium/planetarium';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
+import { LookAnglesPlugin } from './look-angles-plugin';
+import { SensorInfoPlugin } from './sensor-info-plugin';
 
 export class SensorManager {
   lastMultiSiteArray: TearrData[];
@@ -146,18 +150,16 @@ export class SensorManager {
       case 'BLEAFB':
       case 'CLRSFS':
       case 'THLSFB':
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.minAz + 120, sensor.minEl, sensor.maxRng], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz + 120, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 2);
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 2, 2);
         break;
       case 'RAFFYL':
-        // TODO: Find actual face directions
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 300, 60, sensor.minEl, sensor.maxRng], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 60, 180, sensor.minEl, sensor.maxRng], 'c');
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, 180, 300, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 3);
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 2, 3);
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 3, 3);
         break;
       case 'COBRADANE':
-        // NOTE: This will be a bit more complicated later
-        lineManagerInstance.create(LineTypes.SENSOR_SCAN_HORIZON, [sensorId, sensor.minAz, sensor.maxAz, sensor.minEl, sensor.maxRng], 'c');
+        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 1);
         break;
       default:
         errorManagerInstance.warn('Sensor not found');
@@ -265,18 +267,24 @@ export class SensorManager {
     keepTrackApi.getPlugin(SensorFov)?.disableFovView();
     keepTrackApi.getPlugin(SensorSurvFence)?.disableSurvView();
 
-    getEl('menu-sensor-info')?.classList.remove('bmenu-item-selected');
-    getEl('menu-fov-bubble')?.classList.remove('bmenu-item-selected');
-    getEl('menu-surveillance')?.classList.remove('bmenu-item-selected');
-    getEl('menu-lookangles')?.classList.remove('bmenu-item-selected');
-    getEl('menu-planetarium')?.classList.remove('bmenu-item-selected');
-    getEl('menu-astronomy')?.classList.remove('bmenu-item-selected');
-    getEl('menu-sensor-info')?.classList.add('bmenu-item-disabled');
-    getEl('menu-fov-bubble')?.classList.add('bmenu-item-disabled');
-    getEl('menu-surveillance')?.classList.add('bmenu-item-disabled');
-    getEl('menu-lookangles')?.classList.add('bmenu-item-disabled');
-    getEl('menu-planetarium')?.classList.add('bmenu-item-disabled');
-    getEl('menu-astronomy')?.classList.add('bmenu-item-disabled');
+    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToDisabled();
 
     setTimeout(() => {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -379,6 +387,13 @@ export class SensorManager {
   setSensor(selectedSensor: DetailedSensor | string | null, sensorId?: number): void {
     if (!selectedSensor) {
       selectedSensor = SensorManager.getSensorFromsensorId(sensorId);
+    }
+
+    if (selectedSensor instanceof DetailedSensor) {
+      keepTrackApi.analytics.track('select_sensor', {
+        sensor: selectedSensor.uiName,
+        objName: selectedSensor.objName,
+      });
     }
 
     PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
@@ -528,16 +543,16 @@ export class SensorManager {
   static updateSensorUiStyling(sensors: DetailedSensor[] | null) {
     try {
       if (sensors?.[0]?.objName) {
-        getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-planetarium', true)?.classList.remove('bmenu-item-disabled');
-        getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
+        keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
 
-        if (getEl('reset-sensor-button')) {
+        if (getEl('reset-sensor-button', true)) {
           (getEl('reset-sensor-button') as HTMLButtonElement).disabled = false;
         }
-      } else if (getEl('reset-sensor-button')) {
+      } else if (getEl('reset-sensor-button', true)) {
         (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
       }
     } catch (error) {
@@ -560,6 +575,10 @@ export class SensorManager {
 
   getAllActiveSensors(): DetailedSensor[] {
     return this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
+  }
+
+  getAllSensors(): DetailedSensor[] {
+    return Object.values(sensors);
   }
 
   public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {

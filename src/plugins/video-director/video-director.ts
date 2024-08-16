@@ -36,15 +36,11 @@ declare module '@app/interfaces' {
 }
 
 export class VideoDirectorPlugin extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Video Director';
+  protected dependencies_: string[];
   isRotateL = true;
   isRotateR = false;
   isRotateU = false;
   isRotateD = false;
-  constructor() {
-    super(VideoDirectorPlugin.PLUGIN_NAME);
-  }
-
   bottomIconElementName: string = 'video-director-icon';
   bottomIconImg = settingsPng;
   bottomIconLabel: string = 'Video Director';
@@ -168,7 +164,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('video-director-form').addEventListener('change', VideoDirectorPlugin.onFormChange);
         getEl('video-director-form').addEventListener('submit', VideoDirectorPlugin.onSubmit);

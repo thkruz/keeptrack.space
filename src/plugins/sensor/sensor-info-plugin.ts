@@ -1,13 +1,16 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { LineManager, LineTypes } from '@app/singletons/draw-manager/line-manager';
+import { LineManager } from '@app/singletons/draw-manager/line-manager';
+import { SensorToMoonLine } from '@app/singletons/draw-manager/line-manager/sensor-to-moon-line';
+import { SensorToSunLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sun-line';
 import radioTowerPng from '@public/img/icons/radio-tower.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
+  protected dependencies_: string[];
   isRequireSensorSelected: boolean = true;
 
   bottomIconCallback: () => void = () => {
@@ -89,13 +92,8 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     isDraggable: true,
   };
 
-  static PLUGIN_NAME = 'Sensor Info';
   private isSunLineVisible_ = false;
   private isMonnLineVisible_ = false;
-
-  constructor() {
-    super(SensorInfoPlugin.PLUGIN_NAME);
-  }
 
   helpTitle = 'Sensor Info';
   helpBody = keepTrackApi.html`
@@ -125,7 +123,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         this.addSensorToSunBtnListener_();
         this.addSensorToMoonBtnListener();
@@ -134,7 +132,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onLineAdded,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (lineManager: LineManager) => {
         this.checkIfLinesVisible_(lineManager);
       },
@@ -142,8 +140,8 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   }
 
   private checkIfLinesVisible_(lineManager: LineManager) {
-    this.isSunLineVisible_ = lineManager.drawLineList.some((line) => {
-      if (line.type === LineTypes.SENSOR_TO_SUN) {
+    this.isSunLineVisible_ = lineManager.lines.some((line) => {
+      if (line instanceof SensorToSunLine) {
         return true;
       }
 
@@ -158,8 +156,8 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       this.isSunLineVisible_ = false;
     }
 
-    this.isMonnLineVisible_ = lineManager.drawLineList.some((line) => {
-      if (line.type === LineTypes.SENSOR_TO_MOON) {
+    this.isMonnLineVisible_ = lineManager.lines.some((line) => {
+      if (line instanceof SensorToMoonLine) {
         return true;
       }
 
@@ -180,9 +178,9 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       if (this.isMonnLineVisible_) {
         const lineManager = keepTrackApi.getLineManager();
 
-        for (const line of lineManager.drawLineList) {
-          if (line.type === LineTypes.SENSOR_TO_MOON) {
-            lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
+        for (const line of lineManager.lines) {
+          if (line instanceof SensorToMoonLine) {
+            line.isGarbage = true;
             getEl('sensor-moon-btn').textContent = 'Add Line to Moon  \u25B6';
             this.isMonnLineVisible_ = false;
             keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
@@ -195,20 +193,12 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         const sensors = keepTrackApi.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
+          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
         }
-
-        // Draw Line to Sun from Sensor
-        const scene = keepTrackApi.getScene();
-        const now = keepTrackApi.getTimeManager().simulationTimeObj;
 
         keepTrackApi
           .getLineManager()
-          .create(
-            LineTypes.SENSOR_TO_MOON,
-            [sensors[0].eci(now).x, sensors[0].eci(now).y, sensors[0].eci(now).z, scene.moon.position[0], scene.moon.position[1], scene.moon.position[2]],
-            'w',
-          );
+          .createSensorToMoon(keepTrackApi.getSensorManager().currentSensors[0]);
 
         // Change Button Text
         getEl('sensor-moon-btn').textContent = 'Remove Line to Moon  \u25B6';
@@ -223,9 +213,9 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       if (this.isSunLineVisible_) {
         const lineManager = keepTrackApi.getLineManager();
 
-        for (const line of lineManager.drawLineList) {
-          if (line.type === LineTypes.SENSOR_TO_SUN) {
-            lineManager.drawLineList.splice(lineManager.drawLineList.indexOf(line), 1);
+        for (const line of lineManager.lines) {
+          if (line instanceof SensorToSunLine) {
+            line.isGarbage = true;
             getEl('sensor-sun-btn').textContent = 'Add Line to Sun  \u25B6';
             this.isSunLineVisible_ = false;
             keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
@@ -238,20 +228,12 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         const sensors = keepTrackApi.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', 'caution');
+          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
         }
-
-        // Draw Line to Sun from Sensor
-        const scene = keepTrackApi.getScene();
-        const now = keepTrackApi.getTimeManager().simulationTimeObj;
 
         keepTrackApi
           .getLineManager()
-          .create(
-            LineTypes.SENSOR_TO_SUN,
-            [sensors[0].eci(now).x, sensors[0].eci(now).y, sensors[0].eci(now).z, scene.sun.position[0], scene.sun.position[1], scene.sun.position[2]],
-            'o',
-          );
+          .createSensorToSun(keepTrackApi.getSensorManager().currentSensors[0]);
 
         // Change Button Text
         getEl('sensor-sun-btn').textContent = 'Remove Line to Sun  \u25B6';

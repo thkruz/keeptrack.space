@@ -271,7 +271,7 @@ export class CatalogManager {
   getSat(satId: number, type: GetSatType = GetSatType.DEFAULT): DetailedSatellite | null {
     const sat = this.getObject(satId, type);
 
-    if (!sat.isSatellite()) {
+    if (!sat?.isSatellite()) {
       return null;
     }
 

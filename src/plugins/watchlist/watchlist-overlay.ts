@@ -1,25 +1,24 @@
-import { GetSatType, KeepTrackApiEvents, SatPassTimes } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, SatPassTimes, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
 import { showLoading } from '@app/lib/showLoading';
-import { LineTypes, lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
-import { SatMath } from '@app/static/sat-math';
+import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
+import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { SensorMath } from '@app/static/sensor-math';
 import infoPng from '@public/img/icons/info.png';
-import { DetailedSatellite, MILLISECONDS_PER_DAY, Sgp4 } from 'ootk';
+import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Watchlist Overlay';
-  dependencies = [WatchlistPlugin.PLUGIN_NAME];
+  dependencies_ = [WatchlistPlugin.name];
   private watchlistPlugin_: WatchlistPlugin;
 
   constructor() {
-    super(WatchlistOverlay.PLUGIN_NAME);
+    super();
     this.watchlistPlugin_ = keepTrackApi.getPlugin(WatchlistPlugin);
   }
 
@@ -35,7 +34,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
 
     if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
       shake(getEl('menu-info-overlay'));
 
       return;
@@ -46,7 +45,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
 
     if (this.watchlistPlugin_.watchlistList.length === 0 && !this.watchlistPlugin_.isWatchlistChanged) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
       shake(getEl('menu-info-overlay'));
       this.nextPassArray = [];
 
@@ -108,12 +107,12 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.onWatchlistUpdated_.bind(this),
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: WatchlistOverlay.uiManagerFinal.bind(this),
     });
   }
@@ -129,48 +128,35 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       return;
     }
     this.updateFovLines_();
-
-    for (const element of this.watchlistPlugin_.watchlistInViewList) {
-      if (element === true) {
-        return;
-      }
-    }
   }
 
-  private updateFovLinesMulti_(sat: DetailedSatellite, i: number) {
-    keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[i]);
+  private updateFovLinesMulti_(sat: DetailedSatellite) {
+    const idx = this.watchlistPlugin_.watchlistList.findIndex((el) => el.id === sat.id);
+
+    keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
     for (const sensor of keepTrackApi.getSensorManager().currentSensors) {
-      const satrec = Sgp4.createSatrec(sat.tle1, sat.tle2); // perform and store sat init calcs
-      const rae = SatMath.getRae(keepTrackApi.getTimeManager().simulationTimeObj, satrec, sensor);
-      const isInFov = SatMath.checkIsInView(sensor, rae);
-
-      if (!isInFov) {
-        continue;
-      }
-      lineManagerInstance.create(LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV, [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(sensor.name)], 'g');
+      lineManagerInstance.createSensorToSatFovOnly(sensor, sat, LineColors.GREEN);
     }
   }
 
-  private updateFovLinesSingle_(sat: DetailedSatellite, i: number) {
+  private updateFovLinesSingle_(sat: DetailedSatellite) {
     const inView = keepTrackApi.getDotsManager().inViewData[sat.id];
     const uiManagerInstance = keepTrackApi.getUiManager();
+    const idx = this.watchlistPlugin_.watchlistList.findIndex((el) => el.id === sat.id);
+    const inViewListVal = this.watchlistPlugin_.watchlistList[idx].inView;
 
-    if (inView === 1 && this.watchlistPlugin_.watchlistInViewList[i] === false) {
+    if (inView === 1 && inViewListVal === false) {
       // Is inview and wasn't previously
-      this.watchlistPlugin_.watchlistInViewList[i] = true;
-      uiManagerInstance.toast(`Satellite ${sat.sccNum} is In Field of View!`, 'normal');
-      lineManagerInstance.create(
-        LineTypes.SELECTED_SENSOR_TO_SAT_IF_IN_FOV,
-        [sat.id, keepTrackApi.getCatalogManager().getSensorFromSensorName(keepTrackApi.getSensorManager().currentSensors[0].name)],
-        'g',
-      );
-      keepTrackApi.getOrbitManager().addInViewOrbit(this.watchlistPlugin_.watchlistList[i]);
+      this.watchlistPlugin_.watchlistList[idx].inView = true;
+      uiManagerInstance.toast(`Satellite ${sat.sccNum} is In Field of View!`, ToastMsgType.normal);
+      lineManagerInstance.createSensorToSatFovOnly(keepTrackApi.getSensorManager().currentSensors[0], sat, LineColors.GREEN);
+      keepTrackApi.getOrbitManager().addInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
     }
-    if (inView === 0 && this.watchlistPlugin_.watchlistInViewList[i] === true) {
+    if (inView === 0 && inViewListVal === true) {
       // Isn't inview and was previously
-      this.watchlistPlugin_.watchlistInViewList[i] = false;
-      uiManagerInstance.toast(`Satellite ${sat.sccNum} left Field of View!`, 'standby');
-      keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[i]);
+      this.watchlistPlugin_.watchlistList[idx].inView = false;
+      uiManagerInstance.toast(`Satellite ${sat.sccNum} left Field of View!`, ToastMsgType.standby);
+      keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
     }
   }
 
@@ -178,13 +164,13 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-    for (let i = 0; i < this.watchlistPlugin_.watchlistList.length; i++) {
-      const sat = catalogManagerInstance.getSat(this.watchlistPlugin_.watchlistList[i]);
+    for (const obj of this.watchlistPlugin_.watchlistList) {
+      const sat = catalogManagerInstance.getSat(obj.id);
 
       if (sensorManagerInstance.currentSensors.length > 1) {
-        this.updateFovLinesMulti_(sat, i);
+        this.updateFovLinesMulti_(sat);
       } else {
-        this.updateFovLinesSingle_(sat, i);
+        this.updateFovLinesSingle_(sat);
       }
     }
   }
@@ -213,8 +199,8 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
         const satArray: DetailedSatellite[] = [];
 
-        for (const id of this.watchlistPlugin_.watchlistList) {
-          satArray.push(catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY));
+        for (const obj of this.watchlistPlugin_.watchlistList) {
+          satArray.push(catalogManagerInstance.getSat(obj.id, GetSatType.EXTRA_ONLY));
         }
 
         this.nextPassArray = SensorMath.nextpassList(satArray, sensorManagerInstance.currentSensors, 1, this.OVERLAY_CALC_LENGTH_IN_DAYS);

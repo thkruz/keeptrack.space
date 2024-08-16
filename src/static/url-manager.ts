@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { DetailedSatellite } from 'ootk';
@@ -106,7 +106,7 @@ export abstract class UrlManager {
         if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId).active) {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {
-          uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, 'caution', true);
+          uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
         }
       },
     });
@@ -124,7 +124,7 @@ export abstract class UrlManager {
         if (urlSatId !== null) {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {
-          uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, 'caution', true);
+          uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
         }
       },
     });
@@ -139,7 +139,7 @@ export abstract class UrlManager {
     (<HTMLButtonElement>getEl('missile')).click();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    uiManagerInstance.toast('Missile launched!', 'normal', false);
+    uiManagerInstance.toast('Missile launched!', ToastMsgType.normal, false);
   }
 
   private static handleDateParam_(val: string) {
@@ -147,7 +147,7 @@ export abstract class UrlManager {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     if (isNaN(parseInt(val))) {
-      uiManagerInstance.toast(`Date value of "${val}" is not a proper unix timestamp!`, 'caution', true);
+      uiManagerInstance.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
 
       return;
     }
@@ -160,7 +160,7 @@ export abstract class UrlManager {
     let rate = parseFloat(val);
 
     if (isNaN(rate)) {
-      uiManagerInstance.toast(`Propagation rate of "${rate}" is not a valid float!`, 'caution', true);
+      uiManagerInstance.toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
@@ -185,7 +185,7 @@ export abstract class UrlManager {
 
         uiManagerInstance.doSearch(decodedVal);
         if (settingsManager.lastSearchResults.length === 0) {
-          uiManagerInstance.toast(`Search for "${val}" found nothing!`, 'caution', true);
+          uiManagerInstance.toast(`Search for "${val}" found nothing!`, ToastMsgType.caution, true);
           uiManagerInstance.searchManager.hideResults();
         }
       }

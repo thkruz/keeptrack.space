@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
@@ -29,7 +30,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
-  dependencies = [SelectSatManager.name];
+  dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
@@ -56,7 +57,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast('Select a Satellite First!', 'caution');
+      uiManagerInstance.toast('Select a Satellite First!', ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
     }
   };

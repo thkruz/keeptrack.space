@@ -12,8 +12,7 @@ import { SoundNames } from '../sounds/SoundNames';
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
 export class PolarPlotPlugin extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Polar Plot';
-  dependencies = [SelectSatManager.PLUGIN_NAME];
+  dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
   passStartTime_: Date;
   passStopTime_: Date;
@@ -21,7 +20,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private plotDuration_ = 3;
 
   constructor() {
-    super(PolarPlotPlugin.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -69,7 +68,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('polar-plot-save').addEventListener('click', () => {
           const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
@@ -89,7 +88,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         if (this.isMenuButtonActive) {
           this.updatePlot_();
@@ -99,7 +98,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');

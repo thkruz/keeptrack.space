@@ -35,13 +35,13 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
 
 export class Astronomy extends KeepTrackPlugin {
+  protected dependencies_: string[];
   bottomIconElementName = 'menu-astronomy';
   bottomIconLabel = 'Astronomy View';
   bottomIconImg = constellationPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   bottomIconCallback = (): void => {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const drawManagerInstance = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
@@ -51,13 +51,6 @@ export class Astronomy extends KeepTrackPlugin {
         return;
       }
 
-      if (catalogManagerInstance.isStarManagerLoaded) {
-        /*
-         * TODO: This takes way too long trying to find the star's
-         * satellite id from its name. The ids should be predetermined.
-         */
-        keepTrackApi.getStarManager().drawAllConstellations();
-      }
       orbitManagerInstance.clearInViewOrbit();
       keepTrackApi.getMainCamera().cameraType = CameraType.ASTRONOMY; // Activate Astronomy Camera Mode
       // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
@@ -72,25 +65,16 @@ export class Astronomy extends KeepTrackPlugin {
       uiManagerInstance.hideSideMenus();
       keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       LegendManager.change('default');
-      if (catalogManagerInstance.isStarManagerLoaded) {
-        keepTrackApi.getStarManager().clearConstellations();
-      }
       // getEl('fov-text').innerHTML = ('');
       getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
     }
   };
 
-  static PLUGIN_NAME = 'Astronomy';
-
-  constructor() {
-    super(Astronomy.PLUGIN_NAME);
-  }
-
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sensor: Sensor | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');

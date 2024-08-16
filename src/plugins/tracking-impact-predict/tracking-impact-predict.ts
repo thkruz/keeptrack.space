@@ -2,7 +2,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -80,13 +80,13 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.uiManagerFinal_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added
@@ -147,7 +147,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[row].NORAD_CAT_ID));
 
     if (!sat) {
-      keepTrackApi.getUiManager().toast('Satellite appears to have decayed!', 'caution');
+      keepTrackApi.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);
 
       return;
     }

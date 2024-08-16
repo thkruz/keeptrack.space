@@ -7,6 +7,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  * The main website now covers all of this functionality.
  */
 export class AboutMenu extends KeepTrackPlugin {
+  protected dependencies_: string[];
   bottomIconElementName = 'menu-about-icon';
   bottomIconImg = aboutPng;
   bottomIconLabel = 'About Menu';
@@ -94,12 +95,6 @@ export class AboutMenu extends KeepTrackPlugin {
   Q: Why do the dots jitter sometimes?<br>
   A: The dots jitter because the orbit is being propagated once a second and interpolated between updates. If your PC becomes busy or the time changes the propagation thread will become out of sync for a moment from the main thread.<br>
   `;
-
-  constructor() {
-    const PLUGIN_NAME = 'About Menu';
-
-    super(PLUGIN_NAME);
-  }
 }
 
 /**

@@ -11,6 +11,7 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatConstellations extends KeepTrackPlugin {
+  protected dependencies_: string[] = [SelectSatManager.name];
   bottomIconImg = satChngPng;
   bottomIconElementName: string = 'menu-constellations';
   bottomIconLabel: string = 'Constellations';
@@ -47,11 +48,6 @@ export class SatConstellations extends KeepTrackPlugin {
     isDraggable: true,
   };
 
-  static PLUGIN_NAME = 'Sat Constellations';
-  constructor() {
-    super(SatConstellations.PLUGIN_NAME);
-  }
-
   addHtml(): void {
     super.addHtml();
 
@@ -76,6 +72,11 @@ export class SatConstellations extends KeepTrackPlugin {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
 
     if (typeof groupManagerInstance === 'undefined') {
+      return;
+    }
+
+    // Catch for things like the divider
+    if (!groupName) {
       return;
     }
 

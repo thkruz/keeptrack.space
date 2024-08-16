@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
@@ -18,12 +18,11 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class NewLaunch extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'New Launch';
-  dependencies = [SelectSatManager.PLUGIN_NAME];
+  dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(NewLaunch.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
@@ -182,7 +181,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     /*
      * if (sat.inclination < launchLat) {
-     *   uiManagerInstance.toast(`Satellite Inclination Lower than Launch Latitude!`, 'critical');
+     *   uiManagerInstance.toast(`Satellite Inclination Lower than Launch Latitude!`, ToastMsgType.critical);
      *   return;
      * }
      * Set time to 0000z for relative time.
@@ -210,11 +209,11 @@ export class NewLaunch extends KeepTrackPlugin {
 
     if (tle1 === 'Error' || tle1.length !== 69 || tle2.length !== 69) {
       if (tle1 === 'Error') {
-        uiManagerInstance.toast(`Failed to Create TLE: ${tle2}`, 'critical');
+        uiManagerInstance.toast(`Failed to Create TLE: ${tle2}`, ToastMsgType.critical);
       } else if (tle1.length !== 69) {
-        uiManagerInstance.toast(`Invalid TLE1 Created: length is not 69 - ${tle1}`, 'critical');
+        uiManagerInstance.toast(`Invalid TLE1 Created: length is not 69 - ${tle1}`, ToastMsgType.critical);
       } else if (tle2.length !== 69) {
-        uiManagerInstance.toast(`Invalid TLE2 Created: length is not 69 - ${tle2}`, 'critical');
+        uiManagerInstance.toast(`Invalid TLE2 Created: length is not 69 - ${tle2}`, ToastMsgType.critical);
       }
 
       // We have to change the time for the TLE creation, but it failed, so revert it.
@@ -225,7 +224,7 @@ export class NewLaunch extends KeepTrackPlugin {
       return;
     }
 
-    uiManagerInstance.toast('Time is now relative to launch time.', 'standby');
+    uiManagerInstance.toast('Time is now relative to launch time.', ToastMsgType.standby);
     keepTrackApi.getSoundManager()?.play(SoundNames.LIFT_OFF);
 
     // Prevent caching of old TLEs
@@ -254,7 +253,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
       orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
     } else {
-      uiManagerInstance.toast('Failed Altitude Test - Try a Different Satellite!', 'critical');
+      uiManagerInstance.toast('Failed Altitude Test - Try a Different Satellite!', ToastMsgType.critical);
     }
 
     waitForCruncher({
@@ -263,14 +262,14 @@ export class NewLaunch extends KeepTrackPlugin {
         this.isDoingCalculations = false;
         hideLoading();
 
-        uiManagerInstance.toast('Launch Nominal Created!', 'standby');
+        uiManagerInstance.toast('Launch Nominal Created!', ToastMsgType.standby);
         uiManagerInstance.searchManager.doSearch(sat.sccNum);
       },
       validationFunc: (data: any) => typeof data.satPos !== 'undefined',
       error: () => {
         this.isDoingCalculations = false;
         hideLoading();
-        uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', 'critical');
+        uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', ToastMsgType.critical);
       },
     });
   };
@@ -279,7 +278,7 @@ export class NewLaunch extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl(`${this.sideMenuElementName}-form`).addEventListener('change', () => {
           const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
@@ -294,7 +293,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           const sat = obj as DetailedSatellite;

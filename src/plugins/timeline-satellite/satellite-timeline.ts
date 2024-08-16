@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -22,7 +22,7 @@ interface SatellitePasses {
 }
 
 export class SatelliteTimeline extends KeepTrackPlugin {
-  dependencies = [SelectSatManager.PLUGIN_NAME];
+  dependencies_ = [SelectSatManager.name];
   private canvas_: HTMLCanvasElement;
   private ctx_: CanvasRenderingContext2D;
   private canvasStatic_: HTMLCanvasElement;
@@ -32,10 +32,6 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   private lengthOfBadPass_ = 120 as Seconds;
   private lengthOfAvgPass_ = 240 as Seconds;
   private angleCalculationInterval_ = <Seconds>30;
-
-  constructor() {
-    super(SatelliteTimeline.name);
-  }
 
   isRequireSensorSelected = true;
   isIconDisabled = true;
@@ -50,7 +46,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     }
 
     if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', 'caution');
+      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
 
       return;
@@ -128,7 +124,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
@@ -168,8 +164,12 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sat: BaseObject) => {
+        if (!this.isMenuButtonActive) {
+          return;
+        }
+
         if (sat) {
           this.ctxStatic_.reset();
           this.updateTimeline();
@@ -185,13 +185,13 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.onWatchlistUpdated_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.resize,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: this.resizeCanvas_.bind(this),
     });
   }

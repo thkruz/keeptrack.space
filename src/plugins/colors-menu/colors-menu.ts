@@ -10,7 +10,7 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Color Menu';
+  protected dependencies_: string[];
   bottomIconImg = colorsPng;
   bottomIconElementName: string = 'menu-color-scheme';
   bottomIconLabel: string = 'Color Schemes';
@@ -105,15 +105,11 @@ The various themes can change the colors based on the objects' orbits, objects' 
     isDraggable: true,
   };
 
-  constructor() {
-    super(ColorMenu.PLUGIN_NAME);
-  }
-
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('colors-menu')
           .querySelectorAll('li')

@@ -19,7 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, SensorGeolocation } from '@app/interfaces';
+import { KeepTrackApiEvents, SensorGeolocation, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-scheme-manager';
@@ -1432,10 +1432,10 @@ export class SettingsManager {
                       if (id >= 0) {
                         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
                       } else {
-                        keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, 'error');
+                        keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
                       }
                     } else {
-                      keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, 'error');
+                      keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
                     }
                   }
                 }, 2000);
@@ -1455,7 +1455,7 @@ export class SettingsManager {
             if (parseInt(val) > 0) {
               this.searchLimit = parseInt(val);
             } else {
-              keepTrackApi.getUiManager().toast(`Invalid search limit: ${val}`, 'error');
+              keepTrackApi.getUiManager().toast(`Invalid search limit: ${val}`, ToastMsgType.error);
             }
             break;
           case 'console':

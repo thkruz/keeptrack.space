@@ -9,12 +9,11 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Inc2AltPlots extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Time vs Lon Plots';
-  dependencies: string[] = [SelectSatManager.PLUGIN_NAME];
+  dependencies_: string[] = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(Inc2AltPlots.PLUGIN_NAME);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 

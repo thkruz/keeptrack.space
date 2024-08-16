@@ -11,10 +11,16 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import customPng from '@public/img/icons/custom.png';
 import removePng from '@public/img/icons/remove.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
+import { Astronomy } from '../astronomy/astronomy';
 import { KeepTrackPlugin, SideMenuSettingsOptions, clickDragOptions } from '../KeepTrackPlugin';
+import { Planetarium } from '../planetarium/planetarium';
+import { SensorFov } from '../sensor-fov/sensor-fov';
+import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/SoundNames';
+import { SensorInfoPlugin } from './sensor-info-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
+  protected dependencies_: string[];
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
       const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -241,7 +247,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         CustomSensorPlugin.httpsCheck_();
         CustomSensorPlugin.addCustomSensorFormSubmitListener();
@@ -292,11 +298,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   }
 
   private static processCustomSensorSubmit_(isReplaceSensor = false) {
-    getEl('menu-sensor-info')?.classList.remove('bmenu-item-disabled');
-    getEl('menu-fov-bubble')?.classList.remove('bmenu-item-disabled');
-    getEl('menu-surveillance')?.classList.remove('bmenu-item-disabled');
-    getEl('menu-planetarium')?.classList.remove('bmenu-item-disabled');
-    getEl('menu-astronomy')?.classList.remove('bmenu-item-disabled');
+    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+
     (<HTMLInputElement>getEl('sensor-type')).value = (<HTMLInputElement>getEl('cs-type')).value.replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
     getEl('sensor-info-title').innerHTML = 'Custom Sensor';
     getEl('sensor-country').innerHTML = 'Custom Sensor';

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
@@ -64,6 +64,8 @@ export class Scene {
     this.moon.update(simulationTime);
     this.skybox.update();
 
+    keepTrackApi.getLineManager().update();
+
     this.sensorFovFactory.updateAll(gmst);
     this.coneFactory.updateAll();
   }
@@ -95,7 +97,7 @@ export class Scene {
         settingsManager.isDrawAurora ||
         settingsManager.isDrawMilkyWay) &&
       !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
-      keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling some visual effects in settings.', 'caution');
+      keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling some visual effects in settings.', ToastMsgType.caution);
       settingsManager.isDisableMoon = true;
       settingsManager.isDrawSun = false;
       settingsManager.isDrawAurora = false;
@@ -169,7 +171,7 @@ export class Scene {
 
     orbitManagerInstance.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
 
-    keepTrackApi.getLineManager().draw(renderer, dotsManagerInstance.inViewData, camera.camMatrix, null);
+    keepTrackApi.getLineManager().draw(null);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {

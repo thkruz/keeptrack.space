@@ -13,11 +13,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class CountriesMenu extends KeepTrackPlugin {
-  static PLUGIN_NAME = 'Countries Menu';
-  constructor() {
-    super(CountriesMenu.PLUGIN_NAME);
-  }
-
+  protected dependencies_: string[];
   bottomIconElementName = 'menu-countries-icon';
   bottomIconImg = flagPng;
   bottomIconLabel = 'Countries';
@@ -83,7 +79,7 @@ export class CountriesMenu extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: () => {
         getEl('country-menu')
           .querySelectorAll('li')

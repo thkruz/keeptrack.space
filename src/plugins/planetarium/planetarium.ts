@@ -35,12 +35,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
 
 export class Planetarium extends KeepTrackPlugin {
-  static readonly PLUGIN_NAME = 'Planetarium';
-
-  constructor() {
-    super(Planetarium.PLUGIN_NAME);
-  }
-
+  protected dependencies_: string[];
   bottomIconElementName = 'menu-planetarium';
   bottomIconLabel = 'Planetarium View';
   bottomIconImg = planetariumPng;
@@ -78,11 +73,6 @@ export class Planetarium extends KeepTrackPlugin {
        * getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
        */
       LegendManager.change('planetarium');
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-      if (catalogManagerInstance.isStarManagerLoaded) {
-        keepTrackApi.getStarManager().clearConstellations();
-      }
 
       keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
     } else {
@@ -106,7 +96,7 @@ export class Planetarium extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.PLUGIN_NAME,
+      cbName: this.constructor.name,
       cb: (sensor: Sensor | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');

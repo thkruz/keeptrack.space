@@ -261,7 +261,7 @@ export const uiManagerFinal = (plugins: any): void => {
   }
 
   // Only turn on analytics if on keeptrack.space ()
-  if (window.location.hostname === 'localhost' || window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
+  if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
     keepTrackApi.analytics = createAnalytics({
       app: 'KeepTrack',
       version: 100,

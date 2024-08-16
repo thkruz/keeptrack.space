@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.0.1
+
+>  
+
+- fix: :bug: add conistent hover color
+- ci: :green_heart: prevent overwriting production files when deploying
+- fix: :bug: fix sorting of the tracking and impact prediction plugin
+- feat: :sparkles: add new TIP message plugin
+- refactor: :recycle: refactor lineManager into separate classes
+- fix: :bug: fix dependency checking logic for plugins
+- docs: :memo: update readme and release notes
+- refactor: :recycle: refactor all toast types to an enum
+- chore: :card_file_box: update data
+- fix: :technologist: fix linter and formatter conflict
+- feat: :monocle_face: add basic telemtry to determine which features should be prioritized
+- fix: :bug: fix ui issues with missile objects
+- chore: :goal_net: catch and log invalid velocity
+- fix: :bug: convert legacy missile sims into new missileObject class
+- fix: :bug: fix missilesInUse count
+- fix: :bug: fix missiles causing search errors
+- fix: :bug: fix camera trying to go inside the earth
+- docs: :memo: add a citation file
+- fix: :zap: fix lag when selecting satellites
+- build: :arrow_up: bump dependencies
+- ci: :construction_worker: allow npm audit to fail but open an issue
+- docs: :memo: fix readme links
+- fix: :bug: fix bug with depth test when milkyway is disabled
+- fix: :bug: dont draw FOV lines to missiles
+- build: :arrow_up: upgrade materializecss
+- fix: :bug: fix bug where search results were shown even if no results
+- fix: :bug: fix duplicate listeners on search box
+
 #### v10.0.0
 
 >  

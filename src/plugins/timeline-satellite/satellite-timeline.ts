@@ -170,6 +170,10 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: BaseObject) => {
+        if (!this.isMenuButtonActive) {
+          return;
+        }
+
         if (sat) {
           this.ctxStatic_.reset();
           this.updateTimeline();

@@ -152,6 +152,9 @@ export class StereoMap extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.PLUGIN_NAME,
       cb: (sat: BaseObject) => {
+        if (!this.isMenuButtonActive) {
+          return;
+        }
         if (sat) {
           this.updateMap();
         }
@@ -181,7 +184,7 @@ export class StereoMap extends KeepTrackPlugin {
     });
   }
 
-  async updateMap(): Promise<void> {
+  updateMap(): void {
     try {
       if (this.selectSatManager_.selectedSat === -1) {
         return;

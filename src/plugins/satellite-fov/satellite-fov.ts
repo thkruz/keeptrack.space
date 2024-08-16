@@ -31,10 +31,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SatelliteFov extends KeepTrackPlugin {
-  constructor() {
-    super(SatelliteFov.name);
-  }
-
+  protected dependencies_ = [SelectSatManager.name];
   bottomIconElementName = 'menu-sat-fov';
   bottomIconLabel = 'Satellite FOV';
   bottomIconImg = sensorOccupiedPng;

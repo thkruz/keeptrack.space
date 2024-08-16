@@ -227,10 +227,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     isDraggable: true,
   };
 
-  constructor() {
-    super(CustomSensorPlugin.name);
-  }
-
   helpTitle = 'Custom Sensor Menu';
   helpBody = keepTrackApi.html`
   This allows you to create a custom sensor for use in calculations and other menu's functions.

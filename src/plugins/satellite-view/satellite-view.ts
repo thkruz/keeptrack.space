@@ -34,7 +34,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   private selectSatManager_: SelectSatManager;
 
   constructor() {
-    super(SatelliteViewPlugin.name);
+    super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 

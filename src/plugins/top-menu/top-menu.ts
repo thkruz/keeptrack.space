@@ -14,9 +14,6 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 export class TopMenu extends KeepTrackPlugin {
   protected dependencies_: string[];
   static readonly SEARCH_RESULT_ID = 'search-results';
-  constructor() {
-    super(TopMenu.name);
-  }
 
   addHtml = (): void => {
     super.addHtml();

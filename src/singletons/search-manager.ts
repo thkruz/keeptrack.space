@@ -55,7 +55,6 @@ export class SearchManager {
       cbName: 'Search Manager',
       cb: this.addListeners_.bind(this),
     });
-    this.addListeners_();
   }
 
   private addListeners_() {

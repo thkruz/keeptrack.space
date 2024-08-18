@@ -203,17 +203,41 @@ export class CatalogLoader {
       }: { extraSats: Promise<ExtraSat[]>; asciiCatalog: Promise<AsciiTleSat[] | void>; jsCatalog: Promise<JsSat[]>; externalCatalog: Promise<AsciiTleSat[] | void> } =
         CatalogLoader.getAdditionalCatalogs_(settingsManager);
 
-      if (settingsManager.isUseDebrisCatalog) {
+      if (settingsManager.externalTLEsOnly) {
+        // Load our database for the extra information - the satellites will be filtered out
+        await fetch(`${settingsManager.installDirectory}tle/TLE2.json`)
+          .then((response) => response.json())
+          .then((data) => CatalogLoader.parse({
+            keepTrackTle: data,
+            externalCatalog,
+          }))
+          .catch((error) => {
+            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+          });
+      } else if (settingsManager.isUseDebrisCatalog) {
+        // Load the debris catalog
         await fetch(`${settingsManager.installDirectory}tle/TLEdebris.json`)
           .then((response) => response.json())
-          .then((data) => CatalogLoader.parse(data, extraSats, { asciiCatalog }, jsCatalog))
+          .then((data) => CatalogLoader.parse({
+            keepTrackTle: data,
+            keepTrackExtra: extraSats,
+            keepTrackAscii: asciiCatalog,
+            vimpelCatalog: jsCatalog,
+          }))
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
       } else {
+        // Load the primary catalog
         await fetch(`${settingsManager.installDirectory}tle/TLE2.json`)
           .then((response) => response.json())
-          .then((data) => CatalogLoader.parse(data, extraSats, { externalCatalog, asciiCatalog }, jsCatalog))
+          .then((data) => CatalogLoader.parse({
+            keepTrackTle: data,
+            keepTrackExtra: extraSats,
+            keepTrackAscii: asciiCatalog,
+            externalCatalog,
+            vimpelCatalog: jsCatalog,
+          }))
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
@@ -232,16 +256,20 @@ export class CatalogLoader {
    *    - externalCatalog: (optional) A Promise that resolves to an array of AsciiTleSat objects or void.
    * @param jsCatalog - A Promise that resolves to an array of JsSat objects.
    */
-  static async parse(
-    resp: KeepTrackTLEFile[],
-    extraSats: Promise<ExtraSat[]>,
-    altCatalog: {
-      asciiCatalog: Promise<AsciiTleSat[] | void>;
-      externalCatalog?: Promise<void> | Promise<AsciiTleSat[] | void>;
-    },
-    jsCatalog: Promise<JsSat[]>,
-  ) {
-    await Promise.all([extraSats, altCatalog.asciiCatalog, altCatalog.externalCatalog, jsCatalog]).then(([extraSats, asciiCatalog, externalCatalog, jsCatalog]) => {
+  static async parse({
+    keepTrackTle: resp = [],
+    keepTrackExtra: extraSats = Promise.resolve([]),
+    keepTrackAscii: asciiCatalog = Promise.resolve([]),
+    externalCatalog = Promise.resolve([]),
+    vimpelCatalog: jsCatalog = Promise.resolve([]),
+  }: {
+    keepTrackTle?: KeepTrackTLEFile[];
+    keepTrackExtra?: Promise<ExtraSat[]>;
+    keepTrackAscii?: Promise<AsciiTleSat[] | void>;
+    externalCatalog?: Promise<AsciiTleSat[] | void>;
+    vimpelCatalog?: Promise<JsSat[]>;
+  }): Promise<void> {
+    await Promise.all([extraSats, asciiCatalog, externalCatalog, jsCatalog]).then(([extraSats, asciiCatalog, externalCatalog, jsCatalog]) => {
       asciiCatalog = externalCatalog || asciiCatalog;
       const limitSatsArray = !settingsManager.limitSats ? CatalogLoader.setupGetVariables() : settingsManager.limitSats.split(',');
 
@@ -464,7 +492,7 @@ export class CatalogLoader {
         if (resp.ok) {
           const externalCatalog: AsciiTleSat[] = [];
 
-          resp.text().then((data) => {
+          return resp.text().then((data) => {
             const content = data.split('\n');
             // Check if last line is empty and remove it if so
 
@@ -482,11 +510,12 @@ export class CatalogLoader {
 
             return externalCatalog;
           });
-        } else {
-          errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.externalTLEs}`);
-          errorManagerInstance.info('Reverting to internal TLEs');
-          settingsManager.externalTLEs = '';
         }
+        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.externalTLEs}`);
+        errorManagerInstance.info('Reverting to internal TLEs');
+        settingsManager.externalTLEs = '';
+
+        return [];
       })
       .catch(() => {
         errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.externalTLEs}`);
@@ -760,6 +789,8 @@ export class CatalogLoader {
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
     tempSatData[i].isExternal = true;
     tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
+
+    tempSatData[i].altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
   }
 
   private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempObjData: BaseObject[], catalogManagerInstance: CatalogManager) {
@@ -802,6 +833,7 @@ export class CatalogLoader {
     });
 
     satellite.id = tempObjData.length;
+    satellite.altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
 
     tempObjData.push(satellite);
   }
@@ -828,7 +860,17 @@ export class CatalogLoader {
     }
 
     if (settingsManager.externalTLEs) {
-      tempSatData = tempSatData.filter((sat) => sat.isExternal);
+      if (settingsManager.externalTLEsOnly) {
+        tempSatData = tempSatData.filter((sat) => {
+          if (sat.altId === 'EXTERNAL_SAT') {
+            console.log(sat);
+
+            return true;
+          }
+
+          return false;
+        });
+      }
       catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
       catalogManagerInstance.cosparIndex = <{ [key: string]: number }>{};
 

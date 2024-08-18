@@ -999,6 +999,12 @@ export class SettingsManager {
    * 0 = earth and 1 = max distance from earth
    */
   initZoomLevel: number;
+  /**
+   * A boolean flag indicating whether only external TLEs (Two-Line Elements) should be used.
+   * When set to `true`, the system will exclusively utilize external TLE data.
+   * When set to `false`, the system may use internal or other sources of TLE data.
+   */
+  externalTLEsOnly = false;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
@@ -1409,6 +1415,9 @@ export class SettingsManager {
               default:
                 break;
             }
+            break;
+          case 'external-only':
+            this.externalTLEsOnly = true;
             break;
           case 'tle':
             // Decode from UTF-8

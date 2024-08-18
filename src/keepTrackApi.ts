@@ -134,7 +134,14 @@ type rmbMenuItem = {
 };
 
 export class KeepTrackApi {
-  analytics: AnalyticsInstance;
+  analytics: AnalyticsInstance = {
+    page: () => {
+      // Do nothing
+    },
+    track: () => {
+      // Do nothing
+    },
+  } as unknown as AnalyticsInstance;
   /**
    * Unregisters all events in the KeepTrackApi. Used for testing.
    */

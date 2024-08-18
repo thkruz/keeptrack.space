@@ -621,9 +621,13 @@ export class SatInfoBox extends KeepTrackPlugin {
     const confidenceDom = getEl('sat-confidence');
 
     if (confidenceDom) {
+      // We encode confidence score in the 65th character in the TLE line 1
       const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
 
-      if (confidenceScore >= 7) {
+      if (settingsManager.externalTLEsOnly) {
+        text = 'External';
+        color = 'gray';
+      } else if (confidenceScore >= 7) {
         text = `High (${confidenceScore})`;
         color = 'green';
       } else if (confidenceScore >= 4) {

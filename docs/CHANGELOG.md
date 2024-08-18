@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.0.2
+
+>  
+
+- chore: :card_file_box: update databases
+- fix: :bug: fix external TLEs not loading
+- docs: :memo: update changelog
+- fix: :ambulance: emergency fix
+- fix: fix analytics on localhost
+
 #### v10.0.1
 
 >  

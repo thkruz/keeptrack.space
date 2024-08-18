@@ -189,10 +189,24 @@ export class HoverManager {
       this.satHoverBoxNode3.textContent = country;
     } else {
       const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
-      // eslint-disable-next-line no-nested-ternary
-      const color = confidenceScore >= 7 ? 'green' : confidenceScore >= 4 ? 'orange' : 'red';
+      let color: string;
 
-      this.satHoverBoxNode1.innerHTML = keepTrackApi.html`<span>${sat.name}</span><span style='color:${color};'> (${confidenceScore.toString()})</span>`;
+      if (confidenceScore >= 7) {
+        color = 'green';
+      } else if (confidenceScore >= 4) {
+        color = 'orange';
+      } else {
+        color = 'red';
+      }
+
+      let confidenceScoreString = confidenceScore.toString();
+
+      if (settingsManager.externalTLEsOnly) {
+        confidenceScoreString = 'External';
+        color = 'gray';
+      }
+
+      this.satHoverBoxNode1.innerHTML = keepTrackApi.html`<span>${sat.name}</span><span style='color:${color};'> (${confidenceScoreString.toString()})</span>`;
       if (sat.sccNum) {
         this.satHoverBoxNode2.textContent = `NORAD: ${sat.sccNum}`;
       } else {
@@ -244,23 +258,17 @@ export class HoverManager {
   private showEciDistAndVel_(sat: DetailedSatellite) {
     if (settingsManager.isEciOnHover) {
       this.satHoverBoxNode3.innerHTML =
-        `X: ${
-          sat.position.x.toFixed(2)
+        `X: ${sat.position.x.toFixed(2)
         } km` +
-        ` Y: ${
-          sat.position.y.toFixed(2)
+        ` Y: ${sat.position.y.toFixed(2)
         } km` +
-        ` Z: ${
-          sat.position.z.toFixed(2)
+        ` Z: ${sat.position.z.toFixed(2)
         } km` +
-        `XDot: ${
-          sat.velocity.x.toFixed(2)
+        `XDot: ${sat.velocity.x.toFixed(2)
         } km/s` +
-        ` YDot: ${
-          sat.velocity.y.toFixed(2)
+        ` YDot: ${sat.velocity.y.toFixed(2)
         } km/s` +
-        ` ZDot: ${
-          sat.velocity.z.toFixed(2)
+        ` ZDot: ${sat.velocity.z.toFixed(2)
         } km/s`;
     } else {
       this.satHoverBoxNode3.innerHTML = '';
@@ -270,18 +278,12 @@ export class HoverManager {
 
   private showEciVel_(sat: DetailedSatellite) {
     this.satHoverBoxNode3.innerHTML =
-      `X: ${
-        sat.position.x.toFixed(2)
-      } Y: ${
-        sat.position.y.toFixed(2)
-      } Z: ${
-        sat.position.z.toFixed(2)
-      }X: ${
-        sat.velocity.x.toFixed(2)
-      } Y: ${
-        sat.velocity.y.toFixed(2)
-      } Z: ${
-        sat.velocity.z.toFixed(2)}`;
+      `X: ${sat.position.x.toFixed(2)
+      } Y: ${sat.position.y.toFixed(2)
+      } Z: ${sat.position.z.toFixed(2)
+      }X: ${sat.velocity.x.toFixed(2)
+      } Y: ${sat.velocity.y.toFixed(2)
+      } Z: ${sat.velocity.z.toFixed(2)}`;
   }
 
   private showHoverDetails_(id: number, satX?: number, satY?: number) {
@@ -341,7 +343,7 @@ export class HoverManager {
 
   /**
    * The internal method that actually updates the hover.
-   * TODO: Rename this 
+   * TODO: Rename this
    */
   private updateHover_(id: number) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();

@@ -139,7 +139,7 @@
     "webpack": "^5.93.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
-    "webpackbar": "^5.0.2",
+    "webpackbar": "^7.0.0",
     "worker-loader": "^3.0.8"
   },
   "dependencies": {

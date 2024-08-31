@@ -57,7 +57,7 @@ export class SensorManager {
 
   getSensorList(list: string) {
     for (const sensorGroup in sensorGroups) {
-      if (sensorGroup === list) {
+      if (sensorGroups[sensorGroup].name === list) {
         return sensorGroups[sensorGroup].list.map((sensor) => sensors[sensor]);
       }
     }

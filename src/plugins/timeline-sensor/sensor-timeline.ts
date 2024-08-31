@@ -28,17 +28,17 @@ export class SensorTimeline extends KeepTrackPlugin {
   private canvasStatic_: HTMLCanvasElement;
   private ctxStatic_: CanvasRenderingContext2D;
   private drawEvents_: { [key: string]: (mouseX: number, mouseY: number) => boolean } = {};
-  private allSensorLists_ = keepTrackApi.getSensorManager().sensorListSsn.concat(
-    keepTrackApi.getSensorManager().sensorListMw,
-    keepTrackApi.getSensorManager().sensorListMda,
-    keepTrackApi.getSensorManager().sensorListLeoLabs,
-    keepTrackApi.getSensorManager().sensorListEsoc,
-    keepTrackApi.getSensorManager().sensorListRus,
-    keepTrackApi.getSensorManager().sensorListPrc,
-    keepTrackApi.getSensorManager().sensorListOther,
+  private allSensorLists_ = keepTrackApi.getSensorManager().getSensorList('ssn').concat(
+    keepTrackApi.getSensorManager().getSensorList('mw'),
+    keepTrackApi.getSensorManager().getSensorList('md'),
+    keepTrackApi.getSensorManager().getSensorList('leolabs'),
+    keepTrackApi.getSensorManager().getSensorList('esoc'),
+    keepTrackApi.getSensorManager().getSensorList('rus'),
+    keepTrackApi.getSensorManager().getSensorList('prc'),
+    keepTrackApi.getSensorManager().getSensorList('other'),
   );
   private enabledSensors_: DetailedSensor[] = this.allSensorLists_.filter((s) =>
-    keepTrackApi.getSensorManager().sensorListMw.includes(s),
+    keepTrackApi.getSensorManager().getSensorList('mw').includes(s),
   );
   private lengthOfLookAngles_ = 6 as Hours;
   private lengthOfBadPass_ = 120 as Seconds;

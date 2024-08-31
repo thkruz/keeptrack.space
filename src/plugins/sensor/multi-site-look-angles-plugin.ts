@@ -1,3 +1,4 @@
+import { sensors } from '@app/catalogs/sensors';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -9,6 +10,7 @@ import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, MINUTES_PER_DAY, SatelliteRecord, Seconds, TAU } from 'ootk';
+import { sensorGroups } from '../../catalogs/sensor-groups';
 import { KeepTrackPlugin, SideMenuSettingsOptions, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -17,32 +19,35 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
-  private sensorList_ = keepTrackApi.getSensorManager().sensorListSsn.concat(
-    keepTrackApi.getSensorManager().sensorListMw,
-    keepTrackApi.getSensorManager().sensorListMda,
-    keepTrackApi.getSensorManager().sensorListLeoLabs,
-    keepTrackApi.getSensorManager().sensorListEsoc,
-    keepTrackApi.getSensorManager().sensorListRus,
-    keepTrackApi.getSensorManager().sensorListPrc,
-    keepTrackApi.getSensorManager().sensorListOther,
-  );
+  private sensorList_: DetailedSensor[] = [];
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = false;
 
   // Settings
   private lengthOfLookAngles_ = 1; // Days
   private angleCalculationInterval_ = <Seconds>30;
-  private disabledSensors_: DetailedSensor[] = this.sensorList_.filter((s) =>
-    !keepTrackApi.getSensorManager().sensorListMw.includes(s),
-  );
+  private disabledSensors_: DetailedSensor[] = [];
 
   constructor() {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    this.sensorList_ = sensorGroups.map((group) => group.list).flat().map((sensor) => {
+      if (sensors[sensor] instanceof DetailedSensor) {
+        return sensors[sensor];
+      }
+      console.error(`Sensor ${sensor} not found in sensor catalog`);
+
+      return null;
+    }).filter((sensor) => sensor !== null);
 
     // remove duplicates in sensorList
-    this.sensorList_ = this.sensorList_.filter(
-      (sensor, index, self) => index === self.findIndex((t) => t.uiName === sensor.uiName),
+    this.sensorList_ = this.sensorList_.filter((sensor, index, self) =>
+      index === self.findIndex((s) => s.objName === sensor.objName),
+    );
+
+    // Default to only the MW sensors being enabled
+    this.disabledSensors_ = this.sensorList_.filter((sensor) =>
+      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName),
     );
   }
 
